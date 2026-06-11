@@ -8,18 +8,19 @@
  *
  * API endpoints:
  *   GET /api/v2/reviews/user/{userId}       — reviews received by current user
+ *   GET /api/v2/reviews/given               — reviews written by current user
  *   GET /api/v2/reviews/pending             — exchanges awaiting a review
  *   DELETE /api/v2/reviews/{id}             — delete own review
  */
 
 import { useState, useCallback, useEffect, useRef, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import Star from 'lucide-react/icons/star';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Trash2 from 'lucide-react/icons/trash-2';
-import { useAuth } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
@@ -48,6 +49,15 @@ interface Review {
   is_liked?: boolean;
   likes_count?: number;
   comments_count?: number;
+}
+
+/** A review written by the current user — `receiver` is the member it's about. */
+interface GivenReview {
+  id: number;
+  rating: number;
+  comment?: string | null;
+  receiver: Reviewer;
+  created_at: string;
 }
 
 interface PendingReview {
@@ -101,14 +111,14 @@ function ReviewCard({
     });
     if (!ok) return;
     setDeleting(true);
-    try {
-      await api.delete(`/v2/reviews/${review.id}`);
+    // The api client never rejects — branch on response.success.
+    const res = await api.delete(`/v2/reviews/${review.id}`);
+    setDeleting(false);
+    if (res.success) {
       toast.success(t('reviews:review_card.delete_success'));
       onDelete?.(review.id);
-    } catch {
-      toast.error(t('reviews:review_card.delete_error'));
-    } finally {
-      setDeleting(false);
+    } else {
+      toast.error(res.error || t('reviews:review_card.delete_error'));
     }
   }, [review.id, t, toast, onDelete, confirm]);
 
@@ -167,6 +177,90 @@ function ReviewCard({
   );
 }
 
+// ─── Given Review Card ────────────────────────────────────────────────────────
+
+function GivenReviewCard({
+  review,
+  onDelete,
+}: {
+  review: GivenReview;
+  onDelete: (id: number) => void;
+}): JSX.Element {
+  const { t } = useTranslation(['reviews', 'common']);
+  const { tenantPath } = useTenant();
+  const [deleting, setDeleting] = useState(false);
+  const toast = useToast();
+  const confirm = useConfirm();
+
+  const handleDelete = useCallback(async () => {
+    const ok = await confirm({
+      title: t('reviews:review_card.delete_confirm'),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) return;
+    setDeleting(true);
+    // The api client never rejects — branch on response.success.
+    const res = await api.delete(`/v2/reviews/${review.id}`);
+    setDeleting(false);
+    if (res.success) {
+      toast.success(t('reviews:review_card.delete_success'));
+      onDelete(review.id);
+    } else {
+      toast.error(res.error || t('reviews:review_card.delete_error'));
+    }
+  }, [review.id, t, toast, onDelete, confirm]);
+
+  const avatarUrl = resolveAvatarUrl(review.receiver.avatar_url ?? review.receiver.avatar);
+
+  return (
+    <div className="flex gap-3 p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+      <Avatar
+        src={avatarUrl ?? undefined}
+        name={review.receiver.name}
+        size="sm"
+        className="shrink-0 mt-0.5"
+      />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            {review.receiver.id ? (
+              <Link
+                to={tenantPath(`/profile/${review.receiver.id}`)}
+                className="text-sm font-medium text-[var(--color-text)] hover:underline"
+              >
+                {review.receiver.name}
+              </Link>
+            ) : (
+              <p className="text-sm font-medium text-[var(--color-text)]">{review.receiver.name}</p>
+            )}
+            <StarRating rating={review.rating} />
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs text-[var(--color-text-muted)]">
+              {new Date(review.created_at).toLocaleDateString()}
+            </span>
+            <Button
+              isIconOnly
+              size="sm"
+              variant="light"
+              color="danger"
+              isLoading={deleting}
+              onPress={handleDelete}
+              aria-label={t('reviews:review_card.delete')}
+            >
+              <Trash2 className="w-4 h-4" aria-hidden="true" />
+            </Button>
+          </div>
+        </div>
+        {review.comment && (
+          <p className="mt-1.5 text-sm text-[var(--color-text-muted)] leading-relaxed">{review.comment}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Empty state ──────────────────────────────────────────────────────────────
 
 function EmptyState({ message, subtitle }: { message: string; subtitle: string }): JSX.Element {
@@ -201,6 +295,14 @@ export default function ReviewsPage(): JSX.Element {
   const [receivedHasMore, setReceivedHasMore] = useState(false);
   const [receivedLoadingMore, setReceivedLoadingMore] = useState(false);
 
+  // Reviews given state
+  const [given, setGiven] = useState<GivenReview[]>([]);
+  const [givenLoading, setGivenLoading] = useState(true);
+  const [givenError, setGivenError] = useState(false);
+  const [givenCursor, setGivenCursor] = useState<string | null>(null);
+  const [givenHasMore, setGivenHasMore] = useState(false);
+  const [givenLoadingMore, setGivenLoadingMore] = useState(false);
+
   // Pending reviews state
   const [pending, setPending] = useState<PendingReview[]>([]);
   const [pendingLoading, setPendingLoading] = useState(true);
@@ -217,24 +319,42 @@ export default function ReviewsPage(): JSX.Element {
     const isLoadMore = !!cursor;
     if (isLoadMore) setReceivedLoadingMore(true); else setReceivedLoading(true);
     setReceivedError(false);
-    try {
-      const qs = new URLSearchParams({ per_page: '20' });
-      if (cursor) qs.set('cursor', cursor);
-      const res = await api.get<{ items: Review[]; cursor: string | null; has_more: boolean }>(
-        `/v2/reviews/user/${user.id}?${qs}`,
-      );
-      const payload = res.data;
-      const items: Review[] = payload?.items ?? [];
+    const qs = new URLSearchParams({ per_page: '20' });
+    if (cursor) qs.set('cursor', cursor);
+    // respondWithCollection unwraps to data = items[]; cursor/has_more in meta.
+    const res = await api.get<Review[]>(`/v2/reviews/user/${user.id}?${qs}`);
+    if (res.success) {
+      const items: Review[] = Array.isArray(res.data) ? res.data : [];
       setReceived(prev => isLoadMore ? [...prev, ...items] : items);
-      setReceivedCursor(payload?.cursor ?? null);
-      setReceivedHasMore(payload?.has_more ?? false);
-    } catch {
-      if (!isLoadMore) setReceivedError(true);
-      else toast.error(t('load_error'));
-    } finally {
-      if (isLoadMore) setReceivedLoadingMore(false); else setReceivedLoading(false);
+      setReceivedCursor(res.meta?.cursor ?? null);
+      setReceivedHasMore(res.meta?.has_more ?? false);
+    } else if (!isLoadMore) {
+      setReceivedError(true);
+    } else {
+      toast.error(res.error || t('load_error'));
     }
+    if (isLoadMore) setReceivedLoadingMore(false); else setReceivedLoading(false);
   }, [user?.id, t, toast]);
+
+  const fetchGiven = useCallback(async (cursor?: string | null) => {
+    const isLoadMore = !!cursor;
+    if (isLoadMore) setGivenLoadingMore(true); else setGivenLoading(true);
+    setGivenError(false);
+    const qs = new URLSearchParams({ per_page: '20' });
+    if (cursor) qs.set('cursor', cursor);
+    const res = await api.get<GivenReview[]>(`/v2/reviews/given?${qs}`);
+    if (res.success) {
+      const items: GivenReview[] = Array.isArray(res.data) ? res.data : [];
+      setGiven(prev => isLoadMore ? [...prev, ...items] : items);
+      setGivenCursor(res.meta?.cursor ?? null);
+      setGivenHasMore(res.meta?.has_more ?? false);
+    } else if (!isLoadMore) {
+      setGivenError(true);
+    } else {
+      toast.error(res.error || t('load_error'));
+    }
+    if (isLoadMore) setGivenLoadingMore(false); else setGivenLoading(false);
+  }, [t, toast]);
 
   const fetchPending = useCallback(async () => {
     setPendingLoading(true);
@@ -252,8 +372,9 @@ export default function ReviewsPage(): JSX.Element {
 
   useEffect(() => {
     fetchReceived();
+    fetchGiven();
     fetchPending();
-  }, [fetchReceived, fetchPending]);
+  }, [fetchReceived, fetchGiven, fetchPending]);
 
   // Resolve the email deep link to a specific pending review and open the modal.
   // Uses the transaction_id filter so the target is found even when the user has
@@ -284,6 +405,12 @@ export default function ReviewsPage(): JSX.Element {
   const handleReviewWritten = useCallback((pendingItem: PendingReview) => {
     setPending(prev => prev.filter(p => p.exchange_id !== pendingItem.exchange_id));
     setReviewTarget(null);
+    // The new review now belongs in the Given tab.
+    fetchGiven();
+  }, [fetchGiven]);
+
+  const handleGivenDeleted = useCallback((id: number) => {
+    setGiven(prev => prev.filter(r => r.id !== id));
   }, []);
 
   if (error) {
@@ -291,7 +418,7 @@ export default function ReviewsPage(): JSX.Element {
       <div role="alert" className="max-w-2xl mx-auto p-6 text-center">
         <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-danger" aria-hidden="true" />
         <p className="text-[var(--color-text-muted)]">{t('load_error')}</p>
-        <Button className="mt-4" onPress={() => { setError(null); fetchReceived(); fetchPending(); }}>{t('load_more')}</Button>
+        <Button className="mt-4" onPress={() => { setError(null); fetchReceived(); fetchGiven(); fetchPending(); }}>{t('load_more')}</Button>
       </div>
     );
   }
@@ -343,6 +470,50 @@ export default function ReviewsPage(): JSX.Element {
                   className="w-full"
                   isLoading={receivedLoadingMore}
                   onPress={() => fetchReceived(receivedCursor)}
+                >
+                  {t('load_more')}
+                </Button>
+              )}
+            </div>
+          )}
+        </Tab>
+
+        {/* ── Given ─────────────────────────────────────────────────── */}
+        <Tab
+          key="given"
+          title={
+            <span className="flex items-center gap-1.5">
+              {t('tabs.given')}
+              {given.length > 0 && (
+                <Chip size="sm" variant="flat">{given.length}</Chip>
+              )}
+            </span>
+          }
+        >
+          {givenLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 3 }, (_, i) => (
+                <Skeleton key={i} className="h-24 rounded-xl" />
+              ))}
+            </div>
+          ) : givenError ? (
+            <div className="text-center py-8">
+              <p className="text-[var(--color-text-muted)]">{t('load_error')}</p>
+              <Button className="mt-3" size="sm" onPress={() => fetchGiven()}>{t('load_more')}</Button>
+            </div>
+          ) : given.length === 0 ? (
+            <EmptyState message={t('given.empty')} subtitle={t('given.empty_subtitle')} />
+          ) : (
+            <div className="space-y-3">
+              {given.map(review => (
+                <GivenReviewCard key={review.id} review={review} onDelete={handleGivenDeleted} />
+              ))}
+              {givenHasMore && (
+                <Button
+                  variant="flat"
+                  className="w-full"
+                  isLoading={givenLoadingMore}
+                  onPress={() => fetchGiven(givenCursor)}
                 >
                   {t('load_more')}
                 </Button>

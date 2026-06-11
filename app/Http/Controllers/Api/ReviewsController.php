@@ -14,6 +14,8 @@ use Illuminate\Validation\ValidationException;
  * ReviewsController - User reviews for completed exchanges.
  *
  * Endpoints (v2):
+ *   GET    /api/v2/reviews/pending               pending()
+ *   GET    /api/v2/reviews/given                 given()
  *   GET    /api/v2/reviews/user/{userId}        userReviews()
  *   GET    /api/v2/reviews/user/{userId}/stats   userStats()
  *   GET    /api/v2/reviews/{id}                  show()
@@ -48,6 +50,38 @@ class ReviewsController extends BaseApiController
         $result = $this->reviewService->getPendingReviews($userId, $filters);
 
         return $this->respondWithData($result['items'] ?? [], $result['meta'] ?? null);
+    }
+
+    // -----------------------------------------------------------------
+    //  GET /api/v2/reviews/given
+    // -----------------------------------------------------------------
+
+    /**
+     * List reviews WRITTEN BY the current user with cursor pagination.
+     *
+     * Excludes reviews the author has deleted (deleted_by_author_at set).
+     * Query params: per_page (default 20, max 100), cursor.
+     */
+    public function given(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('reviews_given', 60, 60);
+
+        $filters = [
+            'limit' => $this->queryInt('per_page', 20, 1, 100),
+        ];
+        if ($this->query('cursor')) {
+            $filters['cursor'] = $this->query('cursor');
+        }
+
+        $result = $this->reviewService->getGivenByUser($userId, $filters);
+
+        return $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'] ?? null,
+            $filters['limit'],
+            $result['has_more'] ?? false
+        );
     }
 
     // -----------------------------------------------------------------

@@ -118,6 +118,78 @@ class ReviewService
     }
 
     /**
+     * Get reviews WRITTEN BY a specific user (as reviewer) with cursor pagination.
+     *
+     * Powers the Reviews page "Given" tab. Tenant-scoped via the global
+     * TenantScope. Excludes reviews the author has deleted
+     * (deleted_by_author_at IS NOT NULL).
+     *
+     * @param int   $userId  The user whose written reviews to fetch
+     * @param array $filters Optional: limit, cursor
+     * @return array{items: array, cursor: string|null, has_more: bool}
+     */
+    public function getGivenByUser(int $userId, array $filters = []): array
+    {
+        $limit = min((int) ($filters['limit'] ?? 20), 100);
+        $cursor = $filters['cursor'] ?? null;
+
+        $query = $this->review->newQuery()
+            ->with(['receiver:id,first_name,last_name,avatar_url,organization_name,profile_type'])
+            ->where('reviewer_id', $userId)
+            ->whereNull('deleted_by_author_at')
+            ->orderByDesc('id');
+
+        if ($cursor !== null) {
+            $cursorId = base64_decode($cursor, true);
+            if ($cursorId !== false) {
+                $query->where('id', '<', (int) $cursorId);
+            }
+        }
+
+        $items = $query->limit($limit + 1)->get();
+        $hasMore = $items->count() > $limit;
+        if ($hasMore) {
+            $items->pop();
+        }
+
+        $nextCursor = $hasMore && $items->isNotEmpty()
+            ? base64_encode((string) $items->last()->id)
+            : null;
+
+        // Format reviews to match the React contract — the `receiver` block
+        // describes the member the review is ABOUT.
+        $formatted = $items->map(function (Review $r) {
+            $receiver = $r->receiver;
+            $receiverName = ($receiver && $receiver->profile_type === 'organisation' && $receiver->organization_name)
+                ? $receiver->organization_name
+                : trim(($receiver->first_name ?? '') . ' ' . ($receiver->last_name ?? ''));
+
+            return [
+                'id'          => $r->id,
+                'rating'      => $r->rating,
+                'comment'     => $r->comment,
+                'review_type' => $r->review_type ?? 'local',
+                'status'      => $r->status,
+                'receiver'    => [
+                    'id'         => $receiver?->id,
+                    'name'       => $receiverName,
+                    'first_name' => $receiver?->first_name,
+                    'last_name'  => $receiver?->last_name,
+                    'avatar'     => $receiver?->avatar_url,
+                    'avatar_url' => $receiver?->avatar_url,
+                ],
+                'created_at' => $r->created_at?->toIso8601String(),
+            ];
+        })->all();
+
+        return [
+            'items'    => array_values($formatted),
+            'cursor'   => $nextCursor,
+            'has_more' => $hasMore,
+        ];
+    }
+
+    /**
      * Get the current user's PENDING reviews — completed transactions where the
      * user has not yet reviewed their counterparty.
      *

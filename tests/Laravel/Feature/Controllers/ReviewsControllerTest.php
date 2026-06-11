@@ -336,6 +336,93 @@ class ReviewsControllerTest extends TestCase
     }
 
     // ------------------------------------------------------------------
+    //  GIVEN (reviews written by the current user)
+    // ------------------------------------------------------------------
+
+    public function test_given_returns_only_own_written_reviews(): void
+    {
+        $user = $this->authenticatedUser();
+        $other = User::factory()->forTenant($this->testTenantId)->create();
+
+        $mine = Review::factory()->forTenant($this->testTenantId)->create([
+            'reviewer_id' => $user->id,
+            'receiver_id' => $other->id,
+            'status' => 'approved',
+        ]);
+
+        // Written by someone else — must NOT appear in my given list.
+        $theirs = Review::factory()->forTenant($this->testTenantId)->create([
+            'reviewer_id' => $other->id,
+            'receiver_id' => $user->id,
+            'status' => 'approved',
+        ]);
+
+        $response = $this->apiGet('/v2/reviews/given');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure(['data', 'meta']);
+
+        $ids = array_column($response->json('data'), 'id');
+        $this->assertContains($mine->id, $ids);
+        $this->assertNotContains($theirs->id, $ids);
+
+        // Receiver block describes the member the review is about.
+        $item = collect($response->json('data'))->firstWhere('id', $mine->id);
+        $this->assertSame($other->id, (int) $item['receiver']['id']);
+    }
+
+    public function test_given_excludes_author_deleted_reviews(): void
+    {
+        $user = $this->authenticatedUser();
+        $other = User::factory()->forTenant($this->testTenantId)->create();
+
+        $deleted = Review::factory()->forTenant($this->testTenantId)->create([
+            'reviewer_id' => $user->id,
+            'receiver_id' => $other->id,
+            'status' => 'rejected',
+        ]);
+        // deleted_by_author_at is not in $fillable — set it directly.
+        \Illuminate\Support\Facades\DB::table('reviews')
+            ->where('id', $deleted->id)
+            ->update(['deleted_by_author_at' => now()]);
+
+        $kept = Review::factory()->forTenant($this->testTenantId)->create([
+            'reviewer_id' => $user->id,
+            'receiver_id' => $other->id,
+            'status' => 'approved',
+        ]);
+
+        $response = $this->apiGet('/v2/reviews/given');
+
+        $response->assertStatus(200);
+        $ids = array_column($response->json('data'), 'id');
+        $this->assertContains($kept->id, $ids);
+        $this->assertNotContains($deleted->id, $ids, 'Author-deleted reviews must not appear in the given list');
+    }
+
+    public function test_given_is_tenant_scoped(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $crossTenant = Review::factory()->forTenant(999)->create([
+            'reviewer_id' => $user->id, // Same reviewer ID in another tenant
+        ]);
+
+        $response = $this->apiGet('/v2/reviews/given');
+
+        $response->assertStatus(200);
+        $ids = array_column($response->json('data'), 'id');
+        $this->assertNotContains($crossTenant->id, $ids, 'Given list must be tenant-scoped');
+    }
+
+    public function test_given_requires_authentication(): void
+    {
+        $response = $this->apiGet('/v2/reviews/given');
+
+        $response->assertStatus(401);
+    }
+
+    // ------------------------------------------------------------------
     //  TENANT ISOLATION
     // ------------------------------------------------------------------
 
