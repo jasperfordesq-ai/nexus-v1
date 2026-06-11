@@ -2066,10 +2066,11 @@ Route::post('/v2/admin/volunteering/approvals/{id}/approve', [\App\Http\Controll
 Route::post('/v2/admin/volunteering/approvals/{id}/decline', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'declineApplication']);
 Route::post('/v2/admin/volunteering/send-shift-reminders', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'sendShiftReminders']);
 Route::get('/v2/admin/volunteering/expenses', [\App\Http\Controllers\Api\VolunteerExpenseController::class, 'adminExpenses']);
-Route::put('/v2/admin/volunteering/expenses/{id}', [\App\Http\Controllers\Api\VolunteerExpenseController::class, 'reviewExpense']);
 Route::get('/v2/admin/volunteering/expenses/export', [\App\Http\Controllers\Api\VolunteerExpenseController::class, 'exportExpenses']);
 Route::get('/v2/admin/volunteering/expenses/policies', [\App\Http\Controllers\Api\VolunteerExpenseController::class, 'getExpensePolicies']);
 Route::put('/v2/admin/volunteering/expenses/policies', [\App\Http\Controllers\Api\VolunteerExpenseController::class, 'updateExpensePolicy']);
+// NOTE: the {id} route must stay below the literal /export and /policies routes or it shadows them
+Route::put('/v2/admin/volunteering/expenses/{id}', [\App\Http\Controllers\Api\VolunteerExpenseController::class, 'reviewExpense']);
 Route::get('/v2/admin/volunteering/guardian-consents', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'adminGuardianConsents']);
 Route::get('/v2/admin/volunteering/training', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'adminTraining']);
 Route::put('/v2/admin/volunteering/training/{id}/verify', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'verifyTraining']);
