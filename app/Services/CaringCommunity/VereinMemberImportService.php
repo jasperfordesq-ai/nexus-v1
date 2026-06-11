@@ -146,7 +146,7 @@ class VereinMemberImportService
                 }
 
                 DB::table('org_members')->updateOrInsert(
-                    ['organization_id' => $organizationId, 'user_id' => $userId],
+                    ['organization_id' => $organizationId, 'org_type' => 'volunteer', 'user_id' => $userId],
                     [
                         'tenant_id' => $tenantId,
                         'role' => $item['role'],
@@ -199,7 +199,7 @@ class VereinMemberImportService
         );
 
         DB::table('org_members')->updateOrInsert(
-            ['organization_id' => $organizationId, 'user_id' => $userId],
+            ['organization_id' => $organizationId, 'org_type' => 'volunteer', 'user_id' => $userId],
             [
                 'tenant_id' => $tenantId,
                 'role' => 'admin',
@@ -330,6 +330,7 @@ class VereinMemberImportService
         return DB::table('org_members')
             ->where('tenant_id', $tenantId)
             ->where('organization_id', $organizationId)
+            ->where('org_type', 'volunteer')
             ->where('user_id', $userId)
             ->where('status', 'active')
             ->exists();

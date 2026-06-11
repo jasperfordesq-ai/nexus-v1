@@ -76,12 +76,14 @@ export function GroupSignUpTab() {
   // Add member modal
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedReservationId, setSelectedReservationId] = useState<number | null>(null);
-  const [newMemberEmail, setNewMemberEmail] = useState('');
+  const [memberQuery, setMemberQuery] = useState('');
+  const [selectedMember, setSelectedMember] = useState<{ id: number; name: string } | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
 
-  // Debounced member search state
-  const [searchResults, setSearchResults] = useState<{ id: number; name: string; email: string }[]>([]);
+  // Debounced member search state — /v2/users never returns email, so members
+  // are matched by selecting a suggestion (id), not by typing an email.
+  const [searchResults, setSearchResults] = useState<{ id: number; name: string }[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchAbortRef = useRef<AbortController | null>(null);
@@ -146,7 +148,7 @@ export function GroupSignUpTab() {
       searchAbortRef.current = controller;
 
       try {
-        const searchRes = await api.get<{ id: number; name: string; email: string }[]>(
+        const searchRes = await api.get<{ id: number; name: string }[]>(
           `/v2/users?q=${encodeURIComponent(query.trim())}&limit=5`
         );
         if (controller.signal.aborted) return;
@@ -169,7 +171,8 @@ export function GroupSignUpTab() {
 
   const openAddMemberModal = (reservationId: number) => {
     setSelectedReservationId(reservationId);
-    setNewMemberEmail('');
+    setMemberQuery('');
+    setSelectedMember(null);
     setAddError(null);
     setSearchResults([]);
     setIsSearching(false);
@@ -185,48 +188,22 @@ export function GroupSignUpTab() {
   }, []);
 
   const handleAddMember = async () => {
-    if (!selectedReservationId || !newMemberEmail.trim()) return;
+    if (!selectedReservationId || !selectedMember) return;
 
     try {
       setIsAdding(true);
       setAddError(null);
 
-      // Use cached search results if available, otherwise do a fresh lookup
-      let matchedUser: { id: number; email: string } | undefined;
-      const emailLower = newMemberEmail.trim().toLowerCase();
-
-      if (searchResults.length > 0) {
-        matchedUser = searchResults.find((u) => u.email?.toLowerCase() === emailLower);
-      }
-
-      // Fall back to a direct search if no cached match
-      if (!matchedUser) {
-        const searchRes = await api.get<{ id: number; email: string }[]>(
-          `/v2/users?q=${encodeURIComponent(newMemberEmail.trim())}&limit=5`
-        );
-
-        if (!searchRes.success || !Array.isArray(searchRes.data)) {
-          setAddError(tRef.current('group_signup.lookup_error'));
-          return;
-        }
-
-        matchedUser = searchRes.data.find((u) => u.email?.toLowerCase() === emailLower);
-      }
-
-      if (!matchedUser) {
-        setAddError(tRef.current('group_signup.no_member_found'));
-        return;
-      }
-
       const response = await api.post(
         `/v2/volunteering/group-reservations/${selectedReservationId}/members`,
-        { user_id: matchedUser.id }
+        { user_id: selectedMember.id }
       );
 
       if (response.success) {
         toastRef.current.success(tRef.current('group_signup.member_added'));
         onClose();
-        setNewMemberEmail('');
+        setMemberQuery('');
+        setSelectedMember(null);
         setSearchResults([]);
         load();
       } else {
@@ -450,16 +427,17 @@ export function GroupSignUpTab() {
           <ModalHeader className="text-theme-primary">{t('group_signup.add_group_member')}</ModalHeader>
           <ModalBody className="space-y-4">
             <p className="text-sm text-theme-muted">
-              {t('group_signup.add_member_description')}
+              {t('group_signup.search_description')}
             </p>
             <Input
-              type="email"
-              label={t('group_signup.email_label')}
-              placeholder={t('group_signup.email_placeholder')}
-              value={newMemberEmail}
+              type="text"
+              label={t('group_signup.search_label')}
+              placeholder={t('group_signup.search_placeholder')}
+              value={memberQuery}
               onChange={(e) => {
                 const val = e.target.value;
-                setNewMemberEmail(val);
+                setMemberQuery(val);
+                setSelectedMember(null);
                 searchMembers(val);
               }}
               isRequired
@@ -471,6 +449,9 @@ export function GroupSignUpTab() {
             {isSearching && (
               <p className="text-xs text-theme-subtle">{t('group_signup.searching')}</p>
             )}
+            {!isSearching && !selectedMember && memberQuery.trim().length >= 2 && searchResults.length === 0 && (
+              <p className="text-xs text-theme-subtle">{t('group_signup.no_results')}</p>
+            )}
             {!isSearching && searchResults.length > 0 && (
               <div className="space-y-1">
                 {searchResults.map((user) => (
@@ -479,12 +460,12 @@ export function GroupSignUpTab() {
                     variant="tertiary"
                     className="min-h-10 w-full min-w-0 justify-start rounded-lg px-3 py-2 text-left text-sm text-theme-primary"
                     onPress={() => {
-                      setNewMemberEmail(user.email);
+                      setSelectedMember({ id: user.id, name: user.name });
+                      setMemberQuery(user.name);
                       setSearchResults([]);
                     }}
                   >
                     <span className="font-medium">{user.name}</span>
-                    <span className="text-theme-subtle ml-2">{user.email}</span>
                   </Button>
                 ))}
               </div>
@@ -499,7 +480,7 @@ export function GroupSignUpTab() {
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleAddMember}
               isLoading={isAdding}
-              isDisabled={!newMemberEmail.trim()}
+              isDisabled={!selectedMember}
               startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
             >
               {t('group_signup.add_member')}

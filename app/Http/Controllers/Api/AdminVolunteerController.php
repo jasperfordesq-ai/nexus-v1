@@ -220,29 +220,39 @@ class AdminVolunteerController extends BaseApiController
         }
 
         try {
-            // Stats summary — paid/paid_amount columns may not exist
-            $hasPaidCol = Schema::hasColumn('vol_logs', 'paid');
-            $paidSelect = $hasPaidCol
-                ? "COALESCE(SUM(CASE WHEN status = 'approved' AND paid = 1 THEN paid_amount ELSE 0 END), 0)"
+            // Hour payments live in vol_org_transactions (type=volunteer_payment,
+            // one row per vol_log_id) — vol_logs has no paid/paid_amount columns.
+            $hasPayments = $this->tableExists('vol_org_transactions');
+
+            $totalPaidSelect = $hasPayments
+                ? "(SELECT COALESCE(SUM(ABS(amount)), 0) FROM vol_org_transactions
+                     WHERE tenant_id = ? AND type = 'volunteer_payment' AND vol_log_id IS NOT NULL)"
                 : '0';
+            $statsParams = $hasPayments ? [$tenantId, $tenantId] : [$tenantId];
 
             $statsRow = DB::selectOne(
                 "SELECT
                     COALESCE(SUM(hours), 0) as total_hours,
                     COALESCE(SUM(CASE WHEN status = 'approved' THEN hours ELSE 0 END), 0) as approved_hours,
                     COALESCE(SUM(CASE WHEN status = 'pending' THEN hours ELSE 0 END), 0) as pending_hours,
-                    {$paidSelect} as total_paid
+                    {$totalPaidSelect} as total_paid
                  FROM vol_logs WHERE tenant_id = ?",
-                [$tenantId]
+                $statsParams
             );
 
-            $paidCols = $hasPaidCol ? ', vl.paid, vl.paid_amount' : ', 0 as paid, 0 as paid_amount';
+            $paidCols = $hasPayments
+                ? ', CASE WHEN vt.id IS NOT NULL THEN 1 ELSE 0 END as paid, COALESCE(ABS(vt.amount), 0) as paid_amount'
+                : ', 0 as paid, 0 as paid_amount';
+            $paymentJoin = $hasPayments
+                ? " LEFT JOIN vol_org_transactions vt ON vt.vol_log_id = vl.id
+                        AND vt.tenant_id = vl.tenant_id AND vt.type = 'volunteer_payment'"
+                : '';
             $sql = "SELECT vl.id, vl.hours, vl.status, vl.created_at{$paidCols},
                            u.first_name, u.last_name,
                            vo.name as org_name
                     FROM vol_logs vl
                     LEFT JOIN users u ON vl.user_id = u.id
-                    LEFT JOIN vol_organizations vo ON vl.organization_id = vo.id
+                    LEFT JOIN vol_organizations vo ON vl.organization_id = vo.id{$paymentJoin}
                     WHERE vl.tenant_id = ?";
             $params = [$tenantId];
 
@@ -584,13 +594,17 @@ class AdminVolunteerController extends BaseApiController
         }
 
         try {
+            // The admin UI splits this one response into pending/approved/declined
+            // tabs client-side — returning only 'pending' left the other two tabs
+            // permanently empty. Pending rows sort first so they are never crowded
+            // out by recent decisions.
             $results = DB::select(
                 "SELECT va.*, u.first_name, u.last_name, u.email, vo.title as opportunity_title
                  FROM vol_applications va
                  INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
                  LEFT JOIN users u ON va.user_id = u.id
-                 WHERE vo.tenant_id = ? AND va.tenant_id = ? AND va.status = 'pending'
-                 ORDER BY va.created_at DESC LIMIT 50",
+                 WHERE vo.tenant_id = ? AND va.tenant_id = ?
+                 ORDER BY (va.status = 'pending') DESC, va.created_at DESC LIMIT 150",
                 [$tenantId, $tenantId]
             );
             return $this->respondWithData(array_map(fn($r) => (array)$r, $results));
@@ -624,7 +638,7 @@ class AdminVolunteerController extends BaseApiController
                      LEFT JOIN (
                          SELECT organization_id, COUNT(*) as member_count
                          FROM org_members
-                         WHERE tenant_id = ? AND status = 'active'
+                         WHERE tenant_id = ? AND org_type = 'volunteer' AND status = 'active'
                          GROUP BY organization_id
                      ) mc ON mc.organization_id = vo.id
                      LEFT JOIN (
@@ -791,7 +805,7 @@ class AdminVolunteerController extends BaseApiController
              LEFT JOIN vol_logs vl ON vl.user_id = om.user_id
                 AND vl.organization_id = om.organization_id
                 AND vl.tenant_id = om.tenant_id
-             WHERE om.organization_id = ? AND om.tenant_id = ? AND om.status = 'active'
+             WHERE om.organization_id = ? AND om.org_type = 'volunteer' AND om.tenant_id = ? AND om.status = 'active'
              GROUP BY om.id, om.user_id, u.first_name, u.last_name, u.name, om.role
              ORDER BY om.id DESC
              LIMIT 100",
@@ -1000,7 +1014,9 @@ class AdminVolunteerController extends BaseApiController
     /** POST /api/v2/admin/volunteering/send-shift-reminders -- delegates to service (email sending) */
     public function sendShiftReminders(): JsonResponse
     {
-        $this->requireSuperAdmin();
+        // Tenant-scoped action exposed to all admins in the admin UI — a
+        // super-admin gate here just 403'd every legitimate use.
+        $this->requireAdmin();
         $this->ensureFeature();
 
         $tenantId = TenantContext::getId();
@@ -1025,7 +1041,8 @@ class AdminVolunteerController extends BaseApiController
      */
     public function adjustOrgWallet(int $id): JsonResponse
     {
-        $this->requireSuperAdmin();
+        // Tenant-scoped action exposed to all admins in the admin UI.
+        $this->requireAdmin();
         $this->ensureFeature();
         // Defence-in-depth: even super-admin adjustments should be rate-limited
         // so an accidental loop or compromised session cannot drain/inflate a
@@ -1103,7 +1120,8 @@ class AdminVolunteerController extends BaseApiController
      */
     public function orgWalletTransactions(int $id): JsonResponse
     {
-        $this->requireSuperAdmin();
+        // Tenant-scoped read exposed to all admins in the admin UI.
+        $this->requireAdmin();
         $this->ensureFeature();
 
         $filters = [

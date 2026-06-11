@@ -98,7 +98,7 @@ class OrgWalletController extends BaseApiController
 
         if (!$isSiteAdmin) {
             $orgRole = DB::selectOne(
-                'SELECT role FROM org_members WHERE organization_id = ? AND user_id = ? AND tenant_id = ? AND status = ?',
+                'SELECT role FROM org_members WHERE organization_id = ? AND org_type = \'community\' AND user_id = ? AND tenant_id = ? AND status = ?',
                 [$fromOrgId, $userId, $tenantId, 'active']
             );
 
@@ -171,6 +171,7 @@ class OrgWalletController extends BaseApiController
             $isMember = DB::table('org_members')
                 ->where('tenant_id', $tenantId)
                 ->where('organization_id', $orgId)
+                ->where('org_type', 'community')
                 ->where('user_id', $userId)
                 ->where('status', 'active')
                 ->exists();
@@ -183,6 +184,7 @@ class OrgWalletController extends BaseApiController
             ->join('users as u', 'om.user_id', '=', 'u.id')
             ->where('om.tenant_id', $tenantId)
             ->where('om.organization_id', $orgId)
+            ->where('om.org_type', 'community')
             ->where('om.status', 'active')
             ->orderByRaw("FIELD(om.role, 'owner', 'admin', 'member')")
             ->orderBy('u.first_name')
@@ -229,6 +231,7 @@ class OrgWalletController extends BaseApiController
             $isMember = DB::table('org_members')
                 ->where('tenant_id', $tenantId)
                 ->where('organization_id', $orgId)
+                ->where('org_type', 'community')
                 ->where('user_id', $userId)
                 ->where('status', 'active')
                 ->exists();

@@ -566,7 +566,8 @@
     "accept": "Annehmen",
     "reject": "Ablehnen",
     "cancel": "Abbrechen",
-    "reject_confirm": "Möchten Sie diese Tauschanfrage wirklich ablehnen?"
+    "reject_confirm": "Möchten Sie diese Tauschanfrage wirklich ablehnen?",
+    "accept_pending_admin": "Tausch angenommen — wartet auf Admin-Freigabe, bevor die Schichten wechseln."
   },
   "opportunity": {
     "search_placeholder": "Nach Name suchen...",
@@ -679,7 +680,11 @@
       "confirmed": "Bestätigt",
       "pending": "Ausstehend",
       "cancelled": "Abgesagt"
-    }
+    },
+    "search_label": "Mitgliedsname",
+    "search_placeholder": "Mitglieder nach Namen suchen…",
+    "search_description": "Suchen Sie das Mitglied, das Sie dieser Gruppenreservierung hinzufügen möchten, und wählen Sie es aus den Ergebnissen aus. Es erhält eine Einladung.",
+    "no_results": "Keine Mitglieder entsprechen Ihrer Suche."
   },
   "recommendations": {
     "title": "Für Sie empfohlen",

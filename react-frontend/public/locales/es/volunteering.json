@@ -566,7 +566,8 @@
     "accept": "Aceptar",
     "reject": "Rechazar",
     "cancel": "Cancelar",
-    "reject_confirm": "¿Está seguro de que desea rechazar esta solicitud de intercambio?"
+    "reject_confirm": "¿Está seguro de que desea rechazar esta solicitud de intercambio?",
+    "accept_pending_admin": "Intercambio aceptado: pendiente de aprobación del administrador antes de cambiar los turnos."
   },
   "opportunity": {
     "search_placeholder": "Buscar por nombre...",
@@ -679,7 +680,11 @@
       "confirmed": "Confirmado",
       "pending": "Pendiente",
       "cancelled": "Cancelado"
-    }
+    },
+    "search_label": "Nombre del miembro",
+    "search_placeholder": "Buscar miembros por nombre…",
+    "search_description": "Busca al miembro que quieres añadir a esta reserva de grupo y selecciónalo en los resultados. Recibirá una invitación para unirse.",
+    "no_results": "Ningún miembro coincide con tu búsqueda."
   },
   "recommendations": {
     "title": "Recomendado para ti",

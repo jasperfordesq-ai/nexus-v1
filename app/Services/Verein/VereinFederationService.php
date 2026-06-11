@@ -155,6 +155,7 @@ class VereinFederationService
         $sharedSources = DB::table('org_members as viewer_member')
             ->join('org_members as target_member', function ($join) use ($targetUserId) {
                 $join->on('target_member.organization_id', '=', 'viewer_member.organization_id')
+                    ->where('target_member.org_type', '=', 'volunteer')
                     ->where('target_member.user_id', '=', $targetUserId)
                     ->where('target_member.status', '=', 'active');
             })
@@ -164,6 +165,7 @@ class VereinFederationService
             ->where('target_member.tenant_id', $tenantId)
             ->where('source_org.tenant_id', $tenantId)
             ->where('source_consent.tenant_id', $tenantId)
+            ->where('viewer_member.org_type', 'volunteer')
             ->where('viewer_member.user_id', $viewerUserId)
             ->where('viewer_member.status', 'active')
             ->where('source_org.org_type', 'club')
@@ -186,6 +188,7 @@ class VereinFederationService
                 ->join('vol_organizations as target_org', 'target_org.id', '=', 'target_consent.organization_id')
                 ->leftJoin('org_members as target_existing_member', function ($join) use ($targetUserId, $tenantId) {
                     $join->on('target_existing_member.organization_id', '=', 'target_org.id')
+                        ->where('target_existing_member.org_type', '=', 'volunteer')
                         ->where('target_existing_member.user_id', '=', $targetUserId)
                         ->where('target_existing_member.tenant_id', '=', $tenantId)
                         ->where('target_existing_member.status', '=', 'active');
@@ -400,6 +403,7 @@ class VereinFederationService
         $isMember = DB::table('org_members')
             ->where('tenant_id', $tenantId)
             ->where('organization_id', $sourceOrgId)
+            ->where('org_type', 'volunteer')
             ->where('user_id', $inviteeUserId)
             ->where('status', 'active')
             ->exists();

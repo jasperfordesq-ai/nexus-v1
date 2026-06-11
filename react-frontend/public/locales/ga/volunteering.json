@@ -566,7 +566,8 @@
     "accept": "Glac",
     "reject": "Diúltaigh",
     "cancel": "Cealaigh",
-    "reject_confirm": "An bhfuil tú cinnte gur mhaith leat diúltú don iarratas babhtála seo?"
+    "reject_confirm": "An bhfuil tú cinnte gur mhaith leat diúltú don iarratas babhtála seo?",
+    "accept_pending_admin": "Glacadh leis an mbabhtáil — ag fanacht le ceadú riarthóra sula n-athraítear na sealanna."
   },
   "opportunity": {
     "search_placeholder": "Cuardaigh de réir ainm...",
@@ -679,7 +680,11 @@
       "confirmed": "Deimhnithe",
       "pending": "Ar feitheamh",
       "cancelled": "Cealaithe"
-    }
+    },
+    "search_label": "Ainm an bhaill",
+    "search_placeholder": "Cuardaigh baill de réir ainm…",
+    "search_description": "Cuardaigh an ball ba mhaith leat a chur leis an áirithint ghrúpa seo, ansin roghnaigh é as na torthaí. Gheobhaidh sé cuireadh le páirt a ghlacadh.",
+    "no_results": "Níl aon bhall ag teacht le do chuardach."
   },
   "recommendations": {
     "title": "Molta Duit",

@@ -2378,6 +2378,7 @@ return [
     'vol_expense_monthly_limit_exceeded' => 'This expense would exceed your monthly limit (:limit). Current month total: :total.',
     'vol_expense_receipt_required_above' => 'A receipt is required for expenses above :amount.',
     'vol_expense_review_status_invalid' => "Review status must be 'approved' or 'rejected'.",
+    'vol_expense_policy_not_found' => 'Expense policy not found.',
     'vol_expense_review_own_forbidden' => 'You cannot review your own expense.',
     'guardian_name_required' => 'Guardian name is required.',
     'guardian_email_required' => 'Guardian email is required.',

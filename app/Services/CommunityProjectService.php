@@ -185,7 +185,22 @@ class CommunityProjectService
             $items->pop();
         }
 
-        $formatted = $items->map(fn ($row) => $this->formatProject($row, $public))->all();
+        // Resolve the viewer's supported set in one query so has_supported is real
+        $supportedIds = [];
+        $viewerId = isset($filters['user_id']) ? (int) $filters['user_id'] : 0;
+        if ($viewerId > 0 && $items->isNotEmpty()) {
+            $supportedIds = DB::table('vol_community_project_supporters')
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $viewerId)
+                ->whereIn('project_id', $items->pluck('id')->all())
+                ->pluck('project_id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+        }
+
+        $formatted = $items->map(
+            fn ($row) => $this->formatProject($row, $public, in_array((int) $row->id, $supportedIds, true))
+        )->all();
 
         return [
             'items'    => $formatted,
@@ -237,7 +252,7 @@ class CommunityProjectService
     /**
      * Get a single proposal with supporter count and proposer info.
      */
-    public function getProposal(int $id, bool $public = false): ?array
+    public function getProposal(int $id, bool $public = false, ?int $viewerId = null): ?array
     {
         $tenantId = TenantContext::getId();
 
@@ -264,7 +279,13 @@ class CommunityProjectService
             return null;
         }
 
-        return $this->formatProject($row, $public);
+        $hasSupported = $viewerId !== null && $viewerId > 0 && DB::table('vol_community_project_supporters')
+            ->where('tenant_id', $tenantId)
+            ->where('project_id', $id)
+            ->where('user_id', $viewerId)
+            ->exists();
+
+        return $this->formatProject($row, $public, $hasSupported);
     }
 
     /**
@@ -452,13 +473,16 @@ class CommunityProjectService
             return false;
         }
 
-        // INSERT IGNORE handles the unique constraint on (project_id, user_id)
-        $inserted = DB::statement(
+        // INSERT IGNORE handles the unique constraint on (project_id, user_id).
+        // DB::statement() returns true even when 0 rows are inserted, so the
+        // counter must only bump when affectingStatement reports a real insert
+        // — otherwise repeat clicks inflate supporter_count indefinitely.
+        $inserted = DB::affectingStatement(
             "INSERT IGNORE INTO vol_community_project_supporters (tenant_id, project_id, user_id, supported_at) VALUES (?, ?, ?, NOW())",
             [$tenantId, $proposalId, $userId]
         );
 
-        if ($inserted) {
+        if ($inserted > 0) {
             DB::table('vol_community_projects')
                 ->where('id', $proposalId)
                 ->where('tenant_id', $tenantId)
@@ -468,7 +492,8 @@ class CommunityProjectService
                 ]);
         }
 
-        return $inserted;
+        // Already-a-supporter is an idempotent success, not a failure.
+        return true;
     }
 
     /**
@@ -499,7 +524,7 @@ class CommunityProjectService
     /**
      * Format a raw project row for API response.
      */
-    private function formatProject(object $row, bool $public = false): array
+    private function formatProject(object $row, bool $public = false, bool $hasSupported = false): array
     {
         $project = [
             'id'                => (int) $row->id,
@@ -520,7 +545,9 @@ class CommunityProjectService
             'upvotes'           => (int) ($row->supporter_count ?? 0),
             'supporter_count'   => (int) ($row->supporter_count ?? 0),
             'supporters_count'  => (int) ($row->supporter_count ?? 0),
-            'user_has_supported' => false,
+            // Frontend reads has_supported; user_has_supported kept for compat
+            'has_supported'      => $hasSupported,
+            'user_has_supported' => $hasSupported,
             'created_at'        => $row->created_at,
             'updated_at'        => $row->updated_at ?? null,
             'proposer'          => [

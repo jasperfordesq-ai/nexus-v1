@@ -118,12 +118,17 @@ export function ShiftSwapsTab() {
   const handleAccept = async (swapId: number) => {
     try {
       setActioningId(swapId);
-      const response = await api.put(`/v2/volunteering/swaps/${swapId}`, { action: 'accept' });
+      const response = await api.put<{ status?: string }>(`/v2/volunteering/swaps/${swapId}`, { action: 'accept' });
       if (response.success) {
+        // The backend reports the real outcome: swaps can land in
+        // admin_pending (tenant requires admin approval) instead of accepted.
+        const newStatus = response.data?.status === 'admin_pending' ? 'admin_pending' as const : 'accepted' as const;
         setSwaps((prev) =>
-          prev.map((s) => (s.id === swapId ? { ...s, status: 'accepted' as const } : s))
+          prev.map((s) => (s.id === swapId ? { ...s, status: newStatus } : s))
         );
-        toastRef.current.success(tRef.current('swaps.accept_success'));
+        toastRef.current.success(
+          tRef.current(newStatus === 'admin_pending' ? 'swaps.accept_pending_admin' : 'swaps.accept_success')
+        );
       } else {
         toastRef.current.error(tRef.current('swaps.accept_failed'));
       }

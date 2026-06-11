@@ -72,16 +72,15 @@ class VolunteerService
             });
         }
 
-        if (is_string($cursor) && ($cid = base64_decode($cursor, true)) !== false) {
-            $query->where('id', '<', (int) $cid);
-        }
-
         // Proximity / radius filter using Haversine formula
         $nearLat = isset($filters['near_lat']) ? (float) $filters['near_lat'] : null;
         $nearLng = isset($filters['near_lng']) ? (float) $filters['near_lng'] : null;
         $radiusKm = isset($filters['radius_km']) ? (float) $filters['radius_km'] : null;
+        $proximity = $nearLat !== null && $nearLng !== null && $radiusKm !== null;
 
-        if ($nearLat !== null && $nearLng !== null && $radiusKm !== null) {
+        $decodedCursor = is_string($cursor) ? base64_decode($cursor, true) : false;
+
+        if ($proximity) {
             $haversine = "(6371 * acos(LEAST(1.0, GREATEST(-1.0,
                 cos(radians(?)) * cos(radians(vol_opportunities.latitude)) * cos(radians(vol_opportunities.longitude) - radians(?)) +
                 sin(radians(?)) * sin(radians(vol_opportunities.latitude))
@@ -90,8 +89,22 @@ class VolunteerService
                   ->whereNotNull('vol_opportunities.longitude')
                   ->selectRaw("vol_opportunities.*, {$haversine} AS distance_km", [$nearLat, $nearLng, $nearLat])
                   ->having('distance_km', '<=', $radiusKm)
-                  ->orderBy('distance_km');
+                  ->orderBy('distance_km')
+                  ->orderBy('id');
+
+            // Distance ordering needs a (distance, id) keyset cursor — an
+            // id-based one would skip/repeat items across pages.
+            if ($decodedCursor !== false && str_starts_with($decodedCursor, 'D:') && str_contains($decodedCursor, '|')) {
+                [$lastDistance, $lastId] = explode('|', substr($decodedCursor, 2), 2);
+                $query->havingRaw(
+                    '(distance_km > ?) OR (distance_km = ? AND vol_opportunities.id > ?)',
+                    [(float) $lastDistance, (float) $lastDistance, (int) $lastId]
+                );
+            }
         } else {
+            if ($decodedCursor !== false && is_numeric($decodedCursor)) {
+                $query->where('id', '<', (int) $decodedCursor);
+            }
             $query->orderByDesc('id');
         }
 
@@ -110,9 +123,17 @@ class VolunteerService
             return $data;
         })->all();
 
+        $nextCursor = null;
+        if ($hasMore && $items->isNotEmpty()) {
+            $last = $items->last();
+            $nextCursor = $proximity
+                ? base64_encode('D:' . (float) $last->distance_km . '|' . $last->id)
+                : base64_encode((string) $last->id);
+        }
+
         return [
             'items'    => array_values($results),
-            'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'cursor'   => $nextCursor,
             'has_more' => $hasMore,
         ];
     }
@@ -530,7 +551,9 @@ class VolunteerService
 
         $query = VolOrganization::query()
             ->with('owner:id,first_name,last_name,avatar_url')
-            ->where('status', 'approved');
+            // Orgs are created/admin-toggled with status 'active' but legacy rows
+            // hold 'approved' — the directory must show both.
+            ->whereIn('status', ['approved', 'active']);
 
         if (! empty($filters['search'])) {
             $term = '%' . $filters['search'] . '%';
@@ -670,12 +693,17 @@ class VolunteerService
         $formatted['shifts'] = self::getShiftsForOpportunity($id);
 
         if ($viewerId) {
+            // Only pending/approved applications block re-applying — apply()
+            // permits a fresh application after a decline/withdrawal, and the
+            // UI hides the Apply button whenever has_applied is true.
             $formatted['has_applied'] = (bool) DB::selectOne(
-                "SELECT 1 FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND tenant_id = ? LIMIT 1",
+                "SELECT 1 FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND tenant_id = ?
+                 AND status IN ('pending', 'approved') LIMIT 1",
                 [$id, $viewerId, $tenantId]
             );
             $userApp = DB::selectOne(
-                "SELECT * FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND tenant_id = ?",
+                "SELECT * FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND tenant_id = ?
+                 ORDER BY id DESC LIMIT 1",
                 [$id, $viewerId, $tenantId]
             );
             $formatted['application'] = $userApp ? [
@@ -1393,6 +1421,7 @@ class VolunteerService
             LEFT JOIN org_members om
                 ON om.tenant_id = l.tenant_id
                 AND om.organization_id = org.id
+                AND om.org_type = 'volunteer'
                 AND om.user_id = ?
                 AND om.status = 'active'
                 AND om.role IN ('owner', 'admin')
@@ -1488,7 +1517,7 @@ class VolunteerService
         }
 
         $orgAdminRole = DB::selectOne(
-            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
+            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND org_type = 'volunteer' AND user_id = ? AND status = 'active'",
             [$tenantId, (int) $org->id, $adminUserId]
         );
 
@@ -1707,6 +1736,7 @@ class VolunteerService
             FROM vol_organizations vo
             LEFT JOIN org_members om
                 ON om.organization_id = vo.id
+                AND om.org_type = 'volunteer'
                 AND om.tenant_id = vo.tenant_id
                 AND om.user_id = ?
                 AND om.status = 'active'
@@ -1833,7 +1863,7 @@ class VolunteerService
 
                     // Initialize owner membership
                     DB::insert(
-                        "INSERT INTO org_members (tenant_id, organization_id, user_id, role, status, created_at) VALUES (?, ?, ?, 'owner', 'active', NOW())",
+                        "INSERT INTO org_members (tenant_id, organization_id, org_type, user_id, role, status, created_at) VALUES (?, ?, 'volunteer', ?, 'owner', 'active', NOW())",
                         [$tenantId, $orgId, $userId]
                     );
 
@@ -2092,7 +2122,7 @@ class VolunteerService
         }
 
         $orgRole = DB::selectOne(
-            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
+            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND org_type = 'volunteer' AND user_id = ? AND status = 'active'",
             [self::getTenantId(), $orgId, $userId]
         );
 
@@ -2117,7 +2147,7 @@ class VolunteerService
         }
 
         $orgRole = DB::selectOne(
-            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
+            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND org_type = 'volunteer' AND user_id = ? AND status = 'active'",
             [$tenantId, $orgId, $userId]
         );
 
@@ -2154,6 +2184,7 @@ class VolunteerService
              FROM vol_organizations org
              LEFT JOIN org_members om
                ON om.organization_id = org.id
+              AND om.org_type = 'volunteer'
               AND om.tenant_id = org.tenant_id
               AND om.user_id = ?
               AND om.status = 'active'

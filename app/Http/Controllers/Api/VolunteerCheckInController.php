@@ -72,6 +72,7 @@ class VolunteerCheckInController extends BaseApiController
 
             $isOrgAdmin = DB::table('org_members')
                 ->where('tenant_id', $tenantId)
+                ->where('org_type', 'volunteer')
                 ->where('organization_id', (int) $row->organization_id)
                 ->where('user_id', $userId)
                 ->where('status', 'active')

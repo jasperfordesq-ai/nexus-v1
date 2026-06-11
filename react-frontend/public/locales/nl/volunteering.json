@@ -566,7 +566,8 @@
     "accept": "Accepteren",
     "reject": "Afwijzen",
     "cancel": "Annuleren",
-    "reject_confirm": "Weet u zeker dat u dit ruilverzoek wilt afwijzen?"
+    "reject_confirm": "Weet u zeker dat u dit ruilverzoek wilt afwijzen?",
+    "accept_pending_admin": "Ruil geaccepteerd — wacht op goedkeuring van een beheerder voordat de diensten wisselen."
   },
   "opportunity": {
     "search_placeholder": "Zoek op naam...",
@@ -679,7 +680,11 @@
       "confirmed": "Bevestigd",
       "pending": "In afwachting",
       "cancelled": "Geannuleerd"
-    }
+    },
+    "search_label": "Naam van lid",
+    "search_placeholder": "Zoek leden op naam…",
+    "search_description": "Zoek het lid dat je aan deze groepsreservering wilt toevoegen en selecteer het uit de resultaten. Het lid ontvangt een uitnodiging.",
+    "no_results": "Geen leden komen overeen met je zoekopdracht."
   },
   "recommendations": {
     "title": "Aanbevolen voor jou",

@@ -478,6 +478,7 @@ class VolOrgWalletService
                                 SELECT om.user_id FROM org_members om
                                 WHERE om.tenant_id = ?
                                   AND om.organization_id = ?
+                                  AND om.org_type = 'volunteer'
                                   AND om.status = 'active'
                                   AND om.role IN ('owner', 'admin')
                             )

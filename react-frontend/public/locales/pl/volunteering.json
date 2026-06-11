@@ -566,7 +566,8 @@
     "accept": "Przyjąć",
     "reject": "Odrzucić",
     "cancel": "Anulować",
-    "reject_confirm": "Czy na pewno chcesz odrzucić tę prośbę o wymianę?"
+    "reject_confirm": "Czy na pewno chcesz odrzucić tę prośbę o wymianę?",
+    "accept_pending_admin": "Zamiana zaakceptowana — oczekuje na zatwierdzenie przez administratora przed zmianą zmian."
   },
   "opportunity": {
     "search_placeholder": "Szukaj według nazwy...",
@@ -679,7 +680,11 @@
       "confirmed": "Potwierdzone",
       "pending": "Oczekujące",
       "cancelled": "Anulowane"
-    }
+    },
+    "search_label": "Imię i nazwisko członka",
+    "search_placeholder": "Szukaj członków po nazwie…",
+    "search_description": "Wyszukaj członka, którego chcesz dodać do tej rezerwacji grupowej, a następnie wybierz go z wyników. Otrzyma zaproszenie do dołączenia.",
+    "no_results": "Żaden członek nie pasuje do wyszukiwania."
   },
   "recommendations": {
     "title": "Polecane dla Ciebie",

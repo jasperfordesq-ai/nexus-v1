@@ -117,6 +117,7 @@ class OrgWalletService
         // Check membership
         $member = DB::table('org_members')
             ->where('organization_id', $orgId)
+            ->where('org_type', 'community')
             ->where('user_id', $userId)
             ->where('status', 'active')
             ->first();
@@ -172,6 +173,7 @@ class OrgWalletService
         // Check requester is a member
         $member = DB::table('org_members')
             ->where('organization_id', $orgId)
+            ->where('org_type', 'community')
             ->where('user_id', $requesterId)
             ->where('status', 'active')
             ->first();
@@ -224,6 +226,7 @@ class OrgWalletService
         // Check approver is admin or owner
         $approverMember = DB::table('org_members')
             ->where('organization_id', $request->organization_id)
+            ->where('org_type', 'community')
             ->where('user_id', $approverId)
             ->where('status', 'active')
             ->whereIn('role', ['admin', 'owner'])
@@ -312,6 +315,7 @@ class OrgWalletService
         // Check admin/owner role
         $adminMember = DB::table('org_members')
             ->where('organization_id', $request->organization_id)
+            ->where('org_type', 'community')
             ->where('user_id', $adminId)
             ->where('status', 'active')
             ->whereIn('role', ['admin', 'owner'])
@@ -380,6 +384,7 @@ class OrgWalletService
 
         $adminMember = DB::table('org_members')
             ->where('organization_id', $orgId)
+            ->where('org_type', 'community')
             ->where('user_id', $adminId)
             ->where('status', 'active')
             ->whereIn('role', ['admin', 'owner'])

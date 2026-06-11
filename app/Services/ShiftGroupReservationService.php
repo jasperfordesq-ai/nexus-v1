@@ -304,24 +304,24 @@ class ShiftGroupReservationService
                 }
 
                 // Get members
+                // All statuses included — the frontend renders pending/declined
+                // icons. Shape is flat {id, name, avatar_url, status} (the old
+                // nested {user: {...}} shape rendered blank member lists).
                 $memberRows = DB::table('vol_shift_group_members as gm')
                     ->join('vol_shift_group_reservations as r', 'gm.reservation_id', '=', 'r.id')
                     ->join('users as u', 'gm.user_id', '=', 'u.id')
                     ->where('gm.reservation_id', $row->id)
-                    ->where('gm.status', 'confirmed')
                     ->where('r.tenant_id', $tenantId)
                     ->orderBy('gm.created_at')
-                    ->select('gm.id', 'gm.user_id', 'gm.created_at', 'u.name as user_name', 'u.avatar_url as user_avatar')
+                    ->select('gm.user_id', 'gm.status', 'gm.created_at', 'u.name as user_name', 'u.avatar_url as user_avatar')
                     ->get();
 
                 $members = $memberRows->map(function ($m) {
                     return [
-                        'id'   => (int) $m->id,
-                        'user' => [
-                            'id'         => (int) $m->user_id,
-                            'name'       => $m->user_name,
-                            'avatar_url' => $m->user_avatar,
-                        ],
+                        'id'         => (int) $m->user_id,
+                        'name'       => $m->user_name,
+                        'avatar_url' => $m->user_avatar,
+                        'status'     => $m->status,
                         'created_at' => $m->created_at,
                     ];
                 })->all();

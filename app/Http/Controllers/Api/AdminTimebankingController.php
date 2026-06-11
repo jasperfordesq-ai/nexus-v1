@@ -272,7 +272,7 @@ class AdminTimebankingController extends BaseApiController
                         COALESCE(ot_out.total_out, 0) as total_out
                  FROM org_wallets ow
                  JOIN vol_organizations vo ON ow.organization_id = vo.id
-                 LEFT JOIN org_members om ON om.organization_id = ow.organization_id AND om.status = 'active'
+                 LEFT JOIN org_members om ON om.organization_id = ow.organization_id AND om.org_type = 'community' AND om.status = 'active'
                  LEFT JOIN (
                      SELECT organization_id, ROUND(SUM(amount), 1) as total_in
                      FROM org_transactions

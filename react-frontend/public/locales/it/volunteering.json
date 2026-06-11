@@ -566,7 +566,8 @@
     "accept": "Accettare",
     "reject": "Rifiutare",
     "cancel": "Cancellare",
-    "reject_confirm": "Sei sicuro di voler rifiutare questa richiesta di scambio?"
+    "reject_confirm": "Sei sicuro di voler rifiutare questa richiesta di scambio?",
+    "accept_pending_admin": "Scambio accettato: in attesa dell'approvazione dell'amministratore prima del cambio turni."
   },
   "opportunity": {
     "search_placeholder": "Cerca per nome...",
@@ -679,7 +680,11 @@
       "confirmed": "Confermato",
       "pending": "In attesa",
       "cancelled": "Annullato"
-    }
+    },
+    "search_label": "Nome del membro",
+    "search_placeholder": "Cerca membri per nome…",
+    "search_description": "Cerca il membro da aggiungere a questa prenotazione di gruppo, poi selezionalo dai risultati. Riceverà un invito a partecipare.",
+    "no_results": "Nessun membro corrisponde alla tua ricerca."
   },
   "recommendations": {
     "title": "Consigliato per te",

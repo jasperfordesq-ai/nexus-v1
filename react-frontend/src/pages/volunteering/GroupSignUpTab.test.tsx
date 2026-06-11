@@ -166,14 +166,15 @@ describe("GroupSignUpTab", () => {
     fireEvent.click(screen.getAllByRole("button", { name: /Add Member/i })[0]);
     await waitFor(() => {
       expect(screen.getByText("Add Group Member")).toBeInTheDocument();
-      expect(screen.getByPlaceholderText("member@example.com")).toBeInTheDocument();
+      expect(screen.getByPlaceholderText("Search members by name…")).toBeInTheDocument();
     });
   });
 
-  it("looks up members with the current users API query contract", async () => {
+  it("adds the member selected from search suggestions by user id", async () => {
+    // Real contract: /v2/users (member directory) returns id+name, never email.
     vi.mocked(api.get).mockImplementation(async (url: string) => {
       if (url.startsWith("/v2/users")) {
-        return { success: true, data: [{ id: 44, name: "Charlie Example", email: "charlie@example.com" }] };
+        return { success: true, data: [{ id: 44, name: "Charlie Example" }] };
       }
       return { success: true, data: [mockReservation] };
     });
@@ -184,14 +185,20 @@ describe("GroupSignUpTab", () => {
     // Click the trigger (first "Add Member" button — see note above re: the
     // eager Modal stub).
     fireEvent.click(screen.getAllByRole("button", { name: /Add Member/i })[0]);
-    fireEvent.change(screen.getByPlaceholderText("member@example.com"), {
-      target: { value: "charlie@example.com" },
+    fireEvent.change(screen.getByPlaceholderText("Search members by name…"), {
+      target: { value: "Charlie" },
     });
+
+    // Debounced search fires, then the suggestion must be selected to enable Add
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith("/v2/users?q=Charlie&limit=5");
+    });
+    fireEvent.click(await screen.findByRole("button", { name: "Charlie Example" }));
+
     const addButtons = screen.getAllByRole("button", { name: /Add Member/i });
     fireEvent.click(addButtons[addButtons.length - 1]);
 
     await waitFor(() => {
-      expect(api.get).toHaveBeenCalledWith("/v2/users?q=charlie%40example.com&limit=5");
       expect(api.post).toHaveBeenCalledWith("/v2/volunteering/group-reservations/1/members", { user_id: 44 });
     });
   });

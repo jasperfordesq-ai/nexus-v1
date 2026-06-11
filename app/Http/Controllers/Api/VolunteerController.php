@@ -526,7 +526,13 @@ class VolunteerController extends BaseApiController
         if ($this->query('search')) $filters['search'] = $this->query('search');
         if ($this->query('cursor')) $filters['cursor'] = $this->query('cursor');
         $result = $this->volunteerService->getOrganisations($filters);
-        return $this->respondWithCollection($result['items'], $result['cursor'], $filters['limit'], $result['has_more']);
+        // Public endpoint (withoutMiddleware('auth:sanctum')) — never expose
+        // wallet/financial state, mirroring showOrganisation() below.
+        $items = array_map(static function (array $org): array {
+            unset($org['balance'], $org['auto_pay_enabled']);
+            return $org;
+        }, $result['items']);
+        return $this->respondWithCollection($items, $result['cursor'], $filters['limit'], $result['has_more']);
     }
 
     public function showOrganisation($id): JsonResponse
@@ -655,7 +661,7 @@ class VolunteerController extends BaseApiController
 
         // Org members with owner/admin role have access
         $membership = DB::selectOne(
-            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
+            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND org_type = 'volunteer' AND user_id = ? AND status = 'active'",
             [$tenantId, $orgId, $userId]
         );
 
@@ -795,7 +801,7 @@ class VolunteerController extends BaseApiController
         $limit = $this->queryInt('per_page', 20, 1, 50);
         $cursor = $this->query('cursor');
 
-        $params = [$tenantId, $orgId, $tenantId];
+        $params = [$orgId, $tenantId, $tenantId, $orgId, $tenantId];
         $cursorClause = '';
         if ($cursor) {
             $cursorClause = ' AND u.id < ?';
@@ -803,15 +809,19 @@ class VolunteerController extends BaseApiController
         }
         $params[] = $limit + 1;
 
+        // Hours come from a correlated subquery: joining vol_logs onto the
+        // applications join fans out (N applications x M logs) and inflated
+        // SUM(hours) by the application count.
         $rows = DB::select("
             SELECT u.id, u.name, u.avatar_url, u.email,
                    MAX(va.created_at) as applied_at,
-                   COALESCE(SUM(CASE WHEN vl.status = 'approved' THEN vl.hours ELSE 0 END), 0) as total_hours,
+                   COALESCE((SELECT SUM(vl.hours) FROM vol_logs vl
+                             WHERE vl.user_id = u.id AND vl.organization_id = ?
+                               AND vl.tenant_id = ? AND vl.status = 'approved'), 0) as total_hours,
                    COUNT(DISTINCT va.id) as applications_count
             FROM users u
             INNER JOIN vol_applications va ON va.user_id = u.id AND va.tenant_id = u.tenant_id AND va.status = 'approved' AND va.tenant_id = ?
             INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id AND vo.tenant_id = va.tenant_id AND vo.organization_id = ?
-            LEFT JOIN vol_logs vl ON vl.user_id = u.id AND vl.organization_id = vo.organization_id AND vl.tenant_id = va.tenant_id
             WHERE u.tenant_id = ?
             {$cursorClause}
             GROUP BY u.id, u.name, u.avatar_url, u.email

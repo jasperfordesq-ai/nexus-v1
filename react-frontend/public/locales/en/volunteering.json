@@ -566,7 +566,8 @@
     "accept": "Accept",
     "reject": "Reject",
     "cancel": "Cancel",
-    "reject_confirm": "Are you sure you want to reject this swap request?"
+    "reject_confirm": "Are you sure you want to reject this swap request?",
+    "accept_pending_admin": "Swap accepted — awaiting admin approval before the shifts change."
   },
   "opportunity": {
     "search_placeholder": "Search by name...",
@@ -679,7 +680,11 @@
       "confirmed": "Confirmed",
       "pending": "Pending",
       "cancelled": "Cancelled"
-    }
+    },
+    "search_label": "Member name",
+    "search_placeholder": "Search members by name…",
+    "search_description": "Search for the member you would like to add to this group reservation, then select them from the results. They will receive an invitation to join.",
+    "no_results": "No members match your search."
   },
   "recommendations": {
     "title": "Recommended for You",

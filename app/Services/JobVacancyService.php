@@ -148,6 +148,7 @@ class JobVacancyService
         }
 
         $canPost = DB::table('org_members')
+            ->where('org_type', 'community')
             ->where('tenant_id', $tenantId)
             ->where('organization_id', $organizationId)
             ->where('user_id', $userId)

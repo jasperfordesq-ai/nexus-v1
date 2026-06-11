@@ -18,7 +18,7 @@ class OrgMember extends Model
     protected $table = 'org_members';
 
     protected $fillable = [
-        'tenant_id', 'organization_id', 'user_id', 'role', 'status',
+        'tenant_id', 'organization_id', 'org_type', 'user_id', 'role', 'status',
     ];
 
     protected $casts = [

@@ -314,11 +314,14 @@ class VolunteerMatchingService
             ->map(fn ($s) => strtolower(trim($s)))
             ->all();
 
-        // Get shifts the user is already signed up for
-        $signedUpShifts = DB::table('vol_shift_signups')
+        // Get shifts the user is already signed up for. Live shift signups are
+        // vol_applications rows with a shift_id — vol_shift_signups is a legacy
+        // table nothing writes to anymore.
+        $signedUpShifts = DB::table('vol_applications')
             ->where('tenant_id', $tenantId)
             ->where('user_id', $userId)
-            ->where('status', 'confirmed')
+            ->whereNotNull('shift_id')
+            ->whereIn('status', ['pending', 'approved'])
             ->pluck('shift_id')
             ->all();
 
@@ -361,10 +364,12 @@ class VolunteerMatchingService
         $shiftIds = $shifts->pluck('shift_id')->all();
         $signupCounts = [];
         if (!empty($shiftIds)) {
-            $signupCounts = DB::table('vol_shift_signups')
+            // Capacity is consumed by approved applications (same rule as
+            // VolunteerService shift assignment) — not the legacy signups table.
+            $signupCounts = DB::table('vol_applications')
                 ->whereIn('shift_id', $shiftIds)
                 ->where('tenant_id', $tenantId)
-                ->where('status', 'confirmed')
+                ->where('status', 'approved')
                 ->selectRaw('shift_id, COUNT(*) as cnt')
                 ->groupBy('shift_id')
                 ->pluck('cnt', 'shift_id')

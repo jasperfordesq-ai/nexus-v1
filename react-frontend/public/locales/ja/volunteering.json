@@ -566,7 +566,8 @@
     "accept": "受け入れる",
     "reject": "拒否する",
     "cancel": "キャンセル",
-    "reject_confirm": "この交換リクエストを拒否してもよろしいですか?"
+    "reject_confirm": "この交換リクエストを拒否してもよろしいですか?",
+    "accept_pending_admin": "交代を承諾しました。シフト変更には管理者の承認が必要です。"
   },
   "opportunity": {
     "search_placeholder": "名前で検索...",
@@ -679,7 +680,11 @@
       "confirmed": "確定",
       "pending": "保留中",
       "cancelled": "キャンセル済み"
-    }
+    },
+    "search_label": "メンバー名",
+    "search_placeholder": "名前でメンバーを検索…",
+    "search_description": "このグループ予約に追加したいメンバーを検索し、結果から選択してください。招待が送信されます。",
+    "no_results": "検索に一致するメンバーがいません。"
   },
   "recommendations": {
     "title": "あなたへのおすすめ",
