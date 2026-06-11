@@ -23,14 +23,30 @@ class StartingBalanceService
     private const SETTING_KEY = 'wallet.starting_balance';
 
     /**
+     * Legacy key written by the general admin Settings page
+     * (AdminSettingsController / AdminConfigController 'welcome_credits').
+     */
+    private const LEGACY_SETTING_KEY = 'general.welcome_credits';
+
+    /**
      * Get the configured starting balance for the current tenant.
+     *
+     * Reads the canonical 'wallet.starting_balance' key first (written by the
+     * wallet admin endpoints), then falls back to the legacy
+     * 'general.welcome_credits' key (written by the general admin Settings
+     * page) so tenants configured via either surface behave the same.
+     * Unset on both keys = 0 = no grant.
      *
      * @return float Always >= 0.
      */
     public static function getStartingBalance(): float
     {
         $tenantId = TenantContext::getId();
-        $value = app(TenantSettingsService::class)->get($tenantId, self::SETTING_KEY, '0');
+        $settings = app(TenantSettingsService::class);
+        $value = $settings->get($tenantId, self::SETTING_KEY);
+        if ($value === null) {
+            $value = $settings->get($tenantId, self::LEGACY_SETTING_KEY, '0');
+        }
 
         return max(0.0, (float) $value);
     }
@@ -69,15 +85,11 @@ class StartingBalanceService
             ];
         }
 
-        // Check idempotency — has this user already received a starting balance?
-        $existing = DB::selectOne(
-            "SELECT id FROM transactions
-             WHERE tenant_id = ? AND receiver_id = ? AND transaction_type = 'starting_balance'
-             LIMIT 1",
-            [$tenantId, $userId]
-        );
-
-        if ($existing) {
+        // Fast-path idempotency check (no lock) — covers BOTH this service's
+        // 'starting_balance' transactions and the admin-approval path's
+        // '[Welcome Bonus]' grants (AdminUsersController::grantWelcomeCredits)
+        // so the two mechanisms can never double-credit the same user.
+        if (static::alreadyGranted($tenantId, $userId)) {
             return [
                 'success' => true,
                 'amount' => 0.0,
@@ -87,6 +99,39 @@ class StartingBalanceService
 
         try {
             DB::beginTransaction();
+
+            // Lock the user row to serialise concurrent grant attempts
+            // (registration retries / double-submitted verification), then
+            // re-check idempotency under the lock. The pre-transaction check
+            // above alone is racy: two concurrent calls could both pass it.
+            $userRow = DB::selectOne(
+                "SELECT id FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE",
+                [$userId, $tenantId]
+            );
+
+            if (!$userRow) {
+                DB::rollBack();
+                Log::warning('[StartingBalanceService] applyToNewUser: user not found in tenant', [
+                    'user_id' => $userId,
+                    'tenant_id' => $tenantId,
+                ]);
+
+                return [
+                    'success' => false,
+                    'amount' => 0.0,
+                    'source' => 'user_not_found',
+                ];
+            }
+
+            if (static::alreadyGranted($tenantId, $userId)) {
+                DB::rollBack();
+
+                return [
+                    'success' => true,
+                    'amount' => 0.0,
+                    'source' => 'already_applied',
+                ];
+            }
 
             // Create the starting_balance transaction (sender_id=0 for system)
             DB::insert(
@@ -118,5 +163,24 @@ class StartingBalanceService
                 'source' => 'error',
             ];
         }
+    }
+
+    /**
+     * Whether this user has already received a welcome grant via EITHER
+     * mechanism: this service ('starting_balance' transaction type) or the
+     * admin-approval flow ('[Welcome Bonus]…' description, legacy 'transfer'
+     * type — see AdminUsersController::grantWelcomeCredits).
+     */
+    private static function alreadyGranted(int $tenantId, int $userId): bool
+    {
+        $existing = DB::selectOne(
+            "SELECT id FROM transactions
+             WHERE tenant_id = ? AND receiver_id = ?
+               AND (transaction_type = 'starting_balance' OR description LIKE '[Welcome Bonus]%')
+             LIMIT 1",
+            [$tenantId, $userId]
+        );
+
+        return $existing !== null;
     }
 }

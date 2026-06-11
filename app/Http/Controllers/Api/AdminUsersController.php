@@ -19,6 +19,7 @@ use App\Services\EmailDispatchService;
 use App\Services\Enterprise\GdprService;
 use App\Services\GamificationService;
 use App\Services\PasswordHistoryService;
+use App\Services\StartingBalanceService;
 use App\Services\TenantSettingsService;
 use App\Services\TokenService;
 use App\Core\EmailTemplateBuilder;
@@ -513,6 +514,16 @@ class AdminUsersController extends BaseApiController
 
         ActivityLog::log($adminId, 'admin_create_user', "Created user: {$email}");
         $this->auditLogService->logUserCreated($adminId, $newUserId, $email);
+
+        // Admin-created accounts are active immediately and never pass through
+        // the approval flow, so grant the tenant-configured starting balance
+        // here (wallet.starting_balance / legacy general.welcome_credits).
+        // Idempotent and non-fatal — a wallet failure must never fail creation.
+        try {
+            StartingBalanceService::applyToNewUser((int) $newUserId);
+        } catch (\Throwable $e) {
+            Log::warning("[AdminUsers] Starting balance grant failed for admin-created user #{$newUserId}: " . $e->getMessage());
+        }
 
         // Record GDPR consents (admin-created accounts)
         try {
@@ -1899,9 +1910,12 @@ class AdminUsersController extends BaseApiController
                     [$userId, $userTenantId]
                 );
 
-                // Check if a welcome bonus was already granted (true idempotency key)
+                // Check if a welcome bonus was already granted (true idempotency key).
+                // Also treat a 'starting_balance' transaction as already-granted so
+                // this path can never stack on top of StartingBalanceService grants
+                // (self-serve verification / admin-created users).
                 $existing = DB::selectOne(
-                    "SELECT id FROM transactions WHERE tenant_id = ? AND receiver_id = ? AND description LIKE '[Welcome Bonus]%' LIMIT 1",
+                    "SELECT id FROM transactions WHERE tenant_id = ? AND receiver_id = ? AND (description LIKE '[Welcome Bonus]%' OR transaction_type = 'starting_balance') LIMIT 1",
                     [$userTenantId, $userId]
                 );
 

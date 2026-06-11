@@ -392,8 +392,11 @@ class RegistrationService
                 $user->newsletter_opt_in = filter_var($data['newsletter_opt_in'] ?? false, FILTER_VALIDATE_BOOLEAN);
             }
 
-            // Welcome credits are granted during admin approval (AdminUsersController::grantWelcomeCredits)
-            // NOT at registration time — to avoid double-crediting on tenants with admin_approval enabled
+            // Welcome credits are granted at ACTIVATION, not at registration time:
+            // admin-approval tenants grant on approval (AdminUsersController::grantWelcomeCredits),
+            // self-serve tenants grant on email verification (verifyEmail →
+            // StartingBalanceService::applyToNewUser). Both are idempotent against
+            // the transactions table so they can never double-credit.
             $user->balance = 0;
 
             // Optional fields from frontend
@@ -539,6 +542,33 @@ class RegistrationService
             'verification_token' => null,
             'email_verified_at'  => now(),
         ]);
+
+        // Self-serve tenants (admin approval OFF): the account just became
+        // active, so grant the tenant-configured starting balance now.
+        // Admin-approval tenants grant on approval instead
+        // (AdminUsersController::grantWelcomeCredits) — granting here too
+        // would double-credit. applyToNewUser is idempotent and tenant-scoped;
+        // a wallet failure must never break email verification, so any
+        // throw is swallowed and logged.
+        if (! $requiresAdminApproval) {
+            $previousTenantId = TenantContext::currentId();
+            try {
+                TenantContext::setById((int) $user->tenant_id);
+                StartingBalanceService::applyToNewUser((int) $user->id);
+            } catch (\Throwable $e) {
+                Log::warning('RegistrationService: starting balance grant failed', [
+                    'user_id' => $user->id,
+                    'tenant_id' => $user->tenant_id,
+                    'error' => $e->getMessage(),
+                ]);
+            } finally {
+                if ($previousTenantId !== null) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
+            }
+        }
 
         return true;
     }
