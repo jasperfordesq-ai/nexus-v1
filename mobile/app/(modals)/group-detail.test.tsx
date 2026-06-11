@@ -383,6 +383,15 @@ jest.mock('@/components/ui/AppToast', () => {
   return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
 });
 
+// The bottom-sheet wrapper renders gesture/portal machinery that does not work in
+// the test renderer; mock it as a plain conditional View (same as volunteering-detail).
+jest.mock('@/components/ui/BottomSheet', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return ({ children, visible }: { children: React.ReactNode; visible: boolean }) =>
+    visible ? <View testID="group-discussion-sheet">{children}</View> : null;
+});
+
 // Auto-confirm: pressing a destructive button runs the action immediately,
 // mirroring the old Alert.alert destructive button-press simulation.
 jest.mock('@/components/ui/useConfirm', () => ({
@@ -401,6 +410,7 @@ import {
   answerGroupQuestion,
   acceptGroupAnswer,
   createGroupAnnouncement,
+  createGroupDiscussion,
   createGroupQuestion,
   createGroupTask,
   createGroupWikiPage,
@@ -684,6 +694,57 @@ describe('GroupDetailScreen', () => {
         is_pinned: true,
       });
       expect(refreshAnnouncements).toHaveBeenCalled();
+    });
+  });
+
+  it('lets members start a discussion from the bottom-sheet composer', async () => {
+    const refreshDiscussions = jest.fn();
+    const groupState = {
+      data: { data: { ...mockGroupDetail, is_member: true } },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    };
+    const emptyListState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+    const discussionsState = { data: { data: [] }, isLoading: false, error: null, refresh: refreshDiscussions };
+    const emptyAnnouncementsState = { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() };
+    const eventsState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+    let apiCall = 0;
+    mockUseApi.mockImplementation(() => {
+      const emptyFilesState = { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() };
+      const emptyQuestionsState = { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() };
+      const states = [groupState, emptyListState, discussionsState, emptyAnnouncementsState, emptyFilesState, emptyQuestionsState, eventsState];
+      const state = states[apiCall % states.length];
+      apiCall += 1;
+      return state;
+    });
+
+    const { getByPlaceholderText, getByTestId, getByText, queryByTestId } = render(<GroupDetailScreen />);
+
+    fireEvent.press(getByText('Discussions'));
+
+    // The composer sheet is closed until the trigger button opens it.
+    expect(queryByTestId('group-discussion-sheet')).toBeNull();
+    fireEvent.press(getByText('New'));
+    expect(getByTestId('group-discussion-sheet')).toBeTruthy();
+
+    // Validation: publishing with empty fields never calls the API.
+    fireEvent.press(getByText('Publish discussion'));
+    expect(createGroupDiscussion).not.toHaveBeenCalled();
+    expect(getByTestId('group-discussion-sheet')).toBeTruthy();
+
+    fireEvent.changeText(getByPlaceholderText('Discussion title'), 'Compost rota');
+    fireEvent.changeText(getByPlaceholderText('Write a message'), 'Who can take the Friday slot?');
+    fireEvent.press(getByText('Publish discussion'));
+
+    await waitFor(() => {
+      expect(createGroupDiscussion).toHaveBeenCalledWith(1, {
+        title: 'Compost rota',
+        content: 'Who can take the Friday slot?',
+      });
+      expect(refreshDiscussions).toHaveBeenCalled();
+      // The sheet closes and fields reset after a successful publish.
+      expect(queryByTestId('group-discussion-sheet')).toBeNull();
     });
   });
 

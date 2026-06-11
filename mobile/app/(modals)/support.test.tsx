@@ -28,6 +28,22 @@ jest.mock('expo-linking', () => ({
 }));
 
 jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: React.ReactNode }) => children);
+jest.mock('@gorhom/bottom-sheet', () => {
+  const { ScrollView } = require('react-native');
+  return { BottomSheetScrollView: ScrollView };
+});
+jest.mock('@/components/ui/BottomSheet', () => {
+  const { View, Text } = require('react-native');
+  return function MockBottomSheet({ visible, title, children }: { visible: boolean; title?: string; children: React.ReactNode }) {
+    if (!visible) return null;
+    return (
+      <View testID="support-document-sheet">
+        {title ? <Text>{title}</Text> : null}
+        {children}
+      </View>
+    );
+  };
+});
 jest.mock('@/components/ui/AppTopBar', () => {
   const { Text } = require('react-native');
   return function MockAppTopBar({ title }: { title: string }) {
@@ -60,15 +76,23 @@ describe('SupportRoute', () => {
     expect(Linking.openURL).toHaveBeenCalledWith('https://app.project-nexus.ie/help');
   });
 
-  it('renders native legal summaries and keeps canonical web links available', () => {
-    const { getAllByText, getByText } = render(<SupportRoute />);
+  it('renders native legal summaries in a bottom sheet and keeps canonical web links available', () => {
+    const { getAllByText, getByText, getByTestId, queryByTestId } = render(<SupportRoute />);
+
+    // Sheet is closed until "Read in app" is tapped — the document used to
+    // render at the TOP of the scroll view, invisible from further down the
+    // page (looked like a dead button).
+    expect(queryByTestId('support-document-sheet')).toBeNull();
 
     fireEvent.press(getAllByText('Read in app')[3]);
 
+    expect(getByTestId('support-document-sheet')).toBeTruthy();
     expect(getByText('Privacy summary')).toBeTruthy();
     expect(getByText('Data you provide')).toBeTruthy();
 
-    fireEvent.press(getAllByText('Open web')[0]);
+    // The sheet's own "Open web" action is rendered last in the tree
+    const openWebButtons = getAllByText('Open web');
+    fireEvent.press(openWebButtons[openWebButtons.length - 1]);
 
     expect(Linking.openURL).toHaveBeenCalledWith('https://app.project-nexus.ie/privacy');
   });

@@ -13,10 +13,13 @@ import * as Linking from 'expo-linking';
 import { useTranslation } from 'react-i18next';
 import { Button as HeroButton, Card as HeroCard, Text } from 'heroui-native';
 
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+
 import AppTopBar from '@/components/ui/AppTopBar';
+import BottomSheet from '@/components/ui/BottomSheet';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import { useTheme } from '@/lib/hooks/useTheme';
-import { withAlpha } from '@/lib/utils/color';
+import { contrastText, withAlpha } from '@/lib/utils/color';
 
 type SupportItem = {
   key: string;
@@ -79,10 +82,10 @@ function ActionPill({
         borderColor: primary ? 'transparent' : withAlpha(tone, 0.22),
       }}
     >
-      <HeroButton.Label className="text-sm font-semibold" style={{ color: primary ? '#ffffff' : theme.text }} numberOfLines={1}>
+      <HeroButton.Label className="text-sm font-semibold" style={{ color: primary ? contrastText(tone) : theme.text }} numberOfLines={1}>
         {label}
       </HeroButton.Label>
-      <Ionicons name={icon} size={16} color={primary ? '#ffffff' : tone} />
+      <Ionicons name={icon} size={16} color={primary ? contrastText(tone) : tone} />
     </HeroButton>
   );
 }
@@ -131,16 +134,6 @@ function SupportScreen() {
           </HeroCard.Body>
         </HeroCard>
 
-        {selectedDocument ? (
-          <SupportDocumentCard
-            document={selectedDocument}
-            theme={theme}
-            tone={tone}
-            t={t}
-            onClose={() => setSelectedDocumentKey(null)}
-          />
-        ) : null}
-
         <View className="gap-3">
           {SUPPORT_ITEMS.map((item) => (
             <HeroCard
@@ -185,6 +178,59 @@ function SupportScreen() {
           ))}
         </View>
       </ScrollView>
+
+      {/* Document reader — a bottom sheet so "Read in app" visibly responds from
+          anywhere on the page (it previously rendered at the TOP of the scroll
+          view, off-screen when the user was scrolled down → looked dead). */}
+      <BottomSheet
+        visible={!!selectedDocument}
+        onClose={() => setSelectedDocumentKey(null)}
+        snapPoints={['85%']}
+        title={selectedDocument ? t(`support.docs.${selectedDocument.key}.title`) : undefined}
+      >
+        {selectedDocument ? (
+          <BottomSheetScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
+            <View className="gap-4 pt-2">
+              <View className="flex-row items-start gap-3">
+                <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.14) }}>
+                  <Ionicons name={selectedDocument.icon} size={21} color={tone} />
+                </View>
+                <Text className="min-w-0 flex-1 text-sm leading-5" style={{ color: theme.textSecondary }}>
+                  {t(`support.docs.${selectedDocument.key}.summary`)}
+                </Text>
+              </View>
+              {[1, 2, 3].map((section) => (
+                <View
+                  key={section}
+                  className="gap-1 rounded-panel-inner p-3"
+                  style={{ backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.borderSubtle }}
+                >
+                  <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                    {t(`support.docs.${selectedDocument.key}.section${section}Title`)}
+                  </Text>
+                  <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+                    {t(`support.docs.${selectedDocument.key}.section${section}Body`)}
+                  </Text>
+                </View>
+              ))}
+              <View className="flex-row flex-wrap gap-2">
+                <ActionPill
+                  label={t('support.openWeb')}
+                  icon="open-outline"
+                  tone={tone}
+                  onPress={() => void Linking.openURL(selectedDocument.url)}
+                />
+                <ActionPill
+                  label={t('support.closeDocument')}
+                  icon="close-outline"
+                  tone={tone}
+                  onPress={() => setSelectedDocumentKey(null)}
+                />
+              </View>
+            </View>
+          </BottomSheetScrollView>
+        ) : null}
+      </BottomSheet>
     </SafeAreaView>
   );
 }
@@ -196,65 +242,3 @@ function normalizeSupportDocumentKey(value: string | string[] | undefined): stri
   return SUPPORT_DOCUMENTS[normalized] ? normalized : null;
 }
 
-function SupportDocumentCard({
-  document,
-  theme,
-  tone,
-  t,
-  onClose,
-}: {
-  document: SupportDocument;
-  theme: ReturnType<typeof useTheme>;
-  tone: string;
-  t: (key: string) => string;
-  onClose: () => void;
-}) {
-  return (
-    <HeroCard className="mb-4 overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: withAlpha(tone, 0.16) }}>
-      <View className="h-1" style={{ backgroundColor: tone }} />
-      <HeroCard.Body className="gap-4 p-4">
-        <View className="flex-row items-start gap-3">
-          <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.14) }}>
-            <Ionicons name={document.icon} size={21} color={tone} />
-          </View>
-          <View className="min-w-0 flex-1">
-            <Text className="text-lg font-bold" style={{ color: theme.text }} numberOfLines={2}>
-              {t(`support.docs.${document.key}.title`)}
-            </Text>
-            <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={4}>
-              {t(`support.docs.${document.key}.summary`)}
-            </Text>
-          </View>
-        </View>
-        {[1, 2, 3].map((section) => (
-          <View
-            key={section}
-            className="gap-1 rounded-panel-inner p-3"
-            style={{ backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.borderSubtle }}
-          >
-            <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
-              {t(`support.docs.${document.key}.section${section}Title`)}
-            </Text>
-            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
-              {t(`support.docs.${document.key}.section${section}Body`)}
-            </Text>
-          </View>
-        ))}
-        <View className="flex-row flex-wrap gap-2">
-          <ActionPill
-            label={t('support.closeDocument')}
-            icon="close-outline"
-            tone={tone}
-            onPress={onClose}
-          />
-          <ActionPill
-            label={t('support.openWeb')}
-            icon="open-outline"
-            tone={tone}
-            onPress={() => void Linking.openURL(document.url)}
-          />
-        </View>
-      </HeroCard.Body>
-    </HeroCard>
-  );
-}

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, Share, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
@@ -38,6 +38,7 @@ import Avatar from '@/components/ui/Avatar';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import NativePressable from '@/components/ui/NativePressable';
 import AppTopBar from '@/components/ui/AppTopBar';
 import { useAppToast } from '@/components/ui/AppToast';
 import { useConfirm } from '@/components/ui/useConfirm';
@@ -546,11 +547,7 @@ function MemberProfileScreenInner() {
           <ReviewsSection reviews={member.reviews ?? []} rating={member.rating} primary={primary} theme={theme} t={t} />
 
           {!isFederatedProfile ? (
-            <AppreciationCta member={member} displayName={displayName} primary={primary} theme={theme} t={t} />
-          ) : null}
-
-          {!isFederatedProfile ? (
-            <CollectionsCta member={member} displayName={displayName} isOwnProfile={isOwnProfile} primary={primary} theme={theme} t={t} />
+            <ProfileExtrasCard member={member} displayName={displayName} isOwnProfile={isOwnProfile} primary={primary} theme={theme} t={t} />
           ) : null}
 
           <HeroCard variant="secondary" className="mt-3">
@@ -1142,7 +1139,6 @@ function AchievementsAccordion({
       selectionMode="single"
       variant="surface"
       hideSeparator
-      defaultValue="achievements"
       className="mt-3 overflow-hidden rounded-panel"
     >
       <Accordion.Item value="achievements">
@@ -1506,40 +1502,12 @@ function ReviewsSection({
   );
 }
 
-function AppreciationCta({
-  member,
-  displayName,
-  primary,
-  theme,
-  t,
-}: {
-  member: MemberProfile;
-  displayName: string;
-  primary: string;
-  theme: Theme;
-  t: (key: string, opts?: Record<string, unknown>) => string;
-}) {
-  return (
-    <HeroCard variant="secondary" className="mt-3">
-      <HeroCard.Body className="gap-3 px-4 py-4">
-        <SectionTitle icon="chatbubble-ellipses-outline" title={t('profile.appreciations')} primary={primary} theme={theme} />
-        <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
-          {t('profile.appreciationsHint', { name: displayName })}
-        </Text>
-        <HeroButton
-          variant="secondary"
-          onPress={() => router.push({ pathname: '/(modals)/appreciations', params: { userId: String(member.id), name: displayName } } as unknown as Href)}
-          accessibilityLabel={t('profile.viewAppreciationsFor', { name: displayName })}
-        >
-          <Ionicons name="chatbubble-ellipses-outline" size={18} color={primary} />
-          <HeroButton.Label>{t('profile.viewAppreciations')}</HeroButton.Label>
-        </HeroButton>
-      </HeroCard.Body>
-    </HeroCard>
-  );
-}
-
-function CollectionsCta({
+/**
+ * Compact two-row card linking to the member's appreciation wall and saved
+ * collections. Replaces two full-width CTA cards that read as disconnected
+ * "weird graphics" under the achievements accordion.
+ */
+function ProfileExtrasCard({
   member,
   displayName,
   isOwnProfile,
@@ -1554,26 +1522,65 @@ function CollectionsCta({
   theme: Theme;
   t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
+  const rows: {
+    key: string;
+    icon: IoniconName;
+    title: string;
+    hint: string;
+    accessibilityLabel: string;
+    onPress: () => void;
+  }[] = [
+    {
+      key: 'appreciations',
+      icon: 'chatbubble-ellipses-outline',
+      title: t('profile.appreciations'),
+      hint: t('profile.appreciationsHint', { name: displayName }),
+      accessibilityLabel: t('profile.viewAppreciationsFor', { name: displayName }),
+      onPress: () => router.push({ pathname: '/(modals)/appreciations', params: { userId: String(member.id), name: displayName } } as unknown as Href),
+    },
+    {
+      key: 'collections',
+      icon: 'folder-open-outline',
+      title: t('profile.collections'),
+      hint: isOwnProfile ? t('profile.collectionsOwnHint') : t('profile.collectionsPublicHint', { name: displayName }),
+      accessibilityLabel: isOwnProfile ? t('profile.viewMyCollections') : t('profile.viewCollectionsFor', { name: displayName }),
+      onPress: () =>
+        router.push({
+          pathname: '/(modals)/profile-collections',
+          params: isOwnProfile ? {} : { userId: String(member.id), name: displayName, scope: 'public' },
+        } as unknown as Href),
+    },
+  ];
+
   return (
-    <HeroCard variant="secondary" className="mt-3">
-      <HeroCard.Body className="gap-3 px-4 py-4">
-        <SectionTitle icon="folder-open-outline" title={t('profile.collections')} primary={primary} theme={theme} />
-        <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
-          {isOwnProfile ? t('profile.collectionsOwnHint') : t('profile.collectionsPublicHint', { name: displayName })}
-        </Text>
-        <HeroButton
-          variant="secondary"
-          onPress={() =>
-            router.push({
-              pathname: '/(modals)/profile-collections',
-              params: isOwnProfile ? {} : { userId: String(member.id), name: displayName, scope: 'public' },
-            } as unknown as Href)
-          }
-          accessibilityLabel={isOwnProfile ? t('profile.viewMyCollections') : t('profile.viewCollectionsFor', { name: displayName })}
-        >
-          <Ionicons name="folder-open-outline" size={18} color={primary} />
-          <HeroButton.Label>{isOwnProfile ? t('profile.viewMyCollections') : t('profile.viewCollections')}</HeroButton.Label>
-        </HeroButton>
+    <HeroCard variant="secondary" className="mt-3 overflow-hidden p-0">
+      <HeroCard.Body className="p-0">
+        {rows.map((row, index) => (
+          <Fragment key={row.key}>
+            {index > 0 ? <View className="h-px" style={{ backgroundColor: theme.borderSubtle }} /> : null}
+            <NativePressable
+              onPress={row.onPress}
+              accessibilityLabel={row.accessibilityLabel}
+              feedback="highlight"
+              className="w-full"
+            >
+              <View className="flex-row items-center gap-3 px-4 py-3.5">
+                <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withColorAlpha(primary, 0.12) }}>
+                  <Ionicons name={row.icon} size={19} color={primary} />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                    {row.title}
+                  </Text>
+                  <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                    {row.hint}
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward-outline" size={17} color={theme.textMuted} />
+              </View>
+            </NativePressable>
+          </Fragment>
+        ))}
       </HeroCard.Body>
     </HeroCard>
   );

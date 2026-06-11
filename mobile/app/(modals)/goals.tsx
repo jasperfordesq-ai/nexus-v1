@@ -37,6 +37,8 @@ import AppTopBar from '@/components/ui/AppTopBar';
 import { useAppToast } from '@/components/ui/AppToast';
 import { useConfirm } from '@/components/ui/useConfirm';
 import EmptyState from '@/components/ui/EmptyState';
+import BottomSheet from '@/components/ui/BottomSheet';
+import { contrastText } from '@/lib/utils/color';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -735,7 +737,7 @@ export default function GoalsScreen() {
                             setShowForm((visible) => !visible);
                           }}
                         >
-                          <Ionicons name="add-outline" size={16} color={showForm ? '#fff' : primary} />
+                          <Ionicons name="add-outline" size={16} color={showForm ? contrastText(primary) : primary} />
                           <HeroButton.Label>{t('addGoal')}</HeroButton.Label>
                         </HeroButton>
                         <HeroButton
@@ -747,20 +749,12 @@ export default function GoalsScreen() {
                             setShowTemplates((visible) => !visible);
                           }}
                         >
-                          <Ionicons name="sparkles-outline" size={16} color={showTemplates ? '#fff' : primary} />
+                          <Ionicons name="sparkles-outline" size={16} color={showTemplates ? contrastText(primary) : primary} />
                           <HeroButton.Label>{t('templates.open')}</HeroButton.Label>
                         </HeroButton>
                       </View>
                     </HeroCard.Body>
                   </HeroCard>
-                  {showForm ? (
-                    <CreateGoalForm
-                      theme={theme}
-                      t={t}
-                      onCreated={handleGoalCreated}
-                      onCancel={() => setShowForm(false)}
-                    />
-                  ) : null}
                   {showTemplates ? (
                     <GoalTemplatesPanel
                       primary={primary}
@@ -804,6 +798,17 @@ export default function GoalsScreen() {
             />
           </KeyboardAvoidingView>
         )}
+
+        {/* Goal composer — bottom sheet so the keyboard never buries the form
+            (was rendered inline inside the list header). */}
+        <BottomSheet visible={showForm} onClose={() => setShowForm(false)} snapPoints={['75%', '92%']}>
+          <CreateGoalForm
+            theme={theme}
+            t={t}
+            onCreated={handleGoalCreated}
+            onCancel={() => setShowForm(false)}
+          />
+        </BottomSheet>
       </SafeAreaView>
     </ModalErrorBoundary>
   );

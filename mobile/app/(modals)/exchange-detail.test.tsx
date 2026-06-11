@@ -43,6 +43,12 @@ jest.mock('react-i18next', () => ({
         'detail.comment': 'Comment',
         'detail.share': 'Share',
         'detail.report': 'Report',
+        'detail.reported': 'Reported',
+        'detail.reportTitle': 'Report this listing',
+        'detail.reportSubmit': 'Submit report',
+        'detail.reportDetailsPlaceholder': 'Add details (optional)',
+        'detail.reportReason.safety_concern': 'Safety concern',
+        'detail.reportReason.spam': 'Spam',
         'detail.ownerTools': 'Listing tools',
         'offering': 'Offering',
         'requesting': 'Requesting',
@@ -93,26 +99,35 @@ jest.mock('@/lib/hooks/useAuth', () => ({
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn().mockResolvedValue(undefined),
   ImpactFeedbackStyle: { Medium: 'medium', Light: 'light' },
+  notificationAsync: jest.fn().mockResolvedValue(undefined),
+  NotificationFeedbackType: { Success: 'success', Warning: 'warning', Error: 'error' },
 }));
 
 jest.mock('@expo/vector-icons', () => ({
   Ionicons: 'View',
 }));
 
-jest.mock('heroui-native', () => {
-  const actual = jest.requireActual('heroui-native');
+// Mirror the volunteering-detail.test.tsx convention: the project BottomSheet
+// wrapper renders its title + children inline when visible, nothing otherwise.
+jest.mock('@/components/ui/BottomSheet', () => {
   const React = require('react');
-  const { Pressable, Text, View } = require('react-native');
-  const Dialog = ({ children, isOpen }: { children: React.ReactNode; isOpen?: boolean }) => (
-    isOpen ? <View>{children}</View> : null
-  );
-  Dialog.Portal = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
-  Dialog.Overlay = (props: Record<string, unknown>) => <Pressable {...props} />;
-  Dialog.Content = ({ children, ...props }: { children: React.ReactNode }) => <View {...props}>{children}</View>;
-  Dialog.Title = ({ children, ...props }: { children: React.ReactNode }) => <Text {...props}>{children}</Text>;
-  Dialog.Description = ({ children, ...props }: { children: React.ReactNode }) => <Text {...props}>{children}</Text>;
-
-  return { ...actual, Dialog };
+  const { Text, View } = require('react-native');
+  return function MockBottomSheet({
+    children,
+    visible,
+    title,
+  }: {
+    children: React.ReactNode;
+    visible: boolean;
+    title?: string;
+  }) {
+    return visible ? (
+      <View>
+        {title ? <Text>{title}</Text> : null}
+        {children}
+      </View>
+    ) : null;
+  };
 });
 
 jest.mock('@/lib/api/exchanges', () => ({
@@ -290,7 +305,7 @@ describe('ExchangeDetailModal', () => {
     });
   });
 
-  it('opens the request exchange form as a visible native dialog', async () => {
+  it('opens the request exchange form as a bottom sheet', async () => {
     mockUseApi.mockReturnValue({ data: { data: mockExchange }, isLoading: false, error: null, refresh: jest.fn() });
 
     const { getByLabelText, getByTestId, queryByTestId } = render(<ExchangeDetailModal />);
@@ -299,14 +314,76 @@ describe('ExchangeDetailModal', () => {
       expect(getByLabelText('Request exchange')).toBeTruthy();
     });
 
-    expect(queryByTestId('exchange-request-dialog')).toBeNull();
+    expect(queryByTestId('exchange-request-sheet')).toBeNull();
     fireEvent.press(getByLabelText('Request exchange'));
 
     await waitFor(() => {
-      expect(getByTestId('exchange-request-dialog')).toBeTruthy();
+      expect(getByTestId('exchange-request-sheet')).toBeTruthy();
       expect(getByLabelText('Proposed hours')).toBeTruthy();
       expect(getByLabelText('Add a note for the member')).toBeTruthy();
       expect(getByLabelText('Send request')).toBeTruthy();
+    });
+  });
+
+  it('submits an exchange request from the bottom sheet and closes it', async () => {
+    mockUseApi.mockReturnValue({ data: { data: mockExchange }, isLoading: false, error: null, refresh: jest.fn() });
+    const { createExchangeRequest } = require('@/lib/api/exchanges');
+    (createExchangeRequest as jest.Mock).mockResolvedValue({ data: { id: 77, status: 'requested' } });
+
+    const { getByLabelText, getByPlaceholderText, getByTestId, queryByTestId } = render(<ExchangeDetailModal />);
+
+    await waitFor(() => {
+      expect(getByLabelText('Request exchange')).toBeTruthy();
+    });
+    fireEvent.press(getByLabelText('Request exchange'));
+
+    await waitFor(() => {
+      expect(getByTestId('exchange-request-sheet')).toBeTruthy();
+    });
+
+    fireEvent.changeText(getByPlaceholderText('Proposed hours'), '3');
+    fireEvent.changeText(getByPlaceholderText('Add a note for the member'), 'I would love a lesson.');
+    fireEvent.press(getByLabelText('Send request'));
+
+    await waitFor(() => {
+      expect(createExchangeRequest).toHaveBeenCalledWith({
+        listing_id: 5,
+        proposed_hours: 3,
+        message: 'I would love a lesson.',
+      });
+    });
+    await waitFor(() => {
+      expect(queryByTestId('exchange-request-sheet')).toBeNull();
+    });
+  });
+
+  it('opens the report listing form as a bottom sheet and submits it', async () => {
+    mockUseApi.mockReturnValue({ data: { data: mockExchange }, isLoading: false, error: null, refresh: jest.fn() });
+    const { reportExchange } = require('@/lib/api/exchanges');
+    (reportExchange as jest.Mock).mockResolvedValue({});
+
+    const { getByLabelText, getByPlaceholderText, getByTestId, getByText, queryByTestId } = render(<ExchangeDetailModal />);
+
+    expect(queryByTestId('exchange-report-sheet')).toBeNull();
+    fireEvent.press(getByText('Report'));
+
+    await waitFor(() => {
+      expect(getByTestId('exchange-report-sheet')).toBeTruthy();
+      expect(getByText('Safety concern')).toBeTruthy();
+    });
+
+    fireEvent.press(getByText('Spam'));
+    fireEvent.changeText(getByPlaceholderText('Add details (optional)'), 'This looks like spam.');
+    fireEvent.press(getByLabelText('Submit report'));
+
+    await waitFor(() => {
+      expect(reportExchange).toHaveBeenCalledWith(5, {
+        reason: 'spam',
+        details: 'This looks like spam.',
+      });
+    });
+    await waitFor(() => {
+      expect(queryByTestId('exchange-report-sheet')).toBeNull();
     });
   });
 

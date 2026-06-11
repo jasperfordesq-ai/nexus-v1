@@ -104,7 +104,9 @@ import AppTopBar from '@/components/ui/AppTopBar';
 import { useAppToast } from '@/components/ui/AppToast';
 import { useConfirm } from '@/components/ui/useConfirm';
 import Avatar from '@/components/ui/Avatar';
+import BottomSheet from '@/components/ui/BottomSheet';
 import Input from '@/components/ui/Input';
+import TextArea from '@/components/ui/TextArea';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
@@ -816,41 +818,12 @@ function GroupDetailScreenInner() {
                       </View>
                       <HeroButton
                         size="sm"
-                        variant={showDiscussionComposer ? 'secondary' : 'primary'}
-                        onPress={() => setShowDiscussionComposer((value) => !value)}
+                        variant="primary"
+                        onPress={() => setShowDiscussionComposer(true)}
                       >
-                        <HeroButton.Label>
-                          {showDiscussionComposer ? t('common:buttons.cancel') : t('detail.newDiscussion')}
-                        </HeroButton.Label>
+                        <HeroButton.Label>{t('detail.newDiscussion')}</HeroButton.Label>
                       </HeroButton>
                     </View>
-
-                    {showDiscussionComposer ? (
-                      <View className="gap-3">
-                        <Input
-                          value={discussionTitle}
-                          onChangeText={setDiscussionTitle}
-                          placeholder={t('detail.discussionTitlePlaceholder')}
-                          placeholderTextColor={theme.textMuted}
-                          className="text-base"
-                          style={{ color: theme.text }}
-                          accessibilityLabel={t('detail.discussionTitlePlaceholder')}
-                        />
-                        <Input
-                          value={discussionContent}
-                          onChangeText={setDiscussionContent}
-                          placeholder={t('detail.discussionContentPlaceholder')}
-                          placeholderTextColor={theme.textMuted}
-                          multiline
-                          className="min-h-[104px] text-base"
-                          style={{ color: theme.text, textAlignVertical: 'top' }}
-                          accessibilityLabel={t('detail.discussionContentPlaceholder')}
-                        />
-                        <HeroButton isDisabled={creatingDiscussion} onPress={() => void handleCreateDiscussion()}>
-                          {creatingDiscussion ? <Spinner size="sm" /> : <HeroButton.Label>{t('detail.publishDiscussion')}</HeroButton.Label>}
-                        </HeroButton>
-                      </View>
-                    ) : null}
                   </HeroCard.Body>
                 </HeroCard>
 
@@ -1129,6 +1102,56 @@ function GroupDetailScreenInner() {
           <GroupMarketplacePanel groupId={loadedGroup.id} canView={userCanSeeMemberContent} />
         ) : null}
       </ScrollView>
+      <BottomSheet
+        visible={showDiscussionComposer}
+        onClose={() => setShowDiscussionComposer(false)}
+        snapPoints={['62%', '88%']}
+        title={t('detail.startDiscussion')}
+      >
+        <View className="gap-4 py-2">
+          <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+            {t('detail.startDiscussionHint')}
+          </Text>
+          <Input
+            value={discussionTitle}
+            onChangeText={setDiscussionTitle}
+            placeholder={t('detail.discussionTitlePlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            containerClassName="mb-0"
+            className="text-base"
+            style={{ color: theme.text }}
+            accessibilityLabel={t('detail.discussionTitlePlaceholder')}
+          />
+          <TextArea
+            value={discussionContent}
+            onChangeText={setDiscussionContent}
+            placeholder={t('detail.discussionContentPlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            numberOfLines={6}
+            containerClassName="mb-0"
+            inputClassName="min-h-[140px] text-base"
+            style={{ color: theme.text }}
+            accessibilityLabel={t('detail.discussionContentPlaceholder')}
+          />
+          <View className="flex-row gap-3">
+            <HeroButton
+              className="flex-1"
+              variant="secondary"
+              isDisabled={creatingDiscussion}
+              onPress={() => setShowDiscussionComposer(false)}
+            >
+              <HeroButton.Label>{t('common:buttons.cancel')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton
+              className="flex-1"
+              isDisabled={creatingDiscussion}
+              onPress={() => void handleCreateDiscussion()}
+            >
+              {creatingDiscussion ? <Spinner size="sm" /> : <HeroButton.Label>{t('detail.publishDiscussion')}</HeroButton.Label>}
+            </HeroButton>
+          </View>
+        </View>
+      </BottomSheet>
       {confirmDialog}
     </SafeAreaView>
   );

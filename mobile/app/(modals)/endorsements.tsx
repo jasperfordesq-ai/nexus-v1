@@ -42,6 +42,7 @@ import { useAppToast } from '@/components/ui/AppToast';
 import { useConfirm } from '@/components/ui/useConfirm';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
+import BottomSheet from '@/components/ui/BottomSheet';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -556,59 +557,65 @@ function EndorsementsHeader({
 
       {activeTab === 'skills' ? (
         <Surface variant="secondary" className="gap-3 rounded-panel p-3">
-          {addingSkill ? (
-            <>
-              <View className="flex-row items-center gap-2 rounded-panel-inner border px-3 py-2" style={{ borderColor: withAlpha(primary, 0.34), backgroundColor: theme.surface }}>
-                <Ionicons name="add-circle-outline" size={18} color={primary} />
-                <Input
-                  ref={skillInputRef}
-                  containerClassName="mb-0 flex-1"
-                  inputClassName="min-h-10 flex-1 text-sm"
-                  style={{ color: theme.text }}
-                  placeholder={t('skillPlaceholder')}
-                  placeholderTextColor={theme.textMuted}
-                  value={skillInput}
-                  onChangeText={setSkillInput}
-                  autoFocus
-                  returnKeyType="done"
-                  onSubmitEditing={() => void handleAddSkill()}
-                />
-              </View>
-              <View className="flex-row flex-wrap gap-2">
-                <ActionPill
-                  label={t('common:cancel')}
-                  icon="close-outline"
-                  primary={primary}
-                  onPress={() => { setAddingSkill(false); setSkillInput(''); }}
-                />
-                <ActionPill
-                  label={t('addSkill')}
-                  icon="checkmark-outline"
-                  primary={primary}
-                  tone="primary"
-                  disabled={submitting || !skillInput.trim()}
-                  onPress={() => void handleAddSkill()}
-                  accessibilityLabel={t('addSkill')}
-                />
-              </View>
-            </>
-          ) : (
-            <View className="items-start">
-              <ActionPill
-                label={t('addSkill')}
-                icon="add-circle-outline"
-                primary={primary}
-                tone="primary"
-                onPress={() => {
-                  setAddingSkill(true);
-                  setTimeout(() => skillInputRef.current?.focus(), 50);
-                }}
-                accessibilityLabel={t('addSkill')}
-              />
-            </View>
-          )}
+          <View className="items-start">
+            <ActionPill
+              label={t('addSkill')}
+              icon="add-circle-outline"
+              primary={primary}
+              tone="primary"
+              onPress={() => setAddingSkill(true)}
+              accessibilityLabel={t('addSkill')}
+            />
+          </View>
         </Surface>
       ) : null}
+
+      {/* Add-skill composer — bottom sheet so the keyboard never hides the
+          input (was a cramped inline field that the keyboard covered). */}
+      <BottomSheet
+        visible={addingSkill}
+        onClose={() => { setAddingSkill(false); setSkillInput(''); }}
+        title={t('addSkill')}
+      >
+        <View className="gap-4 py-2">
+          <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+            {t('skillPlaceholder')}
+          </Text>
+          <View className="flex-row items-center gap-2 rounded-panel-inner border px-3 py-2" style={{ borderColor: withAlpha(primary, 0.34), backgroundColor: theme.surface }}>
+            <Ionicons name="add-circle-outline" size={18} color={primary} />
+            <Input
+              ref={skillInputRef}
+              containerClassName="mb-0 flex-1"
+              inputClassName="min-h-10 flex-1 text-sm"
+              style={{ color: theme.text }}
+              placeholder={t('skillPlaceholder')}
+              placeholderTextColor={theme.textMuted}
+              value={skillInput}
+              onChangeText={setSkillInput}
+              autoFocus
+              returnKeyType="done"
+              onSubmitEditing={() => void handleAddSkill()}
+            />
+          </View>
+          <View className="flex-row flex-wrap gap-2">
+            <ActionPill
+              label={t('common:cancel')}
+              icon="close-outline"
+              primary={primary}
+              onPress={() => { setAddingSkill(false); setSkillInput(''); }}
+            />
+            <ActionPill
+              label={t('addSkill')}
+              icon="checkmark-outline"
+              primary={primary}
+              tone="primary"
+              disabled={submitting || !skillInput.trim()}
+              onPress={() => void handleAddSkill()}
+              accessibilityLabel={t('addSkill')}
+            />
+          </View>
+        </View>
+      </BottomSheet>
       {activeTab === 'discover' ? (
         <View className="gap-3">
           {categoriesLoading ? (

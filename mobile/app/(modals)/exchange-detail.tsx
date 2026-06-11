@@ -10,8 +10,6 @@ import {
   ScrollView,
   RefreshControl,
   Share,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, type Href } from 'expo-router';
@@ -19,7 +17,7 @@ import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from '@/lib/haptics';
-import { Button as HeroButton, Card as HeroCard, Chip, Dialog, Spinner, Surface } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 
 import {
   checkActiveExchange,
@@ -41,8 +39,10 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { APP_URL } from '@/lib/constants';
+import { contrastText } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import Avatar from '@/components/ui/Avatar';
+import BottomSheet from '@/components/ui/BottomSheet';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -92,6 +92,7 @@ function ExchangeDetailModalInner() {
   const { t } = useTranslation(['exchanges', 'common']);
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
+  const onPrimary = contrastText(primary);
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { user: currentUser } = useAuth();
@@ -659,49 +660,19 @@ function ExchangeDetailModalInner() {
                 <HeroButton.Label>{t('detail.share')}</HeroButton.Label>
               </HeroButton>
               {!isOwner ? (
-                <HeroButton variant={isReported ? 'secondary' : 'ghost'} isDisabled={isReported} onPress={() => setShowReportForm((current) => !current)}>
+                <HeroButton
+                  variant={isReported ? 'secondary' : 'ghost'}
+                  isDisabled={isReported}
+                  onPress={() => {
+                    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setShowReportForm(true);
+                  }}
+                >
                   <Ionicons name="flag-outline" size={18} color={isReported ? theme.warning : theme.textMuted} />
                   <HeroButton.Label>{isReported ? t('detail.reported') : t('detail.report')}</HeroButton.Label>
                 </HeroButton>
               ) : null}
             </View>
-
-            {showReportForm && !isReported ? (
-              <View className="gap-3 border-t border-border pt-3">
-                <Text className="text-sm font-semibold text-foreground">{t('detail.reportTitle')}</Text>
-                <View className="flex-row flex-wrap gap-2">
-                  {reportReasons.map((reason) => {
-                    const selected = reportReason === reason;
-                    return (
-                      <HeroButton
-                        key={reason}
-                        size="sm"
-                        variant={selected ? 'secondary' : 'outline'}
-                        onPress={() => setReportReason(reason)}
-                        accessibilityState={{ selected }}
-                      >
-                        <HeroButton.Label>{t(`detail.reportReason.${reason}`)}</HeroButton.Label>
-                      </HeroButton>
-                    );
-                  })}
-                </View>
-                <Input
-                  value={reportDetails}
-                  onChangeText={setReportDetails}
-                  placeholder={t('detail.reportDetailsPlaceholder')}
-                  placeholderTextColor={theme.textMuted}
-                  multiline
-                  textAlignVertical="top"
-                  className="min-h-20 text-sm"
-                  style={{ color: theme.text, textAlignVertical: 'top' }}
-                  accessibilityLabel={t('detail.reportDetailsPlaceholder')}
-                />
-                <HeroButton variant="danger-soft" isDisabled={isReporting} onPress={() => void handleReportSubmit()}>
-                  {isReporting ? <Spinner size="sm" /> : <Ionicons name="flag-outline" size={18} color={theme.error} />}
-                  <HeroButton.Label>{t('detail.reportSubmit')}</HeroButton.Label>
-                </HeroButton>
-              </View>
-            ) : null}
           </HeroCard.Body>
         </HeroCard>
 
@@ -762,74 +733,127 @@ function ExchangeDetailModalInner() {
         onCountChange={setCommentsCount}
       />
 
-      <Dialog
-        isOpen={!isOwner && workflowEnabled && showRequestForm}
-        onOpenChange={(open) => setShowRequestForm(open)}
+      <BottomSheet
+        visible={!isOwner && workflowEnabled && showRequestForm}
+        onClose={() => setShowRequestForm(false)}
+        snapPoints={['52%', '84%']}
+        title={t('detail.requestExchange')}
       >
-        <Dialog.Portal unstable_accessibilityContainerViewIsModal>
-          <Dialog.Overlay isCloseOnPress className="bg-black/60" />
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            className="w-full px-4"
-          >
-            <Dialog.Content
-              testID="exchange-request-dialog"
-              isSwipeable
-              className="gap-4 rounded-[28px] border border-border bg-background p-5"
+        <View testID="exchange-request-sheet" className="gap-4 py-3">
+          <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+            {t('detail.requestMessagePlaceholder')}
+          </Text>
+          <Input
+            value={requestHours}
+            onChangeText={setRequestHours}
+            keyboardType="decimal-pad"
+            placeholder={t('detail.requestHoursPlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            containerClassName="mb-0"
+            style={{ color: theme.text }}
+            accessibilityLabel={t('detail.requestHoursPlaceholder')}
+          />
+          <Input
+            value={requestMessage}
+            onChangeText={setRequestMessage}
+            placeholder={t('detail.requestMessagePlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            multiline
+            textAlignVertical="top"
+            containerClassName="mb-0"
+            inputClassName="min-h-[132px] flex-1 text-base"
+            style={{ color: theme.text, textAlignVertical: 'top' }}
+            accessibilityLabel={t('detail.requestMessagePlaceholder')}
+          />
+          <View className="flex-row gap-3">
+            <HeroButton
+              variant="secondary"
+              className="min-w-0 flex-1"
+              isDisabled={isSubmitting}
+              accessibilityLabel={t('detail.cancel')}
+              onPress={() => setShowRequestForm(false)}
             >
-              <View className="gap-2">
-                <Dialog.Title className="text-xl font-bold text-foreground">
-                  {t('detail.requestExchange')}
-                </Dialog.Title>
-                <Dialog.Description className="text-sm leading-5 text-muted-foreground">
-                  {t('detail.requestMessagePlaceholder')}
-                </Dialog.Description>
-              </View>
-              <Input
-                value={requestHours}
-                onChangeText={setRequestHours}
-                keyboardType="decimal-pad"
-                placeholder={t('detail.requestHoursPlaceholder')}
-                placeholderTextColor={theme.textMuted}
-                style={{ color: theme.text }}
-                accessibilityLabel={t('detail.requestHoursPlaceholder')}
-              />
-              <Input
-                value={requestMessage}
-                onChangeText={setRequestMessage}
-                placeholder={t('detail.requestMessagePlaceholder')}
-                placeholderTextColor={theme.textMuted}
-                multiline
-                textAlignVertical="top"
-                inputClassName="min-h-24 text-sm"
-                style={{ color: theme.text, textAlignVertical: 'top' }}
-                accessibilityLabel={t('detail.requestMessagePlaceholder')}
-              />
-              <View className="flex-row gap-3">
+              <HeroButton.Label>{t('detail.cancel')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton
+              variant="primary"
+              className="min-w-0 flex-1"
+              isDisabled={isSubmitting}
+              style={{ backgroundColor: primary }}
+              accessibilityLabel={t('detail.sendRequest')}
+              onPress={() => void handleRequestExchange()}
+            >
+              {isSubmitting ? (
+                <Spinner size="sm" color={onPrimary} />
+              ) : (
+                <>
+                  <Ionicons name="paper-plane-outline" size={16} color={onPrimary} />
+                  <HeroButton.Label style={{ color: onPrimary }}>{t('detail.sendRequest')}</HeroButton.Label>
+                </>
+              )}
+            </HeroButton>
+          </View>
+        </View>
+      </BottomSheet>
+
+      <BottomSheet
+        visible={!isOwner && showReportForm && !isReported}
+        onClose={() => setShowReportForm(false)}
+        snapPoints={['62%', '88%']}
+        title={t('detail.reportTitle')}
+      >
+        <View testID="exchange-report-sheet" className="gap-4 py-3">
+          <View className="flex-row flex-wrap gap-2">
+            {reportReasons.map((reason) => {
+              const selected = reportReason === reason;
+              return (
                 <HeroButton
-                  variant="ghost"
-                  className="min-w-0 flex-1"
-                  isDisabled={isSubmitting}
-                  accessibilityLabel={t('detail.cancel')}
-                  onPress={() => setShowRequestForm(false)}
+                  key={reason}
+                  size="sm"
+                  variant={selected ? 'secondary' : 'outline'}
+                  onPress={() => setReportReason(reason)}
+                  accessibilityState={{ selected }}
                 >
-                  <HeroButton.Label>{t('detail.cancel')}</HeroButton.Label>
+                  <HeroButton.Label>{t(`detail.reportReason.${reason}`)}</HeroButton.Label>
                 </HeroButton>
-                <HeroButton
-                  variant="primary"
-                  className="min-w-0 flex-1"
-                  isDisabled={isSubmitting}
-                  style={{ backgroundColor: primary }}
-                  accessibilityLabel={t('detail.sendRequest')}
-                  onPress={() => void handleRequestExchange()}
-                >
-                  {isSubmitting ? <Spinner size="sm" /> : <HeroButton.Label>{t('detail.sendRequest')}</HeroButton.Label>}
-                </HeroButton>
-              </View>
-            </Dialog.Content>
-          </KeyboardAvoidingView>
-        </Dialog.Portal>
-      </Dialog>
+              );
+            })}
+          </View>
+          <Input
+            value={reportDetails}
+            onChangeText={setReportDetails}
+            placeholder={t('detail.reportDetailsPlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            multiline
+            textAlignVertical="top"
+            containerClassName="mb-0"
+            inputClassName="min-h-[112px] flex-1 text-base"
+            style={{ color: theme.text, textAlignVertical: 'top' }}
+            accessibilityLabel={t('detail.reportDetailsPlaceholder')}
+          />
+          <View className="flex-row gap-3">
+            <HeroButton
+              variant="secondary"
+              className="min-w-0 flex-1"
+              isDisabled={isReporting}
+              accessibilityLabel={t('detail.cancel')}
+              onPress={() => setShowReportForm(false)}
+            >
+              <HeroButton.Label>{t('detail.cancel')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton
+              variant="danger-soft"
+              className="min-w-0 flex-1"
+              isDisabled={isReporting}
+              accessibilityLabel={t('detail.reportSubmit')}
+              onPress={() => void handleReportSubmit()}
+            >
+              {isReporting ? <Spinner size="sm" /> : <Ionicons name="flag-outline" size={18} color={theme.error} />}
+              <HeroButton.Label>{t('detail.reportSubmit')}</HeroButton.Label>
+            </HeroButton>
+          </View>
+        </View>
+      </BottomSheet>
 
       {showMemberActions ? (
         <Surface
@@ -900,10 +924,10 @@ function ExchangeDetailModalInner() {
               <Spinner size="sm" />
             ) : (
               <>
-                <HeroButton.Label className="text-[13px] font-semibold leading-4" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72}>
+                <HeroButton.Label className="text-[13px] font-semibold leading-4" style={{ color: onPrimary }} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72}>
                   {primaryActionLabel}
                 </HeroButton.Label>
-                <Ionicons name={primaryActionIcon} size={16} color="#fff" />
+                <Ionicons name={primaryActionIcon} size={16} color={onPrimary} />
               </>
             )}
           </HeroButton>
