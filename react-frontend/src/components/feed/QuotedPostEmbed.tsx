@@ -60,7 +60,7 @@ export function QuotedPostEmbed({ post, isPreview = false }: QuotedPostEmbedProp
       : null;
 
   const cardContent = (
-    <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-elevated)] p-3 hover:border-[var(--color-primary)]/30 transition-colors cursor-pointer">
+    <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-elevated)] p-3 hover:border-[var(--color-primary)]/50 transition-colors duration-200 cursor-pointer">
       {/* Author row */}
       <div className="flex items-center gap-2 mb-2">
         <Avatar

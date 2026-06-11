@@ -45,7 +45,7 @@ export function FriendsWidget({ friends }: FriendsWidgetProps) {
         </div>
         <Link
           to={tenantPath('/connections')}
-          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
+          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors duration-200"
         >
           {t('sidebar.friends.see_all')}
         </Link>
@@ -56,7 +56,7 @@ export function FriendsWidget({ friends }: FriendsWidgetProps) {
           <Link
             key={friend.id}
             to={tenantPath(`/profile/${friend.id}`)}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--surface-elevated)] transition-colors"
+            className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--surface-elevated)] transition-colors duration-200"
           >
             <div className="relative flex-shrink-0">
               <Avatar

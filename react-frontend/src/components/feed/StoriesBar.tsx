@@ -50,6 +50,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
   const { user, isAuthenticated } = useAuth();
   const [storyUsers, setStoryUsers] = useState<StoryUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerStartIndex, setViewerStartIndex] = useState(0);
   const [creatorOpen, setCreatorOpen] = useState(false);
@@ -61,12 +62,16 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
     if (!isAuthenticated) return;
     try {
       setIsLoading(true);
+      setLoadError(false);
       const response = await api.get<StoryUser[]>('/v2/stories');
       if (response.success && response.data) {
         setStoryUsers(Array.isArray(response.data) ? response.data : []);
+      } else {
+        setLoadError(true);
       }
     } catch (err) {
       logError('Failed to load stories', err);
+      setLoadError(true);
     } finally {
       setIsLoading(false);
     }
@@ -147,6 +152,23 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
     );
   }
 
+  // Quiet inline error state with retry
+  if (loadError) {
+    return (
+      <div className="flex items-center gap-2 px-1 py-2">
+        <span className="text-xs text-[var(--text-muted)]">{t('stories.load_failed')}</span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onPress={() => loadStories()}
+          className="h-6 min-w-0 px-2 text-xs text-[var(--text-muted)] underline underline-offset-2"
+        >
+          {t('stories.retry')}
+        </Button>
+      </div>
+    );
+  }
+
   // Determine if current user has their own story in the list
   const hasOwnStory = storyUsers.some((su) => su.is_own);
 
@@ -160,7 +182,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
             variant="tertiary"
             size="sm"
             onPress={() => scroll('left')}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[var(--surface-elevated)] shadow-md opacity-0 group-hover:opacity-100 transition-opacity border border-[var(--border-default)]"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[var(--surface-elevated)] shadow-md opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity duration-200 border border-[var(--border-default)]"
             aria-label={t('stories.scroll_left')}
           >
             <ChevronLeft className="w-4 h-4 text-[var(--text-primary)]" />
@@ -174,7 +196,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
             variant="tertiary"
             size="sm"
             onPress={() => scroll('right')}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[var(--surface-elevated)] shadow-md opacity-0 group-hover:opacity-100 transition-opacity border border-[var(--border-default)]"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[var(--surface-elevated)] shadow-md opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity duration-200 border border-[var(--border-default)]"
             aria-label={t('stories.scroll_right')}
           >
             <ChevronRight className="w-4 h-4 text-[var(--text-primary)]" />
@@ -239,7 +261,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
                     <div className={`w-14 h-14 rounded-full p-[2px] ${
                       storyUser.has_unseen
                         ? 'bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600'
-                        : 'bg-gray-300 dark:bg-gray-600'
+                        : 'bg-[var(--border-default)]'
                     }`}>
                       <div className="w-full h-full rounded-full bg-[var(--surface-elevated)] p-[2px]">
                         <Avatar

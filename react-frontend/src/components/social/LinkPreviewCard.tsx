@@ -176,7 +176,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
           </div>
 
           {/* External link icon */}
-          <div className="flex items-center pr-2.5 opacity-0 group-hover/link:opacity-100 transition-opacity">
+          <div className="flex items-center pr-2.5 opacity-0 group-hover/link:opacity-100 transition-opacity duration-200">
             <ExternalLink className="w-3.5 h-3.5 text-[var(--text-subtle)]" aria-hidden="true" />
           </div>
         </Card>
@@ -200,7 +200,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
             <img
               src={safeUrl(imageUrl!)}
               alt={title ? `Preview for ${title}` : `Preview from ${domain}`}
-              className="w-full h-full object-cover group-hover/link:scale-[1.02] transition-transform duration-500"
+              className="w-full h-full object-cover group-hover/link:scale-[1.03] transition-transform duration-500"
               loading="lazy"
               onError={() => setImageError(true)}
             />

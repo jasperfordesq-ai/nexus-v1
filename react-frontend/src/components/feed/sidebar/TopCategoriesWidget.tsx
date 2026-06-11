@@ -51,7 +51,7 @@ export function TopCategoriesWidget({ categories }: TopCategoriesWidgetProps) {
         </div>
         <Link
           to={tenantPath('/listings')}
-          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
+          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors duration-200"
         >
           {t('sidebar.categories.all_listings')}
         </Link>
@@ -62,7 +62,7 @@ export function TopCategoriesWidget({ categories }: TopCategoriesWidgetProps) {
           <Link
             key={category.id}
             to={tenantPath(`/listings?category=${category.id}`)}
-            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors duration-200 ${
               COLOR_CLASSES[idx % COLOR_CLASSES.length]
             }`}
           >

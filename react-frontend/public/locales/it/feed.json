@@ -231,7 +231,8 @@
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "Anteprima dell'annuncio",
     "image_preview_alt": "Anteprima del caricamento",
-    "type_tabs_aria": "Componi il tipo di contenuto"
+    "type_tabs_aria": "Componi il tipo di contenuto",
+    "compose_post": "Compose post"
   },
   "moderation": {
     "unauthorized": "Non hai il permesso di eseguire questa azione."
@@ -534,7 +535,9 @@
     "scroll_left": "Scorri storie a sinistra",
     "scroll_right": "Scorri storie a destra",
     "create_your_story": "Crea la tua storia",
-    "view_story_from": "Vedi storia di {{name}}"
+    "view_story_from": "Vedi storia di {{name}}",
+    "load_failed": "Couldn't load stories",
+    "retry": "Retry"
   },
   "fab": {
     "create": "Crea post"
@@ -619,5 +622,8 @@
   "new_posts_available": "Nuovi post disponibili",
   "confirm": {
     "delete_post": "Eliminare questo post? Questa operazione non può essere annullata."
+  },
+  "aria": {
+    "feed_sidebar": "Community suggestions and highlights"
   }
 }

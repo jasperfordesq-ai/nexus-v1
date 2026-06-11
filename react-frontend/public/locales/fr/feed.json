@@ -231,7 +231,8 @@
     "file_size_mb": "{{name}} ({{size}} Mo)",
     "listing_preview_alt": "Aperçu de l'annonce",
     "image_preview_alt": "Aperçu du téléversement",
-    "type_tabs_aria": "Composer un type de contenu"
+    "type_tabs_aria": "Composer un type de contenu",
+    "compose_post": "Compose post"
   },
   "moderation": {
     "unauthorized": "Vous n'avez pas la permission d'effectuer cette action."
@@ -534,7 +535,9 @@
     "scroll_left": "Faire défiler les stories vers la gauche",
     "scroll_right": "Faire défiler les stories vers la droite",
     "create_your_story": "Créez votre story",
-    "view_story_from": "Voir la story de {{name}}"
+    "view_story_from": "Voir la story de {{name}}",
+    "load_failed": "Couldn't load stories",
+    "retry": "Retry"
   },
   "fab": {
     "create": "Créer un post"
@@ -619,5 +622,8 @@
   "new_posts_available": "Nouveaux messages disponibles",
   "confirm": {
     "delete_post": "Supprimer ce message ? Cela ne peut pas être annulé."
+  },
+  "aria": {
+    "feed_sidebar": "Community suggestions and highlights"
   }
 }

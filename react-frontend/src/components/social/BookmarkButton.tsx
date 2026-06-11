@@ -135,7 +135,7 @@ export function BookmarkButton({
           bookmarked
             ? 'text-[var(--color-warning)]'
             : 'text-[var(--text-muted)] hover:text-[var(--color-warning)]'
-        } transition-colors min-w-0 ${className}`}
+        } transition-[color,transform] duration-150 active:scale-90 min-w-0 ${className}`}
         onPress={handlePress}
         isDisabled={isLoading}
         aria-label={bookmarked ? t('bookmark.remove') : t('bookmark.save')}
@@ -144,7 +144,7 @@ export function BookmarkButton({
         onTouchEnd={longPressHandlers.onTouchEnd}
       >
         {bookmarked ? (
-          <BookmarkCheck className={`${iconSize} fill-amber-500 text-[var(--color-warning)]`} aria-hidden="true" />
+          <BookmarkCheck className={`${iconSize} fill-amber-500 text-[var(--color-warning)] animate-heart-pop`} aria-hidden="true" />
         ) : (
           <Bookmark className={iconSize} aria-hidden="true" />
         )}

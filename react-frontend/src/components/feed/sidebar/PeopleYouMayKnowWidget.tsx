@@ -44,7 +44,7 @@ export function PeopleYouMayKnowWidget({ members }: PeopleYouMayKnowWidgetProps)
         </div>
         <Link
           to={tenantPath('/members')}
-          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
+          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors duration-200"
         >
           {t('sidebar.people.see_all')}
         </Link>
@@ -54,7 +54,7 @@ export function PeopleYouMayKnowWidget({ members }: PeopleYouMayKnowWidgetProps)
         {members.map((member) => (
           <div
             key={member.id}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--surface-elevated)] transition-colors"
+            className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--surface-elevated)] transition-colors duration-200"
           >
             <Link to={tenantPath(`/profile/${member.id}`)} className="relative flex-shrink-0">
               <Avatar

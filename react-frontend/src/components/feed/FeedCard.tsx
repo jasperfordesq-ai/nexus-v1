@@ -1553,7 +1553,7 @@ const FeedCard = React.memo(function FeedCard({
                     }`}
                     startContent={
                       <Heart
-                        className={`w-[18px] h-[18px] transition-all ${item.is_liked ? 'fill-rose-500 text-rose-500 scale-110' : ''}`}
+                        className={`w-[18px] h-[18px] transition-all ${item.is_liked ? 'fill-rose-500 text-rose-500 scale-110 animate-heart-pop' : ''}`}
                         aria-hidden="true"
                       />
                     }

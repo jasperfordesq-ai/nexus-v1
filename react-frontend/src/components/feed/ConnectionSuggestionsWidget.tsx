@@ -98,15 +98,20 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
 
   const handleConnect = useCallback(async (suggestion: Suggestion) => {
     setConnectingIds((prev) => new Set(prev).add(suggestion.id));
+    const previousStatus = suggestion.connection_status;
+    // Optimistic update — reverted on failure
+    setSuggestions((prev) =>
+      prev.map((s) => s.id === suggestion.id ? { ...s, connection_status: 'pending' } : s)
+    );
     try {
       await api.post('/v2/connections/request', { user_id: suggestion.id });
-      // Optimistic update
-      setSuggestions((prev) =>
-        prev.map((s) => s.id === suggestion.id ? { ...s, connection_status: 'pending' } : s)
-      );
       toast.success(t('suggestions.connect_sent'));
     } catch (err) {
       logError('Failed to send connection request', err);
+      // Revert the optimistic update
+      setSuggestions((prev) =>
+        prev.map((s) => s.id === suggestion.id ? { ...s, connection_status: previousStatus } : s)
+      );
       toast.error(t('suggestions.connect_failed'));
     } finally {
       setConnectingIds((prev) => {
@@ -253,13 +258,13 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
         {suggestions.slice(0, 5).map((suggestion) => (
           <div
             key={suggestion.id}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--surface-elevated)] transition-colors relative group"
+            className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--surface-elevated)] transition-colors duration-200 relative group"
           >
             <Button
               isIconOnly
               size="sm"
               variant="light"
-              className="absolute top-1 right-1 w-5 h-5 min-w-0 text-[var(--text-subtle)] opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute top-1 right-1 w-5 h-5 min-w-0 text-[var(--text-subtle)] opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity duration-150"
               onPress={() => handleDismiss(suggestion.id)}
               aria-label={t('suggestions.dismiss')}
             >

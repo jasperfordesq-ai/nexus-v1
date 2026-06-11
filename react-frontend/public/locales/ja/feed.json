@@ -231,7 +231,8 @@
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "リスティングのプレビュー",
     "image_preview_alt": "アップロードのプレビュー",
-    "type_tabs_aria": "コンテンツタイプを作成する"
+    "type_tabs_aria": "コンテンツタイプを作成する",
+    "compose_post": "Compose post"
   },
   "moderation": {
     "unauthorized": "この操作を実行する権限がありません。"
@@ -534,7 +535,9 @@
     "scroll_left": "左にストーリーをスクロール",
     "scroll_right": "右にストーリーをスクロール",
     "create_your_story": "あなたのストーリーを作成",
-    "view_story_from": "{{name}} からのストーリーを見る"
+    "view_story_from": "{{name}} からのストーリーを見る",
+    "load_failed": "Couldn't load stories",
+    "retry": "Retry"
   },
   "fab": {
     "create": "投稿を作成"
@@ -619,5 +622,8 @@
   "new_posts_available": "新しい投稿が利用可能",
   "confirm": {
     "delete_post": "この投稿を削除しますか?これを元に戻すことはできません。"
+  },
+  "aria": {
+    "feed_sidebar": "Community suggestions and highlights"
   }
 }

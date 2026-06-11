@@ -231,7 +231,8 @@
     "file_size_mb": "{{name}} ({{size}} MB)",
     "listing_preview_alt": "Vorschau des Eintrags",
     "image_preview_alt": "Upload-Vorschau",
-    "type_tabs_aria": "Inhaltstyp erstellen"
+    "type_tabs_aria": "Inhaltstyp erstellen",
+    "compose_post": "Compose post"
   },
   "moderation": {
     "unauthorized": "Sie sind nicht berechtigt, diese Aktion auszuführen."
@@ -534,7 +535,9 @@
     "scroll_left": "Stories nach links scrollen",
     "scroll_right": "Stories nach rechts scrollen",
     "create_your_story": "Erstelle deine Story",
-    "view_story_from": "Story von {{name}} ansehen"
+    "view_story_from": "Story von {{name}} ansehen",
+    "load_failed": "Couldn't load stories",
+    "retry": "Retry"
   },
   "fab": {
     "create": "Beitrag erstellen"
@@ -619,5 +622,8 @@
   "new_posts_available": "Neue Beiträge verfügbar",
   "confirm": {
     "delete_post": "Diesen Beitrag löschen? Dies kann nicht rückgängig gemacht werden."
+  },
+  "aria": {
+    "feed_sidebar": "Community suggestions and highlights"
   }
 }

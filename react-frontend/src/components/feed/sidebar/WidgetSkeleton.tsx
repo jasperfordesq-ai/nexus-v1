@@ -20,7 +20,7 @@ export function WidgetSkeleton({ lines = 3 }: WidgetSkeletonProps) {
       <Skeleton className="h-4 w-32 rounded mb-4" />
       <div className="space-y-3">
         {Array.from({ length: lines }, (_, i) => (
-          <div key={i} className="flex items-center gap-3">
+          <div key={`line-${i}`} className="flex items-center gap-3">
             <Skeleton className="w-8 h-8 rounded-full flex-shrink-0" />
             <div className="flex-1">
               <Skeleton className="h-3.5 w-full rounded mb-1.5" />

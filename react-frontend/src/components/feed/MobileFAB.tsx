@@ -24,7 +24,7 @@ export function MobileFAB({ onPress }: MobileFABProps) {
     >
       <Button
         isIconOnly
-        className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30"
+        className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 active:scale-95 transition-transform"
         onPress={onPress}
         aria-label={t('compose.create_post')}
       >

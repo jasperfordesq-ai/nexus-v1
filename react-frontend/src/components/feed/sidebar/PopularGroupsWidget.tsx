@@ -42,7 +42,7 @@ export function PopularGroupsWidget({ groups }: PopularGroupsWidgetProps) {
         </div>
         <Link
           to={tenantPath('/groups')}
-          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
+          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors duration-200"
         >
           {t('sidebar.groups.see_all')}
         </Link>
@@ -53,7 +53,7 @@ export function PopularGroupsWidget({ groups }: PopularGroupsWidgetProps) {
           <Link
             key={group.id}
             to={tenantPath(`/groups/${group.id}`)}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--surface-elevated)] transition-colors group"
+            className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--surface-elevated)] transition-colors duration-200 group"
           >
             {/* Group icon/image */}
             <div className="w-9 h-9 rounded-lg bg-[var(--surface-elevated)] border border-[var(--border-default)] flex items-center justify-center flex-shrink-0 overflow-hidden">
@@ -72,7 +72,7 @@ export function PopularGroupsWidget({ groups }: PopularGroupsWidgetProps) {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-indigo-500 transition-colors">
+              <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-indigo-500 transition-colors duration-200">
                 {group.name}
               </p>
               <p className="text-xs text-[var(--text-muted)]">

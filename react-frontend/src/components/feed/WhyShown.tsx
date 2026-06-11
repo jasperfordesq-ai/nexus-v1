@@ -44,7 +44,7 @@ export function WhyShown({ item, feedMode }: WhyShownProps) {
           isIconOnly
           variant="ghost"
           size="sm"
-          className="size-6 min-h-6 w-6 p-0.5 text-[var(--text-subtle)] opacity-70 transition-colors hover:text-[var(--text-muted)] focus-visible:opacity-100 sm:opacity-40 sm:group-hover:opacity-100"
+          className="size-8 min-w-8 min-h-8 -my-1 p-1.5 flex items-center justify-center text-[var(--text-subtle)] opacity-70 transition-colors hover:text-[var(--text-muted)] focus-visible:opacity-100 sm:opacity-40 sm:group-hover:opacity-100"
           aria-label={t('why_shown.label')}
         >
           <Info className="w-3.5 h-3.5" />

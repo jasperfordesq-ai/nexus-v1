@@ -73,7 +73,7 @@ export function ProfileCardWidget() {
           isBordered
           className="ring-2 ring-indigo-500/30 mb-2"
         />
-        <h3 className="font-semibold text-sm text-[var(--text-primary)] group-hover:text-indigo-500 transition-colors">
+        <h3 className="font-semibold text-sm text-[var(--text-primary)] group-hover:text-indigo-500 transition-colors duration-200">
           {displayName}
         </h3>
         {handle && (
@@ -114,7 +114,7 @@ export function ProfileCardWidget() {
           <div className="grid grid-cols-2 gap-2 mt-3">
             <Link
               to={tenantPath('/listings?type=offer')}
-              className="flex items-center gap-2 p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors"
+              className="flex items-center gap-2 p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors duration-200"
             >
               <Heart className="w-3.5 h-3.5 text-emerald-500" aria-hidden="true" />
               <div>
@@ -126,7 +126,7 @@ export function ProfileCardWidget() {
             </Link>
             <Link
               to={tenantPath('/listings?type=request')}
-              className="flex items-center gap-2 p-2 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 transition-colors"
+              className="flex items-center gap-2 p-2 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 transition-colors duration-200"
             >
               <HandHelping className="w-3.5 h-3.5 text-orange-500" aria-hidden="true" />
               <div>

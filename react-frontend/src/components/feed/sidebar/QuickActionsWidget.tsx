@@ -79,7 +79,7 @@ export function QuickActionsWidget() {
             <Link
               key={action.path}
               to={tenantPath(action.path)}
-              className={`flex flex-col items-center gap-1.5 p-3 rounded-lg ${action.bg} transition-colors`}
+              className={`flex flex-col items-center gap-1.5 p-3 rounded-lg ${action.bg} transition-colors duration-200`}
             >
               <action.icon className={`w-4 h-4 ${action.color}`} aria-hidden="true" />
               <span className={`text-[11px] font-medium ${action.color}`}>

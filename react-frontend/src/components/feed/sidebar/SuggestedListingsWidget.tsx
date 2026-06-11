@@ -42,7 +42,7 @@ export function SuggestedListingsWidget({ listings }: SuggestedListingsWidgetPro
         </div>
         <Link
           to={tenantPath('/listings')}
-          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
+          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors duration-200"
         >
           {t('sidebar.suggested.see_all')}
         </Link>
@@ -53,7 +53,7 @@ export function SuggestedListingsWidget({ listings }: SuggestedListingsWidgetPro
           <Link
             key={listing.id}
             to={tenantPath(`/listings/${listing.id}`)}
-            className="flex items-start gap-3 p-2 rounded-lg hover:bg-[var(--surface-elevated)] transition-colors group"
+            className="flex items-start gap-3 p-2 rounded-lg hover:bg-[var(--surface-elevated)] transition-colors duration-200 group"
           >
             <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${
               listing.type === 'offer' ? 'bg-emerald-500/10' : 'bg-orange-500/10'
@@ -65,7 +65,7 @@ export function SuggestedListingsWidget({ listings }: SuggestedListingsWidgetPro
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-indigo-500 transition-colors">
+              <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-indigo-500 transition-colors duration-200">
                 {listing.title}
               </p>
               <p className="text-xs text-[var(--text-muted)] truncate">

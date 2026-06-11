@@ -231,7 +231,8 @@
     "file_size_mb": "{{name}} ({{size}}ميجابايت)",
     "listing_preview_alt": "معاينة الإعلان",
     "image_preview_alt": "معاينة الرفع",
-    "type_tabs_aria": "يؤلف نوع المحتوى"
+    "type_tabs_aria": "يؤلف نوع المحتوى",
+    "compose_post": "Compose post"
   },
   "moderation": {
     "unauthorized": "ليس لديك صلاحية لتنفيذ هذا الإجراء."
@@ -534,7 +535,9 @@
     "scroll_left": "مرر القصص لليسار",
     "scroll_right": "مرر القصص لليمين",
     "create_your_story": "أنشئ قصتك",
-    "view_story_from": "عرض القصة من {{name}}"
+    "view_story_from": "عرض القصة من {{name}}",
+    "load_failed": "Couldn't load stories",
+    "retry": "Retry"
   },
   "fab": {
     "create": "إنشاء منشور"
@@ -619,5 +622,8 @@
   "new_posts_available": "وظائف جديدة متاحة",
   "confirm": {
     "delete_post": "هل تريد حذف هذه المشاركة؟ لا يمكن التراجع عن هذا."
+  },
+  "aria": {
+    "feed_sidebar": "Community suggestions and highlights"
   }
 }

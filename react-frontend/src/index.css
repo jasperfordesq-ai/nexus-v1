@@ -563,6 +563,22 @@
 }
 
 /* ─────────────────────────────────────────────
+   HEART POP (like/bookmark micro-interaction)
+   Quick overshoot pop applied when an item
+   becomes liked/bookmarked. Settles at 1.1 to
+   match the existing scale-110 liked state.
+   ───────────────────────────────────────────── */
+@keyframes heart-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  100% { transform: scale(1.1); }
+}
+
+.animate-heart-pop {
+  animation: heart-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ─────────────────────────────────────────────
    WCAG 2.3.3 — REDUCED MOTION
    Tailwind's animate-* utilities and custom
    shimmer/spin animations must respect the

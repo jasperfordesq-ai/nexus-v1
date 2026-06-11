@@ -231,7 +231,8 @@
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "Réamhamharc liostála",
     "image_preview_alt": "Réamhamharc uaslódála",
-    "type_tabs_aria": "Cum cineál ábhair"
+    "type_tabs_aria": "Cum cineál ábhair",
+    "compose_post": "Compose post"
   },
   "moderation": {
     "unauthorized": "Níl cead agat an gníomh seo a dhéanamh."
@@ -534,7 +535,9 @@
     "scroll_left": "Scrollaigh scéalta ar chlé",
     "scroll_right": "Scrollaigh scéalta ar dheis",
     "create_your_story": "Cruthaigh do scéal",
-    "view_story_from": "Féach ar scéal ó {{name}}"
+    "view_story_from": "Féach ar scéal ó {{name}}",
+    "load_failed": "Couldn't load stories",
+    "retry": "Retry"
   },
   "fab": {
     "create": "Cruthaigh postáil"
@@ -619,5 +622,8 @@
   "new_posts_available": "Poist nua ar fáil",
   "confirm": {
     "delete_post": "Scrios an postáil seo? Ní féidir é seo a chealú."
+  },
+  "aria": {
+    "feed_sidebar": "Community suggestions and highlights"
   }
 }

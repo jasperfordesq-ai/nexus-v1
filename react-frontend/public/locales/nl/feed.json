@@ -231,7 +231,8 @@
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "Voorbeeld van vermelding",
     "image_preview_alt": "Uploadvoorbeeld",
-    "type_tabs_aria": "Inhoudstype samenstellen"
+    "type_tabs_aria": "Inhoudstype samenstellen",
+    "compose_post": "Compose post"
   },
   "moderation": {
     "unauthorized": "Je hebt geen toestemming om deze actie uit te voeren."
@@ -534,7 +535,9 @@
     "scroll_left": "Scroll verhalen naar links",
     "scroll_right": "Scroll verhalen naar rechts",
     "create_your_story": "Maak jouw verhaal",
-    "view_story_from": "Bekijk verhaal van {{name}}"
+    "view_story_from": "Bekijk verhaal van {{name}}",
+    "load_failed": "Couldn't load stories",
+    "retry": "Retry"
   },
   "fab": {
     "create": "Plaats aanmaken"
@@ -619,5 +622,8 @@
   "new_posts_available": "Nieuwe berichten beschikbaar",
   "confirm": {
     "delete_post": "Dit bericht verwijderen? Dit kan niet ongedaan worden gemaakt."
+  },
+  "aria": {
+    "feed_sidebar": "Community suggestions and highlights"
   }
 }

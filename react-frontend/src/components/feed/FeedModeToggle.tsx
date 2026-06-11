@@ -8,6 +8,8 @@
  */
 
 
+import { useMemo } from 'react';
+
 import Sparkles from 'lucide-react/icons/sparkles';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui';
 import Clock from 'lucide-react/icons/clock';
@@ -21,7 +23,7 @@ interface FeedModeToggleProps {
 
 export function FeedModeToggle({ mode, onModeChange }: FeedModeToggleProps) {
   const { t } = useTranslation('feed');
-  const selectedKeys = new Set<Key>([mode]);
+  const selectedKeys = useMemo(() => new Set<Key>([mode]), [mode]);
 
   const handleSelectionChange = (keys: Set<Key>) => {
     const [key] = Array.from(keys);
@@ -44,7 +46,7 @@ export function FeedModeToggle({ mode, onModeChange }: FeedModeToggleProps) {
       <ToggleButton
         id="ranking"
         variant="ghost"
-        className="h-8 px-0 text-[var(--text-muted)] data-[selected=true]:text-[var(--text-primary)]"
+        className="h-8 px-0 text-[var(--text-muted)] transition-colors duration-200 hover:text-accent data-[selected=true]:text-accent data-[selected=true]:font-semibold"
       >
         <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
         <span>{t('mode.for_you')}</span>
@@ -52,7 +54,7 @@ export function FeedModeToggle({ mode, onModeChange }: FeedModeToggleProps) {
       <ToggleButton
         id="recent"
         variant="ghost"
-        className="h-8 px-0 text-[var(--text-muted)] data-[selected=true]:text-[var(--text-primary)]"
+        className="h-8 px-0 text-[var(--text-muted)] transition-colors duration-200 hover:text-accent data-[selected=true]:text-accent data-[selected=true]:font-semibold"
       >
         <Clock className="w-3.5 h-3.5" aria-hidden="true" />
         <span>{t('mode.recent')}</span>

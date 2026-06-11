@@ -54,7 +54,7 @@ export function UpcomingEventsWidget({ events }: UpcomingEventsWidgetProps) {
         </div>
         <Link
           to={tenantPath('/events')}
-          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
+          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors duration-200"
         >
           {t('sidebar.events.see_all')}
         </Link>
@@ -65,7 +65,7 @@ export function UpcomingEventsWidget({ events }: UpcomingEventsWidgetProps) {
           <Link
             key={event.id}
             to={tenantPath(`/events/${event.id}`)}
-            className="flex items-start gap-3 p-2 rounded-lg hover:bg-[var(--surface-elevated)] transition-colors group"
+            className="flex items-start gap-3 p-2 rounded-lg hover:bg-[var(--surface-elevated)] transition-colors duration-200 group"
           >
             {/* Calendar date card */}
             <div className="w-11 h-12 rounded-lg bg-[var(--surface-elevated)] border border-[var(--border-default)] flex flex-col items-center justify-center overflow-hidden flex-shrink-0">
@@ -80,7 +80,7 @@ export function UpcomingEventsWidget({ events }: UpcomingEventsWidgetProps) {
 
             {/* Event info */}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-indigo-500 transition-colors">
+              <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-indigo-500 transition-colors duration-200">
                 {event.title}
               </p>
               {event.start_time && (
