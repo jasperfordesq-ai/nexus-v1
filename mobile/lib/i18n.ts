@@ -6,6 +6,8 @@
 import i18n, { changeLanguage as changeI18nextLanguage, use as useI18next } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import * as Localization from 'expo-localization';
+import { storage } from '@/lib/storage';
+import { STORAGE_KEYS } from '@/lib/constants';
 
 /**
  * i18n setup with LAZY language loading.
@@ -274,10 +276,28 @@ export function loadLanguage(lang: string): void {
 
 /**
  * Switch the active language. Loads resources on demand if needed.
+ * Persists the choice so it survives app restarts (otherwise the app
+ * silently reverts to the device locale on every cold start).
  */
 export async function changeLanguage(lang: string): Promise<void> {
   loadLanguage(lang);
   await changeI18nextLanguage(lang);
+  void storage.set(STORAGE_KEYS.LANGUAGE, lang);
 }
+
+/**
+ * Re-apply the language the user last chose in Settings.
+ * Called once at app boot (fire-and-forget below); i18n initialises
+ * synchronously with the device locale first so first render never blocks.
+ */
+export async function restoreSavedLanguage(): Promise<void> {
+  const saved = await storage.get(STORAGE_KEYS.LANGUAGE);
+  if (saved && SUPPORTED_LANGUAGES.includes(saved) && saved !== i18n.language) {
+    loadLanguage(saved);
+    await changeI18nextLanguage(saved);
+  }
+}
+
+void restoreSavedLanguage();
 
 export default i18n;

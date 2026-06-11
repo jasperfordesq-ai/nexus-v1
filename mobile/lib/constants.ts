@@ -31,6 +31,8 @@ export const STORAGE_KEYS = {
   TENANT_SLUG: 'nexus_tenant_slug',
   USER_DATA: 'nexus_user_data',
   THEME_MODE: 'nexus_theme_mode',
+  /** Last language explicitly chosen by the user in Settings (restored at boot) */
+  LANGUAGE: 'nexus_language',
 } as const;
 
 /** App-wide timing constants */
