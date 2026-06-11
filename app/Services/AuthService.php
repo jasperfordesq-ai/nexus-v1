@@ -30,7 +30,10 @@ class AuthService
     /**
      * Authenticate a user by email and password.
      *
-     * @return array{user: array, token: string}|null
+     * Returns the user + token on success, null on invalid credentials,
+     * or a {success: false, error: ...} array when rate-limited.
+     *
+     * @return array{user: array, token: string}|array{success: false, error: string}|null
      */
     public function login(string $email, string $password, ?string $deviceType = null): ?array
     {

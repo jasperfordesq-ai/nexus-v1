@@ -1765,7 +1765,7 @@ class AdminUsersController extends BaseApiController
      * Uses the user's tenant_id to look up the correct values.
      *
      * @param array $user User record from the database
-     * @return array{tenant_id: int, name: string, slug_prefix: string}
+     * @return array{tenant_id: int, name: string, slug_prefix: string, frontend_url: string}
      */
     private function resolveUserTenant(array $user): array
     {

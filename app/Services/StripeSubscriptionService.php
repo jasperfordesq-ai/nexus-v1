@@ -119,7 +119,10 @@ class StripeSubscriptionService
     /**
      * Create a Stripe Checkout Session for a tenant to subscribe to a plan.
      *
-     * @return array{checkout_url: string, session_id: string}
+     * Free plans (price 0/0) are activated directly without Stripe and return
+     * {activated: true, checkout_url: null} instead of a checkout session.
+     *
+     * @return array{checkout_url: string, session_id: string}|array{activated: true, checkout_url: null}
      */
     public static function createCheckoutSession(int $tenantId, int $planId, string $billingInterval): array
     {
