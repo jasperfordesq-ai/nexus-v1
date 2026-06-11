@@ -119,7 +119,7 @@ class MentionServiceTest extends TestCase
 
     public function test_resolveMentions_resolves_by_username(): void
     {
-        DB::shouldReceive('table->where->where->where->select->get')
+        DB::shouldReceive('table->where->where->whereNull->where->select->get')
             ->once()
             ->andReturn(collect([
                 (object) ['id' => 10, 'username' => 'johndoe', 'first_name' => 'John', 'name' => 'John Doe', 'last_name' => 'Doe'],
@@ -133,7 +133,7 @@ class MentionServiceTest extends TestCase
 
     public function test_resolveMentions_resolves_by_first_name(): void
     {
-        DB::shouldReceive('table->where->where->where->select->get')
+        DB::shouldReceive('table->where->where->whereNull->where->select->get')
             ->once()
             ->andReturn(collect([
                 (object) ['id' => 20, 'username' => 'jsmith', 'first_name' => 'Jane', 'name' => 'Jane Smith', 'last_name' => 'Smith'],
@@ -147,7 +147,7 @@ class MentionServiceTest extends TestCase
 
     public function test_resolveMentions_case_insensitive(): void
     {
-        DB::shouldReceive('table->where->where->where->select->get')
+        DB::shouldReceive('table->where->where->whereNull->where->select->get')
             ->once()
             ->andReturn(collect([
                 (object) ['id' => 30, 'username' => 'ALICE', 'first_name' => 'Alice', 'name' => 'Alice W', 'last_name' => 'W'],
@@ -161,7 +161,7 @@ class MentionServiceTest extends TestCase
 
     public function test_resolveMentions_returns_empty_for_unmatched(): void
     {
-        DB::shouldReceive('table->where->where->where->select->get')
+        DB::shouldReceive('table->where->where->whereNull->where->select->get')
             ->once()
             ->andReturn(collect([]));
 
@@ -175,7 +175,7 @@ class MentionServiceTest extends TestCase
         // The DB query includes `->where('status', '!=', 'banned')`, so banned users
         // are filtered out at the database level. An empty result means the only
         // matching user was banned.
-        DB::shouldReceive('table->where->where->where->select->get')
+        DB::shouldReceive('table->where->where->whereNull->where->select->get')
             ->once()
             ->andReturn(collect([]));
 
@@ -186,7 +186,7 @@ class MentionServiceTest extends TestCase
 
     public function test_resolveMentions_resolves_multiple_usernames(): void
     {
-        DB::shouldReceive('table->where->where->where->select->get')
+        DB::shouldReceive('table->where->where->whereNull->where->select->get')
             ->once()
             ->andReturn(collect([
                 (object) ['id' => 10, 'username' => 'alice', 'first_name' => 'Alice', 'name' => 'Alice', 'last_name' => 'Smith'],
@@ -274,7 +274,7 @@ class MentionServiceTest extends TestCase
 
     public function test_processText_returns_zero_when_no_users_resolved(): void
     {
-        DB::shouldReceive('table->where->where->where->select->get')
+        DB::shouldReceive('table->where->where->whereNull->where->select->get')
             ->once()
             ->andReturn(collect([]));
 
@@ -286,7 +286,7 @@ class MentionServiceTest extends TestCase
     public function test_processText_returns_count_of_created_mentions(): void
     {
         // resolveMentions: returns two matched users
-        DB::shouldReceive('table->where->where->where->select->get')
+        DB::shouldReceive('table->where->where->whereNull->where->select->get')
             ->once()
             ->andReturn(collect([
                 (object) ['id' => 10, 'username' => 'alice', 'first_name' => 'Alice', 'name' => 'Alice', 'last_name' => 'Smith'],
