@@ -95,6 +95,29 @@ jobs:
           mysql -h 127.0.0.1 -u root -ptesting nexus -e "INSERT IGNORE INTO categories (id, name, slug, tenant_id, type) VALUES (1, 'General', 'general', 1, 'listing');"
           echo "Test database schema and seed data loaded successfully."
 
+      # Apply any migrations newer than the committed schema dump. Without this,
+      # a migration committed without refreshing database/schema/mysql-schema.sql
+      # breaks every PR's test run with "table/column not found" errors that have
+      # nothing to do with the PR's diff. The dump includes laravel_migrations
+      # bookkeeping, so only pending migrations run; all migrations are guarded
+      # with Schema::hasTable/hasColumn for idempotency.
+      - name: Apply pending migrations on top of schema dump
+        run: |
+          php artisan migrate --force
+          DB_NAME=nexus php artisan migrate --force
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_NAME: nexus_test
+          DB_USER: root
+          DB_PASS: testing
+          APP_ENV: testing
+          APP_KEY: base64:HfQEDtbtr90JIXhsaAhSFWnzIo1f31VZ2e5qLqKKnls=
+          CACHE_DRIVER: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
+          LOG_CHANNEL: null
+
       - name: PHP Syntax Check
         run: |
           echo "Checking PHP syntax in app/ ..."
