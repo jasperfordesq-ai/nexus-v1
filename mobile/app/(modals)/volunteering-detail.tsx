@@ -360,18 +360,24 @@ function VolunteeringDetailScreenInner() {
       return;
     }
 
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setInterestLoading(true);
+    setInterestSent(true); // optimistic — reverted in catch
     try {
       await expressInterest(opportunity.id, applyMessage.trim() || undefined);
-      setInterestSent(true);
       setApplyMessage('');
       setApplySheetOpen(false);
       refresh();
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       showToast({ title: t('interestSentTitle'), description: t('interestSentMessage'), variant: 'success' });
-    } catch {
+    } catch (err) {
+      setInterestSent(false);
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      showToast({ title: t('common:errors.alertTitle'), description: t('interestError'), variant: 'danger' });
+      showToast({
+        title: t('common:errors.alertTitle'),
+        description: err instanceof Error && err.message ? err.message : t('interestError'),
+        variant: 'danger',
+      });
     } finally {
       setInterestLoading(false);
     }

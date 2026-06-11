@@ -254,6 +254,11 @@ class VolunteerService
             throw new \RuntimeException(__('api.volunteer_opportunity_not_active'), 404);
         }
 
+        // Creators cannot apply to their own opportunity
+        if ((int) ($opportunity->created_by ?? 0) === $userId) {
+            throw new \RuntimeException(__('api.volunteer_cannot_apply_own'), 422);
+        }
+
         // Prevent duplicate applications
         $existing = VolApplication::where('opportunity_id', $opportunityId)
             ->where('user_id', $userId)
@@ -574,8 +579,71 @@ class VolunteerService
             $items->pop();
         }
 
+        // Per-org stats via grouped aggregates over the page's org IDs —
+        // a fixed number of queries regardless of page size.
+        $orgIds = $items->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $oppCounts = [];
+        $volCounts = [];
+        $hourTotals = [];
+        $avgRatings = [];
+        if (! empty($orgIds)) {
+            $tenantId = self::getTenantId();
+
+            $oppCounts = DB::table('vol_opportunities')
+                ->where('tenant_id', $tenantId)
+                ->whereIn('organization_id', $orgIds)
+                ->where('is_active', true)
+                ->whereIn('status', ['open', 'active'])
+                ->groupBy('organization_id')
+                ->selectRaw('organization_id, COUNT(*) as cnt')
+                ->pluck('cnt', 'organization_id')
+                ->all();
+
+            $volCounts = DB::table('vol_applications as a')
+                ->join('vol_opportunities as o', function ($join) {
+                    $join->on('a.opportunity_id', '=', 'o.id')
+                        ->whereColumn('o.tenant_id', 'a.tenant_id');
+                })
+                ->where('a.tenant_id', $tenantId)
+                ->where('a.status', 'approved')
+                ->whereIn('o.organization_id', $orgIds)
+                ->groupBy('o.organization_id')
+                ->selectRaw('o.organization_id, COUNT(DISTINCT a.user_id) as cnt')
+                ->pluck('cnt', 'organization_id')
+                ->all();
+
+            $hourTotals = DB::table('vol_logs')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'approved')
+                ->whereIn('organization_id', $orgIds)
+                ->groupBy('organization_id')
+                ->selectRaw('organization_id, SUM(hours) as total')
+                ->pluck('total', 'organization_id')
+                ->all();
+
+            $avgRatings = DB::table('vol_reviews')
+                ->where('tenant_id', $tenantId)
+                ->where('target_type', 'organization')
+                ->whereIn('target_id', $orgIds)
+                ->groupBy('target_id')
+                ->selectRaw('target_id, AVG(rating) as avg_rating')
+                ->pluck('avg_rating', 'target_id')
+                ->all();
+        }
+
+        $itemsArray = $items->map(function ($org) use ($oppCounts, $volCounts, $hourTotals, $avgRatings) {
+            $data = $org->toArray();
+            $id = (int) $org->id;
+            $data['opportunity_count'] = (int) ($oppCounts[$id] ?? 0);
+            $data['volunteer_count'] = (int) ($volCounts[$id] ?? 0);
+            $data['total_hours'] = (float) ($hourTotals[$id] ?? 0);
+            $data['average_rating'] = isset($avgRatings[$id]) ? round((float) $avgRatings[$id], 1) : 0.0;
+
+            return $data;
+        })->all();
+
         return [
-            'items'    => $items->toArray(),
+            'items'    => $itemsArray,
             'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
             'has_more' => $hasMore,
         ];
@@ -610,6 +678,10 @@ class VolunteerService
             ->where('status', 'approved')
             ->distinct('user_id')
             ->count('user_id');
+
+        // Aliases matching getOrganisations() — keep the old keys for back-compat.
+        $data['opportunity_count'] = $data['opportunities_count'];
+        $data['volunteer_count'] = $data['total_volunteers'];
 
         return $data;
     }
@@ -713,7 +785,17 @@ class VolunteerService
                 'shift_id'   => $userApp->shift_id ? (int) $userApp->shift_id : null,
                 'created_at' => $userApp->created_at,
             ] : null;
-            $formatted['is_owner'] = $viewerCanManage;
+            // is_owner means CREATOR ONLY — the web/mobile UIs gate the owner
+            // panel (Edit / Applications) on it, so org owners and tenant
+            // admins must not see owner UI on other members' posts. Legacy
+            // rows predate the created_by column (NULL) and fall back to the
+            // organisation owner. Admin tooling should use can_manage, which
+            // keeps the broader canManageOpportunity() grant.
+            $createdBy = isset($opp->created_by) && $opp->created_by !== null
+                ? (int) $opp->created_by
+                : (int) ($opp->org_owner_id ?? 0);
+            $formatted['is_owner'] = $createdBy > 0 && $createdBy === (int) $viewerId;
+            $formatted['can_manage'] = $viewerCanManage;
         }
 
         return $formatted;

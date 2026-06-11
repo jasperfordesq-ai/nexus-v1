@@ -830,6 +830,13 @@ class GovukAlphaFrontendTest extends TestCase
     public function test_volunteering_pages_render_opportunity_detail_and_application_flow(): void
     {
         $user = $this->authenticatedUser();
+        // The opportunity must be created by a DIFFERENT user — creators can
+        // no longer apply to their own opportunities (VolunteerService::apply
+        // rejects them), and this test exercises the applicant path.
+        $creator = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
         $organizationId = DB::table('vol_organizations')->insertGetId([
             'tenant_id' => $this->testTenantId,
             'user_id' => $user->id,
@@ -844,7 +851,7 @@ class GovukAlphaFrontendTest extends TestCase
         $opportunityId = DB::table('vol_opportunities')->insertGetId([
             'tenant_id' => $this->testTenantId,
             'organization_id' => $organizationId,
-            'created_by' => $user->id,
+            'created_by' => $creator->id,
             'title' => 'Alpha volunteering opportunity',
             'description' => 'Accessible volunteering detail body.',
             'location' => 'Volunteer Centre',

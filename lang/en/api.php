@@ -1616,6 +1616,7 @@ return [
     'volunteer_organization_required'      => 'Organisation is required',
     'volunteer_org_manage_forbidden'       => 'You do not have permission to manage this organisation',
     'volunteer_opportunity_not_active'     => 'Opportunity not found or is not active',
+    'volunteer_cannot_apply_own'           => 'You cannot apply to your own opportunity',
     'volunteer_shift_not_found'            => 'Shift not found',
     'volunteer_shift_started'              => 'This shift has already started',
     'volunteer_shift_at_capacity'          => 'This shift is at capacity',
