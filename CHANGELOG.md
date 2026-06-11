@@ -37,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Job moderation decisions now arrive by email too.** When an admin approves or rejects a job posting, the poster now also receives a durable email in their own language — for rejections, including the reason and how to edit and resubmit — in addition to the existing in-app bell and push notifications (which previously left no lasting record). Listing approvals now also send a device push for channel parity, and use the tenant-safe notification writer.
 
+- **The platform now notices within minutes if background processing stops.** The June outage went undetected for 5 days because every health indicator only checked that the queue *manager* was running — not that work was actually being done. Two new safeguards close that gap: a tiny "heartbeat" task is sent through the real queue every 5 minutes and an independent watchdog raises an alarm (error log + monitoring alert, at most one alert per 6 hours) if heartbeats stop coming back; and the container health status itself now requires a live worker process, not just the manager.
+
 ### Fixed
 
 - **Background job processing restored (queued work had been silently stuck since 6 June).** A version mismatch between two framework components meant every background worker crashed the instant it started — while the system still reported itself "healthy". Anything handled by the background queue (federation syncing between communities and some queued notifications) quietly piled up instead of being processed; nothing was lost, and the backlog is worked off automatically once this fix is deployed. The mismatched component has been updated to the release that fixes the incompatibility.

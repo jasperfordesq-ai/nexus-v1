@@ -70,6 +70,27 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->name('federation-reconcile-pending-tx')
             ->withoutOverlapping(10);
 
+        // Queue worker liveness: dispatch a heartbeat through a real worker…
+        $schedule->call(function () {
+            \Illuminate\Support\Facades\Cache::put(
+                \App\Console\Commands\VerifyQueueLiveness::DISPATCHED_AT_KEY,
+                now()->getTimestamp(),
+                \App\Jobs\QueueHeartbeatJob::STAMP_TTL_SECONDS
+            );
+            \App\Jobs\QueueHeartbeatJob::dispatch();
+        })
+            ->everyFiveMinutes()
+            ->name('queue-heartbeat-dispatch');
+
+        // …and alarm (log + Sentry, 6h throttle) when heartbeats stop coming
+        // back. Runs in the scheduler container, independent of the workers
+        // it watches — "Horizon master alive" is NOT proof jobs process
+        // (see the 2026-06-06→11 outage).
+        $schedule->command('queue:verify-liveness')
+            ->everyTenMinutes()
+            ->withoutOverlapping()
+            ->name('queue-verify-liveness');
+
         $schedule->command('safeguarding:purge-message-copies')
             ->weekly()
             ->withoutOverlapping()

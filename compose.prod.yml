@@ -251,11 +251,13 @@ services:
     restart: unless-stopped
     stop_grace_period: 120s
     healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'artisan horizon' > /dev/null || exit 1"]
+      # Master alive is NOT enough — workers can crash at boot while the
+      # master stays "healthy". Require at least one live horizon:work too.
+      test: ["CMD-SHELL", "pgrep -f 'artisan horizon' > /dev/null && pgrep -f 'horizon:work' > /dev/null || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 60s
+      start_period: 90s
     volumes:
       - ./app:/var/www/html/app:ro
       - ./src:/var/www/html/src:ro

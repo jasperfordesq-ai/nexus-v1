@@ -130,11 +130,14 @@ services:
     networks:
       - nexus-php-internal
     healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'artisan horizon' > /dev/null || exit 1"]
+      # Master alive is NOT enough — in the 2026-06 outage every horizon:work
+      # worker crashed at boot for 5 days while the master kept "healthy".
+      # min-processes=1 guarantees >=1 horizon:work process on a healthy node.
+      test: ["CMD-SHELL", "pgrep -f 'artisan horizon' > /dev/null && pgrep -f 'horizon:work' > /dev/null || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 60s
+      start_period: 90s
 
   scheduler:
     image: nexus-php-app:${BUILD_COMMIT:-candidate}
