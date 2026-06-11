@@ -230,8 +230,14 @@ class VolunteerWellbeingController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_emergency_list', 60, 60);
 
-        $alerts = $this->volunteerEmergencyAlertService->getUserAlerts($userId);
-        return $this->respondWithData(['alerts' => $alerts]);
+        // getUserAlerts returns a {items, cursor, has_more} envelope — the
+        // frontend expects data.alerts to be the plain array, not the envelope.
+        $result = $this->volunteerEmergencyAlertService->getUserAlerts($userId);
+        return $this->respondWithData([
+            'alerts'   => $result['items'],
+            'cursor'   => $result['cursor'],
+            'has_more' => $result['has_more'],
+        ]);
     }
 
     public function createEmergencyAlert(): JsonResponse
