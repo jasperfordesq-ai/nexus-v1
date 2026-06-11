@@ -731,6 +731,29 @@ class VolunteerCommunityController extends BaseApiController
         return $this->respondWithData(['items' => $rows]);
     }
 
+    /**
+     * Admin: mark a pending offline donation as completed.
+     *
+     * Offline donations (cash / bank transfer / PayPal) recorded via the
+     * volunteering Donations tab have no payment webhook, so this is the
+     * only path that moves them out of 'pending' and credits the linked
+     * giving day's raised total.
+     */
+    public function completeDonation(string $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->requireAdmin();
+
+        try {
+            $result = VolunteerDonationService::markCompleted((int) $id, TenantContext::getId());
+            return $this->respondWithData($result);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('NOT_FOUND', $e->getMessage(), null, 404);
+        }
+    }
+
     /** Returns raw CSV for donation export */
     public function exportDonations(): Response
     {

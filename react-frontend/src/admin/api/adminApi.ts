@@ -2711,6 +2711,15 @@ export const adminDonations = {
   /** Issues a full Stripe refund for a completed donation. */
   refund: (id: number) =>
     api.post<{ success: boolean; refund_id: string }>(`/v2/admin/donations/${id}/refund`),
+
+  /**
+   * Marks a pending offline donation (cash / bank transfer / PayPal) as
+   * completed. Stripe donations complete via webhook and are rejected here.
+   */
+  complete: (id: number) =>
+    api.post<{ id: number; status: string; already_completed: boolean }>(
+      `/v2/admin/volunteering/donations/${id}/complete`
+    ),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

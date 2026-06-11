@@ -127,31 +127,54 @@ class ShiftGroupReservationService
             return false;
         }
 
-        if ((int) $reservation->filled_slots >= (int) $reservation->reserved_slots) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_reservation_slots_filled')];
-            return false;
-        }
-
-        // Check if user is already in this reservation
-        $alreadyMember = DB::table('vol_shift_group_members')
-            ->where('reservation_id', $reservationId)
-            ->where('user_id', $userId)
-            ->where('status', 'confirmed')
-            ->exists();
-
-        if ($alreadyMember) {
-            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.shift_reservation_member_already_added')];
-            return false;
-        }
-
         try {
             return DB::transaction(function () use ($reservationId, $userId, $tenantId) {
-                DB::table('vol_shift_group_members')->insert([
-                    'reservation_id' => $reservationId,
-                    'user_id'        => $userId,
-                    'status'         => 'confirmed',
-                    'created_at'     => now(),
-                ]);
+                // Lock the reservation row so concurrent addMember calls can't
+                // both pass the capacity check and overbook the slots.
+                $locked = DB::table('vol_shift_group_reservations')
+                    ->where('id', $reservationId)
+                    ->where('status', 'active')
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $locked) {
+                    self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.shift_reservation_not_found')];
+                    return false;
+                }
+
+                if ((int) $locked->filled_slots >= (int) $locked->reserved_slots) {
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_reservation_slots_filled')];
+                    return false;
+                }
+
+                // A removed member keeps a 'cancelled' row (unique on
+                // reservation_id+user_id), so re-adding must update it
+                // rather than insert a duplicate.
+                $existing = DB::table('vol_shift_group_members')
+                    ->where('reservation_id', $reservationId)
+                    ->where('user_id', $userId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($existing && $existing->status === 'confirmed') {
+                    self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.shift_reservation_member_already_added')];
+                    return false;
+                }
+
+                if ($existing) {
+                    DB::table('vol_shift_group_members')
+                        ->where('id', $existing->id)
+                        ->update(['status' => 'confirmed', 'tenant_id' => $tenantId]);
+                } else {
+                    DB::table('vol_shift_group_members')->insert([
+                        'reservation_id' => $reservationId,
+                        'tenant_id'      => $tenantId,
+                        'user_id'        => $userId,
+                        'status'         => 'confirmed',
+                        'created_at'     => now(),
+                    ]);
+                }
 
                 DB::table('vol_shift_group_reservations')
                     ->where('id', $reservationId)

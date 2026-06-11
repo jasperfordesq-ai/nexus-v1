@@ -200,6 +200,62 @@ class VolunteerDonationService
     }
 
     /**
+     * Admin: mark a pending offline donation (cash / bank transfer / PayPal)
+     * as completed and credit the linked giving day's raised total.
+     *
+     * Stripe donations are excluded — they complete via the payment webhook
+     * only, otherwise an admin completion racing a later payment failure
+     * would leave totals inflated.
+     *
+     * Lock-guarded and idempotent: the giving-day increment fires exactly
+     * once per donation even under concurrent calls.
+     *
+     * @return array{id: int, status: string, already_completed: bool}
+     * @throws \RuntimeException         If the donation does not exist for this tenant
+     * @throws \InvalidArgumentException If the donation cannot be completed manually
+     */
+    public static function markCompleted(int $donationId, int $tenantId): array
+    {
+        return DB::transaction(function () use ($donationId, $tenantId) {
+            $donation = DB::table('vol_donations')
+                ->where('id', $donationId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$donation) {
+                throw new \RuntimeException(__('api.donation_not_found'));
+            }
+
+            if ($donation->payment_method === 'stripe') {
+                throw new \InvalidArgumentException(__('api.vol_donation_stripe_complete_via_webhook'));
+            }
+
+            if ($donation->status === 'completed') {
+                return ['id' => (int) $donation->id, 'status' => 'completed', 'already_completed' => true];
+            }
+
+            if ($donation->status !== 'pending') {
+                throw new \InvalidArgumentException(__('api.vol_donation_only_pending_completable'));
+            }
+
+            DB::table('vol_donations')
+                ->where('id', $donation->id)
+                ->where('tenant_id', $tenantId)
+                ->update(['status' => 'completed']);
+
+            if (!empty($donation->giving_day_id)) {
+                DB::table('vol_giving_days')
+                    ->where('id', $donation->giving_day_id)
+                    ->where('tenant_id', $tenantId)
+                    ->increment('raised_amount', (float) $donation->amount);
+            }
+
+            return ['id' => (int) $donation->id, 'status' => 'completed', 'already_completed' => false];
+        });
+    }
+
+    /**
      * List active giving days for the current tenant.
      */
     public static function getGivingDays(): array

@@ -17562,7 +17562,13 @@
     "total_donations": "Donaciones totales",
     "completed_total": "Total completado",
     "refunded_total": "Total reembolsado",
-    "filter_status_aria": "Filtrar donaciones por estado"
+    "filter_status_aria": "Filtrar donaciones por estado",
+    "mark_completed": "Mark completed",
+    "complete_title": "Mark donation completed",
+    "complete_confirm": "Mark donation #{{id}} of {{amount}} as completed? This confirms the money was received outside the platform (cash, bank transfer or PayPal) and adds it to the campaign total.",
+    "complete_confirm_label": "Mark completed",
+    "complete_success": "Donation marked as completed",
+    "complete_failed": "Failed to mark donation as completed"
   },
   "sso": {
     "page_title": "Single Sign-On",

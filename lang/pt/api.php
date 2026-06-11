@@ -1813,6 +1813,8 @@ return [
     'vol_donation_amount_max' => 'Donation amount exceeds the maximum allowed.',
     'vol_donation_currency_invalid' => 'Currency must be a 3-letter ISO code.',
     'vol_donation_payment_method_required' => 'Payment method is required.',
+    'vol_donation_stripe_complete_via_webhook' => 'Card donations are completed automatically by the payment provider and cannot be completed manually.',
+    'vol_donation_only_pending_completable' => 'Only pending donations can be marked as completed.',
     'vol_giving_day_title_required' => 'Title is required.',
     'vol_giving_day_dates_required' => 'Start date and end date are required.',
     'vol_giving_day_end_after_start' => 'End date must be after start date.',

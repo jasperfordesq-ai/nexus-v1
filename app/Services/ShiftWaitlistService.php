@@ -106,20 +106,23 @@ class ShiftWaitlistService
         self::$errors = [];
         $tenantId = TenantContext::getId();
 
-        $entry = DB::table('vol_shift_waitlist')
-            ->where('shift_id', $shiftId)
-            ->where('user_id', $userId)
-            ->where('status', 'waiting')
-            ->where('tenant_id', $tenantId)
-            ->first();
-
-        if (! $entry) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.shift_waitlist_not_on_waitlist')];
-            return false;
-        }
-
         try {
-            return DB::transaction(function () use ($entry, $shiftId, $tenantId) {
+            return DB::transaction(function () use ($shiftId, $userId, $tenantId) {
+                // Lock the entry so concurrent leave() calls reorder from the
+                // live position instead of a stale snapshot (which left gaps).
+                $entry = DB::table('vol_shift_waitlist')
+                    ->where('shift_id', $shiftId)
+                    ->where('user_id', $userId)
+                    ->where('status', 'waiting')
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $entry) {
+                    self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.shift_waitlist_not_on_waitlist')];
+                    return false;
+                }
+
                 // Cancel the entry
                 DB::table('vol_shift_waitlist')
                     ->where('id', $entry->id)

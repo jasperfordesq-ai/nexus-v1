@@ -1154,11 +1154,26 @@ class VolunteerService
             [$opportunityId, $tenantId]
         );
 
-        return array_map(function ($shift) use ($tenantId) {
-            $signupCount = (int) DB::selectOne(
-                "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
-                [$shift->id, $tenantId]
-            )->cnt;
+        if ($shifts === []) {
+            return [];
+        }
+
+        // Single grouped count instead of one COUNT query per shift (N+1)
+        $shiftIds = array_map(static fn ($s) => (int) $s->id, $shifts);
+        $placeholders = implode(',', array_fill(0, count($shiftIds), '?'));
+        $countRows = DB::select(
+            "SELECT shift_id, COUNT(*) as cnt FROM vol_applications
+             WHERE shift_id IN ($placeholders) AND status = 'approved' AND tenant_id = ?
+             GROUP BY shift_id",
+            [...$shiftIds, $tenantId]
+        );
+        $counts = [];
+        foreach ($countRows as $row) {
+            $counts[(int) $row->shift_id] = (int) $row->cnt;
+        }
+
+        return array_map(function ($shift) use ($counts) {
+            $signupCount = $counts[(int) $shift->id] ?? 0;
 
             return [
                 'id'              => (int) $shift->id,

@@ -2109,6 +2109,7 @@ Route::post('/v2/admin/volunteering/giving-days', [\App\Http\Controllers\Api\Vol
 Route::put('/v2/admin/volunteering/giving-days/{id}', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'updateGivingDay']);
 Route::get('/v2/admin/volunteering/donations', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'listDonations']);
 Route::get('/v2/admin/volunteering/donations/export', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'exportDonations']);
+Route::post('/v2/admin/volunteering/donations/{id}/complete', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'completeDonation']);
 Route::post('/v2/admin/donations/{id}/refund', [\App\Http\Controllers\Api\DonationPaymentController::class, 'adminRefund']);
 Route::get('/v2/admin/events', [\App\Http\Controllers\Api\AdminEventsController::class, 'index']);
 Route::get('/v2/admin/events/{id}', [\App\Http\Controllers\Api\AdminEventsController::class, 'show']);

@@ -82,6 +82,10 @@ export function DonationRefunds() {
   const [refundTarget, setRefundTarget] = useState<AdminDonation | null>(null);
   const [refunding, setRefunding] = useState(false);
 
+  // Mark-completed confirm state (offline donations only)
+  const [completeTarget, setCompleteTarget] = useState<AdminDonation | null>(null);
+  const [completing, setCompleting] = useState(false);
+
   // ─── Data loading ───
 
   const loadDonations = useCallback(async () => {
@@ -159,6 +163,25 @@ export function DonationRefunds() {
     setRefunding(false);
   };
 
+  // ─── Mark completed ───
+
+  const handleComplete = async () => {
+    if (!completeTarget) return;
+    setCompleting(true);
+
+    const res = await adminDonations.complete(completeTarget.id);
+    if (res.success) {
+      toast.success(t('donation_refunds.complete_success'));
+      setCompleteTarget(null);
+      loadDonations();
+    } else {
+      // Keep the dialog target so the admin can retry or cancel deliberately.
+      toast.error(res.error || t('donation_refunds.complete_failed'));
+    }
+
+    setCompleting(false);
+  };
+
   // ─── Table columns ───
 
   const statusLabel = (status: string) =>
@@ -226,6 +249,15 @@ export function DonationRefunds() {
             onPress={() => setRefundTarget(d)}
           >
             {t('donation_refunds.refund')}
+          </Button>
+        ) : d.status === 'pending' && d.payment_method !== 'stripe' ? (
+          <Button
+            size="sm"
+            variant="secondary"
+            startContent={<CheckCircle2 size={14} />}
+            onPress={() => setCompleteTarget(d)}
+          >
+            {t('donation_refunds.mark_completed')}
           </Button>
         ) : (
           <span className="text-sm text-muted">—</span>
@@ -340,6 +372,26 @@ export function DonationRefunds() {
           cancelLabel={t('common.cancel')}
           confirmColor="danger"
           isLoading={refunding}
+        />
+      )}
+
+      {/* ─── Mark Completed Confirmation ─── */}
+      {completeTarget && (
+        <ConfirmModal
+          isOpen={!!completeTarget}
+          onClose={() => {
+            if (!completing) setCompleteTarget(null);
+          }}
+          onConfirm={handleComplete}
+          title={t('donation_refunds.complete_title')}
+          message={t('donation_refunds.complete_confirm', {
+            amount: formatAmount(completeTarget.amount, completeTarget.currency),
+            id: completeTarget.id,
+          })}
+          confirmLabel={t('donation_refunds.complete_confirm_label')}
+          cancelLabel={t('common.cancel')}
+          confirmColor="primary"
+          isLoading={completing}
         />
       )}
     </div>
