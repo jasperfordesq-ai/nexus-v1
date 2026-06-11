@@ -530,7 +530,9 @@ class VolunteerService
 
         $query = VolOrganization::query()
             ->with('owner:id,first_name,last_name,avatar_url')
-            ->where('status', 'approved');
+            // Orgs are created/admin-toggled with status 'active' but legacy rows
+            // hold 'approved' — the directory must show both.
+            ->whereIn('status', ['approved', 'active']);
 
         if (! empty($filters['search'])) {
             $term = '%' . $filters['search'] . '%';

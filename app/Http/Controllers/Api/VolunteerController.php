@@ -526,7 +526,13 @@ class VolunteerController extends BaseApiController
         if ($this->query('search')) $filters['search'] = $this->query('search');
         if ($this->query('cursor')) $filters['cursor'] = $this->query('cursor');
         $result = $this->volunteerService->getOrganisations($filters);
-        return $this->respondWithCollection($result['items'], $result['cursor'], $filters['limit'], $result['has_more']);
+        // Public endpoint (withoutMiddleware('auth:sanctum')) — never expose
+        // wallet/financial state, mirroring showOrganisation() below.
+        $items = array_map(static function (array $org): array {
+            unset($org['balance'], $org['auto_pay_enabled']);
+            return $org;
+        }, $result['items']);
+        return $this->respondWithCollection($items, $result['cursor'], $filters['limit'], $result['has_more']);
     }
 
     public function showOrganisation($id): JsonResponse
