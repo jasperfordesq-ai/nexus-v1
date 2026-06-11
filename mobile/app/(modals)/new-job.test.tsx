@@ -353,7 +353,8 @@ describe('NewJobRoute', () => {
         location: 'Cork',
         is_remote: false,
         category: 'Community',
-        skills_required: ['Planning', 'Support'],
+        skills_required: 'Planning, Support',
+        skills: ['Planning', 'Support'],
         hours_per_week: 8,
         time_credits: 4,
         contact_email: 'old@example.org',
@@ -388,7 +389,7 @@ describe('NewJobRoute', () => {
         type: 'timebank',
         commitment: 'part_time',
         company_size: '51-200',
-        skills_required: ['Planning', 'Support'],
+        skills_required: 'Planning, Support',
       }));
       expect((updateJob as jest.Mock).mock.calls[0]?.[1]).not.toHaveProperty('status');
     });

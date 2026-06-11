@@ -66,6 +66,20 @@ class JobVacancyService
         return null;
     }
 
+    /**
+     * Accept skills as either a comma-separated string (web) or an array of
+     * strings (mobile builds ≤ 2026-06-11 sent arrays). The column is text;
+     * inserting a raw array fataled with "Array to string conversion".
+     */
+    private function normalizeSkillsInput($value): ?string
+    {
+        if (is_array($value)) {
+            $value = implode(', ', array_filter(array_map(fn ($s) => trim((string) $s), $value)));
+        }
+        $value = trim((string) ($value ?? ''));
+        return $value === '' ? null : $value;
+    }
+
     private function normalizeCoordinate(mixed $value, float $min, float $max): ?float
     {
         if ($value === null || $value === '' || !is_numeric($value)) {
@@ -486,7 +500,7 @@ class JobVacancyService
             'longitude'      => $this->normalizeCoordinate($data['longitude'] ?? null, -180, 180),
             'is_remote'      => $this->inputBool($data['is_remote'] ?? false),
             'category'       => $data['category'] ?? null,
-            'skills_required' => $data['skills_required'] ?? null,
+            'skills_required' => $this->normalizeSkillsInput($data['skills_required'] ?? null),
             'hours_per_week' => ($data['hours_per_week'] ?? '') === '' ? null : (float) $data['hours_per_week'],
             'time_credits'   => ($data['time_credits'] ?? '') === '' ? null : (float) $data['time_credits'],
             'contact_email'  => $data['contact_email'] ?? null,
@@ -613,6 +627,10 @@ class JobVacancyService
             if (array_key_exists($field, $data)) {
                 $updates[$field] = $data[$field];
             }
+        }
+
+        if (array_key_exists('skills_required', $updates)) {
+            $updates['skills_required'] = $this->normalizeSkillsInput($updates['skills_required']);
         }
 
         if (empty($updates)) {

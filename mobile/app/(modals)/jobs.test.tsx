@@ -191,7 +191,11 @@ const mockJob: JobVacancy = {
   type: 'paid',
   commitment: 'full_time',
   category: 'Community',
-  skills_required: ['Communication', 'Organisation'],
+  // Real API contract: skills_required is the raw comma-separated STRING (web
+  // consumes it as text); the parsed array lives in skills. The mobile crash
+  // (2026-06-11) happened because fixtures used an array here and hid that.
+  skills_required: 'Communication, Organisation',
+  skills: ['Communication', 'Organisation'],
   hours_per_week: 40,
   time_credits: null,
   salary_min: 30000,

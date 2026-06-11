@@ -109,7 +109,7 @@ function NewJobScreen() {
     setCommitment(job.commitment ?? 'flexible');
     setLocation(job.location ?? '');
     setCategory(job.category ?? '');
-    setSkills((job.skills_required ?? []).join(', '));
+    setSkills((job.skills ?? []).join(', '));
     setHours(job.hours_per_week !== null && job.hours_per_week !== undefined ? String(job.hours_per_week) : '');
     setCredits(job.time_credits !== null && job.time_credits !== undefined ? String(job.time_credits) : '');
     setContactEmail(job.contact_email ?? '');
@@ -166,7 +166,7 @@ function NewJobScreen() {
         location: location.trim() || null,
         is_remote: isRemote,
         category: category.trim() || null,
-        skills_required: skills.split(',').map((skill) => skill.trim()).filter(Boolean),
+        skills_required: skills.split(',').map((skill) => skill.trim()).filter(Boolean).join(', ') || null,
         hours_per_week: optionalNumber(hours),
         time_credits: optionalNumber(credits),
         contact_email: contactEmail.trim() || null,

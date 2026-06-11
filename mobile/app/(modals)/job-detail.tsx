@@ -367,10 +367,10 @@ export default function JobDetailScreen() {
           </HeroCard.Body>
         </HeroCard>
 
-        {(job.skills_required ?? []).length > 0 ? (
+        {(job.skills ?? []).length > 0 ? (
           <DetailSection title={t('detail.skills')} theme={theme}>
             <View className="flex-row flex-wrap gap-2">
-              {(job.skills_required ?? []).map((skill) => (
+              {(job.skills ?? []).map((skill) => (
                 <Chip key={skill} size="sm" variant="secondary">
                   <Chip.Label>{skill}</Chip.Label>
                 </Chip>

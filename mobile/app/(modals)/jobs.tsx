@@ -120,7 +120,8 @@ function JobCard({
     return null;
   })();
 
-  const visibleSkills = (item.skills_required ?? []).slice(0, 3);
+  const allSkills = item.skills ?? [];
+  const visibleSkills = allSkills.slice(0, 3);
 
   return (
     <NativePressable
@@ -198,9 +199,9 @@ function JobCard({
                   <Chip.Label>{skill}</Chip.Label>
                 </Chip>
               ))}
-              {(item.skills_required ?? []).length > 3 ? (
+              {allSkills.length > 3 ? (
                 <Chip size="sm" variant="secondary">
-                  <Chip.Label>+{item.skills_required.length - 3}</Chip.Label>
+                  <Chip.Label>+{allSkills.length - 3}</Chip.Label>
                 </Chip>
               ) : null}
             </View>

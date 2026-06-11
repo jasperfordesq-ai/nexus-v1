@@ -20,7 +20,12 @@ export interface JobVacancy {
   type: 'paid' | 'volunteer' | 'timebank';
   commitment: 'full_time' | 'part_time' | 'flexible' | 'one_off';
   category: string | null;
-  skills_required: string[];
+  /** Raw comma-separated string — the API keeps this as text (web renders it
+   *  directly). Use `skills` for the parsed array; treating this field as an
+   *  array crashed the Jobs screens (2026-06-11). */
+  skills_required: string | null;
+  /** Parsed skills array (added server-side by enrichVacancyArray) */
+  skills?: string[];
   hours_per_week: number | null;
   time_credits: number | null;
   salary_min: number | null;
@@ -185,7 +190,9 @@ export interface CreateJobPayload {
   location?: string | null;
   is_remote?: boolean;
   category?: string | null;
-  skills_required?: string[];
+  /** Comma-separated string — the backend stores this verbatim in a text
+   *  column (sending an array breaks the insert). */
+  skills_required?: string | null;
   hours_per_week?: number | null;
   time_credits?: number | null;
   contact_email?: string | null;
