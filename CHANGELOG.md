@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Joining a group twice by double-click is now impossible at the database level.** A fast double-click on "Join" could create two membership records (double member counts, duplicate welcome messages). The database now enforces one membership per person per group — existing duplicates are cleaned up automatically — and the same hard guarantee was added for marketplace escrow records. The join action treats a lost race as "already a member" instead of an error.
 - **Marketplace payouts can no longer be released twice.** A buyer clicking "confirm received" at the same moment the automatic timed release ran (or a double-click) could complete the same order twice — doubling the seller's recorded sales and revenue and sending duplicate payout notifications. Completion and escrow release are now claimed atomically; exactly one path wins.
 - **Volunteer-organisation wallets can no longer deadlock.** A member depositing into an organisation at the same moment the organisation paid a volunteer could lock both records in opposite orders, failing one action with a server error. Both paths now lock in the same order.
 - **Transaction XP can't be double-awarded on a queue retry**, and **search results show listing category names again** (a leftover legacy column was shadowing the real category link, so the name was always blank).

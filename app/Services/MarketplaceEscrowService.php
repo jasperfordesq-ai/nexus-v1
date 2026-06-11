@@ -59,7 +59,14 @@ class MarketplaceEscrowService
         $escrow->status = 'held';
         $escrow->held_at = now();
         $escrow->release_after = now()->addDays($autoReleaseDays);
-        $escrow->save();
+
+        try {
+            $escrow->save();
+        } catch (\Illuminate\Database\UniqueConstraintViolationException) {
+            // UNIQUE(order_id) backstop: a concurrent holdFunds won the
+            // race between our exists-check and save — return its row.
+            return MarketplaceEscrow::where('order_id', $order->id)->firstOrFail();
+        }
 
         Log::info('MarketplaceEscrow: funds held', [
             'escrow_id' => $escrow->id,

@@ -429,10 +429,17 @@ class GroupService
 
         $status = $group->visibility === 'private' ? 'pending' : 'active';
 
-        $group->attachMember($userId, [
-            'role'   => 'member',
-            'status' => $status,
-        ]);
+        try {
+            $group->attachMember($userId, [
+                'role'   => 'member',
+                'status' => $status,
+            ]);
+        } catch (\Illuminate\Database\UniqueConstraintViolationException) {
+            // Double-click race: UNIQUE(group_id, user_id) made the other
+            // request win — treat this one as already-member, exactly like
+            // the pre-check above (no double count/welcome/webhook).
+            return ['success' => false, 'code' => 'ALREADY_MEMBER', 'error' => __('api.group_already_member')];
+        }
 
         if ($status === 'active') {
             $group->increment('cached_member_count');
