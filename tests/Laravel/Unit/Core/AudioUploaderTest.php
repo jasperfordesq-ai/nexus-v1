@@ -113,6 +113,48 @@ class AudioUploaderTest extends TestCase
     }
 
     // -------------------------------------------------------
+    // uploadFromBase64() — mobile MPEG-4 recordings (regression)
+    // -------------------------------------------------------
+    //
+    // The Expo mobile app records voice messages as MPEG-4/AAC (.m4a) on both
+    // Android and iOS. PHP's finfo content-sniffing reports those containers as
+    // audio/x-m4a (M4A brand), video/mp4 (Android MediaRecorder's isom/mp42
+    // brands — even for audio-only files), or audio/x-hx-aac-adts (raw AAC).
+    // None of these were in the allowlist, so every mobile voice message was
+    // rejected with "Invalid audio format" (prod errors 2026-06-03/2026-06-11).
+
+    /** Minimal MPEG-4 'ftyp' box with the given brand, padded so finfo can sniff it */
+    private static function mp4Bytes(string $brand, string $compat): string
+    {
+        return "\x00\x00\x00\x18ftyp{$brand}\x00\x00\x00\x00{$compat}" . str_repeat("\x00", 256);
+    }
+
+    /** @return array<string, array{string, string}> claimed MIME + raw content */
+    public static function mobileAudioProvider(): array
+    {
+        return [
+            'M4A-branded MPEG-4 (audio/x-m4a)' => ['audio/mp4', self::mp4Bytes('M4A ', 'M4A mp42isom')],
+            'Android MediaRecorder mp42 (video/mp4)' => ['audio/mp4', self::mp4Bytes('mp42', 'mp42isom')],
+            'Android MediaRecorder isom (video/mp4)' => ['audio/mp4', self::mp4Bytes('isom', 'isomiso2mp41')],
+            'raw AAC ADTS stream' => ['audio/aac', "\xFF\xF1\x50\x80\x00\x1F\xFC" . str_repeat("\x00", 256)],
+        ];
+    }
+
+    /** @dataProvider mobileAudioProvider */
+    public function test_uploadFromBase64_accepts_mobile_mpeg4_recordings(string $claimedMime, string $content): void
+    {
+        // Same pattern as the codec-strip test: the save step may fail in a unit
+        // environment, but the format validation must NOT be the failure.
+        try {
+            AudioUploader::uploadFromBase64(base64_encode($content), $claimedMime, 5);
+            $this->addToAssertionCount(1);
+        } catch (\Exception $e) {
+            $this->assertStringNotContainsString('Invalid audio format', $e->getMessage());
+            $this->assertStringNotContainsString('does not match allowed types', $e->getMessage());
+        }
+    }
+
+    // -------------------------------------------------------
     // delete()
     // -------------------------------------------------------
 

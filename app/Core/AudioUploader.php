@@ -20,7 +20,10 @@ class AudioUploader
         'audio/wav',
         'audio/x-wav',
         'audio/mp4',
+        'audio/x-m4a',          // finfo detection for M4A-branded MPEG-4 audio (mobile recordings)
+        'video/mp4',            // Android MediaRecorder writes isom/mp42-branded MPEG-4 — finfo reports video/mp4 even for audio-only
         'audio/aac',
+        'audio/x-hx-aac-adts',  // finfo detection for raw AAC (ADTS) streams
     ];
 
     private static $maxSize = 10 * 1024 * 1024; // 10MB max for voice messages
@@ -59,7 +62,7 @@ class AudioUploader
         $detectedMime = $finfo->file($file['tmp_name']);
 
         if (!in_array($detectedMime, self::$allowedTypes)) {
-            throw new \Exception("Invalid audio format. Supported: WebM, OGG, MP3, WAV, AAC");
+            throw new \Exception("Invalid audio format (detected: {$detectedMime}). Supported: WebM, OGG, MP3, WAV, M4A, AAC");
         }
 
         // Determine extension from MIME
@@ -211,7 +214,10 @@ class AudioUploader
             'audio/wav' => 'wav',
             'audio/x-wav' => 'wav',
             'audio/mp4' => 'm4a',
+            'audio/x-m4a' => 'm4a',
+            'video/mp4' => 'm4a',
             'audio/aac' => 'aac',
+            'audio/x-hx-aac-adts' => 'aac',
         ];
 
         return $map[$mime] ?? 'webm';
