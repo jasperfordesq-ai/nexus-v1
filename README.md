@@ -98,7 +98,7 @@ Run Laravel migrations after starting Docker to create the schema:
 docker exec nexus-php-app php artisan migrate
 ```
 
-A legacy schema dump is also available at [schema.sql](schema.sql) if needed for reference. For zero-downtime deployment notes, see [docs/ZERO_DOWNTIME_DEPLOYMENT_PLAN.md](docs/ZERO_DOWNTIME_DEPLOYMENT_PLAN.md).
+A legacy schema dump is also available at [schema.sql](schema.sql) if needed for reference. Zero-downtime deployments use a blue/green container switch (see `scripts/deploy/bluegreen-deploy.sh`).
 
 ## Project Status
 
