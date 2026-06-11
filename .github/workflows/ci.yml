@@ -469,6 +469,7 @@ jobs:
               - 'scripts/check-i18n*.mjs'
               - 'scripts/check-i18n.sh'
               - 'scripts/check-php-i18n-coverage.mjs'
+              - 'scripts/check-php-lang-parity.mjs'
               - '.github/i18n-gap-baseline.json'
 
   i18n-drift:
@@ -496,6 +497,12 @@ jobs:
 
       - name: "BLOCKING: Check for hardcoded strings in PHP code"
         run: bash scripts/check-i18n.sh
+
+      # PHP lang/*.php parity gate — react-frontend JSON has been drift-gated
+      # for months, but lang/ was not, which let new lang/en keys sit
+      # untranslated for weeks (added 2026-06-11). Uses the runner's PHP CLI.
+      - name: "BLOCKING: PHP lang/ translation parity"
+        run: node scripts/check-php-lang-parity.mjs
 
       # Re-added 2026-06-06: admin panel is multilingual again (policy reversed
       # 2026-05-22). Validates admin t() keys resolve against the English locale.

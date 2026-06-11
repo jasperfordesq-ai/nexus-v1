@@ -760,4 +760,8 @@ return [
             'connections' => 'Connections only',
         ],
     ],
+    'seo' => [
+        'description' => 'Use el frontend alfa accesible de Project NEXUS para las tareas comunitarias esenciales, con navegación clara, formularios estándar y mejora progresiva.',
+        'og_image_alt' => 'Project NEXUS, plataforma de código abierto de banco de tiempo y comunidad',
+    ],
 ];

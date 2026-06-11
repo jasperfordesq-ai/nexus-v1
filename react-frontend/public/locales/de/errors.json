@@ -47,5 +47,7 @@
   "session_expiring_message": "Ihre Sitzung läuft in {{seconds}} Sekunden ab. Verlängern Sie Ihre Sitzung, um angemeldet zu bleiben.",
   "session_expiring_countdown_aria": "Die Sitzung läuft in {{seconds}} Sekunden ab",
   "extend_session": "Sitzung verlängern",
-  "dismiss": "Schließen"
+  "dismiss": "Schließen",
+  "idle_logout_title": "Wegen Inaktivität abgemeldet",
+  "idle_logout_message": "Sie wurden nach einer Phase der Inaktivität automatisch abgemeldet. Bitte melden Sie sich erneut an, um fortzufahren."
 }

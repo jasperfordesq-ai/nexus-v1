@@ -760,4 +760,8 @@ return [
             'connections' => 'Connections only',
         ],
     ],
+    'seo' => [
+        'description' => 'アクセシブルなProject NEXUSアルファ版フロントエンドで、わかりやすいナビゲーション、標準フォーム、プログレッシブエンハンスメントにより主要なコミュニティタスクを行えます。',
+        'og_image_alt' => 'Project NEXUS - オープンソースのタイムバンキング・コミュニティプラットフォーム',
+    ],
 ];

@@ -760,4 +760,8 @@ return [
             'connections' => 'Connections only',
         ],
     ],
+    'seo' => [
+        'description' => 'Úsáid leagan alfa inrochtana Project NEXUS le haghaidh príomhthascanna pobail, le nascleanúint shoiléir, foirmeacha caighdeánacha agus feabhsú forásach.',
+        'og_image_alt' => 'Project NEXUS, ardán foinse oscailte do bhaincéireacht ama agus don phobal',
+    ],
 ];

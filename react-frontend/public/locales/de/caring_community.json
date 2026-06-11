@@ -690,6 +690,10 @@
         "load": "Die Umfragen konnten nicht geladen werden",
         "create": "Die Umfrage konnte nicht erstellt werden",
         "export_failed": "Umfrageantworten konnten nicht exportiert werden."
+      },
+      "toasts": {
+        "published": "Umfrage veröffentlicht.",
+        "closed": "Umfrage geschlossen."
       }
     },
     "feedback": {

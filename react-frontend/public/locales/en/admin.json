@@ -4670,7 +4670,8 @@
       "reject": "Reject",
       "view": "View",
       "cancel": "Cancel",
-      "reject_proposal": "Reject proposal"
+      "reject_proposal": "Reject proposal",
+      "publish": "Publish"
     },
     "about": {
       "title": "About this page",
@@ -4718,8 +4719,9 @@
       "model": "Model: {{model}}"
     },
     "states": {
-      "accepted": "Accepted. Now publish the polished text via the Announcements admin.",
-      "rejected_reason": "Rejected - reason: {{reason}}"
+      "accepted": "Accepted but not published yet. Press Publish to send it as an announcement.",
+      "rejected_reason": "Rejected - reason: {{reason}}",
+      "published": "Published as announcement #{{id}}."
     },
     "empty": {
       "value": "-",
@@ -4744,11 +4746,12 @@
       "draft_too_long": "Draft is too long (max 4000 characters)",
       "generated": "Proposal generated",
       "generate_failed": "Failed to generate proposal",
-      "accepted": "Proposal accepted - now publish via Announcements admin",
+      "accepted": "Proposal accepted and published as an announcement",
       "accept_failed": "Failed to accept proposal",
       "reason_required": "Reason is required",
       "rejected": "Proposal rejected",
-      "reject_failed": "Failed to reject proposal"
+      "reject_failed": "Failed to reject proposal",
+      "publish_failed": "Proposal accepted, but publishing failed - press Publish to retry"
     }
   },
   "kpi_baselines": {

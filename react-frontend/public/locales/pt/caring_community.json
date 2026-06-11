@@ -690,6 +690,10 @@
         "load": "Falha ao carregar pesquisas",
         "create": "Falha ao criar pesquisa",
         "export_failed": "Falha ao exportar as respostas da pesquisa."
+      },
+      "toasts": {
+        "published": "Pesquisa publicada.",
+        "closed": "Pesquisa fechada."
       }
     },
     "feedback": {

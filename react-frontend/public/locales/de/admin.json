@@ -4670,7 +4670,8 @@
       "reject": "Ablehnen",
       "view": "Sicht",
       "cancel": "Stornieren",
-      "reject_proposal": "Vorschlag ablehnen"
+      "reject_proposal": "Vorschlag ablehnen",
+      "publish": "Veröffentlichen"
     },
     "about": {
       "title": "Über diese Seite",
@@ -4718,8 +4719,9 @@
       "model": "Modell: {{model}}"
     },
     "states": {
-      "accepted": "Akzeptiert. Veröffentlichen Sie nun den ausgefeilten Text über den Ankündigungsadministrator.",
-      "rejected_reason": "Abgelehnt – Grund: {{reason}}"
+      "accepted": "Angenommen, aber noch nicht veröffentlicht. Klicken Sie auf Veröffentlichen, um den Text als Ankündigung zu senden.",
+      "rejected_reason": "Abgelehnt – Grund: {{reason}}",
+      "published": "Als Ankündigung #{{id}} veröffentlicht."
     },
     "empty": {
       "value": "-",
@@ -4744,11 +4746,12 @@
       "draft_too_long": "Der Entwurf ist zu lang (maximal 4000 Zeichen)",
       "generated": "Vorschlag erstellt",
       "generate_failed": "Das Angebot konnte nicht generiert werden",
-      "accepted": "Vorschlag angenommen – jetzt über den Ankündigungsadministrator veröffentlichen",
+      "accepted": "Vorschlag angenommen und als Ankündigung veröffentlicht",
       "accept_failed": "Vorschlag konnte nicht angenommen werden",
       "reason_required": "Begründung ist erforderlich",
       "rejected": "Vorschlag abgelehnt",
-      "reject_failed": "Vorschlag konnte nicht abgelehnt werden"
+      "reject_failed": "Vorschlag konnte nicht abgelehnt werden",
+      "publish_failed": "Vorschlag angenommen, aber die Veröffentlichung ist fehlgeschlagen - klicken Sie auf Veröffentlichen, um es erneut zu versuchen"
     }
   },
   "kpi_baselines": {
@@ -13731,7 +13734,9 @@
       "welcome_credits_issued": "Willkommens-Credits ausgestellt"
     },
     "partner_logo_link_url": "Partner Logo Link URL",
-    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer."
+    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer.",
+    "label_inactivity_timeout": "Inaktivitäts-Timeout (Minuten)",
+    "desc_inactivity_timeout": "Mitglieder nach so vielen Minuten ohne Aktivität automatisch abmelden. 0 deaktiviert das Timeout; zulässiger Bereich ist 5–480 Minuten. Empfohlen: 120."
   },
   "timebanking": {
     "col_description": "Description",
@@ -15369,7 +15374,15 @@
     "maps_kill_switch_aria": "Notausschalter für die Kartenanzeige (gesperrt)",
     "map_provider_aria": "Kartenanbieter",
     "geocoding_provider_aria": "Autovervollständigungsanbieter",
-    "clear_failed": "Fehler beim Löschen"
+    "clear_failed": "Fehler beim Löschen",
+    "provider_os_maps": "Ordnance Survey (UK)",
+    "os_maps_api_key_label": "Ordnance-Survey-Maps-API-Schlüssel",
+    "os_maps_api_key_hint": "OS-Data-Hub-Projektschlüssel für die OS Maps API. Wird verwendet, wenn Ordnance Survey der Kartenanbieter ist; britische Public-Sector-Mandanten sind in der Regel über die PSGA abgedeckt. Ohne Schlüssel greifen Ordnance-Survey-Mandanten auf kostenlose OpenStreetMap-Kacheln zurück.",
+    "os_maps_key_cleared": "Ordnance-Survey-Schlüssel entfernt",
+    "tiles_status_os_maps": "OS Maps API aktiv",
+    "tiles_status_os_maps_unset": "Kein Schlüssel — Rückgriff auf kostenloses OSM",
+    "provider_os_places": "Ordnance Survey Places (UK, UPRN)",
+    "status_os_places": "OS Places (PSGA)"
   },
   "cron_setup": {
     "notice_title": "Wichtig: Wie Cron bei Project NEXUS funktioniert",
@@ -17303,5 +17316,36 @@
     "never_run": "Never run",
     "no_jobs": "No background jobs configured",
     "loading": "Loading"
+  },
+  "retention": {
+    "page_title": "Datenaufbewahrung",
+    "page_subtitle": "Konfigurieren Sie, wie lange Betriebsdaten vor der automatischen Löschung aufbewahrt werden. Deaktivierte Richtlinien bewahren Daten unbegrenzt auf.",
+    "loading": "Aufbewahrungsrichtlinien werden geladen",
+    "refresh": "Aktualisieren",
+    "policies_title": "Aufbewahrungsrichtlinien",
+    "policies_intro": "Aktivieren Sie eine Richtlinie und legen Sie ihr Aufbewahrungsfenster fest ({{min}}–{{max}} Tage). Daten, die älter als das Fenster sind, werden vom nächtlichen Durchsetzungslauf gelöscht, und jede Löschung wird unten protokolliert.",
+    "load_failed": "Aufbewahrungsrichtlinien konnten nicht geladen werden",
+    "policy_saved": "Aufbewahrungsrichtlinie gespeichert",
+    "save_failed": "Aufbewahrungsrichtlinie konnte nicht gespeichert werden",
+    "save": "Speichern",
+    "days_suffix": "Tage",
+    "days_aria": "Aufbewahrungsdauer in Tagen für {{type}}",
+    "enable_aria": "Aufbewahrungsrichtlinie für {{type}} aktivieren",
+    "runs_title": "Letzte Löschläufe",
+    "no_runs": "Noch keine Löschläufe. Läufe erscheinen hier, nachdem die nächtliche Durchsetzung eine aktivierte Richtlinie verarbeitet hat.",
+    "run_summary": "{{rows}} Zeilen gelöscht (älter als {{days}} Tage)",
+    "status_completed": "Abgeschlossen",
+    "status_partial": "Teilweise",
+    "status_failed": "Fehlgeschlagen",
+    "type_activity_log": "Aktivitätsprotokoll",
+    "type_activity_log_desc": "Aktivitätsverlauf von Mitgliedern und System (Anmeldungen, Datensatzänderungen).",
+    "type_admin_audit_log": "Admin-Audit-Protokoll",
+    "type_admin_audit_log_desc": "Aktionen der Administrator- und Organisationsverwaltung.",
+    "type_notifications": "Benachrichtigungen",
+    "type_notifications_desc": "In-App-Glockenbenachrichtigungen an Mitglieder.",
+    "type_email_log": "E-Mail-Protokoll",
+    "type_email_log_desc": "Zustellprotokolle ausgehender E-Mails (verschlüsselte Inhalte).",
+    "type_login_attempts": "Anmeldeversuche",
+    "type_login_attempts_desc": "Aufzeichnungen erfolgreicher und fehlgeschlagener Anmeldeversuche."
   }
 }

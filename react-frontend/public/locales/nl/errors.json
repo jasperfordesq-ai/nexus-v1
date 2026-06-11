@@ -47,5 +47,7 @@
   "session_expiring_message": "Uw sessie verloopt over {{seconds}} seconden. Verleng uw sessie om ingelogd te blijven.",
   "session_expiring_countdown_aria": "Sessie verloopt over {{seconds}} seconden",
   "extend_session": "Sessie verlengen",
-  "dismiss": "Sluiten"
+  "dismiss": "Sluiten",
+  "idle_logout_title": "Afgemeld wegens inactiviteit",
+  "idle_logout_message": "U bent automatisch afgemeld na een periode van inactiviteit. Meld u opnieuw aan om door te gaan."
 }

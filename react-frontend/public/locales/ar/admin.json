@@ -4670,7 +4670,8 @@
       "reject": "يرفض",
       "view": "منظر",
       "cancel": "يلغي",
-      "reject_proposal": "رفض الاقتراح"
+      "reject_proposal": "رفض الاقتراح",
+      "publish": "نشر"
     },
     "about": {
       "title": "حول هذه الصفحة",
@@ -4718,8 +4719,9 @@
       "model": "الموديل: {{model}}"
     },
     "states": {
-      "accepted": "مقبول. الآن قم بنشر النص المصقول عبر مسؤول الإعلانات.",
-      "rejected_reason": "مرفوض - السبب: {{reason}}"
+      "accepted": "تم القبول ولكن لم يُنشر بعد. اضغط على نشر لإرساله كإعلان.",
+      "rejected_reason": "مرفوض - السبب: {{reason}}",
+      "published": "تم النشر كإعلان رقم {{id}}."
     },
     "empty": {
       "value": "-",
@@ -4744,11 +4746,12 @@
       "draft_too_long": "المسودة طويلة جدًا (الحد الأقصى 4000 حرف)",
       "generated": "تم إنشاء الاقتراح",
       "generate_failed": "فشل في إنشاء الاقتراح",
-      "accepted": "تم قبول الاقتراح - قم بالنشر الآن عبر مسؤول الإعلانات",
+      "accepted": "تم قبول الاقتراح ونشره كإعلان",
       "accept_failed": "فشل في قبول الاقتراح",
       "reason_required": "السبب مطلوب",
       "rejected": "تم رفض الاقتراح",
-      "reject_failed": "فشل في رفض الاقتراح"
+      "reject_failed": "فشل في رفض الاقتراح",
+      "publish_failed": "تم قبول الاقتراح، لكن فشل النشر - اضغط على نشر لإعادة المحاولة"
     }
   },
   "kpi_baselines": {
@@ -13731,7 +13734,9 @@
       "welcome_credits_issued": "تم إصدار الاعتمادات الترحيبية"
     },
     "partner_logo_link_url": "Partner Logo Link URL",
-    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer."
+    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer.",
+    "label_inactivity_timeout": "مهلة عدم النشاط (بالدقائق)",
+    "desc_inactivity_timeout": "تسجيل خروج الأعضاء تلقائيًا بعد هذا العدد من الدقائق دون نشاط. القيمة 0 تعطّل المهلة؛ والنطاق المسموح به هو 5–480 دقيقة. الموصى به: 120."
   },
   "timebanking": {
     "col_description": "Description",
@@ -15369,7 +15374,15 @@
     "maps_kill_switch_aria": "مفتاح إيقاف عرض الخريطة (مغلق)",
     "map_provider_aria": "مزود الخرائط",
     "geocoding_provider_aria": "مزود الإكمال التلقائي",
-    "clear_failed": "فشل في المسح"
+    "clear_failed": "فشل في المسح",
+    "provider_os_maps": "Ordnance Survey (المملكة المتحدة)",
+    "os_maps_api_key_label": "مفتاح API لخرائط Ordnance Survey",
+    "os_maps_api_key_hint": "مفتاح مشروع OS Data Hub لواجهة OS Maps API. يُستخدم عندما يكون مزوّد الخرائط Ordnance Survey؛ وعادةً ما تكون جهات القطاع العام البريطانية مشمولة باتفاقية PSGA. بدون مفتاح، تعود جهات Ordnance Survey إلى مربعات OpenStreetMap المجانية.",
+    "os_maps_key_cleared": "تم مسح مفتاح Ordnance Survey",
+    "tiles_status_os_maps": "OS Maps API نشطة",
+    "tiles_status_os_maps_unset": "لا يوجد مفتاح — يتم الرجوع إلى OSM المجاني",
+    "provider_os_places": "Ordnance Survey Places (المملكة المتحدة، UPRN)",
+    "status_os_places": "OS Places (PSGA)"
   },
   "cron_setup": {
     "notice_title": "هام: كيف يعمل cron على Project NEXUS",
@@ -17303,5 +17316,36 @@
     "never_run": "Never run",
     "no_jobs": "No background jobs configured",
     "loading": "Loading"
+  },
+  "retention": {
+    "page_title": "الاحتفاظ بالبيانات",
+    "page_subtitle": "حدد مدة الاحتفاظ بالبيانات التشغيلية قبل التخلص التلقائي منها. السياسات المعطّلة تحتفظ بالبيانات إلى أجل غير مسمى.",
+    "loading": "جارٍ تحميل سياسات الاحتفاظ",
+    "refresh": "تحديث",
+    "policies_title": "سياسات الاحتفاظ",
+    "policies_intro": "فعّل سياسة وحدد نافذة الاحتفاظ الخاصة بها ({{min}}–{{max}} يومًا). تُحذف البيانات الأقدم من النافذة في عملية التنفيذ الليلية، ويُسجّل كل تخلص أدناه.",
+    "load_failed": "فشل تحميل سياسات الاحتفاظ",
+    "policy_saved": "تم حفظ سياسة الاحتفاظ",
+    "save_failed": "فشل حفظ سياسة الاحتفاظ",
+    "save": "حفظ",
+    "days_suffix": "يوم",
+    "days_aria": "مدة الاحتفاظ بالأيام لـ {{type}}",
+    "enable_aria": "تفعيل سياسة الاحتفاظ لـ {{type}}",
+    "runs_title": "عمليات التخلص الأخيرة",
+    "no_runs": "لا توجد عمليات تخلص بعد. تظهر العمليات هنا بعد أن يعالج التنفيذ الليلي سياسة مفعّلة.",
+    "run_summary": "تم التخلص من {{rows}} صفًا (أقدم من {{days}} يومًا)",
+    "status_completed": "مكتمل",
+    "status_partial": "جزئي",
+    "status_failed": "فشل",
+    "type_activity_log": "سجل النشاط",
+    "type_activity_log_desc": "أثر نشاط الأعضاء والنظام (تسجيلات الدخول وتغييرات السجلات).",
+    "type_admin_audit_log": "سجل تدقيق المسؤولين",
+    "type_admin_audit_log_desc": "إجراءات إدارة المسؤولين والمنظمة.",
+    "type_notifications": "الإشعارات",
+    "type_notifications_desc": "إشعارات الجرس داخل التطبيق المُرسلة إلى الأعضاء.",
+    "type_email_log": "سجل البريد الإلكتروني",
+    "type_email_log_desc": "سجلات تسليم البريد الإلكتروني الصادر (نصوص مشفّرة).",
+    "type_login_attempts": "محاولات تسجيل الدخول",
+    "type_login_attempts_desc": "سجلات محاولات تسجيل الدخول الناجحة والفاشلة."
   }
 }

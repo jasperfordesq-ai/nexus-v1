@@ -4670,7 +4670,8 @@
       "reject": "拒否する",
       "view": "ビュー",
       "cancel": "キャンセル",
-      "reject_proposal": "提案を拒否する"
+      "reject_proposal": "提案を拒否する",
+      "publish": "公開"
     },
     "about": {
       "title": "このページについて",
@@ -4718,8 +4719,9 @@
       "model": "モデル: {{model}}"
     },
     "states": {
-      "accepted": "受け入れられました。次に、お知らせ管理者を通じて洗練されたテキストを公開します。",
-      "rejected_reason": "拒否されました - 理由: {{reason}}"
+      "accepted": "承認済みですが、まだ公開されていません。「公開」を押してお知らせとして送信してください。",
+      "rejected_reason": "拒否されました - 理由: {{reason}}",
+      "published": "お知らせ #{{id}} として公開されました。"
     },
     "empty": {
       "value": "-",
@@ -4744,11 +4746,12 @@
       "draft_too_long": "下書きが長すぎます (最大 4000 文字)",
       "generated": "生成された提案",
       "generate_failed": "プロポーザルの生成に失敗しました",
-      "accepted": "提案が承認されました - お知らせ管理者経由で公開されるようになりました",
+      "accepted": "提案が承認され、お知らせとして公開されました",
       "accept_failed": "提案を受け入れられませんでした",
       "reason_required": "理由は必須です",
       "rejected": "提案は拒否されました",
-      "reject_failed": "提案を拒否できませんでした"
+      "reject_failed": "提案を拒否できませんでした",
+      "publish_failed": "提案は承認されましたが、公開に失敗しました。「公開」を押して再試行してください"
     }
   },
   "kpi_baselines": {
@@ -13731,7 +13734,9 @@
       "welcome_credits_issued": "発行されたウェルカム クレジット"
     },
     "partner_logo_link_url": "Partner Logo Link URL",
-    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer."
+    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer.",
+    "label_inactivity_timeout": "無操作タイムアウト(分)",
+    "desc_inactivity_timeout": "操作がないままこの分数が経過すると、メンバーを自動的にサインアウトします。0でタイムアウトを無効化。許可範囲は5〜480分。推奨: 120。"
   },
   "timebanking": {
     "col_description": "Description",
@@ -15369,7 +15374,15 @@
     "maps_kill_switch_aria": "地図表示キルスイッチ（ロックオフ）",
     "map_provider_aria": "地図プロバイダー",
     "geocoding_provider_aria": "オートコンプリートプロバイダー",
-    "clear_failed": "クリアできませんでした"
+    "clear_failed": "クリアできませんでした",
+    "provider_os_maps": "Ordnance Survey(英国)",
+    "os_maps_api_key_label": "Ordnance Survey Maps APIキー",
+    "os_maps_api_key_hint": "OS Maps API用のOS Data Hubプロジェクトキーです。地図プロバイダーがOrdnance Surveyの場合に使用されます。英国の公共セクターのテナントは通常PSGAの対象です。キーがない場合、Ordnance Surveyのテナントは無料のOpenStreetMapタイルにフォールバックします。",
+    "os_maps_key_cleared": "Ordnance Surveyキーを削除しました",
+    "tiles_status_os_maps": "OS Maps API有効",
+    "tiles_status_os_maps_unset": "キーなし — 無料のOSMにフォールバック",
+    "provider_os_places": "Ordnance Survey Places(英国、UPRN)",
+    "status_os_places": "OS Places(PSGA)"
   },
   "cron_setup": {
     "notice_title": "重要: Project NEXUS での cron の動作方法",
@@ -17303,5 +17316,36 @@
     "never_run": "Never run",
     "no_jobs": "No background jobs configured",
     "loading": "Loading"
+  },
+  "retention": {
+    "page_title": "データ保持",
+    "page_subtitle": "運用データを自動廃棄するまでの保持期間を設定します。無効化されたポリシーはデータを無期限に保持します。",
+    "loading": "保持ポリシーを読み込み中",
+    "refresh": "更新",
+    "policies_title": "保持ポリシー",
+    "policies_intro": "ポリシーを有効にして保持期間({{min}}〜{{max}}日)を設定します。期間より古いデータは夜間の実行で削除され、すべての廃棄が下に記録されます。",
+    "load_failed": "保持ポリシーの読み込みに失敗しました",
+    "policy_saved": "保持ポリシーを保存しました",
+    "save_failed": "保持ポリシーの保存に失敗しました",
+    "save": "保存",
+    "days_suffix": "日",
+    "days_aria": "{{type}}の保持期間(日数)",
+    "enable_aria": "{{type}}の保持ポリシーを有効化",
+    "runs_title": "最近の廃棄実行",
+    "no_runs": "まだ廃棄実行はありません。夜間の実行が有効なポリシーを処理すると、ここに表示されます。",
+    "run_summary": "{{rows}}行を廃棄({{days}}日より古いもの)",
+    "status_completed": "完了",
+    "status_partial": "一部完了",
+    "status_failed": "失敗",
+    "type_activity_log": "アクティビティログ",
+    "type_activity_log_desc": "メンバーおよびシステムのアクティビティ履歴(ログイン、レコード変更)。",
+    "type_admin_audit_log": "管理者監査ログ",
+    "type_admin_audit_log_desc": "管理者および組織管理の操作。",
+    "type_notifications": "通知",
+    "type_notifications_desc": "メンバーに配信されるアプリ内ベル通知。",
+    "type_email_log": "メールログ",
+    "type_email_log_desc": "送信メールの配信記録(本文は暗号化)。",
+    "type_login_attempts": "ログイン試行",
+    "type_login_attempts_desc": "成功および失敗したサインイン試行の記録。"
   }
 }

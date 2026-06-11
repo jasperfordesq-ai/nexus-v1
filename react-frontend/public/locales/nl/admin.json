@@ -4670,7 +4670,8 @@
       "reject": "Afwijzen",
       "view": "Weergave",
       "cancel": "Annuleren",
-      "reject_proposal": "Voorstel afwijzen"
+      "reject_proposal": "Voorstel afwijzen",
+      "publish": "Publiceren"
     },
     "about": {
       "title": "Over deze pagina",
@@ -4718,8 +4719,9 @@
       "model": "Gebruikt model: {{model}}"
     },
     "states": {
-      "accepted": "Geaccepteerd. Publiceer nu de gepolijste tekst via de aankondigingenbeheerder.",
-      "rejected_reason": "Afgewezen - reden: {{reason}}"
+      "accepted": "Geaccepteerd maar nog niet gepubliceerd. Druk op Publiceren om de tekst als aankondiging te versturen.",
+      "rejected_reason": "Afgewezen - reden: {{reason}}",
+      "published": "Gepubliceerd als aankondiging #{{id}}."
     },
     "empty": {
       "value": "-",
@@ -4744,11 +4746,12 @@
       "draft_too_long": "Het concept is te lang (max. 4000 tekens)",
       "generated": "Voorstel gegenereerd",
       "generate_failed": "Kan voorstel niet genereren",
-      "accepted": "Voorstel geaccepteerd - publiceer nu via de aankondigingenbeheerder",
+      "accepted": "Voorstel geaccepteerd en gepubliceerd als aankondiging",
       "accept_failed": "Kan het voorstel niet accepteren",
       "reason_required": "Reden is vereist",
       "rejected": "Voorstel afgewezen",
-      "reject_failed": "Het voorstel kan niet worden afgewezen"
+      "reject_failed": "Het voorstel kan niet worden afgewezen",
+      "publish_failed": "Voorstel geaccepteerd, maar publiceren is mislukt - druk op Publiceren om het opnieuw te proberen"
     }
   },
   "kpi_baselines": {
@@ -13731,7 +13734,9 @@
       "welcome_credits_issued": "Welkomstkrediet uitgegeven"
     },
     "partner_logo_link_url": "Partner Logo Link URL",
-    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer."
+    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer.",
+    "label_inactivity_timeout": "Inactiviteitstime-out (minuten)",
+    "desc_inactivity_timeout": "Leden automatisch afmelden na dit aantal minuten zonder activiteit. 0 schakelt de time-out uit; het toegestane bereik is 5–480 minuten. Aanbevolen: 120."
   },
   "timebanking": {
     "col_description": "Description",
@@ -15369,7 +15374,15 @@
     "maps_kill_switch_aria": "Kill-schakelaar voor kaartweergave (vergrendeld uit)",
     "map_provider_aria": "Kaartaanbieder",
     "geocoding_provider_aria": "Aanbieder van automatisch aanvullen",
-    "clear_failed": "Kan niet wissen"
+    "clear_failed": "Kan niet wissen",
+    "provider_os_maps": "Ordnance Survey (VK)",
+    "os_maps_api_key_label": "Ordnance Survey Maps API-sleutel",
+    "os_maps_api_key_hint": "OS Data Hub-projectsleutel voor de OS Maps API. Gebruikt wanneer de kaartprovider Ordnance Survey is; Britse publieke-sectortenants vallen doorgaans onder de PSGA. Zonder sleutel vallen Ordnance Survey-tenants terug op gratis OpenStreetMap-tegels.",
+    "os_maps_key_cleared": "Ordnance Survey-sleutel gewist",
+    "tiles_status_os_maps": "OS Maps API actief",
+    "tiles_status_os_maps_unset": "Geen sleutel — valt terug op gratis OSM",
+    "provider_os_places": "Ordnance Survey Places (VK, UPRN)",
+    "status_os_places": "OS Places (PSGA)"
   },
   "cron_setup": {
     "notice_title": "Belangrijk: hoe cron werkt op Project NEXUS",
@@ -17303,5 +17316,36 @@
     "never_run": "Never run",
     "no_jobs": "No background jobs configured",
     "loading": "Loading"
+  },
+  "retention": {
+    "page_title": "Gegevensbewaring",
+    "page_subtitle": "Stel in hoe lang operationele gegevens worden bewaard voordat ze automatisch worden verwijderd. Uitgeschakelde beleidsregels bewaren gegevens onbeperkt.",
+    "loading": "Bewaarbeleid laden",
+    "refresh": "Vernieuwen",
+    "policies_title": "Bewaarbeleid",
+    "policies_intro": "Schakel een beleidsregel in en stel het bewaarvenster in ({{min}}–{{max}} dagen). Gegevens ouder dan het venster worden door de nachtelijke uitvoering verwijderd, en elke verwijdering wordt hieronder gelogd.",
+    "load_failed": "Bewaarbeleid kon niet worden geladen",
+    "policy_saved": "Bewaarbeleid opgeslagen",
+    "save_failed": "Bewaarbeleid kon niet worden opgeslagen",
+    "save": "Opslaan",
+    "days_suffix": "dagen",
+    "days_aria": "Bewaartermijn in dagen voor {{type}}",
+    "enable_aria": "Bewaarbeleid inschakelen voor {{type}}",
+    "runs_title": "Recente verwijderingsruns",
+    "no_runs": "Nog geen verwijderingsruns. Runs verschijnen hier nadat de nachtelijke uitvoering een ingeschakelde beleidsregel heeft verwerkt.",
+    "run_summary": "{{rows}} rijen verwijderd (ouder dan {{days}} dagen)",
+    "status_completed": "Voltooid",
+    "status_partial": "Gedeeltelijk",
+    "status_failed": "Mislukt",
+    "type_activity_log": "Activiteitenlog",
+    "type_activity_log_desc": "Activiteitenspoor van leden en systeem (aanmeldingen, recordwijzigingen).",
+    "type_admin_audit_log": "Beheerder-auditlog",
+    "type_admin_audit_log_desc": "Acties van beheerders- en organisatiebeheer.",
+    "type_notifications": "Meldingen",
+    "type_notifications_desc": "In-app belmeldingen die aan leden worden bezorgd.",
+    "type_email_log": "E-maillog",
+    "type_email_log_desc": "Bezorgingsrecords van uitgaande e-mails (versleutelde inhoud).",
+    "type_login_attempts": "Aanmeldpogingen",
+    "type_login_attempts_desc": "Records van geslaagde en mislukte aanmeldpogingen."
   }
 }

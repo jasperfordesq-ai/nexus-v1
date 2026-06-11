@@ -760,4 +760,8 @@ return [
             'connections' => 'Connections only',
         ],
     ],
+    'seo' => [
+        'description' => 'Korzystaj z dostępnego frontendu alfa Project NEXUS do podstawowych zadań społeczności, z przejrzystą nawigacją, standardowymi formularzami i progresywnym ulepszaniem.',
+        'og_image_alt' => 'Project NEXUS — otwartoźródłowa platforma banku czasu i społeczności',
+    ],
 ];

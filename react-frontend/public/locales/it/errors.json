@@ -47,5 +47,7 @@
   "session_expiring_message": "La tua sessione scadrà tra {{seconds}} secondi. Prolunga la tua sessione per rimanere connesso.",
   "session_expiring_countdown_aria": "La sessione scade tra {{seconds}} secondi",
   "extend_session": "Estendi la sessione",
-  "dismiss": "Chiudi"
+  "dismiss": "Chiudi",
+  "idle_logout_title": "Disconnessione per inattività",
+  "idle_logout_message": "È stato disconnesso automaticamente dopo un periodo di inattività. Acceda di nuovo per continuare."
 }

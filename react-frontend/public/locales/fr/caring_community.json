@@ -690,6 +690,10 @@
         "load": "Échec du chargement des enquêtes",
         "create": "Échec de la création de l'enquête",
         "export_failed": "Échec de l'exportation des réponses à l'enquête."
+      },
+      "toasts": {
+        "published": "Enquête publiée.",
+        "closed": "Enquête fermée."
       }
     },
     "feedback": {

@@ -267,5 +267,6 @@
   "zone_commerce": "Handel",
   "zone_platform": "Platforma",
   "zone_diagnostics": "Diagnostyka",
-  "admin_meta_description": "Prywatne narzedzia administracyjne do zarzadzania ta spolecznoscia."
+  "admin_meta_description": "Prywatne narzedzia administracyjne do zarzadzania ta spolecznoscia.",
+  "retention_policies": "Retencja danych"
 }

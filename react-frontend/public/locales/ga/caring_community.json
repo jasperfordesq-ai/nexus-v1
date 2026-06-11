@@ -690,6 +690,10 @@
         "load": "Theip ar na suirbhéanna a lódáil",
         "create": "Theip ar an suirbhé a chruthú",
         "export_failed": "Theip ar easpórtáil freagraí suirbhé."
+      },
+      "toasts": {
+        "published": "Foilsíodh an suirbhé.",
+        "closed": "Dúnadh an suirbhé."
       }
     },
     "feedback": {

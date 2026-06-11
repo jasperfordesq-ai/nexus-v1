@@ -690,6 +690,10 @@
         "load": "Failed to load surveys",
         "create": "Failed to create survey",
         "export_failed": "Failed to export survey responses."
+      },
+      "toasts": {
+        "published": "Survey published.",
+        "closed": "Survey closed."
       }
     },
     "feedback": {

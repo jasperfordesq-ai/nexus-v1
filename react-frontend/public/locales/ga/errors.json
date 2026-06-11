@@ -47,5 +47,7 @@
   "session_expiring_message": "Rachaidh do sheisiún in éag i {{seconds}} soicind. Leathnaigh do sheisiún chun fanacht logáilte isteach.",
   "session_expiring_countdown_aria": "Rachaidh an seisiún in éag i {{seconds}} soicind",
   "extend_session": "Seisiún a leathnú",
-  "dismiss": "Dún"
+  "dismiss": "Dún",
+  "idle_logout_title": "Sínithe amach de bharr neamhghníomhaíochta",
+  "idle_logout_message": "Síníodh amach thú go huathoibríoch tar éis tréimhse neamhghníomhaíochta. Logáil isteach arís le leanúint ar aghaidh."
 }

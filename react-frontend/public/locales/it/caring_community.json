@@ -690,6 +690,10 @@
         "load": "Impossibile caricare i sondaggi",
         "create": "Impossibile creare il sondaggio",
         "export_failed": "Impossibile esportare le risposte al sondaggio."
+      },
+      "toasts": {
+        "published": "Sondaggio pubblicato.",
+        "closed": "Sondaggio chiuso."
       }
     },
     "feedback": {

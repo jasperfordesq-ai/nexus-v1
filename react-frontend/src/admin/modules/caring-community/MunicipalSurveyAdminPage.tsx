@@ -318,7 +318,7 @@ export default function MunicipalSurveyAdminPage() {
     try {
       const res = await api.post(`/v2/admin/caring-community/surveys/${id}/publish`);
       if (res.success) {
-        showToast(t('admin.surveys.status.active'), 'success');
+        showToast(t('admin.surveys.toasts.published'), 'success');
         await fetchSurveys();
       } else {
         showToast(res.error || tAdmin('common.an_unexpected_error'), 'error');
@@ -333,7 +333,7 @@ export default function MunicipalSurveyAdminPage() {
     try {
       const res = await api.post(`/v2/admin/caring-community/surveys/${id}/close`);
       if (res.success) {
-        showToast(t('admin.surveys.status.closed'), 'success');
+        showToast(t('admin.surveys.toasts.closed'), 'success');
         await fetchSurveys();
       } else {
         showToast(res.error || tAdmin('common.an_unexpected_error'), 'error');

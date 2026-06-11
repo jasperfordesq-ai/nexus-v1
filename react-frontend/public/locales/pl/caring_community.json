@@ -690,6 +690,10 @@
         "load": "Nie udało się załadować ankiet",
         "create": "Nie udało się utworzyć ankiety",
         "export_failed": "Nie udało się wyeksportować odpowiedzi na ankietę."
+      },
+      "toasts": {
+        "published": "Ankieta została opublikowana.",
+        "closed": "Ankieta została zamknięta."
       }
     },
     "feedback": {

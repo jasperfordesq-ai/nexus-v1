@@ -690,6 +690,10 @@
         "load": "Kan enquêtes niet laden",
         "create": "Kan enquête niet maken",
         "export_failed": "Kan enquêtereacties niet exporteren."
+      },
+      "toasts": {
+        "published": "Enquête gepubliceerd.",
+        "closed": "Enquête gesloten."
       }
     },
     "feedback": {

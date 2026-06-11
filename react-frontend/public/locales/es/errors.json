@@ -47,5 +47,7 @@
   "session_expiring_message": "Your session will expire in {{seconds}} seconds. Amplíe su sesión para permanecer conectado.",
   "session_expiring_countdown_aria": "La sesión caduca en {{seconds}} segundos",
   "extend_session": "Ampliar sesión",
-  "dismiss": "Cerrar"
+  "dismiss": "Cerrar",
+  "idle_logout_title": "Sesión cerrada por inactividad",
+  "idle_logout_message": "Su sesión se cerró automáticamente tras un período de inactividad. Inicie sesión de nuevo para continuar."
 }

@@ -690,6 +690,10 @@
         "load": "No se pudieron cargar las encuestas",
         "create": "No se pudo crear la encuesta",
         "export_failed": "No se pudieron exportar las respuestas de la encuesta."
+      },
+      "toasts": {
+        "published": "Encuesta publicada.",
+        "closed": "Encuesta cerrada."
       }
     },
     "feedback": {

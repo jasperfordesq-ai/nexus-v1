@@ -47,5 +47,7 @@
   "session_expiring_message": "Twoja sesja wygaśnie za {{seconds}} sekund. Przedłuż sesję, aby pozostać zalogowanym.",
   "session_expiring_countdown_aria": "Sesja wygasa za {{seconds}} sekund",
   "extend_session": "Przedłuż sesję",
-  "dismiss": "Zamknij"
+  "dismiss": "Zamknij",
+  "idle_logout_title": "Wylogowano z powodu bezczynności",
+  "idle_logout_message": "Po okresie bezczynności nastąpiło automatyczne wylogowanie. Zaloguj się ponownie, aby kontynuować."
 }

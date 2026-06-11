@@ -47,5 +47,7 @@
   "session_expiring_message": "セッションは {{seconds}} 秒後に期限切れになります。セッションを延長してログイン状態を維持します。",
   "session_expiring_countdown_aria": "セッションは {{seconds}} 秒後に期限切れになります",
   "extend_session": "セッションを延長する",
-  "dismiss": "閉じる"
+  "dismiss": "閉じる",
+  "idle_logout_title": "無操作のためサインアウトしました",
+  "idle_logout_message": "一定時間操作がなかったため、自動的にサインアウトされました。続行するには再度ログインしてください。"
 }

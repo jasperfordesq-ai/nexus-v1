@@ -267,5 +267,6 @@
   "zone_commerce": "コマース",
   "zone_platform": "プラットフォーム",
   "zone_diagnostics": "診断",
-  "admin_meta_description": "このコミュニティを管理するためのプライベート管理ツール。"
+  "admin_meta_description": "このコミュニティを管理するためのプライベート管理ツール。",
+  "retention_policies": "データ保持"
 }

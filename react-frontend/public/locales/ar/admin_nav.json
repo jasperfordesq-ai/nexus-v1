@@ -267,5 +267,6 @@
   "zone_commerce": "التجارة",
   "zone_platform": "منصة",
   "zone_diagnostics": "التشخيصات",
-  "admin_meta_description": "أدوات الإدارة الخاصة لإدارة هذا المجتمع."
+  "admin_meta_description": "أدوات الإدارة الخاصة لإدارة هذا المجتمع.",
+  "retention_policies": "الاحتفاظ بالبيانات"
 }

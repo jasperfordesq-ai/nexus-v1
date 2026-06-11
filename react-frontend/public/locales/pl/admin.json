@@ -4670,7 +4670,8 @@
       "reject": "Odrzucić",
       "view": "Pogląd",
       "cancel": "Anulować",
-      "reject_proposal": "Odrzuć propozycję"
+      "reject_proposal": "Odrzuć propozycję",
+      "publish": "Opublikuj"
     },
     "about": {
       "title": "O tej stronie",
@@ -4718,8 +4719,9 @@
       "model": "Użyty model: {{model}}"
     },
     "states": {
-      "accepted": "Przyjęty. Teraz opublikuj poprawiony tekst za pośrednictwem panelu administracyjnego Ogłoszenia.",
-      "rejected_reason": "Odrzucono - powód: {{reason}}"
+      "accepted": "Zaakceptowano, ale jeszcze nie opublikowano. Naciśnij Opublikuj, aby wysłać tekst jako ogłoszenie.",
+      "rejected_reason": "Odrzucono - powód: {{reason}}",
+      "published": "Opublikowano jako ogłoszenie nr {{id}}."
     },
     "empty": {
       "value": "-",
@@ -4744,11 +4746,12 @@
       "draft_too_long": "Wersja robocza jest za długa (maks. 4000 znaków)",
       "generated": "Wygenerowano propozycję",
       "generate_failed": "Nie udało się wygenerować propozycji",
-      "accepted": "Propozycja zaakceptowana — teraz opublikuj za pośrednictwem administratora ogłoszeń",
+      "accepted": "Propozycja zaakceptowana i opublikowana jako ogłoszenie",
       "accept_failed": "Nie udało się zaakceptować propozycji",
       "reason_required": "Powód jest wymagany",
       "rejected": "Propozycja odrzucona",
-      "reject_failed": "Nie udało się odrzucić propozycji"
+      "reject_failed": "Nie udało się odrzucić propozycji",
+      "publish_failed": "Propozycja zaakceptowana, ale publikacja się nie powiodła - naciśnij Opublikuj, aby spróbować ponownie"
     }
   },
   "kpi_baselines": {
@@ -13731,7 +13734,9 @@
       "welcome_credits_issued": "Wydano kredyty powitalne"
     },
     "partner_logo_link_url": "Partner Logo Link URL",
-    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer."
+    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer.",
+    "label_inactivity_timeout": "Limit bezczynności (minuty)",
+    "desc_inactivity_timeout": "Automatycznie wylogowuj członków po tylu minutach bez aktywności. 0 wyłącza limit; dozwolony zakres to 5–480 minut. Zalecane: 120."
   },
   "timebanking": {
     "col_description": "Description",
@@ -15369,7 +15374,15 @@
     "maps_kill_switch_aria": "Wyłącznik wyświetlania mapy (zablokowany)",
     "map_provider_aria": "Dostawca map",
     "geocoding_provider_aria": "Dostawca autouzupełniania",
-    "clear_failed": "Nie udało się wyczyścić"
+    "clear_failed": "Nie udało się wyczyścić",
+    "provider_os_maps": "Ordnance Survey (Wielka Brytania)",
+    "os_maps_api_key_label": "Klucz API Ordnance Survey Maps",
+    "os_maps_api_key_hint": "Klucz projektu OS Data Hub dla OS Maps API. Używany, gdy dostawcą map jest Ordnance Survey; tenanci brytyjskiego sektora publicznego są zwykle objęci umową PSGA. Bez klucza tenanci Ordnance Survey wracają do darmowych kafelków OpenStreetMap.",
+    "os_maps_key_cleared": "Klucz Ordnance Survey usunięty",
+    "tiles_status_os_maps": "OS Maps API aktywne",
+    "tiles_status_os_maps_unset": "Brak klucza — powrót do darmowego OSM",
+    "provider_os_places": "Ordnance Survey Places (Wielka Brytania, UPRN)",
+    "status_os_places": "OS Places (PSGA)"
   },
   "cron_setup": {
     "notice_title": "Ważne: jak działa cron w Projekcie NEXUS",
@@ -17303,5 +17316,36 @@
     "never_run": "Never run",
     "no_jobs": "No background jobs configured",
     "loading": "Loading"
+  },
+  "retention": {
+    "page_title": "Retencja danych",
+    "page_subtitle": "Skonfiguruj, jak długo dane operacyjne są przechowywane przed automatycznym usunięciem. Wyłączone zasady przechowują dane bezterminowo.",
+    "loading": "Ładowanie zasad retencji",
+    "refresh": "Odśwież",
+    "policies_title": "Zasady retencji",
+    "policies_intro": "Włącz zasadę i ustaw jej okno retencji ({{min}}–{{max}} dni). Dane starsze niż okno są usuwane podczas nocnego przebiegu, a każde usunięcie jest rejestrowane poniżej.",
+    "load_failed": "Nie udało się załadować zasad retencji",
+    "policy_saved": "Zasada retencji zapisana",
+    "save_failed": "Nie udało się zapisać zasady retencji",
+    "save": "Zapisz",
+    "days_suffix": "dni",
+    "days_aria": "Okres retencji w dniach dla {{type}}",
+    "enable_aria": "Włącz zasadę retencji dla {{type}}",
+    "runs_title": "Ostatnie przebiegi usuwania",
+    "no_runs": "Brak przebiegów usuwania. Przebiegi pojawią się tutaj, gdy nocne wykonanie przetworzy włączoną zasadę.",
+    "run_summary": "Usunięto {{rows}} wierszy (starszych niż {{days}} dni)",
+    "status_completed": "Zakończono",
+    "status_partial": "Częściowo",
+    "status_failed": "Niepowodzenie",
+    "type_activity_log": "Dziennik aktywności",
+    "type_activity_log_desc": "Ślad aktywności członków i systemu (logowania, zmiany rekordów).",
+    "type_admin_audit_log": "Dziennik audytu administratora",
+    "type_admin_audit_log_desc": "Działania administracyjne i zarządzanie organizacją.",
+    "type_notifications": "Powiadomienia",
+    "type_notifications_desc": "Powiadomienia dzwonka w aplikacji dostarczane członkom.",
+    "type_email_log": "Dziennik e-maili",
+    "type_email_log_desc": "Rejestry dostarczania wychodzących e-maili (zaszyfrowana treść).",
+    "type_login_attempts": "Próby logowania",
+    "type_login_attempts_desc": "Rejestry udanych i nieudanych prób logowania."
   }
 }

@@ -760,4 +760,8 @@ return [
             'connections' => 'Connections only',
         ],
     ],
+    'seo' => [
+        'description' => 'Gebruik de toegankelijke Project NEXUS-alfafrontend voor de belangrijkste communitytaken, met duidelijke navigatie, standaardformulieren en progressieve verbetering.',
+        'og_image_alt' => 'Project NEXUS, opensourceplatform voor tijdbankieren en community',
+    ],
 ];

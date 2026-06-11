@@ -267,5 +267,6 @@
   "zone_commerce": "Handel",
   "zone_platform": "Platform",
   "zone_diagnostics": "Diagnostiek",
-  "admin_meta_description": "Prive beheertools om deze community te beheren."
+  "admin_meta_description": "Prive beheertools om deze community te beheren.",
+  "retention_policies": "Gegevensbewaring"
 }

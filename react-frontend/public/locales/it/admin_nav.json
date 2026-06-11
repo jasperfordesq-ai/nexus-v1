@@ -267,5 +267,6 @@
   "zone_commerce": "Commercio",
   "zone_platform": "Piattaforma",
   "zone_diagnostics": "Diagnostica",
-  "admin_meta_description": "Strumenti di amministrazione privati per gestire questa comunita."
+  "admin_meta_description": "Strumenti di amministrazione privati per gestire questa comunita.",
+  "retention_policies": "Conservazione dei dati"
 }

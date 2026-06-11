@@ -760,4 +760,8 @@ return [
             'connections' => 'Connections only',
         ],
     ],
+    'seo' => [
+        'description' => 'Nutzen Sie das barrierefreie Project-NEXUS-Alpha-Frontend für zentrale Community-Aufgaben mit klarer Navigation, Standardformularen und progressiver Verbesserung.',
+        'og_image_alt' => 'Project NEXUS, Open-Source-Plattform für Timebanking und Community',
+    ],
 ];

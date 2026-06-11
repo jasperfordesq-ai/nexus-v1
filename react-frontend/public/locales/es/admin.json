@@ -4670,7 +4670,8 @@
       "reject": "Rechazar",
       "view": "Vista",
       "cancel": "Cancelar",
-      "reject_proposal": "Rechazar propuesta"
+      "reject_proposal": "Rechazar propuesta",
+      "publish": "Publicar"
     },
     "about": {
       "title": "Acerca de esta página",
@@ -4718,8 +4719,9 @@
       "model": "Modelo: {{model}}"
     },
     "states": {
-      "accepted": "Aceptado. Ahora publique el texto pulido a través del administrador de Anuncios.",
-      "rejected_reason": "Rechazado - motivo: {{reason}}"
+      "accepted": "Aceptada pero aún no publicada. Pulse Publicar para enviarla como anuncio.",
+      "rejected_reason": "Rechazado - motivo: {{reason}}",
+      "published": "Publicada como anuncio n.º {{id}}."
     },
     "empty": {
       "value": "-",
@@ -4744,11 +4746,12 @@
       "draft_too_long": "El borrador es demasiado largo (máximo 4000 caracteres)",
       "generated": "Propuesta generada",
       "generate_failed": "No se pudo generar la propuesta",
-      "accepted": "Propuesta aceptada: ahora publíquela a través del administrador de Anuncios.",
+      "accepted": "Propuesta aceptada y publicada como anuncio",
       "accept_failed": "No se pudo aceptar la propuesta",
       "reason_required": "Se requiere razón",
       "rejected": "Propuesta rechazada",
-      "reject_failed": "No se pudo rechazar la propuesta"
+      "reject_failed": "No se pudo rechazar la propuesta",
+      "publish_failed": "Propuesta aceptada, pero la publicación falló - pulse Publicar para reintentar"
     }
   },
   "kpi_baselines": {
@@ -13731,7 +13734,9 @@
       "welcome_credits_issued": "Créditos de bienvenida emitidos"
     },
     "partner_logo_link_url": "Partner Logo Link URL",
-    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer."
+    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer.",
+    "label_inactivity_timeout": "Tiempo de inactividad (minutos)",
+    "desc_inactivity_timeout": "Cerrar la sesión de los miembros automáticamente tras este número de minutos sin actividad. 0 desactiva el límite; el rango permitido es de 5 a 480 minutos. Recomendado: 120."
   },
   "timebanking": {
     "col_description": "Description",
@@ -15369,7 +15374,15 @@
     "maps_kill_switch_aria": "Interruptor de apagado de visualización del mapa (bloqueado)",
     "map_provider_aria": "Proveedor de mapas",
     "geocoding_provider_aria": "Proveedor de autocompletar",
-    "clear_failed": "No se pudo borrar"
+    "clear_failed": "No se pudo borrar",
+    "provider_os_maps": "Ordnance Survey (Reino Unido)",
+    "os_maps_api_key_label": "Clave de API de Ordnance Survey Maps",
+    "os_maps_api_key_hint": "Clave de proyecto de OS Data Hub para la API de OS Maps. Se usa cuando el proveedor de mapas es Ordnance Survey; los tenants del sector público del Reino Unido suelen estar cubiertos por la PSGA. Sin clave, los tenants de Ordnance Survey recurren a los mosaicos gratuitos de OpenStreetMap.",
+    "os_maps_key_cleared": "Clave de Ordnance Survey eliminada",
+    "tiles_status_os_maps": "API de OS Maps activa",
+    "tiles_status_os_maps_unset": "Sin clave — se usa OSM gratuito",
+    "provider_os_places": "Ordnance Survey Places (Reino Unido, UPRN)",
+    "status_os_places": "OS Places (PSGA)"
   },
   "cron_setup": {
     "notice_title": "Importante: cómo funciona cron en el Proyecto NEXUS",
@@ -17303,5 +17316,36 @@
     "never_run": "Never run",
     "no_jobs": "No background jobs configured",
     "loading": "Loading"
+  },
+  "retention": {
+    "page_title": "Retención de datos",
+    "page_subtitle": "Configure cuánto tiempo se conservan los datos operativos antes de su eliminación automática. Las políticas desactivadas conservan los datos indefinidamente.",
+    "loading": "Cargando políticas de retención",
+    "refresh": "Actualizar",
+    "policies_title": "Políticas de retención",
+    "policies_intro": "Active una política y establezca su ventana de retención ({{min}}–{{max}} días). Los datos más antiguos que la ventana se eliminan en la ejecución nocturna, y cada eliminación queda registrada abajo.",
+    "load_failed": "No se pudieron cargar las políticas de retención",
+    "policy_saved": "Política de retención guardada",
+    "save_failed": "No se pudo guardar la política de retención",
+    "save": "Guardar",
+    "days_suffix": "días",
+    "days_aria": "Período de retención en días para {{type}}",
+    "enable_aria": "Activar la política de retención para {{type}}",
+    "runs_title": "Eliminaciones recientes",
+    "no_runs": "Aún no hay eliminaciones. Las ejecuciones aparecen aquí después de que el proceso nocturno haya aplicado una política activada.",
+    "run_summary": "{{rows}} filas eliminadas (anteriores a {{days}} días)",
+    "status_completed": "Completado",
+    "status_partial": "Parcial",
+    "status_failed": "Fallido",
+    "type_activity_log": "Registro de actividad",
+    "type_activity_log_desc": "Historial de actividad de miembros y del sistema (inicios de sesión, cambios de registros).",
+    "type_admin_audit_log": "Registro de auditoría de administración",
+    "type_admin_audit_log_desc": "Acciones de administración y gestión de la organización.",
+    "type_notifications": "Notificaciones",
+    "type_notifications_desc": "Notificaciones de campana en la aplicación enviadas a los miembros.",
+    "type_email_log": "Registro de correos",
+    "type_email_log_desc": "Registros de entrega de correos salientes (cuerpos cifrados).",
+    "type_login_attempts": "Intentos de inicio de sesión",
+    "type_login_attempts_desc": "Registros de intentos de inicio de sesión correctos y fallidos."
   }
 }

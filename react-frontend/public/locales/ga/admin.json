@@ -4670,7 +4670,8 @@
       "reject": "Diúltaigh",
       "view": "Amharc",
       "cancel": "Cealaigh",
-      "reject_proposal": "Diúltú don mholadh"
+      "reject_proposal": "Diúltú don mholadh",
+      "publish": "Foilsigh"
     },
     "about": {
       "title": "Maidir leis an leathanach seo",
@@ -4718,8 +4719,9 @@
       "model": "Múnla: {{model}}"
     },
     "states": {
-      "accepted": "Glactar leis. Anois foilsigh an téacs snasta tríd an riarthóir Fógraí.",
-      "rejected_reason": "Diúltaíodh - cúis: {{reason}}"
+      "accepted": "Glactha ach níor foilsíodh fós é. Brúigh Foilsigh chun é a sheoladh mar fhógra.",
+      "rejected_reason": "Diúltaíodh - cúis: {{reason}}",
+      "published": "Foilsithe mar fhógra #{{id}}."
     },
     "empty": {
       "value": "-",
@@ -4744,11 +4746,12 @@
       "draft_too_long": "Tá an dréacht ró-fhada (4000 carachtar ar a mhéad)",
       "generated": "Togra ginte",
       "generate_failed": "Theip ar thogra a ghiniúint",
-      "accepted": "Glacadh leis an togra - foilsigh anois trí admin Fógraí",
+      "accepted": "Glacadh leis an togra agus foilsíodh é mar fhógra",
       "accept_failed": "Theip ar glacadh leis an moladh",
       "reason_required": "Tá gá le cúis",
       "rejected": "Diúltaíodh don togra",
-      "reject_failed": "Theip ar an moladh a dhiúltú"
+      "reject_failed": "Theip ar an moladh a dhiúltú",
+      "publish_failed": "Glacadh leis an togra, ach theip ar an bhfoilsiú - brúigh Foilsigh chun triail eile a bhaint as"
     }
   },
   "kpi_baselines": {
@@ -13731,7 +13734,9 @@
       "welcome_credits_issued": "Creidmheasanna Fáilte Eisithe"
     },
     "partner_logo_link_url": "Partner Logo Link URL",
-    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer."
+    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer.",
+    "label_inactivity_timeout": "Teorainn neamhghníomhaíochta (nóiméid)",
+    "desc_inactivity_timeout": "Sínigh baill amach go huathoibríoch tar éis an líon seo nóiméad gan ghníomhaíocht. Díchumasaíonn 0 an teorainn; is é 5–480 nóiméad an raon ceadaithe. Moltar: 120."
   },
   "timebanking": {
     "col_description": "Description",
@@ -15369,7 +15374,15 @@
     "maps_kill_switch_aria": "Lasc marú taispeána léarscáile (glasáilte as)",
     "map_provider_aria": "Soláthraí léarscáileanna",
     "geocoding_provider_aria": "Soláthraí uathchríochnaithe",
-    "clear_failed": "Theip ar ghlanadh"
+    "clear_failed": "Theip ar ghlanadh",
+    "provider_os_maps": "Ordnance Survey (RA)",
+    "os_maps_api_key_label": "Eochair API Ordnance Survey Maps",
+    "os_maps_api_key_hint": "Eochair tionscadail OS Data Hub don API OS Maps. Úsáidtear í nuair is Ordnance Survey an soláthraí léarscáileanna; is gnách go gclúdaíonn an PSGA tionóntaí earnála poiblí na RA. Gan eochair, titeann tionóntaí Ordnance Survey siar ar thíleanna saor in aisce OpenStreetMap.",
+    "os_maps_key_cleared": "Glanadh eochair Ordnance Survey",
+    "tiles_status_os_maps": "API OS Maps gníomhach",
+    "tiles_status_os_maps_unset": "Gan eochair — titeann siar ar OSM saor in aisce",
+    "provider_os_places": "Ordnance Survey Places (RA, UPRN)",
+    "status_os_places": "OS Places (PSGA)"
   },
   "cron_setup": {
     "notice_title": "Tábhachtach: conas a oibríonn cron ar Project NEXUS",
@@ -17303,5 +17316,36 @@
     "never_run": "Never run",
     "no_jobs": "No background jobs configured",
     "loading": "Loading"
+  },
+  "retention": {
+    "page_title": "Coinneáil Sonraí",
+    "page_subtitle": "Cumraigh cá fhad a choinnítear sonraí oibríochtúla sula ndiúscraítear go huathoibríoch iad. Coinníonn polasaithe díchumasaithe sonraí gan teorainn.",
+    "loading": "Polasaithe coinneála á lódáil",
+    "refresh": "Athnuaigh",
+    "policies_title": "Polasaithe coinneála",
+    "policies_intro": "Cumasaigh polasaí agus socraigh a fhuinneog choinneála ({{min}}–{{max}} lá). Scriostar sonraí atá níos sine ná an fhuinneog leis an rith forfheidhmithe oíche, agus logáiltear gach diúscairt thíos.",
+    "load_failed": "Theip ar pholasaithe coinneála a lódáil",
+    "policy_saved": "Sábháladh an polasaí coinneála",
+    "save_failed": "Theip ar an bpolasaí coinneála a shábháil",
+    "save": "Sábháil",
+    "days_suffix": "lá",
+    "days_aria": "Tréimhse choinneála i laethanta do {{type}}",
+    "enable_aria": "Cumasaigh polasaí coinneála do {{type}}",
+    "runs_title": "Rití diúscartha le déanaí",
+    "no_runs": "Níl aon rití diúscartha fós. Taispeántar rití anseo tar éis don fhorfheidhmiú oíche polasaí cumasaithe a phróiseáil.",
+    "run_summary": "{{rows}} ró diúscartha (níos sine ná {{days}} lá)",
+    "status_completed": "Críochnaithe",
+    "status_partial": "Páirteach",
+    "status_failed": "Teipthe",
+    "type_activity_log": "Loga gníomhaíochta",
+    "type_activity_log_desc": "Lorg gníomhaíochta ball agus an chórais (logálacha isteach, athruithe ar thaifid).",
+    "type_admin_audit_log": "Loga iniúchta riarthóra",
+    "type_admin_audit_log_desc": "Gníomhartha riaracháin agus bainistíochta eagraíochta.",
+    "type_notifications": "Fógraí",
+    "type_notifications_desc": "Fógraí cloigín san aip a sheachadtar chuig baill.",
+    "type_email_log": "Loga ríomhphoist",
+    "type_email_log_desc": "Taifid seachadta ríomhphost amach (coirp chriptithe).",
+    "type_login_attempts": "Iarrachtaí logála isteach",
+    "type_login_attempts_desc": "Taifid ar iarrachtaí sínithe isteach rathúla agus teipthe."
   }
 }
