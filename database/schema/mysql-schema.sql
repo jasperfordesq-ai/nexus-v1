@@ -11335,9 +11335,33 @@ CREATE TABLE `social_value_config` (
   `reporting_period` enum('monthly','quarterly','annually') NOT NULL DEFAULT 'annually',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `investment_amount` decimal(12,2) DEFAULT NULL COMMENT 'Total investment for the reporting period (SROI denominator); null = not configured',
+  `deadweight_pct` decimal(5,2) NOT NULL DEFAULT 10.00 COMMENT '% of outcome that would have happened anyway',
+  `displacement_pct` decimal(5,2) NOT NULL DEFAULT 10.00 COMMENT '% of outcome displaced from elsewhere',
+  `attribution_pct` decimal(5,2) NOT NULL DEFAULT 10.00 COMMENT '% of outcome attributable to other actors',
+  `dropoff_pct` decimal(5,2) NOT NULL DEFAULT 70.00 COMMENT '% of impact lost per subsequent year',
+  `discount_rate_pct` decimal(5,2) NOT NULL DEFAULT 3.50 COMMENT 'Social discount rate (HM Treasury Green Book default 3.5%)',
+  `projection_years` tinyint(3) unsigned NOT NULL DEFAULT 2 COMMENT 'Years of benefit projection including year 1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_tenant` (`tenant_id`),
   KEY `idx_tenant` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `social_value_outcomes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `social_value_outcomes` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` int(11) NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `quantity` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Verified stakeholders experiencing this outcome (Q)',
+  `proxy_value` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'Financial proxy value per stakeholder (P)',
+  `proxy_source` varchar(255) DEFAULT NULL COMMENT 'Provenance of the proxy, e.g. HACT Social Value Bank',
+  `sort_order` smallint(6) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `social_value_outcomes_tenant_id_index` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `staffing_predictions`;

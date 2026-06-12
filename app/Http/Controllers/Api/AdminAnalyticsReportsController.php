@@ -63,11 +63,21 @@ class AdminAnalyticsReportsController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
 
+        $existing = $this->socialValueService->getConfig($tenantId);
+        $investmentInput = $this->input('investment_amount', $existing['investment_amount']);
+
         $config = [
             'hour_value_currency' => $this->input('hour_value_currency', 'GBP'),
             'hour_value_amount' => (float) $this->input('hour_value_amount', 15.00),
             'social_multiplier' => (float) $this->input('social_multiplier', 3.5),
             'reporting_period' => $this->input('reporting_period', 'annually'),
+            'investment_amount' => ($investmentInput === null || $investmentInput === '') ? null : (float) $investmentInput,
+            'deadweight_pct' => (float) $this->input('deadweight_pct', $existing['deadweight_pct']),
+            'displacement_pct' => (float) $this->input('displacement_pct', $existing['displacement_pct']),
+            'attribution_pct' => (float) $this->input('attribution_pct', $existing['attribution_pct']),
+            'dropoff_pct' => (float) $this->input('dropoff_pct', $existing['dropoff_pct']),
+            'discount_rate_pct' => (float) $this->input('discount_rate_pct', $existing['discount_rate_pct']),
+            'projection_years' => (int) $this->input('projection_years', $existing['projection_years']),
         ];
 
         if ($config['hour_value_amount'] <= 0 || $config['hour_value_amount'] > 10000) {
@@ -82,7 +92,47 @@ class AdminAnalyticsReportsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_reporting_period'), 'reporting_period', 400);
         }
 
+        if ($config['investment_amount'] !== null && ($config['investment_amount'] < 0 || $config['investment_amount'] > 100000000)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.sroi_investment_range'), 'investment_amount', 400);
+        }
+
+        foreach (['deadweight_pct', 'displacement_pct', 'attribution_pct', 'dropoff_pct'] as $pctField) {
+            if ($config[$pctField] < 0 || $config[$pctField] > 100) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.sroi_percentage_range'), $pctField, 400);
+            }
+        }
+
+        if ($config['discount_rate_pct'] < 0 || $config['discount_rate_pct'] > 20) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.sroi_discount_range'), 'discount_rate_pct', 400);
+        }
+
+        if ($config['projection_years'] < 1 || $config['projection_years'] > 10) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.sroi_projection_years_range'), 'projection_years', 400);
+        }
+
+        $outcomes = $this->input('outcomes');
+        if ($outcomes !== null) {
+            if (!is_array($outcomes) || count($outcomes) > 25) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.sroi_outcomes_invalid'), 'outcomes', 400);
+            }
+            foreach ($outcomes as $outcome) {
+                if (!is_array($outcome)
+                    || !is_string($outcome['name'] ?? null)
+                    || !is_numeric($outcome['quantity'] ?? null)
+                    || !is_numeric($outcome['proxy_value'] ?? null)
+                    || (float) $outcome['quantity'] < 0
+                    || (float) $outcome['proxy_value'] < 0
+                ) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.sroi_outcomes_invalid'), 'outcomes', 400);
+                }
+            }
+        }
+
         $success = $this->socialValueService->saveConfig($tenantId, $config);
+
+        if ($success && $outcomes !== null) {
+            $this->socialValueService->saveOutcomes($tenantId, $outcomes);
+        }
 
         if ($success) {
             return $this->respondWithData(['message' => __('api.social_value_config_updated'), 'config' => $config]);

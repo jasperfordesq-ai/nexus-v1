@@ -2273,7 +2273,12 @@ export const adminCommunityAnalytics = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const adminImpactReport = {
-  getData: (months = 12) => api.get<{ total_hours: number; economic_value: number; social_impact: number; members_active: number; monthly_data: Array<{ month: string; hours: number; value: number }> }>(`/v2/admin/impact-report${buildQuery({ months })}`),
+  getData: (months = 12) => api.get<{
+    sroi: { total_hours: number; total_transactions: number; unique_givers: number; unique_receivers: number; hourly_value: number; monetary_value: number; social_multiplier: number; social_value: number; sroi_ratio: number; period_months: number };
+    health: Record<string, number>;
+    timeline: Array<{ month: string; hours_exchanged: number; transactions: number; new_users: number }>;
+    config: { tenant_name: string; tenant_slug: string; logo_url: string | null; hourly_value: number; social_multiplier: number };
+  }>(`/v2/admin/impact-report${buildQuery({ months })}`),
   updateConfig: (data: { hourly_value?: number; social_multiplier?: number }) =>
     api.put<{ success: boolean }>('/v2/admin/impact-report/config', data),
 };

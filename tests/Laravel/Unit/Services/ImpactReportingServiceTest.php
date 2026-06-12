@@ -23,6 +23,7 @@ class ImpactReportingServiceTest extends TestCase
     {
         DB::shouldReceive('table')->with('transactions')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereNotIn')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('first')->andReturn((object) [
             'total_hours' => 100,
@@ -47,6 +48,7 @@ class ImpactReportingServiceTest extends TestCase
     {
         DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereNotIn')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('first')->andReturn((object) [
             'total_hours' => 50,
@@ -71,6 +73,7 @@ class ImpactReportingServiceTest extends TestCase
     {
         DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereNotIn')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('first')->andReturn((object) [
             'total_hours' => 0, 'total_transactions' => 0,
@@ -85,6 +88,7 @@ class ImpactReportingServiceTest extends TestCase
     {
         DB::shouldReceive('table')->with('transactions')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereNotIn')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('groupBy')->andReturnSelf();
         DB::shouldReceive('orderBy')->andReturnSelf();
@@ -94,6 +98,7 @@ class ImpactReportingServiceTest extends TestCase
 
         DB::shouldReceive('table')->with('users')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereNotIn')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('groupBy')->andReturnSelf();
         DB::shouldReceive('pluck')->andReturn(collect(['2026-01' => 3]));
@@ -110,6 +115,7 @@ class ImpactReportingServiceTest extends TestCase
     {
         DB::shouldReceive('table')->with('tenants')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereNotIn')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('first')->andReturn((object) [
             'name' => 'Hour Timebank',

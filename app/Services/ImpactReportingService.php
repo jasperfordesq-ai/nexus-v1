@@ -32,6 +32,8 @@ class ImpactReportingService
 
         $data = DB::table('transactions')
             ->where('tenant_id', $tenantId)
+            ->where('status', 'completed')
+            ->whereNotIn('transaction_type', SocialValueService::EXCLUDED_TRANSACTION_TYPES)
             ->where('created_at', '>=', DB::raw("DATE_SUB(NOW(), INTERVAL " . ((int) $months) . " MONTH)"))
             ->select([
                 DB::raw('COALESCE(SUM(amount), 0) as total_hours'),
@@ -80,13 +82,14 @@ class ImpactReportingService
         $active90d = (int) $userStats->active_90d;
         $new30d = (int) $userStats->new_30d;
 
-        // Engagement: users who traded in last 30 days
-        // Use parameterized query to avoid SQL injection via raw interpolation
+        // Engagement: users who traded in last 30 days. Only completed
+        // service exchanges count — system credit issuance is not trading.
+        $typeExclusion = SocialValueService::transactionTypeExclusionSql();
         $activeTraderRows = DB::select(
             "SELECT COUNT(DISTINCT user_id) as cnt FROM (
-                SELECT sender_id as user_id FROM transactions WHERE tenant_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                SELECT sender_id as user_id FROM transactions WHERE tenant_id = ? AND status = 'completed' {$typeExclusion} AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
                 UNION
-                SELECT receiver_id as user_id FROM transactions WHERE tenant_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                SELECT receiver_id as user_id FROM transactions WHERE tenant_id = ? AND status = 'completed' {$typeExclusion} AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
             ) t",
             [$tenantId, $tenantId]
         );
@@ -96,8 +99,8 @@ class ImpactReportingService
         $balanceStats = DB::selectOne(
             "SELECT AVG(ABS(given_amt - received_amt) / GREATEST(given_amt + received_amt, 1)) as imbalance_ratio FROM (
                 SELECT u.id,
-                    COALESCE((SELECT SUM(amount) FROM transactions WHERE sender_id = u.id AND tenant_id = ?), 0) as given_amt,
-                    COALESCE((SELECT SUM(amount) FROM transactions WHERE receiver_id = u.id AND tenant_id = ?), 0) as received_amt
+                    COALESCE((SELECT SUM(amount) FROM transactions WHERE sender_id = u.id AND tenant_id = ? AND status = 'completed' {$typeExclusion}), 0) as given_amt,
+                    COALESCE((SELECT SUM(amount) FROM transactions WHERE receiver_id = u.id AND tenant_id = ? AND status = 'completed' {$typeExclusion}), 0) as received_amt
                 FROM users u WHERE u.tenant_id = ? AND u.status = 'active'
                 HAVING given_amt > 0 OR received_amt > 0
             ) user_balance",
@@ -117,6 +120,8 @@ class ImpactReportingService
                     $q->select(DB::raw(1))
                       ->from('transactions as t')
                       ->where('t.tenant_id', $tenantId)
+                      ->where('t.status', 'completed')
+                      ->whereNotIn('t.transaction_type', SocialValueService::EXCLUDED_TRANSACTION_TYPES)
                       ->where(function ($sq) {
                           $sq->whereColumn('t.sender_id', 'u.id')
                              ->orWhereColumn('t.receiver_id', 'u.id');
@@ -155,6 +160,8 @@ class ImpactReportingService
 
         $timeline = DB::table('transactions')
             ->where('tenant_id', $tenantId)
+            ->where('status', 'completed')
+            ->whereNotIn('transaction_type', SocialValueService::EXCLUDED_TRANSACTION_TYPES)
             ->where('created_at', '>=', DB::raw("DATE_SUB(NOW(), INTERVAL " . ((int) $months) . " MONTH)"))
             ->select([
                 DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),

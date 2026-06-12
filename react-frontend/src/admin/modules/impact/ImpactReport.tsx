@@ -28,6 +28,8 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import Lightbulb from 'lucide-react/icons/lightbulb';
 import Calendar from 'lucide-react/icons/calendar';
 import Award from 'lucide-react/icons/award';
+import Plus from 'lucide-react/icons/plus';
+import Trash2 from 'lucide-react/icons/trash-2';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api, tokenManager } from '@/lib/api';
@@ -108,6 +110,32 @@ interface ImpactReportData {
   config: ReportConfig;
 }
 
+interface SroiOutcome {
+  id?: number;
+  name: string;
+  quantity: number;
+  proxy_value: number;
+  proxy_source?: string | null;
+}
+
+interface SroiProjection {
+  gross_value: number;
+  year_one_net: number;
+  yearly: Array<{ year: number; retained: number; present_value: number }>;
+  total_present_value: number;
+  investment_amount: number | null;
+  sroi_ratio: number | null;
+  is_configured: boolean;
+  coefficients: {
+    deadweight_pct: number;
+    displacement_pct: number;
+    attribution_pct: number;
+    dropoff_pct: number;
+    discount_rate_pct: number;
+    projection_years: number;
+  };
+}
+
 interface SocialValueExtras {
   period?: { from: string; to: string };
   config: {
@@ -115,7 +143,16 @@ interface SocialValueExtras {
     hour_value: number;
     social_multiplier: number;
     reporting_period: string;
+    investment_amount: number | null;
+    deadweight_pct: number;
+    displacement_pct: number;
+    attribution_pct: number;
+    dropoff_pct: number;
+    discount_rate_pct: number;
+    projection_years: number;
   };
+  sroi?: SroiProjection;
+  outcomes?: SroiOutcome[];
   members?: {
     total_registered: number;
     active_traders: number;
@@ -242,6 +279,16 @@ export function ImpactReport() {
   const [configMultiplier, setConfigMultiplier] = useState('3.5');
   const [configPeriod, setConfigPeriod] = useState('annually');
 
+  // Methodology SROI config state (Social Value International model)
+  const [configInvestment, setConfigInvestment] = useState('');
+  const [configDeadweight, setConfigDeadweight] = useState('10');
+  const [configDisplacement, setConfigDisplacement] = useState('10');
+  const [configAttribution, setConfigAttribution] = useState('10');
+  const [configDropoff, setConfigDropoff] = useState('70');
+  const [configDiscount, setConfigDiscount] = useState('3.5');
+  const [configYears, setConfigYears] = useState('2');
+  const [configOutcomes, setConfigOutcomes] = useState<SroiOutcome[]>([]);
+
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
@@ -273,7 +320,16 @@ export function ImpactReport() {
             hour_value: (rawConfig.hour_value_amount as number) ?? 15,
             social_multiplier: (rawConfig.social_multiplier as number) ?? 3.5,
             reporting_period: (rawConfig.reporting_period as string) ?? 'annually',
+            investment_amount: (rawConfig.investment_amount as number | null) ?? null,
+            deadweight_pct: (rawConfig.deadweight_pct as number) ?? 10,
+            displacement_pct: (rawConfig.displacement_pct as number) ?? 10,
+            attribution_pct: (rawConfig.attribution_pct as number) ?? 10,
+            dropoff_pct: (rawConfig.dropoff_pct as number) ?? 70,
+            discount_rate_pct: (rawConfig.discount_rate_pct as number) ?? 3.5,
+            projection_years: (rawConfig.projection_years as number) ?? 2,
           },
+          sroi: (raw.sroi as SroiProjection | undefined) ?? undefined,
+          outcomes: (raw.outcomes as SroiOutcome[] | undefined) ?? undefined,
           members: rawSummary.active_members != null ? {
             total_registered: 0,
             active_traders: rawSummary.active_members as number,
@@ -295,6 +351,14 @@ export function ImpactReport() {
         setConfigHourValue(String(sv.config.hour_value));
         setConfigMultiplier(String(sv.config.social_multiplier));
         setConfigPeriod(sv.config.reporting_period);
+        setConfigInvestment(sv.config.investment_amount != null ? String(sv.config.investment_amount) : '');
+        setConfigDeadweight(String(sv.config.deadweight_pct));
+        setConfigDisplacement(String(sv.config.displacement_pct));
+        setConfigAttribution(String(sv.config.attribution_pct));
+        setConfigDropoff(String(sv.config.dropoff_pct));
+        setConfigDiscount(String(sv.config.discount_rate_pct));
+        setConfigYears(String(sv.config.projection_years));
+        setConfigOutcomes(sv.outcomes ?? []);
       }
     } catch {
       // Silently handle — cards will show empty state
@@ -324,6 +388,21 @@ export function ImpactReport() {
           hour_value_amount: hourValue,
           social_multiplier: multiplier,
           reporting_period: configPeriod,
+          investment_amount: configInvestment.trim() === '' ? null : parseFloat(configInvestment),
+          deadweight_pct: parseFloat(configDeadweight) || 0,
+          displacement_pct: parseFloat(configDisplacement) || 0,
+          attribution_pct: parseFloat(configAttribution) || 0,
+          dropoff_pct: parseFloat(configDropoff) || 0,
+          discount_rate_pct: parseFloat(configDiscount) || 0,
+          projection_years: parseInt(configYears, 10) || 2,
+          outcomes: configOutcomes
+            .filter((o) => o.name.trim() !== '')
+            .map((o) => ({
+              name: o.name.trim(),
+              quantity: Math.max(0, Math.round(Number(o.quantity) || 0)),
+              proxy_value: Math.max(0, Number(o.proxy_value) || 0),
+              proxy_source: o.proxy_source || null,
+            })),
         }),
       ]);
       closeConfig();
@@ -370,18 +449,40 @@ export function ImpactReport() {
     doc.setTextColor(30, 30, 30);
     doc.text(t('impact.pdf_sroi_heading'), 20, 48);
 
+    const sroiBody: Array<[string, string]> = [
+      [t('impact.pdf_total_hours_exchanged'), data.sroi.total_hours.toFixed(1)],
+      [t('impact.pdf_total_transactions'), String(data.sroi.total_transactions)],
+      [t('impact.pdf_unique_givers'), String(data.sroi.unique_givers)],
+      [t('impact.pdf_unique_receivers'), String(data.sroi.unique_receivers)],
+      [t('impact.label_monetary_value'), formatCurrency(data.sroi.monetary_value, currency)],
+      [t('impact.label_social_value'), formatCurrency(data.sroi.social_value, currency)],
+      [t('impact.label_value_multiplier'), `×${data.sroi.social_multiplier}`],
+    ];
+
+    if (extras?.sroi?.is_configured) {
+      sroiBody.push(
+        [t('impact.label_gross_social_value'), formatCurrency(extras.sroi.gross_value, currency)],
+        [t('impact.label_total_present_value'), formatCurrency(extras.sroi.total_present_value, currency)],
+        [t('impact.label_investment'), formatCurrency(extras.sroi.investment_amount, currency)],
+        [t('impact.label_sroi_ratio'), `${extras.sroi.sroi_ratio?.toFixed(2)}:1`],
+        [
+          t('impact.pdf_coefficients'),
+          t('impact.coefficients_line', {
+            deadweight: extras.sroi.coefficients.deadweight_pct,
+            displacement: extras.sroi.coefficients.displacement_pct,
+            attribution: extras.sroi.coefficients.attribution_pct,
+            dropoff: extras.sroi.coefficients.dropoff_pct,
+            discount: extras.sroi.coefficients.discount_rate_pct,
+            years: extras.sroi.coefficients.projection_years,
+          }),
+        ],
+      );
+    }
+
     autoTable(doc, {
       startY: 52,
       head: [[t('impact.pdf_metric'), t('impact.pdf_value')]],
-      body: [
-        [t('impact.pdf_total_hours_exchanged'), data.sroi.total_hours.toFixed(1)],
-        [t('impact.pdf_total_transactions'), String(data.sroi.total_transactions)],
-        [t('impact.pdf_unique_givers'), String(data.sroi.unique_givers)],
-        [t('impact.pdf_unique_receivers'), String(data.sroi.unique_receivers)],
-        [t('impact.label_monetary_value'), formatCurrency(data.sroi.monetary_value, currency)],
-        [t('impact.label_social_value'), formatCurrency(data.sroi.social_value, currency)],
-        [t('impact.label_sroi_ratio'), `${data.sroi.sroi_ratio}:1`],
-      ],
+      body: sroiBody,
       theme: 'striped',
       headStyles: { fillColor: [99, 102, 241] },
     });
@@ -534,7 +635,75 @@ export function ImpactReport() {
         }
       />
 
-      {/* SROI Section --------------------------------------------------- */}
+      {/* Methodology SROI (Social Value International model) ------------ */}
+
+      <div className="mb-2">
+        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+          <Award size={20} className="text-success" aria-hidden="true" />
+          {t('impact.section_true_sroi')}
+        </h2>
+        <p className="text-sm text-muted mt-0.5">
+          {t('impact.desc_true_sroi')}
+        </p>
+      </div>
+
+      {extras?.sroi?.is_configured ? (
+        <>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-2">
+            <StatCard
+              label={t('impact.label_sroi_ratio')}
+              value={`${extras.sroi.sroi_ratio?.toFixed(2)}:1`}
+              icon={Award}
+              color="success"
+              loading={loading}
+            />
+            <StatCard
+              label={t('impact.label_total_present_value')}
+              value={formatCurrency(extras.sroi.total_present_value, currency)}
+              icon={Sparkles}
+              loading={loading}
+            />
+            <StatCard
+              label={t('impact.label_investment')}
+              value={formatCurrency(extras.sroi.investment_amount, currency)}
+              icon={TrendingUp}
+              color="warning"
+              loading={loading}
+            />
+            <StatCard
+              label={t('impact.label_gross_social_value')}
+              value={formatCurrency(extras.sroi.gross_value, currency)}
+              icon={Heart}
+              color="danger"
+              loading={loading}
+            />
+          </div>
+          <p className="text-xs text-muted mb-6">
+            {t('impact.coefficients_line', {
+              deadweight: extras.sroi.coefficients.deadweight_pct,
+              displacement: extras.sroi.coefficients.displacement_pct,
+              attribution: extras.sroi.coefficients.attribution_pct,
+              dropoff: extras.sroi.coefficients.dropoff_pct,
+              discount: extras.sroi.coefficients.discount_rate_pct,
+              years: extras.sroi.coefficients.projection_years,
+            })}
+          </p>
+        </>
+      ) : (
+        <Card className="mb-6">
+          <CardBody className="flex flex-col items-start gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-medium text-foreground">{t('impact.sroi_not_configured_title')}</p>
+              <p className="text-sm text-muted mt-1">{t('impact.sroi_not_configured_desc')}</p>
+            </div>
+            <Button variant="secondary" size="sm" startContent={<Settings size={16} />} onPress={openConfig}>
+              {t('impact.btn_configure')}
+            </Button>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Exchange Activity Value Section --------------------------------- */}
 
       <div className="mb-2">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -568,8 +737,8 @@ export function ImpactReport() {
           loading={loading}
         />
         <StatCard
-          label={t('impact.label_sroi_ratio')}
-          value={data ? `${data.sroi.sroi_ratio}:1` : '\u2014'}
+          label={t('impact.label_value_multiplier')}
+          value={data ? `\u00d7${data.sroi.social_multiplier}` : '\u2014'}
           icon={TrendingUp}
           loading={loading}
         />
@@ -978,6 +1147,190 @@ export function ImpactReport() {
                 ))}
               </Select>
             </div>
+
+            <Separator className="my-4" />
+
+            {/* Methodology SROI parameters ------------------------------- */}
+            <h4 className="font-semibold text-sm mb-1">{t('impact.section_true_sroi')}</h4>
+            <p className="text-xs text-muted mb-3">{t('impact.desc_sroi_methodology')}</p>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Input
+                label={t('impact.label_investment')}
+                type="number"
+                min={0}
+                step={100}
+                value={configInvestment}
+                onValueChange={setConfigInvestment}
+                variant="secondary"
+                startContent={
+                  <span className="text-muted text-sm">
+                    {CURRENCY_SYMBOLS[configCurrency] || configCurrency}
+                  </span>
+                }
+                description={t('impact.desc_investment')}
+              />
+              <Input
+                label={t('impact.label_projection_years')}
+                type="number"
+                min={1}
+                max={10}
+                step={1}
+                value={configYears}
+                onValueChange={setConfigYears}
+                variant="secondary"
+              />
+              <Input
+                label={t('impact.label_deadweight')}
+                type="number"
+                min={0}
+                max={100}
+                step={1}
+                value={configDeadweight}
+                onValueChange={setConfigDeadweight}
+                variant="secondary"
+                endContent={<span className="text-muted text-sm">%</span>}
+                description={t('impact.desc_deadweight')}
+              />
+              <Input
+                label={t('impact.label_displacement')}
+                type="number"
+                min={0}
+                max={100}
+                step={1}
+                value={configDisplacement}
+                onValueChange={setConfigDisplacement}
+                variant="secondary"
+                endContent={<span className="text-muted text-sm">%</span>}
+                description={t('impact.desc_displacement')}
+              />
+              <Input
+                label={t('impact.label_attribution')}
+                type="number"
+                min={0}
+                max={100}
+                step={1}
+                value={configAttribution}
+                onValueChange={setConfigAttribution}
+                variant="secondary"
+                endContent={<span className="text-muted text-sm">%</span>}
+                description={t('impact.desc_attribution')}
+              />
+              <Input
+                label={t('impact.label_dropoff')}
+                type="number"
+                min={0}
+                max={100}
+                step={1}
+                value={configDropoff}
+                onValueChange={setConfigDropoff}
+                variant="secondary"
+                endContent={<span className="text-muted text-sm">%</span>}
+                description={t('impact.desc_dropoff')}
+              />
+              <Input
+                label={t('impact.label_discount_rate')}
+                type="number"
+                min={0}
+                max={20}
+                step={0.1}
+                value={configDiscount}
+                onValueChange={setConfigDiscount}
+                variant="secondary"
+                endContent={<span className="text-muted text-sm">%</span>}
+                description={t('impact.desc_discount_rate')}
+              />
+            </div>
+
+            <Separator className="my-4" />
+
+            {/* Outcome categories ---------------------------------------- */}
+            <div className="flex items-center justify-between mb-1">
+              <h4 className="font-semibold text-sm">{t('impact.section_outcomes')}</h4>
+              <div className="flex gap-2">
+                {configOutcomes.length === 0 && (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onPress={() => setConfigOutcomes([
+                      { name: t('impact.tbi_outcome_socialisation'), quantity: 0, proxy_value: 3432, proxy_source: t('impact.tbi_proxy_socialisation') },
+                      { name: t('impact.tbi_outcome_health'), quantity: 0, proxy_value: 600, proxy_source: t('impact.tbi_proxy_health') },
+                      { name: t('impact.tbi_outcome_independence'), quantity: 0, proxy_value: 640, proxy_source: t('impact.tbi_proxy_independence') },
+                      { name: t('impact.tbi_outcome_inclusion'), quantity: 0, proxy_value: 4353, proxy_source: t('impact.tbi_proxy_inclusion') },
+                    ])}
+                  >
+                    {t('impact.btn_load_template')}
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  startContent={<Plus size={14} />}
+                  isDisabled={configOutcomes.length >= 25}
+                  onPress={() => setConfigOutcomes((prev) => [...prev, { name: '', quantity: 0, proxy_value: 0 }])}
+                >
+                  {t('impact.btn_add_outcome')}
+                </Button>
+              </div>
+            </div>
+            <p className="text-xs text-muted mb-3">{t('impact.desc_outcomes')}</p>
+            {configOutcomes.length === 0 ? (
+              <p className="text-sm text-muted mb-2">{t('impact.empty_outcomes')}</p>
+            ) : (
+              <div className="space-y-2">
+                {configOutcomes.map((outcome, idx) => (
+                  <div key={idx} className="flex flex-col gap-2 sm:flex-row sm:items-end">
+                    <Input
+                      label={idx === 0 ? t('impact.label_outcome_name') : undefined}
+                      aria-label={t('impact.label_outcome_name')}
+                      size="sm"
+                      value={outcome.name}
+                      onValueChange={(v) => setConfigOutcomes((prev) => prev.map((o, i) => (i === idx ? { ...o, name: v } : o)))}
+                      variant="secondary"
+                      className="flex-1"
+                    />
+                    <Input
+                      label={idx === 0 ? t('impact.label_outcome_quantity') : undefined}
+                      aria-label={t('impact.label_outcome_quantity')}
+                      size="sm"
+                      type="number"
+                      min={0}
+                      step={1}
+                      value={String(outcome.quantity)}
+                      onValueChange={(v) => setConfigOutcomes((prev) => prev.map((o, i) => (i === idx ? { ...o, quantity: Number(v) || 0 } : o)))}
+                      variant="secondary"
+                      className="w-full sm:w-28"
+                    />
+                    <Input
+                      label={idx === 0 ? t('impact.label_outcome_proxy') : undefined}
+                      aria-label={t('impact.label_outcome_proxy')}
+                      size="sm"
+                      type="number"
+                      min={0}
+                      step={1}
+                      value={String(outcome.proxy_value)}
+                      onValueChange={(v) => setConfigOutcomes((prev) => prev.map((o, i) => (i === idx ? { ...o, proxy_value: Number(v) || 0 } : o)))}
+                      variant="secondary"
+                      className="w-full sm:w-32"
+                      startContent={
+                        <span className="text-muted text-xs">
+                          {CURRENCY_SYMBOLS[configCurrency] || configCurrency}
+                        </span>
+                      }
+                    />
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="ghost"
+                      aria-label={t('impact.btn_remove_outcome')}
+                      onPress={() => setConfigOutcomes((prev) => prev.filter((_, i) => i !== idx))}
+                    >
+                      <Trash2 size={14} />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <Separator className="my-4" />
             <div className="text-xs text-muted space-y-1">
               <p>
@@ -988,10 +1341,13 @@ export function ImpactReport() {
                 })}
               </p>
               <p>
-                <strong>{t('impact.label_sroi_ratio')}:</strong> {t('impact.formula_ratio', {
+                <strong>{t('impact.label_value_multiplier')}:</strong> {t('impact.formula_ratio', {
                   currency: CURRENCY_SYMBOLS[configCurrency] || configCurrency,
                   multiplier: configMultiplier,
                 })}
+              </p>
+              <p>
+                <strong>{t('impact.label_sroi_ratio')}:</strong> {t('impact.formula_true_sroi')}
               </p>
               <p>
                 <strong>{t('impact.label_reciprocity_score')}:</strong> {t('impact.formula_reciprocity')}

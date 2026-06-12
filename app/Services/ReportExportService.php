@@ -561,13 +561,15 @@ class ReportExportService
         $multiplier = (float) ($config->social_multiplier ?? 3.50);
         $currency = $config->hour_value_currency ?? 'GBP';
 
+        $typeExclusion = SocialValueService::transactionTypeExclusionSql('t.');
+
         $query = "SELECT
                 DATE_FORMAT(t.created_at, '%Y-%m') AS period,
                 COALESCE(SUM(t.amount), 0) AS total_hours,
                 COUNT(*) AS transaction_count,
                 COUNT(DISTINCT t.sender_id) AS unique_members
             FROM transactions t
-            WHERE t.tenant_id = ? AND t.status = 'completed'
+            WHERE t.tenant_id = ? AND t.status = 'completed' {$typeExclusion}
             {$dateConditions}
             GROUP BY DATE_FORMAT(t.created_at, '%Y-%m')
             ORDER BY period ASC";
@@ -575,7 +577,7 @@ class ReportExportService
         $rows = DB::select($query, array_merge([$tenantId], $dateBindings));
 
         return [
-            'headers' => ['Period', 'Total Hours', 'Transactions', 'Unique Members', "Direct Value ({$currency})", "Social Value ({$currency})", "Total Value ({$currency})"],
+            'headers' => ['Period', 'Total Hours', 'Transactions', 'Unique Givers', "Direct Value ({$currency})", "Additional Social Value ({$currency})", "Combined Value ({$currency})"],
             'rows' => array_map(function ($r) use ($hourValue, $multiplier) {
                 $hours = (float) $r->total_hours;
                 $direct = round($hours * $hourValue, 2);
