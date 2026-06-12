@@ -6,21 +6,24 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\HasTenantScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * The job_application_history table has NO tenant_id column — tenant scoping
+ * is via the application FK (job applications are tenant-scoped), so this
+ * model must NOT use HasTenantScope.
+ */
 class JobApplicationHistory extends Model
 {
-    use HasFactory, HasTenantScope;
+    use HasFactory;
 
     protected $table = 'job_application_history';
 
     public $timestamps = false;
 
     protected $fillable = [
-        'tenant_id',
         'application_id',
         'from_status',
         'to_status',

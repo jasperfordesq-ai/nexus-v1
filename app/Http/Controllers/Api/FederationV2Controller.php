@@ -2809,7 +2809,9 @@ class FederationV2Controller extends BaseApiController
         }
 
         if (!($result['success'] ?? false)) {
-            // Definitive partner rejection — issue compensating refund.
+            // Definitive partner rejection — issue compensating refund. The
+            // failed external transfer is recorded as 'cancelled' (the
+            // transactions.status enum has no 'failed' value).
             $refundOk = false;
             try {
                 DB::transaction(function () use ($userId, $tenantId, $amount, $txId) {
@@ -2818,7 +2820,7 @@ class FederationV2Controller extends BaseApiController
                         [$amount, $userId, $tenantId]
                     );
                     DB::update(
-                        "UPDATE transactions SET status = 'failed' WHERE id = ? AND tenant_id = ? AND sender_id = ?",
+                        "UPDATE transactions SET status = 'cancelled' WHERE id = ? AND tenant_id = ? AND sender_id = ?",
                         [$txId, $tenantId, $userId]
                     );
                 });

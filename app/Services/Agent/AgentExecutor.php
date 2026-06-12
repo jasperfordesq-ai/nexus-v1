@@ -173,7 +173,7 @@ final class AgentExecutor
                         'tenant_id'    => $tenantId,
                         'supporter_id' => $supporterId,
                         'recipient_id' => $recipientId,
-                        'status'       => 'pending',
+                        'status'       => 'active',
                         'created_at'   => now(),
                         'updated_at'   => now(),
                     ]);

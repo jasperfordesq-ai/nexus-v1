@@ -331,7 +331,7 @@ class ContentModerationService
                 match ($contentType) {
                     'post' => DB::table('feed_posts')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['is_hidden' => 0]),
                     'listing' => DB::table('listings')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['status' => 'active']),
-                    'event' => DB::table('events')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['status' => 'published']),
+                    'event' => DB::table('events')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['status' => 'active']),
                     'comment' => DB::table('comments')->where('id', $contentId)->where('tenant_id', $tenantId)->update(['is_hidden' => 0]),
                     default => null,
                 };

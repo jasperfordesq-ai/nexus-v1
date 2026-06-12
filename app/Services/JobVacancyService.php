@@ -2183,7 +2183,6 @@ class JobVacancyService
     {
         try {
             JobApplicationHistory::create([
-                'tenant_id' => TenantContext::getId(),
                 'application_id' => $applicationId,
                 'from_status' => $fromStatus,
                 'to_status' => $toStatus,

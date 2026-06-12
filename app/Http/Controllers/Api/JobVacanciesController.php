@@ -2789,13 +2789,13 @@ class JobVacanciesController extends BaseApiController
 
         // 1. Application history events
         $appHistory = \App\Models\JobApplicationHistory::whereHas('application', fn($q) => $q->where('vacancy_id', $id))
-            ->with(['changedByUser:id,first_name,last_name', 'application:id,user_id', 'application.applicant:id,first_name,last_name'])
+            ->with(['changer:id,first_name,last_name', 'application:id,user_id', 'application.applicant:id,first_name,last_name'])
             ->orderByDesc('changed_at')
             ->limit(200)
             ->get();
 
         foreach ($appHistory as $h) {
-            $actorName = $h->changedByUser ? trim(($h->changedByUser->first_name ?? '') . ' ' . ($h->changedByUser->last_name ?? '')) : 'System';
+            $actorName = $h->changer ? trim(($h->changer->first_name ?? '') . ' ' . ($h->changer->last_name ?? '')) : 'System';
             $candidateName = ($h->application && $h->application->applicant) ? trim(($h->application->applicant->first_name ?? '') . ' ' . ($h->application->applicant->last_name ?? '')) : 'Unknown';
             $events->push([
                 'type' => 'status_change',

@@ -124,16 +124,22 @@ class MatchingService
             // Sync category preferences only when an explicit, non-empty list is
             // provided. An empty array (the default) means "no categories to sync"
             // and must not touch the optional match_preference_categories table.
+            // Isolated try/catch: the table may not exist — a failed category
+            // sync must never fail the main preferences save above.
             if (is_array($categories) && count($categories) > 0) {
-                DB::table('match_preference_categories')
-                    ->where('user_id', $userId)
-                    ->delete();
+                try {
+                    DB::table('match_preference_categories')
+                        ->where('user_id', $userId)
+                        ->delete();
 
-                foreach ($categories as $catId) {
-                    DB::table('match_preference_categories')->insert([
-                        'user_id'     => $userId,
-                        'category_id' => (int) $catId,
-                    ]);
+                    foreach ($categories as $catId) {
+                        DB::table('match_preference_categories')->insert([
+                            'user_id'     => $userId,
+                            'category_id' => (int) $catId,
+                        ]);
+                    }
+                } catch (\Throwable $e) {
+                    Log::debug('[MatchingService] category preference sync skipped: ' . $e->getMessage());
                 }
             }
 
@@ -159,11 +165,17 @@ class MatchingService
                 return self::DEFAULT_PREFERENCES;
             }
 
-            $categories = DB::table('match_preference_categories')
-                ->where('user_id', $userId)
-                ->pluck('category_id')
-                ->map(fn ($id) => (int) $id)
-                ->all();
+            // Isolated try/catch: the table may not exist — a failed categories
+            // read must not discard the saved preferences row already loaded.
+            try {
+                $categories = DB::table('match_preference_categories')
+                    ->where('user_id', $userId)
+                    ->pluck('category_id')
+                    ->map(fn ($id) => (int) $id)
+                    ->all();
+            } catch (\Throwable $e) {
+                $categories = [];
+            }
 
             return [
                 'max_distance_km'        => (int) ($row->max_distance_km ?? self::DEFAULT_PREFERENCES['max_distance_km']),

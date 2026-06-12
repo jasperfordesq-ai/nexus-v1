@@ -517,7 +517,7 @@ class AdminBlogController extends BaseApiController
             try {
                 $ph = implode(',', array_fill(0, count($toPublish), '?'));
                 $updated = DB::update(
-                    "UPDATE posts SET status = 'published', published_at = COALESCE(published_at, NOW()), updated_at = NOW()
+                    "UPDATE posts SET status = 'published', updated_at = NOW()
                      WHERE tenant_id = ? AND id IN ({$ph})",
                     array_merge([$tenantId], $toPublish)
                 );
