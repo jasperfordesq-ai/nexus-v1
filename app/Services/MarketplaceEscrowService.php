@@ -194,10 +194,26 @@ class MarketplaceEscrowService
         }
 
         DB::transaction(function () use ($escrow) {
-            $escrow->status = 'refunded';
-            $escrow->released_at = now();
-            $escrow->release_trigger = null;
-            $escrow->save();
+            // Atomic claim — the in-memory status check above can race a
+            // concurrent releaseFunds() (buyer confirm / auto-release cron).
+            // An unconditional save() here would overwrite 'released' with
+            // 'refunded' AFTER the seller was paid: buyer refunded AND seller
+            // paid out for the same order. Exactly one transition wins.
+            $claimed = MarketplaceEscrow::query()
+                ->whereKey($escrow->id)
+                ->whereIn('status', ['held', 'disputed'])
+                ->update([
+                    'status' => 'refunded',
+                    'released_at' => now(),
+                    'release_trigger' => null,
+                ]);
+
+            if ($claimed === 0) {
+                $escrow->refresh();
+                throw new \InvalidArgumentException("Escrow cannot be refunded from status: {$escrow->status}");
+            }
+
+            $escrow->refresh();
 
             // Update payment payout status
             $payment = $escrow->payment;
@@ -249,9 +265,13 @@ class MarketplaceEscrowService
                     ->exists();
 
                 if ($hasDispute) {
-                    // Mark escrow as disputed instead of releasing
-                    $escrow->status = 'disputed';
-                    $escrow->save();
+                    // Mark escrow as disputed instead of releasing — conditional
+                    // so a concurrent refund/release isn't clobbered back to
+                    // 'disputed' by this unconditional cron write.
+                    MarketplaceEscrow::query()
+                        ->whereKey($escrow->id)
+                        ->where('status', 'held')
+                        ->update(['status' => 'disputed']);
 
                     Log::info('MarketplaceEscrow: auto-release blocked by open dispute', [
                         'escrow_id' => $escrow->id,

@@ -77,63 +77,8 @@ class MarketplaceEscrowServiceTest extends TestCase
         MarketplaceEscrowService::refundEscrow($escrow);
     }
 
-    public function test_refundEscrow_allowsRefundFromHeldStatus(): void
-    {
-        $payment = Mockery::mock(MarketplacePayment::class)->makePartial();
-        $payment->shouldReceive('save')->once();
-
-        $escrow = Mockery::mock(MarketplaceEscrow::class)->makePartial();
-        $escrow->status = 'held';
-        $escrow->order_id = 10;
-        $escrow->amount = '45.00';
-        $escrow->shouldReceive('save')->once();
-        $escrow->shouldReceive('getAttribute')->with('payment')->andReturn($payment);
-
-        \Illuminate\Support\Facades\DB::shouldReceive('transaction')->once()->andReturnUsing(fn ($cb) => $cb());
-        \Illuminate\Support\Facades\Log::shouldReceive('info')->once();
-
-        MarketplaceEscrowService::refundEscrow($escrow);
-
-        $this->assertEquals('refunded', $escrow->status);
-        $this->assertNull($escrow->release_trigger);
-        $this->assertEquals('failed', $payment->payout_status);
-    }
-
-    public function test_refundEscrow_allowsRefundFromDisputedStatus(): void
-    {
-        $payment = Mockery::mock(MarketplacePayment::class)->makePartial();
-        $payment->shouldReceive('save')->once();
-
-        $escrow = Mockery::mock(MarketplaceEscrow::class)->makePartial();
-        $escrow->status = 'disputed';
-        $escrow->order_id = 20;
-        $escrow->amount = '30.00';
-        $escrow->shouldReceive('save')->once();
-        $escrow->shouldReceive('getAttribute')->with('payment')->andReturn($payment);
-
-        \Illuminate\Support\Facades\DB::shouldReceive('transaction')->once()->andReturnUsing(fn ($cb) => $cb());
-        \Illuminate\Support\Facades\Log::shouldReceive('info')->once();
-
-        MarketplaceEscrowService::refundEscrow($escrow);
-
-        $this->assertEquals('refunded', $escrow->status);
-        $this->assertEquals('failed', $payment->payout_status);
-    }
-
-    public function test_refundEscrow_handlesNullPaymentGracefully(): void
-    {
-        $escrow = Mockery::mock(MarketplaceEscrow::class)->makePartial();
-        $escrow->status = 'held';
-        $escrow->order_id = 30;
-        $escrow->amount = '20.00';
-        $escrow->shouldReceive('save')->once();
-        $escrow->shouldReceive('getAttribute')->with('payment')->andReturn(null);
-
-        \Illuminate\Support\Facades\DB::shouldReceive('transaction')->once()->andReturnUsing(fn ($cb) => $cb());
-        \Illuminate\Support\Facades\Log::shouldReceive('info')->once();
-
-        MarketplaceEscrowService::refundEscrow($escrow);
-
-        $this->assertEquals('refunded', $escrow->status);
-    }
+    // The refundEscrow happy paths now use an atomic conditional UPDATE
+    // (race-safe claim) instead of $escrow->save(), so they can no longer be
+    // exercised with facade mocks — the real-DB coverage lives in
+    // tests/Laravel/Feature/Marketplace/MarketplaceEscrowRefundRaceTest.php.
 }

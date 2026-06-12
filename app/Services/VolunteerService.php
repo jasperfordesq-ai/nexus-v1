@@ -259,54 +259,69 @@ class VolunteerService
             throw new \RuntimeException(__('api.volunteer_cannot_apply_own'), 422);
         }
 
-        // Prevent duplicate applications
-        $existing = VolApplication::where('opportunity_id', $opportunityId)
-            ->where('user_id', $userId)
-            ->where('tenant_id', $tenantId)
-            ->whereIn('status', ['pending', 'approved'])
-            ->exists();
-
-        if ($existing) {
+        // Serialise the duplicate-check + insert under an atomic lock keyed on
+        // the natural duplicate key (same pattern as logHours). vol_applications
+        // has no unique key on (opportunity_id, user_id) — declined rows may
+        // legitimately repeat — so without this lock two concurrent identical
+        // submissions both pass the existence check and double-insert.
+        $dupLock = Cache::lock(sprintf('vol_apply_dedupe:%d:%d:%d', $tenantId, $opportunityId, $userId), 10);
+        if (! $dupLock->get()) {
+            // A concurrent identical submission already holds the lock.
             throw new \RuntimeException(__('api.already_applied'), 409);
         }
 
-        $shiftId = !empty($data['shift_id']) ? (int) $data['shift_id'] : null;
-        if ($shiftId !== null) {
-            $shift = DB::selectOne(
-                "SELECT id, opportunity_id, start_time, capacity FROM vol_shifts WHERE id = ? AND opportunity_id = ? AND tenant_id = ?",
-                [$shiftId, $opportunityId, $tenantId]
-            );
+        try {
+            // Prevent duplicate applications
+            $existing = VolApplication::where('opportunity_id', $opportunityId)
+                ->where('user_id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->whereIn('status', ['pending', 'approved'])
+                ->exists();
 
-            if (!$shift) {
-                throw new \RuntimeException(__('api.volunteer_shift_not_found'), 404);
+            if ($existing) {
+                throw new \RuntimeException(__('api.already_applied'), 409);
             }
 
-            if (strtotime((string) $shift->start_time) < time()) {
-                throw new \RuntimeException(__('api.volunteer_shift_started'), 422);
-            }
+            $shiftId = !empty($data['shift_id']) ? (int) $data['shift_id'] : null;
+            if ($shiftId !== null) {
+                $shift = DB::selectOne(
+                    "SELECT id, opportunity_id, start_time, capacity FROM vol_shifts WHERE id = ? AND opportunity_id = ? AND tenant_id = ?",
+                    [$shiftId, $opportunityId, $tenantId]
+                );
 
-            if (!empty($shift->capacity)) {
-                $signupCount = (int) DB::selectOne(
-                    "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
-                    [$shiftId, $tenantId]
-                )->cnt;
+                if (!$shift) {
+                    throw new \RuntimeException(__('api.volunteer_shift_not_found'), 404);
+                }
 
-                if ($signupCount >= (int) $shift->capacity) {
-                    throw new \RuntimeException(__('api.volunteer_shift_at_capacity'), 422);
+                if (strtotime((string) $shift->start_time) < time()) {
+                    throw new \RuntimeException(__('api.volunteer_shift_started'), 422);
+                }
+
+                if (!empty($shift->capacity)) {
+                    $signupCount = (int) DB::selectOne(
+                        "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
+                        [$shiftId, $tenantId]
+                    )->cnt;
+
+                    if ($signupCount >= (int) $shift->capacity) {
+                        throw new \RuntimeException(__('api.volunteer_shift_at_capacity'), 422);
+                    }
                 }
             }
+
+            $application = VolApplication::create([
+                'opportunity_id' => $opportunityId,
+                'user_id'        => $userId,
+                'message'        => trim($data['message'] ?? ''),
+                'shift_id'       => $shiftId,
+            ]);
+
+            $application->save();
+
+            return $application->fresh(['user', 'opportunity']);
+        } finally {
+            $dupLock->release();
         }
-
-        $application = VolApplication::create([
-            'opportunity_id' => $opportunityId,
-            'user_id'        => $userId,
-            'message'        => trim($data['message'] ?? ''),
-            'shift_id'       => $shiftId,
-        ]);
-
-        $application->save();
-
-        return $application->fresh(['user', 'opportunity']);
     }
 
     /**

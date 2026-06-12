@@ -672,7 +672,7 @@ class AdminVolunteerController extends BaseApiController
 
         try {
             $results = DB::select(
-                "SELECT ow.*, o.name as org_name FROM org_wallets ow LEFT JOIN organizations o ON ow.org_id = o.id
+                "SELECT ow.*, o.name as org_name FROM org_wallets ow LEFT JOIN organizations o ON ow.organization_id = o.id
                  WHERE ow.tenant_id = ? ORDER BY o.name ASC LIMIT 50",
                 [$tenantId]
             );

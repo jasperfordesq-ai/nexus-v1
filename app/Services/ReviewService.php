@@ -428,7 +428,16 @@ class ReviewService
             'status'         => 'approved',
         ]);
 
-        $review->save();
+        try {
+            $review->save();
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            // A concurrent duplicate submission won the race past the exists()
+            // check above — the unique index on (reviewer_id, transaction_id)
+            // is the backstop. Surface the same error as the fast-path check
+            // so the caller sees one consistent contract (no double XP, no
+            // double rating count, no duplicate notifications).
+            throw new \RuntimeException('You have already reviewed this exchange');
+        }
 
         $review = $review->fresh(['reviewer', 'receiver']);
 
