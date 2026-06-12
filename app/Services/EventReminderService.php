@@ -41,6 +41,32 @@ class EventReminderService
     {
     }
 
+    /**
+     * Format an event start time for email text in the tenant's wall clock.
+     *
+     * events.start_time is stored as a UTC instant (the web/mobile forms send
+     * toISOString() and the Eloquent datetime cast persists it under the UTC
+     * app timezone). Browsers convert back to local time automatically, but
+     * server-rendered email text must convert explicitly — otherwise a Dublin
+     * tenant's 19:00 summer event reads "18:00" in the reminder email. Uses
+     * the tenant's general.timezone setting; the default 'UTC' preserves the
+     * previous output for tenants that haven't configured one.
+     */
+    private static function formatEventTimeForTenant(int $tenantId, ?string $startTime): string
+    {
+        if (!$startTime) {
+            return '';
+        }
+
+        try {
+            $tz = (string) (app(\App\Services\TenantSettingsService::class)->get($tenantId, 'general.timezone', 'UTC') ?: 'UTC');
+
+            return \Carbon\Carbon::parse($startTime, 'UTC')->setTimezone($tz)->format('l, M j \a\t g:i A');
+        } catch (\Throwable $e) {
+            return date('l, M j \a\t g:i A', strtotime($startTime));
+        }
+    }
+
     public static function claimReminderDelivery(int $tenantId, int $eventId, int $userId, string $reminderType): bool
     {
         try {
@@ -253,7 +279,7 @@ class EventReminderService
                     // workers default to config('app.locale') = 'en' otherwise.
                     LocaleContext::withLocale($attendee, function () use ($tenantId, $eventId, $reminderType, $event, $attendee, $userId, &$sent, &$emailAccepted) {
                         $title = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
-                        $when = date('l, M j \\a\\t g:i A', strtotime($event->start_time));
+                        $when = self::formatEventTimeForTenant($tenantId, $event->start_time);
 
                         if ($reminderType === '24h') {
                             $message = __('svc_notifications_2.event.reminder_tomorrow', ['title' => $title, 'when' => $when]);
@@ -266,6 +292,13 @@ class EventReminderService
                         // Email notification
                         $emailOk = true;
                         if (!empty($attendee->email)) {
+                            if (\App\Core\Mailer::isSuppressed($attendee->email)) {
+                                // Permanent failure (hard bounce / spam report) — skip the
+                                // email but leave $emailOk=true so the claim is marked
+                                // handled and the in-app bell still fires; releasing the
+                                // claim would retry the dead address on every cron run.
+                                \Illuminate\Support\Facades\Log::info("[EventReminderService] recipient suppressed — email skipped, reminder marked handled: event={$eventId}, user={$userId}");
+                            } else {
                             try {
                                 $subjectKey = $reminderType === '24h'
                                     ? 'notifications.event_reminder_subject_24h'
@@ -298,6 +331,7 @@ class EventReminderService
                             } catch (\Exception $emailEx) {
                                 \Illuminate\Support\Facades\Log::warning("[EventReminderService] Email failed: event={$eventId}, user={$userId}: " . $emailEx->getMessage());
                                 $emailOk = false;
+                            }
                             }
                         }
 
@@ -385,7 +419,7 @@ class EventReminderService
 
                 LocaleContext::withLocale($reminder, function () use ($tenantId, $eventId, $userId, $reminder, $deliveryType, $reminderType, &$sent, &$emailAccepted): void {
                     $title = htmlspecialchars($reminder->title, ENT_QUOTES, 'UTF-8');
-                    $when = date('l, M j \\a\\t g:i A', strtotime($reminder->start_time));
+                    $when = self::formatEventTimeForTenant($tenantId, $reminder->start_time);
                     $message = match ((int) $reminder->remind_before_minutes) {
                         10080 => __('svc_notifications_2.event.reminder_7d', ['title' => $title, 'when' => $when]),
                         1440 => __('svc_notifications_2.event.reminder_tomorrow', ['title' => $title, 'when' => $when]),
@@ -399,7 +433,17 @@ class EventReminderService
 
                     $hasValidEmail = !empty($reminder->email) && filter_var($reminder->email, FILTER_VALIDATE_EMAIL);
 
-                    if ($needsEmail && $hasValidEmail) {
+                    if ($needsEmail && $hasValidEmail && \App\Core\Mailer::isSuppressed($reminder->email)) {
+                        // Permanent failure — keep $emailOk=true so the reminder is
+                        // marked sent (and the platform bell still fires) instead of
+                        // being released and retried forever against a dead address.
+                        \Illuminate\Support\Facades\Log::info('[EventReminderService] recipient suppressed — configured reminder email skipped, marked handled', [
+                            'tenant_id' => $tenantId,
+                            'event_id' => $eventId,
+                            'user_id' => $userId,
+                            'reminder_id' => $reminder->reminder_id,
+                        ]);
+                    } elseif ($needsEmail && $hasValidEmail) {
                         $subjectKey = match ((int) $reminder->remind_before_minutes) {
                             10080 => 'notifications.event_reminder_subject_7d',
                             1440 => 'notifications.event_reminder_subject_24h',

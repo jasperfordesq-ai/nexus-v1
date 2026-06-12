@@ -890,6 +890,32 @@ class GdprService
             // anonymise the sender/receiver side belonging to the erased
             // user and scrub the body where this user authored it. The row
             // stays so the counterparty's audit trail remains intact.
+            //
+            // Voice recordings are biometric-adjacent PII stored on disk under
+            // uploads/{tenant}/voice_messages (NOT the per-user uploads dir
+            // that step 6 removes) — delete the files BEFORE audio_url is
+            // nulled below, or the paths are lost.
+            try {
+                $audioUrls = $this->query(
+                    "SELECT audio_url FROM messages
+                      WHERE sender_id = ? AND tenant_id = ? AND audio_url IS NOT NULL",
+                    [$userId, $this->tenantId]
+                )->fetchAll(\PDO::FETCH_COLUMN);
+                $docRoot = rtrim($_SERVER['DOCUMENT_ROOT'] ?? '', '/');
+                if ($docRoot === '' && function_exists('public_path')) {
+                    $docRoot = rtrim(public_path(), '/\\');
+                }
+                foreach ($audioUrls as $audioUrl) {
+                    $relative = parse_url((string) $audioUrl, PHP_URL_PATH);
+                    // Only ever unlink inside the uploads tree.
+                    if ($docRoot !== '' && is_string($relative) && str_starts_with($relative, '/uploads/')) {
+                        $file = $docRoot . $relative;
+                        if (is_file($file)) {
+                            @unlink($file);
+                        }
+                    }
+                }
+            } catch (\Throwable $e) { $this->logger->warning('GDPR voice-file deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
             $this->query(
                 "UPDATE messages
                     SET body = CASE WHEN sender_id = ? THEN '[message removed — account erased]' ELSE body END,
@@ -963,13 +989,16 @@ class GdprService
             // metrics (delivery rate, bounce rate) intact while removing the
             // link back to this person.
             try {
+                // Unique-per-user anonymized address: a single shared
+                // 'deleted@anonymized.local' collapses every erased user into
+                // one recipient and corrupts delivery/bounce aggregates.
                 $this->query(
                     "UPDATE email_log
-                        SET recipient_email = 'deleted@anonymized.local',
+                        SET recipient_email = ?,
                             subject = NULL,
                             error = NULL
                       WHERE user_id = ? AND tenant_id = ?",
-                    [$userId, $this->tenantId]
+                    ["deleted_{$userId}@anonymized.local", $userId, $this->tenantId]
                 );
             } catch (\Throwable $e) {
                 // email_log table may not exist on older deployments
@@ -1114,6 +1143,97 @@ class GdprService
                 $this->query("UPDATE vol_logs SET description = NULL, feedback = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 $this->query("UPDATE vol_expenses SET description = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
             } catch (\Throwable $e) { $this->logger->warning('GDPR volunteering anonymization step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+
+            // 3q. Job applications — CVs and cover letters are pure applicant
+            // PII (career history, contact details). Delete the files from the
+            // 'local' storage disk first, then the rows. Covers BOTH historic
+            // tables (job_applications.resume_path and the canonical
+            // job_vacancy_applications.cv_path — stored under
+            // job-applications/{tenant}, NOT the per-user uploads dir).
+            try {
+                $cvPaths = $this->query(
+                    "SELECT cv_path FROM job_vacancy_applications WHERE user_id = ? AND tenant_id = ? AND cv_path IS NOT NULL",
+                    [$userId, $this->tenantId]
+                )->fetchAll(\PDO::FETCH_COLUMN);
+                $resumePaths = $this->query(
+                    "SELECT resume_path FROM job_applications WHERE user_id = ? AND tenant_id = ? AND resume_path IS NOT NULL",
+                    [$userId, $this->tenantId]
+                )->fetchAll(\PDO::FETCH_COLUMN);
+                foreach (array_merge($cvPaths, $resumePaths) as $storedPath) {
+                    try {
+                        \Illuminate\Support\Facades\Storage::disk('local')->delete((string) $storedPath);
+                    } catch (\Throwable $e) {
+                        // best-effort file cleanup
+                    }
+                }
+                $this->query("DELETE FROM job_vacancy_applications WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("DELETE FROM job_applications WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+            } catch (\Throwable $e) { $this->logger->warning('GDPR job-applications deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+
+            // 3r. Stories — user-authored ephemeral content (text + media) has
+            // no CASCADE FK and survived erasure. Reactions go with them.
+            try {
+                $this->query(
+                    "DELETE FROM story_reactions
+                      WHERE tenant_id = ?
+                        AND (user_id = ? OR story_id IN (SELECT id FROM stories WHERE user_id = ? AND tenant_id = ?))",
+                    [$this->tenantId, $userId, $userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) { $this->logger->warning('GDPR story-reactions deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+            try {
+                $this->query("DELETE FROM stories WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+            } catch (\Throwable $e) { $this->logger->warning('GDPR stories deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+
+            // 3s. Marketplace — the seller profile holds business identity
+            // (name, address JSON, VAT number, Stripe account id): delete it.
+            // Orders/offers are two-party transaction records (same rationale
+            // as 3n) — keep the rows, scrub this user's free-text and address.
+            try {
+                $this->query("DELETE FROM marketplace_seller_profiles WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query(
+                    "UPDATE marketplace_orders SET delivery_notes = NULL, delivery_address = NULL
+                      WHERE buyer_id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
+                );
+                $this->query(
+                    "UPDATE marketplace_offers SET message = NULL, counter_message = NULL
+                      WHERE (buyer_id = ? OR seller_id = ?) AND tenant_id = ?",
+                    [$userId, $userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) { $this->logger->warning('GDPR marketplace scrub step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+
+            // 3t. Poll votes — opinions linked to the user; no CASCADE FK.
+            try {
+                $this->query("DELETE FROM poll_votes WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("DELETE FROM poll_rankings WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+            } catch (\Throwable $e) { $this->logger->warning('GDPR poll-votes deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+
+            // 3u. Goals — personal aspirations + free-text check-in notes.
+            try {
+                $this->query(
+                    "DELETE FROM goal_progress_log
+                      WHERE tenant_id = ?
+                        AND (created_by = ? OR goal_id IN (SELECT id FROM goals WHERE user_id = ? AND tenant_id = ?))",
+                    [$this->tenantId, $userId, $userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) { /* table optional */ }
+            try {
+                $this->query("DELETE FROM goal_checkins WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("DELETE FROM goals WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+            } catch (\Throwable $e) { $this->logger->warning('GDPR goals deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+
+            // 3v. Feed comments — no CASCADE FK (feed_activity is covered in 3l).
+            try {
+                $this->query("DELETE FROM feed_comments WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+            } catch (\Throwable $e) { $this->logger->warning('GDPR feed-comments deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+
+            // 3w. Courses — learning history (defensive: schema has no CASCADE
+            // FK on these tables; quiz answers can contain free text).
+            try {
+                $this->query("DELETE FROM course_quiz_attempts WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("DELETE FROM course_reviews WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("DELETE FROM course_enrollments WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+            } catch (\Throwable $e) { $this->logger->warning('GDPR courses deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
             // 4. Soft delete listings
             $this->query(

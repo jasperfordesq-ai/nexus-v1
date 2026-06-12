@@ -853,4 +853,51 @@ class GdprServiceTest extends \Tests\Laravel\TestCase
             );
         }
     }
+
+    /**
+     * Regression guard for the 2026-06-12 Fable hunt: account erasure was
+     * missing job applications (CVs!), stories, marketplace seller identity,
+     * poll votes, goals, feed comments, course history, voice-message files
+     * and used a colliding shared anonymized email in email_log.
+     */
+    public function testAccountDeletionCoversCrossModuleTables(): void
+    {
+        $src = file_get_contents(app_path('Services/Enterprise/GdprService.php'));
+        $start = strpos($src, 'function executeAccountDeletion');
+        $this->assertNotFalse($start, 'executeAccountDeletion not found');
+        $deletionSrc = substr($src, $start);
+
+        $required = [
+            'DELETE FROM job_vacancy_applications',
+            'DELETE FROM job_applications',
+            'DELETE FROM stories',
+            'DELETE FROM story_reactions',
+            'DELETE FROM marketplace_seller_profiles',
+            'UPDATE marketplace_orders SET delivery_notes = NULL, delivery_address = NULL',
+            'UPDATE marketplace_offers SET message = NULL, counter_message = NULL',
+            'DELETE FROM poll_votes',
+            'DELETE FROM poll_rankings',
+            'DELETE FROM goal_checkins',
+            'DELETE FROM goals',
+            'DELETE FROM feed_comments',
+            'DELETE FROM course_quiz_attempts',
+            'DELETE FROM course_enrollments',
+            'voice_messages',
+            '@anonymized.local',
+        ];
+
+        foreach ($required as $needle) {
+            $this->assertStringContainsString(
+                $needle,
+                $deletionSrc,
+                "GDPR account deletion lost cross-module coverage: {$needle}"
+            );
+        }
+
+        $this->assertStringNotContainsString(
+            "SET recipient_email = 'deleted@anonymized.local'",
+            $deletionSrc,
+            'email_log anonymization must use a unique per-user address, not a shared one'
+        );
+    }
 }
