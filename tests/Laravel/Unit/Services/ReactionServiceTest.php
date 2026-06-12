@@ -401,11 +401,22 @@ class ReactionServiceTest extends TestCase
                 (object) ['target_id' => 1, 'emoji' => 'love'],
             ]);
 
+        // Top-reactors query
+        DB::shouldReceive('select')
+            ->once()
+            ->andReturn([
+                (object) ['target_id' => 1, 'user_id' => 7, 'name' => 'Anna Murphy', 'avatar_url' => null],
+            ]);
+
         $result = $this->service->getReactionsForPosts([1, 2, 3], 5);
 
         $this->assertEquals(['love' => 3, 'laugh' => 1], $result[1]['counts']);
         $this->assertEquals(4, $result[1]['total']);
         $this->assertEquals('love', $result[1]['user_reaction']);
+        $this->assertEquals(
+            [['id' => 7, 'name' => 'Anna Murphy', 'avatar_url' => null]],
+            $result[1]['top_reactors']
+        );
 
         $this->assertEquals(['wow' => 2], $result[2]['counts']);
         $this->assertEquals(2, $result[2]['total']);
@@ -418,11 +429,17 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactionsForPosts_without_user_id(): void
     {
+        // Counts query (no user-reactions query without a user id)
         DB::shouldReceive('select')
             ->once()
             ->andReturn([
                 (object) ['target_id' => 10, 'emoji' => 'clap', 'count' => 5],
             ]);
+
+        // Top-reactors query
+        DB::shouldReceive('select')
+            ->once()
+            ->andReturn([]);
 
         $result = $this->service->getReactionsForPosts([10], null);
 
@@ -433,8 +450,9 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactionsForPosts_initialises_all_post_ids(): void
     {
+        // Counts + top-reactors queries (no user-reactions query without a user id)
         DB::shouldReceive('select')
-            ->once()
+            ->twice()
             ->andReturn([]);
 
         $result = $this->service->getReactionsForPosts([100, 200, 300], null);

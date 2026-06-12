@@ -33,7 +33,7 @@ class JobApplicationHistoryTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'application_id', 'from_status', 'to_status',
+            'application_id', 'from_status', 'to_status',
             'changed_by', 'changed_at', 'notes',
         ];
         $this->assertEquals($expected, $this->model->getFillable());

@@ -67,6 +67,7 @@ class CrossInvitationTest extends TestCase
         DB::table('org_members')->insert([
             'tenant_id' => self::TENANT_ID,
             'organization_id' => $orgId,
+            'org_type' => 'volunteer',
             'user_id' => $userId,
             'role' => 'member',
             'status' => $status,

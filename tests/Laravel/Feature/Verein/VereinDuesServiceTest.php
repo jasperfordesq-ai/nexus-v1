@@ -81,6 +81,7 @@ class VereinDuesServiceTest extends TestCase
         DB::table('org_members')->insert([
             'tenant_id' => self::TENANT_ID,
             'organization_id' => $this->organizationId,
+            'org_type' => 'volunteer',
             'user_id' => $userId,
             'status' => 'active',
             'created_at' => now(),

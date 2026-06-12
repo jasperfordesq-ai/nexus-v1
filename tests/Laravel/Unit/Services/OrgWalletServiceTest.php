@@ -87,7 +87,7 @@ class OrgWalletServiceTest extends TestCase
 
     public function test_depositToOrg_rejects_non_member(): void
     {
-        DB::shouldReceive('table->where->where->where->first')->andReturnNull();
+        DB::shouldReceive('table->where->where->where->where->first')->andReturnNull();
         $result = OrgWalletService::depositToOrg(1, 1, 10.0);
         $this->assertFalse($result['success']);
         $this->assertStringContainsString('not an active member', $result['message']);
