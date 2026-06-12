@@ -17,7 +17,7 @@ class StripeDonationReceiptReliabilityTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function test_completed_donation_without_receipt_evidence_is_retryable(): void
+    public function test_failed_receipt_email_is_recorded_and_repaired_on_event_redelivery_without_failing_webhook(): void
     {
         $tenantId = $this->testTenantId;
         $user = User::factory()->forTenant($tenantId)->create([
@@ -42,15 +42,14 @@ class StripeDonationReceiptReliabilityTest extends TestCase
 
         app()->instance(EmailDispatchService::class, $this->fakeMailer(false));
 
-        try {
-            StripeDonationService::handlePaymentSucceeded((object) [
-                'id' => $paymentIntentId,
-                'metadata' => (object) ['nexus_tenant_id' => $tenantId],
-            ]);
-            $this->fail('Expected donation receipt failure to keep webhook retryable.');
-        } catch (\RuntimeException $e) {
-            $this->assertStringContainsString('Donation receipt email was not sent', $e->getMessage());
-        }
+        // New contract (2026-06-12): a failed receipt email must NOT fail
+        // the webhook (Stripe would retry the event for ~3 days; a suppressed
+        // donor address fails permanently). The failed-at marker records it,
+        // and a redelivered event still repairs the email (asserted below).
+        StripeDonationService::handlePaymentSucceeded((object) [
+            'id' => $paymentIntentId,
+            'metadata' => (object) ['nexus_tenant_id' => $tenantId],
+        ]);
 
         $failed = DB::table('vol_donations')->where('id', $donationId)->first();
         $this->assertSame('completed', $failed->status);

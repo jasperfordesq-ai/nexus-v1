@@ -135,7 +135,7 @@ class MemberPremiumBillingEmailTest extends TestCase
             ->count());
     }
 
-    public function test_failed_member_premium_email_keeps_event_retryable_without_bell(): void
+    public function test_failed_member_premium_email_records_failure_without_bell_and_without_failing_webhook(): void
     {
         $tenantId = 999;
         [$user, , $stripeSubId] = $this->createMemberSubscription($tenantId);
@@ -144,20 +144,19 @@ class MemberPremiumBillingEmailTest extends TestCase
 
         $eventId = 'evt_member_email_failure_' . uniqid();
 
-        try {
-            MemberPremiumService::applyWebhookEvent((object) [
-                'id' => $eventId,
-                'type' => 'invoice.payment_failed',
-                'data' => (object) [
-                    'object' => (object) [
-                        'subscription' => $stripeSubId,
-                    ],
+        // New contract (2026-06-12): an email failure must NOT fail the
+        // webhook (Stripe would retry the event for days; a suppressed
+        // recipient fails permanently). The failure markers below still
+        // record the miss for ops.
+        MemberPremiumService::applyWebhookEvent((object) [
+            'id' => $eventId,
+            'type' => 'invoice.payment_failed',
+            'data' => (object) [
+                'object' => (object) [
+                    'subscription' => $stripeSubId,
                 ],
-            ]);
-            $this->fail('Expected failed member premium email to fail webhook processing for retry.');
-        } catch (\RuntimeException $e) {
-            $this->assertStringContainsString('Member premium payment failed email failed', $e->getMessage());
-        }
+            ],
+        ]);
 
         $this->assertCount(1, $mailer->calls);
         $eventRow = DB::table('member_subscription_events')->where('stripe_event_id', $eventId)->first();
@@ -172,7 +171,7 @@ class MemberPremiumBillingEmailTest extends TestCase
             ->count());
     }
 
-    public function test_failed_member_premium_event_replay_marks_sent_only_after_email_acceptance(): void
+    public function test_failed_member_premium_email_is_repaired_when_event_is_redelivered(): void
     {
         $tenantId = 999;
         [$user, , $stripeSubId] = $this->createMemberSubscription($tenantId);
@@ -189,12 +188,8 @@ class MemberPremiumBillingEmailTest extends TestCase
             ],
         ];
 
-        try {
-            MemberPremiumService::applyWebhookEvent($event);
-            $this->fail('Expected first member premium email attempt to fail webhook processing.');
-        } catch (\RuntimeException $e) {
-            $this->assertStringContainsString('Member premium payment failed email failed', $e->getMessage());
-        }
+        // New contract: email failure does not throw; markers record it.
+        MemberPremiumService::applyWebhookEvent($event);
 
         $failedEventRow = DB::table('member_subscription_events')->where('stripe_event_id', $event->id)->first();
         $this->assertNotNull($failedEventRow);
@@ -232,20 +227,17 @@ class MemberPremiumBillingEmailTest extends TestCase
 
         $eventId = 'evt_member_missing_recipient_' . uniqid();
 
-        try {
-            MemberPremiumService::applyWebhookEvent((object) [
-                'id' => $eventId,
-                'type' => 'invoice.paid',
-                'data' => (object) [
-                    'object' => (object) [
-                        'subscription' => $stripeSubId,
-                    ],
+        // New contract: a missing recipient is recorded as failed, but the
+        // webhook itself succeeds (nothing a Stripe retry could fix).
+        MemberPremiumService::applyWebhookEvent((object) [
+            'id' => $eventId,
+            'type' => 'invoice.paid',
+            'data' => (object) [
+                'object' => (object) [
+                    'subscription' => $stripeSubId,
                 ],
-            ]);
-            $this->fail('Expected missing member premium recipient to fail webhook processing for retry.');
-        } catch (\RuntimeException $e) {
-            $this->assertStringContainsString('Member premium paid email failed', $e->getMessage());
-        }
+            ],
+        ]);
 
         $this->assertCount(0, $mailer->calls);
         $eventRow = DB::table('member_subscription_events')->where('stripe_event_id', $eventId)->first();
