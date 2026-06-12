@@ -23,11 +23,14 @@ use Illuminate\Support\Facades\Log;
  *
  *   php artisan emails:resend-stuck-activations [--dry-run] [--tenant=N] [--since=YYYY-MM-DD] [--limit=200]
  *
- * Defaults to a dry-run so you can sanity-check the recipient list before
- * actually sending. `--since` defaults to 60 days ago so we don't email
- * accounts that were abandoned long before any of this. Tenant filter is
- * optional. Hard ceiling on `--limit` (default 200) so a typo can't blast
- * thousands of mails.
+ * SENDS LIVE unless --dry-run is passed — always preview with --dry-run
+ * first. `--since` defaults to 60 days ago so we don't email accounts that
+ * were abandoned long before any of this. Tenant filter is optional. Hard
+ * ceiling on `--limit` (default 200) so a typo can't blast thousands of
+ * mails. Users who already have a successful verification email on record
+ * (email_log category `email_verification`, status sent/delivered) are
+ * excluded — so repeat runs walk through the backlog instead of re-mailing
+ * the same oldest `--limit` users forever.
  *
  * Re-uses the canonical Mailer path so:
  *   - SendGrid is used (the default driver in prod)
@@ -71,6 +74,19 @@ class ResendStuckVerificationEmails extends Command
             ->whereNull('deleted_at')
             ->where('created_at', '>=', $since)
             ->whereIn('status', ['pending', 'active'])
+            // The command exists for users who NEVER received an activation
+            // email. Anyone with a successful verification send on record is
+            // out of scope — and without this exclusion, repeat runs re-mailed
+            // the same oldest `--limit` users on every invocation and never
+            // progressed past them.
+            ->whereNotExists(function ($sub) {
+                $sub->select(DB::raw(1))
+                    ->from('email_log')
+                    ->whereColumn('email_log.recipient_email', 'users.email')
+                    ->whereColumn('email_log.tenant_id', 'users.tenant_id')
+                    ->where('email_log.category', 'email_verification')
+                    ->whereIn('email_log.status', ['sent', 'delivered']);
+            })
             ->orderBy('created_at', 'asc')
             ->limit($limit);
         if ($tenant !== null) {

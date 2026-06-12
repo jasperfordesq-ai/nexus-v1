@@ -51,6 +51,35 @@ class ResendStuckVerificationEmailsTest extends TestCase
         $this->assertFalse(DB::table('email_verification_tokens')->where('token', $oldToken)->exists());
     }
 
+    public function test_selection_skips_users_who_already_received_a_verification_email(): void
+    {
+        // Regression: without the email_log exclusion, every run re-mailed the
+        // same oldest `--limit` users and never progressed through a backlog
+        // larger than the limit.
+        $tenantId = 996;
+        $neverSentId = $this->seedPendingUser($tenantId);
+        $alreadySentId = $this->seedPendingUser($tenantId);
+
+        $neverSentEmail = (string) DB::table('users')->where('id', $neverSentId)->value('email');
+        $alreadySentEmail = (string) DB::table('users')->where('id', $alreadySentId)->value('email');
+
+        DB::table('email_log')->insert([
+            'tenant_id' => $tenantId,
+            'user_id' => $alreadySentId,
+            'recipient_email' => $alreadySentEmail,
+            'category' => 'email_verification',
+            'status' => 'sent',
+            'subject' => 'Verify Your Email',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->artisan('emails:resend-stuck-activations', ['--dry-run' => true, '--tenant' => $tenantId])
+            ->expectsOutputToContain($neverSentEmail)
+            ->doesntExpectOutputToContain($alreadySentEmail)
+            ->assertSuccessful();
+    }
+
     private function seedPendingUser(int $tenantId): int
     {
         DB::table('tenants')->insertOrIgnore([
