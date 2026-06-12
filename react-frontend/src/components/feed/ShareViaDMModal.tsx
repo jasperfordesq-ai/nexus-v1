@@ -44,7 +44,12 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
 
   // M4: Mounted guard — prevents setState after unmount in debounced search
   const isMountedRef = useRef(true);
-  useEffect(() => { return () => { isMountedRef.current = false; }; }, []);
+  useEffect(() => {
+    // Re-arm on every (re)mount — a cleanup-only mount guard stays false
+    // forever under StrictMode's simulated remount.
+    isMountedRef.current = true;
+    return () => { isMountedRef.current = false; };
+  }, []);
 
   // Track the latest search token so out-of-order responses from rapid typing
   // don't overwrite newer results with stale ones.

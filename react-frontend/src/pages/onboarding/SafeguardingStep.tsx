@@ -79,7 +79,12 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
 
   const savingRef = useRef(false);
   const mountedRef = useRef(true);
-  useEffect(() => () => { mountedRef.current = false; }, []);
+  useEffect(() => {
+    // Re-arm on every (re)mount — see OnboardingPage; cleanup-only mount
+    // guards stay false forever under StrictMode's simulated remount.
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   // ── Aggregated triggers (OR-merge across selected options) ────────────────
 

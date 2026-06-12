@@ -7,6 +7,7 @@
  * Tests for OnboardingPage
  */
 
+import { StrictMode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 
@@ -353,6 +354,45 @@ describe('OnboardingPage', () => {
     const nextButton = screen.getByText('Next').closest('button');
     expect(nextButton).toBeTruthy();
     expect(nextButton).toBeDisabled();
+  });
+
+  it('advances from profile to interests after saving the bio under StrictMode', async () => {
+    // Regression: the mounted-guard effect was cleanup-only, so StrictMode's
+    // simulated unmount left mountedRef false for the component's whole life
+    // and handleSaveProfileAndProceed silently returned after its PUT —
+    // the wizard never advanced past the profile step in dev/E2E.
+    const { useAuth } = await import('@/contexts');
+    vi.mocked(useAuth).mockReturnValue({
+      // Avatar present, bio empty: passes the photo check, no auto-skip to step 3
+      user: { id: 1, first_name: 'Test', name: 'Test User', onboarding_completed: false, avatar_url: '/uploads/avatar.jpg', bio: '' },
+      isAuthenticated: true,
+      refreshUser: vi.fn().mockResolvedValue(undefined),
+    } as unknown as ReturnType<typeof useAuth>);
+
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+
+    render(
+      <StrictMode>
+        <OnboardingPage />
+      </StrictMode>
+    );
+
+    await user.click(screen.getByText("Let's Get Started"));
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Step 2: Profile \(current\)/ })).toBeInTheDocument();
+    });
+
+    await user.type(screen.getByRole('textbox'), 'A bio long enough to pass the minimum length check.');
+
+    const nextButton = screen.getByText('Next').closest('button');
+    expect(nextButton).toBeEnabled();
+    await user.click(nextButton!);
+
+    await waitFor(() => {
+      expect(vi.mocked(api.put)).toHaveBeenCalledWith('/v2/users/me', expect.objectContaining({ bio: expect.any(String) }));
+      expect(screen.getByRole('button', { name: /Step 3.*\(current\)/ })).toBeInTheDocument();
+    });
   });
 
   // ── API error handling ──────────────────────────────────────────────────

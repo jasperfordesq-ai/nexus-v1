@@ -157,6 +157,10 @@ export function OnboardingPage() {
   const mountedRef = useRef(true);
   const completionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
+    // Re-arm on every (re)mount: StrictMode runs this cleanup once on its
+    // simulated unmount, so a cleanup-only effect would leave the ref false
+    // for the component's whole life in dev.
+    mountedRef.current = true;
     return () => {
       mountedRef.current = false;
       if (completionTimerRef.current) clearTimeout(completionTimerRef.current);
