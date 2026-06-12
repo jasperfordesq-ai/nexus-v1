@@ -201,10 +201,19 @@ function TenantGuard({
  * that checks if the slug is missing from the browser URL and restores it via
  * history.replaceState. The user never sees the wrong URL.
  *
+ * It re-runs on EVERY router location change, not just on mount: pages that
+ * call setSearchParams/navigate from inside the slug-stripped nested <Routes>
+ * (e.g. EventsPage syncing filters to the URL) rewrite the browser URL from
+ * the router's stripped pathname, dropping the slug AFTER the mount-time
+ * check ran. A slug-less URL is not just cosmetic — detectTenantFromUrl()
+ * re-reads it on the next TenantShell render and silently flips the app to
+ * the master tenant.
+ *
  * SAFE for custom domains: this component is only rendered when slugPrefix is
  * defined, which only happens on shared hosts (localhost, app.project-nexus.ie).
  */
-function SlugUrlGuard({ slug }: { slug: string }) {
+export function SlugUrlGuard({ slug }: { slug: string }) {
+  const routerLocation = useLocation();
   useLayoutEffect(() => {
     // ONLY restore slug on shared hosts where the path prefix IS the tenant identifier.
     // On subdomains (hour-timebank.project-nexus.ie) or custom domains (hour-timebank.ie),
@@ -221,7 +230,7 @@ function SlugUrlGuard({ slug }: { slug: string }) {
       const correctedUrl = prefix + currentPath + window.location.search + window.location.hash;
       window.history.replaceState(window.history.state, '', correctedUrl);
     }
-  }, [slug]);
+  }, [slug, routerLocation]);
   return null;
 }
 
