@@ -42,7 +42,8 @@ class ShiftWaitlistServiceTest extends TestCase
 
     public function test_leave_fails_when_not_on_waitlist(): void
     {
-        DB::shouldReceive('table->where->where->where->where->first')->andReturnNull();
+        DB::shouldReceive('transaction')->andReturnUsing(fn ($cb) => $cb());
+        DB::shouldReceive('table->where->where->whereIn->where->lockForUpdate->first')->andReturnNull();
 
         $result = ShiftWaitlistService::leave(1, 1);
         $this->assertFalse($result);

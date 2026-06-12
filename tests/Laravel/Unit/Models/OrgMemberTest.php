@@ -28,7 +28,7 @@ class OrgMemberTest extends TestCase
 
     public function test_fillable_contains_expected_fields(): void
     {
-        $expected = ['tenant_id', 'organization_id', 'user_id', 'role', 'status'];
+        $expected = ['tenant_id', 'organization_id', 'org_type', 'user_id', 'role', 'status'];
         $this->assertEquals($expected, $this->model->getFillable());
     }
 
