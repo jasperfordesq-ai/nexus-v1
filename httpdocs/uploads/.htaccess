@@ -9,8 +9,12 @@ RewriteCond %{REQUEST_FILENAME} -d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^.*$ / [R=301,L]
 
-# Allow direct file access for images, videos, and documents (Apache 2.4 syntax)
-<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|pdf|doc|docx|mp4|mov|avi|apk)$">
+# Allow direct file access for images, videos, audio (voice messages) and
+# documents (Apache 2.4 syntax). Audio extensions (m4a/webm/ogg/wav/aac/mp3)
+# back the in-app voice-message player — without them a fresh image-based
+# deploy would 403 voice files. (Production's uploads volume has no FilesMatch
+# restriction, so it already serves audio; this keeps the repo copy correct.)
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|pdf|doc|docx|mp4|mov|avi|apk|m4a|webm|ogg|wav|aac|mp3)$">
     Require all granted
 </FilesMatch>
 

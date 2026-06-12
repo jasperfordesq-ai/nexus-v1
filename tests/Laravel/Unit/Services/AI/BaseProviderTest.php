@@ -4,7 +4,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-namespace Tests\Laravel\Unit\Services;
+namespace Tests\Laravel\Unit\Services\AI;
 
 use Tests\Laravel\TestCase;
 use App\Services\AI\Providers\BaseProvider;
