@@ -37,7 +37,7 @@ return [
     'defaults' => [
         'supervisor-1' => [
             'connection' => 'redis',
-            'queue' => ['federation-high', 'federation', 'default'],
+            'queue' => ['federation-high', 'federation', 'default', 'search'],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
             'maxProcesses' => 4,
