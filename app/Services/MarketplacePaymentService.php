@@ -762,10 +762,15 @@ class MarketplacePaymentService
             in_array($payment->status, ['refunded'], true)
             || ((float) ($payment->refund_amount ?? 0) >= $refundedAmount && $refundedAmount > 0)
         ) {
+            // Email failure must NOT fail the webhook: the refund is already
+            // recorded, and throwing makes Stripe retry the event for days
+            // (a suppressed/bounced recipient fails permanently).
             if ($order && !self::marketplaceRefundNotificationsHaveEvidence($payment, $order)) {
                 $sent = self::sendMarketplaceRefundNotifications($payment, $order, $refundedAmount, $isFullRefund);
                 if (!$sent) {
-                    throw new \RuntimeException('Marketplace refund notification email was not sent.');
+                    Log::warning('MarketplacePayment webhook: refund notification email not sent (will not fail webhook)', [
+                        'payment_id' => $payment->id,
+                    ]);
                 }
             }
             return; // Already processed
@@ -786,7 +791,9 @@ class MarketplacePaymentService
         if ($order) {
             $sent = self::sendMarketplaceRefundNotifications($payment, $order, $refundedAmount, $isFullRefund);
             if (!$sent) {
-                throw new \RuntimeException('Marketplace refund notification email was not sent.');
+                Log::warning('MarketplacePayment webhook: refund notification email not sent (will not fail webhook)', [
+                    'payment_id' => $payment->id,
+                ]);
             }
         }
 

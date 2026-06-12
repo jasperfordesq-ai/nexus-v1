@@ -723,7 +723,8 @@ class MemberPremiumService
 
         $eventRecordId = self::recordEvent((int) $row->id, (int) $row->tenant_id, 'subscription.deleted', $eventId, $sub);
         if ($eventRecordId > 0 && !self::notifyMemberBillingEvent((int) $row->id, (int) $row->tenant_id, 'cancelled', $eventRecordId)) {
-            throw new \RuntimeException('Member premium cancellation email failed');
+            // Email failure must not fail the webhook (Stripe would retry for days).
+            Log::warning('MemberPremium: cancellation email not sent (will not fail webhook)', ['subscription_id' => $row->id]);
         }
     }
 
@@ -751,7 +752,8 @@ class MemberPremiumService
 
         $eventRecordId = self::recordEvent((int) $row->id, (int) $row->tenant_id, 'invoice.paid', $eventId, $invoice);
         if ($eventRecordId > 0 && !self::notifyMemberBillingEvent((int) $row->id, (int) $row->tenant_id, 'paid', $eventRecordId)) {
-            throw new \RuntimeException('Member premium paid email failed');
+            // Email failure must not fail the webhook (Stripe would retry for days).
+            Log::warning('MemberPremium: paid email not sent (will not fail webhook)', ['subscription_id' => $row->id]);
         }
     }
 
@@ -781,7 +783,8 @@ class MemberPremiumService
 
         $eventRecordId = self::recordEvent((int) $row->id, (int) $row->tenant_id, 'invoice.payment_failed', $eventId, $invoice);
         if ($eventRecordId > 0 && !self::notifyMemberBillingEvent((int) $row->id, (int) $row->tenant_id, 'payment_failed', $eventRecordId)) {
-            throw new \RuntimeException('Member premium payment failed email failed');
+            // Email failure must not fail the webhook (Stripe would retry for days).
+            Log::warning('MemberPremium: payment-failed email not sent (will not fail webhook)', ['subscription_id' => $row->id]);
         }
     }
 

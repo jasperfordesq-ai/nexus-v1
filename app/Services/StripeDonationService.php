@@ -202,8 +202,14 @@ class StripeDonationService
                 'donation_id' => $donation->id,
                 'payment_intent_id' => $piId,
             ]);
+            // Email failure must NOT fail the webhook: the money state is
+            // already correct, and throwing makes Stripe retry the event for
+            // days (a suppressed/bounced donor address fails permanently).
+            // The failure marker (receipt_email_failed_at) is kept for ops.
             if (empty($donation->receipt_email_sent_at) && !self::sendDonationReceiptEmail($donation)) {
-                throw new \RuntimeException('Donation receipt email was not sent.');
+                Log::warning('Stripe donation: receipt email not sent (will not fail webhook)', [
+                    'donation_id' => $donation->id,
+                ]);
             }
             return;
         }
@@ -230,7 +236,9 @@ class StripeDonationService
         ]);
 
         if (!self::sendDonationReceiptEmail($donation)) {
-            throw new \RuntimeException('Donation receipt email was not sent.');
+            Log::warning('Stripe donation: receipt email not sent (will not fail webhook)', [
+                'donation_id' => $donation->id,
+            ]);
         }
     }
 
