@@ -1209,11 +1209,13 @@ class CronJobRunner
 
         // 6. Clean expired API tokens
         // Global cleanup across all tenants — expired auth tokens (table not present in current schema; user-keyed if added), not user-facing.
-        try {
-            DB::delete("DELETE FROM api_tokens WHERE expires_at IS NOT NULL AND expires_at < NOW()");
-            $tasks[] = "Cleaned expired API tokens";
-        } catch (\Exception $e) {
-            $tasks[] = "API tokens: skipped (" . $e->getMessage() . ")";
+        if (\Illuminate\Support\Facades\Schema::hasTable('api_tokens')) {
+            try {
+                DB::delete("DELETE FROM api_tokens WHERE expires_at IS NOT NULL AND expires_at < NOW()");
+                $tasks[] = "Cleaned expired API tokens";
+            } catch (\Exception $e) {
+                $tasks[] = "API tokens: skipped (" . $e->getMessage() . ")";
+            }
         }
 
         // 7. Clean expired password_resets entries (older than 1 hour)
@@ -1849,12 +1851,15 @@ class CronJobRunner
             Log::warning('[CronCleanup] Failed to clean expired password_resets: ' . $e->getMessage());
         }
 
-        // Clean expired API tokens
-        try {
-            DB::delete("DELETE FROM api_tokens WHERE expires_at IS NOT NULL AND expires_at < NOW()");
-            echo "   Cleaned expired API tokens.\n";
-        } catch (\Exception $e) {
-            Log::warning('[CronCleanup] Failed to clean expired API tokens: ' . $e->getMessage());
+        // Clean expired API tokens (table not present in current schema; guarded so
+        // the nightly cleanup doesn't log a warning on every run)
+        if (\Illuminate\Support\Facades\Schema::hasTable('api_tokens')) {
+            try {
+                DB::delete("DELETE FROM api_tokens WHERE expires_at IS NOT NULL AND expires_at < NOW()");
+                echo "   Cleaned expired API tokens.\n";
+            } catch (\Exception $e) {
+                Log::warning('[CronCleanup] Failed to clean expired API tokens: ' . $e->getMessage());
+            }
         }
 
         // Clean old match cache entries (older than 24 hours)

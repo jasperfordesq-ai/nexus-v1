@@ -372,8 +372,11 @@ class Mailer
      * Check if an address is on the local suppression cache. Hydrated from
      * SendGrid's /v3/suppression/* endpoints via the webhook + periodic sync.
      * Safe to call before the table exists (defaults to "not suppressed").
+     *
+     * Public so retrying senders (e.g. VolunteerReminderService) can treat a
+     * suppressed recipient as a permanent failure instead of retrying forever.
      */
-    private static function isSuppressed(string $email): bool
+    public static function isSuppressed(string $email): bool
     {
         try {
             if (!\Illuminate\Support\Facades\Schema::hasTable('email_suppression')) {

@@ -1369,7 +1369,8 @@ export const adminVolunteering = {
     api.download('/v2/admin/volunteering/donations/export', { filename }),
 
   // Guardian Consents
-  getGuardianConsents: () => api.get('/v2/admin/volunteering/guardian-consents'),
+  getGuardianConsents: (params?: { status?: string; cursor?: number; limit?: number }) =>
+    api.get(`/v2/admin/volunteering/guardian-consents${buildQuery(params || {})}`),
 
   // Community Projects
   getCommunityProjects: (params?: { status?: string; cursor?: string; per_page?: number }) =>

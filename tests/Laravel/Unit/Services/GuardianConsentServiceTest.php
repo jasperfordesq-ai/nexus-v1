@@ -242,14 +242,14 @@ class GuardianConsentServiceTest extends TestCase
 
     public function test_expireOldConsents_returns_count(): void
     {
-        DB::shouldReceive('table->where->where->whereNotNull->where->update')->andReturn(3);
+        DB::shouldReceive('table->whereIn->whereNotNull->where->update')->andReturn(3);
 
         $this->assertEquals(3, GuardianConsentService::expireOldConsents());
     }
 
     public function test_expireOldConsents_returns_zero_on_error(): void
     {
-        DB::shouldReceive('table->where->where->whereNotNull->where->update')
+        DB::shouldReceive('table->whereIn->whereNotNull->where->update')
             ->andThrow(new \Exception('error'));
         Log::shouldReceive('error')->once();
 

@@ -1031,6 +1031,8 @@ class VolunteerCommunityController extends BaseApiController
         $filters = [
             'status' => $this->query('status'),
             'search' => $this->query('search'),
+            'cursor' => $this->query('cursor'),
+            'limit'  => $this->query('limit'),
         ];
 
         $consents = $this->guardianConsentService->getConsentsForAdmin($filters);

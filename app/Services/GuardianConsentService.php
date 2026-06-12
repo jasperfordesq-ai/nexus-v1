@@ -211,9 +211,8 @@ class GuardianConsentService
                 ->where('id', $consent->id)
                 ->update([
                     'status' => 'active',
-                    'granted_at' => now(),
-                    'granted_ip' => $ip,
-                    'updated_at' => now(),
+                    'consent_given_at' => now(),
+                    'consent_ip' => $ip,
                 ]);
 
             // Notify the minor that their guardian has granted consent
@@ -294,10 +293,15 @@ class GuardianConsentService
                 ->where('tenant_id', $tenantId)
                 ->update([
                     'status' => 'withdrawn',
-                    'withdrawn_at' => now(),
-                    'withdrawn_by' => $userId,
-                    'updated_at' => now(),
+                    'consent_withdrawn_at' => now(),
                 ]);
+
+            // The table has no withdrawn_by column — keep an audit trail in the log.
+            Log::info('GuardianConsentService::withdrawConsent', [
+                'consent_id' => $consentId,
+                'withdrawn_by_user_id' => $userId,
+                'tenant_id' => $tenantId,
+            ]);
 
             // Notify the minor that consent has been withdrawn — render bell text
             // in the minor's preferred_language since the bell is displayed to them.
@@ -405,11 +409,12 @@ class GuardianConsentService
         $tenantId = TenantContext::getId();
 
         try {
-            $limit = (int) ($filters['limit'] ?? 20);
+            $limit = min(200, max(1, (int) ($filters['limit'] ?? 20)));
             $cursor = (int) ($filters['cursor'] ?? 0);
 
             $query = DB::table('vol_guardian_consents as gc')
                 ->leftJoin('users as minor', 'gc.minor_user_id', '=', 'minor.id')
+                ->leftJoin('vol_opportunities as opp', 'gc.opportunity_id', '=', 'opp.id')
                 ->where('gc.tenant_id', $tenantId);
 
             if (!empty($filters['status'])) {
@@ -420,15 +425,37 @@ class GuardianConsentService
                 $query->where('gc.id', '<', $cursor);
             }
 
+            // Never expose consent_token here: it is the secret that grants
+            // consent, and an admin must not be able to grant on the
+            // guardian's behalf by visiting the verify URL themselves.
             $items = $query->orderByDesc('gc.id')
                 ->limit($limit + 1)
                 ->select([
-                    'gc.*',
+                    'gc.id',
+                    'gc.minor_user_id',
+                    'gc.guardian_name',
+                    'gc.guardian_email',
+                    'gc.guardian_phone',
+                    'gc.relationship',
+                    'gc.opportunity_id',
+                    'gc.status',
+                    'gc.consent_given_at',
+                    'gc.consent_withdrawn_at',
+                    'gc.expires_at',
+                    'gc.created_at',
                     'minor.name as minor_name',
                     'minor.email as minor_email',
+                    'opp.title as opportunity_title',
                 ])
                 ->get()
-                ->map(fn ($row) => (array) $row)
+                ->map(function ($row) {
+                    $item = (array) $row;
+                    // Field names the admin UI table reads.
+                    $item['consent_date'] = $item['consent_given_at'] ?? $item['created_at'];
+                    $item['expires_date'] = $item['expires_at'];
+
+                    return $item;
+                })
                 ->toArray();
 
             $hasMore = count($items) > $limit;
@@ -454,23 +481,27 @@ class GuardianConsentService
     }
 
     /**
-     * Expire old pending consent records.
+     * Expire pending/active consent records that are past their expires_at.
      *
      * @return int Number of records expired
      */
     public static function expireOldConsents(): int
     {
-        $tenantId = TenantContext::getId();
-
+        // Deliberately NOT tenant-scoped: this is a cron maintenance sweep
+        // (CronJobRunner::volunteerExpireConsentsInternal) whose semantics are
+        // absolute — any pending consent past its own expires_at is expired,
+        // regardless of which tenant the cron worker context points at.
         try {
+            // Covers 'active' as well as 'pending': checkConsent() already treats
+            // an active consent past expires_at as invalid, so the status must
+            // follow — otherwise admins see stale "active" rows and the
+            // re-request workflow (status='expired') never surfaces them.
             return DB::table('vol_guardian_consents')
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'pending')
+                ->whereIn('status', ['pending', 'active'])
                 ->whereNotNull('expires_at')
                 ->where('expires_at', '<', now())
                 ->update([
                     'status' => 'expired',
-                    'updated_at' => now(),
                 ]);
         } catch (\Exception $e) {
             Log::error('GuardianConsentService::expireOldConsents error: ' . $e->getMessage());

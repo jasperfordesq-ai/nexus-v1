@@ -65,6 +65,28 @@ class VolunteerReminderService
         return TenantContext::runForTenant($tenantId, $callback);
     }
 
+    /**
+     * A recipient on the email suppression list (hard bounce / spam report)
+     * will never accept delivery. Callers must treat this as a PERMANENT
+     * failure — mark the reminder handled instead of releasing the claim,
+     * otherwise the cron retries the same dead address on every run forever
+     * (observed in production: 36 suppressed demo users × every 30 minutes).
+     */
+    private static function recipientSuppressed(string $email, int $tenantId, int $userId, int $referenceId): bool
+    {
+        if (!\App\Core\Mailer::isSuppressed($email)) {
+            return false;
+        }
+
+        Log::info('[VolunteerReminderService] recipient suppressed — reminder marked handled, not retried', [
+            'tenant_id' => $tenantId,
+            'user_id' => $userId,
+            'reference_id' => $referenceId,
+        ]);
+
+        return true;
+    }
+
     private static function claimReminderDelivery(int $tenantId, int $userId, string $reminderType, int $referenceId, string $channel): bool
     {
         try {
@@ -246,6 +268,9 @@ class VolunteerReminderService
                             ->first(['email', 'first_name', 'name', 'preferred_language']);
 
                         if ($user && !empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+                            if (self::recipientSuppressed((string) $user->email, (int) $tenantId, (int) $userId, (int) $shift->id)) {
+                                // $emailOk stays true → claim marked handled, no retry storm.
+                            } else {
                             try {
                                 // Cron → render in recipient's language and tenant, not leaked worker defaults.
                                 $emailOk = self::withTenantContext($tenantId, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $userId, $tenantId): bool {
@@ -299,6 +324,7 @@ class VolunteerReminderService
                                     'shift_id' => $shift->id,
                                 ]);
                                 $emailOk = false;
+                            }
                             }
                         } else {
                             Log::warning('[VolunteerReminderService] sendReminders email channel claimed without valid recipient email', [
@@ -613,6 +639,9 @@ class VolunteerReminderService
                                     ->first(['email', 'first_name', 'name', 'preferred_language']);
 
                                 if ($user && !empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+                                    if (self::recipientSuppressed((string) $user->email, (int) $tenantId, (int) $userId, (int) $shift->id)) {
+                                        // $emailOk stays true → claim marked handled, no retry storm.
+                                    } else {
                                     $emailOk = self::withTenantContext((int) $tenantId, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $tenantId, $userId): bool {
                                         return LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $tenantId, $userId): bool {
                                         $firstName    = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
@@ -655,6 +684,7 @@ class VolunteerReminderService
                                         return true;
                                         });
                                     });
+                                    }
                                 } else {
                                     Log::warning('[VolunteerReminderService] sendPreShiftReminders email channel claimed without valid recipient email', [
                                         'tenant_id' => $tenantId,
@@ -804,6 +834,9 @@ class VolunteerReminderService
                                     ->first(['email', 'first_name', 'name', 'preferred_language']);
 
                                 if ($user && !empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+                                    if (self::recipientSuppressed((string) $user->email, (int) $tenantId, (int) $userId, (int) $shift->id)) {
+                                        // $emailOk stays true → claim marked handled, no retry storm.
+                                    } else {
                                     $emailOk = self::withTenantContext((int) $tenantId, function () use ($user, $shift, $opportunityTitle, $tenantId, $userId): bool {
                                         return LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $tenantId, $userId): bool {
                                         $firstName  = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
@@ -835,6 +868,7 @@ class VolunteerReminderService
                                         return true;
                                         });
                                     });
+                                    }
                                 } else {
                                     Log::warning('[VolunteerReminderService] sendPostShiftFeedback email channel claimed without valid recipient email', [
                                         'tenant_id' => $tenantId,

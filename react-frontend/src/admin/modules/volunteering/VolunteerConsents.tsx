@@ -51,15 +51,28 @@ export default function VolunteerConsents() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await adminVolunteering.getGuardianConsents();
-      if (res.success && res.data) {
+      // The endpoint returns a cursor-paginated envelope: { items, cursor, has_more }.
+      // Walk all pages (bounded) so the table and the expiry banner see every record.
+      const all: GuardianConsent[] = [];
+      let cursor: number | undefined;
+      for (let page = 0; page < 25; page++) {
+        const res = await adminVolunteering.getGuardianConsents({ cursor, limit: 200 });
+        if (!res.success || !res.data) {
+          if (all.length === 0) toast.error(t('volunteering.failed_to_load_consents'));
+          break;
+        }
         const payload = res.data as unknown;
         if (Array.isArray(payload)) {
-          setConsents(payload);
-        } else if (payload && typeof payload === 'object' && 'data' in payload) {
-          setConsents((payload as { data: GuardianConsent[] }).data || []);
+          // Defensive: tolerate a plain-array response shape.
+          all.push(...(payload as GuardianConsent[]));
+          break;
         }
+        const envelope = payload as { items?: GuardianConsent[]; cursor?: number | null; has_more?: boolean };
+        all.push(...(envelope.items || []));
+        if (!envelope.has_more || !envelope.cursor) break;
+        cursor = envelope.cursor;
       }
+      setConsents(all);
     } catch {
       toast.error(t('volunteering.failed_to_load_consents'));
       setConsents([]);
