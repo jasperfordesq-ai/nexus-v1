@@ -134,7 +134,11 @@ jobs:
           echo "All PHP files passed syntax check."
 
       - name: "BLOCKING: PHPUnit Laravel suite"
-        run: vendor/bin/phpunit --testsuite=Laravel,LaravelMigrated --colors=always --no-coverage
+        # --display-warnings/--display-deprecations: phpunit.xml sets
+        # failOnWarning/failOnRisky=true, so a single warning fails this gate
+        # with a bare "OK, but there were issues!" and no detail. The display
+        # flags itemise the offending tests so the red is actionable.
+        run: vendor/bin/phpunit --testsuite=Laravel,LaravelMigrated --colors=always --no-coverage --display-warnings --display-deprecations --display-incomplete --display-skipped
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
