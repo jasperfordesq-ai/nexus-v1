@@ -10,6 +10,32 @@ The sections below apply only to Claude Code. All universal project rules, stack
 
 ---
 
+## Verification / Definition of Done
+
+After ANY code edit, run the relevant tests AND typecheck (tsc/PHPStan) before committing. Never commit unverified changes.
+
+## Testing
+
+Never run more than one heavy test suite at a time; run suites sequentially to avoid CPU starvation and false failures.
+
+## Environment / Platform Notes
+
+This is a Windows + WSL2/Docker environment. Avoid inline Bash with Windows paths (backslashes collapse); write scripts to temp files and use forward slashes or grep-based extraction. SSH host strings already include the user prefix.
+
+## Version Control / Commit Hygiene
+
+When committing, stage ONLY the files relevant to the current task; preserve unrelated in-progress work. Do not touch repos outside the stated scope (e.g. the .NET backend).
+
+## Workspace Hygiene
+
+Do not create scratch/temp files in the user's Downloads or project root; use a dedicated temp directory and clean it up before finishing.
+
+## Debugging
+
+When fixing a reported bug, ask for or locate the exact error/Sentry trace before editing; confirm the true root cause rather than fixing the first plausible layer.
+
+---
+
 ## HeroUI MCP Migration Workflow
 
 For any HeroUI v2/v3 migration, component API question, or related React code change, use the `heroui-react` MCP server before giving migration advice or editing components.
