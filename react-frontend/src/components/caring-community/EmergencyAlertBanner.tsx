@@ -89,10 +89,12 @@ export default function EmergencyAlertBanner() {
     try {
       const res = await api.get<{ data: EmergencyAlert[] }>('/v2/caring-community/emergency-alerts');
       const data = res.data;
-      // Unwrap v2 envelope: data may already be the array or wrapped in { data: [...] }
+      // Unwrap v2 envelope: data may already be the array, wrapped in
+      // { data: [...] }, or undefined on a failed/aborted request (the
+      // poll runs while auth is still bootstrapping).
       const list: EmergencyAlert[] = Array.isArray(data)
         ? data
-        : (Array.isArray((data as { data?: EmergencyAlert[] }).data)
+        : (Array.isArray((data as { data?: EmergencyAlert[] } | undefined)?.data)
             ? (data as { data: EmergencyAlert[] }).data
             : []);
       setAlerts(list);
