@@ -42,6 +42,7 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import OfflineBanner from '@/components/OfflineBanner';
 import TypingIndicator from '@/components/TypingIndicator';
 import VoiceMessageBubble from '@/components/VoiceMessageBubble';
+import { resolveMediaUrl } from '@/lib/utils/resolveImageUrl';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 const REACTION_EMOJIS = ['\u{1F44D}', '\u2764\uFE0F', '\u{1F602}', '\u{1F62E}', '\u{1F622}', '\u{1F64F}'];
@@ -876,7 +877,7 @@ function MessageBubble({
             </Text>
           ) : item.is_voice && item.audio_url ? (
             <VoiceMessageBubble
-              audioUrl={item.audio_url}
+              audioUrl={resolveMediaUrl(item.audio_url) ?? item.audio_url}
               isOwn={isOwn}
               primaryColor={primary}
               textColor={theme.text}
