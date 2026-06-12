@@ -2037,6 +2037,7 @@ return [
     'guardian_email_invalid' => 'Indirizzo e-mail del tutore non valido.',
     'guardian_relationship_invalid' => 'Tipo di relazione non valido. Deve essere uno tra: :types',
     'guardian_consent_not_required' => 'L\'utente non è minorenne e non richiede il consenso di un tutore.',
+    'guardian_consent_required' => 'Un genitore o tutore deve approvare la tua partecipazione prima che tu possa fare volontariato. Invia prima una richiesta di consenso.',
     'vol_alert_shift_id_required' => 'L\'ID del turno è obbligatorio.',
     'vol_alert_message_required' => 'Il messaggio è obbligatorio.',
     'vol_alert_priority_invalid' => 'La priorità deve essere normal, urgent o critical.',

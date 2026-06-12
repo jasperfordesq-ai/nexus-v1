@@ -404,6 +404,50 @@ class FederationExternalPartnerService
                 [$id]
             );
 
+            // Partner departure: remove the imported MIRROR data so the
+            // departed partner's content stops appearing in federated views.
+            // Deliberately KEPT: federation_messages (local members'
+            // communication records), federation_transactions (financial
+            // ledger), reviews (historical reputation) — same retention
+            // rationale as GDPR account erasure.
+            foreach ([
+                'federation_listings',
+                'federation_members',
+                'federation_events',
+                'federation_groups',
+                'federation_volunteering',
+                'federation_inbound_connections',
+            ] as $mirrorTable) {
+                try {
+                    DB::delete(
+                        "DELETE FROM {$mirrorTable} WHERE external_partner_id = ? AND tenant_id = ?",
+                        [$id, $tenantId]
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning('[FederationExternalPartner] mirror cleanup skipped', [
+                        'table' => $mirrorTable,
+                        'partner_id' => $id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            // Imported volunteer opportunities may have local applications
+            // attached — deactivate instead of deleting so history survives
+            // but they disappear from browse/search.
+            try {
+                DB::update(
+                    "UPDATE vol_opportunities SET is_active = 0
+                      WHERE external_partner_id = ? AND tenant_id = ? AND is_federated = 1",
+                    [$id, $tenantId]
+                );
+            } catch (\Throwable $e) {
+                Log::warning('[FederationExternalPartner] imported-opportunity deactivation skipped', [
+                    'partner_id' => $id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             // Delete the partner (hard delete — table has no deleted_at column)
             DB::delete(
                 "DELETE FROM federation_external_partners WHERE id = ? AND tenant_id = ?",

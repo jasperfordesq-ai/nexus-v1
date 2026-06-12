@@ -182,6 +182,15 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_apply', 20, 60);
+
+        // Minors (by date_of_birth) need an active guardian consent before
+        // taking part in volunteering. Adults (or users without a recorded
+        // date of birth) are unaffected.
+        if (\App\Services\GuardianConsentService::isMinor($userId)
+            && !\App\Services\GuardianConsentService::checkConsent($userId, (int) $id)) {
+            return $this->respondWithError('GUARDIAN_CONSENT_REQUIRED', __('api.guardian_consent_required'), null, 403);
+        }
+
         $data = ['message' => trim($this->input('message', '')), 'shift_id' => $this->inputInt('shift_id') ?: null];
 
         // Check for duplicate application (tenant-scoped to prevent cross-tenant leaks)
@@ -378,6 +387,16 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_shift_signup', 20, 60);
+
+        // Guardian-consent gate for minors (see apply()).
+        if (\App\Services\GuardianConsentService::isMinor($userId)) {
+            $gateOppId = VolShift::where('tenant_id', TenantContext::getId())
+                ->where('id', (int) $id)
+                ->value('opportunity_id');
+            if (!\App\Services\GuardianConsentService::checkConsent($userId, $gateOppId ? (int) $gateOppId : null)) {
+                return $this->respondWithError('GUARDIAN_CONSENT_REQUIRED', __('api.guardian_consent_required'), null, 403);
+            }
+        }
 
         $success = $this->volunteerService->signUpForShift((int) $id, $userId);
         if (!$success) {

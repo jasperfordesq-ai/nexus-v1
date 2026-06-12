@@ -2037,6 +2037,7 @@ return [
     'guardian_email_invalid' => 'Adresse e-mail du tuteur invalide.',
     'guardian_relationship_invalid' => 'Type de lien invalide. Doit être l\'un des suivants : :types',
     'guardian_consent_not_required' => 'L\'utilisateur n\'est pas mineur et ne nécessite pas le consentement d\'un tuteur.',
+    'guardian_consent_required' => "Un parent ou tuteur doit approuver ta participation avant que tu puisses faire du bénévolat. Merci d'envoyer d'abord une demande de consentement.",
     'vol_alert_shift_id_required' => 'L\'identifiant du créneau est requis.',
     'vol_alert_message_required' => 'Un message est requis.',
     'vol_alert_priority_invalid' => 'La priorité doit être normal, urgent ou critical.',

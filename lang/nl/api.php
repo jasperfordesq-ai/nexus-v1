@@ -2038,6 +2038,7 @@ return [
     'guardian_email_invalid' => 'Ongeldig e-mailadres van de voogd.',
     'guardian_relationship_invalid' => 'Ongeldig relatietype. Moet een van de volgende zijn: :types',
     'guardian_consent_not_required' => 'De gebruiker is niet minderjarig en heeft geen toestemming van een voogd nodig.',
+    'guardian_consent_required' => 'Een ouder of voogd moet je deelname goedkeuren voordat je vrijwilligerswerk kunt doen. Stuur eerst een toestemmingsverzoek.',
     'vol_alert_shift_id_required' => 'Dienst-ID is verplicht.',
     'vol_alert_message_required' => 'Bericht is verplicht.',
     'vol_alert_priority_invalid' => 'Prioriteit moet normal, urgent of critical zijn.',

@@ -47,6 +47,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
 import { useTranslation } from 'react-i18next';
+import GuardianConsentModal from '@/components/volunteering/GuardianConsentModal';
 /* ───────────────────────── Types ───────────────────────── */
 
 interface Shift {
@@ -635,6 +636,10 @@ export function OpportunityDetailPage() {
   const [applyMessage, setApplyMessage] = useState('');
   const [isApplying, setIsApplying] = useState(false);
   const [selectedShiftId, setSelectedShiftId] = useState<number | null>(null);
+
+  // Guardian consent modal — opened when the API gates a minor with
+  // GUARDIAN_CONSENT_REQUIRED (under-18 member without an active consent).
+  const guardianModal = useDisclosure();
   const tRef = useRef(t);
   tRef.current = t;
   const abortLoadRef = useRef<AbortController | null>(null);
@@ -688,6 +693,9 @@ export function OpportunityDetailPage() {
         setApplyMessage('');
         setSelectedShiftId(null);
         load(); // Refresh to show applied state
+      } else if (response.code === 'GUARDIAN_CONSENT_REQUIRED') {
+        applyModal.onClose();
+        guardianModal.onOpen();
       } else {
         toast.error(response.error || t('opportunity.apply_failed'));
       }
@@ -1045,6 +1053,14 @@ export function OpportunityDetailPage() {
           )}
         </ModalContent>
       </Modal>
+
+      {/* Guardian consent flow for under-18 members */}
+      <GuardianConsentModal
+        isOpen={guardianModal.isOpen}
+        onOpenChange={guardianModal.onOpenChange}
+        onClose={guardianModal.onClose}
+        opportunityId={id ? Number(id) : undefined}
+      />
     </div>
   );
 }

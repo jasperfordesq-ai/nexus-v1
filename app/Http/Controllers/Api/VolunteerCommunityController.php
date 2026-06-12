@@ -75,6 +75,18 @@ class VolunteerCommunityController extends BaseApiController
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_waitlist_join', 20, 60);
 
+        // Guardian-consent gate for minors — the waitlist leads straight to a
+        // shift place on promotion, so it must be gated like signUp().
+        if (\App\Services\GuardianConsentService::isMinor($userId)) {
+            $gateOppId = \Illuminate\Support\Facades\DB::table('vol_shifts')
+                ->where('tenant_id', \App\Core\TenantContext::getId())
+                ->where('id', (int) $id)
+                ->value('opportunity_id');
+            if (!\App\Services\GuardianConsentService::checkConsent($userId, $gateOppId ? (int) $gateOppId : null)) {
+                return $this->respondWithError('GUARDIAN_CONSENT_REQUIRED', __('api.guardian_consent_required'), null, 403);
+            }
+        }
+
         $entryId = $this->shiftWaitlistService->join((int) $id, $userId);
         if ($entryId === null) {
             $errors = $this->shiftWaitlistService->getErrors();

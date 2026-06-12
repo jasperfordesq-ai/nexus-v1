@@ -1235,6 +1235,44 @@ class GdprService
                 $this->query("DELETE FROM course_enrollments WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
             } catch (\Throwable $e) { $this->logger->warning('GDPR courses deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
+            // 3x. Identity & compliance records. The users row is ANONYMIZED,
+            // never deleted, so the ON DELETE CASCADE constraints on
+            // vetting_records / insurance_certificates never fire — without an
+            // explicit delete these highly sensitive records (DBS/Garda vetting
+            // references, insurance policy numbers, KYC session outcomes, and
+            // the uploaded document files) survive erasure. Decision 2026-06-12:
+            // the platform is not the vetting authority and holds no
+            // post-erasure retention duty for these COPIES — delete them,
+            // including files. (Safeguarding REPORTS are different and are
+            // deliberately retained: legal hold.)
+            try {
+                $docRoot = function_exists('public_path') ? rtrim(public_path(), '/\\') : '';
+
+                $vettingDocs = $this->query(
+                    "SELECT document_url FROM vetting_records WHERE user_id = ? AND tenant_id = ? AND document_url IS NOT NULL",
+                    [$userId, $this->tenantId]
+                )->fetchAll(\PDO::FETCH_COLUMN);
+                foreach ($vettingDocs as $docUrl) {
+                    $relative = parse_url((string) $docUrl, PHP_URL_PATH);
+                    if ($docRoot !== '' && is_string($relative) && str_starts_with($relative, '/uploads/')) {
+                        $file = $docRoot . $relative;
+                        if (is_file($file)) {
+                            @unlink($file);
+                        }
+                    }
+                }
+                $this->query("DELETE FROM vetting_records WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+
+                // Insurance certificates live in a per-user directory.
+                $insuranceDir = $docRoot . "/uploads/insurance/{$this->tenantId}/{$userId}";
+                if ($docRoot !== '' && is_dir($insuranceDir)) {
+                    self::deleteDirectory($insuranceDir);
+                }
+                $this->query("DELETE FROM insurance_certificates WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+
+                $this->query("DELETE FROM identity_verification_sessions WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+            } catch (\Throwable $e) { $this->logger->warning('GDPR compliance-records deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+
             // 4. Soft delete listings
             $this->query(
                 "UPDATE listings SET status = 'deleted', description = '[DELETED]', deleted_at = NOW()

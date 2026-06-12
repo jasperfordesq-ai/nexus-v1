@@ -30,6 +30,24 @@ class PushFederationDataRetraction implements ShouldQueue
     /** Route to the standard federation queue (bulk, non-time-critical). */
     public string $queue = 'federation';
 
+    /**
+     * GDPR erasure must not be fire-and-forget: if a partner API is down, the
+     * retraction is retried (5 min / 30 min / 2 h) instead of silently lost.
+     * Retraction is idempotent on the partner side, so re-sending to partners
+     * that already succeeded on an earlier attempt is safe. The timeout stays
+     * below the queue's retry_after (90s) so a slow run cannot be
+     * double-delivered mid-flight.
+     */
+    public int $tries = 4;
+
+    public int $timeout = 75;
+
+    /** @return array<int,int> */
+    public function backoff(): array
+    {
+        return [300, 1800, 7200];
+    }
+
     public function __construct(
         private readonly FederationFeatureService $federationFeatureService,
     ) {}
@@ -39,6 +57,7 @@ class PushFederationDataRetraction implements ShouldQueue
         $userId   = $event->userId;
         $tenantId = $event->tenantId;
         $previousTenantId = TenantContext::currentId();
+        $failedPartners = [];
 
         try {
             if (!TenantContext::setById($tenantId)) {
@@ -80,6 +99,7 @@ class PushFederationDataRetraction implements ShouldQueue
                         'reason'           => $event->reason,
                     ]);
                 } catch (\Throwable $e) {
+                    $failedPartners[] = $partnerId;
                     Log::warning('PushFederationDataRetraction: retraction failed for partner', [
                         'partner_id' => $partnerId,
                         'tenant_id'  => $tenantId,
@@ -97,5 +117,27 @@ class PushFederationDataRetraction implements ShouldQueue
         } finally {
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
+
+        // Throw OUTSIDE the try/finally so the queue re-delivers this listener
+        // and the failed partners are attempted again (see $tries/backoff).
+        if (!empty($failedPartners)) {
+            throw new \RuntimeException(
+                'Federation data retraction failed for partner(s) ' . implode(',', $failedPartners)
+                . " (user {$userId}, tenant {$tenantId}) — will retry"
+            );
+        }
+    }
+
+    public function failed(UserFederatedOptOut $event, \Throwable $exception): void
+    {
+        // All retries exhausted — surface loudly so an operator can retract
+        // manually from the federation admin; the user's GDPR erasure locally
+        // has already completed regardless.
+        Log::error('PushFederationDataRetraction: PERMANENT failure after retries — manual partner retraction needed', [
+            'tenant_id' => $event->tenantId,
+            'user_id'   => $event->userId,
+            'reason'    => $event->reason,
+            'error'     => $exception->getMessage(),
+        ]);
     }
 }

@@ -2038,6 +2038,7 @@ return [
     'guardian_email_invalid' => '保護者のメールアドレスが無効です。',
     'guardian_relationship_invalid' => '続柄の種類が無効です。次のいずれかである必要があります: :types',
     'guardian_consent_not_required' => 'このユーザーは未成年ではないため、保護者の同意は不要です。',
+    'guardian_consent_required' => 'ボランティアに参加するには、保護者の承認が必要です。まず同意リクエストを送信してください。',
     'vol_alert_shift_id_required' => 'シフトIDは必須です。',
     'vol_alert_message_required' => 'メッセージは必須です。',
     'vol_alert_priority_invalid' => '優先度はnormal、urgent、criticalのいずれかである必要があります。',

@@ -214,6 +214,7 @@ const OpportunityDetailPage = lazyWithRetry(() => import('@/pages/volunteering/O
 const VolOrgDashboardPage = lazyWithRetry(() => import('@/pages/volunteering/VolOrgDashboardPage'));
 const MyOrganisationsPage = lazyWithRetry(() => import('@/pages/volunteering/MyOrganisationsPage'));
 const DonationReceiptPage = lazyWithRetry(() => import('@/pages/volunteering/DonationReceiptPage'));
+const GuardianConsentVerifyPage = lazyWithRetry(() => import('@/pages/volunteering/GuardianConsentVerifyPage'));
 const OrganisationsPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationsPage'));
 const OrganisationDetailPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationDetailPage'));
 const RegisterOrganisationPage = lazyWithRetry(() => import('@/pages/organisations/RegisterOrganisationPage'));
@@ -417,6 +418,9 @@ function AppRoutes() {
 
         {/* Newsletter unsubscribe — public, no auth, token-based */}
         <Route path="newsletter/unsubscribe" element={<ErrorBoundary><NewsletterUnsubscribePage /></ErrorBoundary>} />
+
+        {/* Guardian consent approval — public, no auth, token-based (linked from the consent email) */}
+        <Route path="volunteering/guardian-consent/verify/:token" element={<ErrorBoundary><GuardianConsentVerifyPage /></ErrorBoundary>} />
 
         {/* Explore / Discover — curated discovery page */}
         <Route path="explore" element={<ErrorBoundary><ExplorePage /></ErrorBoundary>} />

@@ -2037,6 +2037,7 @@ return [
     'guardian_email_invalid' => 'Dirección de correo electrónico del tutor no válida.',
     'guardian_relationship_invalid' => 'Tipo de relación no válido. Debe ser uno de: :types',
     'guardian_consent_not_required' => 'El usuario no es menor de edad y no requiere el consentimiento de un tutor.',
+    'guardian_consent_required' => 'Un padre, madre o tutor debe aprobar tu participación antes de que puedas ser voluntario. Envía primero una solicitud de consentimiento.',
     'vol_alert_shift_id_required' => 'El ID del turno es obligatorio.',
     'vol_alert_message_required' => 'El mensaje es obligatorio.',
     'vol_alert_priority_invalid' => 'La prioridad debe ser normal, urgent o critical.',

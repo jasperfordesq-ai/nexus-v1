@@ -2038,6 +2038,7 @@ return [
     'guardian_email_invalid' => 'Nieprawidłowy adres e-mail opiekuna.',
     'guardian_relationship_invalid' => 'Nieprawidłowy typ pokrewieństwa. Musi być jednym z: :types',
     'guardian_consent_not_required' => 'Użytkownik nie jest osobą niepełnoletnią i nie wymaga zgody opiekuna.',
+    'guardian_consent_required' => 'Rodzic lub opiekun musi zatwierdzić Twój udział, zanim będziesz mógł/mogła zostać wolontariuszem. Najpierw wyślij prośbę o zgodę.',
     'vol_alert_shift_id_required' => 'Identyfikator zmiany jest wymagany.',
     'vol_alert_message_required' => 'Wiadomość jest wymagana.',
     'vol_alert_priority_invalid' => 'Priorytet musi mieć wartość normal, urgent lub critical.',

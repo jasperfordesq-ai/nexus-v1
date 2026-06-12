@@ -2392,6 +2392,7 @@ return [
     'guardian_email_invalid' => 'Invalid guardian email address.',
     'guardian_relationship_invalid' => 'Invalid relationship type. Must be one of: :types',
     'guardian_consent_not_required' => 'User is not a minor and does not require guardian consent.',
+    'guardian_consent_required' => 'A parent or guardian needs to approve your participation before you can volunteer. Please send a consent request first.',
     'vol_project_title_required' => 'Title is required.',
     'vol_project_description_required' => 'Description is required.',
     'vol_project_proposed_date_invalid' => 'Proposed date must be a valid date (YYYY-MM-DD).',

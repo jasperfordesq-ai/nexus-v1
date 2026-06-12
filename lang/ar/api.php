@@ -2038,6 +2038,7 @@ return [
     'guardian_email_invalid' => 'عنوان البريد الإلكتروني لولي الأمر غير صالح.',
     'guardian_relationship_invalid' => 'نوع صلة القرابة غير صالح. يجب أن يكون أحد الخيارات التالية: :types',
     'guardian_consent_not_required' => 'المستخدم ليس قاصرًا ولا يحتاج إلى موافقة ولي الأمر.',
+    'guardian_consent_required' => 'يجب أن يوافق أحد الوالدين أو ولي الأمر على مشاركتك قبل أن تتمكن من التطوع. يُرجى إرسال طلب الموافقة أولاً.',
     'vol_alert_shift_id_required' => 'معرّف المناوبة مطلوب.',
     'vol_alert_message_required' => 'الرسالة مطلوبة.',
     'vol_alert_priority_invalid' => 'يجب أن تكون الأولوية normal أو urgent أو critical.',

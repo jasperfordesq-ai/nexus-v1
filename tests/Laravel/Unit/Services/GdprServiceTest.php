@@ -884,6 +884,11 @@ class GdprServiceTest extends \Tests\Laravel\TestCase
             'DELETE FROM course_enrollments',
             'voice_messages',
             '@anonymized.local',
+            // Compliance copies — the users row is anonymized (not deleted),
+            // so CASCADE FKs never fire; explicit deletes are required.
+            'DELETE FROM vetting_records',
+            'DELETE FROM insurance_certificates',
+            'DELETE FROM identity_verification_sessions',
         ];
 
         foreach ($required as $needle) {

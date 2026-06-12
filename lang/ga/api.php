@@ -2038,6 +2038,7 @@ return [
     'guardian_email_invalid' => 'Seoladh ríomhphoist neamhbhailí don chaomhnóir.',
     'guardian_relationship_invalid' => 'Cineál gaoil neamhbhailí. Caithfidh sé a bheith ar cheann díobh seo: :types',
     'guardian_consent_not_required' => 'Ní mionaoiseach é an t-úsáideoir agus ní gá toiliú caomhnóra.',
+    'guardian_consent_required' => 'Caithfidh tuismitheoir nó caomhnóir do rannpháirtíocht a cheadú sular féidir leat obair dheonach a dhéanamh. Seol iarratas toilithe ar dtús, le do thoil.',
     'vol_alert_shift_id_required' => 'Tá ID an tseala riachtanach.',
     'vol_alert_message_required' => 'Tá teachtaireacht riachtanach.',
     'vol_alert_priority_invalid' => 'Caithfidh an tosaíocht a bheith normal, urgent nó critical.',

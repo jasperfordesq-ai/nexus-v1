@@ -2037,6 +2037,7 @@ return [
     'guardian_email_invalid' => 'Ungültige E-Mail-Adresse des Erziehungsberechtigten.',
     'guardian_relationship_invalid' => 'Ungültiger Beziehungstyp. Muss einer der folgenden sein: :types',
     'guardian_consent_not_required' => 'Der Benutzer ist nicht minderjährig und benötigt keine Zustimmung eines Erziehungsberechtigten.',
+    'guardian_consent_required' => 'Ein Elternteil oder Erziehungsberechtigter muss deine Teilnahme genehmigen, bevor du dich freiwillig engagieren kannst. Bitte sende zuerst eine Einwilligungsanfrage.',
     'vol_alert_shift_id_required' => 'Die Schicht-ID ist erforderlich.',
     'vol_alert_message_required' => 'Eine Nachricht ist erforderlich.',
     'vol_alert_priority_invalid' => 'Die Priorität muss normal, urgent oder critical sein.',
