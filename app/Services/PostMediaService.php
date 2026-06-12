@@ -170,15 +170,19 @@ class PostMediaService
             // Generate thumbnail — images only (video thumbnails require FFmpeg, deferred)
             $thumbnailUrl = null;
             if ($isImage) {
-                $thumbnailUrl = $this->generateThumbnail(
+                $thumbCreated = $this->generateThumbnail(
                     $uploadDir . '/' . $filename,
                     $thumbDir,
                     $filename,
                     $mime
                 );
 
-                if ($thumbnailUrl) {
+                if ($thumbCreated === true) {
                     $thumbnailUrl = "/uploads/posts/{$tenantId}/{$postId}/thumbs/{$filename}";
+                } elseif ($thumbCreated === false) {
+                    // Image is already thumbnail-sized — no thumbs/ file exists,
+                    // so the thumbnail URL must point at the original.
+                    $thumbnailUrl = $fileUrl;
                 }
             }
 
@@ -373,12 +377,16 @@ class PostMediaService
      *
      * @return string|null Thumbnail filename on success, null on failure.
      */
+    /**
+     * @return bool|null true = thumbs/ file written, false = image already
+     *                   thumbnail-sized (use the original), null = failed.
+     */
     private function generateThumbnail(
         string $sourcePath,
         string $thumbDir,
         string $filename,
         string $mimeType
-    ): ?string {
+    ): ?bool {
         try {
             $source = match ($mimeType) {
                 'image/jpeg' => @imagecreatefromjpeg($sourcePath),
@@ -399,7 +407,7 @@ class PostMediaService
             if ($origWidth <= self::THUMBNAIL_WIDTH) {
                 imagedestroy($source);
                 // Use the original as thumbnail
-                return $filename;
+                return false;
             }
 
             $ratio = self::THUMBNAIL_WIDTH / $origWidth;
@@ -436,7 +444,7 @@ class PostMediaService
             imagedestroy($source);
             imagedestroy($thumb);
 
-            return $saved ? $filename : null;
+            return $saved ? true : null;
         } catch (\Exception $e) {
             Log::warning("PostMediaService::generateThumbnail failed: " . $e->getMessage());
             return null;

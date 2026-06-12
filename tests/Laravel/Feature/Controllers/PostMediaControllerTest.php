@@ -98,6 +98,36 @@ class PostMediaControllerTest extends TestCase
         $response->assertJsonPath('errors.0.code', 'VALIDATION_ERROR');
     }
 
+    public function test_upload_small_image_thumbnail_url_points_at_an_existing_file(): void
+    {
+        $user = $this->authenticatedUser();
+        $post = $this->createPost($user);
+
+        // 64px wide — below PostMediaService::THUMBNAIL_WIDTH, so no thumbs/
+        // file is written and the original serves as its own thumbnail.
+        // Regression: thumbnail_url used to point into thumbs/ anyway,
+        // 404ing for every thumbnail-sized image.
+        $file = \Illuminate\Http\UploadedFile::fake()->image('small.jpg', 64, 64);
+
+        try {
+            $response = $this->post(
+                "/api/v2/posts/{$post->id}/media",
+                ['media' => [$file]],
+                $this->withTenantHeader()
+            );
+
+            $response->assertSuccessful();
+            $media = $response->json('data.0');
+            $this->assertNotNull($media['thumbnail_url'] ?? null);
+            $this->assertFileExists(base_path('httpdocs' . $media['thumbnail_url']));
+            $this->assertSame($media['file_url'], $media['thumbnail_url']);
+        } finally {
+            \Illuminate\Support\Facades\File::deleteDirectory(
+                base_path("httpdocs/uploads/posts/{$this->testTenantId}/{$post->id}")
+            );
+        }
+    }
+
     // ------------------------------------------------------------------
     //  PUT /api/v2/posts/{id}/media/reorder — reorderMedia
     // ------------------------------------------------------------------

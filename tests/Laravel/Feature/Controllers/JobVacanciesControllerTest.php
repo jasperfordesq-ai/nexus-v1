@@ -516,6 +516,39 @@ class JobVacanciesControllerTest extends TestCase
     }
 
     // =====================================================================
+    // CV DOWNLOAD — GET /v2/jobs/applications/{id}/cv
+    // =====================================================================
+
+    public function test_download_cv_returns_the_stored_file(): void
+    {
+        // Regression: downloadCv() declared Response|JsonResponse but the
+        // success path returns a Symfony BinaryFileResponse — the TypeError
+        // made every successful CV download 500 while the error paths worked.
+        \Illuminate\Support\Facades\Storage::fake('local');
+
+        $applicant = $this->authenticatedUser();
+        $vacancy = $this->createVacancy(['status' => 'open']);
+
+        $bytes = '%PDF-1.4 cv-download-regression';
+        \Illuminate\Support\Facades\Storage::disk('local')->put('job-applications/cv-regression.pdf', $bytes);
+
+        $application = JobApplication::factory()->create([
+            'vacancy_id' => $vacancy->id,
+            'user_id' => $applicant->id,
+            'status' => 'submitted',
+            'cv_path' => 'job-applications/cv-regression.pdf',
+            'cv_filename' => 'my-cv.pdf',
+        ]);
+
+        $response = $this->apiGet("/v2/jobs/applications/{$application->id}/cv");
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Disposition', 'attachment; filename=my-cv.pdf');
+        $file = $response->baseResponse->getFile();
+        $this->assertSame($bytes, file_get_contents($file->getPathname()));
+    }
+
+    // =====================================================================
     // BULK APPLICATION STATUS — POST /v2/jobs/{id}/applications/bulk-status
     // =====================================================================
 

@@ -631,7 +631,7 @@ class JobVacanciesController extends BaseApiController
     }
 
     /** GET /api/v2/jobs/applications/{id}/cv — download CV for an application */
-    public function downloadCv(int $applicationId): Response|JsonResponse
+    public function downloadCv(int $applicationId): \Symfony\Component\HttpFoundation\BinaryFileResponse|JsonResponse
     {
         $this->ensureFeature();
         $userId = $this->getUserId();
