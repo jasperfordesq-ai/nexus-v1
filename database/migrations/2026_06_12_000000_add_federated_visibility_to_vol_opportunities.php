@@ -30,10 +30,9 @@ return new class extends Migration
 
         Schema::table('vol_opportunities', function (Blueprint $table) {
             if (! Schema::hasColumn('vol_opportunities', 'federated_visibility')) {
-                // NOT NULL is the Blueprint default (no ->nullable()).
-                $table->enum('federated_visibility', ['none', 'listed'])
-                    ->default('none')
-                    ->after('is_federated');
+                // Single line: the migration safety gate lints per-line and must
+                // see ->default() on the same line as the column add.
+                $table->enum('federated_visibility', ['none', 'listed'])->default('none')->after('is_federated');
                 $table->index(['federated_visibility', 'tenant_id'], 'idx_vol_opp_fed_visibility');
             }
         });
