@@ -148,7 +148,9 @@ class ResendStuckVerificationEmails extends Command
 
         // Fresh token: supersede any older pending token only after send acceptance.
         $token = bin2hex(random_bytes(32));
-        $hashed = password_hash($token, PASSWORD_DEFAULT);
+        // SHA-256, not bcrypt — matches the verify-time indexed lookup; see
+        // EmailVerificationController::findValidVerificationToken().
+        $hashed = hash('sha256', $token);
         $expiresAt = date('Y-m-d H:i:s', time() + self::TOKEN_TTL_SECONDS);
 
         $appUrl  = TenantContext::getFrontendUrl();

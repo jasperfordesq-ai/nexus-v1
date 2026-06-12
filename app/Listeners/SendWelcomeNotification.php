@@ -186,7 +186,10 @@ class SendWelcomeNotification implements ShouldQueue
 
         return [
             'token' => $token,
-            'hashed_token' => password_hash($token, PASSWORD_DEFAULT),
+            // SHA-256, not bcrypt: 256-bit random token needs no stretching,
+            // and the deterministic hash enables indexed lookup at verify time
+            // (the bcrypt scheme forced a full-table password_verify scan).
+            'hashed_token' => hash('sha256', $token),
             'expires_at' => date('Y-m-d H:i:s', time() + 86400), // 24 hours
         ];
     }

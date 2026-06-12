@@ -88,6 +88,63 @@ class EmailVerificationControllerTest extends TestCase
         $this->assertContains($response->getStatusCode(), [400, 404, 422]);
     }
 
+    public function test_verify_email_accepts_a_sha256_stored_token(): void
+    {
+        // Regression: tokens are now stored as sha256(token) so verification
+        // is one indexed lookup. The old bcrypt scheme password_verify()'d
+        // EVERY unexpired token in the tenant (~100ms each) — a registration
+        // wave of a few hundred pending users made this public endpoint hang
+        // for 30+ seconds and time out.
+        $this->ensureEmailVerificationTokenTable();
+
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'email_verified_at' => null,
+            'is_verified' => false,
+            'is_approved' => true,
+            'status' => 'pending',
+        ]);
+
+        $plaintext = bin2hex(random_bytes(32));
+        DB::table('email_verification_tokens')->insert([
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'token' => hash('sha256', $plaintext),
+            'expires_at' => now()->addDay(),
+        ]);
+
+        $response = $this->apiPost('/auth/verify-email', ['token' => $plaintext]);
+
+        $response->assertOk();
+        $this->assertNotNull(DB::table('users')->where('id', $user->id)->value('email_verified_at'));
+    }
+
+    public function test_verify_email_still_accepts_a_legacy_bcrypt_stored_token(): void
+    {
+        // Rows written before the sha256 switch hold bcrypt hashes; they must
+        // keep verifying until they expire (24h TTL) after the deploy.
+        $this->ensureEmailVerificationTokenTable();
+
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'email_verified_at' => null,
+            'is_verified' => false,
+            'is_approved' => true,
+            'status' => 'pending',
+        ]);
+
+        $plaintext = bin2hex(random_bytes(32));
+        DB::table('email_verification_tokens')->insert([
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'token' => password_hash($plaintext, PASSWORD_DEFAULT),
+            'expires_at' => now()->addDay(),
+        ]);
+
+        $response = $this->apiPost('/auth/verify-email', ['token' => $plaintext]);
+
+        $response->assertOk();
+        $this->assertNotNull(DB::table('users')->where('id', $user->id)->value('email_verified_at'));
+    }
+
     // ------------------------------------------------------------------
     //  POST /auth/resend-verification (public, rate-limited)
     // ------------------------------------------------------------------

@@ -241,8 +241,13 @@ class EmailVerificationController extends BaseApiController
         // Generate a secure random token
         $token = bin2hex(random_bytes(32));
 
-        // Hash the token before storing (bcrypt — constant-time verification)
-        $hashedToken = password_hash($token, PASSWORD_DEFAULT);
+        // Hash the token before storing. SHA-256 (not bcrypt): the token is
+        // 256 bits of CSPRNG output, so key-stretching adds nothing — and a
+        // deterministic hash allows an indexed exact-match lookup. The bcrypt
+        // scheme made verification scan EVERY unexpired token in the tenant
+        // at ~100ms of password_verify() per row, hanging the endpoint once
+        // a registration wave left a few hundred tokens outstanding.
+        $hashedToken = hash('sha256', $token);
 
         // Calculate expiry time
         $expiresAt = date('Y-m-d H:i:s', time() + self::TOKEN_EXPIRY_SECONDS);
@@ -335,8 +340,21 @@ class EmailVerificationController extends BaseApiController
             return null;
         }
 
+        // Fast path: tokens are stored as SHA-256 of the 256-bit random value,
+        // so the lookup is a single indexed exact match.
+        $record = DB::selectOne(
+            "SELECT * FROM email_verification_tokens WHERE tenant_id = ? AND token = ? AND expires_at > NOW()",
+            [$tenantId, hash('sha256', $token)]
+        );
+        if ($record) {
+            return (array)$record;
+        }
+
+        // Legacy fallback: rows written before the SHA-256 switch hold bcrypt
+        // hashes ('$2y$...'). Tokens live 24h, so this set drains to empty
+        // within a day of deploy and the scan then matches zero rows.
         $records = DB::select(
-            "SELECT * FROM email_verification_tokens WHERE tenant_id = ? AND expires_at > NOW()",
+            "SELECT * FROM email_verification_tokens WHERE tenant_id = ? AND expires_at > NOW() AND token LIKE '\$2%'",
             [$tenantId]
         );
 
