@@ -241,7 +241,7 @@ export function ReactionSummary({
           <ModalBody className="pb-4 pt-2">
             {/* Tabs for each reaction type */}
             <Tabs
-              aria-label={t('reactions_tabs_aria')}
+              aria-label={t('social:reactions_tabs_aria')}
               selectedKey={selectedTab}
               onSelectionChange={handleTabChange}
               variant="light"
