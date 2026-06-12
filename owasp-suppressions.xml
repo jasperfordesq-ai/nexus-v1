@@ -263,6 +263,35 @@
   </suppress>
 
   <!--
+    VENDOR/DEBUG-ONLY: esbuild@0.25.9 in vendor/laravel/framework exception
+    renderer (same vendored package-lock.json as the vite entries above —
+    Illuminate/Foundation/resources/exceptions/renderer). It is a build-time
+    artifact inside the PHP package: we never npm-install or execute it, and
+    the renderer only runs with APP_DEBUG=true (local dev). Our OWN esbuild
+    is 0.28.1 (patched) in every tree via npm overrides.
+    GHSA-gv7w-rqvm-qjhr is Deno-specific RCE; GHSA-g7r4-m6w7-qqqr requires
+    running the esbuild dev server — neither is reachable from a lockfile
+    that is never installed.
+  -->
+  <suppress>
+    <notes><![CDATA[
+      VENDOR DEBUG-ONLY: esbuild@0.25.9 pinned in vendor/laravel/framework's
+      exception-renderer package-lock.json. Never installed or executed;
+      our esbuild is 0.28.1 everywhere via overrides.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/esbuild@0\.2[0-7]\..*$</packageUrl>
+    <vulnerabilityName>GHSA-gv7w-rqvm-qjhr</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      VENDOR DEBUG-ONLY: esbuild@0.25.9 in vendor/laravel/framework's
+      exception-renderer package-lock.json — never installed or executed.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/esbuild@0\.2[0-7]\..*$</packageUrl>
+    <vulnerabilityName>GHSA-g7r4-m6w7-qqqr</vulnerabilityName>
+  </suppress>
+
+  <!--
     FALSE POSITIVE: certifi in vendor/mockery/mockery/docs/requirements.txt
     This is a Python requirements.txt inside the DOCUMENTATION folder of the
     Mockery PHP testing library (require-dev). We never install Python in this
