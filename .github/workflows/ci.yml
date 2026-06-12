@@ -166,6 +166,15 @@ jobs:
       # 512M alongside the parallel workers (it OOMs). GitHub runners have ample RAM.
       - name: "BLOCKING: PHPStan static analysis (level 1, larastan + baseline)"
         run: vendor/bin/phpstan analyse --no-progress --memory-limit=2G --error-format=github
+        env:
+          # larastan boots the full Laravel app; routes/channels.php resolves
+          # the default broadcaster at route load, and the 'pusher' driver
+          # throws on a null PUSHER_KEY (no secrets in CI). Same null-driver
+          # pin as the migration and PHPUnit steps. This step had been
+          # unreachable for weeks (PHPUnit failed first), so the gap only
+          # surfaced once the suite went green.
+          BROADCAST_CONNECTION: "null"
+          BROADCAST_DRIVER: "null"
 
       # TD15: Validate that all required env vars referenced in config/ are
       # documented in .env.example. Catches the class of bug where a new
