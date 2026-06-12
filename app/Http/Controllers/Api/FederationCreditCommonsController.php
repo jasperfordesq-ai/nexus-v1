@@ -619,11 +619,20 @@ class FederationCreditCommonsController extends BaseApiController
             if ($entry->state === CreditCommonsAdapter::STATE_COMPLETED) {
                 DB::beginTransaction();
                 try {
-                    $this->reverseTransaction($entry, $tenantId);
-
-                    DB::table('federation_cc_entries')
+                    // Atomically claim C→E first: with two concurrent erases of
+                    // the same UUID, only one may reverse balances (the
+                    // reversal UPDATEs are unconditional and would double-apply).
+                    $claimed = DB::table('federation_cc_entries')
                         ->where('id', $entry->id)
+                        ->where('state', CreditCommonsAdapter::STATE_COMPLETED)
                         ->update($updates);
+                    if ($claimed === 0) {
+                        DB::rollBack();
+                        return $this->ccError('InvalidStateTransition',
+                            "Cannot transition from {$entry->state} to E (transaction was concurrently transitioned)", 400);
+                    }
+
+                    $this->reverseTransaction($entry, $tenantId);
 
                     DB::commit();
                 } catch (\Throwable $e) {
@@ -649,9 +658,16 @@ class FederationCreditCommonsController extends BaseApiController
             return response()->json(null, 204);
         }
 
-        DB::table('federation_cc_entries')
+        // Conditioned on the state we validated so a concurrent transition
+        // can't be silently overwritten (last-writer-wins race).
+        $transitioned = DB::table('federation_cc_entries')
             ->where('id', $entry->id)
+            ->where('state', $entry->state)
             ->update($updates);
+        if ($transitioned === 0) {
+            return $this->ccError('InvalidStateTransition',
+                "Cannot transition from {$entry->state} to {$destState} (transaction was concurrently transitioned)", 400);
+        }
 
         return response()->json([
             'data' => [
@@ -931,7 +947,22 @@ class FederationCreditCommonsController extends BaseApiController
             }
         }
 
-        // Payee is remote — forward to the next node
+        // Payee is remote — forward to the next node.
+        // Idempotency FIRST (mirrors the local-payee branch): a replayed relay
+        // must not re-forward downstream — the forward is the side effect.
+        $incomingUuid = (is_string($payload['uuid'] ?? null) && $payload['uuid'] !== '')
+            ? (string) $payload['uuid']
+            : null;
+        if ($incomingUuid) {
+            $existing = DB::table('federation_cc_entries')
+                ->where('tenant_id', $tenantId)
+                ->where('transaction_uuid', $incomingUuid)
+                ->first();
+            if ($existing) {
+                return $this->ccReplayResponse($incomingUuid, $existing);
+            }
+        }
+
         $relayResult = CreditCommonsNodeService::relayTransaction($payload, $tenantId);
 
         if (!$relayResult['success']) {
@@ -939,22 +970,37 @@ class FederationCreditCommonsController extends BaseApiController
                 $relayResult['error'] ?? 'Failed to relay transaction', 500);
         }
 
-        // Record the relay in our entries for audit
-        $uuid = $relayResult['data']['uuid'] ?? (string) Str::uuid();
-        DB::table('federation_cc_entries')->insert([
-            'tenant_id' => $tenantId,
-            'transaction_uuid' => $uuid,
-            'payer' => $payerPath,
-            'payee' => $payeePath,
-            'quant' => $quant,
-            'description' => $description,
-            'state' => CreditCommonsAdapter::STATE_COMPLETED,
-            'workflow' => $workflow,
-            'author' => $payerPath,
-            'written_at' => now(),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        // Record the relay in our entries for audit. A concurrent duplicate
+        // delivery hits UNIQUE(tenant_id, transaction_uuid) — answer
+        // idempotently instead of surfacing a 500 after the forward fired.
+        $uuid = $relayResult['data']['uuid'] ?? ($incomingUuid ?? (string) Str::uuid());
+        try {
+            DB::table('federation_cc_entries')->insert([
+                'tenant_id' => $tenantId,
+                'transaction_uuid' => $uuid,
+                'payer' => $payerPath,
+                'payee' => $payeePath,
+                'quant' => $quant,
+                'description' => $description,
+                'state' => CreditCommonsAdapter::STATE_COMPLETED,
+                'workflow' => $workflow,
+                'author' => $payerPath,
+                'written_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ((int) ($e->errorInfo[1] ?? 0) !== 1062) {
+                throw $e;
+            }
+            $dup = DB::table('federation_cc_entries')
+                ->where('tenant_id', $tenantId)
+                ->where('transaction_uuid', $uuid)
+                ->first();
+            if ($dup) {
+                return $this->ccReplayResponse($uuid, $dup);
+            }
+        }
 
         // Advance hashchain for the relay hop
         $newHash = CreditCommonsNodeService::advanceHashchain(
@@ -1002,23 +1048,50 @@ class FederationCreditCommonsController extends BaseApiController
             return $this->ccError('MissingParameter', 'Amount exceeds maximum', 400);
         }
 
-        $uuid = (string) Str::uuid();
+        // Honour a caller-supplied UUID (like createTransaction and relay do)
+        // so a replayed propose is idempotent instead of accumulating duplicate
+        // independently-committable PENDING proposals.
+        $uuid = (is_string($payload['uuid'] ?? null) && $payload['uuid'] !== '')
+            ? (string) $payload['uuid']
+            : (string) Str::uuid();
 
-        DB::table('federation_cc_entries')->insert([
-            'tenant_id' => $tenantId,
-            'transaction_uuid' => $uuid,
-            'federation_transaction_id' => null,
-            'payer' => $payerPath,
-            'payee' => $payeePath,
-            'quant' => $quant,
-            'description' => $description,
-            'state' => CreditCommonsAdapter::STATE_PENDING,
-            'workflow' => $workflow,
-            'author' => $payerPath,
-            'written_at' => null,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $existing = DB::table('federation_cc_entries')
+            ->where('tenant_id', $tenantId)
+            ->where('transaction_uuid', $uuid)
+            ->first();
+        if ($existing) {
+            return $this->ccReplayResponse($uuid, $existing);
+        }
+
+        try {
+            DB::table('federation_cc_entries')->insert([
+                'tenant_id' => $tenantId,
+                'transaction_uuid' => $uuid,
+                'federation_transaction_id' => null,
+                'payer' => $payerPath,
+                'payee' => $payeePath,
+                'quant' => $quant,
+                'description' => $description,
+                'state' => CreditCommonsAdapter::STATE_PENDING,
+                'workflow' => $workflow,
+                'author' => $payerPath,
+                'written_at' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ((int) ($e->errorInfo[1] ?? 0) !== 1062) {
+                throw $e;
+            }
+            $dup = DB::table('federation_cc_entries')
+                ->where('tenant_id', $tenantId)
+                ->where('transaction_uuid', $uuid)
+                ->first();
+            if ($dup) {
+                return $this->ccReplayResponse($uuid, $dup);
+            }
+            throw $e;
+        }
 
         return response()->json([
             'data' => [
@@ -1113,6 +1186,25 @@ class FederationCreditCommonsController extends BaseApiController
 
         DB::beginTransaction();
         try {
+            // Atomically claim the state transition FIRST, conditioned on the
+            // state we validated above. With two concurrent commits of the same
+            // UUID, exactly one claim succeeds; the loser affects 0 rows and
+            // must NOT apply balances again (double-credit window otherwise —
+            // the balance UPDATEs alone do not protect against double-apply).
+            $claimed = DB::table('federation_cc_entries')
+                ->where('id', $entry->id)
+                ->where('state', $entry->state)
+                ->update([
+                    'state' => CreditCommonsAdapter::STATE_COMPLETED,
+                    'written_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            if ($claimed === 0) {
+                DB::rollBack();
+                return $this->ccError('InvalidStateTransition',
+                    "Cannot transition from {$entry->state} to C (transaction was concurrently transitioned)", 400);
+            }
+
             // Authorization: only debit a local payer who has opted into federation
             // (mirrors createTransaction — prevents debiting a non-consenting member).
             if ($payerId && !$this->payerMayBeDebited($payerId, $tenantId)) {
@@ -1137,14 +1229,6 @@ class FederationCreditCommonsController extends BaseApiController
                 DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
                     [$quant, $payeeId, $tenantId]);
             }
-
-            DB::table('federation_cc_entries')
-                ->where('id', $entry->id)
-                ->update([
-                    'state' => CreditCommonsAdapter::STATE_COMPLETED,
-                    'written_at' => now(),
-                    'updated_at' => now(),
-                ]);
 
             $newHash = CreditCommonsNodeService::advanceHashchain(
                 $tenantId, $uuid, $quant, $entry->payer, $entry->payee
