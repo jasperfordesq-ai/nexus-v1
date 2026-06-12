@@ -139,8 +139,14 @@ export function LoginPage() {
   }, [selectedTenantId, from]);
 
   useEffect(() => {
-    startConditionalAuth();
+    // Deferred one tick: StrictMode's synchronous mount→unmount→mount must
+    // net out to ONE challenge POST and ONE pending credential request, not
+    // two stacked ones.
+    const timer = window.setTimeout(() => {
+      startConditionalAuth();
+    }, 0);
     return () => {
+      window.clearTimeout(timer);
       conditionalAbortRef.current?.abort();
     };
   }, [startConditionalAuth]);

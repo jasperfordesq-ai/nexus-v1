@@ -20,6 +20,7 @@ vi.mock("@simplewebauthn/browser", () => ({
   platformAuthenticatorIsAvailable: vi.fn(),
   startRegistration: vi.fn(),
   startAuthentication: vi.fn(),
+  WebAuthnAbortService: { cancelCeremony: vi.fn() },
 }));
 
 vi.mock("@/lib/api", () => ({
@@ -36,6 +37,7 @@ import {
   platformAuthenticatorIsAvailable,
   startRegistration,
   startAuthentication,
+  WebAuthnAbortService,
 } from "@simplewebauthn/browser";
 
 import { api } from "@/lib/api";
@@ -63,6 +65,7 @@ const mockBrowserSupports = browserSupportsWebAuthn as Mock;
 const mockPlatformAvailable = platformAuthenticatorIsAvailable as Mock;
 const mockStartRegistration = startRegistration as Mock;
 const mockStartAuthentication = startAuthentication as Mock;
+const mockCancelCeremony = WebAuthnAbortService.cancelCeremony as Mock;
 const mockApiGet = api.get as Mock;
 const mockApiPost = api.post as Mock;
 
@@ -492,6 +495,57 @@ describe("startConditionalAuthentication", () => {
     mockStartAuthentication.mockResolvedValue(MOCK_ASSERTION);
     const result = await startConditionalAuthentication();
     expect(result).toEqual({ success: false, error: "Verification failed" });
+  });
+
+  // The page's AbortController must reach the actual browser ceremony.
+  // Pre-fix, the signal was only checked AFTER the assertion resolved, so a
+  // pending navigator.credentials.get() leaked past unmount for the life of
+  // the document (the cause of stray native passkey dialogs).
+  it("cancels the pending browser ceremony when the signal aborts mid-request", async () => {
+    mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_AUTH_CHALLENGE });
+    let rejectGet!: (e: Error) => void;
+    mockStartAuthentication.mockImplementationOnce(
+      () => new Promise((_resolve, reject) => { rejectGet = reject; }),
+    );
+    const controller = new AbortController();
+    const pending = startConditionalAuthentication(controller.signal);
+    await vi.waitFor(() => expect(mockStartAuthentication).toHaveBeenCalled());
+
+    controller.abort();
+    expect(mockCancelCeremony).toHaveBeenCalledTimes(1);
+
+    // The cancelled ceremony rejects with AbortError → resolves to null
+    rejectGet(new DOMException("Aborted", "AbortError"));
+    expect(await pending).toBeNull();
+  });
+
+  it("does not start a credential request when the signal aborts during the challenge fetch", async () => {
+    const controller = new AbortController();
+    mockApiPost.mockImplementationOnce(async () => {
+      controller.abort();
+      return { success: true, data: MOCK_AUTH_CHALLENGE };
+    });
+    expect(await startConditionalAuthentication(controller.signal)).toBeNull();
+    expect(mockStartAuthentication).not.toHaveBeenCalled();
+  });
+
+  it("does not cancel a ceremony it no longer owns after modal login takes over", async () => {
+    // Conditional request pending…
+    mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_AUTH_CHALLENGE });
+    mockStartAuthentication.mockImplementationOnce(() => new Promise(() => {}));
+    const controller = new AbortController();
+    void startConditionalAuthentication(controller.signal);
+    await vi.waitFor(() => expect(mockStartAuthentication).toHaveBeenCalledTimes(1));
+
+    // …then the user clicks the explicit passkey button (modal ceremony)
+    mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_AUTH_CHALLENGE });
+    mockStartAuthentication.mockImplementationOnce(() => new Promise(() => {}));
+    void authenticateWithBiometric("user@example.com");
+    await vi.waitFor(() => expect(mockStartAuthentication).toHaveBeenCalledTimes(2));
+
+    // The login page unmounting now must NOT cancel the user's modal ceremony
+    controller.abort();
+    expect(mockCancelCeremony).not.toHaveBeenCalled();
   });
 });
 

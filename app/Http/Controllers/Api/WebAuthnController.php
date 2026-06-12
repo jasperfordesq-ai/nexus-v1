@@ -715,8 +715,11 @@ class WebAuthnController extends BaseApiController
      */
     private function getRpId(): string
     {
-        $envRpId = $_ENV['WEBAUTHN_RP_ID'] ?? $_SERVER['WEBAUTHN_RP_ID'] ?? getenv('WEBAUTHN_RP_ID');
-        if ($envRpId && is_string($envRpId) && $envRpId !== '') {
+        // config() (not $_ENV/getenv): direct superglobal reads come back
+        // empty under config:cache and under SAPIs that don't populate $_ENV,
+        // silently shifting the RP ID to the HTTP_HOST fallback.
+        $envRpId = config('webauthn.rp_id');
+        if (is_string($envRpId) && $envRpId !== '') {
             return $envRpId;
         }
 

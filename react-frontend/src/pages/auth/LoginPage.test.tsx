@@ -257,6 +257,61 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
     abortSpy.mockRestore();
   });
 
+  // ─── 6b. StrictMode double-mount must net out to ONE credential request ────
+  // Pre-fix, the mount effect fired the conditional flow twice per page load
+  // (two /webauthn/auth-challenge POSTs, two stacked credential requests).
+  it('starts conditional mediation exactly once under StrictMode double-mount', async () => {
+    const { StrictMode } = await import('react');
+    mockIsConditionalMediationAvailable.mockResolvedValue(true);
+    mockStartConditionalAuthentication.mockReturnValue(new Promise(() => {}));
+
+    render(
+      <StrictMode>
+        <LoginPage />
+      </StrictMode>,
+    );
+
+    await waitFor(() => {
+      expect(mockStartConditionalAuthentication).toHaveBeenCalled();
+    });
+    // Settle any second deferred start before counting
+    await new Promise((r) => setTimeout(r, 20));
+
+    expect(mockStartConditionalAuthentication).toHaveBeenCalledTimes(1);
+  });
+
+  // ─── 6c. Mount must never start a MODAL credential request ─────────────────
+  // Only the conditional (silent, autofill-integrated) flow may run without a
+  // user click. A modal request on mount pops a native OS passkey dialog.
+  it('never starts a modal credential request on mount', async () => {
+    mockIsConditionalMediationAvailable.mockResolvedValue(true);
+
+    render(<LoginPage />);
+
+    await waitFor(() => {
+      expect(mockStartConditionalAuthentication).toHaveBeenCalled();
+    });
+
+    expect(mockLoginWithBiometric).not.toHaveBeenCalled();
+  });
+
+  // ─── 6d. No conditional request when mediation is unavailable ──────────────
+  // Without conditional support, ANY mount-time credential request would be
+  // modal — there must be none at all.
+  it('starts no credential request at all when conditional mediation is unavailable', async () => {
+    mockIsConditionalMediationAvailable.mockResolvedValue(false);
+
+    render(<LoginPage />);
+
+    await waitFor(() => {
+      expect(mockIsConditionalMediationAvailable).toHaveBeenCalled();
+    });
+    await new Promise((r) => setTimeout(r, 20));
+
+    expect(mockStartConditionalAuthentication).not.toHaveBeenCalled();
+    expect(mockLoginWithBiometric).not.toHaveBeenCalled();
+  });
+
   // ─── 7. Error toast when no passkey found ──────────────────────────────────
   it('shows error toast when loginWithBiometric returns "Credential not found"', async () => {
     mockLoginWithBiometric.mockResolvedValue({

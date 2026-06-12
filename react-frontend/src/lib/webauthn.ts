@@ -16,6 +16,7 @@ import {
   startAuthentication,
   browserSupportsWebAuthn,
   platformAuthenticatorIsAvailable,
+  WebAuthnAbortService,
 } from '@simplewebauthn/browser';
 import type {
   PublicKeyCredentialCreationOptionsJSON,
@@ -110,6 +111,10 @@ export async function registerBiometric(
   attachment?: AuthenticatorAttachment,
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    // Modal registration supersedes any pending autofill request — see
+    // authenticateWithBiometric.
+    conditionalCeremonyActive = false;
+
     // Step 1: Get registration challenge from server
     const challengeRes = await api.post<{
       challenge: string;
@@ -231,6 +236,11 @@ export async function authenticateWithBiometric(
   error?: string;
 }> {
   try {
+    // This modal ceremony supersedes any pending autofill request (the
+    // library aborts it when this one starts) — a later unmount abort from
+    // the autofill caller must not cancel this one.
+    conditionalCeremonyActive = false;
+
     // Step 1: Get authentication challenge from server
     const challengeRes = await api.post<{
       challenge: string;
@@ -315,6 +325,14 @@ export async function isConditionalMediationAvailable(): Promise<boolean> {
 }
 
 /**
+ * True while the autofill (conditional-mediation) request owns the browser's
+ * single in-flight WebAuthn ceremony. A user-initiated modal ceremony
+ * (authenticateWithBiometric / registerBiometric) takes that slot over, and an
+ * unmount abort arriving afterwards must not cancel the user's ceremony.
+ */
+let conditionalCeremonyActive = false;
+
+/**
  * Start conditional mediation — browser will show passkey suggestions
  * in the username field's autofill dropdown. Call on page load.
  *
@@ -334,6 +352,8 @@ export async function startConditionalAuthentication(
   error?: string;
 } | null> {
   try {
+    if (abortSignal?.aborted) return null;
+
     // Get challenge from server (no email — discoverable credential flow)
     const challengeRes = await api.post<{
       challenge: string;
@@ -348,6 +368,10 @@ export async function startConditionalAuthentication(
       return null;
     }
 
+    // The caller may have unmounted while the challenge was in flight —
+    // never start a credential request its AbortController can't reach.
+    if (abortSignal?.aborted) return null;
+
     const serverOptions = challengeRes.data;
 
     const optionsJSON: PublicKeyCredentialRequestOptionsJSON = {
@@ -358,12 +382,33 @@ export async function startConditionalAuthentication(
       // Empty allowCredentials for discoverable credential flow
     };
 
+    // startAuthentication doesn't accept an external signal — it registers its
+    // own with the WebAuthnAbortService singleton. Bridge the caller's signal
+    // to cancelCeremony() so unmount/re-render actually cancels the pending
+    // navigator.credentials.get() instead of leaking it for the life of the
+    // document (leaked OS-mediated requests are what popped native passkey
+    // dialogs while login pages sat idle).
+    conditionalCeremonyActive = true;
+    const cancelOnAbort = () => {
+      if (conditionalCeremonyActive) {
+        conditionalCeremonyActive = false;
+        WebAuthnAbortService.cancelCeremony();
+      }
+    };
+    abortSignal?.addEventListener('abort', cancelOnAbort, { once: true });
+
     // Start conditional authentication — this waits for user to interact
     // with the autofill dropdown
-    const assertion: AuthenticationResponseJSON = await startAuthentication({
-      optionsJSON,
-      useBrowserAutofill: true,
-    });
+    let assertion: AuthenticationResponseJSON;
+    try {
+      assertion = await startAuthentication({
+        optionsJSON,
+        useBrowserAutofill: true,
+      });
+    } finally {
+      conditionalCeremonyActive = false;
+      abortSignal?.removeEventListener('abort', cancelOnAbort);
+    }
 
     // If we got here and the signal was aborted, bail
     if (abortSignal?.aborted) return null;
