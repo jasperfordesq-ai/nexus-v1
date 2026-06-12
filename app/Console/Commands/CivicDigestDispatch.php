@@ -55,7 +55,13 @@ class CivicDigestDispatch extends Command
             'daily' => 'daily',
             default => 'daily',
         };
-        $windowSeconds = $cadence === 'monthly' ? 30 * 86400 : 24 * 3600;
+        // Cadence window with tolerance. The stamp is written per-user AT SEND
+        // TIME, so the next scheduled run always arrives slightly LESS than a
+        // full cadence after each user's stamp (run-start drift + send pacing).
+        // Exact windows (30d / 24h) therefore skipped users every other day,
+        // and the monthly run skipped everyone after every sub-30-day month
+        // (Feb: 28d, plus 30-day months) — use 27d / 23h instead.
+        $windowSeconds = $cadence === 'monthly' ? 27 * 86400 : 23 * 3600;
 
         $tenantOption = $this->option('tenant');
         $limitOption = (int) $this->option('limit');

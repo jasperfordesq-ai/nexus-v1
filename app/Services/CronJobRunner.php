@@ -1779,6 +1779,13 @@ class CronJobRunner
             return;
         }
 
+        // Time-box the drain. runAll() holds a global mutex; an unbounded
+        // drain of a large newsletter used to hold it across exact-minute
+        // gates (08:00 digests, 00:00 leaderboard snapshot, monthly jobs),
+        // silently skipping them for the whole day/month. Remaining items
+        // are picked up by the next every-minute tick.
+        $deadline = time() + 45;
+
         try {
             foreach ($pending as $row) {
                 TenantContext::reset();
@@ -1787,7 +1794,6 @@ class CronJobRunner
                 if ($newsletter && $newsletter['status'] === 'sending') {
                     TenantContext::setById($newsletter['tenant_id']);
 
-                    // Process ALL pending items for this newsletter
                     // Smaller batches with pauses for stability
                     $batchSize = 25;
                     $newsletterSent = 0;
@@ -1804,12 +1810,17 @@ class CronJobRunner
                         $morePending = ($stats['pending'] ?? 0) > 0;
 
                         // Pause between batches to prevent server overload
-                        if ($morePending && $batchSent > 0) {
+                        if ($morePending && $batchSent > 0 && time() < $deadline) {
                             sleep(2);
                         }
-                    } while ($morePending && $batchSent > 0);
+                    } while ($morePending && $batchSent > 0 && time() < $deadline);
 
-                    echo "   Newsletter {$row['newsletter_id']}: Sent $newsletterSent, failed $newsletterFailed\n";
+                    $note = ($morePending && time() >= $deadline) ? ' (time-boxed; continuing next tick)' : '';
+                    echo "   Newsletter {$row['newsletter_id']}: Sent $newsletterSent, failed $newsletterFailed{$note}\n";
+                }
+
+                if (time() >= $deadline) {
+                    break;
                 }
             }
         } finally {
@@ -2610,6 +2621,17 @@ class CronJobRunner
                         [$tenantId, $season['id']]
                     ));
 
+                    // A season whose end-date snapshot is missing (skipped
+                    // 00:00 run, downtime) would otherwise be finalized
+                    // SILENTLY with zero rewards — make that loud.
+                    if (empty($topUsers)) {
+                        Log::warning('[CronJobRunner] Finalizing season with NO end-date rank snapshot — no season rewards will be awarded', [
+                            'tenant_id' => $tenantId,
+                            'season_id' => $season['id'],
+                        ]);
+                        echo "   [$slug] WARNING: season {$season['id']} has no end-date snapshot — finalizing with zero rewards.\n";
+                    }
+
                     $rewards = [1 => 500, 2 => 300, 3 => 200, 4 => 100, 5 => 100];
                     foreach ($topUsers as $user) {
                         $xp = $rewards[$user['rank_position']] ?? 50;
@@ -2632,18 +2654,27 @@ class CronJobRunner
     private function gamificationStreakMilestonesInternal(): void
     {
         try {
-            $milestones = [7, 14, 30, 60, 90, 180, 365];
+            // Keys MUST match GamificationService::getBadgeDefinitions() —
+            // the old loop awarded "streak_7"/"streak_14"/… which don't exist
+            // (real keys are streak_7d/30d/100d/365d), so this cron had never
+            // awarded a single badge.
+            $milestones = [7 => 'streak_7d', 30 => 'streak_30d', 100 => 'streak_100d', 365 => 'streak_365d'];
             $this->forEachTenant(function ($tenantId, $slug) use ($milestones) {
                 if (!TenantContext::hasFeature('gamification')) return;
 
-                foreach ($milestones as $days) {
+                foreach ($milestones as $days => $badgeKey) {
+                    // >= not ==: with an exact match, a user whose streak
+                    // incremented past the milestone before this 01:00 check
+                    // (early-morning login) or during a skipped run would
+                    // permanently miss the badge. awardBadge() dedupes, so
+                    // re-matching higher streaks is an idempotent no-op.
                     $users = array_map(fn($r) => (array) $r, DB::select(
-                        "SELECT id FROM users WHERE tenant_id = ? AND login_streak = ?",
+                        "SELECT id FROM users WHERE tenant_id = ? AND login_streak >= ?",
                         [$tenantId, $days]
                     ));
 
                     foreach ($users as $user) {
-                        GamificationService::awardBadge($user['id'], "streak_{$days}");
+                        GamificationService::awardBadge($user['id'], $badgeKey);
                     }
 
                     if (count($users) > 0) {
