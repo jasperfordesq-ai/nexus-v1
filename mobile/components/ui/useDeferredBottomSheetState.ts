@@ -46,12 +46,17 @@ export function useDeferredBottomSheetState(visible: boolean) {
   const [open, setOpen] = useState(false);
   const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reassertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const openedAtRef = useRef(0);
 
   useEffect(() => {
     if (openTimerRef.current) {
       clearTimeout(openTimerRef.current);
       openTimerRef.current = null;
+    }
+    if (reassertTimerRef.current) {
+      clearTimeout(reassertTimerRef.current);
+      reassertTimerRef.current = null;
     }
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current);
@@ -84,16 +89,39 @@ export function useDeferredBottomSheetState(visible: boolean) {
   useEffect(() => {
     if (!visible || !mounted) return undefined;
 
+    // Two-stage open: the library opens via a one-shot snapToIndex() fired on
+    // the false→true transition. In RELEASE builds Hermes reaches a 16ms timer
+    // before the sheet container has measured, the snap is silently swallowed
+    // and there is no retry — sheets never appeared (the 'dead comment sheet'
+    // bug). Give layout a real frame budget first, then re-assert the open
+    // once more shortly after in case the first snap raced the measurement.
     openTimerRef.current = setTimeout(() => {
       openTimerRef.current = null;
       openedAtRef.current = Date.now();
       setOpen(true);
-    }, 16);
+      reassertTimerRef.current = setTimeout(() => {
+        reassertTimerRef.current = null;
+        // Force the library's isOpen-transition effect to re-run its
+        // snapToIndex by bouncing through false for a single frame. If the
+        // sheet already opened, the close+open happens between frames of the
+        // same spring and is imperceptible; if the first snap was swallowed,
+        // this is what actually opens the sheet.
+        setOpen(false);
+        requestAnimationFrame(() => {
+          openedAtRef.current = Date.now();
+          setOpen(true);
+        });
+      }, 220);
+    }, 90);
 
     return () => {
       if (openTimerRef.current) {
         clearTimeout(openTimerRef.current);
         openTimerRef.current = null;
+      }
+      if (reassertTimerRef.current) {
+        clearTimeout(reassertTimerRef.current);
+        reassertTimerRef.current = null;
       }
     };
   }, [mounted, visible]);
