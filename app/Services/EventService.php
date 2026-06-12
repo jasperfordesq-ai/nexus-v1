@@ -1873,12 +1873,24 @@ class EventService
 
         $occurrences = [];
         $current = clone $startTime;
+        $monthsAdded = 0;
 
         for ($i = 0; $i < $maxOccurrences; $i++) {
             switch ($frequency) {
                 case 'daily':   $current->modify("+{$interval} days"); break;
                 case 'weekly':  $current->modify("+{$interval} weeks"); break;
-                case 'monthly': $current->modify("+{$interval} months"); break;
+                case 'monthly':
+                    // Re-anchor each occurrence to the template's day-of-month,
+                    // clamped to the target month's length. Naive mutable
+                    // "+1 month" overflows (May 31 → Jul 1) and the series then
+                    // permanently drifts to the 1st, skipping months entirely.
+                    $monthsAdded += $interval;
+                    $anchor = clone $startTime;
+                    $anchor->modify('first day of this month');
+                    $anchor->modify("+{$monthsAdded} months");
+                    $dayOfMonth = min((int) $startTime->format('j'), (int) $anchor->format('t'));
+                    $current = $anchor->setDate((int) $anchor->format('Y'), (int) $anchor->format('n'), $dayOfMonth);
+                    break;
                 case 'yearly':  $current->modify("+{$interval} years"); break;
                 default:        $current->modify("+{$interval} weeks"); break;
             }

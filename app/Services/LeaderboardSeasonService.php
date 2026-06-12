@@ -29,10 +29,14 @@ class LeaderboardSeasonService
                 return null;
             }
 
+            // start_date/end_date are DATE columns: comparing end_date against a
+            // full datetime casts the DATE to midnight, which made the season
+            // invisible for its entire final day (and getOrCreateCurrentSeason
+            // then inserted a duplicate season on every call that day).
             $season = DB::table('leaderboard_seasons')
                 ->where('tenant_id', $tenantId)
-                ->where('start_date', '<=', now())
-                ->where('end_date', '>=', now())
+                ->where('start_date', '<=', now()->toDateString())
+                ->where('end_date', '>=', now()->toDateString())
                 ->where('status', 'active')
                 ->orderByDesc('start_date')
                 ->first();
@@ -351,6 +355,17 @@ class LeaderboardSeasonService
         ];
 
         $name = $monthNames[$month] . ' ' . $year;
+
+        // Guard against duplicate season rows for the same month (the table has
+        // no unique key): a duplicate would make the nightly finalizer award
+        // the season rewards once per duplicate row.
+        $existing = DB::table('leaderboard_seasons')
+            ->where('tenant_id', $tenantId)
+            ->whereDate('start_date', substr($startDate, 0, 10))
+            ->first();
+        if ($existing) {
+            return $existing->status === 'active' ? (array) $existing : null;
+        }
 
         $rewards = json_encode([
             1 => ['xp' => 500, 'badge' => 'season_champion', 'title' => 'Season Champion'],

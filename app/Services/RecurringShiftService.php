@@ -137,6 +137,12 @@ class RecurringShiftService
                 ? (json_decode($pattern->days_of_week, true) ?: [])
                 : [];
 
+            // Recurrence anchor: ALWAYS the pattern's original start date.
+            // Clamping the anchor to today made monthly patterns match
+            // "today's day-of-month" on every daily cron run (a shift per day)
+            // and rolled biweekly week-parity so it fired on the wrong weeks.
+            $anchorDate = new \DateTime($pattern->start_date);
+            // Iteration window: never generate before today or the pattern start.
             $startDate = new \DateTime(max($pattern->start_date, date('Y-m-d')));
             $endDate = new \DateTime(date('Y-m-d', strtotime("+{$daysAhead} days")));
 
@@ -168,11 +174,11 @@ class RecurringShiftService
                         $shouldGenerate = empty($daysOfWeek) || in_array($dayOfWeek, $daysOfWeek, true);
                         break;
                     case 'biweekly':
-                        $weekDiff = (int) $startDate->diff($current)->days / 7;
+                        $weekDiff = intdiv((int) $anchorDate->diff($current)->days, 7);
                         $shouldGenerate = ($weekDiff % 2 === 0) && (empty($daysOfWeek) || in_array($dayOfWeek, $daysOfWeek, true));
                         break;
                     case 'monthly':
-                        $shouldGenerate = ($current->format('d') === $startDate->format('d'));
+                        $shouldGenerate = ($current->format('d') === $anchorDate->format('d'));
                         break;
                 }
 
