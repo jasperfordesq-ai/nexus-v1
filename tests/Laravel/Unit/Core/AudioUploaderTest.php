@@ -11,6 +11,42 @@ use PHPUnit\Framework\TestCase;
 
 class AudioUploaderTest extends TestCase
 {
+    /** Sandbox DOCUMENT_ROOT so uploadFromBase64() writes land in a temp dir.
+     *  In CLI/CI $_SERVER['DOCUMENT_ROOT'] is empty, so the uploader resolved
+     *  its target to /uploads/... at the filesystem root — mkdir/file_put_contents
+     *  emitted PHP warnings that failed the suite (failOnWarning). */
+    private string $docRoot;
+    private ?string $originalDocRoot = null;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->docRoot = sys_get_temp_dir() . '/audio-uploader-test-' . uniqid();
+        mkdir($this->docRoot, 0755, true);
+        $this->originalDocRoot = $_SERVER['DOCUMENT_ROOT'] ?? null;
+        $_SERVER['DOCUMENT_ROOT'] = $this->docRoot;
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->originalDocRoot === null) {
+            unset($_SERVER['DOCUMENT_ROOT']);
+        } else {
+            $_SERVER['DOCUMENT_ROOT'] = $this->originalDocRoot;
+        }
+        if (is_dir($this->docRoot)) {
+            $items = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($this->docRoot, \FilesystemIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::CHILD_FIRST
+            );
+            foreach ($items as $item) {
+                $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
+            }
+            rmdir($this->docRoot);
+        }
+        parent::tearDown();
+    }
+
     // -------------------------------------------------------
     // upload() — validation
     // -------------------------------------------------------
@@ -143,15 +179,13 @@ class AudioUploaderTest extends TestCase
     /** @dataProvider mobileAudioProvider */
     public function test_uploadFromBase64_accepts_mobile_mpeg4_recordings(string $claimedMime, string $content): void
     {
-        // Same pattern as the codec-strip test: the save step may fail in a unit
-        // environment, but the format validation must NOT be the failure.
-        try {
-            AudioUploader::uploadFromBase64(base64_encode($content), $claimedMime, 5);
-            $this->addToAssertionCount(1);
-        } catch (\Exception $e) {
-            $this->assertStringNotContainsString('Invalid audio format', $e->getMessage());
-            $this->assertStringNotContainsString('does not match allowed types', $e->getMessage());
-        }
+        // DOCUMENT_ROOT is sandboxed in setUp, so the full pipeline — format
+        // validation, content sniffing AND persistence — must succeed.
+        $result = AudioUploader::uploadFromBase64(base64_encode($content), $claimedMime, 5);
+
+        $this->assertStringStartsWith('/uploads/', $result['url']);
+        $this->assertFileExists($this->docRoot . $result['url']);
+        $this->assertSame($content, file_get_contents($this->docRoot . $result['url']));
     }
 
     // -------------------------------------------------------
