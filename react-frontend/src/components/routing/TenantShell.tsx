@@ -38,7 +38,7 @@ import { detectTenantFromUrl } from '@/lib/tenant-routing';
 import { CookieConsentBanner } from '@/components/feedback/CookieConsentBanner';
 import { IdleLogoutGuard } from '@/components/security/IdleLogoutGuard';
 import { LoadingScreen } from '@/components/feedback/LoadingScreen';
-import { lazy, Suspense, useEffect, useLayoutEffect } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { listenForImpersonationToken } from '@/lib/impersonate';
 
 const MaintenancePage = lazy(() => import('@/pages/public/MaintenancePage'));
@@ -67,7 +67,24 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
   // - R3: app.project-nexus.ie or localhost → slug from first path segment if not reserved
   // - R4: No tenant → null
   const { slug: detectedSlug } = detectTenantFromUrl();
-  const effectiveSlug = detectedSlug ?? undefined;
+
+  // Sticky within this document: pages inside the slug-stripped nested Routes
+  // resolve relative URL rewrites (setSearchParams, navigate('?...')) against
+  // the stripped pathname, so the browser URL briefly reads /listings instead
+  // of /hour-timebank/listings. TenantShell re-renders on every navigation;
+  // re-reading the slug from that momentarily slug-less URL unmounted
+  // SlugUrlGuard (before it could restore the URL) and flipped the whole app
+  // to the master tenant. Once a slug is detected for this document, keep it —
+  // SlugUrlGuard puts it back in the URL. A real tenant/master switch always
+  // arrives as a fresh document load, which starts with an empty ref.
+  // (Unlike the localStorage slug-recovery removed 2026-05-08, this never
+  // crosses page loads, so app.project-nexus.ie/ still renders the master
+  // landing page.)
+  const stickySlugRef = useRef<string | null>(null);
+  if (detectedSlug) {
+    stickySlugRef.current = detectedSlug;
+  }
+  const effectiveSlug = detectedSlug ?? stickySlugRef.current ?? undefined;
 
   // Cross-tenant slug-recovery redirect REMOVED (2026-05-08). The previous
   // logic re-prepended a stored slug from localStorage when a user hit a

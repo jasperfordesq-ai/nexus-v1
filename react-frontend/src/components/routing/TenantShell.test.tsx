@@ -199,6 +199,35 @@ describe('TenantShell', () => {
       renderWithRouter('/');
       expect(capturedTenantSlug).toBeUndefined();
     });
+
+    it('keeps the detected slug when a later render sees a slug-less URL (sticky within document)', () => {
+      // Regression: pages inside the slug-stripped nested Routes rewrite the
+      // browser URL relative to the stripped pathname (e.g. ListingsPage
+      // setSearchParams turns /hour-timebank/listings into /listings).
+      // TenantShell re-renders on every navigation; re-detecting from the
+      // momentarily slug-less URL flipped the app to the master tenant and
+      // unmounted SlugUrlGuard before it could restore the URL.
+      mockDetectTenantFromUrl.mockReturnValue({ slug: 'hour-timebank', source: 'path' });
+      const { rerender } = render(
+        <MemoryRouter initialEntries={['/hour-timebank/listings']}>
+          <Routes>
+            <Route path="/*" element={<TenantShell />} />
+          </Routes>
+        </MemoryRouter>,
+      );
+      expect(capturedTenantSlug).toBe('hour-timebank');
+
+      // Simulate the post-rewrite render: the URL no longer carries the slug
+      mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
+      rerender(
+        <MemoryRouter initialEntries={['/hour-timebank/listings']}>
+          <Routes>
+            <Route path="/*" element={<TenantShell />} />
+          </Routes>
+        </MemoryRouter>,
+      );
+      expect(capturedTenantSlug).toBe('hour-timebank');
+    });
   });
 
   describe('Provider wrapping', () => {
