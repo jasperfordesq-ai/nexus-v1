@@ -132,8 +132,11 @@ class JobModerationService
 
                     // Durable email — the bell + push above leave no lasting record.
                     if ($poster && !empty($poster->email)) {
-                        $title = htmlspecialchars((string) $job->title, ENT_QUOTES, 'UTF-8');
-                        $subject = __('emails_misc.jobs.posting_approved_subject', ['title' => $title]);
+                        // Subject is a plain-text MIME header and title() escapes
+                        // at render — only the raw-HTML paragraph() needs escaping.
+                        $titleRaw = (string) $job->title;
+                        $title = htmlspecialchars($titleRaw, ENT_QUOTES, 'UTF-8');
+                        $subject = __('emails_misc.jobs.posting_approved_subject', ['title' => $titleRaw]);
                         $html = \App\Core\EmailTemplateBuilder::make()
                             ->theme('success')
                             ->title($subject)

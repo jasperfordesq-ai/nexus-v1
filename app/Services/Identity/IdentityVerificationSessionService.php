@@ -194,7 +194,9 @@ class IdentityVerificationSessionService
                         ->theme('success')
                         ->title(__('emails.identity_verification.passed_title'))
                         ->previewText(__('emails.identity_verification.passed_preview'))
-                        ->greeting(__('emails.identity_verification.passed_greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8')]))
+                        // greeting() expects the bare name (wrapped + escaped at
+                        // render) — a full translated greeting rendered doubled.
+                        ->greeting($firstName)
                         ->paragraph(__('emails.identity_verification.passed_body'))
                         ->button(__('emails.identity_verification.passed_cta'), $ctaUrl)
                         ->render();
@@ -206,12 +208,13 @@ class IdentityVerificationSessionService
                         ->theme('brand')
                         ->title(__('emails.identity_verification.failed_title'))
                         ->previewText(__('emails.identity_verification.failed_preview'))
-                        ->greeting(__('emails.identity_verification.failed_greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8')]))
+                        ->greeting($firstName)
                         ->paragraph(__('emails.identity_verification.failed_body'));
 
                     if (!empty($failureReason)) {
+                        // infoCard escapes at render — pre-escaping double-encodes.
                         $builder->infoCard([
-                            __('emails.identity_verification.failed_reason_label') => htmlspecialchars($failureReason, ENT_QUOTES, 'UTF-8'),
+                            __('emails.identity_verification.failed_reason_label') => $failureReason,
                         ]);
                     }
 

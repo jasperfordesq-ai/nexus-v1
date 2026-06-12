@@ -13,7 +13,7 @@
   "targets_required": "Deve ser especificado pelo menos um clube de destino.",
   "target_and_invitee_required": "target_organization_id e invitee_user_id são obrigatórios.",
   "notification_invitation_title": "Novo convite de clube",
-  "notification_invitation_received": "Um membro de {source} convidou-o(a) a aderir a {target}.",
+  "notification_invitation_received": "Um membro de {{source}} convidou-o(a) a aderir a {{target}}.",
   "notification_accepted_title": "Convite aceite",
-  "notification_invitation_accepted": "{name} aceitou o seu convite para aderir a {target}."
+  "notification_invitation_accepted": "{{name}} aceitou o seu convite para aderir a {{target}}."
 }

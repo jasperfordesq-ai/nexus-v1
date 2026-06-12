@@ -13,7 +13,7 @@
   "targets_required": "È necessario specificare almeno un club di destinazione.",
   "target_and_invitee_required": "target_organization_id e invitee_user_id sono obbligatori.",
   "notification_invitation_title": "Nuovo invito di club",
-  "notification_invitation_received": "Un membro di {source} la ha invitata a unirsi a {target}.",
+  "notification_invitation_received": "Un membro di {{source}} la ha invitata a unirsi a {{target}}.",
   "notification_accepted_title": "Invito accettato",
-  "notification_invitation_accepted": "{name} ha accettato il suo invito a unirsi a {target}."
+  "notification_invitation_accepted": "{{name}} ha accettato il suo invito a unirsi a {{target}}."
 }

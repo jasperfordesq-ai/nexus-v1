@@ -1,9 +1,9 @@
 {
   "welcome": {
-    "subject": "Uw gemeenschap {name} is klaar",
+    "subject": "Uw gemeenschap {{name}} is klaar",
     "title": "Welkom bij Project NEXUS",
-    "preview": "Uw gemeenschap {name} is klaar om te lanceren",
-    "body": "Goed nieuws — uw gemeenschap {name} is ingericht en klaar voor u om in te stellen. Gebruik de onderstaande inloggegevens om voor de eerste keer in te loggen.",
+    "preview": "Uw gemeenschap {{name}} is klaar om te lanceren",
+    "body": "Goed nieuws — uw gemeenschap {{name}} is ingericht en klaar voor u om in te stellen. Gebruik de onderstaande inloggegevens om voor de eerste keer in te loggen.",
     "tenant_url_label": "Gemeenschap URL",
     "login_url_label": "Admin-aanmelding",
     "admin_email_label": "Admin-e-mail",
@@ -15,7 +15,7 @@
     "subject": "Update over uw Project NEXUS-aanmelding",
     "title": "Aanmelding update",
     "preview": "Een update over uw gemeenschapsaanmelding",
-    "body": "Bedankt voor uw interesse in het opzetten van {org} op Project NEXUS. Na beoordeling zijn we op dit moment niet in staat om door te gaan met inrichting.",
+    "body": "Bedankt voor uw interesse in het opzetten van {{org}} op Project NEXUS. Na beoordeling zijn we op dit moment niet in staat om door te gaan met inrichting.",
     "reason_label": "Reden",
     "followup": "Als u dit verder wilt bespreken of opnieuw wilt aanmelden met een andere scope, beantwoord dan deze e-mail en ons team neemt contact met u op."
   }

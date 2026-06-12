@@ -1,9 +1,9 @@
 {
   "welcome": {
-    "subject": "La tua comunità {name} è pronta",
+    "subject": "La tua comunità {{name}} è pronta",
     "title": "Benvenuto su Project NEXUS",
-    "preview": "La tua comunità {name} è pronta per il lancio",
-    "body": "Ottime notizie — la tua comunità {name} è stata predisposta ed è pronta per la configurazione. Utilizza le credenziali qui sotto per accedere per la prima volta.",
+    "preview": "La tua comunità {{name}} è pronta per il lancio",
+    "body": "Ottime notizie — la tua comunità {{name}} è stata predisposta ed è pronta per la configurazione. Utilizza le credenziali qui sotto per accedere per la prima volta.",
     "tenant_url_label": "URL della Comunità",
     "login_url_label": "Accesso amministratore",
     "admin_email_label": "Email amministratore",
@@ -15,7 +15,7 @@
     "subject": "Aggiornamento sulla tua candidatura per Project NEXUS",
     "title": "Aggiornamento Candidatura",
     "preview": "Un aggiornamento sulla tua candidatura per la comunità",
-    "body": "Grazie per il tuo interesse nel configurare {org} su Project NEXUS. Dopo la revisione, non siamo in grado di procedere con la predisposizione in questo momento.",
+    "body": "Grazie per il tuo interesse nel configurare {{org}} su Project NEXUS. Dopo la revisione, non siamo in grado di procedere con la predisposizione in questo momento.",
     "reason_label": "Motivo",
     "followup": "Se desideri discuterne ulteriormente o presentare nuovamente la candidatura con un ambito diverso, rispondi a questa email e il nostro team ti contatterà."
   }

@@ -1,9 +1,9 @@
 {
   "welcome": {
-    "subject": "Twoja społeczność {name} jest gotowa",
+    "subject": "Twoja społeczność {{name}} jest gotowa",
     "title": "Witamy w Project NEXUS",
-    "preview": "Twoja społeczność {name} jest gotowa do uruchomienia",
-    "body": "Wspaniałe wiadomości — Twoja społeczność {name} została skonfigurowana i jest gotowa do ustawienia. Użyj poniższych danych logowania, aby zalogować się po raz pierwszy.",
+    "preview": "Twoja społeczność {{name}} jest gotowa do uruchomienia",
+    "body": "Wspaniałe wiadomości — Twoja społeczność {{name}} została skonfigurowana i jest gotowa do ustawienia. Użyj poniższych danych logowania, aby zalogować się po raz pierwszy.",
     "tenant_url_label": "URL społeczności",
     "login_url_label": "Logowanie administratora",
     "admin_email_label": "E-mail administratora",
@@ -15,7 +15,7 @@
     "subject": "Aktualizacja dotycząca Twojego wniosku do Project NEXUS",
     "title": "Aktualizacja wniosku",
     "preview": "Aktualizacja dotycząca Twojego wniosku o społeczność",
-    "body": "Dziękujemy za zainteresowanie założeniem {org} na Project NEXUS. Po weryfikacji nie jesteśmy w stanie w tej chwili przystąpić do konfiguracji.",
+    "body": "Dziękujemy za zainteresowanie założeniem {{org}} na Project NEXUS. Po weryfikacji nie jesteśmy w stanie w tej chwili przystąpić do konfiguracji.",
     "reason_label": "Powód",
     "followup": "Jeśli chciałbyś(chciałabyś) omówić to dalej lub złożyć ponowny wniosek o innym zakresie, odpowiedz na tę wiadomość e-mail, a nasz zespół skontaktuje się z Tobą."
   }

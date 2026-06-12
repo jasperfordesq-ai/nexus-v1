@@ -368,16 +368,17 @@ class PasswordResetController extends BaseApiController
         try {
             TenantContext::setById($userTenantId);
             $resetEmailSent = (bool) LocaleContext::withLocale($user['preferred_language'] ?? null, function () use ($user, $email, $resetUrl, $tenantName, $userTenantId) {
+                // greeting() expects the bare NAME — it wraps it in
+                // emails.common.greeting and escapes at render. Passing a full
+                // translated greeting rendered "Hi Hi John,," with a
+                // double-escaped name.
                 $firstName = $user['first_name'] ?? ($user['name'] ?? null);
-                $greeting = $firstName
-                    ? __('emails.password_reset.greeting', ['name' => htmlspecialchars($firstName, ENT_QUOTES, 'UTF-8')])
-                    : null;
 
                 $html = EmailTemplateBuilder::make()
                     ->theme('warning')
                     ->title(__('emails.password_reset.title'))
                     ->previewText(__('emails.password_reset.preview'))
-                    ->greeting($greeting ?? __('emails.password_reset.greeting', ['name' => __('emails.common.fallback_name')]))
+                    ->greeting($firstName ?? __('emails.common.fallback_name'))
                     ->paragraph(__('emails.password_reset.body'))
                     ->paragraph(__('emails.password_reset.expiry'))
                     ->button(__('emails.password_reset.cta'), $resetUrl)

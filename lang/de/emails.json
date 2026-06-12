@@ -137,7 +137,8 @@
     "listing_type_offer": "Angebot",
     "listing_type_request": "Gesuch",
     "fallback_they_offer": "eine Fähigkeit, die Sie benötigen",
-    "fallback_you_offer": "etwas, das sie benötigen"
+    "fallback_you_offer": "etwas, das sie benötigen",
+    "hours_amount": "{{amount}} Stunde(n)"
   },
   "footer": {
     "unsubscribe": "Von diesen E-Mails abmelden",
@@ -545,26 +546,26 @@
   },
   "verein_federation": {
     "invitation_received_title": "Sie haben eine neue Vereinseinladung",
-    "invitation_received_preview": "Sie wurden eingeladen, {target} beizutreten",
-    "invitation_received_subject": "Einladung zum Beitritt zu {target}",
-    "invitation_received_body": "Ein Mitglied von {source} hat Sie eingeladen, auch {target} beizutreten. Die beiden Vereine sind Teil desselben kommunalen Netzwerks.",
+    "invitation_received_preview": "Sie wurden eingeladen, {{target}} beizutreten",
+    "invitation_received_subject": "Einladung zum Beitritt zu {{target}}",
+    "invitation_received_body": "Ein Mitglied von {{source}} hat Sie eingeladen, auch {{target}} beizutreten. Die beiden Vereine sind Teil desselben kommunalen Netzwerks.",
     "message_label": "Persönliche Nachricht",
     "cta_respond": "Einladung prüfen",
     "invitation_accepted_title": "Ihre Vereinseinladung wurde angenommen",
     "invitation_accepted_preview": "Gute Neuigkeiten — sie haben angenommen!",
     "invitation_accepted_subject": "Ihre Einladung wurde angenommen",
-    "invitation_accepted_body": "{name} hat Ihre Einladung zum Beitritt zu {target} angenommen. Sie können sich jetzt im neuen Verein mit ihnen verbinden."
+    "invitation_accepted_body": "{{name}} hat Ihre Einladung zum Beitritt zu {{target}} angenommen. Sie können sich jetzt im neuen Verein mit ihnen verbinden."
   },
   "verein_dues": {
-    "generated_subject": "Ihr {organization}-Mitgliedsbeitrag für {year}",
-    "generated_title": "Mitgliedsbeitrag für {year}",
-    "generated_body": "Ihr jährlicher {organization}-Mitgliedsbeitrag von {amount} für {year} ist jetzt zur Zahlung bereit. Sie können sicher online per Karte oder Banküberweisung bezahlen.",
-    "reminder_subject": "Erinnerung: {organization}-Mitgliedsbeitrag für {year}",
-    "reminder_title": "Ihr {organization}-Mitgliedsbeitrag ist überfällig",
-    "reminder_body": "Ihr {organization}-Mitgliedsbeitrag von {amount} für {year} war am {due_date} fällig und ist jetzt überfällig. Bitte zahlen Sie so schnell wie möglich, um Ihre Mitgliedschaft aufrechtzuerhalten.",
-    "paid_subject": "Quittung: {organization}-Mitgliedschaft {year}",
+    "generated_subject": "Ihr {{organization}}-Mitgliedsbeitrag für {{year}}",
+    "generated_title": "Mitgliedsbeitrag für {{year}}",
+    "generated_body": "Ihr jährlicher {{organization}}-Mitgliedsbeitrag von {{amount}} für {{year}} ist jetzt zur Zahlung bereit. Sie können sicher online per Karte oder Banküberweisung bezahlen.",
+    "reminder_subject": "Erinnerung: {{organization}}-Mitgliedsbeitrag für {{year}}",
+    "reminder_title": "Ihr {{organization}}-Mitgliedsbeitrag ist überfällig",
+    "reminder_body": "Ihr {{organization}}-Mitgliedsbeitrag von {{amount}} für {{year}} war am {{due_date}} fällig und ist jetzt überfällig. Bitte zahlen Sie so schnell wie möglich, um Ihre Mitgliedschaft aufrechtzuerhalten.",
+    "paid_subject": "Quittung: {{organization}}-Mitgliedschaft {{year}}",
     "paid_title": "Vielen Dank für Ihre Zahlung",
-    "paid_body": "Wir haben Ihren {organization}-Mitgliedsbeitrag von {amount} für {year} erhalten. Ihre Mitgliedschaft ist jetzt aktiv.",
+    "paid_body": "Wir haben Ihren {{organization}}-Mitgliedsbeitrag von {{amount}} für {{year}} erhalten. Ihre Mitgliedschaft ist jetzt aktiv.",
     "cta_pay": "Mitgliedsbeitrag zahlen",
     "cta_view": "Meine Beiträge anzeigen",
     "cta_receipt": "Stripe-Quittung anzeigen"
@@ -584,5 +585,22 @@
     "public_note": "Diese Wertschätzung ist öffentlich — andere können sie auf Ihrem Profil sehen.",
     "private_note": "Diese Wertschätzung ist privat — nur Sie können sie sehen.",
     "cta_view": "Auf Ihrem Profil anzeigen"
+  },
+  "support_report": {
+    "created_subject": "Neuer Support-Bericht :reference",
+    "created_title": "Neuer Support-Bericht",
+    "created_preview": ":reference benötigt Triage. Auswirkung: :impact.",
+    "created_body": "Ein Mitglied hat einen neuen technischen Support-Bericht eingereicht. Bitte überprüfen Sie ihn, solange der Seitenkontext und die Diagnosedaten noch aktuell sind.",
+    "created_bell": "Neuer Support-Bericht :reference: :summary",
+    "reference_label": "Referenz",
+    "impact_label": "Auswirkung",
+    "summary_label": "Zusammenfassung",
+    "route_label": "Seitenpfad",
+    "not_provided": "Nicht angegeben",
+    "review_cta": "Bericht überprüfen",
+    "impact_blocked": "Blockiert",
+    "impact_major": "Schwerwiegend",
+    "impact_minor": "Gering",
+    "impact_cosmetic": "Kosmetisch"
   }
 }

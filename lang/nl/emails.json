@@ -137,7 +137,8 @@
     "listing_type_offer": "Aanbod",
     "listing_type_request": "Verzoek",
     "fallback_they_offer": "een vaardigheid die u nodig heeft",
-    "fallback_you_offer": "iets wat zij nodig hebben"
+    "fallback_you_offer": "iets wat zij nodig hebben",
+    "hours_amount": "{{amount}} uur"
   },
   "footer": {
     "unsubscribe": "Afmelden voor deze e-mails",
@@ -545,26 +546,26 @@
   },
   "verein_federation": {
     "invitation_received_title": "U heeft een nieuwe clubuitnodiging",
-    "invitation_received_preview": "U bent uitgenodigd om lid te worden van {target}",
-    "invitation_received_subject": "Uitnodiging om lid te worden van {target}",
-    "invitation_received_body": "Een lid van {source} heeft u uitgenodigd om ook lid te worden van {target}. De twee clubs maken deel uit van hetzelfde gemeentelijke netwerk.",
+    "invitation_received_preview": "U bent uitgenodigd om lid te worden van {{target}}",
+    "invitation_received_subject": "Uitnodiging om lid te worden van {{target}}",
+    "invitation_received_body": "Een lid van {{source}} heeft u uitgenodigd om ook lid te worden van {{target}}. De twee clubs maken deel uit van hetzelfde gemeentelijke netwerk.",
     "message_label": "Persoonlijk bericht",
     "cta_respond": "Uitnodiging bekijken",
     "invitation_accepted_title": "Uw clubuitnodiging is geaccepteerd",
     "invitation_accepted_preview": "Goed nieuws — ze hebben geaccepteerd!",
     "invitation_accepted_subject": "Uw uitnodiging is geaccepteerd",
-    "invitation_accepted_body": "{name} heeft uw uitnodiging geaccepteerd om lid te worden van {target}. U kunt nu met hen verbinding maken in de nieuwe club."
+    "invitation_accepted_body": "{{name}} heeft uw uitnodiging geaccepteerd om lid te worden van {{target}}. U kunt nu met hen verbinding maken in de nieuwe club."
   },
   "verein_dues": {
-    "generated_subject": "Uw {organization} lidmaatschapsbijdrage voor {year}",
-    "generated_title": "Lidmaatschapsbijdrage voor {year}",
-    "generated_body": "Uw jaarlijkse {organization} lidmaatschapsbijdrage van {amount} voor {year} is nu klaar om te betalen. U kunt veilig online betalen via kaart of bankoverschrijving.",
-    "reminder_subject": "Herinnering: {organization} lidmaatschapsbijdrage voor {year}",
-    "reminder_title": "Uw {organization} lidmaatschap is achterstallig",
-    "reminder_body": "Uw {organization} lidmaatschapsbijdrage van {amount} voor {year} was verschuldigd op {due_date} en is nu achterstallig. Betaal zo snel mogelijk om uw lidmaatschap actief te houden.",
-    "paid_subject": "Kwitantie: {organization} lidmaatschap {year}",
+    "generated_subject": "Uw {{organization}} lidmaatschapsbijdrage voor {{year}}",
+    "generated_title": "Lidmaatschapsbijdrage voor {{year}}",
+    "generated_body": "Uw jaarlijkse {{organization}} lidmaatschapsbijdrage van {{amount}} voor {{year}} is nu klaar om te betalen. U kunt veilig online betalen via kaart of bankoverschrijving.",
+    "reminder_subject": "Herinnering: {{organization}} lidmaatschapsbijdrage voor {{year}}",
+    "reminder_title": "Uw {{organization}} lidmaatschap is achterstallig",
+    "reminder_body": "Uw {{organization}} lidmaatschapsbijdrage van {{amount}} voor {{year}} was verschuldigd op {{due_date}} en is nu achterstallig. Betaal zo snel mogelijk om uw lidmaatschap actief te houden.",
+    "paid_subject": "Kwitantie: {{organization}} lidmaatschap {{year}}",
     "paid_title": "Bedankt voor uw betaling",
-    "paid_body": "We hebben uw {organization} lidmaatschapsbijdrage van {amount} voor {year} ontvangen. Uw lidmaatschap is nu actief.",
+    "paid_body": "We hebben uw {{organization}} lidmaatschapsbijdrage van {{amount}} voor {{year}} ontvangen. Uw lidmaatschap is nu actief.",
     "cta_pay": "Lidmaatschapsbijdrage betalen",
     "cta_view": "Mijn bijdragen bekijken",
     "cta_receipt": "Stripe-kwitantie bekijken"
@@ -584,5 +585,22 @@
     "public_note": "Deze waardering is openbaar — anderen kunnen het zien op uw profiel.",
     "private_note": "Deze waardering is privé — alleen u kunt het zien.",
     "cta_view": "Bekijken op uw profiel"
+  },
+  "support_report": {
+    "created_subject": "Nieuw ondersteuningsrapport :reference",
+    "created_title": "Nieuw Ondersteuningsrapport",
+    "created_preview": ":reference heeft triage nodig. Impact: :impact.",
+    "created_body": "Een lid heeft een nieuw technisch ondersteuningsrapport ingediend. Bekijk het terwijl de paginacontext en de diagnostiek nog actueel zijn.",
+    "created_bell": "Nieuw ondersteuningsrapport :reference: :summary",
+    "reference_label": "Referentie",
+    "impact_label": "Impact",
+    "summary_label": "Samenvatting",
+    "route_label": "Paginapad",
+    "not_provided": "Niet opgegeven",
+    "review_cta": "Rapport bekijken",
+    "impact_blocked": "Geblokkeerd",
+    "impact_major": "Ernstig",
+    "impact_minor": "Klein",
+    "impact_cosmetic": "Cosmetisch"
   }
 }

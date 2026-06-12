@@ -587,16 +587,15 @@ class FederationEmailService
                             ->previewText(__('emails.federation.partnership_preview', ['community' => $requestingTenantName]))
                             ->greeting($adminName)
                             ->paragraph(__('emails.federation.partnership_body', ['community' => $safeRequestingName]))
+                            // infoCard/blockquote escape at render time —
+                            // pre-escaping double-encodes names like St. Mary's.
                             ->infoCard([
-                                __('emails.federation.label_from_community') => $safeRequestingName,
-                                __('emails.federation.label_requested_level') => htmlspecialchars($levelName, ENT_QUOTES, 'UTF-8'),
+                                __('emails.federation.label_from_community') => $requestingTenantName,
+                                __('emails.federation.label_requested_level') => $levelName,
                             ]);
 
                         if ($notes !== null && $notes !== '') {
-                            $builder->blockquote(
-                                htmlspecialchars($notes, ENT_QUOTES, 'UTF-8'),
-                                $safeRequestingName
-                            );
+                            $builder->blockquote($notes, $requestingTenantName);
                         }
 
                         $html = $builder

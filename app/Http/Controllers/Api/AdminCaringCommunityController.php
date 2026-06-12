@@ -735,9 +735,10 @@ class AdminCaringCommunityController extends BaseApiController
                             ->greeting(__('emails_misc.admin_actions.welcome_created_greeting', ['community' => $tenantName]))
                             ->paragraph(__('emails_misc.admin_actions.welcome_created_body_intro', ['community' => $tenantName]))
                             ->paragraph(__('emails_misc.admin_actions.welcome_created_body_credentials'))
+                            // infoCard escapes at render — no pre-escaping.
                             ->infoCard([
-                                __('emails_misc.admin_actions.welcome_created_info_email')    => htmlspecialchars($email, ENT_QUOTES, 'UTF-8'),
-                                __('emails_misc.admin_actions.welcome_created_info_password') => htmlspecialchars($tempPassword, ENT_QUOTES, 'UTF-8'),
+                                __('emails_misc.admin_actions.welcome_created_info_email')    => $email,
+                                __('emails_misc.admin_actions.welcome_created_info_password') => $tempPassword,
                             ])
                             ->paragraph(__('emails_misc.admin_actions.welcome_created_body_change_pass'))
                             ->button(__('emails_misc.admin_actions.welcome_created_cta'), $loginLink)

@@ -137,7 +137,8 @@
     "listing_type_offer": "Offerta",
     "listing_type_request": "Richiesta",
     "fallback_they_offer": "una competenza di cui ha bisogno",
-    "fallback_you_offer": "qualcosa di cui hanno bisogno"
+    "fallback_you_offer": "qualcosa di cui hanno bisogno",
+    "hours_amount": "{{amount}} ora/e"
   },
   "footer": {
     "unsubscribe": "Annulla l'iscrizione a queste e-mail",
@@ -545,26 +546,26 @@
   },
   "verein_federation": {
     "invitation_received_title": "Ha ricevuto un nuovo invito al club",
-    "invitation_received_preview": "È stato/a invitato/a a unirsi a {target}",
-    "invitation_received_subject": "Invito ad unirsi a {target}",
-    "invitation_received_body": "Un membro di {source} l'ha invitata ad unirsi anche a {target}. I due club fanno parte della stessa rete municipale.",
+    "invitation_received_preview": "È stato/a invitato/a a unirsi a {{target}}",
+    "invitation_received_subject": "Invito ad unirsi a {{target}}",
+    "invitation_received_body": "Un membro di {{source}} l'ha invitata ad unirsi anche a {{target}}. I due club fanno parte della stessa rete municipale.",
     "message_label": "Messaggio personale",
     "cta_respond": "Esamina l'invito",
     "invitation_accepted_title": "Il suo invito al club è stato accettato",
     "invitation_accepted_preview": "Buone notizie — hanno accettato!",
     "invitation_accepted_subject": "Il suo invito è stato accettato",
-    "invitation_accepted_body": "{name} ha accettato il suo invito ad unirsi a {target}. Ora può connettersi con loro nel nuovo club."
+    "invitation_accepted_body": "{{name}} ha accettato il suo invito ad unirsi a {{target}}. Ora può connettersi con loro nel nuovo club."
   },
   "verein_dues": {
-    "generated_subject": "Le sue quote associative {organization} per {year}",
-    "generated_title": "Quote associative per {year}",
-    "generated_body": "Le sue quote associative annuali {organization} di {amount} per {year} sono ora pronte per il pagamento. Può pagare in sicurezza online tramite carta o bonifico bancario.",
-    "reminder_subject": "Promemoria: quote associative {organization} per {year}",
-    "reminder_title": "La sua iscrizione a {organization} è scaduta",
-    "reminder_body": "Le sue quote associative {organization} di {amount} per {year} erano dovute il {due_date} e sono ora scadute. Paghi il prima possibile per mantenere attiva la sua iscrizione.",
-    "paid_subject": "Ricevuta: iscrizione a {organization} {year}",
+    "generated_subject": "Le sue quote associative {{organization}} per {{year}}",
+    "generated_title": "Quote associative per {{year}}",
+    "generated_body": "Le sue quote associative annuali {{organization}} di {{amount}} per {{year}} sono ora pronte per il pagamento. Può pagare in sicurezza online tramite carta o bonifico bancario.",
+    "reminder_subject": "Promemoria: quote associative {{organization}} per {{year}}",
+    "reminder_title": "La sua iscrizione a {{organization}} è scaduta",
+    "reminder_body": "Le sue quote associative {{organization}} di {{amount}} per {{year}} erano dovute il {{due_date}} e sono ora scadute. Paghi il prima possibile per mantenere attiva la sua iscrizione.",
+    "paid_subject": "Ricevuta: iscrizione a {{organization}} {{year}}",
     "paid_title": "Grazie per il suo pagamento",
-    "paid_body": "Abbiamo ricevuto le sue quote associative {organization} di {amount} per {year}. La sua iscrizione è ora attiva.",
+    "paid_body": "Abbiamo ricevuto le sue quote associative {{organization}} di {{amount}} per {{year}}. La sua iscrizione è ora attiva.",
     "cta_pay": "Paga le quote associative",
     "cta_view": "Visualizza le mie quote",
     "cta_receipt": "Visualizza ricevuta Stripe"
@@ -584,5 +585,22 @@
     "public_note": "Questo apprezzamento è pubblico — gli altri possono vederlo sul suo profilo.",
     "private_note": "Questo apprezzamento è privato — solo lei può vederlo.",
     "cta_view": "Visualizza sul suo profilo"
+  },
+  "support_report": {
+    "created_subject": "Nuovo report di supporto :reference",
+    "created_title": "Nuovo Report di Supporto",
+    "created_preview": ":reference richiede il triage. Impatto: :impact.",
+    "created_body": "Un membro ha inviato un nuovo report di supporto tecnico. Lo riveda mentre il contesto della pagina e i dati diagnostici sono ancora aggiornati.",
+    "created_bell": "Nuovo report di supporto :reference: :summary",
+    "reference_label": "Riferimento",
+    "impact_label": "Impatto",
+    "summary_label": "Riepilogo",
+    "route_label": "Percorso pagina",
+    "not_provided": "Non fornito",
+    "review_cta": "Esamina il Report",
+    "impact_blocked": "Bloccato",
+    "impact_major": "Grave",
+    "impact_minor": "Minore",
+    "impact_cosmetic": "Cosmetico"
   }
 }

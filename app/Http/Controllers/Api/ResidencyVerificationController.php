@@ -76,7 +76,7 @@ class ResidencyVerificationController extends BaseApiController
             'declared_address' => [$address, self::MAX_ADDRESS_LENGTH],
         ] as $field => [$value, $max]) {
             if ($value !== '' && mb_strlen($value) > $max) {
-                return $this->respondWithError('VALIDATION_ERROR', __('api.field_too_long', ['field' => $field, 'max' => $max]), $field, 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.field_too_long_with_limit', ['field' => $field, 'max' => $max]), $field, 422);
             }
         }
 

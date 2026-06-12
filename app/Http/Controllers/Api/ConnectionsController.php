@@ -257,7 +257,7 @@ class ConnectionsController extends BaseApiController
                             ->greeting($requesterName)
                             ->paragraph(__('emails_security_alerts.connection_declined.body', ['name' => $declinerName, 'community' => $tenantName]))
                             ->paragraph(__('emails_security_alerts.connection_declined.suggestion'))
-                            ->button(__('emails_security_alerts.connection_declined.cta'), '/members')
+                            ->button(__('emails_security_alerts.connection_declined.cta'), EmailTemplateBuilder::tenantUrl('/members'))
                             ->render();
 
                         $subject = __('emails_security_alerts.connection_declined.subject', ['community' => $tenantName]);

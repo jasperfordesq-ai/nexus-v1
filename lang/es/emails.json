@@ -137,7 +137,8 @@
     "listing_type_offer": "Oferta",
     "listing_type_request": "Solicitud",
     "fallback_they_offer": "una habilidad que usted necesita",
-    "fallback_you_offer": "algo que ellos necesitan"
+    "fallback_you_offer": "algo que ellos necesitan",
+    "hours_amount": "{{amount}} hora(s)"
   },
   "footer": {
     "unsubscribe": "Cancelar suscripción a estos correos electrónicos",
@@ -545,26 +546,26 @@
   },
   "verein_federation": {
     "invitation_received_title": "Tiene una nueva invitación de club",
-    "invitation_received_preview": "Ha sido invitado/a a unirse a {target}",
-    "invitation_received_subject": "Invitación para unirse a {target}",
-    "invitation_received_body": "Un miembro de {source} le ha invitado a unirse también a {target}. Los dos clubes forman parte de la misma red municipal.",
+    "invitation_received_preview": "Ha sido invitado/a a unirse a {{target}}",
+    "invitation_received_subject": "Invitación para unirse a {{target}}",
+    "invitation_received_body": "Un miembro de {{source}} le ha invitado a unirse también a {{target}}. Los dos clubes forman parte de la misma red municipal.",
     "message_label": "Mensaje personal",
     "cta_respond": "Revisar invitación",
     "invitation_accepted_title": "Su invitación de club ha sido aceptada",
     "invitation_accepted_preview": "¡Buenas noticias — aceptaron!",
     "invitation_accepted_subject": "Su invitación ha sido aceptada",
-    "invitation_accepted_body": "{name} ha aceptado su invitación para unirse a {target}. Ahora puede conectarse con ellos en el nuevo club."
+    "invitation_accepted_body": "{{name}} ha aceptado su invitación para unirse a {{target}}. Ahora puede conectarse con ellos en el nuevo club."
   },
   "verein_dues": {
-    "generated_subject": "Sus cuotas de socio de {organization} para {year}",
-    "generated_title": "Cuotas de socio para {year}",
-    "generated_body": "Sus cuotas anuales de socio de {organization} de {amount} para {year} están ahora listas para pagar. Puede pagar de forma segura en línea con tarjeta o transferencia bancaria.",
-    "reminder_subject": "Recordatorio: cuotas de socio de {organization} para {year}",
-    "reminder_title": "Su membresía en {organization} está vencida",
-    "reminder_body": "Sus cuotas de socio de {organization} de {amount} para {year} vencían el {due_date} y ahora están vencidas. Por favor, pague lo antes posible para mantener su membresía activa.",
-    "paid_subject": "Recibo: membresía en {organization} {year}",
+    "generated_subject": "Sus cuotas de socio de {{organization}} para {{year}}",
+    "generated_title": "Cuotas de socio para {{year}}",
+    "generated_body": "Sus cuotas anuales de socio de {{organization}} de {{amount}} para {{year}} están ahora listas para pagar. Puede pagar de forma segura en línea con tarjeta o transferencia bancaria.",
+    "reminder_subject": "Recordatorio: cuotas de socio de {{organization}} para {{year}}",
+    "reminder_title": "Su membresía en {{organization}} está vencida",
+    "reminder_body": "Sus cuotas de socio de {{organization}} de {{amount}} para {{year}} vencían el {{due_date}} y ahora están vencidas. Por favor, pague lo antes posible para mantener su membresía activa.",
+    "paid_subject": "Recibo: membresía en {{organization}} {{year}}",
     "paid_title": "Gracias por su pago",
-    "paid_body": "Hemos recibido sus cuotas de socio de {organization} de {amount} para {year}. Su membresía está ahora activa.",
+    "paid_body": "Hemos recibido sus cuotas de socio de {{organization}} de {{amount}} para {{year}}. Su membresía está ahora activa.",
     "cta_pay": "Pagar cuotas de socio",
     "cta_view": "Ver mis cuotas",
     "cta_receipt": "Ver recibo de Stripe"
@@ -584,5 +585,22 @@
     "public_note": "Este agradecimiento es público — otros pueden verlo en su perfil.",
     "private_note": "Este agradecimiento es privado — solo usted puede verlo.",
     "cta_view": "Ver en su perfil"
+  },
+  "support_report": {
+    "created_subject": "Nuevo informe de soporte :reference",
+    "created_title": "Nuevo Informe de Soporte",
+    "created_preview": ":reference requiere triaje. Impacto: :impact.",
+    "created_body": "Un miembro ha enviado un nuevo informe de soporte técnico. Revíselo mientras el contexto de la página y los diagnósticos aún están vigentes.",
+    "created_bell": "Nuevo informe de soporte :reference: :summary",
+    "reference_label": "Referencia",
+    "impact_label": "Impacto",
+    "summary_label": "Resumen",
+    "route_label": "Ruta de la página",
+    "not_provided": "No proporcionado",
+    "review_cta": "Revisar el Informe",
+    "impact_blocked": "Bloqueado",
+    "impact_major": "Mayor",
+    "impact_minor": "Menor",
+    "impact_cosmetic": "Cosmético"
   }
 }

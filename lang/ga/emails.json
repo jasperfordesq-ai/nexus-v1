@@ -137,7 +137,8 @@
     "listing_type_offer": "Tairiscint",
     "listing_type_request": "Iarratas",
     "fallback_they_offer": "scil atá de dhíth ort",
-    "fallback_you_offer": "rud atá de dhíth orthu"
+    "fallback_you_offer": "rud atá de dhíth orthu",
+    "hours_amount": "{{amount}} uair(eanta)"
   },
   "footer": {
     "unsubscribe": "Díliostáil ó na ríomhphoist seo",
@@ -545,26 +546,26 @@
   },
   "verein_federation": {
     "invitation_received_title": "Tá cuireadh nua cumann agat",
-    "invitation_received_preview": "Tugadh cuireadh duit dul isteach i {target}",
-    "invitation_received_subject": "Cuireadh dul isteach i {target}",
-    "invitation_received_body": "Thug ball de {source} cuireadh duit dul isteach i {target} freisin. Tá an dá chumann mar chuid den líonra cathrach céanna.",
+    "invitation_received_preview": "Tugadh cuireadh duit dul isteach i {{target}}",
+    "invitation_received_subject": "Cuireadh dul isteach i {{target}}",
+    "invitation_received_body": "Thug ball de {{source}} cuireadh duit dul isteach i {{target}} freisin. Tá an dá chumann mar chuid den líonra cathrach céanna.",
     "message_label": "Teachtaireacht phearsanta",
     "cta_respond": "Athbhreithnigh cuireadh",
     "invitation_accepted_title": "Glacadh le do chuireadh cumainn",
     "invitation_accepted_preview": "Dea-scéala — ghlac siad leis!",
     "invitation_accepted_subject": "Glacadh le do chuireadh",
-    "invitation_accepted_body": "Ghlac {name} le do chuireadh dul isteach i {target}. Is féidir leat nasc a dhéanamh leo sa chlub nua anois."
+    "invitation_accepted_body": "Ghlac {{name}} le do chuireadh dul isteach i {{target}}. Is féidir leat nasc a dhéanamh leo sa chlub nua anois."
   },
   "verein_dues": {
-    "generated_subject": "Do tháillí ballraíochta {organization} do {year}",
-    "generated_title": "Táillí ballraíochta do {year}",
-    "generated_body": "Tá do tháillí ballraíochta bliantúla {organization} de {amount} do {year} réidh le híoc anois. Is féidir leat íoc go slán ar líne trí chárta nó aistriú bainc.",
-    "reminder_subject": "Meabhrúchán: táillí ballraíochta {organization} do {year}",
-    "reminder_title": "Tá do bhallraíocht {organization} dlite",
-    "reminder_body": "Bhí do tháillí ballraíochta {organization} de {amount} do {year} dlite ar {due_date} agus tá siad dlite anois. Íoc a luaithe is féidir chun do bhallraíocht a choinneáil gníomhach.",
-    "paid_subject": "Admháil: ballraíocht {organization} {year}",
+    "generated_subject": "Do tháillí ballraíochta {{organization}} do {{year}}",
+    "generated_title": "Táillí ballraíochta do {{year}}",
+    "generated_body": "Tá do tháillí ballraíochta bliantúla {{organization}} de {{amount}} do {{year}} réidh le híoc anois. Is féidir leat íoc go slán ar líne trí chárta nó aistriú bainc.",
+    "reminder_subject": "Meabhrúchán: táillí ballraíochta {{organization}} do {{year}}",
+    "reminder_title": "Tá do bhallraíocht {{organization}} dlite",
+    "reminder_body": "Bhí do tháillí ballraíochta {{organization}} de {{amount}} do {{year}} dlite ar {{due_date}} agus tá siad dlite anois. Íoc a luaithe is féidir chun do bhallraíocht a choinneáil gníomhach.",
+    "paid_subject": "Admháil: ballraíocht {{organization}} {{year}}",
     "paid_title": "Go raibh maith agat as d'íocaíocht",
-    "paid_body": "Fuaireamar do tháillí ballraíochta {organization} de {amount} do {year}. Tá do bhallraíocht gníomhach anois.",
+    "paid_body": "Fuaireamar do tháillí ballraíochta {{organization}} de {{amount}} do {{year}}. Tá do bhallraíocht gníomhach anois.",
     "cta_pay": "Íoc táillí ballraíochta",
     "cta_view": "Féach ar mo tháillí",
     "cta_receipt": "Féach ar admháil Stripe"
@@ -584,5 +585,22 @@
     "public_note": "Tá an buíochas seo poiblí — is féidir le daoine eile é a fheiceáil ar do phróifíl.",
     "private_note": "Tá an buíochas seo príobháideach — ní féidir ach tú féin é a fheiceáil.",
     "cta_view": "Féach ar do phróifíl"
+  },
+  "support_report": {
+    "created_subject": "Tuarascail tacaiochta nua :reference",
+    "created_title": "Tuarascail Tacaiochta Nua",
+    "created_preview": "Teastaionn triage o :reference. Tionchar: :impact.",
+    "created_body": "Chuir ball tuarascail tacaiochta theicniula nua isteach. Dean athbhreithniu air agus comhtheacs na leathanaigh agus na diagnoisice fos ur.",
+    "created_bell": "Tuarascail tacaiochta nua :reference: :summary",
+    "reference_label": "Tagairt",
+    "impact_label": "Tionchar",
+    "summary_label": "Achoimre",
+    "route_label": "Sli leathanaigh",
+    "not_provided": "Gan soláthar",
+    "review_cta": "Dean Athbhreithniu ar an Tuarascail",
+    "impact_blocked": "Coiscthe",
+    "impact_major": "Mor",
+    "impact_minor": "Mionur",
+    "impact_cosmetic": "Cosmaiteach"
   }
 }

@@ -13,7 +13,7 @@
   "targets_required": "يجب تحديد نادٍ هدف واحد على الأقل.",
   "target_and_invitee_required": "target_organization_id و invitee_user_id مطلوبان.",
   "notification_invitation_title": "دعوة نادي جديدة",
-  "notification_invitation_received": "دعاك عضو في {source} للانضمام إلى {target}.",
+  "notification_invitation_received": "دعاك عضو في {{source}} للانضمام إلى {{target}}.",
   "notification_accepted_title": "تم قبول الدعوة",
-  "notification_invitation_accepted": "قبِل {name} دعوتك للانضمام إلى {target}."
+  "notification_invitation_accepted": "قبِل {{name}} دعوتك للانضمام إلى {{target}}."
 }

@@ -1,9 +1,9 @@
 {
   "welcome": {
-    "subject": "Ihre Community {name} ist bereit",
+    "subject": "Ihre Community {{name}} ist bereit",
     "title": "Willkommen bei Project NEXUS",
-    "preview": "Ihre Community {name} ist bereit zum Start",
-    "body": "Gute Nachrichten — Ihre Community {name} wurde eingerichtet und ist bereit zur Konfiguration. Verwenden Sie die unten stehenden Zugangsdaten für Ihre erste Anmeldung.",
+    "preview": "Ihre Community {{name}} ist bereit zum Start",
+    "body": "Gute Nachrichten — Ihre Community {{name}} wurde eingerichtet und ist bereit zur Konfiguration. Verwenden Sie die unten stehenden Zugangsdaten für Ihre erste Anmeldung.",
     "tenant_url_label": "Community-URL",
     "login_url_label": "Admin-Anmeldung",
     "admin_email_label": "Admin-E-Mail",
@@ -15,7 +15,7 @@
     "subject": "Aktualisierung zu Ihrer Project NEXUS-Bewerbung",
     "title": "Aktualisierung zur Bewerbung",
     "preview": "Eine Aktualisierung zu Ihrer Community-Bewerbung",
-    "body": "Vielen Dank für Ihr Interesse daran, {org} auf Project NEXUS einzurichten. Nach Prüfung sind wir derzeit nicht in der Lage, mit der Einrichtung fortzufahren.",
+    "body": "Vielen Dank für Ihr Interesse daran, {{org}} auf Project NEXUS einzurichten. Nach Prüfung sind wir derzeit nicht in der Lage, mit der Einrichtung fortzufahren.",
     "reason_label": "Grund",
     "followup": "Wenn Sie dies weiter besprechen oder eine neue Bewerbung mit einem anderen Umfang einreichen möchten, antworten Sie bitte auf diese E-Mail und unser Team wird sich bei Ihnen melden."
   }

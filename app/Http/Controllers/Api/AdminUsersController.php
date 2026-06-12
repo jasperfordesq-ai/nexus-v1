@@ -554,9 +554,12 @@ class AdminUsersController extends BaseApiController
                         ->greeting(__('emails_misc.admin_actions.welcome_created_greeting', ['community' => $tenantName]))
                         ->paragraph(__('emails_misc.admin_actions.welcome_created_body_intro', ['community' => $tenantName]))
                         ->paragraph(__('emails_misc.admin_actions.welcome_created_body_credentials'))
+                        // infoCard escapes at render — pre-escaping corrupted
+                        // displayed passwords containing & ' < (user would
+                        // copy-paste a broken credential).
                         ->infoCard([
-                            __('emails_misc.admin_actions.welcome_created_info_email')    => htmlspecialchars($email, ENT_QUOTES, 'UTF-8'),
-                            __('emails_misc.admin_actions.welcome_created_info_password') => htmlspecialchars($password, ENT_QUOTES, 'UTF-8'),
+                            __('emails_misc.admin_actions.welcome_created_info_email')    => $email,
+                            __('emails_misc.admin_actions.welcome_created_info_password') => $password,
                         ])
                         ->paragraph(__('emails_misc.admin_actions.welcome_created_body_change_pass'))
                         ->button(__('emails_misc.admin_actions.welcome_created_cta'), $loginLink)

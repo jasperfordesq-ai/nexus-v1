@@ -13,7 +13,7 @@
   "targets_required": "Er moet minimaal één doelclub worden opgegeven.",
   "target_and_invitee_required": "target_organization_id en invitee_user_id zijn vereist.",
   "notification_invitation_title": "Nieuwe clubuitnodiging",
-  "notification_invitation_received": "Een lid van {source} heeft u uitgenodigd om lid te worden van {target}.",
+  "notification_invitation_received": "Een lid van {{source}} heeft u uitgenodigd om lid te worden van {{target}}.",
   "notification_accepted_title": "Uitnodiging geaccepteerd",
-  "notification_invitation_accepted": "{name} heeft uw uitnodiging om lid te worden van {target} geaccepteerd."
+  "notification_invitation_accepted": "{{name}} heeft uw uitnodiging om lid te worden van {{target}} geaccepteerd."
 }

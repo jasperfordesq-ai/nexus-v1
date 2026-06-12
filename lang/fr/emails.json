@@ -137,7 +137,8 @@
     "listing_type_offer": "Offre",
     "listing_type_request": "Demande",
     "fallback_they_offer": "une compétence dont vous avez besoin",
-    "fallback_you_offer": "quelque chose dont ils ont besoin"
+    "fallback_you_offer": "quelque chose dont ils ont besoin",
+    "hours_amount": "{{amount}} heure(s)"
   },
   "footer": {
     "unsubscribe": "Se désabonner de ces e-mails",
@@ -545,26 +546,26 @@
   },
   "verein_federation": {
     "invitation_received_title": "Vous avez une nouvelle invitation d'association",
-    "invitation_received_preview": "Vous avez été invité(e) à rejoindre {target}",
-    "invitation_received_subject": "Invitation à rejoindre {target}",
-    "invitation_received_body": "Un membre de {source} vous a invité(e) à rejoindre également {target}. Les deux associations font partie du même réseau municipal.",
+    "invitation_received_preview": "Vous avez été invité(e) à rejoindre {{target}}",
+    "invitation_received_subject": "Invitation à rejoindre {{target}}",
+    "invitation_received_body": "Un membre de {{source}} vous a invité(e) à rejoindre également {{target}}. Les deux associations font partie du même réseau municipal.",
     "message_label": "Message personnel",
     "cta_respond": "Examiner l'invitation",
     "invitation_accepted_title": "Votre invitation d'association a été acceptée",
     "invitation_accepted_preview": "Bonne nouvelle — ils ont accepté !",
     "invitation_accepted_subject": "Votre invitation a été acceptée",
-    "invitation_accepted_body": "{name} a accepté votre invitation à rejoindre {target}. Vous pouvez maintenant vous connecter avec eux dans la nouvelle association."
+    "invitation_accepted_body": "{{name}} a accepté votre invitation à rejoindre {{target}}. Vous pouvez maintenant vous connecter avec eux dans la nouvelle association."
   },
   "verein_dues": {
-    "generated_subject": "Vos cotisations {organization} pour {year}",
-    "generated_title": "Cotisations pour {year}",
-    "generated_body": "Vos cotisations annuelles {organization} de {amount} pour {year} sont maintenant prêtes à être payées. Vous pouvez payer en toute sécurité en ligne par carte ou virement bancaire.",
-    "reminder_subject": "Rappel : cotisations {organization} pour {year}",
-    "reminder_title": "Votre adhésion {organization} est en retard",
-    "reminder_body": "Vos cotisations {organization} de {amount} pour {year} étaient dues le {due_date} et sont maintenant en retard. Veuillez payer dès que possible pour maintenir votre adhésion active.",
-    "paid_subject": "Reçu : adhésion {organization} {year}",
+    "generated_subject": "Vos cotisations {{organization}} pour {{year}}",
+    "generated_title": "Cotisations pour {{year}}",
+    "generated_body": "Vos cotisations annuelles {{organization}} de {{amount}} pour {{year}} sont maintenant prêtes à être payées. Vous pouvez payer en toute sécurité en ligne par carte ou virement bancaire.",
+    "reminder_subject": "Rappel : cotisations {{organization}} pour {{year}}",
+    "reminder_title": "Votre adhésion {{organization}} est en retard",
+    "reminder_body": "Vos cotisations {{organization}} de {{amount}} pour {{year}} étaient dues le {{due_date}} et sont maintenant en retard. Veuillez payer dès que possible pour maintenir votre adhésion active.",
+    "paid_subject": "Reçu : adhésion {{organization}} {{year}}",
     "paid_title": "Merci pour votre paiement",
-    "paid_body": "Nous avons reçu vos cotisations {organization} de {amount} pour {year}. Votre adhésion est maintenant active.",
+    "paid_body": "Nous avons reçu vos cotisations {{organization}} de {{amount}} pour {{year}}. Votre adhésion est maintenant active.",
     "cta_pay": "Payer les cotisations",
     "cta_view": "Voir mes cotisations",
     "cta_receipt": "Voir le reçu Stripe"
@@ -584,5 +585,22 @@
     "public_note": "Cette appréciation est publique — les autres peuvent la voir sur votre profil.",
     "private_note": "Cette appréciation est privée — vous seul(e) pouvez la voir.",
     "cta_view": "Voir sur votre profil"
+  },
+  "support_report": {
+    "created_subject": "Nouveau rapport de support :reference",
+    "created_title": "Nouveau Rapport de Support",
+    "created_preview": ":reference nécessite un triage. Impact : :impact.",
+    "created_body": "Un membre a soumis un nouveau rapport de support technique. Examinez-le pendant que le contexte de la page et les diagnostics sont encore récents.",
+    "created_bell": "Nouveau rapport de support :reference : :summary",
+    "reference_label": "Référence",
+    "impact_label": "Impact",
+    "summary_label": "Résumé",
+    "route_label": "Route de la page",
+    "not_provided": "Non fourni",
+    "review_cta": "Examiner le rapport",
+    "impact_blocked": "Bloqué",
+    "impact_major": "Majeur",
+    "impact_minor": "Mineur",
+    "impact_cosmetic": "Cosmétique"
   }
 }

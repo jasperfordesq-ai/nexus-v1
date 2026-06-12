@@ -137,7 +137,8 @@
     "listing_type_offer": "Oferta",
     "listing_type_request": "Prośba",
     "fallback_they_offer": "umiejętność, której potrzebujesz",
-    "fallback_you_offer": "coś, czego oni potrzebują"
+    "fallback_you_offer": "coś, czego oni potrzebują",
+    "hours_amount": "{{amount}} godzin(y)"
   },
   "footer": {
     "unsubscribe": "Zrezygnuj z subskrypcji tych e-maili",
@@ -545,26 +546,26 @@
   },
   "verein_federation": {
     "invitation_received_title": "Masz nowe zaproszenie do klubu",
-    "invitation_received_preview": "Zostałeś/aś zaproszony/a do dołączenia do {target}",
-    "invitation_received_subject": "Zaproszenie do dołączenia do {target}",
-    "invitation_received_body": "Członek {source} zaprosił/a Cię do dołączenia do {target}. Oba kluby są częścią tej samej sieci miejskiej.",
+    "invitation_received_preview": "Zostałeś/aś zaproszony/a do dołączenia do {{target}}",
+    "invitation_received_subject": "Zaproszenie do dołączenia do {{target}}",
+    "invitation_received_body": "Członek {{source}} zaprosił/a Cię do dołączenia do {{target}}. Oba kluby są częścią tej samej sieci miejskiej.",
     "message_label": "Osobista wiadomość",
     "cta_respond": "Przejrzyj zaproszenie",
     "invitation_accepted_title": "Twoje zaproszenie do klubu zostało zaakceptowane",
     "invitation_accepted_preview": "Dobra wiadomość — zaakceptowali!",
     "invitation_accepted_subject": "Twoje zaproszenie zostało zaakceptowane",
-    "invitation_accepted_body": "{name} zaakceptował/a Twoje zaproszenie do dołączenia do {target}. Możesz teraz z nimi nawiązać kontakt w nowym klubie."
+    "invitation_accepted_body": "{{name}} zaakceptował/a Twoje zaproszenie do dołączenia do {{target}}. Możesz teraz z nimi nawiązać kontakt w nowym klubie."
   },
   "verein_dues": {
-    "generated_subject": "Twoje składki członkowskie {organization} na {year}",
-    "generated_title": "Składki członkowskie na {year}",
-    "generated_body": "Twoje roczne składki członkowskie {organization} w wysokości {amount} na {year} są teraz gotowe do opłacenia. Możesz bezpiecznie zapłacić online kartą lub przelewem bankowym.",
-    "reminder_subject": "Przypomnienie: składki członkowskie {organization} na {year}",
-    "reminder_title": "Składki członkowskie {organization} są zaległe",
-    "reminder_body": "Twoje składki członkowskie {organization} w wysokości {amount} na {year} były należne {due_date} i są teraz zaległe. Proszę zapłacić jak najszybciej, aby utrzymać aktywne członkostwo.",
-    "paid_subject": "Potwierdzenie: członkostwo {organization} {year}",
+    "generated_subject": "Twoje składki członkowskie {{organization}} na {{year}}",
+    "generated_title": "Składki członkowskie na {{year}}",
+    "generated_body": "Twoje roczne składki członkowskie {{organization}} w wysokości {{amount}} na {{year}} są teraz gotowe do opłacenia. Możesz bezpiecznie zapłacić online kartą lub przelewem bankowym.",
+    "reminder_subject": "Przypomnienie: składki członkowskie {{organization}} na {{year}}",
+    "reminder_title": "Składki członkowskie {{organization}} są zaległe",
+    "reminder_body": "Twoje składki członkowskie {{organization}} w wysokości {{amount}} na {{year}} były należne {{due_date}} i są teraz zaległe. Proszę zapłacić jak najszybciej, aby utrzymać aktywne członkostwo.",
+    "paid_subject": "Potwierdzenie: członkostwo {{organization}} {{year}}",
     "paid_title": "Dziękujemy za Twoją płatność",
-    "paid_body": "Otrzymaliśmy Twoje składki członkowskie {organization} w wysokości {amount} na {year}. Twoje członkostwo jest teraz aktywne.",
+    "paid_body": "Otrzymaliśmy Twoje składki członkowskie {{organization}} w wysokości {{amount}} na {{year}}. Twoje członkostwo jest teraz aktywne.",
     "cta_pay": "Opłać składki członkowskie",
     "cta_view": "Zobacz moje składki",
     "cta_receipt": "Zobacz potwierdzenie Stripe"
@@ -584,5 +585,22 @@
     "public_note": "To podziękowanie jest publiczne — inni mogą je zobaczyć na Twoim profilu.",
     "private_note": "To podziękowanie jest prywatne — tylko Ty możesz je zobaczyć.",
     "cta_view": "Zobacz na swoim profilu"
+  },
+  "support_report": {
+    "created_subject": "Nowe zgłoszenie pomocy technicznej :reference",
+    "created_title": "Nowe Zgłoszenie Pomocy Technicznej",
+    "created_preview": ":reference wymaga triaóu. Wpływ: :impact.",
+    "created_body": "Członek przesłał nowe techniczne zgłoszenie pomocy. Przejrzyj je, póki kontekst strony i dane diagnostyczne są jeszcze aktualne.",
+    "created_bell": "Nowe zgłoszenie pomocy :reference: :summary",
+    "reference_label": "Numer zgłoszenia",
+    "impact_label": "Wpływ",
+    "summary_label": "Podsumowanie",
+    "route_label": "Ścieżka strony",
+    "not_provided": "Nie podano",
+    "review_cta": "Przeglądaj zgłoszenie",
+    "impact_blocked": "Blokujący",
+    "impact_major": "Poważny",
+    "impact_minor": "Drobny",
+    "impact_cosmetic": "Kosmetyczny"
   }
 }

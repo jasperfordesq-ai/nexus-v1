@@ -494,7 +494,7 @@ class NotificationDispatcher
     public static function dispatchHotMatch($userId, $match): bool
     {
         // Check user's match notification preferences (cheap DB miss exit first)
-        $prefs = \App\Services\MatchingService::getPreferencesStatic($userId);
+        $prefs = \App\Services\MatchingService::getPreferences($userId);
         if (empty($prefs['notify_hot_matches'])) {
             return false;
         }
@@ -548,7 +548,7 @@ class NotificationDispatcher
      */
     public static function dispatchMutualMatch($userId, $match, $reciprocalInfo = []): void
     {
-        $prefs = \App\Services\MatchingService::getPreferencesStatic($userId);
+        $prefs = \App\Services\MatchingService::getPreferences($userId);
         if (empty($prefs['notify_mutual_matches'])) {
             return;
         }
@@ -910,8 +910,10 @@ class NotificationDispatcher
                 $basePath = TenantContext::getSlugPrefix();
                 $walletUrl = $baseUrl . $basePath . '/wallet';
 
-                $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
-                $subject = __('emails.notification.credit_received_subject', ['sender' => htmlspecialchars($senderName), 'amount' => $amountDisplay, 'community' => $tenantName]);
+                // Subject lines are plain-text MIME headers — no HTML escaping —
+                // and the unit must come from i18n, not a hardcoded English plural.
+                $amountDisplay = __('emails.common.hours_amount', ['amount' => $amount]);
+                $subject = __('emails.notification.credit_received_subject', ['sender' => $senderName, 'amount' => $amountDisplay, 'community' => $tenantName]);
                 $emailBody = self::buildCreditReceivedEmail(
                     htmlspecialchars($recipientName),
                     htmlspecialchars($senderName),
@@ -975,29 +977,33 @@ class NotificationDispatcher
                 $baseUrl         = TenantContext::getFrontendUrl();
                 $basePath        = TenantContext::getSlugPrefix();
                 $walletUrl       = $baseUrl . $basePath . '/wallet';
-                $amountDisplay   = $amount . ' hour' . ($amount != 1 ? 's' : '');
+                // i18n unit (no hardcoded English plural). infoCard/previewText
+                // escape at render time — pre-escaping double-encodes names
+                // like O'Brien. paragraph() is the only raw-HTML sink here.
+                $amountDisplay   = __('emails.common.hours_amount', ['amount' => $amount]);
 
                 $infoCard = [
                     __('emails_created.credits_sent.label_amount')    => $amountDisplay,
-                    __('emails_created.credits_sent.label_recipient') => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8'),
+                    __('emails_created.credits_sent.label_recipient') => $recipientName,
                 ];
                 if ($description !== '') {
-                    $infoCard[__('emails_created.credits_sent.label_description')] = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
+                    $infoCard[__('emails_created.credits_sent.label_description')] = $description;
                 }
 
                 $html = EmailTemplateBuilder::make()
                     ->theme('success')
                     ->title(__('emails_created.credits_sent.title'))
-                    ->previewText(__('emails_created.credits_sent.preview', ['amount' => $amountDisplay, 'recipient' => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8'), 'community' => $tenantName]))
+                    ->previewText(__('emails_created.credits_sent.preview', ['amount' => $amountDisplay, 'recipient' => $recipientName, 'community' => $tenantName]))
                     ->greeting($senderFirstName)
                     ->paragraph(__('emails_created.credits_sent.body', ['recipient' => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8')]))
                     ->infoCard($infoCard)
                     ->button(__('emails_created.credits_sent.cta'), $walletUrl)
                     ->render();
 
+                // Plain-text MIME subject — no HTML escaping.
                 $subject = __('emails_created.credits_sent.subject', [
                     'amount'    => $amountDisplay,
-                    'recipient' => htmlspecialchars($recipientName, ENT_QUOTES, 'UTF-8'),
+                    'recipient' => $recipientName,
                     'community' => $tenantName,
                 ]);
 
@@ -1061,11 +1067,13 @@ class NotificationDispatcher
                 $basePath   = TenantContext::getSlugPrefix();
                 $reviewUrl  = $baseUrl . $basePath . '/reviews/create?transaction_id=' . $transactionId;
 
-                $subject = __('emails.review_request.subject', ['name' => htmlspecialchars($otherPersonName, ENT_QUOTES, 'UTF-8')]);
+                // Plain-text MIME subject; title() escapes at render time —
+                // pre-escaping double-encodes names like O'Brien.
+                $subject = __('emails.review_request.subject', ['name' => $otherPersonName]);
 
                 $html = EmailTemplateBuilder::make()
                     ->theme('brand')
-                    ->title(__('emails.review_request.subject', ['name' => htmlspecialchars($otherPersonName, ENT_QUOTES, 'UTF-8')]))
+                    ->title(__('emails.review_request.subject', ['name' => $otherPersonName]))
                     ->greeting($firstName)
                     ->paragraph(__('emails.review_request.body', ['name' => htmlspecialchars($otherPersonName, ENT_QUOTES, 'UTF-8')]))
                     ->button(__('emails.review_request.cta'), $reviewUrl)
@@ -1550,14 +1558,17 @@ class NotificationDispatcher
                 $fullUrl = $baseUrl . $slugPrefix . $link;
 
                 if ($type === 'credit_received') {
-                    $senderName = htmlspecialchars($data['sender_name'] ?? __('emails.common.fallback_member_name'));
+                    $senderNameRaw = $data['sender_name'] ?? __('emails.common.fallback_member_name');
+                    $senderName = htmlspecialchars($senderNameRaw);
                     $amount = (float) ($data['amount'] ?? 0);
                     $description = htmlspecialchars($data['description'] ?? '');
                     $recipientName = htmlspecialchars($user->first_name ?? $user->name ?? __('emails.common.fallback_name'));
-                    $tenantName = htmlspecialchars(TenantContext::getSetting('site_name', 'Project NEXUS'));
+                    $tenantNameRaw = TenantContext::getSetting('site_name', 'Project NEXUS');
+                    $tenantName = htmlspecialchars($tenantNameRaw);
 
-                    $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
-                    $subject = __('emails.notification.credit_received_subject', ['sender' => $senderName, 'amount' => $amountDisplay, 'community' => $tenantName]);
+                    $amountDisplay = __('emails.common.hours_amount', ['amount' => $amount]);
+                    // Plain-text MIME subject — raw values, no HTML entities.
+                    $subject = __('emails.notification.credit_received_subject', ['sender' => $senderNameRaw, 'amount' => $amountDisplay, 'community' => $tenantNameRaw]);
                     $emailBody = self::buildCreditReceivedEmail($recipientName, $senderName, $amount, $description, $fullUrl, $tenantName);
                     if (!EmailDispatchService::sendRaw($user->email, $subject, $emailBody, null, null, null, 'transaction', ['tenant_id' => $tenantId])) {
                         Log::warning('NotificationDispatcher: credit received email returned false', [
@@ -1957,7 +1968,7 @@ HTML;
 
     private static function buildCreditReceivedEmail(string $recipientName, string $senderName, float $amount, string $description, string $walletUrl, string $tenantName): string
     {
-        $amountDisplay = $amount . ' hour' . ($amount != 1 ? 's' : '');
+        $amountDisplay = __('emails.common.hours_amount', ['amount' => $amount]);
         $descriptionHtml = $description ? "<p style=\"margin:12px 0 0;padding:12px;background:#f0f0f0;border-radius:8px;font-style:italic;color:#555;\">\"{$description}\"</p>" : '';
         $creditTitle = __('emails.notification.credit_received_title');
         $creditGreeting = __('emails.common.greeting', ['name' => $recipientName]);

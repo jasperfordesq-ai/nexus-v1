@@ -137,7 +137,8 @@
     "listing_type_offer": "オファー",
     "listing_type_request": "リクエスト",
     "fallback_they_offer": "あなたが必要とするスキル",
-    "fallback_you_offer": "相手が必要とするもの"
+    "fallback_you_offer": "相手が必要とするもの",
+    "hours_amount": "{{amount}} 時間"
   },
   "footer": {
     "unsubscribe": "このメールの配信を停止する",
@@ -545,26 +546,26 @@
   },
   "verein_federation": {
     "invitation_received_title": "新しいクラブへの招待があります",
-    "invitation_received_preview": "{target} への参加に招待されました",
-    "invitation_received_subject": "{target} への参加招待",
-    "invitation_received_body": "{source} のメンバーが {target} への参加にも招待しました。両クラブは同じ市のネットワークの一部です。",
+    "invitation_received_preview": "{{target}} への参加に招待されました",
+    "invitation_received_subject": "{{target}} への参加招待",
+    "invitation_received_body": "{{source}} のメンバーが {{target}} への参加にも招待しました。両クラブは同じ市のネットワークの一部です。",
     "message_label": "個人メッセージ",
     "cta_respond": "招待を確認する",
     "invitation_accepted_title": "クラブへの招待が承認されました",
     "invitation_accepted_preview": "素晴らしいニュース — 承認されました！",
     "invitation_accepted_subject": "招待が承認されました",
-    "invitation_accepted_body": "{name} が {target} への参加招待を承認しました。新しいクラブでつながることができます。"
+    "invitation_accepted_body": "{{name}} が {{target}} への参加招待を承認しました。新しいクラブでつながることができます。"
   },
   "verein_dues": {
-    "generated_subject": "{year} 年度 {organization} 会費",
-    "generated_title": "{year} 年度会費",
-    "generated_body": "{year} 年度の {organization} 年会費 {amount} の支払い準備ができました。カードまたは銀行振込でオンラインで安全に支払えます。",
-    "reminder_subject": "リマインダー：{year} 年度 {organization} 会費",
-    "reminder_title": "{organization} 会員資格の支払いが遅れています",
-    "reminder_body": "{year} 年度の {organization} 会費 {amount} は {due_date} が期限でしたが、現在延滞しています。会員資格を維持するためにできるだけ早くお支払いください。",
-    "paid_subject": "領収書：{organization} 会員資格 {year}",
+    "generated_subject": "{{year}} 年度 {{organization}} 会費",
+    "generated_title": "{{year}} 年度会費",
+    "generated_body": "{{year}} 年度の {{organization}} 年会費 {{amount}} の支払い準備ができました。カードまたは銀行振込でオンラインで安全に支払えます。",
+    "reminder_subject": "リマインダー：{{year}} 年度 {{organization}} 会費",
+    "reminder_title": "{{organization}} 会員資格の支払いが遅れています",
+    "reminder_body": "{{year}} 年度の {{organization}} 会費 {{amount}} は {{due_date}} が期限でしたが、現在延滞しています。会員資格を維持するためにできるだけ早くお支払いください。",
+    "paid_subject": "領収書：{{organization}} 会員資格 {{year}}",
     "paid_title": "お支払いありがとうございます",
-    "paid_body": "{year} 年度の {organization} 会費 {amount} を受領しました。会員資格が有効になりました。",
+    "paid_body": "{{year}} 年度の {{organization}} 会費 {{amount}} を受領しました。会員資格が有効になりました。",
     "cta_pay": "会費を支払う",
     "cta_view": "会費を見る",
     "cta_receipt": "Stripe 領収書を見る"
@@ -584,5 +585,22 @@
     "public_note": "この感謝は公開されています — プロフィールで他の人が見ることができます。",
     "private_note": "この感謝は非公開です — あなただけが見ることができます。",
     "cta_view": "プロフィールで見る"
+  },
+  "support_report": {
+    "created_subject": "新しいサポートレポート :reference",
+    "created_title": "新規サポートレポート",
+    "created_preview": ":reference のトリアージが必要です。影響: :impact。",
+    "created_body": "メンバーから新しいテクニカルサポートレポートが提出されました。ページのコンテキストと診断情報がまだ新しいうちに確認してください。",
+    "created_bell": "新しいサポートレポート :reference: :summary",
+    "reference_label": "参照番号",
+    "impact_label": "影響",
+    "summary_label": "概要",
+    "route_label": "ページルート",
+    "not_provided": "未記入",
+    "review_cta": "レポートを確認する",
+    "impact_blocked": "ブロック中",
+    "impact_major": "重大",
+    "impact_minor": "軽微",
+    "impact_cosmetic": "外観上のみ"
   }
 }

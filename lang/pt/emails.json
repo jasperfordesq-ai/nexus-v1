@@ -137,7 +137,8 @@
     "listing_type_offer": "Oferta",
     "listing_type_request": "Pedido",
     "fallback_they_offer": "uma competência de que precisa",
-    "fallback_you_offer": "algo de que eles precisam"
+    "fallback_you_offer": "algo de que eles precisam",
+    "hours_amount": "{{amount}} hora(s)"
   },
   "footer": {
     "unsubscribe": "Cancelar subscrição destes e-mails",
@@ -545,26 +546,26 @@
   },
   "verein_federation": {
     "invitation_received_title": "Tem um novo convite de clube",
-    "invitation_received_preview": "Foi convidado/a para se juntar a {target}",
-    "invitation_received_subject": "Convite para se juntar a {target}",
-    "invitation_received_body": "Um membro de {source} convidou-o/a a juntar-se também a {target}. Os dois clubes fazem parte da mesma rede municipal.",
+    "invitation_received_preview": "Foi convidado/a para se juntar a {{target}}",
+    "invitation_received_subject": "Convite para se juntar a {{target}}",
+    "invitation_received_body": "Um membro de {{source}} convidou-o/a a juntar-se também a {{target}}. Os dois clubes fazem parte da mesma rede municipal.",
     "message_label": "Mensagem pessoal",
     "cta_respond": "Analisar convite",
     "invitation_accepted_title": "O seu convite de clube foi aceite",
     "invitation_accepted_preview": "Boas notícias — aceitaram!",
     "invitation_accepted_subject": "O seu convite foi aceite",
-    "invitation_accepted_body": "{name} aceitou o seu convite para se juntar a {target}. Pode agora conectar-se com eles no novo clube."
+    "invitation_accepted_body": "{{name}} aceitou o seu convite para se juntar a {{target}}. Pode agora conectar-se com eles no novo clube."
   },
   "verein_dues": {
-    "generated_subject": "As suas quotas de associado {organization} para {year}",
-    "generated_title": "Quotas de associado para {year}",
-    "generated_body": "As suas quotas anuais de associado {organization} de {amount} para {year} estão agora prontas para pagamento. Pode pagar com segurança online por cartão ou transferência bancária.",
-    "reminder_subject": "Lembrete: quotas de associado {organization} para {year}",
-    "reminder_title": "A sua associação a {organization} está em atraso",
-    "reminder_body": "As suas quotas de associado {organization} de {amount} para {year} eram devidas em {due_date} e estão agora em atraso. Por favor, pague o mais brevemente possível para manter a sua associação ativa.",
-    "paid_subject": "Recibo: associação a {organization} {year}",
+    "generated_subject": "As suas quotas de associado {{organization}} para {{year}}",
+    "generated_title": "Quotas de associado para {{year}}",
+    "generated_body": "As suas quotas anuais de associado {{organization}} de {{amount}} para {{year}} estão agora prontas para pagamento. Pode pagar com segurança online por cartão ou transferência bancária.",
+    "reminder_subject": "Lembrete: quotas de associado {{organization}} para {{year}}",
+    "reminder_title": "A sua associação a {{organization}} está em atraso",
+    "reminder_body": "As suas quotas de associado {{organization}} de {{amount}} para {{year}} eram devidas em {{due_date}} e estão agora em atraso. Por favor, pague o mais brevemente possível para manter a sua associação ativa.",
+    "paid_subject": "Recibo: associação a {{organization}} {{year}}",
     "paid_title": "Obrigado pelo seu pagamento",
-    "paid_body": "Recebemos as suas quotas de associado {organization} de {amount} para {year}. A sua associação está agora ativa.",
+    "paid_body": "Recebemos as suas quotas de associado {{organization}} de {{amount}} para {{year}}. A sua associação está agora ativa.",
     "cta_pay": "Pagar quotas de associado",
     "cta_view": "Ver as minhas quotas",
     "cta_receipt": "Ver recibo Stripe"
@@ -584,5 +585,22 @@
     "public_note": "Este agradecimento é público — outros podem vê-lo no seu perfil.",
     "private_note": "Este agradecimento é privado — apenas você pode vê-lo.",
     "cta_view": "Ver no seu perfil"
+  },
+  "support_report": {
+    "created_subject": "Novo relatório de suporte :reference",
+    "created_title": "Novo Relatório de Suporte",
+    "created_preview": ":reference necessita de triagem. Impacto: :impact.",
+    "created_body": "Um membro submeteu um novo relatório de suporte técnico. Reveja-o enquanto o contexto da página e os diagnósticos ainda estão frescos.",
+    "created_bell": "Novo relatório de suporte :reference: :summary",
+    "reference_label": "Referência",
+    "impact_label": "Impacto",
+    "summary_label": "Resumo",
+    "route_label": "Rota da página",
+    "not_provided": "Não fornecido",
+    "review_cta": "Rever o Relatório",
+    "impact_blocked": "Bloqueado",
+    "impact_major": "Grave",
+    "impact_minor": "Menor",
+    "impact_cosmetic": "Cosmético"
   }
 }

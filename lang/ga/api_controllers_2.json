@@ -225,5 +225,8 @@
   "merchant_coupon.code_required": "Coupon code is required.",
   "merchant_coupon.code_in_use": "Coupon code already in use for this tenant.",
   "push.device_unregistered": "Device unregistered",
-  "push.device_not_found": "Device not found"
+  "push.device_not_found": "Device not found",
+  "merchant_coupon": {
+    "not_found": "Cupón gan aimsiú."
+  }
 }

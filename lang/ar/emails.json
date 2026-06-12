@@ -137,7 +137,8 @@
     "listing_type_offer": "عرض",
     "listing_type_request": "طلب",
     "fallback_they_offer": "مهارة تحتاجها",
-    "fallback_you_offer": "شيء يحتاجونه"
+    "fallback_you_offer": "شيء يحتاجونه",
+    "hours_amount": "{{amount}} ساعة"
   },
   "footer": {
     "unsubscribe": "إلغاء الاشتراك من هذه الرسائل",
@@ -545,26 +546,26 @@
   },
   "verein_federation": {
     "invitation_received_title": "لديك دعوة نادٍ جديدة",
-    "invitation_received_preview": "تمت دعوتك للانضمام إلى {target}",
-    "invitation_received_subject": "دعوة للانضمام إلى {target}",
-    "invitation_received_body": "قام أحد أعضاء {source} بدعوتك أيضاً للانضمام إلى {target}. كلا الناديين جزء من نفس الشبكة البلدية.",
+    "invitation_received_preview": "تمت دعوتك للانضمام إلى {{target}}",
+    "invitation_received_subject": "دعوة للانضمام إلى {{target}}",
+    "invitation_received_body": "قام أحد أعضاء {{source}} بدعوتك أيضاً للانضمام إلى {{target}}. كلا الناديين جزء من نفس الشبكة البلدية.",
     "message_label": "رسالة شخصية",
     "cta_respond": "مراجعة الدعوة",
     "invitation_accepted_title": "تم قبول دعوة ناديك",
     "invitation_accepted_preview": "أخبار جيدة — تم القبول!",
     "invitation_accepted_subject": "تم قبول دعوتك",
-    "invitation_accepted_body": "قبل {name} دعوتك للانضمام إلى {target}. يمكنك الآن التواصل معه في النادي الجديد."
+    "invitation_accepted_body": "قبل {{name}} دعوتك للانضمام إلى {{target}}. يمكنك الآن التواصل معه في النادي الجديد."
   },
   "verein_dues": {
-    "generated_subject": "اشتراكات عضويتك في {organization} لعام {year}",
-    "generated_title": "اشتراكات العضوية لعام {year}",
-    "generated_body": "اشتراكات عضوية {organization} السنوية بمبلغ {amount} لعام {year} جاهزة للدفع الآن. يمكنك الدفع بأمان عبر الإنترنت بالبطاقة أو التحويل المصرفي.",
-    "reminder_subject": "تذكير: اشتراكات عضوية {organization} لعام {year}",
-    "reminder_title": "عضويتك في {organization} متأخرة",
-    "reminder_body": "كانت اشتراكات عضويتك في {organization} بمبلغ {amount} لعام {year} مستحقة في {due_date} وهي الآن متأخرة. يرجى الدفع في أقرب وقت ممكن للحفاظ على نشاط عضويتك.",
-    "paid_subject": "إيصال: عضوية {organization} {year}",
+    "generated_subject": "اشتراكات عضويتك في {{organization}} لعام {{year}}",
+    "generated_title": "اشتراكات العضوية لعام {{year}}",
+    "generated_body": "اشتراكات عضوية {{organization}} السنوية بمبلغ {{amount}} لعام {{year}} جاهزة للدفع الآن. يمكنك الدفع بأمان عبر الإنترنت بالبطاقة أو التحويل المصرفي.",
+    "reminder_subject": "تذكير: اشتراكات عضوية {{organization}} لعام {{year}}",
+    "reminder_title": "عضويتك في {{organization}} متأخرة",
+    "reminder_body": "كانت اشتراكات عضويتك في {{organization}} بمبلغ {{amount}} لعام {{year}} مستحقة في {{due_date}} وهي الآن متأخرة. يرجى الدفع في أقرب وقت ممكن للحفاظ على نشاط عضويتك.",
+    "paid_subject": "إيصال: عضوية {{organization}} {{year}}",
     "paid_title": "شكراً لدفعتك",
-    "paid_body": "تلقينا اشتراكات عضويتك في {organization} بمبلغ {amount} لعام {year}. عضويتك نشطة الآن.",
+    "paid_body": "تلقينا اشتراكات عضويتك في {{organization}} بمبلغ {{amount}} لعام {{year}}. عضويتك نشطة الآن.",
     "cta_pay": "دفع اشتراكات العضوية",
     "cta_view": "عرض اشتراكاتي",
     "cta_receipt": "عرض إيصال Stripe"
@@ -584,5 +585,22 @@
     "public_note": "هذا التقدير عام — يمكن للآخرين رؤيته في ملفك الشخصي.",
     "private_note": "هذا التقدير خاص — أنت فقط يمكنك رؤيته.",
     "cta_view": "عرض في ملفك الشخصي"
+  },
+  "support_report": {
+    "created_subject": "تقرير دعم جديد :reference",
+    "created_title": "تقرير دعم جديد",
+    "created_preview": "يحتاج :reference إلى الفرز. التأثير: :impact.",
+    "created_body": "قدّم أحد الأعضاء تقرير دعم فني جديداً. يُرجى مراجعته بينما سياق الصفحة وبيانات التشخيص لا تزال حديثة.",
+    "created_bell": "تقرير دعم جديد :reference: :summary",
+    "reference_label": "المرجع",
+    "impact_label": "التأثير",
+    "summary_label": "الملخص",
+    "route_label": "مسار الصفحة",
+    "not_provided": "غير مقدَّم",
+    "review_cta": "مراجعة التقرير",
+    "impact_blocked": "محجوب",
+    "impact_major": "رئيسي",
+    "impact_minor": "ثانوي",
+    "impact_cosmetic": "شكلي"
   }
 }

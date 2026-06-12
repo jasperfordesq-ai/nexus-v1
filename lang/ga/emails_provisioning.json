@@ -1,9 +1,9 @@
 {
   "welcome": {
-    "subject": "Tá do phobal {name} réidh",
+    "subject": "Tá do phobal {{name}} réidh",
     "title": "Fáilte go Project NEXUS",
-    "preview": "Tá do phobal {name} réidh le seoladh",
-    "body": "Nuacht mhaith — soláthraíodh do phobal {name} agus tá sé réidh le socrú agat. Úsáid na creidiúintí thíos chun logáil isteach den chéad uair.",
+    "preview": "Tá do phobal {{name}} réidh le seoladh",
+    "body": "Nuacht mhaith — soláthraíodh do phobal {{name}} agus tá sé réidh le socrú agat. Úsáid na creidiúintí thíos chun logáil isteach den chéad uair.",
     "tenant_url_label": "URL Pobail",
     "login_url_label": "Logáil isteach riaracháin",
     "admin_email_label": "Ríomhphost riaracháin",
@@ -15,7 +15,7 @@
     "subject": "Nuashonrú ar d'iarratas Project NEXUS",
     "title": "Nuashonrú Iarratais",
     "preview": "Nuashonrú ar d'iarratas pobail",
-    "body": "Go raibh maith agat as do spéis i socrú {org} ar Project NEXUS. Tar éis athbhreithnithe, ní féidir linn dul ar aghaidh le soláthar ag an am seo.",
+    "body": "Go raibh maith agat as do spéis i socrú {{org}} ar Project NEXUS. Tar éis athbhreithnithe, ní féidir linn dul ar aghaidh le soláthar ag an am seo.",
     "reason_label": "Cúis",
     "followup": "Má theastaíonn uait é seo a phlé tuilleadh nó iarratas nua a chur isteach le raon difriúil, freagair an ríomhphost seo agus déanfaidh ár bhfoireann teagmháil leat."
   }

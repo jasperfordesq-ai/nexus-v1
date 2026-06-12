@@ -3541,7 +3541,12 @@
       "welcome_text": "Welcome Text",
       "welcome_text_desc": "Manage and configure welcome text settings",
       "welcome_text_placeholder": "Welcome Text Placeholder",
-      "your_community": "Your Community"
+      "your_community": "Your Community",
+      "preset_custom": "Saincheaptha",
+      "preset_england_wales": "Sasana agus an Bhreatain Bheag",
+      "preset_ireland": "Éire",
+      "preset_northern_ireland": "Tuaisceart Éireann",
+      "preset_scotland": "Albain"
     },
     "overdue_jobs": "Overdue Jobs",
     "page_title": "System",

@@ -153,5 +153,8 @@
   },
   "shift_waitlist": {
     "spot_available": "A spot opened up on a shift you're waitlisted for — claim it before it expires"
+  },
+  "podcast": {
+    "new_episode": "حلقة جديدة من {{show}}: {{title}}"
   }
 }

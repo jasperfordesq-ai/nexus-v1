@@ -184,6 +184,16 @@ class SendGridWebhookController extends BaseApiController
                     break;
             }
 
+            } catch (\Throwable $e) {
+                // One bad event must not fail the whole batch: a thrown event
+                // makes the request 500, SendGrid then redelivers the ENTIRE
+                // batch (re-signed, so the replay cache can't block it) and the
+                // already-committed events double-write (newsletter_bounces has
+                // no unique key; suppression bounce_count inflates).
+                Log::error('[SendGridWebhook] Event processing failed — skipping event', [
+                    'type' => $type,
+                    'error' => $e->getMessage(),
+                ]);
             } finally {
                 if ($previousTenantId !== null) {
                     TenantContext::setById($previousTenantId);

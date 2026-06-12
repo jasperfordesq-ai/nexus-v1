@@ -13,7 +13,7 @@
   "targets_required": "少なくとも1つのターゲットクラブを指定する必要があります。",
   "target_and_invitee_required": "target_organization_id と invitee_user_id は必須です。",
   "notification_invitation_title": "新しいクラブ招待",
-  "notification_invitation_received": "{source} のメンバーから {target} への参加招待が届きました。",
+  "notification_invitation_received": "{{source}} のメンバーから {{target}} への参加招待が届きました。",
   "notification_accepted_title": "招待が承認されました",
-  "notification_invitation_accepted": "{name} さんが {target} への招待を承認しました。"
+  "notification_invitation_accepted": "{{name}} さんが {{target}} への招待を承認しました。"
 }

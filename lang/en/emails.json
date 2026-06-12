@@ -137,7 +137,8 @@
     "listing_type_offer": "Offer",
     "listing_type_request": "Request",
     "fallback_they_offer": "a skill you need",
-    "fallback_you_offer": "something they need"
+    "fallback_you_offer": "something they need",
+    "hours_amount": "{{amount}} hour(s)"
   },
   "footer": {
     "unsubscribe": "Unsubscribe from these emails",
@@ -562,26 +563,26 @@
   },
   "verein_federation": {
     "invitation_received_title": "You have a new club invitation",
-    "invitation_received_preview": "You've been invited to join {target}",
-    "invitation_received_subject": "Invitation to join {target}",
-    "invitation_received_body": "A member of {source} has invited you to also join {target}. The two clubs are part of the same municipal network.",
+    "invitation_received_preview": "You've been invited to join {{target}}",
+    "invitation_received_subject": "Invitation to join {{target}}",
+    "invitation_received_body": "A member of {{source}} has invited you to also join {{target}}. The two clubs are part of the same municipal network.",
     "message_label": "Personal message",
     "cta_respond": "Review invitation",
     "invitation_accepted_title": "Your club invitation was accepted",
     "invitation_accepted_preview": "Good news — they accepted!",
     "invitation_accepted_subject": "Your invitation was accepted",
-    "invitation_accepted_body": "{name} has accepted your invitation to join {target}. You can now connect with them in the new club."
+    "invitation_accepted_body": "{{name}} has accepted your invitation to join {{target}}. You can now connect with them in the new club."
   },
   "verein_dues": {
-    "generated_subject": "Your {organization} membership dues for {year}",
-    "generated_title": "Membership dues for {year}",
-    "generated_body": "Your annual {organization} membership dues of {amount} for {year} are now ready to pay. You can pay securely online via card or bank transfer.",
-    "reminder_subject": "Reminder: {organization} membership dues for {year}",
-    "reminder_title": "Your {organization} membership is overdue",
-    "reminder_body": "Your {organization} membership dues of {amount} for {year} were due on {due_date} and are now overdue. Please pay as soon as possible to keep your membership active.",
-    "paid_subject": "Receipt: {organization} membership {year}",
+    "generated_subject": "Your {{organization}} membership dues for {{year}}",
+    "generated_title": "Membership dues for {{year}}",
+    "generated_body": "Your annual {{organization}} membership dues of {{amount}} for {{year}} are now ready to pay. You can pay securely online via card or bank transfer.",
+    "reminder_subject": "Reminder: {{organization}} membership dues for {{year}}",
+    "reminder_title": "Your {{organization}} membership is overdue",
+    "reminder_body": "Your {{organization}} membership dues of {{amount}} for {{year}} were due on {{due_date}} and are now overdue. Please pay as soon as possible to keep your membership active.",
+    "paid_subject": "Receipt: {{organization}} membership {{year}}",
     "paid_title": "Thank you for your payment",
-    "paid_body": "We've received your {organization} membership dues of {amount} for {year}. Your membership is now active.",
+    "paid_body": "We've received your {{organization}} membership dues of {{amount}} for {{year}}. Your membership is now active.",
     "cta_pay": "Pay membership dues",
     "cta_view": "View my dues",
     "cta_receipt": "View Stripe receipt"

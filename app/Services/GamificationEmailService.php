@@ -294,14 +294,13 @@ class GamificationEmailService
      */
     private function buildDigestEmailBody(string $name, array $digest, string $communityName): string
     {
-        $safeName = htmlspecialchars($name ?: '', ENT_QUOTES, 'UTF-8');
         $safeCommunity = htmlspecialchars($communityName, ENT_QUOTES, 'UTF-8');
 
         $builder = EmailTemplateBuilder::make()
             ->theme('achievement')
             ->title(__('emails.gamification_digest.title'))
             ->previewText(__('emails.gamification_digest.preview', ['xp' => $digest['xp_earned'], 'community' => $safeCommunity]))
-            ->greeting($safeName ?: __('emails.common.fallback_name'))
+            ->greeting($name ?: __('emails.common.fallback_name'))
             ->paragraph(__('emails.gamification_digest.intro', ['community' => $safeCommunity]));
 
         // Build stat cards — always show XP and Level
@@ -345,7 +344,6 @@ class GamificationEmailService
      */
     private function buildMilestoneEmail(string $name, string $type, array $data): array
     {
-        $safeName = htmlspecialchars($name ?: '', ENT_QUOTES, 'UTF-8');
 
         switch ($type) {
             case 'level_up':
@@ -355,7 +353,7 @@ class GamificationEmailService
                     ->theme('achievement')
                     ->title(__('emails.gamification_milestone.level_up_title') . " \u{1F389}")
                     ->previewText(__('emails.gamification_milestone.level_up_preview', ['level' => $level]))
-                    ->greeting($safeName)
+                    ->greeting($name)
                     ->highlight(__('emails.gamification_milestone.level_up_highlight', ['level' => $level]), "\u{1F389}")
                     ->paragraph(__('emails.gamification_milestone.level_up_body'))
                     ->button(__('emails.gamification_milestone.view_profile'), EmailTemplateBuilder::tenantUrl('/profile'))
@@ -363,14 +361,16 @@ class GamificationEmailService
                 break;
 
             case 'badge_earned':
-                $badgeName = htmlspecialchars((string) ($data['badge_name'] ?? $data['name'] ?? __('emails.gamification_milestone.badge_fallback')), ENT_QUOTES, 'UTF-8');
+                $badgeNameRaw = (string) ($data['badge_name'] ?? $data['name'] ?? __('emails.gamification_milestone.badge_fallback'));
+                $badgeName = htmlspecialchars($badgeNameRaw, ENT_QUOTES, 'UTF-8');
                 $badgeIcon = $data['icon'] ?? '';
-                $subject = __('emails.gamification_milestone.badge_earned_subject', ['badge' => $badgeName]);
+                // Plain-text MIME subject - raw value, no HTML entities.
+                $subject = __('emails.gamification_milestone.badge_earned_subject', ['badge' => $badgeNameRaw]);
                 $builder = EmailTemplateBuilder::make()
                     ->theme('achievement')
                     ->title(__('emails.gamification_milestone.badge_earned_title') . " {$badgeIcon}")
-                    ->previewText(__('emails.gamification_milestone.badge_earned_preview', ['badge' => $badgeName]))
-                    ->greeting($safeName)
+                    ->previewText(__('emails.gamification_milestone.badge_earned_preview', ['badge' => $badgeNameRaw]))
+                    ->greeting($name)
                     ->highlight(__('emails.gamification_milestone.badge_earned_highlight', ['icon' => $badgeIcon, 'badge' => $badgeName]), "\u{1F3C5}");
 
                 if (!empty($data['description'])) {
@@ -391,7 +391,7 @@ class GamificationEmailService
                     ->theme('achievement')
                     ->title(__('emails.gamification_milestone.streak_title') . " \u{1F525}")
                     ->previewText(__('emails.gamification_milestone.streak_preview', ['days' => $days]))
-                    ->greeting($safeName)
+                    ->greeting($name)
                     ->statCards([
                         ['value' => (string) $days, 'label' => __('emails.gamification_milestone.streak_label'), 'icon' => "\u{1F525}"],
                     ])
@@ -407,7 +407,7 @@ class GamificationEmailService
                     ->theme('achievement')
                     ->title(__('emails.gamification_milestone.leaderboard_title') . " \u{1F4CA}")
                     ->previewText(__('emails.gamification_milestone.leaderboard_preview', ['position' => $position]))
-                    ->greeting($safeName)
+                    ->greeting($name)
                     ->statCards([
                         ['value' => '#' . $position, 'label' => __('emails.gamification_milestone.leaderboard_label'), 'icon' => "\u{1F4CA}"],
                     ])
@@ -424,7 +424,7 @@ class GamificationEmailService
                 $body = EmailTemplateBuilder::make()
                     ->theme('achievement')
                     ->title(__('emails.gamification_milestone.default_title') . " \u{1F3C6}")
-                    ->greeting($safeName)
+                    ->greeting($name)
                     ->highlight($message, "\u{1F3C6}")
                     ->button(__('emails.gamification_milestone.view_profile'), EmailTemplateBuilder::tenantUrl('/profile'))
                     ->render();
