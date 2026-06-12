@@ -3,7 +3,16 @@
   "detailTitle": "Dettagli annuncio",
   "share": "Condividi annuncio",
   "detail": {
-    "messageMember": "Messaggio"
+    "messageMember": "Messaggio",
+    "commentReply": "Rispondi",
+    "commentReplyingTo": "In risposta a {name}",
+    "commentEditing": "Modifica in corso",
+    "commentDeleteTitle": "Elimina commento",
+    "commentDeleteMessage": "Eliminare questo commento? Verranno eliminate anche le risposte.",
+    "commentEdited": "(modificato)",
+    "commentLike": "Mi piace",
+    "commentEditFailed": "Non siamo riusciti ad aggiornare il tuo commento.",
+    "commentDeleteFailed": "Non siamo riusciti a eliminare il commento."
   },
   "groupExchanges": {
     "create": {

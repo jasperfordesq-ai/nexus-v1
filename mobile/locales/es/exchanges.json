@@ -3,7 +3,16 @@
   "detailTitle": "Detalles de la oferta",
   "share": "Compartir oferta",
   "detail": {
-    "messageMember": "Mensaje"
+    "messageMember": "Mensaje",
+    "commentReply": "Responder",
+    "commentReplyingTo": "Respondiendo a {name}",
+    "commentEditing": "Editando",
+    "commentDeleteTitle": "Eliminar comentario",
+    "commentDeleteMessage": "¿Eliminar este comentario? Las respuestas también se eliminarán.",
+    "commentEdited": "(editado)",
+    "commentLike": "Me gusta",
+    "commentEditFailed": "No pudimos actualizar tu comentario.",
+    "commentDeleteFailed": "No pudimos eliminar el comentario."
   },
   "groupExchanges": {
     "create": {

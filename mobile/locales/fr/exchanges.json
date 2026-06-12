@@ -3,7 +3,16 @@
   "detailTitle": "Détails de l'annonce",
   "share": "Partager l'annonce",
   "detail": {
-    "messageMember": "Message"
+    "messageMember": "Message",
+    "commentReply": "Répondre",
+    "commentReplyingTo": "Réponse à {name}",
+    "commentEditing": "Modification en cours",
+    "commentDeleteTitle": "Supprimer le commentaire",
+    "commentDeleteMessage": "Supprimer ce commentaire ? Les réponses seront également supprimées.",
+    "commentEdited": "(modifié)",
+    "commentLike": "J'aime",
+    "commentEditFailed": "Nous n'avons pas pu mettre à jour votre commentaire.",
+    "commentDeleteFailed": "Nous n'avons pas pu supprimer le commentaire."
   },
   "groupExchanges": {
     "create": {

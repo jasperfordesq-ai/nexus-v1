@@ -728,6 +728,18 @@ function ExchangeDetailModalInner() {
           actionFailedTitle: t('detail.actionFailedTitle'),
           send: t('common:buttons.send'),
           authorFallback: t('common:labels.member'),
+          reply: t('detail.commentReply'),
+          replyingTo: t('detail.commentReplyingTo'),
+          edit: t('common:buttons.edit'),
+          editing: t('detail.commentEditing'),
+          delete: t('common:buttons.delete'),
+          deleteConfirmTitle: t('detail.commentDeleteTitle'),
+          deleteConfirmMessage: t('detail.commentDeleteMessage'),
+          edited: t('detail.commentEdited'),
+          cancel: t('common:buttons.cancel'),
+          like: t('detail.commentLike'),
+          editFailed: t('detail.commentEditFailed'),
+          deleteFailed: t('detail.commentDeleteFailed'),
         }}
         onClose={() => setShowComments(false)}
         onCountChange={setCommentsCount}

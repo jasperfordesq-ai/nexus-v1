@@ -3,7 +3,16 @@
   "detailTitle": "Detalhes do anúncio",
   "share": "Partilhar anúncio",
   "detail": {
-    "messageMember": "Mensagem"
+    "messageMember": "Mensagem",
+    "commentReply": "Responder",
+    "commentReplyingTo": "A responder a {name}",
+    "commentEditing": "A editar",
+    "commentDeleteTitle": "Eliminar comentário",
+    "commentDeleteMessage": "Eliminar este comentário? As respostas também serão eliminadas.",
+    "commentEdited": "(editado)",
+    "commentLike": "Gosto",
+    "commentEditFailed": "Não foi possível atualizar o seu comentário.",
+    "commentDeleteFailed": "Não foi possível eliminar o comentário."
   },
   "groupExchanges": {
     "create": {

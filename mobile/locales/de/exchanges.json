@@ -3,7 +3,16 @@
   "detailTitle": "Angebotsdetails",
   "share": "Angebot teilen",
   "detail": {
-    "messageMember": "Nachricht"
+    "messageMember": "Nachricht",
+    "commentReply": "Antworten",
+    "commentReplyingTo": "Antwort an {name}",
+    "commentEditing": "Wird bearbeitet",
+    "commentDeleteTitle": "Kommentar löschen",
+    "commentDeleteMessage": "Diesen Kommentar löschen? Antworten darauf werden ebenfalls gelöscht.",
+    "commentEdited": "(bearbeitet)",
+    "commentLike": "Gefällt mir",
+    "commentEditFailed": "Dein Kommentar konnte nicht aktualisiert werden.",
+    "commentDeleteFailed": "Der Kommentar konnte nicht gelöscht werden."
   },
   "groupExchanges": {
     "create": {

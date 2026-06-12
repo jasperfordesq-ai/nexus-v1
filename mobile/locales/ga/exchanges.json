@@ -3,7 +3,16 @@
   "detailTitle": "Sonraí na liostála",
   "share": "Roinn liostáil",
   "detail": {
-    "messageMember": "Teachtaireacht"
+    "messageMember": "Teachtaireacht",
+    "commentReply": "Freagair",
+    "commentReplyingTo": "Ag freagairt do {name}",
+    "commentEditing": "Á chur in eagar",
+    "commentDeleteTitle": "Scrios an nóta tráchta",
+    "commentDeleteMessage": "An nóta tráchta seo a scriosadh? Scriosfar aon fhreagraí freisin.",
+    "commentEdited": "(curtha in eagar)",
+    "commentLike": "Is maith liom",
+    "commentEditFailed": "Níorbh fhéidir linn do nóta tráchta a nuashonrú.",
+    "commentDeleteFailed": "Níorbh fhéidir linn an nóta tráchta a scriosadh."
   },
   "groupExchanges": {
     "create": {

@@ -366,7 +366,16 @@
     "comments": "{{count}} comment",
     "comments_other": "{{count}} comments",
     "hours": "{{count}} hr",
-    "hours_other": "{{count}} hrs"
+    "hours_other": "{{count}} hrs",
+    "commentReply": "Reply",
+    "commentReplyingTo": "Replying to {name}",
+    "commentEditing": "Editing",
+    "commentDeleteTitle": "Delete comment",
+    "commentDeleteMessage": "Delete this comment? Any replies will also be deleted.",
+    "commentEdited": "(edited)",
+    "commentLike": "Like",
+    "commentEditFailed": "We couldn't update your comment.",
+    "commentDeleteFailed": "We couldn't delete the comment."
   },
   "status": {
     "active": "Active",
