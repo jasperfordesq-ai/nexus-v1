@@ -151,6 +151,80 @@ class AdminUsersControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function test_approve_lifts_registration_pending_status_so_login_gate_passes(): void
+    {
+        // Registration on an approval-required tenant leaves status='pending'.
+        // The login gate rejects that status before it ever reads is_approved,
+        // so approval must flip BOTH — or the member gets the welcome email
+        // and stays locked out.
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $pending = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'pending',
+            'is_approved' => false,
+            'email_verified_at' => now(),
+        ]);
+        $mailer = new AdminUsersSuccessfulEmailDispatchService();
+        app()->instance(EmailDispatchService::class, $mailer);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/users/' . $pending->id . '/approve');
+
+        $response->assertStatus(200);
+        $row = DB::table('users')->where('id', $pending->id)->first(['status', 'is_approved']);
+        $this->assertSame('active', strtolower((string) $row->status));
+        $this->assertSame(1, (int) $row->is_approved);
+
+        $gate = app(\App\Services\TenantSettingsService::class)->checkLoginGatesForUser(
+            (array) DB::table('users')->where('id', $pending->id)->first()
+        );
+        $this->assertNull($gate, 'approved member must pass the login gates');
+    }
+
+    public function test_approve_repairs_already_approved_account_stuck_on_pending_status(): void
+    {
+        // Accounts approved by the pre-fix endpoint ended up is_approved=1
+        // with status still 'pending' (locked out). Re-approving must repair
+        // them without re-granting welcome credits.
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $stuck = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'pending',
+            'is_approved' => true,
+            'email_verified_at' => now(),
+        ]);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/users/' . $stuck->id . '/approve');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.already_approved', true);
+        $this->assertSame(
+            'active',
+            strtolower((string) DB::table('users')->where('id', $stuck->id)->value('status'))
+        );
+    }
+
+    public function test_bulk_approve_lifts_registration_pending_status(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $pending = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'pending',
+            'is_approved' => false,
+            'email_verified_at' => now(),
+        ]);
+        $mailer = new AdminUsersSuccessfulEmailDispatchService();
+        app()->instance(EmailDispatchService::class, $mailer);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/users/bulk-approve', [
+            'user_ids' => [$pending->id],
+        ]);
+
+        $response->assertStatus(200);
+        $row = DB::table('users')->where('id', $pending->id)->first(['status', 'is_approved']);
+        $this->assertSame('active', strtolower((string) $row->status));
+        $this->assertSame(1, (int) $row->is_approved);
+    }
+
     // ================================================================
     // SUSPEND — POST /v2/admin/users/{id}/suspend
     // ================================================================

@@ -600,8 +600,11 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
 
-        // Idempotency: prevent double-approval (and double welcome credits)
+        // Idempotency: prevent double-approval (and double welcome credits).
+        // Still lift a leftover pending status — accounts approved by the
+        // pre-fix path have is_approved=1 with status stuck on 'pending'.
         if (!empty($user['is_approved'])) {
+            $this->activatePendingStatus($id, (int) $tenantId);
             return $this->respondWithData(['approved' => true, 'id' => $id, 'already_approved' => true]);
         }
 
@@ -610,6 +613,7 @@ class AdminUsersController extends BaseApiController
             'is_approved' => 1,
             'tenant_id' => (int) $user['tenant_id'],
         ]);
+        $this->activatePendingStatus($id, (int) $tenantId);
 
         ActivityLog::log($adminId, 'admin_approve_user', "Approved user #{$id} ({$user['email']})");
         $this->auditLogService->logUserApproved($adminId, $id, $user['email']);
@@ -625,6 +629,20 @@ class AdminUsersController extends BaseApiController
             'email_sent' => $emailSent,
             'welcome_credits' => $creditsAwarded,
         ]);
+    }
+
+    /**
+     * Approval must also lift a registration-pending status: the login gate
+     * rejects status='pending' before it ever reads is_approved, so setting
+     * is_approved alone sends the welcome email while leaving the member
+     * locked out.
+     */
+    private function activatePendingStatus(int $userId, int $tenantId): void
+    {
+        DB::update(
+            "UPDATE users SET status = 'active' WHERE id = ? AND tenant_id = ? AND LOWER(TRIM(status)) = 'pending'",
+            [$userId, $tenantId]
+        );
     }
 
     // =========================================================================
@@ -2222,6 +2240,8 @@ class AdminUsersController extends BaseApiController
             }
             $row = $eligibleById[$id];
             if (!empty($row->is_approved)) {
+                // Repair pre-fix approvals that left status='pending'.
+                $this->activatePendingStatus((int) $id, (int) $tenantId);
                 $skippedIds[] = $id;
                 continue;
             }
@@ -2231,6 +2251,7 @@ class AdminUsersController extends BaseApiController
                     'is_approved' => 1,
                     'tenant_id' => $tenantId,
                 ]);
+                $this->activatePendingStatus((int) $id, (int) $tenantId);
                 $userArr = (array) $row;
                 $creditsAwarded = $this->grantWelcomeCredits($userArr, $adminId);
                 $this->sendApprovalWelcomeEmail($userArr, $creditsAwarded);
