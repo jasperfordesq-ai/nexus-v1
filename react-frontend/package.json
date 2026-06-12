@@ -82,6 +82,7 @@
   },
   "overrides": {
     "basic-ftp": ">=5.2.3",
+    "esbuild": ">=0.28.1",
     "postcss": ">=8.5.10",
     "serialize-javascript": "^7.0.4",
     "tmp": ">=0.2.6",

@@ -59,6 +59,7 @@
   "overrides": {
     "@xmldom/xmldom": ">=0.8.13",
     "basic-ftp": ">=5.2.3",
+    "esbuild": ">=0.28.1",
     "tar": ">=7.5.10"
   }
 }
