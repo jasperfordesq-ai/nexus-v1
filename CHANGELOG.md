@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The community name no longer vanishes from the web address on the Events page.** Opening Events (or filtering it) silently rewrote the address from `/your-community/events` to just `/events` — so refreshing the page or sharing that link could land in the wrong community (the platform's default one) instead of yours. The address now keeps your community's name at all times.
+- **Screen readers now announce the reaction-filter tabs properly.** The tab list in the "who reacted to this post" dialog was reading out a raw internal code instead of "Reaction type filter", in every language.
 - **Downloading a CV attached to a job application works again.** Opening an applicant's CV (as the applicant, the job poster, or an admin) always failed with a server error — the download response was built in a way the system rejected at the very last step, so the error pages worked but the actual file never arrived. CVs now download correctly, byte-for-byte.
 - **Small images attached to feed posts no longer show a broken thumbnail.** For images already small enough to not need a separate thumbnail, the post still pointed its thumbnail at a file that was never created — so feeds showed a broken image for every small picture. Small images now serve as their own thumbnail.
 - **Daily and monthly community digests now arrive on schedule.** The civic digest's "have I already sent this recently?" check was slightly too strict, so daily digest readers were silently skipped every other day, and the monthly digest skipped entire months (every March, plus most months with 30 days). The timing check now has a sensible margin.
