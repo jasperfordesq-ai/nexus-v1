@@ -110,15 +110,33 @@
     "createError": "Could not create poll."
   },
   "reaction": {
-    "like": "Like",
-    "love": "Love",
-    "laugh": "Laugh",
+    "like": "Mi piace",
+    "love": "Amore",
+    "laugh": "Ahah",
     "wow": "Wow",
-    "sad": "Sad",
-    "celebrate": "Celebrate",
-    "clap": "Clap",
-    "time_credit": "Time Credit",
-    "longPressHint": "Long press to choose a reaction",
-    "dismiss": "Dismiss reaction picker"
-  }
+    "sad": "Triste",
+    "celebrate": "Festeggia",
+    "clap": "Applausi",
+    "time_credit": "Credito tempo",
+    "longPressHint": "Tieni premuto per scegliere una reazione",
+    "dismiss": "Chiudi selettore reazioni",
+    "failed": "Impossibile salvare la tua reazione. Riprova.",
+    "summaryTwo": "{{a}} e {{b}}",
+    "summaryMany": "{{name}} e {{count}} altra persona",
+    "summaryMany_other": "{{name}} e altre {{count}} persone",
+    "viewReactors": "Vedi chi ha reagito",
+    "reactorsTitle": "Reazioni",
+    "noReactors": "Ancora nessuna reazione"
+  },
+  "stats": {
+    "reactions": "{{count}} reazione",
+    "reactions_other": "{{count}} reazioni",
+    "comments": "{{count}} commento",
+    "comments_other": "{{count}} commenti",
+    "views": "{{count}} visualizzazione",
+    "views_other": "{{count}} visualizzazioni",
+    "shares": "{{count}} condivisione",
+    "shares_other": "{{count}} condivisioni"
+  },
+  "saveFailed": "Impossibile aggiornare gli elementi salvati. Riprova."
 }

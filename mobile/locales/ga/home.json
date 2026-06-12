@@ -110,15 +110,33 @@
     "createError": "Could not create poll."
   },
   "reaction": {
-    "like": "Like",
-    "love": "Love",
-    "laugh": "Laugh",
-    "wow": "Wow",
-    "sad": "Sad",
-    "celebrate": "Celebrate",
-    "clap": "Clap",
-    "time_credit": "Time Credit",
-    "longPressHint": "Long press to choose a reaction",
-    "dismiss": "Dismiss reaction picker"
-  }
+    "like": "Is maith liom",
+    "love": "Grá",
+    "laugh": "Gáire",
+    "wow": "Iontas",
+    "sad": "Brónach",
+    "celebrate": "Ceiliúradh",
+    "clap": "Bualadh bos",
+    "time_credit": "Creidmheas ama",
+    "longPressHint": "Brúigh go fada chun freagairt a roghnú",
+    "dismiss": "Dún roghnóir freagartha",
+    "failed": "Níorbh fhéidir do fhreagairt a shábháil. Bain triail eile as.",
+    "summaryTwo": "{{a}} agus {{b}}",
+    "summaryMany": "{{name}} agus {{count}} duine eile",
+    "summaryMany_other": "{{name}} agus {{count}} duine eile",
+    "viewReactors": "Féach cé a d’fhreagair",
+    "reactorsTitle": "Freagairtí",
+    "noReactors": "Níl aon fhreagairtí fós"
+  },
+  "stats": {
+    "reactions": "{{count}} freagairt",
+    "reactions_other": "{{count}} freagairtí",
+    "comments": "{{count}} nóta tráchta",
+    "comments_other": "{{count}} nótaí tráchta",
+    "views": "{{count}} amharc",
+    "views_other": "{{count}} amharc",
+    "shares": "{{count}} roinnt",
+    "shares_other": "{{count}} roinnt"
+  },
+  "saveFailed": "Níorbh fhéidir do mhíreanna sábháilte a nuashonrú. Bain triail eile as."
 }

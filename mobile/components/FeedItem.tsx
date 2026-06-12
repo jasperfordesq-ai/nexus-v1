@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Platform, Pressable, Share, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,8 +21,10 @@ import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import Avatar from '@/components/ui/Avatar';
 import ImageCarousel from '@/components/ui/ImageCarousel';
 import ActionSheet from '@/components/ui/ActionSheet';
+import { useAppToast } from '@/components/ui/AppToast';
 import CommentSheet from '@/components/comments/CommentSheet';
 import ReactionBar, { REACTION_EMOJI_MAP } from '@/components/reactions/ReactionBar';
+import ReactionSummaryRow from '@/components/reactions/ReactionSummaryRow';
 import PollCard from '@/components/PollCard';
 import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 
@@ -32,6 +34,16 @@ interface FeedItemProps {
   commentsCountOverride?: number;
   onOpenComments?: (target: FeedCommentTarget) => void;
   onCommentsCountChange?: (target: FeedCommentTarget, count: number) => void;
+  /** Screen-level handler that opens the shared reactors sheet. Sheets cannot
+   *  render from inside a FlatList row (portal never becomes visible), so the
+   *  host screen owns the sheet — same architecture as onOpenComments. */
+  onOpenReactors?: (target: FeedReactorsTarget) => void;
+}
+
+export interface FeedReactorsTarget {
+  targetType: string;
+  targetId: number;
+  reactions: ReactionsSummary | null;
 }
 
 export interface FeedCommentTarget {
@@ -209,14 +221,16 @@ function getDetailTarget(item: FeedItemType) {
   }
 }
 
-export default function FeedItem({
+function FeedItemInner({
   item,
   disableDetailNavigation = false,
   commentsCountOverride,
   onOpenComments,
   onCommentsCountChange,
+  onOpenReactors,
 }: FeedItemProps) {
   const { t } = useTranslation(['home', 'exchanges', 'common']);
+  const { show: showToast } = useAppToast();
   const primary = usePrimaryColor();
   const theme = useTheme();
 
@@ -224,12 +238,40 @@ export default function FeedItem({
   const [likesCount, setLikesCount] = useState(item.likes_count ?? 0);
   const [reactions, setReactions] = useState<ReactionsSummary | null>(item.reactions ?? null);
   const [reactionBarVisible, setReactionBarVisible] = useState(false);
-  const [isReacting, setIsReacting] = useState(false);
+  const isReactingRef = useRef(false);
   const [localCommentsCount, setLocalCommentsCount] = useState(item.comments_count ?? 0);
   const [pollData, setPollData] = useState<PollData | null | undefined>(item.poll_data);
   const [bookmarked, setBookmarked] = useState(item.is_bookmarked ?? false);
   const [actionSheetVisible, setActionSheetVisible] = useState(false);
   const [commentsVisible, setCommentsVisible] = useState(false);
+
+  // Server truth wins after a refresh: when the parent hands us a NEW item
+  // object (refetch), reseed the interaction state. Optimistic updates are
+  // safe — they never replace the item reference.
+  useEffect(() => {
+    setLiked(item.is_liked ?? false);
+    setLikesCount(item.likes_count ?? 0);
+    setReactions(item.reactions ?? null);
+    setBookmarked(item.is_bookmarked ?? false);
+    setPollData(item.poll_data);
+    setLocalCommentsCount(item.comments_count ?? 0);
+  }, [item]);
+
+  // FlatList recycles rows — never let a pending tap/hold timer fire against
+  // a different item after this row unmounts.
+  useEffect(() => {
+    return () => {
+      if (singleTapTimerRef.current) {
+        clearTimeout(singleTapTimerRef.current);
+        singleTapTimerRef.current = null;
+      }
+      if (holdTimerRef.current) {
+        clearTimeout(holdTimerRef.current);
+        holdTimerRef.current = null;
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const lastTapRef = useRef<number>(0);
   const singleTapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -250,8 +292,9 @@ export default function FeedItem({
     } catch {
       setLiked(wasLiked);
       setLikesCount((n) => (wasLiked ? n + 1 : n - 1));
+      showToast({ title: t('common:errors.alertTitle'), description: t('reaction.failed'), variant: 'danger' });
     }
-  }, [liked, item.id, item.type]);
+  }, [liked, item.id, item.type, showToast, t]);
 
   const isReactable = REACTABLE_TYPES.has(item.type);
   const userReaction = reactions?.user_reaction ?? null;
@@ -262,9 +305,9 @@ export default function FeedItem({
    * reconciled from the server's authoritative summary.
    */
   const performReact = useCallback(async (type: ReactionType) => {
-    if (isReacting) return;
+    if (isReactingRef.current) return;
+    isReactingRef.current = true;
     setReactionBarVisible(false);
-    setIsReacting(true);
 
     const previous = reactions ?? { counts: {}, total: 0, user_reaction: null };
     const counts = { ...previous.counts };
@@ -290,10 +333,11 @@ export default function FeedItem({
     } catch {
       setReactions(previous);
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      showToast({ title: t('common:errors.alertTitle'), description: t('reaction.failed'), variant: 'danger' });
     } finally {
-      setIsReacting(false);
+      isReactingRef.current = false;
     }
-  }, [isReacting, item.id, item.type, reactions]);
+  }, [item.id, item.type, reactions]);
 
   function showHeartOverlay() {
     overlayOpacity.setValue(1);
@@ -333,6 +377,7 @@ export default function FeedItem({
 
   function navigateToDetail() {
     if (disableDetailNavigation) return;
+    setReactionBarVisible(false);
     const detailTarget = getDetailTarget(item);
     if (detailTarget) {
       router.push({ pathname: detailTarget.pathname as never, params: detailTarget.params });
@@ -474,8 +519,9 @@ export default function FeedItem({
       setBookmarked(result.data.bookmarked);
     } catch {
       setBookmarked(wasBookmarked);
+      showToast({ title: t('common:errors.alertTitle'), description: t('saveFailed'), variant: 'danger' });
     }
-  }, [bookmarked, item.id, item.type]);
+  }, [bookmarked, item.id, item.type, showToast, t]);
 
   const cardLabel = `${authorName}. ${item.title ?? ''}${item.content ? '. ' + item.content.slice(0, 100) : ''}`;
 
@@ -662,7 +708,13 @@ export default function FeedItem({
         {reactionTotal > 0 || commentsCount > 0 || (item.views_count ?? 0) > 0 || (item.share_count ?? 0) > 0 ? (
           <View className="flex-row items-center justify-between px-4 pt-3">
             <View className="flex-row flex-wrap items-center gap-3">
-              {reactionTotal > 0 ? (
+              {isReactable && reactions && reactions.total > 0 ? (
+                <ReactionSummaryRow
+                  reactions={reactions}
+                  primary={primary}
+                  onPress={() => onOpenReactors?.({ targetType: item.type, targetId: item.id, reactions })}
+                />
+              ) : reactionTotal > 0 ? (
                 <Text className="text-xs" style={{ color: theme.textSecondary }}>
                   {t('stats.reactions', { count: reactionTotal })}
                 </Text>
@@ -784,6 +836,18 @@ export default function FeedItem({
             actionFailedTitle: t('exchanges:detail.actionFailedTitle'),
             send: t('common:buttons.send'),
             authorFallback: t('common:labels.member'),
+            reply: t('exchanges:detail.commentReply'),
+            replyingTo: t('exchanges:detail.commentReplyingTo'),
+            edit: t('common:buttons.edit'),
+            editing: t('exchanges:detail.commentEditing'),
+            delete: t('common:buttons.delete'),
+            deleteConfirmTitle: t('exchanges:detail.commentDeleteTitle'),
+            deleteConfirmMessage: t('exchanges:detail.commentDeleteMessage'),
+            edited: t('exchanges:detail.commentEdited'),
+            cancel: t('common:buttons.cancel'),
+            like: t('exchanges:detail.commentLike'),
+            editFailed: t('exchanges:detail.commentEditFailed'),
+            deleteFailed: t('exchanges:detail.commentDeleteFailed'),
           }}
           onClose={() => setCommentsVisible(false)}
           onCountChange={handleCommentsCountChange}
@@ -792,3 +856,19 @@ export default function FeedItem({
     </View>
   );
 }
+
+/**
+ * Memoized: home.tsx re-renders on every comment-count / target change; without
+ * memo every visible card re-rendered (animations re-initialised, images
+ * re-evaluated). Rows only re-render when their own item or count changes.
+ */
+const FeedItem = memo(FeedItemInner, (prev, next) =>
+  prev.item === next.item &&
+  prev.commentsCountOverride === next.commentsCountOverride &&
+  prev.disableDetailNavigation === next.disableDetailNavigation &&
+  prev.onOpenComments === next.onOpenComments &&
+  prev.onCommentsCountChange === next.onCommentsCountChange &&
+  prev.onOpenReactors === next.onOpenReactors,
+);
+
+export default FeedItem;

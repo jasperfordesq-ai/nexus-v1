@@ -270,6 +270,30 @@ export function toggleReaction(
   });
 }
 
+export interface ReactorUser {
+  id: number;
+  name: string;
+  avatar_url: string | null;
+  reacted_at?: string;
+}
+
+/**
+ * GET /api/v2/reactions/{type}/{id}/users/{reactionType} — paginated list of
+ * users who reacted with a specific type (for the reactors sheet).
+ */
+export function getReactors(
+  targetType: string,
+  targetId: number,
+  reactionType: ReactionType,
+  page = 1,
+  perPage = 30,
+): Promise<{ data: ReactorUser[]; meta?: { total?: number } }> {
+  return api.get<{ data: ReactorUser[]; meta?: { total?: number } }>(
+    `${API_V2}/reactions/${encodeURIComponent(targetType)}/${targetId}/users/${encodeURIComponent(reactionType)}`,
+    { page: String(page), per_page: String(perPage) },
+  );
+}
+
 export interface LikeResult {
   /** The API returns action: 'liked' | 'unliked' — there is NO boolean
    *  `liked` field. Reading `.liked` returned undefined and un-highlighted

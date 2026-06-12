@@ -12,13 +12,14 @@ import { Button as HeroButton, Card as HeroCard, Spinner } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import { getHashtagFeed, type FeedItem as FeedItemType } from '@/lib/api/feed';
+import ReactorsSheet from '@/components/reactions/ReactorsSheet';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
-import FeedItem from '@/components/FeedItem';
+import FeedItem, { type FeedReactorsTarget } from '@/components/FeedItem';
 
 function normalizeTag(value: string | string[] | undefined): string {
   const raw = Array.isArray(value) ? value[0] : value;
@@ -33,6 +34,7 @@ export default function FeedHashtagScreen() {
   const theme = useTheme();
   const { hasModule } = useTenant();
   const [items, setItems] = useState<FeedItemType[]>([]);
+  const [reactorsTarget, setReactorsTarget] = useState<FeedReactorsTarget | null>(null);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [postCount, setPostCount] = useState(0);
@@ -89,7 +91,7 @@ export default function FeedHashtagScreen() {
     void loadPosts(false);
   }, [loadPosts]);
 
-  const renderItem = useCallback(({ item }: { item: FeedItemType }) => <FeedItem item={item} />, []);
+  const renderItem = useCallback(({ item }: { item: FeedItemType }) => <FeedItem item={item} onOpenReactors={setReactorsTarget} />, []);
 
   return (
     <ModalErrorBoundary>
@@ -157,7 +159,14 @@ export default function FeedHashtagScreen() {
             contentContainerStyle={{ paddingBottom: 28 }}
           />
         )}
-      </SafeAreaView>
+        <ReactorsSheet
+        visible={Boolean(reactorsTarget)}
+        targetType={reactorsTarget?.targetType ?? 'post'}
+        targetId={reactorsTarget?.targetId ?? 0}
+        reactions={reactorsTarget?.reactions ?? null}
+        onClose={() => setReactorsTarget(null)}
+      />
+    </SafeAreaView>
     </ModalErrorBoundary>
   );
 }

@@ -28,6 +28,7 @@ const mockT = (key: string, values?: Record<string, unknown>) => {
   return map[key] ?? key;
 };
 
+jest.mock('@/components/reactions/ReactorsSheet', () => 'View');
 jest.mock('expo-router', () => ({
   router: { back: jest.fn(), canGoBack: jest.fn(() => false), replace: jest.fn() },
   useLocalSearchParams: () => mockUseLocalSearchParams(),

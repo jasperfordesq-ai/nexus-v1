@@ -19,10 +19,16 @@ export function formatDate(date: string | Date): string {
 }
 
 /**
- * Converts an ISO date string to a human-readable relative time string.
- *
- * NOTE: Returns English-only strings. Callers needing full localization should
- * use i18n `t()` with date formatting instead of this utility.
+ * Whether the runtime can localize relative times. Hermes builds without
+ * Intl.RelativeTimeFormat fall back to compact English strings.
+ */
+const relativeFormatterAvailable =
+  typeof Intl !== 'undefined' &&
+  typeof (Intl as { RelativeTimeFormat?: unknown }).RelativeTimeFormat === 'function';
+
+/**
+ * Converts an ISO date string to a human-readable relative time string in the
+ * app's active language (e.g. "vor 5 Min.", "il y a 2 h").
  *
  * @param iso - ISO 8601 date string
  * @param short - If true, returns compact format (e.g. "5m") instead of "5m ago"
@@ -37,6 +43,24 @@ export function formatRelativeTime(iso: string, short = false): string {
   const minutes = Math.floor(diff / 60_000);
 
   if (minutes < 1) return short ? 'now' : 'just now';
+
+  if (relativeFormatterAvailable) {
+    try {
+      const rtf = new Intl.RelativeTimeFormat(dateLocale(), {
+        numeric: 'always',
+        style: short ? 'narrow' : 'short',
+      });
+      if (minutes < 60) return rtf.format(-minutes, 'minute');
+      const localizedHours = Math.floor(minutes / 60);
+      if (localizedHours < 24) return rtf.format(-localizedHours, 'hour');
+      const localizedDays = Math.floor(localizedHours / 24);
+      if (localizedDays < 7 || short) return rtf.format(-localizedDays, 'day');
+      return parsed.toLocaleDateString(dateLocale());
+    } catch {
+      // Unsupported locale tag or partial Intl build — use the fallback below.
+    }
+  }
+
   if (minutes < 60) return short ? `${minutes}m` : `${minutes}m ago`;
 
   const hours = Math.floor(minutes / 60);

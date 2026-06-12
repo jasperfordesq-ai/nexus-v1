@@ -110,15 +110,33 @@
     "createError": "Could not create poll."
   },
   "reaction": {
-    "like": "Like",
-    "love": "Love",
-    "laugh": "Laugh",
+    "like": "Gefällt mir",
+    "love": "Liebe",
+    "laugh": "Haha",
     "wow": "Wow",
-    "sad": "Sad",
-    "celebrate": "Celebrate",
-    "clap": "Clap",
-    "time_credit": "Time Credit",
-    "longPressHint": "Long press to choose a reaction",
-    "dismiss": "Dismiss reaction picker"
-  }
+    "sad": "Traurig",
+    "celebrate": "Feiern",
+    "clap": "Applaus",
+    "time_credit": "Zeitguthaben",
+    "longPressHint": "Lange drücken, um eine Reaktion zu wählen",
+    "dismiss": "Reaktionsauswahl schließen",
+    "failed": "Deine Reaktion konnte nicht gespeichert werden. Bitte erneut versuchen.",
+    "summaryTwo": "{{a}} und {{b}}",
+    "summaryMany": "{{name}} und {{count}} weitere Person",
+    "summaryMany_other": "{{name}} und {{count}} weitere Personen",
+    "viewReactors": "Ansehen, wer reagiert hat",
+    "reactorsTitle": "Reaktionen",
+    "noReactors": "Noch keine Reaktionen"
+  },
+  "stats": {
+    "reactions": "{{count}} Reaktion",
+    "reactions_other": "{{count}} Reaktionen",
+    "comments": "{{count}} Kommentar",
+    "comments_other": "{{count}} Kommentare",
+    "views": "{{count}} Aufruf",
+    "views_other": "{{count}} Aufrufe",
+    "shares": "{{count}} geteilt",
+    "shares_other": "{{count}} geteilt"
+  },
+  "saveFailed": "Deine gespeicherten Elemente konnten nicht aktualisiert werden. Bitte erneut versuchen."
 }

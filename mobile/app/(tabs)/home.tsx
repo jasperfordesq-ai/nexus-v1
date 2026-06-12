@@ -18,8 +18,9 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { useRealtimeContext } from '@/lib/context/RealtimeContext';
-import FeedItem, { type FeedCommentTarget } from '@/components/FeedItem';
+import FeedItem, { type FeedCommentTarget, type FeedReactorsTarget } from '@/components/FeedItem';
 import CommentSheet from '@/components/comments/CommentSheet';
+import ReactorsSheet from '@/components/reactions/ReactorsSheet';
 import OfflineBanner from '@/components/OfflineBanner';
 import TenantBanner from '@/components/TenantBanner';
 import { FeedItemSkeleton } from '@/components/ui/Skeleton';
@@ -70,7 +71,12 @@ export default function HomeScreen() {
   const [filter, setFilter] = useState<FeedFilter>('all');
   const [subFilter, setSubFilter] = useState<string | null>(null);
   const [commentTarget, setCommentTarget] = useState<FeedCommentTarget | null>(null);
+  const [reactorsTarget, setReactorsTarget] = useState<FeedReactorsTarget | null>(null);
   const [commentCountOverrides, setCommentCountOverrides] = useState<Record<string, number>>({});
+  // Mirror for stable callbacks — handleOpenComments must not be recreated on
+  // every count change or the memoized FeedItem rows all re-render.
+  const commentCountOverridesRef = useRef<Record<string, number>>({});
+  commentCountOverridesRef.current = commentCountOverrides;
 
   const fetchFeed = useCallback(
     (cursor: string | null) => getFeed(1, cursor, { filter, mode: feedMode, subtype: subFilter }),
@@ -104,9 +110,13 @@ export default function HomeScreen() {
     const key = `${target.targetType}-${target.targetId}`;
     setCommentTarget({
       ...target,
-      initialCount: commentCountOverrides[key] ?? target.initialCount,
+      initialCount: commentCountOverridesRef.current[key] ?? target.initialCount,
     });
-  }, [commentCountOverrides]);
+  }, []);
+
+  const handleOpenReactors = useCallback((target: FeedReactorsTarget) => {
+    setReactorsTarget(target);
+  }, []);
 
   const handleCommentCountChange = useCallback((count: number) => {
     if (!commentTarget) return;
@@ -122,9 +132,10 @@ export default function HomeScreen() {
         item={item}
         commentsCountOverride={commentCountOverrides[commentKey]}
         onOpenComments={handleOpenComments}
+        onOpenReactors={handleOpenReactors}
       />
     );
-  }, [commentCountOverrides, handleOpenComments]);
+  }, [commentCountOverrides, handleOpenComments, handleOpenReactors]);
   const keyExtractor = useCallback((item: FeedItemType) => `${item.type}-${item.id}`, []);
 
   const handleFilterChange = useCallback((nextFilter: FeedFilter) => {
@@ -147,7 +158,7 @@ export default function HomeScreen() {
           <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor={primary} colors={[primary]} />
         }
         onEndReached={loadMore}
-        onEndReachedThreshold={0.3}
+        onEndReachedThreshold={0.7}
         removeClippedSubviews
         maxToRenderPerBatch={8}
         windowSize={5}
@@ -312,9 +323,10 @@ export default function HomeScreen() {
         }
         ListFooterComponent={
           isLoadingMore ? (
-            <View className="items-center py-4">
-              <Spinner size="sm" />
-            </View>
+            <>
+              <FeedItemSkeleton />
+              <FeedItemSkeleton />
+            </>
           ) : !hasMore && items.length > 0 && !isLoading ? (
             <View className="items-center py-4">
               <Text className="text-xs" style={{ color: theme.textSecondary }}>{t('common:endOfList')}</Text>
@@ -325,6 +337,13 @@ export default function HomeScreen() {
       />
 
       <FAB icon="add" onPress={() => router.push('/(modals)/new-exchange')} position="bottom-right" />
+      <ReactorsSheet
+        visible={Boolean(reactorsTarget)}
+        targetType={reactorsTarget?.targetType ?? 'post'}
+        targetId={reactorsTarget?.targetId ?? 0}
+        reactions={reactorsTarget?.reactions ?? null}
+        onClose={() => setReactorsTarget(null)}
+      />
       <CommentSheet
         visible={Boolean(commentTarget)}
         targetType={commentTarget?.targetType ?? 'post'}
@@ -339,6 +358,18 @@ export default function HomeScreen() {
           actionFailedTitle: t('exchanges:detail.actionFailedTitle'),
           send: t('common:buttons.send'),
           authorFallback: t('common:labels.member'),
+          reply: t('exchanges:detail.commentReply'),
+          replyingTo: t('exchanges:detail.commentReplyingTo'),
+          edit: t('common:buttons.edit'),
+          editing: t('exchanges:detail.commentEditing'),
+          delete: t('common:buttons.delete'),
+          deleteConfirmTitle: t('exchanges:detail.commentDeleteTitle'),
+          deleteConfirmMessage: t('exchanges:detail.commentDeleteMessage'),
+          edited: t('exchanges:detail.commentEdited'),
+          cancel: t('common:buttons.cancel'),
+          like: t('exchanges:detail.commentLike'),
+          editFailed: t('exchanges:detail.commentEditFailed'),
+          deleteFailed: t('exchanges:detail.commentDeleteFailed'),
         }}
         onClose={() => setCommentTarget(null)}
         onCountChange={handleCommentCountChange}

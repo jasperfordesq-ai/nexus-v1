@@ -110,15 +110,33 @@
     "createError": "Could not create poll."
   },
   "reaction": {
-    "like": "Like",
-    "love": "Love",
-    "laugh": "Laugh",
-    "wow": "Wow",
-    "sad": "Sad",
-    "celebrate": "Celebrate",
-    "clap": "Clap",
-    "time_credit": "Time Credit",
-    "longPressHint": "Long press to choose a reaction",
-    "dismiss": "Dismiss reaction picker"
-  }
+    "like": "J’aime",
+    "love": "J’adore",
+    "laugh": "Haha",
+    "wow": "Wouah",
+    "sad": "Triste",
+    "celebrate": "Bravo",
+    "clap": "Applaudissements",
+    "time_credit": "Crédit temps",
+    "longPressHint": "Appui long pour choisir une réaction",
+    "dismiss": "Fermer le sélecteur de réactions",
+    "failed": "Impossible d’enregistrer votre réaction. Veuillez réessayer.",
+    "summaryTwo": "{{a}} et {{b}}",
+    "summaryMany": "{{name}} et {{count}} autre personne",
+    "summaryMany_other": "{{name}} et {{count}} autres personnes",
+    "viewReactors": "Voir qui a réagi",
+    "reactorsTitle": "Réactions",
+    "noReactors": "Pas encore de réactions"
+  },
+  "stats": {
+    "reactions": "{{count}} réaction",
+    "reactions_other": "{{count}} réactions",
+    "comments": "{{count}} commentaire",
+    "comments_other": "{{count}} commentaires",
+    "views": "{{count}} vue",
+    "views_other": "{{count}} vues",
+    "shares": "{{count}} partage",
+    "shares_other": "{{count}} partages"
+  },
+  "saveFailed": "Impossible de mettre à jour vos éléments enregistrés. Veuillez réessayer."
 }

@@ -198,10 +198,14 @@
     "blog": "Read post"
   },
   "stats": {
-    "reactions": "{{count}} reactions",
-    "comments": "{{count}} comments",
-    "views": "{{count}} views",
-    "shares": "{{count}} shares"
+    "reactions": "{{count}} reaction",
+    "comments": "{{count}} comment",
+    "views": "{{count}} view",
+    "shares": "{{count}} share",
+    "reactions_other": "{{count}} reactions",
+    "comments_other": "{{count}} comments",
+    "views_other": "{{count}} views",
+    "shares_other": "{{count}} shares"
   },
   "milestone": {
     "badgeUnlocked": "Badge unlocked",
@@ -246,6 +250,14 @@
     "clap": "Clap",
     "time_credit": "Time Credit",
     "longPressHint": "Long press to choose a reaction",
-    "dismiss": "Dismiss reaction picker"
-  }
+    "dismiss": "Dismiss reaction picker",
+    "failed": "Could not save your reaction. Please try again.",
+    "summaryTwo": "{{a}} and {{b}}",
+    "summaryMany": "{{name}} and {{count}} other",
+    "summaryMany_other": "{{name}} and {{count}} others",
+    "viewReactors": "See who reacted",
+    "reactorsTitle": "Reactions",
+    "noReactors": "No reactions yet"
+  },
+  "saveFailed": "Could not update your saved items. Please try again."
 }

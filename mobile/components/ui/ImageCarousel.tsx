@@ -71,6 +71,8 @@ export default function ImageCarousel({ images, height = 250, onImagePress }: Im
       >
         <Image
           source={{ uri: item.uri }}
+          recyclingKey={item.uri}
+          transition={120}
           style={{ width: IMAGE_WIDTH, height, borderRadius: 10 }}
           contentFit="cover"
         />

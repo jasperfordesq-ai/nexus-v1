@@ -110,15 +110,33 @@
     "createError": "Could not create poll."
   },
   "reaction": {
-    "like": "Like",
-    "love": "Love",
-    "laugh": "Laugh",
-    "wow": "Wow",
-    "sad": "Sad",
-    "celebrate": "Celebrate",
-    "clap": "Clap",
-    "time_credit": "Time Credit",
-    "longPressHint": "Long press to choose a reaction",
-    "dismiss": "Dismiss reaction picker"
-  }
+    "like": "Gosto",
+    "love": "Adoro",
+    "laugh": "Riso",
+    "wow": "Uau",
+    "sad": "Triste",
+    "celebrate": "Celebrar",
+    "clap": "Aplausos",
+    "time_credit": "Crédito de tempo",
+    "longPressHint": "Prima sem soltar para escolher uma reação",
+    "dismiss": "Fechar seletor de reações",
+    "failed": "Não foi possível guardar a sua reação. Tente novamente.",
+    "summaryTwo": "{{a}} e {{b}}",
+    "summaryMany": "{{name}} e {{count}} outra pessoa",
+    "summaryMany_other": "{{name}} e mais {{count}} pessoas",
+    "viewReactors": "Ver quem reagiu",
+    "reactorsTitle": "Reações",
+    "noReactors": "Ainda sem reações"
+  },
+  "stats": {
+    "reactions": "{{count}} reação",
+    "reactions_other": "{{count}} reações",
+    "comments": "{{count}} comentário",
+    "comments_other": "{{count}} comentários",
+    "views": "{{count}} visualização",
+    "views_other": "{{count}} visualizações",
+    "shares": "{{count}} partilha",
+    "shares_other": "{{count}} partilhas"
+  },
+  "saveFailed": "Não foi possível atualizar os seus itens guardados. Tente novamente."
 }

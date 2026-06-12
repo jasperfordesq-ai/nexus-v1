@@ -9,13 +9,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 
 import { getFeedItem, type FeedItem as FeedItemType, type FeedItemType as FeedType } from '@/lib/api/feed';
+import ReactorsSheet from '@/components/reactions/ReactorsSheet';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
-import FeedItem from '@/components/FeedItem';
+import FeedItem, { type FeedReactorsTarget } from '@/components/FeedItem';
 import { useTranslation } from 'react-i18next';
 
 const SUPPORTED_TYPES = new Set<FeedType>([
@@ -54,6 +55,7 @@ function FeedItemDetailScreenInner() {
   const type = useMemo(() => normalizeType(params.type), [params.type]);
   const id = useMemo(() => normalizeId(params.id), [params.id]);
   const [item, setItem] = useState<FeedItemType | null>(null);
+  const [reactorsTarget, setReactorsTarget] = useState<FeedReactorsTarget | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -119,7 +121,7 @@ function FeedItemDetailScreenInner() {
               <RefreshControl refreshing={isRefreshing} onRefresh={() => void loadItem(true)} tintColor={primary} colors={[primary]} />
             }
           >
-            <FeedItem item={item} disableDetailNavigation />
+            <FeedItem item={item} disableDetailNavigation onOpenReactors={setReactorsTarget} />
           </ScrollView>
         )}
       </SafeAreaView>

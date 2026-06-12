@@ -100,7 +100,7 @@ export default function ReactionBar({
                 accessibilityLabel={t(config.labelKey)}
                 accessibilityRole="menuitem"
                 accessibilityState={{ selected: isActive }}
-                className="size-9 items-center justify-center rounded-full"
+                className="size-11 items-center justify-center rounded-full"
                 style={isActive ? { backgroundColor: withAlpha(primary, 0.18) } : undefined}
               >
                 {config.type === 'time_credit' ? (

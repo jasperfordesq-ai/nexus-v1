@@ -310,7 +310,7 @@ class ReactionService
 
         $result = [];
         foreach ($resultKeys as $k) {
-            $result[$k] = ['counts' => [], 'total' => 0, 'user_reaction' => null];
+            $result[$k] = ['counts' => [], 'total' => 0, 'user_reaction' => null, 'top_reactors' => []];
         }
 
         if (empty($byType)) {
@@ -349,6 +349,30 @@ class ReactionService
                     $key = $type . ':' . (int) $row->target_id;
                     $result[$key]['user_reaction'] = $row->emoji;
                 }
+            }
+
+            // Top 3 most-recent reactors per item (window function) so feed
+            // cards can render the "Anna, Bob and 5 others" summary without a
+            // per-item follow-up request. Same shape as getReactions().
+            $reactorRows = DB::select(
+                "SELECT target_id, user_id, name, avatar_url FROM (
+                    SELECT r.target_id, r.user_id,
+                           CONCAT(u.first_name, ' ', u.last_name) AS name,
+                           u.avatar_url,
+                           ROW_NUMBER() OVER (PARTITION BY r.target_id ORDER BY r.created_at DESC) AS rn
+                    FROM reactions r
+                    JOIN users u ON u.id = r.user_id AND u.tenant_id = r.tenant_id
+                    WHERE r.tenant_id = ? AND r.target_type = ? AND r.target_id IN ({$placeholders})
+                 ) ranked WHERE rn <= 3",
+                array_merge([$tenantId, $type], $ids)
+            );
+            foreach ($reactorRows as $row) {
+                $key = $type . ':' . (int) $row->target_id;
+                $result[$key]['top_reactors'][] = [
+                    'id' => (int) $row->user_id,
+                    'name' => trim((string) $row->name),
+                    'avatar_url' => $row->avatar_url,
+                ];
             }
         }
 

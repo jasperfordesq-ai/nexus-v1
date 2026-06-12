@@ -8,6 +8,7 @@ import { render, fireEvent } from '@testing-library/react-native';
 
 // --- Mocks ---
 
+jest.mock('@/components/reactions/ReactorsSheet', () => 'View');
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
   useSegments: () => ['(tabs)'],

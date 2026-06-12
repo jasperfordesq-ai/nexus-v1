@@ -42,6 +42,11 @@ jest.mock('@/lib/api/feed', () => ({
   toggleReaction: jest.fn(),
 }));
 
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  return { useAppToast: () => ({ show }) };
+});
+
 jest.mock('@/lib/haptics', () => ({
   ImpactFeedbackStyle: { Light: 'Light', Medium: 'Medium' },
   NotificationFeedbackType: { Success: 'Success' },
@@ -99,6 +104,7 @@ jest.mock('@/components/ui/ImageCarousel', () => {
   };
 });
 jest.mock('@/components/ui/ActionSheet', () => 'View');
+jest.mock('@/components/reactions/ReactorsSheet', () => 'View');
 jest.mock('@/components/PollCard', () => 'View');
 jest.mock('@/components/comments/CommentSheet', () => {
   const React = require('react');
