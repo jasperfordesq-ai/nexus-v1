@@ -634,6 +634,12 @@ return [
         'own_listing' => 'Ní féidir leat malartú a iarraidh ar do liostú féin.',
     ],
     'exchanges' => [
+        'action_respond' => 'Action needed: respond',
+        'action_confirm' => 'Action needed: confirm hours',
+        'requester_confirmation_label' => 'Requester confirmation',
+        'provider_confirmation_label' => 'Provider confirmation',
+        'confirmed' => 'Confirmed',
+        'awaiting_confirmation' => 'Awaiting confirmation',
         'ratings_title' => 'Rátálacha',
         'timeline_by' => 'ag:name',
         'status_descriptions' => [

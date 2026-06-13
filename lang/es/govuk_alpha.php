@@ -634,6 +634,12 @@ return [
         'own_listing' => 'No puedes solicitar un cambio en tu propio anuncio.',
     ],
     'exchanges' => [
+        'action_respond' => 'Action needed: respond',
+        'action_confirm' => 'Action needed: confirm hours',
+        'requester_confirmation_label' => 'Requester confirmation',
+        'provider_confirmation_label' => 'Provider confirmation',
+        'confirmed' => 'Confirmed',
+        'awaiting_confirmation' => 'Awaiting confirmation',
         'ratings_title' => 'Calificaciones',
         'timeline_by' => 'por:name',
         'status_descriptions' => [

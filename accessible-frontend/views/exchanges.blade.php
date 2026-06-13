@@ -76,15 +76,27 @@
                 @php
                     $statusKey = $exchange['status'] ?? 'pending_provider';
                     $created = $formatDate($exchange['created_at'] ?? null);
-                    $otherName = (int) ($exchange['requester_id'] ?? 0) === $currentUserId
+                    $isProvider = (int) ($exchange['provider_id'] ?? 0) === $currentUserId;
+                    $isRequester = (int) ($exchange['requester_id'] ?? 0) === $currentUserId;
+                    $otherName = $isRequester
                         ? ($exchange['provider_name'] ?? __('govuk_alpha.members.unknown_member'))
                         : ($exchange['requester_name'] ?? __('govuk_alpha.members.unknown_member'));
+                    // Action-needed chip mirrors the React list: provider must respond to a
+                    // pending request; either party must confirm hours once work is done.
+                    $viewerConfirmed = ($isRequester && !empty($exchange['requester_confirmed_at']))
+                        || ($isProvider && !empty($exchange['provider_confirmed_at']));
+                    $actionNeeded = ($statusKey === 'pending_provider' && $isProvider)
+                        ? 'respond'
+                        : ((in_array($statusKey, ['in_progress', 'pending_confirmation'], true) && !$viewerConfirmed) ? 'confirm' : null);
                 @endphp
                 <article class="nexus-alpha-card">
                     <h3 class="govuk-heading-m govuk-!-margin-bottom-2">
                         <a class="govuk-link" href="{{ route('govuk-alpha.exchanges.show', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}">{{ $exchange['listing_title'] ?? __('govuk_alpha.exchanges.detail_title') }}</a>
                     </h3>
                     <strong class="govuk-tag {{ $statusTagClass($statusKey) }}">{{ $label('exchanges.statuses', $statusKey) }}</strong>
+                    @if ($actionNeeded)
+                        <strong class="govuk-tag govuk-tag--red">{{ __('govuk_alpha.exchanges.action_' . $actionNeeded) }}</strong>
+                    @endif
                     <dl class="nexus-alpha-inline-list govuk-!-margin-top-3">
                         <div>
                             <dt>{{ __('govuk_alpha.exchanges.proposed_hours_label') }}</dt>

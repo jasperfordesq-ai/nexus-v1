@@ -634,6 +634,12 @@ return [
         'own_listing' => 'Sie können für Ihren eigenen Eintrag keinen Umtausch beantragen.',
     ],
     'exchanges' => [
+        'action_respond' => 'Action needed: respond',
+        'action_confirm' => 'Action needed: confirm hours',
+        'requester_confirmation_label' => 'Requester confirmation',
+        'provider_confirmation_label' => 'Provider confirmation',
+        'confirmed' => 'Confirmed',
+        'awaiting_confirmation' => 'Awaiting confirmation',
         'ratings_title' => 'Bewertungen',
         'timeline_by' => 'von:name',
         'status_descriptions' => [

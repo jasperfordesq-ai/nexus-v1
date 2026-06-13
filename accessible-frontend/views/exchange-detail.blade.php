@@ -110,6 +110,28 @@
                 <dd class="govuk-summary-list__value">{{ __('govuk_alpha.exchanges.hours', ['count' => (float) $exchange['final_hours']]) }}</dd>
             </div>
         @endif
+        @if (in_array($statusKey, ['in_progress', 'pending_confirmation', 'completed'], true))
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.exchanges.requester_confirmation_label') }}</dt>
+                <dd class="govuk-summary-list__value">
+                    @if ($hasRequesterConfirmed)
+                        <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.exchanges.confirmed') }}</strong>
+                    @else
+                        <strong class="govuk-tag govuk-tag--yellow">{{ __('govuk_alpha.exchanges.awaiting_confirmation') }}</strong>
+                    @endif
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.exchanges.provider_confirmation_label') }}</dt>
+                <dd class="govuk-summary-list__value">
+                    @if ($hasProviderConfirmed)
+                        <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.exchanges.confirmed') }}</strong>
+                    @else
+                        <strong class="govuk-tag govuk-tag--yellow">{{ __('govuk_alpha.exchanges.awaiting_confirmation') }}</strong>
+                    @endif
+                </dd>
+            </div>
+        @endif
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">{{ __('govuk_alpha.exchanges.risk_label') }}</dt>
             <dd class="govuk-summary-list__value">{{ $label('exchanges.risk_values', $riskKey) }}</dd>

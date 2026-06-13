@@ -634,6 +634,12 @@ return [
         'own_listing' => 'You cannot request an exchange on your own listing.',
     ],
     'exchanges' => [
+        'action_respond' => 'Action needed: respond',
+        'action_confirm' => 'Action needed: confirm hours',
+        'requester_confirmation_label' => 'Requester confirmation',
+        'provider_confirmation_label' => 'Provider confirmation',
+        'confirmed' => 'Confirmed',
+        'awaiting_confirmation' => 'Awaiting confirmation',
         'ratings_title' => 'Ratings',
         'timeline_by' => 'by :name',
         'status_descriptions' => [

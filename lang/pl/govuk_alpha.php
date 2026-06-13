@@ -634,6 +634,12 @@ return [
         'own_listing' => 'Nie możesz poprosić o wymianę w ramach własnej oferty.',
     ],
     'exchanges' => [
+        'action_respond' => 'Action needed: respond',
+        'action_confirm' => 'Action needed: confirm hours',
+        'requester_confirmation_label' => 'Requester confirmation',
+        'provider_confirmation_label' => 'Provider confirmation',
+        'confirmed' => 'Confirmed',
+        'awaiting_confirmation' => 'Awaiting confirmation',
         'ratings_title' => 'Oceny',
         'timeline_by' => 'przez:name',
         'status_descriptions' => [

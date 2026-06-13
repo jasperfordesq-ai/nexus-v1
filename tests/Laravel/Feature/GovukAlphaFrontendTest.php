@@ -1282,6 +1282,47 @@ class GovukAlphaFrontendTest extends TestCase
         ]);
     }
 
+    public function test_exchanges_list_action_chip_and_detail_per_party_confirmation(): void
+    {
+        $requester = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Chip Requester',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $provider = $this->authenticatedUser(['name' => 'Chip Provider']);
+        $this->enableExchangeWorkflow();
+
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $provider->id,
+            'title' => 'Chip listing',
+            'type' => 'offer',
+        ]);
+
+        $exchangeId = DB::table('exchange_requests')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'listing_id' => $listing->id,
+            'requester_id' => $requester->id,
+            'provider_id' => $provider->id,
+            'proposed_hours' => 2,
+            'status' => 'pending_provider',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // The provider sees an "action needed: respond" chip in the list.
+        $list = $this->get("/{$this->testTenantSlug}/alpha/exchanges");
+        $list->assertOk();
+        $list->assertSee(__('govuk_alpha.exchanges.action_respond'));
+
+        // Once in progress, the detail page shows both parties' confirmation state.
+        DB::table('exchange_requests')->where('id', $exchangeId)->update(['status' => 'in_progress']);
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}");
+        $detail->assertOk();
+        $detail->assertSee(__('govuk_alpha.exchanges.requester_confirmation_label'));
+        $detail->assertSee(__('govuk_alpha.exchanges.provider_confirmation_label'));
+        $detail->assertSee(__('govuk_alpha.exchanges.awaiting_confirmation'));
+    }
+
     public function test_accessible_exchange_detail_supports_provider_lifecycle_actions(): void
     {
         $requester = User::factory()->forTenant($this->testTenantId)->create([
