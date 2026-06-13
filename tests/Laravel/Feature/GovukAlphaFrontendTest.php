@@ -1613,6 +1613,19 @@ class GovukAlphaFrontendTest extends TestCase
         $organisations->assertSee(__('govuk_alpha.volunteering.roles.owner'));
     }
 
+    public function test_volunteering_recommended_tab_renders(): void
+    {
+        $this->authenticatedUser();
+
+        // The skills-based "For you" tab renders (empty state when no matching
+        // shifts exist for the member).
+        $page = $this->get("/{$this->testTenantSlug}/alpha/volunteering?tab=recommended");
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.volunteering.tabs.recommended'));
+        $page->assertSee(__('govuk_alpha.volunteering.recommended_title'));
+        $page->assertSee('aria-current="page"', false);
+    }
+
     public function test_volunteering_applications_tab_supports_status_filter_and_withdraw(): void
     {
         $user = $this->authenticatedUser();

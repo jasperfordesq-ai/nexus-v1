@@ -810,6 +810,11 @@ return [
         'description_title' => 'Description',
     ],
     'volunteering' => [
+        'recommended_title' => 'Recommended for you',
+        'recommended_intro' => 'Shifts matched to your skills and availability.',
+        'empty_recommended' => 'No recommended shifts right now. Check the opportunities tab.',
+        'match_score' => ':score% match',
+        'spots_remaining_label' => 'Spaces left',
         'organiser_note' => 'Note from the organiser',
         'hours_of_goal' => ':hours of :goal hours',
         'accessibility_title' => 'Your accessibility needs',
@@ -892,6 +897,7 @@ return [
         ],
         'tabs_title' => 'Volunteering sections',
         'tabs' => [
+            'recommended' => 'For you',
             'opportunities' => 'Opportunities',
             'applications' => 'Applications',
             'hours' => 'Hours',

@@ -1104,7 +1104,7 @@ class AlphaController extends Controller
         }
 
         $filters = $this->volunteeringFilters($request);
-        $selectedTab = $this->allowed($request->query('tab', 'opportunities'), ['opportunities', 'applications', 'organisations'], 'opportunities');
+        $selectedTab = $this->allowed($request->query('tab', 'opportunities'), ['opportunities', 'applications', 'organisations', 'recommended'], 'opportunities');
         $query = ['limit' => 12];
         foreach (['category_id', 'search', 'cursor', 'is_remote'] as $key) {
             if ($filters[$key] !== null && $filters[$key] !== '') {
@@ -1144,6 +1144,16 @@ class AlphaController extends Controller
             $applications = VolunteerService::getMyApplications($userId, $applicationsQuery);
         }
 
+        // Recommended (skills-based) shifts — read-only "For you" tab.
+        $recommendedShifts = [];
+        if ($userId !== null && $selectedTab === 'recommended') {
+            try {
+                $recommendedShifts = app(\App\Services\VolunteerMatchingService::class)->getRecommendedShifts($userId, ['limit' => 10]);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
         return $this->view('accessible-frontend::volunteering', [
             'title' => __('govuk_alpha.volunteering.title'),
             'tenantSlug' => $tenantSlug,
@@ -1160,6 +1170,7 @@ class AlphaController extends Controller
             'applicationsMeta' => ['has_more' => (bool) ($applications['has_more'] ?? false), 'cursor' => $applications['cursor'] ?? null],
             'applicationsStatus' => $applicationsStatus,
             'organizations' => $userId ? (VolunteerService::getMyOrganizations($userId, ['limit' => 5])['items'] ?? []) : [],
+            'recommendedShifts' => $recommendedShifts,
             'selectedTab' => $selectedTab,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
