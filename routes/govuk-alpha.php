@@ -110,6 +110,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/members', [AlphaController::class, 'members'])->name('members.index');
         Route::get('/members/{id}', [AlphaController::class, 'memberProfile'])->whereNumber('id')->name('members.show');
         Route::post('/members/{id}/connection', [AlphaController::class, 'updateMemberConnection'])->middleware('throttle:20,1')->whereNumber('id')->name('members.connection');
+        Route::post('/members/{id}/endorse', [AlphaController::class, 'endorseMemberSkill'])->middleware('throttle:30,1')->whereNumber('id')->name('members.endorse');
         Route::get('/profile', [AlphaController::class, 'myProfile'])->name('profile.me');
         Route::get('/profile/settings', [AlphaController::class, 'profileSettings'])->name('profile.settings');
         Route::post('/profile/settings', [AlphaController::class, 'updateProfileSettings'])->middleware('throttle:20,1')->name('profile.settings.update');

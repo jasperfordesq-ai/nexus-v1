@@ -2470,7 +2470,77 @@ class AlphaController extends Controller
             'connectionState' => $id === $viewerId
                 ? null
                 : (ConnectionService::getStatus($viewerId, $id)['status'] ?? 'none'),
+            'endorsements' => $this->memberEndorsements($id, $viewerId),
+            'canEndorse' => $id !== $viewerId,
         ]);
+    }
+
+    /**
+     * Skill-endorsement counts for a profile, plus the set of skills the viewer
+     * has already endorsed (so the UI can offer endorse vs remove). Never blocks
+     * the page render.
+     *
+     * @return array{counts: array<string, int>, viewerEndorsed: array<int, string>}
+     */
+    private function memberEndorsements(int $profileUserId, int $viewerId): array
+    {
+        $counts = [];
+        $viewerEndorsed = [];
+
+        try {
+            foreach (\App\Services\EndorsementService::getEndorsements($profileUserId) as $group) {
+                $skill = (string) ($group['skill_name'] ?? '');
+                if ($skill === '') {
+                    continue;
+                }
+                $counts[$skill] = (int) ($group['count'] ?? 0);
+                foreach (($group['endorsers'] ?? []) as $endorser) {
+                    if ((int) ($endorser['id'] ?? 0) === $viewerId) {
+                        $viewerEndorsed[] = $skill;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return ['counts' => $counts, 'viewerEndorsed' => $viewerEndorsed];
+    }
+
+    public function endorseMemberSkill(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('connections'), 403);
+
+        $viewerId = $this->currentUserId();
+        if ($viewerId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $skillName = trim(self::asStr($request->input('skill_name')));
+        $action = $this->allowed($request->input('action'), ['endorse', 'remove'], '');
+
+        if ($id === $viewerId || $skillName === '' || $action === '') {
+            return redirect()->route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'endorsement-failed']);
+        }
+
+        // Confirm the target is a real member of this tenant before acting.
+        abort_if($this->profileForViewer($id, $viewerId) === null, 404);
+
+        $status = 'endorsement-failed';
+        try {
+            if ($action === 'endorse') {
+                $status = \App\Services\EndorsementService::endorse($viewerId, $id, $skillName) !== null
+                    ? 'endorsement-added' : 'endorsement-failed';
+            } else {
+                $status = \App\Services\EndorsementService::removeEndorsement($viewerId, $id, $skillName)
+                    ? 'endorsement-removed' : 'endorsement-failed';
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
     }
 
     /**

@@ -29,10 +29,10 @@
     @endif
 
     @php
-        $connectionStatuses = ['connection-sent', 'connection-accepted', 'connection-declined', 'connection-cancelled', 'connection-removed', 'connection-failed'];
+        $connectionStatuses = ['connection-sent', 'connection-accepted', 'connection-declined', 'connection-cancelled', 'connection-removed', 'connection-failed', 'endorsement-added', 'endorsement-removed', 'endorsement-failed'];
     @endphp
     @if (in_array(($status ?? ''), $connectionStatuses, true))
-        @php $isFailure = ($status === 'connection-failed'); @endphp
+        @php $isFailure = in_array($status, ['connection-failed', 'endorsement-failed'], true); @endphp
         <div class="govuk-notification-banner {{ $isFailure ? '' : 'govuk-notification-banner--success' }}" role="region" aria-labelledby="connection-status-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="connection-status-title">{{ $isFailure ? __('govuk_alpha.states.important') : __('govuk_alpha.states.success_title') }}</h2>
@@ -172,13 +172,31 @@
             @else
                 <ul class="govuk-list nexus-alpha-skill-list">
                     @foreach ($profileSkills as $skill)
+                        @php
+                            $skillName = (string) ($skill['skill_name'] ?? '');
+                            $endorseCount = (int) (($endorsements['counts'][$skillName] ?? 0));
+                            $viewerEndorsed = in_array($skillName, $endorsements['viewerEndorsed'] ?? [], true);
+                        @endphp
                         <li>
-                            <span class="govuk-!-font-weight-bold">{{ $skill['skill_name'] }}</span>
+                            <span class="govuk-!-font-weight-bold">{{ $skillName }}</span>
                             @if (!empty($skill['is_offering']))
                                 <strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha.profile.skill_offering') }}</strong>
                             @endif
                             @if (!empty($skill['is_requesting']))
                                 <strong class="govuk-tag govuk-tag--purple">{{ __('govuk_alpha.profile.skill_requesting') }}</strong>
+                            @endif
+                            @if ($endorseCount > 0)
+                                <strong class="govuk-tag govuk-tag--green">{{ trans_choice('govuk_alpha.profile.endorsement_count', $endorseCount, ['count' => $endorseCount]) }}</strong>
+                            @endif
+                            @if (($canEndorse ?? false) && $skillName !== '')
+                                <form method="post" action="{{ route('govuk-alpha.members.endorse', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}" class="govuk-!-margin-top-1">
+                                    @csrf
+                                    <input type="hidden" name="skill_name" value="{{ $skillName }}">
+                                    <input type="hidden" name="action" value="{{ $viewerEndorsed ? 'remove' : 'endorse' }}">
+                                    <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">
+                                        {{ $viewerEndorsed ? __('govuk_alpha.profile.remove_endorsement') : __('govuk_alpha.profile.endorse') }}<span class="govuk-visually-hidden"> {{ $skillName }}</span>
+                                    </button>
+                                </form>
                             @endif
                         </li>
                     @endforeach

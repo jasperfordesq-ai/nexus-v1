@@ -17,6 +17,12 @@ class SkillEndorsement extends Model
 
     protected $table = 'skill_endorsements';
 
+    // The skill_endorsements table has only created_at (see the creating
+    // migration + schema dump), so Eloquent must not manage updated_at — writing
+    // it 500s every endorsement. Matches the created_at-only pattern used by many
+    // models here (Category, ActivityLog, GoalCheckin, …).
+    public const UPDATED_AT = null;
+
     protected $fillable = [
         'tenant_id',
         'endorser_id',

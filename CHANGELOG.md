@@ -9,8 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Skill endorsements now work again across the whole platform.** Endorsing a member's skill was silently failing with a server error (the endorsements table has no "updated at" column, but the code tried to write one). Endorsing and un-endorsing now work everywhere.
+
 ### Added
 
+- **Endorse a member's skills on the accessible site.** A member's profile on the accessibility-first site now shows how many endorsements each of their skills has, and lets you endorse (or remove your endorsement of) any skill.
 - **The accessible community home page now shows live stats and the community's tagline.** The landing page displays the community's own one-line tagline and live totals (members, hours exchanged, active listings and communities), matching the main site.
 
 - **A more visual accessible dashboard.** The dashboard's recent-activity and recent-listings cards now show author photos and images, and the quick links now include Messages and Members.

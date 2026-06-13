@@ -116,6 +116,9 @@ return [
         'cancel_exchange' => 'Cancel exchange',
     ],
     'states' => [
+        'endorsement-added' => 'Your endorsement has been added.',
+        'endorsement-removed' => 'Your endorsement has been removed.',
+        'endorsement-failed' => 'That endorsement action could not be completed.',
         'post-updated' => 'Your post has been updated.',
         'post-update-failed' => 'Your post could not be updated. Try again.',
         'post-deleted' => 'Your post has been deleted.',
@@ -973,6 +976,9 @@ return [
         'more_results_label' => 'More members',
     ],
     'profile' => [
+        'endorse' => 'Endorse',
+        'remove_endorsement' => 'Remove endorsement',
+        'endorsement_count' => '{1} 1 endorsement|[2,*] :count endorsements',
         'badges_title' => 'Badges',
         'title' => 'Profile',
         'caption' => ':community',

@@ -2026,6 +2026,54 @@ class GovukAlphaFrontendTest extends TestCase
         ]);
     }
 
+    public function test_member_profile_skill_can_be_endorsed_and_unendorsed(): void
+    {
+        $viewer = $this->authenticatedUser(['name' => 'Endorser']);
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Endorsed Member',
+            'first_name' => 'Endorsed',
+            'last_name' => 'Member',
+            'status' => 'active',
+            'is_approved' => true,
+            'privacy_search' => true,
+            'privacy_profile' => 'members',
+            'onboarding_completed' => true,
+        ]);
+
+        Sanctum::actingAs($viewer, ['*']);
+
+        // Endorse a skill.
+        $endorse = $this->post("/{$this->testTenantSlug}/alpha/members/{$member->id}/endorse", [
+            'skill_name' => 'Gardening',
+            'action' => 'endorse',
+        ]);
+        $endorse->assertRedirectContains('status=endorsement-added');
+        $this->assertDatabaseHas('skill_endorsements', [
+            'endorser_id' => $viewer->id,
+            'endorsed_id' => $member->id,
+            'skill_name' => 'Gardening',
+        ]);
+
+        // Remove the endorsement.
+        $remove = $this->post("/{$this->testTenantSlug}/alpha/members/{$member->id}/endorse", [
+            'skill_name' => 'Gardening',
+            'action' => 'remove',
+        ]);
+        $remove->assertRedirectContains('status=endorsement-removed');
+        $this->assertDatabaseMissing('skill_endorsements', [
+            'endorser_id' => $viewer->id,
+            'endorsed_id' => $member->id,
+            'skill_name' => 'Gardening',
+        ]);
+
+        // You cannot endorse your own skill.
+        $self = $this->post("/{$this->testTenantSlug}/alpha/members/{$viewer->id}/endorse", [
+            'skill_name' => 'Gardening',
+            'action' => 'endorse',
+        ]);
+        $self->assertRedirectContains('status=endorsement-failed');
+    }
+
     public function test_my_profile_and_settings_update_stay_inside_accessible_frontend(): void
     {
         $user = $this->authenticatedUser([
