@@ -1023,6 +1023,16 @@ return [
         'connection_request_received' => 'Quiere conectarse',
     ],
     'profile' => [
+        'recent_activity_title' => 'Recent activity',
+        'empty_activity' => 'No recent activity to show yet.',
+        'activity_types' => [
+            'post' => 'Posted',
+            'comment' => 'Commented',
+            'gave_hours' => 'Gave time',
+            'received_hours' => 'Received time',
+            'connection' => 'Connected',
+            'event_rsvp' => 'Going to an event',
+        ],
         'endorse' => 'respaldar',
         'remove_endorsement' => 'Quitar respaldo',
         'endorsement_count' => '{1} 1 respaldo|[2,*]:count respaldos',

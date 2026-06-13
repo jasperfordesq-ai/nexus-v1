@@ -2750,7 +2750,26 @@ class AlphaController extends Controller
                 : (ConnectionService::getStatus($viewerId, $id)['status'] ?? 'none'),
             'endorsements' => $this->memberEndorsements($id, $viewerId),
             'canEndorse' => $id !== $viewerId,
+            'profileActivity' => $this->profileActivity($id),
         ]);
+    }
+
+    /**
+     * Recent public activity for a member (posts, hours, comments, connections,
+     * event RSVPs) via the shared MemberActivityService. Never blocks render.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function profileActivity(int $id): array
+    {
+        try {
+            return app(\App\Services\MemberActivityService::class)
+                ->getRecentTimeline($id, TenantContext::getId(), 12);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return [];
+        }
     }
 
     /**

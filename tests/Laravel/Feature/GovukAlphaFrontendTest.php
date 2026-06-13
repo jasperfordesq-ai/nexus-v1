@@ -2268,6 +2268,28 @@ class GovukAlphaFrontendTest extends TestCase
         ]);
     }
 
+    public function test_member_profile_shows_recent_activity_timeline(): void
+    {
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Active Member',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        FeedPost::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $member->id,
+            'content' => 'Timeline post content.',
+            'visibility' => 'public',
+        ]);
+
+        $this->authenticatedUser(['name' => 'Timeline Viewer']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/members/{$member->id}");
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.profile.recent_activity_title'));
+        $response->assertSee(__('govuk_alpha.profile.activity_types.post'));
+        $response->assertSee('Timeline post content.');
+    }
+
     public function test_member_profile_skill_can_be_endorsed_and_unendorsed(): void
     {
         $viewer = $this->authenticatedUser(['name' => 'Endorser']);

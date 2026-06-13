@@ -1023,6 +1023,16 @@ return [
         'more_results_label' => 'メンバーを増やす',
     ],
     'profile' => [
+        'recent_activity_title' => 'Recent activity',
+        'empty_activity' => 'No recent activity to show yet.',
+        'activity_types' => [
+            'post' => 'Posted',
+            'comment' => 'Commented',
+            'gave_hours' => 'Gave time',
+            'received_hours' => 'Received time',
+            'connection' => 'Connected',
+            'event_rsvp' => 'Going to an event',
+        ],
         'endorse' => '支持する',
         'remove_endorsement' => '承認を削除する',
         'endorsement_count' => '{1} 1 件の承認|[2,*]:count 件の承認',

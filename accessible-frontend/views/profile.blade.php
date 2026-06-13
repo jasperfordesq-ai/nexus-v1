@@ -245,6 +245,44 @@
                     @endforeach
                 </div>
             @endif
+
+            <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.profile.recent_activity_title') }}</h2>
+            @if (empty($profileActivity))
+                <div class="govuk-inset-text">{{ __('govuk_alpha.profile.empty_activity') }}</div>
+            @else
+                @php
+                    $activityTagClass = [
+                        'post' => 'govuk-tag--blue',
+                        'comment' => 'govuk-tag--blue',
+                        'gave_hours' => 'govuk-tag--green',
+                        'received_hours' => 'govuk-tag--turquoise',
+                        'connection' => 'govuk-tag--purple',
+                        'event_rsvp' => 'govuk-tag--yellow',
+                    ];
+                @endphp
+                <ol class="govuk-list nexus-alpha-timeline">
+                    @foreach ($profileActivity as $activity)
+                        @php
+                            $activityType = (string) ($activity['activity_type'] ?? 'post');
+                            $activityLabel = \Illuminate\Support\Facades\Lang::has('govuk_alpha.profile.activity_types.' . $activityType)
+                                ? __('govuk_alpha.profile.activity_types.' . $activityType)
+                                : \Illuminate\Support\Str::headline($activityType);
+                            $activityDate = !empty($activity['created_at'])
+                                ? \Illuminate\Support\Carbon::parse($activity['created_at'])->translatedFormat('j F Y')
+                                : null;
+                        @endphp
+                        <li class="govuk-!-margin-bottom-3">
+                            <strong class="govuk-tag {{ $activityTagClass[$activityType] ?? 'govuk-tag--grey' }}">{{ $activityLabel }}</strong>
+                            @if (!empty($activity['description']))
+                                <span class="govuk-body">{{ \Illuminate\Support\Str::limit((string) $activity['description'], 160) }}</span>
+                            @endif
+                            @if ($activityDate)
+                                <span class="govuk-body-s nexus-alpha-meta">{{ $activityDate }}</span>
+                            @endif
+                        </li>
+                    @endforeach
+                </ol>
+            @endif
         </div>
 
         <div class="govuk-grid-column-one-third">

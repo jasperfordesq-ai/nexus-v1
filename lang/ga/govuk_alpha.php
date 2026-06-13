@@ -1023,6 +1023,16 @@ return [
         'more_results_label' => 'Tuilleadh ball',
     ],
     'profile' => [
+        'recent_activity_title' => 'Recent activity',
+        'empty_activity' => 'No recent activity to show yet.',
+        'activity_types' => [
+            'post' => 'Posted',
+            'comment' => 'Commented',
+            'gave_hours' => 'Gave time',
+            'received_hours' => 'Received time',
+            'connection' => 'Connected',
+            'event_rsvp' => 'Going to an event',
+        ],
         'endorse' => 'Tacaigh',
         'remove_endorsement' => 'Bain formhuiniú',
         'endorsement_count' => '{1} 1 fhormhuiniú|[2,*]:count formhuiniú',
