@@ -37,6 +37,26 @@
                         </div>
                     </div>
                 </div>
+                @if (in_array($status, ['email-not-verified', 'pending-verification'], true))
+                    <form method="post" action="{{ route('govuk-alpha.login.resend', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-6" novalidate>
+                        @csrf
+                        <div class="govuk-form-group">
+                            <label class="govuk-label" for="resend_email">{{ __('govuk_alpha.auth.resend_email_label') }}</label>
+                            <div id="resend-email-hint" class="govuk-hint">{{ __('govuk_alpha.auth.resend_verification_hint') }}</div>
+                            <input class="govuk-input govuk-!-width-two-thirds" id="resend_email" name="email" type="email" autocomplete="email" value="{{ old('email') }}" aria-describedby="resend-email-hint">
+                        </div>
+                        <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.auth.resend_verification_button') }}</button>
+                    </form>
+                @endif
+            @elseif (($status ?? '') === 'verification-resent')
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="verification-resent-title">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="verification-resent-title">{{ __('govuk_alpha.states.success_title') }}</h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.auth.verification_resent') }}</p>
+                    </div>
+                </div>
             @elseif (($status ?? '') === 'register-created')
                 <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="register-status-title">
                     <div class="govuk-notification-banner__header">
@@ -70,7 +90,7 @@
                 @csrf
                 <div class="govuk-form-group">
                     <label class="govuk-label" for="email">{{ __('govuk_alpha.auth.email_label') }}</label>
-                    <input class="govuk-input" id="email" name="email" type="email" autocomplete="email" required>
+                    <input class="govuk-input" id="email" name="email" type="email" autocomplete="email" value="{{ old('email') }}" required>
                 </div>
 
                 <div class="govuk-form-group">

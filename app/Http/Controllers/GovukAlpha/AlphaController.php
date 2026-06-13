@@ -228,7 +228,26 @@ class AlphaController extends Controller
             default                                    => 'login-failed',
         };
 
-        return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+        return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => $status])
+            ->withInput($request->only('email'));
+    }
+
+    /**
+     * Resend an email-verification link. Delegates to the v2 endpoint, which
+     * always returns a generic success (anti-enumeration), so the alpha shows
+     * the same confirmation regardless of whether the address exists.
+     */
+    public function resendVerification(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        try {
+            app(\App\Http\Controllers\Api\EmailVerificationController::class)->resendVerificationByEmail();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'verification-resent']);
     }
 
     public function twoFactor(Request $request, string $tenantSlug): Response|RedirectResponse

@@ -266,6 +266,10 @@ return [
         'edit_profile' => 'Cuir do phróifíl in eagar',
     ],
     'auth' => [
+        'resend_email_label' => 'Email address',
+        'resend_verification_hint' => 'We will send a new verification link to this address if an account needs verifying.',
+        'resend_verification_button' => 'Resend verification email',
+        'verification_resent' => 'If an account with that email needs verifying, we have sent a new verification link. Please check your inbox.',
         'two_factor_title' => 'Fíordheimhniú dhá fhachtóir',
         'two_factor_description' => 'Cuir isteach an cód fíorúcháin ó d\'aip fíordheimhnitheora chun síniú isteach a chríochnú.',
         'two_factor_code_label' => 'Cód fíoraithe',

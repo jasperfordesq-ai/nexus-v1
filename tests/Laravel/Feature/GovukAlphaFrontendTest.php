@@ -119,6 +119,36 @@ class GovukAlphaFrontendTest extends TestCase
         $ar->assertDontSee($this->alphaText('en', 'auth.login_description', ['community' => 'Hour Timebank']));
     }
 
+    public function test_login_unverified_shows_resend_form_and_resend_is_generic(): void
+    {
+        // The login page surfaces a resend-verification form for unverified accounts.
+        $page = $this->get("/{$this->testTenantSlug}/alpha/login?status=email-not-verified");
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.auth.resend_verification_button'));
+        $page->assertSee(route('govuk-alpha.login.resend', ['tenantSlug' => $this->testTenantSlug]), false);
+
+        // Posting returns the generic (anti-enumeration) confirmation regardless.
+        $resend = $this->post("/{$this->testTenantSlug}/alpha/login/resend-verification", [
+            'email' => 'nobody@example.com',
+        ]);
+        $resend->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=verification-resent");
+
+        $confirm = $this->get("/{$this->testTenantSlug}/alpha/login?status=verification-resent");
+        $confirm->assertSee(__('govuk_alpha.auth.verification_resent'));
+    }
+
+    public function test_failed_login_repopulates_the_email_field(): void
+    {
+        $login = $this->post("/{$this->testTenantSlug}/alpha/login", [
+            'email' => 'someone@example.com',
+            'password' => 'definitely-the-wrong-password',
+        ]);
+
+        $login->assertRedirect();
+        // withInput() flashes the email so the form can pre-fill old('email').
+        $login->assertSessionHasInput('email', 'someone@example.com');
+    }
+
     public function test_home_module_grid_distinguishes_signin_from_disabled(): void
     {
         // Anonymous viewer: auth-gated modules (Dashboard, My Profile, …) are not

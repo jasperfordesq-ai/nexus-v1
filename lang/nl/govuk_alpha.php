@@ -266,6 +266,10 @@ return [
         'edit_profile' => 'Bewerk uw profiel',
     ],
     'auth' => [
+        'resend_email_label' => 'Email address',
+        'resend_verification_hint' => 'We will send a new verification link to this address if an account needs verifying.',
+        'resend_verification_button' => 'Resend verification email',
+        'verification_resent' => 'If an account with that email needs verifying, we have sent a new verification link. Please check your inbox.',
         'two_factor_title' => 'Tweefactorauthenticatie',
         'two_factor_description' => 'Voer de verificatiecode van uw authenticator-app in om het inloggen te voltooien.',
         'two_factor_code_label' => 'Verificatiecode',

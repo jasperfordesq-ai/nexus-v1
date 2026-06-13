@@ -266,6 +266,10 @@ return [
         'edit_profile' => 'Modifica il tuo profilo',
     ],
     'auth' => [
+        'resend_email_label' => 'Email address',
+        'resend_verification_hint' => 'We will send a new verification link to this address if an account needs verifying.',
+        'resend_verification_button' => 'Resend verification email',
+        'verification_resent' => 'If an account with that email needs verifying, we have sent a new verification link. Please check your inbox.',
         'two_factor_title' => 'Autenticazione a due fattori',
         'two_factor_description' => 'Inserisci il codice di verifica dall\'app di autenticazione per completare l\'accesso.',
         'two_factor_code_label' => 'Codice di verifica',
