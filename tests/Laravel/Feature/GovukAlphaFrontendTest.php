@@ -2248,7 +2248,7 @@ class GovukAlphaFrontendTest extends TestCase
         $profile->assertSee(__('govuk_alpha.nav.profile'));
         $profile->assertSee('class="nexus-alpha-header__link" href="' . $profileUrl . '"', false);
         $profile->assertDontSee('class="govuk-service-navigation__link" href="' . $profileUrl . '"', false);
-        $profile->assertSee(__('govuk_alpha.header.back_to_main_site'));
+        $profile->assertDontSee(__('govuk_alpha.header.back_to_main_site'));
         $profile->assertSee(route('govuk-alpha.profile.settings', ['tenantSlug' => $this->testTenantSlug]), false);
 
         $dashboard = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
@@ -2347,6 +2347,93 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee(route('govuk-alpha.profile.data-export', ['tenantSlug' => $this->testTenantSlug]), false);
         $response->assertSee(route('govuk-alpha.profile.delete', ['tenantSlug' => $this->testTenantSlug]), false);
         $response->assertSee('govuk-button--warning', false);
+    }
+
+    public function test_profile_settings_renders_notification_and_passkey_sections(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/profile/settings");
+
+        $response->assertOk();
+        // Notification preferences form + a representative toggle from each group.
+        $response->assertSee(__('govuk_alpha.profile_settings.notifications.title'));
+        $response->assertSee(route('govuk-alpha.profile.notifications.update', ['tenantSlug' => $this->testTenantSlug]), false);
+        $response->assertSee('name="email_messages"', false);
+        $response->assertSee('name="email_org_admin"', false);
+        $response->assertSee('name="push_enabled"', false);
+        // Passkey management section (none registered yet).
+        $response->assertSee(__('govuk_alpha.profile_settings.passkeys.title'));
+        $response->assertSee(__('govuk_alpha.profile_settings.passkeys.none'));
+        // No raw translation keys leaked into the rendered page.
+        $response->assertDontSee('govuk_alpha.profile_settings.notifications', false);
+        $response->assertDontSee('govuk_alpha.profile_settings.passkeys', false);
+    }
+
+    public function test_profile_settings_notification_preferences_can_be_saved(): void
+    {
+        $user = $this->authenticatedUser();
+
+        // Submit a subset on; everything not posted is treated as off.
+        $response = $this->post("/{$this->testTenantSlug}/alpha/profile/notifications", [
+            'email_messages' => '1',
+            'email_reviews' => '1',
+            'push_enabled' => '1',
+            'federation_notifications_enabled' => '1',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=notifications-saved', (string) $response->headers->get('Location'));
+
+        $prefs = json_decode((string) DB::table('users')
+            ->where('id', $user->id)->where('tenant_id', $this->testTenantId)
+            ->value('notification_preferences'), true) ?: [];
+
+        $this->assertSame(1, $prefs['email_messages'] ?? null);
+        $this->assertSame(1, $prefs['email_reviews'] ?? null);
+        $this->assertSame(0, $prefs['email_listings'] ?? null); // not posted => off
+        $this->assertSame(1, (int) DB::table('users')->where('id', $user->id)->value('federation_notifications_enabled'));
+    }
+
+    public function test_profile_settings_passkey_can_be_renamed_and_removed(): void
+    {
+        $user = $this->authenticatedUser();
+
+        DB::table('webauthn_credentials')->insert([
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'credential_id' => 'test-cred-abc',
+            'public_key' => 'PEM',
+            'device_name' => 'Old name',
+            'authenticator_type' => 'platform',
+            'created_at' => now(),
+        ]);
+
+        // It is listed on the settings page.
+        $page = $this->get("/{$this->testTenantSlug}/alpha/profile/settings");
+        $page->assertOk();
+        $page->assertSee('Old name');
+
+        // Rename.
+        $rename = $this->post("/{$this->testTenantSlug}/alpha/profile/passkeys/rename", [
+            'credential_id' => 'test-cred-abc',
+            'device_name' => 'My laptop',
+        ]);
+        $rename->assertRedirect();
+        $this->assertStringContainsString('status=passkey-renamed', (string) $rename->headers->get('Location'));
+        $this->assertSame('My laptop', DB::table('webauthn_credentials')
+            ->where('credential_id', 'test-cred-abc')->where('user_id', $user->id)->value('device_name'));
+
+        // Remove.
+        $remove = $this->post("/{$this->testTenantSlug}/alpha/profile/passkeys/remove", [
+            'credential_id' => 'test-cred-abc',
+        ]);
+        $remove->assertRedirect();
+        $this->assertStringContainsString('status=passkey-removed', (string) $remove->headers->get('Location'));
+        $this->assertDatabaseMissing('webauthn_credentials', [
+            'credential_id' => 'test-cred-abc',
+            'user_id' => $user->id,
+        ]);
     }
 
     public function test_profile_settings_avatar_upload_stores_a_400_by_400_image(): void

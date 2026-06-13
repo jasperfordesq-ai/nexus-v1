@@ -121,6 +121,9 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/profile/email', [AlphaController::class, 'updateProfileEmail'])->middleware('throttle:10,1')->name('profile.email.update');
         Route::post('/profile/password', [AlphaController::class, 'updateProfilePassword'])->middleware('throttle:10,1')->name('profile.password.update');
         Route::post('/profile/language', [AlphaController::class, 'updateProfileLanguage'])->middleware('throttle:20,1')->name('profile.language.update');
+        Route::post('/profile/notifications', [AlphaController::class, 'updateProfileNotifications'])->middleware('throttle:20,1')->name('profile.notifications.update');
+        Route::post('/profile/passkeys/rename', [AlphaController::class, 'renameProfilePasskey'])->middleware('throttle:20,1')->name('profile.passkeys.rename');
+        Route::post('/profile/passkeys/remove', [AlphaController::class, 'removeProfilePasskey'])->middleware('throttle:20,1')->name('profile.passkeys.remove');
         Route::post('/profile/data-export', [AlphaController::class, 'requestDataExport'])->middleware('throttle:3,60')->name('profile.data-export');
         Route::get('/profile/delete-account', [AlphaController::class, 'confirmDeleteAccount'])->name('profile.delete');
         Route::post('/profile/delete-account', [AlphaController::class, 'deleteAccount'])->middleware('throttle:5,60')->name('profile.delete.store');

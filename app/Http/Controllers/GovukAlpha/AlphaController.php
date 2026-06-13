@@ -11,6 +11,7 @@ use App\Core\Validator;
 use App\Http\Controllers\Api\CoreController;
 use App\Models\Category;
 use App\Models\ListingImage;
+use App\Models\User;
 use App\Services\BrokerControlConfigService;
 use App\Services\CommentService;
 use App\Services\ConnectionService;
@@ -2795,8 +2796,165 @@ class AlphaController extends Controller
             'currentEmail' => (string) ($account->email ?? ''),
             'currentLanguage' => (string) ($account->preferred_language ?? app()->getLocale()),
             'locales' => self::ALPHA_LOCALES,
+            'notificationPrefs' => $this->alphaNotificationPrefs($userId),
+            'passkeys' => $this->alphaPasskeys($userId),
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
+    }
+
+    /**
+     * The 16 notification toggles with their defaults, mirroring
+     * UsersController::notificationPreferences so the alpha settings page
+     * shows the same controls as the React NotificationsTab.
+     *
+     * @return array<string, bool>
+     */
+    private function alphaNotificationPrefs(int $userId): array
+    {
+        $prefs = User::getNotificationPreferences($userId);
+        $fedEnabled = (bool) (DB::table('users')->where('id', $userId)->value('federation_notifications_enabled') ?? 1);
+
+        return [
+            'email_messages'                => (bool) ($prefs['email_messages'] ?? true),
+            'email_connections'             => (bool) ($prefs['email_connections'] ?? true),
+            'caring_smart_nudges'           => (bool) ($prefs['caring_smart_nudges'] ?? true),
+            'federation_notifications_enabled' => $fedEnabled,
+            'email_listings'                => (bool) ($prefs['email_listings'] ?? true),
+            'email_transactions'            => (bool) ($prefs['email_transactions'] ?? true),
+            'email_reviews'                 => (bool) ($prefs['email_reviews'] ?? true),
+            'email_gamification_digest'     => (bool) ($prefs['email_gamification_digest'] ?? true),
+            'email_gamification_milestones' => (bool) ($prefs['email_gamification_milestones'] ?? true),
+            'email_digest'                  => (bool) ($prefs['email_digest'] ?? false),
+            'email_org_payments'            => (bool) ($prefs['email_org_payments'] ?? true),
+            'email_org_transfers'           => (bool) ($prefs['email_org_transfers'] ?? true),
+            'email_org_membership'          => (bool) ($prefs['email_org_membership'] ?? true),
+            'email_org_admin'               => (bool) ($prefs['email_org_admin'] ?? true),
+            'push_enabled'                  => (bool) ($prefs['push_enabled'] ?? true),
+            'push_campaigns_opted_in'       => (bool) ($prefs['push_campaigns_opted_in'] ?? false),
+        ];
+    }
+
+    /**
+     * Persist the alpha notification-preference form. Checkboxes that are
+     * unticked do not post, so every known key is read as a boolean (absent =
+     * off) to honour the user's full intent.
+     */
+    public function updateProfileNotifications(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $jsonKeys = [
+            'email_messages', 'email_connections', 'caring_smart_nudges',
+            'email_listings', 'email_transactions', 'email_reviews',
+            'email_gamification_digest', 'email_gamification_milestones', 'email_digest',
+            'email_org_payments', 'email_org_transfers', 'email_org_membership', 'email_org_admin',
+            'push_enabled', 'push_campaigns_opted_in',
+        ];
+        $prefs = [];
+        foreach ($jsonKeys as $key) {
+            $prefs[$key] = $request->boolean($key);
+        }
+
+        try {
+            $ok = User::updateNotificationPreferences($userId, $prefs);
+            DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', TenantContext::getId())
+                ->update([
+                    'federation_notifications_enabled' => $request->boolean('federation_notifications_enabled') ? 1 : 0,
+                    'updated_at' => now(),
+                ]);
+        } catch (\Throwable $e) {
+            report($e);
+            $ok = false;
+        }
+
+        return redirect()->route('govuk-alpha.profile.settings', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'notifications-saved' : 'notifications-failed',
+        ])->withFragment('notifications');
+    }
+
+    /**
+     * The viewer's registered passkeys (tenant + user scoped), mirroring
+     * WebAuthnController::credentials so the alpha settings page can list,
+     * rename and remove them without JavaScript.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function alphaPasskeys(int $userId): array
+    {
+        try {
+            $rows = DB::select(
+                'SELECT credential_id, device_name, authenticator_type, created_at, last_used_at
+                 FROM webauthn_credentials
+                 WHERE user_id = ? AND tenant_id = ?
+                 ORDER BY created_at DESC',
+                [$userId, TenantContext::getId()]
+            );
+
+            return array_map(static fn ($r): array => (array) $r, $rows);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return [];
+        }
+    }
+
+    /** Rename one of the viewer's passkeys. */
+    public function renameProfilePasskey(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $credentialId = trim(self::asStr($request->input('credential_id')));
+        $name = mb_substr(trim(self::asStr($request->input('device_name'))), 0, 100);
+
+        if ($credentialId === '' || $name === '') {
+            return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'passkey-name-required'])->withFragment('passkeys');
+        }
+
+        $affected = DB::update(
+            'UPDATE webauthn_credentials SET device_name = ? WHERE credential_id = ? AND user_id = ? AND tenant_id = ?',
+            [$name, $credentialId, $userId, TenantContext::getId()]
+        );
+
+        return redirect()->route('govuk-alpha.profile.settings', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $affected > 0 ? 'passkey-renamed' : 'passkey-not-found',
+        ])->withFragment('passkeys');
+    }
+
+    /** Remove one of the viewer's passkeys. */
+    public function removeProfilePasskey(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $credentialId = trim(self::asStr($request->input('credential_id')));
+        if ($credentialId === '') {
+            return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'passkey-not-found'])->withFragment('passkeys');
+        }
+
+        $deleted = DB::delete(
+            'DELETE FROM webauthn_credentials WHERE credential_id = ? AND user_id = ? AND tenant_id = ?',
+            [$credentialId, $userId, TenantContext::getId()]
+        );
+
+        return redirect()->route('govuk-alpha.profile.settings', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $deleted > 0 ? 'passkey-removed' : 'passkey-not-found',
+        ])->withFragment('passkeys');
     }
 
     public function updateProfileEmail(Request $request, string $tenantSlug): RedirectResponse

@@ -87,6 +87,12 @@
                     'password-failed' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.password_failed'), 'anchor' => '#new_password'],
                     'language-changed' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.language_changed')],
                     'language-invalid' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.language_invalid'), 'anchor' => '#language'],
+                    'notifications-saved' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.notifications.saved')],
+                    'notifications-failed' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.notifications.failed'), 'anchor' => '#notifications'],
+                    'passkey-renamed' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.passkeys.renamed')],
+                    'passkey-removed' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.passkeys.removed')],
+                    'passkey-not-found' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.passkeys.not_found'), 'anchor' => '#passkeys'],
+                    'passkey-name-required' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.passkeys.name_required'), 'anchor' => '#passkeys'],
                 ];
                 $accountStatus = $accountStatusMap[$status ?? ''] ?? null;
             @endphp
@@ -290,6 +296,66 @@
                     </div>
                     <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.password_submit') }}</button>
                 </form>
+
+                <h3 class="govuk-heading-m govuk-!-margin-top-6" id="passkeys">{{ __('govuk_alpha.profile_settings.passkeys.title') }}</h3>
+                <p class="govuk-body">{{ __('govuk_alpha.profile_settings.passkeys.description') }}</p>
+
+                @php
+                    $passkeyDate = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y') : null;
+                @endphp
+
+                @if (empty($passkeys))
+                    <p class="govuk-inset-text">{{ __('govuk_alpha.profile_settings.passkeys.none') }}</p>
+                @else
+                    @foreach ($passkeys as $pk)
+                        @php
+                            $pkName = trim((string) ($pk['device_name'] ?? '')) !== '' ? $pk['device_name'] : __('govuk_alpha.profile_settings.passkeys.unnamed');
+                            $pkType = ($pk['authenticator_type'] ?? '') === 'platform'
+                                ? __('govuk_alpha.profile_settings.passkeys.type_platform')
+                                : __('govuk_alpha.profile_settings.passkeys.type_cross_platform');
+                        @endphp
+                        <div class="nexus-alpha-card govuk-!-margin-bottom-4">
+                            <h4 class="govuk-heading-s govuk-!-margin-bottom-2">{{ $pkName }}</h4>
+                            <dl class="nexus-alpha-inline-list govuk-!-margin-bottom-3">
+                                <div>
+                                    <dt>{{ __('govuk_alpha.profile_settings.passkeys.type') }}</dt>
+                                    <dd>{{ $pkType }}</dd>
+                                </div>
+                                <div>
+                                    <dt>{{ __('govuk_alpha.profile_settings.passkeys.added') }}</dt>
+                                    <dd>{{ $passkeyDate($pk['created_at'] ?? null) ?? '—' }}</dd>
+                                </div>
+                                <div>
+                                    <dt>{{ __('govuk_alpha.profile_settings.passkeys.last_used') }}</dt>
+                                    <dd>{{ $passkeyDate($pk['last_used_at'] ?? null) ?? __('govuk_alpha.profile_settings.passkeys.never') }}</dd>
+                                </div>
+                            </dl>
+                            <form method="post" action="{{ route('govuk-alpha.profile.passkeys.rename', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-2">
+                                @csrf
+                                <input type="hidden" name="credential_id" value="{{ $pk['credential_id'] ?? '' }}">
+                                <div class="govuk-form-group govuk-!-margin-bottom-2">
+                                    <label class="govuk-label" for="rename-{{ $loop->index }}">{{ __('govuk_alpha.profile_settings.passkeys.rename_label') }}</label>
+                                    <input class="govuk-input govuk-!-width-two-thirds" id="rename-{{ $loop->index }}" name="device_name" type="text" value="{{ $pk['device_name'] ?? '' }}" maxlength="100">
+                                </div>
+                                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.passkeys.rename_submit') }}</button>
+                            </form>
+                            <form method="post" action="{{ route('govuk-alpha.profile.passkeys.remove', ['tenantSlug' => $tenantSlug]) }}">
+                                @csrf
+                                <input type="hidden" name="credential_id" value="{{ $pk['credential_id'] ?? '' }}">
+                                <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.passkeys.remove_submit') }}<span class="govuk-visually-hidden"> {{ $pkName }}</span></button>
+                            </form>
+                        </div>
+                    @endforeach
+                @endif
+
+                <details class="govuk-details govuk-!-margin-top-4">
+                    <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text">{{ __('govuk_alpha.profile_settings.passkeys.add_title') }}</span>
+                    </summary>
+                    <div class="govuk-details__text">
+                        <p class="govuk-body">{{ __('govuk_alpha.profile_settings.passkeys.add_description') }}</p>
+                    </div>
+                </details>
             </section>
 
             <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
@@ -308,6 +374,43 @@
                         </select>
                     </div>
                     <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.language_submit') }}</button>
+                </form>
+            </section>
+
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+            <section aria-labelledby="notifications-heading" id="notifications">
+                <h2 class="govuk-heading-l" id="notifications-heading">{{ __('govuk_alpha.profile_settings.notifications.title') }}</h2>
+                <p class="govuk-body">{{ __('govuk_alpha.profile_settings.notifications.description') }}</p>
+
+                @php
+                    $notifGroups = [
+                        'messages' => ['email_messages', 'email_connections', 'caring_smart_nudges', 'federation_notifications_enabled'],
+                        'activity' => ['email_listings', 'email_transactions', 'email_reviews'],
+                        'achievements' => ['email_gamification_digest', 'email_gamification_milestones', 'email_digest'],
+                        'organisation' => ['email_org_payments', 'email_org_transfers', 'email_org_membership', 'email_org_admin'],
+                        'push' => ['push_enabled', 'push_campaigns_opted_in'],
+                    ];
+                @endphp
+
+                <form method="post" action="{{ route('govuk-alpha.profile.notifications.update', ['tenantSlug' => $tenantSlug]) }}">
+                    @csrf
+                    @foreach ($notifGroups as $group => $keys)
+                        <fieldset class="govuk-fieldset govuk-!-margin-top-6">
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                <h3 class="govuk-fieldset__heading">{{ __('govuk_alpha.profile_settings.notifications.groups.' . $group) }}</h3>
+                            </legend>
+                            <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                @foreach ($keys as $key)
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="notif_{{ $key }}" name="{{ $key }}" type="checkbox" value="1" @checked($notificationPrefs[$key] ?? false)>
+                                        <label class="govuk-label govuk-checkboxes__label" for="notif_{{ $key }}">{{ __('govuk_alpha.profile_settings.notifications.labels.' . $key) }}</label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </fieldset>
+                    @endforeach
+                    <button class="govuk-button govuk-!-margin-top-6" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.notifications.save') }}</button>
                 </form>
             </section>
 
