@@ -8,7 +8,7 @@
  * Wraps all pages with navigation, footer, and background
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, type CSSProperties } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Navbar } from './Navbar';
@@ -79,7 +79,7 @@ export function Layout({
   // Register FCM device token for push notifications once user is authenticated.
   // No-ops on web browsers — only runs inside the Capacitor native app.
   const { user } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, branding } = useTenant();
   const navigate = useNavigate();
   usePushNotifications(user?.id ?? null);
 
@@ -180,11 +180,14 @@ export function Layout({
       {/* Main Content — padding adapts when utility bar hides on scroll */}
       <main
         id="main-content"
+        // --logo-extra grows the top offset to match the navbar when it expands
+        // for a tall square/stacked logo; 0 for wide/landscape (compact bar).
+        style={{ '--logo-extra': branding.logoShape === 'square' ? '1.75rem' : '0rem' } as CSSProperties}
         className={`flex-1 relative z-10 min-w-0 transition-[padding-top] duration-200 ${
           withNavbarPadding && showNavbar
             ? isUtilityBarVisible
-              ? 'pt-[calc(var(--safe-area-top)+5rem)] sm:pt-[calc(var(--safe-area-top)+7.5rem)]'
-              : 'pt-[calc(var(--safe-area-top)+5rem)] sm:pt-[calc(var(--safe-area-top)+5.5rem)]'
+              ? 'pt-[calc(var(--safe-area-top)+5rem+var(--logo-extra,0rem))] sm:pt-[calc(var(--safe-area-top)+7.5rem+var(--logo-extra,0rem))]'
+              : 'pt-[calc(var(--safe-area-top)+5rem+var(--logo-extra,0rem))] sm:pt-[calc(var(--safe-area-top)+5.5rem+var(--logo-extra,0rem))]'
             : ''
         }`}
       >

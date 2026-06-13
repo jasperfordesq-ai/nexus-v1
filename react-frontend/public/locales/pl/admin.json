@@ -17331,7 +17331,17 @@
     "upload_image": "Upload image",
     "remove_light_image": "Remove light mode image",
     "remove_dark_image": "Remove dark mode image",
-    "remove_partner_logo": "Remove partner logo"
+    "remove_partner_logo": "Remove partner logo",
+    "header_logo_section": "Header Logo",
+    "header_logo_desc": "Upload a custom logo to show in the site header instead of your community's initials. Leave empty to use the default.",
+    "header_logo_light_label": "Header logo (light mode)",
+    "header_logo_dark_label": "Header logo (dark mode)",
+    "header_logo_hint": "Used for light backgrounds. PNG, JPEG, WebP or SVG — max 2 MB.",
+    "header_logo_dark_hint": "Optional. Shown when the viewer uses dark mode. If omitted, the light logo is used everywhere.",
+    "header_logo_uploaded": "Header logo updated",
+    "header_logo_removed": "Header logo removed",
+    "remove_header_logo": "Remove header logo",
+    "remove_header_logo_dark": "Remove dark mode header logo"
   },
   "national": {
     "trend_chart_aria": "Chart showing community activity trends over time"

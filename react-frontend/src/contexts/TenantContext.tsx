@@ -466,6 +466,8 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
   const branding = useMemo<TenantBranding>(() => {
     const raw = state.tenant?.branding ?? {};
     const logo = raw.logo ?? raw.logo_url ?? undefined;
+    const logoDark = raw.logoDark ?? raw.logo_dark_url ?? undefined;
+    const logoShape = (raw.logoShape ?? raw.logo_shape ?? undefined) as TenantBranding['logoShape'];
     const favicon = raw.favicon ?? raw.favicon_url ?? undefined;
     const primaryColor = raw.primaryColor ?? raw.primary_color ?? defaultBranding.primaryColor;
     return {
@@ -475,6 +477,8 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       name: state.tenant?.name ?? raw.name ?? defaultBranding.name,
       tagline: state.tenant?.tagline ?? raw.tagline ?? defaultBranding.tagline,
       logo,
+      logoDark,
+      logoShape,
       favicon,
       primaryColor,
     };

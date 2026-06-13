@@ -14,6 +14,7 @@ import { useToast, useTenant, useAuth } from '@/contexts';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
+import { resolveAssetUrl } from '@/lib/helpers';
 import type { AdminSettingsResponse } from '../../api/types';
 import SystemConfig from '../enterprise/SystemConfig';
 // Copyright © 2024–2026 Jasper Ford
@@ -96,7 +97,7 @@ export function AdminSettings() {
   const { t } = useTranslation('admin');
   useAdminPageMeta({ title: tNav('system') });
   const toast = useToast();
-  const { tenant, tenantPath, refreshTenant } = useTenant();
+  const { tenant, tenantPath, refreshTenant, branding } = useTenant();
   const { user } = useAuth();
   const userRecord = user as Record<string, unknown> | null;
   const isGod =
@@ -115,6 +116,10 @@ export function AdminSettings() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pbLightInputRef = useRef<HTMLInputElement>(null);
   const pbDarkInputRef  = useRef<HTMLInputElement>(null);
+  const headerLogoInputRef = useRef<HTMLInputElement>(null);
+  const headerLogoDarkInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingHeaderLogo, setUploadingHeaderLogo] = useState(false);
+  const [uploadingHeaderLogoDark, setUploadingHeaderLogoDark] = useState(false);
 
   const fetchSettings = useCallback(async () => {
     setLoading(true);
@@ -271,6 +276,57 @@ export function AdminSettings() {
     }
   };
 
+  // Header logo lives in tenants.configuration (not tenant_settings), so it is
+  // uploaded immediately and reflected via refreshTenant() rather than the
+  // form/save cycle. The bootstrap exposes it as branding.logo / branding.logoDark.
+  const handleHeaderLogoUpload = async (
+    variant: 'light' | 'dark',
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const setUploading = variant === 'light' ? setUploadingHeaderLogo : setUploadingHeaderLogoDark;
+    const inputRef     = variant === 'light' ? headerLogoInputRef     : headerLogoDarkInputRef;
+    const uploadFn     = variant === 'light'
+      ? adminSettings.uploadHeaderLogo
+      : adminSettings.uploadHeaderLogoDark;
+
+    setUploading(true);
+    try {
+      const res = await uploadFn(file);
+      if (res.data?.url) {
+        toast.success(t('admin_settings.header_logo_uploaded'));
+        await refreshTenant();
+      } else {
+        // Surface the real reason (e.g. "Session expired", "Image must be 2 MB
+        // or smaller") instead of a generic toast, so failures are diagnosable.
+        toast.error(res.error || t('admin_settings.upload_failed'));
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t('admin_settings.upload_failed'));
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = '';
+    }
+  };
+
+  const handleHeaderLogoRemove = async (variant: 'light' | 'dark') => {
+    const removeFn = variant === 'light'
+      ? adminSettings.removeHeaderLogo
+      : adminSettings.removeHeaderLogoDark;
+    try {
+      const res = await removeFn();
+      if (res.success === false) {
+        toast.error(res.error || t('admin_settings.upload_failed'));
+        return;
+      }
+      toast.success(t('admin_settings.header_logo_removed'));
+      await refreshTenant();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t('admin_settings.upload_failed'));
+    }
+  };
+
   if (loading) {
     return (
       <div>
@@ -418,6 +474,98 @@ export function AdminSettings() {
               description={t('system.partner_logo_link_url_description')}
               type="url"
             />
+          </CardBody>
+        </Card>
+
+        {/* Header Logo — overrides the default initials/text branding in the site header */}
+        <Card>
+          <CardHeader>
+            <h3 className="text-lg font-semibold">{t('admin_settings.header_logo_section')}</h3>
+          </CardHeader>
+          <CardBody className="gap-5">
+            <p className="text-sm text-muted">{t('admin_settings.header_logo_desc')}</p>
+
+            {/* Light / default variant */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">{t('admin_settings.header_logo_light_label')}</p>
+              <p className="text-xs text-muted">{t('admin_settings.header_logo_hint')}</p>
+              {branding.logo && (
+                <div className="flex items-start gap-3 rounded-lg border border-border bg-surface-secondary p-3">
+                  <img
+                    src={resolveAssetUrl(branding.logo)}
+                    alt={t('admin_settings.header_logo_light_label')}
+                    className="h-14 w-auto max-w-[180px] object-contain rounded"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  />
+                  <Button
+                    isIconOnly size="sm" variant="danger"
+                    aria-label={t('admin_settings.remove_header_logo')}
+                    onPress={() => handleHeaderLogoRemove('light')}
+                  >
+                    <X size={14} />
+                  </Button>
+                </div>
+              )}
+              <input
+                ref={headerLogoInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                className="hidden"
+                onChange={(e) => handleHeaderLogoUpload('light', e)}
+                aria-hidden="true"
+              />
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  variant="secondary" size="sm"
+                  isLoading={uploadingHeaderLogo}
+                  startContent={!uploadingHeaderLogo ? <Upload size={14} /> : undefined}
+                  onPress={() => headerLogoInputRef.current?.click()}
+                >
+                  {branding.logo ? t('admin_settings.replace_image') : t('admin_settings.upload_image')}
+                </Button>
+              </div>
+            </div>
+
+            {/* Dark variant — previewed on a dark surface so it reads correctly */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">{t('admin_settings.header_logo_dark_label')}</p>
+              <p className="text-xs text-muted">{t('admin_settings.header_logo_dark_hint')}</p>
+              {branding.logoDark && (
+                <div className="flex items-start gap-3 rounded-lg border border-border bg-neutral-900 p-3">
+                  <img
+                    src={resolveAssetUrl(branding.logoDark)}
+                    alt={t('admin_settings.header_logo_dark_label')}
+                    className="h-14 w-auto max-w-[180px] object-contain rounded"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  />
+                  <Button
+                    isIconOnly size="sm" variant="danger"
+                    aria-label={t('admin_settings.remove_header_logo_dark')}
+                    onPress={() => handleHeaderLogoRemove('dark')}
+                  >
+                    <X size={14} />
+                  </Button>
+                </div>
+              )}
+              <input
+                ref={headerLogoDarkInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                className="hidden"
+                onChange={(e) => handleHeaderLogoUpload('dark', e)}
+                aria-hidden="true"
+              />
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  variant="secondary" size="sm"
+                  isLoading={uploadingHeaderLogoDark}
+                  startContent={!uploadingHeaderLogoDark ? <Upload size={14} /> : undefined}
+                  onPress={() => headerLogoDarkInputRef.current?.click()}
+                >
+                  {branding.logoDark ? t('admin_settings.replace_image') : t('admin_settings.upload_image')}
+                </Button>
+              </div>
+            </div>
           </CardBody>
         </Card>
 

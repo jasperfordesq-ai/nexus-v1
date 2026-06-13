@@ -1271,6 +1271,10 @@ Route::put('/v2/admin/settings', [\App\Http\Controllers\Api\AdminConfigControlle
 Route::post('/v2/admin/settings/partner-logo', [\App\Http\Controllers\Api\AdminConfigController::class, 'uploadPartnerLogo']);
 Route::post('/v2/admin/settings/powered-by-image-light', [\App\Http\Controllers\Api\AdminConfigController::class, 'uploadPoweredByImageLight']);
 Route::post('/v2/admin/settings/powered-by-image-dark',  [\App\Http\Controllers\Api\AdminConfigController::class, 'uploadPoweredByImageDark']);
+Route::post('/v2/admin/settings/header-logo',       [\App\Http\Controllers\Api\AdminConfigController::class, 'uploadHeaderLogo']);
+Route::post('/v2/admin/settings/header-logo-dark',  [\App\Http\Controllers\Api\AdminConfigController::class, 'uploadHeaderLogoDark']);
+Route::delete('/v2/admin/settings/header-logo',      [\App\Http\Controllers\Api\AdminConfigController::class, 'removeHeaderLogo']);
+Route::delete('/v2/admin/settings/header-logo-dark', [\App\Http\Controllers\Api\AdminConfigController::class, 'removeHeaderLogoDark']);
 Route::get('/v2/admin/config/registration-policy', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getPolicy']);
 Route::put('/v2/admin/config/registration-policy', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'updatePolicy']);
 Route::get('/v2/admin/identity/providers', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'listProviders']);

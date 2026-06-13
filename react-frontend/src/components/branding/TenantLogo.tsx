@@ -3,11 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { motion } from '@/lib/motion';
 import { useTenant } from '@/contexts';
 import { Avatar, Tooltip } from '@/components/ui';
+import { resolveAssetUrl } from '@/lib/helpers';
 
 /** Extract 1–2 initials from a tenant name. */
 function getInitials(name: string): string {
@@ -31,20 +33,43 @@ function shouldUseDarkText(hex: string): boolean {
 
 const avatarSizeMap = { sm: 'sm', md: 'sm', lg: 'md' } as const;
 
-const imgClassMap = {
-  sm: 'h-7 w-auto object-contain max-w-[96px] sm:max-w-[140px]',
-  md: 'h-8 sm:h-9 w-auto object-contain max-w-[112px] sm:max-w-[160px]',
-  lg: 'h-9 w-auto object-contain max-w-[128px] sm:max-w-[160px]',
+// Smart, aspect-ratio-aware sizing: the logo's height grows as it gets narrower,
+// so a wide wordmark, a landscape lockup and a square/stacked mark (e.g. a crest
+// over two lines of text) all carry similar visual weight. Width is capped per
+// size; height per (size × shape). Heights stay within the navbar row
+// (h-14 = 56px mobile / h-16 = 64px desktop) so the header itself never grows.
+type LogoShape = 'wide' | 'landscape' | 'square';
+
+const logoMaxWidth = {
+  sm: 'max-w-[110px] sm:max-w-[150px]',
+  md: 'max-w-[200px] sm:max-w-[260px]',
+  lg: 'max-w-[200px] sm:max-w-[260px]',
 } as const;
+
+// Square/stacked logos get notably more height; the navbar row grows to fit them
+// (see Navbar min-h + Layout --logo-extra). Wide/landscape stay compact.
+const logoHeight: Record<'sm' | 'md' | 'lg', Record<LogoShape, string>> = {
+  sm: { wide: 'h-7',          landscape: 'h-8',          square: 'h-10' },
+  md: { wide: 'h-9 sm:h-11',  landscape: 'h-10 sm:h-12', square: 'h-16 sm:h-20' },
+  lg: { wide: 'h-10 sm:h-12', landscape: 'h-11 sm:h-14', square: 'h-16 sm:h-20' },
+};
+
+/** Bucket a logo by aspect ratio (width / height). Narrower → taller box. */
+function logoShape(aspect: number | null): LogoShape {
+  if (aspect === null) return 'landscape'; // sensible default before the image loads
+  if (aspect >= 2.8) return 'wide';        // long wordmark — already reads big by width
+  if (aspect >= 1.9) return 'landscape';   // horizontal lockup
+  return 'square';                         // square / stacked / crest-over-text — needs height
+}
 
 // Explicit intrinsic dimensions to let the browser reserve layout space
 // before the logo loads (reduces Cumulative Layout Shift). CSS still
 // controls the rendered size via the imgClassMap classes; these values
 // are the upper bounds so we never under-reserve.
 const imgDimMap = {
-  sm: { width: 140, height: 28 },
-  md: { width: 160, height: 36 },
-  lg: { width: 160, height: 36 },
+  sm: { width: 150, height: 32 },
+  md: { width: 240, height: 48 },
+  lg: { width: 240, height: 48 },
 } as const;
 
 const nameClassMap = {
@@ -81,19 +106,52 @@ export function TenantLogo({
   const darkText = shouldUseDarkText(primaryColor);
   const needsTooltip = branding.name.length > 20;
 
-  // When compact, use smaller sizes
-  const effectiveSize = compact ? 'sm' : size;
+  // A custom uploaded logo (light variant, dark variant, or both) takes
+  // precedence over the initials avatar. When present it must NOT shrink on
+  // scroll, and the tenant-name text is hidden — the logo already carries the
+  // brand name (still exposed to screen readers via the <img> alt).
+  const hasLogo = Boolean(branding.logo || branding.logoDark);
+  const hasDistinctDark = Boolean(branding.logo && branding.logoDark);
+
+  // Compact (scrolled) shrinks the initials avatar, but a real logo keeps its size.
+  const effectiveSize = (compact && !hasLogo) ? 'sm' : size;
+
+  // Smart sizing: prefer the server-provided shape (synchronous, no layout shift,
+  // and shared with the navbar/offset). Fall back to measuring the image on load.
+  const [logoAspect, setLogoAspect] = useState<number | null>(null);
+  const shape: LogoShape = branding.logoShape ?? logoShape(logoAspect);
+  const heightClass = logoHeight[effectiveSize][shape];
 
   /* ── icon / image ────────────────────────────────────────── */
-  const iconElement = branding.logo ? (
+  const renderLogoImg = (src: string, extra: string) => (
     <img
-      src={branding.logo}
+      src={src}
       alt={branding.name}
-      className={`${imgClassMap[effectiveSize]} transition-all duration-200`}
+      onLoad={(e) => {
+        const img = e.currentTarget;
+        if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+          setLogoAspect(img.naturalWidth / img.naturalHeight);
+        }
+      }}
+      className={`${heightClass} w-auto object-contain ${logoMaxWidth[effectiveSize]} transition-all duration-200 ${extra}`.trim()}
       loading={size === 'sm' ? 'lazy' : 'eager'}
       width={imgDimMap[effectiveSize].width}
       height={imgDimMap[effectiveSize].height}
     />
+  );
+
+  // When both light + dark exist we render each and swap by theme via Tailwind
+  // `dark:` utilities; with only one we use it for both themes; with neither we
+  // fall back to the initials avatar (hasLogo/hasDistinctDark computed above).
+  const iconElement = hasLogo ? (
+    hasDistinctDark ? (
+      <>
+        {renderLogoImg(resolveAssetUrl(branding.logo), 'block dark:hidden')}
+        {renderLogoImg(resolveAssetUrl(branding.logoDark), 'hidden dark:block')}
+      </>
+    ) : (
+      renderLogoImg(resolveAssetUrl(branding.logo || branding.logoDark), '')
+    )
   ) : (
     <Avatar
       name={branding.name}
@@ -150,7 +208,7 @@ export function TenantLogo({
         {iconElement}
       </motion.div>
 
-      {showName && !compact && (
+      {showName && !compact && !hasLogo && (
         <div className="hidden min-[480px]:flex flex-col min-w-0 transition-all duration-200">
           {nameElement}
           {taglineElement}

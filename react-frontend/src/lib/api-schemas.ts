@@ -197,6 +197,8 @@ export const tenantBootstrapSchema = z.object({
     tagline: z.string().optional(),
     logo: z.string().nullable().optional(),
     logo_url: z.string().nullable().optional(),
+    logo_dark_url: z.string().nullable().optional(),
+    logo_shape: z.string().optional(),
     favicon: z.string().nullable().optional(),
     favicon_url: z.string().nullable().optional(),
     primaryColor: z.string().optional(),

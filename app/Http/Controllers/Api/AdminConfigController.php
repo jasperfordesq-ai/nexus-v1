@@ -892,6 +892,131 @@ class AdminConfigController extends BaseApiController
         }
     }
 
+    /** POST /api/v2/admin/settings/header-logo */
+    public function uploadHeaderLogo(): JsonResponse
+    {
+        return $this->uploadHeaderLogoVariant('light');
+    }
+
+    /** POST /api/v2/admin/settings/header-logo-dark */
+    public function uploadHeaderLogoDark(): JsonResponse
+    {
+        return $this->uploadHeaderLogoVariant('dark');
+    }
+
+    /** DELETE /api/v2/admin/settings/header-logo */
+    public function removeHeaderLogo(): JsonResponse
+    {
+        return $this->removeHeaderLogoVariant('light');
+    }
+
+    /** DELETE /api/v2/admin/settings/header-logo-dark */
+    public function removeHeaderLogoDark(): JsonResponse
+    {
+        return $this->removeHeaderLogoVariant('dark');
+    }
+
+    /**
+     * Upload a tenant header-logo variant ('light'|'dark') and persist its URL
+     * into the tenants.configuration JSON (logo_url / logo_dark_url). The
+     * bootstrap controller already reads these keys, so the new logo flows to
+     * the React header and the accessible GOV.UK header with no further wiring.
+     */
+    private function uploadHeaderLogoVariant(string $variant): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $this->rateLimit('admin_logo_upload', 10, 60);
+
+        $file = request()->file('logo');
+        if (!$file || !$file->isValid()) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No image uploaded.', 'logo', 400);
+        }
+
+        // SVG MIME sniffing (finfo) is unreliable across platforms — it often
+        // reports text/plain or text/xml for a real SVG. Treat a .svg extension
+        // OR an svg MIME as SVG; SvgUploader then hard-validates that the bytes
+        // are a well-formed <svg> document, so a mislabelled file is still caught.
+        $mime = $file->getMimeType();
+        $ext = strtolower($file->getClientOriginalExtension());
+        $isSvg = $mime === 'image/svg+xml' || $ext === 'svg';
+
+        if (!$isSvg && !in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'File must be an image (JPEG, PNG, GIF, WebP, or SVG).', 'logo', 422);
+        }
+
+        // Max 2 MB
+        if ($file->getSize() > 2 * 1024 * 1024) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Image must be 2 MB or smaller.', 'logo', 422);
+        }
+
+        $configKey = $variant === 'dark' ? 'logo_dark_url' : 'logo_url';
+
+        try {
+            $fileArray = [
+                'name'     => $file->getClientOriginalName(),
+                'type'     => $file->getMimeType(),
+                'tmp_name' => $file->getRealPath(),
+                'error'    => UPLOAD_ERR_OK,
+                'size'     => $file->getSize(),
+            ];
+
+            // SVG cannot go through the raster pipeline — it is sanitised and
+            // stored separately to neutralise the same-origin XSS vector.
+            $imageUrl = $isSvg
+                ? \App\Core\SvgUploader::save($fileArray, 'tenant-logos')
+                : \App\Core\ImageUploader::upload($fileArray, 'tenant-logos');
+
+            $this->setTenantConfigValue($tenantId, $configKey, $imageUrl);
+
+            return $this->respondWithData(['url' => $imageUrl]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Header logo upload failed', [
+                'variant'   => $variant,
+                'error'     => $e->getMessage(),
+                'tenant_id' => $tenantId,
+            ]);
+            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image. Please try again.', 'logo', 500);
+        }
+    }
+
+    /**
+     * Clear a header-logo variant, reverting the header to the tenant default
+     * (initials avatar in React, text name in the accessible frontend).
+     */
+    private function removeHeaderLogoVariant(string $variant): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $configKey = $variant === 'dark' ? 'logo_dark_url' : 'logo_url';
+
+        $this->setTenantConfigValue($tenantId, $configKey, null);
+
+        return $this->respondWithData(['url' => null]);
+    }
+
+    /**
+     * Read-modify-write a single key in the tenants.configuration JSON so the
+     * other keys (modules, languages, …) are preserved, then bust the cached
+     * bootstrap payload. Passing $value === null unsets the key.
+     */
+    private function setTenantConfigValue(int $tenantId, string $key, ?string $value): void
+    {
+        $tenantRow = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
+        $config = ($tenantRow && !empty($tenantRow->configuration))
+            ? (json_decode($tenantRow->configuration, true) ?: [])
+            : [];
+
+        if ($value === null || $value === '') {
+            unset($config[$key]);
+        } else {
+            $config[$key] = $value;
+        }
+
+        DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
+    }
+
     /** PUT /api/v2/admin/config/settings */
     public function updateSettings(): JsonResponse
     {

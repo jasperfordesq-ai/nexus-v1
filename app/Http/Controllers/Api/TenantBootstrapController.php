@@ -578,10 +578,27 @@ class TenantBootstrapController extends BaseApiController
             $branding['tagline'] = $tenant['tagline'];
         }
 
+        // Header logo variants are rendered as <img> in the SPA, which resolves
+        // relative /uploads paths to the API origin via resolveAssetUrl(). Keep
+        // them relative (NOT tenant-domain absolute, unlike og_image) so they
+        // load in local dev too — an absolute tenant domain points at production,
+        // which doesn't have a freshly-uploaded local file.
         if (!empty($tenant['logo_url'])) {
-            $branding['logo_url'] = UrlHelper::absolute($tenant['logo_url']);
+            $branding['logo_url'] = $tenant['logo_url'];
         } elseif (!empty($config['logo_url'])) {
-            $branding['logo_url'] = UrlHelper::absolute($config['logo_url']);
+            $branding['logo_url'] = $config['logo_url'];
+        }
+
+        // Optional dark-theme header logo variant (tenant-uploaded).
+        if (!empty($config['logo_dark_url'])) {
+            $branding['logo_dark_url'] = $config['logo_dark_url'];
+        }
+
+        // Aspect-ratio bucket so the SPA can size the header logo (and grow the
+        // navbar for square/stacked logos) without an async measure + layout shift.
+        $shapeSource = $branding['logo_url'] ?? ($config['logo_dark_url'] ?? null);
+        if (!empty($shapeSource)) {
+            $branding['logo_shape'] = \App\Support\LogoShape::classify($shapeSource);
         }
 
         if (!empty($tenant['favicon_url'])) {

@@ -583,7 +583,11 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
         {/* Main Navigation Bar */}
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-2 h-14 sm:h-16">
+          {/* min-h keeps the bar compact for wide/initials logos but lets it grow
+              to fit a tall square/stacked logo. py-1.5 gives a tall logo breathing
+              room top & bottom (a no-op for compact logos, where min-h dominates);
+              Layout adds a matching --logo-extra offset. */}
+          <div className="flex items-center justify-between gap-2 min-h-14 sm:min-h-16 py-1.5">
             {/* Left Section: Mobile Menu + Brand */}
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 lg:flex-none">
               {/* Mobile Menu Toggle — guests only (authenticated users use MobileTabBar) */}

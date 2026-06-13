@@ -1732,6 +1732,10 @@ export const adminSettings = {
   uploadPartnerLogo: (file: File) => api.upload<{ url: string }>('/v2/admin/settings/partner-logo', file, 'logo'),
   uploadPoweredByImageLight: (file: File) => api.upload<{ url: string }>('/v2/admin/settings/powered-by-image-light', file, 'logo'),
   uploadPoweredByImageDark:  (file: File) => api.upload<{ url: string }>('/v2/admin/settings/powered-by-image-dark',  file, 'logo'),
+  uploadHeaderLogo:      (file: File) => api.upload<{ url: string }>('/v2/admin/settings/header-logo',      file, 'logo'),
+  uploadHeaderLogoDark:  (file: File) => api.upload<{ url: string }>('/v2/admin/settings/header-logo-dark', file, 'logo'),
+  removeHeaderLogo:      () => api.delete<{ url: string | null }>('/v2/admin/settings/header-logo'),
+  removeHeaderLogoDark:  () => api.delete<{ url: string | null }>('/v2/admin/settings/header-logo-dark'),
 
   getAiConfig: () => api.get<Record<string, unknown>>('/v2/admin/config/ai'),
   updateAiConfig: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/config/ai', data),
