@@ -17,7 +17,7 @@
     <a class="govuk-back-link" href="{{ route('govuk-alpha.events.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_events') }}</a>
 
     @if ($status === 'event-created')
-        <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="event-created-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="event-created-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="event-created-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -26,7 +26,7 @@
             </div>
         </div>
     @elseif ($status === 'rsvp-updated')
-        <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="rsvp-success-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="rsvp-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="rsvp-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -35,7 +35,7 @@
             </div>
         </div>
     @elseif ($status === 'rsvp-failed')
-        <div class="govuk-error-summary" data-module="govuk-error-summary">
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">

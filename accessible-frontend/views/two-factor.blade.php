@@ -19,7 +19,7 @@
             <a class="govuk-back-link" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.auth.back_to_sign_in') }}</a>
 
             @if ($hasError)
-                <div class="govuk-error-summary" data-module="govuk-error-summary">
+                <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                     <div role="alert">
                         <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                         <div class="govuk-error-summary__body">

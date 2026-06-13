@@ -23,7 +23,7 @@
     @endif
 
     @if ($status === 'conversation-archived' || $status === 'conversation-restored')
-        <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="messages-status-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="messages-status-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="messages-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>

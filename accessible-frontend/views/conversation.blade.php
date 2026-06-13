@@ -15,7 +15,7 @@
     <a class="govuk-back-link" href="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_messages') }}</a>
 
     @if ($status === 'message-sent')
-        <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="message-success-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="message-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="message-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -24,7 +24,7 @@
             </div>
         </div>
     @elseif (in_array($status, ['message-failed', 'message-empty', 'message-disabled'], true))
-        <div class="govuk-error-summary" data-module="govuk-error-summary">
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">

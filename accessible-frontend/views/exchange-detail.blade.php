@@ -26,12 +26,23 @@
         $label = fn (string $ns, ?string $key): string => ($key !== null && $key !== '' && \Illuminate\Support\Facades\Lang::has("govuk_alpha.$ns.$key"))
             ? __("govuk_alpha.$ns.$key")
             : \Illuminate\Support\Str::headline((string) $key);
+        // Colour the status tag by state (matches the exchanges list page) so the
+        // single-exchange page conveys status by colour + text, not text alone.
+        $statusTagClass = fn (string $key): string => match ($key) {
+            'completed' => 'govuk-tag--green',
+            'in_progress' => 'govuk-tag--blue',
+            'accepted' => 'govuk-tag--turquoise',
+            'pending_provider', 'pending_broker', 'pending_confirmation' => 'govuk-tag--yellow',
+            'disputed' => 'govuk-tag--red',
+            'cancelled', 'expired', 'declined' => 'govuk-tag--grey',
+            default => 'govuk-tag--blue',
+        };
     @endphp
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_exchanges') }}</a>
 
     @if (in_array($status, ['exchange-created', 'exchange-updated', 'rating-submitted'], true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="exchange-success-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="exchange-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="exchange-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -40,7 +51,7 @@
             </div>
         </div>
     @elseif (in_array($status, ['exchange-action-failed', 'rating-failed', 'rating-invalid'], true))
-        <div class="govuk-error-summary" data-module="govuk-error-summary">
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
@@ -53,7 +64,7 @@
     <span class="govuk-caption-l">{{ __('govuk_alpha.exchanges.detail_title') }}</span>
     <h1 class="govuk-heading-xl">{{ $exchange['listing_title'] ?? __('govuk_alpha.exchanges.detail_title') }}</h1>
     <p class="govuk-body-l">{{ $roleText }}</p>
-    <strong class="govuk-tag govuk-!-margin-bottom-4">{{ $label('exchanges.statuses', $statusKey) }}</strong>
+    <strong class="govuk-tag {{ $statusTagClass($statusKey) }} govuk-!-margin-bottom-4">{{ $label('exchanges.statuses', $statusKey) }}</strong>
 
     @php
         $statusDescriptionKey = "govuk_alpha.exchanges.status_descriptions.$statusKey";

@@ -32,7 +32,7 @@
     <a class="govuk-back-link" href="{{ route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_listings') }}</a>
 
     @if ($status === 'listing-created')
-        <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="listing-created-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="listing-created-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="listing-created-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>

@@ -19,7 +19,7 @@
     <a class="govuk-back-link" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_volunteering') }}</a>
 
     @if ($status === 'apply-created')
-        <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="apply-success-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="apply-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="apply-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -28,7 +28,7 @@
             </div>
         </div>
     @elseif ($status === 'apply-failed')
-        <div class="govuk-error-summary" data-module="govuk-error-summary">
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
@@ -37,7 +37,7 @@
             </div>
         </div>
     @elseif (in_array($status, ['shift-signed-up', 'shift-cancelled'], true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="shift-success-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="shift-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="shift-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -46,7 +46,7 @@
             </div>
         </div>
     @elseif (in_array($status, ['shift-signup-failed', 'shift-cancel-failed'], true))
-        <div class="govuk-error-summary" data-module="govuk-error-summary">
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">

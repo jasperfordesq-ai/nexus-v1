@@ -140,8 +140,21 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
 }
 
 // Unread-count badge beside the Messages item in the service navigation.
+// A small count chip beside the Messages nav item (NOT a govuk-tag — a tag must
+// not live inside a link). Decorative; the accessible count is in a sibling
+// visually-hidden span.
 .nexus-alpha-nav-badge {
+  display: inline-block;
   margin-inline-start: govuk-spacing(1);
+  min-width: 20px;
+  padding: 0 govuk-spacing(1);
+  border-radius: 10px;
+  background: govuk-colour("blue");
+  color: govuk-colour("white");
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
 }
 
 @include govuk-media-query($until: tablet) {
@@ -570,6 +583,16 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
   background: none;
   font: inherit;
   cursor: pointer;
+}
+
+// Keyboard focus must be visible (WCAG 2.4.7) — mirror the GOV.UK link focus
+// box, since background:none removes any default indicator.
+.nexus-alpha-linkbutton:focus {
+  outline: 3px solid transparent;
+  color: $govuk-focus-text-colour;
+  background-color: $govuk-focus-colour;
+  box-shadow: 0 -2px $govuk-focus-colour, 0 4px $govuk-focus-text-colour;
+  text-decoration: none;
 }
 
 .nexus-alpha-profile-hero {

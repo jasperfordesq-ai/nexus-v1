@@ -62,7 +62,7 @@
                         <li class="nexus-alpha-card">
                             @if (! empty($post['featured_image']))
                                 <p class="govuk-!-margin-bottom-2">
-                                    <img class="nexus-alpha-card-thumb" src="{{ $post['featured_image'] }}" alt="{{ __('govuk_alpha.blog.image_alt', ['title' => $post['title'] ?? '']) }}">
+                                    <img class="nexus-alpha-card-thumb" src="{{ $post['featured_image'] }}" alt="{{ __('govuk_alpha.blog.image_alt', ['title' => $post['title'] ?? '']) }}" width="120" height="90" loading="lazy" decoding="async">
                                 </p>
                             @endif
                             @if ($index === 0)

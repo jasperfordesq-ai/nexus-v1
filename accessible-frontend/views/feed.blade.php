@@ -65,7 +65,7 @@
     @endif
 
     @if (in_array($status, $successStatuses, true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="post-created-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="post-created-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="post-created-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -74,15 +74,9 @@
             </div>
         </div>
     @elseif ($status === 'post-empty')
-        <div class="govuk-notification-banner" role="region" aria-labelledby="post-empty-title">
-            <div class="govuk-notification-banner__header">
-                <h2 class="govuk-notification-banner__title" id="post-empty-title">{{ __('govuk_alpha.states.error_title') }}</h2>
-            </div>
-            <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.states.post_empty') }}</p>
-            </div>
-        </div>
-        <div class="govuk-error-summary" data-module="govuk-error-summary">
+        {{-- Only the error-summary (matches the post-failed branch); the duplicate
+             notification banner announced the same error twice. --}}
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
@@ -93,7 +87,7 @@
             </div>
         </div>
     @elseif ($status === 'post-failed')
-        <div class="govuk-error-summary" data-module="govuk-error-summary">
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">

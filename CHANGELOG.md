@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Accessibility and visual polish across every page of the accessible site.** A platform-wide pass to the GOV.UK Design System standard: status labels are now colour-coded by state (so an approved application looks different from a declined one at a glance), the keyboard now jumps straight to errors and confirmations, the current section is announced to screen readers, images reserve their space so the page doesn't jump as it loads, and the sign-out control and message-count badge are cleaner and fully keyboard-accessible.
+
 ### Added
 
 - **See who's going to an event on the accessible site, with clearer create errors.** An event page now lists the people going and interested (with their photos), and the "Create an event" form now highlights each field that needs fixing with a message beside it, instead of one vague error.

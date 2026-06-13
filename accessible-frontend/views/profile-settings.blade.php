@@ -30,7 +30,7 @@
             <p class="govuk-body-l">{{ __('govuk_alpha.profile_settings.description') }}</p>
 
             @if (($status ?? '') === 'profile-update-failed')
-                <div class="govuk-error-summary" data-module="govuk-error-summary">
+                <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                     <div role="alert">
                         <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                         <div class="govuk-error-summary__body">
@@ -41,7 +41,7 @@
                     </div>
                 </div>
             @elseif (in_array($status ?? '', $errorStatuses, true))
-                <div class="govuk-error-summary" data-module="govuk-error-summary">
+                <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                     <div role="alert">
                         <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                         <div class="govuk-error-summary__body">
@@ -52,7 +52,7 @@
                     </div>
                 </div>
             @elseif (in_array($status ?? '', $successStatuses, true))
-                <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="settings-status-title">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="settings-status-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="settings-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                     </div>
@@ -92,7 +92,7 @@
             @endphp
             @if ($accountStatus)
                 @if ($accountStatus['type'] === 'success')
-                    <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="account-status-title">
+                    <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="account-status-title">
                         <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="account-status-title">{{ __('govuk_alpha.states.success_title') }}</h2></div>
                         <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ $accountStatus['msg'] }}</p></div>
                     </div>
@@ -102,7 +102,7 @@
                         <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ $accountStatus['msg'] }}</p></div>
                     </div>
                 @else
-                    <div class="govuk-error-summary" data-module="govuk-error-summary">
+                    <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                         <div role="alert">
                             <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                             <div class="govuk-error-summary__body">

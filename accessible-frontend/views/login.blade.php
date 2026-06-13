@@ -21,21 +21,24 @@
                         'account-suspended'     => __('govuk_alpha.auth.account_suspended'),
                         default                 => __('govuk_alpha.auth.login_failed'),
                     };
+                    // Only anchor to the email field when the email is the source of
+                    // the error; account-level problems jump to the main content.
+                    $loginErrorAnchor = in_array($status, ['login-failed', 'email-not-verified'], true) ? '#email' : '#main-content';
                 @endphp
-                <div class="govuk-error-summary" data-module="govuk-error-summary">
+                <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                     <div role="alert">
                         <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                         <div class="govuk-error-summary__body">
                             <ul class="govuk-list govuk-error-summary__list">
                                 <li>
-                                    <a href="#email">{{ $loginErrorMessage }}</a>
+                                    <a href="{{ $loginErrorAnchor }}">{{ $loginErrorMessage }}</a>
                                 </li>
                             </ul>
                         </div>
                     </div>
                 </div>
             @elseif (($status ?? '') === 'register-created')
-                <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="register-status-title">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="register-status-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="register-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                     </div>
@@ -44,7 +47,7 @@
                     </div>
                 </div>
             @elseif (($status ?? '') === 'account-deletion-requested')
-                <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="account-deleted-title">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="account-deleted-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="account-deleted-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                     </div>
@@ -53,7 +56,7 @@
                     </div>
                 </div>
             @elseif (($status ?? '') === 'password-reset')
-                <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="password-reset-title">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="password-reset-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="password-reset-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                     </div>

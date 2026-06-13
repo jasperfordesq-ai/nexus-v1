@@ -84,7 +84,7 @@
             @php($brandLogo = ($tenantLogoDarkUrl ?? null) ?: ($tenantLogoUrl ?? null))
             <a class="nexus-alpha-header__brand govuk-!-font-size-24" href="{{ $tenantSlug ? route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]) : route('govuk-alpha.tenant-chooser') }}">
                 @if (!empty($brandLogo))
-                    <img class="nexus-alpha-header__logo nexus-alpha-header__logo--{{ $tenantLogoShape ?? 'landscape' }}" src="{{ $brandLogo }}" alt="{{ $brandText }}">
+                    <img class="nexus-alpha-header__logo nexus-alpha-header__logo--{{ $tenantLogoShape ?? 'landscape' }}" src="{{ $brandLogo }}" alt="{{ $brandText }}" width="260" height="52" decoding="async">
                 @else
                     {{ $brandText }}
                 @endif
@@ -141,7 +141,7 @@
                                             {{ __('govuk_alpha.nav.' . $key) }}
                                         @endif
                                         @if ($key === 'messages' && ($alphaUnreadMessages ?? 0) > 0)
-                                            <strong class="govuk-tag govuk-tag--blue nexus-alpha-nav-badge" aria-hidden="true">{{ $alphaUnreadMessages > 99 ? '99+' : $alphaUnreadMessages }}</strong>
+                                            <span class="nexus-alpha-nav-badge" aria-hidden="true">{{ $alphaUnreadMessages > 99 ? '99+' : $alphaUnreadMessages }}</span>
                                             <span class="govuk-visually-hidden">{{ trans_choice('govuk_alpha.messages.unread_count', $alphaUnreadMessages, ['count' => $alphaUnreadMessages]) }}</span>
                                         @endif
                                     </a>

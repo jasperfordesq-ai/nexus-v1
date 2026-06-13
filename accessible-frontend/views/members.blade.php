@@ -42,7 +42,7 @@
                         <div class="govuk-form-group">
                             <label class="govuk-label" for="q">{{ __('govuk_alpha.members.search_label') }}</label>
                             <div id="member-q-hint" class="govuk-hint">{{ __('govuk_alpha.members.search_hint') }}</div>
-                            <input class="govuk-input" id="q" name="q" type="search" value="{{ $filters['q'] }}" aria-describedby="member-q-hint">
+                            <input class="govuk-input" id="q" name="q" type="search" value="{{ $filters['q'] ?? '' }}" aria-describedby="member-q-hint">
                         </div>
                     </div>
                     <div class="govuk-grid-column-one-quarter">
@@ -50,7 +50,7 @@
                             <label class="govuk-label" for="sort">{{ __('govuk_alpha.members.sort_label') }}</label>
                             <select class="govuk-select" id="sort" name="sort">
                                 @foreach (['name', 'joined', 'rating', 'hours_given'] as $sort)
-                                    <option value="{{ $sort }}" @selected($filters['sort'] === $sort)>{{ __('govuk_alpha.members.sort.' . $sort) }}</option>
+                                    <option value="{{ $sort }}" @selected(($filters['sort'] ?? 'name') === $sort)>{{ __('govuk_alpha.members.sort.' . $sort) }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -60,7 +60,7 @@
                             <label class="govuk-label" for="order">{{ __('govuk_alpha.members.order_label') }}</label>
                             <select class="govuk-select" id="order" name="order">
                                 @foreach (['ASC', 'DESC'] as $order)
-                                    <option value="{{ $order }}" @selected($filters['order'] === $order)>{{ __('govuk_alpha.members.order.' . $order) }}</option>
+                                    <option value="{{ $order }}" @selected(($filters['order'] ?? 'ASC') === $order)>{{ __('govuk_alpha.members.order.' . $order) }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -82,7 +82,7 @@
         </p>
 
         @if ($error)
-            <div class="govuk-error-summary" data-module="govuk-error-summary">
+            <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                 <div role="alert">
                     <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                     <div class="govuk-error-summary__body">

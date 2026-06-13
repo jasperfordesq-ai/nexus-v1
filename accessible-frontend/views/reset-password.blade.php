@@ -24,9 +24,10 @@
             <a class="govuk-back-link" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.auth.back_to_sign_in') }}</a>
 
             @if ($invalidLink)
+                <h1 class="govuk-heading-xl">{{ __('govuk_alpha.auth.reset_link_invalid_title') }}</h1>
                 <div class="govuk-notification-banner" role="region" aria-labelledby="reset-invalid-title">
                     <div class="govuk-notification-banner__header">
-                        <h2 class="govuk-notification-banner__title" id="reset-invalid-title">{{ __('govuk_alpha.auth.reset_link_invalid_title') }}</h2>
+                        <h2 class="govuk-notification-banner__title" id="reset-invalid-title">{{ __('govuk_alpha.states.important') }}</h2>
                     </div>
                     <div class="govuk-notification-banner__content">
                         <p class="govuk-body">{{ __('govuk_alpha.auth.reset_link_invalid_detail') }}</p>
@@ -35,7 +36,7 @@
                 </div>
             @else
                 @if (in_array($status ?? '', $fieldErrors, true))
-                    <div class="govuk-error-summary" data-module="govuk-error-summary">
+                    <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                         <div role="alert">
                             <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                             <div class="govuk-error-summary__body">

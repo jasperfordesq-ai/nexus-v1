@@ -10,7 +10,7 @@
             <a class="govuk-back-link" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.auth.back_to_sign_in') }}</a>
 
             @if (($status ?? null) === 'forgot-sent')
-                <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="forgot-sent-title">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="forgot-sent-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="forgot-sent-title">{{ __('govuk_alpha.auth.forgot_sent_title') }}</h2>
                     </div>
@@ -26,7 +26,7 @@
                 </p>
             @else
                 @if (in_array($status ?? '', ['forgot-invalid', 'forgot-rate-limited'], true))
-                    <div class="govuk-error-summary" data-module="govuk-error-summary">
+                    <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                         <div role="alert">
                             <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                             <div class="govuk-error-summary__body">

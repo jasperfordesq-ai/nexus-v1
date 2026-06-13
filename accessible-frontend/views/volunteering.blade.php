@@ -32,7 +32,7 @@
         </div>
     @else
         @if (($status ?? null) === 'application-withdrawn')
-            <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="application-withdrawn-title">
+            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="application-withdrawn-title">
                 <div class="govuk-notification-banner__header">
                     <h2 class="govuk-notification-banner__title" id="application-withdrawn-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                 </div>
@@ -41,7 +41,7 @@
                 </div>
             </div>
         @elseif (($status ?? null) === 'application-withdraw-failed')
-            <div class="govuk-error-summary" data-module="govuk-error-summary">
+            <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                 <div role="alert">
                     <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                     <div class="govuk-error-summary__body">
@@ -89,16 +89,16 @@
                 <h2 class="govuk-tabs__title">{{ __('govuk_alpha.volunteering.tabs_title') }}</h2>
                 <ul class="govuk-tabs__list">
                     <li class="govuk-tabs__list-item{{ $selectedTab === 'opportunities' ? ' govuk-tabs__list-item--selected' : '' }}">
-                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.tabs.opportunities') }}</a>
+                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}" @if ($selectedTab === 'opportunities') aria-current="page" @endif>{{ __('govuk_alpha.volunteering.tabs.opportunities') }}</a>
                     </li>
                     <li class="govuk-tabs__list-item{{ $selectedTab === 'applications' ? ' govuk-tabs__list-item--selected' : '' }}">
-                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'applications']) }}">{{ __('govuk_alpha.volunteering.tabs.applications') }}</a>
+                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'applications']) }}" @if ($selectedTab === 'applications') aria-current="page" @endif>{{ __('govuk_alpha.volunteering.tabs.applications') }}</a>
                     </li>
                     <li class="govuk-tabs__list-item">
                         <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.hours', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.tabs.hours') }}</a>
                     </li>
                     <li class="govuk-tabs__list-item{{ $selectedTab === 'organisations' ? ' govuk-tabs__list-item--selected' : '' }}">
-                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'organisations']) }}">{{ __('govuk_alpha.volunteering.tabs.organisations') }}</a>
+                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'organisations']) }}" @if ($selectedTab === 'organisations') aria-current="page" @endif>{{ __('govuk_alpha.volunteering.tabs.organisations') }}</a>
                     </li>
                 </ul>
             </div>
@@ -143,7 +143,15 @@
                                     {{ $opportunity['title'] ?? __('govuk_alpha.volunteering.detail_title') }}
                                 @endif
                             </h3>
-                            <strong class="govuk-tag">{{ $label('volunteering.status_values', $statusValue) }}</strong>
+                            @php
+                                $appStatusTagClass = [
+                                    'approved' => 'govuk-tag--green',
+                                    'pending' => 'govuk-tag--yellow',
+                                    'declined' => 'govuk-tag--red',
+                                    'withdrawn' => 'govuk-tag--grey',
+                                ][$statusValue] ?? 'govuk-tag--grey';
+                            @endphp
+                            <strong class="govuk-tag {{ $appStatusTagClass }}">{{ $label('volunteering.status_values', $statusValue) }}</strong>
                             <dl class="govuk-summary-list govuk-!-margin-top-4 govuk-!-margin-bottom-0">
                                 @if (!empty($organization['name']))
                                     <div class="govuk-summary-list__row">
@@ -303,7 +311,7 @@
         </p>
 
         @if ($error)
-            <div class="govuk-error-summary" data-module="govuk-error-summary">
+            <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                 <div role="alert">
                     <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                     <div class="govuk-error-summary__body">

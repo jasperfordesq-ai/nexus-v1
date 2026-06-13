@@ -59,9 +59,11 @@
                     <span aria-hidden="true"> · </span>
                     <span class="nexus-alpha-meta">{{ __('govuk_alpha.dashboard.xp_label', ['xp' => number_format($xp)]) }}</span>
                 </p>
-                <label class="govuk-visually-hidden" for="xp-progress">{{ __('govuk_alpha.dashboard.progress_to_next', ['percent' => $progressPct]) }}</label>
-                <progress id="xp-progress" max="100" value="{{ $progressPct }}">{{ $progressPct }}%</progress>
-                <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-top-1">{{ __('govuk_alpha.dashboard.progress_to_next', ['percent' => $progressPct]) }}</p>
+                {{-- <progress> is not a labelable element, so name it with aria-label
+                     rather than a <label for>; the visible caption is aria-hidden to
+                     avoid a duplicate screen-reader announcement. --}}
+                <progress id="xp-progress" max="100" value="{{ $progressPct }}" aria-label="{{ __('govuk_alpha.dashboard.progress_to_next', ['percent' => $progressPct]) }}">{{ $progressPct }}%</progress>
+                <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-top-1" aria-hidden="true">{{ __('govuk_alpha.dashboard.progress_to_next', ['percent' => $progressPct]) }}</p>
 
                 <h3 class="govuk-heading-m">{{ __('govuk_alpha.dashboard.badges_title', ['count' => $badgesCount]) }}</h3>
                 @if (!empty($badges))

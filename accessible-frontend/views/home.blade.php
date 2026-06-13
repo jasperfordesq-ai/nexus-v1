@@ -89,7 +89,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             @if (($status ?? '') === 'signed-out')
-                <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="home-status-title">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="home-status-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="home-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                     </div>
