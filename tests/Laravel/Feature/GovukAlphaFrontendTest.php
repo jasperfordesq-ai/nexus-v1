@@ -1235,6 +1235,84 @@ class GovukAlphaFrontendTest extends TestCase
         $hours->assertSee('class="govuk-table"', false);
     }
 
+    public function test_volunteering_shift_signup_and_cancel_for_approved_applicant(): void
+    {
+        $user = $this->authenticatedUser();
+        $creator = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $organizationId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $creator->id,
+            'name' => 'Shift Org',
+            'slug' => 'shift-org',
+            'description' => 'Shift signup org.',
+            'contact_email' => 'shift-alpha@example.test',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $opportunityId = DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $organizationId,
+            'created_by' => $creator->id,
+            'title' => 'Shift opportunity',
+            'description' => 'Has a future shift.',
+            'location' => 'Centre',
+            'is_remote' => 0,
+            'skills_needed' => 'Support',
+            'start_date' => now()->addWeek()->toDateString(),
+            'end_date' => now()->addMonth()->toDateString(),
+            'is_active' => 1,
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $shiftId = DB::table('vol_shifts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $opportunityId,
+            'start_time' => now()->addDays(10),
+            'end_time' => now()->addDays(10)->addHours(3),
+            'capacity' => 5,
+            'created_at' => now(),
+        ]);
+        $applicationId = DB::table('vol_applications')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $opportunityId,
+            'user_id' => $user->id,
+            'status' => 'approved',
+            'message' => 'Approved volunteer.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $signupUrl = route('govuk-alpha.volunteering.shifts.signup', ['tenantSlug' => $this->testTenantSlug, 'id' => $opportunityId, 'shiftId' => $shiftId]);
+        $cancelUrl = route('govuk-alpha.volunteering.shifts.cancel', ['tenantSlug' => $this->testTenantSlug, 'id' => $opportunityId, 'shiftId' => $shiftId]);
+
+        // Approved applicant sees a sign-up control on the shift.
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/volunteering/opportunities/{$opportunityId}");
+        $detail->assertOk();
+        $detail->assertSee(__('govuk_alpha.volunteering.sign_up_shift'));
+        $detail->assertSee($signupUrl, false);
+
+        // Sign up → shift_id set on the application.
+        $signup = $this->post($signupUrl);
+        $signup->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/opportunities/{$opportunityId}?status=shift-signed-up");
+        $this->assertDatabaseHas('vol_applications', ['id' => $applicationId, 'shift_id' => $shiftId]);
+
+        // Detail now shows the "Signed up" state + cancel control.
+        $afterSignup = $this->get("/{$this->testTenantSlug}/alpha/volunteering/opportunities/{$opportunityId}");
+        $afterSignup->assertOk();
+        $afterSignup->assertSee(__('govuk_alpha.volunteering.shift_signed_up'));
+        $afterSignup->assertSee($cancelUrl, false);
+
+        // Cancel → shift_id cleared.
+        $cancel = $this->post($cancelUrl);
+        $cancel->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/opportunities/{$opportunityId}?status=shift-cancelled");
+        $this->assertDatabaseHas('vol_applications', ['id' => $applicationId, 'shift_id' => null]);
+    }
+
     public function test_volunteering_hours_page_renders_member_hour_logging_form(): void
     {
         $user = $this->authenticatedUser();

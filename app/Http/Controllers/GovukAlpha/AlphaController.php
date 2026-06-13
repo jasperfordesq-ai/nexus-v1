@@ -776,6 +776,54 @@ class AlphaController extends Controller
         return redirect()->route('govuk-alpha.volunteering.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'apply-created']);
     }
 
+    public function signUpForVolunteerShift(Request $request, string $tenantSlug, int $id, int $shiftId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $ok = false;
+        try {
+            $ok = VolunteerService::signUpForShift($shiftId, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'shift-signed-up' : 'shift-signup-failed',
+        ]);
+    }
+
+    public function cancelVolunteerShift(Request $request, string $tenantSlug, int $id, int $shiftId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $ok = false;
+        try {
+            $ok = VolunteerService::cancelShiftSignup($shiftId, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'shift-cancelled' : 'shift-cancel-failed',
+        ]);
+    }
+
     public function withdrawVolunteerApplication(Request $request, string $tenantSlug, int $id): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);

@@ -11,6 +11,9 @@
         $organizationName = $opportunity['organization']['name'] ?? null;
         $categoryName = $opportunity['category'] ?? null;
         $hasApplied = !empty($opportunity['has_applied']);
+        $application = $opportunity['application'] ?? null;
+        $isApprovedApplicant = is_array($application) && ($application['status'] ?? null) === 'approved';
+        $signedUpShiftId = $isApprovedApplicant ? (int) ($application['shift_id'] ?? 0) : 0;
     @endphp
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_volunteering') }}</a>
@@ -30,6 +33,24 @@
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
                     <p>{{ __('govuk_alpha.volunteering.apply_failed') }}</p>
+                </div>
+            </div>
+        </div>
+    @elseif (in_array($status, ['shift-signed-up', 'shift-cancelled'], true))
+        <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="shift-success-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="shift-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ $status === 'shift-signed-up' ? __('govuk_alpha.volunteering.shift_signed_up_detail') : __('govuk_alpha.volunteering.shift_cancelled_detail') }}</p>
+            </div>
+        </div>
+    @elseif (in_array($status, ['shift-signup-failed', 'shift-cancel-failed'], true))
+        <div class="govuk-error-summary" data-module="govuk-error-summary">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                <div class="govuk-error-summary__body">
+                    <p>{{ $status === 'shift-signup-failed' ? __('govuk_alpha.volunteering.shift_signup_failed') : __('govuk_alpha.volunteering.shift_cancel_failed') }}</p>
                 </div>
             </div>
         </div>
@@ -101,6 +122,12 @@
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($opportunity['shifts'] as $shift)
+                @php
+                    $shiftId = (int) ($shift['id'] ?? 0);
+                    $shiftIsPast = !empty($shift['start_time']) && strtotime((string) $shift['start_time']) < time();
+                    $isSignedUpHere = $signedUpShiftId > 0 && $signedUpShiftId === $shiftId;
+                    $shiftHasSpace = !array_key_exists('spots_available', $shift) || $shift['spots_available'] === null || (int) $shift['spots_available'] > 0;
+                @endphp
                 <article class="nexus-alpha-card">
                     <h3 class="govuk-heading-m govuk-!-margin-bottom-2">{{ $formatDateTime($shift['start_time'] ?? null) }}</h3>
                     <dl class="nexus-alpha-inline-list">
@@ -117,6 +144,22 @@
                             </div>
                         @endif
                     </dl>
+                    @if ($isApprovedApplicant && $shiftId > 0 && !$shiftIsPast)
+                        @if ($isSignedUpHere)
+                            <p class="govuk-!-margin-bottom-2"><strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.volunteering.shift_signed_up') }}</strong></p>
+                            <form method="post" action="{{ route('govuk-alpha.volunteering.shifts.cancel', ['tenantSlug' => $tenantSlug, 'id' => $opportunity['id'], 'shiftId' => $shiftId]) }}">
+                                @csrf
+                                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.volunteering.cancel_shift') }}</button>
+                            </form>
+                        @elseif ($shiftHasSpace)
+                            <form method="post" action="{{ route('govuk-alpha.volunteering.shifts.signup', ['tenantSlug' => $tenantSlug, 'id' => $opportunity['id'], 'shiftId' => $shiftId]) }}">
+                                @csrf
+                                <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.volunteering.sign_up_shift') }}</button>
+                            </form>
+                        @else
+                            <strong class="govuk-tag govuk-tag--red">{{ __('govuk_alpha.volunteering.shift_full') }}</strong>
+                        @endif
+                    @endif
                 </article>
             @endforeach
         </div>

@@ -44,6 +44,8 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/volunteering/opportunities/{id}', [AlphaController::class, 'volunteerOpportunity'])->whereNumber('id')->name('volunteering.show');
         Route::post('/volunteering/opportunities/{id}/apply', [AlphaController::class, 'applyVolunteerOpportunity'])->middleware('throttle:20,1')->whereNumber('id')->name('volunteering.apply.store');
         Route::post('/volunteering/applications/{id}/withdraw', [AlphaController::class, 'withdrawVolunteerApplication'])->middleware('throttle:20,1')->whereNumber('id')->name('volunteering.applications.withdraw');
+        Route::post('/volunteering/opportunities/{id}/shifts/{shiftId}/signup', [AlphaController::class, 'signUpForVolunteerShift'])->middleware('throttle:20,1')->whereNumber('id')->whereNumber('shiftId')->name('volunteering.shifts.signup');
+        Route::post('/volunteering/opportunities/{id}/shifts/{shiftId}/cancel', [AlphaController::class, 'cancelVolunteerShift'])->middleware('throttle:20,1')->whereNumber('id')->whereNumber('shiftId')->name('volunteering.shifts.cancel');
         Route::get('/feed', [AlphaController::class, 'feed'])->name('feed');
         Route::post('/feed/posts', [AlphaController::class, 'storeFeedPost'])->middleware('throttle:20,1')->name('feed.posts.store');
         Route::post('/feed/items/{type}/{id}/like', [AlphaController::class, 'storeFeedLike'])
