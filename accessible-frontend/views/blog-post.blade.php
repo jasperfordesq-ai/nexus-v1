@@ -29,7 +29,7 @@
 
             @if (! empty($post['featured_image']))
                 <div class="nexus-alpha-detail-hero">
-                    <img src="{{ $post['featured_image'] }}" alt="{{ __('govuk_alpha.blog.image_alt', ['title' => $post['title'] ?? '']) }}">
+                    <img src="{{ $post['featured_image'] }}" alt="{{ !empty($post['title']) ? __('govuk_alpha.blog.image_alt', ['title' => $post['title']]) : __('govuk_alpha.blog.featured_image_generic') }}">
                 </div>
             @endif
 

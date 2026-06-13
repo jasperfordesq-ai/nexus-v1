@@ -1644,6 +1644,7 @@ return [
         'not_found_body' => 'Es posible que este artículo haya sido movido o eliminado.',
     ],
     'blog' => [
+        'featured_image_generic' => 'Featured image for this article',
         'caption' => ':community',
         'title' => 'Noticias',
         'subtitle' => 'Noticias, historias y actualizaciones de:name.',

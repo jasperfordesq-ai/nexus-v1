@@ -1644,6 +1644,7 @@ return [
         'not_found_body' => 'ربما تم نقل هذه المقالة أو إزالتها.',
     ],
     'blog' => [
+        'featured_image_generic' => 'Featured image for this article',
         'caption' => ':community',
         'title' => 'مدونة',
         'subtitle' => 'الأخبار والقصص والتحديثات من:name.',

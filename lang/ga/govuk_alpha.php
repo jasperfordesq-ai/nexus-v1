@@ -1644,6 +1644,7 @@ return [
         'not_found_body' => 'Seans gur bogadh nó gur baineadh an t-alt seo.',
     ],
     'blog' => [
+        'featured_image_generic' => 'Featured image for this article',
         'caption' => ':community',
         'title' => 'Blag',
         'subtitle' => 'Nuacht, scéalta agus nuashonruithe ó:name.',

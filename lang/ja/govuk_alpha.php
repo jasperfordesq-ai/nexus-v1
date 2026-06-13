@@ -1644,6 +1644,7 @@ return [
         'not_found_body' => 'この記事は移動または削除された可能性があります。',
     ],
     'blog' => [
+        'featured_image_generic' => 'Featured image for this article',
         'caption' => ':community',
         'title' => 'ブログ',
         'subtitle' => ':name からのニュース、ストーリー、最新情報。',

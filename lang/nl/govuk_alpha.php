@@ -1644,6 +1644,7 @@ return [
         'not_found_body' => 'Mogelijk is dit artikel verplaatst of verwijderd.',
     ],
     'blog' => [
+        'featured_image_generic' => 'Featured image for this article',
         'caption' => ':community',
         'title' => 'Bloggen',
         'subtitle' => 'Nieuws, verhalen en updates van:name.',

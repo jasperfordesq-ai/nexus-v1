@@ -1644,6 +1644,7 @@ return [
         'not_found_body' => 'Cet article a peut-être été déplacé ou supprimé.',
     ],
     'blog' => [
+        'featured_image_generic' => 'Featured image for this article',
         'caption' => ':community',
         'title' => 'Blogue',
         'subtitle' => 'Nouvelles, histoires et mises à jour de:name.',
