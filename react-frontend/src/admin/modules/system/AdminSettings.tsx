@@ -8,6 +8,7 @@ import Scale from 'lucide-react/icons/scale';
 import Lock from 'lucide-react/icons/lock';
 import Upload from 'lucide-react/icons/upload';
 import X from 'lucide-react/icons/x';
+import Palette from 'lucide-react/icons/palette';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useToast, useTenant, useAuth } from '@/contexts';
@@ -61,6 +62,8 @@ interface SettingsForm {
   powered_by_url: string;         // general.powered_by_url
   default_currency: string;       // general.default_currency (ISO 4217 lowercase, e.g. 'eur', 'usd')
   inactivity_timeout_minutes: string; // general.inactivity_timeout_minutes ('0' = disabled, 5–480)
+  header_bg_color: string;        // tenants.configuration.header_bg_color (accessible header background; '' = default black)
+  header_accent_color: string;    // tenants.configuration.header_accent_color (accessible header accent line; '' = match background / GOV.UK blue)
 }
 
 const CURRENCY_OPTIONS: Array<{ code: string; labelKey: string }> = [
@@ -90,7 +93,27 @@ const DEFAULT_SETTINGS: SettingsForm = {
   powered_by_url: '',
   default_currency: 'eur',
   inactivity_timeout_minutes: '0',
+  header_bg_color: '',
+  header_accent_color: '',
 };
+
+// Mirror of AlphaController::readableForeground — pick white or near-black text
+// for the live preview so it matches what the accessible header actually renders
+// (WCAG relative-luminance contrast, whichever foreground wins).
+function readableHeaderText(hex: string): string {
+  const m = /^#?([0-9a-fA-F]{6})$/.exec(hex.trim());
+  const v = m?.[1];
+  if (!v) return '#ffffff';
+  const lin = (c: number) => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  };
+  const L =
+    0.2126 * lin(parseInt(v.slice(0, 2), 16)) +
+    0.7152 * lin(parseInt(v.slice(2, 4), 16)) +
+    0.0722 * lin(parseInt(v.slice(4, 6), 16));
+  return 1.05 / (L + 0.05) >= (L + 0.05) / 0.05 ? '#ffffff' : '#0b0c0c';
+}
 
 export function AdminSettings() {
   const { t: tNav } = useTranslation('admin_nav');
@@ -149,6 +172,8 @@ export function AdminSettings() {
           powered_by_url: (settings.powered_by_url as string) ?? '',
           default_currency: (settings.default_currency as string)?.toLowerCase() || 'eur',
           inactivity_timeout_minutes: String(settings.inactivity_timeout_minutes ?? '0'),
+          header_bg_color: (settings.header_bg_color as string) ?? '',
+          header_accent_color: (settings.header_accent_color as string) ?? '',
         };
         setForm(loaded);
         setOriginalForm(loaded);
@@ -194,14 +219,41 @@ export function AdminSettings() {
         changes.inactivity_timeout_minutes = String(parseInt(form.inactivity_timeout_minutes, 10) || 0);
       }
 
-      if (Object.keys(changes).length === 0) {
+      // Accessible (GOV.UK alpha) header colours live in tenants.configuration,
+      // not the general settings KV table, so they persist via a dedicated
+      // endpoint rather than the `changes` diff above.
+      const headerColorsChanged =
+        form.header_bg_color !== originalForm.header_bg_color ||
+        form.header_accent_color !== originalForm.header_accent_color;
+
+      if (Object.keys(changes).length === 0 && !headerColorsChanged) {
         toast.error(t('system.no_changes_to_save'));
         setSaving(false);
         return;
       }
-      const res = await adminSettings.update(changes);
 
-      if (res.success) {
+      let ok = true;
+
+      if (Object.keys(changes).length > 0) {
+        const res = await adminSettings.update(changes);
+        if (!res.success) {
+          ok = false;
+          toast.error((res as { error?: string }).error || t('system.save_failed'));
+        }
+      }
+
+      if (ok && headerColorsChanged) {
+        const res = await adminSettings.saveHeaderColors(
+          form.header_bg_color || null,
+          form.header_accent_color || null,
+        );
+        if (res.success === false) {
+          ok = false;
+          toast.error(res.error || t('system.save_failed'));
+        }
+      }
+
+      if (ok) {
         toast.success(t('system.settings_saved'));
         // Reload settings to confirm persistence
         fetchSettings();
@@ -210,9 +262,6 @@ export function AdminSettings() {
         // values immediately — mirrors the powered-by image upload handler.
         // Without this, saved text/URL changes only appear after a hard reload.
         refreshTenant();
-      } else {
-        const error = (res as { error?: string }).error || t('system.save_failed');
-        toast.error(error);
       }
     } catch (err) {
       toast.error(t('system.failed_to_save_settings'));
@@ -564,6 +613,97 @@ export function AdminSettings() {
                 >
                   {branding.logoDark ? t('admin_settings.replace_image') : t('admin_settings.upload_image')}
                 </Button>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+
+        {/* Accessible header colour — themes the GOV.UK alpha header bar */}
+        <Card>
+          <CardHeader>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Palette size={20} aria-hidden="true" /> {t('admin_settings.header_colors_section')}
+            </h3>
+          </CardHeader>
+          <CardBody className="gap-5">
+            <p className="text-sm text-muted">{t('admin_settings.header_colors_desc')}</p>
+
+            {/* Live preview of the accessible header bar */}
+            <div className="rounded-lg overflow-hidden border border-border">
+              <div
+                className="flex items-center justify-between px-4 py-3"
+                style={{
+                  backgroundColor: form.header_bg_color || '#0b0c0c',
+                  borderBottom: `8px solid ${form.header_accent_color || form.header_bg_color || '#1d70b8'}`,
+                  color: readableHeaderText(form.header_bg_color || '#0b0c0c'),
+                }}
+              >
+                <span className="font-semibold text-sm">{tenant?.name || t('system.your_community')}</span>
+                <span className="text-xs">{t('admin_settings.header_colors_preview')}</span>
+              </div>
+            </div>
+
+            {/* Background colour */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">{t('admin_settings.header_bg_color_label')}</p>
+              <p className="text-xs text-muted">{t('admin_settings.header_bg_color_hint')}</p>
+              <div className="flex items-center gap-3 flex-wrap">
+                <Input
+                  type="color"
+                  aria-label={t('admin_settings.header_bg_color_label')}
+                  variant="secondary"
+                  className="w-16"
+                  value={form.header_bg_color || '#0b0c0c'}
+                  onValueChange={(v) => setForm(prev => ({ ...prev, header_bg_color: v }))}
+                />
+                <Input
+                  aria-label={t('admin_settings.header_bg_color_label')}
+                  variant="secondary"
+                  className="w-40"
+                  placeholder="#0053BE"
+                  value={form.header_bg_color}
+                  onValueChange={(v) => setForm(prev => ({ ...prev, header_bg_color: v }))}
+                />
+                {form.header_bg_color && (
+                  <Button
+                    variant="secondary" size="sm"
+                    onPress={() => setForm(prev => ({ ...prev, header_bg_color: '' }))}
+                  >
+                    {t('admin_settings.header_colors_reset')}
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Accent line colour */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">{t('admin_settings.header_accent_color_label')}</p>
+              <p className="text-xs text-muted">{t('admin_settings.header_accent_color_hint')}</p>
+              <div className="flex items-center gap-3 flex-wrap">
+                <Input
+                  type="color"
+                  aria-label={t('admin_settings.header_accent_color_label')}
+                  variant="secondary"
+                  className="w-16"
+                  value={form.header_accent_color || form.header_bg_color || '#1d70b8'}
+                  onValueChange={(v) => setForm(prev => ({ ...prev, header_accent_color: v }))}
+                />
+                <Input
+                  aria-label={t('admin_settings.header_accent_color_label')}
+                  variant="secondary"
+                  className="w-40"
+                  placeholder="#ffffff"
+                  value={form.header_accent_color}
+                  onValueChange={(v) => setForm(prev => ({ ...prev, header_accent_color: v }))}
+                />
+                {form.header_accent_color && (
+                  <Button
+                    variant="secondary" size="sm"
+                    onPress={() => setForm(prev => ({ ...prev, header_accent_color: '' }))}
+                  >
+                    {t('admin_settings.header_colors_reset')}
+                  </Button>
+                )}
               </div>
             </div>
           </CardBody>

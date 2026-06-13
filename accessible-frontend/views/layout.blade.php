@@ -46,6 +46,31 @@
     @foreach (($assetEntrypoint['css'] ?? []) as $stylesheet)
         <link rel="stylesheet" href="{{ $stylesheet }}">
     @endforeach
+    @php
+        // Per-tenant header theming. All values are server-validated #rrggbb so
+        // they are safe to inline. The stylesheet reads these custom properties
+        // with the stock GOV.UK black/blue as fallbacks, so an unset tenant is
+        // untouched. When a custom background is set but no accent is chosen, we
+        // default the accent line to the background so two mismatched blues never
+        // stack — keeping the bar clean.
+        $alphaHeaderVars = [];
+        if (!empty($alphaHeaderBg)) {
+            $alphaHeaderVars[] = '--nexus-alpha-header-bg:' . $alphaHeaderBg;
+            if (!empty($alphaHeaderFg)) {
+                $alphaHeaderVars[] = '--nexus-alpha-header-fg:' . $alphaHeaderFg;
+            }
+            if (!empty($alphaHeaderFgHover)) {
+                $alphaHeaderVars[] = '--nexus-alpha-header-fg-hover:' . $alphaHeaderFgHover;
+            }
+        }
+        $alphaAccent = (!empty($alphaHeaderAccent)) ? $alphaHeaderAccent : (!empty($alphaHeaderBg) ? $alphaHeaderBg : null);
+        if (!empty($alphaAccent)) {
+            $alphaHeaderVars[] = '--nexus-alpha-header-accent:' . $alphaAccent;
+        }
+    @endphp
+    @if (!empty($alphaHeaderVars))
+        <style>:root{ {{ implode(';', $alphaHeaderVars) }} }</style>
+    @endif
 </head>
 <body class="govuk-template__body">
     {{-- GOV.UK progressive enhancement: only claim JS support when JS actually runs --}}

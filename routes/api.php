@@ -1275,6 +1275,7 @@ Route::post('/v2/admin/settings/header-logo',       [\App\Http\Controllers\Api\A
 Route::post('/v2/admin/settings/header-logo-dark',  [\App\Http\Controllers\Api\AdminConfigController::class, 'uploadHeaderLogoDark']);
 Route::delete('/v2/admin/settings/header-logo',      [\App\Http\Controllers\Api\AdminConfigController::class, 'removeHeaderLogo']);
 Route::delete('/v2/admin/settings/header-logo-dark', [\App\Http\Controllers\Api\AdminConfigController::class, 'removeHeaderLogoDark']);
+Route::put('/v2/admin/settings/header-colors',       [\App\Http\Controllers\Api\AdminConfigController::class, 'saveHeaderColors']);
 Route::get('/v2/admin/config/registration-policy', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getPolicy']);
 Route::put('/v2/admin/config/registration-policy', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'updatePolicy']);
 Route::get('/v2/admin/identity/providers', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'listProviders']);

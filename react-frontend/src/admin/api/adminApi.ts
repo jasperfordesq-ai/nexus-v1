@@ -1736,6 +1736,13 @@ export const adminSettings = {
   uploadHeaderLogoDark:  (file: File) => api.upload<{ url: string }>('/v2/admin/settings/header-logo-dark', file, 'logo'),
   removeHeaderLogo:      () => api.delete<{ url: string | null }>('/v2/admin/settings/header-logo'),
   removeHeaderLogoDark:  () => api.delete<{ url: string | null }>('/v2/admin/settings/header-logo-dark'),
+  // Accessible (GOV.UK alpha) header colours. Pass null / '' to clear an
+  // override and revert to the stock GOV.UK black + blue.
+  saveHeaderColors: (bgColor: string | null, accentColor: string | null) =>
+    api.put<{ header_bg_color: string | null; header_accent_color: string | null }>(
+      '/v2/admin/settings/header-colors',
+      { bg_color: bgColor ?? '', accent_color: accentColor ?? '' },
+    ),
 
   getAiConfig: () => api.get<Record<string, unknown>>('/v2/admin/config/ai'),
   updateAiConfig: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/config/ai', data),

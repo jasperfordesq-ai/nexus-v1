@@ -1849,6 +1849,10 @@ export interface AdminSettingsResponse {
     os_maps_api_key_set?: boolean;
     /** '0' = disabled; 5–480 minutes when enabled. */
     inactivity_timeout_minutes?: string | null;
+    /** Accessible (GOV.UK alpha) header background colour — #rrggbb or null for the default black. */
+    header_bg_color?: string | null;
+    /** Accessible header accent line colour — #rrggbb or null (defaults to the background, or GOV.UK blue when no background is set). */
+    header_accent_color?: string | null;
   };
 }
 

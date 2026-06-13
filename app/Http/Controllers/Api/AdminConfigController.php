@@ -749,6 +749,15 @@ class AdminConfigController extends BaseApiController
             }
         }
 
+        // Accessible (GOV.UK alpha) header colours live in tenants.configuration
+        // (next to the header logo), not the tenant_settings KV table. Surface
+        // them here so the admin colour pickers prefill with the current values.
+        $config = !empty($tenant['configuration'])
+            ? (json_decode((string) $tenant['configuration'], true) ?: [])
+            : [];
+        $generalSettings['header_bg_color'] = is_string($config['header_bg_color'] ?? null) ? $config['header_bg_color'] : null;
+        $generalSettings['header_accent_color'] = is_string($config['header_accent_color'] ?? null) ? $config['header_accent_color'] : null;
+
         return $this->respondWithData([
             'tenant_id' => $tenantId,
             'tenant' => $directSettings,
@@ -914,6 +923,70 @@ class AdminConfigController extends BaseApiController
     public function removeHeaderLogoDark(): JsonResponse
     {
         return $this->removeHeaderLogoVariant('dark');
+    }
+
+    /**
+     * PUT /api/v2/admin/settings/header-colors
+     *
+     * Persist the accessible (GOV.UK alpha) header colours into
+     * tenants.configuration (header_bg_color / header_accent_color). Both are
+     * optional #rrggbb hex strings; an empty value clears the override and
+     * reverts that part of the header to the stock GOV.UK black + blue. They
+     * sit next to the header logo so TenantContext::getSetting() reads them
+     * with no extra wiring, exactly like the logo URLs.
+     */
+    public function saveHeaderColors(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $input = $this->getAllInput();
+        $rawBg = $input['bg_color'] ?? null;
+        $rawAccent = $input['accent_color'] ?? null;
+        $bg = $this->normalizeHexColor($rawBg);
+        $accent = $this->normalizeHexColor($rawAccent);
+
+        // A present-but-invalid value is a client bug worth surfacing; an
+        // absent / empty value is a deliberate "use the default", stored as
+        // null below (setTenantConfigValue unsets the key).
+        if (is_string($rawBg) && trim($rawBg) !== '' && $bg === null) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Background colour must be a valid hex value like #0053BE.', 'bg_color', 422);
+        }
+        if (is_string($rawAccent) && trim($rawAccent) !== '' && $accent === null) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Accent colour must be a valid hex value like #0053BE.', 'accent_color', 422);
+        }
+
+        $this->setTenantConfigValue($tenantId, 'header_bg_color', $bg);
+        $this->setTenantConfigValue($tenantId, 'header_accent_color', $accent);
+
+        return $this->respondWithData([
+            'header_bg_color' => $bg,
+            'header_accent_color' => $accent,
+        ]);
+    }
+
+    /**
+     * Validate + normalise a #rrggbb hex colour. Accepts an optional leading
+     * '#' and 3- or 6-digit hex (shorthand expanded), lower-cased. Returns
+     * null for empty input or anything that isn't valid hex — callers decide
+     * whether null means "clear" or "reject".
+     */
+    private function normalizeHexColor($value): ?string
+    {
+        if (!is_string($value)) {
+            return null;
+        }
+        $hex = ltrim(trim($value), '#');
+        if ($hex === '') {
+            return null;
+        }
+        if (preg_match('/^[0-9a-fA-F]{3}$/', $hex)) {
+            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+        }
+        if (!preg_match('/^[0-9a-fA-F]{6}$/', $hex)) {
+            return null;
+        }
+        return '#' . strtolower($hex);
     }
 
     /**

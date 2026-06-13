@@ -2913,6 +2913,16 @@ class AlphaController extends Controller
         // Header is always black, so the dark variant (when present) is what's shown.
         $effectiveLogo = $logoDarkUrl ?: $logoUrl;
 
+        // Optional per-tenant header theming (stored next to the logo in
+        // tenants.configuration). Values are re-validated to #rrggbb here so
+        // they are safe to inline into a <style> block; anything invalid or
+        // absent falls back to the stock GOV.UK black + blue in the stylesheet.
+        // When a custom background is set we also pick a readable foreground
+        // (white or near-black) so header text keeps WCAG-AA contrast.
+        $headerBg = $this->normalizeHeaderColor(TenantContext::getSetting('header_bg_color'));
+        $headerAccent = $this->normalizeHeaderColor(TenantContext::getSetting('header_accent_color'));
+        $headerFg = $headerBg !== null ? $this->readableForeground($headerBg) : null;
+
         return [
             'assetEntrypoint' => $this->assetEntrypoint(),
             'tenant' => TenantContext::get(),
@@ -2924,6 +2934,11 @@ class AlphaController extends Controller
             // Smart sizing: bucket the logo by aspect ratio so a wide wordmark and
             // a square/stacked crest both read at a sensible size in the header.
             'tenantLogoShape' => $this->logoShapeClass($effectiveLogo),
+            // Per-tenant header colours (null = keep the stock GOV.UK black + blue).
+            'alphaHeaderBg' => $headerBg,
+            'alphaHeaderAccent' => $headerAccent,
+            'alphaHeaderFg' => $headerFg['fg'] ?? null,
+            'alphaHeaderFgHover' => $headerFg['hover'] ?? null,
             'isAuthenticated' => $this->currentUserId() !== null,
             'alphaNavItems' => $this->alphaNavItems(),
             'alphaFooterColumns' => $this->alphaFooterColumns(),
@@ -2941,6 +2956,50 @@ class AlphaController extends Controller
             'robotsDirective' => 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
             'defaultOgImage' => 'https://project-nexus.ie/og-image.png',
         ];
+    }
+
+    /**
+     * Validate + normalise a #rrggbb hex colour for safe inlining into the
+     * header <style> block. Accepts an optional '#' and 3- or 6-digit hex
+     * (shorthand expanded); returns null for empty / invalid input.
+     */
+    private function normalizeHeaderColor($value): ?string
+    {
+        if (!is_string($value)) {
+            return null;
+        }
+        $hex = ltrim(trim($value), '#');
+        if (preg_match('/^[0-9a-fA-F]{3}$/', $hex)) {
+            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+        }
+        return preg_match('/^[0-9a-fA-F]{6}$/', $hex) ? '#' . strtolower($hex) : null;
+    }
+
+    /**
+     * Pick a header foreground (text) colour that stays legible on $hexBg,
+     * using the WCAG relative-luminance contrast formula — white vs near-black,
+     * whichever yields the higher contrast ratio. Returns the base text colour
+     * and a slightly-muted hover variant.
+     *
+     * @return array{fg: string, hover: string}
+     */
+    private function readableForeground(string $hexBg): array
+    {
+        $channel = static function (string $pair): float {
+            $c = hexdec($pair) / 255;
+            return $c <= 0.03928 ? $c / 12.92 : (($c + 0.055) / 1.055) ** 2.4;
+        };
+        $luminance = 0.2126 * $channel(substr($hexBg, 1, 2))
+            + 0.7152 * $channel(substr($hexBg, 3, 2))
+            + 0.0722 * $channel(substr($hexBg, 5, 2));
+
+        // Contrast ratio of white (L=1) and near-black (#0b0c0c, L≈0) on $hexBg.
+        $contrastWhite = (1.0 + 0.05) / ($luminance + 0.05);
+        $contrastBlack = ($luminance + 0.05) / (0.0 + 0.05);
+
+        return $contrastWhite >= $contrastBlack
+            ? ['fg' => '#ffffff', 'hover' => '#f3f2f1']
+            : ['fg' => '#0b0c0c', 'hover' => '#505a5f'];
     }
 
     /**

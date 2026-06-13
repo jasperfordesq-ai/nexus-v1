@@ -49,9 +49,13 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
 @import "govuk-frontend/dist/govuk/utilities/index";
 @import "govuk-frontend/dist/govuk/overrides/index";
 
+// Header colours are themeable per tenant via CSS custom properties injected
+// in the page <head> (AlphaController::sharedViewData → layout.blade.php). When
+// a tenant has no override the variables are absent and these fall back to the
+// stock GOV.UK black background + blue accent line.
 .nexus-alpha-header {
-  border-bottom: 10px solid govuk-colour("blue");
-  background: govuk-colour("black");
+  border-bottom: 10px solid var(--nexus-alpha-header-accent, #{govuk-colour("blue")});
+  background: var(--nexus-alpha-header-bg, #{govuk-colour("black")});
 }
 
 .nexus-alpha-header__container {
@@ -65,7 +69,7 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
 
 .nexus-alpha-header__brand,
 .nexus-alpha-header__brand:visited {
-  color: govuk-colour("white");
+  color: var(--nexus-alpha-header-fg, #{govuk-colour("white")});
   font-weight: 700;
   text-decoration: none;
 }
@@ -93,7 +97,7 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
 .nexus-alpha-header__logo--square { max-height: 80px; }
 
 .nexus-alpha-header__service {
-  color: govuk-colour("white");
+  color: var(--nexus-alpha-header-fg, #{govuk-colour("white")});
 }
 
 .nexus-alpha-header__links {
@@ -105,12 +109,12 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
 
 .nexus-alpha-header__link,
 .nexus-alpha-header__link:visited {
-  color: govuk-colour("white");
+  color: var(--nexus-alpha-header-fg, #{govuk-colour("white")});
   font-weight: 700;
 }
 
 .nexus-alpha-header__link:hover {
-  color: govuk-colour("black", $variant: "tint-95");
+  color: var(--nexus-alpha-header-fg-hover, #{govuk-colour("black", $variant: "tint-95")});
 }
 
 .nexus-alpha-header__link:focus {
