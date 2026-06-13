@@ -1488,6 +1488,78 @@ class GovukAlphaFrontendTest extends TestCase
         $create->assertSee('class="govuk-error-message"', false);
     }
 
+    public function test_event_organiser_can_edit_cancel_and_delete_their_event(): void
+    {
+        $user = $this->authenticatedUser();
+        $eventId = DB::table('events')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Organiser event',
+            'description' => 'Original description.',
+            'location' => 'Organiser Hall',
+            'start_time' => now()->addDays(7),
+            'end_time' => now()->addDays(7)->addHours(2),
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // The organiser sees Edit/Cancel/Delete controls on the detail page.
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}");
+        $detail->assertOk();
+        $detail->assertSee(__('govuk_alpha.events.edit_event'));
+        $detail->assertSee(route('govuk-alpha.events.edit', ['tenantSlug' => $this->testTenantSlug, 'id' => $eventId]), false);
+
+        // The edit form is prefilled.
+        $edit = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}/edit");
+        $edit->assertOk();
+        $edit->assertSee('Organiser event', false);
+        $edit->assertSee(__('govuk_alpha.events.update_submit'));
+
+        // Update the event.
+        $update = $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/edit", [
+            'title' => 'Updated event title',
+            'description' => 'Updated description.',
+            'start_time' => now()->addDays(8)->format('Y-m-d\TH:i'),
+            'location' => 'Organiser Hall',
+        ]);
+        $update->assertRedirect("/{$this->testTenantSlug}/alpha/events/{$eventId}?status=event-updated");
+        $this->assertSame('Updated event title', DB::table('events')->where('id', $eventId)->value('title'));
+
+        // Cancel the event.
+        $cancel = $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/cancel", ['reason' => 'No longer running.']);
+        $cancel->assertRedirectContains('status=event-cancelled');
+
+        // Delete the event (returns to the list).
+        $delete = $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/delete");
+        $delete->assertRedirect("/{$this->testTenantSlug}/alpha/events?status=event-deleted");
+    }
+
+    public function test_event_edit_rejects_a_non_owner(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $eventId = DB::table('events')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'title' => 'Someone elses event',
+            'description' => 'Not yours to edit.',
+            'start_time' => now()->addDays(3),
+            'end_time' => now()->addDays(3)->addHours(1),
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // A different signed-in member cannot edit or delete it.
+        $this->authenticatedUser();
+        $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}/edit")->assertForbidden();
+        $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/delete")->assertForbidden();
+        $this->assertDatabaseHas('events', ['id' => $eventId, 'title' => 'Someone elses event']);
+    }
+
     public function test_event_card_and_detail_render_cover_image_and_online_link(): void
     {
         $user = $this->authenticatedUser();

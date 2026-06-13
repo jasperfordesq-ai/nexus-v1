@@ -15,6 +15,17 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.events.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.events.description') }}</p>
 
+    @if (($status ?? '') === 'event-deleted')
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="event-deleted-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="event-deleted-title">{{ __('govuk_alpha.states.success_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.events.deleted') }}</p>
+            </div>
+        </div>
+    @endif
+
     @if ($moduleDisabled)
         <div class="govuk-notification-banner" role="region" aria-labelledby="events-disabled-title">
             <div class="govuk-notification-banner__header">

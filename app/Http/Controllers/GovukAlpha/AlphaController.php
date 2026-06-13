@@ -945,6 +945,7 @@ class AlphaController extends Controller
             'meta' => $meta,
             'moduleDisabled' => false,
             'error' => $error,
+            'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
 
@@ -1055,6 +1056,106 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $eventId, 'status' => 'event-created']);
+    }
+
+    /**
+     * Resolve an event the current user owns, or null (with the right HTTP abort)
+     * for the organiser-only edit/cancel/delete flows.
+     */
+    private function ownedEventOrAbort(string $tenantSlug, int $id): array
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('events'), 403);
+        $userId = $this->currentUserId();
+        abort_if($userId === null, 401);
+
+        $event = EventService::getById($id, $userId);
+        abort_if($event === null, 404);
+        abort_unless((int) ($event['user_id'] ?? 0) === $userId, 403);
+
+        return [$event, $userId];
+    }
+
+    public function editEvent(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('events'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        $event = EventService::getById($id, $userId);
+        abort_if($event === null, 404);
+        abort_unless((int) ($event['user_id'] ?? 0) === $userId, 403);
+
+        return $this->view('accessible-frontend::event-edit', [
+            'title' => __('govuk_alpha.events.edit_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'events',
+            'event' => $event,
+            'categories' => $this->categoriesForTypes(['events', 'event']),
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function updateEvent(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        [, $userId] = $this->ownedEventOrAbort($tenantSlug, $id);
+
+        try {
+            $ok = EventService::update($id, $userId, $this->eventInput($request));
+        } catch (ValidationException $e) {
+            return redirect()
+                ->route('govuk-alpha.events.edit', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withErrors($e->errors())
+                ->withInput();
+        } catch (\Throwable $e) {
+            report($e);
+            $ok = false;
+        }
+
+        return redirect()->route('govuk-alpha.events.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'event-updated' : 'event-update-failed',
+        ]);
+    }
+
+    public function cancelEvent(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        [, $userId] = $this->ownedEventOrAbort($tenantSlug, $id);
+
+        $reason = trim(self::asStr($request->input('reason')));
+        $ok = false;
+        try {
+            $ok = EventService::cancelEvent($id, $userId, $reason);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.events.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'event-cancelled' : 'event-cancel-failed',
+        ]);
+    }
+
+    public function deleteEvent(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        [, $userId] = $this->ownedEventOrAbort($tenantSlug, $id);
+
+        $ok = false;
+        try {
+            $ok = EventService::delete($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // The event no longer exists on success, so return to the events list.
+        return redirect()->route('govuk-alpha.events.index', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'event-deleted' : 'event-delete-failed',
+        ]);
     }
 
     public function storeEventRsvp(Request $request, string $tenantSlug, int $id): RedirectResponse

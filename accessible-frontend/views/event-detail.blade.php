@@ -34,12 +34,21 @@
                 <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.events.rsvp_updated') }}</p>
             </div>
         </div>
-    @elseif ($status === 'rsvp-failed')
+    @elseif (in_array($status, ['event-updated', 'event-cancelled'], true))
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="event-organiser-success-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="event-organiser-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ $status === 'event-updated' ? __('govuk_alpha.events.updated') : __('govuk_alpha.events.cancelled') }}</p>
+            </div>
+        </div>
+    @elseif (in_array($status, ['rsvp-failed', 'event-update-failed', 'event-cancel-failed'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
-                    <p>{{ __('govuk_alpha.events.rsvp_failed') }}</p>
+                    <p>{{ $status === 'rsvp-failed' ? __('govuk_alpha.events.rsvp_failed') : ($status === 'event-update-failed' ? __('govuk_alpha.events.update_failed') : __('govuk_alpha.events.cancel_failed')) }}</p>
                 </div>
             </div>
         </div>
@@ -49,6 +58,36 @@
         <div class="govuk-grid-column-two-thirds">
             <span class="govuk-caption-l">{{ __('govuk_alpha.events.detail_title') }}</span>
             <h1 class="govuk-heading-xl">{{ $event['title'] }}</h1>
+
+            @if ($isOwner ?? false)
+                <div class="nexus-alpha-actions govuk-!-margin-bottom-4">
+                    <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ route('govuk-alpha.events.edit', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.events.edit_event') }}</a>
+                </div>
+                <details class="govuk-details govuk-!-margin-bottom-2" data-module="govuk-details">
+                    <summary class="govuk-details__summary"><span class="govuk-details__summary-text">{{ __('govuk_alpha.events.cancel_event') }}</span></summary>
+                    <div class="govuk-details__text">
+                        <p class="govuk-body">{{ __('govuk_alpha.events.cancel_confirm') }}</p>
+                        <form method="post" action="{{ route('govuk-alpha.events.cancel', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+                            @csrf
+                            <div class="govuk-form-group">
+                                <label class="govuk-label" for="cancel-reason">{{ __('govuk_alpha.events.cancel_reason_label') }}</label>
+                                <textarea class="govuk-textarea" id="cancel-reason" name="reason" rows="3"></textarea>
+                            </div>
+                            <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.cancel_event_button') }}</button>
+                        </form>
+                    </div>
+                </details>
+                <details class="govuk-details govuk-!-margin-bottom-4" data-module="govuk-details">
+                    <summary class="govuk-details__summary"><span class="govuk-details__summary-text">{{ __('govuk_alpha.events.delete_event') }}</span></summary>
+                    <div class="govuk-details__text">
+                        <p class="govuk-body">{{ __('govuk_alpha.events.delete_confirm') }}</p>
+                        <form method="post" action="{{ route('govuk-alpha.events.delete', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+                            @csrf
+                            <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.delete_event_button') }}</button>
+                        </form>
+                    </div>
+                </details>
+            @endif
 
             @if (!empty($event['cover_image']))
                 <figure class="nexus-alpha-detail-hero">

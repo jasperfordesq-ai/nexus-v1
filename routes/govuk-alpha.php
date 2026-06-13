@@ -62,6 +62,10 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/events', [AlphaController::class, 'events'])->name('events.index');
         Route::get('/events/new', [AlphaController::class, 'createEvent'])->name('events.create');
         Route::post('/events/new', [AlphaController::class, 'storeEvent'])->middleware('throttle:10,1')->name('events.store');
+        Route::get('/events/{id}/edit', [AlphaController::class, 'editEvent'])->whereNumber('id')->name('events.edit');
+        Route::post('/events/{id}/edit', [AlphaController::class, 'updateEvent'])->whereNumber('id')->middleware('throttle:10,1')->name('events.update');
+        Route::post('/events/{id}/cancel', [AlphaController::class, 'cancelEvent'])->whereNumber('id')->middleware('throttle:10,1')->name('events.cancel');
+        Route::post('/events/{id}/delete', [AlphaController::class, 'deleteEvent'])->whereNumber('id')->middleware('throttle:10,1')->name('events.delete');
         Route::get('/events/{id}', [AlphaController::class, 'event'])->whereNumber('id')->name('events.show');
         Route::post('/events/{id}/rsvp', [AlphaController::class, 'storeEventRsvp'])->whereNumber('id')->name('events.rsvp.store');
         Route::get('/volunteering', [AlphaController::class, 'volunteering'])->name('volunteering.index');

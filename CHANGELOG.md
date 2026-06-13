@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Manage your own events on the accessible site.** An event's organiser can now edit it (with the same field-by-field validation as creating), cancel it with an optional reason (which notifies everyone who RSVP'd), or delete it — each with a clear confirmation step.
 - **A "For you" tab on the accessible volunteering page.** Signed-in members now see volunteer shifts recommended for them — matched to their skills and availability, with a match score, the organisation, location, time and spaces left.
 - **Sort listings by Newest or Recommended on the accessible site.** The listings page now has a "Sort by" control, with Recommended surfacing featured listings first.
 - **See who's going to an event on the accessible site, with clearer create errors.** An event page now lists the people going and interested (with their photos), and the "Create an event" form now highlights each field that needs fixing with a message beside it, instead of one vague error.
