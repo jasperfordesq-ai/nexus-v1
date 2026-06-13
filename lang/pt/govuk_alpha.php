@@ -646,6 +646,10 @@ return [
         'description_title' => 'Description',
     ],
     'volunteering' => [
+        'org_logo_alt' => ':name logo',
+        'hours_by_org_title' => 'Hours by organisation',
+        'hours_by_month_title' => 'Hours by month',
+        'month_label' => 'Month',
         'application_status_label' => 'Filter by status',
         'application_status_all' => 'All applications',
         'withdraw_application' => 'Withdraw application',

@@ -45,8 +45,12 @@
             <div class="govuk-body govuk-!-margin-top-5">{!! nl2br(e((string) ($opportunity['description'] ?? ''))) !!}</div>
         </div>
         <div class="govuk-grid-column-one-third">
+            @php $orgLogo = $opportunity['organization']['logo_url'] ?? null; @endphp
             <div class="govuk-inset-text">
-                {{ $organizationName ?: __('govuk_alpha.volunteering.organization') }}
+                @if (!empty($orgLogo))
+                    <img class="nexus-alpha-org-logo govuk-!-margin-bottom-2" src="{{ $orgLogo }}" alt="{{ __('govuk_alpha.volunteering.org_logo_alt', ['name' => $organizationName ?: __('govuk_alpha.volunteering.organization')]) }}" width="96" height="96" loading="lazy" decoding="async">
+                @endif
+                <p class="govuk-body govuk-!-margin-bottom-0">{{ $organizationName ?: __('govuk_alpha.volunteering.organization') }}</p>
             </div>
         </div>
     </div>

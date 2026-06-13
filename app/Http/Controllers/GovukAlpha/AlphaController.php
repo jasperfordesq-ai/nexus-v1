@@ -736,6 +736,11 @@ class AlphaController extends Controller
         $opportunity = VolunteerService::getOpportunityById($id, $this->currentUserId());
         abort_if($opportunity === null, 404);
 
+        // There is no opportunity-level image in the payload; the organisation logo
+        // is the only image React shows here too. Resolve it to a same-origin URL.
+        $orgLogo = $this->resolveAsset($opportunity['organization']['logo_url'] ?? null);
+        $opportunity['organization']['logo_url'] = $orgLogo;
+
         return $this->view('accessible-frontend::volunteer-opportunity', [
             'title' => $opportunity['title'] ?? __('govuk_alpha.volunteering.detail_title'),
             'tenantSlug' => $tenantSlug,
@@ -743,6 +748,8 @@ class AlphaController extends Controller
             'opportunity' => $opportunity,
             'requiresAuth' => $this->currentUserId() === null,
             'status' => self::asStr($request->query('status')) ?: null,
+            'ogImage' => $this->absoluteAssetUrl($orgLogo),
+            'ogImageAlt' => $orgLogo ? ($opportunity['organization']['name'] ?? null) : null,
         ]);
     }
 

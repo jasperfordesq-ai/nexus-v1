@@ -1177,6 +1177,64 @@ class GovukAlphaFrontendTest extends TestCase
         $after->assertSee(__('govuk_alpha.volunteering.application_withdrawn'));
     }
 
+    public function test_volunteering_opportunity_shows_org_logo_and_hours_show_breakdowns(): void
+    {
+        $user = $this->authenticatedUser();
+        $organizationId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'name' => 'Logo Org',
+            'slug' => 'logo-org',
+            'description' => 'Org with a logo and logged hours.',
+            'contact_email' => 'logo-alpha@example.test',
+            'logo_url' => '/uploads/tenants/' . $this->testTenantSlug . '/vol/org-logo.png',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $opportunityId = DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $organizationId,
+            'created_by' => $user->id,
+            'title' => 'Logo opportunity',
+            'description' => 'Has an organisation logo.',
+            'location' => 'Centre',
+            'is_remote' => 0,
+            'skills_needed' => 'Support',
+            'start_date' => now()->addWeek()->toDateString(),
+            'end_date' => now()->addMonth()->toDateString(),
+            'is_active' => 1,
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('vol_logs')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'organization_id' => $organizationId,
+            'opportunity_id' => $opportunityId,
+            'date_logged' => now()->toDateString(),
+            'hours' => 3.5,
+            'description' => 'Approved log entry.',
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/volunteering/opportunities/{$opportunityId}");
+        $detail->assertOk();
+        $detail->assertSee('class="nexus-alpha-org-logo', false);
+        $detail->assertSee('org-logo.png', false);
+        $detail->assertSee(__('govuk_alpha.volunteering.org_logo_alt', ['name' => 'Logo Org']), false);
+
+        $hours = $this->get("/{$this->testTenantSlug}/alpha/volunteering/hours");
+        $hours->assertOk();
+        $hours->assertSee(__('govuk_alpha.volunteering.hours_by_org_title'));
+        $hours->assertSee('Logo Org');
+        $hours->assertSee(__('govuk_alpha.volunteering.hours_by_month_title'));
+        $hours->assertSee('class="govuk-table"', false);
+    }
+
     public function test_volunteering_hours_page_renders_member_hour_logging_form(): void
     {
         $user = $this->authenticatedUser();

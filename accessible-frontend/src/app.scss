@@ -282,6 +282,15 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
   background: #f3f2f1;
 }
 
+.nexus-alpha-org-logo {
+  display: block;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  background: govuk-colour("white");
+  border: 1px solid $govuk-border-colour;
+}
+
 .nexus-alpha-detail-hero {
   margin: 0 0 govuk-spacing(5) 0;
 }

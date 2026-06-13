@@ -50,6 +50,59 @@
         </div>
     </dl>
 
+    @php
+        $summaryByOrg = $summary['by_organization'] ?? [];
+        $summaryByMonth = $summary['by_month'] ?? [];
+    @endphp
+    @if (!empty($summaryByOrg))
+        <h2 class="govuk-heading-m govuk-!-margin-top-7">{{ __('govuk_alpha.volunteering.hours_by_org_title') }}</h2>
+        <table class="govuk-table">
+            <caption class="govuk-table__caption govuk-table__caption--s govuk-visually-hidden">{{ __('govuk_alpha.volunteering.hours_by_org_title') }}</caption>
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">{{ __('govuk_alpha.volunteering.organization') }}</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">{{ __('govuk_alpha.volunteering.approved_hours') }}</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @foreach ($summaryByOrg as $orgRow)
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">{{ $orgRow['name'] ?? '' }}</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">{{ number_format((float) ($orgRow['hours'] ?? 0), 1) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+    @if (!empty($summaryByMonth))
+        <h2 class="govuk-heading-m">{{ __('govuk_alpha.volunteering.hours_by_month_title') }}</h2>
+        <table class="govuk-table">
+            <caption class="govuk-table__caption govuk-table__caption--s govuk-visually-hidden">{{ __('govuk_alpha.volunteering.hours_by_month_title') }}</caption>
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">{{ __('govuk_alpha.volunteering.month_label') }}</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">{{ __('govuk_alpha.volunteering.approved_hours') }}</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @foreach ($summaryByMonth as $monthRow)
+                    @php
+                        $monthLabel = (string) ($monthRow['month'] ?? '');
+                        try {
+                            $monthLabel = \Illuminate\Support\Carbon::createFromFormat('Y-m', (string) $monthRow['month'])->translatedFormat('F Y');
+                        } catch (\Throwable) {
+                            // Fall back to the raw 'YYYY-MM' string on any parse issue.
+                        }
+                    @endphp
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">{{ $monthLabel }}</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">{{ number_format((float) ($monthRow['hours'] ?? 0), 1) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+
     <form method="post" action="{{ route('govuk-alpha.volunteering.hours.store', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-top-7">
         @csrf
         <fieldset class="govuk-fieldset">
