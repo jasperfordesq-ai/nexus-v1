@@ -50,6 +50,12 @@
             <span class="govuk-caption-l">{{ __('govuk_alpha.events.detail_title') }}</span>
             <h1 class="govuk-heading-xl">{{ $event['title'] }}</h1>
 
+            @if (!empty($event['cover_image']))
+                <figure class="nexus-alpha-detail-hero">
+                    <img src="{{ $event['cover_image'] }}" alt="{{ __('govuk_alpha.events.image_alt', ['title' => $event['title']]) }}" width="640" height="360" decoding="async">
+                </figure>
+            @endif
+
             <h2 class="govuk-heading-l">{{ __('govuk_alpha.events.description_title') }}</h2>
             <div class="govuk-body">{!! nl2br(e((string) ($event['description'] ?? ''))) !!}</div>
         </div>
@@ -80,6 +86,14 @@
             <dt class="govuk-summary-list__key">{{ __('govuk_alpha.events.location') }}</dt>
             <dd class="govuk-summary-list__value">{{ $event['location'] ?? __('govuk_alpha.events.online') }}</dd>
         </div>
+        @if (!empty($event['online_link']) && \Illuminate\Support\Str::startsWith((string) $event['online_link'], ['http://', 'https://']))
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.events.online_link_label') }}</dt>
+                <dd class="govuk-summary-list__value">
+                    <a class="govuk-link" href="{{ $event['online_link'] }}" rel="noopener noreferrer">{{ __('govuk_alpha.events.online_link_text') }}</a>
+                </dd>
+            </div>
+        @endif
         @if ($organiserName !== '')
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">{{ __('govuk_alpha.events.organiser') }}</dt>

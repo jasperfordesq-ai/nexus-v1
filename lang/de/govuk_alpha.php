@@ -527,6 +527,9 @@ return [
         'auth_required_detail' => 'Sign in to read and send messages for :community.',
     ],
     'events' => [
+        'image_alt' => 'Photo for :title',
+        'online_link_label' => 'Online link',
+        'online_link_text' => 'Join online',
         'title' => 'Events',
         'description' => 'Find upcoming and past community events.',
         'caption' => ':community',

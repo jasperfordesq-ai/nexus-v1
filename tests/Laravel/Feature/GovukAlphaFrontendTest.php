@@ -904,6 +904,39 @@ class GovukAlphaFrontendTest extends TestCase
         ]);
     }
 
+    public function test_event_card_and_detail_render_cover_image_and_online_link(): void
+    {
+        $user = $this->authenticatedUser();
+        $eventId = DB::table('events')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Event with a cover photo',
+            'description' => 'Event detail with a hero image.',
+            'location' => 'Photo Hall',
+            'cover_image' => '/uploads/tenants/' . $this->testTenantSlug . '/events/cover.jpg',
+            'online_link' => 'https://example.test/live',
+            'start_time' => now()->addDays(5),
+            'end_time' => now()->addDays(5)->addHours(2),
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $index = $this->get("/{$this->testTenantSlug}/alpha/events");
+        $index->assertOk();
+        $index->assertSee('class="nexus-alpha-card-thumb"', false);
+        $index->assertSee('events/cover.jpg', false);
+        $index->assertSee(__('govuk_alpha.events.image_alt', ['title' => 'Event with a cover photo']), false);
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}");
+        $detail->assertOk();
+        $detail->assertSee('class="nexus-alpha-detail-hero"', false);
+        $detail->assertSee('events/cover.jpg', false);
+        // online_link captured but previously never shown — now surfaced safely.
+        $detail->assertSee(__('govuk_alpha.events.online_link_label'));
+        $detail->assertSee('property="og:image" content="' . url('/uploads/tenants/' . $this->testTenantSlug . '/events/cover.jpg') . '"', false);
+    }
+
     public function test_volunteering_pages_render_opportunity_detail_and_application_flow(): void
     {
         $user = $this->authenticatedUser();

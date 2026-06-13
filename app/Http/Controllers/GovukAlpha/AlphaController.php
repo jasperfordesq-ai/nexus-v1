@@ -505,7 +505,7 @@ class AlphaController extends Controller
 
         try {
             $result = EventService::getAll($query);
-            $items = $result['items'] ?? [];
+            $items = $this->withResolvedImageKey($result['items'] ?? [], 'cover_image');
             $meta = [
                 'has_more' => (bool) ($result['has_more'] ?? false),
                 'cursor' => $result['cursor'] ?? null,
@@ -536,6 +536,8 @@ class AlphaController extends Controller
         $event = EventService::getById($id, $this->currentUserId());
         abort_if($event === null, 404);
 
+        $event['cover_image'] = $this->resolveAsset($event['cover_image'] ?? null);
+
         return $this->view('accessible-frontend::event-detail', [
             'title' => $event['title'] ?? __('govuk_alpha.events.detail_title'),
             'tenantSlug' => $tenantSlug,
@@ -543,6 +545,8 @@ class AlphaController extends Controller
             'event' => $event,
             'requiresAuth' => $this->currentUserId() === null,
             'status' => self::asStr(request()->query('status')) ?: null,
+            'ogImage' => $this->absoluteAssetUrl($event['cover_image'] ?? null),
+            'ogImageAlt' => $event['cover_image'] ? ($event['title'] ?? null) : null,
         ]);
     }
 
@@ -1176,7 +1180,7 @@ class AlphaController extends Controller
 
         try {
             $result = $this->listingService->getAll($query);
-            $items = $this->withResolvedListingImages($result['items'] ?? []);
+            $items = $this->withResolvedImageKey($result['items'] ?? [], 'image_url');
             $meta = [
                 'total_items' => $this->listingService->countAll($query),
                 'has_more' => (bool) ($result['has_more'] ?? false),
@@ -2249,17 +2253,18 @@ class AlphaController extends Controller
     }
 
     /**
-     * Resolve the cover image_url on each listing item in place so the
-     * templates only ever receive a browser-ready URL (or null).
+     * Resolve a named cover-image key on each item in place so the templates
+     * only ever receive a browser-ready URL (or null). Used for listings
+     * (image_url) and events (cover_image).
      *
      * @param array<int, array<string, mixed>> $items
      * @return array<int, array<string, mixed>>
      */
-    private function withResolvedListingImages(array $items): array
+    private function withResolvedImageKey(array $items, string $key): array
     {
         foreach ($items as &$item) {
             if (is_array($item)) {
-                $item['image_url'] = $this->resolveAsset($item['image_url'] ?? null);
+                $item[$key] = $this->resolveAsset($item[$key] ?? null);
             }
         }
         unset($item);

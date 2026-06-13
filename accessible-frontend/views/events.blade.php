@@ -118,6 +118,13 @@
                         $categoryName = $event['category']['name'] ?? $event['category_name'] ?? null;
                     @endphp
                     <article class="nexus-alpha-card">
+                        <div class="nexus-alpha-listing-row">
+                            @if (!empty($event['cover_image']))
+                                <div class="nexus-alpha-listing-row__media">
+                                    <img class="nexus-alpha-card-thumb" src="{{ $event['cover_image'] }}" alt="{{ __('govuk_alpha.events.image_alt', ['title' => $event['title']]) }}" width="120" height="90" loading="lazy" decoding="async">
+                                </div>
+                            @endif
+                            <div class="nexus-alpha-listing-row__body">
                         <h3 class="govuk-heading-m govuk-!-margin-bottom-2">
                             <a class="govuk-link" href="{{ route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ $event['title'] }}</a>
                         </h3>
@@ -155,6 +162,8 @@
                             @endif
                         </p>
                         <a class="govuk-link govuk-link--no-visited-state" href="{{ route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('govuk_alpha.actions.view_details') }}</a>
+                            </div>
+                        </div>
                     </article>
                 @endforeach
             </div>
