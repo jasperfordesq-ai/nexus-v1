@@ -10,10 +10,11 @@
             <h1 class="govuk-heading-xl">{{ __('govuk_alpha.auth.login_title') }}</h1>
             <p class="govuk-body-l">{{ __('govuk_alpha.auth.login_description', ['community' => $tenant['name'] ?? $tenantSlug]) }}</p>
 
-            @if (in_array($status ?? '', ['login-failed', 'two-factor-required', 'rate-limited', 'email-not-verified', 'pending-verification', 'account-suspended'], true))
+            @if (in_array($status ?? '', ['login-failed', 'two-factor-required', 'two-factor-expired', 'rate-limited', 'email-not-verified', 'pending-verification', 'account-suspended'], true))
                 @php
                     $loginErrorMessage = match ($status) {
                         'two-factor-required'   => __('govuk_alpha.auth.two_factor_required'),
+                        'two-factor-expired'    => __('govuk_alpha.auth.two_factor_expired'),
                         'rate-limited'          => __('govuk_alpha.auth.rate_limited'),
                         'email-not-verified'    => __('govuk_alpha.auth.email_not_verified'),
                         'pending-verification'  => __('govuk_alpha.auth.pending_verification'),

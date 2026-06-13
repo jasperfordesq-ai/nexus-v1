@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Two-factor authentication now works on the accessible site.** If your account has two-factor authentication turned on, signing in now takes you to a page to enter your authenticator code (or a backup code) instead of stopping with an unusable message. Previously two-factor sign-in was a dead end on the accessible site.
 - **You can now reset a forgotten password from the accessible site.** The accessible sign-in page now has a "Forgot your password?" link that takes you to a page where you can request a reset link by email, plus a "Choose a new password" page for setting it — with clear inline guidance (minimum length, breached-password and reuse checks) and a friendly message when a link has expired. Previously a locked-out member had no way to recover their account from the accessible site.
 - **You can now manage volunteer applications on the accessible site.** The volunteering "My applications" tab now lets you filter by status (pending, approved, declined, withdrawn), page through a longer history, and withdraw a pending application — none of which was possible before.
 - **Volunteer hours breakdown and organisation logos on the accessible site.** The volunteering hours page now shows your approved hours broken down by organisation and by month, and a volunteer opportunity now shows the organisation's logo.

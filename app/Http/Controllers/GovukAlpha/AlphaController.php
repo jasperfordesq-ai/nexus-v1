@@ -191,7 +191,16 @@ class AlphaController extends Controller
         }
 
         if (($payload['requires_2fa'] ?? false) === true) {
-            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'two-factor-required']);
+            // Carry the short-lived (5-min, single-use) challenge token to the 2FA
+            // code page via the session — never in the URL. Email+password are not
+            // re-sent; the token identifies the pending challenge.
+            $twoFactorToken = (string) ($payload['two_factor_token'] ?? '');
+            if ($twoFactorToken === '' || !$request->hasSession()) {
+                return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'two-factor-required']);
+            }
+            $request->session()->put('alpha_2fa_token', $twoFactorToken);
+
+            return redirect()->route('govuk-alpha.login.twofactor', ['tenantSlug' => $tenantSlug]);
         }
 
         // Surface the specific failure reason so the Blade page can show a
@@ -209,6 +218,90 @@ class AlphaController extends Controller
         };
 
         return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    public function twoFactor(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $token = $request->hasSession() ? (string) $request->session()->get('alpha_2fa_token', '') : '';
+        if ($token === '') {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'two-factor-expired']);
+        }
+
+        return $this->view('accessible-frontend::two-factor', [
+            'title' => __('govuk_alpha.auth.two_factor_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'login',
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function storeTwoFactor(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $token = $request->hasSession() ? (string) $request->session()->get('alpha_2fa_token', '') : '';
+        if ($token === '') {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'two-factor-expired']);
+        }
+
+        $code = trim(self::asStr($request->input('code')));
+        if ($code === '') {
+            return redirect()->route('govuk-alpha.login.twofactor', ['tenantSlug' => $tenantSlug, 'status' => 'two-factor-code-required']);
+        }
+
+        // Delegate to the same v2 contract the React verify2FA() uses.
+        $previousStatelessHeader = $_SERVER['HTTP_X_STATELESS_AUTH'] ?? null;
+        $_SERVER['HTTP_X_STATELESS_AUTH'] = '1';
+        $request->merge([
+            'two_factor_token' => $token,
+            'code' => $code,
+            'use_backup_code' => $request->boolean('use_backup_code'),
+        ]);
+
+        try {
+            $response = app(\App\Http\Controllers\Api\TotpController::class)->verify();
+            $payload = $response->getData(true);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect()->route('govuk-alpha.login.twofactor', ['tenantSlug' => $tenantSlug, 'status' => 'two-factor-failed']);
+        } finally {
+            if ($previousStatelessHeader === null) {
+                unset($_SERVER['HTTP_X_STATELESS_AUTH']);
+            } else {
+                $_SERVER['HTTP_X_STATELESS_AUTH'] = $previousStatelessHeader;
+            }
+        }
+
+        if (($payload['success'] ?? false) === true) {
+            $accessToken = (string) ($payload['access_token'] ?? $payload['token'] ?? $payload['sanctum_token'] ?? '');
+            if ($accessToken === '') {
+                return redirect()->route('govuk-alpha.login.twofactor', ['tenantSlug' => $tenantSlug, 'status' => 'two-factor-failed']);
+            }
+
+            if ($request->hasSession()) {
+                $request->session()->forget('alpha_2fa_token');
+            }
+
+            return redirect()
+                ->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'signed-in'])
+                ->withCookie(cookie('auth_token', $accessToken, 60 * 24 * 7, '/', null, $request->isSecure(), true, false, 'Lax'));
+        }
+
+        // The challenge is single-use with a 5-minute TTL and a 5-attempt cap — when
+        // it is spent, send the member back to sign in rather than loop the code page.
+        $errorCode = strtoupper((string) ($payload['errors'][0]['code'] ?? $payload['code'] ?? ''));
+        if (str_contains($errorCode, 'EXPIRED') || str_contains($errorCode, 'CHALLENGE') || str_contains($errorCode, 'ATTEMPT')) {
+            if ($request->hasSession()) {
+                $request->session()->forget('alpha_2fa_token');
+            }
+
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'two-factor-expired']);
+        }
+
+        return redirect()->route('govuk-alpha.login.twofactor', ['tenantSlug' => $tenantSlug, 'status' => 'two-factor-invalid']);
     }
 
     public function forgotPassword(Request $request, string $tenantSlug): Response

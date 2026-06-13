@@ -1870,6 +1870,30 @@ class GovukAlphaFrontendTest extends TestCase
         $missing->assertRedirectContains('status=reset-token-missing');
     }
 
+    public function test_two_factor_page_requires_a_pending_challenge(): void
+    {
+        // No pending challenge in the session → bounced back to sign in.
+        $noChallenge = $this->get("/{$this->testTenantSlug}/alpha/login/two-factor");
+        $noChallenge->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=two-factor-expired");
+
+        // With a pending challenge → the code-entry form renders.
+        $form = $this->withSession(['alpha_2fa_token' => 'demo-challenge'])
+            ->get("/{$this->testTenantSlug}/alpha/login/two-factor");
+        $form->assertOk();
+        $form->assertSee(__('govuk_alpha.auth.two_factor_title'));
+        $form->assertSee('name="code"', false);
+        $form->assertSee('name="use_backup_code"', false);
+
+        // Submitting with no code (challenge present) → anchored field error.
+        $noCode = $this->withSession(['alpha_2fa_token' => 'demo-challenge'])
+            ->post("/{$this->testTenantSlug}/alpha/login/two-factor", ['code' => '']);
+        $noCode->assertRedirect("/{$this->testTenantSlug}/alpha/login/two-factor?status=two-factor-code-required");
+
+        // Submitting with no challenge → bounced to sign in.
+        $noSession = $this->post("/{$this->testTenantSlug}/alpha/login/two-factor", ['code' => '123456']);
+        $noSession->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=two-factor-expired");
+    }
+
     private function authenticatedUser(array $overrides = []): User
     {
         $user = User::factory()->forTenant($this->testTenantId)->create(array_merge([
