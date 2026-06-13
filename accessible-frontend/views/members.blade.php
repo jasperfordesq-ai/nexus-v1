@@ -123,6 +123,17 @@
                                     @if (!empty($member['is_verified']))
                                         <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.members.verified') }}</strong>
                                     @endif
+                                    @switch($member['connection_state'] ?? 'none')
+                                        @case('connected')
+                                            <strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha.members.connection_connected') }}</strong>
+                                            @break
+                                        @case('pending_sent')
+                                            <strong class="govuk-tag govuk-tag--yellow">{{ __('govuk_alpha.members.connection_request_sent') }}</strong>
+                                            @break
+                                        @case('pending_received')
+                                            <strong class="govuk-tag govuk-tag--purple">{{ __('govuk_alpha.members.connection_request_received') }}</strong>
+                                            @break
+                                    @endswitch
                                 </div>
 
                                 @if (!empty($member['tagline']))

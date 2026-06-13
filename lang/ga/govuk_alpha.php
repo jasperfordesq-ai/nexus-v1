@@ -965,6 +965,9 @@ return [
         'more_results_label' => 'More opportunities',
     ],
     'members' => [
+        'connection_connected' => 'Connected',
+        'connection_request_sent' => 'Request sent',
+        'connection_request_received' => 'Wants to connect',
         'title' => 'Members',
         'description' => 'Search the member directory for this community.',
         'caption' => ':community',

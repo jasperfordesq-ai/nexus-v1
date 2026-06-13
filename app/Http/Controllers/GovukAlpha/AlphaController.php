@@ -4153,7 +4153,18 @@ class AlphaController extends Controller
         $items = DB::select($sql, array_merge([$tenantId, $tenantId, $tenantId], $params, [$filters['limit'], $filters['offset']]));
 
         return [
-            'items' => array_map(fn (object $row): array => (array) $row, $items),
+            // Attach the viewer's connection state per card (≤ per_page lookups) so
+            // the directory shows "Connected"/"Request sent" at a glance.
+            'items' => array_map(function (object $row) use ($viewerId): array {
+                $member = (array) $row;
+                try {
+                    $member['connection_state'] = ConnectionService::getStatus($viewerId, (int) $member['id'])['status'] ?? 'none';
+                } catch (\Throwable $e) {
+                    $member['connection_state'] = 'none';
+                }
+
+                return $member;
+            }, $items),
             'meta' => [
                 'total_items' => $total,
                 'offset' => $filters['offset'],
