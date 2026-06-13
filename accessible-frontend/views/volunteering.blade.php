@@ -170,6 +170,10 @@
                                     </div>
                                 @endif
                             </dl>
+                            @if (in_array($statusValue, ['approved', 'declined'], true) && !empty($application['org_note']))
+                                <p class="govuk-body govuk-!-margin-top-3 govuk-!-margin-bottom-1"><strong>{{ __('govuk_alpha.volunteering.organiser_note') }}</strong></p>
+                                <div class="govuk-inset-text govuk-!-margin-top-0">{{ $application['org_note'] }}</div>
+                            @endif
                             @if ($statusValue === 'pending' && !empty($application['id']))
                                 <form method="post" action="{{ route('govuk-alpha.volunteering.applications.withdraw', ['tenantSlug' => $tenantSlug, 'id' => $application['id']]) }}" class="govuk-!-margin-top-3">
                                     @csrf

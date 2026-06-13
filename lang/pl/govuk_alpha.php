@@ -800,6 +800,8 @@ return [
         'description_title' => 'Description',
     ],
     'volunteering' => [
+        'organiser_note' => 'Note from the organiser',
+        'hours_of_goal' => ':hours of :goal hours',
         'accessibility_title' => 'Your accessibility needs',
         'accessibility_link' => 'Manage your accessibility needs',
         'accessibility_description' => 'Tell organisers about any accessibility needs so they can support you. You control this information and can change or remove it at any time.',

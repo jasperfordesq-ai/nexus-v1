@@ -51,6 +51,20 @@
     </dl>
 
     @php
+        // Progress toward the next round-number goal (mirrors the React hours view,
+        // computed in-view since getHoursSummary returns no target).
+        $approvedTotal = (float) ($summary['total_approved_hours'] ?? $summary['approved_hours'] ?? 0);
+        $hoursGoal = $approvedTotal > 0 ? (int) (ceil($approvedTotal / 50) * 50) : 0;
+    @endphp
+    @if ($hoursGoal > 0)
+        <div class="govuk-!-margin-bottom-6">
+            <label class="govuk-visually-hidden" for="hours-goal-progress">{{ __('govuk_alpha.volunteering.hours_of_goal', ['hours' => number_format($approvedTotal, 1), 'goal' => $hoursGoal]) }}</label>
+            <progress id="hours-goal-progress" max="{{ $hoursGoal }}" value="{{ $approvedTotal }}">{{ number_format($approvedTotal, 1) }} / {{ $hoursGoal }}</progress>
+            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-top-1">{{ __('govuk_alpha.volunteering.hours_of_goal', ['hours' => number_format($approvedTotal, 1), 'goal' => $hoursGoal]) }}</p>
+        </div>
+    @endif
+
+    @php
         $summaryByOrg = $summary['by_organization'] ?? [];
         $summaryByMonth = $summary['by_month'] ?? [];
     @endphp
