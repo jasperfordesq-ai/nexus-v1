@@ -77,6 +77,18 @@
                     </div>
                 </div>
 
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-one-quarter">
+                        <div class="govuk-form-group">
+                            <label class="govuk-label" for="sort">{{ __('govuk_alpha.listings.sort_label') }}</label>
+                            <select class="govuk-select" id="sort" name="sort">
+                                <option value="newest" @selected(($filters['sort'] ?? 'newest') === 'newest')>{{ __('govuk_alpha.listings.sort_newest') }}</option>
+                                <option value="recommended" @selected(($filters['sort'] ?? 'newest') === 'recommended')>{{ __('govuk_alpha.listings.sort_recommended') }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <details class="govuk-details" data-module="govuk-details" @if (($filters['hours'] ?? 'any') !== 'any' || ($filters['service'] ?? 'any') !== 'any' || ($filters['posted'] ?? 'any') !== 'any') open @endif>
                     <summary class="govuk-details__summary">
                         <span class="govuk-details__summary-text">{{ __('govuk_alpha.listings.advanced_filters_title') }}</span>
@@ -218,7 +230,7 @@
             @if (!empty($meta['has_more']) && !empty($meta['cursor']))
                 <nav class="govuk-pagination govuk-pagination--block govuk-!-margin-top-6" aria-label="{{ __('govuk_alpha.listings.pagination_label') }}">
                     <div class="govuk-pagination__next">
-                        <a class="govuk-link govuk-pagination__link" href="{{ route('govuk-alpha.listings.index', array_filter(['tenantSlug' => $tenantSlug, 'q' => $filters['search'] ?? null, 'type' => $filters['type'] ?? null, 'category_id' => $filters['category_id'] ?? null, 'hours' => ($filters['hours'] ?? 'any') !== 'any' ? $filters['hours'] : null, 'service' => ($filters['service'] ?? 'any') !== 'any' ? $filters['service'] : null, 'posted' => ($filters['posted'] ?? 'any') !== 'any' ? $filters['posted'] : null, 'cursor' => $meta['cursor']])) }}" rel="next">
+                        <a class="govuk-link govuk-pagination__link" href="{{ route('govuk-alpha.listings.index', array_filter(['tenantSlug' => $tenantSlug, 'q' => $filters['search'] ?? null, 'type' => $filters['type'] ?? null, 'category_id' => $filters['category_id'] ?? null, 'hours' => ($filters['hours'] ?? 'any') !== 'any' ? $filters['hours'] : null, 'service' => ($filters['service'] ?? 'any') !== 'any' ? $filters['service'] : null, 'posted' => ($filters['posted'] ?? 'any') !== 'any' ? $filters['posted'] : null, 'sort' => ($filters['sort'] ?? 'newest') !== 'newest' ? $filters['sort'] : null, 'cursor' => $meta['cursor']])) }}" rel="next">
                             <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
                                 <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
                             </svg>

@@ -920,6 +920,34 @@ class GovukAlphaFrontendTest extends TestCase
         $filtered->assertSee('value="30" selected', false);
     }
 
+    public function test_listings_sort_recommended_surfaces_featured_first(): void
+    {
+        $user = $this->authenticatedUser();
+        $this->ensureListingCategory();
+        // Featured is created FIRST (lower id) so default "newest" (id desc) would
+        // put it LAST — only "recommended" (featured_first) lifts it to the top.
+        Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id, 'title' => 'Featured listing alpha', 'type' => 'offer',
+            'category_id' => 1, 'is_featured' => true,
+        ]);
+        Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id, 'title' => 'Plain listing alpha', 'type' => 'offer',
+            'category_id' => 1, 'is_featured' => false,
+        ]);
+
+        $page = $this->get("/{$this->testTenantSlug}/alpha/listings?sort=recommended");
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.listings.sort_label'));
+        $page->assertSee('value="recommended" selected', false);
+
+        $content = $page->getContent();
+        $this->assertLessThan(
+            strpos($content, 'Plain listing alpha'),
+            strpos($content, 'Featured listing alpha'),
+            'Recommended sort should surface the featured listing before the plain one'
+        );
+    }
+
     public function test_listings_page_renders_module_disabled_state(): void
     {
         DB::table('tenants')

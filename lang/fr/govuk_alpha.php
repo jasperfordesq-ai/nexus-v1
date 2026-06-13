@@ -462,6 +462,9 @@ return [
         'comment_posted_on_prefix' => 'Comment posted on',
     ],
     'listings' => [
+        'sort_label' => 'Sort by',
+        'sort_newest' => 'Newest',
+        'sort_recommended' => 'Recommended',
         'expires_label' => 'Expiry',
         'expires_on' => 'Expires on :date',
         'expired_on' => 'Expired on :date',

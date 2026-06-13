@@ -1915,6 +1915,12 @@ class AlphaController extends Controller
             }
         }
 
+        // "Recommended" surfaces featured listings first; "newest" (default) keeps
+        // the id-descending order. Full personalised ranking is React-only.
+        if (($filters['sort'] ?? 'newest') === 'recommended') {
+            $query['featured_first'] = true;
+        }
+
         $items = [];
         $meta = ['total_items' => 0, 'has_more' => false, 'cursor' => null];
         $error = null;
@@ -3856,6 +3862,7 @@ class AlphaController extends Controller
         $hours = $this->allowed($request->query('hours', 'any'), ['any', 'quick', 'short', 'half_day', 'full_day'], 'any');
         $service = $this->allowed($request->query('service', 'any'), ['any', 'remote', 'in_person'], 'any');
         $posted = $this->allowed($request->query('posted', 'any'), ['any', '1', '7', '30'], 'any');
+        $sort = $this->allowed($request->query('sort', 'newest'), ['newest', 'recommended'], 'newest');
 
         $hoursMap = [
             'quick' => ['max_hours' => 1],
@@ -3872,6 +3879,7 @@ class AlphaController extends Controller
             'hours' => $hours,
             'service' => $service,
             'posted' => $posted,
+            'sort' => $sort,
             'min_hours' => null,
             'max_hours' => null,
             'service_type' => null,
