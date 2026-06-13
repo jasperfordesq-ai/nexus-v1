@@ -17,6 +17,7 @@ use App\Services\EventService;
 use App\Services\ExchangeService;
 use App\Services\ExchangeWorkflowService;
 use App\Services\FeedService;
+use App\Services\ListingConfigurationService;
 use App\Services\ListingService;
 use App\Services\MessageService;
 use App\Services\OnboardingConfigService;
@@ -1246,6 +1247,64 @@ class AlphaController extends Controller
         ]);
     }
 
+    public function createListing(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        return $this->view('accessible-frontend::listing-create', $this->listingFormViewData($tenantSlug, $request));
+    }
+
+    public function storeListing(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        [$data, $errors] = $this->validateListingInput($request);
+        if ($errors !== []) {
+            return redirect()
+                ->route('govuk-alpha.listings.create', ['tenantSlug' => $tenantSlug])
+                ->withErrors($errors)
+                ->withInput();
+        }
+
+        try {
+            $listing = $this->listingService->create($userId, $data);
+            $listingId = (int) $listing->id;
+
+            // Optional cover photo. Mirror ListingsController::uploadImage(): push the
+            // file through the shared pipeline and set the listing cover. Best-effort —
+            // a bad image must never discard a listing the member already wrote.
+            if ($request->hasFile('image')) {
+                $this->attachListingCoverImage($request, $listingId);
+            }
+        } catch (ValidationException $e) {
+            // Conditional service-side rules (per-user cap, tenant requirements not
+            // mirrored above) — surface them per field where we can.
+            return redirect()
+                ->route('govuk-alpha.listings.create', ['tenantSlug' => $tenantSlug])
+                ->withErrors($this->flattenValidationErrors($e))
+                ->withInput();
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect()
+                ->route('govuk-alpha.listings.create', ['tenantSlug' => $tenantSlug, 'status' => 'listing-create-failed'])
+                ->withInput();
+        }
+
+        return redirect()->route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $listingId, 'status' => 'listing-created']);
+    }
+
     public function requestExchange(string $tenantSlug, int $listingId): Response|RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
@@ -2300,6 +2359,156 @@ class AlphaController extends Controller
 
             return [];
         }
+    }
+
+    /**
+     * Shared view data for the create-listing form (GET render + error redirect
+     * back). The required-field markers follow the same tenant configuration the
+     * React CreateListingPage reads.
+     *
+     * @return array<string, mixed>
+     */
+    private function listingFormViewData(string $tenantSlug, Request $request): array
+    {
+        return [
+            'title' => __('govuk_alpha.listings.create.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'listings',
+            'categories' => Category::where('type', 'listing')
+                ->where('tenant_id', TenantContext::getId())
+                ->orderBy('name')
+                ->get(['id', 'name'])
+                ->toArray(),
+            'requireCategory' => $this->listingConfigBool(ListingConfigurationService::CONFIG_REQUIRE_CATEGORY),
+            'requireLocation' => $this->listingConfigBool(ListingConfigurationService::CONFIG_REQUIRE_LOCATION),
+            'requireHours' => $this->listingConfigBool(ListingConfigurationService::CONFIG_REQUIRE_HOURS_ESTIMATE),
+            'enableServiceType' => $this->listingConfigBool(ListingConfigurationService::CONFIG_ENABLE_SERVICE_TYPE),
+            'status' => self::asStr($request->query('status')) ?: null,
+        ];
+    }
+
+    /**
+     * Validate the create-listing form and build the ListingService::create()
+     * payload. Returns [$data, $errors] where $errors is keyed by field name so
+     * the Blade form can anchor a GOV.UK error summary and per-field messages.
+     *
+     * @return array{0: array<string, mixed>, 1: array<string, string>}
+     */
+    private function validateListingInput(Request $request): array
+    {
+        $minTitle = max(1, (int) ListingConfigurationService::get(ListingConfigurationService::CONFIG_MIN_TITLE_LENGTH));
+        $minDescription = max(1, (int) ListingConfigurationService::get(ListingConfigurationService::CONFIG_MIN_DESCRIPTION_LENGTH));
+
+        $title = trim(self::asStr($request->input('title')));
+        $description = trim(self::asStr($request->input('description')));
+        $type = $this->allowed($request->input('type'), ['offer', 'request'], '');
+        $serviceType = $this->allowed($request->input('service_type'), ['physical_only', 'remote_only', 'hybrid', 'location_dependent'], 'physical_only');
+        $categoryRaw = self::asStr($request->input('category_id'));
+        $categoryId = $categoryRaw !== '' ? (int) $categoryRaw : null;
+        $hoursRaw = self::asStr($request->input('hours_estimate'));
+        $hours = $hoursRaw !== '' ? (float) $hoursRaw : null;
+        $location = trim(self::asStr($request->input('location')));
+
+        $errors = [];
+
+        if ($title === '') {
+            $errors['title'] = __('govuk_alpha.listings.create.errors.title_required');
+        } elseif (mb_strlen($title) < $minTitle) {
+            $errors['title'] = __('govuk_alpha.listings.create.errors.title_min', ['min' => $minTitle]);
+        } elseif (mb_strlen($title) > 255) {
+            $errors['title'] = __('govuk_alpha.listings.create.errors.title_max');
+        }
+
+        if ($description === '') {
+            $errors['description'] = __('govuk_alpha.listings.create.errors.description_required');
+        } elseif (mb_strlen($description) < $minDescription) {
+            $errors['description'] = __('govuk_alpha.listings.create.errors.description_min', ['min' => $minDescription]);
+        } elseif (mb_strlen($description) > 10000) {
+            $errors['description'] = __('govuk_alpha.listings.create.errors.description_max');
+        }
+
+        if ($type === '') {
+            $errors['type'] = __('govuk_alpha.listings.create.errors.type_required');
+        }
+
+        if ($this->listingConfigBool(ListingConfigurationService::CONFIG_REQUIRE_CATEGORY) && $categoryId === null) {
+            $errors['category_id'] = __('govuk_alpha.listings.create.errors.category_required');
+        }
+
+        if ($this->listingConfigBool(ListingConfigurationService::CONFIG_REQUIRE_HOURS_ESTIMATE) && $hours === null) {
+            $errors['hours_estimate'] = __('govuk_alpha.listings.create.errors.hours_required');
+        } elseif ($hours !== null && ($hours < 0.5 || $hours > 2000)) {
+            $errors['hours_estimate'] = __('govuk_alpha.listings.create.errors.hours_range');
+        }
+
+        if ($this->listingConfigBool(ListingConfigurationService::CONFIG_REQUIRE_LOCATION) && $location === '') {
+            $errors['location'] = __('govuk_alpha.listings.create.errors.location_required');
+        }
+
+        $data = [
+            'title' => $title,
+            'description' => $description,
+            'type' => $type !== '' ? $type : 'offer',
+            'category_id' => $categoryId,
+            'hours_estimate' => $hours,
+            'service_type' => $serviceType,
+            'location' => $location !== '' ? $location : null,
+        ];
+
+        return [$data, $errors];
+    }
+
+    /**
+     * Upload an optional cover photo for a freshly-created listing and set it as
+     * the listing cover, mirroring the React /v2/listings/{id}/image endpoint.
+     * Best-effort: failures are reported but never bubble up to the member.
+     */
+    private function attachListingCoverImage(Request $request, int $listingId): void
+    {
+        $file = $request->file('image');
+        if ($file === null || is_array($file) || !$file->isValid()) {
+            return;
+        }
+
+        try {
+            $imageUrl = \App\Core\ImageUploader::upload([
+                'name' => $file->getClientOriginalName(),
+                'type' => $file->getMimeType(),
+                'tmp_name' => $file->getRealPath(),
+                'error' => UPLOAD_ERR_OK,
+                'size' => $file->getSize(),
+            ], 'listings');
+
+            if (is_string($imageUrl) && $imageUrl !== '') {
+                ListingService::update($listingId, ['image_url' => $imageUrl]);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+    }
+
+    /**
+     * Flatten a Laravel ValidationException into a field => message map for the
+     * GOV.UK error summary, falling back to a single generic message.
+     *
+     * @return array<string, string>
+     */
+    private function flattenValidationErrors(ValidationException $e): array
+    {
+        $out = [];
+        foreach ($e->errors() as $field => $messages) {
+            $message = is_array($messages) ? (string) reset($messages) : (string) $messages;
+            if ($message !== '') {
+                $out[(string) $field] = $message;
+            }
+        }
+
+        return $out !== [] ? $out : ['title' => __('govuk_alpha.listings.create.errors.failed')];
+    }
+
+    private function listingConfigBool(string $key): bool
+    {
+        return filter_var(ListingConfigurationService::get($key), FILTER_VALIDATE_BOOLEAN);
     }
 
     private function listingFilters(Request $request): array

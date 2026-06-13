@@ -27,6 +27,18 @@
             </div>
         </div>
     @else
+        @if ($isAuthenticated)
+            <p class="govuk-body">
+                <a class="govuk-button" href="{{ route('govuk-alpha.listings.create', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.listings.create.title') }}</a>
+            </p>
+        @else
+            <div class="govuk-inset-text">
+                <p class="govuk-body">
+                    <a class="govuk-link" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']) }}">{{ __('govuk_alpha.listings.create.auth_link') }}</a>
+                </p>
+            </div>
+        @endif
+
         <form method="get" action="{{ route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-7">
             <fieldset class="govuk-fieldset" aria-describedby="listings-filter-hint">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">

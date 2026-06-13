@@ -56,6 +56,8 @@ Route::prefix('{tenantSlug}/alpha')
             ->middleware('throttle:30,1')
             ->name('feed.items.comments.store');
         Route::get('/listings', [AlphaController::class, 'listings'])->name('listings.index');
+        Route::get('/listings/new', [AlphaController::class, 'createListing'])->name('listings.create');
+        Route::post('/listings/new', [AlphaController::class, 'storeListing'])->middleware('throttle:10,1')->name('listings.store');
         Route::get('/listings/{listingId}/exchange-request', [AlphaController::class, 'requestExchange'])->whereNumber('listingId')->name('exchanges.request');
         Route::post('/listings/{listingId}/exchange-request', [AlphaController::class, 'storeExchangeRequest'])->middleware('throttle:20,1')->whereNumber('listingId')->name('exchanges.request.store');
         Route::get('/listings/{id}', [AlphaController::class, 'listing'])->whereNumber('id')->name('listings.show');

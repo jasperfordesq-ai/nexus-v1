@@ -669,6 +669,79 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('property="og:image" content="' . url('/uploads/tenants/' . $this->testTenantSlug . '/listings/hero.jpg') . '"', false);
     }
 
+    public function test_listings_create_form_renders_and_creates_a_listing(): void
+    {
+        $user = $this->authenticatedUser();
+        $this->ensureListingCategory();
+
+        $form = $this->get("/{$this->testTenantSlug}/alpha/listings/new");
+        $form->assertOk();
+        $form->assertSee(__('govuk_alpha.listings.create.title'));
+        $form->assertSee('name="type"', false);
+        $form->assertSee('name="title"', false);
+        $form->assertSee('name="description"', false);
+        $form->assertSee('class="govuk-file-upload"', false);
+        $form->assertSee('enctype="multipart/form-data"', false);
+
+        $create = $this->post("/{$this->testTenantSlug}/alpha/listings/new", [
+            'type' => 'offer',
+            'title' => 'Accessible created listing',
+            'description' => 'Created through the accessible alpha listing form for verification.',
+            'category_id' => 1,
+            'hours_estimate' => 2,
+            'service_type' => 'remote_only',
+            'location' => 'Anytown',
+        ]);
+
+        $listingId = DB::table('listings')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('title', 'Accessible created listing')
+            ->value('id');
+
+        $this->assertNotNull($listingId);
+        $create->assertRedirect("/{$this->testTenantSlug}/alpha/listings/{$listingId}?status=listing-created");
+        $this->assertDatabaseHas('listings', [
+            'id' => $listingId,
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'type' => 'offer',
+            'service_type' => 'remote_only',
+        ]);
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listingId}?status=listing-created");
+        $detail->assertOk();
+        $detail->assertSee(__('govuk_alpha.listings.create.created'));
+    }
+
+    public function test_listings_create_rejects_invalid_input_with_field_errors(): void
+    {
+        $this->authenticatedUser();
+        $this->ensureListingCategory();
+
+        $create = $this->post("/{$this->testTenantSlug}/alpha/listings/new", [
+            'type' => 'offer',
+            'title' => '',
+            'description' => 'short',
+            'category_id' => 1,
+        ]);
+
+        $create->assertRedirect("/{$this->testTenantSlug}/alpha/listings/new");
+        $create->assertSessionHasErrors(['title', 'description']);
+
+        // No listing should have been created from invalid input.
+        $this->assertDatabaseMissing('listings', [
+            'tenant_id' => $this->testTenantId,
+            'description' => 'short',
+        ]);
+
+        $form = $this->get("/{$this->testTenantSlug}/alpha/listings/new");
+        $form->assertOk();
+        $form->assertSee('class="govuk-error-summary"', false);
+        $form->assertSee('href="#title"', false);
+        $form->assertSee('href="#description"', false);
+        $form->assertSee('govuk-input--error', false);
+    }
+
     public function test_listing_detail_can_start_accessible_exchange_request(): void
     {
         $requester = $this->authenticatedUser(['name' => 'Alpha Requester']);
