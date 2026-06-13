@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Core\Validator;
 use App\Http\Controllers\Api\CoreController;
 use App\Models\Category;
+use App\Models\ListingImage;
 use App\Services\BrokerControlConfigService;
 use App\Services\CommentService;
 use App\Services\EventService;
@@ -1175,7 +1176,7 @@ class AlphaController extends Controller
 
         try {
             $result = $this->listingService->getAll($query);
-            $items = $result['items'] ?? [];
+            $items = $this->withResolvedListingImages($result['items'] ?? []);
             $meta = [
                 'total_items' => $this->listingService->countAll($query),
                 'has_more' => (bool) ($result['has_more'] ?? false),
@@ -1216,6 +1217,15 @@ class AlphaController extends Controller
         $ownerId = (int) ($listing['user_id'] ?? $listing['author_id'] ?? $listing['user']['id'] ?? 0);
         $isOwner = $userId !== null && $ownerId === $userId;
 
+        // Resolve the cover image to a same-origin URL and attach the multi-image
+        // gallery (the ListingImage rows are not returned by ListingService::getById,
+        // so we load them here exactly as the React ListingsController::show() does).
+        $listing['image_url'] = $this->resolveAsset($listing['image_url'] ?? null);
+        $listing['images'] = $this->listingGallery($id, $listing['image_url']);
+        $listing['author_avatar'] = $this->resolveAsset(
+            $listing['author_avatar'] ?? $listing['user']['avatar_url'] ?? $listing['user']['avatar'] ?? null
+        );
+
         return $this->view('accessible-frontend::listing-detail', [
             'title' => $listing['title'] ?? __('govuk_alpha.listings.detail_title'),
             'tenantSlug' => $tenantSlug,
@@ -1227,6 +1237,8 @@ class AlphaController extends Controller
             'directMessagingEnabled' => BrokerControlConfigService::isDirectMessagingEnabled(),
             'activeExchange' => $userId && !$isOwner ? ExchangeWorkflowService::getActiveExchangeForListing($userId, $id) : null,
             'status' => self::asStr(request()->query('status')) ?: null,
+            'ogImage' => $this->absoluteAssetUrl($listing['image_url'] ?? null),
+            'ogImageAlt' => $listing['image_url'] ? ($listing['title'] ?? null) : null,
         ]);
     }
 
@@ -2201,6 +2213,88 @@ class AlphaController extends Controller
         return mb_strlen((string) ($data['bio'] ?? '')) <= 5000
             && mb_strlen((string) ($data['tagline'] ?? '')) <= 255
             && mb_strlen((string) ($data['location'] ?? '')) <= 255;
+    }
+
+    /**
+     * Resolve a stored asset path to a same-origin URL the browser can load,
+     * mirroring the React frontend's resolveAssetUrl(): pass through absolute
+     * http(s) URLs, otherwise ensure a leading-slash same-origin path. Returns
+     * null for empty values so templates can omit the figure entirely.
+     */
+    private function resolveAsset(?string $path): ?string
+    {
+        $path = is_string($path) ? trim($path) : '';
+        if ($path === '') {
+            return null;
+        }
+        if (preg_match('#^https?://#i', $path) === 1) {
+            return $path;
+        }
+        return '/' . ltrim($path, '/');
+    }
+
+    /**
+     * Turn a resolved (possibly relative) asset URL into an absolute URL for
+     * social/Open Graph tags. Already-absolute URLs are returned unchanged.
+     */
+    private function absoluteAssetUrl(?string $resolved): ?string
+    {
+        if ($resolved === null || $resolved === '') {
+            return null;
+        }
+        if (preg_match('#^https?://#i', $resolved) === 1) {
+            return $resolved;
+        }
+        return url($resolved);
+    }
+
+    /**
+     * Resolve the cover image_url on each listing item in place so the
+     * templates only ever receive a browser-ready URL (or null).
+     *
+     * @param array<int, array<string, mixed>> $items
+     * @return array<int, array<string, mixed>>
+     */
+    private function withResolvedListingImages(array $items): array
+    {
+        foreach ($items as &$item) {
+            if (is_array($item)) {
+                $item['image_url'] = $this->resolveAsset($item['image_url'] ?? null);
+            }
+        }
+        unset($item);
+
+        return $items;
+    }
+
+    /**
+     * Load a listing's image gallery from the listing_images table, mirroring
+     * ListingsController::show(). Tenant scoping is automatic via the
+     * ListingImage HasTenantScope global scope. The cover image is skipped so
+     * the hero photo is never duplicated as a thumbnail.
+     *
+     * @return array<int, array{id: int, url: string, sort_order: int, alt_text: ?string}>
+     */
+    private function listingGallery(int $listingId, ?string $coverUrl = null): array
+    {
+        try {
+            return ListingImage::where('listing_id', $listingId)
+                ->orderBy('sort_order')
+                ->get()
+                ->map(fn ($image): array => [
+                    'id' => (int) $image->id,
+                    'url' => $this->resolveAsset($image->image_url),
+                    'sort_order' => (int) $image->sort_order,
+                    'alt_text' => $image->alt_text,
+                ])
+                ->filter(fn (array $image): bool => $image['url'] !== null && $image['url'] !== $coverUrl)
+                ->values()
+                ->all();
+        } catch (\Throwable $e) {
+            report($e);
+
+            return [];
+        }
     }
 
     private function listingFilters(Request $request): array

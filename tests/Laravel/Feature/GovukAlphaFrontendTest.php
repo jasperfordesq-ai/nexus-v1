@@ -594,6 +594,81 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('class="govuk-tag govuk-tag--purple"', false);
     }
 
+    public function test_listings_card_renders_cover_image_when_present(): void
+    {
+        $user = $this->authenticatedUser();
+        $this->ensureListingCategory();
+        Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'title' => 'Listing with a cover photo',
+            'description' => 'Has an image.',
+            'type' => 'offer',
+            'category_id' => 1,
+            'image_url' => '/uploads/tenants/' . $this->testTenantSlug . '/listings/cover-card.jpg',
+            'is_featured' => true,
+            'service_type' => 'remote_only',
+        ]);
+        // A second listing with no image must NOT render a broken figure.
+        Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'title' => 'Listing without a photo',
+            'description' => 'No image.',
+            'type' => 'offer',
+            'category_id' => 1,
+            'image_url' => null,
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings");
+
+        $response->assertOk();
+        $response->assertSee('class="nexus-alpha-card-thumb"', false);
+        $response->assertSee('cover-card.jpg', false);
+        $response->assertSee(__('govuk_alpha.listings.image_alt', ['title' => 'Listing with a cover photo']), false);
+        // Featured + remote delivery badges from the payload.
+        $response->assertSee(__('govuk_alpha.listings.featured'));
+        $response->assertSee(__('govuk_alpha.listings.service_types.remote_only'));
+    }
+
+    public function test_listing_detail_renders_hero_image_gallery_and_author_block(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Cover Author']);
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'title' => 'Detail listing with photos',
+            'description' => 'Detail with a hero image and a gallery.',
+            'type' => 'offer',
+            'status' => 'active',
+            'service_type' => 'hybrid',
+            'image_url' => '/uploads/tenants/' . $this->testTenantSlug . '/listings/hero.jpg',
+        ]);
+        DB::table('listing_images')->insert([
+            'tenant_id' => $this->testTenantId,
+            'listing_id' => $listing->id,
+            'image_url' => '/uploads/tenants/' . $this->testTenantSlug . '/listings/gallery-1.jpg',
+            'sort_order' => 1,
+            'alt_text' => 'A descriptive gallery caption',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}");
+
+        $response->assertOk();
+        // Hero cover image.
+        $response->assertSee('class="nexus-alpha-detail-hero"', false);
+        $response->assertSee('hero.jpg', false);
+        // Gallery thumbnail with its own alt text.
+        $response->assertSee('class="nexus-alpha-thumb-list"', false);
+        $response->assertSee('gallery-1.jpg', false);
+        $response->assertSee('A descriptive gallery caption', false);
+        // Status + delivery-mode summary rows.
+        $response->assertSee(__('govuk_alpha.listings.status_values.active'));
+        $response->assertSee(__('govuk_alpha.listings.service_types.hybrid'));
+        // Author block + per-listing Open Graph image.
+        $response->assertSee(__('govuk_alpha.listings.author_title'));
+        $response->assertSee('property="og:image" content="' . url('/uploads/tenants/' . $this->testTenantSlug . '/listings/hero.jpg') . '"', false);
+    }
+
     public function test_listing_detail_can_start_accessible_exchange_request(): void
     {
         $requester = $this->authenticatedUser(['name' => 'Alpha Requester']);

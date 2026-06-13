@@ -145,10 +145,26 @@
                         $type = (($listing['type'] ?? 'offer') === 'request') ? 'request' : 'offer';
                         $authorName = $listing['user']['name'] ?? $listing['author_name'] ?? null;
                     @endphp
+                    @php
+                        $serviceType = $listing['service_type'] ?? null;
+                        $showServiceBadge = is_string($serviceType) && $serviceType !== '' && $serviceType !== 'physical_only'
+                            && \Illuminate\Support\Facades\Lang::has('govuk_alpha.listings.service_types.' . $serviceType);
+                    @endphp
                     <article class="nexus-alpha-card">
                         <div class="nexus-alpha-listing-row">
-                            <div>
+                            @if (!empty($listing['image_url']))
+                                <div class="nexus-alpha-listing-row__media">
+                                    <img class="nexus-alpha-card-thumb" src="{{ $listing['image_url'] }}" alt="{{ __('govuk_alpha.listings.image_alt', ['title' => $listing['title']]) }}" width="120" height="90" loading="lazy" decoding="async">
+                                </div>
+                            @endif
+                            <div class="nexus-alpha-listing-row__body">
                                 <strong class="govuk-tag {{ $listingTypeClass($type) }}">{{ $listingTypeLabel($type) }}</strong>
+                                @if (!empty($listing['is_featured']))
+                                    <strong class="govuk-tag govuk-tag--yellow">{{ __('govuk_alpha.listings.featured') }}</strong>
+                                @endif
+                                @if ($showServiceBadge)
+                                    <strong class="govuk-tag govuk-tag--turquoise">{{ __('govuk_alpha.listings.service_types.' . $serviceType) }}</strong>
+                                @endif
                                 <h3 class="govuk-heading-m govuk-!-margin-top-2 govuk-!-margin-bottom-2">
                                     <a class="govuk-link" href="{{ route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}">{{ $listing['title'] }}</a>
                                 </h3>

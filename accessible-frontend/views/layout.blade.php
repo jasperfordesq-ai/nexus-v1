@@ -28,14 +28,20 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="{{ $fullTitle }}">
     <meta property="og:site_name" content="{{ $serviceName }}">
-    @if (!empty($defaultOgImage))
-        <meta property="og:image" content="{{ $defaultOgImage }}">
-        <meta property="og:image:width" content="1200">
-        <meta property="og:image:height" content="630">
-        <meta property="og:image:alt" content="{{ __('govuk_alpha.seo.og_image_alt') }}">
+    @php
+        $ogImageResolved = ($ogImage ?? null) ?: ($defaultOgImage ?? null);
+        $ogImageAltResolved = ($ogImageAlt ?? null) ?: __('govuk_alpha.seo.og_image_alt');
+    @endphp
+    @if (!empty($ogImageResolved))
+        <meta property="og:image" content="{{ $ogImageResolved }}">
+        @empty($ogImage)
+            <meta property="og:image:width" content="1200">
+            <meta property="og:image:height" content="630">
+        @endempty
+        <meta property="og:image:alt" content="{{ $ogImageAltResolved }}">
         <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:image" content="{{ $defaultOgImage }}">
-        <meta name="twitter:image:alt" content="{{ __('govuk_alpha.seo.og_image_alt') }}">
+        <meta name="twitter:image" content="{{ $ogImageResolved }}">
+        <meta name="twitter:image:alt" content="{{ $ogImageAltResolved }}">
     @endif
     @foreach (($assetEntrypoint['css'] ?? []) as $stylesheet)
         <link rel="stylesheet" href="{{ $stylesheet }}">
