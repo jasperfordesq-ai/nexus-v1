@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **See who's going to an event on the accessible site, with clearer create errors.** An event page now lists the people going and interested (with their photos), and the "Create an event" form now highlights each field that needs fixing with a message beside it, instead of one vague error.
+
 ### Fixed
 
 - **The accessible home page no longer mislabels sign-in-only sections as "not enabled".** When you're signed out, sections that simply need you to log in (Dashboard, My Profile, Messages, Exchanges) now say "Sign in to use this" and link to the login page, instead of wrongly saying "This module is not enabled for this community". Sections the community has genuinely turned off still say so.

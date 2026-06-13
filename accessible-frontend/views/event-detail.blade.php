@@ -149,4 +149,25 @@
             <button class="govuk-button govuk-!-margin-top-4" data-module="govuk-button">{{ __('govuk_alpha.actions.rsvp') }}</button>
         </form>
     @endif
+
+    @if (!empty($attendees))
+        <h2 class="govuk-heading-l govuk-!-margin-top-8">{{ __('govuk_alpha.events.attendees_title') }}</h2>
+        <ul class="govuk-list">
+            @foreach ($attendees as $attendee)
+                @php
+                    $attendeeName = trim((string) ($attendee['name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
+                    $rsvp = ($attendee['rsvp_status'] ?? '') === 'going' ? 'going' : 'interested';
+                @endphp
+                <li class="nexus-alpha-card-head">
+                    @if (!empty($attendee['avatar_url']))
+                        <img class="nexus-alpha-avatar" src="{{ $attendee['avatar_url'] }}" alt="" loading="lazy" decoding="async" width="48" height="48">
+                    @else
+                        <span class="nexus-alpha-avatar nexus-alpha-avatar--placeholder" aria-hidden="true">{{ mb_strtoupper(mb_substr($attendeeName, 0, 1)) }}</span>
+                    @endif
+                    <span class="govuk-body govuk-!-margin-bottom-0 govuk-!-font-weight-bold">{{ $attendeeName }}</span>
+                    <strong class="govuk-tag {{ $rsvp === 'going' ? 'govuk-tag--green' : 'govuk-tag--grey' }}">{{ __('govuk_alpha.events.rsvp_status.' . $rsvp) }}</strong>
+                </li>
+            @endforeach
+        </ul>
+    @endif
 @endsection

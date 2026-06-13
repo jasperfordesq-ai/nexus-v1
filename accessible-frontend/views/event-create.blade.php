@@ -13,7 +13,20 @@
             <h1 class="govuk-heading-xl">{{ __('govuk_alpha.events.create_title') }}</h1>
             <p class="govuk-body-l">{{ __('govuk_alpha.events.create_description') }}</p>
 
-            @if (($status ?? '') === 'event-create-failed')
+            @if ($errors->any())
+                <div class="govuk-error-summary" data-module="govuk-error-summary">
+                    <div role="alert">
+                        <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                        <div class="govuk-error-summary__body">
+                            <ul class="govuk-list govuk-error-summary__list">
+                                @foreach ($errors->keys() as $field)
+                                    <li><a href="#{{ $field }}">{{ $errors->first($field) }}</a></li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @elseif (($status ?? '') === 'event-create-failed')
                 <div class="govuk-error-summary" data-module="govuk-error-summary">
                     <div role="alert">
                         <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
@@ -34,15 +47,21 @@
                         <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha.events.create_details_title') }}</h2>
                     </legend>
 
-                    <div class="govuk-form-group">
+                    <div class="govuk-form-group{{ $errors->has('title') ? ' govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="title">{{ __('govuk_alpha.events.title_label') }}</label>
-                        <input class="govuk-input" id="title" name="title" type="text" value="{{ old('title') }}" maxlength="255" required>
+                        @error('title')
+                            <p id="title-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $message }}</p>
+                        @enderror
+                        <input class="govuk-input{{ $errors->has('title') ? ' govuk-input--error' : '' }}" id="title" name="title" type="text" value="{{ old('title') }}" maxlength="255" @error('title') aria-describedby="title-error" @enderror required>
                     </div>
 
-                    <div class="govuk-form-group">
+                    <div class="govuk-form-group{{ $errors->has('description') ? ' govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="description">{{ __('govuk_alpha.events.description_label') }}</label>
                         <div id="description-hint" class="govuk-hint">{{ __('govuk_alpha.events.description_hint') }}</div>
-                        <textarea class="govuk-textarea" id="description" name="description" rows="6" aria-describedby="description-hint" required>{{ old('description') }}</textarea>
+                        @error('description')
+                            <p id="description-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $message }}</p>
+                        @enderror
+                        <textarea class="govuk-textarea{{ $errors->has('description') ? ' govuk-textarea--error' : '' }}" id="description" name="description" rows="6" aria-describedby="description-hint @error('description') description-error @enderror" required>{{ old('description') }}</textarea>
                     </div>
 
                     <div class="govuk-form-group">
@@ -67,16 +86,22 @@
                         <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha.events.create_time_title') }}</h2>
                     </legend>
 
-                    <div class="govuk-form-group">
+                    <div class="govuk-form-group{{ $errors->has('start_time') ? ' govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="start_time">{{ __('govuk_alpha.events.start_time_label') }}</label>
                         <div id="start-time-hint" class="govuk-hint">{{ __('govuk_alpha.events.datetime_hint') }}</div>
-                        <input class="govuk-input govuk-!-width-one-half" id="start_time" name="start_time" type="datetime-local" value="{{ old('start_time') }}" aria-describedby="start-time-hint" required>
+                        @error('start_time')
+                            <p id="start_time-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $message }}</p>
+                        @enderror
+                        <input class="govuk-input govuk-!-width-one-half{{ $errors->has('start_time') ? ' govuk-input--error' : '' }}" id="start_time" name="start_time" type="datetime-local" value="{{ old('start_time') }}" aria-describedby="start-time-hint @error('start_time') start_time-error @enderror" required>
                     </div>
 
-                    <div class="govuk-form-group">
+                    <div class="govuk-form-group{{ $errors->has('end_time') ? ' govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="end_time">{{ __('govuk_alpha.events.end_time_label') }}</label>
                         <div id="end-time-hint" class="govuk-hint">{{ __('govuk_alpha.events.end_time_hint') }}</div>
-                        <input class="govuk-input govuk-!-width-one-half" id="end_time" name="end_time" type="datetime-local" value="{{ old('end_time') }}" aria-describedby="end-time-hint">
+                        @error('end_time')
+                            <p id="end_time-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $message }}</p>
+                        @enderror
+                        <input class="govuk-input govuk-!-width-one-half{{ $errors->has('end_time') ? ' govuk-input--error' : '' }}" id="end_time" name="end_time" type="datetime-local" value="{{ old('end_time') }}" aria-describedby="end-time-hint @error('end_time') end_time-error @enderror">
                     </div>
                 </fieldset>
 

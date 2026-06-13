@@ -1437,6 +1437,27 @@ class GovukAlphaFrontendTest extends TestCase
             'user_id' => $user->id,
             'status' => 'going',
         ]);
+
+        // Once people have RSVP'd, the detail page shows the attendee roster.
+        $afterRsvp = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}");
+        $afterRsvp->assertSee(__('govuk_alpha.events.attendees_title'));
+    }
+
+    public function test_event_create_shows_per_field_validation_errors(): void
+    {
+        $this->authenticatedUser();
+
+        // Submitting with no title/description must return per-field errors and an
+        // anchored error summary, not a single generic message.
+        $create = $this->followingRedirects()->post("/{$this->testTenantSlug}/alpha/events/new", [
+            'title' => '',
+            'description' => '',
+        ]);
+
+        $create->assertOk();
+        $create->assertSee('class="govuk-error-summary"', false);
+        $create->assertSee('govuk-form-group--error', false);
+        $create->assertSee('class="govuk-error-message"', false);
     }
 
     public function test_event_card_and_detail_render_cover_image_and_online_link(): void

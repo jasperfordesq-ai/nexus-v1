@@ -953,17 +953,30 @@ class AlphaController extends Controller
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('events'), 403);
 
-        $event = EventService::getById($id, $this->currentUserId());
+        $viewerId = $this->currentUserId();
+        $event = EventService::getById($id, $viewerId);
         abort_if($event === null, 404);
 
         $event['cover_image'] = $this->resolveAsset($event['cover_image'] ?? null);
+
+        // Attendee roster (going + interested). EventService::getAttendees
+        // self-enforces roster privacy, returning an empty list when the viewer
+        // may not see it.
+        $attendees = [];
+        try {
+            $attendees = EventService::getAttendees($id, ['status' => 'all', 'limit' => 50], $viewerId)['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return $this->view('accessible-frontend::event-detail', [
             'title' => $event['title'] ?? __('govuk_alpha.events.detail_title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'events',
             'event' => $event,
-            'requiresAuth' => $this->currentUserId() === null,
+            'requiresAuth' => $viewerId === null,
+            'isOwner' => $viewerId !== null && (int) ($event['user_id'] ?? 0) === $viewerId,
+            'attendees' => $attendees,
             'status' => self::asStr(request()->query('status')) ?: null,
             'ogImage' => $this->absoluteAssetUrl($event['cover_image'] ?? null),
             'ogImageAlt' => $event['cover_image'] ? ($event['title'] ?? null) : null,
@@ -1026,9 +1039,12 @@ class AlphaController extends Controller
             } catch (\Throwable $e) {
                 Log::warning('Accessible event feed activity failed', ['event_id' => $eventId, 'error' => $e->getMessage()]);
             }
-        } catch (ValidationException) {
+        } catch (ValidationException $e) {
+            // Forward the per-field error bag so the create form can render an
+            // anchored govuk-error-summary + inline govuk-error-message per field.
             return redirect()
-                ->route('govuk-alpha.events.create', ['tenantSlug' => $tenantSlug, 'status' => 'event-create-failed'])
+                ->route('govuk-alpha.events.create', ['tenantSlug' => $tenantSlug])
+                ->withErrors($e->errors())
                 ->withInput();
         } catch (\Throwable $e) {
             report($e);
