@@ -71,19 +71,19 @@ export function Footer({ children, copyright }: FooterProps) {
             target="_blank"
             rel="noopener noreferrer"
             title={pbLabel || t('footer.powered_by')}
-            className="transition-opacity hover:opacity-80"
+            className="max-w-full transition-opacity hover:opacity-80"
           >
-            <img src={pbImage} alt={pbLabel || t('footer.powered_by')} className="h-24 w-auto object-contain" />
+            <img src={pbImage} alt={pbLabel || t('footer.powered_by')} className="h-auto max-h-24 w-auto max-w-full object-contain" />
           </a>
           <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />
           {/* Tenant partner logo — real or placeholder */}
           {partnerLogoUrl ? (
             partnerLinkUrl ? (
-              <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" className="transition-opacity hover:opacity-80">
-                <img src={partnerLogoUrl} alt={branding.name} className="max-h-16 w-auto max-w-[22rem] object-contain" />
+              <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" className="max-w-full transition-opacity hover:opacity-80">
+                <img src={partnerLogoUrl} alt={branding.name} className="max-h-16 w-auto max-w-full object-contain" />
               </a>
             ) : (
-              <img src={partnerLogoUrl} alt={branding.name} className="max-h-16 w-auto max-w-[22rem] object-contain" />
+              <img src={partnerLogoUrl} alt={branding.name} className="max-h-16 w-auto max-w-full object-contain" />
             )
           ) : (
             <div className="w-full max-w-[22rem] border-2 border-dashed border-theme-default/40 rounded-xl h-16 flex items-center justify-center">
@@ -249,17 +249,17 @@ export function Footer({ children, copyright }: FooterProps) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 items-start">
 
                 {/* COL 1: Community partner logo */}
-                <div className="flex flex-col items-start gap-2">
+                <div className="flex min-w-0 flex-col items-start gap-2">
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-theme-subtle/50">
                     {t('footer.community_partner')}
                   </span>
                   {partnerLogoUrl ? (
                     partnerLinkUrl ? (
-                      <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-accent rounded-lg">
-                        <img src={partnerLogoUrl} alt={branding.name} className="max-h-20 w-auto max-w-[22rem] object-contain" />
+                      <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" className="max-w-full transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-accent rounded-lg">
+                        <img src={partnerLogoUrl} alt={branding.name} className="max-h-20 w-auto max-w-full object-contain" />
                       </a>
                     ) : (
-                      <img src={partnerLogoUrl} alt={branding.name} className="max-h-20 w-auto max-w-[22rem] object-contain" />
+                      <img src={partnerLogoUrl} alt={branding.name} className="max-h-20 w-auto max-w-full object-contain" />
                     )
                   ) : (
                     <div className="h-20 w-48 border-2 border-dashed border-theme-default/40 rounded-xl flex items-center justify-center">
@@ -279,7 +279,7 @@ export function Footer({ children, copyright }: FooterProps) {
                 </div>
 
                 {/* COL 3: Powered by — always shown; defaults to NEXUS branding, overridable by God */}
-                <div className="flex flex-col items-start sm:items-end gap-2">
+                <div className="flex min-w-0 flex-col items-start sm:items-end gap-2">
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-theme-subtle/50">
                     {pbLabel || t('footer.powered_by')}
                   </span>
@@ -289,12 +289,12 @@ export function Footer({ children, copyright }: FooterProps) {
                     rel="noopener noreferrer"
                     title={pbLabel || t('footer.powered_by')}
                     aria-label={pbLabel || t('footer.powered_by')}
-                    className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-accent rounded-lg"
+                    className="max-w-full transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-accent rounded-lg"
                   >
                     <img
                       src={pbImage}
                       alt={pbLabel || t('footer.powered_by')}
-                      className="h-32 w-auto object-contain"
+                      className="h-auto max-h-32 w-auto max-w-full object-contain"
                     />
                   </a>
                 </div>
