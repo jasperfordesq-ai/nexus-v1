@@ -24,6 +24,7 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
 @import "govuk-frontend/dist/govuk/components/error-summary/index";
 @import "govuk-frontend/dist/govuk/components/exit-this-page/index";
 @import "govuk-frontend/dist/govuk/components/fieldset/index";
+@import "govuk-frontend/dist/govuk/components/footer/index";
 @import "govuk-frontend/dist/govuk/components/file-upload/index";
 @import "govuk-frontend/dist/govuk/components/hint/index";
 @import "govuk-frontend/dist/govuk/components/input/index";
@@ -72,6 +73,24 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
 .nexus-alpha-header__brand:focus {
   color: govuk-colour("black");
 }
+
+// Smart, aspect-ratio-aware sizing. The shape modifier is chosen server-side
+// (AlphaController::logoShapeClass) so a wide wordmark stays compact while a
+// square/stacked crest gets the height it needs to stay legible — all within a
+// fixed width and object-fit so nothing distorts.
+.nexus-alpha-header__logo {
+  display: block;
+  width: auto;
+  max-width: 260px;
+  max-height: 52px; // default / landscape
+  object-fit: contain;
+}
+
+// Wide/landscape keep the header compact; square/stacked logos get extra height
+// (the in-flow header simply grows to fit) so a crest-over-text stays readable.
+.nexus-alpha-header__logo--wide { max-height: 44px; }
+.nexus-alpha-header__logo--landscape { max-height: 52px; }
+.nexus-alpha-header__logo--square { max-height: 80px; }
 
 .nexus-alpha-header__service {
   color: govuk-colour("white");

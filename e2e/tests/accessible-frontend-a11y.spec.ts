@@ -18,6 +18,18 @@ const alphaPages = [
   '/hour-timebank/alpha/events',
   '/hour-timebank/alpha/volunteering',
   '/hour-timebank/alpha/members',
+  '/hour-timebank/alpha/about',
+  '/hour-timebank/alpha/trust-and-safety',
+  '/hour-timebank/alpha/accessibility',
+  '/hour-timebank/alpha/legal',
+  '/hour-timebank/alpha/legal/terms',
+  '/hour-timebank/alpha/legal/privacy',
+  '/hour-timebank/alpha/legal/cookies',
+  '/hour-timebank/alpha/legal/community-guidelines',
+  '/hour-timebank/alpha/legal/acceptable-use',
+  '/hour-timebank/alpha/help',
+  '/hour-timebank/alpha/kb',
+  '/hour-timebank/alpha/blog',
 ];
 
 for (const path of alphaPages) {

@@ -26,6 +26,26 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/', [AlphaController::class, 'home'])->name('home');
         Route::get('/contact', [AlphaController::class, 'contact'])->name('contact');
         Route::post('/contact', [AlphaController::class, 'storeContact'])->middleware('throttle:5,1')->name('contact.store');
+
+        // Content & legal pages (footer destinations). Legal documents reuse the
+        // tenant-scoped LegalDocumentService with a GOV.UK static fallback; the
+        // shared legalDocument() method reads the document type from route defaults.
+        Route::get('/about', [AlphaController::class, 'about'])->name('about');
+        Route::get('/trust-and-safety', [AlphaController::class, 'trustSafety'])->name('trust-safety');
+        Route::get('/accessibility', [AlphaController::class, 'accessibility'])->name('accessibility');
+        Route::get('/legal', [AlphaController::class, 'legalHub'])->name('legal.hub');
+        Route::get('/legal/terms', [AlphaController::class, 'legalDocument'])->defaults('type', 'terms')->name('legal.terms');
+        Route::get('/legal/privacy', [AlphaController::class, 'legalDocument'])->defaults('type', 'privacy')->name('legal.privacy');
+        Route::get('/legal/cookies', [AlphaController::class, 'legalDocument'])->defaults('type', 'cookies')->name('legal.cookies');
+        Route::get('/legal/community-guidelines', [AlphaController::class, 'legalDocument'])->defaults('type', 'community_guidelines')->name('legal.community-guidelines');
+        Route::get('/legal/acceptable-use', [AlphaController::class, 'legalDocument'])->defaults('type', 'acceptable_use')->name('legal.acceptable-use');
+
+        // Help centre, knowledge base and blog (native, server-rendered).
+        Route::get('/help', [AlphaController::class, 'help'])->name('help');
+        Route::get('/kb', [AlphaController::class, 'kb'])->name('kb.index');
+        Route::get('/kb/{id}', [AlphaController::class, 'kbArticle'])->whereNumber('id')->name('kb.show');
+        Route::get('/blog', [AlphaController::class, 'blog'])->name('blog.index');
+        Route::get('/blog/{slug}', [AlphaController::class, 'blogPost'])->where('slug', '[a-zA-Z0-9_-]+')->name('blog.show');
         Route::get('/login', [AlphaController::class, 'login'])->name('login');
         Route::post('/login', [AlphaController::class, 'storeLogin'])->middleware('throttle:30,1')->name('login.store');
         Route::post('/logout', [AlphaController::class, 'logout'])->name('logout');

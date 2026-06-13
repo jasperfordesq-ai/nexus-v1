@@ -18,6 +18,7 @@ use App\Services\EventService;
 use App\Services\ExchangeService;
 use App\Services\ExchangeWorkflowService;
 use App\Services\FeedService;
+use App\Services\LegalDocumentService;
 use App\Services\ListingConfigurationService;
 use App\Services\ListingService;
 use App\Services\MessageService;
@@ -711,6 +712,179 @@ class AlphaController extends Controller
         return redirect()
             ->route('govuk-alpha.contact', ['tenantSlug' => $tenantSlug, 'status' => 'contact-failed'])
             ->withInput();
+    }
+
+    public function about(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $communityName = (string) (TenantContext::get()['name'] ?? $tenantSlug);
+
+        return $this->view('accessible-frontend::about', [
+            'title' => __('govuk_alpha.about.title', ['name' => $communityName]),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'about',
+            'stats' => $this->platformStats(),
+            'contributors' => $this->aboutContributors(),
+        ]);
+    }
+
+    public function trustSafety(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        return $this->view('accessible-frontend::trust-safety', [
+            'title' => __('govuk_alpha.trust_safety.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'trust-safety',
+        ]);
+    }
+
+    public function accessibility(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        return $this->view('accessible-frontend::accessibility', [
+            'title' => __('govuk_alpha.accessibility.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'accessibility',
+        ]);
+    }
+
+    public function legalHub(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        return $this->view('accessible-frontend::legal-hub', [
+            'title' => __('govuk_alpha.legal.hub_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'legal',
+        ]);
+    }
+
+    public function legalDocument(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        // The document type is supplied via route defaults (see routes/govuk-alpha.php).
+        $type = self::asStr($request->route('type'));
+        $allowed = ['terms', 'privacy', 'cookies', 'community_guidelines', 'acceptable_use'];
+        abort_unless(in_array($type, $allowed, true), 404);
+
+        return $this->view('accessible-frontend::legal-document', [
+            'title' => __('govuk_alpha.legal.documents.' . $type . '.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'legal',
+            'docType' => $type,
+            // Tenant-managed document (admin-editable, same source as the React app),
+            // or null when none is published — the view renders a GOV.UK fallback.
+            'document' => LegalDocumentService::getDocument($type),
+        ]);
+    }
+
+    public function help(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $search = trim(self::asStr($request->query('q')));
+        $groups = app(\App\Services\HelpService::class)
+            ->getFaqs(TenantContext::getId(), null, $search !== '' ? $search : null);
+
+        return $this->view('accessible-frontend::help', [
+            'title' => __('govuk_alpha.help.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'help',
+            'faqGroups' => $groups,
+            'searchQuery' => $search,
+        ]);
+    }
+
+    public function kb(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $search = trim(self::asStr($request->query('q')));
+        $cursor = self::asStr($request->query('cursor')) ?: null;
+        $service = app(\App\Services\KnowledgeBaseService::class);
+
+        if ($search !== '') {
+            $result = ['items' => $service->search($search, 20), 'cursor' => null, 'has_more' => false];
+        } else {
+            $result = $service->getAll([
+                'limit' => 12,
+                'cursor' => $cursor,
+                'published_only' => true,
+            ]);
+        }
+
+        return $this->view('accessible-frontend::kb-index', [
+            'title' => __('govuk_alpha.kb.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'kb',
+            'articles' => $result['items'] ?? [],
+            'hasMore' => (bool) ($result['has_more'] ?? false),
+            'nextCursor' => $result['cursor'] ?? null,
+            'searchQuery' => $search,
+        ]);
+    }
+
+    public function kbArticle(Request $request, string $tenantSlug, int $id): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $article = app(\App\Services\KnowledgeBaseService::class)->getById($id, true);
+        abort_if($article === null, 404);
+
+        return $this->view('accessible-frontend::kb-article', [
+            'title' => (string) ($article['title'] ?? __('govuk_alpha.kb.title')),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'kb',
+            'article' => $article,
+        ]);
+    }
+
+    public function blog(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $search = trim(self::asStr($request->query('q')));
+        $cursor = self::asStr($request->query('cursor')) ?: null;
+        $categoryRaw = self::asStr($request->query('category'));
+        $categoryId = ctype_digit($categoryRaw) ? (int) $categoryRaw : null;
+
+        $service = app(\App\Services\BlogService::class);
+        $result = $service->getAll([
+            'limit' => 12,
+            'cursor' => $cursor,
+            'search' => $search !== '' ? $search : null,
+            'category_id' => $categoryId,
+        ]);
+
+        return $this->view('accessible-frontend::blog-index', [
+            'title' => __('govuk_alpha.blog.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'blog',
+            'posts' => $result['items'] ?? [],
+            'categories' => $service->getCategories(),
+            'hasMore' => (bool) ($result['has_more'] ?? false),
+            'nextCursor' => $result['cursor'] ?? null,
+            'searchQuery' => $search,
+            'categoryId' => $categoryId,
+        ]);
+    }
+
+    public function blogPost(Request $request, string $tenantSlug, string $slug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $post = app(\App\Services\BlogService::class)->getBySlug($slug);
+        abort_if($post === null, 404);
+
+        return $this->view('accessible-frontend::blog-post', [
+            'title' => (string) ($post['title'] ?? __('govuk_alpha.blog.title')),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'blog',
+            'post' => $post,
+        ]);
     }
 
     public function events(Request $request, string $tenantSlug): Response
@@ -2632,6 +2806,10 @@ class AlphaController extends Controller
     {
         $logoUrl = TenantContext::getSetting('logo_url');
         $logoDarkUrl = TenantContext::getSetting('logo_dark_url');
+        $logoUrl = is_string($logoUrl) ? $logoUrl : null;
+        $logoDarkUrl = is_string($logoDarkUrl) ? $logoDarkUrl : null;
+        // Header is always black, so the dark variant (when present) is what's shown.
+        $effectiveLogo = $logoDarkUrl ?: $logoUrl;
 
         return [
             'assetEntrypoint' => $this->assetEntrypoint(),
@@ -2639,11 +2817,15 @@ class AlphaController extends Controller
             // Tenant-uploaded header logo (overrides the text brand). Resolved to
             // same-origin URLs. The GOV.UK alpha header is always black, so the
             // template prefers the dark-background variant when one was uploaded.
-            'tenantLogoUrl' => $this->resolveAsset(is_string($logoUrl) ? $logoUrl : null),
-            'tenantLogoDarkUrl' => $this->resolveAsset(is_string($logoDarkUrl) ? $logoDarkUrl : null),
+            'tenantLogoUrl' => $this->resolveAsset($logoUrl),
+            'tenantLogoDarkUrl' => $this->resolveAsset($logoDarkUrl),
+            // Smart sizing: bucket the logo by aspect ratio so a wide wordmark and
+            // a square/stacked crest both read at a sensible size in the header.
+            'tenantLogoShape' => $this->logoShapeClass($effectiveLogo),
             'isAuthenticated' => $this->currentUserId() !== null,
             'alphaNavItems' => $this->alphaNavItems(),
-            'alphaFooterLinks' => $this->alphaFooterLinks(),
+            'alphaFooterColumns' => $this->alphaFooterColumns(),
+            'alphaSignOutUrl' => $this->alphaSignOutUrl(),
             'feedbackUrl' => $this->feedbackUrl(),
             'mainSiteUrl' => $this->mainSiteUrl(),
             'metaDescription' => __('govuk_alpha.seo.description'),
@@ -2732,7 +2914,14 @@ class AlphaController extends Controller
         return $items;
     }
 
-    private function alphaFooterLinks(): array
+    /**
+     * Build the GOV.UK footer navigation columns. The React frontend footer is
+     * the source of truth for which links appear; the Platform column is gated
+     * by the same module/feature checks as alphaNavItems(), while Support and
+     * Legal are universal. Each value is `key => href`; the Blade resolves the
+     * label via govuk_alpha.footer.columns.<column>.<key>.
+     */
+    private function alphaFooterColumns(): array
     {
         $tenant = TenantContext::get();
         $tenantSlug = (string) ($tenant['slug'] ?? '');
@@ -2740,15 +2929,104 @@ class AlphaController extends Controller
             return [];
         }
 
-        $items = [
-            'contact' => route('govuk-alpha.contact', ['tenantSlug' => $tenantSlug]),
-        ];
+        $route = static fn (string $name): string => route($name, ['tenantSlug' => $tenantSlug]);
 
-        if ($this->currentUserId() !== null) {
-            $items['logout'] = route('govuk-alpha.logout', ['tenantSlug' => $tenantSlug]);
+        $platform = [];
+        if (TenantContext::hasModule('listings')) {
+            $platform['listings'] = $route('govuk-alpha.listings.index');
+        }
+        if (TenantContext::hasFeature('connections')) {
+            $platform['members'] = $route('govuk-alpha.members.index');
+        }
+        if (TenantContext::hasFeature('events')) {
+            $platform['events'] = $route('govuk-alpha.events.index');
+        }
+        if (TenantContext::hasFeature('volunteering')) {
+            $platform['volunteering'] = $route('govuk-alpha.volunteering.index');
+        }
+        if (TenantContext::hasFeature('blog')) {
+            $platform['blog'] = $route('govuk-alpha.blog.index');
         }
 
-        return $items;
+        $support = [
+            'help' => $route('govuk-alpha.help'),
+            'kb' => $route('govuk-alpha.kb.index'),
+            'trust_safety' => $route('govuk-alpha.trust-safety'),
+            'contact' => $route('govuk-alpha.contact'),
+            'about' => $route('govuk-alpha.about'),
+        ];
+
+        $legal = [
+            'legal_hub' => $route('govuk-alpha.legal.hub'),
+            'terms' => $route('govuk-alpha.legal.terms'),
+            'privacy' => $route('govuk-alpha.legal.privacy'),
+            'community_guidelines' => $route('govuk-alpha.legal.community-guidelines'),
+            'acceptable_use' => $route('govuk-alpha.legal.acceptable-use'),
+            'cookies' => $route('govuk-alpha.legal.cookies'),
+            'accessibility' => $route('govuk-alpha.accessibility'),
+        ];
+
+        $columns = ['support' => $support, 'legal' => $legal];
+        if ($platform !== []) {
+            $columns = ['platform' => $platform] + $columns;
+        }
+
+        return $columns;
+    }
+
+    /**
+     * The sign-out URL for the footer meta row. Sign-out changes state, so the
+     * Blade renders it as a CSRF-protected POST form, not a link. Null when the
+     * visitor is not signed in or no tenant is resolved.
+     */
+    private function alphaSignOutUrl(): ?string
+    {
+        $tenant = TenantContext::get();
+        $tenantSlug = (string) ($tenant['slug'] ?? '');
+        if ($tenantSlug === '' || $this->currentUserId() === null) {
+            return null;
+        }
+
+        return route('govuk-alpha.logout', ['tenantSlug' => $tenantSlug]);
+    }
+
+    /**
+     * Live platform statistics for the About page, reusing the same cached
+     * computation as the React app's GET /v2/platform/stats. Returns null on
+     * any failure so the About page simply hides the stats band.
+     */
+    private function platformStats(): ?array
+    {
+        try {
+            $response = app(\App\Http\Controllers\Api\TenantBootstrapController::class)->platformStats();
+            $decoded = json_decode((string) $response->getContent(), true);
+            if (! is_array($decoded)) {
+                return null;
+            }
+
+            return isset($decoded['data']) && is_array($decoded['data']) ? $decoded['data'] : $decoded;
+        } catch (\Throwable $e) {
+            report($e);
+
+            return null;
+        }
+    }
+
+    /**
+     * The shared contributors list rendered on the About page — the same
+     * react-frontend/src/data/contributors.json the React About page uses, so
+     * credits stay in a single source of truth.
+     */
+    private function aboutContributors(): array
+    {
+        $path = base_path('react-frontend/src/data/contributors.json');
+        if (! is_file($path)) {
+            return [];
+        }
+
+        $decoded = json_decode((string) file_get_contents($path), true);
+
+        return is_array($decoded) ? $decoded : [];
     }
 
     private function assetEntrypoint(): array
@@ -3021,6 +3299,17 @@ class AlphaController extends Controller
             return $path;
         }
         return '/' . ltrim($path, '/');
+    }
+
+    /**
+     * Bucket a header logo by aspect ratio so the template can size it sensibly:
+     * a wide wordmark needs little height, a square/stacked crest needs more.
+     * Measured from the local file via getimagesize; SVGs and anything we can't
+     * measure fall back to 'landscape'. Returns 'wide' | 'landscape' | 'square'.
+     */
+    private function logoShapeClass(?string $url): string
+    {
+        return \App\Support\LogoShape::classify($url);
     }
 
     /**

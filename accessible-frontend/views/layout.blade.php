@@ -54,8 +54,15 @@
 
     <header class="nexus-alpha-header" role="banner">
         <div class="govuk-width-container nexus-alpha-header__container">
+            @php($brandText = !empty($tenantSlug) ? ($tenant['name'] ?? $tenantSlug) : __('govuk_alpha.service_name'))
+            {{-- Header is always dark, so prefer the dark-background logo variant. --}}
+            @php($brandLogo = ($tenantLogoDarkUrl ?? null) ?: ($tenantLogoUrl ?? null))
             <a class="nexus-alpha-header__brand govuk-!-font-size-24" href="{{ $tenantSlug ? route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]) : route('govuk-alpha.tenant-chooser') }}">
-                {{ !empty($tenantSlug) ? ($tenant['name'] ?? $tenantSlug) : __('govuk_alpha.service_name') }}
+                @if (!empty($brandLogo))
+                    <img class="nexus-alpha-header__logo nexus-alpha-header__logo--{{ $tenantLogoShape ?? 'landscape' }}" src="{{ $brandLogo }}" alt="{{ $brandText }}">
+                @else
+                    {{ $brandText }}
+                @endif
             </a>
             @if (!empty($tenantSlug))
                 <nav class="nexus-alpha-header__links" aria-label="{{ __('govuk_alpha.header.links_label') }}">
@@ -133,33 +140,55 @@
         </main>
     </div>
 
-    <footer class="nexus-alpha-footer" role="contentinfo">
-        <div class="govuk-width-container govuk-!-padding-top-6 govuk-!-padding-bottom-6">
-            @if (!empty($alphaFooterLinks))
-                <nav class="nexus-alpha-footer__links" aria-label="{{ __('govuk_alpha.footer.links_label') }}">
-                    <h2 class="govuk-heading-s">{{ __('govuk_alpha.footer.links_heading') }}</h2>
-                    <ul class="govuk-list">
-                        @foreach ($alphaFooterLinks as $key => $href)
-                            <li>
-                                @if ($key === 'logout')
-                                    {{-- Sign-out changes state, so it must be a POST with CSRF, not a GET link. --}}
-                                    <form method="post" action="{{ $href }}" class="nexus-alpha-linkform">
-                                        @csrf
-                                        <button type="submit" class="govuk-link nexus-alpha-linkbutton">{{ __('govuk_alpha.footer.links.' . $key) }}</button>
-                                    </form>
-                                @else
-                                    <a class="govuk-link" href="{{ $href }}">{{ __('govuk_alpha.footer.links.' . $key) }}</a>
-                                @endif
-                            </li>
-                        @endforeach
-                    </ul>
-                </nav>
+    {{--
+        Official GOV.UK footer (https://design-system.service.gov.uk/components/footer/).
+        This is NOT an official UK government service, so the crown, the GOV.UK
+        logotype, the Open Government Licence logo/text and the "Crown copyright"
+        link are deliberately omitted. The AGPL Section 7(b) attribution and a
+        link to the source repository are carried in govuk-footer__meta-custom.
+    --}}
+    <footer class="govuk-footer" role="contentinfo">
+        <div class="govuk-width-container">
+            @if (!empty($alphaFooterColumns))
+                <div class="govuk-footer__navigation">
+                    @foreach ($alphaFooterColumns as $column => $links)
+                        <div class="govuk-footer__section govuk-grid-column-one-third">
+                            <h2 class="govuk-footer__heading govuk-heading-m">{{ __('govuk_alpha.footer.columns.' . $column . '.heading') }}</h2>
+                            <ul class="govuk-footer__list">
+                                @foreach ($links as $key => $href)
+                                    <li class="govuk-footer__list-item">
+                                        <a class="govuk-footer__link" href="{{ $href }}">{{ __('govuk_alpha.footer.columns.' . $column . '.' . $key) }}</a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endforeach
+                </div>
+                <hr class="govuk-footer__section-break">
             @endif
-            <p class="govuk-body-s">{{ __('govuk_alpha.footer.licence') }}</p>
-            <p class="govuk-body-s">{{ __('govuk_alpha.footer.attribution') }}</p>
-            <p class="govuk-body-s">
-                <a class="govuk-link" href="https://github.com/jasperfordesq-ai/nexus-v1">{{ __('govuk_alpha.footer.source') }}</a>
-            </p>
+            <div class="govuk-footer__meta">
+                <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+                    <h2 class="govuk-visually-hidden">{{ __('govuk_alpha.footer.meta_label') }}</h2>
+                    @if (!empty($alphaSignOutUrl))
+                        <ul class="govuk-footer__inline-list">
+                            <li class="govuk-footer__inline-list-item">
+                                {{-- Sign-out changes state, so it is a CSRF-protected POST form, not a GET link. --}}
+                                <form method="post" action="{{ $alphaSignOutUrl }}" class="nexus-alpha-linkform">
+                                    @csrf
+                                    <button type="submit" class="govuk-footer__link nexus-alpha-linkbutton">{{ __('govuk_alpha.footer.sign_out') }}</button>
+                                </form>
+                            </li>
+                        </ul>
+                    @endif
+                    <div class="govuk-footer__meta-custom">
+                        <p class="govuk-!-margin-bottom-2">{{ __('govuk_alpha.footer.licence') }}</p>
+                        <p class="govuk-!-margin-bottom-2">{{ __('govuk_alpha.footer.attribution') }}</p>
+                        <p class="govuk-!-margin-bottom-0">
+                            <a class="govuk-footer__link" href="https://github.com/jasperfordesq-ai/nexus-v1" rel="noopener noreferrer">{{ __('govuk_alpha.footer.source') }}</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
 

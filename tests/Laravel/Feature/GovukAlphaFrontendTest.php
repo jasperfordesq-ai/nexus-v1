@@ -193,9 +193,11 @@ class GovukAlphaFrontendTest extends TestCase
         $response = $this->get("/{$this->testTenantSlug}/alpha");
 
         $response->assertOk();
-        $response->assertSee('<nav class="nexus-alpha-footer__links"', false);
-        $response->assertSee('<a class="govuk-link" href="' . $contactUrl . '">' . __('govuk_alpha.footer.links.contact') . '</a>', false);
-        $response->assertDontSee(__('govuk_alpha.footer.links.logout'));
+        // Contact now lives in the GOV.UK footer Support column, not the service nav.
+        $response->assertSee('class="govuk-footer__navigation"', false);
+        $response->assertSee('<a class="govuk-footer__link" href="' . $contactUrl . '">' . __('govuk_alpha.footer.columns.support.contact') . '</a>', false);
+        // Guests do not see the sign-out control.
+        $response->assertDontSee(__('govuk_alpha.footer.sign_out'));
         $response->assertDontSee('<a class="govuk-service-navigation__link" href="' . $contactUrl . '"', false);
     }
 
@@ -226,11 +228,11 @@ class GovukAlphaFrontendTest extends TestCase
         $response = $this->get("/{$this->testTenantSlug}/alpha");
 
         $response->assertOk();
-        $response->assertSee('<nav class="nexus-alpha-footer__links"', false);
+        $response->assertSee('class="govuk-footer__meta"', false);
         // Sign-out changes state, so it is a POST form (with CSRF), not a GET link.
         $response->assertSee('<form method="post" action="' . $logoutUrl . '"', false);
-        $response->assertSee(__('govuk_alpha.footer.links.logout'));
-        $response->assertDontSee('<a class="govuk-link" href="' . $logoutUrl . '">', false);
+        $response->assertSee(__('govuk_alpha.footer.sign_out'));
+        $response->assertDontSee('<a class="govuk-footer__link" href="' . $logoutUrl . '">', false);
 
         // The GET method is no longer routable for the state-changing sign-out.
         $this->get("/{$this->testTenantSlug}/alpha/logout")->assertStatus(405);
@@ -238,6 +240,117 @@ class GovukAlphaFrontendTest extends TestCase
         $logout = $this->post("/{$this->testTenantSlug}/alpha/logout");
         $logout->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=signed-out");
         $logout->assertCookieExpired('auth_token');
+    }
+
+    public function test_govuk_footer_renders_columns_attribution_and_github_link(): void
+    {
+        $response = $this->get("/{$this->testTenantSlug}/alpha");
+
+        $response->assertOk();
+        $response->assertSee('class="govuk-footer"', false);
+        $response->assertSee('class="govuk-footer__navigation"', false);
+        // Support and Legal columns are universal (Platform is feature-gated).
+        $response->assertSee(__('govuk_alpha.footer.columns.support.heading'));
+        $response->assertSee(__('govuk_alpha.footer.columns.legal.heading'));
+        $response->assertSee('<a class="govuk-footer__link" href="' . route('govuk-alpha.about', ['tenantSlug' => $this->testTenantSlug]) . '">' . __('govuk_alpha.footer.columns.support.about') . '</a>', false);
+        $response->assertSee('<a class="govuk-footer__link" href="' . route('govuk-alpha.legal.terms', ['tenantSlug' => $this->testTenantSlug]) . '">' . __('govuk_alpha.footer.columns.legal.terms') . '</a>', false);
+        // AGPL Section 7(b) attribution + a link to the source repository.
+        $response->assertSee('class="govuk-footer__meta-custom"', false);
+        $response->assertSee('AGPL-3.0-or-later');
+        $response->assertSee('https://github.com/jasperfordesq-ai/nexus-v1', false);
+        // Strictly not an official government service: no crown, no OGL licence.
+        $response->assertDontSee('govuk-footer__crown', false);
+        $response->assertDontSee('Open Government Licence');
+    }
+
+    public function test_about_page_renders_react_about_content(): void
+    {
+        $response = $this->get("/{$this->testTenantSlug}/alpha/about");
+
+        $response->assertOk();
+        $response->assertSee('AGPL-3.0-or-later');
+        $response->assertSee(__('govuk_alpha.about.how_it_works.title'));
+        $response->assertSee(__('govuk_alpha.about.values.title'));
+        $response->assertSee(__('govuk_alpha.about.credits.title'));
+        // Contributors come from the shared react-frontend contributors.json.
+        $response->assertSee('Mary Casey');
+        $response->assertSee('https://github.com/jasperfordesq-ai/nexus-v1', false);
+    }
+
+    public function test_legal_hub_and_documents_render(): void
+    {
+        $hub = $this->get("/{$this->testTenantSlug}/alpha/legal");
+        $hub->assertOk();
+        $hub->assertSee(__('govuk_alpha.legal.documents.terms.title'));
+        $hub->assertSee(__('govuk_alpha.legal.documents.privacy.title'));
+        $hub->assertSee(route('govuk-alpha.legal.cookies', ['tenantSlug' => $this->testTenantSlug]), false);
+
+        $terms = $this->get("/{$this->testTenantSlug}/alpha/legal/terms");
+        $terms->assertOk();
+        $terms->assertSee(__('govuk_alpha.legal.documents.terms.title'));
+        $terms->assertSee('class="govuk-back-link"', false);
+
+        // Community guidelines render (tenant-managed document or GOV.UK fallback).
+        $cg = $this->get("/{$this->testTenantSlug}/alpha/legal/community-guidelines");
+        $cg->assertOk();
+        $cg->assertSee(__('govuk_alpha.legal.documents.community_guidelines.title'));
+    }
+
+    public function test_accessibility_statement_renders_wcag_22_and_feedback_route(): void
+    {
+        $response = $this->get("/{$this->testTenantSlug}/alpha/accessibility");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.accessibility.title'));
+        $response->assertSee(__('govuk_alpha.accessibility.standard_value'));
+        $response->assertSee(route('govuk-alpha.contact', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
+    public function test_trust_safety_page_renders_sections_and_safeguarding(): void
+    {
+        $response = $this->get("/{$this->testTenantSlug}/alpha/trust-and-safety");
+
+        $response->assertOk();
+        $response->assertSee('class="govuk-warning-text"', false);
+        $response->assertSee(__('govuk_alpha.trust_safety.safeguarding_title'));
+        $response->assertSee(__('govuk_alpha.trust_safety.sections.how_exchanges.heading'));
+        $response->assertSee(__('govuk_alpha.trust_safety.sections.rights.heading'));
+    }
+
+    public function test_help_page_renders_search_and_shell(): void
+    {
+        $response = $this->get("/{$this->testTenantSlug}/alpha/help");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.help.title'));
+        $response->assertSee('type="search"', false);
+        $response->assertSee(__('govuk_alpha.help.contact_cta_title'));
+    }
+
+    public function test_kb_and_blog_indexes_render_and_unknown_detail_404s(): void
+    {
+        $kb = $this->get("/{$this->testTenantSlug}/alpha/kb");
+        $kb->assertOk();
+        $kb->assertSee(__('govuk_alpha.kb.title'));
+        $kb->assertSee('type="search"', false);
+        $this->get("/{$this->testTenantSlug}/alpha/kb/99999999")->assertNotFound();
+
+        $blog = $this->get("/{$this->testTenantSlug}/alpha/blog");
+        $blog->assertOk();
+        $blog->assertSee(__('govuk_alpha.blog.title'));
+        $this->get("/{$this->testTenantSlug}/alpha/blog/this-slug-does-not-exist")->assertNotFound();
+    }
+
+    public function test_new_content_pages_are_tenant_scoped(): void
+    {
+        // A slug that does not resolve to a tenant is rejected before the page
+        // renders (the tenant-resolution middleware returns 400), so the new
+        // content pages are never served outside their tenant context.
+        foreach (['/not-the-tenant/alpha/about', '/not-the-tenant/alpha/legal', '/not-the-tenant/alpha/legal/terms'] as $path) {
+            $response = $this->get($path);
+            $this->assertSame(400, $response->getStatusCode(), "Expected {$path} to be blocked by tenant resolution");
+            $response->assertDontSee(__('govuk_alpha.about.how_it_works.title'));
+        }
     }
 
     public function test_contact_page_preserves_react_contact_validation_contract(): void
