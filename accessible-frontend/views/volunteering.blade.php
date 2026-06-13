@@ -31,6 +31,26 @@
             </div>
         </div>
     @else
+        @if (($status ?? null) === 'application-withdrawn')
+            <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="application-withdrawn-title">
+                <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title" id="application-withdrawn-title">{{ __('govuk_alpha.states.success_title') }}</h2>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.volunteering.application_withdrawn') }}</p>
+                </div>
+            </div>
+        @elseif (($status ?? null) === 'application-withdraw-failed')
+            <div class="govuk-error-summary" data-module="govuk-error-summary">
+                <div role="alert">
+                    <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                    <div class="govuk-error-summary__body">
+                        <p>{{ __('govuk_alpha.volunteering.application_withdraw_failed') }}</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         @if ($requiresAuth)
             <div class="govuk-notification-banner" role="region" aria-labelledby="volunteering-auth-title">
                 <div class="govuk-notification-banner__header">
@@ -84,6 +104,24 @@
 
         @if (!$requiresAuth && $selectedTab === 'applications')
             <h2 class="govuk-heading-l">{{ __('govuk_alpha.volunteering.applications_title') }}</h2>
+            <form method="get" action="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-6">
+                <input type="hidden" name="tab" value="applications">
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="app_status">{{ __('govuk_alpha.volunteering.application_status_label') }}</label>
+                    <select class="govuk-select" id="app_status" name="app_status">
+                        <option value="">{{ __('govuk_alpha.volunteering.application_status_all') }}</option>
+                        @foreach (['pending', 'approved', 'declined', 'withdrawn'] as $appStatusOption)
+                            <option value="{{ $appStatusOption }}" @selected(($applicationsStatus ?? null) === $appStatusOption)>{{ $label('volunteering.status_values', $appStatusOption) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="nexus-alpha-actions">
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.actions.apply_filters') }}</button>
+                    @if (!empty($applicationsStatus))
+                        <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'applications']) }}">{{ __('govuk_alpha.actions.clear_filters') }}</a>
+                    @endif
+                </div>
+            </form>
             @if (empty($applications))
                 <div class="govuk-inset-text">{{ __('govuk_alpha.volunteering.empty_applications') }}</div>
             @else
@@ -130,9 +168,31 @@
                                     </div>
                                 @endif
                             </dl>
+                            @if ($statusValue === 'pending' && !empty($application['id']))
+                                <form method="post" action="{{ route('govuk-alpha.volunteering.applications.withdraw', ['tenantSlug' => $tenantSlug, 'id' => $application['id']]) }}" class="govuk-!-margin-top-3">
+                                    @csrf
+                                    <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">
+                                        {{ __('govuk_alpha.volunteering.withdraw_application') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.volunteering.withdraw_application_for', ['title' => $opportunity['title'] ?? '']) }}</span>
+                                    </button>
+                                </form>
+                            @endif
                         </article>
                     @endforeach
                 </div>
+                @if (!empty($applicationsMeta['has_more']) && !empty($applicationsMeta['cursor']))
+                    <nav class="govuk-pagination govuk-pagination--block govuk-!-margin-top-6" aria-label="{{ __('govuk_alpha.volunteering.applications_pagination_label') }}">
+                        <div class="govuk-pagination__next">
+                            <a class="govuk-link govuk-pagination__link" href="{{ route('govuk-alpha.volunteering.index', array_filter(['tenantSlug' => $tenantSlug, 'tab' => 'applications', 'app_status' => $applicationsStatus ?? null, 'app_cursor' => $applicationsMeta['cursor']])) }}" rel="next">
+                                <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                                    <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                                </svg>
+                                <span class="govuk-pagination__link-title">{{ __('govuk_alpha.actions.load_more') }}</span>
+                                <span class="govuk-visually-hidden">:</span>
+                                <span class="govuk-pagination__link-label">{{ __('govuk_alpha.volunteering.applications_more_label') }}</span>
+                            </a>
+                        </div>
+                    </nav>
+                @endif
             @endif
         @elseif (!$requiresAuth && $selectedTab === 'organisations')
             <h2 class="govuk-heading-l">{{ __('govuk_alpha.volunteering.organisations_title') }}</h2>

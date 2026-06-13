@@ -692,6 +692,21 @@ class AlphaController extends Controller
             $error = __('govuk_alpha.states.error_title');
         }
 
+        // Applications tab: status filter + cursor pagination (was a fixed top-5).
+        $applicationsStatus = $this->allowed($request->query('app_status'), ['pending', 'approved', 'declined', 'withdrawn'], null);
+        $applications = ['items' => [], 'cursor' => null, 'has_more' => false];
+        if ($userId !== null) {
+            $applicationsQuery = ['limit' => 10];
+            if ($applicationsStatus !== null) {
+                $applicationsQuery['status'] = $applicationsStatus;
+            }
+            $applicationsCursor = self::asStr($request->query('app_cursor'));
+            if ($applicationsCursor !== '') {
+                $applicationsQuery['cursor'] = $applicationsCursor;
+            }
+            $applications = VolunteerService::getMyApplications($userId, $applicationsQuery);
+        }
+
         return $this->view('accessible-frontend::volunteering', [
             'title' => __('govuk_alpha.volunteering.title'),
             'tenantSlug' => $tenantSlug,
@@ -704,9 +719,12 @@ class AlphaController extends Controller
             'error' => $error,
             'requiresAuth' => $userId === null,
             'hoursSummary' => $userId ? VolunteerService::getHoursSummary($userId) : null,
-            'applications' => $userId ? (VolunteerService::getMyApplications($userId, ['limit' => 5])['items'] ?? []) : [],
+            'applications' => $applications['items'] ?? [],
+            'applicationsMeta' => ['has_more' => (bool) ($applications['has_more'] ?? false), 'cursor' => $applications['cursor'] ?? null],
+            'applicationsStatus' => $applicationsStatus,
             'organizations' => $userId ? (VolunteerService::getMyOrganizations($userId, ['limit' => 5])['items'] ?? []) : [],
             'selectedTab' => $selectedTab,
+            'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
 
@@ -749,6 +767,30 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.volunteering.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'apply-created']);
+    }
+
+    public function withdrawVolunteerApplication(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $ok = false;
+        try {
+            $ok = VolunteerService::withdrawApplication($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.index', [
+            'tenantSlug' => $tenantSlug,
+            'tab' => 'applications',
+            'status' => $ok ? 'application-withdrawn' : 'application-withdraw-failed',
+        ]);
     }
 
     public function volunteeringHours(Request $request, string $tenantSlug): Response|RedirectResponse

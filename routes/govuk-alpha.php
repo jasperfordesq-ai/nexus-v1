@@ -43,6 +43,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/volunteering/hours', [AlphaController::class, 'storeVolunteeringHours'])->middleware('throttle:20,1')->name('volunteering.hours.store');
         Route::get('/volunteering/opportunities/{id}', [AlphaController::class, 'volunteerOpportunity'])->whereNumber('id')->name('volunteering.show');
         Route::post('/volunteering/opportunities/{id}/apply', [AlphaController::class, 'applyVolunteerOpportunity'])->middleware('throttle:20,1')->whereNumber('id')->name('volunteering.apply.store');
+        Route::post('/volunteering/applications/{id}/withdraw', [AlphaController::class, 'withdrawVolunteerApplication'])->middleware('throttle:20,1')->whereNumber('id')->name('volunteering.applications.withdraw');
         Route::get('/feed', [AlphaController::class, 'feed'])->name('feed');
         Route::post('/feed/posts', [AlphaController::class, 'storeFeedPost'])->middleware('throttle:20,1')->name('feed.posts.store');
         Route::post('/feed/items/{type}/{id}/like', [AlphaController::class, 'storeFeedLike'])

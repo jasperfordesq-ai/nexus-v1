@@ -1108,6 +1108,75 @@ class GovukAlphaFrontendTest extends TestCase
         $organisations->assertSee(__('govuk_alpha.volunteering.roles.owner'));
     }
 
+    public function test_volunteering_applications_tab_supports_status_filter_and_withdraw(): void
+    {
+        $user = $this->authenticatedUser();
+        $creator = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $organizationId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $creator->id,
+            'name' => 'Withdraw Test Organisation',
+            'slug' => 'withdraw-test-organisation',
+            'description' => 'Org for the withdraw flow.',
+            'contact_email' => 'withdraw-alpha@example.test',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $opportunityId = DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $organizationId,
+            'created_by' => $creator->id,
+            'title' => 'Withdrawable opportunity',
+            'description' => 'Apply then withdraw.',
+            'location' => 'Centre',
+            'is_remote' => 0,
+            'skills_needed' => 'Listening',
+            'start_date' => now()->addWeek()->toDateString(),
+            'end_date' => now()->addMonth()->toDateString(),
+            'is_active' => 1,
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $applicationId = DB::table('vol_applications')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $opportunityId,
+            'user_id' => $user->id,
+            'status' => 'pending',
+            'message' => 'Please consider me.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $withdrawUrl = route('govuk-alpha.volunteering.applications.withdraw', ['tenantSlug' => $this->testTenantSlug, 'id' => $applicationId]);
+
+        $tab = $this->get("/{$this->testTenantSlug}/alpha/volunteering?tab=applications");
+        $tab->assertOk();
+        $tab->assertSee('name="app_status"', false);
+        $tab->assertSee(__('govuk_alpha.volunteering.withdraw_application'));
+        $tab->assertSee($withdrawUrl, false);
+
+        // Status filter: only approved → the pending one is hidden, empty state shows.
+        $approvedOnly = $this->get("/{$this->testTenantSlug}/alpha/volunteering?tab=applications&app_status=approved");
+        $approvedOnly->assertOk();
+        $approvedOnly->assertSee('value="approved" selected', false);
+        $approvedOnly->assertSee(__('govuk_alpha.volunteering.empty_applications'));
+        $approvedOnly->assertDontSee(__('govuk_alpha.volunteering.withdraw_application'));
+
+        // Withdraw the pending application.
+        $withdraw = $this->post($withdrawUrl);
+        $withdraw->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering?tab=applications&status=application-withdrawn");
+        $this->assertDatabaseMissing('vol_applications', ['id' => $applicationId]);
+
+        $after = $this->get("/{$this->testTenantSlug}/alpha/volunteering?tab=applications&status=application-withdrawn");
+        $after->assertOk();
+        $after->assertSee(__('govuk_alpha.volunteering.application_withdrawn'));
+    }
+
     public function test_volunteering_hours_page_renders_member_hour_logging_form(): void
     {
         $user = $this->authenticatedUser();
