@@ -95,6 +95,16 @@
                     'passkey-name-required' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.passkeys.name_required'), 'anchor' => '#passkeys'],
                 ];
                 $accountStatus = $accountStatusMap[$status ?? ''] ?? null;
+                // Field-level error helper: reuse the status map (its anchor IS the
+                // field id) so a failing email/password form highlights the field.
+                $fieldErrorFor = function (string $field) use ($accountStatus): ?string {
+                    if ($accountStatus === null || ($accountStatus['type'] ?? '') !== 'error') {
+                        return null;
+                    }
+                    return ltrim((string) ($accountStatus['anchor'] ?? ''), '#') === $field
+                        ? $accountStatus['msg']
+                        : null;
+                };
             @endphp
             @if ($accountStatus)
                 @if ($accountStatus['type'] === 'success')
@@ -266,14 +276,22 @@
                 <h3 class="govuk-heading-m">{{ __('govuk_alpha.profile_settings.email_heading') }}</h3>
                 <form method="post" action="{{ route('govuk-alpha.profile.email.update', ['tenantSlug' => $tenantSlug]) }}" novalidate>
                     @csrf
-                    <div class="govuk-form-group">
+                    @php $newEmailError = $fieldErrorFor('new_email'); @endphp
+                    <div class="govuk-form-group{{ $newEmailError ? ' govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="new_email">{{ __('govuk_alpha.profile_settings.email_label') }}</label>
-                        <input class="govuk-input govuk-!-width-two-thirds" id="new_email" name="email" type="email" autocomplete="email" value="{{ old('email', $currentEmail ?? '') }}">
+                        @if ($newEmailError)
+                            <p id="new_email-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $newEmailError }}</p>
+                        @endif
+                        <input class="govuk-input govuk-!-width-two-thirds{{ $newEmailError ? ' govuk-input--error' : '' }}" id="new_email" name="email" type="email" autocomplete="email" value="{{ old('email', $currentEmail ?? '') }}" @if ($newEmailError) aria-describedby="new_email-error" @endif>
                     </div>
-                    <div class="govuk-form-group">
+                    @php $emailPwError = $fieldErrorFor('email_current_password'); @endphp
+                    <div class="govuk-form-group{{ $emailPwError ? ' govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="email_current_password">{{ __('govuk_alpha.profile_settings.confirm_password_label') }}</label>
                         <div id="email-current-password-hint" class="govuk-hint">{{ __('govuk_alpha.profile_settings.confirm_password_hint') }}</div>
-                        <input class="govuk-input govuk-!-width-two-thirds" id="email_current_password" name="current_password" type="password" autocomplete="current-password" aria-describedby="email-current-password-hint">
+                        @if ($emailPwError)
+                            <p id="email_current_password-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $emailPwError }}</p>
+                        @endif
+                        <input class="govuk-input govuk-!-width-two-thirds{{ $emailPwError ? ' govuk-input--error' : '' }}" id="email_current_password" name="current_password" type="password" autocomplete="current-password" aria-describedby="email-current-password-hint{{ $emailPwError ? ' email_current_password-error' : '' }}">
                     </div>
                     <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.email_submit') }}</button>
                 </form>
@@ -281,18 +299,30 @@
                 <h3 class="govuk-heading-m govuk-!-margin-top-6">{{ __('govuk_alpha.profile_settings.password_heading') }}</h3>
                 <form method="post" action="{{ route('govuk-alpha.profile.password.update', ['tenantSlug' => $tenantSlug]) }}" novalidate>
                     @csrf
-                    <div class="govuk-form-group">
+                    @php $currentPwError = $fieldErrorFor('current_password'); @endphp
+                    <div class="govuk-form-group{{ $currentPwError ? ' govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="current_password">{{ __('govuk_alpha.profile_settings.current_password_label') }}</label>
-                        <input class="govuk-input govuk-!-width-two-thirds" id="current_password" name="current_password" type="password" autocomplete="current-password">
+                        @if ($currentPwError)
+                            <p id="current_password-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $currentPwError }}</p>
+                        @endif
+                        <input class="govuk-input govuk-!-width-two-thirds{{ $currentPwError ? ' govuk-input--error' : '' }}" id="current_password" name="current_password" type="password" autocomplete="current-password" @if ($currentPwError) aria-describedby="current_password-error" @endif>
                     </div>
-                    <div class="govuk-form-group">
+                    @php $newPwError = $fieldErrorFor('new_password'); @endphp
+                    <div class="govuk-form-group{{ $newPwError ? ' govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="new_password">{{ __('govuk_alpha.profile_settings.new_password_label') }}</label>
                         <div id="new-password-hint" class="govuk-hint">{{ __('govuk_alpha.profile_settings.new_password_hint') }}</div>
-                        <input class="govuk-input govuk-!-width-two-thirds" id="new_password" name="new_password" type="password" autocomplete="new-password" spellcheck="false" aria-describedby="new-password-hint">
+                        @if ($newPwError)
+                            <p id="new_password-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $newPwError }}</p>
+                        @endif
+                        <input class="govuk-input govuk-!-width-two-thirds{{ $newPwError ? ' govuk-input--error' : '' }}" id="new_password" name="new_password" type="password" autocomplete="new-password" spellcheck="false" aria-describedby="new-password-hint{{ $newPwError ? ' new_password-error' : '' }}">
                     </div>
-                    <div class="govuk-form-group">
+                    @php $confirmPwError = $fieldErrorFor('new_password_confirmation'); @endphp
+                    <div class="govuk-form-group{{ $confirmPwError ? ' govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="new_password_confirmation">{{ __('govuk_alpha.profile_settings.new_password_confirm_label') }}</label>
-                        <input class="govuk-input govuk-!-width-two-thirds" id="new_password_confirmation" name="new_password_confirmation" type="password" autocomplete="new-password" spellcheck="false">
+                        @if ($confirmPwError)
+                            <p id="new_password_confirmation-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $confirmPwError }}</p>
+                        @endif
+                        <input class="govuk-input govuk-!-width-two-thirds{{ $confirmPwError ? ' govuk-input--error' : '' }}" id="new_password_confirmation" name="new_password_confirmation" type="password" autocomplete="new-password" spellcheck="false" @if ($confirmPwError) aria-describedby="new_password_confirmation-error" @endif>
                     </div>
                     <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.password_submit') }}</button>
                 </form>

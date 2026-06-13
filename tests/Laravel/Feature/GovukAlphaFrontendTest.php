@@ -2522,6 +2522,19 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('govuk-button--warning', false);
     }
 
+    public function test_profile_settings_email_form_shows_field_level_error(): void
+    {
+        $this->authenticatedUser(['name' => 'Field Error User']);
+
+        // An invalid-email failure renders a GOV.UK field-level error on the
+        // email input, not just a top-of-page banner.
+        $page = $this->get("/{$this->testTenantSlug}/alpha/profile/settings?status=email-invalid");
+        $page->assertOk();
+        $page->assertSee('govuk-form-group--error', false);
+        $page->assertSee('id="new_email-error"', false);
+        $page->assertSee('aria-describedby="new_email-error"', false);
+    }
+
     public function test_profile_settings_renders_notification_and_passkey_sections(): void
     {
         $this->authenticatedUser();
