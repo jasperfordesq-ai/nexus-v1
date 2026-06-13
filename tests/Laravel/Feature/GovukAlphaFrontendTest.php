@@ -1313,6 +1313,53 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertDatabaseHas('vol_applications', ['id' => $applicationId, 'shift_id' => null]);
     }
 
+    public function test_volunteering_accessibility_needs_form_renders_saves_and_clears(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $form = $this->get("/{$this->testTenantSlug}/alpha/volunteering/accessibility");
+        $form->assertOk();
+        $form->assertSee(__('govuk_alpha.volunteering.accessibility_title'));
+        $form->assertSee('name="need_types[]"', false);
+        $form->assertSee(__('govuk_alpha.volunteering.need_type_labels.mobility'));
+        $form->assertSee('name="emergency_contact_phone"', false);
+
+        $save = $this->post("/{$this->testTenantSlug}/alpha/volunteering/accessibility", [
+            'need_types' => ['mobility', 'dietary'],
+            'description' => 'Needs step-free access to venues.',
+            'accommodations_required' => 'A quiet space during breaks.',
+            'emergency_contact_name' => 'Jo Carer',
+            'emergency_contact_phone' => '+1 555 123 4567',
+        ]);
+        $save->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/accessibility?status=accessibility-saved");
+        $this->assertDatabaseHas('vol_accessibility_needs', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'need_type' => 'mobility',
+            'description' => 'Needs step-free access to venues.',
+            'emergency_contact_name' => 'Jo Carer',
+        ]);
+        $this->assertDatabaseHas('vol_accessibility_needs', [
+            'user_id' => $user->id,
+            'need_type' => 'dietary',
+        ]);
+
+        // Re-render reflects the saved selections + shared detail.
+        $after = $this->get("/{$this->testTenantSlug}/alpha/volunteering/accessibility?status=accessibility-saved");
+        $after->assertOk();
+        $after->assertSee('value="mobility" checked', false);
+        $after->assertSee('value="dietary" checked', false);
+        $after->assertSee('Needs step-free access to venues.', false);
+        $after->assertSee(__('govuk_alpha.volunteering.accessibility_saved'));
+
+        // Full-replace: submitting with no categories clears all saved needs.
+        $clear = $this->post("/{$this->testTenantSlug}/alpha/volunteering/accessibility", [
+            'description' => '',
+        ]);
+        $clear->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/accessibility?status=accessibility-saved");
+        $this->assertDatabaseMissing('vol_accessibility_needs', ['user_id' => $user->id]);
+    }
+
     public function test_volunteering_hours_page_renders_member_hour_logging_form(): void
     {
         $user = $this->authenticatedUser();

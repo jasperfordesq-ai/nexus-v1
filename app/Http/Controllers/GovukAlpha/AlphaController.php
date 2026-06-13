@@ -47,6 +47,11 @@ class AlphaController extends Controller
         'job', 'blog', 'discussion',
     ];
 
+    /** Accessibility-need categories — mirrors the vol_accessibility_needs ENUM. */
+    private const ACCESSIBILITY_NEED_TYPES = [
+        'mobility', 'visual', 'hearing', 'cognitive', 'dietary', 'language', 'other',
+    ];
+
     public function __construct(
         private readonly FeedService $feedService,
         private readonly ListingService $listingService,
@@ -901,6 +906,91 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.volunteering.hours', ['tenantSlug' => $tenantSlug, 'status' => 'hours-created']);
+    }
+
+    public function volunteerAccessibility(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $needs = \App\Services\VolunteerFormService::getAccessibilityNeeds($userId, TenantContext::getId());
+
+        // HTML-first simplification: surface the set of need categories plus one
+        // shared set of detail fields (the React tab supports per-need detail; the
+        // accessible form keeps it to a single, clearer form). Read back the first
+        // non-empty value for each shared field.
+        $selectedTypes = [];
+        $shared = ['description' => '', 'accommodations' => '', 'emergency_name' => '', 'emergency_phone' => ''];
+        foreach ($needs as $need) {
+            $type = (string) ($need['need_type'] ?? '');
+            if (in_array($type, self::ACCESSIBILITY_NEED_TYPES, true)) {
+                $selectedTypes[] = $type;
+            }
+            foreach ([
+                'description' => 'description',
+                'accommodations' => 'accommodations_required',
+                'emergency_name' => 'emergency_contact_name',
+                'emergency_phone' => 'emergency_contact_phone',
+            ] as $viewKey => $rowKey) {
+                if ($shared[$viewKey] === '' && !empty($need[$rowKey])) {
+                    $shared[$viewKey] = (string) $need[$rowKey];
+                }
+            }
+        }
+
+        return $this->view('accessible-frontend::volunteering-accessibility', [
+            'title' => __('govuk_alpha.volunteering.accessibility_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'volunteering',
+            'needTypes' => self::ACCESSIBILITY_NEED_TYPES,
+            'selectedTypes' => array_values(array_unique($selectedTypes)),
+            'accessibility' => $shared,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function updateVolunteerAccessibility(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $rawTypes = $request->input('need_types', []);
+        $rawTypes = is_array($rawTypes) ? array_map('strval', $rawTypes) : [];
+        $selected = array_values(array_intersect(self::ACCESSIBILITY_NEED_TYPES, $rawTypes));
+
+        $sharedDetail = [
+            'description' => trim(self::asStr($request->input('description'))) ?: null,
+            'accommodations_required' => trim(self::asStr($request->input('accommodations_required'))) ?: null,
+            'emergency_contact_name' => trim(self::asStr($request->input('emergency_contact_name'))) ?: null,
+            'emergency_contact_phone' => trim(self::asStr($request->input('emergency_contact_phone'))) ?: null,
+        ];
+
+        $needs = array_map(
+            static fn (string $type): array => array_merge(['need_type' => $type], $sharedDetail),
+            $selected
+        );
+
+        $ok = false;
+        try {
+            $ok = \App\Services\VolunteerFormService::updateAccessibilityNeeds($userId, $needs, TenantContext::getId());
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.accessibility', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'accessibility-saved' : 'accessibility-failed',
+        ]);
     }
 
     public function feed(Request $request, string $tenantSlug): Response

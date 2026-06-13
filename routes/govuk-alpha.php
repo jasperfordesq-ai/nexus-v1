@@ -40,6 +40,8 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/events/{id}/rsvp', [AlphaController::class, 'storeEventRsvp'])->whereNumber('id')->name('events.rsvp.store');
         Route::get('/volunteering', [AlphaController::class, 'volunteering'])->name('volunteering.index');
         Route::get('/volunteering/hours', [AlphaController::class, 'volunteeringHours'])->name('volunteering.hours');
+        Route::get('/volunteering/accessibility', [AlphaController::class, 'volunteerAccessibility'])->name('volunteering.accessibility');
+        Route::post('/volunteering/accessibility', [AlphaController::class, 'updateVolunteerAccessibility'])->middleware('throttle:20,1')->name('volunteering.accessibility.update');
         Route::post('/volunteering/hours', [AlphaController::class, 'storeVolunteeringHours'])->middleware('throttle:20,1')->name('volunteering.hours.store');
         Route::get('/volunteering/opportunities/{id}', [AlphaController::class, 'volunteerOpportunity'])->whereNumber('id')->name('volunteering.show');
         Route::post('/volunteering/opportunities/{id}/apply', [AlphaController::class, 'applyVolunteerOpportunity'])->middleware('throttle:20,1')->whereNumber('id')->name('volunteering.apply.store');
