@@ -9,8 +9,8 @@
         $communityName = $tenant['name'] ?? $tenantSlug;
         $hasPostError = in_array($status ?? '', ['post-empty', 'post-failed'], true);
         $postErrorMessage = ($status ?? '') === 'post-failed' ? __('govuk_alpha.states.post_failed') : __('govuk_alpha.states.post_empty');
-        $successStatuses = ['post-created', 'like-added', 'like-removed', 'comment-created', 'poll-voted'];
-        $errorStatuses = ['comment-empty', 'comment-too-long', 'comment-failed', 'like-failed', 'poll-vote-failed'];
+        $successStatuses = ['post-created', 'like-added', 'like-removed', 'comment-created', 'poll-voted', 'post-updated', 'post-deleted', 'comment-updated', 'comment-deleted'];
+        $errorStatuses = ['comment-empty', 'comment-too-long', 'comment-failed', 'like-failed', 'poll-vote-failed', 'post-update-failed', 'post-delete-failed', 'comment-update-failed', 'comment-delete-failed'];
         $hasItems = !empty($items);
         $visibleCount = count($items);
         $typeOptions = ['all', 'following', 'saved', 'posts', 'listings', 'events', 'goals', 'polls', 'jobs', 'challenges', 'volunteering', 'blogs', 'discussions'];
@@ -231,6 +231,8 @@
                         default => null,
                     } : null;
                     $authorAvatar = $item['author']['avatar_url'] ?? null;
+                    $authorId = (int) ($item['author']['id'] ?? 0);
+                    $isOwnPost = $itemType === 'post' && !$requiresAuth && ($currentUserId ?? 0) > 0 && $authorId === (int) $currentUserId;
                 @endphp
                 <article class="nexus-alpha-card" id="feed-item-{{ preg_replace('/[^a-z0-9_-]/i', '-', $itemType) }}-{{ $itemId }}">
                     <div class="nexus-alpha-feed-row">
@@ -379,6 +381,37 @@
                                 </button>
                             </form>
                         </div>
+                        @if ($isOwnPost)
+                            <div class="govuk-!-margin-bottom-3">
+                                <details class="govuk-details govuk-!-margin-bottom-2" data-module="govuk-details">
+                                    <summary class="govuk-details__summary">
+                                        <span class="govuk-details__summary-text">{{ __('govuk_alpha.feed.edit_post') }}</span>
+                                    </summary>
+                                    <div class="govuk-details__text">
+                                        <form method="post" action="{{ route('govuk-alpha.feed.posts.update', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}">
+                                            @csrf
+                                            <div class="govuk-form-group">
+                                                <label class="govuk-label" for="edit-post-{{ $itemId }}">{{ __('govuk_alpha.feed.edit_post_label') }}</label>
+                                                <textarea class="govuk-textarea" id="edit-post-{{ $itemId }}" name="content" rows="4" required>{{ $item['content'] ?? '' }}</textarea>
+                                            </div>
+                                            <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.actions.save_changes') }}</button>
+                                        </form>
+                                    </div>
+                                </details>
+                                <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
+                                    <summary class="govuk-details__summary">
+                                        <span class="govuk-details__summary-text">{{ __('govuk_alpha.feed.delete_post') }}</span>
+                                    </summary>
+                                    <div class="govuk-details__text">
+                                        <p class="govuk-body">{{ __('govuk_alpha.feed.delete_post_confirm') }}</p>
+                                        <form method="post" action="{{ route('govuk-alpha.feed.posts.delete', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}">
+                                            @csrf
+                                            <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.feed.delete_post_button') }}</button>
+                                        </form>
+                                    </div>
+                                </details>
+                            </div>
+                        @endif
                     @endif
                     @if ($isCommentable)
                         <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details" @if (($status ?? '') === 'comment-created') open @endif>
@@ -387,7 +420,16 @@
                             </summary>
                             <div class="govuk-details__text">
                                 @if (!empty($comments))
-                                    @include('accessible-frontend::partials.feed-comments', ['comments' => $comments, 'depth' => 0])
+                                    @include('accessible-frontend::partials.feed-comments', [
+                                        'comments' => $comments,
+                                        'depth' => 0,
+                                        'targetType' => $itemType,
+                                        'targetId' => $itemId,
+                                        'tenantSlug' => $tenantSlug,
+                                        'requiresAuth' => $requiresAuth,
+                                        'currentUserId' => $currentUserId ?? null,
+                                        'preservedFeedInputs' => $preservedFeedInputs,
+                                    ])
                                 @else
                                     <p class="govuk-body">{{ __('govuk_alpha.feed.no_comments') }}</p>
                                 @endif

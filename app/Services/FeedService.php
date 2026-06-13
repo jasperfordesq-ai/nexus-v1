@@ -1442,6 +1442,40 @@ class FeedService
         return ['success' => true];
     }
 
+    /**
+     * Delete a member's own feed post (owner-scoped) and remove its feed_activity
+     * row. Mirrors Api\SocialController::deletePostV2 so the accessible frontend
+     * has a service-level entry point. Returns false when the post does not exist
+     * or is not owned by the user.
+     */
+    public function deletePost(int $postId, int $userId): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        $post = $this->feedPost->newQuery()
+            ->where('id', $postId)
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (! $post) {
+            return false;
+        }
+
+        DB::table('feed_posts')
+            ->where('id', $postId)
+            ->where('tenant_id', $tenantId)
+            ->delete();
+
+        try {
+            app(\App\Services\FeedActivityService::class)->removeActivity('post', $postId);
+        } catch (\Throwable $e) {
+            Log::warning('FeedService::deletePost feed_activity remove failed: ' . $e->getMessage());
+        }
+
+        return true;
+    }
+
     /** @var array Validation error messages */
     private array $errors = [];
 

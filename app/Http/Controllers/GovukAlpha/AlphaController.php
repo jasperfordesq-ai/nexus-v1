@@ -1454,6 +1454,7 @@ class AlphaController extends Controller
             'selectedMode' => $mode,
             'selectedSubtype' => $subtype,
             'requiresAuth' => $userId === null,
+            'currentUserId' => $userId,
             'error' => $error,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
@@ -1586,16 +1587,111 @@ class AlphaController extends Controller
             return $this->redirectToFeed($request, $tenantSlug, 'comment-failed', $targetType, $id);
         }
 
+        $data = ['content' => $content];
+        // A reply carries the parent comment id; CommentService::create enforces
+        // the nesting-depth limit and that the parent belongs to the same target.
+        $parentId = (int) $request->input('parent_id', 0);
+        if ($parentId > 0) {
+            $data['parent_id'] = $parentId;
+        }
+
         try {
-            CommentService::create($targetType, $id, $userId, TenantContext::getId(), [
-                'content' => $content,
-            ]);
+            CommentService::create($targetType, $id, $userId, TenantContext::getId(), $data);
         } catch (\Throwable $e) {
             report($e);
             return $this->redirectToFeed($request, $tenantSlug, 'comment-failed', $targetType, $id);
         }
 
         return $this->redirectToFeed($request, $tenantSlug, 'comment-created', $targetType, $id);
+    }
+
+    public function updateFeedPost(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $content = trim(self::asStr($request->input('content')));
+        if ($content === '') {
+            return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'post-empty']);
+        }
+
+        $status = 'post-update-failed';
+        try {
+            $result = $this->feedService->updatePost($id, $userId, ['content' => $content]);
+            $status = ! empty($result['success']) ? 'post-updated' : 'post-update-failed';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    public function deleteFeedPost(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $status = 'post-delete-failed';
+        try {
+            $status = $this->feedService->deletePost($id, $userId) ? 'post-deleted' : 'post-delete-failed';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    public function updateFeedComment(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $content = trim(self::asStr($request->input('content')));
+        if ($content === '') {
+            return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'comment-empty']);
+        }
+
+        $status = 'comment-update-failed';
+        try {
+            // CommentService::update is owner-scoped and returns the new content on
+            // success, null when the comment is missing or not the user's own.
+            $status = CommentService::update($id, $userId, $content) !== null ? 'comment-updated' : 'comment-update-failed';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    public function deleteFeedComment(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $status = 'comment-delete-failed';
+        try {
+            $status = CommentService::delete($id, $userId) > 0 ? 'comment-deleted' : 'comment-delete-failed';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => $status]);
     }
 
     /**

@@ -87,6 +87,10 @@ Route::prefix('{tenantSlug}/alpha')
             ->where('type', '[a-zA-Z0-9_-]+')
             ->middleware('throttle:30,1')
             ->name('feed.items.comments.store');
+        Route::post('/feed/posts/{id}/update', [AlphaController::class, 'updateFeedPost'])->whereNumber('id')->middleware('throttle:20,1')->name('feed.posts.update');
+        Route::post('/feed/posts/{id}/delete', [AlphaController::class, 'deleteFeedPost'])->whereNumber('id')->middleware('throttle:20,1')->name('feed.posts.delete');
+        Route::post('/feed/comments/{id}/update', [AlphaController::class, 'updateFeedComment'])->whereNumber('id')->middleware('throttle:30,1')->name('feed.comments.update');
+        Route::post('/feed/comments/{id}/delete', [AlphaController::class, 'deleteFeedComment'])->whereNumber('id')->middleware('throttle:30,1')->name('feed.comments.delete');
         Route::get('/listings', [AlphaController::class, 'listings'])->name('listings.index');
         Route::get('/listings/new', [AlphaController::class, 'createListing'])->name('listings.create');
         Route::post('/listings/new', [AlphaController::class, 'storeListing'])->middleware('throttle:10,1')->name('listings.store');

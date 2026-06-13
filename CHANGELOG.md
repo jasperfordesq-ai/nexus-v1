@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Manage your own feed posts and comments on the accessible site.** You can now reply to a comment, edit or delete your own posts, and edit or delete your own comments — each with a plain confirmation step for deletions, and all working without JavaScript. Previously replies could be read but not written, and you could not change or remove anything you posted.
 - **Richer feed cards on the accessible site.** Posts and comments in the feed now show the author's profile photo, and feed cards for events and volunteer opportunities now link through to their full page (previously only listings did, leaving other cards as dead ends).
 - **Friendlier messages on the accessible site.** The Messages page now has a "Message a member" button (so you can start a brand-new conversation, not only reply to existing ones), shows each person's profile photo next to their conversation, and shows photos next to each message in a thread.
 - **Change language anywhere on the accessible site — and have it stick.** Every page of the accessibility-first site now has a language chooser in the header offering all 11 supported languages, and your choice now actually takes effect and is remembered as you move between pages (previously changing language had no effect at all). Arabic now also displays right-to-left. The Messages link in the navigation shows a count of your unread messages.

@@ -526,6 +526,97 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee(__('govuk_alpha.actions.view_details'));
     }
 
+    public function test_feed_author_can_reply_edit_and_delete_own_post_and_comments(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Feed Manager']);
+        $post = FeedPost::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'content' => 'Original post content.',
+            'visibility' => 'public',
+        ]);
+        FeedActivity::factory()->forTenant($this->testTenantId)->create([
+            'source_type' => 'post',
+            'source_id' => $post->id,
+            'user_id' => $user->id,
+            'content' => 'Original post content.',
+            'created_at' => now()->addMinute(),
+        ]);
+
+        // Add a comment, then reply to it (threaded via parent_id).
+        $comment = $this->post("/{$this->testTenantSlug}/alpha/feed/items/post/{$post->id}/comments", [
+            'content' => 'A first comment.',
+        ]);
+        $comment->assertRedirectContains('status=comment-created');
+        $commentId = DB::table('comments')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->where('content', 'A first comment.')
+            ->value('id');
+        $this->assertNotNull($commentId);
+
+        $reply = $this->post("/{$this->testTenantSlug}/alpha/feed/items/post/{$post->id}/comments", [
+            'content' => 'A reply to the comment.',
+            'parent_id' => $commentId,
+        ]);
+        $reply->assertRedirectContains('status=comment-created');
+        $this->assertDatabaseHas('comments', [
+            'tenant_id' => $this->testTenantId,
+            'parent_id' => $commentId,
+            'content' => 'A reply to the comment.',
+        ]);
+
+        // Edit the post.
+        $editPost = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$post->id}/update", [
+            'content' => 'Edited post content.',
+        ]);
+        $editPost->assertRedirectContains('status=post-updated');
+        $this->assertSame('Edited post content.', DB::table('feed_posts')->where('id', $post->id)->value('content'));
+
+        // Edit the comment.
+        $editComment = $this->post("/{$this->testTenantSlug}/alpha/feed/comments/{$commentId}/update", [
+            'content' => 'Edited comment.',
+        ]);
+        $editComment->assertRedirectContains('status=comment-updated');
+        $this->assertSame('Edited comment.', DB::table('comments')->where('id', $commentId)->value('content'));
+
+        // Delete the comment (cascades to its reply). Comments soft-delete.
+        $deleteComment = $this->post("/{$this->testTenantSlug}/alpha/feed/comments/{$commentId}/delete");
+        $deleteComment->assertRedirectContains('status=comment-deleted');
+        $this->assertSoftDeleted('comments', ['id' => $commentId]);
+
+        // Delete the post.
+        $deletePost = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$post->id}/delete");
+        $deletePost->assertRedirectContains('status=post-deleted');
+        $this->assertDatabaseMissing('feed_posts', ['id' => $post->id]);
+    }
+
+    public function test_feed_post_management_rejects_non_owner(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Post Owner',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $post = FeedPost::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $owner->id,
+            'content' => 'Owner post content.',
+            'visibility' => 'public',
+        ]);
+
+        // A different signed-in member cannot edit or delete someone else's post.
+        $this->authenticatedUser(['name' => 'Not The Owner']);
+
+        $edit = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$post->id}/update", [
+            'content' => 'Hijacked content.',
+        ]);
+        $edit->assertRedirectContains('status=post-update-failed');
+        $this->assertSame('Owner post content.', DB::table('feed_posts')->where('id', $post->id)->value('content'));
+
+        $delete = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$post->id}/delete");
+        $delete->assertRedirectContains('status=post-delete-failed');
+        $this->assertDatabaseHas('feed_posts', ['id' => $post->id]);
+    }
+
     public function test_feed_page_has_html_auth_required_state_when_unauthenticated(): void
     {
         // Pin the tenant display name so the community-name assertion does not depend
