@@ -570,7 +570,35 @@ class AlphaController extends Controller
         if (TenantContext::hasModule('listings')) {
             try {
                 $result = $this->listingService->getAll(['limit' => 5]);
-                $listings = $result['items'] ?? [];
+                $listings = $this->withResolvedImageKey($result['items'] ?? [], 'image_url');
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        // Core time-credit metric + gamification + upcoming events — the React
+        // dashboard surfaces all of these; the accessible one previously showed none.
+        $tenantId = TenantContext::getId();
+        $wallet = null;
+        try {
+            $wallet = app(\App\Services\WalletService::class)->getBalance($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $gamification = null;
+        $badges = [];
+        try {
+            $gamification = \App\Services\GamificationService::getProfile($userId, $tenantId);
+            $badges = \App\Services\GamificationService::getBadges($userId, $tenantId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $upcomingEvents = [];
+        if (TenantContext::hasFeature('events')) {
+            try {
+                $upcomingEvents = EventService::getAll(['when' => 'upcoming', 'limit' => 3])['items'] ?? [];
             } catch (\Throwable $e) {
                 report($e);
             }
@@ -585,6 +613,10 @@ class AlphaController extends Controller
             'profileStats' => $this->profileStats($profile),
             'feedItems' => $feedItems,
             'listings' => $listings,
+            'wallet' => $wallet,
+            'gamification' => $gamification,
+            'badges' => $badges,
+            'upcomingEvents' => $upcomingEvents,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }

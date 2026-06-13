@@ -18,8 +18,14 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h2 class="govuk-heading-l">{{ __('govuk_alpha.profile.activity_title') }}</h2>
+            <h2 class="govuk-heading-l">{{ __('govuk_alpha.dashboard.timebank_title') }}</h2>
             <dl class="nexus-alpha-stat-grid">
+                @if (is_array($wallet ?? null))
+                    <div class="nexus-alpha-stat">
+                        <dt>{{ __('govuk_alpha.dashboard.balance_label') }}</dt>
+                        <dd>{{ __('govuk_alpha.dashboard.hours_value', ['value' => number_format((float) ($wallet['balance'] ?? 0), 1)]) }}</dd>
+                    </div>
+                @endif
                 <div class="nexus-alpha-stat">
                     <dt>{{ __('govuk_alpha.profile.hours_given_label') }}</dt>
                     <dd>{{ number_format((float) $profileStats['hours_given'], 1) }}</dd>
@@ -33,6 +39,66 @@
                     <dd>{{ (int) $profileStats['listings_count'] }}</dd>
                 </div>
             </dl>
+
+            @if (is_array($gamification ?? null))
+                @php
+                    $level = (int) ($gamification['level'] ?? 1);
+                    $levelName = trim((string) ($gamification['level_name'] ?? ''));
+                    $xp = (int) ($gamification['xp'] ?? 0);
+                    $levelProgress = $gamification['level_progress'] ?? [];
+                    $progressPct = (int) round((float) ($levelProgress['progress_percentage'] ?? 0));
+                    $progressPct = max(0, min(100, $progressPct));
+                    $badgesCount = (int) ($gamification['badges_count'] ?? count($badges ?? []));
+                @endphp
+                <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.dashboard.progress_title') }}</h2>
+                <p class="govuk-body govuk-!-margin-bottom-1">
+                    <strong>{{ __('govuk_alpha.dashboard.level_label', ['level' => $level]) }}</strong>
+                    @if ($levelName !== '')
+                        <span class="nexus-alpha-meta">({{ $levelName }})</span>
+                    @endif
+                    <span aria-hidden="true"> · </span>
+                    <span class="nexus-alpha-meta">{{ __('govuk_alpha.dashboard.xp_label', ['xp' => number_format($xp)]) }}</span>
+                </p>
+                <label class="govuk-visually-hidden" for="xp-progress">{{ __('govuk_alpha.dashboard.progress_to_next', ['percent' => $progressPct]) }}</label>
+                <progress id="xp-progress" max="100" value="{{ $progressPct }}">{{ $progressPct }}%</progress>
+                <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-top-1">{{ __('govuk_alpha.dashboard.progress_to_next', ['percent' => $progressPct]) }}</p>
+
+                <h3 class="govuk-heading-m">{{ __('govuk_alpha.dashboard.badges_title', ['count' => $badgesCount]) }}</h3>
+                @if (!empty($badges))
+                    <ul class="govuk-list nexus-alpha-actions">
+                        @foreach (array_slice($badges, 0, 8) as $badge)
+                            <li>
+                                @if (!empty($badge['icon']))
+                                    <span aria-hidden="true">{{ $badge['icon'] }}</span>
+                                @endif
+                                <strong class="govuk-tag govuk-tag--blue">{{ $badge['name'] ?? '' }}</strong>
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <p class="govuk-body">{{ __('govuk_alpha.dashboard.badges_empty') }}</p>
+                @endif
+            @endif
+
+            @if (!empty($upcomingEvents))
+                <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.dashboard.upcoming_events_title') }}</h2>
+                <ul class="govuk-list govuk-list--spaced">
+                    @foreach ($upcomingEvents as $event)
+                        @php $eventStart = !empty($event['start_time']) ? \Illuminate\Support\Carbon::parse($event['start_time'])->translatedFormat('j F Y, g:ia') : null; @endphp
+                        <li>
+                            <a class="govuk-link" href="{{ route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ $event['title'] }}</a>
+                            @if ($eventStart || !empty($event['location']))
+                                <br>
+                                <span class="govuk-body-s nexus-alpha-meta">
+                                    @if ($eventStart){{ $eventStart }}@endif
+                                    @if ($eventStart && !empty($event['location'])) <span aria-hidden="true"> · </span> @endif
+                                    @if (!empty($event['location'])){{ $event['location'] }}@endif
+                                </span>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
         </div>
         <div class="govuk-grid-column-one-third">
             <h2 class="govuk-heading-l">{{ __('govuk_alpha.dashboard.quick_links_title') }}</h2>

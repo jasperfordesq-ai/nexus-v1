@@ -1968,6 +1968,37 @@ class GovukAlphaFrontendTest extends TestCase
         $noSession->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=two-factor-expired");
     }
 
+    public function test_dashboard_shows_wallet_gamification_and_upcoming_events_sections(): void
+    {
+        $user = $this->authenticatedUser();
+        DB::table('events')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Dashboard upcoming event',
+            'description' => 'Shown on the dashboard upcoming-events list.',
+            'location' => 'Community Hall',
+            'start_time' => now()->addDays(3),
+            'end_time' => now()->addDays(3)->addHours(2),
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
+
+        $response->assertOk();
+        // Core time-credit balance tile (was entirely absent before) — the value
+        // comes from WalletService; here we assert the tile itself renders.
+        $response->assertSee(__('govuk_alpha.dashboard.timebank_title'));
+        $response->assertSee(__('govuk_alpha.dashboard.balance_label'));
+        // Gamification: level/XP heading + progress bar.
+        $response->assertSee(__('govuk_alpha.dashboard.progress_title'));
+        $response->assertSee('<progress', false);
+        // Upcoming events (community-wide, same as React).
+        $response->assertSee(__('govuk_alpha.dashboard.upcoming_events_title'));
+        $response->assertSee('Dashboard upcoming event');
+    }
+
     private function authenticatedUser(array $overrides = []): User
     {
         $user = User::factory()->forTenant($this->testTenantId)->create(array_merge([
