@@ -19,7 +19,36 @@
             && \App\Core\TenantContext::hasFeature('connections');
     @endphp
     @if ($canStartConversation)
-        <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.members.index', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.messages.start_new') }}</a>
+        <div class="nexus-alpha-card govuk-!-margin-bottom-6">
+            <h2 class="govuk-heading-m">{{ __('govuk_alpha.messages.start_new') }}</h2>
+            <form method="get" action="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]) }}">
+                <div class="govuk-form-group govuk-!-margin-bottom-2">
+                    <label class="govuk-label" for="message-user-search">{{ __('govuk_alpha.messages.search_label') }}</label>
+                    <div id="message-user-search-hint" class="govuk-hint">{{ __('govuk_alpha.messages.search_hint') }}</div>
+                    <input class="govuk-input govuk-!-width-two-thirds" id="message-user-search" name="q" type="search" value="{{ $searchQuery ?? '' }}" aria-describedby="message-user-search-hint">
+                </div>
+                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.actions.search') }}</button>
+            </form>
+
+            @if (($searchQuery ?? '') !== '')
+                @if (empty($searchResults))
+                    <p class="govuk-body govuk-!-margin-top-3 govuk-!-margin-bottom-0">{{ __('govuk_alpha.messages.search_empty') }}</p>
+                @else
+                    <ul class="govuk-list govuk-!-margin-top-3 govuk-!-margin-bottom-0">
+                        @foreach ($searchResults as $result)
+                            @php $resultName = trim((string) ($result['name'] ?? '')) ?: __('govuk_alpha.members.unknown_member'); @endphp
+                            <li class="govuk-!-margin-bottom-2">
+                                <a class="govuk-link" href="{{ route('govuk-alpha.messages.new', ['tenantSlug' => $tenantSlug, 'userId' => $result['id']]) }}">{{ $resultName }}</a>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            @endif
+
+            <p class="govuk-body govuk-!-margin-top-3 govuk-!-margin-bottom-0">
+                <a class="govuk-link" href="{{ route('govuk-alpha.members.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.messages.browse_directory') }}</a>
+            </p>
+        </div>
     @endif
 
     @if ($status === 'conversation-archived' || $status === 'conversation-restored')

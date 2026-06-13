@@ -733,6 +733,10 @@ return [
         ],
     ],
     'messages' => [
+        'search_label' => 'Search for someone to message',
+        'search_hint' => 'Search by member or organisation name.',
+        'search_empty' => 'No members found. Try a different name or browse the directory.',
+        'browse_directory' => 'Browse the full member directory',
         'start_new' => 'Wyślij wiadomość do członka',
         'show_older' => 'Pokaż starsze wiadomości',
         'older_pagination_label' => 'Historia rozmów',

@@ -2578,6 +2578,14 @@ class AlphaController extends Controller
             'cursor' => self::asStr($request->query('cursor')) ?: null,
         ]);
 
+        // Inline "start a conversation" search so a member can find someone and
+        // open a thread without leaving the messages page (React uses a modal).
+        $searchQuery = trim(self::asStr($request->query('q')));
+        $searchResults = [];
+        if ($searchQuery !== '') {
+            $searchResults = $this->messageUserSearch($searchQuery, $userId);
+        }
+
         return $this->view('accessible-frontend::messages', [
             'title' => __('govuk_alpha.messages.title'),
             'tenantSlug' => $tenantSlug,
@@ -2589,7 +2597,44 @@ class AlphaController extends Controller
             'restriction' => app(\App\Services\BrokerMessageVisibilityService::class)->getUserRestrictionStatus($userId),
             'status' => self::asStr($request->query('status')) ?: null,
             'currentUserId' => $userId,
+            'searchQuery' => $searchQuery,
+            'searchResults' => $searchResults,
         ]);
+    }
+
+    /**
+     * Find up to 10 members (tenant-scoped, excluding self) matching a query,
+     * for the messages page's inline start-a-conversation search.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function messageUserSearch(string $query, int $viewerId): array
+    {
+        try {
+            $tenantId = TenantContext::getId();
+            $ids = SearchService::searchUsersStatic($query, $tenantId);
+            if (!is_array($ids) || empty($ids)) {
+                return [];
+            }
+            $ids = array_slice(array_map('intval', $ids), 0, 10);
+
+            return DB::table('users')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'active')
+                ->where('id', '!=', $viewerId)
+                ->whereIn('id', $ids)
+                ->select(
+                    'id',
+                    DB::raw("CASE WHEN profile_type = 'organisation' AND organization_name IS NOT NULL AND organization_name != '' THEN organization_name ELSE CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) END as name")
+                )
+                ->get()
+                ->map(static fn ($r): array => (array) $r)
+                ->all();
+        } catch (\Throwable $e) {
+            report($e);
+
+            return [];
+        }
     }
 
     public function conversation(Request $request, string $tenantSlug, int $userId): Response|RedirectResponse

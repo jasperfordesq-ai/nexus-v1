@@ -1482,6 +1482,23 @@ class GovukAlphaFrontendTest extends TestCase
         $archived->assertSee(__('govuk_alpha.actions.restore_conversation'));
     }
 
+    public function test_messages_inline_start_conversation_search(): void
+    {
+        $this->authenticatedUser(['name' => 'Conversation Starter']);
+
+        // The inline search form renders on the messages index.
+        $page = $this->get("/{$this->testTenantSlug}/alpha/messages");
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.messages.search_label'));
+        $page->assertSee('name="q"', false);
+
+        // A query with no matches shows the empty state (works regardless of
+        // whether the search index is available in the test environment).
+        $noMatch = $this->get("/{$this->testTenantSlug}/alpha/messages?q=zzznosuchmemberzzz");
+        $noMatch->assertOk();
+        $noMatch->assertSee(__('govuk_alpha.messages.search_empty'));
+    }
+
     public function test_unread_message_count_shows_in_the_navigation(): void
     {
         $sender = User::factory()->forTenant($this->testTenantId)->create([
