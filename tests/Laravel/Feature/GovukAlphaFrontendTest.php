@@ -173,7 +173,7 @@ class GovukAlphaFrontendTest extends TestCase
         $signedIn->assertSee(__('govuk_alpha.nav.dashboard'));
     }
 
-    public function test_logout_link_is_in_accessible_footer_for_signed_in_users(): void
+    public function test_logout_is_a_csrf_protected_post_form_in_the_accessible_footer(): void
     {
         $this->authenticatedUser();
 
@@ -183,11 +183,17 @@ class GovukAlphaFrontendTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('<nav class="nexus-alpha-footer__links"', false);
-        $response->assertSee('<a class="govuk-link" href="' . $logoutUrl . '">' . __('govuk_alpha.footer.links.logout') . '</a>', false);
+        // Sign-out changes state, so it is a POST form (with CSRF), not a GET link.
+        $response->assertSee('<form method="post" action="' . $logoutUrl . '"', false);
+        $response->assertSee(__('govuk_alpha.footer.links.logout'));
+        $response->assertDontSee('<a class="govuk-link" href="' . $logoutUrl . '">', false);
 
-        $logout = $this->get("/{$this->testTenantSlug}/alpha/logout");
+        // The GET method is no longer routable for the state-changing sign-out.
+        $this->get("/{$this->testTenantSlug}/alpha/logout")->assertStatus(405);
 
+        $logout = $this->post("/{$this->testTenantSlug}/alpha/logout");
         $logout->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=signed-out");
+        $logout->assertCookieExpired('auth_token');
     }
 
     public function test_contact_page_preserves_react_contact_validation_contract(): void

@@ -11,6 +11,9 @@
         $formatDate = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y') : null;
         $formatDateTime = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y, g:ia') : null;
         $selectedTab = $selectedTab ?? 'opportunities';
+        $label = fn (string $ns, ?string $key): string => ($key !== null && $key !== '' && \Illuminate\Support\Facades\Lang::has("govuk_alpha.$ns.$key"))
+            ? __("govuk_alpha.$ns.$key")
+            : \Illuminate\Support\Str::headline((string) $key);
     @endphp
 
     <span class="govuk-caption-l">{{ __('govuk_alpha.volunteering.caption', ['community' => $communityName]) }}</span>
@@ -100,7 +103,7 @@
                                     {{ $opportunity['title'] ?? __('govuk_alpha.volunteering.detail_title') }}
                                 @endif
                             </h3>
-                            <strong class="govuk-tag">{{ __('govuk_alpha.volunteering.status_values.' . $statusValue) }}</strong>
+                            <strong class="govuk-tag">{{ $label('volunteering.status_values', $statusValue) }}</strong>
                             <dl class="govuk-summary-list govuk-!-margin-top-4 govuk-!-margin-bottom-0">
                                 @if (!empty($organization['name']))
                                     <div class="govuk-summary-list__row">
@@ -150,11 +153,11 @@
                             <dl class="govuk-summary-list govuk-!-margin-bottom-0">
                                 <div class="govuk-summary-list__row">
                                     <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.status') }}</dt>
-                                    <dd class="govuk-summary-list__value">{{ __('govuk_alpha.volunteering.status_values.' . $statusValue) }}</dd>
+                                    <dd class="govuk-summary-list__value">{{ $label('volunteering.status_values', $statusValue) }}</dd>
                                 </div>
                                 <div class="govuk-summary-list__row">
                                     <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.role_label') }}</dt>
-                                    <dd class="govuk-summary-list__value">{{ __('govuk_alpha.volunteering.roles.' . $roleValue) }}</dd>
+                                    <dd class="govuk-summary-list__value">{{ $label('volunteering.roles', $roleValue) }}</dd>
                                 </div>
                                 @if (!empty($organization['contact_email']))
                                     <div class="govuk-summary-list__row">

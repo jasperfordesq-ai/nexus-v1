@@ -123,7 +123,7 @@
                         @if (!empty($log['status']))
                             <div>
                                 <dt>{{ __('govuk_alpha.volunteering.status') }}</dt>
-                                <dd>{{ __('govuk_alpha.volunteering.status_values.' . $log['status']) }}</dd>
+                                <dd>{{ \Illuminate\Support\Facades\Lang::has('govuk_alpha.volunteering.status_values.' . $log['status']) ? __('govuk_alpha.volunteering.status_values.' . $log['status']) : \Illuminate\Support\Str::headline((string) $log['status']) }}</dd>
                             </div>
                         @endif
                     </dl>

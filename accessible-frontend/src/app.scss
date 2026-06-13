@@ -480,6 +480,20 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
   background: govuk-colour("black", $variant: "tint-95");
 }
 
+.nexus-alpha-linkform {
+  margin: 0;
+}
+
+// A submit button that reads as a link (used for the state-changing sign-out
+// action, which must POST with CSRF rather than be a GET link).
+.nexus-alpha-linkbutton {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
 .nexus-alpha-profile-hero {
   display: grid;
   grid-template-columns: 96px minmax(0, 1fr);

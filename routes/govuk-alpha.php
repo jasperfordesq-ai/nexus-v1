@@ -28,7 +28,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/contact', [AlphaController::class, 'storeContact'])->middleware('throttle:5,1')->name('contact.store');
         Route::get('/login', [AlphaController::class, 'login'])->name('login');
         Route::post('/login', [AlphaController::class, 'storeLogin'])->middleware('throttle:30,1')->name('login.store');
-        Route::get('/logout', [AlphaController::class, 'logout'])->name('logout');
+        Route::post('/logout', [AlphaController::class, 'logout'])->name('logout');
         Route::get('/register', [AlphaController::class, 'register'])->name('register');
         Route::post('/register', [AlphaController::class, 'storeRegister'])->middleware('throttle:5,5')->name('register.store');
 

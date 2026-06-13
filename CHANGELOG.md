@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **You can now load older messages in a conversation on the accessible site.** Long conversations previously only showed the most recent messages with no way to reach earlier ones; there's now a "Show older messages" control that works without JavaScript.
 - **You can now post a listing on the accessible site.** The accessibility-first version of the platform gained a "Create a listing" page, so members can offer a skill or ask for help without switching to the main site (previously you could only browse and request exchanges). It's a clear, standard form — offer or request, title, description, category, estimated hours, how it's delivered (in person, remote, or either), location, and an optional photo — with proper inline error messages that link to the field that needs fixing, and it keeps what you typed if something needs correcting.
 - **Event photos and the join-online link now show on the accessible site.** Events on the accessibility-first version of the platform now display their cover photo — a thumbnail in the events list and a large cover image on the event's own page (with a proper text description for screen-reader users, and nothing shown when there's no photo). Online events now also show their "Join online" link, and shared event links preview with the event's own photo.
 - **Listing photos now show on the accessible site.** Listings on the accessibility-first version of the platform now display their photos — a thumbnail on each listing in the browse list, and a large cover photo plus a photo gallery on the listing's own page. Every photo has a proper text description for screen-reader users, and listings without a photo simply show no image rather than a broken one. The listing page also now shows the delivery method (in person, remote, or both), a "Featured" badge where relevant, the listing's status, any skills, and a richer "About the member" panel with the member's photo, rating, reviews and completed-exchange counts, and a link to their profile. Shared listing links now preview with the listing's own photo.
@@ -21,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **The accessible version of the platform has moved from Alpha to Beta.** Having been tested and rounded out, the accessibility-first site now shows a "Beta" label instead of "Alpha", and the remaining "alpha" wording has been removed.
+
+### Fixed
+
+- **Safer sign-out on the accessible site.** Signing out is now a proper protected button rather than a plain link, so it can't be triggered unintentionally.
+- **Clearer exchange and volunteering statuses on the accessible site.** Status labels now always show readable text (never an internal code), and exchange statuses are colour-coded so their state is easier to scan at a glance.
 
 ---
 

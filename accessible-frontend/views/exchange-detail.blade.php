@@ -23,6 +23,9 @@
         $canCancel = ($isRequester || $isProvider) && in_array($statusKey, ['pending_provider', 'pending_broker', 'accepted'], true);
         $hasActions = $canAccept || $canDecline || $canStart || $canComplete || $canConfirm || $canCancel;
         $riskKey = $exchange['risk_level'] ?? 'unknown';
+        $label = fn (string $ns, ?string $key): string => ($key !== null && $key !== '' && \Illuminate\Support\Facades\Lang::has("govuk_alpha.$ns.$key"))
+            ? __("govuk_alpha.$ns.$key")
+            : \Illuminate\Support\Str::headline((string) $key);
     @endphp
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_exchanges') }}</a>
@@ -50,7 +53,7 @@
     <span class="govuk-caption-l">{{ __('govuk_alpha.exchanges.detail_title') }}</span>
     <h1 class="govuk-heading-xl">{{ $exchange['listing_title'] ?? __('govuk_alpha.exchanges.detail_title') }}</h1>
     <p class="govuk-body-l">{{ $roleText }}</p>
-    <strong class="govuk-tag govuk-!-margin-bottom-6">{{ __('govuk_alpha.exchanges.statuses.' . $statusKey) }}</strong>
+    <strong class="govuk-tag govuk-!-margin-bottom-6">{{ $label('exchanges.statuses', $statusKey) }}</strong>
 
     <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.exchanges.summary_title') }}</h2>
     <dl class="govuk-summary-list">
@@ -86,7 +89,7 @@
         @endif
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">{{ __('govuk_alpha.exchanges.risk_label') }}</dt>
-            <dd class="govuk-summary-list__value">{{ __('govuk_alpha.exchanges.risk_values.' . $riskKey) }}</dd>
+            <dd class="govuk-summary-list__value">{{ $label('exchanges.risk_values', $riskKey) }}</dd>
         </div>
         @if (!empty($exchange['created_at']))
             <div class="govuk-summary-list__row">

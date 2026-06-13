@@ -141,7 +141,15 @@
                     <ul class="govuk-list">
                         @foreach ($alphaFooterLinks as $key => $href)
                             <li>
-                                <a class="govuk-link" href="{{ $href }}">{{ __('govuk_alpha.footer.links.' . $key) }}</a>
+                                @if ($key === 'logout')
+                                    {{-- Sign-out changes state, so it must be a POST with CSRF, not a GET link. --}}
+                                    <form method="post" action="{{ $href }}" class="nexus-alpha-linkform">
+                                        @csrf
+                                        <button type="submit" class="govuk-link nexus-alpha-linkbutton">{{ __('govuk_alpha.footer.links.' . $key) }}</button>
+                                    </form>
+                                @else
+                                    <a class="govuk-link" href="{{ $href }}">{{ __('govuk_alpha.footer.links.' . $key) }}</a>
+                                @endif
                             </li>
                         @endforeach
                     </ul>

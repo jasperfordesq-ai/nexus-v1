@@ -8,6 +8,18 @@
     @php
         $statusOptions = ['active', 'pending_provider', 'pending_broker', 'accepted', 'in_progress', 'pending_confirmation', 'completed', 'cancelled', 'disputed'];
         $formatDate = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y') : null;
+        $label = fn (string $ns, ?string $key): string => ($key !== null && $key !== '' && \Illuminate\Support\Facades\Lang::has("govuk_alpha.$ns.$key"))
+            ? __("govuk_alpha.$ns.$key")
+            : \Illuminate\Support\Str::headline((string) $key);
+        $statusTagClass = fn (?string $key): string => match ($key) {
+            'completed' => 'govuk-tag--green',
+            'in_progress' => 'govuk-tag--blue',
+            'accepted' => 'govuk-tag--turquoise',
+            'pending_provider', 'pending_broker', 'pending_confirmation' => 'govuk-tag--yellow',
+            'disputed' => 'govuk-tag--red',
+            'cancelled' => 'govuk-tag--grey',
+            default => 'govuk-tag--grey',
+        };
     @endphp
 
     <span class="govuk-caption-l">{{ __('govuk_alpha.nav.exchanges') }}</span>
@@ -72,7 +84,7 @@
                     <h3 class="govuk-heading-m govuk-!-margin-bottom-2">
                         <a class="govuk-link" href="{{ route('govuk-alpha.exchanges.show', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}">{{ $exchange['listing_title'] ?? __('govuk_alpha.exchanges.detail_title') }}</a>
                     </h3>
-                    <strong class="govuk-tag">{{ __('govuk_alpha.exchanges.statuses.' . $statusKey) }}</strong>
+                    <strong class="govuk-tag {{ $statusTagClass($statusKey) }}">{{ $label('exchanges.statuses', $statusKey) }}</strong>
                     <dl class="nexus-alpha-inline-list govuk-!-margin-top-3">
                         <div>
                             <dt>{{ __('govuk_alpha.exchanges.proposed_hours_label') }}</dt>

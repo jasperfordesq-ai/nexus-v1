@@ -543,6 +543,8 @@ return [
         ],
     ],
     'messages' => [
+        'show_older' => 'Show older messages',
+        'older_pagination_label' => 'Conversation history',
         'title' => 'Messages',
         'description' => 'Read and send direct messages with members of this community.',
         'conversation_title' => 'Conversation with :name',

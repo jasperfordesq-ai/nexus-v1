@@ -74,6 +74,19 @@
     @if (empty($messages))
         <div class="govuk-inset-text">{{ __('govuk_alpha.messages.empty') }}</div>
     @else
+        @if (!empty($meta['has_more']) && !empty($meta['cursor']))
+            {{-- Older messages live above the latest 50; this loads the previous page (no JS). --}}
+            <nav class="govuk-pagination govuk-pagination--block govuk-!-margin-bottom-4" aria-label="{{ __('govuk_alpha.messages.older_pagination_label') }}">
+                <div class="govuk-pagination__prev">
+                    <a class="govuk-link govuk-pagination__link" href="{{ route('govuk-alpha.messages.show', array_filter(['tenantSlug' => $tenantSlug, 'userId' => $conversation['id'], 'cursor' => $meta['cursor'], 'listing' => $listing['id'] ?? null])) }}" rel="prev">
+                        <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                            <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.4492-4.1856-3.9765h12.896v-2h-12.984l4.2931-4.293-1.414-1.4141z"></path>
+                        </svg>
+                        <span class="govuk-pagination__link-title">{{ __('govuk_alpha.messages.show_older') }}</span>
+                    </a>
+                </div>
+            </nav>
+        @endif
         <ol class="govuk-list govuk-list--spaced">
             @foreach ($messages as $message)
                 @php
