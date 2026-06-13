@@ -28,6 +28,21 @@
         </div>
     @endif
 
+    @php
+        $connectionStatuses = ['connection-sent', 'connection-accepted', 'connection-declined', 'connection-cancelled', 'connection-removed', 'connection-failed'];
+    @endphp
+    @if (in_array(($status ?? ''), $connectionStatuses, true))
+        @php $isFailure = ($status === 'connection-failed'); @endphp
+        <div class="govuk-notification-banner {{ $isFailure ? '' : 'govuk-notification-banner--success' }}" role="region" aria-labelledby="connection-status-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="connection-status-title">{{ $isFailure ? __('govuk_alpha.states.important') : __('govuk_alpha.states.success_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.states.' . $status) }}</p>
+            </div>
+        </div>
+    @endif
+
     <div class="nexus-alpha-profile-hero">
         <div class="nexus-alpha-profile-hero__media">
             @if ($avatar)
@@ -54,9 +69,47 @@
                 <div class="nexus-alpha-actions govuk-!-margin-top-4">
                     <a class="govuk-button" href="{{ route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.actions.edit_profile') }}</a>
                 </div>
-            @elseif (($directMessagingEnabled ?? false) && (int) ($memberId ?? 0) > 0)
-                <div class="nexus-alpha-actions govuk-!-margin-top-4">
-                    <a class="govuk-button" href="{{ route('govuk-alpha.messages.new', ['tenantSlug' => $tenantSlug, 'userId' => $memberId]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.actions.send_message') }}</a>
+            @elseif ((int) ($memberId ?? 0) > 0)
+                @php $cs = $connectionState ?? 'none'; @endphp
+                @if ($cs === 'pending_received')
+                    <p class="govuk-body govuk-!-margin-top-4 govuk-!-margin-bottom-2">{{ __('govuk_alpha.profile.connection.request_received', ['name' => $displayName]) }}</p>
+                @endif
+                <div class="nexus-alpha-actions {{ $cs === 'pending_received' ? '' : 'govuk-!-margin-top-4' }}">
+                    @if (($directMessagingEnabled ?? false))
+                        <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ route('govuk-alpha.messages.new', ['tenantSlug' => $tenantSlug, 'userId' => $memberId]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.actions.send_message') }}</a>
+                    @endif
+                    @if ($cs === 'none')
+                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
+                            @csrf
+                            <input type="hidden" name="action" value="connect">
+                            <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.connect') }}</button>
+                        </form>
+                    @elseif ($cs === 'pending_sent')
+                        <strong class="govuk-tag govuk-tag--yellow">{{ __('govuk_alpha.profile.connection.request_sent') }}</strong>
+                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
+                            @csrf
+                            <input type="hidden" name="action" value="cancel">
+                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.cancel_request') }}</button>
+                        </form>
+                    @elseif ($cs === 'pending_received')
+                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
+                            @csrf
+                            <input type="hidden" name="action" value="accept">
+                            <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.accept') }}</button>
+                        </form>
+                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
+                            @csrf
+                            <input type="hidden" name="action" value="decline">
+                            <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.decline') }}</button>
+                        </form>
+                    @elseif ($cs === 'connected')
+                        <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.profile.connection.connected') }}</strong>
+                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
+                            @csrf
+                            <input type="hidden" name="action" value="remove">
+                            <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.remove') }}</button>
+                        </form>
+                    @endif
                 </div>
             @endif
         </div>

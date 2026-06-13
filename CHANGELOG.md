@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Connect with other members on the accessible site.** A member's profile on the accessibility-first site now has a "Connect" button. You can send a connection request, see when one is pending, cancel a request you sent, accept or decline a request someone sent you, and remove an existing connection — each with a clear confirmation message. Previously connections could not be managed from the accessible site at all.
 - **Vote in polls on the accessible feed.** Polls in the feed on the accessibility-first site can now be voted on — pick an option and submit (no JavaScript needed). Once you've voted, or once a poll closes, you see the results, and you can't vote twice.
 - **Rate an exchange after it's completed on the accessible site.** Once an exchange is finished, its page now invites you to leave a star rating (1–5) and an optional comment, and shows a thank-you once you've rated. If an exchange ends up disputed (because the two members confirmed different hours), the page now explains clearly what's happening.
 - **More context when requesting an exchange on the accessible site.** The "Request an exchange" page now shows a fuller summary of the listing (including the time estimate and who posted it) and your current time-credit balance, so you can see what the exchange is likely to cost before you send the request.

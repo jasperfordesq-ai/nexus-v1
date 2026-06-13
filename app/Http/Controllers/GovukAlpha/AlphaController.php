@@ -13,6 +13,7 @@ use App\Models\Category;
 use App\Models\ListingImage;
 use App\Services\BrokerControlConfigService;
 use App\Services\CommentService;
+use App\Services\ConnectionService;
 use App\Services\EventService;
 use App\Services\ExchangeService;
 use App\Services\ExchangeWorkflowService;
@@ -2185,7 +2186,83 @@ class AlphaController extends Controller
             'memberId' => $id,
             'directMessagingEnabled' => BrokerControlConfigService::isDirectMessagingEnabled(),
             'profileBadges' => $this->memberBadges($id),
+            'connectionState' => $id === $viewerId
+                ? null
+                : (ConnectionService::getStatus($viewerId, $id)['status'] ?? 'none'),
         ]);
+    }
+
+    /**
+     * Send, accept, decline, cancel or remove a connection with another member.
+     *
+     * The action is dispatched on a single posted field (mirroring the exchange
+     * action form), and every transition is re-validated against the live
+     * connection status server-side so a stale form cannot drive an invalid
+     * state change. The connection id is always resolved from the service, never
+     * trusted from the request.
+     */
+    public function updateMemberConnection(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('connections'), 403);
+
+        $viewerId = $this->currentUserId();
+        if ($viewerId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        if ($id === $viewerId) {
+            return redirect()->route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'connection-failed']);
+        }
+
+        // Confirm the target is a real member of this tenant before acting.
+        $target = $this->profileForViewer($id, $viewerId);
+        abort_if($target === null, 404);
+
+        $action = $this->allowed($request->input('action'), ['connect', 'accept', 'decline', 'cancel', 'remove'], '');
+        $current = ConnectionService::getStatus($viewerId, $id);
+        $connectionId = (int) ($current['connection_id'] ?? 0);
+        $status = 'connection-failed';
+
+        try {
+            switch ($action) {
+                case 'connect':
+                    if (($current['status'] ?? 'none') === 'none') {
+                        $status = ConnectionService::sendRequest($viewerId, $id) === true
+                            ? 'connection-sent' : 'connection-failed';
+                    }
+                    break;
+                case 'accept':
+                    if (($current['status'] ?? null) === 'pending_received' && $connectionId > 0) {
+                        $status = ConnectionService::acceptRequest($connectionId, $viewerId)
+                            ? 'connection-accepted' : 'connection-failed';
+                    }
+                    break;
+                case 'decline':
+                    if (($current['status'] ?? null) === 'pending_received' && $connectionId > 0) {
+                        $status = ConnectionService::rejectRequest($connectionId, $viewerId)
+                            ? 'connection-declined' : 'connection-failed';
+                    }
+                    break;
+                case 'cancel':
+                    if (($current['status'] ?? null) === 'pending_sent' && $connectionId > 0) {
+                        $status = ConnectionService::removeConnection($connectionId, $viewerId)
+                            ? 'connection-cancelled' : 'connection-failed';
+                    }
+                    break;
+                case 'remove':
+                    if (($current['status'] ?? null) === 'connected' && $connectionId > 0) {
+                        $status = ConnectionService::removeConnection($connectionId, $viewerId)
+                            ? 'connection-removed' : 'connection-failed';
+                    }
+                    break;
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            $status = 'connection-failed';
+        }
+
+        return redirect()->route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
     }
 
     /**

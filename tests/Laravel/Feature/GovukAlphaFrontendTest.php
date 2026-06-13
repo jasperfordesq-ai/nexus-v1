@@ -1652,6 +1652,75 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('Community Helper');
     }
 
+    public function test_member_profile_connection_request_accept_and_remove_flow(): void
+    {
+        $viewer = $this->authenticatedUser([
+            'name' => 'Connector One',
+            'first_name' => 'Connector',
+            'last_name' => 'One',
+            'privacy_search' => true,
+            'privacy_profile' => 'members',
+            'onboarding_completed' => true,
+        ]);
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Connector Two',
+            'first_name' => 'Connector',
+            'last_name' => 'Two',
+            'status' => 'active',
+            'is_approved' => true,
+            'privacy_search' => true,
+            'privacy_profile' => 'members',
+            'onboarding_completed' => true,
+        ]);
+
+        // The viewer sees a Connect button on the member's profile.
+        Sanctum::actingAs($viewer, ['*']);
+        $profile = $this->get("/{$this->testTenantSlug}/alpha/members/{$member->id}");
+        $profile->assertOk();
+        $profile->assertSee(__('govuk_alpha.profile.connection.connect'));
+
+        // The viewer sends a connection request.
+        $send = $this->post("/{$this->testTenantSlug}/alpha/members/{$member->id}/connection", ['action' => 'connect']);
+        $send->assertRedirectContains('status=connection-sent');
+        $this->assertDatabaseHas('connections', [
+            'requester_id' => $viewer->id,
+            'receiver_id' => $member->id,
+            'status' => 'pending',
+        ]);
+
+        // Re-viewing shows the pending-sent state, and a duplicate request is rejected
+        // rather than creating a second row.
+        $pending = $this->get("/{$this->testTenantSlug}/alpha/members/{$member->id}");
+        $pending->assertSee(__('govuk_alpha.profile.connection.request_sent'));
+        $pending->assertSee(__('govuk_alpha.profile.connection.cancel_request'));
+        $dup = $this->post("/{$this->testTenantSlug}/alpha/members/{$member->id}/connection", ['action' => 'connect']);
+        $dup->assertRedirectContains('status=connection-failed');
+        $this->assertSame(
+            1,
+            DB::table('connections')->where('requester_id', $viewer->id)->where('receiver_id', $member->id)->count()
+        );
+
+        // The member accepts from their side (viewing the requester's profile).
+        Sanctum::actingAs($member, ['*']);
+        $received = $this->get("/{$this->testTenantSlug}/alpha/members/{$viewer->id}");
+        $received->assertSee(__('govuk_alpha.profile.connection.accept'));
+        $accept = $this->post("/{$this->testTenantSlug}/alpha/members/{$viewer->id}/connection", ['action' => 'accept']);
+        $accept->assertRedirectContains('status=connection-accepted');
+        $this->assertDatabaseHas('connections', [
+            'requester_id' => $viewer->id,
+            'receiver_id' => $member->id,
+            'status' => 'accepted',
+        ]);
+
+        // Either side can now remove the connection.
+        $remove = $this->post("/{$this->testTenantSlug}/alpha/members/{$viewer->id}/connection", ['action' => 'remove']);
+        $remove->assertRedirectContains('status=connection-removed');
+        $this->assertDatabaseMissing('connections', [
+            'requester_id' => $viewer->id,
+            'receiver_id' => $member->id,
+        ]);
+    }
+
     public function test_my_profile_and_settings_update_stay_inside_accessible_frontend(): void
     {
         $user = $this->authenticatedUser([
