@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **A more visual accessible dashboard.** The dashboard's recent-activity and recent-listings cards now show author photos and images, and the quick links now include Messages and Members.
+
 - **More detail on the accessible volunteering pages.** Your applications now show the organiser's note when one was added on an approved or declined application, and your hours page now shows a progress bar towards your next round-number hours goal.
 
 - **Listing pages on the accessible site now show expiry and renewal details.** A listing's page now tells you when it expires (or expired), and how many times it has been renewed, when that information applies.

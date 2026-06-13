@@ -106,6 +106,12 @@
                 <li><a class="govuk-link" href="{{ route('govuk-alpha.profile.me', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.dashboard.view_profile') }}</a></li>
                 <li><a class="govuk-link" href="{{ route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.dashboard.edit_profile') }}</a></li>
                 <li><a class="govuk-link" href="{{ route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.dashboard.view_feed') }}</a></li>
+                @if (\App\Core\TenantContext::hasModule('messages'))
+                    <li><a class="govuk-link" href="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.nav.messages') }}</a></li>
+                @endif
+                @if (\App\Core\TenantContext::hasFeature('connections'))
+                    <li><a class="govuk-link" href="{{ route('govuk-alpha.members.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.nav.members') }}</a></li>
+                @endif
                 @if (\App\Core\TenantContext::hasModule('listings'))
                     <li><a class="govuk-link" href="{{ route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.dashboard.view_listings') }}</a></li>
                 @endif
@@ -135,9 +141,20 @@
                         <article class="nexus-alpha-card">
                             <strong class="govuk-tag govuk-tag--grey">{{ $feedItemTypeLabel($itemType) }}</strong>
                             <h3 class="govuk-heading-m govuk-!-margin-top-2 govuk-!-margin-bottom-2">{{ $itemTitle }}</h3>
-                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">{{ __('govuk_alpha.feed.posted_by', ['name' => $authorName]) }}</p>
+                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">
+                                @if (!empty($item['author']['avatar_url']))
+                                    <img class="nexus-alpha-avatar nexus-alpha-avatar--small" src="{{ $item['author']['avatar_url'] }}" alt="" loading="lazy" decoding="async" width="32" height="32">
+                                @endif
+                                {{ __('govuk_alpha.feed.posted_by', ['name' => $authorName]) }}
+                            </p>
                             @if (!empty($item['content']))
                                 <p class="govuk-body">{{ \Illuminate\Support\Str::limit(strip_tags((string) $item['content']), 180) }}</p>
+                            @endif
+                            @php
+                                $feedImage = $item['image_url'] ?? ($item['media'][0]['thumbnail_url'] ?? ($item['media'][0]['file_url'] ?? null));
+                            @endphp
+                            @if (!empty($feedImage))
+                                <img class="nexus-alpha-card-thumb" src="{{ $feedImage }}" alt="{{ __('govuk_alpha.feed.image_alt', ['title' => $itemTitle]) }}" width="120" height="90" loading="lazy" decoding="async">
                             @endif
                         </article>
                     @endforeach
@@ -162,6 +179,9 @@
                             </h3>
                             @if (!empty($listing['description']))
                                 <p class="govuk-body">{{ \Illuminate\Support\Str::limit(strip_tags((string) $listing['description']), 180) }}</p>
+                            @endif
+                            @if (!empty($listing['image_url']))
+                                <img class="nexus-alpha-card-thumb" src="{{ $listing['image_url'] }}" alt="{{ __('govuk_alpha.listings.image_alt', ['title' => $listing['title']]) }}" width="120" height="90" loading="lazy" decoding="async">
                             @endif
                         </article>
                     @endforeach
