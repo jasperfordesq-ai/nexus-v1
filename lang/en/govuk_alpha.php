@@ -657,6 +657,8 @@ return [
         'auth_required_detail' => 'Sign in to read and send messages for :community.',
     ],
     'events' => [
+        'create_image_label' => 'Add a cover image (optional)',
+        'create_image_hint' => 'JPG, PNG, GIF or WEBP, up to 8MB. This appears at the top of the event page.',
         'image_alt' => 'Photo for :title',
         'online_link_label' => 'Online link',
         'online_link_text' => 'Join online',

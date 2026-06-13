@@ -1971,6 +1971,48 @@ class GovukAlphaFrontendTest extends TestCase
         }
     }
 
+    public function test_event_create_accepts_a_cover_image_upload(): void
+    {
+        $user = $this->authenticatedUser();
+
+        // The create form must declare the multipart encoding and a file input.
+        $form = $this->get("/{$this->testTenantSlug}/alpha/events/new");
+        $form->assertOk();
+        $form->assertSee('enctype="multipart/form-data"', false);
+        $form->assertSee('name="image"', false);
+        $form->assertSee(__('govuk_alpha.events.create_image_label'));
+
+        $create = $this->post("/{$this->testTenantSlug}/alpha/events/new", [
+            'title' => 'Alpha event with a cover image',
+            'description' => 'Created through the accessible alpha event form with an image.',
+            'start_time' => now()->addDays(12)->format('Y-m-d\TH:i'),
+            'end_time' => now()->addDays(12)->addHours(2)->format('Y-m-d\TH:i'),
+            'location' => 'Accessible Hall',
+            'image' => UploadedFile::fake()->image('event-cover.jpg', 1200, 675),
+        ]);
+
+        $eventId = DB::table('events')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->where('title', 'Alpha event with a cover image')
+            ->value('id');
+        $this->assertNotNull($eventId);
+        $create->assertRedirect("/{$this->testTenantSlug}/alpha/events/{$eventId}?status=event-created");
+
+        $coverImage = DB::table('events')->where('id', $eventId)->value('cover_image');
+        $this->assertNotEmpty($coverImage, 'The uploaded cover image should be stored on the event');
+
+        // The detail page should now render the stored cover image hero.
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}");
+        $detail->assertOk();
+        $detail->assertSee('nexus-alpha-detail-hero', false);
+
+        $path = base_path('httpdocs' . parse_url((string) $coverImage, PHP_URL_PATH));
+        if (is_file($path)) {
+            @unlink($path);
+        }
+    }
+
     public function test_profile_data_export_request_creates_a_gdpr_request(): void
     {
         $user = $this->authenticatedUser();

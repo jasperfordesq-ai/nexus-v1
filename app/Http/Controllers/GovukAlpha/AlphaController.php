@@ -825,6 +825,8 @@ class AlphaController extends Controller
             $event = EventService::create($userId, $this->eventInput($request));
             $eventId = (int) $event->id;
 
+            $this->attachEventCoverImage($request, $eventId, $userId);
+
             try {
                 \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['create_event'], 'create_event', __('govuk_alpha.events.gamification_reason'));
             } catch (\Throwable $e) {
@@ -3206,6 +3208,37 @@ class AlphaController extends Controller
 
             if (is_string($imageUrl) && $imageUrl !== '') {
                 ListingService::update($listingId, ['image_url' => $imageUrl]);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+    }
+
+    /**
+     * Attach an optional uploaded cover image to a newly-created event.
+     *
+     * Mirrors the listing cover-image flow: the upload is best-effort (a failed
+     * or absent image never blocks event creation) and EventService::updateImage
+     * re-checks ownership and tenant scope before writing.
+     */
+    private function attachEventCoverImage(Request $request, int $eventId, int $userId): void
+    {
+        $file = $request->file('image');
+        if ($file === null || is_array($file) || !$file->isValid()) {
+            return;
+        }
+
+        try {
+            $imageUrl = \App\Core\ImageUploader::upload([
+                'name' => $file->getClientOriginalName(),
+                'type' => $file->getMimeType(),
+                'tmp_name' => $file->getRealPath(),
+                'error' => UPLOAD_ERR_OK,
+                'size' => $file->getSize(),
+            ], 'events');
+
+            if (is_string($imageUrl) && $imageUrl !== '') {
+                EventService::updateImage($eventId, $userId, $imageUrl);
             }
         } catch (\Throwable $e) {
             report($e);

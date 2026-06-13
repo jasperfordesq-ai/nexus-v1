@@ -26,7 +26,7 @@
                 </div>
             @endif
 
-            <form method="post" action="{{ route('govuk-alpha.events.store', ['tenantSlug' => $tenantSlug]) }}" novalidate>
+            <form method="post" action="{{ route('govuk-alpha.events.store', ['tenantSlug' => $tenantSlug]) }}" enctype="multipart/form-data" novalidate>
                 @csrf
 
                 <fieldset class="govuk-fieldset">
@@ -53,6 +53,12 @@
                                 <option value="{{ $category['id'] }}" @selected((string) old('category_id') === (string) $category['id'])>{{ $category['name'] }}</option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="image">{{ __('govuk_alpha.events.create_image_label') }}</label>
+                        <div id="image-hint" class="govuk-hint">{{ __('govuk_alpha.events.create_image_hint') }}</div>
+                        <input class="govuk-file-upload" id="image" name="image" type="file" accept="image/jpeg,image/png,image/gif,image/webp" aria-describedby="image-hint">
                     </div>
                 </fieldset>
 
