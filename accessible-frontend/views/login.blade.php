@@ -51,6 +51,15 @@
                         <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.delete_account.success') }}</p>
                     </div>
                 </div>
+            @elseif (($status ?? '') === 'password-reset')
+                <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="password-reset-title">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="password-reset-title">{{ __('govuk_alpha.states.success_title') }}</h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.auth.password_reset') }}</p>
+                    </div>
+                </div>
             @endif
 
             <form method="post" action="{{ route('govuk-alpha.login.store', ['tenantSlug' => $tenantSlug]) }}" novalidate>
@@ -73,6 +82,9 @@
                 <button class="govuk-button" data-module="govuk-button" type="submit">{{ __('govuk_alpha.auth.login_action') }}</button>
             </form>
 
+            <p class="govuk-body">
+                <a class="govuk-link" href="{{ route('govuk-alpha.login.forgot', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.auth.forgot_link') }}</a>
+            </p>
             <p class="govuk-body">
                 <a class="govuk-link" href="{{ route('govuk-alpha.register', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.auth.need_account') }}</a>
             </p>

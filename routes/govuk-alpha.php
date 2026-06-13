@@ -29,6 +29,10 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/login', [AlphaController::class, 'login'])->name('login');
         Route::post('/login', [AlphaController::class, 'storeLogin'])->middleware('throttle:30,1')->name('login.store');
         Route::post('/logout', [AlphaController::class, 'logout'])->name('logout');
+        Route::get('/login/forgot-password', [AlphaController::class, 'forgotPassword'])->name('login.forgot');
+        Route::post('/login/forgot-password', [AlphaController::class, 'sendPasswordReset'])->middleware('throttle:5,1')->name('login.forgot.store');
+        Route::get('/password/reset', [AlphaController::class, 'showResetPassword'])->name('password.reset');
+        Route::post('/password/reset', [AlphaController::class, 'storeResetPassword'])->middleware('throttle:5,1')->name('password.reset.store');
         Route::get('/register', [AlphaController::class, 'register'])->name('register');
         Route::post('/register', [AlphaController::class, 'storeRegister'])->middleware('throttle:5,5')->name('register.store');
 

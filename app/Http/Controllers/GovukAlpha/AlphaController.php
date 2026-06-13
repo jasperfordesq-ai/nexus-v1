@@ -211,6 +211,112 @@ class AlphaController extends Controller
         return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => $status]);
     }
 
+    public function forgotPassword(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        return $this->view('accessible-frontend::forgot-password', [
+            'title' => __('govuk_alpha.auth.forgot_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'login',
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function sendPasswordReset(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $email = trim(self::asStr($request->input('email')));
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return redirect()
+                ->route('govuk-alpha.login.forgot', ['tenantSlug' => $tenantSlug, 'status' => 'forgot-invalid'])
+                ->withInput();
+        }
+
+        // Delegate to the same v2 contract the React ForgotPasswordPage uses. It is
+        // deliberately anti-enumerating (always 200 "if an account exists…"), so we
+        // surface a single generic confirmation regardless of whether the email exists.
+        $request->merge(['email' => $email]);
+        $statusKey = 'forgot-sent';
+        try {
+            $response = app(\App\Http\Controllers\Api\PasswordResetController::class)->forgotPassword();
+            if ($response->getStatusCode() === 429) {
+                $statusKey = 'forgot-rate-limited';
+            }
+        } catch (HttpResponseException $e) {
+            $statusKey = $e->getResponse()->getStatusCode() === 429 ? 'forgot-rate-limited' : 'forgot-sent';
+        } catch (\Throwable $e) {
+            report($e);
+            // Never reveal a failure that could leak account existence.
+        }
+
+        return redirect()->route('govuk-alpha.login.forgot', ['tenantSlug' => $tenantSlug, 'status' => $statusKey]);
+    }
+
+    public function showResetPassword(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        return $this->view('accessible-frontend::reset-password', [
+            'title' => __('govuk_alpha.auth.reset_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'login',
+            'token' => self::asStr($request->query('token')),
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function storeResetPassword(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $token = trim(self::asStr($request->input('token')));
+        $password = self::asStr($request->input('password'));
+        $confirm = self::asStr($request->input('password_confirmation'));
+
+        // Friendly client-side-style pre-checks before hitting the v2 contract.
+        $preStatus = match (true) {
+            $token === '' => 'reset-token-missing',
+            $password === '' => 'reset-weak',
+            mb_strlen($password) < 12 => 'reset-weak',
+            $password !== $confirm => 'reset-mismatch',
+            default => null,
+        };
+        if ($preStatus !== null) {
+            return redirect()->route('govuk-alpha.password.reset', ['tenantSlug' => $tenantSlug, 'token' => $token, 'status' => $preStatus]);
+        }
+
+        $request->merge(['token' => $token, 'password' => $password, 'password_confirmation' => $confirm]);
+
+        try {
+            $response = app(\App\Http\Controllers\Api\PasswordResetController::class)->resetPassword();
+            $payload = $response->getData(true);
+
+            if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300 && ($payload['success'] ?? false) === true) {
+                return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'password-reset']);
+            }
+
+            $code = strtoupper((string) ($payload['errors'][0]['code'] ?? $payload['code'] ?? ''));
+            $status = match (true) {
+                str_contains($code, 'PWNED')   => 'reset-pwned',
+                str_contains($code, 'REUSED')  => 'reset-reused',
+                str_contains($code, 'WEAK')    => 'reset-weak',
+                str_contains($code, 'TOKEN'),
+                $response->getStatusCode() === 400,
+                $response->getStatusCode() === 404 => 'reset-token-invalid',
+                default                         => 'reset-failed',
+            };
+        } catch (HttpResponseException $e) {
+            $status = $e->getResponse()->getStatusCode() === 429 ? 'reset-rate-limited' : 'reset-failed';
+        } catch (\Throwable $e) {
+            report($e);
+            $status = 'reset-failed';
+        }
+
+        return redirect()->route('govuk-alpha.password.reset', ['tenantSlug' => $tenantSlug, 'token' => $token, 'status' => $status]);
+    }
+
     public function logout(Request $request, string $tenantSlug): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);

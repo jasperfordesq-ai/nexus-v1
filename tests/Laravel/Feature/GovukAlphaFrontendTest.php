@@ -1801,6 +1801,75 @@ class GovukAlphaFrontendTest extends TestCase
         ]);
     }
 
+    public function test_login_page_links_to_forgot_password(): void
+    {
+        $response = $this->get("/{$this->testTenantSlug}/alpha/login");
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.auth.forgot_link'));
+        $response->assertSee(route('govuk-alpha.login.forgot', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
+    public function test_forgot_password_flow_renders_and_requests_a_reset(): void
+    {
+        $form = $this->get("/{$this->testTenantSlug}/alpha/login/forgot-password");
+        $form->assertOk();
+        $form->assertSee(__('govuk_alpha.auth.forgot_title'));
+        $form->assertSee('name="email"', false);
+
+        // Invalid email → anchored field error, no request made.
+        $invalid = $this->post("/{$this->testTenantSlug}/alpha/login/forgot-password", ['email' => 'not-an-email']);
+        $invalid->assertRedirect("/{$this->testTenantSlug}/alpha/login/forgot-password?status=forgot-invalid");
+
+        // Any syntactically valid email → the same anti-enumeration confirmation.
+        $sent = $this->post("/{$this->testTenantSlug}/alpha/login/forgot-password", ['email' => 'nobody-' . bin2hex(random_bytes(3)) . '@example.test']);
+        $sent->assertRedirect("/{$this->testTenantSlug}/alpha/login/forgot-password?status=forgot-sent");
+
+        $confirm = $this->get("/{$this->testTenantSlug}/alpha/login/forgot-password?status=forgot-sent");
+        $confirm->assertOk();
+        $confirm->assertSee(__('govuk_alpha.auth.forgot_sent_title'));
+    }
+
+    public function test_reset_password_page_renders_and_validates_pre_checks(): void
+    {
+        // No token → invalid-link state with a "request a new link" route.
+        $noToken = $this->get("/{$this->testTenantSlug}/alpha/password/reset");
+        $noToken->assertOk();
+        $noToken->assertSee(__('govuk_alpha.auth.reset_link_invalid_title'));
+        $noToken->assertSee(route('govuk-alpha.login.forgot', ['tenantSlug' => $this->testTenantSlug]), false);
+        $noToken->assertDontSee('name="password"', false);
+
+        // With a token → the new-password form.
+        $withToken = $this->get("/{$this->testTenantSlug}/alpha/password/reset?token=demo-token-123");
+        $withToken->assertOk();
+        $withToken->assertSee(__('govuk_alpha.auth.reset_title'));
+        $withToken->assertSee('name="password"', false);
+        $withToken->assertSee('name="password_confirmation"', false);
+        $withToken->assertSee('value="demo-token-123"', false);
+
+        // Mismatched passwords → field error, no v2 call.
+        $mismatch = $this->post("/{$this->testTenantSlug}/alpha/password/reset", [
+            'token' => 'demo-token-123',
+            'password' => 'LongEnoughPass1!',
+            'password_confirmation' => 'DifferentPass1!',
+        ]);
+        $mismatch->assertRedirectContains('status=reset-mismatch');
+
+        // Too-short password → weak.
+        $weak = $this->post("/{$this->testTenantSlug}/alpha/password/reset", [
+            'token' => 'demo-token-123',
+            'password' => 'short',
+            'password_confirmation' => 'short',
+        ]);
+        $weak->assertRedirectContains('status=reset-weak');
+
+        // Missing token → token-missing.
+        $missing = $this->post("/{$this->testTenantSlug}/alpha/password/reset", [
+            'password' => 'LongEnoughPass1!',
+            'password_confirmation' => 'LongEnoughPass1!',
+        ]);
+        $missing->assertRedirectContains('status=reset-token-missing');
+    }
+
     private function authenticatedUser(array $overrides = []): User
     {
         $user = User::factory()->forTenant($this->testTenantId)->create(array_merge([
