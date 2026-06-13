@@ -476,6 +476,14 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
   object-fit: cover;
 }
 
+// Inline avatar for compact meta lines (feed cards, comments).
+.nexus-alpha-avatar--small {
+  width: 32px;
+  height: 32px;
+  vertical-align: middle;
+  margin-inline-end: govuk-spacing(1);
+}
+
 .nexus-alpha-avatar--large {
   width: 64px;
   height: 64px;

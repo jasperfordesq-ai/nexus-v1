@@ -496,6 +496,36 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('Alpha feed verification post');
     }
 
+    public function test_event_feed_card_links_to_the_accessible_event_detail(): void
+    {
+        $user = $this->authenticatedUser();
+        $eventId = DB::table('events')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Linked feed event',
+            'description' => 'An event surfaced in the accessible feed.',
+            'location' => 'Feed Hall',
+            'start_time' => now()->addDays(5),
+            'end_time' => now()->addDays(5)->addHours(2),
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        FeedActivity::factory()->forTenant($this->testTenantId)->create([
+            'source_type' => 'event',
+            'source_id' => $eventId,
+            'user_id' => $user->id,
+            'content' => 'Linked feed event',
+            'created_at' => now()->addMinute(),
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/feed");
+        $response->assertOk();
+        // Previously only listing cards linked through; event cards were dead ends.
+        $response->assertSee(route('govuk-alpha.events.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $eventId]), false);
+        $response->assertSee(__('govuk_alpha.actions.view_details'));
+    }
+
     public function test_feed_page_has_html_auth_required_state_when_unauthenticated(): void
     {
         // Pin the tenant display name so the community-name assertion does not depend

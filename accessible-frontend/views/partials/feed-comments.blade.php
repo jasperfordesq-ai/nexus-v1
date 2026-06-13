@@ -10,10 +10,14 @@
     @foreach ($comments as $comment)
         @php
             $authorName = $comment['author']['name'] ?? __('govuk_alpha.feed.unknown_author');
+            $authorAvatar = $comment['author']['avatar'] ?? null;
             $createdAt = !empty($comment['created_at']) ? \Illuminate\Support\Carbon::parse($comment['created_at']) : null;
         @endphp
         <li class="nexus-alpha-comment">
             <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">
+                @if (!empty($authorAvatar))
+                    <img class="nexus-alpha-avatar nexus-alpha-avatar--small" src="{{ $authorAvatar }}" alt="" loading="lazy" decoding="async" width="32" height="32">
+                @endif
                 <strong>{{ $authorName }}</strong>
                 @if ($createdAt)
                     <span aria-hidden="true"> | </span>

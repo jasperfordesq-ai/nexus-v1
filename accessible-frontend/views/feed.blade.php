@@ -221,9 +221,16 @@
                     $likeCount = (int) ($item['likes_count'] ?? 0);
                     $isLiked = (bool) ($item['is_liked'] ?? false);
                     $isCommentable = in_array($itemType, $commentableTypes, true);
-                    $detailUrl = ($itemType === 'listing' && !empty($item['id']))
-                        ? route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $item['id']])
-                        : null;
+                    // Link typed cards through to the accessible detail page that exists
+                    // for that module ($itemId is the source entity id). Types with no
+                    // accessible page (post/poll/goal/job/blog/discussion) stay in-feed.
+                    $detailUrl = $itemId > 0 ? match ($itemType) {
+                        'listing' => route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $itemId]),
+                        'event' => route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $itemId]),
+                        'volunteer' => route('govuk-alpha.volunteering.show', ['tenantSlug' => $tenantSlug, 'id' => $itemId]),
+                        default => null,
+                    } : null;
+                    $authorAvatar = $item['author']['avatar_url'] ?? null;
                 @endphp
                 <article class="nexus-alpha-card" id="feed-item-{{ preg_replace('/[^a-z0-9_-]/i', '-', $itemType) }}-{{ $itemId }}">
                     <div class="nexus-alpha-feed-row">
@@ -231,6 +238,9 @@
                             <strong class="govuk-tag {{ $feedItemType($itemType) }}">{{ $feedItemTypeLabel($itemType) }}</strong>
                             <h3 class="govuk-heading-m govuk-!-margin-top-2 govuk-!-margin-bottom-2">{{ $itemTitle }}</h3>
                             <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">
+                                @if (!empty($authorAvatar))
+                                    <img class="nexus-alpha-avatar nexus-alpha-avatar--small" src="{{ $authorAvatar }}" alt="" loading="lazy" decoding="async" width="32" height="32">
+                                @endif
                                 {{ __('govuk_alpha.feed.posted_by', ['name' => $authorName]) }}
                                 @if ($createdAt)
                                     <span aria-hidden="true"> | </span>
