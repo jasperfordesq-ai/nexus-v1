@@ -381,6 +381,8 @@ return [
         'signed_out' => 'Je bent uitgelogd.',
     ],
     'feed' => [
+        'edit_post_hint' => 'Update the wording of your post.',
+        'comment_hint' => 'Be respectful and stay on topic.',
         'moderation_summary' => 'Hide, mute or report',
         'hide_hint' => 'Stop this item showing in your feed.',
         'hide_button' => 'Hide this from my feed',
@@ -864,6 +866,7 @@ return [
         'description_title' => 'Beschrijving',
     ],
     'volunteering' => [
+        'hours_log_hint' => 'Enter the hours you volunteered, between 0.25 and 24, in quarter-hour steps.',
         'recommended_title' => 'Aanbevolen voor jou',
         'recommended_intro' => 'Diensten afgestemd op jouw vaardigheden en beschikbaarheid.',
         'empty_recommended' => 'Er zijn momenteel geen aanbevolen diensten. Kijk op het tabblad Mogelijkheden.',

@@ -386,7 +386,8 @@
                                             @csrf
                                             <div class="govuk-form-group">
                                                 <label class="govuk-label" for="edit-post-{{ $itemId }}">{{ __('govuk_alpha.feed.edit_post_label') }}</label>
-                                                <textarea class="govuk-textarea" id="edit-post-{{ $itemId }}" name="content" rows="4" required>{{ $item['content'] ?? '' }}</textarea>
+                                                <div id="edit-post-{{ $itemId }}-hint" class="govuk-hint">{{ __('govuk_alpha.feed.edit_post_hint') }}</div>
+                                                <textarea class="govuk-textarea" id="edit-post-{{ $itemId }}" name="content" rows="4" aria-describedby="edit-post-{{ $itemId }}-hint" required>{{ $item['content'] ?? '' }}</textarea>
                                             </div>
                                             <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.actions.save_changes') }}</button>
                                         </form>
@@ -468,7 +469,8 @@
                                         @endforeach
                                         <div class="govuk-form-group">
                                             <label class="govuk-label" for="comment-{{ $itemType }}-{{ $itemId }}">{{ __('govuk_alpha.feed.comment_label') }}</label>
-                                            <textarea class="govuk-textarea" id="comment-{{ $itemType }}-{{ $itemId }}" name="content" rows="3"></textarea>
+                                            <div id="comment-{{ $itemType }}-{{ $itemId }}-hint" class="govuk-hint">{{ __('govuk_alpha.feed.comment_hint') }}</div>
+                                            <textarea class="govuk-textarea" id="comment-{{ $itemType }}-{{ $itemId }}" name="content" rows="3" aria-describedby="comment-{{ $itemType }}-{{ $itemId }}-hint"></textarea>
                                         </div>
                                         <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.comment') }}</button>
                                     </form>

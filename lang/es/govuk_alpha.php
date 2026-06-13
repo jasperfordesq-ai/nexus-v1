@@ -381,6 +381,8 @@ return [
         'signed_out' => 'Has cerrado sesión.',
     ],
     'feed' => [
+        'edit_post_hint' => 'Update the wording of your post.',
+        'comment_hint' => 'Be respectful and stay on topic.',
         'moderation_summary' => 'Hide, mute or report',
         'hide_hint' => 'Stop this item showing in your feed.',
         'hide_button' => 'Hide this from my feed',
@@ -864,6 +866,7 @@ return [
         'description_title' => 'Descripción',
     ],
     'volunteering' => [
+        'hours_log_hint' => 'Enter the hours you volunteered, between 0.25 and 24, in quarter-hour steps.',
         'recommended_title' => 'Recomendado para ti',
         'recommended_intro' => 'Turnos adaptados a tus habilidades y disponibilidad.',
         'empty_recommended' => 'No hay turnos recomendados en este momento. Consulta la pestaña de oportunidades.',

@@ -127,7 +127,7 @@
                 <div class="govuk-grid-column-one-half">
                     <div class="govuk-form-group">
                         <label class="govuk-label" for="organization_id">{{ __('govuk_alpha.volunteering.organization_label') }}</label>
-                        <select class="govuk-select" id="organization_id" name="organization_id">
+                        <select class="govuk-select" id="organization_id" name="organization_id" required>
                             @foreach ($organizations as $organization)
                                 <option value="{{ $organization['id'] }}">{{ $organization['name'] }}</option>
                             @endforeach
@@ -150,13 +150,14 @@
                 <div class="govuk-grid-column-one-half">
                     <div class="govuk-form-group">
                         <label class="govuk-label" for="date">{{ __('govuk_alpha.volunteering.date_label') }}</label>
-                        <input class="govuk-input govuk-input--width-10" id="date" name="date" type="date" value="{{ now()->toDateString() }}">
+                        <input class="govuk-input govuk-input--width-10" id="date" name="date" type="date" value="{{ now()->toDateString() }}" required>
                     </div>
                 </div>
                 <div class="govuk-grid-column-one-half">
                     <div class="govuk-form-group">
                         <label class="govuk-label" for="hours">{{ __('govuk_alpha.volunteering.hours_label') }}</label>
-                        <input class="govuk-input govuk-input--width-5" id="hours" name="hours" type="number" min="0.25" max="24" step="0.25">
+                        <div id="log-hours-hint" class="govuk-hint">{{ __('govuk_alpha.volunteering.hours_log_hint') }}</div>
+                        <input class="govuk-input govuk-input--width-5" id="hours" name="hours" type="number" min="0.25" max="24" step="0.25" aria-describedby="log-hours-hint" required>
                     </div>
                 </div>
             </div>
