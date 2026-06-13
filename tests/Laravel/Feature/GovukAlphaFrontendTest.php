@@ -922,6 +922,8 @@ class GovukAlphaFrontendTest extends TestCase
             'title' => 'Alpha detail listing',
             'description' => 'Detail page description.',
             'type' => 'request',
+            'expires_at' => now()->addDays(30),
+            'renewal_count' => 2,
         ]);
 
         $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}");
@@ -931,6 +933,9 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('class="govuk-back-link"', false);
         $response->assertSee('class="govuk-summary-list"', false);
         $response->assertSee('class="govuk-tag govuk-tag--purple"', false);
+        // Expiry + renewal rows now surface (data was already in the getById payload).
+        $response->assertSee(__('govuk_alpha.listings.expires_label'));
+        $response->assertSee(trans_choice('govuk_alpha.listings.renewed_count', 2, ['count' => 2]));
     }
 
     public function test_listings_card_renders_cover_image_when_present(): void

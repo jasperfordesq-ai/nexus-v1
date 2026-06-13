@@ -160,6 +160,19 @@
                 <dd class="govuk-summary-list__value">{{ $createdAt }}</dd>
             </div>
         @endif
+        @if (!empty($listing['expires_at']))
+            @php($expiresAt = \Illuminate\Support\Carbon::parse($listing['expires_at'])->translatedFormat('j F Y'))
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.listings.expires_label') }}</dt>
+                <dd class="govuk-summary-list__value">{{ $statusValue === 'expired' ? __('govuk_alpha.listings.expired_on', ['date' => $expiresAt]) : __('govuk_alpha.listings.expires_on', ['date' => $expiresAt]) }}</dd>
+            </div>
+        @endif
+        @if ((int) ($listing['renewal_count'] ?? 0) > 0)
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.listings.renewals_label') }}</dt>
+                <dd class="govuk-summary-list__value">{{ trans_choice('govuk_alpha.listings.renewed_count', (int) $listing['renewal_count'], ['count' => (int) $listing['renewal_count']]) }}</dd>
+            </div>
+        @endif
     </dl>
 
     @if ($authorName)

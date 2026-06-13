@@ -457,6 +457,11 @@ return [
         'comment_posted_on_prefix' => 'Comment posted on',
     ],
     'listings' => [
+        'expires_label' => 'Expiry',
+        'expires_on' => 'Expires on :date',
+        'expired_on' => 'Expired on :date',
+        'renewals_label' => 'Renewals',
+        'renewed_count' => '{1} Renewed once|[2,*] Renewed :count times',
         'create' => [
             'title' => 'Create a listing',
             'caption' => ':community',
