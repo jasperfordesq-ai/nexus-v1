@@ -55,7 +55,11 @@
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
-                    <p>{{ $status === 'rating-invalid' ? __('govuk_alpha.exchanges.rating_invalid') : ($status === 'rating-failed' ? __('govuk_alpha.exchanges.rating_failed') : __('govuk_alpha.exchanges.failed')) }}</p>
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li>
+                            <a href="{{ in_array($status, ['rating-invalid', 'rating-failed'], true) ? '#rating' : '#main-content' }}">{{ $status === 'rating-invalid' ? __('govuk_alpha.exchanges.rating_invalid') : ($status === 'rating-failed' ? __('govuk_alpha.exchanges.rating_failed') : __('govuk_alpha.exchanges.failed')) }}</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

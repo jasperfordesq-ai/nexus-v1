@@ -303,8 +303,14 @@ class ExchangeWorkflowService
             return false;
         }
 
-        $role = ((int) $exchange->requester_id === $userId) ? 'requester' : 'provider';
-        $result = self::updateStatus($exchangeId, self::STATUS_IN_PROGRESS, $userId, $role, 'Work started');
+        // Only the provider may start work (mirrors the React product rule). The
+        // controller already restricts callers to the two parties; this closes
+        // the gap where a requester could drive the workflow via a direct call.
+        if ((int) $exchange->provider_id !== $userId) {
+            return false;
+        }
+
+        $result = self::updateStatus($exchangeId, self::STATUS_IN_PROGRESS, $userId, 'provider', 'Work started');
 
         if ($result) {
             try {
@@ -338,8 +344,13 @@ class ExchangeWorkflowService
             return false;
         }
 
-        $role = ((int) $exchange->requester_id === $userId) ? 'requester' : 'provider';
-        $result = self::updateStatus($exchangeId, self::STATUS_PENDING_CONFIRMATION, $userId, $role, 'Work completed, pending confirmation');
+        // Only the provider may mark work ready for confirmation (matches the
+        // React product rule and closes the direct-call IDOR).
+        if ((int) $exchange->provider_id !== $userId) {
+            return false;
+        }
+
+        $result = self::updateStatus($exchangeId, self::STATUS_PENDING_CONFIRMATION, $userId, 'provider', 'Work completed, pending confirmation');
 
         if ($result) {
             try {

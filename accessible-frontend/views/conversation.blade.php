@@ -28,15 +28,19 @@
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
-                    <p>
-                        @if ($status === 'message-empty')
-                            {{ __('govuk_alpha.messages.empty_message') }}
-                        @elseif ($status === 'message-disabled')
-                            {{ __('govuk_alpha.messages.disabled_detail') }}
-                        @else
-                            {{ __('govuk_alpha.messages.failed') }}
-                        @endif
-                    </p>
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li>
+                            <a href="#body">
+                                @if ($status === 'message-empty')
+                                    {{ __('govuk_alpha.messages.empty_message') }}
+                                @elseif ($status === 'message-disabled')
+                                    {{ __('govuk_alpha.messages.disabled_detail') }}
+                                @else
+                                    {{ __('govuk_alpha.messages.failed') }}
+                                @endif
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

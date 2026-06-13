@@ -67,7 +67,7 @@
             @endif
 
             @if ($registrationClosed ?? false)
-                <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="registration-closed-title" data-module="govuk-notification-banner">
+                <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="registration-closed-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="registration-closed-title">{{ __('govuk_alpha.auth.registration_closed_title') }}</h2>
                     </div>

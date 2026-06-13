@@ -105,9 +105,10 @@ class MemberActivityService
     {
         $items = collect();
 
-        // Posts
+        // Posts — only public posts belong in a timeline shown to other members.
         $posts = FeedPost::query()
             ->where('user_id', $userId)
+            ->where('visibility', 'public')
             ->select('id', DB::raw("'post' as activity_type"), 'content as description', 'created_at')
             ->orderByDesc('created_at')
             ->limit($limit)

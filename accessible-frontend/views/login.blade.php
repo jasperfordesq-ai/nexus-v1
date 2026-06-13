@@ -43,7 +43,7 @@
                         <div class="govuk-form-group">
                             <label class="govuk-label" for="resend_email">{{ __('govuk_alpha.auth.resend_email_label') }}</label>
                             <div id="resend-email-hint" class="govuk-hint">{{ __('govuk_alpha.auth.resend_verification_hint') }}</div>
-                            <input class="govuk-input govuk-!-width-two-thirds" id="resend_email" name="email" type="email" autocomplete="email" value="{{ old('email') }}" aria-describedby="resend-email-hint">
+                            <input class="govuk-input govuk-!-width-two-thirds" id="resend_email" name="email" type="email" autocomplete="email" value="{{ old('email') }}" aria-describedby="resend-email-hint" required>
                         </div>
                         <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.auth.resend_verification_button') }}</button>
                     </form>

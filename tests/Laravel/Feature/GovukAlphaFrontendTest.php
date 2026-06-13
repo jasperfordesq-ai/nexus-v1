@@ -2338,6 +2338,12 @@ class GovukAlphaFrontendTest extends TestCase
             'content' => 'Timeline post content.',
             'visibility' => 'public',
         ]);
+        // A private post must NOT leak into another viewer's activity timeline.
+        FeedPost::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $member->id,
+            'content' => 'Secret private diary entry.',
+            'visibility' => 'private',
+        ]);
 
         $this->authenticatedUser(['name' => 'Timeline Viewer']);
 
@@ -2346,6 +2352,7 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee(__('govuk_alpha.profile.recent_activity_title'));
         $response->assertSee(__('govuk_alpha.profile.activity_types.post'));
         $response->assertSee('Timeline post content.');
+        $response->assertDontSee('Secret private diary entry.');
     }
 
     public function test_member_profile_skill_can_be_endorsed_and_unendorsed(): void

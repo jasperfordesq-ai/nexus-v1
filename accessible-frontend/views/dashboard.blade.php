@@ -21,7 +21,7 @@
     @endif
 
     @if (!($onboardingCompleted ?? true))
-        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="dashboard-onboarding-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="dashboard-onboarding-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="dashboard-onboarding-title">{{ __('govuk_alpha.dashboard.onboarding_title') }}</h2>
             </div>
@@ -34,8 +34,8 @@
         </div>
     @endif
 
-    @if (($pendingReviewCount ?? 0) > 0 && \App\Core\TenantContext::hasModule('exchanges'))
-        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="dashboard-reviews-title">
+    @if (($pendingReviewCount ?? 0) > 0 && \App\Core\TenantContext::hasModule('listings'))
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="dashboard-reviews-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="dashboard-reviews-title">{{ __('govuk_alpha.dashboard.pending_reviews_title') }}</h2>
             </div>

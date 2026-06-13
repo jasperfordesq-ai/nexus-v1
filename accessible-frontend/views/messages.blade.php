@@ -27,7 +27,7 @@
                     <div id="message-user-search-hint" class="govuk-hint">{{ __('govuk_alpha.messages.search_hint') }}</div>
                     <input class="govuk-input govuk-!-width-two-thirds" id="message-user-search" name="q" type="search" value="{{ $searchQuery ?? '' }}" aria-describedby="message-user-search-hint">
                 </div>
-                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.actions.search') }}</button>
+                <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.actions.search') }}</button>
             </form>
 
             @if (($searchQuery ?? '') !== '')

@@ -631,7 +631,10 @@ class AlphaController extends Controller
 
         // Personalised dashboard extras the React dashboard surfaces: a pending
         // review prompt, endorsements received, and the onboarding state.
-        $onboardingCompleted = (bool) DB::table('users')->where('id', $userId)->value('onboarding_completed');
+        $onboardingCompleted = (bool) DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->value('onboarding_completed');
 
         $pendingReviewCount = 0;
         try {
@@ -2622,6 +2625,11 @@ class AlphaController extends Controller
                 ->where('tenant_id', $tenantId)
                 ->where('status', 'active')
                 ->where('id', '!=', $viewerId)
+                // Honour the search opt-out: the Meilisearch path that produced
+                // these IDs does not carry privacy_search, so re-filter here.
+                ->where(function ($q) {
+                    $q->where('privacy_search', 1)->orWhereNull('privacy_search');
+                })
                 ->whereIn('id', $ids)
                 ->select(
                     'id',

@@ -69,7 +69,7 @@
                         @if ($confirmHasError)
                             <p id="password_confirmation-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ __('govuk_alpha.auth.reset_mismatch') }}</p>
                         @endif
-                        <input class="govuk-input{{ $confirmHasError ? ' govuk-input--error' : '' }}" id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" spellcheck="false" @if ($confirmHasError) aria-describedby="password_confirmation-error" @endif>
+                        <input class="govuk-input{{ $confirmHasError ? ' govuk-input--error' : '' }}" id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" spellcheck="false" required @if ($confirmHasError) aria-describedby="password_confirmation-error" @endif>
                     </div>
                     <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.auth.reset_submit') }}</button>
                 </form>

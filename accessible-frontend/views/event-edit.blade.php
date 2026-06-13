@@ -78,7 +78,7 @@
                         @error('start_time')
                             <p id="start_time-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $message }}</p>
                         @enderror
-                        <input class="govuk-input govuk-!-width-one-half{{ $errors->has('start_time') ? ' govuk-input--error' : '' }}" id="start_time" name="start_time" type="datetime-local" value="{{ old('start_time', $toLocal($event['start_time'] ?? null)) }}" aria-describedby="start-time-hint @error('start_time') start_time-error @enderror" required>
+                        <input class="govuk-input govuk-!-width-one-half{{ $errors->has('start_time') ? ' govuk-input--error' : '' }}" id="start_time" name="start_time" type="datetime-local" value="{{ old('start_time', $toLocal($event['start_time'] ?? null)) }}" aria-describedby="start-time-hint{{ $errors->has('start_time') ? ' start_time-error' : '' }}" required>
                     </div>
 
                     <div class="govuk-form-group{{ $errors->has('end_time') ? ' govuk-form-group--error' : '' }}">
@@ -87,7 +87,7 @@
                         @error('end_time')
                             <p id="end_time-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $message }}</p>
                         @enderror
-                        <input class="govuk-input govuk-!-width-one-half{{ $errors->has('end_time') ? ' govuk-input--error' : '' }}" id="end_time" name="end_time" type="datetime-local" value="{{ old('end_time', $toLocal($event['end_time'] ?? null)) }}" aria-describedby="end-time-hint @error('end_time') end_time-error @enderror">
+                        <input class="govuk-input govuk-!-width-one-half{{ $errors->has('end_time') ? ' govuk-input--error' : '' }}" id="end_time" name="end_time" type="datetime-local" value="{{ old('end_time', $toLocal($event['end_time'] ?? null)) }}" aria-describedby="end-time-hint{{ $errors->has('end_time') ? ' end_time-error' : '' }}">
                     </div>
                 </fieldset>
 

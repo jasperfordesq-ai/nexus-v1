@@ -431,7 +431,7 @@
                                             <div class="govuk-form-group govuk-!-margin-bottom-2">
                                                 <label class="govuk-label" for="report-reason-{{ $itemType }}-{{ $itemId }}">{{ __('govuk_alpha.feed.report_reason_label') }}</label>
                                                 <div class="govuk-hint" id="report-hint-{{ $itemType }}-{{ $itemId }}">{{ __('govuk_alpha.feed.report_hint') }}</div>
-                                                <input class="govuk-input" id="report-reason-{{ $itemType }}-{{ $itemId }}" name="reason" type="text" maxlength="500" aria-describedby="report-hint-{{ $itemType }}-{{ $itemId }}">
+                                                <input class="govuk-input" id="report-reason-{{ $itemType }}-{{ $itemId }}" name="reason" type="text" maxlength="500" aria-describedby="report-hint-{{ $itemType }}-{{ $itemId }}" required>
                                             </div>
                                             <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.feed.report_button') }}</button>
                                         </form>
