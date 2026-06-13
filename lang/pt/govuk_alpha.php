@@ -634,6 +634,9 @@ return [
         'own_listing' => 'Você não pode solicitar uma troca em sua própria listagem.',
     ],
     'exchanges' => [
+        'confirm_hours_hint' => 'Enter the hours actually given, between 0.25 and 24, in quarter-hour steps.',
+        'review_rating_hint' => 'Rate your experience from 1 (poor) to 5 (excellent).',
+        'review_comment_hint' => 'Optional. Share anything that would help others.',
         'action_respond' => 'Action needed: respond',
         'action_confirm' => 'Action needed: confirm hours',
         'requester_confirmation_label' => 'Requester confirmation',

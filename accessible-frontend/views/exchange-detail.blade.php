@@ -193,7 +193,8 @@
                 <input type="hidden" name="action" value="confirm">
                 <div class="govuk-form-group">
                     <label class="govuk-label" for="hours">{{ __('govuk_alpha.exchanges.confirm_hours_label') }}</label>
-                    <input class="govuk-input govuk-input--width-5" id="hours" name="hours" type="number" min="0.25" max="24" step="0.25" value="{{ (float) ($exchange['proposed_hours'] ?? 1) }}" required>
+                    <div id="hours-hint" class="govuk-hint">{{ __('govuk_alpha.exchanges.confirm_hours_hint') }}</div>
+                    <input class="govuk-input govuk-input--width-5" id="hours" name="hours" type="number" min="0.25" max="24" step="0.25" value="{{ (float) ($exchange['proposed_hours'] ?? 1) }}" aria-describedby="hours-hint" required>
                 </div>
                 <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.confirm_hours') }}</button>
             </form>
@@ -232,7 +233,8 @@
                 @csrf
                 <div class="govuk-form-group">
                     <label class="govuk-label" for="rating">{{ __('govuk_alpha.exchanges.review_rating_label') }}</label>
-                    <select class="govuk-select govuk-input--width-10" id="rating" name="rating" required>
+                    <div id="rating-hint" class="govuk-hint">{{ __('govuk_alpha.exchanges.review_rating_hint') }}</div>
+                    <select class="govuk-select govuk-input--width-10" id="rating" name="rating" aria-describedby="rating-hint" required>
                         @foreach ([5, 4, 3, 2, 1] as $ratingOption)
                             <option value="{{ $ratingOption }}">{{ __('govuk_alpha.exchanges.review_rating_value', ['rating' => $ratingOption]) }}</option>
                         @endforeach
@@ -240,7 +242,8 @@
                 </div>
                 <div class="govuk-form-group">
                     <label class="govuk-label" for="comment">{{ __('govuk_alpha.exchanges.review_comment_label') }}</label>
-                    <textarea class="govuk-textarea" id="comment" name="comment" rows="4"></textarea>
+                    <div id="comment-hint" class="govuk-hint">{{ __('govuk_alpha.exchanges.review_comment_hint') }}</div>
+                    <textarea class="govuk-textarea" id="comment" name="comment" rows="4" aria-describedby="comment-hint"></textarea>
                 </div>
                 <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.exchanges.review_submit') }}</button>
             </form>

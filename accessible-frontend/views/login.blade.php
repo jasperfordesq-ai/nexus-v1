@@ -21,9 +21,14 @@
                         'account-suspended'     => __('govuk_alpha.auth.account_suspended'),
                         default                 => __('govuk_alpha.auth.login_failed'),
                     };
-                    // Only anchor to the email field when the email is the source of
-                    // the error; account-level problems jump to the main content.
-                    $loginErrorAnchor = in_array($status, ['login-failed', 'email-not-verified'], true) ? '#email' : '#main-content';
+                    // Anchor the error summary to the most useful control: the email
+                    // field for a failed sign-in, the resend form for unverified /
+                    // pending accounts (it renders directly below), else main content.
+                    $loginErrorAnchor = match ($status) {
+                        'login-failed' => '#email',
+                        'email-not-verified', 'pending-verification' => '#resend_email',
+                        default => '#main-content',
+                    };
                 @endphp
                 <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                     <div role="alert">
