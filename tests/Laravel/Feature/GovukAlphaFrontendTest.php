@@ -126,6 +126,50 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertDontSee('type="submit"', false);
     }
 
+    public function test_register_page_shows_per_field_inline_errors(): void
+    {
+        // Ensure registration is open so the form (and its fields) renders.
+        DB::table('tenant_registration_policies')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId],
+            [
+                'registration_mode' => 'open',
+                'verification_level' => 'none',
+                'post_verification' => 'activate',
+                'fallback_mode' => 'none',
+                'require_email_verify' => 1,
+                'is_active' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'general.registration_mode'],
+            ['setting_value' => 'open', 'setting_type' => 'string', 'updated_at' => now()]
+        );
+        app(\App\Services\TenantSettingsService::class)->clearCacheForTenant($this->testTenantId);
+
+        // Password mismatch → inline error on the password field + anchored summary.
+        $pw = $this->get("/{$this->testTenantSlug}/alpha/register?status=register-password-mismatch");
+        $pw->assertOk();
+        $pw->assertSee('name="password"', false);
+        $pw->assertSee('govuk-form-group--error', false);
+        $pw->assertSee('id="password-error"', false);
+        $pw->assertSee('href="#password"', false);
+        $pw->assertSee(__('govuk_alpha.auth.register_password_mismatch'));
+
+        // Invalid email domain → inline error on the email field.
+        $email = $this->get("/{$this->testTenantSlug}/alpha/register?status=register-email-domain-invalid");
+        $email->assertOk();
+        $email->assertSee('id="email-error"', false);
+        $email->assertSee('href="#email"', false);
+
+        // Terms required → inline error on the terms checkbox.
+        $terms = $this->get("/{$this->testTenantSlug}/alpha/register?status=register-terms-required");
+        $terms->assertOk();
+        $terms->assertSee('id="terms_accepted-error"', false);
+        $terms->assertSee('href="#terms_accepted"', false);
+    }
+
     public function test_contact_page_renders_govuk_alpha_form_and_feedback_link_targets_it(): void
     {
         $response = $this->get("/{$this->testTenantSlug}/alpha/contact");

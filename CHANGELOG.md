@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Clearer registration errors on the accessible site.** When something is wrong while signing up — a mismatched password, an email that isn't accepted, a missing invite code, or unticked terms — the accessible registration form now highlights the specific field and shows the message next to it, as well as in the summary at the top, instead of only a single summary message.
 - **Safer sign-out on the accessible site.** Signing out is now a proper protected button rather than a plain link, so it can't be triggered unintentionally.
 - **Clearer exchange and volunteering statuses on the accessible site.** Status labels now always show readable text (never an internal code), and exchange statuses are colour-coded so their state is easier to scan at a glance.
 

@@ -13,6 +13,7 @@
             @endif
 
             @php
+                $registerStatus = $status ?? '';
                 $errorStatuses = [
                     'register-failed', 'register-duplicate', 'register-password-pwned',
                     'register-password-mismatch', 'register-terms-required',
@@ -21,38 +22,38 @@
                     'register-email-domain-invalid', 'register-daily-limit',
                     'register-tenant-paused', 'register-closed', 'register-validation',
                 ];
+                $hasRegisterError = in_array($registerStatus, $errorStatuses, true);
+                $registerErrorMessage = match ($registerStatus) {
+                    'register-duplicate'         => __('govuk_alpha.auth.register_duplicate'),
+                    'register-password-pwned'    => __('govuk_alpha.auth.register_password_pwned'),
+                    'register-password-mismatch' => __('govuk_alpha.auth.register_password_mismatch'),
+                    'register-terms-required'    => __('govuk_alpha.auth.register_terms_required'),
+                    'register-invite-required'   => __('govuk_alpha.auth.register_invite_required'),
+                    'register-invite-invalid'    => __('govuk_alpha.auth.register_invite_invalid'),
+                    'register-location-unverified' => __('govuk_alpha.auth.register_location_unverified'),
+                    'register-email-disposable'  => __('govuk_alpha.auth.register_email_disposable'),
+                    'register-email-domain-invalid' => __('govuk_alpha.auth.register_email_domain_invalid'),
+                    'register-daily-limit'       => __('govuk_alpha.auth.register_daily_limit'),
+                    'register-tenant-paused'     => __('govuk_alpha.auth.register_tenant_paused'),
+                    'register-closed'            => __('govuk_alpha.auth.register_closed'),
+                    'register-validation'        => __('govuk_alpha.auth.register_validation'),
+                    default                      => __('govuk_alpha.auth.register_failed'),
+                };
+                // Which single field the error belongs to (for inline messages + summary anchor).
+                $registerErrorField = [
+                    'register-duplicate' => 'email',
+                    'register-email-disposable' => 'email',
+                    'register-email-domain-invalid' => 'email',
+                    'register-password-pwned' => 'password',
+                    'register-password-mismatch' => 'password',
+                    'register-terms-required' => 'terms_accepted',
+                    'register-invite-required' => 'invite_code',
+                    'register-invite-invalid' => 'invite_code',
+                    'register-location-unverified' => 'location',
+                ][$registerStatus] ?? null;
+                $errorAnchor = $registerErrorField ? ('#' . $registerErrorField) : ($registerStatus === 'register-closed' ? '#main-content' : '#first_name');
             @endphp
-            @if (in_array($status ?? '', $errorStatuses, true))
-                @php
-                    $registerErrorMessage = match ($status) {
-                        'register-duplicate'         => __('govuk_alpha.auth.register_duplicate'),
-                        'register-password-pwned'    => __('govuk_alpha.auth.register_password_pwned'),
-                        'register-password-mismatch' => __('govuk_alpha.auth.register_password_mismatch'),
-                        'register-terms-required'    => __('govuk_alpha.auth.register_terms_required'),
-                        'register-invite-required'   => __('govuk_alpha.auth.register_invite_required'),
-                        'register-invite-invalid'    => __('govuk_alpha.auth.register_invite_invalid'),
-                        'register-location-unverified' => __('govuk_alpha.auth.register_location_unverified'),
-                        'register-email-disposable'  => __('govuk_alpha.auth.register_email_disposable'),
-                        'register-email-domain-invalid' => __('govuk_alpha.auth.register_email_domain_invalid'),
-                        'register-daily-limit'       => __('govuk_alpha.auth.register_daily_limit'),
-                        'register-tenant-paused'     => __('govuk_alpha.auth.register_tenant_paused'),
-                        'register-closed'            => __('govuk_alpha.auth.register_closed'),
-                        'register-validation'        => __('govuk_alpha.auth.register_validation'),
-                        default                      => __('govuk_alpha.auth.register_failed'),
-                    };
-                    $errorAnchor = match ($status) {
-                        'register-password-pwned',
-                        'register-password-mismatch' => '#password',
-                        'register-terms-required'    => '#terms_accepted',
-                        'register-invite-required',
-                        'register-invite-invalid'    => '#invite_code',
-                        'register-location-unverified' => '#location',
-                        'register-email-disposable',
-                        'register-email-domain-invalid' => '#email',
-                        'register-closed'              => '#main-content',
-                        default                       => '#first_name',
-                    };
-                @endphp
+            @if ($hasRegisterError)
                 <div class="govuk-error-summary" data-module="govuk-error-summary">
                     <div role="alert">
                         <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
@@ -134,11 +135,14 @@
 
                 {{-- ── Invite code (conditional on tenant policy) ──────── --}}
                 @if ($requiresInviteCode ?? false)
-                    <div class="govuk-form-group">
+                    <div class="govuk-form-group{{ $registerErrorField === 'invite_code' ? ' govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="invite_code">{{ __('govuk_alpha.auth.invite_code_label') }}</label>
                         <div id="invite_code-hint" class="govuk-hint">{{ __('govuk_alpha.auth.invite_code_hint') }}</div>
-                        <input class="govuk-input govuk-input--width-10" id="invite_code" name="invite_code" type="text"
-                               aria-describedby="invite_code-hint" autocomplete="off"
+                        @if ($registerErrorField === 'invite_code')
+                            <p id="invite_code-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $registerErrorMessage }}</p>
+                        @endif
+                        <input class="govuk-input govuk-input--width-10{{ $registerErrorField === 'invite_code' ? ' govuk-input--error' : '' }}" id="invite_code" name="invite_code" type="text"
+                               aria-describedby="invite_code-hint{{ $registerErrorField === 'invite_code' ? ' invite_code-error' : '' }}" autocomplete="off"
                                style="text-transform: uppercase;" value="{{ old('invite_code') }}" required>
                     </div>
                 @endif
@@ -163,11 +167,14 @@
                            autocomplete="tel" aria-describedby="phone-hint" value="{{ old('phone') }}" required>
                 </div>
 
-                <div class="govuk-form-group">
+                <div class="govuk-form-group{{ $registerErrorField === 'location' ? ' govuk-form-group--error' : '' }}">
                     <label class="govuk-label" for="location">{{ __('govuk_alpha.auth.location_label') }}</label>
                     <div id="location-hint" class="govuk-hint">{{ __('govuk_alpha.auth.location_hint') }}</div>
-                    <input class="govuk-input" id="location" name="location" type="text"
-                           autocomplete="address-level2" aria-describedby="location-hint"
+                    @if ($registerErrorField === 'location')
+                        <p id="location-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $registerErrorMessage }}</p>
+                    @endif
+                    <input class="govuk-input{{ $registerErrorField === 'location' ? ' govuk-input--error' : '' }}" id="location" name="location" type="text"
+                           autocomplete="address-level2" aria-describedby="location-hint{{ $registerErrorField === 'location' ? ' location-error' : '' }}"
                            value="{{ old('location') }}" required>
                     {{-- Lat/lng auto-populated by Google Places autocomplete (progressive
                          enhancement). The form works without JS — these stay empty and the
@@ -177,17 +184,23 @@
                 </div>
 
                 {{-- ── Account ──────────────────────────────────────────── --}}
-                <div class="govuk-form-group">
+                <div class="govuk-form-group{{ $registerErrorField === 'email' ? ' govuk-form-group--error' : '' }}">
                     <label class="govuk-label" for="email">{{ __('govuk_alpha.auth.email_label') }}</label>
-                    <input class="govuk-input" id="email" name="email" type="email"
-                           autocomplete="email" value="{{ old('email') }}" required>
+                    @if ($registerErrorField === 'email')
+                        <p id="email-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $registerErrorMessage }}</p>
+                    @endif
+                    <input class="govuk-input{{ $registerErrorField === 'email' ? ' govuk-input--error' : '' }}" id="email" name="email" type="email"
+                           autocomplete="email" value="{{ old('email') }}" @if ($registerErrorField === 'email') aria-describedby="email-error" @endif required>
                 </div>
 
-                <div class="govuk-form-group" id="password-form-group">
+                <div class="govuk-form-group{{ $registerErrorField === 'password' ? ' govuk-form-group--error' : '' }}" id="password-form-group">
                     <label class="govuk-label" for="password">{{ __('govuk_alpha.auth.password_label') }}</label>
                     <div id="password-hint" class="govuk-hint">{{ __('govuk_alpha.auth.password_hint') }}</div>
-                    <input class="govuk-input govuk-!-width-two-thirds" id="password" name="password" type="password"
-                           autocomplete="new-password" aria-describedby="password-hint password-strength-msg"
+                    @if ($registerErrorField === 'password')
+                        <p id="password-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $registerErrorMessage }}</p>
+                    @endif
+                    <input class="govuk-input govuk-!-width-two-thirds{{ $registerErrorField === 'password' ? ' govuk-input--error' : '' }}" id="password" name="password" type="password"
+                           autocomplete="new-password" aria-describedby="password-hint password-strength-msg{{ $registerErrorField === 'password' ? ' password-error' : '' }}"
                            minlength="12" required>
                     <p id="password-strength-msg" class="govuk-body-s govuk-!-margin-top-2" aria-live="polite"></p>
                 </div>
@@ -199,9 +212,12 @@
                 </div>
 
                 {{-- ── Consents ─────────────────────────────────────────── --}}
-                <div class="govuk-form-group">
-                    <fieldset class="govuk-fieldset">
+                <div class="govuk-form-group{{ $registerErrorField === 'terms_accepted' ? ' govuk-form-group--error' : '' }}">
+                    <fieldset class="govuk-fieldset" @if ($registerErrorField === 'terms_accepted') aria-describedby="terms_accepted-error" @endif>
                         <legend class="govuk-fieldset__legend govuk-visually-hidden">{{ __('govuk_alpha.auth.consents_legend') }}</legend>
+                        @if ($registerErrorField === 'terms_accepted')
+                            <p id="terms_accepted-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $registerErrorMessage }}</p>
+                        @endif
                         <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                             <div class="govuk-checkboxes__item">
                                 <input class="govuk-checkboxes__input" id="terms_accepted" name="terms_accepted" type="checkbox" value="1" required>
