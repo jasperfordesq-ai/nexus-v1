@@ -10,8 +10,10 @@ use App\Models\FeedActivity;
 use App\Models\FeedPost;
 use App\Models\Listing;
 use App\Models\User;
+use App\Core\ImageUploader;
 use App\Core\TenantContext;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
@@ -1127,6 +1129,237 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee(__('govuk_alpha.states.empty_title'));
         $response->assertSee(__('govuk_alpha.members.empty'));
         $response->assertSee('class="govuk-inset-text"', false);
+    }
+
+    public function test_phase_banner_is_promoted_to_beta(): void
+    {
+        $response = $this->get("/{$this->testTenantSlug}/alpha");
+
+        $response->assertOk();
+        $response->assertSee('class="govuk-phase-banner"', false);
+        $this->assertSame('Beta', __('govuk_alpha.phase'));
+        $response->assertSee('>' . __('govuk_alpha.phase') . '<', false);
+        $response->assertDontSee('>Alpha<', false);
+    }
+
+    public function test_profile_settings_page_renders_photo_marketing_and_gdpr_sections(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/profile/settings");
+
+        $response->assertOk();
+        // Multipart photo upload field.
+        $response->assertSee('enctype="multipart/form-data"', false);
+        $response->assertSee('name="avatar"', false);
+        $response->assertSee('type="file"', false);
+        $response->assertSee('class="govuk-file-upload"', false);
+        // Marketing consent control.
+        $response->assertSee('name="newsletter_opt_in"', false);
+        $response->assertSee(__('govuk_alpha.profile_settings.marketing_title'));
+        // GDPR data + delete controls.
+        $response->assertSee(__('govuk_alpha.profile_settings.data_title'));
+        $response->assertSee(route('govuk-alpha.profile.data-export', ['tenantSlug' => $this->testTenantSlug]), false);
+        $response->assertSee(route('govuk-alpha.profile.delete', ['tenantSlug' => $this->testTenantSlug]), false);
+        $response->assertSee('govuk-button--warning', false);
+    }
+
+    public function test_profile_settings_avatar_upload_stores_a_400_by_400_image(): void
+    {
+        $user = $this->authenticatedUser([
+            'first_name' => 'Photo',
+            'last_name' => 'Member',
+            'name' => 'Photo Member',
+        ]);
+
+        // Keep the stored extension deterministic in the test (no cwebp dependency).
+        ImageUploader::setAutoConvertWebP(false);
+
+        try {
+            $update = $this->post("/{$this->testTenantSlug}/alpha/profile/settings", [
+                'first_name' => 'Photo',
+                'last_name' => 'Member',
+                'profile_type' => 'individual',
+                'privacy_profile' => 'public',
+                'privacy_search' => '1',
+                'avatar' => UploadedFile::fake()->image('portrait.png', 800, 600),
+            ]);
+
+            $update->assertRedirect("/{$this->testTenantSlug}/alpha/profile?status=profile-updated");
+
+            $avatarUrl = (string) DB::table('users')
+                ->where('id', $user->id)
+                ->where('tenant_id', $this->testTenantId)
+                ->value('avatar_url');
+
+            $this->assertNotSame('', $avatarUrl);
+            $this->assertStringContainsString('/uploads/', $avatarUrl);
+
+            $storedPath = base_path('httpdocs' . parse_url($avatarUrl, PHP_URL_PATH));
+            $this->assertFileExists($storedPath);
+
+            // The avatar pipeline crops to a 400x400 square — verify the real output.
+            [$width, $height] = getimagesize($storedPath);
+            $this->assertSame(400, $width, 'Avatar width should be cropped to 400px');
+            $this->assertSame(400, $height, 'Avatar height should be cropped to 400px');
+
+            @unlink($storedPath);
+        } finally {
+            ImageUploader::setAutoConvertWebP(true);
+        }
+    }
+
+    public function test_profile_settings_rejects_a_non_image_avatar(): void
+    {
+        $this->authenticatedUser(['first_name' => 'Valid', 'last_name' => 'Name']);
+
+        $update = $this->post("/{$this->testTenantSlug}/alpha/profile/settings", [
+            'first_name' => 'Valid',
+            'last_name' => 'Name',
+            'profile_type' => 'individual',
+            'privacy_profile' => 'public',
+            'avatar' => UploadedFile::fake()->create('notes.txt', 16, 'text/plain'),
+        ]);
+
+        $update->assertRedirect("/{$this->testTenantSlug}/alpha/profile/settings?status=avatar-invalid");
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/profile/settings?status=avatar-invalid");
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.states.avatar-invalid'));
+        $response->assertSee('class="govuk-error-summary"', false);
+    }
+
+    public function test_profile_settings_persists_marketing_consent_choice(): void
+    {
+        $user = $this->authenticatedUser([
+            'first_name' => 'Consent',
+            'last_name' => 'Member',
+            'name' => 'Consent Member',
+            'newsletter_opt_in' => 0,
+        ]);
+
+        $base = [
+            'first_name' => 'Consent',
+            'last_name' => 'Member',
+            'profile_type' => 'individual',
+            'privacy_profile' => 'public',
+            'privacy_search' => '1',
+        ];
+
+        $optIn = $this->post("/{$this->testTenantSlug}/alpha/profile/settings", $base + ['newsletter_opt_in' => '1']);
+        $optIn->assertRedirect("/{$this->testTenantSlug}/alpha/profile?status=profile-updated");
+        $this->assertSame(1, (int) DB::table('users')->where('id', $user->id)->value('newsletter_opt_in'));
+
+        // Omitting the checkbox must withdraw the consent.
+        $optOut = $this->post("/{$this->testTenantSlug}/alpha/profile/settings", $base);
+        $optOut->assertRedirect("/{$this->testTenantSlug}/alpha/profile?status=profile-updated");
+        $this->assertSame(0, (int) DB::table('users')->where('id', $user->id)->value('newsletter_opt_in'));
+    }
+
+    public function test_feed_post_accepts_an_image_upload(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $post = $this->post("/{$this->testTenantSlug}/alpha/feed/posts", [
+            'content' => 'Accessible feed post with a photo attached.',
+            'image' => UploadedFile::fake()->image('feed-photo.jpg', 800, 800),
+            'image_alt' => 'A description of the test photo',
+        ]);
+
+        $post->assertRedirect("/{$this->testTenantSlug}/alpha/feed?status=post-created");
+
+        $postId = DB::table('feed_posts')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->orderByDesc('id')
+            ->value('id');
+        $this->assertNotNull($postId);
+
+        $media = DB::table('post_media')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('post_id', $postId)
+            ->first();
+
+        $this->assertNotNull($media, 'A post_media row should be created for the uploaded image');
+        $this->assertSame('image', $media->media_type);
+        $this->assertSame('A description of the test photo', $media->alt_text);
+        $this->assertSame(800, (int) $media->width);
+        $this->assertSame(800, (int) $media->height);
+        $this->assertNotEmpty($media->file_url);
+
+        foreach (array_filter([$media->file_url, $media->thumbnail_url]) as $url) {
+            $path = base_path('httpdocs' . parse_url($url, PHP_URL_PATH));
+            if (is_file($path)) {
+                @unlink($path);
+            }
+        }
+    }
+
+    public function test_profile_data_export_request_creates_a_gdpr_request(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/profile/data-export");
+
+        $response->assertRedirect("/{$this->testTenantSlug}/alpha/profile/settings?status=data-export-requested");
+        $this->assertDatabaseHas('gdpr_requests', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'request_type' => 'portability',
+            'status' => 'pending',
+        ]);
+
+        $settings = $this->get("/{$this->testTenantSlug}/alpha/profile/settings?status=data-export-requested");
+        $settings->assertOk();
+        $settings->assertSee(__('govuk_alpha.states.data-export-requested'));
+    }
+
+    public function test_account_deletion_requires_password_and_confirmation_then_signs_out(): void
+    {
+        $password = 'CorrectHorseBattery1!';
+        $user = $this->authenticatedUser([
+            'password_hash' => Hash::make($password),
+        ]);
+
+        $confirm = $this->get("/{$this->testTenantSlug}/alpha/profile/delete-account");
+        $confirm->assertOk();
+        $confirm->assertSee(__('govuk_alpha.delete_account.title'));
+        $confirm->assertSee('name="password"', false);
+        $confirm->assertSee('name="confirm"', false);
+        $confirm->assertSee('class="govuk-warning-text"', false);
+        $confirm->assertSee('govuk-button--warning', false);
+
+        // Wrong password must not create an erasure request.
+        $wrong = $this->post("/{$this->testTenantSlug}/alpha/profile/delete-account", [
+            'password' => 'NotMyPassword',
+            'confirm' => '1',
+        ]);
+        $wrong->assertRedirect("/{$this->testTenantSlug}/alpha/profile/delete-account?status=delete-password-incorrect");
+        $this->assertDatabaseMissing('gdpr_requests', [
+            'user_id' => $user->id,
+            'request_type' => 'erasure',
+        ]);
+
+        // Missing the explicit confirmation checkbox is rejected.
+        $noConfirm = $this->post("/{$this->testTenantSlug}/alpha/profile/delete-account", [
+            'password' => $password,
+        ]);
+        $noConfirm->assertRedirect("/{$this->testTenantSlug}/alpha/profile/delete-account?status=delete-confirm-required");
+
+        // Correct password + confirmation creates the erasure request and signs out.
+        $deleted = $this->post("/{$this->testTenantSlug}/alpha/profile/delete-account", [
+            'password' => $password,
+            'confirm' => '1',
+            'reason' => 'Moving on from the community.',
+        ]);
+        $deleted->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=account-deletion-requested");
+        $deleted->assertCookieExpired('auth_token');
+        $this->assertDatabaseHas('gdpr_requests', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'request_type' => 'erasure',
+            'status' => 'pending',
+        ]);
     }
 
     private function authenticatedUser(array $overrides = []): User

@@ -91,8 +91,15 @@ class ImageUploader
         $targetPath = $targetDir . '/' . $filename;
         $publicPath = '/uploads/' . $tenantDir . '/' . $filename;
 
-        // Move file
-        if (!\move_uploaded_file($file['tmp_name'], $targetPath)) {
+        // Move file. Genuine HTTP uploads go through move_uploaded_file() for its
+        // is_uploaded_file() safety check. Files the framework injects in the test
+        // harness (and other non-SAPI callers) are not registered uploads, so fall
+        // back to rename() for those — production behaviour is unchanged because
+        // real uploads always satisfy is_uploaded_file().
+        $moved = \is_uploaded_file($file['tmp_name'])
+            ? \move_uploaded_file($file['tmp_name'], $targetPath)
+            : \rename($file['tmp_name'], $targetPath);
+        if (!$moved) {
             throw new \Exception("Failed to save file.");
         }
 

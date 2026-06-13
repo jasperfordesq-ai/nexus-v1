@@ -875,12 +875,37 @@ class AlphaController extends Controller
             if (is_array($post) && isset($post['error'])) {
                 return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'post-failed']);
             }
+
+            // Optional photo — attach via the shared post-media pipeline (validates,
+            // strips EXIF, builds a thumbnail). Best-effort: a bad image must not
+            // discard the text the member already wrote.
+            if ($post instanceof \App\Models\FeedPost && $request->hasFile('image')) {
+                $this->attachFeedPostImage($request, (int) $post->id);
+            }
         } catch (\Throwable $e) {
             report($e);
             return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'post-failed']);
         }
 
         return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'post-created']);
+    }
+
+    private function attachFeedPostImage(Request $request, int $postId): void
+    {
+        $file = $request->file('image');
+        if ($file === null || is_array($file) || !$file->isValid()) {
+            return;
+        }
+
+        try {
+            app(\App\Services\PostMediaService::class)->attachMedia(
+                $postId,
+                [$file],
+                [trim(self::asStr($request->input('image_alt')))]
+            );
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     public function storeFeedLike(Request $request, string $tenantSlug, string $type, int $id): RedirectResponse
@@ -1594,12 +1619,19 @@ class AlphaController extends Controller
         $profile = $this->profileForViewer($userId, $userId);
         abort_if($profile === null, 404);
 
+        $marketingOptIn = (bool) DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->value('newsletter_opt_in');
+
         return $this->view('accessible-frontend::profile-settings', [
             'title' => __('govuk_alpha.profile_settings.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'profile',
             'profile' => $profile,
             'displayName' => $this->profileDisplayName($profile),
+            'avatarUrl' => $profile['avatar_url'] ?? $profile['avatar'] ?? null,
+            'marketingOptIn' => $marketingOptIn,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -1631,6 +1663,21 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'profile-update-failed']);
         }
 
+        // Profile photo: validate and store BEFORE the text update so an invalid
+        // image aborts the whole save with a specific message rather than silently
+        // persisting half the form. ImageUploader crops avatars to a 400x400 square.
+        if ($request->hasFile('avatar')) {
+            $avatarResult = $this->storeUploadedAvatar($request, $userId);
+            if ($avatarResult === false) {
+                return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'avatar-invalid']);
+            }
+        } elseif ($request->boolean('remove_avatar')) {
+            DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', TenantContext::getId())
+                ->update(['avatar_url' => null, 'updated_at' => now()]);
+        }
+
         $success = UserService::updateProfile($userId, $data);
         if (!$success) {
             return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'profile-update-failed']);
@@ -1643,10 +1690,141 @@ class AlphaController extends Controller
                 'name' => trim($data['first_name'] . ' ' . $data['last_name']) ?: ($data['organization_name'] ?: __('govuk_alpha.members.unknown_member')),
                 'privacy_profile' => $privacyProfile,
                 'privacy_search' => $request->boolean('privacy_search'),
+                // GDPR marketing consent — recipient-controlled newsletter opt-in.
+                'newsletter_opt_in' => $request->boolean('newsletter_opt_in'),
                 'updated_at' => now(),
             ]);
 
         return redirect()->route('govuk-alpha.profile.me', ['tenantSlug' => $tenantSlug, 'status' => 'profile-updated']);
+    }
+
+    /**
+     * Store an uploaded profile photo for the user via the shared image
+     * pipeline (validates MIME/size, crops to a 400x400 square). Returns the
+     * stored URL on success, or false when the upload is missing/invalid so the
+     * caller can surface a single "avatar-invalid" message.
+     */
+    private function storeUploadedAvatar(Request $request, int $userId): string|false
+    {
+        $file = $request->file('avatar');
+        if ($file === null || is_array($file) || !$file->isValid()) {
+            return false;
+        }
+
+        try {
+            $avatarUrl = UserService::updateAvatar($userId, [
+                'name' => $file->getClientOriginalName(),
+                'type' => $file->getMimeType(),
+                'tmp_name' => $file->getRealPath(),
+                'error' => UPLOAD_ERR_OK,
+                'size' => $file->getSize(),
+            ]);
+        } catch (\Throwable $e) {
+            // ImageUploader throws on disallowed type / oversize / decompression
+            // bomb — treat all as a validation failure, not a 500.
+            report($e);
+            return false;
+        }
+
+        return $avatarUrl ?: false;
+    }
+
+    public function requestDataExport(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        try {
+            app(\App\Services\Enterprise\GdprService::class)->createRequest($userId, 'portability', [
+                'notes' => __('govuk_alpha.profile_settings.data_export_note'),
+                'metadata' => ['requested_via' => 'accessible-frontend', 'self_service' => true],
+            ]);
+        } catch (\RuntimeException) {
+            // Same-type request already pending — tell the user it's in progress.
+            return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'data-export-exists']);
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'data-export-failed']);
+        }
+
+        return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'data-export-requested']);
+    }
+
+    public function confirmDeleteAccount(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        return $this->view('accessible-frontend::profile-delete', [
+            'title' => __('govuk_alpha.delete_account.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'profile',
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function deleteAccount(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $password = self::asStr($request->input('password'));
+        if ($password === '') {
+            return redirect()->route('govuk-alpha.profile.delete', ['tenantSlug' => $tenantSlug, 'status' => 'delete-password-required']);
+        }
+
+        if (!$request->boolean('confirm')) {
+            return redirect()->route('govuk-alpha.profile.delete', ['tenantSlug' => $tenantSlug, 'status' => 'delete-confirm-required']);
+        }
+
+        // Re-authenticate with the password before destroying the account —
+        // mirrors the React/API GdprController::deleteAccount contract.
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->select('password_hash')
+            ->first();
+
+        if ($user === null || !password_verify($password, (string) $user->password_hash)) {
+            return redirect()->route('govuk-alpha.profile.delete', ['tenantSlug' => $tenantSlug, 'status' => 'delete-password-incorrect']);
+        }
+
+        try {
+            app(\App\Services\Enterprise\GdprService::class)->createRequest($userId, 'erasure', [
+                'notes' => trim(self::asStr($request->input('reason'))) ?: null,
+                'metadata' => ['requested_via' => 'accessible-frontend', 'self_service' => true],
+            ]);
+        } catch (\RuntimeException) {
+            // Erasure already pending — fall through to sign-out + confirmation.
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.profile.delete', ['tenantSlug' => $tenantSlug, 'status' => 'delete-failed']);
+        }
+
+        // Sign the user out immediately — the API contract returns logout_required.
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            unset($_SESSION['user_id']);
+        }
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
+        return redirect()
+            ->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'account-deletion-requested'])
+            ->withCookie(cookie()->forget('auth_token', '/'));
     }
 
     private function view(string $name, array $data = [], int $status = 200): Response

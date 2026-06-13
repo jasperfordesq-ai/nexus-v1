@@ -115,7 +115,7 @@
     @endif
 
     @if (!$requiresAuth)
-        <form method="post" action="{{ route('govuk-alpha.feed.posts.store', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-7">
+        <form method="post" action="{{ route('govuk-alpha.feed.posts.store', ['tenantSlug' => $tenantSlug]) }}" enctype="multipart/form-data" class="govuk-!-margin-bottom-7">
             @csrf
             <div class="govuk-form-group{{ $hasPostError ? ' govuk-form-group--error' : '' }}">
                 <label class="govuk-label govuk-label--m" for="content">{{ __('govuk_alpha.feed.post_label') }}</label>
@@ -126,6 +126,16 @@
                     </p>
                 @endif
                 <textarea class="govuk-textarea{{ $hasPostError ? ' govuk-textarea--error' : '' }}" id="content" name="content" rows="4" aria-describedby="content-hint{{ $hasPostError ? ' content-error' : '' }}"></textarea>
+            </div>
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="image">{{ __('govuk_alpha.feed.image_label') }}</label>
+                <div id="image-hint" class="govuk-hint">{{ __('govuk_alpha.feed.image_hint') }}</div>
+                <input class="govuk-file-upload" id="image" name="image" type="file" accept="image/jpeg,image/png,image/gif,image/webp" aria-describedby="image-hint">
+            </div>
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="image_alt">{{ __('govuk_alpha.feed.image_alt_label') }}</label>
+                <div id="image-alt-hint" class="govuk-hint">{{ __('govuk_alpha.feed.image_alt_hint') }}</div>
+                <input class="govuk-input" id="image_alt" name="image_alt" type="text" maxlength="500" aria-describedby="image-alt-hint">
             </div>
             <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.post') }}</button>
         </form>

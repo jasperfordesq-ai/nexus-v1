@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **You can now add a profile photo on the accessible site.** The accessibility-first version of the platform gained a photo upload on the Edit-your-profile page — pick a JPG, PNG, GIF or WEBP and it's automatically cropped to a neat 400×400 square, with an option to remove it again. It uses the same image pipeline (and the same size and safety checks) as the main site.
+- **You can now attach a photo to a post on the accessible site.** The accessible feed's "Write a post" box now takes an optional photo, with its own field to describe the image for people using a screen reader.
+- **Privacy and data controls on the accessible site (GDPR).** The accessible Edit-your-profile page now has a "Your data and privacy" section: choose whether to receive newsletters, request a downloadable copy of your personal data, and delete your account through a clear, password-confirmed step. These use exactly the same data-request and erasure process as the main site.
+
+### Changed
+
+- **The accessible version of the platform has moved from Alpha to Beta.** Having been tested and rounded out, the accessibility-first site now shows a "Beta" label instead of "Alpha", and the remaining "alpha" wording has been removed.
+
 ---
 
 ## [1.5.2] - 2026-06-13

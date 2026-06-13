@@ -42,6 +42,15 @@
                         <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.auth.register_created') }}</p>
                     </div>
                 </div>
+            @elseif (($status ?? '') === 'account-deletion-requested')
+                <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="account-deleted-title">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="account-deleted-title">{{ __('govuk_alpha.states.success_title') }}</h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.delete_account.success') }}</p>
+                    </div>
+                </div>
             @endif
 
             <form method="post" action="{{ route('govuk-alpha.login.store', ['tenantSlug' => $tenantSlug]) }}" novalidate>
