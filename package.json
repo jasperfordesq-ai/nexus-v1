@@ -10,7 +10,7 @@
     "check:i18n:stubs": "node scripts/check-i18n-stubs.mjs",
     "check:i18n:coverage": "node scripts/check-i18n-coverage.mjs",
     "check:i18n:vars": "node scripts/check-i18n-vars.mjs",
-    "check:i18n:php": "node scripts/check-php-i18n-coverage.mjs",
+    "check:i18n:php": "node scripts/check-php-i18n-coverage.mjs && node scripts/check-govuk-alpha-translations.mjs",
     "check:test-skips": "node scripts/check-test-skip-budget.mjs",
     "check:admin:breadcrumbs": "node scripts/check-admin-breadcrumbs.mjs",
     "check:i18n:types": "npm --prefix react-frontend run i18n:types",

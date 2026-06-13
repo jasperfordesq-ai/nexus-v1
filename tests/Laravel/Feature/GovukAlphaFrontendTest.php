@@ -103,6 +103,8 @@ class GovukAlphaFrontendTest extends TestCase
         $ga = $this->get("/{$this->testTenantSlug}/alpha/login?locale=ga");
         $ga->assertOk();
         $ga->assertSee('lang="ga"', false);
+        $ga->assertSee($this->alphaText('ga', 'auth.login_description', ['community' => 'Hour Timebank']));
+        $ga->assertDontSee($this->alphaText('en', 'auth.login_description', ['community' => 'Hour Timebank']));
 
         // The choice persists to the next request via the session (no ?locale param) —
         // this is the bug the AlphaSetLocale middleware fixes.
@@ -113,6 +115,8 @@ class GovukAlphaFrontendTest extends TestCase
         $ar = $this->get("/{$this->testTenantSlug}/alpha/login?locale=ar");
         $ar->assertSee('lang="ar"', false);
         $ar->assertSee('dir="rtl"', false);
+        $ar->assertSee($this->alphaText('ar', 'auth.login_description', ['community' => 'Hour Timebank']));
+        $ar->assertDontSee($this->alphaText('en', 'auth.login_description', ['community' => 'Hour Timebank']));
     }
 
     public function test_home_module_grid_distinguishes_signin_from_disabled(): void
@@ -2793,6 +2797,21 @@ class GovukAlphaFrontendTest extends TestCase
         Sanctum::actingAs($user, ['*']);
 
         return $user;
+    }
+
+    private function alphaText(string $locale, string $key, array $replace = []): string
+    {
+        $value = require base_path("lang/{$locale}/govuk_alpha.php");
+
+        foreach (explode('.', $key) as $part) {
+            $value = $value[$part];
+        }
+
+        foreach ($replace as $name => $replacement) {
+            $value = str_replace(':' . $name, $replacement, $value);
+        }
+
+        return $value;
     }
 
     private function ensureListingCategory(): void

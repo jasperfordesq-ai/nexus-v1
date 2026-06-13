@@ -16,10 +16,15 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execFileSync } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const PHP_DIRS = [path.join(ROOT, 'app'), path.join(ROOT, 'src')];
+const PHP_DIRS = [
+  path.join(ROOT, 'app'),
+  path.join(ROOT, 'src'),
+  path.join(ROOT, 'accessible-frontend', 'views'),
+];
 const LANG = path.join(ROOT, 'lang/en');
 const BASELINE = path.join(ROOT, '.github/php-i18n-baseline.json');
 
@@ -33,6 +38,35 @@ function flatten(obj, prefix = '', out = new Set()) {
     }
   }
   return out;
+}
+
+function flattenPhpKeys(value, prefix = '', out = new Set()) {
+  if (prefix !== '') {
+    out.add(prefix);
+  }
+
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => flattenPhpKeys(item, prefix ? `${prefix}.${index}` : String(index), out));
+    return out;
+  }
+
+  if (value !== null && typeof value === 'object') {
+    for (const [key, item] of Object.entries(value)) {
+      flattenPhpKeys(item, prefix ? `${prefix}.${key}` : key, out);
+    }
+  }
+
+  return out;
+}
+
+function loadPhpLangFile(file) {
+  const out = execFileSync(
+    'php',
+    ['-d', 'display_errors=stderr', '-r', 'echo json_encode(require $argv[1], JSON_UNESCAPED_UNICODE);', file],
+    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
+  );
+
+  return JSON.parse(out);
 }
 
 function parsePhpReturnArray(text) {
@@ -118,6 +152,7 @@ function parsePhpReturnArray(text) {
           skipWhitespace();
           const pathSoFar = [...prefix, key];
           if (src[i] === '[') {
+            keys.add(pathSoFar.join('.'));
             parseArray(pathSoFar);
           } else {
             keys.add(pathSoFar.join('.'));
@@ -149,7 +184,7 @@ function loadNamespaces() {
       nss.set(ns, flatten(data));
     } else if (file.endsWith('.php')) {
       const ns = file.replace('.php', '');
-      const keys = parsePhpReturnArray(fs.readFileSync(full, 'utf8'));
+      const keys = flattenPhpKeys(loadPhpLangFile(full));
       const existing = nss.get(ns) || new Set();
       for (const k of keys) existing.add(k);
       nss.set(ns, existing);

@@ -44,6 +44,7 @@ CLAUDE.md
 !/scripts/start-native-dev.ps1
 !/scripts/add-spdx-headers.mjs
 !/scripts/check-spdx.mjs
+!/scripts/check-govuk-alpha-translations.mjs
 !/scripts/safe_migrate.php
 !/scripts/backfill_embeddings.php
 !/scripts/watchdog-queue.sh
