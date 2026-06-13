@@ -1800,6 +1800,130 @@ class AlphaController extends Controller
         return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => $status]);
     }
 
+    /** Hide a feed item from the viewer's own feed (any feed item type). */
+    public function hideFeedItem(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $validTypes = ['post', 'listing', 'event', 'poll', 'goal', 'review', 'job', 'challenge', 'volunteer', 'resource', 'blog', 'discussion'];
+        $type = in_array($request->input('type'), $validTypes, true) ? (string) $request->input('type') : 'post';
+
+        $status = 'moderation-failed';
+        if ($id > 0 && FeedItemTables::canView($type, $id, $userId)) {
+            try {
+                DB::table('feed_hidden')->insertOrIgnore([
+                    'user_id'     => $userId,
+                    'tenant_id'   => TenantContext::getId(),
+                    'target_type' => $type,
+                    'target_id'   => $id,
+                    'created_at'  => now(),
+                ]);
+                $status = 'content-hidden';
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    /** Mute another member so their content stops appearing in the viewer's feed. */
+    public function muteFeedUser(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $status = 'moderation-failed';
+        if ($id > 0 && $id !== $userId && DB::table('users')->where('id', $id)->where('tenant_id', $tenantId)->exists()) {
+            try {
+                DB::table('feed_muted_users')->insertOrIgnore([
+                    'user_id'       => $userId,
+                    'tenant_id'     => $tenantId,
+                    'muted_user_id' => $id,
+                    'created_at'    => now(),
+                ]);
+                $status = 'author-muted';
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    /** Report a feed item to moderators (mirrors SocialController::reportItemV2). */
+    public function reportFeedItem(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $rawType = (string) $request->input('type', 'post');
+        $type = $rawType === 'volunteering' ? 'volunteer' : $rawType;
+        $reason = trim(self::asStr($request->input('reason')));
+
+        $status = 'moderation-failed';
+        if (
+            in_array($type, \App\Services\ReactionService::VALID_TARGET_TYPES, true)
+            && $id > 0
+            && $reason !== ''
+            && FeedItemTables::canView($type, $id, $userId)
+        ) {
+            $reason = mb_substr($reason, 0, 1000);
+            $already = DB::table('reports')
+                ->where('reporter_id', $userId)->where('tenant_id', $tenantId)
+                ->where('target_type', $type)->where('target_id', $id)->exists();
+
+            if ($already) {
+                // Idempotent from the member's perspective — already flagged.
+                $status = 'content-reported';
+            } else {
+                try {
+                    $reportId = DB::table('reports')->insertGetId([
+                        'reporter_id' => $userId,
+                        'tenant_id'   => $tenantId,
+                        'target_type' => $type,
+                        'target_id'   => $id,
+                        'reason'      => $reason,
+                        'status'      => 'open',
+                        'created_at'  => now(),
+                    ]);
+                    try {
+                        \App\Services\NotificationDispatcher::notifyModerationAdmins(
+                            'social_report_created',
+                            '/admin/reports',
+                            'svc_notifications_2.social_report.admin_alert',
+                            'emails_misc.moderation.social_subject',
+                            'emails_misc.moderation.social_body',
+                            ['target_type' => $type, 'reason' => $reason, 'report_id' => $reportId]
+                        );
+                    } catch (\Throwable $notifyError) {
+                        Log::warning('Alpha social report admin alert failed: ' . $notifyError->getMessage());
+                    }
+                    $status = 'content-reported';
+                } catch (\Throwable $e) {
+                    report($e);
+                }
+            }
+        }
+
+        return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
     public function updateFeedComment(Request $request, string $tenantSlug, int $id): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);

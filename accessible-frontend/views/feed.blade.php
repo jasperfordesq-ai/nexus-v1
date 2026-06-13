@@ -9,8 +9,8 @@
         $communityName = $tenant['name'] ?? $tenantSlug;
         $hasPostError = in_array($status ?? '', ['post-empty', 'post-failed'], true);
         $postErrorMessage = ($status ?? '') === 'post-failed' ? __('govuk_alpha.states.post_failed') : __('govuk_alpha.states.post_empty');
-        $successStatuses = ['post-created', 'like-added', 'like-removed', 'comment-created', 'poll-voted', 'post-updated', 'post-deleted', 'comment-updated', 'comment-deleted'];
-        $errorStatuses = ['comment-empty', 'comment-too-long', 'comment-failed', 'like-failed', 'poll-vote-failed', 'post-update-failed', 'post-delete-failed', 'comment-update-failed', 'comment-delete-failed'];
+        $successStatuses = ['post-created', 'like-added', 'like-removed', 'comment-created', 'poll-voted', 'post-updated', 'post-deleted', 'comment-updated', 'comment-deleted', 'content-hidden', 'author-muted', 'content-reported'];
+        $errorStatuses = ['comment-empty', 'comment-too-long', 'comment-failed', 'like-failed', 'poll-vote-failed', 'post-update-failed', 'post-delete-failed', 'comment-update-failed', 'comment-delete-failed', 'moderation-failed'];
         $hasItems = !empty($items);
         $visibleCount = count($items);
         $typeOptions = ['all', 'following', 'saved', 'posts', 'listings', 'events', 'goals', 'polls', 'jobs', 'challenges', 'volunteering', 'blogs', 'discussions'];
@@ -401,6 +401,39 @@
                                         <form method="post" action="{{ route('govuk-alpha.feed.posts.delete', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}">
                                             @csrf
                                             <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.feed.delete_post_button') }}</button>
+                                        </form>
+                                    </div>
+                                </details>
+                            </div>
+                        @elseif (!$requiresAuth && ($currentUserId ?? 0) > 0 && $authorId !== (int) ($currentUserId ?? 0))
+                            <div class="govuk-!-margin-bottom-3">
+                                <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
+                                    <summary class="govuk-details__summary">
+                                        <span class="govuk-details__summary-text">{{ __('govuk_alpha.feed.moderation_summary') }}</span>
+                                    </summary>
+                                    <div class="govuk-details__text">
+                                        <form method="post" action="{{ route('govuk-alpha.feed.hide', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}" class="govuk-!-margin-bottom-4">
+                                            @csrf
+                                            <input type="hidden" name="type" value="{{ $itemType }}">
+                                            <p class="govuk-body govuk-!-margin-bottom-2">{{ __('govuk_alpha.feed.hide_hint') }}</p>
+                                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.feed.hide_button') }}</button>
+                                        </form>
+                                        @if ($authorId > 0)
+                                            <form method="post" action="{{ route('govuk-alpha.feed.mute', ['tenantSlug' => $tenantSlug, 'id' => $authorId]) }}" class="govuk-!-margin-bottom-4">
+                                                @csrf
+                                                <p class="govuk-body govuk-!-margin-bottom-2">{{ __('govuk_alpha.feed.mute_hint', ['name' => $authorName]) }}</p>
+                                                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.feed.mute_button') }}<span class="govuk-visually-hidden"> {{ $authorName }}</span></button>
+                                            </form>
+                                        @endif
+                                        <form method="post" action="{{ route('govuk-alpha.feed.report', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}">
+                                            @csrf
+                                            <input type="hidden" name="type" value="{{ $itemType }}">
+                                            <div class="govuk-form-group govuk-!-margin-bottom-2">
+                                                <label class="govuk-label" for="report-reason-{{ $itemType }}-{{ $itemId }}">{{ __('govuk_alpha.feed.report_reason_label') }}</label>
+                                                <div class="govuk-hint" id="report-hint-{{ $itemType }}-{{ $itemId }}">{{ __('govuk_alpha.feed.report_hint') }}</div>
+                                                <input class="govuk-input" id="report-reason-{{ $itemType }}-{{ $itemId }}" name="reason" type="text" maxlength="500" aria-describedby="report-hint-{{ $itemType }}-{{ $itemId }}">
+                                            </div>
+                                            <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.feed.report_button') }}</button>
                                         </form>
                                     </div>
                                 </details>

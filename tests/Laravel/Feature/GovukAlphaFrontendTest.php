@@ -673,6 +673,62 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertDatabaseHas('feed_posts', ['id' => $post->id]);
     }
 
+    public function test_feed_moderation_hide_mute_and_report(): void
+    {
+        $author = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Feed Author',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $post = FeedPost::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $author->id,
+            'content' => 'A post to moderate.',
+            'visibility' => 'public',
+        ]);
+
+        $viewer = $this->authenticatedUser(['name' => 'Moderating Viewer']);
+
+        // Hide the post from the viewer's own feed.
+        $hide = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$post->id}/hide", ['type' => 'post']);
+        $hide->assertRedirectContains('status=content-hidden');
+        $this->assertDatabaseHas('feed_hidden', [
+            'user_id' => $viewer->id,
+            'tenant_id' => $this->testTenantId,
+            'target_type' => 'post',
+            'target_id' => $post->id,
+        ]);
+
+        // Mute the author.
+        $mute = $this->post("/{$this->testTenantSlug}/alpha/feed/users/{$author->id}/mute");
+        $mute->assertRedirectContains('status=author-muted');
+        $this->assertDatabaseHas('feed_muted_users', [
+            'user_id' => $viewer->id,
+            'muted_user_id' => $author->id,
+            'tenant_id' => $this->testTenantId,
+        ]);
+
+        // Report the post (reason required).
+        $report = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$post->id}/report", [
+            'type' => 'post',
+            'reason' => 'Spam content',
+        ]);
+        $report->assertRedirectContains('status=content-reported');
+        $this->assertDatabaseHas('reports', [
+            'reporter_id' => $viewer->id,
+            'tenant_id' => $this->testTenantId,
+            'target_type' => 'post',
+            'target_id' => $post->id,
+            'status' => 'open',
+        ]);
+
+        // Reporting with no reason fails validation.
+        $noReason = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$post->id}/report", [
+            'type' => 'post',
+            'reason' => '',
+        ]);
+        $noReason->assertRedirectContains('status=');
+    }
+
     public function test_feed_page_has_html_auth_required_state_when_unauthenticated(): void
     {
         // Pin the tenant display name so the community-name assertion does not depend

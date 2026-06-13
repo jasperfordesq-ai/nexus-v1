@@ -94,6 +94,9 @@ Route::prefix('{tenantSlug}/alpha')
             ->name('feed.items.comments.store');
         Route::post('/feed/posts/{id}/update', [AlphaController::class, 'updateFeedPost'])->whereNumber('id')->middleware('throttle:20,1')->name('feed.posts.update');
         Route::post('/feed/posts/{id}/delete', [AlphaController::class, 'deleteFeedPost'])->whereNumber('id')->middleware('throttle:20,1')->name('feed.posts.delete');
+        Route::post('/feed/posts/{id}/hide', [AlphaController::class, 'hideFeedItem'])->whereNumber('id')->middleware('throttle:30,1')->name('feed.hide');
+        Route::post('/feed/users/{id}/mute', [AlphaController::class, 'muteFeedUser'])->whereNumber('id')->middleware('throttle:30,1')->name('feed.mute');
+        Route::post('/feed/posts/{id}/report', [AlphaController::class, 'reportFeedItem'])->whereNumber('id')->middleware('throttle:15,1')->name('feed.report');
         Route::post('/feed/comments/{id}/update', [AlphaController::class, 'updateFeedComment'])->whereNumber('id')->middleware('throttle:30,1')->name('feed.comments.update');
         Route::post('/feed/comments/{id}/delete', [AlphaController::class, 'deleteFeedComment'])->whereNumber('id')->middleware('throttle:30,1')->name('feed.comments.delete');
         Route::get('/listings', [AlphaController::class, 'listings'])->name('listings.index');
