@@ -2832,6 +2832,12 @@ class AlphaController extends Controller
             'alphaNavItems' => $this->alphaNavItems(),
             'alphaFooterColumns' => $this->alphaFooterColumns(),
             'alphaSignOutUrl' => $this->alphaSignOutUrl(),
+            // Global, no-JS language switcher + RTL support (all 11 platform
+            // locales are enabled for every tenant by default).
+            'alphaLocaleOptions' => $this->alphaLocaleOptions(),
+            'alphaCurrentLocale' => app()->getLocale(),
+            'alphaTextDirection' => app()->getLocale() === 'ar' ? 'rtl' : 'ltr',
+            'alphaUnreadMessages' => $this->alphaUnreadMessages(),
             'feedbackUrl' => $this->feedbackUrl(),
             'mainSiteUrl' => $this->mainSiteUrl(),
             'metaDescription' => __('govuk_alpha.seo.description'),
@@ -2839,6 +2845,42 @@ class AlphaController extends Controller
             'robotsDirective' => 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
             'defaultOgImage' => 'https://project-nexus.ie/og-image.png',
         ];
+    }
+
+    /**
+     * Language options for the global locale switcher, keyed by code with the
+     * language's own endonym as the label (a name reads the same in every locale).
+     *
+     * @return array<string, string>
+     */
+    private function alphaLocaleOptions(): array
+    {
+        $options = [];
+        foreach (self::ALPHA_LOCALES as $code) {
+            $options[$code] = __('govuk_alpha.profile_settings.languages.' . $code);
+        }
+
+        return $options;
+    }
+
+    /**
+     * Unread-message total for the signed-in member, for the nav badge. Returns
+     * 0 for anonymous viewers or on any failure (never blocks a page render).
+     */
+    private function alphaUnreadMessages(): int
+    {
+        $userId = $this->currentUserId();
+        if ($userId === null || ! TenantContext::hasModule('messages')) {
+            return 0;
+        }
+
+        try {
+            return MessageService::getUnreadCount($userId);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return 0;
+        }
     }
 
     private function mainSiteUrl(): string

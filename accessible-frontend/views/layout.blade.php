@@ -3,7 +3,7 @@
 {{-- Author: Jasper Ford --}}
 {{-- See NOTICE file for attribution and acknowledgements. --}}
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="govuk-template">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ $alphaTextDirection ?? 'ltr' }}" class="govuk-template">
 <head>
     @php
         $serviceName = __('govuk_alpha.service_name');
@@ -64,8 +64,27 @@
                     {{ $brandText }}
                 @endif
             </a>
-            @if (!empty($tenantSlug))
-                <nav class="nexus-alpha-header__links" aria-label="{{ __('govuk_alpha.header.links_label') }}">
+            <nav class="nexus-alpha-header__links" aria-label="{{ __('govuk_alpha.header.links_label') }}">
+                @if (!empty($alphaLocaleOptions) && count($alphaLocaleOptions) > 1)
+                    {{-- Global, no-JS language switcher: a GET form that reloads the
+                         current page with ?locale=xx (honoured + persisted by the
+                         AlphaSetLocale middleware). Existing query params are kept. --}}
+                    <form method="get" action="{{ url()->current() }}" class="nexus-alpha-lang" aria-label="{{ __('govuk_alpha.header.language_label') }}">
+                        @foreach (request()->except(['locale']) as $qKey => $qVal)
+                            @if (is_scalar($qVal))
+                                <input type="hidden" name="{{ $qKey }}" value="{{ $qVal }}">
+                            @endif
+                        @endforeach
+                        <label class="govuk-visually-hidden" for="alpha-locale-select">{{ __('govuk_alpha.header.language_label') }}</label>
+                        <select class="govuk-select nexus-alpha-lang__select" id="alpha-locale-select" name="locale">
+                            @foreach ($alphaLocaleOptions as $code => $label)
+                                <option value="{{ $code }}" @selected($code === ($alphaCurrentLocale ?? 'en'))>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <button type="submit" class="govuk-button govuk-button--secondary nexus-alpha-lang__submit govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.header.language_submit') }}</button>
+                    </form>
+                @endif
+                @if (!empty($tenantSlug))
                     @if ($isAuthenticated ?? false)
                         <a class="nexus-alpha-header__link" href="{{ route('govuk-alpha.profile.me', ['tenantSlug' => $tenantSlug]) }}" @if (($activeNav ?? '') === 'profile') aria-current="page" @endif>
                             {{ __('govuk_alpha.nav.profile') }}
@@ -74,8 +93,8 @@
                     <a class="nexus-alpha-header__link" href="{{ $mainSiteUrl ?? '/' }}">
                         {{ __('govuk_alpha.header.back_to_main_site') }}
                     </a>
-                </nav>
-            @endif
+                @endif
+            </nav>
         </div>
     </header>
 
@@ -95,6 +114,10 @@
                                             <strong class="govuk-service-navigation__active-fallback">{{ __('govuk_alpha.nav.' . $key) }}</strong>
                                         @else
                                             {{ __('govuk_alpha.nav.' . $key) }}
+                                        @endif
+                                        @if ($key === 'messages' && ($alphaUnreadMessages ?? 0) > 0)
+                                            <strong class="govuk-tag govuk-tag--blue nexus-alpha-nav-badge" aria-hidden="true">{{ $alphaUnreadMessages > 99 ? '99+' : $alphaUnreadMessages }}</strong>
+                                            <span class="govuk-visually-hidden">{{ trans_choice('govuk_alpha.messages.unread_count', $alphaUnreadMessages, ['count' => $alphaUnreadMessages]) }}</span>
                                         @endif
                                     </a>
                                 </li>

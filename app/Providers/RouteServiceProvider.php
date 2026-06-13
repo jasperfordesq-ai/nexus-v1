@@ -77,6 +77,9 @@ class RouteServiceProvider extends ServiceProvider
                 \App\Http\Middleware\CheckMaintenanceMode::class,
                 \App\Http\Middleware\SetLocale::class,
                 'web',
+                // Runs AFTER StartSession so it can read/write the session and the
+                // alpha cookie-token member; SetLocale (above) runs too early for both.
+                \App\Http\Middleware\AlphaSetLocale::class,
             ])->group(base_path('routes/govuk-alpha.php'));
 
             // HTTP cron endpoint REMOVED (2026-04-02) — email bombing root cause.

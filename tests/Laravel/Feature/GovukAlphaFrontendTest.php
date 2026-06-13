@@ -90,6 +90,31 @@ class GovukAlphaFrontendTest extends TestCase
         }
     }
 
+    public function test_global_language_switcher_changes_and_persists_the_locale(): void
+    {
+        // The no-JS switcher renders in the header with the supported languages.
+        $page = $this->get("/{$this->testTenantSlug}/alpha/login");
+        $page->assertOk();
+        $page->assertSee('name="locale"', false);
+        $page->assertSee(__('govuk_alpha.profile_settings.languages.ga'), false);
+        $page->assertSee(__('govuk_alpha.header.language_submit'));
+
+        // Switching to Irish renders that locale and sets <html lang>.
+        $ga = $this->get("/{$this->testTenantSlug}/alpha/login?locale=ga");
+        $ga->assertOk();
+        $ga->assertSee('lang="ga"', false);
+
+        // The choice persists to the next request via the session (no ?locale param) —
+        // this is the bug the AlphaSetLocale middleware fixes.
+        $next = $this->get("/{$this->testTenantSlug}/alpha/login");
+        $next->assertSee('lang="ga"', false);
+
+        // Arabic switches the document direction to RTL.
+        $ar = $this->get("/{$this->testTenantSlug}/alpha/login?locale=ar");
+        $ar->assertSee('lang="ar"', false);
+        $ar->assertSee('dir="rtl"', false);
+    }
+
     public function test_register_page_shows_closed_registration_message_and_hides_form(): void
     {
         DB::table('tenant_registration_policies')->updateOrInsert(

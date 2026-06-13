@@ -15,6 +15,8 @@ return [
         'og_image_alt' => 'Project NEXUS, plataforma de código aberto de banco de tempo e comunidade',
     ],
     'header' => [
+        'language_label' => 'Choose a language',
+        'language_submit' => 'Change',
         'community' => 'Community: :name',
         'links_label' => 'Service links',
         'back_to_main_site' => 'Back to main site',
