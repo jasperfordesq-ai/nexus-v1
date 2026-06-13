@@ -1855,6 +1855,17 @@ class AlphaController extends Controller
         abort_if($exchange === null, 404);
         abort_unless((int) $exchange['requester_id'] === $userId || (int) $exchange['provider_id'] === $userId, 404);
 
+        // Post-completion review prompt: only once the exchange is completed and the
+        // viewer has not already rated it (mirrors the React detail page's has_rated gate).
+        $canReview = false;
+        if (($exchange['status'] ?? '') === 'completed') {
+            try {
+                $canReview = !app(\App\Services\ExchangeRatingService::class)->hasRated($id, $userId);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
         return $this->view('accessible-frontend::exchange-detail', [
             'title' => $exchange['listing_title'] ?? __('govuk_alpha.exchanges.detail_title'),
             'tenantSlug' => $tenantSlug,
@@ -1863,6 +1874,42 @@ class AlphaController extends Controller
             'history' => ExchangeWorkflowService::getExchangeHistory($id),
             'status' => self::asStr(request()->query('status')) ?: null,
             'currentUserId' => $userId,
+            'canReview' => $canReview,
+        ]);
+    }
+
+    public function storeExchangeRating(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $exchange = ExchangeWorkflowService::getExchange($id);
+        abort_if($exchange === null, 404);
+        abort_unless((int) $exchange['requester_id'] === $userId || (int) $exchange['provider_id'] === $userId, 404);
+
+        $rating = (int) $request->input('rating');
+        if ($rating < 1 || $rating > 5) {
+            return redirect()->route('govuk-alpha.exchanges.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'rating-invalid']);
+        }
+
+        $comment = trim(self::asStr($request->input('comment'))) ?: null;
+        $ok = false;
+        try {
+            $result = app(\App\Services\ExchangeRatingService::class)->submitRating($id, $userId, $rating, $comment);
+            $ok = (bool) ($result['success'] ?? false);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.exchanges.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'rating-submitted' : 'rating-failed',
         ]);
     }
 

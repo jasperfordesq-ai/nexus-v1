@@ -30,21 +30,21 @@
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_exchanges') }}</a>
 
-    @if ($status === 'exchange-created' || $status === 'exchange-updated')
+    @if (in_array($status, ['exchange-created', 'exchange-updated', 'rating-submitted'], true))
         <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="exchange-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="exchange-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
             <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ $status === 'exchange-created' ? __('govuk_alpha.exchanges.created') : __('govuk_alpha.exchanges.updated') }}</p>
+                <p class="govuk-notification-banner__heading">{{ $status === 'exchange-created' ? __('govuk_alpha.exchanges.created') : ($status === 'rating-submitted' ? __('govuk_alpha.exchanges.rating_submitted') : __('govuk_alpha.exchanges.updated')) }}</p>
             </div>
         </div>
-    @elseif ($status === 'exchange-action-failed')
+    @elseif (in_array($status, ['exchange-action-failed', 'rating-failed', 'rating-invalid'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
-                    <p>{{ __('govuk_alpha.exchanges.failed') }}</p>
+                    <p>{{ $status === 'rating-invalid' ? __('govuk_alpha.exchanges.rating_invalid') : ($status === 'rating-failed' ? __('govuk_alpha.exchanges.rating_failed') : __('govuk_alpha.exchanges.failed')) }}</p>
                 </div>
             </div>
         </div>
@@ -54,6 +54,10 @@
     <h1 class="govuk-heading-xl">{{ $exchange['listing_title'] ?? __('govuk_alpha.exchanges.detail_title') }}</h1>
     <p class="govuk-body-l">{{ $roleText }}</p>
     <strong class="govuk-tag govuk-!-margin-bottom-6">{{ $label('exchanges.statuses', $statusKey) }}</strong>
+
+    @if ($statusKey === 'disputed')
+        <div class="govuk-inset-text">{{ __('govuk_alpha.exchanges.disputed_detail') }}</div>
+    @endif
 
     <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.exchanges.summary_title') }}</h2>
     <dl class="govuk-summary-list">
@@ -175,6 +179,31 @@
         @endif
     @endif
 
+    @if (($exchange['status'] ?? '') === 'completed')
+        <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.exchanges.review_title') }}</h2>
+        @if ($canReview ?? false)
+            <p class="govuk-body">{{ __('govuk_alpha.exchanges.review_hint') }}</p>
+            <form method="post" action="{{ route('govuk-alpha.exchanges.rate.store', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}">
+                @csrf
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="rating">{{ __('govuk_alpha.exchanges.review_rating_label') }}</label>
+                    <select class="govuk-select govuk-input--width-10" id="rating" name="rating" required>
+                        @foreach ([5, 4, 3, 2, 1] as $ratingOption)
+                            <option value="{{ $ratingOption }}">{{ __('govuk_alpha.exchanges.review_rating_value', ['rating' => $ratingOption]) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="comment">{{ __('govuk_alpha.exchanges.review_comment_label') }}</label>
+                    <textarea class="govuk-textarea" id="comment" name="comment" rows="4"></textarea>
+                </div>
+                <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.exchanges.review_submit') }}</button>
+            </form>
+        @else
+            <div class="govuk-inset-text">{{ __('govuk_alpha.exchanges.review_thanks') }}</div>
+        @endif
+    @endif
+
     <h2 class="govuk-heading-l govuk-!-margin-top-8">{{ __('govuk_alpha.exchanges.timeline_title') }}</h2>
     @if (empty($history))
         <div class="govuk-inset-text">{{ __('govuk_alpha.exchanges.empty_timeline') }}</div>
@@ -182,7 +211,7 @@
         <ol class="govuk-list govuk-list--spaced">
             @foreach ($history as $entry)
                 <li>
-                    <strong>{{ __('govuk_alpha.exchanges.statuses.' . ($entry['new_status'] ?? $entry['old_status'] ?? $statusKey)) }}</strong>
+                    <strong>{{ $label('exchanges.statuses', $entry['new_status'] ?? $entry['old_status'] ?? $statusKey) }}</strong>
                     @if (!empty($entry['created_at']))
                         <span class="govuk-hint govuk-!-margin-bottom-0">{{ $formatDate($entry['created_at']) }}</span>
                     @endif

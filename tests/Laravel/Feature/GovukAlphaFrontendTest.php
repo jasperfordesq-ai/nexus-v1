@@ -897,6 +897,61 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertDatabaseHas('exchange_requests', ['id' => $exchangeId, 'status' => 'pending_confirmation']);
     }
 
+    public function test_completed_exchange_offers_a_review_prompt_then_records_the_rating(): void
+    {
+        $requester = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Rating Requester',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $provider = $this->authenticatedUser(['name' => 'Rating Provider']);
+        $this->enableExchangeWorkflow();
+
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $provider->id,
+            'title' => 'Completed exchange listing',
+            'type' => 'offer',
+        ]);
+
+        $exchangeId = DB::table('exchange_requests')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'listing_id' => $listing->id,
+            'requester_id' => $requester->id,
+            'provider_id' => $provider->id,
+            'proposed_hours' => 2,
+            'final_hours' => 2,
+            'status' => 'completed',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Sanctum::actingAs($provider, ['*']);
+
+        // Completed exchange prompts the viewer to rate it.
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}");
+        $detail->assertOk();
+        $detail->assertSee(__('govuk_alpha.exchanges.review_title'));
+        $detail->assertSee('name="rating"', false);
+        $detail->assertSee(route('govuk-alpha.exchanges.rate.store', ['tenantSlug' => $this->testTenantSlug, 'id' => $exchangeId]), false);
+
+        // Submit a rating.
+        $rate = $this->post("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}/rate", [
+            'rating' => 5,
+            'comment' => 'A great exchange, thank you.',
+        ]);
+        $rate->assertRedirect("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}?status=rating-submitted");
+
+        // Now that it is rated, the form is replaced by a thank-you note.
+        $after = $this->get("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}");
+        $after->assertOk();
+        $after->assertSee(__('govuk_alpha.exchanges.review_thanks'));
+        $after->assertDontSee('name="rating"', false);
+
+        // An invalid rating is rejected.
+        $invalid = $this->post("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}/rate", ['rating' => 9]);
+        $invalid->assertRedirect("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}?status=rating-invalid");
+    }
+
     public function test_accessible_messages_render_send_and_archive_flow(): void
     {
         $sender = $this->authenticatedUser(['name' => 'Message Sender']);

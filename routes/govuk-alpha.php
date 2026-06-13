@@ -75,6 +75,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/exchanges', [AlphaController::class, 'exchanges'])->name('exchanges.index');
         Route::get('/exchanges/{id}', [AlphaController::class, 'exchange'])->whereNumber('id')->name('exchanges.show');
         Route::post('/exchanges/{id}', [AlphaController::class, 'storeExchangeAction'])->middleware('throttle:30,1')->whereNumber('id')->name('exchanges.action.store');
+        Route::post('/exchanges/{id}/rate', [AlphaController::class, 'storeExchangeRating'])->middleware('throttle:20,1')->whereNumber('id')->name('exchanges.rate.store');
         Route::get('/messages', [AlphaController::class, 'messages'])->name('messages.index');
         Route::get('/messages/new/{userId}', [AlphaController::class, 'conversation'])->whereNumber('userId')->name('messages.new');
         Route::get('/messages/{userId}', [AlphaController::class, 'conversation'])->whereNumber('userId')->name('messages.show');
