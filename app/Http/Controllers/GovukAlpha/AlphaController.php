@@ -2060,9 +2060,14 @@ class AlphaController extends Controller
         // Post-completion review prompt: only once the exchange is completed and the
         // viewer has not already rated it (mirrors the React detail page's has_rated gate).
         $canReview = false;
+        $ratings = [];
         if (($exchange['status'] ?? '') === 'completed') {
             try {
-                $canReview = !app(\App\Services\ExchangeRatingService::class)->hasRated($id, $userId);
+                $ratingService = app(\App\Services\ExchangeRatingService::class);
+                $canReview = !$ratingService->hasRated($id, $userId);
+                // Surface the ratings each party has left (mirrors the React detail
+                // page's GET /v2/exchanges/:id/ratings section).
+                $ratings = $ratingService->getRatingsForExchange($id);
             } catch (\Throwable $e) {
                 report($e);
             }
@@ -2077,6 +2082,7 @@ class AlphaController extends Controller
             'status' => self::asStr(request()->query('status')) ?: null,
             'currentUserId' => $userId,
             'canReview' => $canReview,
+            'ratings' => $ratings,
         ]);
     }
 

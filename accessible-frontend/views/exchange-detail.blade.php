@@ -53,7 +53,15 @@
     <span class="govuk-caption-l">{{ __('govuk_alpha.exchanges.detail_title') }}</span>
     <h1 class="govuk-heading-xl">{{ $exchange['listing_title'] ?? __('govuk_alpha.exchanges.detail_title') }}</h1>
     <p class="govuk-body-l">{{ $roleText }}</p>
-    <strong class="govuk-tag govuk-!-margin-bottom-6">{{ $label('exchanges.statuses', $statusKey) }}</strong>
+    <strong class="govuk-tag govuk-!-margin-bottom-4">{{ $label('exchanges.statuses', $statusKey) }}</strong>
+
+    @php
+        $statusDescriptionKey = "govuk_alpha.exchanges.status_descriptions.$statusKey";
+        $statusDescription = \Illuminate\Support\Facades\Lang::has($statusDescriptionKey) ? __($statusDescriptionKey) : null;
+    @endphp
+    @if ($statusDescription && $statusKey !== 'disputed')
+        <p class="govuk-body govuk-!-margin-bottom-6">{{ $statusDescription }}</p>
+    @endif
 
     @if ($statusKey === 'disputed')
         <div class="govuk-inset-text">{{ __('govuk_alpha.exchanges.disputed_detail') }}</div>
@@ -204,6 +212,29 @@
         @endif
     @endif
 
+    @if (($exchange['status'] ?? '') === 'completed' && !empty($ratings))
+        <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.exchanges.ratings_title') }}</h2>
+        <ul class="govuk-list">
+            @foreach ($ratings as $rating)
+                @php
+                    $raterName = trim((string) (($rating['rater_first_name'] ?? '') . ' ' . ($rating['rater_last_name'] ?? '')));
+                    if ($raterName === '') {
+                        $raterName = (string) ($rating['rater_username'] ?? '') ?: __('govuk_alpha.members.unknown_member');
+                    }
+                @endphp
+                <li class="nexus-alpha-card govuk-!-margin-bottom-3">
+                    <p class="govuk-body govuk-!-margin-bottom-1">
+                        <strong>{{ $raterName }}</strong>
+                        — {{ __('govuk_alpha.exchanges.review_rating_value', ['rating' => (int) ($rating['rating'] ?? 0)]) }}
+                    </p>
+                    @if (!empty($rating['comment']))
+                        <p class="govuk-body govuk-!-margin-bottom-0">{!! nl2br(e((string) $rating['comment'])) !!}</p>
+                    @endif
+                </li>
+            @endforeach
+        </ul>
+    @endif
+
     <h2 class="govuk-heading-l govuk-!-margin-top-8">{{ __('govuk_alpha.exchanges.timeline_title') }}</h2>
     @if (empty($history))
         <div class="govuk-inset-text">{{ __('govuk_alpha.exchanges.empty_timeline') }}</div>
@@ -212,6 +243,9 @@
             @foreach ($history as $entry)
                 <li>
                     <strong>{{ $label('exchanges.statuses', $entry['new_status'] ?? $entry['old_status'] ?? $statusKey) }}</strong>
+                    @if (!empty($entry['actor']['name']))
+                        <span class="govuk-hint govuk-!-margin-bottom-0">{{ __('govuk_alpha.exchanges.timeline_by', ['name' => $entry['actor']['name']]) }}</span>
+                    @endif
                     @if (!empty($entry['created_at']))
                         <span class="govuk-hint govuk-!-margin-bottom-0">{{ $formatDate($entry['created_at']) }}</span>
                     @endif

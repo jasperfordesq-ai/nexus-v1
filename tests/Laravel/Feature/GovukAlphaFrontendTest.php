@@ -1090,6 +1090,12 @@ class GovukAlphaFrontendTest extends TestCase
         $after->assertSee(__('govuk_alpha.exchanges.review_thanks'));
         $after->assertDontSee('name="rating"', false);
 
+        // The submitted rating is surfaced back on the page (mirrors React's ratings list),
+        // and the completed-status plain-English description renders.
+        $after->assertSee(__('govuk_alpha.exchanges.ratings_title'));
+        $after->assertSee('A great exchange, thank you.');
+        $after->assertSee(__('govuk_alpha.exchanges.status_descriptions.completed'));
+
         // An invalid rating is rejected.
         $invalid = $this->post("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}/rate", ['rating' => 9]);
         $invalid->assertRedirect("/{$this->testTenantSlug}/alpha/exchanges/{$exchangeId}?status=rating-invalid");
