@@ -14,7 +14,43 @@
 
     <span class="govuk-caption-l">{{ __('govuk_alpha.dashboard.caption', ['community' => $communityName]) }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.dashboard.title') }}</h1>
-    <p class="govuk-body-l">{{ __('govuk_alpha.dashboard.description') }}</p>
+    @if (!empty($firstName))
+        <p class="govuk-body-l">{{ __('govuk_alpha.dashboard.welcome', ['name' => $firstName]) }}</p>
+    @else
+        <p class="govuk-body-l">{{ __('govuk_alpha.dashboard.description') }}</p>
+    @endif
+
+    @if (!($onboardingCompleted ?? true))
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="dashboard-onboarding-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="dashboard-onboarding-title">{{ __('govuk_alpha.dashboard.onboarding_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.dashboard.onboarding_body') }}</p>
+                <p class="govuk-body">
+                    <a class="govuk-notification-banner__link" href="{{ route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.dashboard.onboarding_link') }}</a>
+                </p>
+            </div>
+        </div>
+    @endif
+
+    @if (($pendingReviewCount ?? 0) > 0 && \App\Core\TenantContext::hasModule('exchanges'))
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="dashboard-reviews-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="dashboard-reviews-title">{{ __('govuk_alpha.dashboard.pending_reviews_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ trans_choice('govuk_alpha.dashboard.pending_reviews_body', $pendingReviewCount, ['count' => $pendingReviewCount]) }}</p>
+                <p class="govuk-body">
+                    <a class="govuk-notification-banner__link" href="{{ route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug, 'status_filter' => 'completed']) }}">{{ __('govuk_alpha.dashboard.pending_reviews_link') }}</a>
+                </p>
+            </div>
+        </div>
+    @endif
+
+    @if (\App\Core\TenantContext::hasModule('listings'))
+        <a class="govuk-button govuk-!-margin-bottom-6" data-module="govuk-button" href="{{ route('govuk-alpha.listings.create', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.dashboard.new_listing') }}</a>
+    @endif
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
@@ -97,6 +133,19 @@
                                     @if (!empty($event['location'])){{ $event['location'] }}@endif
                                 </span>
                             @endif
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+
+            @if (!empty($endorsements))
+                <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.dashboard.endorsements_title') }}</h2>
+                <ul class="govuk-list nexus-alpha-skill-list">
+                    @foreach (array_slice($endorsements, 0, 6) as $endorsement)
+                        @php $endorseCount = (int) ($endorsement['count'] ?? 0); @endphp
+                        <li>
+                            <span class="govuk-!-font-weight-bold">{{ $endorsement['skill_name'] ?? '' }}</span>
+                            <strong class="govuk-tag govuk-tag--green">{{ trans_choice('govuk_alpha.dashboard.endorsement_count', $endorseCount, ['count' => $endorseCount]) }}</strong>
                         </li>
                     @endforeach
                 </ul>

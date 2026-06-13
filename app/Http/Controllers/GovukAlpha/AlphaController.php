@@ -629,6 +629,27 @@ class AlphaController extends Controller
             }
         }
 
+        // Personalised dashboard extras the React dashboard surfaces: a pending
+        // review prompt, endorsements received, and the onboarding state.
+        $onboardingCompleted = (bool) DB::table('users')->where('id', $userId)->value('onboarding_completed');
+
+        $pendingReviewCount = 0;
+        try {
+            $pendingReviewCount = (int) (app(\App\Services\ReviewService::class)
+                ->getPendingReviews($userId, ['limit' => 1])['meta']['total'] ?? 0);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $endorsements = [];
+        try {
+            $endorsements = \App\Services\EndorsementService::getEndorsementsForUser($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $firstName = trim((string) ($profile['first_name'] ?? '')) ?: $this->profileDisplayName($profile);
+
         return $this->view('accessible-frontend::dashboard', [
             'title' => __('govuk_alpha.dashboard.title'),
             'tenantSlug' => $tenantSlug,
@@ -642,6 +663,10 @@ class AlphaController extends Controller
             'gamification' => $gamification,
             'badges' => $badges,
             'upcomingEvents' => $upcomingEvents,
+            'onboardingCompleted' => $onboardingCompleted,
+            'pendingReviewCount' => $pendingReviewCount,
+            'endorsements' => $endorsements,
+            'firstName' => $firstName,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }

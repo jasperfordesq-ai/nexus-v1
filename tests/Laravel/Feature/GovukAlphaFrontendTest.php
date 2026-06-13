@@ -2982,6 +2982,23 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('Dashboard upcoming event');
     }
 
+    public function test_dashboard_shows_personalised_header_and_onboarding_prompt(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Dash User', 'first_name' => 'Dash']);
+        DB::table('users')->where('id', $user->id)->update(['onboarding_completed' => 0]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
+
+        $response->assertOk();
+        // Personalised welcome using the member's first name.
+        $response->assertSee(__('govuk_alpha.dashboard.welcome', ['name' => 'Dash']));
+        // Onboarding prompt while onboarding is incomplete.
+        $response->assertSee(__('govuk_alpha.dashboard.onboarding_title'));
+        // Prominent create-listing call to action.
+        $response->assertSee(__('govuk_alpha.dashboard.new_listing'));
+        $response->assertSee(route('govuk-alpha.listings.create', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
     private function authenticatedUser(array $overrides = []): User
     {
         $user = User::factory()->forTenant($this->testTenantId)->create(array_merge([
