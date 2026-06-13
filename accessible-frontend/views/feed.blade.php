@@ -9,8 +9,8 @@
         $communityName = $tenant['name'] ?? $tenantSlug;
         $hasPostError = in_array($status ?? '', ['post-empty', 'post-failed'], true);
         $postErrorMessage = ($status ?? '') === 'post-failed' ? __('govuk_alpha.states.post_failed') : __('govuk_alpha.states.post_empty');
-        $successStatuses = ['post-created', 'like-added', 'like-removed', 'comment-created'];
-        $errorStatuses = ['comment-empty', 'comment-too-long', 'comment-failed', 'like-failed'];
+        $successStatuses = ['post-created', 'like-added', 'like-removed', 'comment-created', 'poll-voted'];
+        $errorStatuses = ['comment-empty', 'comment-too-long', 'comment-failed', 'like-failed', 'poll-vote-failed'];
         $hasItems = !empty($items);
         $visibleCount = count($items);
         $typeOptions = ['all', 'following', 'saved', 'posts', 'listings', 'events', 'goals', 'polls', 'jobs', 'challenges', 'volunteering', 'blogs', 'discussions'];
@@ -293,6 +293,63 @@
                                 @endif
                             @endforeach
                         </ul>
+                    @endif
+                    @if ($itemType === 'poll' && is_array($item['poll_data'] ?? null))
+                        @php
+                            $poll = $item['poll_data'];
+                            $pollOptions = is_array($poll['options'] ?? null) ? $poll['options'] : [];
+                            $myVote = $poll['user_vote_option_id'] ?? null;
+                            $pollActive = (bool) ($poll['is_active'] ?? false);
+                            $pollTotal = $poll['total_votes'] ?? null;
+                        @endphp
+                        @if (!empty($pollOptions))
+                            @if ($myVote === null && $pollActive && !$requiresAuth)
+                                <form method="post" action="{{ route('govuk-alpha.feed.polls.vote', ['tenantSlug' => $tenantSlug, 'pollId' => $itemId]) }}" class="govuk-!-margin-bottom-3">
+                                    @csrf
+                                    @foreach ($preservedFeedInputs as $name => $value)
+                                        <input type="hidden" name="{{ $name }}" value="{{ $value }}">
+                                    @endforeach
+                                    <fieldset class="govuk-fieldset">
+                                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha.feed.poll_vote_legend') }}</legend>
+                                        <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                                            @foreach ($pollOptions as $opt)
+                                                @php $optId = (int) ($opt['id'] ?? 0); @endphp
+                                                @if ($optId > 0)
+                                                    <div class="govuk-radios__item">
+                                                        <input class="govuk-radios__input" id="poll-{{ $itemId }}-opt-{{ $optId }}" name="option_id" type="radio" value="{{ $optId }}" required>
+                                                        <label class="govuk-label govuk-radios__label" for="poll-{{ $itemId }}-opt-{{ $optId }}">{{ $opt['text'] ?? $opt['label'] ?? '' }}</label>
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    </fieldset>
+                                    <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.feed.poll_vote_submit') }}</button>
+                                </form>
+                            @else
+                                <ul class="govuk-list govuk-!-margin-bottom-2">
+                                    @foreach ($pollOptions as $opt)
+                                        @php
+                                            $optId = (int) ($opt['id'] ?? 0);
+                                            $voted = $myVote !== null && (int) $myVote === $optId;
+                                            $count = $opt['vote_count'] ?? null;
+                                            $pct = $opt['percentage'] ?? null;
+                                        @endphp
+                                        <li>
+                                            <span class="govuk-!-font-weight-bold">{{ $opt['text'] ?? $opt['label'] ?? '' }}</span>
+                                            @if ($voted)
+                                                <strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha.feed.poll_your_choice') }}</strong>
+                                            @endif
+                                            @if ($count !== null)
+                                                <span class="govuk-body-s nexus-alpha-meta">{{ trans_choice('govuk_alpha.feed.poll_votes', (int) $count, ['count' => (int) $count]) }}@if ($pct !== null) ({{ (int) round((float) $pct) }}%)@endif</span>
+                                            @endif
+                                        </li>
+                                    @endforeach
+                                </ul>
+                                <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">
+                                    @if ($myVote !== null){{ __('govuk_alpha.feed.poll_you_voted') }}@elseif (!$pollActive){{ __('govuk_alpha.feed.poll_closed') }}@endif
+                                </p>
+                            @endif
+                        @endif
                     @endif
                     <p class="govuk-body-s nexus-alpha-meta">
                         {{ trans_choice('govuk_alpha.feed.likes', $likeCount, ['count' => $likeCount]) }}

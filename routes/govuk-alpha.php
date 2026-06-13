@@ -56,6 +56,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/volunteering/opportunities/{id}/shifts/{shiftId}/cancel', [AlphaController::class, 'cancelVolunteerShift'])->middleware('throttle:20,1')->whereNumber('id')->whereNumber('shiftId')->name('volunteering.shifts.cancel');
         Route::get('/feed', [AlphaController::class, 'feed'])->name('feed');
         Route::post('/feed/posts', [AlphaController::class, 'storeFeedPost'])->middleware('throttle:20,1')->name('feed.posts.store');
+        Route::post('/feed/polls/{pollId}/vote', [AlphaController::class, 'storeFeedPollVote'])->whereNumber('pollId')->middleware('throttle:30,1')->name('feed.polls.vote');
         Route::post('/feed/items/{type}/{id}/like', [AlphaController::class, 'storeFeedLike'])
             ->whereNumber('id')
             ->where('type', '[a-zA-Z0-9_-]+')

@@ -1337,6 +1337,31 @@ class AlphaController extends Controller
         }
     }
 
+    public function storeFeedPollVote(Request $request, string $tenantSlug, int $pollId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return $this->redirectToFeed($request, $tenantSlug, 'auth-required', 'poll', $pollId);
+        }
+
+        $optionId = (int) $request->input('option_id');
+        if ($optionId <= 0) {
+            return $this->redirectToFeed($request, $tenantSlug, 'poll-vote-failed', 'poll', $pollId);
+        }
+
+        $ok = false;
+        try {
+            $ok = \App\Services\PollService::vote($pollId, $optionId, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->redirectToFeed($request, $tenantSlug, $ok ? 'poll-voted' : 'poll-vote-failed', 'poll', $pollId);
+    }
+
     public function storeFeedLike(Request $request, string $tenantSlug, string $type, int $id): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);

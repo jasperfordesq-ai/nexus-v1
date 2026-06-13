@@ -86,6 +86,8 @@ return [
         'cancel_exchange' => 'Cancel exchange',
     ],
     'states' => [
+        'poll-voted' => 'Your vote has been counted.',
+        'poll-vote-failed' => 'Your vote could not be counted. You may have already voted.',
         'important' => 'Important',
         'avatar-invalid' => 'The photo could not be uploaded. Use a JPG, PNG, GIF or WEBP image under 8MB.',
         'data-export-requested' => 'We have received your request. We will prepare a copy of your data and contact you when it is ready.',
@@ -302,6 +304,12 @@ return [
         'registration_closed_login' => 'Zaloguj się, jeśli masz już konto.',
     ],
     'feed' => [
+        'poll_vote_legend' => 'Cast your vote',
+        'poll_vote_submit' => 'Vote',
+        'poll_your_choice' => 'Your choice',
+        'poll_you_voted' => 'You have voted in this poll.',
+        'poll_closed' => 'This poll is closed.',
+        'poll_votes' => '{0} No votes|{1} 1 vote|[2,*] :count votes',
         'image_label' => 'Add a photo (optional)',
         'image_hint' => 'JPG, PNG, GIF or WEBP, up to 8MB.',
         'image_alt_label' => 'Describe the photo for people who use a screen reader',

@@ -379,6 +379,36 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee(__('govuk_alpha.feed.empty'));
     }
 
+    public function test_feed_poll_vote_records_a_vote_and_rejects_a_second(): void
+    {
+        $user = $this->authenticatedUser();
+        $pollId = DB::table('polls')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'question' => 'What is the best day to meet?',
+            'is_active' => 1,
+            'end_date' => now()->addWeek(),
+            'created_at' => now(),
+        ]);
+        $optionId = DB::table('poll_options')->insertGetId([
+            'poll_id' => $pollId,
+            'tenant_id' => $this->testTenantId,
+            'label' => 'Monday',
+        ]);
+
+        $vote = $this->post("/{$this->testTenantSlug}/alpha/feed/polls/{$pollId}/vote", ['option_id' => $optionId]);
+        $vote->assertRedirectContains('status=poll-voted');
+        $this->assertDatabaseHas('poll_votes', [
+            'poll_id' => $pollId,
+            'option_id' => $optionId,
+            'user_id' => $user->id,
+        ]);
+
+        // A second vote by the same member is rejected (already voted).
+        $again = $this->post("/{$this->testTenantSlug}/alpha/feed/polls/{$pollId}/vote", ['option_id' => $optionId]);
+        $again->assertRedirectContains('status=poll-vote-failed');
+    }
+
     public function test_feed_page_renders_post_empty_error_state(): void
     {
         $this->authenticatedUser();
