@@ -9,6 +9,7 @@
         $suggestedHours = (float) ($listing['hours_estimate'] ?? $listing['estimated_hours'] ?? 1);
         $suggestedHours = max(0.25, min(24, $suggestedHours > 0 ? $suggestedHours : 1));
         $type = (($listing['type'] ?? 'offer') === 'request') ? 'request' : 'offer';
+        $requestAuthorName = $listing['author_name'] ?? $listing['user']['name'] ?? null;
     @endphp
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}">{{ __('govuk_alpha.actions.back_to_listings') }}</a>
@@ -45,7 +46,34 @@
                 <dd class="govuk-summary-list__value">{{ $listing['location'] }}</dd>
             </div>
         @endif
+        @if (!empty($listing['hours_estimate']))
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.listings.hours_label') }}</dt>
+                <dd class="govuk-summary-list__value">{{ __('govuk_alpha.listings.hours', ['count' => $listing['hours_estimate']]) }}</dd>
+            </div>
+        @endif
+        @if ($requestAuthorName)
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.listings.posted_by_label') }}</dt>
+                <dd class="govuk-summary-list__value">{{ $requestAuthorName }}</dd>
+            </div>
+        @endif
     </dl>
+
+    @if (($walletBalance ?? null) !== null)
+        <div class="govuk-inset-text">
+            {{ __('govuk_alpha.exchanges.balance_context', ['balance' => number_format((float) $walletBalance, 1)]) }}
+        </div>
+        @if ((float) $walletBalance < $suggestedHours)
+            <div class="govuk-warning-text">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <strong class="govuk-warning-text__text">
+                    <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.important') }}</span>
+                    {{ __('govuk_alpha.exchanges.balance_low_warning', ['hours' => number_format($suggestedHours, 1)]) }}
+                </strong>
+            </div>
+        @endif
+    @endif
 
     <form method="post" action="{{ route('govuk-alpha.exchanges.request.store', ['tenantSlug' => $tenantSlug, 'listingId' => $listing['id']]) }}">
         @csrf

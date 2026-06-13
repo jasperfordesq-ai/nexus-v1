@@ -821,6 +821,10 @@ class GovukAlphaFrontendTest extends TestCase
         $form->assertOk();
         $form->assertSee('name="proposed_hours"', false);
         $form->assertSee('class="govuk-textarea"', false);
+        // Listing summary card now includes the time estimate, and the page shows the
+        // requester's wallet balance as context.
+        $form->assertSee(__('govuk_alpha.listings.hours_label'));
+        $form->assertSee('Your time-credit balance is', false);
 
         $request = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/exchange-request", [
             'proposed_hours' => 2.5,

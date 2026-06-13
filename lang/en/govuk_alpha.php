@@ -525,6 +525,8 @@ return [
         'own_listing' => 'You cannot request an exchange on your own listing.',
     ],
     'exchanges' => [
+        'balance_context' => 'Your time-credit balance is :balance hours.',
+        'balance_low_warning' => 'This listing is estimated at :hours hours, which is more than your current balance. You can still send the request; your community decides how balances are managed.',
         'title' => 'Exchanges',
         'description' => 'Review exchange requests, track accepted exchanges and confirm completed hours.',
         'detail_title' => 'Exchange details',

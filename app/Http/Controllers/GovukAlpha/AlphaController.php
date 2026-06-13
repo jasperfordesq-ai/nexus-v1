@@ -1749,6 +1749,13 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $listingId, 'status' => 'own-listing']);
         }
 
+        $walletBalance = null;
+        try {
+            $walletBalance = (float) (app(\App\Services\WalletService::class)->getBalance($userId)['balance'] ?? 0);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         return $this->view('accessible-frontend::exchange-request', [
             'title' => __('govuk_alpha.exchanges.request_title'),
             'tenantSlug' => $tenantSlug,
@@ -1756,6 +1763,7 @@ class AlphaController extends Controller
             'listing' => $listing,
             'config' => BrokerControlConfigService::getConfig('exchange_workflow'),
             'status' => self::asStr(request()->query('status')) ?: null,
+            'walletBalance' => $walletBalance,
         ]);
     }
 
