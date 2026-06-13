@@ -52,6 +52,11 @@ class AlphaController extends Controller
         'mobility', 'visual', 'hearing', 'cognitive', 'dietary', 'language', 'other',
     ];
 
+    /** The platform's 11 supported locales (matches the React LanguageSwitcher). */
+    private const ALPHA_LOCALES = [
+        'en', 'ga', 'de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar',
+    ];
+
     public function __construct(
         private readonly FeedService $feedService,
         private readonly ListingService $listingService,
@@ -2080,10 +2085,11 @@ class AlphaController extends Controller
         $profile = $this->profileForViewer($userId, $userId);
         abort_if($profile === null, 404);
 
-        $marketingOptIn = (bool) DB::table('users')
+        $account = DB::table('users')
             ->where('id', $userId)
             ->where('tenant_id', TenantContext::getId())
-            ->value('newsletter_opt_in');
+            ->select('newsletter_opt_in', 'email', 'preferred_language')
+            ->first();
 
         return $this->view('accessible-frontend::profile-settings', [
             'title' => __('govuk_alpha.profile_settings.title'),
@@ -2092,9 +2098,126 @@ class AlphaController extends Controller
             'profile' => $profile,
             'displayName' => $this->profileDisplayName($profile),
             'avatarUrl' => $profile['avatar_url'] ?? $profile['avatar'] ?? null,
-            'marketingOptIn' => $marketingOptIn,
+            'marketingOptIn' => (bool) ($account->newsletter_opt_in ?? false),
+            'currentEmail' => (string) ($account->email ?? ''),
+            'currentLanguage' => (string) ($account->preferred_language ?? app()->getLocale()),
+            'locales' => self::ALPHA_LOCALES,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
+    }
+
+    public function updateProfileEmail(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $email = trim(self::asStr($request->input('email')));
+        $currentPassword = self::asStr($request->input('current_password'));
+
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'email-invalid']);
+        }
+
+        // The v2 profile update does not gate email changes on the password, but a
+        // self-service email change is sensitive — re-authenticate first.
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->select('password_hash', 'email')
+            ->first();
+
+        if ($user === null || !password_verify($currentPassword, (string) $user->password_hash)) {
+            return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'email-password-incorrect']);
+        }
+
+        if (strcasecmp($email, (string) $user->email) === 0) {
+            return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'email-unchanged']);
+        }
+
+        try {
+            $ok = UserService::updateProfile($userId, ['email' => $email]);
+        } catch (\Throwable $e) {
+            report($e);
+            $ok = false;
+        }
+
+        return redirect()->route('govuk-alpha.profile.settings', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'email-changed' : 'email-failed',
+        ]);
+    }
+
+    public function updateProfilePassword(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $current = self::asStr($request->input('current_password'));
+        $new = self::asStr($request->input('new_password'));
+        $confirm = self::asStr($request->input('new_password_confirmation'));
+
+        $preStatus = match (true) {
+            $current === ''                  => 'password-current-required',
+            $new === '' || mb_strlen($new) < 12 => 'password-weak',
+            $new !== $confirm                => 'password-mismatch',
+            default                          => null,
+        };
+        if ($preStatus !== null) {
+            return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => $preStatus]);
+        }
+
+        try {
+            $ok = UserService::updatePassword($userId, $current, $new);
+        } catch (\Throwable $e) {
+            report($e);
+            $ok = false;
+        }
+
+        if ($ok) {
+            return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'password-changed']);
+        }
+
+        $code = strtoupper((string) (UserService::getErrors()[0]['code'] ?? ''));
+        $status = match (true) {
+            str_contains($code, 'INVALID') => 'password-current-incorrect',
+            str_contains($code, 'REUSED')  => 'password-reused',
+            str_contains($code, 'WEAK')    => 'password-weak',
+            default                        => 'password-failed',
+        };
+
+        return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    public function updateProfileLanguage(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $language = $this->allowed($request->input('language'), self::ALPHA_LOCALES, null);
+        if ($language === null) {
+            return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'language-invalid']);
+        }
+
+        DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->update(['preferred_language' => $language, 'updated_at' => now()]);
+
+        if ($request->hasSession()) {
+            $request->session()->put('locale', $language);
+        }
+        $_SESSION['locale'] = $language;
+
+        return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'language-changed']);
     }
 
     public function updateProfileSettings(Request $request, string $tenantSlug): RedirectResponse
@@ -2297,9 +2420,17 @@ class AlphaController extends Controller
 
     private function sharedViewData(): array
     {
+        $logoUrl = TenantContext::getSetting('logo_url');
+        $logoDarkUrl = TenantContext::getSetting('logo_dark_url');
+
         return [
             'assetEntrypoint' => $this->assetEntrypoint(),
             'tenant' => TenantContext::get(),
+            // Tenant-uploaded header logo (overrides the text brand). Resolved to
+            // same-origin URLs. The GOV.UK alpha header is always black, so the
+            // template prefers the dark-background variant when one was uploaded.
+            'tenantLogoUrl' => $this->resolveAsset(is_string($logoUrl) ? $logoUrl : null),
+            'tenantLogoDarkUrl' => $this->resolveAsset(is_string($logoDarkUrl) ? $logoDarkUrl : null),
             'isAuthenticated' => $this->currentUserId() !== null,
             'alphaNavItems' => $this->alphaNavItems(),
             'alphaFooterLinks' => $this->alphaFooterLinks(),

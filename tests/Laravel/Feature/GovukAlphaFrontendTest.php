@@ -1870,6 +1870,80 @@ class GovukAlphaFrontendTest extends TestCase
         $missing->assertRedirectContains('status=reset-token-missing');
     }
 
+    public function test_profile_settings_account_section_renders_and_updates(): void
+    {
+        $user = $this->authenticatedUser([
+            'first_name' => 'Account',
+            'last_name' => 'User',
+            'name' => 'Account User',
+            'password_hash' => Hash::make('CurrentPass123!'),
+            'email' => 'account-' . bin2hex(random_bytes(3)) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+
+        $page = $this->get("/{$this->testTenantSlug}/alpha/profile/settings");
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.profile_settings.security_title'));
+        $page->assertSee('name="new_password"', false);
+        $page->assertSee('id="language"', false);
+        $page->assertSee(__('govuk_alpha.profile_settings.languages.ga'));
+
+        // Language change (direct DB update, no email).
+        $lang = $this->post("/{$this->testTenantSlug}/alpha/profile/language", ['language' => 'ga']);
+        $lang->assertRedirect("/{$this->testTenantSlug}/alpha/profile/settings?status=language-changed");
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'preferred_language' => 'ga']);
+
+        $langBad = $this->post("/{$this->testTenantSlug}/alpha/profile/language", ['language' => 'xx']);
+        $langBad->assertRedirect("/{$this->testTenantSlug}/alpha/profile/settings?status=language-invalid");
+
+        // Password pre-checks.
+        $mismatch = $this->post("/{$this->testTenantSlug}/alpha/profile/password", [
+            'current_password' => 'CurrentPass123!',
+            'new_password' => 'NewStrongPass456!',
+            'new_password_confirmation' => 'DifferentPass456!',
+        ]);
+        $mismatch->assertRedirect("/{$this->testTenantSlug}/alpha/profile/settings?status=password-mismatch");
+
+        $weak = $this->post("/{$this->testTenantSlug}/alpha/profile/password", [
+            'current_password' => 'CurrentPass123!',
+            'new_password' => 'short',
+            'new_password_confirmation' => 'short',
+        ]);
+        $weak->assertRedirect("/{$this->testTenantSlug}/alpha/profile/settings?status=password-weak");
+
+        // Password change happy path (no HIBP at this layer; fresh user has no history).
+        $changed = $this->post("/{$this->testTenantSlug}/alpha/profile/password", [
+            'current_password' => 'CurrentPass123!',
+            'new_password' => 'NewStrongPass456!',
+            'new_password_confirmation' => 'NewStrongPass456!',
+        ]);
+        $changed->assertRedirect("/{$this->testTenantSlug}/alpha/profile/settings?status=password-changed");
+        $newHash = (string) DB::table('users')->where('id', $user->id)->value('password_hash');
+        $this->assertTrue(Hash::check('NewStrongPass456!', $newHash), 'The stored password hash should match the new password');
+
+        // Wrong current password is rejected.
+        $wrong = $this->post("/{$this->testTenantSlug}/alpha/profile/password", [
+            'current_password' => 'TotallyWrong1!',
+            'new_password' => 'AnotherStrong789!',
+            'new_password_confirmation' => 'AnotherStrong789!',
+        ]);
+        $wrong->assertRedirect("/{$this->testTenantSlug}/alpha/profile/settings?status=password-current-incorrect");
+
+        // Email change re-authenticates: wrong password and invalid address are rejected
+        // (the actual change emails the old address, so the happy path is left to the API tests).
+        $emailWrong = $this->post("/{$this->testTenantSlug}/alpha/profile/email", [
+            'email' => 'changed@example.test',
+            'current_password' => 'NopeNotIt1!',
+        ]);
+        $emailWrong->assertRedirect("/{$this->testTenantSlug}/alpha/profile/settings?status=email-password-incorrect");
+
+        $emailBad = $this->post("/{$this->testTenantSlug}/alpha/profile/email", [
+            'email' => 'not-an-email',
+            'current_password' => 'NewStrongPass456!',
+        ]);
+        $emailBad->assertRedirect("/{$this->testTenantSlug}/alpha/profile/settings?status=email-invalid");
+    }
+
     public function test_two_factor_page_requires_a_pending_challenge(): void
     {
         // No pending challenge in the session → bounced back to sign in.

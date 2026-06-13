@@ -71,6 +71,50 @@
                 </div>
             @endif
 
+            @php
+                $accountStatusMap = [
+                    'email-changed' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.email_changed')],
+                    'email-unchanged' => ['type' => 'info', 'msg' => __('govuk_alpha.profile_settings.email_unchanged')],
+                    'email-invalid' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.email_invalid'), 'anchor' => '#new_email'],
+                    'email-password-incorrect' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.email_password_incorrect'), 'anchor' => '#email_current_password'],
+                    'email-failed' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.email_failed'), 'anchor' => '#new_email'],
+                    'password-changed' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.password_changed')],
+                    'password-current-required' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.password_current_required'), 'anchor' => '#current_password'],
+                    'password-current-incorrect' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.password_current_incorrect'), 'anchor' => '#current_password'],
+                    'password-weak' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.password_weak'), 'anchor' => '#new_password'],
+                    'password-mismatch' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.password_mismatch'), 'anchor' => '#new_password_confirmation'],
+                    'password-reused' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.password_reused'), 'anchor' => '#new_password'],
+                    'password-failed' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.password_failed'), 'anchor' => '#new_password'],
+                    'language-changed' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.language_changed')],
+                    'language-invalid' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.language_invalid'), 'anchor' => '#language'],
+                ];
+                $accountStatus = $accountStatusMap[$status ?? ''] ?? null;
+            @endphp
+            @if ($accountStatus)
+                @if ($accountStatus['type'] === 'success')
+                    <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="account-status-title">
+                        <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="account-status-title">{{ __('govuk_alpha.states.success_title') }}</h2></div>
+                        <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ $accountStatus['msg'] }}</p></div>
+                    </div>
+                @elseif ($accountStatus['type'] === 'info')
+                    <div class="govuk-notification-banner" role="region" aria-labelledby="account-status-title">
+                        <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="account-status-title">{{ __('govuk_alpha.states.important') }}</h2></div>
+                        <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ $accountStatus['msg'] }}</p></div>
+                    </div>
+                @else
+                    <div class="govuk-error-summary" data-module="govuk-error-summary">
+                        <div role="alert">
+                            <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                            <div class="govuk-error-summary__body">
+                                <ul class="govuk-list govuk-error-summary__list">
+                                    <li><a href="{{ $accountStatus['anchor'] ?? '#new_email' }}">{{ $accountStatus['msg'] }}</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            @endif
+
             <form method="post" action="{{ route('govuk-alpha.profile.settings.update', ['tenantSlug' => $tenantSlug]) }}" enctype="multipart/form-data" novalidate>
                 @csrf
 
@@ -207,6 +251,65 @@
 
                 <button class="govuk-button govuk-!-margin-top-4" data-module="govuk-button" type="submit">{{ __('govuk_alpha.actions.save_changes') }}</button>
             </form>
+
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+            <section aria-labelledby="security-heading">
+                <h2 class="govuk-heading-l" id="security-heading">{{ __('govuk_alpha.profile_settings.security_title') }}</h2>
+
+                <h3 class="govuk-heading-m">{{ __('govuk_alpha.profile_settings.email_heading') }}</h3>
+                <form method="post" action="{{ route('govuk-alpha.profile.email.update', ['tenantSlug' => $tenantSlug]) }}" novalidate>
+                    @csrf
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="new_email">{{ __('govuk_alpha.profile_settings.email_label') }}</label>
+                        <input class="govuk-input govuk-!-width-two-thirds" id="new_email" name="email" type="email" autocomplete="email" value="{{ old('email', $currentEmail ?? '') }}">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="email_current_password">{{ __('govuk_alpha.profile_settings.confirm_password_label') }}</label>
+                        <div id="email-current-password-hint" class="govuk-hint">{{ __('govuk_alpha.profile_settings.confirm_password_hint') }}</div>
+                        <input class="govuk-input govuk-!-width-two-thirds" id="email_current_password" name="current_password" type="password" autocomplete="current-password" aria-describedby="email-current-password-hint">
+                    </div>
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.email_submit') }}</button>
+                </form>
+
+                <h3 class="govuk-heading-m govuk-!-margin-top-6">{{ __('govuk_alpha.profile_settings.password_heading') }}</h3>
+                <form method="post" action="{{ route('govuk-alpha.profile.password.update', ['tenantSlug' => $tenantSlug]) }}" novalidate>
+                    @csrf
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="current_password">{{ __('govuk_alpha.profile_settings.current_password_label') }}</label>
+                        <input class="govuk-input govuk-!-width-two-thirds" id="current_password" name="current_password" type="password" autocomplete="current-password">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="new_password">{{ __('govuk_alpha.profile_settings.new_password_label') }}</label>
+                        <div id="new-password-hint" class="govuk-hint">{{ __('govuk_alpha.profile_settings.new_password_hint') }}</div>
+                        <input class="govuk-input govuk-!-width-two-thirds" id="new_password" name="new_password" type="password" autocomplete="new-password" spellcheck="false" aria-describedby="new-password-hint">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="new_password_confirmation">{{ __('govuk_alpha.profile_settings.new_password_confirm_label') }}</label>
+                        <input class="govuk-input govuk-!-width-two-thirds" id="new_password_confirmation" name="new_password_confirmation" type="password" autocomplete="new-password" spellcheck="false">
+                    </div>
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.password_submit') }}</button>
+                </form>
+            </section>
+
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+            <section aria-labelledby="language-heading">
+                <h2 class="govuk-heading-l" id="language-heading">{{ __('govuk_alpha.profile_settings.language_title') }}</h2>
+                <p class="govuk-body">{{ __('govuk_alpha.profile_settings.language_description') }}</p>
+                <form method="post" action="{{ route('govuk-alpha.profile.language.update', ['tenantSlug' => $tenantSlug]) }}">
+                    @csrf
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="language">{{ __('govuk_alpha.profile_settings.language_label') }}</label>
+                        <select class="govuk-select" id="language" name="language">
+                            @foreach ($locales as $locale)
+                                <option value="{{ $locale }}" @selected(($currentLanguage ?? 'en') === $locale)>{{ __('govuk_alpha.profile_settings.languages.' . $locale) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.language_submit') }}</button>
+                </form>
+            </section>
 
             <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
 
