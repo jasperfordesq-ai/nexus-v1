@@ -148,7 +148,11 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee(__('govuk_alpha.auth.registration_closed_title'));
         $response->assertSee(__('govuk_alpha.auth.registration_closed_body'));
         $response->assertDontSee('name="first_name"', false);
-        $response->assertDontSee('type="submit"', false);
+        // The registration form (and its submit button) is hidden. Assert the
+        // register-specific submit label rather than any type="submit", since the
+        // global header language switcher legitimately renders a submit button on
+        // every page.
+        $response->assertDontSee(__('govuk_alpha.auth.register_action'));
     }
 
     public function test_register_page_shows_per_field_inline_errors(): void

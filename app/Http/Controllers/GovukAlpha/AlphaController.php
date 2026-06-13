@@ -135,6 +135,9 @@ class AlphaController extends Controller
             'activeNav' => 'home',
             'isAuthenticated' => $this->currentUserId() !== null,
             'status' => self::asStr($request->query('status')) ?: null,
+            // Live community stats (members / hours / listings / communities),
+            // the same tenant-scoped, cached figures the about page already shows.
+            'stats' => $this->platformStats(),
             'modules' => [
                 'feed' => TenantContext::hasModule('feed'),
                 'listings' => TenantContext::hasModule('listings'),

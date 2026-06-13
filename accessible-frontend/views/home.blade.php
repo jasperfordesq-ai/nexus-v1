@@ -98,6 +98,9 @@
             <span class="govuk-caption-xl">{{ __('govuk_alpha.home.caption', ['community' => $communityName]) }}</span>
             <h1 class="govuk-heading-xl">{{ __('govuk_alpha.home.title') }}</h1>
             <p class="govuk-body-l">{{ __('govuk_alpha.home.description', ['community' => $communityName]) }}</p>
+            @if (!empty($tenant['tagline']))
+                <p class="govuk-body-l govuk-!-font-weight-bold">{{ $tenant['tagline'] }}</p>
+            @endif
             <p class="govuk-body">{{ __('govuk_alpha.home.supporting_text') }}</p>
 
             <div class="nexus-alpha-actions govuk-!-margin-bottom-8">
@@ -117,6 +120,27 @@
             </div>
         </div>
     </div>
+
+    @if (is_array($stats ?? null) && ! empty($stats))
+        <dl class="nexus-alpha-stat-grid govuk-!-margin-bottom-8">
+            <div class="nexus-alpha-stat">
+                <dt>{{ __('govuk_alpha.about.stats.members') }}</dt>
+                <dd>{{ number_format((int) ($stats['members'] ?? 0)) }}</dd>
+            </div>
+            <div class="nexus-alpha-stat">
+                <dt>{{ __('govuk_alpha.about.stats.hours_exchanged') }}</dt>
+                <dd>{{ number_format((float) ($stats['hours_exchanged'] ?? 0)) }}</dd>
+            </div>
+            <div class="nexus-alpha-stat">
+                <dt>{{ __('govuk_alpha.about.stats.active_listings') }}</dt>
+                <dd>{{ number_format((int) ($stats['listings'] ?? 0)) }}</dd>
+            </div>
+            <div class="nexus-alpha-stat">
+                <dt>{{ __('govuk_alpha.about.stats.communities') }}</dt>
+                <dd>{{ number_format((int) ($stats['communities'] ?? 0)) }}</dd>
+            </div>
+        </dl>
+    @endif
 
     <div class="govuk-inset-text">
         {{ __('govuk_alpha.home.accessibility_note') }}
