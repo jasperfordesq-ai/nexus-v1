@@ -867,6 +867,7 @@ return [
         'more_results_label' => 'More members',
     ],
     'profile' => [
+        'badges_title' => 'Badges',
         'title' => 'Profile',
         'caption' => ':community',
         'own_caption' => 'Your profile',

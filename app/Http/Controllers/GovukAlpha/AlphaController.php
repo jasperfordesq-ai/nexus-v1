@@ -2102,7 +2102,26 @@ class AlphaController extends Controller
             'profileSkills' => $this->profileSkills($id, $profile),
             'profileAvailability' => $this->profileAvailability($id, $profile),
             'profileReviews' => $this->profileReviews($id),
+            'memberId' => $id,
+            'directMessagingEnabled' => BrokerControlConfigService::isDirectMessagingEnabled(),
+            'profileBadges' => $this->memberBadges($id),
         ]);
+    }
+
+    /**
+     * A member's earned badges (public achievements), for the profile page.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function memberBadges(int $userId): array
+    {
+        try {
+            return \App\Services\GamificationService::getBadges($userId, TenantContext::getId());
+        } catch (\Throwable $e) {
+            report($e);
+
+            return [];
+        }
     }
 
     public function profileSettings(Request $request, string $tenantSlug): Response|RedirectResponse

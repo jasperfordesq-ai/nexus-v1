@@ -1484,6 +1484,41 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('AGPL-3.0-or-later');
     }
 
+    public function test_member_profile_shows_send_message_button_and_earned_badges(): void
+    {
+        $viewer = $this->authenticatedUser(['name' => 'Profile Visitor']);
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Badged Member',
+            'first_name' => 'Badged',
+            'last_name' => 'Member',
+            'status' => 'active',
+            'is_approved' => true,
+            'is_verified' => true,
+            'privacy_search' => true,
+            'privacy_profile' => 'members',
+            'onboarding_completed' => true,
+        ]);
+        DB::table('user_badges')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $member->id,
+            'badge_key' => 'community_helper',
+            'name' => 'Community Helper',
+            'icon' => '⭐',
+            'awarded_at' => now(),
+        ]);
+
+        Sanctum::actingAs($viewer, ['*']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/members/{$member->id}");
+        $response->assertOk();
+        // Direct-message entry point (conversations previously could only begin from a listing).
+        $response->assertSee(__('govuk_alpha.actions.send_message'));
+        $response->assertSee(route('govuk-alpha.messages.new', ['tenantSlug' => $this->testTenantSlug, 'userId' => $member->id]), false);
+        // Public earned badges.
+        $response->assertSee(__('govuk_alpha.profile.badges_title'));
+        $response->assertSee('Community Helper');
+    }
+
     public function test_my_profile_and_settings_update_stay_inside_accessible_frontend(): void
     {
         $user = $this->authenticatedUser([

@@ -54,6 +54,10 @@
                 <div class="nexus-alpha-actions govuk-!-margin-top-4">
                     <a class="govuk-button" href="{{ route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.actions.edit_profile') }}</a>
                 </div>
+            @elseif (($directMessagingEnabled ?? false) && (int) ($memberId ?? 0) > 0)
+                <div class="nexus-alpha-actions govuk-!-margin-top-4">
+                    <a class="govuk-button" href="{{ route('govuk-alpha.messages.new', ['tenantSlug' => $tenantSlug, 'userId' => $memberId]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.actions.send_message') }}</a>
+                </div>
             @endif
         </div>
     </div>
@@ -87,6 +91,18 @@
             <dd>{{ (int) $profileStats['xp'] }}</dd>
         </div>
     </dl>
+
+    @if (!empty($profileBadges))
+        <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.profile.badges_title') }}</h2>
+        <ul class="govuk-list nexus-alpha-actions">
+            @foreach (array_slice($profileBadges, 0, 12) as $badge)
+                <li>
+                    @if (!empty($badge['icon']))<span aria-hidden="true">{{ $badge['icon'] }}</span>@endif
+                    <strong class="govuk-tag govuk-tag--blue">{{ $badge['name'] ?? '' }}</strong>
+                </li>
+            @endforeach
+        </ul>
+    @endif
 
     <div class="govuk-grid-row govuk-!-margin-top-7">
         <div class="govuk-grid-column-two-thirds">
