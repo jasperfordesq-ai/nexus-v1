@@ -156,7 +156,7 @@
     </dl>
 
     @if ($requiresAuth)
-        <div class="govuk-notification-banner" role="region" aria-labelledby="events-auth-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="events-auth-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="events-auth-title">{{ __('govuk_alpha.states.auth_required') }}</h2>
             </div>

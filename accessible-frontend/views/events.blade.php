@@ -27,7 +27,7 @@
     @endif
 
     @if ($moduleDisabled)
-        <div class="govuk-notification-banner" role="region" aria-labelledby="events-disabled-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="events-disabled-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="events-disabled-title">{{ __('govuk_alpha.states.error_title') }}</h2>
             </div>

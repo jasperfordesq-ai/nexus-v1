@@ -14,8 +14,8 @@
         $formatDate = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y, g:ia') : null;
         $canAccept = $isProvider && $statusKey === 'pending_provider';
         $canDecline = $isProvider && $statusKey === 'pending_provider';
-        $canStart = ($isRequester || $isProvider) && $statusKey === 'accepted';
-        $canComplete = ($isRequester || $isProvider) && $statusKey === 'in_progress';
+        $canStart = $isProvider && $statusKey === 'accepted';
+        $canComplete = $isProvider && $statusKey === 'in_progress';
         $hasRequesterConfirmed = !empty($exchange['requester_confirmed_at']);
         $hasProviderConfirmed = !empty($exchange['provider_confirmed_at']);
         $canConfirm = ($isRequester || $isProvider) && in_array($statusKey, ['in_progress', 'pending_confirmation'], true)

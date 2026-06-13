@@ -16,7 +16,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.members.description') }}</p>
 
     @if ($requiresAuth)
-        <div class="govuk-notification-banner" role="region" aria-labelledby="members-auth-required-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="members-auth-required-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="members-auth-required-title">{{ __('govuk_alpha.states.error_title') }}</h2>
             </div>

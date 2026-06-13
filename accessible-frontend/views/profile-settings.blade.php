@@ -61,7 +61,7 @@
                     </div>
                 </div>
             @elseif (in_array($status ?? '', $infoStatuses, true))
-                <div class="govuk-notification-banner" role="region" aria-labelledby="settings-status-title">
+                <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="settings-status-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="settings-status-title">{{ __('govuk_alpha.states.important') }}</h2>
                     </div>
@@ -97,7 +97,7 @@
                         <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ $accountStatus['msg'] }}</p></div>
                     </div>
                 @elseif ($accountStatus['type'] === 'info')
-                    <div class="govuk-notification-banner" role="region" aria-labelledby="account-status-title">
+                    <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="account-status-title">
                         <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="account-status-title">{{ __('govuk_alpha.states.important') }}</h2></div>
                         <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ $accountStatus['msg'] }}</p></div>
                     </div>

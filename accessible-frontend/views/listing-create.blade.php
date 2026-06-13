@@ -17,7 +17,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.listings.create.description', ['community' => $communityName]) }}</p>
 
     @if (($status ?? null) === 'listing-create-failed')
-        <div class="govuk-notification-banner" role="region" aria-labelledby="listing-create-failed-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="listing-create-failed-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="listing-create-failed-title">{{ __('govuk_alpha.states.error_title') }}</h2>
             </div>

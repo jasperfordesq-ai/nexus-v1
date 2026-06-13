@@ -75,7 +75,7 @@
                     @endif
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                         <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="confirm" name="confirm" type="checkbox" value="1" {{ $confirmError ? 'aria-describedby=confirm-error' : '' }}>
+                            <input class="govuk-checkboxes__input" id="confirm" name="confirm" type="checkbox" value="1" @if ($confirmError) aria-describedby="confirm-error" @endif>
                             <label class="govuk-label govuk-checkboxes__label" for="confirm">{{ __('govuk_alpha.delete_account.confirm_label') }}</label>
                         </div>
                     </div>

@@ -49,7 +49,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.feed.description') }}</p>
 
     @if ($requiresAuth)
-        <div class="govuk-notification-banner" role="region" aria-labelledby="feed-auth-required-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="feed-auth-required-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="feed-auth-required-title">{{ __('govuk_alpha.states.error_title') }}</h2>
             </div>
@@ -98,7 +98,7 @@
             </div>
         </div>
     @elseif (in_array($status, $errorStatuses, true))
-        <div class="govuk-notification-banner" role="region" aria-labelledby="feed-action-error-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="feed-action-error-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="feed-action-error-title">{{ __('govuk_alpha.states.error_title') }}</h2>
             </div>
@@ -180,7 +180,7 @@
     </form>
 
     @if ($error)
-        <div class="govuk-notification-banner" role="region" aria-labelledby="feed-load-error-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="feed-load-error-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="feed-load-error-title">{{ __('govuk_alpha.states.error_title') }}</h2>
             </div>

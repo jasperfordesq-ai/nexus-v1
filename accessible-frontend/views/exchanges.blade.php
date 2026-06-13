@@ -27,7 +27,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.exchanges.description') }}</p>
 
     @if (!$workflowEnabled)
-        <div class="govuk-notification-banner" role="region" aria-labelledby="exchange-disabled-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="exchange-disabled-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="exchange-disabled-title">{{ __('govuk_alpha.exchanges.disabled_title') }}</h2>
             </div>

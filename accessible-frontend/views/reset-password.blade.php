@@ -25,7 +25,7 @@
 
             @if ($invalidLink)
                 <h1 class="govuk-heading-xl">{{ __('govuk_alpha.auth.reset_link_invalid_title') }}</h1>
-                <div class="govuk-notification-banner" role="region" aria-labelledby="reset-invalid-title">
+                <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="reset-invalid-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="reset-invalid-title">{{ __('govuk_alpha.states.important') }}</h2>
                     </div>

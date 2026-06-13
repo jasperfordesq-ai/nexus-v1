@@ -17,7 +17,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.listings.description') }}</p>
 
     @if ($moduleDisabled)
-        <div class="govuk-notification-banner" role="region" aria-labelledby="listings-disabled-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="listings-disabled-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="listings-disabled-title">{{ __('govuk_alpha.states.error_title') }}</h2>
             </div>

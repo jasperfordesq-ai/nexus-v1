@@ -61,7 +61,7 @@
                         @error('description')
                             <p id="description-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $message }}</p>
                         @enderror
-                        <textarea class="govuk-textarea{{ $errors->has('description') ? ' govuk-textarea--error' : '' }}" id="description" name="description" rows="6" aria-describedby="description-hint @error('description') description-error @enderror" required>{{ old('description') }}</textarea>
+                        <textarea class="govuk-textarea{{ $errors->has('description') ? ' govuk-textarea--error' : '' }}" id="description" name="description" rows="6" aria-describedby="description-hint{{ $errors->has('description') ? ' description-error' : '' }}" required>{{ old('description') }}</textarea>
                     </div>
 
                     <div class="govuk-form-group">

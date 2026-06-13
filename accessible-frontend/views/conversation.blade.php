@@ -52,7 +52,7 @@
     @endif
 
     @if (!$directMessagingEnabled)
-        <div class="govuk-notification-banner" role="region" aria-labelledby="conversation-disabled-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="conversation-disabled-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="conversation-disabled-title">{{ __('govuk_alpha.messages.disabled_title') }}</h2>
             </div>
@@ -61,7 +61,7 @@
             </div>
         </div>
     @elseif (!empty($restriction['messaging_disabled']))
-        <div class="govuk-notification-banner" role="region" aria-labelledby="conversation-restricted-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="conversation-restricted-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="conversation-restricted-title">{{ __('govuk_alpha.messages.disabled_title') }}</h2>
             </div>

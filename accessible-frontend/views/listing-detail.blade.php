@@ -43,7 +43,7 @@
     @endif
 
     @if ($status === 'exchange-disabled' || $status === 'own-listing')
-        <div class="govuk-notification-banner" role="region" aria-labelledby="listing-status-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="listing-status-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="listing-status-title">{{ __('govuk_alpha.states.not_available') }}</h2>
             </div>
@@ -217,7 +217,7 @@
         <h2 class="govuk-heading-l" id="listing-exchange-title">{{ __('govuk_alpha.listings.exchange_title') }}</h2>
 
         @if ($requiresAuth)
-            <div class="govuk-notification-banner" role="region" aria-labelledby="listing-auth-required-title">
+            <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="listing-auth-required-title">
                 <div class="govuk-notification-banner__header">
                     <h3 class="govuk-notification-banner__title" id="listing-auth-required-title">{{ __('govuk_alpha.states.auth_required') }}</h3>
                 </div>
