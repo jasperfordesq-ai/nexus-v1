@@ -13,6 +13,15 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.messages.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.messages.description') }}</p>
 
+    @php
+        $canStartConversation = $directMessagingEnabled
+            && empty($restriction['messaging_disabled'])
+            && \App\Core\TenantContext::hasFeature('connections');
+    @endphp
+    @if ($canStartConversation)
+        <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.members.index', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.messages.start_new') }}</a>
+    @endif
+
     @if ($status === 'conversation-archived' || $status === 'conversation-restored')
         <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="messages-status-title">
             <div class="govuk-notification-banner__header">
@@ -60,6 +69,9 @@
         <div class="govuk-inset-text">
             <h2 class="govuk-heading-m">{{ __('govuk_alpha.states.empty_title') }}</h2>
             <p class="govuk-body">{{ __('govuk_alpha.messages.empty') }}</p>
+            @if ($canStartConversation)
+                <a class="govuk-link" href="{{ route('govuk-alpha.members.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.messages.start_new') }}</a>
+            @endif
         </div>
     @else
         <div class="nexus-alpha-card-list">
@@ -73,9 +85,16 @@
                     $unreadCount = (int) ($conversation['unread_count'] ?? 0);
                 @endphp
                 <article class="nexus-alpha-card">
-                    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
-                        <a class="govuk-link" href="{{ route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}">{{ __('govuk_alpha.messages.conversation_title', ['name' => $name]) }}</a>
-                    </h2>
+                    <div class="nexus-alpha-card-head">
+                        @if (!empty($otherUser['avatar_url']))
+                            <img class="nexus-alpha-avatar" src="{{ $otherUser['avatar_url'] }}" alt="" loading="lazy" decoding="async" width="48" height="48">
+                        @else
+                            <span class="nexus-alpha-avatar nexus-alpha-avatar--placeholder" aria-hidden="true">{{ mb_strtoupper(mb_substr($name, 0, 1)) }}</span>
+                        @endif
+                        <h2 class="govuk-heading-m govuk-!-margin-bottom-0">
+                            <a class="govuk-link" href="{{ route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}">{{ __('govuk_alpha.messages.conversation_title', ['name' => $name]) }}</a>
+                        </h2>
+                    </div>
                     @if ($unreadCount > 0)
                         <strong class="govuk-tag govuk-tag--blue">{{ trans_choice('govuk_alpha.messages.unread_count', $unreadCount, ['count' => $unreadCount]) }}</strong>
                     @endif

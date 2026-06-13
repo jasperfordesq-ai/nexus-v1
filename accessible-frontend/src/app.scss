@@ -155,6 +155,21 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
   border-top: 1px solid $govuk-border-colour;
 }
 
+// Card header row: a small avatar beside a heading/name (feed, messages,
+// dashboard mini-cards). Avoids layout shift and degrades to initials.
+.nexus-alpha-card-head {
+  display: flex;
+  align-items: center;
+  gap: govuk-spacing(2);
+  margin-bottom: govuk-spacing(2);
+}
+
+.nexus-alpha-card-head > .govuk-heading-s,
+.nexus-alpha-card-head > .govuk-heading-m,
+.nexus-alpha-card-head > p {
+  margin-bottom: 0;
+}
+
 .nexus-alpha-card {
   padding-top: govuk-spacing(4);
   padding-bottom: govuk-spacing(4);

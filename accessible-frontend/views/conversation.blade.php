@@ -95,7 +95,15 @@
                     $sentAt = $formatDate($message['created_at'] ?? null);
                 @endphp
                 <li class="nexus-alpha-card">
-                    <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">{{ $senderName }}</p>
+                    <div class="nexus-alpha-card-head">
+                        @php($senderAvatar = $message['sender']['avatar_url'] ?? null)
+                        @if (!empty($senderAvatar))
+                            <img class="nexus-alpha-avatar" src="{{ $senderAvatar }}" alt="" loading="lazy" decoding="async" width="48" height="48">
+                        @else
+                            <span class="nexus-alpha-avatar nexus-alpha-avatar--placeholder" aria-hidden="true">{{ mb_strtoupper(mb_substr($senderName, 0, 1)) }}</span>
+                        @endif
+                        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">{{ $senderName }}</p>
+                    </div>
                     @if ($sentAt)
                         <p class="govuk-hint govuk-!-margin-bottom-2">{{ __('govuk_alpha.messages.sent_label') }} {{ $sentAt }}</p>
                     @endif

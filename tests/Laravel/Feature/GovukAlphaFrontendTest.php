@@ -1163,6 +1163,9 @@ class GovukAlphaFrontendTest extends TestCase
         $index->assertSee('class="govuk-tabs"', false);
         $index->assertSee('Accessible message workflow verification.');
         $index->assertSee(route('govuk-alpha.messages.show', ['tenantSlug' => $this->testTenantSlug, 'userId' => $recipient->id]), false);
+        // The index offers a way to start a new conversation (link to the directory).
+        $index->assertSee(__('govuk_alpha.messages.start_new'));
+        $index->assertSee(route('govuk-alpha.members.index', ['tenantSlug' => $this->testTenantSlug]), false);
 
         $archive = $this->post("/{$this->testTenantSlug}/alpha/messages/{$recipient->id}/archive");
         $archive->assertRedirect("/{$this->testTenantSlug}/alpha/messages?status=conversation-archived");
@@ -1170,6 +1173,34 @@ class GovukAlphaFrontendTest extends TestCase
         $archived = $this->get("/{$this->testTenantSlug}/alpha/messages?archived=1");
         $archived->assertOk();
         $archived->assertSee(__('govuk_alpha.actions.restore_conversation'));
+    }
+
+    public function test_unread_message_count_shows_in_the_navigation(): void
+    {
+        $sender = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Nav Sender',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $recipient = $this->authenticatedUser(['name' => 'Nav Recipient']);
+
+        DB::table('messages')->insert([
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $sender->id,
+            'receiver_id' => $recipient->id,
+            'body' => 'Unread nav badge check.',
+            'is_read' => 0,
+            'is_federated' => 0,
+            'created_at' => now(),
+        ]);
+
+        Sanctum::actingAs($recipient, ['*']);
+
+        $dashboard = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
+        $dashboard->assertOk();
+        // The Messages nav item carries an unread badge announced to screen readers.
+        $dashboard->assertSee('nexus-alpha-nav-badge', false);
+        $dashboard->assertSee(trans_choice('govuk_alpha.messages.unread_count', 1, ['count' => 1]));
     }
 
     public function test_events_pages_render_filters_detail_and_rsvp_flow(): void

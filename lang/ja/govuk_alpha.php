@@ -669,6 +669,7 @@ return [
         ],
     ],
     'messages' => [
+        'start_new' => 'Message a member',
         'show_older' => 'Show older messages',
         'older_pagination_label' => 'Conversation history',
         'title' => 'Messages',
