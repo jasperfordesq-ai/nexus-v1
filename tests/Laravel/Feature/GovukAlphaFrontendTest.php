@@ -115,6 +115,24 @@ class GovukAlphaFrontendTest extends TestCase
         $ar->assertSee('dir="rtl"', false);
     }
 
+    public function test_home_module_grid_distinguishes_signin_from_disabled(): void
+    {
+        // Anonymous viewer: auth-gated modules (Dashboard, My Profile, …) are not
+        // "disabled" — they need sign-in. The grid must say so, not "not enabled
+        // for this community".
+        $anon = $this->get("/{$this->testTenantSlug}/alpha");
+        $anon->assertOk();
+        $anon->assertSee(__('govuk_alpha.home.module_signin'));
+        $anon->assertSee(__('govuk_alpha.home.module_signin_hint'));
+
+        // Signed in: the dashboard module becomes available.
+        $this->authenticatedUser();
+        $authed = $this->get("/{$this->testTenantSlug}/alpha");
+        $authed->assertOk();
+        $authed->assertSee(__('govuk_alpha.home.module_available'));
+        $authed->assertSee(route('govuk-alpha.dashboard', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
     public function test_register_page_shows_closed_registration_message_and_hides_form(): void
     {
         DB::table('tenant_registration_policies')->updateOrInsert(

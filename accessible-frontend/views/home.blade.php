@@ -16,6 +16,7 @@
                     ? route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug])
                     : route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']),
                 'available' => $isAuthenticated ?? false,
+                'auth_required' => true,
             ],
             [
                 'key' => 'feed',
@@ -60,6 +61,7 @@
                     ? route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug])
                     : route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']),
                 'available' => ($isAuthenticated ?? false) && \App\Services\BrokerControlConfigService::isDirectMessagingEnabled(),
+                'auth_required' => true,
             ],
             [
                 'key' => 'exchanges',
@@ -69,6 +71,7 @@
                     ? route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug])
                     : route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']),
                 'available' => ($isAuthenticated ?? false) && \App\Core\TenantContext::hasModule('listings') && \App\Services\BrokerControlConfigService::isExchangeWorkflowEnabled(),
+                'auth_required' => true,
             ],
             [
                 'key' => 'profile',
@@ -78,6 +81,7 @@
                     ? route('govuk-alpha.profile.me', ['tenantSlug' => $tenantSlug])
                     : route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']),
                 'available' => $isAuthenticated ?? false,
+                'auth_required' => true,
             ],
         ];
     @endphp
@@ -150,24 +154,37 @@
     <p class="govuk-body">{{ __('govuk_alpha.home.modules_intro', ['community' => $communityName]) }}</p>
     <div class="nexus-alpha-card-list">
         @foreach ($moduleRows as $module)
+            @php
+                // An auth-gated module that is only "unavailable" because the viewer is
+                // signed out is enabled — it just needs sign-in. Distinguish that from a
+                // module the community has genuinely disabled.
+                $needsSignIn = ! $module['available'] && ! empty($module['auth_required']) && ! ($isAuthenticated ?? false);
+                $isLinked = $module['available'] || $needsSignIn;
+            @endphp
             <article class="nexus-alpha-card">
                 <div class="nexus-alpha-module-row">
                     <div>
                         <h3 class="govuk-heading-m govuk-!-margin-bottom-2">
-                            @if ($module['available'])
+                            @if ($isLinked)
                                 <a class="govuk-link" href="{{ $module['href'] }}">{{ $module['title'] }}</a>
                             @else
                                 {{ $module['title'] }}
                             @endif
                         </h3>
                         <p class="govuk-body govuk-!-margin-bottom-0">{{ $module['description'] }}</p>
-                        @if (!$module['available'])
+                        @if ($needsSignIn)
+                            <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">{{ __('govuk_alpha.home.module_signin_hint') }}</p>
+                        @elseif (! $module['available'])
                             <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">{{ __('govuk_alpha.home.module_unavailable_hint') }}</p>
                         @endif
                     </div>
-                    <strong class="govuk-tag {{ $module['available'] ? 'govuk-tag--green' : 'govuk-tag--grey' }}">
-                        {{ $module['available'] ? __('govuk_alpha.home.module_available') : __('govuk_alpha.home.module_unavailable') }}
-                    </strong>
+                    @if ($module['available'])
+                        <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.home.module_available') }}</strong>
+                    @elseif ($needsSignIn)
+                        <strong class="govuk-tag govuk-tag--yellow">{{ __('govuk_alpha.home.module_signin') }}</strong>
+                    @else
+                        <strong class="govuk-tag govuk-tag--grey">{{ __('govuk_alpha.home.module_unavailable') }}</strong>
+                    @endif
                 </div>
             </article>
         @endforeach

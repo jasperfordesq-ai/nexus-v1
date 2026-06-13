@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The accessible home page no longer mislabels sign-in-only sections as "not enabled".** When you're signed out, sections that simply need you to log in (Dashboard, My Profile, Messages, Exchanges) now say "Sign in to use this" and link to the login page, instead of wrongly saying "This module is not enabled for this community". Sections the community has genuinely turned off still say so.
 - **Skill endorsements now work again across the whole platform.** Endorsing a member's skill was silently failing with a server error (the endorsements table has no "updated at" column, but the code tried to write one). Endorsing and un-endorsing now work everywhere.
 
 ### Added

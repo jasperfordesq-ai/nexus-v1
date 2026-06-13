@@ -163,6 +163,8 @@ return [
         'not_available' => 'Not available',
     ],
     'home' => [
+        'module_signin' => 'Sign in',
+        'module_signin_hint' => 'Sign in to use this.',
         'caption' => ':community',
         'title' => 'Accessible',
         'description' => 'Use a simpler, accessible version of :community for core community tasks.',
