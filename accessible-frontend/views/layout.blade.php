@@ -84,7 +84,8 @@
             @php($brandLogo = ($tenantLogoDarkUrl ?? null) ?: ($tenantLogoUrl ?? null))
             <a class="nexus-alpha-header__brand govuk-!-font-size-24" href="{{ $tenantSlug ? route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]) : route('govuk-alpha.tenant-chooser') }}">
                 @if (!empty($brandLogo))
-                    <img class="nexus-alpha-header__logo nexus-alpha-header__logo--{{ $tenantLogoShape ?? 'landscape' }}" src="{{ $brandLogo }}" alt="{{ $brandText }}" width="260" height="52" decoding="async">
+                    {{-- No fixed width/height: logos vary per tenant; CSS (.nexus-alpha-header__logo--*) drives the height by shape. A hardcoded height defeats that sizing. --}}
+                    <img class="nexus-alpha-header__logo nexus-alpha-header__logo--{{ $tenantLogoShape ?? 'landscape' }}" src="{{ $brandLogo }}" alt="{{ $brandText }}" decoding="async">
                 @else
                     {{ $brandText }}
                 @endif

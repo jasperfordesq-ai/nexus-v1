@@ -85,6 +85,10 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
 .nexus-alpha-header__logo {
   display: block;
   width: auto;
+  // height/aspect-ratio auto so any HTML width/height attributes can't pin the
+  // logo to a fixed (wrong) size — the per-shape max-height below drives sizing.
+  height: auto;
+  aspect-ratio: auto;
   max-width: 260px;
   max-height: 52px; // default / landscape
   object-fit: contain;
@@ -92,9 +96,9 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
 
 // Wide/landscape keep the header compact; square/stacked logos get extra height
 // (the in-flow header simply grows to fit) so a crest-over-text stays readable.
-.nexus-alpha-header__logo--wide { max-height: 44px; }
-.nexus-alpha-header__logo--landscape { max-height: 52px; }
-.nexus-alpha-header__logo--square { max-height: 80px; }
+.nexus-alpha-header__logo--wide { max-height: 48px; }
+.nexus-alpha-header__logo--landscape { max-height: 64px; }
+.nexus-alpha-header__logo--square { max-height: 104px; }
 
 .nexus-alpha-header__service {
   color: var(--nexus-alpha-header-fg, #{govuk-colour("white")});
