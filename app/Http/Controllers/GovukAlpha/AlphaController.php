@@ -2671,6 +2671,22 @@ class AlphaController extends Controller
     }
 
     /**
+     * "How timebanking works" — a plain, public educational page. No auth or
+     * module gate: it helps newcomers (and the accessibility-first audience in
+     * particular) understand the model before signing up.
+     */
+    public function guide(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        return $this->view('accessible-frontend::guide', [
+            'title' => __('govuk_alpha.guide.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'guide',
+        ]);
+    }
+
+    /**
      * Connections inbox: the member's accepted network plus pending requests
      * (received — which they can accept/decline — and sent, which they can
      * cancel). Backed by the tenant-scoped ConnectionService.
@@ -2760,6 +2776,35 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'status' => $ok ? $okStatus : 'connection-failed',
         ])->withFragment('connections-top');
+    }
+
+    /**
+     * Matches — members whose offers/requests complement the viewer's listings,
+     * ranked by SmartMatchingEngine (the same engine that powers the React app).
+     * Gated by the listings module since matches are listing-based.
+     */
+    public function matches(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $matches = [];
+        try {
+            $matches = app(\App\Services\SmartMatchingEngine::class)->findMatchesForUser($userId, ['limit' => 20]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::matches', [
+            'title' => __('govuk_alpha.matches.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'matches',
+            'matches' => is_array($matches) ? $matches : [],
+        ]);
     }
 
     /** Time-credit wallet: balance, transaction history, and a transfer form. */
@@ -4181,6 +4226,10 @@ class AlphaController extends Controller
             $items['listings'] = route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]);
             if ($userId !== null && BrokerControlConfigService::isExchangeWorkflowEnabled()) {
                 $items['exchanges'] = route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug]);
+            }
+            // Matches are listing-based; show them to signed-in members only.
+            if ($userId !== null) {
+                $items['matches'] = route('govuk-alpha.matches.index', ['tenantSlug' => $tenantSlug]);
             }
         }
 

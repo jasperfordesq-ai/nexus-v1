@@ -116,6 +116,9 @@
                 <p class="govuk-body-l govuk-!-font-weight-bold">{{ $tenant['tagline'] }}</p>
             @endif
             <p class="govuk-body">{{ __('govuk_alpha.home.supporting_text') }}</p>
+            <p class="govuk-body">
+                <a class="govuk-link" href="{{ route('govuk-alpha.guide', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.guide.title') }}</a>
+            </p>
 
             <div class="nexus-alpha-actions govuk-!-margin-bottom-8">
                 @if ($isAuthenticated ?? false)

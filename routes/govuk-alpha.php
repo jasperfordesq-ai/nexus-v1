@@ -31,6 +31,7 @@ Route::prefix('{tenantSlug}/alpha')
         // tenant-scoped LegalDocumentService with a GOV.UK static fallback; the
         // shared legalDocument() method reads the document type from route defaults.
         Route::get('/about', [AlphaController::class, 'about'])->name('about');
+        Route::get('/guide', [AlphaController::class, 'guide'])->name('guide');
         Route::get('/trust-and-safety', [AlphaController::class, 'trustSafety'])->name('trust-safety');
         Route::get('/accessibility', [AlphaController::class, 'accessibility'])->name('accessibility');
         Route::get('/legal', [AlphaController::class, 'legalHub'])->name('legal.hub');
@@ -109,6 +110,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/exchanges/{id}', [AlphaController::class, 'exchange'])->whereNumber('id')->name('exchanges.show');
         Route::post('/exchanges/{id}', [AlphaController::class, 'storeExchangeAction'])->middleware('throttle:30,1')->whereNumber('id')->name('exchanges.action.store');
         Route::post('/exchanges/{id}/rate', [AlphaController::class, 'storeExchangeRating'])->middleware('throttle:20,1')->whereNumber('id')->name('exchanges.rate.store');
+        Route::get('/matches', [AlphaController::class, 'matches'])->name('matches.index');
         Route::get('/wallet', [AlphaController::class, 'wallet'])->name('wallet.index');
         Route::post('/wallet/transfer', [AlphaController::class, 'transferCredits'])->middleware('throttle:15,1')->name('wallet.transfer');
         Route::get('/messages', [AlphaController::class, 'messages'])->name('messages.index');

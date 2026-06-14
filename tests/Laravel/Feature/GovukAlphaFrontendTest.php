@@ -3439,6 +3439,33 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertSame('pending', DB::table('connections')->where('id', $cid)->value('status'));
     }
 
+    public function test_matches_page_renders_for_a_signed_in_member(): void
+    {
+        $this->authenticatedUser(['name' => 'Matcher Member']);
+
+        // The page must render whether or not the engine finds matches (the
+        // controller degrades to an empty state on any engine error).
+        $response = $this->get("/{$this->testTenantSlug}/alpha/matches");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.matches.title'));
+        $response->assertSee(__('govuk_alpha.matches.description'));
+    }
+
+    public function test_timebanking_guide_renders_publicly(): void
+    {
+        // Public, no auth: newcomers can read how timebanking works before signing up.
+        $guest = $this->get("/{$this->testTenantSlug}/alpha/guide");
+
+        $guest->assertOk();
+        $guest->assertSee(__('govuk_alpha.guide.title'));
+        $guest->assertSee(__('govuk_alpha.guide.equal_title'));
+        $guest->assertSee(__('govuk_alpha.guide.step1_title'));
+        $guest->assertSee(__('govuk_alpha.guide.step3_title'));
+        // Signed-out visitors get a create-account call to action.
+        $guest->assertSee(route('govuk-alpha.register', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
     private function authenticatedUser(array $overrides = []): User
     {
         $user = User::factory()->forTenant($this->testTenantId)->create(array_merge([
