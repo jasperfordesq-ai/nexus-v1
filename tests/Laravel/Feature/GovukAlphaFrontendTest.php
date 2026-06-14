@@ -4702,4 +4702,249 @@ class GovukAlphaFrontendTest extends TestCase
         TenantContext::reset();
         TenantContext::setById($this->testTenantId);
     }
+
+    // ==================================================================
+    // WAVE E2 — Events depth (waitlist join/leave, poll voting, recurring series)
+    // ==================================================================
+
+    /**
+     * Seed a single event owned by $ownerId. Optionally cap attendance to make
+     * the event fillable so the waitlist controls show.
+     */
+    private function seedAlphaEvent(int $ownerId, array $overrides = []): int
+    {
+        return DB::table('events')->insertGetId(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $ownerId,
+            'title' => 'Waitlist depth event',
+            'description' => 'An event for the depth wave.',
+            'location' => 'Depth Hall',
+            'start_time' => now()->addDays(9),
+            'end_time' => now()->addDays(9)->addHours(2),
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $overrides));
+    }
+
+    public function test_event_waitlist_full_event_shows_join_control_and_joins(): void
+    {
+        $organiser = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        // Capacity 1, already filled by one "going" RSVP from another member.
+        $eventId = $this->seedAlphaEvent($organiser->id, ['max_attendees' => 1]);
+        $filler = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $filler->id,
+            'status' => 'going',
+            'created_at' => now(),
+        ]);
+
+        // A different member sees the "join the waitlist" control because the event is full.
+        $member = $this->authenticatedUser();
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}");
+        $detail->assertOk();
+        $detail->assertSee(__('govuk_alpha.events.waitlist_heading'));
+        $detail->assertSee(route('govuk-alpha.events.waitlist.join', ['tenantSlug' => $this->testTenantSlug, 'id' => $eventId]), false);
+
+        // Joining the waitlist redirects with the success status and inserts a waiting row.
+        $join = $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/waitlist");
+        $join->assertRedirect("/{$this->testTenantSlug}/alpha/events/{$eventId}?status=waitlist-joined");
+        $this->assertSame(1, DB::table('event_waitlist')
+            ->where('event_id', $eventId)
+            ->where('user_id', $member->id)
+            ->where('status', 'waiting')
+            ->count());
+
+        // The detail page now shows the member's position and the leave control.
+        $after = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}");
+        $after->assertOk();
+        $after->assertSee(__('govuk_alpha.events.waitlist_position', ['position' => 1]));
+        $after->assertSee(route('govuk-alpha.events.waitlist.leave', ['tenantSlug' => $this->testTenantSlug, 'id' => $eventId]), false);
+    }
+
+    public function test_event_waitlist_leave_cancels_the_waiting_row(): void
+    {
+        $organiser = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $eventId = $this->seedAlphaEvent($organiser->id, ['max_attendees' => 1]);
+
+        $member = $this->authenticatedUser();
+        DB::table('event_waitlist')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $member->id,
+            'position' => 1,
+            'status' => 'waiting',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $leave = $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/waitlist/leave");
+        $leave->assertRedirect("/{$this->testTenantSlug}/alpha/events/{$eventId}?status=waitlist-left");
+
+        // The row is cancelled (not deleted) — no longer 'waiting'.
+        $this->assertSame(0, DB::table('event_waitlist')
+            ->where('event_id', $eventId)
+            ->where('user_id', $member->id)
+            ->where('status', 'waiting')
+            ->count());
+    }
+
+    public function test_event_waitlist_rsvp_going_on_full_event_auto_waitlists(): void
+    {
+        $organiser = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $eventId = $this->seedAlphaEvent($organiser->id, ['max_attendees' => 1]);
+        $filler = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $filler->id,
+            'status' => 'going',
+            'created_at' => now(),
+        ]);
+
+        // RSVPing "going" to a full event is reported as a waitlist join, not a failure.
+        $member = $this->authenticatedUser();
+        $rsvp = $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/rsvp", ['status' => 'going']);
+        $rsvp->assertRedirect("/{$this->testTenantSlug}/alpha/events/{$eventId}?status=waitlist-joined");
+        $this->assertSame(1, DB::table('event_waitlist')
+            ->where('event_id', $eventId)
+            ->where('user_id', $member->id)
+            ->where('status', 'waiting')
+            ->count());
+    }
+
+    public function test_event_waitlist_requires_authentication(): void
+    {
+        $organiser = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $eventId = $this->seedAlphaEvent($organiser->id, ['max_attendees' => 1]);
+
+        // Anonymous POST is bounced to login, not allowed to mutate the waitlist.
+        $join = $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/waitlist");
+        $join->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $this->assertSame(0, DB::table('event_waitlist')->where('event_id', $eventId)->count());
+    }
+
+    public function test_event_poll_open_poll_shows_vote_form_and_records_vote(): void
+    {
+        $organiser = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $eventId = $this->seedAlphaEvent($organiser->id);
+
+        // An open poll attached to this event.
+        $pollId = DB::table('polls')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $organiser->id,
+            'event_id' => $eventId,
+            'question' => 'What time suits best?',
+            'is_active' => 1,
+            'end_date' => null,
+            'created_at' => now(),
+        ]);
+        $morning = DB::table('poll_options')->insertGetId(['tenant_id' => $this->testTenantId, 'poll_id' => $pollId, 'label' => 'Morning', 'votes' => 0]);
+        DB::table('poll_options')->insert(['tenant_id' => $this->testTenantId, 'poll_id' => $pollId, 'label' => 'Evening', 'votes' => 0]);
+
+        // A non-creator who has not voted sees the poll question + vote form.
+        $voter = $this->authenticatedUser(['name' => 'Event Voter']);
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}");
+        $detail->assertOk();
+        $detail->assertSee(__('govuk_alpha.events.polls_heading'));
+        $detail->assertSee('What time suits best?');
+        $detail->assertSee('Morning');
+        $detail->assertSee(__('govuk_alpha.events.poll_vote_button'));
+        $detail->assertSee(route('govuk-alpha.events.polls.vote', ['tenantSlug' => $this->testTenantSlug, 'id' => $eventId, 'pollId' => $pollId]), false);
+
+        // Casting a vote records it and redirects with the success status.
+        $vote = $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/polls/{$pollId}/vote", ['option_id' => $morning]);
+        $vote->assertRedirectContains('status=poll-voted');
+        $this->assertSame(1, DB::table('poll_votes')
+            ->where('poll_id', $pollId)
+            ->where('option_id', $morning)
+            ->where('user_id', $voter->id)
+            ->count());
+    }
+
+    public function test_event_poll_open_poll_hides_running_totals_for_non_creator(): void
+    {
+        $organiser = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $eventId = $this->seedAlphaEvent($organiser->id);
+        $pollId = DB::table('polls')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $organiser->id,
+            'event_id' => $eventId,
+            'question' => 'Secret ballot question?',
+            'is_active' => 1,
+            'end_date' => null,
+            'created_at' => now(),
+        ]);
+        $optA = DB::table('poll_options')->insertGetId(['tenant_id' => $this->testTenantId, 'poll_id' => $pollId, 'label' => 'Option A', 'votes' => 0]);
+
+        // A voter casts a vote, then revisits — while the poll is open totals stay hidden.
+        $this->authenticatedUser(['name' => 'Ballot Voter']);
+        $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/polls/{$pollId}/vote", ['option_id' => $optA]);
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}");
+        $detail->assertOk();
+        // The "results pending" notice is shown instead of percentages.
+        $detail->assertSee(__('govuk_alpha.events.poll_results_pending_note'));
+    }
+
+    public function test_event_poll_vote_rejects_poll_from_a_different_event(): void
+    {
+        $organiser = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $eventA = $this->seedAlphaEvent($organiser->id, ['title' => 'Event A']);
+        $eventB = $this->seedAlphaEvent($organiser->id, ['title' => 'Event B']);
+
+        // Poll belongs to event B.
+        $pollId = DB::table('polls')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $organiser->id,
+            'event_id' => $eventB,
+            'question' => 'Belongs to B',
+            'is_active' => 1,
+            'end_date' => null,
+            'created_at' => now(),
+        ]);
+        $optId = DB::table('poll_options')->insertGetId(['tenant_id' => $this->testTenantId, 'poll_id' => $pollId, 'label' => 'Yes', 'votes' => 0]);
+
+        // Voting on it via event A's URL is a 404 — no cross-event vote stuffing.
+        $this->authenticatedUser();
+        $vote = $this->post("/{$this->testTenantSlug}/alpha/events/{$eventA}/polls/{$pollId}/vote", ['option_id' => $optId]);
+        $vote->assertNotFound();
+        $this->assertSame(0, DB::table('poll_votes')->where('poll_id', $pollId)->count());
+    }
+
+    public function test_event_series_navigation_lists_sibling_occurrences(): void
+    {
+        $organiser = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+
+        $seriesId = DB::table('event_series')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'created_by' => $organiser->id,
+            'title' => 'Weekly meet-up',
+            'description' => 'Repeats weekly.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $first = $this->seedAlphaEvent($organiser->id, [
+            'title' => 'Weekly meet-up — week 1',
+            'series_id' => $seriesId,
+            'start_time' => now()->addDays(7),
+        ]);
+        $second = $this->seedAlphaEvent($organiser->id, [
+            'title' => 'Weekly meet-up — week 2',
+            'series_id' => $seriesId,
+            'start_time' => now()->addDays(14),
+        ]);
+
+        $this->authenticatedUser();
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/events/{$first}");
+        $detail->assertOk();
+        $detail->assertSee(__('govuk_alpha.events.series_heading'));
+        // The current occurrence is flagged, and the sibling links through.
+        $detail->assertSee(__('govuk_alpha.events.series_this_event'));
+        $detail->assertSee(route('govuk-alpha.events.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $second]), false);
+        $detail->assertSee('Weekly meet-up — week 2');
+    }
 }

@@ -1326,6 +1326,50 @@ class AlphaController extends Controller
             report($e);
         }
 
+        // The signed-in member's current waitlist position, if any. When the
+        // event is full, EventService::rsvp('going') auto-waitlists the user and
+        // returns false — so the detail page exposes join/leave-waitlist controls
+        // and the member's queue position (parity with React's EventDetailPage
+        // waitlist_position display).
+        $waitlistPosition = null;
+        if ($viewerId !== null) {
+            try {
+                $waitlistPosition = EventService::getUserWaitlistPosition($id, $viewerId);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        // Polls attached to this event (event_id scope). PollService::getById
+        // applies ballot secrecy internally: per-option counts are null while a
+        // poll is open for anyone but the creator — the blade renders results
+        // only when results_visible is true, exactly like the /alpha/polls page.
+        $polls = [];
+        try {
+            $list = \App\Services\PollService::getAll(['event_id' => $id, 'limit' => 20])['items'] ?? [];
+            foreach ($list as $p) {
+                $full = \App\Services\PollService::getById((int) ($p['id'] ?? 0), $viewerId);
+                if ($full !== null) {
+                    $polls[] = $full;
+                }
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // Sibling occurrences of a recurring series. getSeriesEvents is the
+        // tenant-scoped reader (the API's showSeries uses it too); it returns a
+        // light {id,title,start_time,status,...} shape ordered by start time.
+        $seriesEvents = [];
+        $seriesId = isset($event['series_id']) ? (int) $event['series_id'] : 0;
+        if ($seriesId > 0) {
+            try {
+                $seriesEvents = EventService::getSeriesEvents($seriesId);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
         return $this->view('accessible-frontend::event-detail', [
             'title' => $event['title'] ?? __('govuk_alpha.events.detail_title'),
             'tenantSlug' => $tenantSlug,
@@ -1334,6 +1378,9 @@ class AlphaController extends Controller
             'requiresAuth' => $viewerId === null,
             'isOwner' => $viewerId !== null && (int) ($event['user_id'] ?? 0) === $viewerId,
             'attendees' => $attendees,
+            'waitlistPosition' => $waitlistPosition,
+            'polls' => $polls,
+            'seriesEvents' => $seriesEvents,
             'status' => self::asStr(request()->query('status')) ?: null,
             'ogImage' => $this->absoluteAssetUrl($event['cover_image'] ?? null),
             'ogImageAlt' => $event['cover_image'] ? ($event['title'] ?? null) : null,
@@ -1541,6 +1588,16 @@ class AlphaController extends Controller
 
         try {
             if (!EventService::rsvp($id, $userId, $status)) {
+                // A 'going' RSVP on a full event is not a failure: EventService::rsvp
+                // auto-adds the member to the waitlist and reports it via an
+                // EVENT_FULL error. Surface that as the waitlist-joined banner so
+                // the member knows they are queued, matching the React behaviour.
+                foreach (EventService::getErrors() as $err) {
+                    if (($err['code'] ?? null) === 'EVENT_FULL' || !empty($err['waitlisted'])) {
+                        return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'waitlist-joined']);
+                    }
+                }
+
                 return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'rsvp-failed']);
             }
         } catch (\Throwable $e) {
@@ -1567,6 +1624,115 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'rsvp-updated']);
+    }
+
+    /**
+     * Join the waitlist for a full event.
+     *
+     * Mirrors POST /v2/events/{id}/waitlist. The member is added to the queue;
+     * the detail page then shows their position via EventService::getUserWaitlistPosition.
+     */
+    public function joinEventWaitlist(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('events'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Confirm the event exists in this tenant before mutating the waitlist.
+        $event = EventService::getById($id, $userId);
+        abort_if($event === null, 404);
+
+        $ok = false;
+        try {
+            $ok = EventService::addToWaitlist($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.events.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'waitlist-joined' : 'waitlist-failed',
+        ]);
+    }
+
+    /**
+     * Leave the waitlist for an event.
+     *
+     * Mirrors DELETE /v2/events/{id}/waitlist. removeFromWaitlist is idempotent
+     * (it only cancels a 'waiting' row) so we always report success.
+     */
+    public function leaveEventWaitlist(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('events'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $event = EventService::getById($id, $userId);
+        abort_if($event === null, 404);
+
+        try {
+            EventService::removeFromWaitlist($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.events.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => 'waitlist-left',
+        ]);
+    }
+
+    /**
+     * Cast a vote on a poll attached to an event.
+     *
+     * Mirrors POST /v2/polls/{id}/vote, scoped to the event so the poll must
+     * actually belong to this event (no cross-event vote stuffing). Ballot
+     * secrecy is enforced by PollService::getById on the way back out.
+     */
+    public function storeEventPollVote(Request $request, string $tenantSlug, int $id, int $pollId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('events'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // The event must exist in this tenant, and the poll must be attached to it.
+        $event = EventService::getById($id, $userId);
+        abort_if($event === null, 404);
+
+        $poll = \App\Services\PollService::getById($pollId, $userId);
+        abort_if($poll === null, 404);
+        abort_unless((int) ($poll['event_id'] ?? 0) === $id, 404);
+
+        $optionId = (int) $request->input('option_id');
+        $ok = false;
+        if ($optionId > 0) {
+            try {
+                // PollService::vote validates the option belongs to the poll.
+                $ok = \App\Services\PollService::vote($pollId, $optionId, $userId);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return redirect()->route('govuk-alpha.events.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'poll-voted' : 'poll-vote-failed',
+        ])->withFragment('poll-' . $pollId);
     }
 
     public function volunteering(Request $request, string $tenantSlug): Response

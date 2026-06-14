@@ -78,6 +78,9 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/events/{id}/delete', [AlphaController::class, 'deleteEvent'])->whereNumber('id')->middleware('throttle:10,1')->name('events.delete');
         Route::get('/events/{id}', [AlphaController::class, 'event'])->whereNumber('id')->name('events.show');
         Route::post('/events/{id}/rsvp', [AlphaController::class, 'storeEventRsvp'])->whereNumber('id')->name('events.rsvp.store');
+        Route::post('/events/{id}/waitlist', [AlphaController::class, 'joinEventWaitlist'])->whereNumber('id')->middleware('throttle:30,1')->name('events.waitlist.join');
+        Route::post('/events/{id}/waitlist/leave', [AlphaController::class, 'leaveEventWaitlist'])->whereNumber('id')->middleware('throttle:30,1')->name('events.waitlist.leave');
+        Route::post('/events/{id}/polls/{pollId}/vote', [AlphaController::class, 'storeEventPollVote'])->whereNumber('id')->whereNumber('pollId')->middleware('throttle:30,1')->name('events.polls.vote');
         Route::get('/volunteering', [AlphaController::class, 'volunteering'])->name('volunteering.index');
         Route::get('/volunteering/hours', [AlphaController::class, 'volunteeringHours'])->name('volunteering.hours');
         Route::get('/volunteering/accessibility', [AlphaController::class, 'volunteerAccessibility'])->name('volunteering.accessibility');
