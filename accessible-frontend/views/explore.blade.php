@@ -18,9 +18,8 @@
             ['govuk-alpha.jobs.index', 'jobs', 'job_vacancies'],
             ['govuk-alpha.courses.index', 'courses', 'courses'],
             ['govuk-alpha.podcasts.index', 'podcasts', 'podcasts'],
-            ['govuk-alpha.coupons.index', 'coupons', 'marketplace'],
+            ['govuk-alpha.coupons.index', 'coupons', 'merchant_coupons'],
             ['govuk-alpha.premium.index', 'premium', 'member_premium'],
-            ['govuk-alpha.clubs.index', 'clubs', null],
             ['govuk-alpha.ideation.index', 'ideation', 'ideation_challenges'],
             ['govuk-alpha.federation.index', 'federation', 'federation'],
         ];
@@ -37,6 +36,28 @@
                 'description' => __('govuk_alpha.' . $langKey . '.description'),
                 'href' => route($routeName, ['tenantSlug' => $tenantSlug]),
             ];
+        }
+
+        // Clubs (Vereine) have no feature flag — they only make sense for tenants
+        // that actually run club organisations, so surface the card only then.
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.clubs.index')) {
+            $hasClubs = false;
+            try {
+                $hasClubs = \Illuminate\Support\Facades\DB::table('vol_organizations')
+                    ->where('tenant_id', \App\Core\TenantContext::getId())
+                    ->where('org_type', 'club')
+                    ->where('status', 'active')
+                    ->exists();
+            } catch (\Throwable $e) {
+                $hasClubs = false;
+            }
+            if ($hasClubs) {
+                $exploreLinks[] = [
+                    'title' => __('govuk_alpha.clubs.title'),
+                    'description' => __('govuk_alpha.clubs.description'),
+                    'href' => route('govuk-alpha.clubs.index', ['tenantSlug' => $tenantSlug]),
+                ];
+            }
         }
     @endphp
 

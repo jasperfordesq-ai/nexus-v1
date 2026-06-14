@@ -174,6 +174,19 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/ideation/{id}', [AlphaController::class, 'ideationChallenge'])->whereNumber('id')->name('ideation.show');
         Route::post('/ideation/{id}/ideas', [AlphaController::class, 'submitIdea'])->whereNumber('id')->middleware('throttle:10,1')->name('ideation.ideas.store');
         Route::post('/ideation/{id}/ideas/{ideaId}/vote', [AlphaController::class, 'voteIdea'])->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:30,1')->name('ideation.ideas.vote');
+        // Wave 4 — commerce & discovery modules (each gated by its feature flag).
+        Route::get('/marketplace', [AlphaController::class, 'marketplace'])->name('marketplace.index');
+        Route::get('/marketplace/{id}', [AlphaController::class, 'marketplaceItem'])->whereNumber('id')->name('marketplace.show');
+        Route::get('/courses', [AlphaController::class, 'courses'])->name('courses.index');
+        Route::get('/courses/{id}', [AlphaController::class, 'course'])->whereNumber('id')->name('courses.show');
+        Route::post('/courses/{id}/enrol', [AlphaController::class, 'enrolCourse'])->whereNumber('id')->middleware('throttle:10,1')->name('courses.enrol');
+        Route::get('/podcasts', [AlphaController::class, 'podcasts'])->name('podcasts.index');
+        Route::get('/podcasts/{id}', [AlphaController::class, 'podcast'])->whereNumber('id')->name('podcasts.show');
+        Route::get('/coupons', [AlphaController::class, 'coupons'])->name('coupons.index');
+        Route::get('/premium', [AlphaController::class, 'premium'])->name('premium.index');
+        Route::post('/premium/subscribe', [AlphaController::class, 'subscribePremium'])->middleware('throttle:10,1')->name('premium.subscribe');
+        Route::get('/clubs', [AlphaController::class, 'clubs'])->name('clubs.index');
+        Route::get('/federation', [AlphaController::class, 'federation'])->name('federation.index');
         Route::get('/profile', [AlphaController::class, 'myProfile'])->name('profile.me');
         Route::get('/profile/settings', [AlphaController::class, 'profileSettings'])->name('profile.settings');
         Route::post('/profile/settings', [AlphaController::class, 'updateProfileSettings'])->middleware('throttle:20,1')->name('profile.settings.update');

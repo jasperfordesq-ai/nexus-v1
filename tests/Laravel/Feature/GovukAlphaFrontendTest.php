@@ -3908,6 +3908,155 @@ class GovukAlphaFrontendTest extends TestCase
             ->count());
     }
 
+    public function test_wave4_modules_render_when_enabled(): void
+    {
+        $this->authenticatedUser(['name' => 'Shopper']);
+        $this->enableAlphaFeatures(['marketplace', 'courses', 'podcasts', 'merchant_coupons', 'member_premium']);
+
+        $pages = [
+            'marketplace' => 'govuk_alpha.marketplace.title',
+            'courses' => 'govuk_alpha.courses.title',
+            'podcasts' => 'govuk_alpha.podcasts.title',
+            'coupons' => 'govuk_alpha.coupons.title',
+            'premium' => 'govuk_alpha.premium.title',
+            'federation' => 'govuk_alpha.federation.title',
+        ];
+        foreach ($pages as $path => $key) {
+            $res = $this->get("/{$this->testTenantSlug}/alpha/{$path}");
+            $res->assertOk();
+            $res->assertSee(__($key));
+        }
+    }
+
+    public function test_marketplace_is_gated_off_by_default(): void
+    {
+        $this->authenticatedUser();
+        $this->get("/{$this->testTenantSlug}/alpha/marketplace")->assertStatus(403);
+    }
+
+    public function test_marketplace_item_detail_renders(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Buyer']);
+        $this->enableAlphaFeatures(['marketplace']);
+
+        $id = DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Vintage Bicycle',
+            'description' => 'A lovely old bike in good condition.',
+            'price_type' => 'free',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Detail page.
+        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/{$id}");
+        $res->assertOk();
+        $res->assertSee('Vintage Bicycle');
+
+        // Index card loop renders the same listing.
+        $index = $this->get("/{$this->testTenantSlug}/alpha/marketplace");
+        $index->assertOk();
+        $index->assertSee('Vintage Bicycle');
+    }
+
+    public function test_clubs_directory_lists_a_club(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Club Secretary']);
+
+        DB::table('vol_organizations')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'name' => 'Riverside Chess Club',
+            'description' => 'A friendly chess club meeting weekly.',
+            'org_type' => 'club',
+            'status' => 'active',
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/clubs");
+        $res->assertOk();
+        $res->assertSee('Riverside Chess Club');
+    }
+
+    public function test_podcast_detail_renders_show(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Podcaster']);
+        $this->enableAlphaFeatures(['podcasts']);
+
+        $showId = DB::table('podcast_shows')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_user_id' => $owner->id,
+            'title' => 'Community Voices',
+            'slug' => 'community-voices-' . $owner->id,
+            'status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/podcasts/{$showId}");
+        $res->assertOk();
+        $res->assertSee('Community Voices');
+    }
+
+    public function test_course_free_enrolment_records_enrollment(): void
+    {
+        $learner = $this->authenticatedUser(['name' => 'Learner']);
+        $author = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $this->enableAlphaFeatures(['courses']);
+
+        $courseId = DB::table('courses')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'author_user_id' => $author->id,
+            'title' => 'Intro to Beekeeping',
+            'slug' => 'intro-to-beekeeping-' . $author->id,
+            'level' => 'beginner',
+            'visibility' => 'public',
+            'status' => 'published',
+            'moderation_status' => 'approved',
+            'credit_cost' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Index card loop renders the course.
+        $index = $this->get("/{$this->testTenantSlug}/alpha/courses");
+        $index->assertOk();
+        $index->assertSee('Intro to Beekeeping');
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/courses/{$courseId}");
+        $detail->assertOk();
+        $detail->assertSee('Intro to Beekeeping');
+        $detail->assertSee(__('govuk_alpha.courses.enrol_button'));
+
+        $enrol = $this->post("/{$this->testTenantSlug}/alpha/courses/{$courseId}/enrol");
+        $enrol->assertRedirectContains('status=enrolled');
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertTrue(\App\Services\CourseEnrollmentService::isEnrolled($courseId, $learner->id));
+    }
+
+    /**
+     * Enable one or more feature flags on the test tenant (they default off for
+     * the commerce modules). Mirrors the DB-update + TenantContext::reset pattern
+     * the module-gate tests use, so the next request re-resolves with the flags on.
+     *
+     * @param array<int,string> $features
+     */
+    private function enableAlphaFeatures(array $features): void
+    {
+        $row = DB::table('tenants')->where('id', $this->testTenantId)->value('features');
+        $current = $row ? (json_decode($row, true) ?: []) : [];
+        foreach ($features as $f) {
+            $current[$f] = true;
+        }
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['features' => json_encode($current)]);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+    }
+
     /**
      * Force the member search down its deterministic SQL fallback by marking
      * Meilisearch unavailable. Meili indexing is non-transactional and async, so

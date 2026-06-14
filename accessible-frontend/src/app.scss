@@ -234,6 +234,12 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
   margin-bottom: 0;
 }
 
+// Native audio player (podcast episodes) — full width within its card.
+.nexus-alpha-audio {
+  width: 100%;
+  margin-top: govuk-spacing(2);
+}
+
 .nexus-alpha-listing-row {
   display: flex;
   gap: govuk-spacing(4);

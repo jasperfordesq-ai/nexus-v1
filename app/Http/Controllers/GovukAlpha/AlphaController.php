@@ -3658,6 +3658,465 @@ class AlphaController extends Controller
         return redirect()->route('govuk-alpha.ideation.show', ['tenantSlug' => $tenantSlug, 'id' => $challengeId, 'status' => $ok ? 'idea-voted' : 'idea-failed'])->withFragment('ideas');
     }
 
+    // === Marketplace ===
+
+    public function marketplace(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $q = trim(self::asStr($request->query('q')));
+        $filters = ['limit' => 30, 'current_user_id' => $userId];
+        if ($q !== '') {
+            $filters['search'] = $q;
+        }
+        $items = [];
+        try {
+            $items = \App\Services\MarketplaceListingService::getAll($filters)['items'] ?? [];
+            $items = array_map(static fn ($i) => is_array($i) ? $i : (array) $i, $items);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::marketplace', [
+            'title' => __('govuk_alpha.marketplace.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'listings' => is_array($items) ? $items : [],
+            'marketplaceQuery' => $q,
+        ]);
+    }
+
+    public function marketplaceItem(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $item = null;
+        try {
+            $item = \App\Services\MarketplaceListingService::getById($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($item === null, 404);
+
+        return $this->view('accessible-frontend::marketplace-detail', [
+            'title' => ($item['title'] ?? '') ?: __('govuk_alpha.marketplace.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'item' => $item,
+        ]);
+    }
+
+    // === Courses ===
+
+    public function courses(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $q = trim(self::asStr($request->query('q')));
+        $filters = ['per_page' => 30, 'include_member_only' => true];
+        if ($q !== '') {
+            $filters['search'] = $q;
+        }
+        $items = [];
+        try {
+            $items = \App\Services\CourseService::browse($filters)['items'] ?? [];
+            $items = array_map(static fn ($c) => is_array($c) ? $c : $c->toArray(), $items);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::courses', [
+            'title' => __('govuk_alpha.courses.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'courses' => is_array($items) ? $items : [],
+            'coursesQuery' => $q,
+        ]);
+    }
+
+    public function course(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $course = null;
+        $isEnrolled = false;
+        try {
+            $course = \App\Services\CourseService::findById($id);
+            if ($course !== null) {
+                $isEnrolled = \App\Services\CourseEnrollmentService::isEnrolled($id, $userId);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($course === null, 404);
+
+        return $this->view('accessible-frontend::course-detail', [
+            'title' => ($course->title ?? '') ?: __('govuk_alpha.courses.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'course' => $course->toArray(),
+            'isEnrolled' => $isEnrolled,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function enrolCourse(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $status = 'enrol-failed';
+        try {
+            $course = \App\Services\CourseService::findById($id);
+            if ($course === null) {
+                abort(404);
+            }
+            $cost = (float) ($course->credit_cost ?? 0);
+            if ($cost > 0) {
+                // Credit-priced: this moves time credits. enrollWithPayment throws
+                // a RuntimeException carrying the wallet failure reason.
+                \App\Services\CourseEnrollmentService::enrollWithPayment($course, $userId);
+            } else {
+                \App\Services\CourseEnrollmentService::enroll($id, $userId);
+            }
+            $status = 'enrolled';
+        } catch (\RuntimeException $e) {
+            $status = stripos($e->getMessage(), 'insufficient') !== false ? 'insufficient-credits' : 'enrol-failed';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.courses.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
+    }
+
+    // === Podcasts ===
+
+    public function podcasts(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('podcasts'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $items = [];
+        try {
+            $items = \App\Services\PodcastService::browse(['per_page' => 30])['items'] ?? [];
+            $items = array_map(static fn ($s) => is_array($s) ? $s : $s->toArray(), $items);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::podcasts', [
+            'title' => __('govuk_alpha.podcasts.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'shows' => is_array($items) ? $items : [],
+        ]);
+    }
+
+    public function podcast(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('podcasts'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $show = null;
+        $episodes = [];
+        try {
+            $show = \App\Services\PodcastService::findShowById($id);
+            if ($show !== null) {
+                foreach ($show->episodes ?? [] as $ep) {
+                    $url = '';
+                    try {
+                        $url = \App\Services\PodcastService::episodeAudioUrl($ep, true);
+                    } catch (\Throwable $e) {
+                        $url = '';
+                    }
+                    // Only surface episodes with genuinely playable audio — this also
+                    // hides pending/draft uploads (their URL is a non-http placeholder).
+                    if (!\Illuminate\Support\Str::startsWith($url, ['http://', 'https://', '/'])) {
+                        continue;
+                    }
+                    $episodes[] = [
+                        'id' => (int) $ep->id,
+                        'title' => (string) ($ep->title ?? ''),
+                        'description' => (string) ($ep->description ?? ''),
+                        'audio_url' => $url,
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($show === null, 404);
+
+        return $this->view('accessible-frontend::podcast-detail', [
+            'title' => ($show->title ?? '') ?: __('govuk_alpha.podcasts.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'show' => $show->toArray(),
+            'episodes' => $episodes,
+        ]);
+    }
+
+    // === Coupons ===
+
+    public function coupons(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('merchant_coupons'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $items = [];
+        try {
+            $rows = \App\Services\MerchantCouponService::listForMember();
+            foreach ($rows as $c) {
+                $c = is_array($c) ? (object) $c : $c;
+                $items[] = [
+                    'id' => (int) ($c->id ?? 0),
+                    'code' => (string) ($c->code ?? ''),
+                    'title' => (string) ($c->title ?? ''),
+                    'description' => (string) ($c->description ?? ''),
+                    'discount_type' => (string) ($c->discount_type ?? ''),
+                    'discount_value' => $c->discount_value ?? null,
+                    'valid_until' => $c->valid_until ?? null,
+                ];
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::coupons', [
+            'title' => __('govuk_alpha.coupons.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'coupons' => $items,
+        ]);
+    }
+
+    // === Member premium ===
+
+    public function premium(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('member_premium'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $tiers = [];
+        $currentTier = null;
+        try {
+            $tiers = \App\Services\MemberPremiumService::listTiers($tenantId);
+            $tiers = array_map(static fn ($t) => is_array($t) ? $t : (array) $t, is_array($tiers) ? $tiers : []);
+            $currentTier = \App\Services\MemberPremiumService::getMemberTier($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::premium', [
+            'title' => __('govuk_alpha.premium.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'tiers' => $tiers,
+            'currentTier' => is_array($currentTier) ? $currentTier : null,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function subscribePremium(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('member_premium'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tierId = (int) $request->input('tier_id');
+        $interval = self::asStr($request->input('interval')) === 'year' ? 'year' : 'month';
+        $returnUrl = route('govuk-alpha.premium.index', ['tenantSlug' => $tenantSlug]);
+
+        try {
+            $session = \App\Services\MemberPremiumService::createCheckoutSession($userId, $tierId, $interval, $returnUrl);
+            $url = self::asStr($session['checkout_url'] ?? '');
+            if ($url !== '') {
+                return redirect()->away($url);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.premium.index', ['tenantSlug' => $tenantSlug, 'status' => 'subscribe-failed']);
+    }
+
+    // === Clubs (Vereine) — public directory, no feature flag (gated by club orgs existing) ===
+
+    public function clubs(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $q = trim(self::asStr($request->query('q')));
+        $tenantId = TenantContext::getId();
+        $conditions = ['o.tenant_id = ?', "o.org_type = 'club'", "o.status = 'active'"];
+        $params = [$tenantId];
+        if ($q !== '') {
+            $conditions[] = '(o.name LIKE ? OR o.description LIKE ?)';
+            $pattern = '%' . addcslashes($q, '%_\\') . '%';
+            $params[] = $pattern;
+            $params[] = $pattern;
+        }
+        $where = implode(' AND ', $conditions);
+
+        $clubs = [];
+        try {
+            $rows = \Illuminate\Support\Facades\DB::select(
+                "SELECT o.id, o.name, o.description, o.logo_url, o.contact_email, o.website, o.meeting_schedule,
+                    (SELECT COUNT(DISTINCT om.user_id) FROM org_members om
+                     WHERE om.organization_id = o.id AND om.org_type = 'volunteer' AND om.status = 'active') AS member_count
+                 FROM vol_organizations o WHERE {$where} ORDER BY o.name ASC LIMIT 100",
+                $params
+            );
+            $clubs = array_map(static fn ($r) => (array) $r, $rows);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::clubs', [
+            'title' => __('govuk_alpha.clubs.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'clubs' => $clubs,
+            'clubsQuery' => $q,
+        ]);
+    }
+
+    // === Federation — partner communities (read-only list) ===
+
+    public function federation(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $partners = [];
+        try {
+            $partners = $this->federationPartnersForDisplay(TenantContext::getId());
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::federation', [
+            'title' => __('govuk_alpha.federation.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'partners' => $partners,
+        ]);
+    }
+
+    /**
+     * Active federation partners (internal partnerships + external partners),
+     * mirroring FederationV2Controller::partners but shaped for a read-only,
+     * server-rendered list. Defensive: any failure yields an empty list.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    private function federationPartnersForDisplay(int $tenantId): array
+    {
+        $levelNames = [1 => 'Discovery', 2 => 'Connected', 3 => 'Integrated', 4 => 'Unified'];
+
+        $rows = \Illuminate\Support\Facades\DB::select("
+            SELECT
+                fp.federation_level, fp.created_at as partnership_since,
+                CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END as partner_tenant_id,
+                CASE WHEN fp.tenant_id = ? THEN t2.name ELSE t1.name END as partner_name,
+                CASE WHEN fp.tenant_id = ? THEN t2.tagline ELSE t1.tagline END as partner_tagline,
+                CASE WHEN fp.tenant_id = ? THEN t2.location_name ELSE t1.location_name END as partner_location,
+                (SELECT COUNT(*) FROM users u
+                 JOIN federation_user_settings fus2 ON fus2.user_id = u.id AND fus2.federation_optin = 1
+                 WHERE u.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
+                   AND u.status = 'active') as partner_member_count,
+                (SELECT COUNT(*) FROM listings li
+                 WHERE li.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
+                   AND li.status = 'active') as partner_listing_count
+            FROM federation_partnerships fp
+            LEFT JOIN tenants t1 ON fp.tenant_id = t1.id
+            LEFT JOIN tenants t2 ON fp.partner_tenant_id = t2.id
+            WHERE (fp.tenant_id = ? OR fp.partner_tenant_id = ?) AND fp.status = 'active'
+            ORDER BY partner_name ASC
+        ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId]);
+
+        $partners = array_map(static function ($r) use ($levelNames) {
+            $level = (int) ($r->federation_level ?? 1);
+            return [
+                'id' => (int) ($r->partner_tenant_id ?? 0),
+                'name' => (string) ($r->partner_name ?? ''),
+                'tagline' => (string) ($r->partner_tagline ?? ''),
+                'location' => (string) ($r->partner_location ?? ''),
+                'member_count' => (int) ($r->partner_member_count ?? 0),
+                'listing_count' => (int) ($r->partner_listing_count ?? 0),
+                'level_name' => $levelNames[$level] ?? 'Discovery',
+                'partnership_since' => $r->partnership_since ?? null,
+            ];
+        }, $rows);
+
+        // Merge active external partners (best-effort).
+        try {
+            $external = \App\Services\FederationExternalPartnerService::getActivePartners($tenantId);
+            foreach ($external as $ep) {
+                $partners[] = [
+                    'id' => 0,
+                    'name' => (string) ($ep['name'] ?? ''),
+                    'tagline' => (string) ($ep['description'] ?? ''),
+                    'location' => '',
+                    'member_count' => (int) ($ep['partner_member_count'] ?? 0),
+                    'listing_count' => 0,
+                    'level_name' => 'External',
+                    'partnership_since' => $ep['created_at'] ?? null,
+                ];
+            }
+        } catch (\Throwable $e) {
+            // External partners are optional; ignore failures.
+        }
+
+        return $partners;
+    }
+
     /**
      * "How timebanking works" — a plain, public educational page. No auth or
      * module gate: it helps newcomers (and the accessibility-first audience in
