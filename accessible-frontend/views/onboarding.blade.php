@@ -20,9 +20,10 @@
             <span class="govuk-caption-l">{{ __('govuk_alpha.onboarding.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }} — {{ __('govuk_alpha.onboarding.progress', ['current' => $current, 'total' => $total]) }}</span>
 
             @if (in_array($status, ['bio-too-short', 'avatar-required', 'safeguarding-failed', 'complete-failed', 'avatar-failed'], true))
+                @php $errAnchor = ['bio-too-short' => 'bio', 'avatar-required' => 'avatar'][$status] ?? null; @endphp
                 <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                     <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                        <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ __('govuk_alpha.onboarding.states.' . $status) }}</li></ul></div></div>
+                        <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>@if ($errAnchor)<a href="#{{ $errAnchor }}">{{ __('govuk_alpha.onboarding.states.' . $status) }}</a>@else{{ __('govuk_alpha.onboarding.states.' . $status) }}@endif</li></ul></div></div>
                 </div>
             @elseif ($status === 'avatar-saved')
                 <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="ob-status">
@@ -148,6 +149,8 @@
 
                 <form method="post" action="{{ $postAction }}">
                     @csrf
+                    <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">{{ __('govuk_alpha.onboarding.safeguarding.options_legend') }}</legend>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                         @foreach ($realOptions as $opt)
                             @php $oid = (int) ($opt['id'] ?? 0); $otype = (string) ($opt['option_type'] ?? 'checkbox'); @endphp
@@ -160,7 +163,7 @@
                                     <label class="govuk-label" for="sg-{{ $oid }}">{{ $opt['label'] ?? '' }}</label>
                                     @if (!empty($opt['description']))<div class="govuk-hint">{{ $opt['description'] }}</div>@endif
                                     <select class="govuk-select" id="sg-{{ $oid }}" name="safeguarding[{{ $oid }}]">
-                                        <option value="">{{ __('govuk_alpha.onboarding.skip') }}</option>
+                                        <option value="">{{ __('govuk_alpha.onboarding.safeguarding.select_none') }}</option>
                                         @foreach ((array) ($opt['select_options'] ?? []) as $ovKey => $ovLabel)
                                             <option value="{{ is_int($ovKey) ? $ovLabel : $ovKey }}">{{ $ovLabel }}</option>
                                         @endforeach
@@ -176,6 +179,7 @@
                             @endif
                         @endforeach
                     </div>
+                    </fieldset>
 
                     @if ($noneOption)
                         <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--m">

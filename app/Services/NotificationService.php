@@ -140,7 +140,10 @@ class NotificationService
      */
     public function markAllRead(int $userId): int
     {
+        // Tenant-scope the bulk write explicitly (defence in depth) rather than
+        // relying solely on the model's global scope.
         return $this->notification->newQuery()
+            ->where('tenant_id', \App\Core\TenantContext::getId())
             ->where('user_id', $userId)
             ->where('is_read', false)
             ->update(['is_read' => true]);

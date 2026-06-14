@@ -1709,6 +1709,14 @@ return [
         'listings_label' => 'Listings',
         'level_label' => 'Partnership level',
         'since_label' => 'Partners since',
+        'permissions' => [
+            'profiles' => 'Member profiles',
+            'listings' => 'Listings',
+            'events' => 'Events',
+            'messaging' => 'Messaging',
+            'transactions' => 'Hour transfers',
+            'groups' => 'Groups',
+        ],
         'levels' => [
             'discovery' => 'Discovery',
             'connected' => 'Connected',

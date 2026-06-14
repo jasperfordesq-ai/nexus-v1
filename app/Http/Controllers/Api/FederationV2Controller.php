@@ -572,7 +572,7 @@ class FederationV2Controller extends BaseApiController
                     (fp.tenant_id = :tid1 AND fp.partner_tenant_id = e.tenant_id)
                     OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = e.tenant_id)
                 )
-                JOIN federation_user_settings fus ON fus.user_id = e.user_id AND fus.federation_optin = 1
+                JOIN federation_user_settings fus ON fus.user_id = e.user_id AND fus.federation_optin = 1 AND fus.appear_in_federated_search = 1
                 WHERE fp.status = 'active' AND fp.events_enabled = 1
                 AND e.tenant_id != :tid3 AND e.status = 'active'
             ";
@@ -864,7 +864,7 @@ class FederationV2Controller extends BaseApiController
                 JOIN federation_user_settings fus ON fus.user_id = l.user_id
                 WHERE fp.status = 'active' AND fp.listings_enabled = 1
                 AND l.status = 'active' AND l.tenant_id != :tid3
-                AND fus.federation_optin = 1
+                AND fus.federation_optin = 1 AND fus.appear_in_federated_search = 1
             ";
             $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
 

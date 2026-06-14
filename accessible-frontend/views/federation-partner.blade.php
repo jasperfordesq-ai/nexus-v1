@@ -16,10 +16,12 @@
         $isExternal = (bool) ($partner['is_external'] ?? false);
         $permissions = (array) ($partner['permissions'] ?? []);
         $permissionLabels = [
-            'profiles' => __('govuk_alpha.federation.hub.quick_link_members'),
-            'listings' => __('govuk_alpha.federation.hub.quick_link_listings'),
-            'events' => __('govuk_alpha.federation.hub.quick_link_events'),
-            'messaging' => __('govuk_alpha.federation.hub.stat_messages'),
+            'profiles' => __('govuk_alpha.federation.permissions.profiles'),
+            'listings' => __('govuk_alpha.federation.permissions.listings'),
+            'events' => __('govuk_alpha.federation.permissions.events'),
+            'messaging' => __('govuk_alpha.federation.permissions.messaging'),
+            'transactions' => __('govuk_alpha.federation.permissions.transactions'),
+            'groups' => __('govuk_alpha.federation.permissions.groups'),
         ];
     @endphp
 

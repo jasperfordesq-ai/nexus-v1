@@ -127,7 +127,10 @@ class BlogService
 
         $baseUrl = rtrim(env('APP_URL', 'https://api.project-nexus.ie'), '/');
         $seo = $post->seoMetadata;
-        $content = $post->html_render ?? $post->content ?? '';
+        // Sanitise on read: the detail view outputs this unescaped ({!! !!}), and
+        // html_render is not guaranteed to have passed through the CMS sanitiser on
+        // write. sanitizeCms is idempotent, so already-clean content is unaffected.
+        $content = \App\Helpers\HtmlSanitizer::sanitizeCms((string) ($post->html_render ?? $post->content ?? ''));
         $wordCount = str_word_count(strip_tags($content));
         $readingTime = max(1, (int) ceil($wordCount / 200));
 

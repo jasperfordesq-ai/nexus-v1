@@ -64,7 +64,7 @@
                 </div>
             @endif
 
-            {{-- Content is admin-authored and sanitized on save by the blog service. --}}
+            {{-- Content is run through HtmlSanitizer::sanitizeCms in BlogService::getBySlug before it reaches here. --}}
             <div class="legal-content govuk-body">
                 {!! $post['content'] ?? '' !!}
             </div>
@@ -106,7 +106,7 @@
                             @if (($status ?? null) === 'comment-invalid')
                                 <p id="body-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ __('govuk_alpha.blog.comment_states.comment-invalid') }}</p>
                             @endif
-                            <textarea class="govuk-textarea" id="body" name="body" rows="4" maxlength="5000" {{ ($status ?? null) === 'comment-invalid' ? 'aria-describedby=body-error' : '' }}></textarea>
+                            <textarea class="govuk-textarea" id="body" name="body" rows="4" maxlength="5000" {{ ($status ?? null) === 'comment-invalid' ? 'aria-describedby="body-error"' : '' }}></textarea>
                         </div>
                         <button type="submit" class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.blog.comment_submit') }}</button>
                     </form>
