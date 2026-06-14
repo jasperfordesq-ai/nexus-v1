@@ -161,6 +161,62 @@ export function PartnerPage() {
         </div>
       </section>
 
+      {/* ─── Together for Timebanking banner (prominent) ─── */}
+      <section className="pb-4 sm:pb-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="sr-only">{t('partner.together_banner_heading')}</h2>
+            <div className="rounded-2xl bg-white p-3 sm:p-5 shadow-xl ring-1 ring-black/5">
+              <img
+                src="/images/Timebanking-UK-and-Timebank-Ireland-Partners.png"
+                alt={t('partner.together_banner_alt')}
+                className="w-full h-auto rounded-lg"
+                loading="eager"
+                width={1900}
+                height={800}
+              />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── Timebanking UK partnership announcement ─── */}
+      <section className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <GlassCard className="p-8 sm:p-10 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-emerald-500" aria-hidden="true" />
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 p-3 rounded-xl bg-rose-500/10">
+                  <HeartHandshake className="w-6 h-6 text-rose-500 dark:text-rose-400" aria-hidden="true" />
+                </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-theme-primary mb-4">
+                    {t('partner.tbuk_heading')}
+                  </h2>
+                  <p className="text-theme-muted leading-relaxed mb-4">
+                    {t('partner.tbuk_para1')}
+                  </p>
+                  <p className="text-theme-muted leading-relaxed">
+                    {t('partner.tbuk_para2')}
+                  </p>
+                </div>
+              </div>
+            </GlassCard>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ─── Technology Partner: Project NEXUS ─── */}
       <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
@@ -368,16 +424,18 @@ export function PartnerPage() {
                 viewport={{ once: true }}
                 transition={{ delay: linkIndex * 0.08 }}
               >
-                <Link to={tenantPath(link.to)}>
-                  <GlassCard className="p-5 flex items-center gap-4 group hover:scale-[1.01] transition-transform">
-                    <div className="flex-shrink-0 p-2.5 rounded-xl bg-indigo-500/15">
-                      <link.icon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                <Link to={tenantPath(link.to)} className="block">
+                  <GlassCard className="p-5 group hover:scale-[1.01] transition-transform">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-shrink-0 p-2.5 rounded-xl bg-indigo-500/15">
+                        <link.icon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-theme-primary">{t(`partner.learn_more_${linkIndex}_title`)}</h3>
+                        <p className="text-sm text-theme-muted">{t(`partner.learn_more_${linkIndex}_description`)}</p>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-theme-subtle group-hover:text-indigo-500 transition-colors flex-shrink-0" aria-hidden="true" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-theme-primary">{t(`partner.learn_more_${linkIndex}_title`)}</h3>
-                      <p className="text-sm text-theme-muted">{t(`partner.learn_more_${linkIndex}_description`)}</p>
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-theme-subtle group-hover:text-indigo-500 transition-colors flex-shrink-0" aria-hidden="true" />
                   </GlassCard>
                 </Link>
               </motion.div>
