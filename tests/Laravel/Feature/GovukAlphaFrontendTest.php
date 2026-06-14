@@ -3223,26 +3223,28 @@ class GovukAlphaFrontendTest extends TestCase
     {
         $this->authenticatedUser(['name' => 'Searcher Member']);
 
-        // Two members with the IDENTICAL display name (a rare token to avoid
-        // colliding with seed data), told apart ONLY by location + "member since".
+        // Two members with the IDENTICAL display name, told apart ONLY by
+        // location + "member since". The surname is an invented token so
+        // Meilisearch can't fuzz-match it to real seed members — that guarantees
+        // the deterministic SQL LIKE fallback runs and returns BOTH test users
+        // (which, being transaction-scoped, are never in the Meili index).
         $maryA = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active', 'is_approved' => true,
-            'first_name' => 'Quenby', 'last_name' => 'Stone',
+            'first_name' => 'Quenby', 'last_name' => 'Zzyzxington',
         ]);
         DB::table('users')->where('id', $maryA->id)->update(['location' => 'Cork', 'created_at' => '2024-03-15 10:00:00']);
 
         $maryB = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active', 'is_approved' => true,
-            'first_name' => 'Quenby', 'last_name' => 'Stone',
+            'first_name' => 'Quenby', 'last_name' => 'Zzyzxington',
         ]);
         DB::table('users')->where('id', $maryB->id)->update(['location' => 'Galway', 'created_at' => '2023-09-01 10:00:00']);
 
-        // SQL LIKE fallback returns both when Meilisearch has no index in tests.
-        $response = $this->get("/{$this->testTenantSlug}/alpha/wallet?recipient_q=Quenby");
+        $response = $this->get("/{$this->testTenantSlug}/alpha/wallet?recipient_q=Zzyzxington");
 
         $response->assertOk();
         // Both identically-named members appear, distinguished by location + member-since.
-        $response->assertSee('Quenby Stone');
+        $response->assertSee('Quenby Zzyzxington');
         $response->assertSee('Cork');
         $response->assertSee('Galway');
         $response->assertSee(__('govuk_alpha.wallet.member_since', ['date' => 'March 2024']));
@@ -3540,6 +3542,50 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertOk();
         $response->assertSee(__('govuk_alpha.matches.title'));
         $response->assertSee(__('govuk_alpha.matches.description'));
+    }
+
+    public function test_polls_page_shows_open_poll_with_vote_form(): void
+    {
+        $creator = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Poll Maker']);
+        $pollId = DB::table('polls')->insertGetId([
+            'tenant_id' => $this->testTenantId, 'user_id' => $creator->id, 'question' => 'Best day for the meet-up?',
+            'is_active' => 1, 'end_date' => null, 'created_at' => now(),
+        ]);
+        DB::table('poll_options')->insert([
+            ['tenant_id' => $this->testTenantId, 'poll_id' => $pollId, 'label' => 'Monday', 'votes' => 0],
+            ['tenant_id' => $this->testTenantId, 'poll_id' => $pollId, 'label' => 'Tuesday', 'votes' => 0],
+        ]);
+
+        // A non-creator who has not voted sees the vote form (ballot integrity hides totals).
+        $this->authenticatedUser(['name' => 'Voter One']);
+        $response = $this->get("/{$this->testTenantSlug}/alpha/polls");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.polls.title'));
+        $response->assertSee('Best day for the meet-up?');
+        $response->assertSee('Monday');
+        $response->assertSee('Tuesday');
+        $response->assertSee(__('govuk_alpha.polls.vote_button'));
+    }
+
+    public function test_poll_vote_records_the_vote(): void
+    {
+        $creator = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Poll Maker']);
+        $pollId = DB::table('polls')->insertGetId([
+            'tenant_id' => $this->testTenantId, 'user_id' => $creator->id, 'question' => 'Tea or coffee?',
+            'is_active' => 1, 'end_date' => null, 'created_at' => now(),
+        ]);
+        $optionId = DB::table('poll_options')->insertGetId(['tenant_id' => $this->testTenantId, 'poll_id' => $pollId, 'label' => 'Tea', 'votes' => 0]);
+
+        $voter = $this->authenticatedUser(['name' => 'Voter Two']);
+        $response = $this->post("/{$this->testTenantSlug}/alpha/polls/{$pollId}/vote", ['option_id' => $optionId]);
+
+        $response->assertRedirectContains('status=voted');
+        $this->assertSame(1, DB::table('poll_votes')
+            ->where('poll_id', $pollId)
+            ->where('option_id', $optionId)
+            ->where('user_id', $voter->id)
+            ->count());
     }
 
     public function test_timebanking_guide_renders_publicly(): void

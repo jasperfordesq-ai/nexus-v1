@@ -120,6 +120,8 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/group-exchanges/{id}/complete', [AlphaController::class, 'completeGroupExchange'])->middleware('throttle:15,1')->whereNumber('id')->name('group-exchanges.complete');
         Route::post('/group-exchanges/{id}/cancel', [AlphaController::class, 'cancelGroupExchange'])->middleware('throttle:15,1')->whereNumber('id')->name('group-exchanges.cancel');
         Route::get('/matches', [AlphaController::class, 'matches'])->name('matches.index');
+        Route::get('/polls', [AlphaController::class, 'polls'])->name('polls.index');
+        Route::post('/polls/{pollId}/vote', [AlphaController::class, 'storePollVote'])->whereNumber('pollId')->middleware('throttle:30,1')->name('polls.vote');
         Route::get('/wallet', [AlphaController::class, 'wallet'])->name('wallet.index');
         Route::post('/wallet/transfer', [AlphaController::class, 'transferCredits'])->middleware('throttle:15,1')->name('wallet.transfer');
         Route::get('/messages', [AlphaController::class, 'messages'])->name('messages.index');

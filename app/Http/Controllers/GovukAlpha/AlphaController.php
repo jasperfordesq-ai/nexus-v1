@@ -2807,6 +2807,68 @@ class AlphaController extends Controller
         ]);
     }
 
+    /**
+     * Community polls — a standalone listing where members can vote and see
+     * results. The alpha already votes on polls inline in the feed; this gives
+     * them their own page. Ballot integrity (hidden running totals while a poll
+     * is open) is enforced by PollService::getById.
+     */
+    public function polls(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('polls'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $polls = [];
+        try {
+            $list = \App\Services\PollService::getAll(['limit' => 30])['items'] ?? [];
+            foreach ($list as $p) {
+                $full = \App\Services\PollService::getById((int) ($p['id'] ?? 0), $userId);
+                if ($full !== null) {
+                    $polls[] = $full;
+                }
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::polls', [
+            'title' => __('govuk_alpha.polls.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'polls',
+            'polls' => $polls,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Cast a vote on a poll from the standalone polls page. */
+    public function storePollVote(Request $request, string $tenantSlug, int $pollId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('polls'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $optionId = (int) $request->input('option_id');
+        $ok = false;
+        if ($optionId > 0) {
+            try {
+                $ok = \App\Services\PollService::vote($pollId, $optionId, $userId);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return redirect()->route('govuk-alpha.polls.index', [
+            'tenantSlug' => $tenantSlug, 'status' => $ok ? 'voted' : 'vote-failed',
+        ])->withFragment('poll-' . $pollId);
+    }
+
     // === Group exchanges (multi-party time-credit exchanges) ===
 
     /** List the viewer's group exchanges (as organiser or participant). */
@@ -4549,6 +4611,10 @@ class AlphaController extends Controller
 
         if (TenantContext::hasModule('feed')) {
             $items['feed'] = route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]);
+        }
+
+        if ($userId !== null && TenantContext::hasFeature('polls')) {
+            $items['polls'] = route('govuk-alpha.polls.index', ['tenantSlug' => $tenantSlug]);
         }
 
         if (TenantContext::hasModule('listings')) {
