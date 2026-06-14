@@ -101,6 +101,8 @@
                     'skill-removed' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.skills.removed')],
                     'skill-failed' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.skills.failed'), 'anchor' => '#skills'],
                     'skill-name-required' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.skills.name_required'), 'anchor' => '#skills'],
+                    'safeguarding-revoked' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.safeguarding.revoked')],
+                    'safeguarding-failed' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.safeguarding.failed'), 'anchor' => '#safeguarding'],
                 ];
                 $accountStatus = $accountStatusMap[$status ?? ''] ?? null;
                 // Field-level error helper: reuse the status map (its anchor IS the
@@ -612,6 +614,45 @@
                     </div>
                     <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.personalisation.save') }}</button>
                 </form>
+            </section>
+
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+            <section aria-labelledby="safeguarding-heading" id="safeguarding">
+                <h2 class="govuk-heading-l" id="safeguarding-heading">{{ __('govuk_alpha.profile_settings.safeguarding.title') }}</h2>
+                <p class="govuk-body">{{ __('govuk_alpha.profile_settings.safeguarding.description') }}</p>
+                @if (empty($safeguarding))
+                    <p class="govuk-inset-text">{{ __('govuk_alpha.profile_settings.safeguarding.none') }}</p>
+                @else
+                    @foreach ($safeguarding as $pref)
+                        @php
+                            $activations = collect([
+                                'restricts_messaging' => $pref['restricts_messaging'] ?? false,
+                                'restricts_matching' => $pref['restricts_matching'] ?? false,
+                                'requires_broker_approval' => $pref['requires_broker_approval'] ?? false,
+                                'requires_vetted_interaction' => $pref['requires_vetted_interaction'] ?? false,
+                            ])->filter()->keys();
+                        @endphp
+                        <div class="nexus-alpha-card govuk-!-margin-bottom-4">
+                            <h3 class="govuk-heading-s govuk-!-margin-bottom-1">{{ $pref['label'] ?? '' }}</h3>
+                            @if (!empty($pref['description']))
+                                <p class="govuk-body-s nexus-alpha-meta">{{ $pref['description'] }}</p>
+                            @endif
+                            @if ($activations->isNotEmpty())
+                                <ul class="govuk-list govuk-list--bullet govuk-body-s">
+                                    @foreach ($activations as $activation)
+                                        <li>{{ __('govuk_alpha.profile_settings.safeguarding.activations.' . $activation) }}</li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                            <form method="post" action="{{ route('govuk-alpha.profile.safeguarding.revoke', ['tenantSlug' => $tenantSlug]) }}">
+                                @csrf
+                                <input type="hidden" name="option_id" value="{{ $pref['option_id'] ?? '' }}">
+                                <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.safeguarding.revoke_button') }}<span class="govuk-visually-hidden"> {{ $pref['label'] ?? '' }}</span></button>
+                            </form>
+                        </div>
+                    @endforeach
+                @endif
             </section>
 
             <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">

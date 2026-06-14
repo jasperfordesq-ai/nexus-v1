@@ -1122,6 +1122,20 @@ return [
         ],
     ],
     'profile_settings' => [
+        'safeguarding' => [
+            'title' => 'Safeguarding',
+            'description' => 'Personal safeguarding protections you have chosen. You can withdraw any of them at any time.',
+            'none' => 'You have no active safeguarding preferences.',
+            'revoke_button' => 'Withdraw',
+            'revoked' => 'Your safeguarding preference has been withdrawn.',
+            'failed' => 'We could not update your safeguarding preference. Please try again.',
+            'activations' => [
+                'restricts_messaging' => 'Limits who can message you',
+                'restricts_matching' => 'Limits who you are matched with',
+                'requires_broker_approval' => 'Exchanges need broker approval',
+                'requires_vetted_interaction' => 'Only vetted members can interact with you',
+            ],
+        ],
         'privacy_contact_label' => 'Allow other members to contact me directly',
         'privacy_contact_hint' => 'Members can send you a message even if you are not connected.',
         'skills' => [

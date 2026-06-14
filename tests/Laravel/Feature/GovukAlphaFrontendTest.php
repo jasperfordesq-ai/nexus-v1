@@ -2626,6 +2626,45 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertDatabaseMissing('user_skills', ['id' => $skillId]);
     }
 
+    public function test_profile_settings_safeguarding_list_and_revoke(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Safeguarded Member']);
+
+        $optionId = DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'option_key' => 'needs_vetted',
+            'label' => 'I only interact with vetted members',
+            'description' => 'Extra protection for my interactions.',
+            'triggers' => json_encode(['restricts_messaging' => true, 'requires_vetted_interaction' => true]),
+            'is_active' => 1,
+            'sort_order' => 1,
+            'created_at' => now(),
+        ]);
+        DB::table('user_safeguarding_preferences')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'option_id' => $optionId,
+            'selected_value' => '1',
+            'consent_given_at' => now(),
+            'created_at' => now(),
+        ]);
+
+        // The settings page lists the active safeguarding preference + what it activates.
+        $page = $this->get("/{$this->testTenantSlug}/alpha/profile/settings");
+        $page->assertOk();
+        $page->assertSee('I only interact with vetted members');
+        $page->assertSee(__('govuk_alpha.profile_settings.safeguarding.activations.restricts_messaging'));
+        $page->assertSee(__('govuk_alpha.profile_settings.safeguarding.revoke_button'));
+
+        // Withdraw it.
+        $revoke = $this->post("/{$this->testTenantSlug}/alpha/profile/safeguarding/revoke", [
+            'option_id' => $optionId,
+        ]);
+        $revoke->assertRedirectContains('status=safeguarding-revoked');
+        $this->assertNotNull(DB::table('user_safeguarding_preferences')
+            ->where('option_id', $optionId)->where('user_id', $user->id)->value('revoked_at'));
+    }
+
     public function test_profile_settings_passkey_can_be_renamed_and_removed(): void
     {
         $user = $this->authenticatedUser();

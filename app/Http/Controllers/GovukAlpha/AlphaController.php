@@ -3048,6 +3048,7 @@ class AlphaController extends Controller
             'matchPrefs' => $this->alphaMatchPrefs($userId),
             'mySkills' => $this->alphaUserSkills($userId),
             'sessions' => $this->alphaSessions($userId),
+            'safeguarding' => $this->alphaSafeguardingPreferences($userId),
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -3086,6 +3087,47 @@ class AlphaController extends Controller
     {
         try {
             return app(\App\Services\SkillTaxonomyService::class)->getUserSkills($userId);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return [];
+        }
+    }
+
+    /**
+     * The viewer's active safeguarding preferences (label + what each one
+     * activates), mirroring SafeguardingMemberController::myPreferences. Empty
+     * for members who never set any.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function alphaSafeguardingPreferences(int $userId): array
+    {
+        try {
+            $rows = DB::table('user_safeguarding_preferences as p')
+                ->join('tenant_safeguarding_options as o', function ($join) {
+                    $join->on('o.id', '=', 'p.option_id')->where('o.is_active', 1);
+                })
+                ->where('p.tenant_id', TenantContext::getId())
+                ->where('p.user_id', $userId)
+                ->whereNull('p.revoked_at')
+                ->select(['p.option_id', 'o.label', 'o.description', 'o.triggers'])
+                ->orderBy('o.sort_order')
+                ->get();
+
+            return $rows->map(static function ($row): array {
+                $triggers = is_string($row->triggers) ? (json_decode($row->triggers, true) ?: []) : (array) ($row->triggers ?? []);
+
+                return [
+                    'option_id' => (int) $row->option_id,
+                    'label' => $row->label,
+                    'description' => $row->description,
+                    'restricts_messaging' => (bool) ($triggers['restricts_messaging'] ?? false),
+                    'restricts_matching' => (bool) ($triggers['restricts_matching'] ?? false),
+                    'requires_broker_approval' => (bool) ($triggers['requires_broker_approval'] ?? false),
+                    'requires_vetted_interaction' => (bool) ($triggers['requires_vetted_interaction'] ?? false),
+                ];
+            })->all();
         } catch (\Throwable $e) {
             report($e);
 
@@ -3384,6 +3426,27 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => $status])->withFragment('skills');
+    }
+
+    /** Revoke (withdraw) one of the viewer's safeguarding preferences. */
+    public function revokeProfileSafeguarding(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $optionId = (int) $request->input('option_id');
+        try {
+            $ok = $optionId > 0 && \App\Services\SafeguardingPreferenceService::revokePreference($userId, $optionId);
+            $status = $ok ? 'safeguarding-revoked' : 'safeguarding-failed';
+        } catch (\Throwable $e) {
+            report($e);
+            $status = 'safeguarding-failed';
+        }
+
+        return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => $status])->withFragment('safeguarding');
     }
 
     public function updateProfileEmail(Request $request, string $tenantSlug): RedirectResponse
