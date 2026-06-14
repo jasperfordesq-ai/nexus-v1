@@ -7578,6 +7578,7 @@ class AlphaController extends Controller
             'currentLanguage' => (string) ($account->preferred_language ?? app()->getLocale()),
             'locales' => self::ALPHA_LOCALES,
             'notificationPrefs' => $this->alphaNotificationPrefs($userId),
+            'digestFrequency' => $this->alphaDigestFrequency($userId),
             'passkeys' => $this->alphaPasskeys($userId),
             'prefersChronological' => (bool) ($account->prefers_chronological_feed ?? false),
             'autoTranslate' => (bool) ($account->auto_translate_ugc ?? false),
@@ -7734,6 +7735,27 @@ class AlphaController extends Controller
     }
 
     /**
+     * The member's activity-digest frequency (notification_settings, global
+     * context). Mirrors UsersController: legacy 'weekly' normalises to
+     * 'monthly', and the absence of a row means the member has not opted in.
+     */
+    private function alphaDigestFrequency(int $userId): string
+    {
+        $frequency = DB::table('notification_settings')
+            ->where('user_id', $userId)
+            ->where('context_type', 'global')
+            ->where('context_id', 0)
+            ->value('frequency');
+
+        $frequency = $frequency === null ? 'off' : (string) $frequency;
+
+        return $frequency === 'weekly' ? 'monthly' : $frequency;
+    }
+
+    /** The activity-digest frequencies the member may choose. */
+    private const ALPHA_DIGEST_FREQUENCIES = ['off', 'instant', 'daily', 'monthly'];
+
+    /**
      * Persist the alpha notification-preference form. Checkboxes that are
      * unticked do not post, so every known key is read as a boolean (absent =
      * off) to honour the user's full intent.
@@ -7767,6 +7789,17 @@ class AlphaController extends Controller
                     'federation_notifications_enabled' => $request->boolean('federation_notifications_enabled') ? 1 : 0,
                     'updated_at' => now(),
                 ]);
+
+            // Activity-digest frequency lives in notification_settings (global
+            // context), exactly as UsersController::updateNotificationSettings
+            // writes it. Only accept the known set; anything else is ignored.
+            $digest = self::asStr($request->input('digest_frequency'));
+            if (in_array($digest, self::ALPHA_DIGEST_FREQUENCIES, true)) {
+                DB::table('notification_settings')->updateOrInsert(
+                    ['user_id' => $userId, 'context_type' => 'global', 'context_id' => 0],
+                    ['frequency' => $digest]
+                );
+            }
         } catch (\Throwable $e) {
             report($e);
             $ok = false;

@@ -2351,6 +2351,14 @@ return [
                 'push_enabled' => 'Allow push notifications on my devices',
                 'push_campaigns_opted_in' => 'Allow occasional promotional push notifications',
             ],
+            'digest_label' => 'Activity digest emails',
+            'digest_hint' => 'A round-up of what is happening in your community. Choose how often you would like to receive it.',
+            'digest_options' => [
+                'off' => 'Do not send me a digest',
+                'instant' => 'As it happens',
+                'daily' => 'Daily',
+                'monthly' => 'Monthly',
+            ],
         ],
         'passkeys' => [
             'title' => 'Passkeys',

@@ -1760,6 +1760,51 @@ class GovukAlphaFrontendTest extends TestCase
         ]);
     }
 
+    public function test_n2_activity_digest_frequency_is_saved_and_shown(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Digest Member']);
+        Sanctum::actingAs($user, ['*']);
+
+        // The settings page exposes the activity-digest selector.
+        $page = $this->get("/{$this->testTenantSlug}/alpha/profile/settings");
+        $page->assertOk();
+        $page->assertSee('name="digest_frequency"', false);
+        $page->assertSee(__('govuk_alpha.profile_settings.notifications.digest_label'));
+
+        $save = $this->post("/{$this->testTenantSlug}/alpha/profile/notifications", [
+            'digest_frequency' => 'daily',
+            'email_messages' => '1',
+        ]);
+        $save->assertRedirect();
+
+        $this->assertDatabaseHas('notification_settings', [
+            'user_id' => $user->id,
+            'context_type' => 'global',
+            'context_id' => 0,
+            'frequency' => 'daily',
+        ]);
+
+        // Re-saving with a different value updates the same row (no duplicate).
+        $this->post("/{$this->testTenantSlug}/alpha/profile/notifications", [
+            'digest_frequency' => 'off',
+            'email_messages' => '1',
+        ]);
+        $this->assertSame(
+            1,
+            DB::table('notification_settings')
+                ->where('user_id', $user->id)
+                ->where('context_type', 'global')
+                ->where('context_id', 0)
+                ->count()
+        );
+        $this->assertDatabaseHas('notification_settings', [
+            'user_id' => $user->id,
+            'context_type' => 'global',
+            'context_id' => 0,
+            'frequency' => 'off',
+        ]);
+    }
+
     public function test_messages_inline_start_conversation_search(): void
     {
         $this->authenticatedUser(['name' => 'Conversation Starter']);

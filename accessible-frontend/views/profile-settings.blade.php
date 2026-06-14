@@ -547,6 +547,17 @@
                             </div>
                         </fieldset>
                     @endforeach
+
+                    <div class="govuk-form-group govuk-!-margin-top-6">
+                        <label class="govuk-label govuk-label--m" for="digest_frequency">{{ __('govuk_alpha.profile_settings.notifications.digest_label') }}</label>
+                        <div id="digest-frequency-hint" class="govuk-hint">{{ __('govuk_alpha.profile_settings.notifications.digest_hint') }}</div>
+                        <select class="govuk-select" id="digest_frequency" name="digest_frequency" aria-describedby="digest-frequency-hint">
+                            @foreach (['off', 'instant', 'daily', 'monthly'] as $freq)
+                                <option value="{{ $freq }}" @selected(($digestFrequency ?? 'off') === $freq)>{{ __('govuk_alpha.profile_settings.notifications.digest_options.' . $freq) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <button class="govuk-button govuk-!-margin-top-6" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.notifications.save') }}</button>
                 </form>
             </section>
