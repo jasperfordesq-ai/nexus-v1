@@ -140,6 +140,9 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/connections/{id}/decline', [AlphaController::class, 'declineConnection'])->middleware('throttle:30,1')->whereNumber('id')->name('connections.decline');
         Route::post('/connections/{id}/remove', [AlphaController::class, 'cancelConnection'])->middleware('throttle:30,1')->whereNumber('id')->name('connections.remove');
         Route::get('/account', [AlphaController::class, 'account'])->name('account');
+        Route::get('/achievements', [AlphaController::class, 'achievements'])->name('achievements');
+        Route::get('/leaderboard', [AlphaController::class, 'leaderboard'])->name('leaderboard');
+        Route::get('/nexus-score', [AlphaController::class, 'nexusScore'])->name('nexus-score');
         Route::get('/profile', [AlphaController::class, 'myProfile'])->name('profile.me');
         Route::get('/profile/settings', [AlphaController::class, 'profileSettings'])->name('profile.settings');
         Route::post('/profile/settings', [AlphaController::class, 'updateProfileSettings'])->middleware('throttle:20,1')->name('profile.settings.update');

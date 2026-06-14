@@ -3705,6 +3705,41 @@ class GovukAlphaFrontendTest extends TestCase
         $guest->assertSee(route('govuk-alpha.register', ['tenantSlug' => $this->testTenantSlug]), false);
     }
 
+    public function test_achievements_page_renders_level_and_badges(): void
+    {
+        $this->authenticatedUser(['name' => 'Achiever']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/achievements");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.achievements.title'));
+        $response->assertSee(__('govuk_alpha.achievements.level_label'));
+        $response->assertSee(__('govuk_alpha.achievements.earned_title'));
+    }
+
+    public function test_leaderboard_page_renders_with_metric_filter(): void
+    {
+        $this->authenticatedUser(['name' => 'Ranked Member']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/leaderboard");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.leaderboard.title'));
+        $response->assertSee(__('govuk_alpha.leaderboard.metric_label'));
+        $response->assertSee(__('govuk_alpha.leaderboard.metrics.credits_earned'));
+    }
+
+    public function test_nexus_score_page_renders(): void
+    {
+        $this->authenticatedUser(['name' => 'Scored Member']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/nexus-score");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.nexus_score.title'));
+        $response->assertSee(__('govuk_alpha.nexus_score.description'));
+    }
+
     /**
      * Force the member search down its deterministic SQL fallback by marking
      * Meilisearch unavailable. Meili indexing is non-transactional and async, so

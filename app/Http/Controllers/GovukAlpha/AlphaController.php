@@ -2743,6 +2743,113 @@ class AlphaController extends Controller
         ]);
     }
 
+    // === Gamification (reached from the My account hub) ===
+
+    /** Achievements: the member's level/XP plus earned badges and badges in progress. */
+    public function achievements(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('gamification'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $profile = [];
+        $badges = [];
+        $progress = [];
+        try {
+            $profile = \App\Services\GamificationService::getProfile($userId, $tenantId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        try {
+            $badges = \App\Services\GamificationService::getBadges($userId, $tenantId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        try {
+            $progress = \App\Services\GamificationService::getBadgeProgress($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::achievements', [
+            'title' => __('govuk_alpha.achievements.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'achievements',
+            'gamProfile' => is_array($profile) ? $profile : [],
+            'earnedBadges' => is_array($badges) ? $badges : [],
+            'badgeProgress' => is_array($progress) ? $progress : [],
+        ]);
+    }
+
+    /** Leaderboard: members ranked by a chosen metric + period (server-rendered filter). */
+    public function leaderboard(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('gamification'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $validTypes = ['credits_earned', 'credits_spent', 'vol_hours', 'badges', 'xp', 'connections', 'reviews', 'posts', 'streak'];
+        $validPeriods = ['all_time', 'month', 'week'];
+        $type = in_array($request->query('type'), $validTypes, true) ? (string) $request->query('type') : 'credits_earned';
+        $period = in_array($request->query('period'), $validPeriods, true) ? (string) $request->query('period') : 'all_time';
+
+        $rows = [];
+        try {
+            $svc = app(\App\Services\LeaderboardService::class);
+            $rows = $svc->getLeaderboardByType(TenantContext::getId(), $type, $period, 20, $userId);
+            foreach ($rows as &$row) {
+                $row['score_display'] = $svc->formatScore($row['score'] ?? 0, $type);
+            }
+            unset($row);
+        } catch (\Throwable $e) {
+            report($e);
+            $rows = [];
+        }
+
+        return $this->view('accessible-frontend::leaderboard', [
+            'title' => __('govuk_alpha.leaderboard.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'leaderboard',
+            'leaderboardRows' => is_array($rows) ? $rows : [],
+            'leaderboardType' => $type,
+            'leaderboardPeriod' => $period,
+            'leaderboardTypes' => $validTypes,
+            'leaderboardPeriods' => $validPeriods,
+        ]);
+    }
+
+    /** NEXUS score: the member's reputation score with its category breakdown + tips. */
+    public function nexusScore(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('gamification'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $score = [];
+        try {
+            $score = app(\App\Services\NexusScoreCacheService::class)->getScore($userId, TenantContext::getId());
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::nexus-score', [
+            'title' => __('govuk_alpha.nexus_score.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'nexus_score',
+            'nexusScore' => is_array($score) ? $score : [],
+        ]);
+    }
+
     /**
      * "How timebanking works" — a plain, public educational page. No auth or
      * module gate: it helps newcomers (and the accessibility-first audience in
