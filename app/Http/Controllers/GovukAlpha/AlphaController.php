@@ -893,6 +893,260 @@ class AlphaController extends Controller
         ]);
     }
 
+    // === Onboarding wizard (welcome → profile → interests → skills → safeguarding → confirm) ===
+
+    /** Entry point: redirect to the first active step, or to the dashboard if already complete. */
+    public function onboarding(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        if (\App\Services\OnboardingService::isOnboardingComplete($userId)) {
+            return redirect()->route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]);
+        }
+        $steps = \App\Services\OnboardingConfigService::getActiveSteps(TenantContext::getId());
+        $first = $steps[0]['slug'] ?? 'confirm';
+
+        return redirect()->route('govuk-alpha.onboarding.step', ['tenantSlug' => $tenantSlug, 'step' => $first]);
+    }
+
+    /** Render one wizard step. */
+    public function onboardingStep(Request $request, string $tenantSlug, string $step): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        if (\App\Services\OnboardingService::isOnboardingComplete($userId)) {
+            return redirect()->route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]);
+        }
+
+        $tenantId = TenantContext::getId();
+        $steps = \App\Services\OnboardingConfigService::getActiveSteps($tenantId);
+        $slugs = array_column($steps, 'slug');
+        if (!in_array($step, $slugs, true)) {
+            return redirect()->route('govuk-alpha.onboarding', ['tenantSlug' => $tenantSlug]);
+        }
+
+        $bag = (array) $request->session()->get('alpha_onboarding', []);
+        $config = \App\Services\OnboardingConfigService::getConfig($tenantId);
+
+        $categories = [];
+        $safeguardingOptions = [];
+        $user = null;
+        if (in_array($step, ['interests', 'skills'], true)) {
+            $categories = \Illuminate\Support\Facades\DB::select('SELECT id, name FROM categories WHERE tenant_id = ? ORDER BY name', [$tenantId]);
+            $categories = array_map(static fn ($c) => (array) $c, $categories);
+        }
+        if ($step === 'safeguarding') {
+            try {
+                $safeguardingOptions = \App\Services\SafeguardingPreferenceService::getOptionsForTenant($tenantId);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+        if (in_array($step, ['profile', 'confirm'], true)) {
+            $user = \Illuminate\Support\Facades\DB::table('users')->where('id', $userId)->select(['avatar_url', 'bio'])->first();
+        }
+
+        $idx = array_search($step, $slugs, true);
+
+        return $this->view('accessible-frontend::onboarding', [
+            'title' => __('govuk_alpha.onboarding.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'dashboard',
+            'step' => $step,
+            'steps' => $steps,
+            'stepIndex' => $idx === false ? 0 : (int) $idx,
+            'config' => $config,
+            'bag' => $bag,
+            'categories' => $categories,
+            'safeguardingOptions' => $safeguardingOptions,
+            'onboardingUser' => $user,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Save a step and advance (switches on the step). */
+    public function onboardingStepPost(Request $request, string $tenantSlug, string $step): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        if (\App\Services\OnboardingService::isOnboardingComplete($userId)) {
+            return redirect()->route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]);
+        }
+
+        $tenantId = TenantContext::getId();
+        $steps = \App\Services\OnboardingConfigService::getActiveSteps($tenantId);
+        $slugs = array_column($steps, 'slug');
+        if (!in_array($step, $slugs, true)) {
+            return redirect()->route('govuk-alpha.onboarding', ['tenantSlug' => $tenantSlug]);
+        }
+
+        $bag = (array) $request->session()->get('alpha_onboarding', []);
+
+        switch ($step) {
+            case 'profile':
+                $config = \App\Services\OnboardingConfigService::getConfig($tenantId);
+                $bio = trim(self::asStr($request->input('bio')));
+                $min = (int) ($config['bio_min_length'] ?? 10);
+                $current = \Illuminate\Support\Facades\DB::table('users')->where('id', $userId)->select(['avatar_url'])->first();
+                if (!empty($config['bio_required']) && mb_strlen($bio) < $min) {
+                    return redirect()->route('govuk-alpha.onboarding.step', ['tenantSlug' => $tenantSlug, 'step' => 'profile', 'status' => 'bio-too-short']);
+                }
+                if (!empty($config['avatar_required']) && empty($current->avatar_url ?? null)) {
+                    return redirect()->route('govuk-alpha.onboarding.step', ['tenantSlug' => $tenantSlug, 'step' => 'profile', 'status' => 'avatar-required']);
+                }
+                \Illuminate\Support\Facades\DB::table('users')->where('id', $userId)->update(['bio' => mb_substr($bio, 0, 2000)]);
+                break;
+
+            case 'interests':
+                $bag['interests'] = $this->onboardingCategoryIds($request->input('interests', []), $tenantId);
+                $request->session()->put('alpha_onboarding', $bag);
+                break;
+
+            case 'skills':
+                $bag['offers'] = $this->onboardingCategoryIds($request->input('offers', []), $tenantId);
+                $bag['needs'] = $this->onboardingCategoryIds($request->input('needs', []), $tenantId);
+                $request->session()->put('alpha_onboarding', $bag);
+                break;
+
+            case 'safeguarding':
+                // Opt-in: choosing nothing is valid ("none apply"). Only save when
+                // the member actually selected options.
+                $raw = $request->input('safeguarding', []);
+                $preferences = [];
+                if (is_array($raw)) {
+                    foreach ($raw as $optionId => $value) {
+                        $value = is_array($value) ? '' : trim((string) $value);
+                        if ((int) $optionId > 0 && $value !== '') {
+                            $preferences[] = ['option_id' => (int) $optionId, 'value' => $value];
+                        }
+                    }
+                }
+                if (!empty($preferences)) {
+                    try {
+                        \App\Services\SafeguardingPreferenceService::saveUserPreferences($userId, $preferences, $request->ip());
+                    } catch (\Throwable $e) {
+                        report($e);
+                        return redirect()->route('govuk-alpha.onboarding.step', ['tenantSlug' => $tenantSlug, 'step' => 'safeguarding', 'status' => 'safeguarding-failed']);
+                    }
+                }
+                break;
+
+            case 'confirm':
+                return $this->onboardingComplete($request, $tenantSlug);
+
+            case 'welcome':
+            default:
+                break;
+        }
+
+        $next = $this->onboardingNextStep($slugs, $step);
+        if ($next === null) {
+            return $this->onboardingComplete($request, $tenantSlug);
+        }
+
+        return redirect()->route('govuk-alpha.onboarding.step', ['tenantSlug' => $tenantSlug, 'step' => $next]);
+    }
+
+    /** HTML-first avatar upload during onboarding (multipart POST → PRG back to the profile step). */
+    public function onboardingAvatar(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        $status = 'avatar-failed';
+        try {
+            if ($this->storeUploadedAvatar($request, $userId) !== false) {
+                $status = 'avatar-saved';
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.onboarding.step', ['tenantSlug' => $tenantSlug, 'step' => 'profile', 'status' => $status]);
+    }
+
+    /** Atomic completion: save interests/skills, auto-create listings, mark complete. */
+    private function onboardingComplete(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $userId = (int) $this->currentUserId();
+        $bag = (array) $request->session()->get('alpha_onboarding', []);
+        $interests = array_values(array_filter(array_map('intval', (array) ($bag['interests'] ?? [])), fn ($v) => $v > 0));
+        $offers = array_values(array_filter(array_map('intval', (array) ($bag['offers'] ?? [])), fn ($v) => $v > 0));
+        $needs = array_values(array_filter(array_map('intval', (array) ($bag['needs'] ?? [])), fn ($v) => $v > 0));
+
+        $config = \App\Services\OnboardingConfigService::getConfig(TenantContext::getId());
+        $svc = app(\App\Services\OnboardingService::class);
+
+        try {
+            \Illuminate\Support\Facades\DB::beginTransaction();
+            $user = \Illuminate\Support\Facades\DB::selectOne('SELECT avatar_url, bio, onboarding_completed FROM users WHERE id = ? FOR UPDATE', [$userId]);
+            if (!empty($user->onboarding_completed)) {
+                \Illuminate\Support\Facades\DB::rollBack();
+                return redirect()->route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]);
+            }
+            if (!empty($config['avatar_required']) && empty($user->avatar_url)) {
+                \Illuminate\Support\Facades\DB::rollBack();
+                return redirect()->route('govuk-alpha.onboarding.step', ['tenantSlug' => $tenantSlug, 'step' => 'profile', 'status' => 'avatar-required']);
+            }
+            if (!empty($config['bio_required']) && trim((string) ($user->bio ?? '')) === '') {
+                \Illuminate\Support\Facades\DB::rollBack();
+                return redirect()->route('govuk-alpha.onboarding.step', ['tenantSlug' => $tenantSlug, 'step' => 'profile', 'status' => 'bio-too-short']);
+            }
+            $svc->saveInterests($userId, $interests);
+            $svc->saveSkills($userId, $offers, $needs);
+            $svc->autoCreateListings($userId, $offers, $needs);
+            $svc->completeOnboarding($userId);
+            \Illuminate\Support\Facades\DB::commit();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            report($e);
+            return redirect()->route('govuk-alpha.onboarding.step', ['tenantSlug' => $tenantSlug, 'step' => 'confirm', 'status' => 'complete-failed']);
+        }
+
+        $request->session()->forget('alpha_onboarding');
+
+        return redirect()->route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug, 'status' => 'onboarding-complete']);
+    }
+
+    /** Sanitise + tenant-validate an array of category ids from a form. @return array<int,int> */
+    private function onboardingCategoryIds(mixed $raw, int $tenantId): array
+    {
+        if (!is_array($raw)) {
+            return [];
+        }
+        $ids = array_values(array_unique(array_filter(array_map('intval', $raw), fn ($v) => $v > 0)));
+        if (empty($ids)) {
+            return [];
+        }
+        return \Illuminate\Support\Facades\DB::table('categories')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('id', $ids)
+            ->pluck('id')
+            ->map(fn ($v) => (int) $v)
+            ->all();
+    }
+
+    /** @param array<int,string> $slugs */
+    private function onboardingNextStep(array $slugs, string $current): ?string
+    {
+        $i = array_search($current, $slugs, true);
+        if ($i === false) {
+            return null;
+        }
+        return $slugs[$i + 1] ?? null;
+    }
+
     public function blog(Request $request, string $tenantSlug): Response
     {
         $this->assertTenantSlug($tenantSlug);

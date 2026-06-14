@@ -4263,6 +4263,42 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertSame(0, DB::table('notifications')->where('user_id', $user->id)->count());
     }
 
+    public function test_onboarding_wizard_flows_through_safeguarding_and_completes(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'New Member']);
+        // Satisfy the required profile fields so the full flow + completion can run.
+        DB::table('users')->where('id', $user->id)->update([
+            'onboarding_completed' => 0,
+            'avatar_url' => '/uploads/avatar.jpg',
+            'bio' => 'I love helping out in my community garden.',
+        ]);
+
+        // Entry redirects to the first active step.
+        $this->get("/{$this->testTenantSlug}/alpha/onboarding")
+            ->assertRedirectContains('/alpha/onboarding/welcome');
+
+        $this->get("/{$this->testTenantSlug}/alpha/onboarding/welcome")
+            ->assertOk()->assertSee(__('govuk_alpha.onboarding.welcome.title'));
+
+        // The safeguarding step (the wired-up step) renders.
+        $this->get("/{$this->testTenantSlug}/alpha/onboarding/safeguarding")
+            ->assertOk()->assertSee(__('govuk_alpha.onboarding.safeguarding.title'));
+
+        // Save interests + skills selections.
+        $this->post("/{$this->testTenantSlug}/alpha/onboarding/interests", ['interests' => []])->assertRedirect();
+        $this->post("/{$this->testTenantSlug}/alpha/onboarding/skills", ['offers' => [], 'needs' => []])->assertRedirect();
+
+        // Complete from the confirm step.
+        $this->post("/{$this->testTenantSlug}/alpha/onboarding/confirm")
+            ->assertRedirectContains('status=onboarding-complete');
+
+        $this->assertSame(1, (int) DB::table('users')->where('id', $user->id)->value('onboarding_completed'));
+
+        // Once complete, the wizard redirects away.
+        $this->get("/{$this->testTenantSlug}/alpha/onboarding/welcome")
+            ->assertRedirectContains('/alpha/dashboard');
+    }
+
     public function test_job_application_notifies_the_employer(): void
     {
         $applicant = $this->authenticatedUser(['name' => 'Keen Applicant']);

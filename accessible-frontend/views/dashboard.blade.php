@@ -12,6 +12,13 @@
             : __('govuk_alpha.feed.item_types.activity');
     @endphp
 
+    @if (($status ?? null) === 'onboarding-complete')
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="ob-done-title">
+            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="ob-done-title">{{ __('govuk_alpha.states.success_title') }}</h2></div>
+            <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.onboarding.complete_banner') }}</p></div>
+        </div>
+    @endif
+
     <span class="govuk-caption-l">{{ __('govuk_alpha.dashboard.caption', ['community' => $communityName]) }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.dashboard.title') }}</h1>
     @if (!empty($firstName))
@@ -28,7 +35,7 @@
             <div class="govuk-notification-banner__content">
                 <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.dashboard.onboarding_body') }}</p>
                 <p class="govuk-body">
-                    <a class="govuk-notification-banner__link" href="{{ route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.dashboard.onboarding_link') }}</a>
+                    <a class="govuk-notification-banner__link" href="{{ route('govuk-alpha.onboarding', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.dashboard.onboarding_link') }}</a>
                 </p>
             </div>
         </div>

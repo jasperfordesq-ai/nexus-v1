@@ -64,6 +64,11 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/register', [AlphaController::class, 'storeRegister'])->middleware('throttle:5,5')->name('register.store');
 
         Route::get('/dashboard', [AlphaController::class, 'dashboard'])->name('dashboard');
+        // Onboarding wizard (session-backed, HTML-first multi-step).
+        Route::get('/onboarding', [AlphaController::class, 'onboarding'])->name('onboarding');
+        Route::get('/onboarding/{step}', [AlphaController::class, 'onboardingStep'])->where('step', '[a-z]+')->name('onboarding.step');
+        Route::post('/onboarding/avatar', [AlphaController::class, 'onboardingAvatar'])->middleware('throttle:20,1')->name('onboarding.avatar');
+        Route::post('/onboarding/{step}', [AlphaController::class, 'onboardingStepPost'])->where('step', '[a-z]+')->middleware('throttle:30,1')->name('onboarding.step.post');
         Route::get('/events', [AlphaController::class, 'events'])->name('events.index');
         Route::get('/events/new', [AlphaController::class, 'createEvent'])->name('events.create');
         Route::post('/events/new', [AlphaController::class, 'storeEvent'])->middleware('throttle:10,1')->name('events.store');
