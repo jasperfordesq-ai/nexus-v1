@@ -9,6 +9,17 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.groups.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.groups.description') }}</p>
 
+    @if (($status ?? null) === 'group-deleted')
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="groups-status">
+            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="groups-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
+            <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.groups.states.group-deleted') }}</p></div>
+        </div>
+    @endif
+
+    <p class="govuk-body">
+        <a class="govuk-button" data-module="govuk-button" href="{{ route('govuk-alpha.groups.create', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.groups.create.link') }}</a>
+    </p>
+
     <form method="get" action="{{ route('govuk-alpha.groups.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-6">
         <div class="govuk-form-group">
             <label class="govuk-label" for="q">{{ __('govuk_alpha.groups.search_label') }}</label>
