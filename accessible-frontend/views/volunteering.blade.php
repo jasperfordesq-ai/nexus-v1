@@ -83,6 +83,12 @@
                 <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.hours', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.log_hours_title') }}</a>
                 <span aria-hidden="true"> &middot; </span>
                 <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.accessibility', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.accessibility_link') }}</a>
+                <span aria-hidden="true"> &middot; </span>
+                <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.certificates', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_depth.certificates_link') }}</a>
+                <span aria-hidden="true"> &middot; </span>
+                <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.waitlist', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_depth.waitlist_link') }}</a>
+                <span aria-hidden="true"> &middot; </span>
+                <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.swaps', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_depth.swaps_link') }}</a>
             </p>
 
             <div class="govuk-tabs govuk-!-margin-top-6">

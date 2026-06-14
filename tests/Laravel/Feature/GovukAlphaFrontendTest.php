@@ -5836,4 +5836,458 @@ class GovukAlphaFrontendTest extends TestCase
             'status' => 'pending',
         ]);
     }
+
+    // ===================================================================
+    // WAVE V2: Volunteering depth — certificates, waitlist, shift swaps
+    // ===================================================================
+
+    /** Seed an organisation + opportunity + future shift, returning their ids. */
+    private function v2SeedShift(int $creatorId, array $shiftOverrides = []): array
+    {
+        $organizationId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $creatorId,
+            'name' => 'V2 Depth Org',
+            'slug' => 'v2-depth-org-' . uniqid(),
+            'description' => 'Org for V2 depth tests.',
+            'contact_email' => 'v2depth-' . uniqid() . '@example.test',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $opportunityId = DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $organizationId,
+            'created_by' => $creatorId,
+            'title' => 'V2 Depth Opportunity',
+            'description' => 'Opportunity for V2 depth tests.',
+            'location' => 'Centre',
+            'is_remote' => 0,
+            'skills_needed' => 'Support',
+            'start_date' => now()->addWeek()->toDateString(),
+            'end_date' => now()->addMonth()->toDateString(),
+            'is_active' => 1,
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $shiftId = DB::table('vol_shifts')->insertGetId(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $opportunityId,
+            'start_time' => now()->addDays(10),
+            'end_time' => now()->addDays(10)->addHours(3),
+            'capacity' => 5,
+            'created_at' => now(),
+        ], $shiftOverrides));
+
+        return ['organization_id' => $organizationId, 'opportunity_id' => $opportunityId, 'shift_id' => $shiftId];
+    }
+
+    public function test_v2_certificates_page_renders_empty_state_and_link_from_volunteering(): void
+    {
+        $this->authenticatedUser();
+
+        $hub = $this->get("/{$this->testTenantSlug}/alpha/volunteering");
+        $hub->assertOk();
+        $hub->assertSee(route('govuk-alpha.volunteering.certificates', ['tenantSlug' => $this->testTenantSlug]), false);
+
+        $page = $this->get("/{$this->testTenantSlug}/alpha/volunteering/certificates");
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.vol_depth.certificates_title'));
+        $page->assertSee(__('govuk_alpha.vol_depth.certificates_empty_title'));
+        $page->assertSee(__('govuk_alpha.vol_depth.certificate_generate'));
+    }
+
+    public function test_v2_certificate_generate_requires_approved_hours_then_lists_and_downloads(): void
+    {
+        $user = $this->authenticatedUser();
+        $seed = $this->v2SeedShift($user->id);
+
+        // No approved hours yet → generate fails with the no-hours notice.
+        $noHours = $this->post("/{$this->testTenantSlug}/alpha/volunteering/certificates/generate");
+        $noHours->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/certificates?status=certificate-no-hours");
+
+        // Add an approved hours log (whole-hour amount; nexus_test stores int hours).
+        DB::table('vol_logs')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'organization_id' => $seed['organization_id'],
+            'opportunity_id' => $seed['opportunity_id'],
+            'hours' => 4,
+            'status' => 'approved',
+            'date_logged' => now()->subDays(3)->toDateString(),
+            'description' => 'Approved shift work.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $generated = $this->post("/{$this->testTenantSlug}/alpha/volunteering/certificates/generate");
+        $generated->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/certificates?status=certificate-generated");
+
+        $this->assertDatabaseHas('vol_certificates', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+        ]);
+
+        $code = DB::table('vol_certificates')
+            ->where('user_id', $user->id)
+            ->where('tenant_id', $this->testTenantId)
+            ->value('verification_code');
+        $this->assertNotEmpty($code);
+
+        $list = $this->get("/{$this->testTenantSlug}/alpha/volunteering/certificates");
+        $list->assertOk();
+        $list->assertSee((string) $code);
+        $list->assertSee(route('govuk-alpha.volunteering.certificates.download', ['tenantSlug' => $this->testTenantSlug, 'code' => $code]), false);
+
+        // Download returns the printable HTML and marks the cert downloaded.
+        $download = $this->get("/{$this->testTenantSlug}/alpha/volunteering/certificates/{$code}/download");
+        $download->assertOk();
+        $download->assertHeader('Content-Type', 'text/html; charset=UTF-8');
+        $this->assertDatabaseMissing('vol_certificates', [
+            'verification_code' => $code,
+            'downloaded_at' => null,
+        ]);
+    }
+
+    public function test_v2_certificate_download_blocks_cross_user_idor(): void
+    {
+        $other = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        // A certificate owned by SOMEONE ELSE in the same tenant.
+        $foreignCode = 'FOREIGNCODE99';
+        DB::table('vol_certificates')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $other->id,
+            'verification_code' => $foreignCode,
+            'total_hours' => 6,
+            'date_range_start' => now()->subMonth()->toDateString(),
+            'date_range_end' => now()->toDateString(),
+            'organizations' => json_encode([]),
+            'generated_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // The attacker (different member) guesses the code → must 404, not download.
+        $this->authenticatedUser();
+        $attempt = $this->get("/{$this->testTenantSlug}/alpha/volunteering/certificates/{$foreignCode}/download");
+        $attempt->assertNotFound();
+
+        // And the foreign cert is never marked as downloaded.
+        $this->assertDatabaseHas('vol_certificates', [
+            'verification_code' => $foreignCode,
+            'downloaded_at' => null,
+        ]);
+    }
+
+    public function test_v2_waitlist_page_lists_entries_and_allows_leave(): void
+    {
+        $user = $this->authenticatedUser();
+        $creator = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $seed = $this->v2SeedShift($creator->id);
+
+        $waitlistId = DB::table('vol_shift_waitlist')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'shift_id' => $seed['shift_id'],
+            'user_id' => $user->id,
+            'position' => 1,
+            'status' => 'waiting',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $page = $this->get("/{$this->testTenantSlug}/alpha/volunteering/waitlist");
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.vol_depth.waitlist_title'));
+        $page->assertSee('V2 Depth Opportunity');
+        $page->assertSee(route('govuk-alpha.volunteering.waitlist.leave', ['tenantSlug' => $this->testTenantSlug, 'shiftId' => $seed['shift_id']]), false);
+
+        $leave = $this->post("/{$this->testTenantSlug}/alpha/volunteering/waitlist/{$seed['shift_id']}/leave");
+        $leave->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/waitlist?status=waitlist-left");
+
+        // Entry is now cancelled (not 'waiting'), so it drops off the list.
+        $this->assertDatabaseMissing('vol_shift_waitlist', [
+            'id' => $waitlistId,
+            'status' => 'waiting',
+        ]);
+    }
+
+    public function test_v2_waitlist_leave_cannot_affect_another_members_entry(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $creator = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $seed = $this->v2SeedShift($creator->id);
+
+        // Waitlist entry belongs to $owner.
+        $waitlistId = DB::table('vol_shift_waitlist')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'shift_id' => $seed['shift_id'],
+            'user_id' => $owner->id,
+            'position' => 1,
+            'status' => 'waiting',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // A DIFFERENT member tries to leave that shift's waitlist.
+        $this->authenticatedUser();
+        $attempt = $this->post("/{$this->testTenantSlug}/alpha/volunteering/waitlist/{$seed['shift_id']}/leave");
+        $attempt->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/waitlist?status=waitlist-leave-failed");
+
+        // The owner's entry is untouched.
+        $this->assertDatabaseHas('vol_shift_waitlist', [
+            'id' => $waitlistId,
+            'user_id' => $owner->id,
+            'status' => 'waiting',
+        ]);
+    }
+
+    public function test_v2_swaps_page_renders_request_form_with_my_shifts(): void
+    {
+        $user = $this->authenticatedUser();
+        $seed = $this->v2SeedShift($user->id);
+
+        // The member is signed up (approved) for the shift → it appears as a from-shift option.
+        DB::table('vol_applications')->insert([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $seed['opportunity_id'],
+            'shift_id' => $seed['shift_id'],
+            'user_id' => $user->id,
+            'status' => 'approved',
+            'message' => 'Signed up.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $page = $this->get("/{$this->testTenantSlug}/alpha/volunteering/swaps");
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.vol_depth.swaps_title'));
+        $page->assertSee('name="from_shift_id"', false);
+        $page->assertSee('name="to_shift_id"', false);
+        $page->assertSee('name="to_user_id"', false);
+        $page->assertSee('value="' . $seed['shift_id'] . '"', false);
+    }
+
+    public function test_v2_swap_request_creates_pending_row_and_notifies_target(): void
+    {
+        $user = $this->authenticatedUser();
+        $partner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        $mine = $this->v2SeedShift($user->id);
+        $theirs = $this->v2SeedShift($partner->id);
+
+        // Both volunteers are signed up (approved) for their respective shifts.
+        DB::table('vol_applications')->insert([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $mine['opportunity_id'],
+            'shift_id' => $mine['shift_id'],
+            'user_id' => $user->id,
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('vol_applications')->insert([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $theirs['opportunity_id'],
+            'shift_id' => $theirs['shift_id'],
+            'user_id' => $partner->id,
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $request = $this->post("/{$this->testTenantSlug}/alpha/volunteering/swaps", [
+            'from_shift_id' => $mine['shift_id'],
+            'to_shift_id' => $theirs['shift_id'],
+            'to_user_id' => $partner->id,
+            'message' => 'Could we swap please?',
+        ]);
+        $request->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/swaps?status=swap-requested");
+
+        $this->assertDatabaseHas('vol_shift_swap_requests', [
+            'tenant_id' => $this->testTenantId,
+            'from_user_id' => $user->id,
+            'to_user_id' => $partner->id,
+            'from_shift_id' => $mine['shift_id'],
+            'to_shift_id' => $theirs['shift_id'],
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_v2_swap_request_missing_fields_is_rejected(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $request = $this->post("/{$this->testTenantSlug}/alpha/volunteering/swaps", [
+            'from_shift_id' => 0,
+            'to_shift_id' => 0,
+            'to_user_id' => 0,
+        ]);
+        $request->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/swaps?status=swap-invalid");
+
+        // No swap request row was created for this member.
+        $this->assertDatabaseMissing('vol_shift_swap_requests', [
+            'from_user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+        ]);
+    }
+
+    public function test_v2_swap_recipient_can_accept_and_shifts_are_exchanged(): void
+    {
+        $requester = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $recipient = $this->authenticatedUser(); // the logged-in user is the recipient
+
+        $fromSeed = $this->v2SeedShift($requester->id);
+        $toSeed = $this->v2SeedShift($recipient->id);
+
+        $fromAppId = DB::table('vol_applications')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $fromSeed['opportunity_id'],
+            'shift_id' => $fromSeed['shift_id'],
+            'user_id' => $requester->id,
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $toAppId = DB::table('vol_applications')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $toSeed['opportunity_id'],
+            'shift_id' => $toSeed['shift_id'],
+            'user_id' => $recipient->id,
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $swapId = DB::table('vol_shift_swap_requests')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'from_user_id' => $requester->id,
+            'to_user_id' => $recipient->id,
+            'from_shift_id' => $fromSeed['shift_id'],
+            'to_shift_id' => $toSeed['shift_id'],
+            'status' => 'pending',
+            'requires_admin_approval' => 0,
+            'message' => 'Swap?',
+            'created_at' => now(),
+        ]);
+
+        $accept = $this->post("/{$this->testTenantSlug}/alpha/volunteering/swaps/{$swapId}/respond", [
+            'action' => 'accept',
+        ]);
+        $accept->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/swaps?status=swap-accepted");
+
+        $this->assertDatabaseHas('vol_shift_swap_requests', ['id' => $swapId, 'status' => 'accepted']);
+        // Assignments have been exchanged.
+        $this->assertDatabaseHas('vol_applications', ['id' => $fromAppId, 'shift_id' => $toSeed['shift_id']]);
+        $this->assertDatabaseHas('vol_applications', ['id' => $toAppId, 'shift_id' => $fromSeed['shift_id']]);
+    }
+
+    public function test_v2_swap_respond_cannot_act_on_request_addressed_to_another_member(): void
+    {
+        $requester = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $intendedRecipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        $fromSeed = $this->v2SeedShift($requester->id);
+        $toSeed = $this->v2SeedShift($intendedRecipient->id);
+
+        $swapId = DB::table('vol_shift_swap_requests')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'from_user_id' => $requester->id,
+            'to_user_id' => $intendedRecipient->id,
+            'from_shift_id' => $fromSeed['shift_id'],
+            'to_shift_id' => $toSeed['shift_id'],
+            'status' => 'pending',
+            'requires_admin_approval' => 0,
+            'message' => 'Swap?',
+            'created_at' => now(),
+        ]);
+
+        // A third, unrelated member tries to accept the request.
+        $this->authenticatedUser();
+        $attempt = $this->post("/{$this->testTenantSlug}/alpha/volunteering/swaps/{$swapId}/respond", [
+            'action' => 'accept',
+        ]);
+        $attempt->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/swaps?status=swap-respond-failed");
+
+        // The request is still pending — the intruder could not act on it.
+        $this->assertDatabaseHas('vol_shift_swap_requests', ['id' => $swapId, 'status' => 'pending']);
+    }
+
+    public function test_v2_swap_requester_can_cancel_but_others_cannot(): void
+    {
+        $requester = $this->authenticatedUser();
+        $partner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        $fromSeed = $this->v2SeedShift($requester->id);
+        $toSeed = $this->v2SeedShift($partner->id);
+
+        $swapId = DB::table('vol_shift_swap_requests')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'from_user_id' => $requester->id,
+            'to_user_id' => $partner->id,
+            'from_shift_id' => $fromSeed['shift_id'],
+            'to_shift_id' => $toSeed['shift_id'],
+            'status' => 'pending',
+            'requires_admin_approval' => 0,
+            'message' => 'Swap?',
+            'created_at' => now(),
+        ]);
+
+        $cancel = $this->post("/{$this->testTenantSlug}/alpha/volunteering/swaps/{$swapId}/cancel");
+        $cancel->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/swaps?status=swap-cancelled");
+        $this->assertDatabaseHas('vol_shift_swap_requests', ['id' => $swapId, 'status' => 'cancelled']);
+    }
+
+    public function test_v2_volunteering_depth_pages_require_authentication(): void
+    {
+        // Logged out → each page redirects to the alpha login.
+        foreach (['certificates', 'waitlist', 'swaps'] as $sub) {
+            $page = $this->get("/{$this->testTenantSlug}/alpha/volunteering/{$sub}");
+            $page->assertRedirect(route('govuk-alpha.login', ['tenantSlug' => $this->testTenantSlug, 'status' => 'auth-required']));
+        }
+    }
+
+    public function test_v2_volunteering_depth_blocked_when_feature_disabled(): void
+    {
+        $this->authenticatedUser();
+
+        // Disable the volunteering feature for this tenant.
+        $row = DB::table('tenants')->where('id', $this->testTenantId)->value('features');
+        $features = $row ? (json_decode($row, true) ?: []) : [];
+        $features['volunteering'] = false;
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['features' => json_encode($features)]);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        foreach (['certificates', 'waitlist', 'swaps'] as $sub) {
+            $page = $this->get("/{$this->testTenantSlug}/alpha/volunteering/{$sub}");
+            $page->assertForbidden();
+        }
+    }
 }
