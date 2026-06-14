@@ -4235,6 +4235,60 @@ class GovukAlphaFrontendTest extends TestCase
             ->assertRedirectContains('status=idea-voted');
     }
 
+    public function test_notifications_inbox_mark_read_and_delete_all(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Notified Member']);
+        $nId = DB::table('notifications')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'message' => 'You have a new message',
+            'link' => '/messages/1',
+            'type' => 'message',
+            'is_read' => 0,
+            'created_at' => now(),
+        ]);
+
+        $page = $this->get("/{$this->testTenantSlug}/alpha/notifications");
+        $page->assertOk();
+        $page->assertSee('You have a new message');
+        $page->assertSee(__('govuk_alpha.notifications.types.messages'));
+        $page->assertSee(__('govuk_alpha.notifications.mark_read'));
+
+        $this->post("/{$this->testTenantSlug}/alpha/notifications/{$nId}/read")
+            ->assertRedirectContains('status=notification-marked-read');
+        $this->assertSame(1, (int) DB::table('notifications')->where('id', $nId)->value('is_read'));
+
+        $this->post("/{$this->testTenantSlug}/alpha/notifications/delete-all")
+            ->assertRedirectContains('status=all-notifications-deleted');
+        $this->assertSame(0, DB::table('notifications')->where('user_id', $user->id)->count());
+    }
+
+    public function test_job_application_notifies_the_employer(): void
+    {
+        $applicant = $this->authenticatedUser(['name' => 'Keen Applicant']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+
+        $jobId = DB::table('job_vacancies')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'title' => 'Community Gardener',
+            'description' => 'Help tend the shared allotment.',
+            'type' => 'volunteer',
+            'status' => 'open',
+            'created_at' => now(),
+        ]);
+
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/apply", ['cover_letter' => 'I would love to help.'])
+            ->assertRedirectContains('status=applied');
+
+        // The employer received an in-app notification (parity with the API path).
+        $this->assertTrue(DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $owner->id)
+            ->where('type', 'job_application')
+            ->exists());
+    }
+
     /**
      * Enable one or more feature flags on the test tenant (they default off for
      * the commerce modules). Mirrors the DB-update + TenantContext::reset pattern

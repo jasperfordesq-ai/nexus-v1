@@ -152,6 +152,8 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/notifications', [AlphaController::class, 'notifications'])->name('notifications.index');
         Route::post('/notifications/read-all', [AlphaController::class, 'markAllNotificationsRead'])->middleware('throttle:20,1')->name('notifications.read-all');
         Route::post('/notifications/{id}/delete', [AlphaController::class, 'deleteNotification'])->whereNumber('id')->middleware('throttle:60,1')->name('notifications.delete');
+        Route::post('/notifications/{id}/read', [AlphaController::class, 'markNotificationRead'])->whereNumber('id')->middleware('throttle:60,1')->name('notifications.mark-read');
+        Route::post('/notifications/delete-all', [AlphaController::class, 'deleteAllNotifications'])->middleware('throttle:5,1')->name('notifications.delete-all');
         Route::get('/activity', [AlphaController::class, 'activity'])->name('activity');
         Route::get('/reviews', [AlphaController::class, 'reviews'])->name('reviews.index');
         Route::get('/explore', [AlphaController::class, 'explore'])->name('explore');

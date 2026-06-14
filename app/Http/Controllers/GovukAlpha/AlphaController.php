@@ -1216,6 +1216,19 @@ class AlphaController extends Controller
             $ok = false;
         }
 
+        // Notify everyone who RSVP'd of meaningful changes (parity with
+        // EventsController::update). EventService tracks the changes internally.
+        if ($ok) {
+            try {
+                $meaningfulChanges = EventService::getLastMeaningfulUpdateChanges();
+                if (!empty($meaningfulChanges)) {
+                    app(\App\Services\EventNotificationService::class)->notifyEventUpdated($id, $meaningfulChanges);
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Alpha event update notification failed', ['error' => $e->getMessage()]);
+            }
+        }
+
         return redirect()->route('govuk-alpha.events.show', [
             'tenantSlug' => $tenantSlug,
             'id' => $id,
@@ -1279,6 +1292,24 @@ class AlphaController extends Controller
         } catch (\Throwable $e) {
             report($e);
             return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'rsvp-failed']);
+        }
+
+        // Notify the organiser of the RSVP + award XP for attending — parity with
+        // EventsController::rsvp. wasLastRsvpChanged() must be read before any other
+        // EventService call; notification/XP failure must not change the outcome.
+        try {
+            if (EventService::wasLastRsvpChanged()) {
+                app(\App\Services\EventNotificationService::class)->notifyRsvp($id, $userId, $status);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Alpha RSVP notification failed', ['error' => $e->getMessage()]);
+        }
+        if ($status === 'going') {
+            try {
+                \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['attend_event'], 'attend_event', 'RSVPed to an event');
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Alpha RSVP XP award failed', ['error' => $e->getMessage()]);
+            }
         }
 
         return redirect()->route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'rsvp-updated']);
@@ -1424,6 +1455,26 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.volunteering.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'apply-failed']);
         }
 
+        // Notify the opportunity organiser of the new application (parity with
+        // VolunteerController::apply). Best-effort, in the organiser's language.
+        try {
+            $opportunity = \App\Models\VolOpportunity::where('tenant_id', TenantContext::getId())->find($id);
+            if ($opportunity && $opportunity->created_by && (int) $opportunity->created_by !== $userId) {
+                $volunteer = \App\Models\User::find($userId);
+                $organizer = \App\Models\User::find((int) $opportunity->created_by);
+                \App\I18n\LocaleContext::withLocale($organizer, function () use ($volunteer, $opportunity) {
+                    $volunteerName = $volunteer->name ?? __('emails.common.fallback_someone');
+                    $notifContent = __('notifications.vol_application_received_body', ['name' => $volunteerName, 'title' => $opportunity->title]);
+                    $orgId = $opportunity->organization_id;
+                    $notifLink = "/volunteering/org/{$orgId}/dashboard?tab=applications";
+                    $htmlContent = \App\Services\NotificationDispatcher::buildVolApplicationReceivedEmail($volunteerName, $opportunity->title, (int) $orgId);
+                    \App\Services\NotificationDispatcher::dispatch((int) $opportunity->created_by, 'global', 0, 'vol_application_received', $notifContent, $notifLink, $htmlContent);
+                });
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Alpha volunteer application notification failed', ['error' => $e->getMessage()]);
+        }
+
         return redirect()->route('govuk-alpha.volunteering.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'apply-created']);
     }
 
@@ -1442,6 +1493,29 @@ class AlphaController extends Controller
             $ok = VolunteerService::signUpForShift($shiftId, $userId);
         } catch (\Throwable $e) {
             report($e);
+        }
+
+        // Notify the opportunity organiser of the shift sign-up (parity with
+        // VolunteerController::signUpForShift), in the organiser's language.
+        if ($ok) {
+            try {
+                $shift = \App\Models\VolShift::with('opportunity')->find($shiftId);
+                if ($shift && (int) $shift->tenant_id === TenantContext::getId()
+                    && $shift->opportunity && $shift->opportunity->created_by
+                    && (int) $shift->opportunity->created_by !== $userId) {
+                    $volunteer = \App\Models\User::find($userId);
+                    $organizer = \App\Models\User::find((int) $shift->opportunity->created_by);
+                    \App\I18n\LocaleContext::withLocale($organizer, function () use ($volunteer, $shift) {
+                        $volunteerName = $volunteer->name ?? __('emails.common.fallback_someone');
+                        $msg = __('notifications.vol_shift_signup_body', ['name' => $volunteerName]);
+                        $link = "/volunteering/opportunities/{$shift->opportunity_id}";
+                        \App\Models\Notification::createNotification((int) $shift->opportunity->created_by, $msg, $link, 'volunteering');
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $shift->opportunity->created_by, 'volunteering', $msg, $link);
+                    });
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Alpha volunteer shift signup notification failed', ['error' => $e->getMessage()]);
+            }
         }
 
         return redirect()->route('govuk-alpha.volunteering.show', [
@@ -3075,6 +3149,46 @@ class AlphaController extends Controller
         return redirect()->route('govuk-alpha.notifications.index', ['tenantSlug' => $tenantSlug, 'status' => 'notification-deleted']);
     }
 
+    public function markNotificationRead(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        try {
+            // Tenant + ownership scoped: only the recipient's own row is touched.
+            \Illuminate\Support\Facades\DB::table('notifications')
+                ->where('id', $id)
+                ->where('user_id', $userId)
+                ->where('tenant_id', TenantContext::getId())
+                ->update(['is_read' => 1, 'read_at' => now()]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.notifications.index', ['tenantSlug' => $tenantSlug, 'status' => 'notification-marked-read']);
+    }
+
+    public function deleteAllNotifications(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        try {
+            \Illuminate\Support\Facades\DB::table('notifications')
+                ->where('user_id', $userId)
+                ->where('tenant_id', TenantContext::getId())
+                ->delete();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.notifications.index', ['tenantSlug' => $tenantSlug, 'status' => 'all-notifications-deleted']);
+    }
+
     // === Personal activity (auth-only, self) ===
 
     public function activity(Request $request, string $tenantSlug): Response|RedirectResponse
@@ -3708,7 +3822,98 @@ class AlphaController extends Controller
             report($e);
         }
 
+        // The service does not send the applicant/employer emails — the API
+        // controller does. Mirror that here so the accessible path notifies too
+        // (only on a genuinely new application).
+        if ($ok) {
+            $this->dispatchJobApplicationNotifications($id, $userId);
+        }
+
         return redirect()->route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $ok ? 'applied' : 'apply-failed']);
+    }
+
+    /**
+     * Applicant-confirmation + employer-alert notifications for a new job
+     * application, mirroring JobVacanciesController::apply. Every send is wrapped
+     * in LocaleContext (recipient's language) and best-effort: a failure here must
+     * never change the application outcome.
+     */
+    private function dispatchJobApplicationNotifications(int $jobId, int $applicantId): void
+    {
+        $tenantId = TenantContext::getId();
+        $job = null;
+
+        // Bell + push to the job owner.
+        try {
+            $job = \Illuminate\Support\Facades\DB::selectOne(
+                'SELECT user_id, title FROM job_vacancies WHERE id = ? AND tenant_id = ?',
+                [$jobId, $tenantId]
+            );
+            if ($job && (int) $job->user_id !== $applicantId) {
+                $applicant = \App\Models\User::find($applicantId);
+                $jobOwner = \App\Models\User::find((int) $job->user_id);
+                \App\I18n\LocaleContext::withLocale($jobOwner, function () use ($applicant, $job, $jobId) {
+                    $applicantName = $applicant->first_name ?? $applicant->name ?? __('emails.common.fallback_someone');
+                    $msg = __('svc_notifications.job_application.owner_applied', ['name' => $applicantName, 'title' => $job->title]);
+                    \App\Models\Notification::createNotification((int) $job->user_id, $msg, "/jobs/{$jobId}/applications", 'job_application');
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $job->user_id, 'job_application', $msg, "/jobs/{$jobId}/applications");
+                });
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Alpha job application notification failed', ['vacancy_id' => $jobId, 'error' => $e->getMessage()]);
+        }
+
+        // Email confirmation to the applicant.
+        try {
+            $job = $job ?? \Illuminate\Support\Facades\DB::selectOne('SELECT user_id, title FROM job_vacancies WHERE id = ? AND tenant_id = ?', [$jobId, $tenantId]);
+            if ($job) {
+                $applicantUser = \Illuminate\Support\Facades\DB::table('users')->where('id', $applicantId)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
+                if ($applicantUser && !empty($applicantUser->email)) {
+                    \App\I18n\LocaleContext::withLocale($applicantUser, function () use ($applicantUser, $job, $jobId, $tenantId) {
+                        $firstName = $applicantUser->first_name ?? $applicantUser->name ?? __('emails.common.fallback_name');
+                        $community = TenantContext::getName();
+                        $jobTitle = htmlspecialchars((string) $job->title, ENT_QUOTES, 'UTF-8');
+                        $appUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/jobs/' . $jobId;
+                        $html = \App\Core\EmailTemplateBuilder::make()->theme('brand')
+                            ->title(__('emails_commerce.job_application_applicant.title'))
+                            ->greeting($firstName)
+                            ->paragraph(__('emails_commerce.job_application_applicant.body', ['job_title' => $jobTitle]))
+                            ->paragraph(__('emails_commerce.job_application_applicant.next_steps'))
+                            ->button(__('emails_commerce.job_application_applicant.cta'), $appUrl)
+                            ->render();
+                        \App\Services\EmailDispatchService::sendRaw($applicantUser->email, __('emails_commerce.job_application_applicant.subject', ['job_title' => $jobTitle, 'community' => $community]), $html, null, null, null, 'job_application', ['tenant_id' => $tenantId]);
+                    });
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Alpha applicant confirmation email failed: ' . $e->getMessage());
+        }
+
+        // Email alert to the job poster / employer.
+        try {
+            if ($job && (int) $job->user_id !== $applicantId) {
+                $posterUser = \Illuminate\Support\Facades\DB::table('users')->where('id', $job->user_id)->where('tenant_id', $tenantId)->select(['email', 'first_name', 'name', 'preferred_language'])->first();
+                if ($posterUser && !empty($posterUser->email)) {
+                    $applicant = \App\Models\User::find($applicantId);
+                    \App\I18n\LocaleContext::withLocale($posterUser, function () use ($posterUser, $applicant, $job, $jobId, $tenantId) {
+                        $posterFirst = $posterUser->first_name ?? $posterUser->name ?? __('emails.common.fallback_name');
+                        $community = TenantContext::getName();
+                        $jobTitle = htmlspecialchars((string) $job->title, ENT_QUOTES, 'UTF-8');
+                        $applicantName = $applicant ? (trim(($applicant->first_name ?? '') . ' ' . ($applicant->last_name ?? '')) ?: ($applicant->name ?? __('emails.common.fallback_someone'))) : __('emails.common.fallback_someone');
+                        $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/jobs/' . $jobId . '/applications';
+                        $html = \App\Core\EmailTemplateBuilder::make()->theme('federation')
+                            ->title(__('emails_commerce.job_application_employer.title'))
+                            ->greeting($posterFirst)
+                            ->paragraph(__('emails_commerce.job_application_employer.body', ['applicant_name' => htmlspecialchars($applicantName, ENT_QUOTES, 'UTF-8'), 'job_title' => $jobTitle]))
+                            ->button(__('emails_commerce.job_application_employer.cta'), $reviewUrl)
+                            ->render();
+                        \App\Services\EmailDispatchService::sendRaw($posterUser->email, __('emails_commerce.job_application_employer.subject', ['job_title' => $jobTitle, 'community' => $community]), $html, null, null, null, 'job_application', ['tenant_id' => $tenantId]);
+                    });
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Alpha employer alert email failed: ' . $e->getMessage());
+        }
     }
 
     // === Ideation challenges ===
