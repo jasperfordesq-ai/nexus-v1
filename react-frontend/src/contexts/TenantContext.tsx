@@ -113,7 +113,10 @@ const defaultFeatures: TenantFeatures = {
   newsletter: true,
   merchant_coupons: false,
   regional_analytics: false,
-  maps: true,
+  // Maps default OFF platform-wide (opt-in per tenant) — synced with PHP
+  // TenantFeatureConfig::FEATURE_DEFAULTS. A tenant only shows maps when its
+  // bootstrap features explicitly enable it, so no tenant differs by accident.
+  maps: false,
   // Courses (alpha) — opt-in per tenant. Synced with PHP TenantFeatureConfig.
   courses: false,
   podcasts: false,

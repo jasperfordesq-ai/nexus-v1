@@ -61,6 +61,20 @@ class MapsConfigControllerTest extends TestCase
         }
     }
 
+    /**
+     * Explicitly enable the maps feature for the test tenant. Maps default OFF
+     * platform-wide, so tile-selection tests must opt in rather than rely on the
+     * global default.
+     */
+    private function enableMapsFeature(): void
+    {
+        $features = TenantFeatureConfig::FEATURE_DEFAULTS;
+        $features['maps'] = true;
+        DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update(['features' => json_encode($features)]);
+    }
+
     private function setGeneralSetting(string $key, string $value): void
     {
         DB::table('tenant_settings')->updateOrInsert(
@@ -78,6 +92,7 @@ class MapsConfigControllerTest extends TestCase
     public function test_ordnance_survey_provider_serves_os_maps_tiles_when_key_set(): void
     {
         $osKey = str_repeat('k', 32);
+        $this->enableMapsFeature();
         $this->setGeneralSetting('map_provider', 'ordnance_survey');
         $this->setGeneralSetting('os_maps_api_key', $osKey);
 
@@ -103,6 +118,7 @@ class MapsConfigControllerTest extends TestCase
         putenv('OS_MAPS_API_KEY');
 
         try {
+            $this->enableMapsFeature();
             $this->setGeneralSetting('map_provider', 'ordnance_survey');
             DB::table('tenant_settings')
                 ->where('tenant_id', $this->testTenantId)

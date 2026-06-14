@@ -44,7 +44,12 @@ class TenantFeatureConfig
         'partner_api' => false,
         'regional_analytics' => false,
         'newsletter' => true,
-        'maps' => true,
+        // Maps default OFF platform-wide: the map system has had display issues
+        // (Google AdvancedMarkers need a Map ID, etc.), so maps are opt-in per
+        // tenant via the admin "Maps & location" kill switch rather than on by
+        // default. A tenant only shows maps when its features JSON explicitly
+        // sets maps=true. Keeps behaviour uniform across every tenant.
+        'maps' => false,
         // Courses (alpha) — opt-in per tenant. Ships marked stage:'alpha' in the
         // React module registry. Default OFF like marketplace / caring_community.
         'courses' => false,
