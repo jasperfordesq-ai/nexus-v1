@@ -84,8 +84,14 @@ class ImageUploader
         // Physical Path
         $targetDir = __DIR__ . '/../../httpdocs/uploads/' . $tenantDir;
 
-        if (!\is_dir($targetDir)) {
-            \mkdir($targetDir, 0755, true);
+        // Create the tenant-scoped directory if missing. Suppress the native
+        // warning and re-check is_dir() (race-safe: a concurrent request may have
+        // created it) so a genuine failure — e.g. the tenant folder is owned by
+        // root and the web user can't write into it — surfaces as a clear,
+        // actionable error instead of silently falling through to a doomed
+        // move_uploaded_file() that reports a misleading "Failed to save file".
+        if (!\is_dir($targetDir) && !@\mkdir($targetDir, 0755, true) && !\is_dir($targetDir)) {
+            throw new \Exception("Could not create upload directory ({$targetDir}). The web server user likely lacks write permission on the tenant uploads folder.");
         }
 
         $targetPath = $targetDir . '/' . $filename;

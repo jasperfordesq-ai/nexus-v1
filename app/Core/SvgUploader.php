@@ -101,8 +101,11 @@ class SvgUploader
         $tenantDir = 'tenants/' . $slug . '/' . $directory;
         $targetDir = __DIR__ . '/../../httpdocs/uploads/' . $tenantDir;
 
-        if (!\is_dir($targetDir)) {
-            \mkdir($targetDir, 0755, true);
+        // Race-safe create with a clear error on failure (mirrors ImageUploader):
+        // a tenant folder owned by root would otherwise let mkdir() fail silently
+        // and surface as a misleading "Failed to save file" further down.
+        if (!\is_dir($targetDir) && !@\mkdir($targetDir, 0755, true) && !\is_dir($targetDir)) {
+            throw new \Exception("Could not create upload directory ({$targetDir}). The web server user likely lacks write permission on the tenant uploads folder.");
         }
 
         $targetPath = $targetDir . '/' . $filename;
