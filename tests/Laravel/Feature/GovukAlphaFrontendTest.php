@@ -3353,7 +3353,7 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee(route('govuk-alpha.group-exchanges.index', ['tenantSlug' => $this->testTenantSlug]), false);
     }
 
-    public function test_service_nav_lists_polls_last_and_excludes_personal_items(): void
+    public function test_service_nav_ends_with_explore_and_excludes_personal_items(): void
     {
         $this->authenticatedUser(['name' => 'Nav User']);
 
@@ -3367,13 +3367,22 @@ class GovukAlphaFrontendTest extends TestCase
         $navHtml = substr($html, $navStart);
 
         $volunteeringPos = strpos($navHtml, route('govuk-alpha.volunteering.index', ['tenantSlug' => $this->testTenantSlug]));
-        $pollsPos = strpos($navHtml, route('govuk-alpha.polls.index', ['tenantSlug' => $this->testTenantSlug]));
+        $explorePos = strpos($navHtml, route('govuk-alpha.explore', ['tenantSlug' => $this->testTenantSlug]));
         $this->assertNotFalse($volunteeringPos);
-        $this->assertNotFalse($pollsPos);
-        // Polls comes after Volunteering (it is the last item in the bar).
-        $this->assertGreaterThan($volunteeringPos, $pollsPos);
+        $this->assertNotFalse($explorePos);
+        // Explore is the last item in the bar (after Volunteering).
+        $this->assertGreaterThan($volunteeringPos, $explorePos);
 
-        // Matches + Group exchanges are NOT in the service navigation any more.
+        // Polls and Exchanges have moved to the Explore page — not in the service nav.
+        $this->assertStringNotContainsString(
+            'govuk-service-navigation__link" href="' . route('govuk-alpha.polls.index', ['tenantSlug' => $this->testTenantSlug]),
+            $navHtml
+        );
+        $this->assertStringNotContainsString(
+            'govuk-service-navigation__link" href="' . route('govuk-alpha.exchanges.index', ['tenantSlug' => $this->testTenantSlug]),
+            $navHtml
+        );
+        // Matches + Group exchanges remain out of the service navigation.
         $this->assertStringNotContainsString(
             'govuk-service-navigation__link" href="' . route('govuk-alpha.matches.index', ['tenantSlug' => $this->testTenantSlug]),
             $navHtml
@@ -3382,6 +3391,17 @@ class GovukAlphaFrontendTest extends TestCase
             'govuk-service-navigation__link" href="' . route('govuk-alpha.group-exchanges.index', ['tenantSlug' => $this->testTenantSlug]),
             $navHtml
         );
+    }
+
+    public function test_explore_page_surfaces_polls_and_exchanges(): void
+    {
+        $this->authenticatedUser(['name' => 'Explorer Two']);
+
+        $explore = $this->get("/{$this->testTenantSlug}/alpha/explore");
+        $explore->assertOk();
+        // Polls moved here from the service nav (polls feature is on by default).
+        $explore->assertSee(route('govuk-alpha.polls.index', ['tenantSlug' => $this->testTenantSlug]), false);
+        $explore->assertSee(__('govuk_alpha.polls.title'));
     }
 
     public function test_header_surfaces_account_link_when_signed_in(): void

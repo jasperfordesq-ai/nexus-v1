@@ -2462,7 +2462,7 @@ class AlphaController extends Controller
         return $this->view('accessible-frontend::exchange-request', [
             'title' => __('govuk_alpha.exchanges.request_title'),
             'tenantSlug' => $tenantSlug,
-            'activeNav' => 'exchanges',
+            'activeNav' => 'explore',
             'listing' => $listing,
             'config' => BrokerControlConfigService::getConfig('exchange_workflow'),
             'status' => self::asStr(request()->query('status')) ?: null,
@@ -2535,7 +2535,7 @@ class AlphaController extends Controller
         return $this->view('accessible-frontend::exchanges', [
             'title' => __('govuk_alpha.exchanges.title'),
             'tenantSlug' => $tenantSlug,
-            'activeNav' => 'exchanges',
+            'activeNav' => 'explore',
             'items' => $result['items'] ?? [],
             'meta' => ['has_more' => (bool) ($result['has_more'] ?? false), 'cursor' => $result['cursor'] ?? null],
             'filters' => ['status_filter' => $status],
@@ -2577,7 +2577,7 @@ class AlphaController extends Controller
         return $this->view('accessible-frontend::exchange-detail', [
             'title' => $exchange['listing_title'] ?? __('govuk_alpha.exchanges.detail_title'),
             'tenantSlug' => $tenantSlug,
-            'activeNav' => 'exchanges',
+            'activeNav' => 'explore',
             'exchange' => $exchange,
             'history' => ExchangeWorkflowService::getExchangeHistory($id),
             'status' => self::asStr(request()->query('status')) ?: null,
@@ -4408,7 +4408,7 @@ class AlphaController extends Controller
         return $this->view('accessible-frontend::polls', [
             'title' => __('govuk_alpha.polls.title'),
             'tenantSlug' => $tenantSlug,
-            'activeNav' => 'polls',
+            'activeNav' => 'explore',
             'polls' => $polls,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
@@ -6195,9 +6195,6 @@ class AlphaController extends Controller
 
         if (TenantContext::hasModule('listings')) {
             $items['listings'] = route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]);
-            if ($userId !== null && BrokerControlConfigService::isExchangeWorkflowEnabled()) {
-                $items['exchanges'] = route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug]);
-            }
         }
 
         if (TenantContext::hasFeature('connections')) {
@@ -6213,14 +6210,10 @@ class AlphaController extends Controller
         }
 
         // "Explore" is the gateway to discovery facilities (groups, goals, skills,
-        // organisations, marketplace, jobs, courses, …) so the flat bar stays lean.
+        // organisations, marketplace, jobs, courses, exchanges, polls, …) so the
+        // flat bar stays lean. Exchanges and Polls live there too, not in the bar.
         if ($userId !== null) {
             $items['explore'] = route('govuk-alpha.explore', ['tenantSlug' => $tenantSlug]);
-        }
-
-        // Polls sit last in the bar, after Volunteering.
-        if ($userId !== null && TenantContext::hasFeature('polls')) {
-            $items['polls'] = route('govuk-alpha.polls.index', ['tenantSlug' => $tenantSlug]);
         }
 
         return $items;

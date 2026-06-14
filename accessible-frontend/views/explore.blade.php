@@ -8,6 +8,7 @@
     @php
         // Each discovery facility appears once its route exists and its feature is on.
         $candidates = [
+            ['govuk-alpha.polls.index', 'polls', 'polls'],
             ['govuk-alpha.search', 'search', null],
             ['govuk-alpha.groups.index', 'groups', 'groups'],
             ['govuk-alpha.goals.index', 'goals', 'goals'],
@@ -24,6 +25,20 @@
             ['govuk-alpha.federation.index', 'federation', 'federation'],
         ];
         $exploreLinks = [];
+
+        // Exchanges is gated by the listings module AND the exchange workflow being
+        // enabled (not a plain feature flag), so it is surfaced explicitly — and
+        // first, as a core timebanking facility moved out of the service nav.
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.exchanges.index')
+            && \App\Core\TenantContext::hasModule('listings')
+            && \App\Services\BrokerControlConfigService::isExchangeWorkflowEnabled()) {
+            $exploreLinks[] = [
+                'title' => __('govuk_alpha.exchanges.title'),
+                'description' => __('govuk_alpha.exchanges.description'),
+                'href' => route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug]),
+            ];
+        }
+
         foreach ($candidates as [$routeName, $langKey, $feature]) {
             if (!\Illuminate\Support\Facades\Route::has($routeName)) {
                 continue;
