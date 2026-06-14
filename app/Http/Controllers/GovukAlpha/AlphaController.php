@@ -2670,6 +2670,98 @@ class AlphaController extends Controller
         ]);
     }
 
+    /**
+     * Connections inbox: the member's accepted network plus pending requests
+     * (received — which they can accept/decline — and sent, which they can
+     * cancel). Backed by the tenant-scoped ConnectionService.
+     */
+    public function connections(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('connections'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $accepted = [];
+        $received = [];
+        $sent = [];
+        $counts = ['received' => 0, 'sent' => 0, 'total_friends' => 0];
+
+        try {
+            $accepted = \App\Services\ConnectionService::getConnections($userId, ['status' => 'accepted', 'limit' => 50])['items'] ?? [];
+            $received = \App\Services\ConnectionService::getConnections($userId, ['status' => 'pending_received', 'limit' => 50])['items'] ?? [];
+            $sent = \App\Services\ConnectionService::getConnections($userId, ['status' => 'pending_sent', 'limit' => 50])['items'] ?? [];
+            $counts = \App\Services\ConnectionService::getPendingCounts($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::connections', [
+            'title' => __('govuk_alpha.connections.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'connections',
+            'acceptedConnections' => $accepted,
+            'receivedRequests' => $received,
+            'sentRequests' => $sent,
+            'connectionCounts' => $counts,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function acceptConnection(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        return $this->connectionAction($tenantSlug, $id, 'accept');
+    }
+
+    public function declineConnection(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        return $this->connectionAction($tenantSlug, $id, 'decline');
+    }
+
+    public function cancelConnection(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        return $this->connectionAction($tenantSlug, $id, 'remove');
+    }
+
+    /** Shared accept/decline/remove handler for connection requests. */
+    private function connectionAction(string $tenantSlug, int $id, string $action): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('connections'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $ok = false;
+        try {
+            // ConnectionService verifies the actor is the receiver (accept/decline)
+            // or a participant (remove), so a member can only act on their own.
+            $ok = match ($action) {
+                'accept'  => \App\Services\ConnectionService::acceptRequest($id, $userId),
+                'decline' => \App\Services\ConnectionService::rejectRequest($id, $userId),
+                'remove'  => \App\Services\ConnectionService::removeConnection($id, $userId),
+                default   => false,
+            };
+        } catch (\Throwable $e) {
+            report($e);
+            $ok = false;
+        }
+
+        $okStatus = match ($action) {
+            'accept'  => 'connection-accepted',
+            'decline' => 'connection-declined',
+            default   => 'connection-removed',
+        };
+
+        return redirect()->route('govuk-alpha.connections.index', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? $okStatus : 'connection-failed',
+        ])->withFragment('connections-top');
+    }
+
     /** Time-credit wallet: balance, transaction history, and a transfer form. */
     public function wallet(Request $request, string $tenantSlug): Response|RedirectResponse
     {

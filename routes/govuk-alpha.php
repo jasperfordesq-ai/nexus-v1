@@ -121,6 +121,10 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/members/{id}', [AlphaController::class, 'memberProfile'])->whereNumber('id')->name('members.show');
         Route::post('/members/{id}/connection', [AlphaController::class, 'updateMemberConnection'])->middleware('throttle:20,1')->whereNumber('id')->name('members.connection');
         Route::post('/members/{id}/endorse', [AlphaController::class, 'endorseMemberSkill'])->middleware('throttle:30,1')->whereNumber('id')->name('members.endorse');
+        Route::get('/connections', [AlphaController::class, 'connections'])->name('connections.index');
+        Route::post('/connections/{id}/accept', [AlphaController::class, 'acceptConnection'])->middleware('throttle:30,1')->whereNumber('id')->name('connections.accept');
+        Route::post('/connections/{id}/decline', [AlphaController::class, 'declineConnection'])->middleware('throttle:30,1')->whereNumber('id')->name('connections.decline');
+        Route::post('/connections/{id}/remove', [AlphaController::class, 'cancelConnection'])->middleware('throttle:30,1')->whereNumber('id')->name('connections.remove');
         Route::get('/account', [AlphaController::class, 'account'])->name('account');
         Route::get('/profile', [AlphaController::class, 'myProfile'])->name('profile.me');
         Route::get('/profile/settings', [AlphaController::class, 'profileSettings'])->name('profile.settings');

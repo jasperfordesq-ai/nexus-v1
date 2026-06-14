@@ -3353,6 +3353,92 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertSame(0.0, (float) DB::table('users')->where('id', $recipient->id)->value('balance'));
     }
 
+    public function test_connections_inbox_renders_received_sent_and_accepted(): void
+    {
+        $me = $this->authenticatedUser(['name' => 'Me Member']);
+        $requester = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Rhea Requester']);
+        $sentTo = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Sandro Sent']);
+        $friend = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Fiona Friend']);
+
+        DB::table('connections')->insert([
+            ['tenant_id' => $this->testTenantId, 'requester_id' => $requester->id, 'receiver_id' => $me->id, 'status' => 'pending', 'created_at' => now(), 'updated_at' => now()],
+            ['tenant_id' => $this->testTenantId, 'requester_id' => $me->id, 'receiver_id' => $sentTo->id, 'status' => 'pending', 'created_at' => now(), 'updated_at' => now()],
+            ['tenant_id' => $this->testTenantId, 'requester_id' => $friend->id, 'receiver_id' => $me->id, 'status' => 'accepted', 'created_at' => now(), 'updated_at' => now()],
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/connections");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.connections.received_title'));
+        $response->assertSee(__('govuk_alpha.connections.accepted_title'));
+        $response->assertSee(__('govuk_alpha.connections.sent_title'));
+        $response->assertSee('Rhea Requester');  // pending received
+        $response->assertSee('Sandro Sent');     // pending sent
+        $response->assertSee('Fiona Friend');    // accepted
+    }
+
+    public function test_connection_accept_marks_it_accepted(): void
+    {
+        $me = $this->authenticatedUser(['name' => 'Me Member']);
+        $requester = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Req User']);
+        $cid = DB::table('connections')->insertGetId([
+            'tenant_id' => $this->testTenantId, 'requester_id' => $requester->id, 'receiver_id' => $me->id,
+            'status' => 'pending', 'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/connections/{$cid}/accept");
+
+        $response->assertRedirectContains('status=connection-accepted');
+        $this->assertSame('accepted', DB::table('connections')->where('id', $cid)->value('status'));
+    }
+
+    public function test_connection_decline_deletes_the_request(): void
+    {
+        $me = $this->authenticatedUser(['name' => 'Me Member']);
+        $requester = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Req User']);
+        $cid = DB::table('connections')->insertGetId([
+            'tenant_id' => $this->testTenantId, 'requester_id' => $requester->id, 'receiver_id' => $me->id,
+            'status' => 'pending', 'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/connections/{$cid}/decline");
+
+        $response->assertRedirectContains('status=connection-declined');
+        $this->assertSame(0, DB::table('connections')->where('id', $cid)->count());
+    }
+
+    public function test_connection_cancel_removes_a_sent_request(): void
+    {
+        $me = $this->authenticatedUser(['name' => 'Me Member']);
+        $sentTo = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Target User']);
+        $cid = DB::table('connections')->insertGetId([
+            'tenant_id' => $this->testTenantId, 'requester_id' => $me->id, 'receiver_id' => $sentTo->id,
+            'status' => 'pending', 'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/connections/{$cid}/remove");
+
+        $response->assertRedirectContains('status=connection-removed');
+        $this->assertSame(0, DB::table('connections')->where('id', $cid)->count());
+    }
+
+    public function test_connection_accept_rejects_a_non_participant(): void
+    {
+        $this->authenticatedUser(['name' => 'Bystander']);
+        $a = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Alpha User']);
+        $b = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Bravo User']);
+        // A pending request between two OTHER members — the signed-in user is neither.
+        $cid = DB::table('connections')->insertGetId([
+            'tenant_id' => $this->testTenantId, 'requester_id' => $a->id, 'receiver_id' => $b->id,
+            'status' => 'pending', 'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/connections/{$cid}/accept");
+
+        $response->assertRedirectContains('status=connection-failed');
+        $this->assertSame('pending', DB::table('connections')->where('id', $cid)->value('status'));
+    }
+
     private function authenticatedUser(array $overrides = []): User
     {
         $user = User::factory()->forTenant($this->testTenantId)->create(array_merge([
