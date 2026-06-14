@@ -4492,6 +4492,265 @@ class GovukAlphaFrontendTest extends TestCase
         $res->assertSee(__('govuk_alpha.federation.events_browse.title'));
     }
 
+    // === WAVE F — Groups management (create / edit / delete / roles / requests / discussions) ===
+
+    /**
+     * Seed a group owned by $ownerId (the GroupService auto-joins the creator as
+     * an active admin). Returns the new group id.
+     *
+     * @param array<string, mixed> $data
+     */
+    private function seedAlphaGroup(int $ownerId, array $data = []): int
+    {
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        $group = \App\Services\GroupService::create($ownerId, array_merge([
+            'name' => 'Gardening Club',
+            'description' => 'A friendly group.',
+            'visibility' => 'public',
+        ], $data));
+
+        $this->assertNotNull($group, 'GroupService::create returned null while seeding');
+
+        return (int) $group->id;
+    }
+
+    /** Add an active member with the given role straight into group_members. */
+    private function addAlphaGroupMember(int $groupId, int $userId, string $role = 'member'): void
+    {
+        DB::table('group_members')->insert([
+            'tenant_id'  => $this->testTenantId,
+            'group_id'   => $groupId,
+            'user_id'    => $userId,
+            'role'       => $role,
+            'status'     => 'active',
+            'created_at' => now(),
+            'joined_at'  => now(),
+        ]);
+        DB::table('groups')->where('id', $groupId)->increment('cached_member_count');
+    }
+
+    public function test_group_create_redirects_to_detail_and_persists(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Group Founder']);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/groups/new", [
+            'name' => 'Cyclists of Coventry',
+            'description' => 'We ride together.',
+            'visibility' => 'private',
+        ]);
+
+        $response->assertRedirectContains('/groups/');
+        $response->assertRedirectContains('status=group-created');
+
+        $row = DB::table('groups')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('owner_id', $owner->id)
+            ->where('name', 'Cyclists of Coventry')
+            ->first();
+        $this->assertNotNull($row);
+        $this->assertSame('private', $row->visibility);
+
+        // Creator is auto-joined as an active admin.
+        $this->assertSame('admin', DB::table('group_members')
+            ->where('group_id', $row->id)->where('user_id', $owner->id)->value('role'));
+    }
+
+    public function test_group_create_rejects_blank_name(): void
+    {
+        $this->authenticatedUser(['name' => 'Founder']);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/groups/new", [
+            'name' => '',
+            'visibility' => 'public',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('name');
+        $this->assertSame(0, DB::table('groups')->where('tenant_id', $this->testTenantId)->where('name', '')->count());
+    }
+
+    public function test_group_edit_updates_name_visibility_for_admin(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Group Owner']);
+        $groupId = $this->seedAlphaGroup($owner->id);
+
+        $edit = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/edit");
+        $edit->assertOk();
+        $edit->assertSee('Gardening Club', false);
+
+        $update = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/edit", [
+            'name' => 'Allotment Society',
+            'description' => 'Bigger plots.',
+            'visibility' => 'private',
+        ]);
+        $update->assertRedirectContains("/groups/{$groupId}");
+        $update->assertRedirectContains('status=group-updated');
+
+        $row = DB::table('groups')->where('id', $groupId)->first();
+        $this->assertSame('Allotment Society', $row->name);
+        $this->assertSame('private', $row->visibility);
+    }
+
+    public function test_group_edit_forbidden_for_non_admin_member(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Real Owner']);
+        $groupId = $this->seedAlphaGroup($owner->id);
+
+        $member = $this->authenticatedUser(['name' => 'Plain Member']);
+        $this->addAlphaGroupMember($groupId, $member->id, 'member');
+
+        $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/edit")->assertForbidden();
+        $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/edit", ['name' => 'Hijacked'])->assertForbidden();
+
+        $this->assertSame('Gardening Club', DB::table('groups')->where('id', $groupId)->value('name'));
+    }
+
+    public function test_group_delete_removes_group_for_owner(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Deleting Owner']);
+        $groupId = $this->seedAlphaGroup($owner->id);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/delete", ['confirm' => 'yes']);
+
+        $response->assertRedirectContains('/groups');
+        $response->assertRedirectContains('status=group-deleted');
+        $this->assertSame(0, DB::table('groups')->where('id', $groupId)->count());
+    }
+
+    public function test_group_promote_demote_and_remove_member(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Admin Owner']);
+        $groupId = $this->seedAlphaGroup($owner->id);
+
+        $target = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'first_name' => 'Sam', 'last_name' => 'Member']);
+        $this->addAlphaGroupMember($groupId, $target->id, 'member');
+
+        // Promote
+        $promote = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/members/{$target->id}", ['action' => 'promote']);
+        $promote->assertRedirectContains('status=member-promoted');
+        $this->assertSame('admin', DB::table('group_members')->where('group_id', $groupId)->where('user_id', $target->id)->value('role'));
+
+        // Demote
+        $demote = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/members/{$target->id}", ['action' => 'demote']);
+        $demote->assertRedirectContains('status=member-demoted');
+        $this->assertSame('member', DB::table('group_members')->where('group_id', $groupId)->where('user_id', $target->id)->value('role'));
+
+        // Remove
+        $remove = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/members/{$target->id}", ['action' => 'remove']);
+        $remove->assertRedirectContains('status=member-removed');
+        $this->assertSame(0, DB::table('group_members')->where('group_id', $groupId)->where('user_id', $target->id)->count());
+    }
+
+    public function test_group_member_management_rejected_for_non_admin(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'True Owner']);
+        $groupId = $this->seedAlphaGroup($owner->id);
+
+        $attacker = $this->authenticatedUser(['name' => 'Not An Admin']);
+        $this->addAlphaGroupMember($groupId, $attacker->id, 'member');
+
+        $victim = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Victim']);
+        $this->addAlphaGroupMember($groupId, $victim->id, 'member');
+
+        $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/members/{$victim->id}", ['action' => 'remove'])->assertForbidden();
+        $this->assertSame(1, DB::table('group_members')->where('group_id', $groupId)->where('user_id', $victim->id)->count());
+    }
+
+    public function test_group_join_request_approve_and_reject(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Private Owner']);
+        $groupId = $this->seedAlphaGroup($owner->id, ['visibility' => 'private']);
+
+        $approver = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'first_name' => 'Wants', 'last_name' => 'In']);
+        $rejectee = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'first_name' => 'Also', 'last_name' => 'Wants']);
+        foreach ([$approver, $rejectee] as $u) {
+            DB::table('group_members')->insert([
+                'tenant_id' => $this->testTenantId, 'group_id' => $groupId, 'user_id' => $u->id,
+                'role' => 'member', 'status' => 'pending', 'created_at' => now(), 'joined_at' => now(),
+            ]);
+        }
+
+        $manage = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/manage");
+        $manage->assertOk();
+        $manage->assertSee('Wants In');
+
+        $approve = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/requests/{$approver->id}", ['action' => 'accept']);
+        $approve->assertRedirectContains('status=request-approved');
+        $this->assertSame('active', DB::table('group_members')->where('group_id', $groupId)->where('user_id', $approver->id)->value('status'));
+
+        $reject = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/requests/{$rejectee->id}", ['action' => 'reject']);
+        $reject->assertRedirectContains('status=request-rejected');
+        $this->assertSame(0, DB::table('group_members')->where('group_id', $groupId)->where('user_id', $rejectee->id)->count());
+    }
+
+    public function test_group_discussion_create_and_reply(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Discusser']);
+        $groupId = $this->seedAlphaGroup($owner->id);
+
+        $create = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/discussions/new", [
+            'title' => 'When is the next meet?',
+            'content' => 'Lets pick a date.',
+        ]);
+        $create->assertRedirectContains("/groups/{$groupId}/discussions/");
+        $create->assertRedirectContains('status=discussion-created');
+
+        $discussionId = (int) DB::table('group_discussions')->where('group_id', $groupId)->where('title', 'When is the next meet?')->value('id');
+        $this->assertGreaterThan(0, $discussionId);
+
+        $list = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/discussions");
+        $list->assertOk();
+        $list->assertSee('When is the next meet?');
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/discussions/{$discussionId}");
+        $detail->assertOk();
+
+        $reply = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/discussions/{$discussionId}/reply", [
+            'content' => 'How about Saturday?',
+        ]);
+        $reply->assertRedirectContains('status=reply-posted');
+
+        // Opening post + the reply = 2 posts on the discussion.
+        $this->assertSame(2, DB::table('group_posts')->where('discussion_id', $discussionId)->count());
+    }
+
+    public function test_group_discussion_create_blocked_for_non_member(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Group Boss']);
+        $groupId = $this->seedAlphaGroup($owner->id);
+
+        // A signed-in user who is NOT a member must not open the create form.
+        $this->authenticatedUser(['name' => 'Outsider']);
+
+        $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/discussions/new")->assertForbidden();
+
+        // ...and a forced POST must not create a discussion either.
+        $post = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/discussions/new", [
+            'title' => 'Sneaky', 'content' => 'Should not save.',
+        ]);
+        $post->assertRedirectContains('status=discussion-failed');
+        $this->assertSame(0, DB::table('group_discussions')->where('group_id', $groupId)->where('title', 'Sneaky')->count());
+    }
+
+    public function test_group_management_404s_when_groups_feature_disabled(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Feature Test']);
+        $groupId = $this->seedAlphaGroup($owner->id);
+
+        // Turn the groups feature OFF for this tenant.
+        $row = DB::table('tenants')->where('id', $this->testTenantId)->value('features');
+        $current = $row ? (json_decode($row, true) ?: []) : [];
+        $current['groups'] = false;
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['features' => json_encode($current)]);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        $this->get("/{$this->testTenantSlug}/alpha/groups/new")->assertForbidden();
+        $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/manage")->assertForbidden();
+    }
+
     /**
      * Turn federation on globally with whitelist mode OFF (so every tenant is
      * implicitly whitelisted) and ensure the tenant-level federation feature row

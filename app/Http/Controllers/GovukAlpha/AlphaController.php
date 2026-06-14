@@ -3609,6 +3609,7 @@ class AlphaController extends Controller
             'activeNav' => 'explore',
             'groups' => is_array($items) ? $items : [],
             'groupsQuery' => $q,
+            'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
 
@@ -3687,6 +3688,510 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.groups.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $ok ? 'group-left' : 'group-failed']);
+    }
+
+    // === Groups: management (create / edit / delete / roles / requests / discussions) ===
+
+    /**
+     * Shared auth + feature gate for every group management action. Returns the
+     * authenticated user id, or a redirect (to login / 403) the caller must return.
+     */
+    private function groupGuard(string $tenantSlug): int|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('groups'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        return $userId;
+    }
+
+    /**
+     * Load a group the current user is allowed to administer (owner/admin), or
+     * abort. A group in another tenant resolves to null (tenant global scope) →
+     * 404; a group the user cannot modify → 403. Returns the GroupService array.
+     *
+     * @return array<string, mixed>
+     */
+    private function managedGroupOrAbort(int $groupId, int $userId): array
+    {
+        $group = null;
+        try {
+            $group = \App\Services\GroupService::getById($groupId, $userId, false);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($group === null, 404);
+        abort_unless(\App\Services\GroupService::canModify($groupId, $userId), 403);
+
+        return $group;
+    }
+
+    public function createGroup(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $userId = $this->groupGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        return $this->view('accessible-frontend::group-create', [
+            'title' => __('govuk_alpha.groups.create.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function storeGroup(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $userId = $this->groupGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $name = trim(self::asStr($request->input('name')));
+        $description = trim(self::asStr($request->input('description')));
+        $visibility = self::asStr($request->input('visibility')) === 'private' ? 'private' : 'public';
+        $tags = trim(self::asStr($request->input('tags')));
+
+        $errors = [];
+        if ($name === '') {
+            $errors['name'] = __('govuk_alpha.groups.errors.name_required');
+        } elseif (mb_strlen($name) > 255) {
+            $errors['name'] = __('govuk_alpha.groups.errors.name_too_long');
+        }
+        if ($errors !== []) {
+            return redirect()
+                ->route('govuk-alpha.groups.create', ['tenantSlug' => $tenantSlug])
+                ->withErrors($errors)
+                ->withInput();
+        }
+
+        $data = [
+            'name' => $name,
+            'description' => $description,
+            'visibility' => $visibility,
+        ];
+        if ($tags !== '') {
+            // Normalise comma-separated tags; appended to the description so the
+            // accessible group keeps a single text body (the API tags pipeline is
+            // JS-managed and out of scope here).
+            $tagList = array_values(array_filter(array_map('trim', explode(',', $tags))));
+            if ($tagList !== []) {
+                $data['description'] = trim($description . "\n\n" . __('govuk_alpha.groups.create.tags_label') . ': ' . implode(', ', $tagList));
+            }
+        }
+
+        $group = null;
+        try {
+            $group = \App\Services\GroupService::create($userId, $data);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($group === null || empty($group->id)) {
+            return redirect()
+                ->route('govuk-alpha.groups.create', ['tenantSlug' => $tenantSlug, 'status' => 'group-create-failed'])
+                ->withInput();
+        }
+
+        $groupId = (int) $group->id;
+
+        // Optional cover image — best-effort; a bad image must never discard the
+        // group the member already created. updateImage re-checks ownership.
+        if ($request->hasFile('cover')) {
+            $this->attachGroupCoverImage($request, $groupId, $userId);
+        }
+
+        return redirect()->route('govuk-alpha.groups.show', ['tenantSlug' => $tenantSlug, 'id' => $groupId, 'status' => 'group-created']);
+    }
+
+    public function editGroup(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $userId = $this->groupGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+        $group = $this->managedGroupOrAbort($id, $userId);
+
+        return $this->view('accessible-frontend::group-edit', [
+            'title' => __('govuk_alpha.groups.edit.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'group' => $group,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function updateGroup(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $userId = $this->groupGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+        $this->managedGroupOrAbort($id, $userId);
+
+        $name = trim(self::asStr($request->input('name')));
+        $description = trim(self::asStr($request->input('description')));
+        $visibility = self::asStr($request->input('visibility')) === 'private' ? 'private' : 'public';
+
+        $errors = [];
+        if ($name === '') {
+            $errors['name'] = __('govuk_alpha.groups.errors.name_required');
+        } elseif (mb_strlen($name) > 255) {
+            $errors['name'] = __('govuk_alpha.groups.errors.name_too_long');
+        }
+        if ($errors !== []) {
+            return redirect()
+                ->route('govuk-alpha.groups.edit', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withErrors($errors)
+                ->withInput();
+        }
+
+        $ok = false;
+        try {
+            $ok = \App\Services\GroupService::update($id, $userId, [
+                'name' => $name,
+                'description' => $description,
+                'visibility' => $visibility,
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($request->hasFile('cover')) {
+            $this->attachGroupCoverImage($request, $id, $userId);
+        }
+
+        if (!$ok) {
+            return redirect()
+                ->route('govuk-alpha.groups.edit', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'group-update-failed'])
+                ->withInput();
+        }
+
+        return redirect()->route('govuk-alpha.groups.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'group-updated']);
+    }
+
+    public function deleteGroup(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $userId = $this->groupGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+        // Only the owner (or platform admin) may delete — GroupService::delete
+        // enforces this; managedGroupOrAbort guarantees the group is in-tenant.
+        $this->managedGroupOrAbort($id, $userId);
+
+        $ok = false;
+        try {
+            $ok = \App\Services\GroupService::delete($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($ok) {
+            return redirect()->route('govuk-alpha.groups.index', ['tenantSlug' => $tenantSlug, 'status' => 'group-deleted']);
+        }
+
+        return redirect()->route('govuk-alpha.groups.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'group-delete-failed']);
+    }
+
+    public function manageGroup(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $userId = $this->groupGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+        $group = $this->managedGroupOrAbort($id, $userId);
+
+        $members = [];
+        $pending = [];
+        try {
+            $members = \App\Services\GroupService::getMembers($id, ['limit' => 100])['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        try {
+            $pending = \App\Services\GroupService::getPendingRequests($id, $userId) ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $ownerId = (int) ($group['owner_id'] ?? 0);
+
+        return $this->view('accessible-frontend::group-manage', [
+            'title' => __('govuk_alpha.groups.manage.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'group' => $group,
+            'groupMembers' => is_array($members) ? $members : [],
+            'pendingRequests' => is_array($pending) ? $pending : [],
+            'ownerId' => $ownerId,
+            'currentUserId' => $userId,
+            'isPrivate' => ($group['visibility'] ?? 'public') !== 'public',
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function updateGroupMember(Request $request, string $tenantSlug, int $id, int $memberId): RedirectResponse
+    {
+        $userId = $this->groupGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+        $this->managedGroupOrAbort($id, $userId);
+
+        $action = self::asStr($request->input('action'));
+        $status = 'member-failed';
+        try {
+            if ($action === 'promote') {
+                $ok = \App\Services\GroupService::updateMemberRole($id, $memberId, $userId, 'admin');
+                $status = $ok ? 'member-promoted' : 'member-failed';
+            } elseif ($action === 'demote') {
+                $ok = \App\Services\GroupService::updateMemberRole($id, $memberId, $userId, 'member');
+                $status = $ok ? 'member-demoted' : 'member-failed';
+            } elseif ($action === 'remove') {
+                $ok = \App\Services\GroupService::removeMember($id, $memberId, $userId);
+                $status = $ok ? 'member-removed' : 'member-failed';
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.groups.manage', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
+    }
+
+    public function handleGroupRequest(Request $request, string $tenantSlug, int $id, int $requesterId): RedirectResponse
+    {
+        $userId = $this->groupGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+        $this->managedGroupOrAbort($id, $userId);
+
+        $action = self::asStr($request->input('action')) === 'reject' ? 'reject' : 'accept';
+        $ok = false;
+        try {
+            $ok = \App\Services\GroupService::handleJoinRequest($id, $requesterId, $userId, $action);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $status = $ok
+            ? ($action === 'accept' ? 'request-approved' : 'request-rejected')
+            : 'request-failed';
+
+        return redirect()->route('govuk-alpha.groups.manage', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
+    }
+
+    public function groupDiscussions(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $userId = $this->groupGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $group = null;
+        try {
+            $group = \App\Services\GroupService::getById($id, $userId, true);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($group === null, 404);
+
+        // Discussions require active membership (mirrors GroupService::getDiscussions).
+        $isMember = \App\Services\GroupService::isActiveMember($id, $userId);
+        $discussions = [];
+        if ($isMember) {
+            try {
+                $discussions = \App\Services\GroupService::getDiscussions($id, $userId, ['limit' => 50])['items'] ?? [];
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return $this->view('accessible-frontend::group-discussions', [
+            'title' => __('govuk_alpha.groups.discussions.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'group' => $group,
+            'discussions' => is_array($discussions) ? $discussions : [],
+            'isMember' => $isMember,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function createGroupDiscussion(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $userId = $this->groupGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $group = null;
+        try {
+            $group = \App\Services\GroupService::getById($id, $userId, true);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($group === null, 404);
+        // Only active members may open the create form.
+        abort_unless(\App\Services\GroupService::isActiveMember($id, $userId), 403);
+
+        return $this->view('accessible-frontend::group-discussion-create', [
+            'title' => __('govuk_alpha.groups.discussions.new_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'group' => $group,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function storeGroupDiscussion(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $userId = $this->groupGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+        // Membership is re-checked inside GroupService::createDiscussion.
+
+        $dtitle = trim(self::asStr($request->input('title')));
+        $content = trim(self::asStr($request->input('content')));
+
+        $errors = [];
+        if ($dtitle === '') {
+            $errors['title'] = __('govuk_alpha.groups.errors.title_required');
+        }
+        if ($content === '') {
+            $errors['content'] = __('govuk_alpha.groups.errors.content_required');
+        }
+        if ($errors !== []) {
+            return redirect()
+                ->route('govuk-alpha.groups.discussions.create', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withErrors($errors)
+                ->withInput();
+        }
+
+        $result = null;
+        try {
+            $result = \App\Services\GroupService::createDiscussion($id, $userId, [
+                'title' => $dtitle,
+                'content' => $content,
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($result === null) {
+            return redirect()
+                ->route('govuk-alpha.groups.discussions.create', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'discussion-failed'])
+                ->withInput();
+        }
+
+        return redirect()->route('govuk-alpha.groups.discussions.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'discussionId' => (int) ($result['id'] ?? 0),
+            'status' => 'discussion-created',
+        ]);
+    }
+
+    public function groupDiscussion(Request $request, string $tenantSlug, int $id, int $discussionId): Response|RedirectResponse
+    {
+        $userId = $this->groupGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $group = null;
+        try {
+            $group = \App\Services\GroupService::getById($id, $userId, true);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($group === null, 404);
+
+        $thread = null;
+        try {
+            $thread = \App\Services\GroupService::getDiscussionMessages($id, $discussionId, $userId, ['limit' => 100]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        // Null = not a member or discussion not found → 404 (no info leak).
+        abort_if($thread === null, 404);
+
+        return $this->view('accessible-frontend::group-discussion-detail', [
+            'title' => self::asStr($thread['discussion']['title'] ?? '') ?: __('govuk_alpha.groups.discussions.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'group' => $group,
+            'discussion' => $thread['discussion'] ?? [],
+            'messages' => $thread['items'] ?? [],
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function replyGroupDiscussion(Request $request, string $tenantSlug, int $id, int $discussionId): RedirectResponse
+    {
+        $userId = $this->groupGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $content = trim(self::asStr($request->input('content')));
+        if ($content === '') {
+            return redirect()
+                ->route('govuk-alpha.groups.discussions.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'discussionId' => $discussionId])
+                ->withErrors(['content' => __('govuk_alpha.groups.errors.content_required')])
+                ->withInput();
+        }
+
+        $result = null;
+        try {
+            $result = \App\Services\GroupService::postToDiscussion($id, $discussionId, $userId, ['content' => $content]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $status = $result === null ? 'reply-failed' : 'reply-posted';
+
+        return redirect()->route('govuk-alpha.groups.discussions.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'discussionId' => $discussionId,
+            'status' => $status,
+        ])->withFragment('discussion-replies');
+    }
+
+    /**
+     * Attach an optional uploaded cover image to a group. Mirrors the listing /
+     * event cover-image flow: best-effort (a failed or absent image never blocks
+     * the group), and GroupService::updateImage re-checks ownership + tenant scope.
+     */
+    private function attachGroupCoverImage(Request $request, int $groupId, int $userId): void
+    {
+        $file = $request->file('cover');
+        if ($file === null || is_array($file) || !$file->isValid()) {
+            return;
+        }
+
+        try {
+            $imageUrl = \App\Core\ImageUploader::upload([
+                'name' => $file->getClientOriginalName(),
+                'type' => $file->getMimeType(),
+                'tmp_name' => $file->getRealPath(),
+                'error' => UPLOAD_ERR_OK,
+                'size' => $file->getSize(),
+            ], 'groups');
+
+            if (is_string($imageUrl) && $imageUrl !== '') {
+                \App\Services\GroupService::updateImage($groupId, $userId, $imageUrl, 'cover');
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     // === Goals ===

@@ -165,9 +165,25 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/search', [AlphaController::class, 'search'])->name('search');
         Route::get('/skills', [AlphaController::class, 'skills'])->name('skills.index');
         Route::get('/groups', [AlphaController::class, 'groups'])->name('groups.index');
+        // Static segments BEFORE the {id} catch-all so /groups/new is not swallowed.
+        Route::get('/groups/new', [AlphaController::class, 'createGroup'])->name('groups.create');
+        Route::post('/groups/new', [AlphaController::class, 'storeGroup'])->middleware('throttle:15,1')->name('groups.store');
         Route::get('/groups/{id}', [AlphaController::class, 'group'])->whereNumber('id')->name('groups.show');
         Route::post('/groups/{id}/join', [AlphaController::class, 'joinGroup'])->whereNumber('id')->middleware('throttle:30,1')->name('groups.join');
         Route::post('/groups/{id}/leave', [AlphaController::class, 'leaveGroup'])->whereNumber('id')->middleware('throttle:30,1')->name('groups.leave');
+        // Group management (owner/admin actions; ownership re-verified server-side).
+        Route::get('/groups/{id}/edit', [AlphaController::class, 'editGroup'])->whereNumber('id')->name('groups.edit');
+        Route::post('/groups/{id}/edit', [AlphaController::class, 'updateGroup'])->whereNumber('id')->middleware('throttle:15,1')->name('groups.update');
+        Route::post('/groups/{id}/delete', [AlphaController::class, 'deleteGroup'])->whereNumber('id')->middleware('throttle:10,1')->name('groups.delete');
+        Route::get('/groups/{id}/manage', [AlphaController::class, 'manageGroup'])->whereNumber('id')->name('groups.manage');
+        Route::post('/groups/{id}/members/{memberId}', [AlphaController::class, 'updateGroupMember'])->whereNumber('id')->whereNumber('memberId')->middleware('throttle:30,1')->name('groups.members.update');
+        Route::post('/groups/{id}/requests/{requesterId}', [AlphaController::class, 'handleGroupRequest'])->whereNumber('id')->whereNumber('requesterId')->middleware('throttle:30,1')->name('groups.requests.handle');
+        // Group discussions (active members only; re-checked in the service layer).
+        Route::get('/groups/{id}/discussions', [AlphaController::class, 'groupDiscussions'])->whereNumber('id')->name('groups.discussions.index');
+        Route::get('/groups/{id}/discussions/new', [AlphaController::class, 'createGroupDiscussion'])->whereNumber('id')->name('groups.discussions.create');
+        Route::post('/groups/{id}/discussions/new', [AlphaController::class, 'storeGroupDiscussion'])->whereNumber('id')->middleware('throttle:15,1')->name('groups.discussions.store');
+        Route::get('/groups/{id}/discussions/{discussionId}', [AlphaController::class, 'groupDiscussion'])->whereNumber('id')->whereNumber('discussionId')->name('groups.discussions.show');
+        Route::post('/groups/{id}/discussions/{discussionId}/reply', [AlphaController::class, 'replyGroupDiscussion'])->whereNumber('id')->whereNumber('discussionId')->middleware('throttle:30,1')->name('groups.discussions.reply');
         Route::get('/goals', [AlphaController::class, 'goals'])->name('goals.index');
         Route::post('/goals', [AlphaController::class, 'storeGoal'])->middleware('throttle:15,1')->name('goals.store');
         Route::get('/goals/{id}', [AlphaController::class, 'goal'])->whereNumber('id')->name('goals.show');
