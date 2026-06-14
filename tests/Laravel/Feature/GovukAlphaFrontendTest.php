@@ -4195,6 +4195,292 @@ class GovukAlphaFrontendTest extends TestCase
             ->assertRedirectContains('status=idea-voted');
     }
 
+    // ── Federation core ──────────────────────────────────────────────
+
+    public function test_federation_hub_renders_optin_cta_when_not_opted_in(): void
+    {
+        $this->authenticatedUser(['name' => 'Fed Newcomer']);
+        $this->enableFederationSystem();
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.federation.title'));
+        // Not opted in → the opt-in CTA banner + button are shown.
+        $res->assertSee(__('govuk_alpha.federation.hub.optin_banner_title'));
+        $res->assertSee(route('govuk-alpha.federation.opt-in', ['tenantSlug' => $this->testTenantSlug]), false);
+        $res->assertSee(__('govuk_alpha.federation.hub.optin_off'));
+    }
+
+    public function test_federation_hub_shows_opted_in_state_and_partner_preview(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Fed Member']);
+        $this->enableFederationSystem();
+        $partnerTenantId = $this->seedFederationPartner('Riverside Timebank');
+        $this->setFederationUserSettings($user->id, ['federation_optin' => 1]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation");
+        $res->assertOk();
+        // Opted in → status tag flips and CTA banner is gone.
+        $res->assertSee(__('govuk_alpha.federation.hub.optin_on'));
+        $res->assertDontSee(__('govuk_alpha.federation.hub.optin_banner_title'));
+        // Partner preview card links to the partner detail page.
+        $res->assertSee('Riverside Timebank');
+        $res->assertSee(route('govuk-alpha.federation.partners.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $partnerTenantId]), false);
+    }
+
+    public function test_federation_opt_in_post_flips_the_setting(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Opting In']);
+        $this->enableFederationSystem();
+
+        $this->assertFalse(\App\Services\FederationUserService::hasOptedIn($user->id));
+
+        $this->post("/{$this->testTenantSlug}/alpha/federation/opt-in")
+            ->assertRedirect("/{$this->testTenantSlug}/alpha/federation?status=opted-in");
+
+        $settings = \App\Services\FederationUserService::getUserSettings($user->id);
+        $this->assertTrue((bool) $settings['federation_optin']);
+        $this->assertTrue((bool) $settings['appear_in_federated_search']);
+    }
+
+    public function test_federation_settings_post_saves_visibility_and_reach(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Settings Saver']);
+        $this->enableFederationSystem();
+        $this->setFederationUserSettings($user->id, ['federation_optin' => 1, 'show_skills_federated' => 1]);
+
+        $this->post("/{$this->testTenantSlug}/alpha/federation/settings", [
+            'profile_visible_federated' => '1',
+            'appear_in_federated_search' => '1',
+            // show_skills_federated intentionally omitted → should become false.
+            'service_reach' => 'travel_ok',
+        ])->assertRedirect("/{$this->testTenantSlug}/alpha/federation/settings?status=settings-saved");
+
+        $settings = \App\Services\FederationUserService::getUserSettings($user->id);
+        $this->assertTrue((bool) $settings['profile_visible_federated']);
+        $this->assertFalse((bool) $settings['show_skills_federated']);
+        $this->assertSame('travel_ok', $settings['service_reach']);
+    }
+
+    public function test_federation_opt_out_post_disables_and_dispatches_event(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Opting Out']);
+        $this->enableFederationSystem();
+        $this->setFederationUserSettings($user->id, ['federation_optin' => 1]);
+
+        \Illuminate\Support\Facades\Event::fake([\App\Events\UserFederatedOptOut::class]);
+
+        $this->post("/{$this->testTenantSlug}/alpha/federation/opt-out")
+            ->assertRedirect("/{$this->testTenantSlug}/alpha/federation?status=opted-out");
+
+        $this->assertFalse((bool) \App\Services\FederationUserService::getUserSettings($user->id)['federation_optin']);
+        \Illuminate\Support\Facades\Event::assertDispatched(\App\Events\UserFederatedOptOut::class);
+    }
+
+    public function test_federation_partner_detail_renders_for_an_internal_partner(): void
+    {
+        $this->authenticatedUser(['name' => 'Partner Viewer']);
+        $this->enableFederationSystem();
+        $partnerTenantId = $this->seedFederationPartner('Northside Timebank');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/partners/{$partnerTenantId}");
+        $res->assertOk();
+        $res->assertSee('Northside Timebank');
+        $res->assertSee(__('govuk_alpha.federation.partner.about_label'));
+        $res->assertSee(route('govuk-alpha.federation.index', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
+    public function test_federation_partner_detail_404s_for_unknown_partner(): void
+    {
+        $this->authenticatedUser();
+        $this->enableFederationSystem();
+        $this->get("/{$this->testTenantSlug}/alpha/federation/partners/999999")->assertNotFound();
+    }
+
+    public function test_federation_members_browse_lists_a_federated_member(): void
+    {
+        $this->authenticatedUser(['name' => 'Member Browser']);
+        $this->enableFederationSystem();
+        $partnerTenantId = $this->seedFederationPartner('Eastside Timebank');
+        $partnerUserId = $this->seedFederatedMember($partnerTenantId, 'Federated', 'Friend', 'Gardening, Cooking');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/members");
+        $res->assertOk();
+        $res->assertSee('Federated Friend');
+        // Member links carry the REQUIRED tenant_id query param.
+        $res->assertSee(route('govuk-alpha.federation.members.show', [
+            'tenantSlug' => $this->testTenantSlug,
+            'id' => $partnerUserId,
+            'tenant_id' => $partnerTenantId,
+        ]), false);
+    }
+
+    public function test_federation_member_profile_renders_with_tenant_id(): void
+    {
+        $this->authenticatedUser(['name' => 'Profile Viewer']);
+        $this->enableFederationSystem();
+        $partnerTenantId = $this->seedFederationPartner('Westside Timebank');
+        $partnerUserId = $this->seedFederatedMember($partnerTenantId, 'Visible', 'Profile', 'Carpentry');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/members/{$partnerUserId}?tenant_id={$partnerTenantId}");
+        $res->assertOk();
+        $res->assertSee('Visible Profile');
+        $res->assertSee(__('govuk_alpha.federation.member.skills_label'));
+    }
+
+    public function test_federation_listings_browse_renders(): void
+    {
+        $this->authenticatedUser(['name' => 'Listing Browser']);
+        $this->enableFederationSystem();
+        $partnerTenantId = $this->seedFederationPartner('Harbour Timebank');
+        $partnerUserId = $this->seedFederatedMember($partnerTenantId, 'Listing', 'Owner', 'Plumbing');
+        DB::table('listings')->insert([
+            'tenant_id' => $partnerTenantId,
+            'user_id' => $partnerUserId,
+            'title' => 'Bike repair help',
+            'description' => 'Happy to fix punctures across the network.',
+            'type' => 'offer',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/listings");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.federation.listings_browse.title'));
+        $res->assertSee('Bike repair help');
+    }
+
+    public function test_federation_events_browse_renders(): void
+    {
+        $this->authenticatedUser(['name' => 'Event Browser']);
+        $this->enableFederationSystem();
+        $partnerTenantId = $this->seedFederationPartner('Quayside Timebank');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/events");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.federation.events_browse.title'));
+    }
+
+    /**
+     * Turn federation on globally with whitelist mode OFF (so every tenant is
+     * implicitly whitelisted) and ensure the tenant-level federation feature row
+     * is enabled — the minimum needed for isOperationAllowed()/status() to pass.
+     */
+    private function enableFederationSystem(): void
+    {
+        DB::table('federation_system_control')->updateOrInsert(
+            ['id' => 1],
+            [
+                'federation_enabled' => 1,
+                'whitelist_mode_enabled' => 0,
+                'emergency_lockdown_active' => 0,
+                'cross_tenant_profiles_enabled' => 1,
+                'cross_tenant_listings_enabled' => 1,
+                'cross_tenant_events_enabled' => 1,
+            ]
+        );
+        DB::table('federation_tenant_features')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'feature_key' => 'federation_enabled'],
+            ['is_enabled' => 1]
+        );
+
+        // Drop cached service controls so the next resolve sees the new state.
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        app()->forgetInstance(\App\Services\FederationFeatureService::class);
+    }
+
+    /**
+     * Create a partner tenant and an ACTIVE partnership (all features enabled) so
+     * the current tenant can see it. Returns the partner tenant id.
+     */
+    private function seedFederationPartner(string $name): int
+    {
+        $partnerTenantId = DB::table('tenants')->insertGetId([
+            'name' => $name,
+            'slug' => 'fed-' . strtolower(\Illuminate\Support\Str::random(8)),
+            'is_active' => true,
+            'depth' => 0,
+            'allows_subtenants' => false,
+            'tagline' => 'A neighbouring community.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('federation_partnerships')->insert([
+            'tenant_id' => $this->testTenantId,
+            'partner_tenant_id' => $partnerTenantId,
+            'status' => 'active',
+            'federation_level' => 3,
+            'profiles_enabled' => 1,
+            'messaging_enabled' => 1,
+            'transactions_enabled' => 1,
+            'listings_enabled' => 1,
+            'events_enabled' => 1,
+            'groups_enabled' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return $partnerTenantId;
+    }
+
+    /**
+     * Create an opted-in, searchable federated member in the partner tenant.
+     * Returns the new user id.
+     */
+    private function seedFederatedMember(int $partnerTenantId, string $first, string $last, string $skills): int
+    {
+        $member = User::factory()->forTenant($partnerTenantId)->create([
+            'first_name' => $first,
+            'last_name' => $last,
+            'name' => trim("{$first} {$last}"),
+            'skills' => $skills,
+            'bio' => 'Active across the federation network.',
+            'location' => 'Sample Town',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        $this->setFederationUserSettings($member->id, [
+            'federation_optin' => 1,
+            'profile_visible_federated' => 1,
+            'appear_in_federated_search' => 1,
+            'show_skills_federated' => 1,
+            'show_location_federated' => 1,
+        ]);
+
+        return (int) $member->id;
+    }
+
+    /**
+     * Upsert a federation_user_settings row directly. The table has no tenant_id
+     * column (PK = user_id), so the test seeds it without going through the
+     * tenant-scoped service (which would reject the partner-tenant member).
+     *
+     * @param array<string,int> $settings
+     */
+    private function setFederationUserSettings(int $userId, array $settings): void
+    {
+        DB::table('federation_user_settings')->updateOrInsert(
+            ['user_id' => $userId],
+            array_merge([
+                'federation_optin' => 0,
+                'profile_visible_federated' => 0,
+                'messaging_enabled_federated' => 0,
+                'transactions_enabled_federated' => 0,
+                'appear_in_federated_search' => 0,
+                'show_skills_federated' => 0,
+                'show_location_federated' => 0,
+                'show_reviews_federated' => 0,
+                'service_reach' => 'local_only',
+                'email_notifications' => 1,
+                'updated_at' => now(),
+            ], $settings)
+        );
+    }
+
     /**
      * Enable one or more feature flags on the test tenant (they default off for
      * the commerce modules). Mirrors the DB-update + TenantContext::reset pattern
