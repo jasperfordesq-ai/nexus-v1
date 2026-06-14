@@ -5,6 +5,8 @@
 @extends('accessible-frontend::layout')
 
 @section('content')
+    <a class="govuk-back-link" href="{{ route('govuk-alpha.goals.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.goals.back_to_goals') }}</a>
+
     @php
         $gTitle = trim((string) ($goal['title'] ?? '')) ?: __('govuk_alpha.goals.title');
         $cur = (float) ($goal['current_value'] ?? 0);
@@ -12,16 +14,18 @@
         $pct = $tgt > 0 ? (int) round(min(100, ($cur / $tgt) * 100)) : 0;
         $done = in_array($goal['status'] ?? 'active', ['completed', 'achieved'], true);
         $num = fn ($v) => rtrim(rtrim(number_format((float) $v, 2), '0'), '.');
+        $historyTypes = ['created', 'progress_update', 'checkin', 'milestone', 'buddy_joined', 'buddy_action', 'completed'];
+        $successStates = ['goal-updated', 'goal-edited', 'goal-completed', 'buddy-joined'];
     @endphp
 
-    @if ($status === 'goal-updated')
+    @if (in_array($status, $successStates, true))
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="gd-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="gd-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
-            <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.goals.states.goal-updated') }}</p></div>
+            <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.goals.states.' . $status) }}</p></div>
         </div>
-    @elseif (in_array($status, ['goal-failed', 'goal-invalid', 'goal-completed'], true))
-        <div class="govuk-notification-banner @if ($status === 'goal-completed') govuk-notification-banner--success @endif" data-module="govuk-notification-banner" role="region" aria-labelledby="gd-status2">
-            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="gd-status2">{{ $status === 'goal-completed' ? __('govuk_alpha.states.success_title') : __('govuk_alpha.states.error_title') }}</h2></div>
+    @elseif (in_array($status, ['goal-failed', 'goal-invalid', 'buddy-failed'], true))
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="gd-status2">
+            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="gd-status2">{{ __('govuk_alpha.states.error_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.goals.states.' . $status) }}</p></div>
         </div>
     @endif
@@ -39,6 +43,12 @@
     <p class="govuk-body govuk-!-margin-bottom-1">{{ __('govuk_alpha.goals.progress_label', ['current' => $num($cur), 'target' => $num($tgt)]) }}</p>
     <progress max="100" value="{{ $pct }}" aria-label="{{ $pct }}%">{{ $pct }}%</progress>
 
+    @if ($isOwner)
+        <p class="nexus-alpha-actions govuk-!-margin-top-4">
+            <a class="govuk-link" href="{{ route('govuk-alpha.goals.edit', ['tenantSlug' => $tenantSlug, 'id' => $goal['id']]) }}">{{ __('govuk_alpha.goals.edit_goal') }}</a>
+        </p>
+    @endif
+
     @if ($isOwner && !$done)
         <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.goals.update_title') }}</h2>
         <form method="post" action="{{ route('govuk-alpha.goals.progress', ['tenantSlug' => $tenantSlug, 'id' => $goal['id']]) }}" class="govuk-!-margin-bottom-4">
@@ -53,5 +63,68 @@
             @csrf
             <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.goals.mark_complete') }}</button>
         </form>
+    @endif
+
+    {{-- Buddy system --}}
+    @if ($isBuddy)
+        <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.goals.buddy_section_title') }}</h2>
+        <p class="govuk-inset-text">{{ __('govuk_alpha.goals.buddy_you_are_buddy') }}</p>
+    @elseif (!empty($canBecomeBuddy))
+        <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.goals.become_buddy_title') }}</h2>
+        <p class="govuk-body">{{ __('govuk_alpha.goals.become_buddy_intro') }}</p>
+        <form method="post" action="{{ route('govuk-alpha.goals.buddy', ['tenantSlug' => $tenantSlug, 'id' => $goal['id']]) }}">
+            @csrf
+            <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button" type="submit">{{ __('govuk_alpha.goals.become_buddy_button') }}</button>
+        </form>
+    @elseif ($isOwner && ($goal['mentor_id'] ?? null) !== null)
+        <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.goals.buddy_section_title') }}</h2>
+        <p class="govuk-inset-text">{{ __('govuk_alpha.goals.buddy_has_buddy') }}</p>
+    @endif
+
+    {{-- Buddy updates (notes left by the buddy, visible to owner + buddy) --}}
+    @if (($isOwner || $isBuddy) && !empty($buddyNotes))
+        <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.goals.buddy_notes_title') }}</h2>
+        <ul class="govuk-list nexus-alpha-card-list">
+            @foreach ($buddyNotes as $note)
+                <li class="nexus-alpha-card">
+                    <p class="govuk-body govuk-!-margin-bottom-1">{{ $note['message'] ?? '' }}</p>
+                    <p class="govuk-body-s nexus-alpha-meta">
+                        {{ trim((string) ($note['buddy_name'] ?? '')) ?: __('govuk_alpha.goals.a_member') }}
+                        @if (!empty($note['created_at']))
+                            · {{ \Illuminate\Support\Carbon::parse($note['created_at'])->isoFormat('D MMM YYYY') }}
+                        @endif
+                    </p>
+                </li>
+            @endforeach
+        </ul>
+    @endif
+
+    {{-- Progress history timeline --}}
+    @if ($isOwner || $isBuddy)
+        <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.goals.history_title') }}</h2>
+        @if (empty($goalHistory))
+            <p class="govuk-inset-text">{{ __('govuk_alpha.goals.history_empty') }}</p>
+        @else
+            <dl class="govuk-summary-list">
+                @foreach ($goalHistory as $event)
+                    @php
+                        $type = (string) ($event['type'] ?? $event['event_type'] ?? '');
+                        $typeKey = in_array($type, $historyTypes, true) ? $type : 'progress_update';
+                        $when = $event['created_at'] ?? null;
+                    @endphp
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            {{ __('govuk_alpha.goals.history_type_' . $typeKey) }}
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ trim((string) ($event['description'] ?? '')) }}
+                            @if ($when)
+                                <span class="govuk-!-display-block govuk-body-s nexus-alpha-meta">{{ \Illuminate\Support\Carbon::parse($when)->isoFormat('D MMM YYYY, HH:mm') }}</span>
+                            @endif
+                        </dd>
+                    </div>
+                @endforeach
+            </dl>
+        @endif
     @endif
 @endsection

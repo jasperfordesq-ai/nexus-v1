@@ -9,7 +9,12 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.goals.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.goals.description') }}</p>
 
-    @if (in_array($status, ['goal-created', 'goal-completed'], true))
+    <nav class="govuk-body govuk-!-margin-bottom-6" aria-label="{{ __('govuk_alpha.goals.title') }}">
+        <a class="govuk-link govuk-!-margin-right-4" href="{{ route('govuk-alpha.goals.templates', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.goals.templates_link') }}</a>
+        <a class="govuk-link" href="{{ route('govuk-alpha.goals.buddying', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.goals.buddying_link') }}</a>
+    </nav>
+
+    @if (in_array($status, ['goal-created', 'goal-completed', 'goal-deleted'], true))
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="goal-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="goal-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.goals.states.' . $status) }}</p></div>

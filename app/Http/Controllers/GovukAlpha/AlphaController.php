@@ -4239,14 +4239,290 @@ class AlphaController extends Controller
         }
         abort_if($goal === null, 404);
 
+        $isOwner = (int) ($goal['user_id'] ?? 0) === $userId;
+        $isPublic = (bool) ($goal['is_public'] ?? false);
+        $hasBuddy = ($goal['mentor_id'] ?? null) !== null;
+        $isBuddy = $hasBuddy && (int) ($goal['mentor_id'] ?? 0) === $userId;
+
+        // Non-owners may only view goals that are public (or that they buddy).
+        abort_unless($isOwner || $isPublic || $isBuddy, 403);
+
+        $history = [];
+        $buddyNotes = [];
+        try {
+            $progress = app(\App\Services\GoalProgressService::class);
+            $history = $progress->getProgressHistory($id, ['limit' => 30])['items'] ?? [];
+            $buddyNotes = $progress->getBuddyNotes($id);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // A signed-in member can offer to buddy a public goal that is not theirs
+        // and has no buddy yet (mirrors GoalService::offerBuddy() guards).
+        $canBecomeBuddy = $isPublic && !$isOwner && !$hasBuddy;
+
         return $this->view('accessible-frontend::goal-detail', [
             'title' => ($goal['title'] ?? '') ?: __('govuk_alpha.goals.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
             'goal' => $goal,
-            'isOwner' => (int) ($goal['user_id'] ?? 0) === $userId,
+            'isOwner' => $isOwner,
+            'isBuddy' => $isBuddy,
+            'canBecomeBuddy' => $canBecomeBuddy,
+            'goalHistory' => is_array($history) ? $history : [],
+            'buddyNotes' => is_array($buddyNotes) ? $buddyNotes : [],
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
+    }
+
+    /** Owner-only edit form for an existing goal. */
+    public function editGoalForm(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('goals'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $goal = null;
+        try {
+            $model = app(\App\Services\GoalService::class)->getById($id);
+            $goal = $model?->toArray();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($goal === null, 404);
+        // Owner check server-side: non-owners get 403, never the edit form.
+        abort_unless((int) ($goal['user_id'] ?? 0) === $userId, 403);
+
+        return $this->view('accessible-frontend::goal-edit', [
+            'title' => __('govuk_alpha.goals.edit_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'goal' => $goal,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Owner-only update of an existing goal. */
+    public function updateGoal(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('goals'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Load tenant-scoped + verify owner before any write; 404 if it does not
+        // exist in this tenant, 403 if it is not the caller's goal.
+        $goal = null;
+        try {
+            $goal = app(\App\Services\GoalService::class)->getById($id)?->toArray();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($goal === null, 404);
+        abort_unless((int) ($goal['user_id'] ?? 0) === $userId, 403);
+
+        $title = trim(self::asStr($request->input('title')));
+        $target = (float) $request->input('target_value');
+        if ($title === '' || $target <= 0) {
+            return redirect()->route('govuk-alpha.goals.edit', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'goal-invalid']);
+        }
+
+        $frequency = self::asStr($request->input('checkin_frequency'));
+        if (!in_array($frequency, ['none', 'daily', 'weekly', 'biweekly', 'monthly'], true)) {
+            $frequency = 'none';
+        }
+
+        $ok = false;
+        try {
+            $ok = app(\App\Services\GoalService::class)->update($id, $userId, [
+                'title' => mb_substr($title, 0, 255),
+                'description' => trim(self::asStr($request->input('description'))) ?: null,
+                'target_value' => $target,
+                'deadline' => self::asStr($request->input('deadline')) ?: null,
+                'is_public' => $request->boolean('is_public'),
+                'checkin_frequency' => $frequency,
+            ]) !== null;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if (!$ok) {
+            return redirect()->route('govuk-alpha.goals.edit', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'goal-failed']);
+        }
+
+        return redirect()->route('govuk-alpha.goals.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'goal-edited']);
+    }
+
+    /** Owner-only delete of a goal (confirmed POST behind a warning). */
+    public function deleteGoal(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('goals'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $goal = null;
+        try {
+            $goal = app(\App\Services\GoalService::class)->getById($id)?->toArray();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($goal === null, 404);
+        abort_unless((int) ($goal['user_id'] ?? 0) === $userId, 403);
+
+        $ok = false;
+        try {
+            $ok = app(\App\Services\GoalService::class)->delete($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if (!$ok) {
+            return redirect()->route('govuk-alpha.goals.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'goal-failed']);
+        }
+
+        return redirect()->route('govuk-alpha.goals.index', ['tenantSlug' => $tenantSlug, 'status' => 'goal-deleted']);
+    }
+
+    /** Goal templates picker — start a goal from a shared template. */
+    public function goalTemplates(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('goals'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $templates = [];
+        $categories = [];
+        $category = trim(self::asStr($request->query('category')));
+        try {
+            $svc = app(\App\Services\GoalTemplateService::class);
+            $filters = ['limit' => 50];
+            if ($category !== '') {
+                $filters['category'] = $category;
+            }
+            $templates = $svc->getAll($filters)['items'] ?? [];
+            $categories = $svc->getCategories();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::goal-templates', [
+            'title' => __('govuk_alpha.goals.templates_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'templates' => is_array($templates) ? $templates : [],
+            'categories' => is_array($categories) ? $categories : [],
+            'category' => $category ?: null,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Create a goal from a template (POST). */
+    public function storeGoalFromTemplate(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('goals'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Confirm the template exists in this tenant before creating from it.
+        $template = null;
+        try {
+            $template = app(\App\Services\GoalTemplateService::class)->getById($id);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($template === null, 404);
+
+        $overrides = [];
+        $title = trim(self::asStr($request->input('title')));
+        if ($title !== '') {
+            $overrides['title'] = mb_substr($title, 0, 255);
+        }
+        $deadline = self::asStr($request->input('deadline'));
+        if ($deadline !== '') {
+            $overrides['deadline'] = $deadline;
+        }
+        $overrides['is_public'] = $request->boolean('is_public');
+
+        $newId = null;
+        try {
+            $goal = app(\App\Services\GoalTemplateService::class)->createGoalFromTemplate($id, $userId, $overrides);
+            $newId = $goal?->id;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($newId === null) {
+            return redirect()->route('govuk-alpha.goals.templates', ['tenantSlug' => $tenantSlug, 'status' => 'goal-failed']);
+        }
+
+        return redirect()->route('govuk-alpha.goals.show', ['tenantSlug' => $tenantSlug, 'id' => $newId, 'status' => 'goal-created']);
+    }
+
+    /** Buddy system: goals the member buddies + public goals they can offer to buddy. */
+    public function goalBuddying(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('goals'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $buddying = [];
+        $available = [];
+        try {
+            $svc = app(\App\Services\GoalService::class);
+            $buddying = $svc->getGoalsAsMentor($userId, ['limit' => 30])['items'] ?? [];
+            $available = $svc->getPublicForBuddy($userId, ['limit' => 30])['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::goal-buddying', [
+            'title' => __('govuk_alpha.goals.buddying_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'buddying' => is_array($buddying) ? $buddying : [],
+            'available' => is_array($available) ? $available : [],
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Offer to become the buddy/mentor for a public goal (POST). */
+    public function becomeGoalBuddy(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('goals'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // offerBuddy() enforces is_public + no-existing-buddy + not-own-goal and
+        // returns null when any guard fails, so an IDOR or double-buddy attempt
+        // simply reports failure.
+        $ok = false;
+        try {
+            $ok = app(\App\Services\GoalService::class)->offerBuddy($id, $userId) !== null;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.goals.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $ok ? 'buddy-joined' : 'buddy-failed']);
     }
 
     public function storeGoal(Request $request, string $tenantSlug): RedirectResponse
