@@ -198,6 +198,19 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/premium/subscribe', [AlphaController::class, 'subscribePremium'])->middleware('throttle:10,1')->name('premium.subscribe');
         Route::get('/clubs', [AlphaController::class, 'clubs'])->name('clubs.index');
         Route::get('/federation', [AlphaController::class, 'federation'])->name('federation.index');
+        // Federation core (hub above is list+stats). Static segments are declared
+        // before the partner wildcard so they match first.
+        Route::get('/federation/opt-in', [AlphaController::class, 'federationOptIn'])->name('federation.opt-in');
+        Route::post('/federation/opt-in', [AlphaController::class, 'storeFederationOptIn'])->middleware('throttle:10,1')->name('federation.opt-in.store');
+        Route::get('/federation/opt-out', [AlphaController::class, 'federationOptOut'])->name('federation.opt-out');
+        Route::post('/federation/opt-out', [AlphaController::class, 'storeFederationOptOut'])->middleware('throttle:10,1')->name('federation.opt-out.store');
+        Route::get('/federation/settings', [AlphaController::class, 'federationSettings'])->name('federation.settings');
+        Route::post('/federation/settings', [AlphaController::class, 'updateFederationSettings'])->middleware('throttle:20,1')->name('federation.settings.update');
+        Route::get('/federation/members', [AlphaController::class, 'federationMembers'])->name('federation.members.index');
+        Route::get('/federation/members/{id}', [AlphaController::class, 'federationMember'])->whereNumber('id')->name('federation.members.show');
+        Route::get('/federation/listings', [AlphaController::class, 'federationListings'])->name('federation.listings.index');
+        Route::get('/federation/events', [AlphaController::class, 'federationEvents'])->name('federation.events.index');
+        Route::get('/federation/partners/{id}', [AlphaController::class, 'federationPartner'])->where('id', '[0-9]+|ext-[0-9]+')->name('federation.partners.show');
         Route::get('/profile', [AlphaController::class, 'myProfile'])->name('profile.me');
         Route::get('/profile/settings', [AlphaController::class, 'profileSettings'])->name('profile.settings');
         Route::post('/profile/settings', [AlphaController::class, 'updateProfileSettings'])->middleware('throttle:20,1')->name('profile.settings.update');

@@ -4658,19 +4658,28 @@ class AlphaController extends Controller
         ]);
     }
 
-    // === Federation — partner communities (read-only list) ===
+    // === Federation — the network hub + core flows ===
 
+    /**
+     * Federation hub: network stats, an opt-in CTA when the member is not yet
+     * opted in, a preview of partner communities, and quick links into the rest
+     * of the federation surface. Mirrors FederationV2Controller::status().
+     */
     public function federation(Request $request, string $tenantSlug): Response|RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('federation'), 403);
-        if ($this->currentUserId() === null) {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
+        $tenantId = TenantContext::getId();
+        $stats = $this->federationStats($tenantId, $userId);
+
         $partners = [];
         try {
-            $partners = $this->federationPartnersForDisplay(TenantContext::getId());
+            $partners = $this->federationPartnersForDisplay($tenantId);
         } catch (\Throwable $e) {
             report($e);
         }
@@ -4679,7 +4688,8 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.federation.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
-            'partners' => $partners,
+            'partners' => array_slice($partners, 0, 6),
+            'stats' => $stats,
         ]);
     }
 
@@ -4699,10 +4709,13 @@ class AlphaController extends Controller
         $rows = \Illuminate\Support\Facades\DB::select("
             SELECT
                 fp.federation_level, fp.created_at as partnership_since,
+                fp.profiles_enabled, fp.messaging_enabled, fp.transactions_enabled,
+                fp.listings_enabled, fp.events_enabled, fp.groups_enabled,
                 CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END as partner_tenant_id,
                 CASE WHEN fp.tenant_id = ? THEN t2.name ELSE t1.name END as partner_name,
                 CASE WHEN fp.tenant_id = ? THEN t2.tagline ELSE t1.tagline END as partner_tagline,
                 CASE WHEN fp.tenant_id = ? THEN t2.location_name ELSE t1.location_name END as partner_location,
+                CASE WHEN fp.tenant_id = ? THEN t2.country_code ELSE t1.country_code END as partner_country,
                 (SELECT COUNT(*) FROM users u
                  JOIN federation_user_settings fus2 ON fus2.user_id = u.id AND fus2.federation_optin = 1
                  WHERE u.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
@@ -4715,34 +4728,51 @@ class AlphaController extends Controller
             LEFT JOIN tenants t2 ON fp.partner_tenant_id = t2.id
             WHERE (fp.tenant_id = ? OR fp.partner_tenant_id = ?) AND fp.status = 'active'
             ORDER BY partner_name ASC
-        ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId]);
+        ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId]);
 
         $partners = array_map(static function ($r) use ($levelNames) {
             $level = (int) ($r->federation_level ?? 1);
             return [
+                // Internal partners are linkable by their integer tenant id.
                 'id' => (int) ($r->partner_tenant_id ?? 0),
+                'is_external' => false,
                 'name' => (string) ($r->partner_name ?? ''),
                 'tagline' => (string) ($r->partner_tagline ?? ''),
                 'location' => (string) ($r->partner_location ?? ''),
+                'country' => (string) ($r->partner_country ?? ''),
                 'member_count' => (int) ($r->partner_member_count ?? 0),
                 'listing_count' => (int) ($r->partner_listing_count ?? 0),
+                'level' => $level,
                 'level_name' => $levelNames[$level] ?? 'discovery',
+                'permissions' => self::federationPermissionList($r),
                 'partnership_since' => $r->partnership_since ?? null,
             ];
         }, $rows);
 
-        // Merge active external partners (best-effort).
+        // Merge active external partners (best-effort). External partners carry an
+        // "ext-N" id so the detail page can resolve them via the external service.
         try {
             $external = \App\Services\FederationExternalPartnerService::getActivePartners($tenantId);
             foreach ($external as $ep) {
+                $perms = [];
+                if (!empty($ep['allow_member_search'])) $perms[] = 'profiles';
+                if (!empty($ep['allow_messaging'])) $perms[] = 'messaging';
+                if (!empty($ep['allow_transactions'])) $perms[] = 'transactions';
+                if (!empty($ep['allow_listing_search'])) $perms[] = 'listings';
+                if (!empty($ep['allow_events'])) $perms[] = 'events';
+                if (!empty($ep['allow_groups'])) $perms[] = 'groups';
                 $partners[] = [
-                    'id' => 0,
+                    'id' => 'ext-' . (int) ($ep['id'] ?? 0),
+                    'is_external' => true,
                     'name' => (string) ($ep['name'] ?? ''),
                     'tagline' => (string) ($ep['description'] ?? ''),
                     'location' => '',
+                    'country' => '',
                     'member_count' => (int) ($ep['partner_member_count'] ?? 0),
                     'listing_count' => 0,
+                    'level' => 0,
                     'level_name' => 'external',
+                    'permissions' => $perms,
                     'partnership_since' => $ep['created_at'] ?? null,
                 ];
             }
@@ -4751,6 +4781,801 @@ class AlphaController extends Controller
         }
 
         return $partners;
+    }
+
+    /**
+     * Build the permission slug list for an internal partnership row.
+     *
+     * @param object $r A federation_partnerships row.
+     * @return list<string>
+     */
+    private static function federationPermissionList(object $r): array
+    {
+        $permissions = [];
+        if (!empty($r->profiles_enabled)) $permissions[] = 'profiles';
+        if (!empty($r->messaging_enabled)) $permissions[] = 'messaging';
+        if (!empty($r->transactions_enabled)) $permissions[] = 'transactions';
+        if (!empty($r->listings_enabled)) $permissions[] = 'listings';
+        if (!empty($r->events_enabled)) $permissions[] = 'events';
+        if (!empty($r->groups_enabled)) $permissions[] = 'groups';
+        return $permissions;
+    }
+
+    /**
+     * Network-wide stats for the federation hub. Mirrors
+     * FederationV2Controller::status() but shaped for server-side rendering.
+     *
+     * @return array{
+     *   tenant_federation_enabled: bool, federation_optin: bool, enabled: bool,
+     *   partnerships_count: int, messages_count: int, transactions_count: int
+     * }
+     */
+    private function federationStats(int $tenantId, int $userId): array
+    {
+        $feature = app(\App\Services\FederationFeatureService::class);
+        $tenantEnabled = false;
+        try {
+            $tenantEnabled = $feature->isGloballyEnabled() && $feature->isTenantFederationEnabled($tenantId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $settings = \App\Services\FederationUserService::getUserSettings($userId);
+        $optedIn = (bool) ($settings['federation_optin'] ?? false);
+
+        $partnershipsCount = 0;
+        try {
+            $row = DB::selectOne(
+                "SELECT COUNT(*) as cnt FROM federation_partnerships
+                 WHERE (tenant_id = ? OR partner_tenant_id = ?) AND status = 'active'",
+                [$tenantId, $tenantId]
+            );
+            $partnershipsCount = (int) ($row->cnt ?? 0);
+        } catch (\Throwable $e) {
+            // Defensive — table may be empty/missing in some environments.
+        }
+
+        $messagesCount = 0;
+        $transactionsCount = 0;
+        if ($tenantEnabled && $optedIn) {
+            try {
+                $row = DB::selectOne(
+                    "SELECT COUNT(*) as cnt FROM federation_messages
+                     WHERE (sender_user_id = ? AND sender_tenant_id = ?)
+                        OR (receiver_user_id = ? AND receiver_tenant_id = ?)",
+                    [$userId, $tenantId, $userId, $tenantId]
+                );
+                $messagesCount = (int) ($row->cnt ?? 0);
+            } catch (\Throwable $e) {
+                // federation_messages table may not exist yet.
+            }
+            try {
+                $row = DB::selectOne(
+                    "SELECT COUNT(*) as cnt FROM transactions
+                     WHERE is_federated = 1 AND (sender_id = ? OR receiver_id = ?) AND tenant_id = ?",
+                    [$userId, $userId, $tenantId]
+                );
+                $transactionsCount = (int) ($row->cnt ?? 0);
+            } catch (\Throwable $e) {
+                // ignore
+            }
+        }
+
+        return [
+            'tenant_federation_enabled' => $tenantEnabled,
+            'federation_optin' => $optedIn,
+            'enabled' => $tenantEnabled && $optedIn,
+            'partnerships_count' => $partnershipsCount,
+            'messages_count' => $messagesCount,
+            'transactions_count' => $transactionsCount,
+        ];
+    }
+
+    /**
+     * Federation level slug for a numeric level — kept in sync with the
+     * govuk_alpha.federation.levels.* lang keys.
+     */
+    private static function federationLevelSlug(int $level): string
+    {
+        return [1 => 'discovery', 2 => 'connected', 3 => 'integrated', 4 => 'unified'][$level] ?? 'discovery';
+    }
+
+    /**
+     * Whether a federation operation (profiles|listings|events) is allowed for
+     * the current tenant. Defensive — returns false on any failure so the page
+     * shows the "not available" inset instead of erroring.
+     */
+    private function federationOperationAllowed(string $operation, int $tenantId): bool
+    {
+        try {
+            $check = app(\App\Services\FederationFeatureService::class)->isOperationAllowed($operation, $tenantId);
+            return (bool) ($check['allowed'] ?? false);
+        } catch (\Throwable $e) {
+            report($e);
+            return false;
+        }
+    }
+
+    /**
+     * Partner DETAIL — `/federation/partners/{id}` where {id} is an integer for
+     * an internal partner tenant, or "ext-{N}" for an external partner. Mirrors
+     * FederationV2Controller::partnerDetail().
+     */
+    public function federationPartner(Request $request, string $tenantSlug, string $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $partner = null;
+
+        try {
+            if (str_starts_with($id, 'ext-')) {
+                $extId = (int) substr($id, 4);
+                $ep = $extId > 0 ? \App\Services\FederationExternalPartnerService::getById($extId, $tenantId) : null;
+                if ($ep && ($ep['status'] ?? '') === 'active') {
+                    $perms = [];
+                    if (!empty($ep['allow_member_search'])) $perms[] = 'profiles';
+                    if (!empty($ep['allow_messaging'])) $perms[] = 'messaging';
+                    if (!empty($ep['allow_transactions'])) $perms[] = 'transactions';
+                    if (!empty($ep['allow_listing_search'])) $perms[] = 'listings';
+                    if (!empty($ep['allow_events'])) $perms[] = 'events';
+                    if (!empty($ep['allow_groups'])) $perms[] = 'groups';
+                    $partner = [
+                        'id' => 'ext-' . (int) ($ep['id'] ?? 0),
+                        'is_external' => true,
+                        'name' => (string) ($ep['name'] ?? ''),
+                        'tagline' => (string) ($ep['description'] ?? ''),
+                        'location' => '',
+                        'country' => '',
+                        'member_count' => (int) ($ep['partner_member_count'] ?? 0),
+                        'listing_count' => 0,
+                        'level' => 0,
+                        'level_name' => 'external',
+                        'permissions' => $perms,
+                        'partnership_since' => $ep['created_at'] ?? null,
+                    ];
+                }
+            } else {
+                $partnerTenantId = (int) $id;
+                if ($partnerTenantId > 0) {
+                    $row = DB::selectOne("
+                        SELECT
+                            fp.federation_level, fp.created_at as partnership_since,
+                            fp.profiles_enabled, fp.messaging_enabled, fp.transactions_enabled,
+                            fp.listings_enabled, fp.events_enabled, fp.groups_enabled,
+                            CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END as partner_tenant_id,
+                            CASE WHEN fp.tenant_id = ? THEN t2.name ELSE t1.name END as partner_name,
+                            CASE WHEN fp.tenant_id = ? THEN t2.tagline ELSE t1.tagline END as partner_tagline,
+                            CASE WHEN fp.tenant_id = ? THEN t2.location_name ELSE t1.location_name END as partner_location,
+                            CASE WHEN fp.tenant_id = ? THEN t2.country_code ELSE t1.country_code END as partner_country,
+                            (SELECT COUNT(*) FROM users u
+                             JOIN federation_user_settings fus2 ON fus2.user_id = u.id AND fus2.federation_optin = 1
+                             WHERE u.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
+                               AND u.status = 'active') as partner_member_count,
+                            (SELECT COUNT(*) FROM listings li
+                             WHERE li.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
+                               AND li.status = 'active') as partner_listing_count
+                        FROM federation_partnerships fp
+                        LEFT JOIN tenants t1 ON fp.tenant_id = t1.id
+                        LEFT JOIN tenants t2 ON fp.partner_tenant_id = t2.id
+                        WHERE (fp.tenant_id = ? OR fp.partner_tenant_id = ?) AND fp.status = 'active'
+                          AND CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END = ?
+                        LIMIT 1
+                    ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $partnerTenantId]);
+
+                    if ($row) {
+                        $level = (int) ($row->federation_level ?? 1);
+                        $partner = [
+                            'id' => (int) ($row->partner_tenant_id ?? 0),
+                            'is_external' => false,
+                            'name' => (string) ($row->partner_name ?? ''),
+                            'tagline' => (string) ($row->partner_tagline ?? ''),
+                            'location' => (string) ($row->partner_location ?? ''),
+                            'country' => (string) ($row->partner_country ?? ''),
+                            'member_count' => (int) ($row->partner_member_count ?? 0),
+                            'listing_count' => (int) ($row->partner_listing_count ?? 0),
+                            'level' => $level,
+                            'level_name' => self::federationLevelSlug($level),
+                            'permissions' => self::federationPermissionList($row),
+                            'partnership_since' => $row->partnership_since ?? null,
+                        ];
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        abort_if($partner === null, 404);
+
+        return $this->view('accessible-frontend::federation-partner', [
+            'title' => $partner['name'] ?: __('govuk_alpha.federation.partner.caption'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'partner' => $partner,
+        ]);
+    }
+
+    /**
+     * Opt-IN form — `/federation/opt-in` (GET).
+     */
+    public function federationOptIn(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Already opted in → send them to settings.
+        if (\App\Services\FederationUserService::hasOptedIn($userId)) {
+            return redirect()->route('govuk-alpha.federation.settings', ['tenantSlug' => $tenantSlug]);
+        }
+
+        return $this->view('accessible-frontend::federation-opt-in', [
+            'title' => __('govuk_alpha.federation.optin.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Opt-IN submit — `/federation/opt-in` (POST). Sets federation_optin plus
+     * sensible visibility defaults via FederationUserService::updateSettings.
+     */
+    public function storeFederationOptIn(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $feature = app(\App\Services\FederationFeatureService::class);
+        $tenantEnabled = false;
+        try {
+            $tenantEnabled = $feature->isGloballyEnabled() && $feature->isTenantFederationEnabled($tenantId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        if (!$tenantEnabled) {
+            return redirect()->route('govuk-alpha.federation.opt-in', ['tenantSlug' => $tenantSlug, 'status' => 'unavailable']);
+        }
+
+        $current = \App\Services\FederationUserService::getUserSettings($userId);
+        $settings = array_merge($current, [
+            'federation_optin' => true,
+            'profile_visible_federated' => true,
+            'appear_in_federated_search' => true,
+            'show_skills_federated' => true,
+            'show_location_federated' => true,
+            'show_reviews_federated' => true,
+            'email_notifications' => true,
+            'service_reach' => $current['service_reach'] ?? 'local_only',
+        ]);
+
+        $ok = \App\Services\FederationUserService::updateSettings($userId, $settings);
+
+        return redirect()->route(
+            $ok ? 'govuk-alpha.federation.index' : 'govuk-alpha.federation.opt-in',
+            $ok
+                ? ['tenantSlug' => $tenantSlug, 'status' => 'opted-in']
+                : ['tenantSlug' => $tenantSlug, 'status' => 'optin-failed']
+        );
+    }
+
+    /**
+     * Opt-OUT confirmation — `/federation/opt-out` (GET).
+     */
+    public function federationOptOut(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        return $this->view('accessible-frontend::federation-opt-out', [
+            'title' => __('govuk_alpha.federation.optout.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+        ]);
+    }
+
+    /**
+     * Opt-OUT submit — `/federation/opt-out` (POST). Calls
+     * FederationUserService::optOut AND dispatches UserFederatedOptOut so
+     * federated partners are asked to delete the member's data (GDPR).
+     */
+    public function storeFederationOptOut(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $ok = \App\Services\FederationUserService::optOut($userId);
+
+        if ($ok) {
+            // GDPR propagation — the service does NOT dispatch this itself.
+            try {
+                \App\Events\UserFederatedOptOut::dispatch($userId, $tenantId, 'opt_out');
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return redirect()->route('govuk-alpha.federation.index', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'opted-out' : 'optout-failed',
+        ]);
+    }
+
+    /**
+     * Federation SETTINGS — `/federation/settings` (GET).
+     */
+    public function federationSettings(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $settings = \App\Services\FederationUserService::getUserSettings($userId);
+
+        return $this->view('accessible-frontend::federation-settings', [
+            'title' => __('govuk_alpha.federation.settings.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'settings' => $settings,
+            'optedIn' => (bool) ($settings['federation_optin'] ?? false),
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Federation SETTINGS submit — `/federation/settings` (POST). Persists the
+     * ~10 federation_user_settings fields via the service (which is the only
+     * tenant-safe path — the table has no tenant_id column).
+     */
+    public function updateFederationSettings(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $current = \App\Services\FederationUserService::getUserSettings($userId);
+
+        // Only members who have opted in may manage these toggles.
+        if (!($current['federation_optin'] ?? false)) {
+            return redirect()->route('govuk-alpha.federation.opt-in', ['tenantSlug' => $tenantSlug]);
+        }
+
+        $reachRaw = self::asStr($request->input('service_reach'));
+        $reach = in_array($reachRaw, ['local_only', 'remote_ok', 'travel_ok'], true) ? $reachRaw : ($current['service_reach'] ?? 'local_only');
+
+        $settings = array_merge($current, [
+            'federation_optin' => true,
+            'profile_visible_federated' => $request->boolean('profile_visible_federated'),
+            'appear_in_federated_search' => $request->boolean('appear_in_federated_search'),
+            'show_skills_federated' => $request->boolean('show_skills_federated'),
+            'show_location_federated' => $request->boolean('show_location_federated'),
+            'show_reviews_federated' => $request->boolean('show_reviews_federated'),
+            'email_notifications' => $request->boolean('email_notifications'),
+            'service_reach' => $reach,
+        ]);
+
+        $ok = \App\Services\FederationUserService::updateSettings($userId, $settings);
+
+        return redirect()->route('govuk-alpha.federation.settings', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'settings-saved' : 'settings-failed',
+        ]);
+    }
+
+    /**
+     * Members BROWSE — `/federation/members` (GET, cursor pagination via ?cursor=).
+     * Mirrors FederationV2Controller::members() member-visibility join.
+     */
+    public function federationMembers(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $allowed = $this->federationOperationAllowed('profiles', $tenantId);
+        $q = trim(self::asStr($request->query('q')));
+        $members = [];
+        $nextCursor = null;
+
+        if ($allowed) {
+            $perPage = 20;
+            $cursorId = $this->decodeFederationCursor(self::asStr($request->query('cursor')));
+
+            try {
+                $sql = "
+                    SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.bio, u.skills,
+                        u.location, u.tenant_id, t.name as tenant_name,
+                        fus.service_reach, fus.show_skills_federated, fus.show_location_federated
+                    FROM users u
+                    JOIN federation_user_settings fus ON fus.user_id = u.id
+                    JOIN tenants t ON t.id = u.tenant_id
+                    JOIN federation_partnerships fp ON (
+                        (fp.tenant_id = :tid1 AND fp.partner_tenant_id = u.tenant_id)
+                        OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = u.tenant_id)
+                    )
+                    WHERE fp.status = 'active' AND fp.profiles_enabled = 1
+                    AND fus.federation_optin = 1 AND fus.appear_in_federated_search = 1
+                    AND u.status = 'active' AND u.tenant_id != :tid3
+                ";
+                $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
+
+                if ($q !== '') {
+                    $sql .= " AND (u.first_name LIKE :q1 OR u.last_name LIKE :q2 OR (fus.show_skills_federated = 1 AND u.skills LIKE :q3) OR u.bio LIKE :q4)";
+                    $term = "%{$q}%";
+                    $params[':q1'] = $term;
+                    $params[':q2'] = $term;
+                    $params[':q3'] = $term;
+                    $params[':q4'] = $term;
+                }
+                if ($cursorId !== null) {
+                    $sql .= " AND u.id < :cursor_id";
+                    $params[':cursor_id'] = $cursorId;
+                }
+                $sql .= " ORDER BY u.id DESC LIMIT :lim";
+                $params[':lim'] = $perPage + 1;
+
+                $rows = $this->federationSelect($sql, $params);
+
+                $hasMore = count($rows) > $perPage;
+                if ($hasMore) {
+                    $rows = array_slice($rows, 0, $perPage);
+                }
+
+                $members = array_map(static function (array $m): array {
+                    return [
+                        'id' => (int) $m['id'],
+                        'name' => trim(((string) ($m['first_name'] ?? '')) . ' ' . ((string) ($m['last_name'] ?? ''))),
+                        'avatar' => $m['avatar_url'] ?: null,
+                        'bio' => (string) ($m['bio'] ?? ''),
+                        'skills' => (!empty($m['show_skills_federated']) && !empty($m['skills']))
+                            ? array_values(array_filter(array_map('trim', explode(',', (string) $m['skills']))))
+                            : [],
+                        'location' => !empty($m['show_location_federated']) ? ($m['location'] ?? null) : null,
+                        'tenant_id' => (int) $m['tenant_id'],
+                        'tenant_name' => (string) ($m['tenant_name'] ?? ''),
+                    ];
+                }, $rows);
+
+                if ($hasMore && !empty($rows)) {
+                    $last = end($rows);
+                    $nextCursor = base64_encode((string) ((int) $last['id']));
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return $this->view('accessible-frontend::federation-members', [
+            'title' => __('govuk_alpha.federation.members_browse.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'allowed' => $allowed,
+            'members' => $members,
+            'query' => $q,
+            'nextCursor' => $nextCursor,
+        ]);
+    }
+
+    /**
+     * Member PROFILE — `/federation/members/{id}?tenant_id=X` (GET). The
+     * tenant_id query param scopes the lookup to the owning community.
+     */
+    public function federationMember(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        abort_unless($this->federationOperationAllowed('profiles', $tenantId), 404);
+
+        $memberTenantId = (int) $request->query('tenant_id');
+        $member = null;
+
+        try {
+            $sql = "
+                SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.bio, u.skills,
+                    u.location, u.tenant_id, t.name as tenant_name,
+                    fus.show_skills_federated, fus.show_location_federated
+                FROM users u
+                JOIN federation_user_settings fus ON fus.user_id = u.id
+                JOIN tenants t ON t.id = u.tenant_id
+                JOIN federation_partnerships fp ON (
+                    (fp.tenant_id = :tid1 AND fp.partner_tenant_id = u.tenant_id)
+                    OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = u.tenant_id)
+                )
+                WHERE u.id = :user_id AND fp.status = 'active' AND fp.profiles_enabled = 1
+                AND fus.federation_optin = 1 AND fus.profile_visible_federated = 1
+                AND u.status = 'active'
+            ";
+            $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':user_id' => $id];
+            if ($memberTenantId > 0) {
+                $sql .= " AND u.tenant_id = :member_tenant_id";
+                $params[':member_tenant_id'] = $memberTenantId;
+            }
+            $sql .= " LIMIT 1";
+
+            $rows = $this->federationSelect($sql, $params);
+            $m = $rows[0] ?? null;
+
+            if ($m) {
+                $member = [
+                    'id' => (int) $m['id'],
+                    'name' => trim(((string) ($m['first_name'] ?? '')) . ' ' . ((string) ($m['last_name'] ?? ''))),
+                    'avatar' => $m['avatar_url'] ?: null,
+                    'bio' => (string) ($m['bio'] ?? ''),
+                    'skills' => (!empty($m['show_skills_federated']) && !empty($m['skills']))
+                        ? array_values(array_filter(array_map('trim', explode(',', (string) $m['skills']))))
+                        : [],
+                    'location' => !empty($m['show_location_federated']) ? ($m['location'] ?? null) : null,
+                    'tenant_id' => (int) $m['tenant_id'],
+                    'tenant_name' => (string) ($m['tenant_name'] ?? ''),
+                ];
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        abort_if($member === null, 404);
+
+        return $this->view('accessible-frontend::federation-member', [
+            'title' => $member['name'] ?: __('govuk_alpha.federation.member.caption'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'member' => $member,
+        ]);
+    }
+
+    /**
+     * Listings BROWSE — `/federation/listings` (GET, cursor pagination).
+     * Mirrors FederationV2Controller::listings() (internal partnerships only;
+     * external partners are deferred for this server-rendered surface).
+     */
+    public function federationListings(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $allowed = $this->federationOperationAllowed('listings', $tenantId);
+        $q = trim(self::asStr($request->query('q')));
+        $listings = [];
+        $nextCursor = null;
+
+        if ($allowed) {
+            $perPage = 20;
+            $cursorId = $this->decodeFederationCursor(self::asStr($request->query('cursor')));
+
+            try {
+                $sql = "
+                    SELECT l.id, l.title, l.description, l.type, c.name as category_name,
+                        l.location, l.tenant_id, l.created_at,
+                        u.first_name, u.last_name, t.name as tenant_name
+                    FROM listings l
+                    JOIN users u ON u.id = l.user_id AND u.tenant_id = l.tenant_id
+                    JOIN tenants t ON t.id = l.tenant_id
+                    LEFT JOIN categories c ON c.id = l.category_id
+                    JOIN federation_partnerships fp ON (
+                        (fp.tenant_id = :tid1 AND fp.partner_tenant_id = l.tenant_id)
+                        OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = l.tenant_id)
+                    )
+                    JOIN federation_user_settings fus ON fus.user_id = l.user_id
+                    WHERE fp.status = 'active' AND fp.listings_enabled = 1
+                    AND l.status = 'active' AND l.tenant_id != :tid3
+                    AND fus.federation_optin = 1
+                ";
+                $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
+
+                if ($q !== '') {
+                    $sql .= " AND (l.title LIKE :q1 OR l.description LIKE :q2)";
+                    $term = "%{$q}%";
+                    $params[':q1'] = $term;
+                    $params[':q2'] = $term;
+                }
+                if ($cursorId !== null) {
+                    $sql .= " AND l.id < :cursor_id";
+                    $params[':cursor_id'] = $cursorId;
+                }
+                $sql .= " ORDER BY l.id DESC LIMIT :lim";
+                $params[':lim'] = $perPage + 1;
+
+                $rows = $this->federationSelect($sql, $params);
+
+                $hasMore = count($rows) > $perPage;
+                if ($hasMore) {
+                    $rows = array_slice($rows, 0, $perPage);
+                }
+
+                $listings = array_map(static function (array $l): array {
+                    return [
+                        'id' => (int) $l['id'],
+                        'title' => (string) ($l['title'] ?? ''),
+                        'description' => (string) ($l['description'] ?? ''),
+                        'type' => (string) ($l['type'] ?? 'offer'),
+                        'category_name' => $l['category_name'] ?? null,
+                        'location' => $l['location'] ?? null,
+                        'author_name' => trim(((string) ($l['first_name'] ?? '')) . ' ' . ((string) ($l['last_name'] ?? ''))),
+                        'tenant_id' => (int) $l['tenant_id'],
+                        'tenant_name' => (string) ($l['tenant_name'] ?? ''),
+                    ];
+                }, $rows);
+
+                if ($hasMore && !empty($rows)) {
+                    $last = end($rows);
+                    $nextCursor = base64_encode((string) ((int) $last['id']));
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return $this->view('accessible-frontend::federation-listings', [
+            'title' => __('govuk_alpha.federation.listings_browse.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'allowed' => $allowed,
+            'listings' => $listings,
+            'query' => $q,
+            'nextCursor' => $nextCursor,
+        ]);
+    }
+
+    /**
+     * Events BROWSE — `/federation/events` (GET, cursor pagination).
+     * Mirrors FederationV2Controller::events() (internal partnerships only).
+     */
+    public function federationEvents(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $allowed = $this->federationOperationAllowed('events', $tenantId);
+        $events = [];
+        $nextCursor = null;
+
+        if ($allowed) {
+            $perPage = 20;
+            $cursorId = $this->decodeFederationCursor(self::asStr($request->query('cursor')));
+
+            try {
+                $sql = "
+                    SELECT e.id, e.title, e.description, e.start_time as start_date,
+                        e.location, e.allow_remote_attendance as is_online, e.max_attendees,
+                        e.tenant_id, t.name as tenant_name,
+                        (SELECT COUNT(*) FROM event_rsvps er WHERE er.event_id = e.id AND er.status = 'going') as attendees_count
+                    FROM events e
+                    JOIN users u ON u.id = e.user_id AND u.tenant_id = e.tenant_id
+                    JOIN tenants t ON t.id = e.tenant_id
+                    JOIN federation_partnerships fp ON (
+                        (fp.tenant_id = :tid1 AND fp.partner_tenant_id = e.tenant_id)
+                        OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = e.tenant_id)
+                    )
+                    JOIN federation_user_settings fus ON fus.user_id = e.user_id AND fus.federation_optin = 1
+                    WHERE fp.status = 'active' AND fp.events_enabled = 1
+                    AND e.tenant_id != :tid3 AND e.status = 'active'
+                ";
+                $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
+
+                if ($cursorId !== null) {
+                    $sql .= " AND e.id < :cursor_id";
+                    $params[':cursor_id'] = $cursorId;
+                }
+                $sql .= " ORDER BY e.id DESC LIMIT :lim";
+                $params[':lim'] = $perPage + 1;
+
+                $rows = $this->federationSelect($sql, $params);
+
+                $hasMore = count($rows) > $perPage;
+                if ($hasMore) {
+                    $rows = array_slice($rows, 0, $perPage);
+                }
+
+                $events = array_map(static function (array $e): array {
+                    return [
+                        'id' => (int) $e['id'],
+                        'title' => (string) ($e['title'] ?? ''),
+                        'description' => (string) ($e['description'] ?? ''),
+                        'start_date' => $e['start_date'] ?? null,
+                        'location' => $e['location'] ?? null,
+                        'is_online' => (bool) ($e['is_online'] ?? false),
+                        'attendees_count' => (int) ($e['attendees_count'] ?? 0),
+                        'max_attendees' => !empty($e['max_attendees']) ? (int) $e['max_attendees'] : null,
+                        'tenant_id' => (int) $e['tenant_id'],
+                        'tenant_name' => (string) ($e['tenant_name'] ?? ''),
+                    ];
+                }, $rows);
+
+                if ($hasMore && !empty($rows)) {
+                    $last = end($rows);
+                    $nextCursor = base64_encode((string) ((int) $last['id']));
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return $this->view('accessible-frontend::federation-events', [
+            'title' => __('govuk_alpha.federation.events_browse.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'allowed' => $allowed,
+            'events' => $events,
+            'nextCursor' => $nextCursor,
+        ]);
+    }
+
+    /**
+     * Run a federation browse query with PDO bound params (int vs str), matching
+     * the FederationV2Controller binding approach. Returns assoc-array rows.
+     *
+     * @param array<string,mixed> $params
+     * @return array<int,array<string,mixed>>
+     */
+    private function federationSelect(string $sql, array $params): array
+    {
+        $stmt = DB::getPdo()->prepare($sql);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value, is_int($value) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
+        }
+        $stmt->execute();
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return is_array($rows) ? $rows : [];
+    }
+
+    /**
+     * Decode a federation cursor (base64 of the last row id). Returns null for
+     * empty/invalid cursors.
+     */
+    private function decodeFederationCursor(string $cursor): ?int
+    {
+        if ($cursor === '') {
+            return null;
+        }
+        $decoded = base64_decode($cursor, true);
+        if ($decoded === false || !ctype_digit($decoded)) {
+            return null;
+        }
+        $id = (int) $decoded;
+        return $id > 0 ? $id : null;
     }
 
     /**
