@@ -2649,6 +2649,27 @@ class AlphaController extends Controller
         }
     }
 
+    /**
+     * "My account" hub — a single landing page that gathers the member's
+     * personal/transactional facilities (Wallet, Messages, Connections, Profile,
+     * Settings) so the flat GOV.UK service navigation can stay focused on
+     * community + discovery. Linked from the top header account zone.
+     */
+    public function account(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        return $this->view('accessible-frontend::account', [
+            'title' => __('govuk_alpha.account.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'account',
+        ]);
+    }
+
     /** Time-credit wallet: balance, transaction history, and a transfer form. */
     public function wallet(Request $request, string $tenantSlug): Response|RedirectResponse
     {
@@ -3905,6 +3926,7 @@ class AlphaController extends Controller
             'alphaHeaderFg' => $headerFg['fg'] ?? null,
             'alphaHeaderFgHover' => $headerFg['hover'] ?? null,
             'isAuthenticated' => $this->currentUserId() !== null,
+            'alphaWalletBalance' => $this->alphaHeaderWalletBalance(),
             'alphaNavItems' => $this->alphaNavItems(),
             'alphaFooterColumns' => $this->alphaFooterColumns(),
             'alphaSignOutUrl' => $this->alphaSignOutUrl(),
@@ -4052,11 +4074,11 @@ class AlphaController extends Controller
         if ($userId === null) {
             $items['home'] = route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]);
         } else {
+            // Personal/transactional items (Wallet, Messages) live in the top
+            // header "My account" zone, not the service nav — which is reserved
+            // for community + discovery facilities to keep the flat GOV.UK bar
+            // uncrowded. See account() + the header in layout.blade.php.
             $items['dashboard'] = route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]);
-            $items['messages'] = route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]);
-            if (TenantContext::hasModule('wallet')) {
-                $items['wallet'] = route('govuk-alpha.wallet.index', ['tenantSlug' => $tenantSlug]);
-            }
         }
 
         if (TenantContext::hasModule('feed')) {
@@ -4083,6 +4105,30 @@ class AlphaController extends Controller
         }
 
         return $items;
+    }
+
+    /**
+     * Current time-credit balance for the header "Wallet" chip. A single-column
+     * read (not the full WalletService aggregate) so it stays cheap on every
+     * page; null when signed out or the wallet module is off.
+     */
+    private function alphaHeaderWalletBalance(): ?float
+    {
+        $userId = $this->currentUserId();
+        if ($userId === null || !TenantContext::hasModule('wallet')) {
+            return null;
+        }
+
+        try {
+            $balance = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', TenantContext::getId())
+                ->value('balance');
+
+            return $balance === null ? null : (float) $balance;
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     /**

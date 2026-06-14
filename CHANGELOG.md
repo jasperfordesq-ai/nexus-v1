@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Accessibility and visual polish across every page of the accessible site.** A platform-wide pass to the GOV.UK Design System standard: status labels are now colour-coded by state (so an approved application looks different from a declined one at a glance), the keyboard now jumps straight to errors and confirmations, the current section is announced to screen readers, images reserve their space so the page doesn't jump as it loads, and the sign-out control and message-count badge are cleaner and fully keyboard-accessible.
 
+### Changed
+
+- **A clearer, less crowded header on the accessible site.** Your personal things now live together in a top-right "My account" area: your wallet balance shows at a glance, and a "My account" link opens a hub for your wallet, messages, connections, profile and settings (with your unread-message count shown alongside). The main navigation bar is now reserved for community and discovery — Dashboard, Feed, Listings, Exchanges, Members, Events and Volunteering — so it stays uncluttered as more features are added.
+
 ### Added
 
 - **Tell apart members with the same name when sending credits.** The wallet's recipient search now shows each person's location and how long they've been a member (e.g. "Cork · Member since March 2024") beneath their name, so two members called "Mary" are no longer indistinguishable. Works with no JavaScript.

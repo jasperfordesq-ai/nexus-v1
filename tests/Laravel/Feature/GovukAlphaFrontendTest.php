@@ -2418,8 +2418,11 @@ class GovukAlphaFrontendTest extends TestCase
         $profileUrl = route('govuk-alpha.profile.me', ['tenantSlug' => $this->testTenantSlug]);
 
         $profile->assertOk();
-        $profile->assertSee(__('govuk_alpha.nav.profile'));
-        $profile->assertSee('class="nexus-alpha-header__link" href="' . $profileUrl . '"', false);
+        // Personal items now live behind the top "My account" hub link, not a
+        // direct header profile link nor the service navigation.
+        $accountUrl = route('govuk-alpha.account', ['tenantSlug' => $this->testTenantSlug]);
+        $profile->assertSee(__('govuk_alpha.nav.account'));
+        $profile->assertSee('class="nexus-alpha-header__link" href="' . $accountUrl . '"', false);
         $profile->assertDontSee('class="govuk-service-navigation__link" href="' . $profileUrl . '"', false);
         $profile->assertDontSee(__('govuk_alpha.header.back_to_main_site'));
         $profile->assertSee(route('govuk-alpha.profile.settings', ['tenantSlug' => $this->testTenantSlug]), false);
@@ -3244,6 +3247,38 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('Galway');
         $response->assertSee(__('govuk_alpha.wallet.member_since', ['date' => 'March 2024']));
         $response->assertSee(__('govuk_alpha.wallet.member_since', ['date' => 'September 2023']));
+    }
+
+    public function test_account_hub_renders_personal_facilities(): void
+    {
+        $this->authenticatedUser(['name' => 'Hub User']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/account");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.account.title'));
+        $response->assertSee(__('govuk_alpha.account.wallet_title'));
+        $response->assertSee(__('govuk_alpha.account.profile_title'));
+        $response->assertSee(__('govuk_alpha.account.settings_title'));
+        // Cards link to the real destinations.
+        $response->assertSee(route('govuk-alpha.wallet.index', ['tenantSlug' => $this->testTenantSlug]), false);
+        $response->assertSee(route('govuk-alpha.profile.settings', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
+    public function test_header_surfaces_wallet_balance_and_account_link_when_signed_in(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Header User']);
+        DB::table('users')->where('id', $user->id)->update(['balance' => 8]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
+
+        $response->assertOk();
+        // Glanceable balance chip in the top "account" zone (the visually-hidden
+        // label is unique, unlike a bare "8.00" which can appear elsewhere).
+        $response->assertSee(__('govuk_alpha.wallet.header_balance', ['value' => '8.00']));
+        // "My account" link to the hub.
+        $response->assertSee(__('govuk_alpha.nav.account'));
+        $response->assertSee(route('govuk-alpha.account', ['tenantSlug' => $this->testTenantSlug]), false);
     }
 
     public function test_wallet_transfer_moves_credits_between_members(): void
