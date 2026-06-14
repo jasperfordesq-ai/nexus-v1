@@ -7098,6 +7098,65 @@ class AlphaController extends Controller
         return redirect()->route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug, 'archived' => 1, 'status' => 'conversation-restored']);
     }
 
+    /**
+     * Edit one of the current user's own messages (24-hour window, mirrors PUT /v2/messages/{id}).
+     */
+    public function updateMessage(Request $request, string $tenantSlug, int $userId, int $messageId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('messages'), 403);
+
+        $currentUserId = $this->currentUserId();
+        if ($currentUserId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $body = trim(self::asStr($request->input('body')));
+        if ($body === '') {
+            return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'message-empty']);
+        }
+
+        $result = MessageService::editMessage($messageId, $currentUserId, $body);
+
+        $status = 'message-edited';
+        if ($result === null) {
+            $code = MessageService::getErrors()[0]['code'] ?? 'NOT_FOUND';
+            $status = match ($code) {
+                'FORBIDDEN'    => 'message-edit-forbidden',
+                'EDIT_EXPIRED' => 'message-edit-expired',
+                default        => 'message-edit-failed',
+            };
+        }
+
+        return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => $status]);
+    }
+
+    /**
+     * Delete one of the current user's messages, scope self|everyone (mirrors DELETE /v2/messages/{id}).
+     */
+    public function deleteMessage(Request $request, string $tenantSlug, int $userId, int $messageId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('messages'), 403);
+
+        $currentUserId = $this->currentUserId();
+        if ($currentUserId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $scope = in_array($request->input('scope'), ['self', 'everyone'], true)
+            ? self::asStr($request->input('scope'))
+            : 'everyone';
+
+        $success = MessageService::deleteMessage($messageId, $currentUserId, $scope);
+
+        return redirect()->route('govuk-alpha.messages.show', [
+            'tenantSlug' => $tenantSlug,
+            'userId'     => $userId,
+            'status'     => $success ? 'message-deleted' : 'message-delete-failed',
+        ]);
+    }
+
     public function members(Request $request, string $tenantSlug): Response
     {
         $this->assertTenantSlug($tenantSlug);

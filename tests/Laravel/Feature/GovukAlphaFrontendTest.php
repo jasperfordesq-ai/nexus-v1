@@ -1604,6 +1604,90 @@ class GovukAlphaFrontendTest extends TestCase
         $archived->assertSee(__('govuk_alpha.actions.restore_conversation'));
     }
 
+    public function test_m2_own_message_can_be_edited_and_deleted(): void
+    {
+        $sender = $this->authenticatedUser(['name' => 'Edit Sender']);
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Edit Recipient',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($sender, ['*']);
+
+        $messageId = DB::table('messages')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $sender->id,
+            'receiver_id' => $recipient->id,
+            'body' => 'Original message body.',
+            'is_read' => 0,
+            'is_federated' => 0,
+            'created_at' => now(),
+        ]);
+
+        // The conversation view exposes the edit/delete controls for the sender's own message.
+        $conversation = $this->get("/{$this->testTenantSlug}/alpha/messages/{$recipient->id}");
+        $conversation->assertOk();
+        $conversation->assertSee(__('govuk_alpha.messages.edit_delete_toggle'));
+        $conversation->assertSee(
+            route('govuk-alpha.messages.edit', ['tenantSlug' => $this->testTenantSlug, 'userId' => $recipient->id, 'messageId' => $messageId]),
+            false
+        );
+
+        // Edit within the 24-hour window updates the body.
+        $edit = $this->post("/{$this->testTenantSlug}/alpha/messages/{$recipient->id}/m/{$messageId}/edit", [
+            'body' => 'Edited message body.',
+        ]);
+        $edit->assertRedirect("/{$this->testTenantSlug}/alpha/messages/{$recipient->id}?status=message-edited");
+        $this->assertDatabaseHas('messages', [
+            'id' => $messageId,
+            'tenant_id' => $this->testTenantId,
+            'body' => 'Edited message body.',
+        ]);
+
+        // Delete for everyone blanks the message body.
+        $delete = $this->post("/{$this->testTenantSlug}/alpha/messages/{$recipient->id}/m/{$messageId}/delete", [
+            'scope' => 'everyone',
+        ]);
+        $delete->assertRedirect("/{$this->testTenantSlug}/alpha/messages/{$recipient->id}?status=message-deleted");
+        $this->assertDatabaseHas('messages', [
+            'id' => $messageId,
+            'tenant_id' => $this->testTenantId,
+            'is_deleted' => 1,
+        ]);
+    }
+
+    public function test_m2_cannot_edit_another_users_message(): void
+    {
+        $editor = $this->authenticatedUser(['name' => 'Not The Author']);
+        $author = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Real Author',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($editor, ['*']);
+
+        // A message authored by someone else (the editor is the receiver here).
+        $messageId = DB::table('messages')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $author->id,
+            'receiver_id' => $editor->id,
+            'body' => 'Author original body.',
+            'is_read' => 0,
+            'is_federated' => 0,
+            'created_at' => now(),
+        ]);
+
+        $edit = $this->post("/{$this->testTenantSlug}/alpha/messages/{$author->id}/m/{$messageId}/edit", [
+            'body' => 'Hijacked body.',
+        ]);
+        $edit->assertRedirect("/{$this->testTenantSlug}/alpha/messages/{$author->id}?status=message-edit-forbidden");
+        // The body must be unchanged — the edit was rejected.
+        $this->assertDatabaseHas('messages', [
+            'id' => $messageId,
+            'body' => 'Author original body.',
+        ]);
+    }
+
     public function test_messages_inline_start_conversation_search(): void
     {
         $this->authenticatedUser(['name' => 'Conversation Starter']);

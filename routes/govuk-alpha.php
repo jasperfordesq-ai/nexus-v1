@@ -142,6 +142,8 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/messages/{userId}', [AlphaController::class, 'storeMessage'])->middleware('throttle:30,1')->whereNumber('userId')->name('messages.store');
         Route::post('/messages/{userId}/archive', [AlphaController::class, 'archiveConversation'])->middleware('throttle:20,1')->whereNumber('userId')->name('messages.archive');
         Route::post('/messages/{userId}/restore', [AlphaController::class, 'restoreConversation'])->middleware('throttle:20,1')->whereNumber('userId')->name('messages.restore');
+        Route::post('/messages/{userId}/m/{messageId}/edit', [AlphaController::class, 'updateMessage'])->middleware('throttle:30,1')->whereNumber('userId')->whereNumber('messageId')->name('messages.edit');
+        Route::post('/messages/{userId}/m/{messageId}/delete', [AlphaController::class, 'deleteMessage'])->middleware('throttle:20,1')->whereNumber('userId')->whereNumber('messageId')->name('messages.delete');
         Route::get('/members', [AlphaController::class, 'members'])->name('members.index');
         Route::get('/members/{id}', [AlphaController::class, 'memberProfile'])->whereNumber('id')->name('members.show');
         Route::post('/members/{id}/connection', [AlphaController::class, 'updateMemberConnection'])->middleware('throttle:20,1')->whereNumber('id')->name('members.connection');

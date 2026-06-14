@@ -10,35 +10,41 @@
         $otherName = $otherUser['name'] ?? trim(($otherUser['first_name'] ?? '') . ' ' . ($otherUser['last_name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
         $formatDate = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y, g:ia') : null;
         $canSend = $directMessagingEnabled && empty($restriction['messaging_disabled']);
+        $successStatuses = [
+            'message-sent' => 'govuk_alpha.messages.sent',
+            'message-edited' => 'govuk_alpha.messages.edited_success',
+            'message-deleted' => 'govuk_alpha.messages.deleted_success',
+        ];
+        $errorStatuses = [
+            'message-empty' => 'govuk_alpha.messages.empty_message',
+            'message-disabled' => 'govuk_alpha.messages.disabled_detail',
+            'message-failed' => 'govuk_alpha.messages.failed',
+            'message-edit-forbidden' => 'govuk_alpha.messages.edit_forbidden',
+            'message-edit-expired' => 'govuk_alpha.messages.edit_expired',
+            'message-edit-failed' => 'govuk_alpha.messages.edit_failed',
+            'message-delete-failed' => 'govuk_alpha.messages.delete_failed',
+        ];
     @endphp
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_messages') }}</a>
 
-    @if ($status === 'message-sent')
+    @if (isset($successStatuses[$status]))
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="message-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="message-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
             <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.messages.sent') }}</p>
+                <p class="govuk-notification-banner__heading">{{ __($successStatuses[$status]) }}</p>
             </div>
         </div>
-    @elseif (in_array($status, ['message-failed', 'message-empty', 'message-disabled'], true))
+    @elseif (isset($errorStatuses[$status]))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
                     <ul class="govuk-list govuk-error-summary__list">
                         <li>
-                            <a href="#body">
-                                @if ($status === 'message-empty')
-                                    {{ __('govuk_alpha.messages.empty_message') }}
-                                @elseif ($status === 'message-disabled')
-                                    {{ __('govuk_alpha.messages.disabled_detail') }}
-                                @else
-                                    {{ __('govuk_alpha.messages.failed') }}
-                                @endif
-                            </a>
+                            <a href="#body">{{ __($errorStatuses[$status]) }}</a>
                         </li>
                     </ul>
                 </div>
@@ -97,6 +103,13 @@
                     $isOwn = (int) ($message['sender_id'] ?? 0) === $currentUserId;
                     $senderName = $isOwn ? __('govuk_alpha.messages.sent_by_you') : $otherName;
                     $sentAt = $formatDate($message['created_at'] ?? null);
+                    $isDeleted = (bool) ($message['is_deleted'] ?? false);
+                    $isEdited = (bool) ($message['is_edited'] ?? false);
+                    $messageId = (int) ($message['id'] ?? 0);
+                    $createdAt = $message['created_at'] ?? null;
+                    $canEditMessage = $isOwn && !$isDeleted && $messageId > 0
+                        && $createdAt && \Illuminate\Support\Carbon::parse($createdAt)->gt(now()->subHours(24));
+                    $canManageMessage = $isOwn && !$isDeleted && $messageId > 0;
                 @endphp
                 <li class="nexus-alpha-card">
                     <div class="nexus-alpha-card-head">
@@ -109,9 +122,56 @@
                         <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">{{ $senderName }}</p>
                     </div>
                     @if ($sentAt)
-                        <p class="govuk-hint govuk-!-margin-bottom-2">{{ __('govuk_alpha.messages.sent_label') }} {{ $sentAt }}</p>
+                        <p class="govuk-hint govuk-!-margin-bottom-2">{{ __('govuk_alpha.messages.sent_label') }} {{ $sentAt }}@if ($isEdited && !$isDeleted) <span class="govuk-!-font-weight-regular">&middot; {{ __('govuk_alpha.messages.edited') }}</span>@endif</p>
                     @endif
-                    <div class="govuk-body">{!! nl2br(e((string) ($message['body'] ?? ''))) !!}</div>
+                    @if ($isDeleted)
+                        <p class="govuk-body govuk-hint">{{ __('govuk_alpha.messages.deleted_placeholder') }}</p>
+                    @else
+                        <div class="govuk-body">{!! nl2br(e((string) ($message['body'] ?? ''))) !!}</div>
+                    @endif
+
+                    @if ($canManageMessage)
+                        <details class="govuk-details" data-module="govuk-details">
+                            <summary class="govuk-details__summary">
+                                <span class="govuk-details__summary-text">{{ __('govuk_alpha.messages.edit_delete_toggle') }}</span>
+                            </summary>
+                            <div class="govuk-details__text">
+                                @if ($canEditMessage)
+                                    <form method="post" action="{{ route('govuk-alpha.messages.edit', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id'], 'messageId' => $messageId]) }}" class="govuk-!-margin-bottom-4">
+                                        @csrf
+                                        <div class="govuk-form-group">
+                                            <label class="govuk-label govuk-label--s" for="edit-body-{{ $messageId }}">{{ __('govuk_alpha.messages.edit_label') }}</label>
+                                            <div id="edit-hint-{{ $messageId }}" class="govuk-hint">{{ __('govuk_alpha.messages.edit_window_hint') }}</div>
+                                            <textarea class="govuk-textarea" id="edit-body-{{ $messageId }}" name="body" rows="4" aria-describedby="edit-hint-{{ $messageId }}" required>{{ (string) ($message['body'] ?? '') }}</textarea>
+                                        </div>
+                                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.messages.edit_button') }}</button>
+                                    </form>
+                                @else
+                                    <p class="govuk-hint">{{ __('govuk_alpha.messages.edit_expired_notice') }}</p>
+                                @endif
+
+                                <form method="post" action="{{ route('govuk-alpha.messages.delete', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id'], 'messageId' => $messageId]) }}">
+                                    @csrf
+                                    <fieldset class="govuk-fieldset">
+                                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha.messages.delete_legend') }}</legend>
+                                        <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                                            <div class="govuk-radios__item">
+                                                <input class="govuk-radios__input" id="delete-self-{{ $messageId }}" name="scope" type="radio" value="self" aria-describedby="delete-self-hint-{{ $messageId }}">
+                                                <label class="govuk-label govuk-radios__label" for="delete-self-{{ $messageId }}">{{ __('govuk_alpha.messages.delete_scope_self') }}</label>
+                                                <div id="delete-self-hint-{{ $messageId }}" class="govuk-hint govuk-radios__hint">{{ __('govuk_alpha.messages.delete_scope_self_hint') }}</div>
+                                            </div>
+                                            <div class="govuk-radios__item">
+                                                <input class="govuk-radios__input" id="delete-everyone-{{ $messageId }}" name="scope" type="radio" value="everyone" checked aria-describedby="delete-everyone-hint-{{ $messageId }}">
+                                                <label class="govuk-label govuk-radios__label" for="delete-everyone-{{ $messageId }}">{{ __('govuk_alpha.messages.delete_scope_everyone') }}</label>
+                                                <div id="delete-everyone-hint-{{ $messageId }}" class="govuk-hint govuk-radios__hint">{{ __('govuk_alpha.messages.delete_scope_everyone_hint') }}</div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                    <button class="govuk-button govuk-button--warning govuk-!-margin-top-2 govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.messages.delete_button') }}</button>
+                                </form>
+                            </div>
+                        </details>
+                    @endif
                 </li>
             @endforeach
         </ol>
