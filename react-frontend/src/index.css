@@ -47,6 +47,23 @@
    utilities (those classes set outline:none themselves). */
 
 /* ─────────────────────────────────────────────
+   HeroUI v3 overlay scroll-inside fix (@heroui/react 3.1.0)
+   HeroUI sets `overflow: clip` on the Modal / AlertDialog dialog to
+   enable `scroll="inside"`. In Chromium, `overflow: clip` (unlike
+   `hidden`/`auto`) does NOT give a flex item an automatic min-size of
+   0, so the dialog never shrinks to its viewport-bounded container —
+   tall dialogs overflow the screen with no scroll (e.g. the admin SSO
+   provider form). Adding `min-height: 0` restores the shrink so the
+   body (already `min-h-0 flex-1 overflow-y-auto`) scrolls instead.
+   The Drawer is unaffected (it uses explicit h-full / max-h). Remove
+   if a future HeroUI release adds min-h-0 to these dialogs.
+   ───────────────────────────────────────────── */
+.modal__dialog--scroll-inside,
+.alert-dialog__dialog {
+  min-height: 0;
+}
+
+/* ─────────────────────────────────────────────
    EDGE-TO-EDGE SAFE AREA INSETS
    Required for Capacitor on Android 15 (API 35) and iOS.
    WindowCompat.setDecorFitsSystemWindows(false) lets the WebView
