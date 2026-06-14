@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **A clearer Polls page on the accessible site.** Polls are now split into "Open polls" (which you can vote on) and "Closed polls" (results), with a short note explaining that you vote once and results stay hidden until a poll closes to keep things fair. Open polls show their closing date; closed polls show each option's share of the vote with the leading option and your own choice clearly flagged.
 - **A clearer, less crowded header on the accessible site.** Your personal things now live together in a top-right "My account" area: your wallet balance shows at a glance, and a "My account" link opens a hub for your wallet, messages, connections, profile and settings (with your unread-message count shown alongside). The main navigation bar is now reserved for community and discovery — Dashboard, Feed, Listings, Exchanges, Members, Events and Volunteering — so it stays uncluttered as more features are added.
 
 ### Added

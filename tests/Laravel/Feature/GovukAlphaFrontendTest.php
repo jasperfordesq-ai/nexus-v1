@@ -3659,6 +3659,38 @@ class GovukAlphaFrontendTest extends TestCase
             ->count());
     }
 
+    public function test_polls_page_shows_closed_poll_results_with_leading_option(): void
+    {
+        $creator = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Poll Maker']);
+        // end_date in the past → closed → results become visible to everyone.
+        $pollId = DB::table('polls')->insertGetId([
+            'tenant_id' => $this->testTenantId, 'user_id' => $creator->id, 'question' => 'Which community logo?',
+            'is_active' => 1, 'end_date' => now()->subDay(), 'created_at' => now()->subDays(5),
+        ]);
+        $blue = DB::table('poll_options')->insertGetId(['tenant_id' => $this->testTenantId, 'poll_id' => $pollId, 'label' => 'Blue', 'votes' => 0]);
+        $green = DB::table('poll_options')->insertGetId(['tenant_id' => $this->testTenantId, 'poll_id' => $pollId, 'label' => 'Green', 'votes' => 0]);
+
+        // Blue leads 2–1.
+        foreach ([$blue, $blue, $green] as $i => $optId) {
+            $v = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+            DB::table('poll_votes')->insert([
+                'tenant_id' => $this->testTenantId, 'poll_id' => $pollId, 'option_id' => $optId, 'user_id' => $v->id, 'created_at' => now(),
+            ]);
+        }
+
+        $this->authenticatedUser(['name' => 'Results Viewer']);
+        $response = $this->get("/{$this->testTenantSlug}/alpha/polls");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.polls.closed_section_title'));
+        $response->assertSee('Which community logo?');
+        $response->assertSee('Blue');
+        $response->assertSee('Green');
+        $response->assertSee(__('govuk_alpha.polls.closed_tag'));
+        // Results are visible and the winning option is flagged as leading.
+        $response->assertSee(__('govuk_alpha.polls.leading'));
+    }
+
     public function test_timebanking_guide_renders_publicly(): void
     {
         // Public, no auth: newcomers can read how timebanking works before signing up.
