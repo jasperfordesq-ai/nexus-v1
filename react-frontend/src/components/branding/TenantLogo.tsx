@@ -111,7 +111,6 @@ export function TenantLogo({
   // scroll, and the tenant-name text is hidden — the logo already carries the
   // brand name (still exposed to screen readers via the <img> alt).
   const hasLogo = Boolean(branding.logo || branding.logoDark);
-  const hasDistinctDark = Boolean(branding.logo && branding.logoDark);
 
   // Compact (scrolled) shrinks the initials avatar, but a real logo keeps its size.
   const effectiveSize = (compact && !hasLogo) ? 'sm' : size;
@@ -123,7 +122,7 @@ export function TenantLogo({
   const heightClass = logoHeight[effectiveSize][shape];
 
   /* ── icon / image ────────────────────────────────────────── */
-  const renderLogoImg = (src: string, extra: string) => (
+  const renderLogoImg = (src: string) => (
     <img
       src={src}
       alt={branding.name}
@@ -133,25 +132,35 @@ export function TenantLogo({
           setLogoAspect(img.naturalWidth / img.naturalHeight);
         }
       }}
-      className={`${heightClass} w-auto object-contain ${logoMaxWidth[effectiveSize]} transition-all duration-200 ${extra}`.trim()}
+      className={`${heightClass} w-auto object-contain ${logoMaxWidth[effectiveSize]} transition-all duration-200`.trim()}
       loading={size === 'sm' ? 'lazy' : 'eager'}
       width={imgDimMap[effectiveSize].width}
       height={imgDimMap[effectiveSize].height}
     />
   );
 
-  // When both light + dark exist we render each and swap by theme via Tailwind
-  // `dark:` utilities; with only one we use it for both themes; with neither we
-  // fall back to the initials avatar (hasLogo/hasDistinctDark computed above).
+  // Theme-scoped variants. A light/white logo needs a dark backdrop on the light
+  // navbar; a dark logo needs a light backdrop on the dark navbar. Tone comes from
+  // the server (per slot), so we only add a "chip" where a logo would wash out.
+  const lightSrc = resolveAssetUrl(branding.logo || branding.logoDark);
+  const darkSrc = resolveAssetUrl(branding.logoDark || branding.logo);
+  const lightTone = branding.logoTone ?? branding.logoDarkTone;
+  const darkTone = branding.logoDarkTone ?? branding.logoTone;
+  const chipBase = 'rounded-md px-2 py-1';
+  const lightChip = lightTone === 'light' ? `${chipBase} bg-neutral-900/90` : '';
+  const darkChip = darkTone === 'dark' ? `${chipBase} bg-white/90` : '';
+
+  // Render both theme-scoped variants; CSS shows the right one per theme and adds
+  // a contrast backdrop only where needed (else falls back to the initials avatar).
   const iconElement = hasLogo ? (
-    hasDistinctDark ? (
-      <>
-        {renderLogoImg(resolveAssetUrl(branding.logo), 'block dark:hidden')}
-        {renderLogoImg(resolveAssetUrl(branding.logoDark), 'hidden dark:block')}
-      </>
-    ) : (
-      renderLogoImg(resolveAssetUrl(branding.logo || branding.logoDark), '')
-    )
+    <>
+      <span className={`inline-flex items-center dark:hidden ${lightChip}`.trim()}>
+        {renderLogoImg(lightSrc)}
+      </span>
+      <span className={`hidden items-center dark:inline-flex ${darkChip}`.trim()}>
+        {renderLogoImg(darkSrc)}
+      </span>
+    </>
   ) : (
     <Avatar
       name={branding.name}

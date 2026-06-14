@@ -1175,6 +1175,10 @@ export interface TenantBranding {
   logo_dark_url?: string; // raw backend field
   logoShape?: 'wide' | 'landscape' | 'square'; // normalised from logo_shape (aspect bucket)
   logo_shape?: string; // raw backend field
+  logoTone?: 'light' | 'dark'; // brightness of the light-slot logo (for contrast backdrop)
+  logo_tone?: string; // raw backend field
+  logoDarkTone?: 'light' | 'dark'; // brightness of the dark-slot logo
+  logo_dark_tone?: string; // raw backend field
   favicon?: string;    // normalised from favicon_url
   favicon_url?: string; // raw backend field
   primaryColor?: string;

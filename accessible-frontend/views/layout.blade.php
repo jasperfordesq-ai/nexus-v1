@@ -115,9 +115,6 @@
                             {{ __('govuk_alpha.nav.profile') }}
                         </a>
                     @endif
-                    <a class="nexus-alpha-header__link" href="{{ $mainSiteUrl ?? '/' }}">
-                        {{ __('govuk_alpha.header.back_to_main_site') }}
-                    </a>
                 @endif
             </nav>
         </div>

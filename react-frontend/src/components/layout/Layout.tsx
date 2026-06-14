@@ -182,7 +182,7 @@ export function Layout({
         id="main-content"
         // --logo-extra grows the top offset to match the navbar when it expands
         // for a tall square/stacked logo; 0 for wide/landscape (compact bar).
-        style={{ '--logo-extra': branding.logoShape === 'square' ? '1.75rem' : '0rem' } as CSSProperties}
+        style={{ '--logo-extra': branding.logoShape === 'square' ? '2.25rem' : '0rem' } as CSSProperties}
         className={`flex-1 relative z-10 min-w-0 transition-[padding-top] duration-200 ${
           withNavbarPadding && showNavbar
             ? isUtilityBarVisible

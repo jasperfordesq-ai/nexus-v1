@@ -468,6 +468,8 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
     const logo = raw.logo ?? raw.logo_url ?? undefined;
     const logoDark = raw.logoDark ?? raw.logo_dark_url ?? undefined;
     const logoShape = (raw.logoShape ?? raw.logo_shape ?? undefined) as TenantBranding['logoShape'];
+    const logoTone = (raw.logoTone ?? raw.logo_tone ?? undefined) as TenantBranding['logoTone'];
+    const logoDarkTone = (raw.logoDarkTone ?? raw.logo_dark_tone ?? undefined) as TenantBranding['logoDarkTone'];
     const favicon = raw.favicon ?? raw.favicon_url ?? undefined;
     const primaryColor = raw.primaryColor ?? raw.primary_color ?? defaultBranding.primaryColor;
     return {
@@ -479,6 +481,8 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
       logo,
       logoDark,
       logoShape,
+      logoTone,
+      logoDarkTone,
       favicon,
       primaryColor,
     };

@@ -601,6 +601,21 @@ class TenantBootstrapController extends BaseApiController
             $branding['logo_shape'] = \App\Support\LogoShape::classify($shapeSource);
         }
 
+        // Per-variant brightness so the SPA can add a contrast backdrop where a
+        // logo would otherwise wash out (e.g. a white logo on the light navbar).
+        if (!empty($branding['logo_url'])) {
+            $tone = \App\Support\LogoShape::tone($branding['logo_url']);
+            if ($tone !== null) {
+                $branding['logo_tone'] = $tone;
+            }
+        }
+        if (!empty($branding['logo_dark_url'])) {
+            $tone = \App\Support\LogoShape::tone($branding['logo_dark_url']);
+            if ($tone !== null) {
+                $branding['logo_dark_tone'] = $tone;
+            }
+        }
+
         if (!empty($tenant['favicon_url'])) {
             $branding['favicon_url'] = UrlHelper::absolute($tenant['favicon_url']);
         } elseif (!empty($config['favicon_url'])) {
