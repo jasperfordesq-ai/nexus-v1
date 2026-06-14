@@ -2238,6 +2238,7 @@ class AlphaController extends Controller
             'filters' => $filters,
             'moduleDisabled' => false,
             'error' => $error,
+            'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
 
@@ -2333,6 +2334,101 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $listingId, 'status' => 'listing-created']);
+    }
+
+    /** Resolve a listing the current user is allowed to manage, or abort. */
+    private function ownedListingOrAbort(int $id, int $userId): array
+    {
+        $listing = $this->listingService->getById($id, false, $userId);
+        abort_if($listing === null, 404);
+        $ownerId = (int) ($listing['user_id'] ?? $listing['author_id'] ?? $listing['user']['id'] ?? 0);
+        abort_unless($ownerId === $userId, 403);
+
+        return $listing;
+    }
+
+    public function editListing(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $listing = $this->ownedListingOrAbort($id, $userId);
+        $listing['image_url'] = $this->resolveAsset($listing['image_url'] ?? null);
+
+        $data = $this->listingFormViewData($tenantSlug, $request);
+        $data['title'] = __('govuk_alpha.listings.edit.title');
+        $data['listing'] = $listing;
+
+        return $this->view('accessible-frontend::listing-edit', $data);
+    }
+
+    public function updateListing(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $this->ownedListingOrAbort($id, $userId);
+
+        [$data, $errors] = $this->validateListingInput($request);
+        if ($errors !== []) {
+            return redirect()
+                ->route('govuk-alpha.listings.edit', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withErrors($errors)
+                ->withInput();
+        }
+
+        try {
+            ListingService::update($id, $data);
+            if ($request->hasFile('image')) {
+                $this->attachListingCoverImage($request, $id);
+            }
+        } catch (ValidationException $e) {
+            return redirect()
+                ->route('govuk-alpha.listings.edit', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withErrors($this->flattenValidationErrors($e))
+                ->withInput();
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect()
+                ->route('govuk-alpha.listings.edit', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'listing-update-failed'])
+                ->withInput();
+        }
+
+        return redirect()->route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'listing-updated']);
+    }
+
+    public function deleteListing(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $this->ownedListingOrAbort($id, $userId);
+
+        $ok = false;
+        try {
+            $ok = ListingService::delete($id);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($ok) {
+            return redirect()->route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug, 'status' => 'listing-deleted']);
+        }
+
+        return redirect()->route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'listing-delete-failed']);
     }
 
     public function requestExchange(string $tenantSlug, int $listingId): Response|RedirectResponse

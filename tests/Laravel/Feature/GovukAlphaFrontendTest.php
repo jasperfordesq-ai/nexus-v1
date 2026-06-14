@@ -1197,6 +1197,88 @@ class GovukAlphaFrontendTest extends TestCase
         $detail->assertSee(__('govuk_alpha.listings.create.created'));
     }
 
+    public function test_listing_owner_can_edit_and_update_their_listing(): void
+    {
+        $user = $this->authenticatedUser();
+        $this->ensureListingCategory();
+
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'title' => 'Original listing title',
+            'description' => 'The original description for this listing.',
+            'type' => 'offer',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'service_type' => 'remote_only',
+        ]);
+
+        // Owner sees a prefilled edit form.
+        $form = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/edit");
+        $form->assertOk();
+        $form->assertSee(__('govuk_alpha.listings.edit.title'));
+        $form->assertSee('Original listing title', false);
+        $form->assertSee(__('govuk_alpha.listings.edit.submit'));
+
+        $update = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/edit", [
+            'type' => 'offer',
+            'title' => 'Updated listing title',
+            'description' => 'The updated description for this listing.',
+            'category_id' => 1,
+            'hours_estimate' => 3,
+            'service_type' => 'hybrid',
+            'location' => 'Newtown',
+        ]);
+        $update->assertRedirect("/{$this->testTenantSlug}/alpha/listings/{$listing->id}?status=listing-updated");
+        $this->assertDatabaseHas('listings', [
+            'id' => $listing->id,
+            'title' => 'Updated listing title',
+            'service_type' => 'hybrid',
+        ]);
+    }
+
+    public function test_listing_edit_and_delete_are_forbidden_for_non_owner(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $owner->id,
+            'title' => 'Someone elses listing',
+            'description' => 'Not yours to edit.',
+            'type' => 'offer',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+        ]);
+
+        $this->authenticatedUser(['name' => 'Intruder']);
+        $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/edit")->assertStatus(403);
+        $this->post("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/edit", [
+            'type' => 'offer',
+            'title' => 'Hijacked title attempt',
+            'description' => 'Trying to change this listing without permission.',
+        ])->assertStatus(403);
+        $this->post("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/delete")->assertStatus(403);
+
+        $this->assertDatabaseHas('listings', ['id' => $listing->id, 'title' => 'Someone elses listing']);
+    }
+
+    public function test_listing_owner_can_delete_their_listing(): void
+    {
+        $user = $this->authenticatedUser();
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'title' => 'Listing to delete',
+            'description' => 'This will be deleted.',
+            'type' => 'offer',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+        ]);
+
+        $this->post("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/delete")
+            ->assertRedirect("/{$this->testTenantSlug}/alpha/listings?status=listing-deleted");
+
+        // No longer publicly visible (soft-deleted / removed).
+        $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}")->assertStatus(404);
+    }
+
     public function test_listings_create_rejects_invalid_input_with_field_errors(): void
     {
         $this->authenticatedUser();

@@ -12,6 +12,17 @@
         $listingTypeLabel = fn (?string $type): string => __('govuk_alpha.listings.' . (($type === 'request') ? 'request' : 'offer'));
     @endphp
 
+    @if (($status ?? null) === 'listing-deleted')
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="listing-deleted-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="listing-deleted-title">{{ __('govuk_alpha.states.success_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.listings.edit.deleted') }}</p>
+            </div>
+        </div>
+    @endif
+
     <span class="govuk-caption-l">{{ __('govuk_alpha.listings.caption', ['community' => $communityName]) }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.listings.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.listings.description') }}</p>

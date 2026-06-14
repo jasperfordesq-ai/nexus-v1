@@ -31,14 +31,19 @@
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_listings') }}</a>
 
-    @if ($status === 'listing-created')
+    @if ($status === 'listing-created' || $status === 'listing-updated')
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="listing-created-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="listing-created-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
             <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.listings.create.created') }}</p>
+                <p class="govuk-notification-banner__heading">{{ $status === 'listing-updated' ? __('govuk_alpha.listings.edit.updated') : __('govuk_alpha.listings.create.created') }}</p>
             </div>
+        </div>
+    @elseif ($status === 'listing-delete-failed')
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+            <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ __('govuk_alpha.listings.edit.delete_failed') }}</li></ul></div></div>
         </div>
     @endif
 
@@ -231,6 +236,9 @@
             </div>
         @elseif ($isOwner)
             <div class="govuk-inset-text">{{ __('govuk_alpha.listings.own_listing_detail') }}</div>
+            <div class="nexus-alpha-actions">
+                <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.listings.edit', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.listings.edit.edit_listing') }}</a>
+            </div>
         @elseif ($exchangeWorkflowEnabled)
             @if ($activeExchange)
                 <div class="govuk-inset-text">
