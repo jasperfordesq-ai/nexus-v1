@@ -2850,6 +2850,166 @@ class AlphaController extends Controller
         ]);
     }
 
+    // === Notifications inbox (auth-only; notifications are always-on) ===
+
+    public function notifications(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $unreadOnly = self::asStr($request->query('filter')) === 'unread';
+        $filters = ['limit' => 30];
+        if ($unreadOnly) {
+            $filters['unread_only'] = true;
+        }
+        $cursor = self::asStr($request->query('cursor'));
+        if ($cursor !== '') {
+            $filters['cursor'] = $cursor;
+        }
+
+        $data = ['items' => [], 'cursor' => null, 'has_more' => false];
+        $counts = ['total' => 0];
+        try {
+            $svc = app(\App\Services\NotificationService::class);
+            $data = $svc->getAll($userId, $filters);
+            $counts = $svc->getCounts($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::notifications', [
+            'title' => __('govuk_alpha.notifications.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'notifications',
+            'notifications' => is_array($data['items'] ?? null) ? $data['items'] : [],
+            'notificationsCursor' => $data['cursor'] ?? null,
+            'notificationsHasMore' => (bool) ($data['has_more'] ?? false),
+            'notificationCounts' => is_array($counts) ? $counts : ['total' => 0],
+            'notificationsUnreadOnly' => $unreadOnly,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function markAllNotificationsRead(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        try {
+            app(\App\Services\NotificationService::class)->markAllRead($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.notifications.index', ['tenantSlug' => $tenantSlug, 'status' => 'marked-read']);
+    }
+
+    public function deleteNotification(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        try {
+            app(\App\Services\NotificationService::class)->delete($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.notifications.index', ['tenantSlug' => $tenantSlug, 'status' => 'notification-deleted']);
+    }
+
+    // === Personal activity (auth-only, self) ===
+
+    public function activity(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $data = [];
+        try {
+            $data = app(\App\Services\MemberActivityService::class)->getDashboardData($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::activity', [
+            'title' => __('govuk_alpha.activity.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'activity',
+            'activity' => is_array($data) ? $data : [],
+        ]);
+    }
+
+    // === Reviews (received / given / pending) ===
+
+    public function reviews(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('reviews'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $received = [];
+        $given = [];
+        $pending = [];
+        $stats = [];
+        try {
+            $svc = app(\App\Services\ReviewService::class);
+            $received = $svc->getForUser($userId, ['limit' => 20])['items'] ?? [];
+            $given = $svc->getGivenByUser($userId, ['limit' => 20])['items'] ?? [];
+            $pending = $svc->getPendingReviews($userId, ['limit' => 20])['items'] ?? [];
+            $stats = $svc->getStats($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::reviews', [
+            'title' => __('govuk_alpha.reviews_page.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'reviews',
+            'reviewsReceived' => is_array($received) ? $received : [],
+            'reviewsGiven' => is_array($given) ? $given : [],
+            'reviewsPending' => is_array($pending) ? $pending : [],
+            'reviewStats' => is_array($stats) ? $stats : [],
+        ]);
+    }
+
+    // === Static marketing pages (public) ===
+
+    public function features(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        return $this->view('accessible-frontend::features', [
+            'title' => __('govuk_alpha.features.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'features',
+        ]);
+    }
+
+    public function faq(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        return $this->view('accessible-frontend::faq', [
+            'title' => __('govuk_alpha.faq.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'faq',
+        ]);
+    }
+
     /**
      * "How timebanking works" — a plain, public educational page. No auth or
      * module gate: it helps newcomers (and the accessibility-first audience in

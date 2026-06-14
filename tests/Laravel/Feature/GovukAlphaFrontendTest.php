@@ -3705,6 +3705,45 @@ class GovukAlphaFrontendTest extends TestCase
         $guest->assertSee(route('govuk-alpha.register', ['tenantSlug' => $this->testTenantSlug]), false);
     }
 
+    public function test_notifications_inbox_renders(): void
+    {
+        $this->authenticatedUser(['name' => 'Notified Member']);
+        $response = $this->get("/{$this->testTenantSlug}/alpha/notifications");
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.notifications.title'));
+        $response->assertSee(__('govuk_alpha.notifications.all_filter'));
+    }
+
+    public function test_activity_page_renders(): void
+    {
+        $this->authenticatedUser(['name' => 'Active Member']);
+        $response = $this->get("/{$this->testTenantSlug}/alpha/activity");
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.activity.title'));
+        $response->assertSee(__('govuk_alpha.activity.hours_given'));
+    }
+
+    public function test_reviews_page_renders(): void
+    {
+        $this->authenticatedUser(['name' => 'Reviewed Member']);
+        $response = $this->get("/{$this->testTenantSlug}/alpha/reviews");
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.reviews_page.title'));
+        $response->assertSee(__('govuk_alpha.reviews_page.received_tab'));
+    }
+
+    public function test_features_and_faq_render_publicly(): void
+    {
+        $features = $this->get("/{$this->testTenantSlug}/alpha/features");
+        $features->assertOk();
+        $features->assertSee(__('govuk_alpha.features.title'));
+
+        $faq = $this->get("/{$this->testTenantSlug}/alpha/faq");
+        $faq->assertOk();
+        $faq->assertSee(__('govuk_alpha.faq.title'));
+        $faq->assertSee(__('govuk_alpha.faq.q1'));
+    }
+
     public function test_achievements_page_renders_level_and_badges(): void
     {
         $this->authenticatedUser(['name' => 'Achiever']);

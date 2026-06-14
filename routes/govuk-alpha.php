@@ -32,6 +32,8 @@ Route::prefix('{tenantSlug}/alpha')
         // shared legalDocument() method reads the document type from route defaults.
         Route::get('/about', [AlphaController::class, 'about'])->name('about');
         Route::get('/guide', [AlphaController::class, 'guide'])->name('guide');
+        Route::get('/features', [AlphaController::class, 'features'])->name('features');
+        Route::get('/faq', [AlphaController::class, 'faq'])->name('faq');
         Route::get('/trust-and-safety', [AlphaController::class, 'trustSafety'])->name('trust-safety');
         Route::get('/accessibility', [AlphaController::class, 'accessibility'])->name('accessibility');
         Route::get('/legal', [AlphaController::class, 'legalHub'])->name('legal.hub');
@@ -143,6 +145,11 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/achievements', [AlphaController::class, 'achievements'])->name('achievements');
         Route::get('/leaderboard', [AlphaController::class, 'leaderboard'])->name('leaderboard');
         Route::get('/nexus-score', [AlphaController::class, 'nexusScore'])->name('nexus-score');
+        Route::get('/notifications', [AlphaController::class, 'notifications'])->name('notifications.index');
+        Route::post('/notifications/read-all', [AlphaController::class, 'markAllNotificationsRead'])->middleware('throttle:20,1')->name('notifications.read-all');
+        Route::post('/notifications/{id}/delete', [AlphaController::class, 'deleteNotification'])->whereNumber('id')->middleware('throttle:60,1')->name('notifications.delete');
+        Route::get('/activity', [AlphaController::class, 'activity'])->name('activity');
+        Route::get('/reviews', [AlphaController::class, 'reviews'])->name('reviews.index');
         Route::get('/profile', [AlphaController::class, 'myProfile'])->name('profile.me');
         Route::get('/profile/settings', [AlphaController::class, 'profileSettings'])->name('profile.settings');
         Route::post('/profile/settings', [AlphaController::class, 'updateProfileSettings'])->middleware('throttle:20,1')->name('profile.settings.update');

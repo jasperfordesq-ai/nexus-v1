@@ -37,6 +37,30 @@
             ];
         }
 
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.notifications.index')) {
+            $accountLinks[] = [
+                'title' => __('govuk_alpha.notifications.title'),
+                'description' => __('govuk_alpha.notifications.description'),
+                'href' => route('govuk-alpha.notifications.index', ['tenantSlug' => $tenantSlug]),
+            ];
+        }
+
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.reviews.index') && \App\Core\TenantContext::hasFeature('reviews')) {
+            $accountLinks[] = [
+                'title' => __('govuk_alpha.reviews_page.title'),
+                'description' => __('govuk_alpha.reviews_page.description'),
+                'href' => route('govuk-alpha.reviews.index', ['tenantSlug' => $tenantSlug]),
+            ];
+        }
+
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.activity')) {
+            $accountLinks[] = [
+                'title' => __('govuk_alpha.activity.title'),
+                'description' => __('govuk_alpha.activity.description'),
+                'href' => route('govuk-alpha.activity', ['tenantSlug' => $tenantSlug]),
+            ];
+        }
+
         if (\Illuminate\Support\Facades\Route::has('govuk-alpha.matches.index') && \App\Core\TenantContext::hasModule('listings')) {
             $accountLinks[] = [
                 'title' => __('govuk_alpha.matches.title'),
