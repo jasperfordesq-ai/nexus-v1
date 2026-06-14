@@ -2581,6 +2581,51 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertSame(1, (int) DB::table('users')->where('id', $user->id)->value('federation_notifications_enabled'));
     }
 
+    public function test_profile_settings_personalisation_match_and_skills(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Settings Parity User']);
+
+        // Personalisation: chronological feed + UGC auto-translate.
+        $p = $this->post("/{$this->testTenantSlug}/alpha/profile/personalisation", [
+            'prefers_chronological' => '1',
+            'auto_translate_ugc' => '1',
+            'auto_translate_target_locale' => 'ga',
+        ]);
+        $p->assertRedirectContains('status=personalisation-saved');
+        $row = DB::table('users')->where('id', $user->id)->first();
+        $this->assertSame(1, (int) $row->prefers_chronological_feed);
+        $this->assertSame(1, (int) $row->auto_translate_ugc);
+        $this->assertSame('ga', $row->auto_translate_target_locale);
+
+        // Match notification preferences.
+        $m = $this->post("/{$this->testTenantSlug}/alpha/profile/match-preferences", [
+            'notification_frequency' => 'weekly',
+            'notify_hot_matches' => '1',
+        ]);
+        $m->assertRedirectContains('status=match-prefs-saved');
+        $this->assertDatabaseHas('match_preferences', [
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'notification_frequency' => 'weekly',
+        ]);
+
+        // Add a free-text skill, then remove it.
+        $add = $this->post("/{$this->testTenantSlug}/alpha/profile/skills/add", [
+            'skill_name' => 'Gardening',
+            'is_offering' => '1',
+        ]);
+        $add->assertRedirectContains('status=skill-added');
+        $skillId = DB::table('user_skills')
+            ->where('user_id', $user->id)->where('skill_name', 'Gardening')->value('id');
+        $this->assertNotNull($skillId);
+
+        $remove = $this->post("/{$this->testTenantSlug}/alpha/profile/skills/remove", [
+            'user_skill_id' => $skillId,
+        ]);
+        $remove->assertRedirectContains('status=skill-removed');
+        $this->assertDatabaseMissing('user_skills', ['id' => $skillId]);
+    }
+
     public function test_profile_settings_passkey_can_be_renamed_and_removed(): void
     {
         $user = $this->authenticatedUser();

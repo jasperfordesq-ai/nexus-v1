@@ -93,6 +93,14 @@
                     'passkey-removed' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.passkeys.removed')],
                     'passkey-not-found' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.passkeys.not_found'), 'anchor' => '#passkeys'],
                     'passkey-name-required' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.passkeys.name_required'), 'anchor' => '#passkeys'],
+                    'personalisation-saved' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.personalisation.saved')],
+                    'personalisation-failed' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.personalisation.failed'), 'anchor' => '#personalisation'],
+                    'match-prefs-saved' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.match.saved')],
+                    'match-prefs-failed' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.match.failed'), 'anchor' => '#match-preferences'],
+                    'skill-added' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.skills.added')],
+                    'skill-removed' => ['type' => 'success', 'msg' => __('govuk_alpha.profile_settings.skills.removed')],
+                    'skill-failed' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.skills.failed'), 'anchor' => '#skills'],
+                    'skill-name-required' => ['type' => 'error', 'msg' => __('govuk_alpha.profile_settings.skills.name_required'), 'anchor' => '#skills'],
                 ];
                 $accountStatus = $accountStatusMap[$status ?? ''] ?? null;
                 // Field-level error helper: reuse the status map (its anchor IS the
@@ -245,6 +253,11 @@
                                 <input class="govuk-checkboxes__input" id="privacy_search" name="privacy_search" type="checkbox" value="1" @checked($privacySearch)>
                                 <label class="govuk-label govuk-checkboxes__label" for="privacy_search">{{ __('govuk_alpha.profile_settings.privacy_search_label') }}</label>
                             </div>
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="privacy_contact" name="privacy_contact" type="checkbox" value="1" @checked($privacyContact ?? false)>
+                                <label class="govuk-label govuk-checkboxes__label" for="privacy_contact">{{ __('govuk_alpha.profile_settings.privacy_contact_label') }}</label>
+                                <div id="privacy_contact-hint" class="govuk-hint govuk-checkboxes__hint">{{ __('govuk_alpha.profile_settings.privacy_contact_hint') }}</div>
+                            </div>
                         </div>
                     </div>
                 </fieldset>
@@ -267,6 +280,63 @@
 
                 <button class="govuk-button govuk-!-margin-top-4" data-module="govuk-button" type="submit">{{ __('govuk_alpha.actions.save_changes') }}</button>
             </form>
+
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+            <section aria-labelledby="skills-heading" id="skills">
+                <h2 class="govuk-heading-l" id="skills-heading">{{ __('govuk_alpha.profile_settings.skills.title') }}</h2>
+                <p class="govuk-body">{{ __('govuk_alpha.profile_settings.skills.description') }}</p>
+
+                @if (empty($mySkills))
+                    <p class="govuk-inset-text">{{ __('govuk_alpha.profile_settings.skills.none') }}</p>
+                @else
+                    <ul class="govuk-list nexus-alpha-skill-list">
+                        @foreach ($mySkills as $skill)
+                            @php $skillEndorsements = (int) ($skill['endorsement_count'] ?? 0); @endphp
+                            <li>
+                                <span class="govuk-!-font-weight-bold">{{ $skill['skill_name'] ?? '' }}</span>
+                                @if (!empty($skill['is_offering']))
+                                    <strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha.profile.skill_offering') }}</strong>
+                                @endif
+                                @if (!empty($skill['is_requesting']))
+                                    <strong class="govuk-tag govuk-tag--purple">{{ __('govuk_alpha.profile.skill_requesting') }}</strong>
+                                @endif
+                                @if ($skillEndorsements > 0)
+                                    <strong class="govuk-tag govuk-tag--green">{{ trans_choice('govuk_alpha.profile.endorsement_count', $skillEndorsements, ['count' => $skillEndorsements]) }}</strong>
+                                @endif
+                                <form method="post" action="{{ route('govuk-alpha.profile.skills.remove', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-top-1">
+                                    @csrf
+                                    <input type="hidden" name="user_skill_id" value="{{ $skill['id'] ?? '' }}">
+                                    <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.skills.remove_button') }}<span class="govuk-visually-hidden"> {{ $skill['skill_name'] ?? '' }}</span></button>
+                                </form>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+
+                <form method="post" action="{{ route('govuk-alpha.profile.skills.add', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-top-4">
+                    @csrf
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="skill_name">{{ __('govuk_alpha.profile_settings.skills.add_label') }}</label>
+                        <div id="skill-name-hint" class="govuk-hint">{{ __('govuk_alpha.profile_settings.skills.add_hint') }}</div>
+                        <input class="govuk-input govuk-!-width-two-thirds" id="skill_name" name="skill_name" type="text" maxlength="100" aria-describedby="skill-name-hint">
+                    </div>
+                    <fieldset class="govuk-fieldset govuk-!-margin-bottom-3">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha.profile_settings.skills.type_legend') }}</legend>
+                        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="is_offering" name="is_offering" type="checkbox" value="1" checked>
+                                <label class="govuk-label govuk-checkboxes__label" for="is_offering">{{ __('govuk_alpha.profile_settings.skills.offering') }}</label>
+                            </div>
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="is_requesting" name="is_requesting" type="checkbox" value="1">
+                                <label class="govuk-label govuk-checkboxes__label" for="is_requesting">{{ __('govuk_alpha.profile_settings.skills.requesting') }}</label>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.skills.add_button') }}</button>
+                </form>
+            </section>
 
             <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
 
@@ -386,6 +456,41 @@
                         <p class="govuk-body">{{ __('govuk_alpha.profile_settings.passkeys.add_description') }}</p>
                     </div>
                 </details>
+
+                <h3 class="govuk-heading-m govuk-!-margin-top-6" id="sessions">{{ __('govuk_alpha.profile_settings.sessions.title') }}</h3>
+                <p class="govuk-body">{{ __('govuk_alpha.profile_settings.sessions.description') }}</p>
+                @if (empty($sessions))
+                    <p class="govuk-inset-text">{{ __('govuk_alpha.profile_settings.sessions.none') }}</p>
+                @else
+                    <table class="govuk-table">
+                        <caption class="govuk-table__caption govuk-table__caption--s govuk-visually-hidden">{{ __('govuk_alpha.profile_settings.sessions.title') }}</caption>
+                        <thead class="govuk-table__head">
+                            <tr class="govuk-table__row">
+                                <th scope="col" class="govuk-table__header">{{ __('govuk_alpha.profile_settings.sessions.device') }}</th>
+                                <th scope="col" class="govuk-table__header">{{ __('govuk_alpha.profile_settings.sessions.ip') }}</th>
+                                <th scope="col" class="govuk-table__header">{{ __('govuk_alpha.profile_settings.sessions.last_active') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="govuk-table__body">
+                            @foreach ($sessions as $sessionRow)
+                                @php
+                                    $ua = (string) ($sessionRow['user_agent'] ?? '');
+                                    $deviceLabel = trim((string) ($sessionRow['device_type'] ?? '')) !== '' && ($sessionRow['device_type'] ?? '') !== 'unknown'
+                                        ? \Illuminate\Support\Str::headline((string) $sessionRow['device_type'])
+                                        : __('govuk_alpha.profile_settings.sessions.unknown_device');
+                                    $lastActive = !empty($sessionRow['last_active']) || !empty($sessionRow['last_activity'])
+                                        ? \Illuminate\Support\Carbon::parse($sessionRow['last_active'] ?? $sessionRow['last_activity'])->translatedFormat('j F Y, g:ia')
+                                        : null;
+                                @endphp
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell">{{ $deviceLabel }}</td>
+                                    <td class="govuk-table__cell">{{ $sessionRow['ip_address'] ?? '—' }}</td>
+                                    <td class="govuk-table__cell">{{ $lastActive ?? '—' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
             </section>
 
             <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
@@ -441,6 +546,71 @@
                         </fieldset>
                     @endforeach
                     <button class="govuk-button govuk-!-margin-top-6" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.notifications.save') }}</button>
+                </form>
+            </section>
+
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+            <section aria-labelledby="match-preferences-heading" id="match-preferences">
+                <h2 class="govuk-heading-l" id="match-preferences-heading">{{ __('govuk_alpha.profile_settings.match.title') }}</h2>
+                <p class="govuk-body">{{ __('govuk_alpha.profile_settings.match.description') }}</p>
+                <form method="post" action="{{ route('govuk-alpha.profile.match-preferences.update', ['tenantSlug' => $tenantSlug]) }}">
+                    @csrf
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="notification_frequency">{{ __('govuk_alpha.profile_settings.match.frequency_label') }}</label>
+                        <select class="govuk-select" id="notification_frequency" name="notification_frequency">
+                            @foreach (['daily', 'weekly', 'fortnightly', 'monthly', 'never'] as $freq)
+                                <option value="{{ $freq }}" @selected(($matchPrefs['notification_frequency'] ?? 'monthly') === $freq)>{{ __('govuk_alpha.profile_settings.match.frequency.' . $freq) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <fieldset class="govuk-fieldset govuk-!-margin-bottom-3">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha.profile_settings.match.instant_legend') }}</legend>
+                        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="notify_hot_matches" name="notify_hot_matches" type="checkbox" value="1" @checked($matchPrefs['notify_hot_matches'] ?? true)>
+                                <label class="govuk-label govuk-checkboxes__label" for="notify_hot_matches">{{ __('govuk_alpha.profile_settings.match.notify_hot') }}</label>
+                            </div>
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="notify_mutual_matches" name="notify_mutual_matches" type="checkbox" value="1" @checked($matchPrefs['notify_mutual_matches'] ?? true)>
+                                <label class="govuk-label govuk-checkboxes__label" for="notify_mutual_matches">{{ __('govuk_alpha.profile_settings.match.notify_mutual') }}</label>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.match.save') }}</button>
+                </form>
+            </section>
+
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+            <section aria-labelledby="personalisation-heading" id="personalisation">
+                <h2 class="govuk-heading-l" id="personalisation-heading">{{ __('govuk_alpha.profile_settings.personalisation.title') }}</h2>
+                <p class="govuk-body">{{ __('govuk_alpha.profile_settings.personalisation.description') }}</p>
+                <form method="post" action="{{ route('govuk-alpha.profile.personalisation.update', ['tenantSlug' => $tenantSlug]) }}">
+                    @csrf
+                    <div class="govuk-form-group">
+                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="prefers_chronological" name="prefers_chronological" type="checkbox" value="1" @checked($prefersChronological ?? false)>
+                                <label class="govuk-label govuk-checkboxes__label" for="prefers_chronological">{{ __('govuk_alpha.profile_settings.personalisation.chronological_label') }}</label>
+                                <div id="prefers_chronological-hint" class="govuk-hint govuk-checkboxes__hint">{{ __('govuk_alpha.profile_settings.personalisation.chronological_hint') }}</div>
+                            </div>
+                            <div class="govuk-checkboxes__item" data-module="govuk-checkboxes" data-aria-controls="auto-translate-conditional">
+                                <input class="govuk-checkboxes__input" id="auto_translate_ugc" name="auto_translate_ugc" type="checkbox" value="1" @checked($autoTranslate ?? false)>
+                                <label class="govuk-label govuk-checkboxes__label" for="auto_translate_ugc">{{ __('govuk_alpha.profile_settings.personalisation.auto_translate_label') }}</label>
+                                <div id="auto_translate_ugc-hint" class="govuk-hint govuk-checkboxes__hint">{{ __('govuk_alpha.profile_settings.personalisation.auto_translate_hint') }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="auto_translate_target_locale">{{ __('govuk_alpha.profile_settings.personalisation.translate_into_label') }}</label>
+                        <select class="govuk-select" id="auto_translate_target_locale" name="auto_translate_target_locale">
+                            @foreach ($locales as $locale)
+                                <option value="{{ $locale }}" @selected(($autoTranslateLocale ?? 'en') === $locale)>{{ __('govuk_alpha.profile_settings.languages.' . $locale) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.personalisation.save') }}</button>
                 </form>
             </section>
 

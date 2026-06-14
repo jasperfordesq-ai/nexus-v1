@@ -3022,7 +3022,10 @@ class AlphaController extends Controller
         $account = DB::table('users')
             ->where('id', $userId)
             ->where('tenant_id', TenantContext::getId())
-            ->select('newsletter_opt_in', 'email', 'preferred_language')
+            ->select(
+                'newsletter_opt_in', 'email', 'preferred_language', 'privacy_contact',
+                'prefers_chronological_feed', 'auto_translate_ugc', 'auto_translate_target_locale'
+            )
             ->first();
 
         return $this->view('accessible-frontend::profile-settings', [
@@ -3033,13 +3036,89 @@ class AlphaController extends Controller
             'displayName' => $this->profileDisplayName($profile),
             'avatarUrl' => $profile['avatar_url'] ?? $profile['avatar'] ?? null,
             'marketingOptIn' => (bool) ($account->newsletter_opt_in ?? false),
+            'privacyContact' => (bool) ($account->privacy_contact ?? false),
             'currentEmail' => (string) ($account->email ?? ''),
             'currentLanguage' => (string) ($account->preferred_language ?? app()->getLocale()),
             'locales' => self::ALPHA_LOCALES,
             'notificationPrefs' => $this->alphaNotificationPrefs($userId),
             'passkeys' => $this->alphaPasskeys($userId),
+            'prefersChronological' => (bool) ($account->prefers_chronological_feed ?? false),
+            'autoTranslate' => (bool) ($account->auto_translate_ugc ?? false),
+            'autoTranslateLocale' => (string) ($account->auto_translate_target_locale ?? $account->preferred_language ?? 'en'),
+            'matchPrefs' => $this->alphaMatchPrefs($userId),
+            'mySkills' => $this->alphaUserSkills($userId),
+            'sessions' => $this->alphaSessions($userId),
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
+    }
+
+    /**
+     * Match-digest preferences (frequency + hot/mutual toggles) for the alpha
+     * settings page, mirroring MatchPreferencesController::show defaults.
+     *
+     * @return array{notification_frequency: string, notify_hot_matches: bool, notify_mutual_matches: bool}
+     */
+    private function alphaMatchPrefs(int $userId): array
+    {
+        $defaults = ['notification_frequency' => 'monthly', 'notify_hot_matches' => true, 'notify_mutual_matches' => true];
+        try {
+            $prefs = \App\Services\MatchingService::getPreferences($userId);
+
+            return [
+                'notification_frequency' => (string) ($prefs['notification_frequency'] ?? 'monthly'),
+                'notify_hot_matches' => (bool) ($prefs['notify_hot_matches'] ?? true),
+                'notify_mutual_matches' => (bool) ($prefs['notify_mutual_matches'] ?? true),
+            ];
+        } catch (\Throwable $e) {
+            report($e);
+
+            return $defaults;
+        }
+    }
+
+    /**
+     * The viewer's skills (offering/requesting) via the shared
+     * SkillTaxonomyService (tenant-scoped internally).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function alphaUserSkills(int $userId): array
+    {
+        try {
+            return app(\App\Services\SkillTaxonomyService::class)->getUserSkills($userId);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return [];
+        }
+    }
+
+    /**
+     * The viewer's active sign-in sessions/devices (read-only list; no revoke
+     * endpoint exists), mirroring UsersController::sessions.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function alphaSessions(int $userId): array
+    {
+        try {
+            return DB::table('sessions')
+                ->where('user_id', $userId)
+                ->where('tenant_id', TenantContext::getId())
+                ->where(function ($q) {
+                    $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                })
+                ->orderByDesc('last_activity')
+                ->limit(20)
+                ->select(['id', 'ip_address', 'user_agent', 'device_type', 'last_activity'])
+                ->get()
+                ->map(static fn ($r): array => (array) $r)
+                ->all();
+        } catch (\Throwable $e) {
+            report($e);
+
+            return [];
+        }
     }
 
     /**
@@ -3195,6 +3274,116 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'status' => $deleted > 0 ? 'passkey-removed' : 'passkey-not-found',
         ])->withFragment('passkeys');
+    }
+
+    /** Personalisation: chronological feed + UGC auto-translation (user columns). */
+    public function updateProfilePersonalisation(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $locale = $this->allowed($request->input('auto_translate_target_locale'), self::ALPHA_LOCALES, null);
+
+        try {
+            DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', TenantContext::getId())
+                ->update([
+                    'prefers_chronological_feed'   => $request->boolean('prefers_chronological'),
+                    'auto_translate_ugc'           => $request->boolean('auto_translate_ugc'),
+                    'auto_translate_target_locale' => $locale,
+                    'updated_at'                   => now(),
+                ]);
+            $status = 'personalisation-saved';
+        } catch (\Throwable $e) {
+            report($e);
+            $status = 'personalisation-failed';
+        }
+
+        return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => $status])->withFragment('personalisation');
+    }
+
+    /** Match-digest preferences (frequency + hot/mutual toggles). */
+    public function updateProfileMatchPreferences(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $freq = $this->allowed($request->input('notification_frequency'), ['daily', 'weekly', 'monthly', 'fortnightly', 'never'], 'monthly');
+
+        try {
+            // Preserve the rest of the preference row (distance, score, categories, …).
+            $updated = \App\Services\MatchingService::getPreferences($userId);
+            $updated['notification_frequency'] = $freq;
+            $updated['notify_hot_matches'] = $request->boolean('notify_hot_matches');
+            $updated['notify_mutual_matches'] = $request->boolean('notify_mutual_matches');
+            $ok = \App\Services\MatchingService::savePreferences($userId, $updated);
+            $status = $ok ? 'match-prefs-saved' : 'match-prefs-failed';
+        } catch (\Throwable $e) {
+            report($e);
+            $status = 'match-prefs-failed';
+        }
+
+        return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => $status])->withFragment('match-preferences');
+    }
+
+    /** Add a skill (offering/requesting) to the viewer's profile. */
+    public function addProfileSkill(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $name = trim(self::asStr($request->input('skill_name')));
+        if ($name === '') {
+            return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => 'skill-name-required'])->withFragment('skills');
+        }
+
+        // Offer is the sensible default; both can be set.
+        $isOffering = $request->boolean('is_offering') || !$request->boolean('is_requesting');
+
+        try {
+            $id = app(\App\Services\SkillTaxonomyService::class)->addUserSkill($userId, [
+                'skill_name'    => mb_substr($name, 0, 100),
+                'is_offering'   => $isOffering,
+                'is_requesting' => $request->boolean('is_requesting'),
+            ]);
+            $status = $id !== null ? 'skill-added' : 'skill-failed';
+        } catch (\Throwable $e) {
+            report($e);
+            $status = 'skill-failed';
+        }
+
+        return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => $status])->withFragment('skills');
+    }
+
+    /** Remove one of the viewer's skills. */
+    public function removeProfileSkill(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $skillId = (int) $request->input('user_skill_id');
+        try {
+            $ok = $skillId > 0 && app(\App\Services\SkillTaxonomyService::class)->removeSkill($userId, $skillId);
+            $status = $ok ? 'skill-removed' : 'skill-failed';
+        } catch (\Throwable $e) {
+            report($e);
+            $status = 'skill-failed';
+        }
+
+        return redirect()->route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug, 'status' => $status])->withFragment('skills');
     }
 
     public function updateProfileEmail(Request $request, string $tenantSlug): RedirectResponse
@@ -3365,6 +3554,8 @@ class AlphaController extends Controller
                 'name' => trim($data['first_name'] . ' ' . $data['last_name']) ?: ($data['organization_name'] ?: __('govuk_alpha.members.unknown_member')),
                 'privacy_profile' => $privacyProfile,
                 'privacy_search' => $request->boolean('privacy_search'),
+                // Whether other members may contact this member directly.
+                'privacy_contact' => $request->boolean('privacy_contact'),
                 // GDPR marketing consent — recipient-controlled newsletter opt-in.
                 'newsletter_opt_in' => $request->boolean('newsletter_opt_in'),
                 'updated_at' => now(),
