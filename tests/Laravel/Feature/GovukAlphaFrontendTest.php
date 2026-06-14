@@ -3144,6 +3144,29 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('Dashboard upcoming event');
     }
 
+    public function test_event_detail_renders_for_owner_with_null_end_time(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Event Owner 326']);
+        $eventId = DB::table('events')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'title' => 'Owner event no end time',
+            'description' => 'Repro of the events/{id}?status=event-created 500.',
+            'location' => 'Skibbereen, County Cork, Ireland',
+            'start_time' => now()->addDays(2),
+            'end_time' => null,
+            'status' => 'active',
+            'max_attendees' => 10,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}?status=event-created");
+        $response->assertOk();
+        $response->assertSee('Owner event no end time');
+        $response->assertSee(__('govuk_alpha.events.created'));
+    }
+
     public function test_dashboard_shows_personalised_header_and_onboarding_prompt(): void
     {
         $user = $this->authenticatedUser(['name' => 'Dash User', 'first_name' => 'Dash']);

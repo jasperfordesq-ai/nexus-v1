@@ -16,7 +16,14 @@ return [
     |
     */
 
-    'default' => env('BROADCAST_CONNECTION', 'pusher'),
+    // Default to a no-op broadcaster when no Pusher key is configured. The
+    // installed BroadcastManager has no channel() method, so registering a
+    // channel in routes/channels.php eagerly resolves THIS default driver at
+    // boot — and constructing the Pusher client with a null key throws a
+    // TypeError that 500s every page. Falling back to 'null' keeps the app
+    // bootable when broadcasting is unconfigured (dev / missing env / stale
+    // config cache); production sets the key, so it still uses 'pusher'.
+    'default' => env('BROADCAST_CONNECTION', env('PUSHER_KEY', env('PUSHER_APP_KEY')) ? 'pusher' : 'null'),
 
     'connections' => [
 

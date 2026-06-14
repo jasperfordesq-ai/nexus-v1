@@ -23,10 +23,21 @@ class BroadcastServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Broadcast::routes(['middleware' => ['api']]);
+        // Registering channels resolves the default broadcaster at boot (the
+        // installed BroadcastManager lacks a channel() method, so the call is
+        // proxied to driver()). If broadcasting is misconfigured — e.g. the
+        // default is 'pusher' but no PUSHER key is set (dev / missing env /
+        // stale config cache) — that resolution throws and would otherwise 500
+        // every page. Real-time broadcasting is an enhancement, so degrade
+        // gracefully instead of taking the whole site down.
+        try {
+            Broadcast::routes(['middleware' => ['api']]);
 
-        if (file_exists(base_path('routes/channels.php'))) {
-            require base_path('routes/channels.php');
+            if (file_exists(base_path('routes/channels.php'))) {
+                require base_path('routes/channels.php');
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Broadcasting channels not registered: ' . $e->getMessage());
         }
     }
 }
