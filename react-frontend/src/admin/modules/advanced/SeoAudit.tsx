@@ -34,8 +34,9 @@ const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default
 };
 
 export function SeoAudit() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced' });
   const { t: tNav } = useTranslation('admin_nav');
+  const { t: tAdmin } = useTranslation('admin');
   useAdminPageMeta({ title: tNav('advanced') });
   const toast = useToast();
 
@@ -119,7 +120,7 @@ export function SeoAudit() {
           description={t('seo_audit_desc')}
         />
         <div className="flex h-64 items-center justify-center">
-          <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
+          <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
         </div>
       </div>
     );

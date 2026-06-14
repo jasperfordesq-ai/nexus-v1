@@ -20,8 +20,9 @@ import { adminSettings } from '../../api/adminApi';
 
 
 export function FeedAlgorithm() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced' });
   const { t: tNav } = useTranslation('admin_nav');
+  const { t: tAdmin } = useTranslation('admin');
   usePageTitle(tNav('advanced'));
   const toast = useToast();
   const [loading, setLoading] = useState(true);
@@ -83,7 +84,7 @@ export function FeedAlgorithm() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
+        <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
       </div>
     );
   }

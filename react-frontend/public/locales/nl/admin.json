@@ -2188,6 +2188,8 @@
     "failed_to_run_seo_audit": "Kan SEO-audit niet uitvoeren",
     "failed_count_with_value": "{{count}}is mislukt",
     "fail_count": "{{count}}mislukt",
+    "pass_count": "{{count}} geslaagd",
+    "warning_count": "{{count}} waarschuwing",
     "global_meta_description_count": "{{count}}/160 globale metabeschrijvingstekens",
     "health_auto_sitemap_active_count": "Actief:{{count}}URL's geïndexeerd",
     "health_auto_sitemap_disabled": "Uitgeschakeld: zoekmachines kunnen uw pagina's niet ontdekken",

@@ -2188,6 +2188,8 @@
     "failed_to_run_seo_audit": "SEO監査の実行に失敗しました",
     "failed_count_with_value": "{{count}}が失敗しました",
     "fail_count": "{{count}}が失敗しました",
+    "pass_count": "合格 {{count}} 件",
+    "warning_count": "警告 {{count}} 件",
     "global_meta_description_count": "{{count}}/160 グローバル メタ記述文字",
     "health_auto_sitemap_active_count": "アクティブ —{{count}}URL がインデックス付けされました",
     "health_auto_sitemap_disabled": "無効 — 検索エンジンはページを検出できません",

@@ -68,8 +68,9 @@ interface ServerAuditResult {
 }
 
 export function SeoOverview() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced' });
   const { t: tNav } = useTranslation('admin_nav');
+  const { t: tAdmin } = useTranslation('admin');
   useAdminPageMeta({ title: tNav('advanced') });
   const toast = useToast();
   const [loading, setLoading] = useState(true);
@@ -298,7 +299,7 @@ export function SeoOverview() {
 
   if (loading) {
     return (
-      <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-64 items-center justify-center">
+      <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex h-64 items-center justify-center">
         <Spinner size="lg" />
       </div>
     );
@@ -556,7 +557,7 @@ export function SeoOverview() {
           </CardHeader>
           <CardBody>
             {sitemapLoading && !sitemapStats ? (
-              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="sm" /></div>
+              <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-4"><Spinner size="sm" /></div>
             ) : sitemapStats ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">

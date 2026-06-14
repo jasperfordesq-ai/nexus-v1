@@ -2188,6 +2188,8 @@
     "failed_to_run_seo_audit": "فشل تشغيل تدقيق SEO",
     "failed_count_with_value": "فشل{{count}}",
     "fail_count": "فشل{{count}}",
+    "pass_count": "{{count}} ناجح",
+    "warning_count": "{{count}} تحذير",
     "global_meta_description_count": "{{count}}/160 حرفًا للوصف التعريفي العام",
     "health_auto_sitemap_active_count": "نشط — تمت فهرسة عناوين URL لـ{{count}}",
     "health_auto_sitemap_disabled": "معطل - لا تستطيع محركات البحث اكتشاف صفحاتك",

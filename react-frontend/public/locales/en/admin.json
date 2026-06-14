@@ -2188,6 +2188,8 @@
     "failed_to_run_seo_audit": "Failed to run SEO audit",
     "failed_count_with_value": "{{count}} failed",
     "fail_count": "{{count}} fail",
+    "pass_count": "{{count}} pass",
+    "warning_count": "{{count}} warning",
     "global_meta_description_count": "{{count}}/160 global meta description characters",
     "health_auto_sitemap_active_count": "Active — {{count}} URLs indexed",
     "health_auto_sitemap_disabled": "Disabled — search engines cannot discover your pages",

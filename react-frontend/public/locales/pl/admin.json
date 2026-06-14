@@ -2188,6 +2188,8 @@
     "failed_to_run_seo_audit": "Nie udało się przeprowadzić audytu SEO",
     "failed_count_with_value": "Niepowodzenie{{count}}",
     "fail_count": "Niepowodzenie{{count}}",
+    "pass_count": "{{count}} zaliczone",
+    "warning_count": "{{count}} ostrzeżenie",
     "global_meta_description_count": "{{count}}/160 znaków globalnego metaopisu",
     "health_auto_sitemap_active_count": "Aktywne — indeksowane są adresy URL{{count}}",
     "health_auto_sitemap_disabled": "Wyłączone — wyszukiwarki nie mogą znaleźć Twoich stron",

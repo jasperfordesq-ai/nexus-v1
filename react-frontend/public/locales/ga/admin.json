@@ -2188,6 +2188,8 @@
     "failed_to_run_seo_audit": "Theip ar iniúchadh Sinsearach a rith",
     "failed_count_with_value": "Theip ar{{count}}",
     "fail_count": "{{count}}teip",
+    "pass_count": "{{count}} pas",
+    "warning_count": "{{count}} rabhadh",
     "global_meta_description_count": "{{count}}/160 carachtar meiti-thuairisce domhanda",
     "health_auto_sitemap_active_count": "Gníomhach - URLanna{{count}}innéacsaithe",
     "health_auto_sitemap_disabled": "Díchumasaithe - ní féidir le hinnill chuardaigh do leathanaigh a aimsiú",
