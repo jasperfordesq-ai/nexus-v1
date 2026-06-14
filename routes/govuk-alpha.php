@@ -110,6 +110,15 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/exchanges/{id}', [AlphaController::class, 'exchange'])->whereNumber('id')->name('exchanges.show');
         Route::post('/exchanges/{id}', [AlphaController::class, 'storeExchangeAction'])->middleware('throttle:30,1')->whereNumber('id')->name('exchanges.action.store');
         Route::post('/exchanges/{id}/rate', [AlphaController::class, 'storeExchangeRating'])->middleware('throttle:20,1')->whereNumber('id')->name('exchanges.rate.store');
+        Route::get('/group-exchanges', [AlphaController::class, 'groupExchanges'])->name('group-exchanges.index');
+        Route::get('/group-exchanges/new', [AlphaController::class, 'createGroupExchange'])->name('group-exchanges.create');
+        Route::post('/group-exchanges/new', [AlphaController::class, 'storeGroupExchange'])->middleware('throttle:15,1')->name('group-exchanges.store');
+        Route::get('/group-exchanges/{id}', [AlphaController::class, 'groupExchange'])->whereNumber('id')->name('group-exchanges.show');
+        Route::post('/group-exchanges/{id}/participants', [AlphaController::class, 'addGroupExchangeParticipant'])->middleware('throttle:30,1')->whereNumber('id')->name('group-exchanges.participants.add');
+        Route::post('/group-exchanges/{id}/participants/{participantUserId}/remove', [AlphaController::class, 'removeGroupExchangeParticipant'])->middleware('throttle:30,1')->whereNumber('id')->whereNumber('participantUserId')->name('group-exchanges.participants.remove');
+        Route::post('/group-exchanges/{id}/confirm', [AlphaController::class, 'confirmGroupExchange'])->middleware('throttle:20,1')->whereNumber('id')->name('group-exchanges.confirm');
+        Route::post('/group-exchanges/{id}/complete', [AlphaController::class, 'completeGroupExchange'])->middleware('throttle:15,1')->whereNumber('id')->name('group-exchanges.complete');
+        Route::post('/group-exchanges/{id}/cancel', [AlphaController::class, 'cancelGroupExchange'])->middleware('throttle:15,1')->whereNumber('id')->name('group-exchanges.cancel');
         Route::get('/matches', [AlphaController::class, 'matches'])->name('matches.index');
         Route::get('/wallet', [AlphaController::class, 'wallet'])->name('wallet.index');
         Route::post('/wallet/transfer', [AlphaController::class, 'transferCredits'])->middleware('throttle:15,1')->name('wallet.transfer');

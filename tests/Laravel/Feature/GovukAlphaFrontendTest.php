@@ -3439,6 +3439,96 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertSame('pending', DB::table('connections')->where('id', $cid)->value('status'));
     }
 
+    public function test_group_exchange_create_redirects_to_detail_and_lists(): void
+    {
+        $creator = $this->authenticatedUser(['name' => 'GX Creator']);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/group-exchanges/new", [
+            'title' => 'Spring cleanup',
+            'total_hours' => 3,
+            'split_type' => 'equal',
+        ]);
+
+        $response->assertRedirectContains('/group-exchanges/');
+        $response->assertRedirectContains('status=created');
+        $this->assertSame(1, DB::table('group_exchanges')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('organizer_id', $creator->id)
+            ->where('title', 'Spring cleanup')
+            ->count());
+
+        $list = $this->get("/{$this->testTenantSlug}/alpha/group-exchanges");
+        $list->assertOk();
+        $list->assertSee('Spring cleanup');
+    }
+
+    public function test_group_exchange_organiser_adds_and_removes_a_participant(): void
+    {
+        $organiser = $this->authenticatedUser(['name' => 'Organiser']);
+        $svc = app(\App\Services\GroupExchangeService::class);
+        $exId = $svc->create($organiser->id, ['title' => 'GX', 'total_hours' => 2, 'split_type' => 'custom', 'status' => 'draft']);
+
+        $member = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true, 'first_name' => 'Pat', 'last_name' => 'Helper',
+        ]);
+
+        $add = $this->post("/{$this->testTenantSlug}/alpha/group-exchanges/{$exId}/participants", [
+            'participant_id' => $member->id, 'role' => 'provider', 'hours' => 2,
+        ]);
+        $add->assertRedirectContains('status=participant-added');
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/group-exchanges/{$exId}");
+        $detail->assertOk();
+        $detail->assertSee('Pat Helper');
+
+        $remove = $this->post("/{$this->testTenantSlug}/alpha/group-exchanges/{$exId}/participants/{$member->id}/remove");
+        $remove->assertRedirectContains('status=participant-removed');
+        $this->assertSame(0, DB::table('group_exchange_participants')->where('group_exchange_id', $exId)->count());
+    }
+
+    public function test_group_exchange_complete_moves_credits_when_all_confirmed(): void
+    {
+        $organiser = $this->authenticatedUser(['name' => 'Organiser']);
+        $svc = app(\App\Services\GroupExchangeService::class);
+        $exId = $svc->create($organiser->id, ['title' => 'Pool of hours', 'total_hours' => 4, 'split_type' => 'custom', 'status' => 'draft']);
+
+        $provider = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Provider P']);
+        $receiver = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Receiver R']);
+        DB::table('users')->where('id', $provider->id)->update(['balance' => 0]);
+        DB::table('users')->where('id', $receiver->id)->update(['balance' => 10]);
+
+        // Whole hours keep the assertion exact on the int-column test DB.
+        $svc->addParticipant($exId, $provider->id, 'provider', 4, 1.0);
+        $svc->addParticipant($exId, $receiver->id, 'receiver', 4, 1.0);
+        $svc->confirmParticipation($exId, $provider->id);
+        $svc->confirmParticipation($exId, $receiver->id);
+
+        $complete = $this->post("/{$this->testTenantSlug}/alpha/group-exchanges/{$exId}/complete");
+
+        $complete->assertRedirectContains('status=completed');
+        $this->assertSame(4.0, (float) DB::table('users')->where('id', $provider->id)->value('balance'));
+        $this->assertSame(6.0, (float) DB::table('users')->where('id', $receiver->id)->value('balance'));
+        $this->assertSame('completed', DB::table('group_exchanges')->where('id', $exId)->value('status'));
+    }
+
+    public function test_group_exchange_add_participant_rejected_for_non_organiser(): void
+    {
+        $organiser = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Real Organiser']);
+        $svc = app(\App\Services\GroupExchangeService::class);
+        $exId = $svc->create($organiser->id, ['title' => 'Not yours', 'total_hours' => 2, 'split_type' => 'custom', 'status' => 'draft']);
+
+        // A different signed-in member tries to add someone to an exchange they don't own.
+        $this->authenticatedUser(['name' => 'Outsider']);
+        $victim = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Victim']);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/group-exchanges/{$exId}/participants", [
+            'participant_id' => $victim->id, 'role' => 'provider', 'hours' => 1,
+        ]);
+
+        $response->assertRedirectContains('status=add-failed');
+        $this->assertSame(0, DB::table('group_exchange_participants')->where('group_exchange_id', $exId)->count());
+    }
+
     public function test_matches_page_renders_for_a_signed_in_member(): void
     {
         $this->authenticatedUser(['name' => 'Matcher Member']);

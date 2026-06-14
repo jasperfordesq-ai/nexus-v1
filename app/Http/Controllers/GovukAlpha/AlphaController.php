@@ -2807,6 +2807,335 @@ class AlphaController extends Controller
         ]);
     }
 
+    // === Group exchanges (multi-party time-credit exchanges) ===
+
+    /** List the viewer's group exchanges (as organiser or participant). */
+    public function groupExchanges(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('group_exchanges'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $items = [];
+        try {
+            $items = app(\App\Services\GroupExchangeService::class)->listForUser($userId, ['limit' => 50])['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::group-exchanges', [
+            'title' => __('govuk_alpha.group_exchanges.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'group_exchanges',
+            'exchanges' => $items,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Show the "start a group exchange" form. */
+    public function createGroupExchange(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('group_exchanges'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        return $this->view('accessible-frontend::group-exchange-create', [
+            'title' => __('govuk_alpha.group_exchanges.create_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'group_exchanges',
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Create a draft group exchange, then redirect to its detail page to add people. */
+    public function storeGroupExchange(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('group_exchanges'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $title = trim(self::asStr($request->input('title')));
+        $hours = round((float) $request->input('total_hours'), 2);
+        $rawSplit = self::asStr($request->input('split_type'));
+        $splitType = in_array($rawSplit, ['equal', 'custom'], true) ? $rawSplit : 'equal';
+        $description = trim(self::asStr($request->input('description')));
+
+        if ($title === '' || $hours <= 0) {
+            return redirect()->route('govuk-alpha.group-exchanges.create', ['tenantSlug' => $tenantSlug, 'status' => 'create-invalid']);
+        }
+
+        $id = null;
+        try {
+            $id = app(\App\Services\GroupExchangeService::class)->create($userId, [
+                'title' => $title,
+                'description' => $description,
+                'total_hours' => $hours,
+                'split_type' => $splitType,
+                'status' => 'draft',
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if (!$id) {
+            return redirect()->route('govuk-alpha.group-exchanges.create', ['tenantSlug' => $tenantSlug, 'status' => 'create-failed']);
+        }
+
+        return redirect()->route('govuk-alpha.group-exchanges.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'created']);
+    }
+
+    /** Group exchange detail — info, participants, calculated split, and role-appropriate actions. */
+    public function groupExchange(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('group_exchanges'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $svc = app(\App\Services\GroupExchangeService::class);
+        $exchange = $svc->get($id);
+        abort_if($exchange === null, 404);
+
+        $participants = is_array($exchange['participants'] ?? null) ? $exchange['participants'] : [];
+        $isOrganizer = (int) ($exchange['organizer_id'] ?? 0) === $userId;
+        $viewerRow = null;
+        foreach ($participants as $p) {
+            if ((int) ($p['user_id'] ?? 0) === $userId) {
+                $viewerRow = $p;
+                break;
+            }
+        }
+        $isParticipant = $viewerRow !== null;
+        abort_unless($isOrganizer || $isParticipant, 403);
+
+        // Organiser can edit while the exchange is not yet completed/cancelled.
+        $editable = $isOrganizer && in_array($exchange['status'] ?? '', ['draft', 'pending', 'approved'], true);
+
+        $splitByUser = [];
+        try {
+            foreach ($svc->calculateSplit($id) as $s) {
+                $splitByUser[(int) ($s['user_id'] ?? 0)] = round((float) ($s['hours'] ?? 0), 2);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // Member search to add a participant (organiser + editable only). Hide
+        // anyone already in the exchange.
+        $existingIds = array_map(static fn ($p): int => (int) ($p['user_id'] ?? 0), $participants);
+        $participantQuery = trim(self::asStr($request->query('participant_q')));
+        $participantResults = [];
+        if ($editable && $participantQuery !== '') {
+            $participantResults = array_values(array_filter(
+                $this->messageUserSearch($participantQuery, $userId),
+                static fn ($r): bool => !in_array((int) ($r['id'] ?? 0), $existingIds, true)
+            ));
+        }
+
+        return $this->view('accessible-frontend::group-exchange-detail', [
+            'title' => ($exchange['title'] ?? '') ?: __('govuk_alpha.group_exchanges.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'group_exchanges',
+            'exchange' => $exchange,
+            'participants' => $participants,
+            'splitByUser' => $splitByUser,
+            'isOrganizer' => $isOrganizer,
+            'isParticipant' => $isParticipant,
+            'editable' => $editable,
+            'viewerConfirmed' => (bool) ($viewerRow['confirmed'] ?? false),
+            'participantQuery' => $participantQuery,
+            'participantResults' => $participantResults,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function addGroupExchangeParticipant(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $userId = $this->geGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $svc = app(\App\Services\GroupExchangeService::class);
+        $exchange = $svc->get($id);
+        if ($exchange === null) {
+            abort(404);
+        }
+        // Organiser only, and only while the exchange is still editable.
+        if ((int) ($exchange['organizer_id'] ?? 0) !== $userId || !in_array($exchange['status'] ?? '', ['draft', 'pending', 'approved'], true)) {
+            return $this->geRedirect($tenantSlug, $id, 'add-failed');
+        }
+
+        $participantId = (int) $request->input('participant_id');
+        $rawRole = self::asStr($request->input('role'));
+        $role = in_array($rawRole, ['provider', 'receiver'], true) ? $rawRole : 'provider';
+        $hours = round((float) $request->input('hours'), 2);
+        if ($hours < 0) {
+            $hours = 0;
+        }
+
+        // Defensive same-tenant check (the service does not re-scope the id).
+        $sameTenant = $participantId > 0 && DB::table('users')
+            ->where('id', $participantId)
+            ->where('tenant_id', TenantContext::getId())
+            ->exists();
+        if (!$sameTenant) {
+            return $this->geRedirect($tenantSlug, $id, 'add-failed');
+        }
+
+        $ok = false;
+        try {
+            $ok = $svc->addParticipant($id, $participantId, $role, $hours, 1.0);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->geRedirect($tenantSlug, $id, $ok ? 'participant-added' : 'add-failed');
+    }
+
+    public function removeGroupExchangeParticipant(Request $request, string $tenantSlug, int $id, int $participantUserId): RedirectResponse
+    {
+        $userId = $this->geGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $svc = app(\App\Services\GroupExchangeService::class);
+        $exchange = $svc->get($id);
+        if ($exchange === null) {
+            abort(404);
+        }
+        if ((int) ($exchange['organizer_id'] ?? 0) !== $userId || !in_array($exchange['status'] ?? '', ['draft', 'pending', 'approved'], true)) {
+            return $this->geRedirect($tenantSlug, $id, 'failed');
+        }
+
+        $ok = false;
+        try {
+            $ok = $svc->removeParticipant($id, $participantUserId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->geRedirect($tenantSlug, $id, $ok ? 'participant-removed' : 'failed');
+    }
+
+    public function confirmGroupExchange(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $userId = $this->geGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $svc = app(\App\Services\GroupExchangeService::class);
+        $exchange = $svc->get($id);
+        if ($exchange === null) {
+            abort(404);
+        }
+        $participants = is_array($exchange['participants'] ?? null) ? $exchange['participants'] : [];
+        $isParticipant = false;
+        foreach ($participants as $p) {
+            if ((int) ($p['user_id'] ?? 0) === $userId) {
+                $isParticipant = true;
+                break;
+            }
+        }
+        if (!$isParticipant) {
+            return $this->geRedirect($tenantSlug, $id, 'failed');
+        }
+
+        $ok = false;
+        try {
+            $ok = $svc->confirmParticipation($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->geRedirect($tenantSlug, $id, $ok ? 'confirmed' : 'failed');
+    }
+
+    public function completeGroupExchange(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $userId = $this->geGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $svc = app(\App\Services\GroupExchangeService::class);
+        $exchange = $svc->get($id);
+        if ($exchange === null) {
+            abort(404);
+        }
+        if ((int) ($exchange['organizer_id'] ?? 0) !== $userId) {
+            abort(403);
+        }
+
+        $success = false;
+        try {
+            $result = $svc->complete($id);
+            $success = (bool) ($result['success'] ?? false);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->geRedirect($tenantSlug, $id, $success ? 'completed' : 'complete-failed');
+    }
+
+    public function cancelGroupExchange(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $userId = $this->geGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $svc = app(\App\Services\GroupExchangeService::class);
+        $exchange = $svc->get($id);
+        if ($exchange === null) {
+            abort(404);
+        }
+        if ((int) ($exchange['organizer_id'] ?? 0) !== $userId) {
+            abort(403);
+        }
+
+        $ok = false;
+        try {
+            $ok = $svc->updateStatus($id, 'cancelled');
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->geRedirect($tenantSlug, $id, $ok ? 'cancelled' : 'failed');
+    }
+
+    /** Shared auth/feature guard for group-exchange POST actions; returns the user id or a redirect. */
+    private function geGuard(string $tenantSlug): int|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('group_exchanges'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        return $userId;
+    }
+
+    private function geRedirect(string $tenantSlug, int $id, string $status): RedirectResponse
+    {
+        return redirect()->route('govuk-alpha.group-exchanges.show', [
+            'tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status,
+        ])->withFragment('group-exchange-top');
+    }
+
     /** Time-credit wallet: balance, transaction history, and a transfer form. */
     public function wallet(Request $request, string $tenantSlug): Response|RedirectResponse
     {
@@ -4231,6 +4560,10 @@ class AlphaController extends Controller
             if ($userId !== null) {
                 $items['matches'] = route('govuk-alpha.matches.index', ['tenantSlug' => $tenantSlug]);
             }
+        }
+
+        if ($userId !== null && TenantContext::hasFeature('group_exchanges')) {
+            $items['group_exchanges'] = route('govuk-alpha.group-exchanges.index', ['tenantSlug' => $tenantSlug]);
         }
 
         if (TenantContext::hasFeature('connections')) {
