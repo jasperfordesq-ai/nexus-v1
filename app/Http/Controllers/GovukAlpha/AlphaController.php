@@ -4976,11 +4976,20 @@ class AlphaController extends Controller
         }
         abort_if($org === null, 404);
 
+        // WAVE O: depth — opportunities, member reviews and aggregate stats for
+        // this organisation. All data is loaded through tenant-scoped service
+        // methods (see waveOrgDetailExtras) so a cross-tenant org id 404s above
+        // and never leaks another community's volunteering data.
+        $extras = $this->waveOrgDetailExtras($id);
+
         return $this->view('accessible-frontend::organisation-detail', [
             'title' => ($org['name'] ?? '') ?: __('govuk_alpha.organisations.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
             'organisation' => $org,
+            'orgOpportunities' => $extras['opportunities'],
+            'orgReviews' => $extras['reviews'],
+            'orgStats' => $extras['stats'],
         ]);
     }
 
@@ -9584,5 +9593,80 @@ class AlphaController extends Controller
     private function allowed(mixed $value, array $allowed, mixed $default): mixed
     {
         return in_array($value, $allowed, true) ? $value : $default;
+    }
+
+    // ===== WAVE O: Organisations depth =====
+
+    /**
+     * Build the depth payload for an organisation detail page: open volunteering
+     * opportunities, member reviews and aggregate stats (volunteer count, total
+     * approved hours, average rating).
+     *
+     * Every backing call is tenant-scoped: VolunteerService::getOpportunities()
+     * runs through the VolOpportunity tenant global scope, VolunteerService::
+     * getReviews() and getOrganizationById() filter on tenant_id in SQL. The
+     * caller has already 404'd a cross-tenant / unknown org id, so this only ever
+     * returns the current tenant's data. Failures degrade to empty sections — the
+     * page must still render the core organisation profile.
+     *
+     * @return array{opportunities: list<array<string, mixed>>, reviews: list<array<string, mixed>>, stats: array<string, mixed>}
+     */
+    private function waveOrgDetailExtras(int $orgId): array
+    {
+        $opportunities = [];
+        $reviews = [];
+        $stats = [];
+
+        try {
+            $opportunities = \App\Services\VolunteerService::getOpportunities([
+                'organization_id' => $orgId,
+                'limit' => 10,
+            ])['items'] ?? [];
+            $opportunities = is_array($opportunities) ? array_values($opportunities) : [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        try {
+            $rawReviews = \App\Services\VolunteerService::getReviews('organization', $orgId);
+            foreach ((is_array($rawReviews) ? $rawReviews : []) as $review) {
+                if (! is_array($review)) {
+                    continue;
+                }
+                // Resolve the reviewer avatar to a same-origin URL, matching how
+                // the rest of the accessible frontend handles user images.
+                if (isset($review['author']) && is_array($review['author'])) {
+                    $review['author']['avatar'] = $this->resolveAsset(
+                        self::asStr($review['author']['avatar'] ?? null) ?: null
+                    );
+                }
+                $reviews[] = $review;
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        try {
+            // getOrganizationById() is the stats-bearing, fully tenant-scoped
+            // accessor (volunteer/hours/rating aggregates computed in SQL).
+            $withStats = \App\Services\VolunteerService::getOrganizationById($orgId);
+            if (is_array($withStats)) {
+                $stats = [
+                    'opportunity_count' => (int) ($withStats['opportunity_count'] ?? 0),
+                    'volunteer_count' => $withStats['volunteer_count'] ?? null,
+                    'total_hours' => (float) ($withStats['total_hours'] ?? 0),
+                    'review_count' => (int) ($withStats['review_count'] ?? 0),
+                    'average_rating' => (float) ($withStats['average_rating'] ?? 0),
+                ];
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return [
+            'opportunities' => $opportunities,
+            'reviews' => $reviews,
+            'stats' => $stats,
+        ];
     }
 }

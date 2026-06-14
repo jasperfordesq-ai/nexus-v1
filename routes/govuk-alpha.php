@@ -262,4 +262,13 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/profile/data-export', [AlphaController::class, 'requestDataExport'])->middleware('throttle:3,60')->name('profile.data-export');
         Route::get('/profile/delete-account', [AlphaController::class, 'confirmDeleteAccount'])->name('profile.delete');
         Route::post('/profile/delete-account', [AlphaController::class, 'deleteAccount'])->middleware('throttle:5,60')->name('profile.delete.store');
+
+        // ===== WAVE O: Organisations depth =====
+        // The organisation detail page now surfaces volunteering opportunities,
+        // member reviews and aggregate stats. These read sections are served by
+        // the existing `organisations.show` route (AlphaController::organisation),
+        // and the "apply" action reuses the existing volunteering apply path
+        // (`volunteering.show` -> `volunteering.apply.store`) so the volunteer
+        // application + organiser notification logic is not duplicated. No new
+        // routes are required for WAVE O.
     });
