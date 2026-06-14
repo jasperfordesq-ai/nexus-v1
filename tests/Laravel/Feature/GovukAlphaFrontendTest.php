@@ -3811,6 +3811,103 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee(__('govuk_alpha.nexus_score.description'));
     }
 
+    public function test_wave3_discovery_pages_render(): void
+    {
+        $this->authenticatedUser(['name' => 'Browser Member']);
+
+        foreach (['saved', 'resources', 'jobs', 'ideation'] as $path) {
+            $this->get("/{$this->testTenantSlug}/alpha/{$path}")->assertOk();
+        }
+
+        $this->get("/{$this->testTenantSlug}/alpha/jobs")->assertSee(__('govuk_alpha.jobs.title'));
+        $this->get("/{$this->testTenantSlug}/alpha/ideation")->assertSee(__('govuk_alpha.ideation.title'));
+        $this->get("/{$this->testTenantSlug}/alpha/resources")->assertSee(__('govuk_alpha.resources.title'));
+        $this->get("/{$this->testTenantSlug}/alpha/saved")->assertSee(__('govuk_alpha.saved.title'));
+    }
+
+    public function test_job_detail_renders_and_application_is_recorded(): void
+    {
+        $applicant = $this->authenticatedUser(['name' => 'Keen Applicant']);
+        // The opportunity must belong to someone else — you cannot apply to your own.
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+
+        $jobId = DB::table('job_vacancies')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'title' => 'Community Gardener',
+            'description' => 'Help tend the shared allotment each week.',
+            'type' => 'volunteer',
+            'status' => 'open',
+            'created_at' => now(),
+        ]);
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/jobs/{$jobId}");
+        $detail->assertOk();
+        $detail->assertSee('Community Gardener');
+        $detail->assertSee(__('govuk_alpha.jobs.apply_button'));
+
+        $apply = $this->post("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/apply", [
+            'cover_letter' => 'I would love to help in the garden.',
+        ]);
+        $apply->assertRedirectContains('status=applied');
+
+        $this->assertSame(1, DB::table('job_vacancy_applications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('vacancy_id', $jobId)
+            ->where('user_id', $applicant->id)
+            ->count());
+    }
+
+    public function test_ideation_challenge_detail_submit_and_vote(): void
+    {
+        $member = $this->authenticatedUser(['name' => 'Idea Author']);
+
+        $challengeId = DB::table('ideation_challenges')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $member->id,
+            'title' => 'How should we use the old library?',
+            'description' => 'Share your ideas for the space.',
+            'status' => 'open',
+            'created_at' => now(),
+        ]);
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}");
+        $detail->assertOk();
+        $detail->assertSee('How should we use the old library?');
+        $detail->assertSee(__('govuk_alpha.ideation.submit_button'));
+
+        // Submit a new idea.
+        $submit = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas", [
+            'idea_title' => 'A community makerspace',
+            'idea_content' => 'Tools and benches anyone can use.',
+        ]);
+        $submit->assertRedirectContains('status=idea-submitted');
+        $this->assertSame(1, DB::table('challenge_ideas')
+            ->where('challenge_id', $challengeId)
+            ->where('user_id', $member->id)
+            ->where('title', 'A community makerspace')
+            ->count());
+
+        // Vote on someone else's idea (you cannot vote on your own).
+        $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $ideaId = DB::table('challenge_ideas')->insertGetId([
+            'challenge_id' => $challengeId,
+            'user_id' => $other->id,
+            'title' => 'A reading garden',
+            'description' => 'Quiet outdoor seating with books.',
+            'status' => 'submitted',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $vote = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas/{$ideaId}/vote");
+        $vote->assertRedirectContains('status=idea-voted');
+        $this->assertSame(1, DB::table('challenge_idea_votes')
+            ->where('idea_id', $ideaId)
+            ->where('user_id', $member->id)
+            ->count());
+    }
+
     /**
      * Force the member search down its deterministic SQL fallback by marking
      * Meilisearch unavailable. Meili indexing is non-transactional and async, so

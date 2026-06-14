@@ -222,6 +222,18 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
   font-weight: 700;
 }
 
+// A horizontally wrapping row of tags (e.g. skills on an opportunity).
+.nexus-alpha-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: govuk-spacing(2);
+  margin-bottom: 0;
+}
+
+.nexus-alpha-tag-list li {
+  margin-bottom: 0;
+}
+
 .nexus-alpha-listing-row {
   display: flex;
   gap: govuk-spacing(4);

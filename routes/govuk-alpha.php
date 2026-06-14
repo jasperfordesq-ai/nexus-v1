@@ -165,6 +165,15 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/organisations', [AlphaController::class, 'organisations'])->name('organisations.index');
         Route::post('/organisations', [AlphaController::class, 'storeOrganisation'])->middleware('throttle:5,5')->name('organisations.store');
         Route::get('/organisations/{id}', [AlphaController::class, 'organisation'])->whereNumber('id')->name('organisations.show');
+        Route::get('/saved', [AlphaController::class, 'saved'])->name('saved.index');
+        Route::get('/resources', [AlphaController::class, 'resources'])->name('resources.index');
+        Route::get('/jobs', [AlphaController::class, 'jobs'])->name('jobs.index');
+        Route::get('/jobs/{id}', [AlphaController::class, 'job'])->whereNumber('id')->name('jobs.show');
+        Route::post('/jobs/{id}/apply', [AlphaController::class, 'applyJob'])->whereNumber('id')->middleware('throttle:10,1')->name('jobs.apply');
+        Route::get('/ideation', [AlphaController::class, 'ideation'])->name('ideation.index');
+        Route::get('/ideation/{id}', [AlphaController::class, 'ideationChallenge'])->whereNumber('id')->name('ideation.show');
+        Route::post('/ideation/{id}/ideas', [AlphaController::class, 'submitIdea'])->whereNumber('id')->middleware('throttle:10,1')->name('ideation.ideas.store');
+        Route::post('/ideation/{id}/ideas/{ideaId}/vote', [AlphaController::class, 'voteIdea'])->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:30,1')->name('ideation.ideas.vote');
         Route::get('/profile', [AlphaController::class, 'myProfile'])->name('profile.me');
         Route::get('/profile/settings', [AlphaController::class, 'profileSettings'])->name('profile.settings');
         Route::post('/profile/settings', [AlphaController::class, 'updateProfileSettings'])->middleware('throttle:20,1')->name('profile.settings.update');

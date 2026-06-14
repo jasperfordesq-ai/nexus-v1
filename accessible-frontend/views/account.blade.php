@@ -61,6 +61,14 @@
             ];
         }
 
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.saved.index')) {
+            $accountLinks[] = [
+                'title' => __('govuk_alpha.saved.title'),
+                'description' => __('govuk_alpha.saved.description'),
+                'href' => route('govuk-alpha.saved.index', ['tenantSlug' => $tenantSlug]),
+            ];
+        }
+
         if (\Illuminate\Support\Facades\Route::has('govuk-alpha.matches.index') && \App\Core\TenantContext::hasModule('listings')) {
             $accountLinks[] = [
                 'title' => __('govuk_alpha.matches.title'),
