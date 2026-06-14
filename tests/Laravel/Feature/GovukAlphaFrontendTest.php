@@ -3263,25 +3263,58 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee(__('govuk_alpha.account.wallet_title'));
         $response->assertSee(__('govuk_alpha.account.profile_title'));
         $response->assertSee(__('govuk_alpha.account.settings_title'));
-        // Cards link to the real destinations.
+        // Cards link to the real destinations, including Matches + Group exchanges
+        // which now live in the hub rather than the service nav.
         $response->assertSee(route('govuk-alpha.wallet.index', ['tenantSlug' => $this->testTenantSlug]), false);
         $response->assertSee(route('govuk-alpha.profile.settings', ['tenantSlug' => $this->testTenantSlug]), false);
+        $response->assertSee(route('govuk-alpha.matches.index', ['tenantSlug' => $this->testTenantSlug]), false);
+        $response->assertSee(route('govuk-alpha.group-exchanges.index', ['tenantSlug' => $this->testTenantSlug]), false);
     }
 
-    public function test_header_surfaces_wallet_balance_and_account_link_when_signed_in(): void
+    public function test_service_nav_lists_polls_last_and_excludes_personal_items(): void
     {
-        $user = $this->authenticatedUser(['name' => 'Header User']);
-        DB::table('users')->where('id', $user->id)->update(['balance' => 8]);
+        $this->authenticatedUser(['name' => 'Nav User']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
+        $response->assertOk();
+        $html = $response->getContent();
+
+        $navList = '<ul class="govuk-service-navigation__list"';
+        $navStart = strpos($html, $navList);
+        $this->assertNotFalse($navStart, 'service navigation list should render');
+        $navHtml = substr($html, $navStart);
+
+        $volunteeringPos = strpos($navHtml, route('govuk-alpha.volunteering.index', ['tenantSlug' => $this->testTenantSlug]));
+        $pollsPos = strpos($navHtml, route('govuk-alpha.polls.index', ['tenantSlug' => $this->testTenantSlug]));
+        $this->assertNotFalse($volunteeringPos);
+        $this->assertNotFalse($pollsPos);
+        // Polls comes after Volunteering (it is the last item in the bar).
+        $this->assertGreaterThan($volunteeringPos, $pollsPos);
+
+        // Matches + Group exchanges are NOT in the service navigation any more.
+        $this->assertStringNotContainsString(
+            'govuk-service-navigation__link" href="' . route('govuk-alpha.matches.index', ['tenantSlug' => $this->testTenantSlug]),
+            $navHtml
+        );
+        $this->assertStringNotContainsString(
+            'govuk-service-navigation__link" href="' . route('govuk-alpha.group-exchanges.index', ['tenantSlug' => $this->testTenantSlug]),
+            $navHtml
+        );
+    }
+
+    public function test_header_surfaces_account_link_when_signed_in(): void
+    {
+        $this->authenticatedUser(['name' => 'Header User']);
 
         $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
 
         $response->assertOk();
-        // Glanceable balance chip in the top "account" zone (the visually-hidden
-        // label is unique, unlike a bare "8.00" which can appear elsewhere).
-        $response->assertSee(__('govuk_alpha.wallet.header_balance', ['value' => '8.00']));
-        // "My account" link to the hub.
+        // The top zone holds a single "My account" hub link (wallet and the rest
+        // of the personal items live behind it, not as separate header chips).
         $response->assertSee(__('govuk_alpha.nav.account'));
-        $response->assertSee(route('govuk-alpha.account', ['tenantSlug' => $this->testTenantSlug]), false);
+        $response->assertSee('class="nexus-alpha-header__link" href="' . route('govuk-alpha.account', ['tenantSlug' => $this->testTenantSlug]) . '"', false);
+        // Wallet is no longer a separate header chip.
+        $response->assertDontSee('class="nexus-alpha-header__link nexus-alpha-header__link--wallet"', false);
     }
 
     public function test_wallet_recipient_autocomplete_endpoint_and_pick_by_id(): void

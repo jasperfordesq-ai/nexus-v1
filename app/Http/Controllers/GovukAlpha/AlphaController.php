@@ -4537,7 +4537,6 @@ class AlphaController extends Controller
             'alphaHeaderFg' => $headerFg['fg'] ?? null,
             'alphaHeaderFgHover' => $headerFg['hover'] ?? null,
             'isAuthenticated' => $this->currentUserId() !== null,
-            'alphaWalletBalance' => $this->alphaHeaderWalletBalance(),
             'alphaNavItems' => $this->alphaNavItems(),
             'alphaFooterColumns' => $this->alphaFooterColumns(),
             'alphaSignOutUrl' => $this->alphaSignOutUrl(),
@@ -4685,10 +4684,11 @@ class AlphaController extends Controller
         if ($userId === null) {
             $items['home'] = route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]);
         } else {
-            // Personal/transactional items (Wallet, Messages) live in the top
-            // header "My account" zone, not the service nav — which is reserved
-            // for community + discovery facilities to keep the flat GOV.UK bar
-            // uncrowded. See account() + the header in layout.blade.php.
+            // Personal/transactional items (Wallet, Messages, Connections, Matches,
+            // Group exchanges, gamification) live in the top header "My account"
+            // hub, not the service nav — which is reserved for community +
+            // discovery facilities to keep the flat GOV.UK bar uncrowded. See
+            // account() + the header in layout.blade.php.
             $items['dashboard'] = route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]);
         }
 
@@ -4696,23 +4696,11 @@ class AlphaController extends Controller
             $items['feed'] = route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]);
         }
 
-        if ($userId !== null && TenantContext::hasFeature('polls')) {
-            $items['polls'] = route('govuk-alpha.polls.index', ['tenantSlug' => $tenantSlug]);
-        }
-
         if (TenantContext::hasModule('listings')) {
             $items['listings'] = route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]);
             if ($userId !== null && BrokerControlConfigService::isExchangeWorkflowEnabled()) {
                 $items['exchanges'] = route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug]);
             }
-            // Matches are listing-based; show them to signed-in members only.
-            if ($userId !== null) {
-                $items['matches'] = route('govuk-alpha.matches.index', ['tenantSlug' => $tenantSlug]);
-            }
-        }
-
-        if ($userId !== null && TenantContext::hasFeature('group_exchanges')) {
-            $items['group_exchanges'] = route('govuk-alpha.group-exchanges.index', ['tenantSlug' => $tenantSlug]);
         }
 
         if (TenantContext::hasFeature('connections')) {
@@ -4727,31 +4715,12 @@ class AlphaController extends Controller
             $items['volunteering'] = route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]);
         }
 
+        // Polls sit last in the bar, after Volunteering.
+        if ($userId !== null && TenantContext::hasFeature('polls')) {
+            $items['polls'] = route('govuk-alpha.polls.index', ['tenantSlug' => $tenantSlug]);
+        }
+
         return $items;
-    }
-
-    /**
-     * Current time-credit balance for the header "Wallet" chip. A single-column
-     * read (not the full WalletService aggregate) so it stays cheap on every
-     * page; null when signed out or the wallet module is off.
-     */
-    private function alphaHeaderWalletBalance(): ?float
-    {
-        $userId = $this->currentUserId();
-        if ($userId === null || !TenantContext::hasModule('wallet')) {
-            return null;
-        }
-
-        try {
-            $balance = DB::table('users')
-                ->where('id', $userId)
-                ->where('tenant_id', TenantContext::getId())
-                ->value('balance');
-
-            return $balance === null ? null : (float) $balance;
-        } catch (\Throwable $e) {
-            return null;
-        }
     }
 
     /**

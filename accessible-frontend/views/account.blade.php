@@ -37,6 +37,45 @@
             ];
         }
 
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.matches.index') && \App\Core\TenantContext::hasModule('listings')) {
+            $accountLinks[] = [
+                'title' => __('govuk_alpha.matches.title'),
+                'description' => __('govuk_alpha.matches.description'),
+                'href' => route('govuk-alpha.matches.index', ['tenantSlug' => $tenantSlug]),
+            ];
+        }
+
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.group-exchanges.index') && \App\Core\TenantContext::hasFeature('group_exchanges')) {
+            $accountLinks[] = [
+                'title' => __('govuk_alpha.group_exchanges.title'),
+                'description' => __('govuk_alpha.group_exchanges.description'),
+                'href' => route('govuk-alpha.group-exchanges.index', ['tenantSlug' => $tenantSlug]),
+            ];
+        }
+
+        // Gamification — each appears automatically once its route exists.
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.achievements')) {
+            $accountLinks[] = [
+                'title' => __('govuk_alpha.achievements.title'),
+                'description' => __('govuk_alpha.achievements.description'),
+                'href' => route('govuk-alpha.achievements', ['tenantSlug' => $tenantSlug]),
+            ];
+        }
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.leaderboard')) {
+            $accountLinks[] = [
+                'title' => __('govuk_alpha.leaderboard.title'),
+                'description' => __('govuk_alpha.leaderboard.description'),
+                'href' => route('govuk-alpha.leaderboard', ['tenantSlug' => $tenantSlug]),
+            ];
+        }
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.nexus-score')) {
+            $accountLinks[] = [
+                'title' => __('govuk_alpha.nexus_score.title'),
+                'description' => __('govuk_alpha.nexus_score.description'),
+                'href' => route('govuk-alpha.nexus-score', ['tenantSlug' => $tenantSlug]),
+            ];
+        }
+
         $accountLinks[] = [
             'title' => __('govuk_alpha.account.profile_title'),
             'description' => __('govuk_alpha.account.profile_description'),

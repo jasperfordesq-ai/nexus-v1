@@ -112,17 +112,10 @@
                 @endif
                 @if (!empty($tenantSlug))
                     @if ($isAuthenticated ?? false)
-                        {{-- Wallet chip with a glanceable balance, then the "My account"
-                             hub (which gathers Messages, Connections, Profile, Settings).
-                             Personal/transactional items live here, not in the service nav. --}}
-                        @if (!is_null($alphaWalletBalance ?? null))
-                            <a class="nexus-alpha-header__link nexus-alpha-header__link--wallet" href="{{ route('govuk-alpha.wallet.index', ['tenantSlug' => $tenantSlug]) }}" @if (($activeNav ?? '') === 'wallet') aria-current="page" @endif>
-                                {{ __('govuk_alpha.nav.wallet') }}
-                                <span class="nexus-alpha-header__balance" aria-hidden="true">{{ number_format((float) $alphaWalletBalance, 2) }}</span>
-                                <span class="govuk-visually-hidden">{{ __('govuk_alpha.wallet.header_balance', ['value' => number_format((float) $alphaWalletBalance, 2)]) }}</span>
-                            </a>
-                        @endif
-                        <a class="nexus-alpha-header__link" href="{{ route('govuk-alpha.account', ['tenantSlug' => $tenantSlug]) }}" @if (in_array(($activeNav ?? ''), ['account', 'profile', 'messages', 'connections'], true)) aria-current="page" @endif>
+                        {{-- The "My account" hub gathers all personal items — wallet,
+                             messages, connections, matches, group exchanges, gamification,
+                             profile and settings — so the header and service nav stay lean. --}}
+                        <a class="nexus-alpha-header__link" href="{{ route('govuk-alpha.account', ['tenantSlug' => $tenantSlug]) }}" @if (in_array(($activeNav ?? ''), ['account', 'profile', 'messages', 'connections', 'wallet', 'matches', 'group_exchanges', 'achievements', 'leaderboard', 'nexus_score'], true)) aria-current="page" @endif>
                             {{ __('govuk_alpha.nav.account') }}
                             @if (($alphaUnreadMessages ?? 0) > 0)
                                 <span class="nexus-alpha-nav-badge" aria-hidden="true">{{ $alphaUnreadMessages > 99 ? '99+' : $alphaUnreadMessages }}</span>
