@@ -62,6 +62,9 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/password/reset', [AlphaController::class, 'storeResetPassword'])->middleware('throttle:5,1')->name('password.reset.store');
         Route::get('/register', [AlphaController::class, 'register'])->name('register');
         Route::post('/register', [AlphaController::class, 'storeRegister'])->middleware('throttle:5,5')->name('register.store');
+        // Public landings reached from email links (visitor is signed out).
+        Route::get('/verify-email', [AlphaController::class, 'verifyEmail'])->middleware('throttle:20,1')->name('verify-email');
+        Route::get('/newsletter/unsubscribe', [AlphaController::class, 'newsletterUnsubscribe'])->middleware('throttle:20,1')->name('newsletter.unsubscribe');
 
         Route::get('/dashboard', [AlphaController::class, 'dashboard'])->name('dashboard');
         // Onboarding wizard (session-backed, HTML-first multi-step).
@@ -163,6 +166,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/notifications/delete-all', [AlphaController::class, 'deleteAllNotifications'])->middleware('throttle:5,1')->name('notifications.delete-all');
         Route::get('/activity', [AlphaController::class, 'activity'])->name('activity');
         Route::get('/reviews', [AlphaController::class, 'reviews'])->name('reviews.index');
+        Route::post('/reviews', [AlphaController::class, 'storeReview'])->middleware('throttle:10,1')->name('reviews.store');
         Route::get('/explore', [AlphaController::class, 'explore'])->name('explore');
         Route::get('/search', [AlphaController::class, 'search'])->name('search');
         Route::get('/skills', [AlphaController::class, 'skills'])->name('skills.index');

@@ -1688,6 +1688,78 @@ class GovukAlphaFrontendTest extends TestCase
         ]);
     }
 
+    public function test_a2_verify_email_landing_marks_user_verified(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Pending Verifier',
+            'status' => 'pending',
+            'is_approved' => true,
+            'email_verified_at' => null,
+        ]);
+
+        $rawToken = 'a2verifytoken' . str_repeat('0', 20);
+        DB::table('email_verification_tokens')->insert([
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'token' => hash('sha256', $rawToken),
+            'created_at' => now(),
+            'expires_at' => now()->addDay(),
+        ]);
+
+        $page = $this->get("/{$this->testTenantSlug}/alpha/verify-email?token={$rawToken}");
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.auth.verify_email_success_title'));
+
+        $this->assertNotNull(User::find($user->id)->email_verified_at);
+    }
+
+    public function test_a2_verify_email_landing_rejects_bad_token(): void
+    {
+        $missing = $this->get("/{$this->testTenantSlug}/alpha/verify-email");
+        $missing->assertOk();
+        $missing->assertSee(__('govuk_alpha.auth.verify_email_missing'));
+
+        $invalid = $this->get("/{$this->testTenantSlug}/alpha/verify-email?token=not-a-real-token");
+        $invalid->assertOk();
+        $invalid->assertSee(__('govuk_alpha.auth.verify_email_invalid'));
+    }
+
+    public function test_a2_newsletter_unsubscribe_landing_renders(): void
+    {
+        $missing = $this->get("/{$this->testTenantSlug}/alpha/newsletter/unsubscribe");
+        $missing->assertOk();
+        $missing->assertSee(__('govuk_alpha.auth.unsubscribe_missing'));
+
+        $invalid = $this->get("/{$this->testTenantSlug}/alpha/newsletter/unsubscribe?token=not-a-real-token");
+        $invalid->assertOk();
+        $invalid->assertSee(__('govuk_alpha.auth.unsubscribe_invalid'));
+    }
+
+    public function test_a2_review_can_be_submitted_from_reviews_page(): void
+    {
+        $reviewer = $this->authenticatedUser(['name' => 'Review Author']);
+        $receiver = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Reviewed Member',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($reviewer, ['*']);
+
+        $submit = $this->post("/{$this->testTenantSlug}/alpha/reviews", [
+            'receiver_id' => $receiver->id,
+            'rating' => 5,
+            'comment' => 'A genuinely helpful exchange.',
+        ]);
+        $submit->assertRedirect("/{$this->testTenantSlug}/alpha/reviews?status=review-submitted");
+
+        $this->assertDatabaseHas('reviews', [
+            'tenant_id' => $this->testTenantId,
+            'reviewer_id' => $reviewer->id,
+            'receiver_id' => $receiver->id,
+            'rating' => 5,
+        ]);
+    }
+
     public function test_messages_inline_start_conversation_search(): void
     {
         $this->authenticatedUser(['name' => 'Conversation Starter']);

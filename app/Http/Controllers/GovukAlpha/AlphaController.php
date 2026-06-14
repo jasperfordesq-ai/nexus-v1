@@ -250,6 +250,70 @@ class AlphaController extends Controller
         return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'verification-resent']);
     }
 
+    /**
+     * Email-verification landing reached from the verification email link.
+     * Public (the visitor is signed out). Delegates to the shared API verifier
+     * — the exact logic the React app posts to — then renders a GOV.UK result.
+     */
+    public function verifyEmail(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $token = trim(self::asStr($request->query('token')));
+        $state = 'missing'; // missing | success | invalid
+
+        if ($token !== '') {
+            $request->merge(['token' => $token]);
+            try {
+                $response = app(\App\Http\Controllers\Api\EmailVerificationController::class)->verifyEmail();
+                $payload = $response->getData(true);
+                $verified = (bool) ($payload['data']['verified'] ?? $payload['verified'] ?? false);
+                $state = ($response->getStatusCode() < 300 && $verified) ? 'success' : 'invalid';
+            } catch (\Throwable $e) {
+                report($e);
+                $state = 'invalid';
+            }
+        }
+
+        return $this->view('accessible-frontend::email-verify', [
+            'title' => __('govuk_alpha.auth.verify_email_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'login',
+            'state' => $state,
+        ]);
+    }
+
+    /**
+     * Newsletter unsubscribe landing reached from an email footer link.
+     * Public. Delegates to the shared API unsubscribe handler, then renders
+     * a GOV.UK confirmation page.
+     */
+    public function newsletterUnsubscribe(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+
+        $token = trim(self::asStr($request->query('token')));
+        $state = 'missing'; // missing | success | invalid
+
+        if ($token !== '') {
+            $request->merge(['token' => $token]);
+            try {
+                $response = app(\App\Http\Controllers\Api\NewsletterController::class)->unsubscribe();
+                $state = $response->getStatusCode() < 300 ? 'success' : 'invalid';
+            } catch (\Throwable $e) {
+                report($e);
+                $state = 'invalid';
+            }
+        }
+
+        return $this->view('accessible-frontend::newsletter-unsubscribe', [
+            'title' => __('govuk_alpha.auth.unsubscribe_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => null,
+            'state' => $state,
+        ]);
+    }
+
     public function twoFactor(Request $request, string $tenantSlug): Response|RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
@@ -3501,7 +3565,70 @@ class AlphaController extends Controller
             'reviewsGiven' => is_array($given) ? $given : [],
             'reviewsPending' => is_array($pending) ? $pending : [],
             'reviewStats' => is_array($stats) ? $stats : [],
+            'status' => self::asStr($request->query('status')) ?: null,
         ]);
+    }
+
+    /**
+     * Submit a review for a completed exchange straight from the Pending tab.
+     * Mirrors POST /v2/reviews (ReviewService::create + XP + feed activity).
+     */
+    public function storeReview(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('reviews'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $receiverId = (int) $request->input('receiver_id');
+        $rating = (int) $request->input('rating');
+        $comment = trim(self::asStr($request->input('comment')));
+        $transactionId = (int) $request->input('transaction_id');
+
+        $data = [
+            'receiver_id'    => $receiverId,
+            'rating'         => $rating,
+            'comment'        => $comment !== '' ? $comment : null,
+            'transaction_id' => $transactionId > 0 ? $transactionId : null,
+        ];
+
+        $status = 'review-submitted';
+        try {
+            $review = app(\App\Services\ReviewService::class)->create($userId, $data);
+
+            try {
+                \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['leave_review'], 'leave_review', 'Left a review');
+            } catch (\Throwable $e) {
+                // Gamification is best-effort and must not change the review outcome.
+            }
+
+            try {
+                app(\App\Services\FeedActivityService::class)->recordActivity(
+                    (int) TenantContext::getId(),
+                    $userId,
+                    'review',
+                    (int) ($review['id'] ?? 0),
+                    [
+                        'content'  => $review['comment'] ?? null,
+                        'metadata' => ['rating' => $review['rating'] ?? $rating, 'receiver_id' => $receiverId],
+                    ]
+                );
+            } catch (\Throwable $e) {
+                // Feed activity is best-effort.
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $status = 'review-invalid';
+        } catch (\RuntimeException $e) {
+            $status = str_contains($e->getMessage(), 'yourself') ? 'review-invalid' : 'review-duplicate';
+        } catch (\Throwable $e) {
+            report($e);
+            $status = 'review-failed';
+        }
+
+        return redirect()->route('govuk-alpha.reviews.index', ['tenantSlug' => $tenantSlug, 'status' => $status]);
     }
 
     // === Static marketing pages (public) ===
