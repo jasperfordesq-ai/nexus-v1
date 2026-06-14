@@ -124,6 +124,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/polls/{pollId}/vote', [AlphaController::class, 'storePollVote'])->whereNumber('pollId')->middleware('throttle:30,1')->name('polls.vote');
         Route::get('/wallet', [AlphaController::class, 'wallet'])->name('wallet.index');
         Route::post('/wallet/transfer', [AlphaController::class, 'transferCredits'])->middleware('throttle:15,1')->name('wallet.transfer');
+        Route::get('/wallet/recipients', [AlphaController::class, 'walletRecipients'])->middleware('throttle:60,1')->name('wallet.recipients');
         Route::get('/messages', [AlphaController::class, 'messages'])->name('messages.index');
         Route::get('/messages/new/{userId}', [AlphaController::class, 'conversation'])->whereNumber('userId')->name('messages.new');
         Route::get('/messages/{userId}', [AlphaController::class, 'conversation'])->whereNumber('userId')->name('messages.show');

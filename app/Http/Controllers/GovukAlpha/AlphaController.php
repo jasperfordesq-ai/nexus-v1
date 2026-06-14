@@ -2650,6 +2650,79 @@ class AlphaController extends Controller
     }
 
     /**
+     * Resolve a single transfer recipient by id (used when the JS autocomplete
+     * picks a member). Re-applies the same tenant + active + search-opt-out
+     * filters as the text search, so a picked id can't bypass them.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function walletRecipientById(int $recipientId, int $viewerId): array
+    {
+        if ($recipientId <= 0 || $recipientId === $viewerId) {
+            return [];
+        }
+
+        try {
+            $row = DB::table('users')
+                ->where('id', $recipientId)
+                ->where('tenant_id', TenantContext::getId())
+                ->where('status', 'active')
+                ->where(function ($q) {
+                    $q->where('privacy_search', 1)->orWhereNull('privacy_search');
+                })
+                ->select(
+                    'id',
+                    DB::raw("CASE WHEN profile_type = 'organisation' AND organization_name IS NOT NULL AND organization_name != '' THEN organization_name ELSE CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) END as name"),
+                    'location',
+                    'created_at'
+                )
+                ->first();
+
+            return $row ? [(array) $row] : [];
+        } catch (\Throwable $e) {
+            report($e);
+
+            return [];
+        }
+    }
+
+    /**
+     * JSON suggestions for the wallet recipient autocomplete (progressive
+     * enhancement). Reuses the tenant-scoped, privacy-respecting member search
+     * and adds the disambiguation fields (location + "member since"). The no-JS
+     * path never calls this — it uses the server-rendered search results.
+     */
+    public function walletRecipients(Request $request, string $tenantSlug): \Illuminate\Http\JsonResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('wallet'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return response()->json(['results' => []], 401);
+        }
+
+        $query = trim(self::asStr($request->query('q')));
+        if (mb_strlen($query) < 2) {
+            return response()->json(['results' => []]);
+        }
+
+        $results = [];
+        foreach ($this->messageUserSearch($query, $userId) as $r) {
+            $since = !empty($r['created_at'])
+                ? \Illuminate\Support\Carbon::parse($r['created_at'])->translatedFormat('M Y')
+                : null;
+            $results[] = [
+                'id'       => (int) ($r['id'] ?? 0),
+                'name'     => trim((string) ($r['name'] ?? '')),
+                'location' => (trim((string) ($r['location'] ?? '')) ?: null),
+                'since'    => $since,
+            ];
+        }
+
+        return response()->json(['results' => $results]);
+    }
+
+    /**
      * "My account" hub — a single landing page that gathers the member's
      * personal/transactional facilities (Wallet, Messages, Connections, Profile,
      * Settings) so the flat GOV.UK service navigation can stay focused on
@@ -3225,8 +3298,18 @@ class AlphaController extends Controller
         }
 
         // Reuse the tenant-scoped member search to pick a recipient safely.
+        // A `recipient_id` (set by the JS autocomplete enhancement when a member
+        // is picked) resolves to exactly that one member; otherwise fall back to
+        // the no-JS text search. Both honour the same tenant + privacy filters.
+        $recipientId = (int) $request->query('recipient_id');
         $recipientQuery = trim(self::asStr($request->query('recipient_q')));
-        $recipientResults = $recipientQuery !== '' ? $this->messageUserSearch($recipientQuery, $userId) : [];
+        if ($recipientId > 0) {
+            $recipientResults = $this->walletRecipientById($recipientId, $userId);
+        } elseif ($recipientQuery !== '') {
+            $recipientResults = $this->messageUserSearch($recipientQuery, $userId);
+        } else {
+            $recipientResults = [];
+        }
 
         return $this->view('accessible-frontend::wallet', [
             'title' => __('govuk_alpha.wallet.title'),

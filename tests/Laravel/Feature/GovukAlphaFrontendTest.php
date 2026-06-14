@@ -3221,6 +3221,7 @@ class GovukAlphaFrontendTest extends TestCase
 
     public function test_wallet_recipient_search_disambiguates_same_named_members(): void
     {
+        $this->disableMeiliSearch();
         $this->authenticatedUser(['name' => 'Searcher Member']);
 
         // Two members with the IDENTICAL display name, told apart ONLY by
@@ -3281,6 +3282,43 @@ class GovukAlphaFrontendTest extends TestCase
         // "My account" link to the hub.
         $response->assertSee(__('govuk_alpha.nav.account'));
         $response->assertSee(route('govuk-alpha.account', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
+    public function test_wallet_recipient_autocomplete_endpoint_and_pick_by_id(): void
+    {
+        $this->disableMeiliSearch();
+        $this->authenticatedUser(['name' => 'Picker Member']);
+        $target = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true,
+            'first_name' => 'Quenby', 'last_name' => 'Zzyzxington',
+        ]);
+        DB::table('users')->where('id', $target->id)->update(['location' => 'Cork', 'created_at' => '2024-03-15 10:00:00']);
+
+        // JSON suggestions endpoint (powers the JS autocomplete).
+        $json = $this->getJson("/{$this->testTenantSlug}/alpha/wallet/recipients?q=Zzyzxington");
+        $json->assertOk();
+        // Position-independent: just assert our member is present with the
+        // disambiguation fields + id.
+        $json->assertJsonFragment(['id' => $target->id, 'name' => 'Quenby Zzyzxington', 'location' => 'Cork', 'since' => 'Mar 2024']);
+
+        // Picking by recipient_id resolves to exactly that one transfer card.
+        $page = $this->get("/{$this->testTenantSlug}/alpha/wallet?recipient_id={$target->id}");
+        $page->assertOk();
+        $page->assertSee('Quenby Zzyzxington');
+        $page->assertSee(route('govuk-alpha.wallet.transfer', ['tenantSlug' => $this->testTenantSlug]), false);
+        // The progressive-enhancement hooks are present in the markup.
+        $page->assertSee('data-alpha-recipient-autocomplete', false);
+        $page->assertSee(route('govuk-alpha.wallet.recipients', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
+    public function test_wallet_recipient_autocomplete_endpoint_requires_min_query(): void
+    {
+        $this->authenticatedUser(['name' => 'Picker Member']);
+
+        // Too-short queries return no results (don't hammer the search backend).
+        $json = $this->getJson("/{$this->testTenantSlug}/alpha/wallet/recipients?q=a");
+        $json->assertOk();
+        $json->assertExactJson(['results' => []]);
     }
 
     public function test_wallet_transfer_moves_credits_between_members(): void
@@ -3600,6 +3638,20 @@ class GovukAlphaFrontendTest extends TestCase
         $guest->assertSee(__('govuk_alpha.guide.step3_title'));
         // Signed-out visitors get a create-account call to action.
         $guest->assertSee(route('govuk-alpha.register', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
+    /**
+     * Force the member search down its deterministic SQL fallback by marking
+     * Meilisearch unavailable. Meili indexing is non-transactional and async, so
+     * across a suite run the index accumulates stale ids from rolled-back tests —
+     * which makes any search-result assertion flaky. With Meili off, the SQL LIKE
+     * path queries the live (transaction-visible) rows only.
+     */
+    private function disableMeiliSearch(): void
+    {
+        $prop = new \ReflectionProperty(\App\Services\SearchService::class, 'available');
+        $prop->setAccessible(true);
+        $prop->setValue(null, false);
     }
 
     private function authenticatedUser(array $overrides = []): User

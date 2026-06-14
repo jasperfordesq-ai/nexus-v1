@@ -72,12 +72,18 @@
             <div class="govuk-form-group">
                 <label class="govuk-label" for="recipient_q">{{ __('govuk_alpha.wallet.search_label') }}</label>
                 <div id="recipient-q-hint" class="govuk-hint">{{ __('govuk_alpha.wallet.search_hint') }}</div>
+                {{-- The JS enhancement mounts an accessible autocomplete into this
+                     container and removes the plain input + button below. With no
+                     JavaScript, the plain search input + button are the fallback. --}}
+                <div data-alpha-recipient-autocomplete
+                     data-source="{{ route('govuk-alpha.wallet.recipients', ['tenantSlug' => $tenantSlug]) }}"
+                     data-target="{{ route('govuk-alpha.wallet.index', ['tenantSlug' => $tenantSlug]) }}"></div>
                 <input class="govuk-input govuk-!-width-two-thirds" id="recipient_q" name="recipient_q" type="search" value="{{ $recipientQuery ?? '' }}" aria-describedby="recipient-q-hint">
             </div>
-            <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.actions.search') }}</button>
+            <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button" data-alpha-recipient-submit>{{ __('govuk_alpha.actions.search') }}</button>
         </form>
 
-        @if (($recipientQuery ?? '') !== '')
+        @if (!empty($recipientResults) || ($recipientQuery ?? '') !== '')
             @if (empty($recipientResults))
                 <p class="govuk-body">{{ __('govuk_alpha.wallet.search_empty') }}</p>
             @else
