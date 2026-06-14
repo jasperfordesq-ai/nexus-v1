@@ -5,7 +5,6 @@ import { Separator } from '@/components/ui';
 import Globe from 'lucide-react/icons/globe';
 import MapPin from 'lucide-react/icons/map-pin';
 import KeyRound from 'lucide-react/icons/key-round';
-import Lock from 'lucide-react/icons/lock';
 import Eye from 'lucide-react/icons/eye';
 import EyeOff from 'lucide-react/icons/eye-off';
 import { useTranslation } from 'react-i18next';
@@ -52,13 +51,20 @@ interface PlatformInfrastructureProps {
 export default function PlatformInfrastructure({ config: _config, onConfigChange: _onConfigChange }: PlatformInfrastructureProps) {
   const { t } = useTranslation('admin');
   const toast = useToast();
-  const { refreshTenant, supportedLanguages, defaultLanguage } = useTenant();
+  const { refreshTenant, supportedLanguages, defaultLanguage, hasFeature } = useTenant();
 
   const [loading, setLoading] = useState(true);
   // Language state
   const [langDefault, setLangDefault] = useState(defaultLanguage);
   const [langSupported, setLangSupported] = useState<string[]>(supportedLanguages);
   const [savingLang, setSavingLang] = useState(false);
+
+  // Maps kill switch (the per-tenant `maps` feature flag). When off, no map
+  // components render anywhere for this tenant; address autocomplete still
+  // works via the geocoding provider below. Backed by the same toggle endpoint
+  // every other feature uses (PUT /v2/admin/config/features).
+  const [mapsEnabled, setMapsEnabled] = useState<boolean>(hasFeature('maps'));
+  const [savingMaps, setSavingMaps] = useState(false);
 
   // Provider state
   const [mapProvider, setMapProvider] = useState<'google' | 'openstreetmap' | 'ordnance_survey'>('google');
@@ -85,6 +91,12 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
     setLangDefault(defaultLanguage);
     setLangSupported(supportedLanguages);
   }, [defaultLanguage, supportedLanguages]);
+
+  // Keep the kill-switch in sync with the live tenant feature flag (e.g. after
+  // refreshTenant() re-pulls the bootstrap, or another admin tab changes it).
+  useEffect(() => {
+    setMapsEnabled(hasFeature('maps'));
+  }, [hasFeature]);
 
   const loadSettings = useCallback(async () => {
     setLoading(true);
@@ -140,6 +152,21 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
       toast.error(res.error || t('tenant_features.language_settings_save_failed'));
     }
     setSavingLang(false);
+  };
+
+  const handleToggleMaps = async (value: boolean) => {
+    setSavingMaps(true);
+    const previous = mapsEnabled;
+    setMapsEnabled(value); // optimistic — reverted on failure
+    const res = await adminConfig.updateFeature('maps', value);
+    if (res.success) {
+      toast.success(t('tenant_features.maps_kill_switch_saved'));
+      refreshTenant();
+    } else {
+      setMapsEnabled(previous);
+      toast.error(res.error || t('tenant_features.maps_providers_save_failed'));
+    }
+    setSavingMaps(false);
   };
 
   const handleSaveProviders = async () => {
@@ -301,9 +328,9 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
           <CardBody className="px-4 pb-4 space-y-4">
             <div className="flex flex-wrap gap-2 items-center text-xs">
               <span className="text-muted">{t('tenant_features.currently_serving')}:</span>
-              <span className="px-2 py-0.5 rounded-full font-medium bg-surface-secondary text-muted">
+              <span className={`px-2 py-0.5 rounded-full font-medium ${mapsEnabled ? 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300' : 'bg-surface-secondary text-muted'}`}>
                 {t('tenant_features.status_maps')}{': '}
-                {t('tenant_features.status_off')}
+                {mapsEnabled ? t('tenant_features.status_on') : t('tenant_features.status_off')}
               </span>
               <span className={`px-2 py-0.5 rounded-full font-medium ${geocodingProvider === 'google' ? 'bg-warning-100 text-warning-700 dark:bg-warning-900/30 dark:text-warning-300' : 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300'}`}>
                 {t('tenant_features.status_autocomplete')}{': '}
@@ -323,24 +350,19 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
 
             <Separator />
 
-            <div className="flex items-center justify-between rounded-lg bg-surface-secondary px-3 py-3 opacity-60">
+            <div className="flex items-center justify-between rounded-lg bg-surface-secondary px-3 py-3">
               <div className="pr-4">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <p className="font-medium text-sm">
-                    {t('tenant_features.maps_kill_switch_label')}
-                  </p>
-                  <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full bg-surface text-muted">
-                    <Lock size={10} aria-hidden="true" />
-                    {t('tenant_features.maps_policy_locked')}
-                  </span>
-                </div>
+                <p className="font-medium text-sm mb-0.5">
+                  {t('tenant_features.maps_kill_switch_label')}
+                </p>
                 <p className="text-xs text-muted mt-0.5">
-                  {t('tenant_features.maps_policy_desc')}
+                  {t('tenant_features.maps_kill_switch_desc')}
                 </p>
               </div>
               <Switch
-                isSelected={false}
-                isDisabled={true}
+                isSelected={mapsEnabled}
+                isDisabled={savingMaps}
+                onValueChange={handleToggleMaps}
                 size="sm"
                 aria-label={t('tenant_features.maps_kill_switch_aria')}
               />
@@ -364,7 +386,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 }}
                 className="max-w-xs"
                 size="sm"
-                isDisabled={true}
+                isDisabled={savingProviders}
               >
                 <SelectItem key="google" id="google">{t('tenant_features.provider_google')}</SelectItem>
                 <SelectItem key="openstreetmap" id="openstreetmap">{t('tenant_features.provider_osm')}</SelectItem>

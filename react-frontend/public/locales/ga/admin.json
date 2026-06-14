@@ -15425,7 +15425,9 @@
     "tiles_status_os_maps": "API OS Maps gníomhach",
     "tiles_status_os_maps_unset": "Gan eochair — titeann siar ar OSM saor in aisce",
     "provider_os_places": "Ordnance Survey Places (RA, UPRN)",
-    "status_os_places": "OS Places (PSGA)"
+    "status_os_places": "OS Places (PSGA)",
+    "status_on": "On",
+    "maps_kill_switch_saved": "Map display setting saved"
   },
   "cron_setup": {
     "notice_title": "Tábhachtach: conas a oibríonn cron ar Project NEXUS",

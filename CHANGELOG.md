@@ -36,6 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Maps can be turned on or off per community again, and the map provider is switchable.** The admin "Maps & location" controls were locked, so the maps on/off switch only ever took effect on one community and nobody could change the map provider. Super-admins can now toggle maps for each community individually — turning it off reliably removes every map across listings, members, events, groups and the marketplace — and can choose a different map provider (Google, OpenStreetMap or Ordnance Survey) per community.
+- **Google maps now show their pins even when no Map ID is configured.** Google's newer "advanced" map pins silently render nothing unless a Google Map ID is set, which made maps look empty or broken. Pins now fall back to classic markers when no Map ID is present, so locations always appear; and when a map genuinely can't load (for example a billing or key problem) a clear "map view is not available" message is shown instead of a blank gap.
 - **The accessible home page no longer mislabels sign-in-only sections as "not enabled".** When you're signed out, sections that simply need you to log in (Dashboard, My Profile, Messages, Exchanges) now say "Sign in to use this" and link to the login page, instead of wrongly saying "This module is not enabled for this community". Sections the community has genuinely turned off still say so.
 - **Skill endorsements now work again across the whole platform.** Endorsing a member's skill was silently failing with a server error (the endorsements table has no "updated at" column, but the code tried to write one). Endorsing and un-endorsing now work everywhere.
 

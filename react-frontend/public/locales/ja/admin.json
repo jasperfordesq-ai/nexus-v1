@@ -15425,7 +15425,9 @@
     "tiles_status_os_maps": "OS Maps API有効",
     "tiles_status_os_maps_unset": "キーなし — 無料のOSMにフォールバック",
     "provider_os_places": "Ordnance Survey Places(英国、UPRN)",
-    "status_os_places": "OS Places(PSGA)"
+    "status_os_places": "OS Places(PSGA)",
+    "status_on": "On",
+    "maps_kill_switch_saved": "Map display setting saved"
   },
   "cron_setup": {
     "notice_title": "重要: Project NEXUS での cron の動作方法",

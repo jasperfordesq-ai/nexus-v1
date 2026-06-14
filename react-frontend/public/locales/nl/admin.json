@@ -15425,7 +15425,9 @@
     "tiles_status_os_maps": "OS Maps API actief",
     "tiles_status_os_maps_unset": "Geen sleutel — valt terug op gratis OSM",
     "provider_os_places": "Ordnance Survey Places (VK, UPRN)",
-    "status_os_places": "OS Places (PSGA)"
+    "status_os_places": "OS Places (PSGA)",
+    "status_on": "On",
+    "maps_kill_switch_saved": "Map display setting saved"
   },
   "cron_setup": {
     "notice_title": "Belangrijk: hoe cron werkt op Project NEXUS",

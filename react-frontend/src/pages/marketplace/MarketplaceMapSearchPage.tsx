@@ -20,7 +20,7 @@ import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, 
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';import Search from 'lucide-react/icons/search';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';import Search from 'lucide-react/icons/search';
 import MapIcon from 'lucide-react/icons/map';
 import List from 'lucide-react/icons/list';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -34,6 +34,7 @@ import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { PageMeta } from '@/components/seo/PageMeta';
+import { MAPS_ENABLED } from '@/lib/map-config';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -75,8 +76,13 @@ export function MarketplaceMapSearchPage() {
   const { t } = useTranslation('marketplace');
   usePageTitle(t('map.page_title'));
   const { isAuthenticated, user } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
   const toast = useToast();
+
+  // Maps kill switch: this is a map-first page, so when maps are off for the
+  // tenant there is nothing to show — bounce to the regular marketplace grid
+  // rather than loading the page chrome and firing the nearby-listings API.
+  const canUseMaps = MAPS_ENABLED && hasFeature('maps');
   const [searchParams, setSearchParams] = useSearchParams();
 
   // View mode (mobile)
@@ -136,7 +142,7 @@ export function MarketplaceMapSearchPage() {
 
   // Load nearby listings
   const loadListings = useCallback(async () => {
-    if (!mapCenter) return;
+    if (!mapCenter || !canUseMaps) return;
 
     setIsLoading(true);
     try {
@@ -168,7 +174,7 @@ export function MarketplaceMapSearchPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [mapCenter, radiusKm, debouncedQuery, categoryId, toast, t]);
+  }, [mapCenter, radiusKm, debouncedQuery, categoryId, canUseMaps, toast, t]);
 
   // Refetch when params change
   useEffect(() => {
@@ -239,6 +245,11 @@ export function MarketplaceMapSearchPage() {
 
   // Active filter count
   const activeFilterCount = [categoryId, radiusKm !== String(DEFAULT_RADIUS_KM) ? 'yes' : ''].filter(Boolean).length;
+
+  // Maps disabled for this tenant → redirect to the standard marketplace.
+  if (!canUseMaps) {
+    return <Navigate to={tenantPath('/marketplace')} replace />;
+  }
 
   return (
     <>

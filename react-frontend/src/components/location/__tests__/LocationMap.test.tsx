@@ -198,4 +198,34 @@ describe('LocationMap', () => {
       });
     });
   });
+
+  describe('marker rendering by Map ID (Google display fix)', () => {
+    it('still renders pins via the classic-marker fallback when NO Map ID is configured', async () => {
+      // beforeEach fetch mock returns mapId: null — AdvancedMarkers would render
+      // nothing, so the classic <Marker> fallback must still produce the pins.
+      const markers = [
+        { id: 1, lat: 53.35, lng: -6.26, title: 'A' },
+        { id: 2, lat: 53.40, lng: -6.30, title: 'B' },
+      ];
+      const { container } = render(<W><LocationMap markers={markers} /></W>);
+      await waitFor(() => {
+        expect(container.querySelector('[data-testid="google-map"]')).toBeTruthy();
+        expect(container.querySelectorAll('[data-testid="marker"]').length).toBe(2);
+      });
+    });
+
+    it('renders pins via AdvancedMarkers when a Map ID IS configured', async () => {
+      resetGoogleMapsConfigForTests();
+      vi.stubGlobal('fetch', vi.fn(async () => ({
+        ok: true,
+        json: async () => ({ data: { enabled: true, apiKey: 'test-key', mapId: 'map-abc' } }),
+      })));
+      const markers = [{ id: 1, lat: 53.35, lng: -6.26, title: 'A' }];
+      const { container } = render(<W><LocationMap markers={markers} /></W>);
+      await waitFor(() => {
+        expect(container.querySelector('[data-testid="google-map"]')).toBeTruthy();
+        expect(container.querySelectorAll('[data-testid="marker"]').length).toBe(1);
+      });
+    });
+  });
 });

@@ -15425,7 +15425,9 @@
     "tiles_status_os_maps": "API OS Maps attiva",
     "tiles_status_os_maps_unset": "Nessuna chiave — si torna a OSM gratuito",
     "provider_os_places": "Ordnance Survey Places (Regno Unito, UPRN)",
-    "status_os_places": "OS Places (PSGA)"
+    "status_os_places": "OS Places (PSGA)",
+    "status_on": "On",
+    "maps_kill_switch_saved": "Map display setting saved"
   },
   "cron_setup": {
     "notice_title": "Importante: come funziona cron su Project NEXUS",

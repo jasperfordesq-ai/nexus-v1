@@ -27,15 +27,15 @@ export interface GoogleMapsConfig {
   apiKey: string;
   mapId: string | null;
   mapsEnabled?: boolean;
-  mapProvider?: 'google' | 'openstreetmap';
-  geocodingProvider?: 'google' | 'nominatim';
+  mapProvider?: 'google' | 'openstreetmap' | 'ordnance_survey';
+  geocodingProvider?: 'google' | 'nominatim' | 'os_places';
   googleMapsEnabled?: boolean;
   googlePlacesEnabled?: boolean;
   /** Runtime tile URL for the OSM branch — chosen by the server (free OSM
-   *  vs MapTiler) based on whether a per-tenant MapTiler key is set. */
+   *  vs MapTiler vs Ordnance Survey) based on the tenant's provider + keys. */
   osmTileUrl?: string;
   osmTileAttribution?: string;
-  osmTileProvider?: 'osm' | 'maptiler' | null;
+  osmTileProvider?: 'osm' | 'maptiler' | 'ordnance_survey' | null;
 }
 
 const GoogleMapsConfigContext = createContext<GoogleMapsConfig | null>(null);
@@ -72,11 +72,11 @@ async function fetchGoogleMapsConfig(): Promise<GoogleMapsConfig> {
           mapId: typeof data.mapId === 'string' && data.mapId !== '' ? data.mapId : null,
           mapsEnabled: typeof data.mapsEnabled === 'boolean' ? data.mapsEnabled : undefined,
           mapProvider:
-            data.mapProvider === 'google' || data.mapProvider === 'openstreetmap'
+            data.mapProvider === 'google' || data.mapProvider === 'openstreetmap' || data.mapProvider === 'ordnance_survey'
               ? data.mapProvider
               : undefined,
           geocodingProvider:
-            data.geocodingProvider === 'google' || data.geocodingProvider === 'nominatim'
+            data.geocodingProvider === 'google' || data.geocodingProvider === 'nominatim' || data.geocodingProvider === 'os_places'
               ? data.geocodingProvider
               : undefined,
           googleMapsEnabled: typeof data.googleMapsEnabled === 'boolean' ? data.googleMapsEnabled : undefined,
@@ -84,7 +84,7 @@ async function fetchGoogleMapsConfig(): Promise<GoogleMapsConfig> {
           osmTileUrl: typeof data.osmTileUrl === 'string' ? data.osmTileUrl : undefined,
           osmTileAttribution: typeof data.osmTileAttribution === 'string' ? data.osmTileAttribution : undefined,
           osmTileProvider:
-            data.osmTileProvider === 'maptiler' || data.osmTileProvider === 'osm'
+            data.osmTileProvider === 'maptiler' || data.osmTileProvider === 'osm' || data.osmTileProvider === 'ordnance_survey'
               ? data.osmTileProvider
               : null,
         };

@@ -25,6 +25,7 @@ import {
 import {
   Map as GoogleMap,
   AdvancedMarker,
+  Marker,
   InfoWindow,
   useMap,
   useApiLoadingStatus,
@@ -280,6 +281,44 @@ function PlainMarkers({ markers, onMarkerClick, registerElement }: PlainMarkersP
 }
 
 // ---------------------------------------------------------------------------
+// Classic (legacy) markers — fallback when no Map ID is configured.
+//
+// AdvancedMarkers REQUIRE a Map ID; without one Google logs a warning and
+// renders NO pins — the "the Google map loads but markers are missing /
+// it doesn't display correctly" failure. The Map ID is served at runtime by
+// MapsConfigController from the per-tenant `google_maps_map_id` setting or the
+// `GOOGLE_MAPS_MAP_ID` env fallback; when neither is set, mapId is null.
+//
+// Legacy google.maps.Marker needs no Map ID, so we fall back to it whenever a
+// Map ID is absent, guaranteeing pins always render. InfoWindows in this path
+// are position-anchored (the blank-on-first-open issue only affects
+// position-only windows WITH a Map ID, which is by definition absent here).
+// Clustering is skipped in the fallback (the custom cluster renderer also needs
+// AdvancedMarkerElement) — acceptable for a degraded, misconfigured state.
+// ---------------------------------------------------------------------------
+
+function ClassicMarkers({
+  markers,
+  onMarkerClick,
+}: {
+  markers: MapMarker[];
+  onMarkerClick: (marker: MapMarker) => void;
+}) {
+  return (
+    <>
+      {markers.map((marker) => (
+        <Marker
+          key={marker.id}
+          position={{ lat: marker.lat, lng: marker.lng }}
+          title={marker.title}
+          onClick={() => onMarkerClick(marker)}
+        />
+      ))}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // LocationMapInner — the real map component (rendered inside APIProvider)
 // ---------------------------------------------------------------------------
 
@@ -294,8 +333,11 @@ function LocationMapInner({
   cluster,
   onMapsFailed,
 }: LocationMapProps) {
+  const { t } = useTranslation('common');
   const { resolvedTheme } = useTheme();
   const mapsConfig = useGoogleMapsConfig();
+  // AdvancedMarkers require a Map ID; fall back to classic markers without one.
+  const useAdvanced = Boolean(mapsConfig?.mapId);
   const map = useMap();
   const status = useApiLoadingStatus();
   const [activeMarkerId, setActiveMarkerId] = useState<number | string | null>(null);
@@ -416,9 +458,22 @@ function LocationMapInner({
     [markers, activeMarkerId],
   );
 
-  // Gracefully degrade if API auth fails (billing not enabled, key restricted, etc.)
+  // Gracefully degrade if API auth fails (billing not enabled, key restricted, etc.).
+  // Render a visible "map unavailable" placeholder instead of a bare null so
+  // consumers that don't wire onMapsFailed (LocationMapCard, MapSearchView) show
+  // something rather than a silent blank gap. Consumers that DO pass onMapsFailed
+  // (ListingsPage, MembersPage) switch to a non-map view and unmount this.
   if (status === APILoadingStatus.AUTH_FAILURE || status === APILoadingStatus.FAILED) {
-    return null;
+    return (
+      <div
+        role="status"
+        aria-label={t('map_unavailable')}
+        className={`rounded-xl overflow-hidden flex items-center justify-center bg-surface-secondary ${className}`}
+        style={{ height }}
+      >
+        <p className="text-sm text-theme-muted">{t('map_unavailable')}</p>
+      </div>
+    );
   }
 
   const mapCenter =
@@ -447,19 +502,23 @@ function LocationMapInner({
         clickableIcons={false}
         mapId={mapsConfig?.mapId || undefined}
       >
-        {clusteringEnabled ? (
-          <ClusteredMarkers
-            markers={markers}
-            onMarkerClick={handleMarkerClick}
-            onClusterClick={handleClusterClick}
-            registerElement={registerElement}
-          />
+        {useAdvanced ? (
+          clusteringEnabled ? (
+            <ClusteredMarkers
+              markers={markers}
+              onMarkerClick={handleMarkerClick}
+              onClusterClick={handleClusterClick}
+              registerElement={registerElement}
+            />
+          ) : (
+            <PlainMarkers
+              markers={markers}
+              onMarkerClick={handleMarkerClick}
+              registerElement={registerElement}
+            />
+          )
         ) : (
-          <PlainMarkers
-            markers={markers}
-            onMarkerClick={handleMarkerClick}
-            registerElement={registerElement}
-          />
+          <ClassicMarkers markers={markers} onMarkerClick={handleMarkerClick} />
         )}
 
         {activeMarker?.infoContent && (
