@@ -14,6 +14,7 @@
             ['govuk-alpha.goals.index', 'goals', 'goals'],
             ['govuk-alpha.skills.index', 'skills', null],
             ['govuk-alpha.organisations.index', 'organisations', 'organisations'],
+            ['govuk-alpha.blog.index', 'blog', 'blog'],
             ['govuk-alpha.resources.index', 'resources', 'resources'],
             ['govuk-alpha.marketplace.index', 'marketplace', 'marketplace'],
             ['govuk-alpha.jobs.index', 'jobs', 'job_vacancies'],

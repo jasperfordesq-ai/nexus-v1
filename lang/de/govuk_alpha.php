@@ -2412,6 +2412,18 @@ return [
     'blog' => [
         'featured_image_generic' => 'Featured image for this article',
         'caption' => ':community',
+        'description' => 'News, stories and updates from the community.',
+        'comments_heading' => 'Comments',
+        'comments_count' => '{0} No comments yet|{1} :count comment|[2,*] :count comments',
+        'comments_empty' => 'No comments yet. Be the first to comment.',
+        'comments_signin' => 'Sign in to read and join the discussion.',
+        'comment_body_label' => 'Add a comment',
+        'comment_submit' => 'Post comment',
+        'comment_states' => [
+            'comment-added' => 'Your comment has been posted.',
+            'comment-invalid' => 'Enter a comment before posting.',
+            'comment-failed' => 'We could not post your comment. Please try again.',
+        ],
         'title' => 'Neuigkeiten',
         'subtitle' => 'Neuigkeiten, Geschichten und Updates von:name.',
         'search_label' => 'Durchsuchen Sie den Blog',

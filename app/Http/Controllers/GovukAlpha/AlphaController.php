@@ -896,6 +896,7 @@ class AlphaController extends Controller
     public function blog(Request $request, string $tenantSlug): Response
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('blog'), 403);
 
         $search = trim(self::asStr($request->query('q')));
         $cursor = self::asStr($request->query('cursor')) ?: null;
@@ -926,16 +927,69 @@ class AlphaController extends Controller
     public function blogPost(Request $request, string $tenantSlug, string $slug): Response
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('blog'), 403);
 
         $post = app(\App\Services\BlogService::class)->getBySlug($slug);
         abort_if($post === null, 404);
+
+        // Comments are visible to signed-in members (matches the React social
+        // panel which requires auth to load the thread).
+        $userId = $this->currentUserId();
+        $comments = [];
+        if ($userId !== null) {
+            try {
+                $comments = \App\Services\CommentService::getForEntity('blog', (int) ($post['id'] ?? 0), $userId);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
 
         return $this->view('accessible-frontend::blog-post', [
             'title' => (string) ($post['title'] ?? __('govuk_alpha.blog.title')),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'blog',
             'post' => $post,
+            'comments' => $comments,
+            'commentsCount' => \App\Services\CommentService::countAll($comments),
+            'isAuthenticated' => $userId !== null,
+            'status' => self::asStr($request->query('status')) ?: null,
         ]);
+    }
+
+    public function storeBlogComment(Request $request, string $tenantSlug, string $slug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('blog'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $post = app(\App\Services\BlogService::class)->getBySlug($slug);
+        abort_if($post === null, 404);
+
+        $body = trim(self::asStr($request->input('body')));
+        if ($body === '') {
+            return redirect()->route('govuk-alpha.blog.show', ['tenantSlug' => $tenantSlug, 'slug' => $slug, 'status' => 'comment-invalid'])->withFragment('comments');
+        }
+
+        $status = 'comment-failed';
+        try {
+            $result = \App\Services\CommentService::addComment(
+                $userId,
+                TenantContext::getId(),
+                'blog',
+                (int) ($post['id'] ?? 0),
+                mb_substr($body, 0, 5000)
+            );
+            if (!empty($result['comment']) || !empty($result['success'])) {
+                $status = 'comment-added';
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.blog.show', ['tenantSlug' => $tenantSlug, 'slug' => $slug, 'status' => $status])->withFragment('comments');
     }
 
     public function events(Request $request, string $tenantSlug): Response

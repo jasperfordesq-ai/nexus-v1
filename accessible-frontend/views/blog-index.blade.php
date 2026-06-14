@@ -77,6 +77,7 @@
                             <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-0">
                                 @if (! empty($post['category']['name'])){{ $post['category']['name'] }} · @endif
                                 @if (! empty($post['author']['name'])){{ $post['author']['name'] }} · @endif
+                                @if (! empty($post['published_at'])){{ \Illuminate\Support\Carbon::parse($post['published_at'])->translatedFormat('j F Y') }} · @endif
                                 @if (! empty($post['reading_time'])){{ __('govuk_alpha.blog.read_time', ['count' => (int) $post['reading_time']]) }}@endif
                             </p>
                         </li>

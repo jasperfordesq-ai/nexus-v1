@@ -422,6 +422,46 @@ class GovukAlphaFrontendTest extends TestCase
         $this->get("/{$this->testTenantSlug}/alpha/blog/this-slug-does-not-exist")->assertNotFound();
     }
 
+    public function test_blog_post_detail_renders_seo_and_accepts_a_comment(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Blog Reader']);
+        $slug = 'community-garden-update-' . $user->id;
+        $postId = DB::table('posts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'author_id' => $user->id,
+            'title' => 'Community Garden Update',
+            'slug' => $slug,
+            'content' => 'A real update about our shared community garden and timebank.',
+            'status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/blog/{$slug}");
+        $detail->assertOk();
+        $detail->assertSee('Community Garden Update');
+        $detail->assertSee('application/ld+json', false);
+        $detail->assertSee(__('govuk_alpha.blog.comments_heading'));
+
+        $comment = $this->post("/{$this->testTenantSlug}/alpha/blog/{$slug}/comments", ['body' => 'Lovely work on the garden!']);
+        $comment->assertRedirectContains('status=comment-added');
+        $this->assertSame(1, DB::table('comments')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('target_type', 'blog')
+            ->where('target_id', $postId)
+            ->where('user_id', $user->id)
+            ->count());
+    }
+
+    public function test_blog_appears_on_explore(): void
+    {
+        $this->authenticatedUser(['name' => 'Explorer Blog']);
+        $explore = $this->get("/{$this->testTenantSlug}/alpha/explore");
+        $explore->assertOk();
+        $explore->assertSee(route('govuk-alpha.blog.index', ['tenantSlug' => $this->testTenantSlug]), false);
+        $explore->assertSee(__('govuk_alpha.blog.title'));
+    }
+
     public function test_new_content_pages_are_tenant_scoped(): void
     {
         // A slug that does not resolve to a tenant is rejected before the page

@@ -71,6 +71,7 @@
     @if (!empty($alphaHeaderVars))
         <style>:root{ {{ implode(';', $alphaHeaderVars) }} }</style>
     @endif
+    @stack('alpha_head')
 </head>
 <body class="govuk-template__body">
     {{-- GOV.UK progressive enhancement: only claim JS support when JS actually runs --}}
