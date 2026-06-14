@@ -1482,6 +1482,14 @@ return [
         'caption' => ':community',
         'description' => 'Listings, posts and other items you have saved.',
         'empty' => 'You have not saved anything yet.',
+        'types' => [
+            'post' => 'Post',
+            'listing' => 'Listing',
+            'event' => 'Event',
+            'job' => 'Opportunity',
+            'blog' => 'Blog post',
+            'discussion' => 'Discussion',
+        ],
     ],
     'resources' => [
         'title' => 'Resources',
@@ -1530,7 +1538,7 @@ return [
         'status_label' => 'Status',
         'ideas_title' => 'Ideas',
         'ideas_empty' => 'No ideas have been submitted yet. Be the first.',
-        'votes' => ':count votes',
+        'votes' => '{0} No votes|{1} :count vote|[2,*] :count votes',
         'vote_button' => 'Vote',
         'submit_title' => 'Submit an idea',
         'idea_title_label' => 'Your idea',
@@ -1584,6 +1592,11 @@ return [
         'back' => 'Back to courses',
         'about_label' => 'About this course',
         'contents_label' => 'What you will learn',
+        'levels' => [
+            'beginner' => 'Beginner',
+            'intermediate' => 'Intermediate',
+            'advanced' => 'Advanced',
+        ],
         'enrol_button' => 'Enrol on this course',
         'enrolled_notice' => 'You are enrolled on this course.',
         'cost_notice' => 'This course costs :count time credits.',
@@ -1605,6 +1618,7 @@ return [
         'episodes_empty' => 'No episodes have been published yet.',
         'by_label' => 'By :name',
         'episodes_count' => ':count episodes',
+        'download_episode' => 'Download episode: :title',
     ],
     'coupons' => [
         'title' => 'Coupons',
@@ -1655,6 +1669,13 @@ return [
         'listings_label' => 'Listings',
         'level_label' => 'Partnership level',
         'since_label' => 'Partners since',
+        'levels' => [
+            'discovery' => 'Discovery',
+            'connected' => 'Connected',
+            'integrated' => 'Integrated',
+            'unified' => 'Unified',
+            'external' => 'External',
+        ],
         'location_label' => 'Location',
     ],
     'members' => [

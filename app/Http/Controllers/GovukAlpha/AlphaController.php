@@ -3516,13 +3516,17 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
-        if ($this->currentUserId() === null) {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
         $job = null;
         try {
-            $job = app(\App\Services\JobVacancyService::class)->getById($id);
+            // legacyGetById forwards $userId so has_applied/is_saved resolve — the
+            // bare getById() leaves has_applied=false and shows the apply form even
+            // to members who already applied.
+            $job = app(\App\Services\JobVacancyService::class)->legacyGetById($id, $userId);
         } catch (\Throwable $e) {
             report($e);
         }
@@ -3539,11 +3543,12 @@ class AlphaController extends Controller
 
     public function applyJob(Request $request, string $tenantSlug, int $id): RedirectResponse
     {
-        $userId = $this->geGuard($tenantSlug);
-        if (is_object($userId)) {
-            return $userId;
-        }
+        $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
 
         $cover = trim(self::asStr($request->input('cover_letter')));
         $ok = false;
@@ -3616,11 +3621,12 @@ class AlphaController extends Controller
 
     public function submitIdea(Request $request, string $tenantSlug, int $id): RedirectResponse
     {
-        $userId = $this->geGuard($tenantSlug);
-        if (is_object($userId)) {
-            return $userId;
-        }
+        $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('ideation_challenges'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
 
         $title = trim(self::asStr($request->input('idea_title')));
         $content = trim(self::asStr($request->input('idea_content')));
@@ -3642,11 +3648,12 @@ class AlphaController extends Controller
 
     public function voteIdea(Request $request, string $tenantSlug, int $challengeId, int $ideaId): RedirectResponse
     {
-        $userId = $this->geGuard($tenantSlug);
-        if (is_object($userId)) {
-            return $userId;
-        }
+        $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('ideation_challenges'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
 
         $ok = false;
         try {
@@ -3850,8 +3857,15 @@ class AlphaController extends Controller
         $episodes = [];
         try {
             $show = \App\Services\PodcastService::findShowById($id);
+            // Defence in depth: never surface another tenant's show by id.
+            if ($show !== null && (int) $show->tenant_id !== TenantContext::getId()) {
+                $show = null;
+            }
             if ($show !== null) {
-                foreach ($show->episodes ?? [] as $ep) {
+                // Only published, approved, released episodes — findShowById does not
+                // scope the episodes relation, so the raw relation would include
+                // drafts/pending uploads.
+                foreach ($show->episodes()->published()->get() as $ep) {
                     $url = '';
                     try {
                         $url = \App\Services\PodcastService::episodeAudioUrl($ep, true);
@@ -3964,7 +3978,7 @@ class AlphaController extends Controller
         }
 
         $tierId = (int) $request->input('tier_id');
-        $interval = self::asStr($request->input('interval')) === 'year' ? 'year' : 'month';
+        $interval = self::asStr($request->input('interval')) === 'year' ? 'yearly' : 'monthly';
         $returnUrl = route('govuk-alpha.premium.index', ['tenantSlug' => $tenantSlug]);
 
         try {
@@ -3991,6 +4005,17 @@ class AlphaController extends Controller
 
         $q = trim(self::asStr($request->query('q')));
         $tenantId = TenantContext::getId();
+
+        // Clubs has no feature flag — the directory only exists for tenants that
+        // actually run club organisations. 404 for everyone else so the endpoint
+        // is not exposed (mirrors the Explore-card existence gate).
+        $tenantHasClubs = \Illuminate\Support\Facades\DB::table('vol_organizations')
+            ->where('tenant_id', $tenantId)
+            ->where('org_type', 'club')
+            ->where('status', 'active')
+            ->exists();
+        abort_unless($tenantHasClubs, 404);
+
         $conditions = ['o.tenant_id = ?', "o.org_type = 'club'", "o.status = 'active'"];
         $params = [$tenantId];
         if ($q !== '') {
@@ -4058,7 +4083,9 @@ class AlphaController extends Controller
      */
     private function federationPartnersForDisplay(int $tenantId): array
     {
-        $levelNames = [1 => 'Discovery', 2 => 'Connected', 3 => 'Integrated', 4 => 'Unified'];
+        // Emit lowercase slugs; the blade resolves them through
+        // govuk_alpha.federation.levels.* so the tag label is translatable.
+        $levelNames = [1 => 'discovery', 2 => 'connected', 3 => 'integrated', 4 => 'unified'];
 
         $rows = \Illuminate\Support\Facades\DB::select("
             SELECT
@@ -4090,7 +4117,7 @@ class AlphaController extends Controller
                 'location' => (string) ($r->partner_location ?? ''),
                 'member_count' => (int) ($r->partner_member_count ?? 0),
                 'listing_count' => (int) ($r->partner_listing_count ?? 0),
-                'level_name' => $levelNames[$level] ?? 'Discovery',
+                'level_name' => $levelNames[$level] ?? 'discovery',
                 'partnership_since' => $r->partnership_since ?? null,
             ];
         }, $rows);
@@ -4106,7 +4133,7 @@ class AlphaController extends Controller
                     'location' => '',
                     'member_count' => (int) ($ep['partner_member_count'] ?? 0),
                     'listing_count' => 0,
-                    'level_name' => 'External',
+                    'level_name' => 'external',
                     'partnership_since' => $ep['created_at'] ?? null,
                 ];
             }

@@ -12,7 +12,7 @@
     @if ($status === 'subscribe-failed')
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><p class="govuk-body">{{ __('govuk_alpha.premium.states.subscribe-failed') }}</p></div></div>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ __('govuk_alpha.premium.states.subscribe-failed') }}</li></ul></div></div>
         </div>
     @endif
 
@@ -20,10 +20,10 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.premium.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.premium.description') }}</p>
 
-    @if (!empty($currentTier) && trim((string) ($currentTier['name'] ?? '')) !== '')
+    @if (!empty($currentTier) && trim((string) ($currentTier['tier_name'] ?? '')) !== '')
         <div class="govuk-inset-text">
             <h2 class="govuk-heading-s govuk-!-margin-bottom-1">{{ __('govuk_alpha.premium.current_plan_title') }}</h2>
-            <p class="govuk-body govuk-!-margin-bottom-0">{{ __('govuk_alpha.premium.current_plan_notice', ['name' => $currentTier['name']]) }}</p>
+            <p class="govuk-body govuk-!-margin-bottom-0">{{ __('govuk_alpha.premium.current_plan_notice', ['name' => $currentTier['tier_name']]) }}</p>
         </div>
     @endif
 
@@ -60,7 +60,7 @@
                         @csrf
                         <input type="hidden" name="tier_id" value="{{ $tid }}">
                         @if ($monthly > 0 && $yearly > 0)
-                            <fieldset class="govuk-fieldset" aria-describedby="interval-{{ $tid }}">
+                            <fieldset class="govuk-fieldset">
                                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha.premium.interval_legend') }}</legend>
                                 <div class="govuk-radios govuk-radios--inline govuk-radios--small" data-module="govuk-radios">
                                     <div class="govuk-radios__item">

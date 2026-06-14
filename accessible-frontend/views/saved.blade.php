@@ -16,8 +16,14 @@
             @foreach ($savedItems as $s)
                 @php
                     $sTitle = trim((string) ($s['title'] ?? ''));
-                    $sType = (string) ($s['bookmarkable_type'] ?? '');
-                    $sType = $sType !== '' ? \Illuminate\Support\Str::headline(class_basename($sType)) : '';
+                    // bookmarkable_type is a short slug (post/listing/event/job/blog/discussion);
+                    // translate it where we have a key, else fall back to a readable label.
+                    $sTypeRaw = strtolower(class_basename(trim((string) ($s['bookmarkable_type'] ?? ''))));
+                    $sType = $sTypeRaw === ''
+                        ? ''
+                        : (\Illuminate\Support\Facades\Lang::has('govuk_alpha.saved.types.' . $sTypeRaw)
+                            ? __('govuk_alpha.saved.types.' . $sTypeRaw)
+                            : \Illuminate\Support\Str::headline($sTypeRaw));
                 @endphp
                 @if ($sTitle !== '' || $sType !== '')
                     <li>

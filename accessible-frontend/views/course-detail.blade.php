@@ -26,7 +26,7 @@
     @elseif (in_array($status, ['insufficient-credits', 'enrol-failed'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><p class="govuk-body">{{ __('govuk_alpha.courses.states.' . $status) }}</p></div></div>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ __('govuk_alpha.courses.states.' . $status) }}</li></ul></div></div>
         </div>
     @endif
 
@@ -36,7 +36,7 @@
         <strong class="govuk-tag {{ $cost > 0 ? 'govuk-tag--blue' : 'govuk-tag--green' }}">{{ $costLabel }}</strong>
     </div>
     @if ($level !== '')
-        <p class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha.courses.level_label') }}: {{ ucfirst($level) }}</p>
+        <p class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha.courses.level_label') }}: {{ \Illuminate\Support\Facades\Lang::has('govuk_alpha.courses.levels.' . $level) ? __('govuk_alpha.courses.levels.' . $level) : ucfirst($level) }}</p>
     @endif
 
     @if (trim((string) ($course['description'] ?? '')) !== '')

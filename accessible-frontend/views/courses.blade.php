@@ -47,7 +47,7 @@
                         <p class="govuk-body govuk-!-margin-bottom-1">{{ \Illuminate\Support\Str::limit(strip_tags((string) $c['description']), 160) }}</p>
                     @endif
                     @if ($level !== '')
-                        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-0">{{ __('govuk_alpha.courses.level_label') }}: {{ ucfirst($level) }}</p>
+                        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-0">{{ __('govuk_alpha.courses.level_label') }}: {{ \Illuminate\Support\Facades\Lang::has('govuk_alpha.courses.levels.' . $level) ? __('govuk_alpha.courses.levels.' . $level) : ucfirst($level) }}</p>
                     @endif
                 </article>
             @endforeach

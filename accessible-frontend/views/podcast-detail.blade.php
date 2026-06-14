@@ -31,8 +31,8 @@
                         <p class="govuk-body govuk-!-margin-bottom-2">{{ \Illuminate\Support\Str::limit(strip_tags((string) $ep['description']), 240) }}</p>
                     @endif
                     @if (trim((string) ($ep['audio_url'] ?? '')) !== '')
-                        <audio controls preload="none" class="nexus-alpha-audio" src="{{ $ep['audio_url'] }}">
-                            <a class="govuk-link" href="{{ $ep['audio_url'] }}">{{ $epTitle }}</a>
+                        <audio controls preload="none" class="nexus-alpha-audio" src="{{ $ep['audio_url'] }}" aria-label="{{ $epTitle }}">
+                            <a class="govuk-link" href="{{ $ep['audio_url'] }}">{{ __('govuk_alpha.podcasts.download_episode', ['title' => $epTitle]) }}</a>
                         </audio>
                     @endif
                 </article>

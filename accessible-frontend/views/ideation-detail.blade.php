@@ -33,7 +33,9 @@
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
                     <ul class="govuk-list govuk-error-summary__list">
-                        <li><a href="#idea_title">{{ __('govuk_alpha.ideation.states.' . $status) }}</a></li>
+                        {{-- The submit form (and #idea_title) only renders while the challenge is open;
+                             linking to it when closed would be a dead anchor, so drop the link then. --}}
+                        <li>@if ($isOpenForIdeas)<a href="#idea_title">{{ __('govuk_alpha.ideation.states.' . $status) }}</a>@else{{ __('govuk_alpha.ideation.states.' . $status) }}@endif</li>
                     </ul>
                 </div></div>
         </div>
@@ -96,7 +98,7 @@
             <div class="govuk-form-group {{ $status === 'idea-invalid' ? 'govuk-form-group--error' : '' }}">
                 <label class="govuk-label" for="idea_title">{{ __('govuk_alpha.ideation.idea_title_label') }}</label>
                 @if ($status === 'idea-invalid')
-                    <p id="idea_title-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_title') }}:</span> {{ __('govuk_alpha.ideation.states.idea-invalid') }}</p>
+                    <p id="idea_title-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ __('govuk_alpha.ideation.states.idea-invalid') }}</p>
                 @endif
                 <input class="govuk-input" id="idea_title" name="idea_title" type="text" maxlength="255" {{ $status === 'idea-invalid' ? 'aria-describedby=idea_title-error' : '' }}>
             </div>

@@ -22,7 +22,8 @@
                     $pName = trim((string) ($p['name'] ?? '')) ?: __('govuk_alpha.federation.title');
                     $since = $dateFmt($p['partnership_since'] ?? null);
                     $loc = trim((string) ($p['location'] ?? ''));
-                    $levelName = trim((string) ($p['level_name'] ?? ''));
+                    $levelSlug = trim((string) ($p['level_name'] ?? ''));
+                    $levelName = $levelSlug !== '' ? __('govuk_alpha.federation.levels.' . $levelSlug) : '';
                 @endphp
                 <article class="nexus-alpha-card">
                     <div class="nexus-alpha-module-row">

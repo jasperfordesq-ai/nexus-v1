@@ -5,7 +5,7 @@
     "isDynamicEntry": true
   },
   "accessible-frontend/src/app.ts": {
-    "file": "assets/app-v3x84WoJ.js",
+    "file": "assets/app-DbAU7Yh7.js",
     "name": "app",
     "src": "accessible-frontend/src/app.ts",
     "isEntry": true,
@@ -13,7 +13,7 @@
       "_accessible-autocomplete.min-BIbILKeA.js"
     ],
     "css": [
-      "assets/app-Cjz5z1jU.css"
+      "assets/app-DC0bhbTU.css"
     ]
   },
   "node_modules/accessible-autocomplete/dist/accessible-autocomplete.min.css": {

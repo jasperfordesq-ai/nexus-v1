@@ -4038,6 +4038,61 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertTrue(\App\Services\CourseEnrollmentService::isEnrolled($courseId, $learner->id));
     }
 
+    public function test_job_and_ideation_mutations_work_without_group_exchanges_feature(): void
+    {
+        // Regression: applyJob/submitIdea/voteIdea must NOT depend on the
+        // group_exchanges feature. Disable it while keeping job_vacancies and
+        // ideation_challenges on.
+        $features = \App\Services\TenantFeatureConfig::FEATURE_DEFAULTS;
+        $features['group_exchanges'] = false;
+        $features['job_vacancies'] = true;
+        $features['ideation_challenges'] = true;
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['features' => json_encode($features)]);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        $applicant = $this->authenticatedUser(['name' => 'Applicant No GE']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+
+        $jobId = DB::table('job_vacancies')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'title' => 'Allotment Helper',
+            'description' => 'Weekly help on the allotment.',
+            'type' => 'volunteer',
+            'status' => 'open',
+            'created_at' => now(),
+        ]);
+        // Apply must succeed (not 403) even with group_exchanges off.
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/apply", ['cover_letter' => 'Happy to help.'])
+            ->assertRedirectContains('status=applied');
+
+        $challengeId = DB::table('ideation_challenges')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $applicant->id,
+            'title' => 'New use for the hall?',
+            'description' => 'Ideas welcome.',
+            'status' => 'open',
+            'created_at' => now(),
+        ]);
+        $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas", [
+            'idea_title' => 'Weekly repair cafe',
+            'idea_content' => 'Fix things together.',
+        ])->assertRedirectContains('status=idea-submitted');
+
+        $ideaId = DB::table('challenge_ideas')->insertGetId([
+            'challenge_id' => $challengeId,
+            'user_id' => $owner->id,
+            'title' => 'Board game night',
+            'description' => 'Monthly games.',
+            'status' => 'submitted',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas/{$ideaId}/vote")
+            ->assertRedirectContains('status=idea-voted');
+    }
+
     /**
      * Enable one or more feature flags on the test tenant (they default off for
      * the commerce modules). Mirrors the DB-update + TenantContext::reset pattern

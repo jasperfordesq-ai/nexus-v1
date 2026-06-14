@@ -45,7 +45,7 @@
     @elseif ($status === 'apply-failed')
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><p class="govuk-body">{{ __('govuk_alpha.jobs.states.apply-failed') }}</p></div></div>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ __('govuk_alpha.jobs.states.apply-failed') }}</li></ul></div></div>
         </div>
     @endif
 
