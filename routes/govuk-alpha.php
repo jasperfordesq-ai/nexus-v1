@@ -228,4 +228,15 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/profile/data-export', [AlphaController::class, 'requestDataExport'])->middleware('throttle:3,60')->name('profile.data-export');
         Route::get('/profile/delete-account', [AlphaController::class, 'confirmDeleteAccount'])->name('profile.delete');
         Route::post('/profile/delete-account', [AlphaController::class, 'deleteAccount'])->middleware('throttle:5,60')->name('profile.delete.store');
+
+        // ===== WAVE V2: Volunteering depth =====
+        Route::get('/volunteering/certificates', [AlphaController::class, 'volunteeringCertificates'])->name('volunteering.certificates');
+        Route::post('/volunteering/certificates/generate', [AlphaController::class, 'generateVolunteerCertificate'])->middleware('throttle:10,1')->name('volunteering.certificates.generate');
+        Route::get('/volunteering/certificates/{code}/download', [AlphaController::class, 'downloadVolunteerCertificate'])->where('code', '[A-Za-z0-9]+')->name('volunteering.certificates.download');
+        Route::get('/volunteering/waitlist', [AlphaController::class, 'volunteeringWaitlist'])->name('volunteering.waitlist');
+        Route::post('/volunteering/waitlist/{shiftId}/leave', [AlphaController::class, 'leaveVolunteerWaitlist'])->whereNumber('shiftId')->middleware('throttle:20,1')->name('volunteering.waitlist.leave');
+        Route::get('/volunteering/swaps', [AlphaController::class, 'volunteeringSwaps'])->name('volunteering.swaps');
+        Route::post('/volunteering/swaps', [AlphaController::class, 'requestVolunteerSwap'])->middleware('throttle:10,1')->name('volunteering.swaps.request');
+        Route::post('/volunteering/swaps/{id}/respond', [AlphaController::class, 'respondVolunteerSwap'])->whereNumber('id')->middleware('throttle:20,1')->name('volunteering.swaps.respond');
+        Route::post('/volunteering/swaps/{id}/cancel', [AlphaController::class, 'cancelVolunteerSwap'])->whereNumber('id')->middleware('throttle:20,1')->name('volunteering.swaps.cancel');
     });

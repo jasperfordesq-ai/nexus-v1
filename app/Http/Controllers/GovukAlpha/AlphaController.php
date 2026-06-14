@@ -8419,4 +8419,322 @@ class AlphaController extends Controller
     {
         return in_array($value, $allowed, true) ? $value : $default;
     }
+
+    // ===== WAVE V2: Volunteering depth =====
+
+    /**
+     * Certificates tab — list the member's earned volunteer impact certificates
+     * with a download action. Generation summarises the member's own approved
+     * hours; every read/write is scoped to the authenticated user + tenant.
+     */
+    public function volunteeringCertificates(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $certificates = [];
+        $error = null;
+        try {
+            $result = \App\Services\VolunteerCertificateService::getUserCertificates($userId, ['limit' => 50]);
+            $certificates = $result['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+            $error = __('govuk_alpha.vol_depth.certificates_error');
+        }
+
+        return $this->view('accessible-frontend::volunteering-certificates', [
+            'title' => __('govuk_alpha.vol_depth.certificates_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'volunteering',
+            'certificates' => $certificates,
+            'error' => $error,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Generate a new volunteer impact certificate for the authenticated member.
+     * Backed by VolunteerCertificateService::generate(), which only ever
+     * aggregates the supplied user's own approved hours within the tenant.
+     */
+    public function generateVolunteerCertificate(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $certificate = null;
+        try {
+            $certificate = \App\Services\VolunteerCertificateService::generate($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.certificates', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $certificate === null ? 'certificate-no-hours' : 'certificate-generated',
+        ]);
+    }
+
+    /**
+     * Download a certificate as printable HTML. The certificate is loaded via
+     * the tenant-scoped service and its user_id is compared to the caller:
+     * a member can only download their OWN certificate (404 if the code does
+     * not resolve to a certificate they own within this tenant — prevents IDOR
+     * by guessing another member's verification code).
+     */
+    public function downloadVolunteerCertificate(Request $request, string $tenantSlug, string $code): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Ownership gate: the certificate must belong to THIS user within the
+        // current tenant. verify()/generateHtml() are tenant-scoped but not
+        // user-scoped, so we enforce the user_id check here ourselves.
+        $owns = DB::table('vol_certificates')
+            ->where('verification_code', $code)
+            ->where('user_id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->exists();
+        abort_unless($owns, 404);
+
+        $html = \App\Services\VolunteerCertificateService::generateHtml($code);
+        abort_if($html === null, 404);
+
+        \App\Services\VolunteerCertificateService::markDownloaded($code);
+
+        return response($html, 200)
+            ->header('Content-Type', 'text/html; charset=UTF-8')
+            ->header('Content-Disposition', 'inline; filename="volunteer-certificate-' . preg_replace('/[^A-Za-z0-9_-]/', '', $code) . '.html"');
+    }
+
+    /**
+     * Waitlist tab — list the shifts the member is currently waitlisted for,
+     * with a leave-waitlist action. getUserWaitlists() is tenant-scoped via the
+     * passed tenant id and only returns the supplied user's own entries.
+     */
+    public function volunteeringWaitlist(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $entries = [];
+        $error = null;
+        try {
+            $entries = \App\Services\ShiftWaitlistService::getUserWaitlists($userId, TenantContext::getId());
+        } catch (\Throwable $e) {
+            report($e);
+            $error = __('govuk_alpha.vol_depth.waitlist_error');
+        }
+
+        return $this->view('accessible-frontend::volunteering-waitlist', [
+            'title' => __('govuk_alpha.vol_depth.waitlist_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'volunteering',
+            'entries' => $entries,
+            'error' => $error,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Leave the waitlist for a shift. ShiftWaitlistService::leave() is scoped to
+     * the current tenant AND the supplied user id, so a member can only remove
+     * their OWN waitlist entry — passing another member's shift id simply finds
+     * no entry for this user and returns false (rendered as a not-found notice).
+     */
+    public function leaveVolunteerWaitlist(Request $request, string $tenantSlug, int $shiftId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $ok = false;
+        try {
+            $ok = \App\Services\ShiftWaitlistService::leave($shiftId, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.waitlist', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'waitlist-left' : 'waitlist-leave-failed',
+        ]);
+    }
+
+    /**
+     * Shift swaps tab — list incoming/outgoing swap requests and render a form
+     * to request a new swap. The "your shift" options are the caller's OWN
+     * approved shift assignments (getMyShifts is user + tenant scoped); the
+     * service re-verifies sign-up ownership before creating any swap.
+     */
+    public function volunteeringSwaps(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $swaps = [];
+        $myShifts = [];
+        $error = null;
+        try {
+            $swaps = \App\Services\ShiftSwapService::getSwapRequests($userId, 'all');
+            $myShifts = \App\Services\VolunteerService::getMyShifts($userId, ['limit' => 50])['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+            $error = __('govuk_alpha.vol_depth.swaps_error');
+        }
+
+        return $this->view('accessible-frontend::volunteering-swaps', [
+            'title' => __('govuk_alpha.vol_depth.swaps_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'volunteering',
+            'swaps' => $swaps,
+            'myShifts' => $myShifts,
+            'error' => $error,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Request a shift swap. ShiftSwapService::requestSwap() verifies the caller
+     * is signed up for from_shift and the target user is signed up for to_shift
+     * (both tenant-scoped), so a member cannot offer a shift that is not theirs
+     * or fabricate a swap on another member's behalf.
+     */
+    public function requestVolunteerSwap(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $fromShiftId = (int) $request->input('from_shift_id');
+        $toShiftId = (int) $request->input('to_shift_id');
+        $toUserId = (int) $request->input('to_user_id');
+
+        if ($fromShiftId <= 0 || $toShiftId <= 0 || $toUserId <= 0) {
+            return redirect()->route('govuk-alpha.volunteering.swaps', [
+                'tenantSlug' => $tenantSlug,
+                'status' => 'swap-invalid',
+            ]);
+        }
+
+        $swapId = null;
+        try {
+            $swapId = \App\Services\ShiftSwapService::requestSwap($userId, [
+                'from_shift_id' => $fromShiftId,
+                'to_shift_id' => $toShiftId,
+                'to_user_id' => $toUserId,
+                'message' => trim(self::asStr($request->input('message'))),
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.swaps', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $swapId === null ? 'swap-request-failed' : 'swap-requested',
+        ]);
+    }
+
+    /**
+     * Respond to an incoming swap request (accept / reject). The service checks
+     * that the swap is addressed to THIS user (to_user_id === caller) and is
+     * tenant-scoped, so a member cannot accept/reject a request directed at
+     * someone else (returns false → handled as a not-found/forbidden notice).
+     */
+    public function respondVolunteerSwap(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $action = $this->allowed($request->input('action'), ['accept', 'reject'], null);
+        if ($action === null) {
+            return redirect()->route('govuk-alpha.volunteering.swaps', [
+                'tenantSlug' => $tenantSlug,
+                'status' => 'swap-invalid',
+            ]);
+        }
+
+        $ok = false;
+        try {
+            $ok = \App\Services\ShiftSwapService::respond($id, $userId, (string) $action);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $statusCode = 'swap-respond-failed';
+        if ($ok) {
+            $statusCode = $action === 'accept' ? 'swap-accepted' : 'swap-rejected';
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.swaps', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $statusCode,
+        ]);
+    }
+
+    /**
+     * Cancel a swap request the caller sent. ShiftSwapService::cancel() filters
+     * by from_user_id === caller AND tenant, so only the original requester can
+     * cancel their own pending request.
+     */
+    public function cancelVolunteerSwap(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $ok = false;
+        try {
+            $ok = \App\Services\ShiftSwapService::cancel($id, $userId, TenantContext::getId());
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.swaps', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'swap-cancelled' : 'swap-cancel-failed',
+        ]);
+    }
 }
