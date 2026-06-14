@@ -139,25 +139,20 @@ export function TenantLogo({
     />
   );
 
-  // Theme-scoped variants. A light/white logo needs a dark backdrop on the light
-  // navbar; a dark logo needs a light backdrop on the dark navbar. Tone comes from
-  // the server (per slot), so we only add a "chip" where a logo would wash out.
+  // Theme-scoped variants: show the light-slot logo in light mode and the
+  // dark-slot logo in dark mode (each falling back to the other). The logo is
+  // rendered directly on the bar with no backdrop — a logo that only suits a dark
+  // background should be supplied via the dark slot (or the tenant sets a header
+  // colour); we don't paint a contrast chip behind it.
   const lightSrc = resolveAssetUrl(branding.logo || branding.logoDark);
   const darkSrc = resolveAssetUrl(branding.logoDark || branding.logo);
-  const lightTone = branding.logoTone ?? branding.logoDarkTone;
-  const darkTone = branding.logoDarkTone ?? branding.logoTone;
-  const chipBase = 'rounded-md px-2 py-1';
-  const lightChip = lightTone === 'light' ? `${chipBase} bg-neutral-900/90` : '';
-  const darkChip = darkTone === 'dark' ? `${chipBase} bg-white/90` : '';
 
-  // Render both theme-scoped variants; CSS shows the right one per theme and adds
-  // a contrast backdrop only where needed (else falls back to the initials avatar).
   const iconElement = hasLogo ? (
     <>
-      <span className={`inline-flex items-center dark:hidden ${lightChip}`.trim()}>
+      <span className="inline-flex items-center dark:hidden">
         {renderLogoImg(lightSrc)}
       </span>
-      <span className={`hidden items-center dark:inline-flex ${darkChip}`.trim()}>
+      <span className="hidden items-center dark:inline-flex">
         {renderLogoImg(darkSrc)}
       </span>
     </>
