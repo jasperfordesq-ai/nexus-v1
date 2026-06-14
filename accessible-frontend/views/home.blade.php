@@ -74,6 +74,16 @@
                 'auth_required' => true,
             ],
             [
+                'key' => 'wallet',
+                'title' => __('govuk_alpha.wallet.title'),
+                'description' => __('govuk_alpha.wallet.description'),
+                'href' => ($isAuthenticated ?? false)
+                    ? route('govuk-alpha.wallet.index', ['tenantSlug' => $tenantSlug])
+                    : route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']),
+                'available' => ($isAuthenticated ?? false) && \App\Core\TenantContext::hasModule('wallet'),
+                'auth_required' => true,
+            ],
+            [
                 'key' => 'profile',
                 'title' => __('govuk_alpha.nav.profile'),
                 'description' => __('govuk_alpha.profile_settings.description'),

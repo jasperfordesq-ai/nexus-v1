@@ -2645,6 +2645,103 @@ class AlphaController extends Controller
         }
     }
 
+    /** Time-credit wallet: balance, transaction history, and a transfer form. */
+    public function wallet(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('wallet'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $walletService = app(\App\Services\WalletService::class);
+
+        $wallet = null;
+        try {
+            $wallet = $walletService->getBalance($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $transactions = [];
+        try {
+            $transactions = $walletService->getTransactions($userId, ['type' => 'all', 'limit' => 20])['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // Reuse the tenant-scoped member search to pick a recipient safely.
+        $recipientQuery = trim(self::asStr($request->query('recipient_q')));
+        $recipientResults = $recipientQuery !== '' ? $this->messageUserSearch($recipientQuery, $userId) : [];
+
+        return $this->view('accessible-frontend::wallet', [
+            'title' => __('govuk_alpha.wallet.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'wallet',
+            'wallet' => $wallet,
+            'transactions' => $transactions,
+            'recipientQuery' => $recipientQuery,
+            'recipientResults' => $recipientResults,
+            'status' => self::asStr($request->query('status')) ?: null,
+            'transferError' => self::asStr($request->query('error')) ?: null,
+        ]);
+    }
+
+    /** Transfer time credits to another member via the canonical WalletService. */
+    public function transferCredits(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('wallet'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $recipientId = (int) $request->input('recipient_id');
+        $amount = (float) $request->input('amount');
+        $note = trim(self::asStr($request->input('note')));
+
+        $fail = fn (string $error): RedirectResponse => redirect()->route('govuk-alpha.wallet.index', [
+            'tenantSlug' => $tenantSlug, 'status' => 'transfer-failed', 'error' => $error,
+        ])->withFragment('transfer');
+
+        if ($recipientId <= 0 || $amount <= 0) {
+            return $fail('invalid');
+        }
+
+        // Defensive tenant check: only ever transfer to a member of THIS tenant
+        // (the WalletService resolves the recipient by id without re-scoping).
+        $sameTenant = DB::table('users')
+            ->where('id', $recipientId)
+            ->where('tenant_id', TenantContext::getId())
+            ->exists();
+        if (!$sameTenant) {
+            return $fail('not-found');
+        }
+
+        try {
+            app(\App\Services\WalletService::class)->transfer($userId, [
+                'recipient'   => $recipientId,
+                'amount'      => $amount,
+                'description' => mb_substr($note, 0, 255),
+            ]);
+        } catch (\Throwable $e) {
+            $msg = $e->getMessage();
+            return $fail(match (true) {
+                str_contains($msg, 'Insufficient')  => 'insufficient',
+                str_contains($msg, 'not found')     => 'not-found',
+                str_contains($msg, 'yourself')      => 'self',
+                str_contains($msg, 'not active')    => 'inactive',
+                str_contains($msg, 'exceed')        => 'too-large',
+                str_contains($msg, 'decimal')       => 'decimals',
+                default                             => 'failed',
+            });
+        }
+
+        return redirect()->route('govuk-alpha.wallet.index', ['tenantSlug' => $tenantSlug, 'status' => 'transfer-sent'])->withFragment('transactions');
+    }
+
     public function conversation(Request $request, string $tenantSlug, int $userId): Response|RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
@@ -3953,6 +4050,9 @@ class AlphaController extends Controller
         } else {
             $items['dashboard'] = route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]);
             $items['messages'] = route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]);
+            if (TenantContext::hasModule('wallet')) {
+                $items['wallet'] = route('govuk-alpha.wallet.index', ['tenantSlug' => $tenantSlug]);
+            }
         }
 
         if (TenantContext::hasModule('feed')) {

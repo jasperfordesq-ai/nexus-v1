@@ -3184,6 +3184,110 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee(route('govuk-alpha.listings.create', ['tenantSlug' => $this->testTenantSlug]), false);
     }
 
+    public function test_wallet_page_renders_balance_and_transaction_history(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Wallet Owner']);
+        DB::table('users')->where('id', $user->id)->update(['balance' => 20]);
+
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'first_name' => 'Gardening',
+            'last_name' => 'Neighbour',
+        ]);
+        DB::table('users')->where('id', $recipient->id)->update(['balance' => 0]);
+
+        // Seed a transaction through the real transfer endpoint so every column is
+        // set correctly and the history table renders a row.
+        $this->post("/{$this->testTenantSlug}/alpha/wallet/transfer", [
+            'recipient_id' => $recipient->id,
+            'amount' => '5',
+            'note' => 'Allotment digging',
+        ])->assertRedirectContains('status=transfer-sent');
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/wallet");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.wallet.title'));
+        // Balance is 20 − 5 = 15.00, formatted to two decimals.
+        $response->assertSee(__('govuk_alpha.wallet.hours_value', ['value' => '15.00']));
+        $response->assertSee(__('govuk_alpha.wallet.history_title'));
+        $response->assertSee('Allotment digging');
+        $response->assertSee('Gardening Neighbour');
+    }
+
+    public function test_wallet_transfer_moves_credits_between_members(): void
+    {
+        $sender = $this->authenticatedUser(['name' => 'Sender Member']);
+        DB::table('users')->where('id', $sender->id)->update(['balance' => 10]);
+
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'name' => 'Recipient Member',
+            'balance' => 0,
+        ]);
+
+        // Whole-hour amount keeps the assertion exact regardless of the test DB's
+        // balance column precision (nexus_test is int; production is decimal(10,2)).
+        $response = $this->post("/{$this->testTenantSlug}/alpha/wallet/transfer", [
+            'recipient_id' => $recipient->id,
+            'amount' => '3',
+            'note' => 'Thanks for the help',
+        ]);
+
+        $response->assertRedirectContains('status=transfer-sent');
+
+        $this->assertSame(7.0, (float) DB::table('users')->where('id', $sender->id)->value('balance'));
+        $this->assertSame(3.0, (float) DB::table('users')->where('id', $recipient->id)->value('balance'));
+    }
+
+    public function test_wallet_transfer_rejects_a_recipient_from_another_tenant(): void
+    {
+        $sender = $this->authenticatedUser(['name' => 'Tenant Two Sender']);
+        DB::table('users')->where('id', $sender->id)->update(['balance' => 10]);
+
+        // A user that belongs to the pre-seeded second tenant (id 999).
+        $foreign = User::factory()->forTenant(999)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'name' => 'Foreign Member',
+            'balance' => 0,
+        ]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/wallet/transfer", [
+            'recipient_id' => $foreign->id,
+            'amount' => '3',
+        ]);
+
+        // The defensive same-tenant guard rejects before any balance moves.
+        $response->assertRedirectContains('error=not-found');
+        $this->assertSame(10.0, (float) DB::table('users')->where('id', $sender->id)->value('balance'));
+        $this->assertSame(0.0, (float) DB::table('users')->where('id', $foreign->id)->value('balance'));
+    }
+
+    public function test_wallet_transfer_rejects_insufficient_balance(): void
+    {
+        $sender = $this->authenticatedUser(['name' => 'Broke Member']);
+        DB::table('users')->where('id', $sender->id)->update(['balance' => 1]);
+
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'name' => 'Hopeful Member',
+            'balance' => 0,
+        ]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/wallet/transfer", [
+            'recipient_id' => $recipient->id,
+            'amount' => 5,
+        ]);
+
+        $response->assertRedirectContains('error=insufficient');
+        $this->assertSame(1.0, (float) DB::table('users')->where('id', $sender->id)->value('balance'));
+        $this->assertSame(0.0, (float) DB::table('users')->where('id', $recipient->id)->value('balance'));
+    }
+
     private function authenticatedUser(array $overrides = []): User
     {
         $user = User::factory()->forTenant($this->testTenantId)->create(array_merge([

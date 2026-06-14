@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **A time wallet on the accessible site.** Signed-in members now have a Wallet page showing their time-credit balance, total hours earned and spent, and a full history of who they exchanged with and for what. You can also send credits to another member of your community: search for them by name, choose an amount, add an optional note, and send — with clear errors if you don't have enough credits or pick someone outside your community. Wallet now appears in the main navigation and on the home page.
 - **Manage your own events on the accessible site.** An event's organiser can now edit it (with the same field-by-field validation as creating), cancel it with an optional reason (which notifies everyone who RSVP'd), or delete it — each with a clear confirmation step.
 - **A "For you" tab on the accessible volunteering page.** Signed-in members now see volunteer shifts recommended for them — matched to their skills and availability, with a match score, the organisation, location, time and spaces left.
 - **Sort listings by Newest or Recommended on the accessible site.** The listings page now has a "Sort by" control, with Recommended surfacing featured listings first.
