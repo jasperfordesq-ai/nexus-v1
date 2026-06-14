@@ -4702,4 +4702,254 @@ class GovukAlphaFrontendTest extends TestCase
         TenantContext::reset();
         TenantContext::setById($this->testTenantId);
     }
+
+    // ==================================================================
+    // WAVE G — Goals depth (edit, delete, progress history, templates, buddy)
+    // ==================================================================
+
+    /**
+     * Seed a goal row directly for the test tenant and return its id.
+     *
+     * @param array<string,mixed> $overrides
+     */
+    private function seedGoal(int $userId, array $overrides = []): int
+    {
+        return (int) DB::table('goals')->insertGetId(array_merge([
+            'tenant_id'         => $this->testTenantId,
+            'user_id'           => $userId,
+            'title'             => 'Seeded goal',
+            'description'       => 'A seeded goal for testing.',
+            'is_public'         => 1,
+            'status'            => 'active',
+            'current_value'     => 0,
+            'target_value'      => 10,
+            'checkin_frequency' => 'none',
+            'created_at'        => now(),
+            'updated_at'        => now(),
+        ], $overrides));
+    }
+
+    public function test_goal_owner_can_open_edit_form_with_prefilled_values(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Goal Editor']);
+        $goalId = $this->seedGoal($user->id, ['title' => 'Learn to bake bread', 'target_value' => 12]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/edit");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.goals.edit_title'));
+        // Pre-filled title is present in the form.
+        $response->assertSee('value="Learn to bake bread"', false);
+        // The delete warning (GOV.UK warning-text) is shown on the edit page.
+        $response->assertSee(__('govuk_alpha.goals.delete_warning'));
+        $response->assertSee('govuk-warning-text', false);
+    }
+
+    public function test_goal_non_owner_cannot_open_edit_form(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Goal Owner G']);
+        $goalId = $this->seedGoal($owner->id);
+
+        // Switch to a different member in the same tenant.
+        $this->authenticatedUser(['name' => 'Goal Intruder']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/edit");
+
+        $response->assertForbidden();
+    }
+
+    public function test_goal_owner_can_update_goal(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Goal Updater']);
+        $goalId = $this->seedGoal($user->id, ['title' => 'Old title', 'is_public' => 0]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/edit", [
+            'title' => 'New shiny title',
+            'target_value' => 25,
+            'description' => 'Updated description',
+            'checkin_frequency' => 'weekly',
+            'is_public' => '1',
+        ]);
+
+        $response->assertRedirectContains('status=goal-edited');
+        $row = DB::table('goals')->where('id', $goalId)->first();
+        $this->assertSame('New shiny title', $row->title);
+        $this->assertSame('weekly', $row->checkin_frequency);
+        $this->assertEquals(25, (float) $row->target_value);
+        $this->assertEquals(1, (int) $row->is_public);
+    }
+
+    public function test_goal_non_owner_cannot_update_goal(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Goal Owner U']);
+        $goalId = $this->seedGoal($owner->id, ['title' => 'Untouchable']);
+
+        $this->authenticatedUser(['name' => 'Update Intruder']);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/edit", [
+            'title' => 'Hijacked',
+            'target_value' => 99,
+        ]);
+
+        $response->assertForbidden();
+        // The goal is unchanged.
+        $this->assertSame('Untouchable', DB::table('goals')->where('id', $goalId)->value('title'));
+    }
+
+    public function test_goal_owner_can_delete_goal(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Goal Deleter']);
+        $goalId = $this->seedGoal($user->id);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/delete");
+
+        $response->assertRedirectContains('status=goal-deleted');
+        $this->assertSame(0, DB::table('goals')->where('id', $goalId)->count());
+    }
+
+    public function test_goal_non_owner_cannot_delete_goal(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Goal Owner D']);
+        $goalId = $this->seedGoal($owner->id);
+
+        $this->authenticatedUser(['name' => 'Delete Intruder']);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/delete");
+
+        $response->assertForbidden();
+        $this->assertSame(1, DB::table('goals')->where('id', $goalId)->count());
+    }
+
+    public function test_goal_detail_shows_progress_history_to_owner(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'History Watcher']);
+        $goalId = $this->seedGoal($user->id);
+
+        DB::table('goal_progress_history')->insert([
+            'goal_id'     => $goalId,
+            'tenant_id'   => $this->testTenantId,
+            'event_type'  => 'created',
+            'description' => 'Goal created',
+            'data'        => null,
+            'created_at'  => now(),
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.goals.history_title'));
+        $response->assertSee(__('govuk_alpha.goals.history_type_created'));
+        $response->assertSee('govuk-summary-list', false);
+    }
+
+    public function test_goal_templates_picker_lists_public_templates(): void
+    {
+        $this->authenticatedUser(['name' => 'Template Browser']);
+
+        DB::table('goal_templates')->insert([
+            'tenant_id'            => $this->testTenantId,
+            'title'               => 'Volunteer 50 hours',
+            'description'         => 'A ready-made volunteering goal.',
+            'category'            => 'Volunteering',
+            'default_target_value'=> 50,
+            'default_milestones'  => null,
+            'is_public'           => 1,
+            'created_by'          => null,
+            'created_at'          => now(),
+            'updated_at'          => now(),
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/goals/templates");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.goals.templates_title'));
+        $response->assertSee('Volunteer 50 hours');
+        $response->assertSee(__('govuk_alpha.goals.template_use_button'));
+    }
+
+    public function test_goal_can_be_created_from_a_template(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Template User']);
+
+        $templateId = (int) DB::table('goal_templates')->insertGetId([
+            'tenant_id'            => $this->testTenantId,
+            'title'               => 'Read 12 books',
+            'description'         => 'A reading challenge.',
+            'category'            => 'Learning',
+            'default_target_value'=> 12,
+            'default_milestones'  => null,
+            'is_public'           => 1,
+            'created_by'          => null,
+            'created_at'          => now(),
+            'updated_at'          => now(),
+        ]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/goals/templates/{$templateId}", [
+            'title' => 'My reading year',
+            'is_public' => '1',
+        ]);
+
+        $response->assertRedirectContains('status=goal-created');
+        $this->assertSame(1, DB::table('goals')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->where('title', 'My reading year')
+            ->where('template_id', $templateId)
+            ->count());
+    }
+
+    public function test_goal_buddying_page_lists_buddied_and_available_goals(): void
+    {
+        $me = $this->authenticatedUser(['name' => 'Buddy Member']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+
+        // A goal I already buddy (mentor_id = me).
+        $this->seedGoal($owner->id, ['title' => 'Goal I support', 'mentor_id' => $me->id]);
+        // A public goal with no buddy that I could offer to buddy.
+        $this->seedGoal($owner->id, ['title' => 'Goal needing a buddy', 'is_public' => 1]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/goals/buddying");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.goals.buddying_title'));
+        $response->assertSee('Goal I support');
+        $response->assertSee('Goal needing a buddy');
+        $response->assertSee(__('govuk_alpha.goals.become_buddy_button'));
+    }
+
+    public function test_member_can_become_buddy_of_public_goal(): void
+    {
+        $me = $this->authenticatedUser(['name' => 'Would-be Buddy']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $goalId = $this->seedGoal($owner->id, ['is_public' => 1, 'mentor_id' => null]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/buddy");
+
+        $response->assertRedirectContains('status=buddy-joined');
+        $this->assertSame($me->id, (int) DB::table('goals')->where('id', $goalId)->value('mentor_id'));
+    }
+
+    public function test_member_cannot_become_buddy_of_private_goal(): void
+    {
+        $this->authenticatedUser(['name' => 'Blocked Buddy']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $goalId = $this->seedGoal($owner->id, ['is_public' => 0, 'mentor_id' => null]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/buddy");
+
+        $response->assertRedirectContains('status=buddy-failed');
+        $this->assertNull(DB::table('goals')->where('id', $goalId)->value('mentor_id'));
+    }
+
+    public function test_non_owner_cannot_view_private_goal_detail(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $goalId = $this->seedGoal($owner->id, ['is_public' => 0]);
+
+        $this->authenticatedUser(['name' => 'Nosy Member']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}");
+
+        $response->assertForbidden();
+    }
 }

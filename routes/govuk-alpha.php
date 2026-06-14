@@ -170,7 +170,16 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/groups/{id}/leave', [AlphaController::class, 'leaveGroup'])->whereNumber('id')->middleware('throttle:30,1')->name('groups.leave');
         Route::get('/goals', [AlphaController::class, 'goals'])->name('goals.index');
         Route::post('/goals', [AlphaController::class, 'storeGoal'])->middleware('throttle:15,1')->name('goals.store');
+        // Static goal sub-routes declared before /goals/{id} so they are never
+        // shadowed by the numeric id matcher.
+        Route::get('/goals/templates', [AlphaController::class, 'goalTemplates'])->name('goals.templates');
+        Route::post('/goals/templates/{id}', [AlphaController::class, 'storeGoalFromTemplate'])->whereNumber('id')->middleware('throttle:15,1')->name('goals.templates.use');
+        Route::get('/goals/buddying', [AlphaController::class, 'goalBuddying'])->name('goals.buddying');
         Route::get('/goals/{id}', [AlphaController::class, 'goal'])->whereNumber('id')->name('goals.show');
+        Route::get('/goals/{id}/edit', [AlphaController::class, 'editGoalForm'])->whereNumber('id')->name('goals.edit');
+        Route::post('/goals/{id}/edit', [AlphaController::class, 'updateGoal'])->whereNumber('id')->middleware('throttle:15,1')->name('goals.update');
+        Route::post('/goals/{id}/delete', [AlphaController::class, 'deleteGoal'])->whereNumber('id')->middleware('throttle:15,1')->name('goals.delete');
+        Route::post('/goals/{id}/buddy', [AlphaController::class, 'becomeGoalBuddy'])->whereNumber('id')->middleware('throttle:15,1')->name('goals.buddy');
         Route::post('/goals/{id}/progress', [AlphaController::class, 'incrementGoal'])->whereNumber('id')->middleware('throttle:30,1')->name('goals.progress');
         Route::post('/goals/{id}/complete', [AlphaController::class, 'completeGoal'])->whereNumber('id')->middleware('throttle:15,1')->name('goals.complete');
         Route::get('/organisations', [AlphaController::class, 'organisations'])->name('organisations.index');
