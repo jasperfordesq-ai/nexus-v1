@@ -453,6 +453,31 @@ class GovukAlphaFrontendTest extends TestCase
             ->count());
     }
 
+    public function test_misc_blog_rss_feed_renders(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Feed Author']);
+        $slug = 'rss-feed-post-' . $user->id;
+        DB::table('posts')->insert([
+            'tenant_id' => $this->testTenantId,
+            'author_id' => $user->id,
+            'title' => 'A Post In The Feed',
+            'slug' => $slug,
+            'excerpt' => 'A short summary for the feed.',
+            'content' => 'Full body of the feed post.',
+            'status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // The feed is public (no auth required).
+        $feed = $this->get("/{$this->testTenantSlug}/alpha/blog/feed.xml");
+        $feed->assertOk();
+        $feed->assertHeader('Content-Type', 'application/rss+xml; charset=UTF-8');
+        $feed->assertSee('<rss version="2.0">', false);
+        $feed->assertSee('A Post In The Feed', false);
+        $feed->assertSee(route('govuk-alpha.blog.show', ['tenantSlug' => $this->testTenantSlug, 'slug' => $slug]), false);
+    }
+
     public function test_blog_appears_on_explore(): void
     {
         $this->authenticatedUser(['name' => 'Explorer Blog']);

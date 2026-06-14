@@ -1242,6 +1242,59 @@ class AlphaController extends Controller
         ]);
     }
 
+    /**
+     * RSS 2.0 feed of the community's recent published blog posts. Public and
+     * gated only on the blog feature. Registered before the /blog/{slug} route
+     * so "feed.xml" is never captured as a post slug.
+     */
+    public function blogFeed(Request $request, string $tenantSlug): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('blog'), 403);
+
+        $tenant = TenantContext::get();
+        $tenantName = self::asStr($tenant['name'] ?? '') ?: $tenantSlug;
+        $channelTitle = __('govuk_alpha.blog.title') . ' — ' . $tenantName;
+        $channelLink = route('govuk-alpha.blog.index', ['tenantSlug' => $tenantSlug]);
+
+        $posts = app(\App\Services\BlogService::class)->getAll(['limit' => 20])['items'] ?? [];
+
+        $esc = static fn ($value): string => htmlspecialchars((string) $value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+
+        $items = '';
+        foreach ($posts as $post) {
+            $slug = self::asStr($post['slug'] ?? '');
+            if ($slug === '') {
+                continue;
+            }
+            $url = route('govuk-alpha.blog.show', ['tenantSlug' => $tenantSlug, 'slug' => $slug]);
+            $pubDate = '';
+            try {
+                $pubDate = \Illuminate\Support\Carbon::parse(self::asStr($post['published_at'] ?? $post['created_at'] ?? ''))->toRfc822String();
+            } catch (\Throwable $e) {
+                $pubDate = '';
+            }
+            $items .= '<item>'
+                . '<title>' . $esc($post['title'] ?? '') . '</title>'
+                . '<link>' . $esc($url) . '</link>'
+                . '<guid isPermaLink="true">' . $esc($url) . '</guid>'
+                . ($pubDate !== '' ? '<pubDate>' . $esc($pubDate) . '</pubDate>' : '')
+                . '<description>' . $esc($post['excerpt'] ?? '') . '</description>'
+                . '</item>';
+        }
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'
+            . '<rss version="2.0"><channel>'
+            . '<title>' . $esc($channelTitle) . '</title>'
+            . '<link>' . $esc($channelLink) . '</link>'
+            . '<description>' . $esc($channelTitle) . '</description>'
+            . '<language>' . $esc(app()->getLocale()) . '</language>'
+            . $items
+            . '</channel></rss>';
+
+        return response($xml, 200)->header('Content-Type', 'application/rss+xml; charset=UTF-8');
+    }
+
     public function blogPost(Request $request, string $tenantSlug, string $slug): Response
     {
         $this->assertTenantSlug($tenantSlug);

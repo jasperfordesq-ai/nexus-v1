@@ -48,6 +48,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/kb', [AlphaController::class, 'kb'])->name('kb.index');
         Route::get('/kb/{id}', [AlphaController::class, 'kbArticle'])->whereNumber('id')->name('kb.show');
         Route::get('/blog', [AlphaController::class, 'blog'])->name('blog.index');
+        Route::get('/blog/feed.xml', [AlphaController::class, 'blogFeed'])->name('blog.feed');
         Route::get('/blog/{slug}', [AlphaController::class, 'blogPost'])->where('slug', '[a-zA-Z0-9_-]+')->name('blog.show');
         Route::post('/blog/{slug}/comments', [AlphaController::class, 'storeBlogComment'])->where('slug', '[a-zA-Z0-9_-]+')->middleware('throttle:20,1')->name('blog.comments.store');
         Route::get('/login', [AlphaController::class, 'login'])->name('login');
