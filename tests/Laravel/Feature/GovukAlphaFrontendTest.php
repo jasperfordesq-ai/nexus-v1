@@ -3705,6 +3705,38 @@ class GovukAlphaFrontendTest extends TestCase
         $guest->assertSee(route('govuk-alpha.register', ['tenantSlug' => $this->testTenantSlug]), false);
     }
 
+    public function test_explore_hub_and_discovery_pages_render(): void
+    {
+        $this->authenticatedUser(['name' => 'Explorer']);
+
+        foreach (['explore', 'search', 'groups', 'goals', 'skills', 'organisations'] as $path) {
+            $response = $this->get("/{$this->testTenantSlug}/alpha/{$path}");
+            $response->assertOk();
+        }
+
+        $this->get("/{$this->testTenantSlug}/alpha/explore")->assertSee(__('govuk_alpha.explore.title'));
+        $this->get("/{$this->testTenantSlug}/alpha/goals")->assertSee(__('govuk_alpha.goals.create_title'));
+        $this->get("/{$this->testTenantSlug}/alpha/organisations")->assertSee(__('govuk_alpha.organisations.register_title'));
+    }
+
+    public function test_goal_create_stores_a_goal(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Goal Setter']);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/goals", [
+            'title' => 'Give 20 hours this year',
+            'target_value' => 20,
+            'description' => 'My volunteering target',
+        ]);
+
+        $response->assertRedirectContains('status=goal-created');
+        $this->assertSame(1, DB::table('goals')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->where('title', 'Give 20 hours this year')
+            ->count());
+    }
+
     public function test_notifications_inbox_renders(): void
     {
         $this->authenticatedUser(['name' => 'Notified Member']);

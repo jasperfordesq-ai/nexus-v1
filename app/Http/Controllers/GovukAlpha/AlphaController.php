@@ -3010,6 +3010,417 @@ class AlphaController extends Controller
         ]);
     }
 
+    // === Explore hub (discovery facilities — keeps the flat service nav lean) ===
+
+    public function explore(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        return $this->view('accessible-frontend::explore', [
+            'title' => __('govuk_alpha.explore.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+        ]);
+    }
+
+    // === Global search ===
+
+    public function search(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('search'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $q = trim(self::asStr($request->query('q')));
+        $type = in_array($request->query('type'), ['all', 'listing', 'user', 'event', 'group'], true) ? (string) $request->query('type') : 'all';
+        $results = [];
+        $total = 0;
+        if ($q !== '') {
+            try {
+                $r = app(\App\Services\SearchService::class)->unifiedSearch($q, $userId, ['type' => $type, 'limit' => 30]);
+                $results = is_array($r['items'] ?? null) ? $r['items'] : [];
+                $total = (int) ($r['total'] ?? count($results));
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return $this->view('accessible-frontend::search', [
+            'title' => __('govuk_alpha.search.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'searchQuery' => $q,
+            'searchType' => $type,
+            'searchResults' => $results,
+            'searchTotal' => $total,
+        ]);
+    }
+
+    // === Groups ===
+
+    public function groups(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('groups'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $q = trim(self::asStr($request->query('q')));
+        $filters = ['limit' => 30, 'viewer_user_id' => $userId];
+        if ($q !== '') {
+            $filters['search'] = $q;
+        }
+        $items = [];
+        try {
+            $items = \App\Services\GroupService::getAll($filters)['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::groups', [
+            'title' => __('govuk_alpha.groups.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'groups' => is_array($items) ? $items : [],
+            'groupsQuery' => $q,
+        ]);
+    }
+
+    public function group(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('groups'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $group = null;
+        $members = [];
+        try {
+            $group = \App\Services\GroupService::getById($id, $userId, true);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($group === null, 404);
+        try {
+            $members = \App\Services\GroupService::getMembers($id, ['limit' => 50])['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $isMember = false;
+        foreach ($members as $m) {
+            if ((int) ($m['user_id'] ?? ($m['id'] ?? 0)) === $userId) {
+                $isMember = true;
+                break;
+            }
+        }
+
+        return $this->view('accessible-frontend::group-detail', [
+            'title' => ($group['name'] ?? '') ?: __('govuk_alpha.groups.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'group' => $group,
+            'groupMembers' => is_array($members) ? $members : [],
+            'isMember' => $isMember,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function joinGroup(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $userId = $this->geGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+        abort_unless(TenantContext::hasFeature('groups'), 403);
+        $ok = false;
+        try {
+            $res = \App\Services\GroupService::join($id, $userId);
+            $ok = (bool) ($res['success'] ?? (is_array($res) ? !isset($res['error']) : (bool) $res));
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.groups.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $ok ? 'group-joined' : 'group-failed']);
+    }
+
+    public function leaveGroup(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $userId = $this->geGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+        abort_unless(TenantContext::hasFeature('groups'), 403);
+        $ok = false;
+        try {
+            $ok = \App\Services\GroupService::leave($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.groups.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $ok ? 'group-left' : 'group-failed']);
+    }
+
+    // === Goals ===
+
+    public function goals(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('goals'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $items = [];
+        try {
+            $items = app(\App\Services\GoalService::class)->getAll(['limit' => 30, 'user_id' => $userId])['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::goals', [
+            'title' => __('govuk_alpha.goals.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'goals' => is_array($items) ? $items : [],
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function goal(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('goals'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $goal = null;
+        try {
+            $model = app(\App\Services\GoalService::class)->getById($id);
+            $goal = $model?->toArray();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($goal === null, 404);
+
+        return $this->view('accessible-frontend::goal-detail', [
+            'title' => ($goal['title'] ?? '') ?: __('govuk_alpha.goals.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'goal' => $goal,
+            'isOwner' => (int) ($goal['user_id'] ?? 0) === $userId,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function storeGoal(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $userId = $this->geGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+        abort_unless(TenantContext::hasFeature('goals'), 403);
+
+        $title = trim(self::asStr($request->input('title')));
+        $target = (float) $request->input('target_value');
+        if ($title === '' || $target <= 0) {
+            return redirect()->route('govuk-alpha.goals.index', ['tenantSlug' => $tenantSlug, 'status' => 'goal-invalid']);
+        }
+
+        $ok = false;
+        try {
+            $goal = app(\App\Services\GoalService::class)->create($userId, [
+                'title' => mb_substr($title, 0, 255),
+                'description' => trim(self::asStr($request->input('description'))) ?: null,
+                'target_value' => $target,
+                'current_value' => 0,
+                'deadline' => self::asStr($request->input('deadline')) ?: null,
+                'is_public' => $request->boolean('is_public'),
+            ]);
+            $ok = $goal !== null;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.goals.index', ['tenantSlug' => $tenantSlug, 'status' => $ok ? 'goal-created' : 'goal-failed']);
+    }
+
+    public function incrementGoal(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $userId = $this->geGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+        abort_unless(TenantContext::hasFeature('goals'), 403);
+
+        $inc = (float) $request->input('increment');
+        $status = 'goal-invalid';
+        if ($inc > 0) {
+            try {
+                $status = app(\App\Services\GoalService::class)->incrementProgress($id, $userId, $inc) !== null ? 'goal-updated' : 'goal-failed';
+            } catch (\Throwable $e) {
+                report($e);
+                $status = 'goal-failed';
+            }
+        }
+
+        return redirect()->route('govuk-alpha.goals.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
+    }
+
+    public function completeGoal(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $userId = $this->geGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+        abort_unless(TenantContext::hasFeature('goals'), 403);
+
+        $ok = false;
+        try {
+            $ok = app(\App\Services\GoalService::class)->complete($id, $userId) !== null;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.goals.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $ok ? 'goal-completed' : 'goal-failed']);
+    }
+
+    // === Skills directory (ungated — no 'skills' feature flag) ===
+
+    public function skills(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $svc = app(\App\Services\SkillTaxonomyService::class);
+        $tree = [];
+        try {
+            $tree = $svc->getTree(true);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        $skillQuery = trim(self::asStr($request->query('skill')));
+        $skillMembers = [];
+        if ($skillQuery !== '') {
+            try {
+                $skillMembers = $svc->getMembersWithSkill($skillQuery, 40);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return $this->view('accessible-frontend::skills', [
+            'title' => __('govuk_alpha.skills.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'skillTree' => is_array($tree) ? $tree : [],
+            'skillQuery' => $skillQuery,
+            'skillMembers' => is_array($skillMembers) ? $skillMembers : [],
+        ]);
+    }
+
+    // === Organisations ===
+
+    public function organisations(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('organisations'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $q = trim(self::asStr($request->query('q')));
+        $filters = ['limit' => 30];
+        if ($q !== '') {
+            $filters['search'] = $q;
+        }
+        $items = [];
+        try {
+            $items = \App\Services\VolunteerService::getOrganisations($filters)['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::organisations', [
+            'title' => __('govuk_alpha.organisations.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'organisations' => is_array($items) ? $items : [],
+            'organisationsQuery' => $q,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function organisation(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('organisations'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $org = null;
+        try {
+            $org = \App\Services\VolunteerService::getOrganisationById($id);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($org === null, 404);
+
+        return $this->view('accessible-frontend::organisation-detail', [
+            'title' => ($org['name'] ?? '') ?: __('govuk_alpha.organisations.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'organisation' => $org,
+        ]);
+    }
+
+    public function storeOrganisation(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $userId = $this->geGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+        abort_unless(TenantContext::hasFeature('organisations'), 403);
+
+        $name = trim(self::asStr($request->input('name')));
+        if ($name === '') {
+            return redirect()->route('govuk-alpha.organisations.index', ['tenantSlug' => $tenantSlug, 'status' => 'org-invalid']);
+        }
+
+        $ok = false;
+        try {
+            $id = \App\Services\VolunteerService::createOrganization($userId, [
+                'name' => mb_substr($name, 0, 255),
+                'description' => trim(self::asStr($request->input('description'))) ?: null,
+                'email' => trim(self::asStr($request->input('email'))) ?: null,
+                'website' => trim(self::asStr($request->input('website'))) ?: null,
+            ]);
+            $ok = $id !== null;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.organisations.index', ['tenantSlug' => $tenantSlug, 'status' => $ok ? 'org-submitted' : 'org-failed']);
+    }
+
     /**
      * "How timebanking works" — a plain, public educational page. No auth or
      * module gate: it helps newcomers (and the accessibility-first audience in
@@ -4980,6 +5391,12 @@ class AlphaController extends Controller
 
         if (TenantContext::hasFeature('volunteering')) {
             $items['volunteering'] = route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]);
+        }
+
+        // "Explore" is the gateway to discovery facilities (groups, goals, skills,
+        // organisations, marketplace, jobs, courses, …) so the flat bar stays lean.
+        if ($userId !== null) {
+            $items['explore'] = route('govuk-alpha.explore', ['tenantSlug' => $tenantSlug]);
         }
 
         // Polls sit last in the bar, after Volunteering.
