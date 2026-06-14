@@ -3216,6 +3216,36 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('Gardening Neighbour');
     }
 
+    public function test_wallet_recipient_search_disambiguates_same_named_members(): void
+    {
+        $this->authenticatedUser(['name' => 'Searcher Member']);
+
+        // Two members with the IDENTICAL display name (a rare token to avoid
+        // colliding with seed data), told apart ONLY by location + "member since".
+        $maryA = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true,
+            'first_name' => 'Quenby', 'last_name' => 'Stone',
+        ]);
+        DB::table('users')->where('id', $maryA->id)->update(['location' => 'Cork', 'created_at' => '2024-03-15 10:00:00']);
+
+        $maryB = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true,
+            'first_name' => 'Quenby', 'last_name' => 'Stone',
+        ]);
+        DB::table('users')->where('id', $maryB->id)->update(['location' => 'Galway', 'created_at' => '2023-09-01 10:00:00']);
+
+        // SQL LIKE fallback returns both when Meilisearch has no index in tests.
+        $response = $this->get("/{$this->testTenantSlug}/alpha/wallet?recipient_q=Quenby");
+
+        $response->assertOk();
+        // Both identically-named members appear, distinguished by location + member-since.
+        $response->assertSee('Quenby Stone');
+        $response->assertSee('Cork');
+        $response->assertSee('Galway');
+        $response->assertSee(__('govuk_alpha.wallet.member_since', ['date' => 'March 2024']));
+        $response->assertSee(__('govuk_alpha.wallet.member_since', ['date' => 'September 2023']));
+    }
+
     public function test_wallet_transfer_moves_credits_between_members(): void
     {
         $sender = $this->authenticatedUser(['name' => 'Sender Member']);

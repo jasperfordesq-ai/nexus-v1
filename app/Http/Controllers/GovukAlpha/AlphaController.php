@@ -2633,7 +2633,11 @@ class AlphaController extends Controller
                 ->whereIn('id', $ids)
                 ->select(
                     'id',
-                    DB::raw("CASE WHEN profile_type = 'organisation' AND organization_name IS NOT NULL AND organization_name != '' THEN organization_name ELSE CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) END as name")
+                    DB::raw("CASE WHEN profile_type = 'organisation' AND organization_name IS NOT NULL AND organization_name != '' THEN organization_name ELSE CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) END as name"),
+                    // Disambiguation fields for the recipient picker: two members can
+                    // share a display name, so callers render location + "member since".
+                    'location',
+                    'created_at'
                 )
                 ->get()
                 ->map(static fn ($r): array => (array) $r)

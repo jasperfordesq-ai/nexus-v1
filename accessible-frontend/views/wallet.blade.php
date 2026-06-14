@@ -83,9 +83,23 @@
             @else
                 <h3 class="govuk-heading-m">{{ __('govuk_alpha.wallet.recipient_heading') }}</h3>
                 @foreach ($recipientResults as $recipient)
-                    @php $recipientName = trim((string) ($recipient['name'] ?? '')) ?: __('govuk_alpha.members.unknown_member'); @endphp
+                    @php
+                        $recipientName = trim((string) ($recipient['name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
+                        // Disambiguate same-named members: location + "Member since …".
+                        $recipientLoc = trim((string) ($recipient['location'] ?? ''));
+                        $recipientSince = !empty($recipient['created_at'])
+                            ? \Illuminate\Support\Carbon::parse($recipient['created_at'])->translatedFormat('F Y')
+                            : null;
+                        $recipientMeta = array_values(array_filter([
+                            $recipientLoc !== '' ? $recipientLoc : null,
+                            $recipientSince ? __('govuk_alpha.wallet.member_since', ['date' => $recipientSince]) : null,
+                        ]));
+                    @endphp
                     <div class="nexus-alpha-card govuk-!-margin-bottom-4">
-                        <h4 class="govuk-heading-s govuk-!-margin-bottom-2">{{ $recipientName }}</h4>
+                        <h4 class="govuk-heading-s govuk-!-margin-bottom-1">{{ $recipientName }}</h4>
+                        @if (!empty($recipientMeta))
+                            <p class="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-3">{{ implode(' · ', $recipientMeta) }}</p>
+                        @endif
                         <form method="post" action="{{ route('govuk-alpha.wallet.transfer', ['tenantSlug' => $tenantSlug]) }}">
                             @csrf
                             <input type="hidden" name="recipient_id" value="{{ $recipient['id'] }}">

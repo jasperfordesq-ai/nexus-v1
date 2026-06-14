@@ -1026,6 +1026,7 @@ return [
         'note_label' => 'Note (optional)',
         'note_hint' => 'Add a short note so the member knows what the credits are for.',
         'send_button' => 'Send credits to :name',
+        'member_since' => 'Member since :date',
         'sent' => 'Your time credits were sent successfully.',
         'sent_short' => 'Sent',
         'received' => 'Received',
