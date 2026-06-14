@@ -4702,4 +4702,183 @@ class GovukAlphaFrontendTest extends TestCase
         TenantContext::reset();
         TenantContext::setById($this->testTenantId);
     }
+
+    // ===== WAVE O: Organisations depth =====
+
+    /**
+     * Seed an approved organisation owned by $ownerId, with one open opportunity
+     * (created by $creatorId), one approved volunteer log (hours) and one review.
+     * Returns [organizationId, opportunityId, creatorId, reviewerId].
+     *
+     * @return array{0:int,1:int,2:int,3:int}
+     */
+    private function seedOrgWithDepth(int $ownerId): array
+    {
+        $creator = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $reviewer = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'name' => 'Grateful Reviewer',
+            'first_name' => 'Grateful',
+            'last_name' => 'Reviewer',
+        ]);
+
+        $organizationId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $ownerId,
+            'name' => 'Depth Org',
+            'slug' => 'depth-org-' . $ownerId,
+            'description' => 'An organisation with opportunities, reviews and stats.',
+            'contact_email' => 'depth-org@example.test',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $opportunityId = DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $organizationId,
+            'created_by' => $creator->id,
+            'title' => 'Depth volunteering opportunity',
+            'description' => 'A meaningful accessible opportunity at the depth org.',
+            'location' => 'Community Centre',
+            'is_remote' => 1,
+            'is_active' => 1,
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('vol_logs')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $reviewer->id,
+            'organization_id' => $organizationId,
+            'opportunity_id' => $opportunityId,
+            'date_logged' => now()->toDateString(),
+            'hours' => 6,
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('vol_reviews')->insert([
+            'tenant_id' => $this->testTenantId,
+            'reviewer_id' => $reviewer->id,
+            'target_type' => 'organization',
+            'target_id' => $organizationId,
+            'rating' => 5,
+            'comment' => 'A wonderful organisation to volunteer with.',
+            'created_at' => now(),
+        ]);
+
+        return [$organizationId, $opportunityId, $creator->id, $reviewer->id];
+    }
+
+    public function test_o_organisation_detail_shows_opportunities_reviews_and_stats(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Org Owner']);
+        [$organizationId, $opportunityId] = $this->seedOrgWithDepth($owner->id);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/{$organizationId}");
+        $res->assertOk();
+
+        // Core profile.
+        $res->assertSee('Depth Org');
+
+        // Stats section.
+        $res->assertSee(__('govuk_alpha.org_depth.stats_heading'));
+        $res->assertSee(__('govuk_alpha.org_depth.stat_hours'));
+        $res->assertSee(__('govuk_alpha.org_depth.stat_rating'));
+
+        // Opportunities section links through to the existing opportunity detail
+        // page (where the apply form already lives).
+        $res->assertSee(__('govuk_alpha.org_depth.opportunities_heading'));
+        $res->assertSee('Depth volunteering opportunity');
+        $res->assertSee(
+            route('govuk-alpha.volunteering.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $opportunityId]),
+            false
+        );
+
+        // Reviews section.
+        $res->assertSee(__('govuk_alpha.org_depth.reviews_heading'));
+        $res->assertSee('A wonderful organisation to volunteer with.');
+        $res->assertSee('Grateful Reviewer');
+    }
+
+    public function test_o_organisation_detail_empty_states_when_no_depth_data(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Bare Owner']);
+
+        $organizationId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'name' => 'Bare Org',
+            'slug' => 'bare-org-' . $owner->id,
+            'description' => 'No opportunities or reviews yet.',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/{$organizationId}");
+        $res->assertOk();
+        $res->assertSee('Bare Org');
+        $res->assertSee(__('govuk_alpha.org_depth.opportunities_empty'));
+        $res->assertSee(__('govuk_alpha.org_depth.reviews_empty'));
+    }
+
+    public function test_o_organisation_detail_404_for_cross_tenant_org(): void
+    {
+        $this->authenticatedUser(['name' => 'Tenant Two Member']);
+
+        // An organisation belonging to a DIFFERENT tenant must not be visible.
+        // The VolOrganization tenant global scope filters every read by the
+        // current tenant id, so a row stamped with a foreign tenant_id is
+        // invisible regardless of whether a matching tenants row exists.
+        $otherTenantId = $this->testTenantId + 1000;
+        $foreignOrgId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $otherTenantId,
+            'user_id' => 0,
+            'name' => 'Foreign Org',
+            'slug' => 'foreign-org-wave-o',
+            'description' => 'Belongs to another tenant.',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/{$foreignOrgId}");
+        $res->assertNotFound();
+    }
+
+    public function test_o_apply_to_org_opportunity_uses_existing_volunteer_path(): void
+    {
+        $applicant = $this->authenticatedUser(['name' => 'Eager Applicant']);
+        [$organizationId, $opportunityId] = $this->seedOrgWithDepth($applicant->id);
+
+        // The opportunity link on the org page leads to the opportunity detail
+        // page; applying there exercises the existing, shared apply route +
+        // organiser-notification logic (not duplicated for WAVE O).
+        $orgPage = $this->get("/{$this->testTenantSlug}/alpha/organisations/{$organizationId}");
+        $orgPage->assertOk();
+        $orgPage->assertSee(
+            route('govuk-alpha.volunteering.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $opportunityId]),
+            false
+        );
+
+        $apply = $this->post("/{$this->testTenantSlug}/alpha/volunteering/opportunities/{$opportunityId}/apply", [
+            'message' => 'Found you via the organisation page.',
+        ]);
+        $apply->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/opportunities/{$opportunityId}?status=apply-created");
+
+        $this->assertDatabaseHas('vol_applications', [
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $opportunityId,
+            'user_id' => $applicant->id,
+            'status' => 'pending',
+        ]);
+    }
 }
