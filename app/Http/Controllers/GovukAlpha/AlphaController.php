@@ -3104,11 +3104,12 @@ class AlphaController extends Controller
     private function alphaSafeguardingPreferences(int $userId): array
     {
         try {
+            $tenantId = TenantContext::getId();
             $rows = DB::table('user_safeguarding_preferences as p')
-                ->join('tenant_safeguarding_options as o', function ($join) {
-                    $join->on('o.id', '=', 'p.option_id')->where('o.is_active', 1);
+                ->join('tenant_safeguarding_options as o', function ($join) use ($tenantId) {
+                    $join->on('o.id', '=', 'p.option_id')->where('o.tenant_id', $tenantId)->where('o.is_active', 1);
                 })
-                ->where('p.tenant_id', TenantContext::getId())
+                ->where('p.tenant_id', $tenantId)
                 ->where('p.user_id', $userId)
                 ->whereNull('p.revoked_at')
                 ->select(['p.option_id', 'o.label', 'o.description', 'o.triggers'])
@@ -3360,8 +3361,12 @@ class AlphaController extends Controller
         $freq = $this->allowed($request->input('notification_frequency'), ['daily', 'weekly', 'monthly', 'fortnightly', 'never'], 'monthly');
 
         try {
-            // Preserve the rest of the preference row (distance, score, categories, …).
+            // Preserve the rest of the preference row (distance, score, …). The
+            // alpha does not edit category matches, so drop 'categories' from the
+            // payload — that keeps the existing categories untouched AND avoids the
+            // service's optional (non-tenant-scoped) category-sync delete path.
             $updated = \App\Services\MatchingService::getPreferences($userId);
+            unset($updated['categories']);
             $updated['notification_frequency'] = $freq;
             $updated['notify_hot_matches'] = $request->boolean('notify_hot_matches');
             $updated['notify_mutual_matches'] = $request->boolean('notify_mutual_matches');

@@ -55,8 +55,8 @@ class SafeguardingMemberController extends BaseApiController
         }
 
         $rows = DB::table('user_safeguarding_preferences as p')
-            ->join('tenant_safeguarding_options as o', function ($join) {
-                $join->on('o.id', '=', 'p.option_id')->where('o.is_active', 1);
+            ->join('tenant_safeguarding_options as o', function ($join) use ($tenantId) {
+                $join->on('o.id', '=', 'p.option_id')->where('o.tenant_id', $tenantId)->where('o.is_active', 1);
             })
             ->where('p.tenant_id', $tenantId)
             ->where('p.user_id', $userId)

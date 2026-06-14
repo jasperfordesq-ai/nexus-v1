@@ -401,6 +401,7 @@ class SkillTaxonomyService
         return DB::table('user_skills')
             ->where('id', $userSkillId)
             ->where('user_id', $userId)
+            ->where('tenant_id', TenantContext::getId())
             ->delete() > 0;
     }
 

@@ -1182,6 +1182,7 @@ return [
             'failed' => 'We could not save your match settings. Please try again.',
         ],
         'personalisation' => [
+            'options_legend' => 'Feed and translation options',
             'title' => 'Personalisation and translation',
             'description' => 'Control how your feed is ordered and whether posts in other languages are translated for you.',
             'chronological_label' => 'Show my feed in time order (newest first)',

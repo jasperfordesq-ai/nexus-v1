@@ -256,7 +256,7 @@
                                 <label class="govuk-label govuk-checkboxes__label" for="privacy_search">{{ __('govuk_alpha.profile_settings.privacy_search_label') }}</label>
                             </div>
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="privacy_contact" name="privacy_contact" type="checkbox" value="1" @checked($privacyContact ?? false)>
+                                <input class="govuk-checkboxes__input" id="privacy_contact" name="privacy_contact" type="checkbox" value="1" @checked($privacyContact ?? false) aria-describedby="privacy_contact-hint">
                                 <label class="govuk-label govuk-checkboxes__label" for="privacy_contact">{{ __('govuk_alpha.profile_settings.privacy_contact_label') }}</label>
                                 <div id="privacy_contact-hint" class="govuk-hint govuk-checkboxes__hint">{{ __('govuk_alpha.profile_settings.privacy_contact_hint') }}</div>
                             </div>
@@ -590,20 +590,21 @@
                 <p class="govuk-body">{{ __('govuk_alpha.profile_settings.personalisation.description') }}</p>
                 <form method="post" action="{{ route('govuk-alpha.profile.personalisation.update', ['tenantSlug' => $tenantSlug]) }}">
                     @csrf
-                    <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset govuk-!-margin-bottom-3">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha.profile_settings.personalisation.options_legend') }}</legend>
                         <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="prefers_chronological" name="prefers_chronological" type="checkbox" value="1" @checked($prefersChronological ?? false)>
+                                <input class="govuk-checkboxes__input" id="prefers_chronological" name="prefers_chronological" type="checkbox" value="1" @checked($prefersChronological ?? false) aria-describedby="prefers_chronological-hint">
                                 <label class="govuk-label govuk-checkboxes__label" for="prefers_chronological">{{ __('govuk_alpha.profile_settings.personalisation.chronological_label') }}</label>
                                 <div id="prefers_chronological-hint" class="govuk-hint govuk-checkboxes__hint">{{ __('govuk_alpha.profile_settings.personalisation.chronological_hint') }}</div>
                             </div>
-                            <div class="govuk-checkboxes__item" data-module="govuk-checkboxes" data-aria-controls="auto-translate-conditional">
-                                <input class="govuk-checkboxes__input" id="auto_translate_ugc" name="auto_translate_ugc" type="checkbox" value="1" @checked($autoTranslate ?? false)>
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="auto_translate_ugc" name="auto_translate_ugc" type="checkbox" value="1" @checked($autoTranslate ?? false) aria-describedby="auto_translate_ugc-hint">
                                 <label class="govuk-label govuk-checkboxes__label" for="auto_translate_ugc">{{ __('govuk_alpha.profile_settings.personalisation.auto_translate_label') }}</label>
                                 <div id="auto_translate_ugc-hint" class="govuk-hint govuk-checkboxes__hint">{{ __('govuk_alpha.profile_settings.personalisation.auto_translate_hint') }}</div>
                             </div>
                         </div>
-                    </div>
+                    </fieldset>
                     <div class="govuk-form-group">
                         <label class="govuk-label" for="auto_translate_target_locale">{{ __('govuk_alpha.profile_settings.personalisation.translate_into_label') }}</label>
                         <select class="govuk-select" id="auto_translate_target_locale" name="auto_translate_target_locale">
