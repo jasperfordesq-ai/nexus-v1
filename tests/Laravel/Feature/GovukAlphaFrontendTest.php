@@ -7658,6 +7658,18 @@ class GovukAlphaFrontendTest extends TestCase
         $this->authenticatedUser(['name' => 'Market Browser']);
         $this->enableAlphaFeatures(['marketplace']);
 
+        // The category filter only renders when the tenant has marketplace
+        // categories, so seed one to make the test self-contained.
+        DB::table('marketplace_categories')->insert([
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Tools',
+            'slug' => 'tools-' . $this->testTenantId,
+            'is_active' => 1,
+            'sort_order' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace");
         $res->assertOk();
         $res->assertSee('category_id', false);
@@ -7862,14 +7874,15 @@ class GovukAlphaFrontendTest extends TestCase
         $this->authenticatedUser(['name' => 'Premium Shopper']);
         $this->enableAlphaFeatures(['member_premium']);
 
-        DB::table('premium_tiers')->insert([
+        DB::table('member_premium_tiers')->insert([
             'tenant_id' => $this->testTenantId,
             'name' => 'Gold',
             'slug' => 'gold-' . $this->testTenantId,
             'monthly_price_cents' => 500,
             'yearly_price_cents' => 5000,
             'description' => 'Full access.',
-            'status' => 'active',
+            'is_active' => 1,
+            'sort_order' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
