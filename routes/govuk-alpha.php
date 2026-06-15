@@ -115,6 +115,12 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/feed/posts/{id}/report', [AlphaController::class, 'reportFeedItem'])->whereNumber('id')->middleware('throttle:15,1')->name('feed.report');
         Route::post('/feed/comments/{id}/update', [AlphaController::class, 'updateFeedComment'])->whereNumber('id')->middleware('throttle:30,1')->name('feed.comments.update');
         Route::post('/feed/comments/{id}/delete', [AlphaController::class, 'deleteFeedComment'])->whereNumber('id')->middleware('throttle:30,1')->name('feed.comments.delete');
+        // ===== WAVE T1-FEED =====
+        Route::get('/feed/posts/{id}', [AlphaController::class, 'feedPost'])->whereNumber('id')->name('feed.posts.show');
+        Route::post('/feed/posts/{id}/react', [AlphaController::class, 'storeFeedPostReaction'])->whereNumber('id')->middleware('throttle:60,1')->name('feed.posts.react');
+        Route::post('/feed/comments/{id}/react', [AlphaController::class, 'storeFeedCommentReaction'])->whereNumber('id')->middleware('throttle:60,1')->name('feed.comments.react');
+        Route::post('/feed/posts/{id}/share', [AlphaController::class, 'storeFeedPostShare'])->whereNumber('id')->middleware('throttle:20,1')->name('feed.posts.share');
+        Route::post('/feed/posts/{id}/save', [AlphaController::class, 'storeFeedPostSave'])->whereNumber('id')->middleware('throttle:30,1')->name('feed.posts.save');
         Route::get('/listings', [AlphaController::class, 'listings'])->name('listings.index');
         Route::get('/listings/new', [AlphaController::class, 'createListing'])->name('listings.create');
         Route::post('/listings/new', [AlphaController::class, 'storeListing'])->middleware('throttle:10,1')->name('listings.store');

@@ -2293,6 +2293,8 @@ class AlphaController extends Controller
             'activeNav' => 'feed',
             'items' => $items,
             'commentsByTarget' => $this->commentsForFeedItems($items, $userId),
+            'reactionsByTarget' => $this->reactionsForFeedItems($items, $userId),
+            'alphaReactions' => self::ALPHA_FEED_REACTIONS,
             'meta' => $meta,
             'selectedType' => $type,
             'selectedMode' => $mode,
@@ -10785,5 +10787,249 @@ class AlphaController extends Controller
             'tenant_id' => $receiverTenantId,
             'status' => 'transfer-sent',
         ]);
+    }
+
+    // ===== WAVE T1-FEED: feed engagement =====
+
+    /**
+     * The small, fixed set of reactions the accessible feed exposes as plain
+     * submit-buttons. These are a curated subset of ReactionService::VALID_TYPES
+     * (the full picker is React-only). Mapping reaction-type to emoji glyph mirrors
+     * the React REACTION_CONFIGS so both frontends agree on what each type means.
+     *
+     * @var array<string, string>
+     */
+    private const ALPHA_FEED_REACTIONS = [
+        'like'      => "\u{1F44D}", // thumbs up
+        'love'      => "\u{2764}\u{FE0F}", // heart
+        'celebrate' => "\u{1F389}", // party popper
+    ];
+
+    /**
+     * Toggle an emoji reaction on a feed post via the shared ReactionService.
+     *
+     * Mirrors ReactionController::togglePostReaction: the reaction type is
+     * validated against the backend allowed set, the target is tenant-scoped and
+     * visibility-checked, and the member can only react as themselves.
+     */
+    public function storeFeedPostReaction(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        return $this->toggleAlphaReaction($request, $tenantSlug, 'post', $id);
+    }
+
+    /**
+     * Toggle an emoji reaction on a comment via the shared ReactionService.
+     * Mirrors ReactionController::toggleCommentReaction.
+     */
+    public function storeFeedCommentReaction(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        return $this->toggleAlphaReaction($request, $tenantSlug, 'comment', $id);
+    }
+
+    /**
+     * Shared reaction-toggle path for posts and comments. Only the reaction types
+     * the accessible frontend renders are accepted; anything else is rejected
+     * before touching the service so a tampered form cannot smuggle an arbitrary
+     * (still backend-valid) emoji through.
+     */
+    private function toggleAlphaReaction(Request $request, string $tenantSlug, string $targetType, int $targetId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return $this->redirectToFeed($request, $tenantSlug, 'auth-required', $targetType, $targetId);
+        }
+
+        $emoji = self::asStr($request->input('emoji'));
+        // Accept only the curated accessible set, which is itself a subset of
+        // ReactionService::VALID_TYPES. Fail closed on anything else.
+        if (!array_key_exists($emoji, self::ALPHA_FEED_REACTIONS)
+            || !in_array($emoji, \App\Services\ReactionService::VALID_TYPES, true)) {
+            return $this->redirectToFeed($request, $tenantSlug, 'reaction-failed', $targetType, $targetId);
+        }
+
+        if ($targetId <= 0 || !FeedItemTables::canView($targetType, $targetId, $userId)) {
+            return $this->redirectToFeed($request, $tenantSlug, 'reaction-failed', $targetType, $targetId);
+        }
+
+        $status = 'reaction-failed';
+        try {
+            $result = app(\App\Services\ReactionService::class)->toggleReaction($targetId, $targetType, $emoji, $userId);
+            $status = ($result['action'] ?? '') === 'removed' ? 'reaction-removed' : 'reaction-added';
+
+            // Best-effort author notification, matching the like path. Reacting to
+            // your own content never notifies.
+            if ($status === 'reaction-added') {
+                try {
+                    $ownerId = SocialNotificationService::getContentOwnerId($targetType, $targetId);
+                    if ($ownerId && $ownerId !== $userId) {
+                        SocialNotificationService::notifyLike($ownerId, $userId, $targetType, $targetId, $emoji);
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('Alpha reaction notification failed: ' . $e->getMessage());
+                }
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // Comment reactions live inside a post's comment thread; bounce back to the
+        // anchor for the comment (or post) on the feed.
+        $anchorType = $targetType === 'comment' ? 'comment' : 'post';
+
+        return $this->redirectToFeed($request, $tenantSlug, $status, $anchorType, $targetId);
+    }
+
+    /**
+     * Toggle a "share to my feed" repost of a feed post via ShareService.
+     * Mirrors FeedSocialController::sharePost / unsharePost (toggle semantics).
+     * The service blocks self-shares (DomainException) and unviewable posts.
+     */
+    public function storeFeedPostShare(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return $this->redirectToFeed($request, $tenantSlug, 'auth-required', 'post', $id);
+        }
+
+        if ($id <= 0 || !FeedItemTables::canView('post', $id, $userId)) {
+            return $this->redirectToFeed($request, $tenantSlug, 'share-failed', 'post', $id);
+        }
+
+        $status = 'share-failed';
+        try {
+            $result = app(\App\Services\ShareService::class)->toggle($userId, 'post', $id);
+            $status = !empty($result['shared']) ? 'share-added' : 'share-removed';
+        } catch (\DomainException $e) {
+            // Self-share is not allowed; surface a distinct message.
+            $status = 'share-own';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->redirectToFeed($request, $tenantSlug, $status, 'post', $id);
+    }
+
+    /**
+     * Toggle a bookmark (save) on a feed post via BookmarkService so the existing
+     * feed "Saved" filter and the /saved page surface it. Bookmarks are stored
+     * against the polymorphic ('post', id) target and are owner-scoped to the
+     * member by the service.
+     */
+    public function storeFeedPostSave(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return $this->redirectToFeed($request, $tenantSlug, 'auth-required', 'post', $id);
+        }
+
+        if ($id <= 0 || !FeedItemTables::canView('post', $id, $userId)) {
+            return $this->redirectToFeed($request, $tenantSlug, 'save-failed', 'post', $id);
+        }
+
+        $status = 'save-failed';
+        try {
+            $result = app(\App\Services\BookmarkService::class)->toggle($userId, 'post', $id);
+            $status = !empty($result['bookmarked']) ? 'save-added' : 'save-removed';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->redirectToFeed($request, $tenantSlug, $status, 'post', $id);
+    }
+
+    /**
+     * Single-post permalink page. Gives notification/email deep-links to a post a
+     * real, server-rendered target with the full comment thread. Tenant-scoped:
+     * 404s when the post is missing or not visible to the viewer.
+     */
+    public function feedPost(Request $request, string $tenantSlug, int $id): Response
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
+        $userId = $this->currentUserId();
+
+        // Visibility gate before the feed query; invisible/cross-tenant posts 404.
+        abort_unless($id > 0 && FeedItemTables::canView('post', $id, $userId), 404);
+
+        $item = null;
+        try {
+            $result = $this->feedService->getFeed($userId, ['post_id' => $id, 'limit' => 1]);
+            $rows = $this->attachPostMedia($result['items'] ?? []);
+            $item = $rows[0] ?? null;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        abort_if($item === null, 404);
+
+        $comments = [];
+        if ($userId !== null) {
+            try {
+                $comments = CommentService::getForEntity('post', $id, $userId);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        $reactionsByTarget = $this->reactionsForFeedItems([$item], $userId);
+
+        return $this->view('accessible-frontend::feed-post', [
+            'title' => __('govuk_alpha.feed_t1.permalink_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'feed',
+            'item' => $item,
+            'comments' => $comments,
+            'postReactions' => $reactionsByTarget['post'][(int) ($item['id'] ?? $id)] ?? null,
+            'alphaReactions' => self::ALPHA_FEED_REACTIONS,
+            'requiresAuth' => $userId === null,
+            'currentUserId' => $userId,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Batch-fetch reaction summaries for a set of feed items, keyed [type][id].
+     * Comments already carry their reactions from CommentService::getForEntity;
+     * this covers the top-level post/typed cards.
+     *
+     * @param array<int, array<string, mixed>> $items
+     * @return array<string, array<int, array{counts: array<string,int>, total: int, user_reaction: string|null}>>
+     */
+    private function reactionsForFeedItems(array $items, ?int $userId): array
+    {
+        $lookup = [];
+        foreach ($items as $item) {
+            $type = $this->normalizeFeedTargetType((string) ($item['type'] ?? 'post'));
+            $id = (int) ($item['id'] ?? 0);
+            if ($id > 0 && in_array($type, \App\Services\ReactionService::VALID_TARGET_TYPES, true)) {
+                $lookup[] = ['type' => $type, 'id' => $id];
+            }
+        }
+        if ($lookup === []) {
+            return [];
+        }
+
+        try {
+            $byKey = app(\App\Services\ReactionService::class)->getReactionsForItems($lookup, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+            return [];
+        }
+
+        $byTarget = [];
+        foreach ($byKey as $key => $data) {
+            [$type, $id] = array_pad(explode(':', $key, 2), 2, null);
+            if ($type !== null && $id !== null) {
+                $byTarget[$type][(int) $id] = $data;
+            }
+        }
+
+        return $byTarget;
     }
 }
