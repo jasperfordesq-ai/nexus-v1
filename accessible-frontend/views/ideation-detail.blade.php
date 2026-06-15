@@ -71,7 +71,7 @@
                 @endphp
                 <article class="nexus-alpha-card">
                     <div class="nexus-alpha-module-row">
-                        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">{{ $iTitle }}</h3>
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-1" id="idea-{{ $idea['id'] }}-title">{{ $iTitle }}</h3>
                         <strong class="govuk-tag govuk-tag--blue">{{ trans_choice('govuk_alpha.ideation.votes', $iVotes, ['count' => $iVotes]) }}</strong>
                     </div>
                     @if (trim((string) ($idea['description'] ?? '')) !== '')
@@ -83,7 +83,9 @@
                     @if ($isOpenForVotes)
                         <form method="post" action="{{ route('govuk-alpha.ideation.ideas.vote', ['tenantSlug' => $tenantSlug, 'id' => $challenge['id'], 'ideaId' => $idea['id']]) }}">
                             @csrf
-                            <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.ideation.vote_button') }}</button>
+                            <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button"
+                                aria-describedby="idea-{{ $idea['id'] }}-title"
+                                aria-label="{{ __('govuk_alpha.polish_discovery.idea_vote_aria', ['title' => $iTitle]) }}">{{ __('govuk_alpha.ideation.vote_button') }}</button>
                         </form>
                     @endif
                 </article>

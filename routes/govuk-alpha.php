@@ -145,6 +145,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/group-exchanges/{id}/cancel', [AlphaController::class, 'cancelGroupExchange'])->middleware('throttle:15,1')->whereNumber('id')->name('group-exchanges.cancel');
         Route::get('/matches', [AlphaController::class, 'matches'])->name('matches.index');
         Route::get('/polls', [AlphaController::class, 'polls'])->name('polls.index');
+        Route::post('/polls', [AlphaController::class, 'storePoll'])->middleware('throttle:10,1')->name('polls.store');
         Route::post('/polls/{pollId}/vote', [AlphaController::class, 'storePollVote'])->whereNumber('pollId')->middleware('throttle:30,1')->name('polls.vote');
         Route::get('/wallet', [AlphaController::class, 'wallet'])->name('wallet.index');
         // ===== WAVE T1-WALLET =====
@@ -230,6 +231,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/organisations', [AlphaController::class, 'storeOrganisation'])->middleware('throttle:5,5')->name('organisations.store');
         Route::get('/organisations/{id}', [AlphaController::class, 'organisation'])->whereNumber('id')->name('organisations.show');
         Route::get('/saved', [AlphaController::class, 'saved'])->name('saved.index');
+        Route::post('/saved/destroy', [AlphaController::class, 'destroySaved'])->middleware('throttle:30,1')->name('saved.destroy');
         Route::get('/resources', [AlphaController::class, 'resources'])->name('resources.index');
         Route::get('/jobs', [AlphaController::class, 'jobs'])->name('jobs.index');
         // Static segments are registered before the {id} wildcard so they always win.

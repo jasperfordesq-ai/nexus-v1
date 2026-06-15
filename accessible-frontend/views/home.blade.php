@@ -120,7 +120,7 @@
                 <a class="govuk-link" href="{{ route('govuk-alpha.guide', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.guide.title') }}</a>
             </p>
 
-            <div class="nexus-alpha-actions govuk-!-margin-bottom-8">
+            <div class="govuk-button-group govuk-!-margin-bottom-8">
                 @if ($isAuthenticated ?? false)
                     <a class="govuk-button" href="{{ route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.home.primary_authenticated') }}</a>
                     <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.profile.me', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.home.profile_action') }}</a>

@@ -15,14 +15,46 @@
                 default => ['govuk-tag--grey', __('govuk_alpha.ideation.status_draft')],
             };
         };
+        $activeStatus = $ideationStatus ?? '';
+        $activeQuery  = $ideationQuery ?? '';
     @endphp
 
     <span class="govuk-caption-xl">{{ __('govuk_alpha.ideation.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.ideation.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.ideation.description') }}</p>
 
+    {{-- Search + filter form --}}
+    <form method="get" action="{{ route('govuk-alpha.ideation.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-6">
+        <div class="govuk-form-group govuk-!-margin-bottom-4">
+            <label class="govuk-label" for="ideation-q">{{ __('govuk_alpha.polish_discovery.ideation_search_label') }}</label>
+            <input class="govuk-input govuk-input--width-30" id="ideation-q" name="q" type="search" value="{{ $activeQuery }}">
+        </div>
+        <div class="govuk-form-group govuk-!-margin-bottom-4">
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend">{{ __('govuk_alpha.polish_discovery.ideation_filter_label') }}</legend>
+                <div class="govuk-radios govuk-radios--inline govuk-radios--small" data-module="govuk-radios">
+                    @foreach ([
+                        '' => __('govuk_alpha.polish_discovery.ideation_filter_all'),
+                        'open' => __('govuk_alpha.polish_discovery.ideation_filter_open'),
+                        'voting' => __('govuk_alpha.polish_discovery.ideation_filter_voting'),
+                        'closed' => __('govuk_alpha.polish_discovery.ideation_filter_closed'),
+                    ] as $val => $label)
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="ideation-status-{{ $val === '' ? 'all' : $val }}" name="status" type="radio" value="{{ $val }}"{{ $activeStatus === $val ? ' checked' : '' }}>
+                            <label class="govuk-label govuk-radios__label" for="ideation-status-{{ $val === '' ? 'all' : $val }}">{{ $label }}</label>
+                        </div>
+                    @endforeach
+                </div>
+            </fieldset>
+        </div>
+        <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.polish_discovery.ideation_search_button') }}</button>
+        @if ($activeStatus !== '' || $activeQuery !== '')
+            <a class="govuk-link govuk-!-margin-left-4" href="{{ route('govuk-alpha.ideation.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.clear_filters') }}</a>
+        @endif
+    </form>
+
     @if (empty($challenges))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.ideation.empty') }}</p>
+        <div class="govuk-inset-text">{{ __('govuk_alpha.ideation.empty') }}</div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($challenges as $c)

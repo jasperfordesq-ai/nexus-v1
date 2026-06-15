@@ -37,7 +37,8 @@
                         <p class="govuk-body govuk-!-margin-bottom-2">{{ \Illuminate\Support\Str::limit($r['description'], 200) }}</p>
                     @endif
                     @if ($rPath !== '')
-                        <a class="govuk-link" href="{{ \Illuminate\Support\Str::startsWith($rPath, ['http://', 'https://', '/']) ? $rPath : '/' . ltrim($rPath, '/') }}" rel="noopener">{{ __('govuk_alpha.resources.download') }}</a>
+                        <a class="govuk-link" href="{{ \Illuminate\Support\Str::startsWith($rPath, ['http://', 'https://', '/']) ? $rPath : '/' . ltrim($rPath, '/') }}" rel="noopener"
+                           aria-label="{{ __('govuk_alpha.resources.download') }} {{ $rTitle }}">{{ __('govuk_alpha.resources.download') }}</a>
                     @endif
                 </article>
             @endforeach

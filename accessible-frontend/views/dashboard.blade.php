@@ -56,7 +56,9 @@
     @endif
 
     @if (\App\Core\TenantContext::hasModule('listings'))
-        <a class="govuk-button govuk-!-margin-bottom-6" data-module="govuk-button" href="{{ route('govuk-alpha.listings.create', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.dashboard.new_listing') }}</a>
+        <div class="govuk-button-group govuk-!-margin-bottom-6">
+            <a class="govuk-button" data-module="govuk-button" href="{{ route('govuk-alpha.listings.create', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.dashboard.new_listing') }}</a>
+        </div>
     @endif
 
     <div class="govuk-grid-row">
@@ -198,7 +200,7 @@
                         @endphp
                         <article class="nexus-alpha-card">
                             <strong class="govuk-tag govuk-tag--grey">{{ $feedItemTypeLabel($itemType) }}</strong>
-                            <h3 class="govuk-heading-m govuk-!-margin-top-2 govuk-!-margin-bottom-2">{{ $itemTitle }}</h3>
+                            <h3 class="govuk-heading-m govuk-!-margin-top-2 govuk-!-margin-bottom-2"><a class="govuk-link" href="{{ route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]) }}">{{ $itemTitle }}</a></h3>
                             <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">
                                 @if (!empty($item['author']['avatar_url']))
                                     <img class="nexus-alpha-avatar nexus-alpha-avatar--small" src="{{ $item['author']['avatar_url'] }}" alt="" loading="lazy" decoding="async" width="32" height="32">

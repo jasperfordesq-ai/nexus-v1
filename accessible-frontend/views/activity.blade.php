@@ -8,6 +8,8 @@
     @php
         $hs = is_array($activity['hours_summary'] ?? null) ? $activity['hours_summary'] : [];
         $cs = is_array($activity['connection_stats'] ?? null) ? $activity['connection_stats'] : [];
+        $eng = is_array($activity['engagement'] ?? null) ? $activity['engagement'] : [];
+        $skills = is_array($activity['skills_breakdown'] ?? null) ? $activity['skills_breakdown'] : [];
         $monthly = is_array($activity['monthly_hours'] ?? null) ? $activity['monthly_hours'] : [];
         $timeline = is_array($activity['timeline'] ?? null) ? $activity['timeline'] : [];
         $maxMonth = 0;
@@ -37,6 +39,54 @@
             <dd>{{ number_format((int) ($cs['groups_joined'] ?? 0)) }}</dd>
         </div>
     </dl>
+
+    {{-- ===== Engagement quick-stats (last 30 days) ===== --}}
+    @if (!empty($eng))
+        <h2 class="govuk-heading-l">{{ __('govuk_alpha.polish_discovery.activity_engagement_title') }}</h2>
+        <dl class="nexus-alpha-stat-grid govuk-!-margin-bottom-6">
+            <div class="nexus-alpha-stat">
+                <dt>{{ __('govuk_alpha.polish_discovery.activity_posts_count') }}</dt>
+                <dd>{{ number_format((int) ($eng['posts_count'] ?? 0)) }}</dd>
+            </div>
+            <div class="nexus-alpha-stat">
+                <dt>{{ __('govuk_alpha.polish_discovery.activity_comments_count') }}</dt>
+                <dd>{{ number_format((int) ($eng['comments_count'] ?? 0)) }}</dd>
+            </div>
+            <div class="nexus-alpha-stat">
+                <dt>{{ __('govuk_alpha.polish_discovery.activity_likes_given') }}</dt>
+                <dd>{{ number_format((int) ($eng['likes_given'] ?? 0)) }}</dd>
+            </div>
+            <div class="nexus-alpha-stat">
+                <dt>{{ __('govuk_alpha.polish_discovery.activity_likes_received') }}</dt>
+                <dd>{{ number_format((int) ($eng['likes_received'] ?? 0)) }}</dd>
+            </div>
+            @if (isset($hs['net_balance']))
+                <div class="nexus-alpha-stat">
+                    <dt>{{ __('govuk_alpha.polish_discovery.activity_net_balance') }}</dt>
+                    <dd>{{ __('govuk_alpha.polish_discovery.activity_net_hours', ['value' => number_format((float) $hs['net_balance'], 1)]) }}</dd>
+                </div>
+            @endif
+        </dl>
+    @endif
+
+    {{-- ===== Skills breakdown ===== --}}
+    @if (!empty($skills))
+        <h2 class="govuk-heading-l">{{ __('govuk_alpha.polish_discovery.activity_skills_title') }}</h2>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-6">
+            @foreach ($skills as $skill)
+                @php
+                    $skillName = trim((string) ($skill['name'] ?? ($skill['category'] ?? '')));
+                    $skillHours = number_format((float) ($skill['hours'] ?? ($skill['total_hours'] ?? 0)), 1);
+                @endphp
+                @if ($skillName !== '')
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">{{ $skillName }}</dt>
+                        <dd class="govuk-summary-list__value">{{ __('govuk_alpha.polish_discovery.activity_skills_hours_label', ['hours' => $skillHours]) }}</dd>
+                    </div>
+                @endif
+            @endforeach
+        </dl>
+    @endif
 
     @if (!empty($monthly))
         <h2 class="govuk-heading-l">{{ __('govuk_alpha.activity.monthly_title') }}</h2>
