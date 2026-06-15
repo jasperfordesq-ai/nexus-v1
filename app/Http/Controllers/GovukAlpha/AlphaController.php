@@ -3990,6 +3990,19 @@ class AlphaController extends Controller
             }
         }
 
+        // WAVE T1-GROUPS: events + feed tabs on the group detail page.
+        // A participant is an active member OR the group owner — both can read and
+        // post to the group feed (canPostInGroup is the authority and short-circuits
+        // for the owner). The members roster does not always include the owner row,
+        // so derive participation from owner_id too.
+        $isParticipant = $isMember || (int) ($group['owner_id'] ?? 0) === $userId;
+
+        // Both reads are member-and-visibility scoped at the service layer:
+        //   - EventService::getAll is tenant-scoped (HasTenantScope) and filtered to this group.
+        //   - FeedService::getFeed gates private-group posts to members (and 404s a
+        //     non-member viewer of a private group), so we never leak posts.
+        [$groupEvents, $groupFeed] = $this->loadGroupTabData($group, $userId, $isParticipant);
+
         return $this->view('accessible-frontend::group-detail', [
             'title' => ($group['name'] ?? '') ?: __('govuk_alpha.groups.title'),
             'tenantSlug' => $tenantSlug,
@@ -3997,8 +4010,121 @@ class AlphaController extends Controller
             'group' => $group,
             'groupMembers' => is_array($members) ? $members : [],
             'isMember' => $isMember,
+            'groupCanParticipate' => $isParticipant,
+            'groupEvents' => $groupEvents,
+            'groupFeed' => $groupFeed,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
+    }
+
+    // ===== WAVE T1-GROUPS: events + feed tabs =====
+
+    /**
+     * Build the events + feed tab payloads for the group detail page.
+     *
+     * Visibility rules (mirrors React GroupDetailPage):
+     *   - Events: this group's upcoming events, always tenant-scoped. For a private
+     *     group the events tab is only populated for members (parity with the feed).
+     *   - Feed: only members of the group see its posts. FeedService::getFeed already
+     *     gates private-group posts to members, but we additionally skip the read for
+     *     non-members so an empty list never doubles as a membership oracle.
+     *
+     * @param array<string, mixed> $group
+     * @return array{0: array<int, array<string, mixed>>, 1: array<int, array<string, mixed>>}
+     */
+    private function loadGroupTabData(array $group, int $userId, bool $isParticipant): array
+    {
+        $groupId = (int) ($group['id'] ?? 0);
+        $isPrivate = ($group['visibility'] ?? 'public') !== 'public';
+        $events = [];
+        $feed = [];
+
+        if ($groupId <= 0) {
+            return [$events, $feed];
+        }
+
+        // Events: visible to anyone who can see the group page, except for a private
+        // group where only participants (members/owner) get the listing.
+        if (!$isPrivate || $isParticipant) {
+            try {
+                $result = EventService::getAll([
+                    'group_id' => $groupId,
+                    'when'     => 'upcoming',
+                    'limit'    => 10,
+                ]);
+                $events = $this->withResolvedImageKey($result['items'] ?? [], 'cover_image');
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        // Feed: participants only. FeedService enforces this too, but skipping the read
+        // for non-participants avoids any chance of leaking post existence.
+        if ($isParticipant) {
+            try {
+                $result = $this->feedService->getFeed($userId, [
+                    'group_id' => $groupId,
+                    'mode'     => 'chronological',
+                    'limit'    => 20,
+                ]);
+                $feed = is_array($result['items'] ?? null) ? $result['items'] : [];
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return [$events, $feed];
+    }
+
+    /**
+     * Post to a group's feed (members only). The service layer (FeedService::createPost
+     * → FeedItemTables::canPostInGroup) is the authority: a non-member, or a member of a
+     * different group passing another group's id, is rejected there with a 403-equivalent
+     * error array. We also gate up-front so the redirect status is meaningful.
+     */
+    public function storeGroupFeedPost(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $userId = $this->groupGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $back = fn (string $status): RedirectResponse => redirect()->route(
+            'govuk-alpha.groups.show',
+            ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]
+        )->withFragment('group-feed');
+
+        // The group must exist in this tenant and the user must be allowed to post.
+        // canPostInGroup is tenant-scoped and membership-aware, so this single check
+        // blocks both the non-member case and the cross-group (member of A → B) case.
+        if (!\App\Support\FeedItemTables::canPostInGroup($id, $userId)) {
+            return $back('group-post-forbidden');
+        }
+
+        $content = trim(self::asStr($request->input('content')));
+        if ($content === '') {
+            return $back('group-post-empty');
+        }
+
+        try {
+            $post = $this->feedService->createPost($userId, [
+                'content'    => $content,
+                'visibility' => 'public',
+                'group_id'   => $id,
+            ]);
+            if (is_array($post) && isset($post['error'])) {
+                return $back('group-post-failed');
+            }
+
+            if ($post instanceof \App\Models\FeedPost && $request->hasFile('image')) {
+                $this->attachFeedPostImage($request, (int) $post->id);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            return $back('group-post-failed');
+        }
+
+        return $back('group-posted');
     }
 
     public function joinGroup(Request $request, string $tenantSlug, int $id): RedirectResponse

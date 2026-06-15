@@ -6615,4 +6615,160 @@ class GovukAlphaFrontendTest extends TestCase
         $this->get("/{$this->testTenantSlug}/alpha/federation/connections")->assertForbidden();
         $this->get("/{$this->testTenantSlug}/alpha/federation/messages")->assertForbidden();
     }
+
+    // ==================================================================
+    // WAVE T1-GROUPS: group detail depth (events tab + group feed)
+    // ==================================================================
+
+    /**
+     * Seed a group owned by $ownerId. Returns the new group id.
+     */
+    private function t1groupsSeedGroup(int $ownerId, string $name, string $visibility = 'public'): int
+    {
+        return (int) DB::table('groups')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_id' => $ownerId,
+            'name' => $name,
+            'slug' => \Illuminate\Support\Str::slug($name) . '-' . uniqid(),
+            'description' => 'Seeded group for T1 tests.',
+            'visibility' => $visibility,
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function t1groupsAddMember(int $groupId, int $userId, string $role = 'member'): void
+    {
+        DB::table('group_members')->insert([
+            'tenant_id' => $this->testTenantId,
+            'group_id' => $groupId,
+            'user_id' => $userId,
+            'status' => 'active',
+            'role' => $role,
+            'joined_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function t1groupsSeedGroupEvent(int $groupId, int $userId, string $title): int
+    {
+        return (int) DB::table('events')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'group_id' => $groupId,
+            'title' => $title,
+            'description' => 'Seeded group event for T1 tests.',
+            'location' => 'Community Hall',
+            'start_time' => now()->addDays(7),
+            'end_time' => now()->addDays(7)->addHours(2),
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    public function test_t1groups_event_appears_in_group_events_tab(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Group Owner']);
+        $groupId = $this->t1groupsSeedGroup((int) $owner->id, 'Hillwalkers');
+        $eventId = $this->t1groupsSeedGroupEvent($groupId, (int) $owner->id, 'Saturday Summit Walk');
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}");
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.groups_t1.events_title'));
+        $response->assertSee('Saturday Summit Walk');
+        // The event card links through to the accessible event detail page.
+        $response->assertSee(route('govuk-alpha.events.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $eventId]), false);
+    }
+
+    public function test_t1groups_member_can_post_to_group_feed_and_see_it(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Feed Owner']);
+        $groupId = $this->t1groupsSeedGroup((int) $owner->id, 'Book Club');
+        // Owner can always post (canPostInGroup short-circuits for owner).
+
+        $post = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/feed", [
+            'content' => 'First chapter discussion tonight at 8pm.',
+        ]);
+        $post->assertRedirect();
+        $post->assertRedirectContains('status=group-posted');
+
+        // Row landed in the group's feed, scoped to this group + tenant.
+        $this->assertSame(1, DB::table('feed_posts')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('group_id', $groupId)
+            ->where('user_id', $owner->id)
+            ->count());
+
+        // And it renders back on the group detail page for the member.
+        $page = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}");
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.groups_t1.feed_title'));
+        $page->assertSee('First chapter discussion tonight at 8pm.');
+    }
+
+    public function test_t1groups_non_member_cannot_post_to_group_feed(): void
+    {
+        // Group owned by someone else; the acting user is NOT a member.
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $groupId = $this->t1groupsSeedGroup((int) $owner->id, 'Private Allotment', 'public');
+
+        $outsider = $this->authenticatedUser(['name' => 'Outsider']);
+
+        $post = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/feed", [
+            'content' => 'Trying to post without joining.',
+        ]);
+        $post->assertRedirect();
+        $post->assertRedirectContains('status=group-post-forbidden');
+
+        // Nothing was written.
+        $this->assertSame(0, DB::table('feed_posts')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('group_id', $groupId)
+            ->where('user_id', $outsider->id)
+            ->count());
+    }
+
+    public function test_t1groups_member_of_group_a_cannot_post_into_group_b(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $groupA = $this->t1groupsSeedGroup((int) $owner->id, 'Group A');
+        $groupB = $this->t1groupsSeedGroup((int) $owner->id, 'Group B');
+
+        // Acting user is a member of A only.
+        $member = $this->authenticatedUser(['name' => 'Member of A']);
+        $this->t1groupsAddMember($groupA, (int) $member->id);
+
+        $post = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupB}/feed", [
+            'content' => 'Wrong group post.',
+        ]);
+        $post->assertRedirect();
+        $post->assertRedirectContains('status=group-post-forbidden');
+
+        $this->assertSame(0, DB::table('feed_posts')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('group_id', $groupB)
+            ->count());
+    }
+
+    public function test_t1groups_non_member_does_not_see_private_group_feed_compose(): void
+    {
+        // Private group; outsider can view the page but not the feed compose form.
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $groupId = $this->t1groupsSeedGroup((int) $owner->id, 'Members Only', 'private');
+
+        $this->authenticatedUser(['name' => 'Curious Outsider']);
+
+        $page = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}");
+        // GroupService may 404 a private group for a non-member; either way the
+        // member-only compose endpoint must never appear for a non-member.
+        if ($page->isOk()) {
+            $page->assertSee(__('govuk_alpha.groups_t1.feed_members_only'));
+            $page->assertDontSee(route('govuk-alpha.groups.feed.store', ['tenantSlug' => $this->testTenantSlug, 'id' => $groupId]), false);
+        } else {
+            $page->assertNotFound();
+        }
+    }
 }
