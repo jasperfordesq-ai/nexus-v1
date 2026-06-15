@@ -30,7 +30,7 @@
     </form>
 
     @if (empty($organisations))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.organisations.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.organisations.empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list govuk-!-margin-bottom-8">
             @foreach ($organisations as $o)

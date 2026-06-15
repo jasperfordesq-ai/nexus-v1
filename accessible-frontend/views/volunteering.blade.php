@@ -79,19 +79,16 @@
                     <dd>{{ number_format((float) ($summary['this_month_hours'] ?? 0), 1) }}</dd>
                 </div>
             </dl>
-            <p class="govuk-body">
-                <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.hours', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.log_hours_title') }}</a>
-                <span aria-hidden="true"> &middot; </span>
-                <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.accessibility', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.accessibility_link') }}</a>
-                <span aria-hidden="true"> &middot; </span>
-                <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.certificates', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_depth.certificates_link') }}</a>
-                <span aria-hidden="true"> &middot; </span>
-                <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.waitlist', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_depth.waitlist_link') }}</a>
-                <span aria-hidden="true"> &middot; </span>
-                <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.swaps', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_depth.swaps_link') }}</a>
-            </p>
+            {{-- POLISH: govuk-list for semantic nav instead of <p> with middot separators --}}
+            <ul class="govuk-list govuk-list--inline govuk-!-margin-bottom-4">
+                <li><a class="govuk-link" href="{{ route('govuk-alpha.volunteering.hours', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.log_hours_title') }}</a></li>
+                <li><a class="govuk-link" href="{{ route('govuk-alpha.volunteering.accessibility', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.accessibility_link') }}</a></li>
+                <li><a class="govuk-link" href="{{ route('govuk-alpha.volunteering.certificates', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_depth.certificates_link') }}</a></li>
+                <li><a class="govuk-link" href="{{ route('govuk-alpha.volunteering.waitlist', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_depth.waitlist_link') }}</a></li>
+                <li><a class="govuk-link" href="{{ route('govuk-alpha.volunteering.swaps', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_depth.swaps_link') }}</a></li>
+            </ul>
 
-            <div class="govuk-tabs govuk-!-margin-top-6">
+            <div class="govuk-tabs govuk-!-margin-top-6" data-module="govuk-tabs">
                 <h2 class="govuk-tabs__title">{{ __('govuk_alpha.volunteering.tabs_title') }}</h2>
                 <ul class="govuk-tabs__list">
                     <li class="govuk-tabs__list-item{{ $selectedTab === 'opportunities' ? ' govuk-tabs__list-item--selected' : '' }}">

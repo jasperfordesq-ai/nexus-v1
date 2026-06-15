@@ -76,7 +76,7 @@
         </div>
     </div>
 
-    <h2 class="govuk-heading-l">{{ __('govuk_alpha.volunteering.detail_title') }}</h2>
+    <h2 class="govuk-heading-l">{{ __('govuk_alpha.polish_gamify.vol_about_heading') }}</h2>
     <dl class="govuk-summary-list">
         @if ($organizationName)
             <div class="govuk-summary-list__row">
