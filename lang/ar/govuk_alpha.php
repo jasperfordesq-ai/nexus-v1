@@ -2318,6 +2318,17 @@ return [
         'unblock' => 'Unblock',
         'unblocked' => 'The member has been unblocked.',
     ],
+    'near_me' => [
+        'label' => 'Distance',
+        'no_location' => 'Add your location in your profile to filter by distance.',
+        'options' => [
+            'any' => 'Any distance',
+            '5' => 'Within 5 km',
+            '10' => 'Within 10 km',
+            '25' => 'Within 25 km',
+            '50' => 'Within 50 km',
+        ],
+    ],
     'members' => [
         'connection_connected' => 'متصل',
         'connection_request_sent' => 'تم إرسال الطلب',

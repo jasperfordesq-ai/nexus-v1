@@ -2814,6 +2814,41 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertFalse(app(\App\Services\TotpService::class)->isEnabled($user->id));
     }
 
+    public function test_t1near_listings_show_near_me_filter(): void
+    {
+        $this->authenticatedUser(['name' => 'Near Listings']);
+
+        $page = $this->get("/{$this->testTenantSlug}/alpha/listings");
+        $page->assertOk();
+        $page->assertSee('name="near"', false);
+        $page->assertSee(__('govuk_alpha.near_me.label'));
+    }
+
+    public function test_t1near_no_location_hint_shown_when_member_has_no_location(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'No Location Member']);
+        DB::table('users')->where('id', $user->id)->update(['latitude' => null, 'longitude' => null]);
+
+        $page = $this->get("/{$this->testTenantSlug}/alpha/listings?near=10");
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.near_me.no_location'));
+    }
+
+    public function test_t1near_located_member_can_filter_listings_and_events(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Located Member']);
+        DB::table('users')->where('id', $user->id)->update(['latitude' => 53.349805, 'longitude' => -6.260310]);
+
+        // Both pages render the proximity query without error (no location hint).
+        $listings = $this->get("/{$this->testTenantSlug}/alpha/listings?near=25");
+        $listings->assertOk();
+        $listings->assertDontSee(__('govuk_alpha.near_me.no_location'));
+
+        $events = $this->get("/{$this->testTenantSlug}/alpha/events?near=25");
+        $events->assertOk();
+        $events->assertSee('name="near"', false);
+    }
+
     public function test_my_profile_and_settings_update_stay_inside_accessible_frontend(): void
     {
         $user = $this->authenticatedUser([

@@ -1386,8 +1386,8 @@ class AlphaController extends Controller
             'when' => $filters['when'],
         ];
 
-        foreach (['category_id', 'search', 'cursor'] as $key) {
-            if ($filters[$key] !== null && $filters[$key] !== '') {
+        foreach (['category_id', 'search', 'cursor', 'near_lat', 'near_lng', 'radius_km'] as $key) {
+            if (($filters[$key] ?? null) !== null && $filters[$key] !== '') {
                 $query[$key] = $filters[$key];
             }
         }
@@ -2858,8 +2858,8 @@ class AlphaController extends Controller
         $filters = $this->listingFilters($request);
         $query = ['limit' => 12];
 
-        foreach (['type', 'category_id', 'search', 'cursor', 'min_hours', 'max_hours', 'service_type', 'posted_within'] as $key) {
-            if ($filters[$key] !== null && $filters[$key] !== '') {
+        foreach (['type', 'category_id', 'search', 'cursor', 'min_hours', 'max_hours', 'service_type', 'posted_within', 'near_lat', 'near_lng', 'radius_km'] as $key) {
+            if (($filters[$key] ?? null) !== null && $filters[$key] !== '') {
                 $query[$key] = $filters[$key];
             }
         }
@@ -2870,6 +2870,11 @@ class AlphaController extends Controller
             $query['featured_first'] = true;
         }
 
+        // countAll does not run the haversine subquery, so total is the count of
+        // listings matching the non-proximity filters (avoids a proximity count
+        // edge case while keeping the page count meaningful).
+        $countQuery = array_diff_key($query, array_flip(['near_lat', 'near_lng', 'radius_km']));
+
         $items = [];
         $meta = ['total_items' => 0, 'has_more' => false, 'cursor' => null];
         $error = null;
@@ -2878,7 +2883,7 @@ class AlphaController extends Controller
             $result = $this->listingService->getAll($query);
             $items = $this->withResolvedImageKey($result['items'] ?? [], 'image_url');
             $meta = [
-                'total_items' => $this->listingService->countAll($query),
+                'total_items' => $this->listingService->countAll($countQuery),
                 'has_more' => (bool) ($result['has_more'] ?? false),
                 'cursor' => $result['cursor'] ?? null,
             ];
@@ -9796,17 +9801,56 @@ class AlphaController extends Controller
             $filters['posted_within'] = (int) $posted;
         }
 
+        $near = $this->allowed($request->query('near', 'any'), ['any', '5', '10', '25', '50'], 'any');
+        $filters['near'] = $near;
+        $filters = array_merge($filters, $this->nearMeFilters($near));
+
         return $filters;
+    }
+
+    /**
+     * Resolve near-me proximity filters from the signed-in member's STORED
+     * location, so "near me" works with no browser geolocation/JS. Returns
+     * near_lat/near_lng/radius_km when the member has a saved location and asked
+     * for a radius; otherwise nulls plus a flag so the page can prompt them.
+     *
+     * @return array{near_lat: float|null, near_lng: float|null, radius_km: float|null, near_no_location: bool}
+     */
+    private function nearMeFilters(string $near): array
+    {
+        $out = ['near_lat' => null, 'near_lng' => null, 'radius_km' => null, 'near_no_location' => false];
+        if ($near === 'any') {
+            return $out;
+        }
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return $out;
+        }
+        $loc = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->first(['latitude', 'longitude']);
+        if (!$loc || $loc->latitude === null || $loc->longitude === null) {
+            $out['near_no_location'] = true;
+            return $out;
+        }
+        $out['near_lat'] = (float) $loc->latitude;
+        $out['near_lng'] = (float) $loc->longitude;
+        $out['radius_km'] = (float) $near;
+        return $out;
     }
 
     private function eventFilters(Request $request): array
     {
-        return [
+        $near = $this->allowed($request->query('near', 'any'), ['any', '5', '10', '25', '50'], 'any');
+
+        return array_merge([
             'search' => trim(self::asStr($request->query('q'))) ?: null,
             'when' => $this->allowed($request->query('when', 'upcoming'), ['upcoming', 'past', 'all'], 'upcoming'),
             'category_id' => self::asStr($request->query('category_id')) !== '' ? (int) self::asStr($request->query('category_id')) : null,
             'cursor' => self::asStr($request->query('cursor')) ?: null,
-        ];
+            'near' => $near,
+        ], $this->nearMeFilters($near));
     }
 
     private function eventInput(Request $request): array

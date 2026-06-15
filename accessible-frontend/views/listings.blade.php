@@ -98,6 +98,19 @@
                             </select>
                         </div>
                     </div>
+                    <div class="govuk-grid-column-one-quarter">
+                        <div class="govuk-form-group">
+                            <label class="govuk-label" for="near">{{ __('govuk_alpha.near_me.label') }}</label>
+                            <select class="govuk-select" id="near" name="near" aria-describedby="near-hint">
+                                @foreach (['any', '5', '10', '25', '50'] as $nearOption)
+                                    <option value="{{ $nearOption }}" @selected(($filters['near'] ?? 'any') === $nearOption)>{{ __('govuk_alpha.near_me.options.' . $nearOption) }}</option>
+                                @endforeach
+                            </select>
+                            @if (!empty($filters['near_no_location']))
+                                <p id="near-hint" class="govuk-hint govuk-!-margin-top-1">{{ __('govuk_alpha.near_me.no_location') }}</p>
+                            @endif
+                        </div>
+                    </div>
                 </div>
 
                 <details class="govuk-details" data-module="govuk-details" @if (($filters['hours'] ?? 'any') !== 'any' || ($filters['service'] ?? 'any') !== 'any' || ($filters['posted'] ?? 'any') !== 'any') open @endif>
