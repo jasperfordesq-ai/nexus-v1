@@ -6432,7 +6432,8 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('federation'), 403);
-        if ($this->currentUserId() === null) {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
@@ -6441,12 +6442,17 @@ class AlphaController extends Controller
 
         $memberTenantId = (int) $request->query('tenant_id');
         $member = null;
+        $reviews = [];
 
         try {
             $sql = "
                 SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.bio, u.skills,
                     u.location, u.tenant_id, t.name as tenant_name,
-                    fus.show_skills_federated, fus.show_location_federated
+                    fus.show_skills_federated, fus.show_location_federated,
+                    fus.show_reviews_federated,
+                    fus.messaging_enabled_federated, fus.transactions_enabled_federated,
+                    fp.messaging_enabled as partner_messaging_enabled,
+                    fp.transactions_enabled as partner_transactions_enabled
                 FROM users u
                 JOIN federation_user_settings fus ON fus.user_id = u.id
                 JOIN tenants t ON t.id = u.tenant_id
@@ -6480,7 +6486,17 @@ class AlphaController extends Controller
                     'location' => !empty($m['show_location_federated']) ? ($m['location'] ?? null) : null,
                     'tenant_id' => (int) $m['tenant_id'],
                     'tenant_name' => (string) ($m['tenant_name'] ?? ''),
+                    // Capability flags — a member-side opt-in AND a partnership-level
+                    // permission must BOTH be set before the action is offered.
+                    'messaging_enabled' => !empty($m['messaging_enabled_federated']) && !empty($m['partner_messaging_enabled']),
+                    'transactions_enabled' => !empty($m['transactions_enabled_federated']) && !empty($m['partner_transactions_enabled']),
                 ];
+
+                // Reviews — only when the member exposes them federated. Mirrors
+                // FederationV2Controller::memberReviews (local member path).
+                if (!empty($m['show_reviews_federated'])) {
+                    $reviews = $this->federationMemberReviewList((int) $m['id'], (int) $m['tenant_id']);
+                }
             }
         } catch (\Throwable $e) {
             report($e);
@@ -6488,12 +6504,86 @@ class AlphaController extends Controller
 
         abort_if($member === null, 404);
 
+        // Connection status between the viewer and this member (mirrors the
+        // React member-profile connect button states).
+        $connectionStatus = ['status' => 'none', 'connection_id' => null];
+        try {
+            $connectionStatus = app(\App\Services\FederatedConnectionService::class)
+                ->getStatus($userId, $member['id'], $member['tenant_id']);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // The viewer's own federation participation gates the message / transfer
+        // / connect actions (you cannot act across the network unless opted in).
+        $viewerSettings = \App\Services\FederationUserService::getUserSettings($userId);
+
         return $this->view('accessible-frontend::federation-member', [
             'title' => $member['name'] ?: __('govuk_alpha.federation.member.caption'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
             'member' => $member,
+            'reviews' => $reviews,
+            'connectionStatus' => $connectionStatus,
+            'viewerOptedIn' => (bool) ($viewerSettings['federation_optin'] ?? false),
+            'viewerMessagingEnabled' => (bool) ($viewerSettings['messaging_enabled_federated'] ?? false),
+            'viewerTransactionsEnabled' => (bool) ($viewerSettings['transactions_enabled_federated'] ?? false),
+            'status' => self::asStr($request->query('status')) ?: null,
         ]);
+    }
+
+    /**
+     * Fetch the visible federated review list for a local federated member.
+     * Mirrors FederationV2Controller::memberReviews (local path): merges local +
+     * cross-tenant reviews so reputation follows the user. Read-only; any failure
+     * yields an empty list. Always scoped to the member's owning tenant id.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    private function federationMemberReviewList(int $memberId, int $memberTenantId): array
+    {
+        if ($memberId <= 0 || $memberTenantId <= 0) {
+            return [];
+        }
+
+        try {
+            $rows = \App\Models\Review::query()
+                ->withoutGlobalScope(\App\Scopes\TenantScope::class)
+                ->with(['reviewer:id,first_name,last_name,avatar_url,organization_name,profile_type'])
+                ->where('receiver_id', $memberId)
+                ->where(function ($q) use ($memberTenantId) {
+                    $q->where('receiver_tenant_id', $memberTenantId)
+                      ->orWhere(function ($q2) use ($memberTenantId) {
+                          $q2->where('tenant_id', $memberTenantId)
+                             ->whereNull('receiver_tenant_id');
+                      });
+                })
+                ->where(function ($q) {
+                    $q->whereNull('status')->orWhereIn('status', ['active', 'approved']);
+                })
+                ->orderByDesc('id')
+                ->limit(20)
+                ->get();
+
+            return $rows->map(function (\App\Models\Review $r): array {
+                $reviewer = $r->reviewer;
+                $isAnon = (bool) ($r->is_anonymous ?? false);
+                $reviewerName = ($reviewer && ($reviewer->profile_type ?? null) === 'organisation' && !empty($reviewer->organization_name))
+                    ? $reviewer->organization_name
+                    : trim(((string) ($reviewer->first_name ?? '')) . ' ' . ((string) ($reviewer->last_name ?? '')));
+
+                return [
+                    'id' => (int) $r->id,
+                    'rating' => (int) $r->rating,
+                    'comment' => (string) ($r->comment ?? ''),
+                    'reviewer_name' => $isAnon ? __('govuk_alpha.fed2.reviews.anonymous') : ($reviewerName ?: __('govuk_alpha.fed2.reviews.anonymous')),
+                    'created_at' => $r->created_at?->toIso8601String(),
+                ];
+            })->all();
+        } catch (\Throwable $e) {
+            report($e);
+            return [];
+        }
     }
 
     /**
@@ -10038,6 +10128,662 @@ class AlphaController extends Controller
         return redirect()->route('govuk-alpha.volunteering.swaps', [
             'tenantSlug' => $tenantSlug,
             'status' => $ok ? 'swap-cancelled' : 'swap-cancel-failed',
+        ]);
+    }
+
+    // =====================================================================
+    // WAVE FED2: Federation heavy slice — federated connections, messaging,
+    // and hour transfers. CREDIT-MOVING code: every read is tenant-scoped,
+    // every mutation is owner-scoped, and the transfer is balance-exact and
+    // non-duplicable. Mirrors FederationV2Controller methods one-for-one.
+    // =====================================================================
+
+    /**
+     * Federated CONNECTIONS list — `/federation/connections` (GET).
+     * Mirrors FederationV2Controller::connections() — the
+     * FederatedConnectionService::getConnections query is fully tenant-scoped
+     * and only returns rows where the viewer is the requester OR receiver.
+     */
+    public function federationConnections(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $allowed = $this->federationOperationAllowed('profiles', $tenantId);
+
+        // Tab selection. Default to accepted connections; the other tabs mirror
+        // the React directional pending filters.
+        $tab = self::asStr($request->query('tab')) ?: 'accepted';
+        $statusFilter = match ($tab) {
+            'received' => 'pending_received',
+            'sent' => 'pending_sent',
+            default => 'accepted',
+        };
+        if (!in_array($tab, ['accepted', 'received', 'sent'], true)) {
+            $tab = 'accepted';
+        }
+
+        $connections = [];
+        if ($allowed) {
+            try {
+                $connections = app(\App\Services\FederatedConnectionService::class)
+                    ->getConnections($userId, $statusFilter, 100, 0);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return $this->view('accessible-frontend::federation-connections', [
+            'title' => __('govuk_alpha.fed2.connections.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'allowed' => $allowed,
+            'connections' => $connections,
+            'tab' => $tab,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Send a federated CONNECTION request — `/federation/connections` (POST).
+     * Delegates to FederatedConnectionService::sendRequest which validates the
+     * receiver opt-in, partnership status, and dispatches the same notification
+     * + email the API path does (LocaleContext-wrapped inside the service).
+     */
+    public function storeFederationConnection(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $receiverId = (int) $request->input('receiver_id');
+        $receiverTenantId = (int) $request->input('receiver_tenant_id');
+        $message = self::asStr($request->input('message')) ?: null;
+
+        // Send the viewer back to the member profile they connected from.
+        $backToMember = fn (string $status): RedirectResponse => redirect()->route(
+            'govuk-alpha.federation.members.show',
+            ['tenantSlug' => $tenantSlug, 'id' => $receiverId, 'tenant_id' => $receiverTenantId, 'status' => $status]
+        );
+
+        if (!$this->federationOperationAllowed('profiles', $tenantId)) {
+            return redirect()->route('govuk-alpha.federation.members.index', ['tenantSlug' => $tenantSlug, 'status' => 'connect-unavailable']);
+        }
+        if ($receiverId <= 0 || $receiverTenantId <= 0) {
+            return redirect()->route('govuk-alpha.federation.members.index', ['tenantSlug' => $tenantSlug, 'status' => 'connect-failed']);
+        }
+
+        $result = ['success' => false];
+        try {
+            $result = app(\App\Services\FederatedConnectionService::class)
+                ->sendRequest($userId, $receiverId, $receiverTenantId, $message);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $backToMember(($result['success'] ?? false) ? 'connect-sent' : 'connect-failed');
+    }
+
+    /**
+     * Accept a federated connection request — `/federation/connections/{id}/accept`.
+     * FederatedConnectionService::acceptRequest only accepts a row where the
+     * current user is the receiver AND in the current tenant AND status=pending,
+     * so member A can never accept member B's request (returns failure → 404 page).
+     */
+    public function acceptFederationConnection(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        return $this->mutateFederationConnection($tenantSlug, $id, 'accept');
+    }
+
+    /** Reject a federated connection request — `/federation/connections/{id}/reject`. */
+    public function rejectFederationConnection(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        return $this->mutateFederationConnection($tenantSlug, $id, 'reject');
+    }
+
+    /** Remove an existing federated connection — `/federation/connections/{id}/remove`. */
+    public function removeFederationConnection(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        return $this->mutateFederationConnection($tenantSlug, $id, 'remove');
+    }
+
+    /**
+     * Shared accept/reject/remove handler. Each underlying service method is
+     * owner-scoped (accept/reject require the viewer to be the RECEIVER of a
+     * pending row; remove requires the viewer to be EITHER party) — a guessed id
+     * belonging to another member yields success=false and a 'failed' redirect.
+     */
+    private function mutateFederationConnection(string $tenantSlug, int $id, string $action): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $service = app(\App\Services\FederatedConnectionService::class);
+        $result = ['success' => false];
+        try {
+            $result = match ($action) {
+                'accept' => $service->acceptRequest($id, $userId),
+                'reject' => $service->rejectRequest($id, $userId),
+                'remove' => $service->removeConnection($id, $userId),
+                default => ['success' => false],
+            };
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $ok = (bool) ($result['success'] ?? false);
+        $statusMap = [
+            'accept' => $ok ? 'connection-accepted' : 'connection-action-failed',
+            'reject' => $ok ? 'connection-rejected' : 'connection-action-failed',
+            'remove' => $ok ? 'connection-removed' : 'connection-action-failed',
+        ];
+
+        // Accept/reject act on a received request; default the tab so the user
+        // lands where the row used to be.
+        $tab = $action === 'remove' ? 'accepted' : 'received';
+
+        return redirect()->route('govuk-alpha.federation.connections.index', [
+            'tenantSlug' => $tenantSlug,
+            'tab' => $tab,
+            'status' => $statusMap[$action] ?? 'connection-action-failed',
+        ]);
+    }
+
+    /**
+     * Federated MESSAGES inbox — `/federation/messages` (GET).
+     * Mirrors FederationV2Controller::messages() WHERE clause exactly: a row is
+     * only returned when the viewer is the sender OR receiver (internal), or the
+     * matching party on an external row. Read-only.
+     */
+    public function federationMessages(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $allowed = $this->federationOperationAllowed('messaging', $tenantId);
+
+        $messages = [];
+        if ($allowed) {
+            try {
+                $rows = DB::select("
+                    SELECT fm.id, fm.subject, fm.body, fm.direction, fm.status, fm.read_at,
+                        fm.created_at, fm.sender_tenant_id, fm.sender_user_id,
+                        fm.receiver_tenant_id, fm.receiver_user_id,
+                        COALESCE(su.first_name, '') as sender_first_name,
+                        COALESCE(su.last_name, '') as sender_last_name,
+                        st.name as sender_tenant_name,
+                        COALESCE(ru.first_name, '') as receiver_first_name,
+                        COALESCE(ru.last_name, '') as receiver_last_name,
+                        rt.name as receiver_tenant_name
+                    FROM federation_messages fm
+                    LEFT JOIN users su ON su.id = fm.sender_user_id AND su.tenant_id = fm.sender_tenant_id
+                    LEFT JOIN tenants st ON st.id = fm.sender_tenant_id
+                    LEFT JOIN users ru ON ru.id = fm.receiver_user_id AND ru.tenant_id = fm.receiver_tenant_id
+                    LEFT JOIN tenants rt ON rt.id = fm.receiver_tenant_id
+                    WHERE fm.external_partner_id IS NULL
+                      AND (
+                        (fm.sender_tenant_id = ? AND fm.sender_user_id = ?)
+                        OR (fm.receiver_tenant_id = ? AND fm.receiver_user_id = ?)
+                      )
+                    ORDER BY fm.created_at DESC, fm.id DESC LIMIT 200
+                ", [$tenantId, $userId, $tenantId, $userId]);
+
+                $messages = array_map(static function ($r): array {
+                    $direction = ($r->direction === 'outbound') ? 'outbound' : 'inbound';
+                    return [
+                        'id' => (int) $r->id,
+                        'subject' => (string) ($r->subject ?? ''),
+                        'body' => (string) ($r->body ?? ''),
+                        'direction' => $direction,
+                        'status' => (string) ($r->status ?? 'delivered'),
+                        'read_at' => $r->read_at ?: null,
+                        'created_at' => $r->created_at,
+                        'sender_name' => trim(((string) ($r->sender_first_name ?? '')) . ' ' . ((string) ($r->sender_last_name ?? ''))),
+                        'sender_tenant_name' => (string) ($r->sender_tenant_name ?? ''),
+                        'sender_user_id' => (int) $r->sender_user_id,
+                        'sender_tenant_id' => (int) $r->sender_tenant_id,
+                        'receiver_name' => trim(((string) ($r->receiver_first_name ?? '')) . ' ' . ((string) ($r->receiver_last_name ?? ''))),
+                        'receiver_tenant_name' => (string) ($r->receiver_tenant_name ?? ''),
+                        'receiver_user_id' => (int) $r->receiver_user_id,
+                        'receiver_tenant_id' => (int) $r->receiver_tenant_id,
+                    ];
+                }, $rows);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return $this->view('accessible-frontend::federation-messages', [
+            'title' => __('govuk_alpha.fed2.messages.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'allowed' => $allowed,
+            'messages' => $messages,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Send a federated MESSAGE — `/federation/messages` (POST).
+     *
+     * CRITICAL DUAL-INSERT: mirrors FederationV2Controller::sendMessage() — a
+     * single send writes EXACTLY ONE 'outbound' row (sender's copy) AND ONE
+     * 'inbound' row (recipient's copy). All gating (sender opt-in, receiver
+     * opt-in + messaging, active partnership with messaging) is replicated.
+     * External (ext-) recipients are NOT supported on this server-rendered
+     * surface and are rejected. Recipient notification is LocaleContext-wrapped.
+     */
+    public function storeFederationMessage(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $receiverId = (int) $request->input('receiver_id');
+        $receiverTenantId = (int) $request->input('receiver_tenant_id');
+        $subject = trim(self::asStr($request->input('subject')));
+        $body = trim(self::asStr($request->input('body')));
+
+        $backToMember = fn (string $status): RedirectResponse => redirect()->route(
+            'govuk-alpha.federation.members.show',
+            ['tenantSlug' => $tenantSlug, 'id' => $receiverId, 'tenant_id' => $receiverTenantId, 'status' => $status]
+        );
+
+        if (!$this->federationOperationAllowed('messaging', $tenantId)) {
+            return redirect()->route('govuk-alpha.federation.members.index', ['tenantSlug' => $tenantSlug, 'status' => 'message-unavailable']);
+        }
+        if ($receiverId <= 0 || $receiverTenantId <= 0) {
+            return redirect()->route('govuk-alpha.federation.members.index', ['tenantSlug' => $tenantSlug, 'status' => 'message-failed']);
+        }
+        if ($body === '') {
+            return $backToMember('message-empty');
+        }
+        if (mb_strlen($subject) > 255 || mb_strlen($body) > 10000) {
+            return $backToMember('message-too-long');
+        }
+
+        // Sender must be opted in AND have federated messaging enabled.
+        $senderSettings = \App\Services\FederationUserService::getUserSettings($userId);
+        if (!($senderSettings['federation_optin'] ?? false) || !($senderSettings['messaging_enabled_federated'] ?? false)) {
+            return $backToMember('message-not-enabled');
+        }
+
+        // Prevent self-messaging across the same identity.
+        if ($receiverId === $userId && $receiverTenantId === $tenantId) {
+            return $backToMember('message-failed');
+        }
+
+        // Sanitise (stored-XSS safe; the blade renders these escaped).
+        $subject = htmlspecialchars($subject, ENT_QUOTES, 'UTF-8');
+        $bodyClean = htmlspecialchars($body, ENT_QUOTES, 'UTF-8');
+
+        try {
+            // Receiver must exist, be opted in, and accept federated messages.
+            $receiver = DB::selectOne("
+                SELECT u.id, u.preferred_language, fus.federation_optin, fus.messaging_enabled_federated
+                FROM users u
+                JOIN federation_user_settings fus ON fus.user_id = u.id
+                WHERE u.id = ? AND u.tenant_id = ? AND u.status = 'active'
+            ", [$receiverId, $receiverTenantId]);
+
+            if (!$receiver || empty($receiver->federation_optin) || empty($receiver->messaging_enabled_federated)) {
+                return $backToMember('message-recipient-unavailable');
+            }
+
+            // Active partnership with messaging permission must exist.
+            $partnership = \App\Services\FederationPartnershipService::getPartnership($tenantId, $receiverTenantId);
+            if (!$partnership || ($partnership['status'] ?? null) !== 'active' || empty($partnership['messaging_enabled'])) {
+                return $backToMember('message-recipient-unavailable');
+            }
+
+            // ── DUAL-INSERT: outbound (sender copy) + inbound (receiver copy) ──
+            DB::insert("
+                INSERT INTO federation_messages
+                (sender_tenant_id, sender_user_id, receiver_tenant_id, receiver_user_id,
+                 subject, body, direction, status, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, 'outbound', 'delivered', NOW())
+            ", [$tenantId, $userId, $receiverTenantId, $receiverId, $subject, $bodyClean]);
+            $outboundId = (int) DB::getPdo()->lastInsertId();
+
+            DB::insert("
+                INSERT INTO federation_messages
+                (sender_tenant_id, sender_user_id, receiver_tenant_id, receiver_user_id,
+                 subject, body, direction, status, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, 'inbound', 'unread', NOW())
+            ", [$tenantId, $userId, $receiverTenantId, $receiverId, $subject, $bodyClean]);
+            $inboundId = (int) DB::getPdo()->lastInsertId();
+
+            // Audit (best-effort).
+            try {
+                \App\Services\FederationAuditService::log(
+                    'cross_tenant_message', $tenantId, $receiverTenantId, $userId,
+                    ['message_id' => $outboundId, 'receiver_id' => $receiverId],
+                    \App\Services\FederationAuditService::LEVEL_INFO
+                );
+            } catch (\Throwable $e) {
+                report($e);
+            }
+
+            // Recipient notification — rendered in the RECIPIENT's locale, never
+            // the sender's. Wrapped in try/catch so a notification failure can
+            // never undo the committed message rows.
+            try {
+                $senderRow = DB::selectOne(
+                    "SELECT TRIM(CONCAT(COALESCE(first_name,''),' ',COALESCE(last_name,''))) AS sender_name FROM users WHERE id = ? AND tenant_id = ?",
+                    [$userId, $tenantId]
+                );
+                $senderName = trim((string) ($senderRow->sender_name ?? '')) !== ''
+                    ? (string) $senderRow->sender_name
+                    : __('govuk_alpha.fed2.messages.someone');
+                $senderTenant = DB::table('tenants')->where('id', $tenantId)->value('name') ?? '';
+
+                \App\I18n\LocaleContext::withLocale($receiver, function () use ($receiverId, $receiverTenantId, $senderName, $senderTenant, $inboundId) {
+                    $notifMessage = __('svc_notifications.federation.message_received', [
+                        'sender' => $senderName,
+                        'partner' => $senderTenant,
+                    ]);
+                    \App\Models\Notification::createNotification(
+                        $receiverId, $notifMessage, '/federation/messages', 'federation_message', true, $receiverTenantId
+                    );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $receiverId, 'federation_message', $notifMessage, '/federation/messages');
+                    DB::update(
+                        "UPDATE federation_messages SET notification_sent_at = NOW() WHERE id = ? AND receiver_tenant_id = ? AND notification_sent_at IS NULL",
+                        [$inboundId, $receiverTenantId]
+                    );
+                });
+            } catch (\Throwable $e) {
+                report($e);
+            }
+
+            return $backToMember('message-sent');
+        } catch (\Throwable $e) {
+            report($e);
+            return $backToMember('message-failed');
+        }
+    }
+
+    /**
+     * Hour-transfer CONFIRM form — `/federation/members/{id}/transfer` (GET).
+     * Re-runs the same visibility + capability gate as the profile so the form
+     * is only shown for a member who can actually receive a transfer. Shows the
+     * viewer's current balance + a govuk-warning-text before confirming.
+     */
+    public function federationTransfer(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        abort_unless($this->federationOperationAllowed('transactions', $tenantId), 404);
+
+        $memberTenantId = (int) $request->query('tenant_id');
+        $member = $this->resolveTransferableMember($userId, $tenantId, $id, $memberTenantId);
+        abort_if($member === null, 404);
+
+        // Viewer's federated transaction capability + balance.
+        $viewerSettings = \App\Services\FederationUserService::getUserSettings($userId);
+        $balance = (int) (DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)->value('balance') ?? 0);
+
+        return $this->view('accessible-frontend::federation-transfer', [
+            'title' => __('govuk_alpha.fed2.transfer.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'member' => $member,
+            'balance' => $balance,
+            'viewerEnabled' => (bool) ($viewerSettings['federation_optin'] ?? false) && (bool) ($viewerSettings['transactions_enabled_federated'] ?? false),
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Resolve a federated member who is BOTH profile-visible AND can receive a
+     * transfer (member opt-in for transactions + partnership transactions
+     * permission). Returns null when not transferable. Always cross-tenant
+     * (u.tenant_id != self) and partnership-scoped. Shared by the transfer
+     * confirm form and the POST handler.
+     *
+     * @return array<string,mixed>|null
+     */
+    private function resolveTransferableMember(int $userId, int $tenantId, int $memberId, int $memberTenantId): ?array
+    {
+        if ($memberId <= 0) {
+            return null;
+        }
+
+        try {
+            $sql = "
+                SELECT u.id, u.first_name, u.last_name, u.tenant_id, t.name as tenant_name,
+                    u.preferred_language,
+                    fus.transactions_enabled_federated,
+                    fp.transactions_enabled as partner_transactions_enabled
+                FROM users u
+                JOIN federation_user_settings fus ON fus.user_id = u.id
+                JOIN tenants t ON t.id = u.tenant_id
+                JOIN federation_partnerships fp ON (
+                    (fp.tenant_id = :tid1 AND fp.partner_tenant_id = u.tenant_id)
+                    OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = u.tenant_id)
+                )
+                WHERE u.id = :user_id AND fp.status = 'active' AND fp.profiles_enabled = 1
+                AND fus.federation_optin = 1 AND fus.profile_visible_federated = 1
+                AND u.status = 'active' AND u.tenant_id != :tid_self
+            ";
+            $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':user_id' => $memberId, ':tid_self' => $tenantId];
+            if ($memberTenantId > 0) {
+                $sql .= " AND u.tenant_id = :member_tenant_id";
+                $params[':member_tenant_id'] = $memberTenantId;
+            }
+            $sql .= " LIMIT 1";
+
+            $rows = $this->federationSelect($sql, $params);
+            $m = $rows[0] ?? null;
+            if (!$m) {
+                return null;
+            }
+            if (empty($m['transactions_enabled_federated']) || empty($m['partner_transactions_enabled'])) {
+                return null;
+            }
+
+            return [
+                'id' => (int) $m['id'],
+                'name' => trim(((string) ($m['first_name'] ?? '')) . ' ' . ((string) ($m['last_name'] ?? ''))),
+                'tenant_id' => (int) $m['tenant_id'],
+                'tenant_name' => (string) ($m['tenant_name'] ?? ''),
+                'preferred_language' => $m['preferred_language'] ?? null,
+            ];
+        } catch (\Throwable $e) {
+            report($e);
+            return null;
+        }
+    }
+
+    /**
+     * Send a federated hour TRANSFER — `/federation/members/{id}/transfer` (POST).
+     *
+     * Mirrors FederationV2Controller::sendTransaction() internal path EXACTLY:
+     *   - conditional atomic debit (UPDATE ... WHERE balance >= amount) so the
+     *     sender can never go negative and the debit is non-duplicable;
+     *   - matching credit to the recipient in their owning tenant;
+     *   - a single completed federated transactions row, all inside one DB
+     *     transaction (rolled back on any failure → no half-moves);
+     *   - recipient bell rendered in their preferred_language (LocaleContext),
+     *     wrapped so a bell failure cannot undo the committed money move.
+     *
+     * The external ext-{N} SAGA is NOT exposed on this server-rendered surface
+     * (no live partner in this context); only the local-partner path is offered.
+     */
+    public function storeFederationTransfer(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $memberTenantId = (int) $request->input('receiver_tenant_id');
+
+        $backToTransfer = fn (string $status): RedirectResponse => redirect()->route(
+            'govuk-alpha.federation.transfer',
+            ['tenantSlug' => $tenantSlug, 'id' => $id, 'tenant_id' => $memberTenantId, 'status' => $status]
+        );
+
+        if (!$this->federationOperationAllowed('transactions', $tenantId)) {
+            return redirect()->route('govuk-alpha.federation.members.index', ['tenantSlug' => $tenantSlug, 'status' => 'transfer-unavailable']);
+        }
+
+        // Viewer must be opted in AND have federated transactions enabled.
+        $senderSettings = \App\Services\FederationUserService::getUserSettings($userId);
+        if (!($senderSettings['federation_optin'] ?? false) || !($senderSettings['transactions_enabled_federated'] ?? false)) {
+            return $backToTransfer('transfer-not-enabled');
+        }
+
+        // Amount: whole hours, 1..100 (matches API bounds).
+        $amountRaw = $request->input('amount');
+        if (!is_numeric($amountRaw)) {
+            return $backToTransfer('transfer-amount-invalid');
+        }
+        $amount = (int) $amountRaw;
+        if ($amount < 1 || $amount > 100) {
+            return $backToTransfer('transfer-amount-invalid');
+        }
+
+        $description = trim(self::asStr($request->input('description')));
+        if ($description === '') {
+            return $backToTransfer('transfer-description-required');
+        }
+        if (mb_strlen($description) > 500) {
+            return $backToTransfer('transfer-description-required');
+        }
+        $description = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
+
+        // Re-resolve the recipient under the SAME gate as the form (do not trust
+        // the posted member id — verify it is a real, transferable, cross-tenant
+        // partner member right now).
+        $member = $this->resolveTransferableMember($userId, $tenantId, $id, $memberTenantId);
+        if ($member === null) {
+            return $backToTransfer('transfer-recipient-unavailable');
+        }
+        $receiverId = $member['id'];
+        $receiverTenantId = $member['tenant_id'];
+
+        // Prevent self-transfer (defence-in-depth; the cross-tenant gate already
+        // excludes the same tenant, but never assume).
+        if ($receiverId === $userId && $receiverTenantId === $tenantId) {
+            return $backToTransfer('transfer-self');
+        }
+
+        // Active partnership with transactions permission must exist.
+        $partnership = \App\Services\FederationPartnershipService::getPartnership($tenantId, $receiverTenantId);
+        if (!$partnership || ($partnership['status'] ?? null) !== 'active' || empty($partnership['transactions_enabled'])) {
+            return $backToTransfer('transfer-recipient-unavailable');
+        }
+
+        $txId = null;
+        try {
+            DB::beginTransaction();
+
+            // Atomic conditional debit — only deducts when balance >= amount, so
+            // the sender can never go negative and a concurrent double-submit
+            // cannot double-debit (the second UPDATE sees the reduced balance).
+            $deducted = DB::update(
+                "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
+                [$amount, $userId, $tenantId, $amount]
+            );
+            if ($deducted === 0) {
+                DB::rollBack();
+                return $backToTransfer('transfer-insufficient');
+            }
+
+            DB::update(
+                "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                [$amount, $receiverId, $receiverTenantId]
+            );
+
+            DB::insert(
+                "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at)
+                 VALUES (?, ?, ?, ?, ?, 'completed', 1, ?, ?, NOW())",
+                [$tenantId, $userId, $receiverId, $amount, $description, $tenantId, $receiverTenantId]
+            );
+            $txId = (int) DB::getPdo()->lastInsertId();
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            report($e);
+            return $backToTransfer('transfer-failed');
+        }
+
+        // Audit (best-effort, post-commit).
+        try {
+            \App\Services\FederationAuditService::log(
+                'federation_transaction', $tenantId, $receiverTenantId, $userId,
+                ['transaction_id' => $txId, 'amount' => $amount, 'receiver_id' => $receiverId]
+            );
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // Recipient bell — rendered in the recipient's preferred_language, and
+        // wrapped so a bell failure can never undo the committed transfer.
+        try {
+            $senderRow = DB::selectOne(
+                "SELECT TRIM(CONCAT(COALESCE(u.first_name,''),' ',COALESCE(u.last_name,''))) AS sender_name, t.name AS sender_tenant_name
+                 FROM users u JOIN tenants t ON t.id = u.tenant_id WHERE u.id = ? AND u.tenant_id = ?",
+                [$userId, $tenantId]
+            );
+            $senderName = trim((string) ($senderRow->sender_name ?? '')) !== ''
+                ? (string) $senderRow->sender_name
+                : __('govuk_alpha.fed2.messages.someone');
+            $sourceCommunity = (string) ($senderRow->sender_tenant_name ?? '');
+
+            $recipientLocale = (object) ['preferred_language' => $member['preferred_language'] ?? null];
+            \App\I18n\LocaleContext::withLocale($recipientLocale, function () use ($receiverId, $receiverTenantId, $amount, $senderName, $sourceCommunity) {
+                $notifMessage = __('svc_notifications.federation.transaction_received', [
+                    'amount' => (string) $amount,
+                    'sender' => $senderName,
+                    'partner' => $sourceCommunity,
+                ]);
+                \App\Models\Notification::createNotification(
+                    $receiverId, $notifMessage, '/wallet', 'federation_transaction', false, $receiverTenantId
+                );
+                \App\Services\NotificationDispatcher::fanOutPush((int) $receiverId, 'federation_transaction', $notifMessage, '/wallet');
+            });
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.federation.members.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $receiverId,
+            'tenant_id' => $receiverTenantId,
+            'status' => 'transfer-sent',
         ]);
     }
 }

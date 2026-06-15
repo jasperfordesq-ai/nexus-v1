@@ -246,6 +246,18 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/federation/listings', [AlphaController::class, 'federationListings'])->name('federation.listings.index');
         Route::get('/federation/events', [AlphaController::class, 'federationEvents'])->name('federation.events.index');
         Route::get('/federation/partners/{id}', [AlphaController::class, 'federationPartner'])->where('id', '[0-9]+|ext-[0-9]+')->name('federation.partners.show');
+        // ===== WAVE FED2 — federated connections, messaging, hour transfer =====
+        // Credit-moving POSTs are throttled (the transfer most tightly). Static
+        // segments are declared so they never get captured as a {id}.
+        Route::get('/federation/connections', [AlphaController::class, 'federationConnections'])->name('federation.connections.index');
+        Route::post('/federation/connections', [AlphaController::class, 'storeFederationConnection'])->middleware('throttle:15,1')->name('federation.connections.store');
+        Route::post('/federation/connections/{id}/accept', [AlphaController::class, 'acceptFederationConnection'])->whereNumber('id')->middleware('throttle:20,1')->name('federation.connections.accept');
+        Route::post('/federation/connections/{id}/reject', [AlphaController::class, 'rejectFederationConnection'])->whereNumber('id')->middleware('throttle:20,1')->name('federation.connections.reject');
+        Route::post('/federation/connections/{id}/remove', [AlphaController::class, 'removeFederationConnection'])->whereNumber('id')->middleware('throttle:20,1')->name('federation.connections.remove');
+        Route::get('/federation/messages', [AlphaController::class, 'federationMessages'])->name('federation.messages.index');
+        Route::post('/federation/messages', [AlphaController::class, 'storeFederationMessage'])->middleware('throttle:15,1')->name('federation.messages.store');
+        Route::get('/federation/members/{id}/transfer', [AlphaController::class, 'federationTransfer'])->whereNumber('id')->name('federation.transfer');
+        Route::post('/federation/members/{id}/transfer', [AlphaController::class, 'storeFederationTransfer'])->whereNumber('id')->middleware('throttle:10,1')->name('federation.transfer.store');
         Route::get('/profile', [AlphaController::class, 'myProfile'])->name('profile.me');
         Route::get('/profile/settings', [AlphaController::class, 'profileSettings'])->name('profile.settings');
         Route::post('/profile/settings', [AlphaController::class, 'updateProfileSettings'])->middleware('throttle:20,1')->name('profile.settings.update');
