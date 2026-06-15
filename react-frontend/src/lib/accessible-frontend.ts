@@ -14,12 +14,24 @@ export function buildAccessibleFrontendUrl(
   tenantSlug: string | null | undefined,
   path = '/',
   baseUrl = getAccessibleFrontendBaseUrl(),
+  accessibleDomain?: string | null,
 ): string | null {
+  const normalizedPath = !path || path === '/' ? '' : path.startsWith('/') ? path : `/${path}`;
+
+  // The tenant has its own accessible (GOV.UK) custom domain → slug-less clean
+  // entry: the host resolves the tenant server-side, so no /{slug} prefix.
+  const customDomain = accessibleDomain
+    ?.trim()
+    .replace(/^https?:\/\//, '')
+    .replace(/\/+$/, '');
+  if (customDomain) {
+    return `https://${customDomain}/alpha${normalizedPath}`;
+  }
+
   const slug = tenantSlug?.trim();
   if (!slug) return null;
 
   const normalizedBaseUrl = (baseUrl.trim() || DEFAULT_ACCESSIBLE_FRONTEND_BASE_URL).replace(/\/+$/, '');
-  const normalizedPath = !path || path === '/' ? '' : path.startsWith('/') ? path : `/${path}`;
 
   return `${normalizedBaseUrl}/${encodeURIComponent(slug)}/alpha${normalizedPath}`;
 }

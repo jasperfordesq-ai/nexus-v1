@@ -1405,6 +1405,8 @@ export interface SuperAdminTenant {
   name: string;
   slug: string;
   domain: string;
+  /** Optional dedicated custom domain for the accessible (GOV.UK) frontend. */
+  accessible_domain?: string;
   tagline?: string;
   description?: string;
   parent_id: number | null;
@@ -1452,6 +1454,7 @@ export interface CreateTenantPayload {
   name: string;
   slug: string;
   domain?: string;
+  accessible_domain?: string;
   tagline?: string;
   description?: string;
   allows_subtenants?: boolean;
@@ -1485,6 +1488,7 @@ export interface UpdateTenantPayload {
   name?: string;
   slug?: string;
   domain?: string;
+  accessible_domain?: string;
   tagline?: string;
   description?: string;
   is_active?: boolean;

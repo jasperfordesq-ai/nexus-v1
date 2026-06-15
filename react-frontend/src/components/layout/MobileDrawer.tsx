@@ -150,7 +150,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   const { resetConsent } = useCookieConsent();
   const { mobileMenus, headerMenus, hasCustomMenus } = useMenuContext();
   const year = new Date().getFullYear();
-  const accessibleFrontendUrl = buildAccessibleFrontendUrl(tenant?.slug);
+  const accessibleFrontendUrl = buildAccessibleFrontendUrl(tenant?.slug, '/', undefined, tenant?.accessible_domain);
 
   const isAdmin = hasAdminPanelAccess(user);
   const isBroker = !isAdmin && hasBrokerPanelAccess(user);

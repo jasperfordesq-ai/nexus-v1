@@ -485,8 +485,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     ...rightSections.flatMap(s => s.items.map(i => i.href)),
   ], [leftSections, rightSections]);
   const accessibleFrontendUrl = useMemo(
-    () => buildAccessibleFrontendUrl(tenant?.slug),
-    [tenant?.slug],
+    () => buildAccessibleFrontendUrl(tenant?.slug, '/', undefined, tenant?.accessible_domain),
+    [tenant?.slug, tenant?.accessible_domain],
   );
 
   return (

@@ -95,6 +95,7 @@ export function TenantForm() {
     name: '',
     slug: '',
     domain: '',
+    accessible_domain: '',
     tagline: '',
     description: '',
     is_active: true,
@@ -165,6 +166,7 @@ export function TenantForm() {
           name: tenant.name || '',
           slug: tenant.slug || '',
           domain: tenant.domain || '',
+          accessible_domain: tenant.accessible_domain || '',
           tagline: tenant.tagline || '',
           description: tenant.description || '',
           is_active: tenant.is_active ?? true,
@@ -364,8 +366,16 @@ export function TenantForm() {
               <Input
                 label={t('tenant_form.domain_label')}
                 placeholder={t('tenant_form.domain_placeholder')}
+                description={t('tenant_form.domain_desc')}
                 value={form.domain}
                 onValueChange={(v) => updateField('domain', v)}
+              />
+              <Input
+                label={t('tenant_form.accessible_domain_label')}
+                placeholder={t('tenant_form.accessible_domain_placeholder')}
+                description={t('tenant_form.accessible_domain_desc')}
+                value={form.accessible_domain}
+                onValueChange={(v) => updateField('accessible_domain', v)}
               />
               <Input
                 label={t('tenant_form.tagline_label')}

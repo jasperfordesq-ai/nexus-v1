@@ -16405,7 +16405,11 @@
     "feature_feed_desc": "コミュニティ フィードを有効にします。",
     "feature_marketplace": "市場",
     "feature_marketplace_desc": "マーケットプレイス機能を有効にします。",
-    "tabs_aria": "Tenant form sections"
+    "tabs_aria": "Tenant form sections",
+    "domain_desc": "Used for the React web frontend (e.g. community.example.org).",
+    "accessible_domain_label": "Accessible frontend domain",
+    "accessible_domain_placeholder": "e.g. accessible.example.org",
+    "accessible_domain_desc": "Optional. Custom domain for the accessible (GOV.UK) frontend."
   },
   "tenant_list": {
     "action_delete": "削除",

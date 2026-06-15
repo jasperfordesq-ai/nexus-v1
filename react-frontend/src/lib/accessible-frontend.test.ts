@@ -29,4 +29,28 @@ describe('buildAccessibleFrontendUrl', () => {
     expect(buildAccessibleFrontendUrl(null)).toBeNull();
     expect(buildAccessibleFrontendUrl('   ')).toBeNull();
   });
+
+  it('uses a slug-less URL on the tenant accessible custom domain', () => {
+    expect(
+      buildAccessibleFrontendUrl('hour-timebank', '/', undefined, 'accessible.example.org'),
+    ).toBe('https://accessible.example.org/alpha');
+  });
+
+  it('appends subpaths on the accessible custom domain (still slug-less)', () => {
+    expect(
+      buildAccessibleFrontendUrl('hour-timebank', '/listings', undefined, 'accessible.example.org'),
+    ).toBe('https://accessible.example.org/alpha/listings');
+  });
+
+  it('strips scheme and trailing slash from a configured accessible domain', () => {
+    expect(
+      buildAccessibleFrontendUrl('hour-timebank', '/', undefined, 'https://accessible.example.org/'),
+    ).toBe('https://accessible.example.org/alpha');
+  });
+
+  it('returns the accessible custom domain URL even without a slug', () => {
+    expect(buildAccessibleFrontendUrl(null, '/', undefined, 'accessible.example.org')).toBe(
+      'https://accessible.example.org/alpha',
+    );
+  });
 });

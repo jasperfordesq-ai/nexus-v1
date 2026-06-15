@@ -94,6 +94,16 @@ class TenantContext
 
             $domainTenant = $hostIsValid ? self::fetchTenant('domain', $host) : null;
 
+            // Also match a tenant's dedicated accessible (GOV.UK) frontend domain.
+            // The React custom domain (tenants.domain) and the accessible custom
+            // domain (tenants.accessible_domain) both resolve to the SAME tenant —
+            // the Plesk vhost decides which container renders. getFrontendUrl()
+            // still keys off the React `domain`, so this is presentation-only and
+            // lets the host-based /alpha routes serve a clean slug-less entry.
+            if (!$domainTenant && $hostIsValid) {
+                $domainTenant = self::fetchTenant('accessible_domain', $host);
+            }
+
             if ($domainTenant && $domainTenant['id'] != 1) {
                 // Check if tenant is active
                 if (empty($domainTenant['is_active'])) {

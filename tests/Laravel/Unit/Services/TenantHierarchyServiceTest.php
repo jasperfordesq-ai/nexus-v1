@@ -64,6 +64,57 @@ class TenantHierarchyServiceTest extends TestCase
         $this->assertEquals('No valid fields to update', $result['error']);
     }
 
+    public function test_createTenant_rejects_same_host_for_both_frontends(): void
+    {
+        $parent = (object) ['id' => 1, 'depth' => 0, 'allows_subtenants' => 1, 'max_depth' => 3, 'path' => '/1/'];
+        DB::shouldReceive('table')->with('tenants')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('first')->andReturn($parent);
+        DB::shouldReceive('exists')->andReturn(false); // slug free
+
+        $result = TenantHierarchyService::createTenant([
+            'name' => 'Test',
+            'slug' => 'test',
+            'domain' => 'foo.example',
+            'accessible_domain' => 'foo.example',
+        ], 1);
+
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('must be different', $result['error']);
+    }
+
+    public function test_updateTenant_rejects_same_host_for_both_frontends(): void
+    {
+        $tenant = (object) ['id' => 2, 'name' => 'Old', 'slug' => 'old', 'domain' => null, 'accessible_domain' => null];
+        DB::shouldReceive('table')->with('tenants')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('first')->andReturn($tenant);
+
+        $result = TenantHierarchyService::updateTenant(2, [
+            'domain' => 'dup.example',
+            'accessible_domain' => 'dup.example',
+        ]);
+
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('must be different', $result['error']);
+    }
+
+    public function test_updateTenant_rejects_accessible_domain_already_in_use(): void
+    {
+        $tenant = (object) ['id' => 2, 'name' => 'Old', 'slug' => 'old', 'domain' => null, 'accessible_domain' => null];
+        DB::shouldReceive('table')->with('tenants')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('first')->andReturn($tenant);
+        DB::shouldReceive('exists')->andReturn(true); // host already used (either column, another tenant)
+
+        $result = TenantHierarchyService::updateTenant(2, [
+            'accessible_domain' => 'taken.example',
+        ]);
+
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('already in use', $result['error']);
+    }
+
     public function test_deleteTenant_prevents_deleting_master(): void
     {
         $result = TenantHierarchyService::deleteTenant(1);

@@ -65,12 +65,28 @@ class TenantHierarchyService
                 return ['success' => false, 'error' => "Slug '{$slug}' is already in use"];
             }
 
-            // Check domain uniqueness if provided
+            // Check domain uniqueness if provided. The React custom domain
+            // (domain) and the accessible/GOV.UK custom domain (accessible_domain)
+            // share ONE global hostname namespace — a host may belong to exactly
+            // one tenant, on exactly one of the two columns.
             $domain = trim($data['domain'] ?? '');
-            if ($domain !== '') {
-                $existingDomain = DB::table('tenants')->where('domain', $domain)->exists();
-                if ($existingDomain) {
-                    return ['success' => false, 'error' => "Domain '{$domain}' is already in use"];
+            $accessibleDomain = trim($data['accessible_domain'] ?? '');
+
+            if ($domain !== '' && $accessibleDomain !== '' && strcasecmp($domain, $accessibleDomain) === 0) {
+                return ['success' => false, 'error' => 'Primary and accessible domains must be different'];
+            }
+
+            foreach ([$domain, $accessibleDomain] as $host) {
+                if ($host === '') {
+                    continue;
+                }
+                $inUse = DB::table('tenants')
+                    ->where(function ($q) use ($host) {
+                        $q->where('domain', $host)->orWhere('accessible_domain', $host);
+                    })
+                    ->exists();
+                if ($inUse) {
+                    return ['success' => false, 'error' => "Domain '{$host}' is already in use"];
                 }
             }
 
@@ -96,12 +112,13 @@ class TenantHierarchyService
 
             // Wrap entire creation in a transaction to prevent half-initialized tenants
             $tenantId = DB::transaction(function () use (
-                $name, $slug, $domain, $data, $parentId, $newDepth, $features, $configuration, $parent
+                $name, $slug, $domain, $accessibleDomain, $data, $parentId, $newDepth, $features, $configuration, $parent
             ) {
                 $tenantId = DB::table('tenants')->insertGetId([
                     'name'               => $name,
                     'slug'               => $slug,
                     'domain'             => $domain ?: null,
+                    'accessible_domain'  => $accessibleDomain ?: null,
                     'tagline'            => $data['tagline'] ?? null,
                     'description'        => $data['description'] ?? null,
                     'parent_id'          => $parentId,
@@ -180,9 +197,22 @@ class TenantHierarchyService
                 return ['success' => false, 'error' => 'Tenant not found'];
             }
 
+            // A host cannot serve as BOTH the React and the accessible frontend of
+            // the same tenant. Validate against the effective post-update values.
+            $effectiveDomain = array_key_exists('domain', $data)
+                ? trim((string) $data['domain'])
+                : (string) ($tenant->domain ?? '');
+            $effectiveAccessible = array_key_exists('accessible_domain', $data)
+                ? trim((string) $data['accessible_domain'])
+                : (string) ($tenant->accessible_domain ?? '');
+            if ($effectiveDomain !== '' && $effectiveAccessible !== ''
+                && strcasecmp($effectiveDomain, $effectiveAccessible) === 0) {
+                return ['success' => false, 'error' => 'Primary and accessible domains must be different'];
+            }
+
             // Build update array from allowed fields
             $allowed = [
-                'name', 'slug', 'domain', 'tagline', 'description',
+                'name', 'slug', 'domain', 'accessible_domain', 'tagline', 'description',
                 'allows_subtenants', 'max_depth', 'is_active', 'features', 'configuration',
                 'contact_email', 'contact_phone', 'address',
                 'meta_title', 'meta_description', 'h1_headline', 'hero_intro',
@@ -225,13 +255,24 @@ class TenantHierarchyService
                     }
                 }
 
-                // Check domain uniqueness if being changed
-                if ($field === 'domain' && $value !== ($tenant->domain ?? '') && !empty($value)) {
-                    $existingDomain = DB::table('tenants')
-                        ->where('domain', $value)
+                // Normalize empty domains to NULL so the UNIQUE indexes accept
+                // multiple "no custom domain" tenants — MySQL allows many NULLs
+                // in a unique index but not many empty strings.
+                if (in_array($field, ['domain', 'accessible_domain'], true)) {
+                    $value = ($value === '' || $value === null) ? null : trim((string) $value);
+                }
+
+                // Check cross-column domain uniqueness if being changed. A host
+                // must be unique across BOTH domain and accessible_domain.
+                if (in_array($field, ['domain', 'accessible_domain'], true)
+                    && !empty($value) && $value !== ($tenant->$field ?? null)) {
+                    $inUse = DB::table('tenants')
                         ->where('id', '!=', $tenantId)
+                        ->where(function ($q) use ($value) {
+                            $q->where('domain', $value)->orWhere('accessible_domain', $value);
+                        })
                         ->exists();
-                    if ($existingDomain) {
+                    if ($inUse) {
                         return ['success' => false, 'error' => "Domain '{$value}' is already in use"];
                     }
                 }

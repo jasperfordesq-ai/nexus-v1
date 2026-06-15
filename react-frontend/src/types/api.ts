@@ -1252,6 +1252,14 @@ export interface TenantConfig {
    * When set, the SPA must use path-prefixed routing: timebanking.uk/cardiff/dashboard.
    */
   parent_domain?: string;
+  /** This tenant's own React custom domain (e.g. pairc-goodman.com), if configured. */
+  domain?: string;
+  /**
+   * Optional dedicated custom domain for the accessible (GOV.UK) frontend.
+   * When set, the "Accessible version" link points at https://{accessible_domain}/alpha
+   * (slug-less) instead of the shared accessible.project-nexus.ie/{slug}/alpha.
+   */
+  accessible_domain?: string;
 }
 
 export interface GroupTabConfig {

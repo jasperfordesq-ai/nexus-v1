@@ -242,6 +242,12 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.domain_format_invalid'), 'domain', 422);
         }
 
+        // Validate accessible (GOV.UK) frontend domain format if provided
+        $accessibleDomain = trim($input['accessible_domain'] ?? '');
+        if ($accessibleDomain !== '' && !preg_match('/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i', $accessibleDomain)) {
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.domain_format_invalid'), 'accessible_domain', 422);
+        }
+
         // Validate contact email if provided
         $contactEmail = trim($input['contact_email'] ?? '');
         if ($contactEmail !== '' && !filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
@@ -268,6 +274,7 @@ class AdminSuperController extends BaseApiController
             'name' => $name,
             'slug' => $slug,
             'domain' => $domain,
+            'accessible_domain' => $accessibleDomain,
             'tagline' => $input['tagline'] ?? '',
             'description' => $input['description'] ?? '',
             'allows_subtenants' => !empty($input['allows_subtenants']),
@@ -341,6 +348,14 @@ class AdminSuperController extends BaseApiController
             $domain = trim($input['domain']);
             if (!preg_match('/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i', $domain)) {
                 return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.domain_format_invalid'), 'domain', 422);
+            }
+        }
+
+        // Validate accessible (GOV.UK) frontend domain format if being updated
+        if (isset($input['accessible_domain']) && trim($input['accessible_domain']) !== '') {
+            $accessibleDomain = trim($input['accessible_domain']);
+            if (!preg_match('/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i', $accessibleDomain)) {
+                return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.domain_format_invalid'), 'accessible_domain', 422);
             }
         }
 

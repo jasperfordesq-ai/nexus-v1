@@ -97,6 +97,35 @@ class TenantBootstrapTest extends TestCase
     }
 
     /**
+     * Test that bootstrap exposes the optional accessible (GOV.UK) frontend
+     * custom domain so the SPA can point its "Accessible version" link at it.
+     * Uses a dedicated tenant id/slug to avoid the per-tenant bootstrap cache.
+     */
+    public function test_bootstrap_exposes_accessible_domain_when_configured(): void
+    {
+        $slug = 'acc-domain-test';
+        DB::table('tenants')->updateOrInsert(
+            ['id' => 990001],
+            [
+                'name' => 'Accessible Domain Test',
+                'slug' => $slug,
+                'domain' => null,
+                'accessible_domain' => 'accessible.acc-domain-test.example',
+                'is_active' => true,
+                'depth' => 0,
+                'allows_subtenants' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+        $response = $this->apiGet('/v2/tenant/bootstrap?slug=' . $slug);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.accessible_domain', 'accessible.acc-domain-test.example');
+    }
+
+    /**
      * Test that bootstrap returns an error for a nonexistent slug.
      */
     public function test_bootstrap_returns_error_for_invalid_slug(): void

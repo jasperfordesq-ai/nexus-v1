@@ -319,6 +319,12 @@ class TenantBootstrapController extends BaseApiController
         if (!empty($tenant['domain'])) {
             $data['domain'] = $tenant['domain'];
         }
+        // Dedicated accessible (GOV.UK) frontend domain, if configured. Lets the
+        // SPA's "Accessible version" link point at the tenant's own accessible
+        // host instead of the shared accessible.project-nexus.ie.
+        if (!empty($tenant['accessible_domain'])) {
+            $data['accessible_domain'] = $tenant['accessible_domain'];
+        }
         if (!empty($tenant['tagline'])) {
             $data['tagline'] = $tenant['tagline'];
         }
