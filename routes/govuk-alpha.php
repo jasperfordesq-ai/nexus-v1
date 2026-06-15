@@ -232,8 +232,14 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/saved', [AlphaController::class, 'saved'])->name('saved.index');
         Route::get('/resources', [AlphaController::class, 'resources'])->name('resources.index');
         Route::get('/jobs', [AlphaController::class, 'jobs'])->name('jobs.index');
+        // Static segments are registered before the {id} wildcard so they always win.
+        Route::get('/jobs/saved', [AlphaController::class, 'savedJobs'])->name('jobs.saved');
+        Route::get('/jobs/applications', [AlphaController::class, 'myJobApplications'])->name('jobs.applications');
+        Route::post('/jobs/applications/{appId}/withdraw', [AlphaController::class, 'withdrawJobApplication'])->whereNumber('appId')->middleware('throttle:15,1')->name('jobs.applications.withdraw');
         Route::get('/jobs/{id}', [AlphaController::class, 'job'])->whereNumber('id')->name('jobs.show');
         Route::post('/jobs/{id}/apply', [AlphaController::class, 'applyJob'])->whereNumber('id')->middleware('throttle:10,1')->name('jobs.apply');
+        Route::post('/jobs/{id}/save', [AlphaController::class, 'saveJobBookmark'])->whereNumber('id')->middleware('throttle:30,1')->name('jobs.save');
+        Route::post('/jobs/{id}/unsave', [AlphaController::class, 'unsaveJobBookmark'])->whereNumber('id')->middleware('throttle:30,1')->name('jobs.unsave');
         Route::get('/ideation', [AlphaController::class, 'ideation'])->name('ideation.index');
         Route::get('/ideation/{id}', [AlphaController::class, 'ideationChallenge'])->whereNumber('id')->name('ideation.show');
         Route::post('/ideation/{id}/ideas', [AlphaController::class, 'submitIdea'])->whereNumber('id')->middleware('throttle:10,1')->name('ideation.ideas.store');

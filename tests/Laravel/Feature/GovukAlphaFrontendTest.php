@@ -4324,6 +4324,145 @@ class GovukAlphaFrontendTest extends TestCase
             ->count());
     }
 
+    // ===== WAVE JOBS-T2: browse depth, saved, my applications =====
+
+    private function insertJob(int $ownerId, array $overrides = []): int
+    {
+        return (int) DB::table('job_vacancies')->insertGetId(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $ownerId,
+            'title' => 'Test Opportunity',
+            'description' => 'A role in the community.',
+            'type' => 'volunteer',
+            'commitment' => 'flexible',
+            'status' => 'open',
+            'created_at' => now(),
+        ], $overrides));
+    }
+
+    public function test_jobs2_browse_renders_subnav_filters_and_filters_by_type(): void
+    {
+        $this->authenticatedUser(['name' => 'Browser']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+
+        $this->insertJob($owner->id, ['title' => 'Paid Coordinator Role', 'type' => 'paid', 'salary_min' => 20000, 'salary_max' => 30000, 'salary_currency' => 'EUR']);
+        $this->insertJob($owner->id, ['title' => 'Volunteer Gardener Role', 'type' => 'volunteer']);
+
+        // Sub-nav + filter controls render on the browse page.
+        $browse = $this->get("/{$this->testTenantSlug}/alpha/jobs");
+        $browse->assertOk();
+        $browse->assertSee(__('govuk_alpha.jobs_t2.nav_browse'));
+        $browse->assertSee(__('govuk_alpha.jobs_t2.nav_saved'));
+        $browse->assertSee(__('govuk_alpha.jobs_t2.type_label'));
+        $browse->assertSee(__('govuk_alpha.jobs_t2.sort_label'));
+        $browse->assertSee('Paid Coordinator Role');
+        $browse->assertSee('Volunteer Gardener Role');
+
+        // Filtering by type=paid hides the volunteer role.
+        $paid = $this->get("/{$this->testTenantSlug}/alpha/jobs?type=paid");
+        $paid->assertOk();
+        $paid->assertSee('Paid Coordinator Role');
+        $paid->assertDontSee('Volunteer Gardener Role');
+    }
+
+    public function test_jobs2_save_and_unsave_round_trip(): void
+    {
+        $member = $this->authenticatedUser(['name' => 'Saver']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $jobId = $this->insertJob($owner->id, ['title' => 'Bookmarkable Role']);
+
+        // Save from the detail page.
+        $save = $this->post("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/save", ['from' => 'detail']);
+        $save->assertRedirectContains('status=saved');
+        $this->assertSame(1, DB::table('saved_jobs')
+            ->where('user_id', $member->id)->where('job_id', $jobId)->count());
+
+        // It appears on the saved list with a remove button.
+        $saved = $this->get("/{$this->testTenantSlug}/alpha/jobs/saved");
+        $saved->assertOk();
+        $saved->assertSee('Bookmarkable Role');
+        $saved->assertSee(__('govuk_alpha.jobs_t2.unsave_button'));
+
+        // Unsave from the saved list.
+        $unsave = $this->post("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/unsave", ['from' => 'saved']);
+        $unsave->assertRedirectContains('status=unsaved');
+        $this->assertSame(0, DB::table('saved_jobs')
+            ->where('user_id', $member->id)->where('job_id', $jobId)->count());
+    }
+
+    public function test_jobs2_my_applications_lists_and_withdraw(): void
+    {
+        $applicant = $this->authenticatedUser(['name' => 'Applicant']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $jobId = $this->insertJob($owner->id, ['title' => 'Withdrawable Role']);
+
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/apply", ['cover_letter' => 'Keen.'])
+            ->assertRedirectContains('status=applied');
+
+        $appId = (int) DB::table('job_vacancy_applications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('vacancy_id', $jobId)
+            ->where('user_id', $applicant->id)
+            ->value('id');
+        $this->assertGreaterThan(0, $appId);
+
+        // The application shows on the my-applications page with a withdraw control.
+        $apps = $this->get("/{$this->testTenantSlug}/alpha/jobs/applications");
+        $apps->assertOk();
+        $apps->assertSee('Withdrawable Role');
+        $apps->assertSee(__('govuk_alpha.jobs_t2.withdraw_button'));
+
+        // Withdraw it.
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/applications/{$appId}/withdraw")
+            ->assertRedirectContains('status=withdrawn');
+        $this->assertSame('withdrawn', DB::table('job_vacancy_applications')->where('id', $appId)->value('status'));
+    }
+
+    public function test_jobs2_detail_shows_skills_match_for_viewer(): void
+    {
+        $member = $this->authenticatedUser(['name' => 'Skilled']);
+        DB::table('users')->where('id', $member->id)->update(['skills' => 'gardening, cooking']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $jobId = $this->insertJob($owner->id, ['title' => 'Skilled Role', 'skills_required' => 'gardening, welding']);
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/jobs/{$jobId}");
+        $detail->assertOk();
+        $detail->assertSee(__('govuk_alpha.jobs_t2.match_heading'));
+        $detail->assertSee(__('govuk_alpha.jobs_t2.save_button'));
+    }
+
+    public function test_jobs2_account_hub_surfaces_jobs(): void
+    {
+        $this->authenticatedUser(['name' => 'Account Holder']);
+
+        $account = $this->get("/{$this->testTenantSlug}/alpha/account");
+        $account->assertOk();
+        $account->assertSee(__('govuk_alpha.jobs_t2.account_title'));
+    }
+
+    public function test_jobs2_detail_404s_for_another_tenants_job(): void
+    {
+        $this->authenticatedUser(['name' => 'Tenant Member']);
+
+        // A vacancy belonging to a different tenant must never be visible: the
+        // HasTenantScope global scope filters it out, so legacyGetById returns null.
+        $foreignJobId = (int) DB::table('job_vacancies')->insertGetId([
+            'tenant_id' => $this->testTenantId + 9999,
+            'user_id' => 999999,
+            'title' => 'Foreign Tenant Role',
+            'description' => 'Should never be reachable.',
+            'type' => 'volunteer',
+            'status' => 'open',
+            'created_at' => now(),
+        ]);
+
+        $this->get("/{$this->testTenantSlug}/alpha/jobs/{$foreignJobId}")->assertNotFound();
+        // Saving a cross-tenant job fails gracefully (no leak, no 404 crash).
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/{$foreignJobId}/save", ['from' => 'detail'])
+            ->assertRedirectContains('status=save-failed');
+        $this->assertSame(0, DB::table('saved_jobs')->where('job_id', $foreignJobId)->count());
+    }
+
     public function test_ideation_challenge_detail_submit_and_vote(): void
     {
         $member = $this->authenticatedUser(['name' => 'Idea Author']);

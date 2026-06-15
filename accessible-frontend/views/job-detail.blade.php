@@ -13,7 +13,16 @@
             'timebank' => __('govuk_alpha.jobs.type_timebank'),
             default => __('govuk_alpha.jobs.type_volunteer'),
         };
+        $jCommitment = (string) ($job['commitment'] ?? '');
+        $commitmentLabel = match ($jCommitment) {
+            'full_time' => __('govuk_alpha.jobs_t2.commitment_full_time'),
+            'part_time' => __('govuk_alpha.jobs_t2.commitment_part_time'),
+            'flexible' => __('govuk_alpha.jobs_t2.commitment_flexible'),
+            'one_off' => __('govuk_alpha.jobs_t2.commitment_one_off'),
+            default => '',
+        };
         $jOrg = trim((string) ($job['organization']['name'] ?? ''));
+        $jPoster = $jOrg !== '' ? $jOrg : trim((string) ($job['creator']['name'] ?? ''));
         $jLocation = (bool) ($job['is_remote'] ?? false)
             ? __('govuk_alpha.jobs.remote')
             : trim((string) ($job['location'] ?? ''));
@@ -33,6 +42,12 @@
         }
         $jSkills = is_array($job['skills'] ?? null) ? array_filter($job['skills']) : [];
         $hasApplied = (bool) ($job['has_applied'] ?? false);
+        $isSaved = (bool) ($job['is_saved'] ?? false);
+        $isOwner = (bool) ($isJobOwner ?? false);
+        $jViews = (int) ($job['views_count'] ?? 0);
+        $jApps = (int) ($job['applications_count'] ?? 0);
+        $match = $jobMatch ?? null;
+        $similar = $similarJobs ?? [];
     @endphp
 
     <a href="{{ route('govuk-alpha.jobs.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-back-link">{{ __('govuk_alpha.jobs.back') }}</a>
@@ -42,20 +57,53 @@
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="job-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs.states.applied') }}</p></div>
         </div>
-    @elseif ($status === 'apply-failed')
+    @elseif ($status === 'saved')
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="job-status">
+            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="job-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
+            <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t2.states.saved') }}</p></div>
+        </div>
+    @elseif ($status === 'unsaved')
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="job-status">
+            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="job-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
+            <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t2.states.unsaved') }}</p></div>
+        </div>
+    @elseif ($status === 'apply-failed' || $status === 'save-failed')
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ __('govuk_alpha.jobs.states.apply-failed') }}</li></ul></div></div>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ $status === 'save-failed' ? __('govuk_alpha.jobs_t2.states.save-failed') : __('govuk_alpha.jobs.states.apply-failed') }}</li></ul></div></div>
         </div>
     @endif
 
-    <span class="govuk-caption-xl">{{ $jOrg !== '' ? $jOrg : ($tenant['name'] ?? $tenantSlug) }}</span>
+    <span class="govuk-caption-xl">{{ $jPoster !== '' ? $jPoster : ($tenant['name'] ?? $tenantSlug) }}</span>
     <div class="nexus-alpha-module-row">
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ $jTitle }}</h1>
         <strong class="govuk-tag govuk-tag--blue">{{ $typeLabel }}</strong>
     </div>
 
+    {{-- Save / unsave toggle (members only; the owner manages, not saves, their role). --}}
+    @unless ($isOwner)
+        @if ($isSaved)
+            <form method="post" action="{{ route('govuk-alpha.jobs.unsave', ['tenantSlug' => $tenantSlug, 'id' => $job['id']]) }}" class="govuk-!-margin-bottom-4">
+                @csrf
+                <input type="hidden" name="from" value="detail">
+                <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.jobs_t2.unsave_button') }}</button>
+            </form>
+        @else
+            <form method="post" action="{{ route('govuk-alpha.jobs.save', ['tenantSlug' => $tenantSlug, 'id' => $job['id']]) }}" class="govuk-!-margin-bottom-4">
+                @csrf
+                <input type="hidden" name="from" value="detail">
+                <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.jobs_t2.save_button') }}</button>
+            </form>
+        @endif
+    @endunless
+
     <dl class="govuk-summary-list govuk-!-margin-bottom-6">
+        @if ($commitmentLabel !== '')
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.jobs_t2.commitment_label') }}</dt>
+                <dd class="govuk-summary-list__value">{{ $commitmentLabel }}</dd>
+            </div>
+        @endif
         @if ($jLocation !== '')
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">{{ __('govuk_alpha.jobs.location_label') }}</dt>
@@ -74,6 +122,14 @@
                 <dd class="govuk-summary-list__value">{{ $jDeadline }}</dd>
             </div>
         @endif
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ __('govuk_alpha.jobs_t2.views_label') }}</dt>
+            <dd class="govuk-summary-list__value">{{ $jViews }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ __('govuk_alpha.jobs_t2.applications_label') }}</dt>
+            <dd class="govuk-summary-list__value">{{ $jApps }}</dd>
+        </div>
     </dl>
 
     @if (trim((string) ($job['description'] ?? '')) !== '')
@@ -90,17 +146,58 @@
         </ul>
     @endif
 
-    <h2 class="govuk-heading-l govuk-!-margin-top-6" id="apply">{{ __('govuk_alpha.jobs.apply_title') }}</h2>
-    @if ($hasApplied)
-        <p class="govuk-inset-text">{{ __('govuk_alpha.jobs.already_applied') }}</p>
+    {{-- Skills match for the viewer. --}}
+    @if (is_array($match) && !empty($match['required_skills']))
+        <h2 class="govuk-heading-m govuk-!-margin-top-6">{{ __('govuk_alpha.jobs_t2.match_heading') }}</h2>
+        @php $pct = (int) ($match['percentage'] ?? 0); @endphp
+        <p class="govuk-body govuk-!-font-weight-bold">{{ __('govuk_alpha.jobs_t2.match_percent', ['percent' => $pct]) }}</p>
+        <progress max="100" value="{{ $pct }}" aria-label="{{ __('govuk_alpha.jobs_t2.match_percent', ['percent' => $pct]) }}">{{ $pct }}%</progress>
+        @if (!empty($match['matched']))
+            <h3 class="govuk-heading-s govuk-!-margin-top-3">{{ __('govuk_alpha.jobs_t2.match_have') }}</h3>
+            <ul class="govuk-list nexus-alpha-tag-list">
+                @foreach ($match['matched'] as $skill)
+                    <li><strong class="govuk-tag govuk-tag--green">{{ $skill }}</strong></li>
+                @endforeach
+            </ul>
+        @endif
+        @if (!empty($match['missing']))
+            <h3 class="govuk-heading-s govuk-!-margin-top-3">{{ __('govuk_alpha.jobs_t2.match_missing') }}</h3>
+            <ul class="govuk-list nexus-alpha-tag-list">
+                @foreach ($match['missing'] as $skill)
+                    <li><strong class="govuk-tag govuk-tag--orange">{{ $skill }}</strong></li>
+                @endforeach
+            </ul>
+        @endif
+    @endif
+
+    {{-- Apply / owner / already-applied. --}}
+    @if ($isOwner)
+        <div class="govuk-inset-text govuk-!-margin-top-6">{{ __('govuk_alpha.jobs_t2.owner_notice') }}</div>
     @else
-        <form method="post" action="{{ route('govuk-alpha.jobs.apply', ['tenantSlug' => $tenantSlug, 'id' => $job['id']]) }}">
-            @csrf
-            <div class="govuk-form-group">
-                <label class="govuk-label" for="cover_letter">{{ __('govuk_alpha.jobs.cover_letter_label') }}</label>
-                <textarea class="govuk-textarea" id="cover_letter" name="cover_letter" rows="5" maxlength="5000"></textarea>
-            </div>
-            <button type="submit" class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.jobs.apply_button') }}</button>
-        </form>
+        <h2 class="govuk-heading-l govuk-!-margin-top-6" id="apply">{{ __('govuk_alpha.jobs.apply_title') }}</h2>
+        @if ($hasApplied)
+            <p class="govuk-inset-text">{{ __('govuk_alpha.jobs.already_applied') }}</p>
+        @else
+            <form method="post" action="{{ route('govuk-alpha.jobs.apply', ['tenantSlug' => $tenantSlug, 'id' => $job['id']]) }}">
+                @csrf
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="cover_letter">{{ __('govuk_alpha.jobs.cover_letter_label') }}</label>
+                    <textarea class="govuk-textarea" id="cover_letter" name="cover_letter" rows="5" maxlength="5000"></textarea>
+                </div>
+                <button type="submit" class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.jobs.apply_button') }}</button>
+            </form>
+        @endif
+    @endif
+
+    {{-- Similar opportunities. --}}
+    @if (!empty($similar))
+        <h2 class="govuk-heading-l govuk-!-margin-top-6">{{ __('govuk_alpha.jobs_t2.similar_heading') }}</h2>
+        <ul class="govuk-list">
+            @foreach ($similar as $s)
+                <li class="govuk-!-margin-bottom-2">
+                    <a class="govuk-link" href="{{ route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $s['id']]) }}">{{ $s['title'] }}</a>
+                </li>
+            @endforeach
+        </ul>
     @endif
 @endsection

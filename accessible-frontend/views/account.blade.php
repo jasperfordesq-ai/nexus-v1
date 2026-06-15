@@ -69,6 +69,14 @@
             ];
         }
 
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.jobs.index') && \App\Core\TenantContext::hasFeature('job_vacancies')) {
+            $accountLinks[] = [
+                'title' => __('govuk_alpha.jobs_t2.account_title'),
+                'description' => __('govuk_alpha.jobs_t2.account_description'),
+                'href' => route('govuk-alpha.jobs.index', ['tenantSlug' => $tenantSlug]),
+            ];
+        }
+
         if (\Illuminate\Support\Facades\Route::has('govuk-alpha.matches.index') && \App\Core\TenantContext::hasModule('listings')) {
             $accountLinks[] = [
                 'title' => __('govuk_alpha.matches.title'),

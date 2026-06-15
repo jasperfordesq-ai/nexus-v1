@@ -5278,14 +5278,33 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
-        $q = trim(self::asStr($request->query('q')));
-        $filters = ['limit' => 30, 'status' => 'open'];
-        if ($q !== '') {
-            $filters['search'] = $q;
+        $perPage = 12;
+        $offset = max(0, (int) $request->query('offset', 0));
+        $f = $this->jobsFilters($request);
+
+        // The service supports offset pagination (returns total + has_more) when an
+        // 'offset' key is present, so the GOV.UK pagination block can show progress.
+        $query = ['limit' => $perPage, 'offset' => $offset, 'status' => 'open', 'sort' => $f['sort']];
+        if ($f['q'] !== '') {
+            $query['search'] = $f['q'];
         }
+        if ($f['type'] !== '') {
+            $query['type'] = $f['type'];
+        }
+        if ($f['commitment'] !== '') {
+            $query['commitment'] = $f['commitment'];
+        }
+        if ($f['remote']) {
+            $query['is_remote'] = 1;
+        }
+
         $items = [];
+        $meta = ['total' => 0, 'has_more' => false, 'offset' => $offset, 'per_page' => $perPage];
         try {
-            $items = app(\App\Services\JobVacancyService::class)->getAll($filters, $userId)['items'] ?? [];
+            $result = app(\App\Services\JobVacancyService::class)->getAll($query, $userId);
+            $items = is_array($result['items'] ?? null) ? $result['items'] : [];
+            $meta['total'] = (int) ($result['total'] ?? 0);
+            $meta['has_more'] = (bool) ($result['has_more'] ?? false);
         } catch (\Throwable $e) {
             report($e);
         }
@@ -5294,8 +5313,11 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.jobs.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
-            'jobs' => is_array($items) ? $items : [],
-            'jobsQuery' => $q,
+            'jobs' => $items,
+            'jobsQuery' => $f['q'],
+            'jobsFilters' => $f,
+            'jobsMeta' => $meta,
+            'jobsActiveTab' => 'browse',
         ]);
     }
 
@@ -5308,22 +5330,56 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
+        $svc = app(\App\Services\JobVacancyService::class);
         $job = null;
         try {
             // legacyGetById forwards $userId so has_applied/is_saved resolve — the
             // bare getById() leaves has_applied=false and shows the apply form even
             // to members who already applied.
-            $job = app(\App\Services\JobVacancyService::class)->legacyGetById($id, $userId);
+            $job = $svc->legacyGetById($id, $userId);
         } catch (\Throwable $e) {
             report($e);
         }
         abort_if($job === null, 404);
+
+        // Count the view, mirroring the React detail page. Best-effort: a failure
+        // here must never block rendering.
+        try {
+            $svc->incrementViews($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // Skills match for the viewer — only meaningful when the role lists skills.
+        $match = null;
+        if (!empty($job['skills_required'])) {
+            try {
+                $match = $svc->calculateMatchPercentage($userId, $id);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        // Similar opportunities (same tenant, by title overlap), excluding this one.
+        $similar = [];
+        try {
+            $similar = array_values(array_filter(
+                $svc->findSimilarJobs((string) ($job['title'] ?? ''), null, TenantContext::getId()),
+                static fn ($s) => (int) ($s['id'] ?? 0) !== $id
+            ));
+            $similar = array_slice($similar, 0, 5);
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return $this->view('accessible-frontend::job-detail', [
             'title' => ($job['title'] ?? '') ?: __('govuk_alpha.jobs.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
             'job' => $job,
+            'jobMatch' => is_array($match) ? $match : null,
+            'similarJobs' => $similar,
+            'isJobOwner' => (int) ($job['user_id'] ?? 0) === $userId,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -11702,6 +11758,189 @@ class AlphaController extends Controller
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
+        ]);
+    }
+
+    // ===== WAVE JOBS-T2: jobs depth (browse filters, saved, my applications) =====
+
+    /**
+     * Validate + normalise the jobs browse filters from the query string. Unknown
+     * values fall back to the neutral default so a hand-typed URL can never push an
+     * arbitrary value into the service query.
+     *
+     * @return array{q: string, type: string, commitment: string, sort: string, remote: bool}
+     */
+    private function jobsFilters(Request $request): array
+    {
+        return [
+            'q' => trim(self::asStr($request->query('q'))),
+            'type' => self::asStr($this->allowed(self::asStr($request->query('type')), ['paid', 'volunteer', 'timebank'], '')),
+            'commitment' => self::asStr($this->allowed(self::asStr($request->query('commitment')), ['full_time', 'part_time', 'flexible', 'one_off'], '')),
+            'sort' => self::asStr($this->allowed(self::asStr($request->query('sort')), ['newest', 'deadline', 'salary_desc'], 'newest')),
+            'remote' => $request->query('remote') === '1',
+        ];
+    }
+
+    /**
+     * Saved (bookmarked) opportunities for the current member — the accessible
+     * equivalent of the React Jobs "Saved" tab. Cursor-paginated via the service.
+     */
+    public function savedJobs(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $cursor = self::asStr($request->query('cursor')) ?: null;
+        $items = [];
+        $meta = ['has_more' => false, 'cursor' => null];
+        try {
+            $result = app(\App\Services\JobVacancyService::class)->getSavedJobs($userId, ['limit' => 12, 'cursor' => $cursor]);
+            $items = is_array($result['items'] ?? null) ? $result['items'] : [];
+            $meta['has_more'] = (bool) ($result['has_more'] ?? false);
+            $meta['cursor'] = $result['cursor'] ?? null;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::jobs-saved', [
+            'title' => __('govuk_alpha.jobs_t2.saved_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'jobs' => $items,
+            'jobsMeta' => $meta,
+            'jobsActiveTab' => 'saved',
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * The current member's own job applications, with the vacancy summary and the
+     * application status — the accessible equivalent of React's MyApplicationsPage.
+     */
+    public function myJobApplications(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $statusFilter = self::asStr($this->allowed(
+            self::asStr($request->query('status_filter')),
+            ['applied', 'pending', 'screening', 'reviewed', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn'],
+            ''
+        ));
+        $cursor = self::asStr($request->query('cursor')) ?: null;
+
+        $items = [];
+        $meta = ['has_more' => false, 'cursor' => null];
+        try {
+            $params = ['limit' => 12, 'cursor' => $cursor];
+            if ($statusFilter !== '') {
+                $params['status'] = $statusFilter;
+            }
+            $result = app(\App\Services\JobVacancyService::class)->getMyApplications($userId, $params);
+            $items = is_array($result['items'] ?? null) ? $result['items'] : [];
+            $meta['has_more'] = (bool) ($result['has_more'] ?? false);
+            $meta['cursor'] = $result['cursor'] ?? null;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::jobs-applications', [
+            'title' => __('govuk_alpha.jobs_t2.applications_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'applications' => $items,
+            'jobsMeta' => $meta,
+            'jobsActiveTab' => 'applications',
+            'statusFilter' => $statusFilter,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Bookmark an opportunity. Idempotent; returns the member to where they were. */
+    public function saveJobBookmark(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $ok = false;
+        try {
+            $ok = app(\App\Services\JobVacancyService::class)->saveJob($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->jobsBookmarkRedirect($tenantSlug, $id, self::asStr($request->input('from')), $ok ? 'saved' : 'save-failed');
+    }
+
+    /** Remove a bookmark. Returns the member to where they were (detail or saved list). */
+    public function unsaveJobBookmark(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        try {
+            app(\App\Services\JobVacancyService::class)->unsaveJob($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->jobsBookmarkRedirect($tenantSlug, $id, self::asStr($request->input('from')), 'unsaved');
+    }
+
+    /**
+     * Route a save/unsave back to its origin. 'saved' returns to the saved list;
+     * anything else (the default) returns to the opportunity detail page. The
+     * origin is a fixed whitelist, never a raw redirect target.
+     */
+    private function jobsBookmarkRedirect(string $tenantSlug, int $id, string $from, string $status): RedirectResponse
+    {
+        if ($from === 'saved') {
+            return redirect()->route('govuk-alpha.jobs.saved', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+        }
+
+        return redirect()->route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
+    }
+
+    /**
+     * Withdraw the member's own application. The service only permits a self-
+     * withdraw when the caller owns the application (status 'withdrawn' + matching
+     * user id), so passing the web-session user id as the actor is safe.
+     */
+    public function withdrawJobApplication(Request $request, string $tenantSlug, int $appId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $ok = false;
+        try {
+            $ok = app(\App\Services\JobVacancyService::class)->updateApplicationStatus($appId, $userId, 'withdrawn');
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.jobs.applications', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'withdrawn' : 'withdraw-failed',
         ]);
     }
 }
