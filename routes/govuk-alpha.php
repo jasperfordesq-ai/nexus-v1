@@ -364,4 +364,10 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/listings/{id}/report', [AlphaController::class, 'listingReport'])->whereNumber('id')->name('listings.report');
         Route::post('/listings/{id}/report', [AlphaController::class, 'storeListingReport'])->whereNumber('id')->middleware('throttle:5,60')->name('listings.report.store');
         Route::post('/matches/{id}/dismiss', [AlphaController::class, 'dismissMatch'])->whereNumber('id')->middleware('throttle:60,1')->name('matches.dismiss');
+        // ===== WAVE NIGHT-MEMBERS: profile review + transfer, review delete =====
+        // Static `/reviews/delete` segment before member wildcard `/members/{id}` is safe
+        // because there is no `reviews` prefix group conflict.
+        Route::post('/members/{id}/review', [AlphaController::class, 'storeProfileReview'])->whereNumber('id')->middleware('throttle:10,1')->name('profile.review.store');
+        Route::post('/members/{id}/transfer', [AlphaController::class, 'profileTransferCredits'])->whereNumber('id')->middleware('throttle:20,1')->name('profile.transfer');
+        Route::post('/reviews/{id}/delete', [AlphaController::class, 'deleteReview'])->whereNumber('id')->middleware('throttle:20,1')->name('reviews.delete');
     });

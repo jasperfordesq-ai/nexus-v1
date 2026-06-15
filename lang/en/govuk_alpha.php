@@ -3695,4 +3695,68 @@ return [
         // Exchange-request — validation error summary
         'exchange_request_error_summary_title' => 'There is a problem with your exchange request',
     ],
+    // ===== WAVE NIGHT-MEMBERS: messages/connections/members/profile/reviews polish + parity =====
+    'polish_members' => [
+        // Messages index
+        'messages_filter_title' => 'Filter conversations',
+        'messages_filter_label' => 'Search by name',
+        'messages_filter_hint' => 'Enter a name to filter your conversations.',
+        'messages_filter_submit' => 'Filter',
+        'messages_filter_clear' => 'Clear filter',
+        'messages_unread_summary' => '{0} No unread messages|{1} 1 unread message|[2,*] :count unread messages',
+        // Conversation
+        'conversation_filter_label' => 'Search messages',
+        'conversation_filter_hint' => 'Filter messages in this conversation by keyword.',
+        'conversation_filter_submit' => 'Search',
+        'conversation_filter_clear' => 'Clear search',
+        'conversation_filter_empty' => 'No messages match your search.',
+        // Connections search
+        'connections_search_title' => 'Find a connection',
+        'connections_search_label' => 'Search by name',
+        'connections_search_hint' => 'Enter a name to filter your connections.',
+        'connections_search_submit' => 'Search',
+        'connections_search_clear' => 'Clear search',
+        // Profile — write review
+        'write_review_title' => 'Write a review for :name',
+        'write_review_hint' => 'Reviews help other members find reliable people to exchange time with.',
+        'write_review_rating_legend' => 'Rating (1 = poor, 5 = excellent)',
+        'write_review_rating_label' => ':n out of 5',
+        'write_review_comment_label' => 'Comment (optional)',
+        'write_review_comment_hint' => 'Describe your experience. Maximum 2,000 characters.',
+        'write_review_submit' => 'Submit review',
+        'write_review_toggle' => 'Write a review for this member',
+        'write_review_self_error' => 'You cannot review yourself.',
+        'write_review_success' => 'Your review has been submitted.',
+        // Profile — send credits
+        'send_credits_title' => 'Send time credits to :name',
+        'send_credits_hint' => 'Send time credits directly to this member wallet.',
+        'send_credits_amount_label' => 'Amount (whole hours)',
+        'send_credits_amount_hint' => 'Enter a whole number of hours to send. You cannot send to yourself.',
+        'send_credits_note_label' => 'Note (optional)',
+        'send_credits_note_hint' => 'Add a short note to the recipient.',
+        'send_credits_submit' => 'Send credits',
+        'send_credits_toggle' => 'Send time credits to this member',
+        'send_credits_success' => 'Your time credits have been sent.',
+        'send_credits_error_invalid' => 'Please enter a valid whole-hour amount.',
+        'send_credits_error_insufficient' => 'You do not have enough time credits.',
+        'send_credits_error_self' => 'You cannot send credits to yourself.',
+        'send_credits_error_not_found' => 'That member could not be found in this community.',
+        'send_credits_error_failed' => 'We could not complete the transfer. Please try again.',
+        // Profile — rating display
+        'rating_accessible' => ':n out of 5',
+        'rating_none' => 'No rating yet',
+        // Reviews page — govuk-accordion labels + delete
+        'reviews_accordion_remember' => 'Remember the sections I have opened',
+        'reviews_accordion_show_all' => 'Show all sections',
+        'reviews_accordion_hide_all' => 'Hide all sections',
+        'review_delete_toggle' => 'Options for this review',
+        'review_delete_legend' => 'Delete this review',
+        'review_delete_button' => 'Delete review',
+        'review_delete_confirm' => 'Are you sure you want to delete this review? This cannot be undone.',
+        'review_deleted_success' => 'Your review has been deleted.',
+        'review_deleted_failed' => 'We could not delete this review. Please try again.',
+        // Members directory — badges/level
+        'member_level_label' => 'Level :n',
+        'member_badges_label' => 'Badges',
+    ],
 ];

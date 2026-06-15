@@ -17,13 +17,38 @@
         <a class="govuk-back-link" href="{{ route('govuk-alpha.members.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_members') }}</a>
     @endif
 
-    @if (($status ?? '') === 'profile-updated')
+    @php
+        $profileSuccessStatuses = ['profile-updated', 'review-submitted', 'transfer-sent'];
+        $profileErrorStatuses   = ['review-invalid', 'review-duplicate', 'review-failed',
+                                   'transfer-failed', 'transfer-self', 'transfer-insufficient'];
+        $profileStatusMsgMap = [
+            'profile-updated'        => __('govuk_alpha.profile_settings.success'),
+            'review-submitted'       => __('govuk_alpha.polish_members.write_review_success'),
+            'transfer-sent'          => __('govuk_alpha.polish_members.send_credits_success'),
+            'review-invalid'         => __('govuk_alpha.reviews_page.submit_invalid'),
+            'review-duplicate'       => __('govuk_alpha.reviews_page.submit_duplicate'),
+            'review-failed'          => __('govuk_alpha.reviews_page.submit_failed'),
+            'transfer-failed'        => __('govuk_alpha.polish_members.send_credits_error_failed'),
+            'transfer-self'          => __('govuk_alpha.polish_members.send_credits_error_self'),
+            'transfer-insufficient'  => __('govuk_alpha.polish_members.send_credits_error_insufficient'),
+        ];
+    @endphp
+    @if (in_array(($status ?? ''), $profileSuccessStatuses, true))
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="profile-status-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="profile-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
             <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.profile_settings.success') }}</p>
+                <p class="govuk-notification-banner__heading">{{ $profileStatusMsgMap[$status] ?? '' }}</p>
+            </div>
+        </div>
+    @elseif (in_array(($status ?? ''), $profileErrorStatuses, true))
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                <div class="govuk-error-summary__body">
+                    <p class="govuk-body">{{ $profileStatusMsgMap[$status] ?? __('govuk_alpha.states.error_title') }}</p>
+                </div>
             </div>
         </div>
     @endif
@@ -56,30 +81,31 @@
         </div>
     @endif
 
-    <div class="nexus-alpha-profile-hero">
-        <div class="nexus-alpha-profile-hero__media">
+    {{-- Profile hero — govuk-grid-row primitives instead of custom flex --}}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter">
             @if ($avatar)
                 <img class="nexus-alpha-avatar nexus-alpha-avatar--xl" src="{{ $avatar }}" alt="{{ __('govuk_alpha.members.avatar_alt', ['name' => $displayName]) }}">
             @else
                 <span class="nexus-alpha-avatar nexus-alpha-avatar--xl nexus-alpha-avatar--placeholder" aria-hidden="true">{{ mb_strtoupper(mb_substr($displayName, 0, 1)) }}</span>
             @endif
         </div>
-        <div class="nexus-alpha-profile-hero__content">
+        <div class="govuk-grid-column-three-quarters">
             <span class="govuk-caption-l">
                 {{ ($isOwnProfile ?? false) ? __('govuk_alpha.profile.own_caption') : __('govuk_alpha.profile.member_caption') }}
             </span>
             <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ $displayName }}</h1>
-            <div class="nexus-alpha-profile-hero__badges">
+            <div class="nexus-alpha-inline-flex-tags govuk-!-margin-bottom-2" style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
                 @if (!empty($profile['is_verified']))
                     <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.profile.verified') }}</strong>
                 @endif
                 <strong class="govuk-tag govuk-tag--grey">{{ __('govuk_alpha.profile.profile_type_' . $profileType) }}</strong>
             </div>
             @if (!empty($profile['tagline']))
-                <p class="govuk-body-l govuk-!-margin-top-4">{{ $profile['tagline'] }}</p>
+                <p class="govuk-body-l govuk-!-margin-top-2">{{ $profile['tagline'] }}</p>
             @endif
             @if ($isOwnProfile ?? false)
-                <div class="nexus-alpha-actions govuk-!-margin-top-4">
+                <div class="govuk-button-group govuk-!-margin-top-4">
                     <a class="govuk-button" href="{{ route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.actions.edit_profile') }}</a>
                 </div>
             @elseif ((int) ($memberId ?? 0) > 0)
@@ -87,40 +113,40 @@
                 @if ($cs === 'pending_received')
                     <p class="govuk-body govuk-!-margin-top-4 govuk-!-margin-bottom-2">{{ __('govuk_alpha.profile.connection.request_received', ['name' => $displayName]) }}</p>
                 @endif
-                <div class="nexus-alpha-actions {{ $cs === 'pending_received' ? '' : 'govuk-!-margin-top-4' }}">
+                <div class="govuk-button-group {{ $cs === 'pending_received' ? '' : 'govuk-!-margin-top-4' }}">
                     @if (($directMessagingEnabled ?? false))
-                        <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ route('govuk-alpha.messages.new', ['tenantSlug' => $tenantSlug, 'userId' => $memberId]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.actions.send_message') }}</a>
+                        <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.messages.new', ['tenantSlug' => $tenantSlug, 'userId' => $memberId]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.actions.send_message') }}</a>
                     @endif
                     @if ($cs === 'none')
-                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
+                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}" style="display:inline">
                             @csrf
                             <input type="hidden" name="action" value="connect">
-                            <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.connect') }}</button>
+                            <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.connect') }}</button>
                         </form>
                     @elseif ($cs === 'pending_sent')
                         <strong class="govuk-tag govuk-tag--yellow">{{ __('govuk_alpha.profile.connection.request_sent') }}</strong>
-                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
+                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}" style="display:inline">
                             @csrf
                             <input type="hidden" name="action" value="cancel">
-                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.cancel_request') }}</button>
+                            <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.cancel_request') }}</button>
                         </form>
                     @elseif ($cs === 'pending_received')
-                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
+                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}" style="display:inline">
                             @csrf
                             <input type="hidden" name="action" value="accept">
-                            <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.accept') }}</button>
+                            <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.accept') }}</button>
                         </form>
-                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
+                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}" style="display:inline">
                             @csrf
                             <input type="hidden" name="action" value="decline">
-                            <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.decline') }}</button>
+                            <button class="govuk-button govuk-button--warning" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.decline') }}</button>
                         </form>
                     @elseif ($cs === 'connected')
                         <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.profile.connection.connected') }}</strong>
-                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
+                        <form method="post" action="{{ route('govuk-alpha.members.connection', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}" style="display:inline">
                             @csrf
                             <input type="hidden" name="action" value="remove">
-                            <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.remove') }}</button>
+                            <button class="govuk-button govuk-button--warning" data-module="govuk-button">{{ __('govuk_alpha.profile.connection.remove') }}</button>
                         </form>
                     @endif
                 </div>
@@ -130,7 +156,7 @@
                         <p class="govuk-body govuk-!-margin-bottom-2">{{ __('govuk_alpha.profile.block.is_blocked', ['name' => $displayName]) }}</p>
                         <form method="post" action="{{ route('govuk-alpha.members.unblock', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
                             @csrf
-                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile.block.unblock') }}</button>
+                            <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.profile.block.unblock') }}</button>
                         </form>
                     </div>
                 @else
@@ -142,7 +168,71 @@
                             <p class="govuk-body">{{ __('govuk_alpha.profile.block.explain') }}</p>
                             <form method="post" action="{{ route('govuk-alpha.members.block', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
                                 @csrf
-                                <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile.block.block') }}</button>
+                                <button class="govuk-button govuk-button--warning" data-module="govuk-button">{{ __('govuk_alpha.profile.block.block') }}</button>
+                            </form>
+                        </div>
+                    </details>
+                @endif
+
+                {{-- Parity: Write a review from a member's profile --}}
+                @if (\App\Core\TenantContext::hasFeature('reviews') && (int) ($memberId ?? 0) > 0)
+                    <details class="govuk-details govuk-!-margin-top-4" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">{{ __('govuk_alpha.polish_members.write_review_toggle') }}</span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            <h2 class="govuk-heading-m">{{ __('govuk_alpha.polish_members.write_review_title', ['name' => $displayName]) }}</h2>
+                            <p class="govuk-body">{{ __('govuk_alpha.polish_members.write_review_hint') }}</p>
+                            <form method="post" action="{{ route('govuk-alpha.profile.review.store', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
+                                @csrf
+                                <input type="hidden" name="receiver_id" value="{{ $memberId }}">
+                                <fieldset class="govuk-fieldset govuk-!-margin-bottom-3">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha.polish_members.write_review_rating_legend') }}</legend>
+                                    <div class="govuk-radios govuk-radios--inline govuk-radios--small" data-module="govuk-radios">
+                                        @for ($star = 5; $star >= 1; $star--)
+                                            <div class="govuk-radios__item">
+                                                <input class="govuk-radios__input" id="profile-rating-{{ $memberId }}-{{ $star }}" name="rating" type="radio" value="{{ $star }}" @if ($star === 5) checked @endif>
+                                                <label class="govuk-label govuk-radios__label" for="profile-rating-{{ $memberId }}-{{ $star }}">
+                                                    {{ $star }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.polish_members.write_review_rating_label', ['n' => $star]) }}</span>
+                                                </label>
+                                            </div>
+                                        @endfor
+                                    </div>
+                                </fieldset>
+                                <div class="govuk-form-group govuk-!-margin-bottom-3">
+                                    <label class="govuk-label govuk-label--s" for="profile-review-comment-{{ $memberId }}">{{ __('govuk_alpha.polish_members.write_review_comment_label') }}</label>
+                                    <div id="profile-review-hint-{{ $memberId }}" class="govuk-hint">{{ __('govuk_alpha.polish_members.write_review_comment_hint') }}</div>
+                                    <textarea class="govuk-textarea" id="profile-review-comment-{{ $memberId }}" name="comment" rows="3" maxlength="2000" aria-describedby="profile-review-hint-{{ $memberId }}"></textarea>
+                                </div>
+                                <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.polish_members.write_review_submit') }}</button>
+                            </form>
+                        </div>
+                    </details>
+                @endif
+
+                {{-- Parity: Send time credits from a member's profile --}}
+                @if (\App\Core\TenantContext::hasModule('wallet') && (int) ($memberId ?? 0) > 0)
+                    <details class="govuk-details govuk-!-margin-top-2" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">{{ __('govuk_alpha.polish_members.send_credits_toggle') }}</span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            <h2 class="govuk-heading-m">{{ __('govuk_alpha.polish_members.send_credits_title', ['name' => $displayName]) }}</h2>
+                            <p class="govuk-body">{{ __('govuk_alpha.polish_members.send_credits_hint') }}</p>
+                            <form method="post" action="{{ route('govuk-alpha.profile.transfer', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
+                                @csrf
+                                <input type="hidden" name="recipient_id" value="{{ $memberId }}">
+                                <div class="govuk-form-group govuk-!-margin-bottom-3">
+                                    <label class="govuk-label govuk-label--s" for="profile-transfer-amount-{{ $memberId }}">{{ __('govuk_alpha.polish_members.send_credits_amount_label') }}</label>
+                                    <div id="profile-transfer-amount-hint-{{ $memberId }}" class="govuk-hint">{{ __('govuk_alpha.polish_members.send_credits_amount_hint') }}</div>
+                                    <input class="govuk-input govuk-!-width-one-quarter" type="number" id="profile-transfer-amount-{{ $memberId }}" name="amount" min="1" step="1" value="1" aria-describedby="profile-transfer-amount-hint-{{ $memberId }}" required>
+                                </div>
+                                <div class="govuk-form-group govuk-!-margin-bottom-3">
+                                    <label class="govuk-label govuk-label--s" for="profile-transfer-note-{{ $memberId }}">{{ __('govuk_alpha.polish_members.send_credits_note_label') }}</label>
+                                    <div id="profile-transfer-note-hint-{{ $memberId }}" class="govuk-hint">{{ __('govuk_alpha.polish_members.send_credits_note_hint') }}</div>
+                                    <input class="govuk-input" type="text" id="profile-transfer-note-{{ $memberId }}" name="note" maxlength="255" aria-describedby="profile-transfer-note-hint-{{ $memberId }}">
+                                </div>
+                                <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.polish_members.send_credits_submit') }}</button>
                             </form>
                         </div>
                     </details>
@@ -273,7 +363,10 @@
                         @endphp
                         <article class="nexus-alpha-card">
                             <h3 class="govuk-heading-m govuk-!-margin-bottom-1">{{ __('govuk_alpha.profile.review_by', ['name' => $reviewerName]) }}</h3>
-                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">{{ __('govuk_alpha.profile.rating_label') }} {{ (int) $review['rating'] }}</p>
+                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">
+                            <strong class="govuk-tag govuk-tag--blue">{{ (int) $review['rating'] }} / 5</strong>
+                            <span class="govuk-visually-hidden">{{ __('govuk_alpha.polish_members.rating_accessible', ['n' => (int) $review['rating']]) }}</span>
+                        </p>
                             @if (!empty($review['comment']))
                                 <div class="govuk-body">{!! nl2br(e((string) $review['comment'])) !!}</div>
                             @endif

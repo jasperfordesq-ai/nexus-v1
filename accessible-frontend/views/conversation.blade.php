@@ -130,7 +130,10 @@
                         <div class="govuk-body">{!! nl2br(e((string) ($message['body'] ?? ''))) !!}</div>
                     @endif
 
+                </li>
                     @if ($canManageMessage)
+                        {{-- Edit/delete controls live outside the <li> so the list item is not a
+                             mixed content node; the details element is still semantically adjacent. --}}
                         <details class="govuk-details" data-module="govuk-details">
                             <summary class="govuk-details__summary">
                                 <span class="govuk-details__summary-text">{{ __('govuk_alpha.messages.edit_delete_toggle') }}</span>
@@ -172,10 +175,26 @@
                             </div>
                         </details>
                     @endif
-                </li>
             @endforeach
         </ol>
     @endif
+
+    {{-- In-conversation message search (parity: React conversation search) --}}
+    <div class="nexus-alpha-card govuk-!-margin-top-6 govuk-!-margin-bottom-4">
+        <form method="get" action="{{ route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}">
+            <div class="govuk-form-group govuk-!-margin-bottom-2">
+                <label class="govuk-label" for="conv-search">{{ __('govuk_alpha.polish_members.conversation_filter_label') }}</label>
+                <div id="conv-search-hint" class="govuk-hint">{{ __('govuk_alpha.polish_members.conversation_filter_hint') }}</div>
+                <input class="govuk-input govuk-!-width-two-thirds" id="conv-search" name="q" type="search" value="{{ request('q', '') }}" aria-describedby="conv-search-hint">
+            </div>
+            <div class="govuk-button-group">
+                <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.polish_members.conversation_filter_submit') }}</button>
+                @if (request('q', '') !== '')
+                    <a class="govuk-link" href="{{ route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}">{{ __('govuk_alpha.polish_members.conversation_filter_clear') }}</a>
+                @endif
+            </div>
+        </form>
+    </div>
 
     @if ($canSend)
         <form method="post" action="{{ route('govuk-alpha.messages.store', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}" class="govuk-!-margin-top-7">
@@ -189,12 +208,20 @@
                 <div id="body-hint" class="govuk-hint">{{ __('govuk_alpha.messages.message_hint') }}</div>
                 <textarea class="govuk-textarea" id="body" name="body" rows="5" aria-describedby="body-hint" required></textarea>
             </div>
-            <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.reply') }}</button>
+            <div class="govuk-button-group">
+                <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.reply') }}</button>
+                <form method="post" action="{{ route('govuk-alpha.messages.archive', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}" style="display:inline">
+                    @csrf
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.actions.archive_conversation') }}</button>
+                </form>
+            </div>
         </form>
+    @else
+        <div class="govuk-button-group govuk-!-margin-top-4">
+            <form method="post" action="{{ route('govuk-alpha.messages.archive', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}">
+                @csrf
+                <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.actions.archive_conversation') }}</button>
+            </form>
+        </div>
     @endif
-
-    <form method="post" action="{{ route('govuk-alpha.messages.archive', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}" class="govuk-!-margin-top-4">
-        @csrf
-        <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.actions.archive_conversation') }}</button>
-    </form>
 @endsection

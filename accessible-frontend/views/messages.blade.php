@@ -12,6 +12,14 @@
     <span class="govuk-caption-l">{{ __('govuk_alpha.nav.messages') }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.messages.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.messages.description') }}</p>
+    @php
+        $totalUnread = (int) ($totalUnread ?? 0);
+    @endphp
+    @if ($totalUnread > 0)
+        <p class="govuk-body">
+            <strong class="govuk-tag govuk-tag--blue">{{ trans_choice('govuk_alpha.polish_members.messages_unread_summary', $totalUnread, ['count' => $totalUnread]) }}</strong>
+        </p>
+    @endif
 
     @php
         $canStartConversation = $directMessagingEnabled
@@ -82,17 +90,41 @@
         </div>
     @endif
 
-    <div class="govuk-tabs">
-        <h2 class="govuk-tabs__title">{{ __('govuk_alpha.messages.tabs_title') }}</h2>
-        <ul class="govuk-tabs__list">
-            <li class="govuk-tabs__list-item{{ !$showArchived ? ' govuk-tabs__list-item--selected' : '' }}">
-                <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.messages.inbox') }}</a>
+    {{-- Secondary navigation — server-side tab switching (no JS panel toggling).
+         Using <nav> instead of govuk-tabs because govuk-tabs needs data-module
+         and associated panel elements for proper progressive enhancement. --}}
+    <nav class="govuk-!-margin-bottom-4" aria-label="{{ __('govuk_alpha.messages.tabs_title') }}">
+        <ul class="govuk-list" style="display:flex;gap:1rem;list-style:none;padding:0;margin:0 0 1rem">
+            <li>
+                <a class="govuk-link{{ !$showArchived ? ' govuk-link--no-visited-state' : '' }}" href="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]) }}"
+                   @if (!$showArchived) aria-current="page" @endif>{{ __('govuk_alpha.messages.inbox') }}</a>
             </li>
-            <li class="govuk-tabs__list-item{{ $showArchived ? ' govuk-tabs__list-item--selected' : '' }}">
-                <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug, 'archived' => 1]) }}">{{ __('govuk_alpha.messages.archived') }}</a>
+            <li>
+                <a class="govuk-link{{ $showArchived ? ' govuk-link--no-visited-state' : '' }}" href="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug, 'archived' => 1]) }}"
+                   @if ($showArchived) aria-current="page" @endif>{{ __('govuk_alpha.messages.archived') }}</a>
             </li>
         </ul>
-    </div>
+    </nav>
+
+    {{-- Conversation filter by name (parity: React conversation search) --}}
+    @if (!empty($items))
+        <form method="get" action="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-5">
+            @if ($showArchived)
+                <input type="hidden" name="archived" value="1">
+            @endif
+            <div class="govuk-form-group govuk-!-margin-bottom-2">
+                <label class="govuk-label" for="conv-filter">{{ __('govuk_alpha.polish_members.messages_filter_label') }}</label>
+                <div id="conv-filter-hint" class="govuk-hint">{{ __('govuk_alpha.polish_members.messages_filter_hint') }}</div>
+                <input class="govuk-input govuk-!-width-two-thirds" id="conv-filter" name="filter" type="search" value="{{ $convFilter ?? '' }}" aria-describedby="conv-filter-hint">
+            </div>
+            <div class="govuk-button-group">
+                <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.polish_members.messages_filter_submit') }}</button>
+                @if (($convFilter ?? '') !== '')
+                    <a class="govuk-link" href="{{ route('govuk-alpha.messages.index', array_filter(['tenantSlug' => $tenantSlug, 'archived' => $showArchived ? 1 : null])) }}">{{ __('govuk_alpha.polish_members.messages_filter_clear') }}</a>
+                @endif
+            </div>
+        </form>
+    @endif
 
     @if (empty($items))
         <div class="govuk-inset-text">
