@@ -9,8 +9,14 @@
         $statusTag = [
             'draft' => 'govuk-tag--grey', 'pending' => 'govuk-tag--yellow', 'approved' => 'govuk-tag--blue',
             'active' => 'govuk-tag--turquoise', 'completed' => 'govuk-tag--green', 'cancelled' => 'govuk-tag--red',
+            'pending_participants' => 'govuk-tag--yellow', 'pending_broker' => 'govuk-tag--yellow',
+            'pending_confirmation' => 'govuk-tag--yellow', 'disputed' => 'govuk-tag--orange',
         ];
         $exStatus = in_array($exchange['status'] ?? '', array_keys($statusTag), true) ? $exchange['status'] : 'draft';
+        $statusLabel = function (string $s): string {
+            $k = 'govuk_alpha.group_exchanges.statuses.' . $s;
+            return \Illuminate\Support\Facades\Lang::has($k) ? __($k) : \Illuminate\Support\Str::headline($s);
+        };
         $isClosed = in_array($exStatus, ['completed', 'cancelled'], true);
         $successStates = ['created', 'participant-added', 'participant-removed', 'confirmed', 'completed', 'cancelled'];
         $errorStates = ['add-failed', 'complete-failed', 'failed'];
@@ -23,7 +29,7 @@
     <span class="govuk-caption-xl" id="group-exchange-top">{{ __('govuk_alpha.group_exchanges.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
     <div class="nexus-alpha-module-row">
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ $exchange['title'] ?: __('govuk_alpha.group_exchanges.title') }}</h1>
-        <strong class="govuk-tag {{ $statusTag[$exStatus] }}">{{ __('govuk_alpha.group_exchanges.statuses.' . $exStatus) }}</strong>
+        <strong class="govuk-tag {{ $statusTag[$exStatus] }}">{{ $statusLabel($exStatus) }}</strong>
     </div>
 
     @if (in_array($status, $successStates, true))

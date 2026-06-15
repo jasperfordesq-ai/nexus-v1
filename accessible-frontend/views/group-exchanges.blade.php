@@ -9,8 +9,16 @@
         $statusTag = [
             'draft' => 'govuk-tag--grey', 'pending' => 'govuk-tag--yellow', 'approved' => 'govuk-tag--blue',
             'active' => 'govuk-tag--turquoise', 'completed' => 'govuk-tag--green', 'cancelled' => 'govuk-tag--red',
+            // React also surfaces these workflow statuses — map them so they no
+            // longer silently render as "draft".
+            'pending_participants' => 'govuk-tag--yellow', 'pending_broker' => 'govuk-tag--yellow',
+            'pending_confirmation' => 'govuk-tag--yellow', 'disputed' => 'govuk-tag--orange',
         ];
-        $knownStatuses = ['draft', 'pending', 'approved', 'active', 'completed', 'cancelled'];
+        $knownStatuses = array_keys($statusTag);
+        $statusLabel = function (string $s): string {
+            $k = 'govuk_alpha.group_exchanges.statuses.' . $s;
+            return \Illuminate\Support\Facades\Lang::has($k) ? __($k) : \Illuminate\Support\Str::headline($s);
+        };
     @endphp
 
     <span class="govuk-caption-xl">{{ __('govuk_alpha.group_exchanges.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
@@ -52,7 +60,7 @@
                         <td class="govuk-table__cell">
                             <a class="govuk-link" href="{{ route('govuk-alpha.group-exchanges.show', ['tenantSlug' => $tenantSlug, 'id' => $e['id']]) }}">{{ $exTitle }}</a>
                         </td>
-                        <td class="govuk-table__cell"><strong class="govuk-tag {{ $statusTag[$st] }}">{{ __('govuk_alpha.group_exchanges.statuses.' . $st) }}</strong></td>
+                        <td class="govuk-table__cell"><strong class="govuk-tag {{ $statusTag[$st] }}">{{ $statusLabel($st) }}</strong></td>
                         <td class="govuk-table__cell govuk-table__cell--numeric">{{ number_format((float) ($e['total_hours'] ?? 0), 2) }}</td>
                     </tr>
                 @endforeach
