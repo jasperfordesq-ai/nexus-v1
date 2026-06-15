@@ -208,6 +208,10 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/groups/{id}/discussions/new', [AlphaController::class, 'storeGroupDiscussion'])->whereNumber('id')->middleware('throttle:15,1')->name('groups.discussions.store');
         Route::get('/groups/{id}/discussions/{discussionId}', [AlphaController::class, 'groupDiscussion'])->whereNumber('id')->whereNumber('discussionId')->name('groups.discussions.show');
         Route::post('/groups/{id}/discussions/{discussionId}/reply', [AlphaController::class, 'replyGroupDiscussion'])->whereNumber('id')->whereNumber('discussionId')->middleware('throttle:30,1')->name('groups.discussions.reply');
+        // ===== WAVE T1-GROUPS: group detail depth (events + feed tabs) =====
+        // Read tabs (events + feed) render inline on groups.show; this is the
+        // members-only compose endpoint for the group feed.
+        Route::post('/groups/{id}/feed', [AlphaController::class, 'storeGroupFeedPost'])->whereNumber('id')->middleware('throttle:30,1')->name('groups.feed.store');
         Route::get('/goals', [AlphaController::class, 'goals'])->name('goals.index');
         Route::post('/goals', [AlphaController::class, 'storeGoal'])->middleware('throttle:15,1')->name('goals.store');
         // Static goal sub-routes declared before /goals/{id} so they are never
