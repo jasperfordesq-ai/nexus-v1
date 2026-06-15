@@ -4633,6 +4633,64 @@ class GovukAlphaFrontendTest extends TestCase
         $resp->assertRedirectContains('status=export-failed');
     }
 
+    // ===== WAVE JOBS-T4: job alerts =====
+
+    public function test_jobs4_alerts_create_pause_resume_delete(): void
+    {
+        $member = $this->authenticatedUser(['name' => 'Alert Member']);
+
+        $empty = $this->get("/{$this->testTenantSlug}/alpha/jobs/alerts");
+        $empty->assertOk();
+        $empty->assertSee(__('govuk_alpha.jobs_t4.create_heading'));
+        $empty->assertSee(__('govuk_alpha.jobs_t4.empty'));
+
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/alerts", [
+            'keywords' => 'gardening',
+            'type' => 'volunteer',
+            'commitment' => 'flexible',
+        ])->assertRedirectContains('status=alert-created');
+
+        $alertId = (int) DB::table('job_alerts')->where('user_id', $member->id)->value('id');
+        $this->assertGreaterThan(0, $alertId);
+
+        $list = $this->get("/{$this->testTenantSlug}/alpha/jobs/alerts");
+        $list->assertSee('gardening');
+        $list->assertSee(__('govuk_alpha.jobs_t4.active_tag'));
+        $list->assertSee(__('govuk_alpha.jobs_t4.pause_button'));
+
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/alerts/{$alertId}/pause")
+            ->assertRedirectContains('status=alert-paused');
+        $this->assertSame(0, (int) DB::table('job_alerts')->where('id', $alertId)->value('is_active'));
+
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/alerts/{$alertId}/resume")
+            ->assertRedirectContains('status=alert-resumed');
+        $this->assertSame(1, (int) DB::table('job_alerts')->where('id', $alertId)->value('is_active'));
+
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/alerts/{$alertId}/delete")
+            ->assertRedirectContains('status=alert-deleted');
+        $this->assertSame(0, DB::table('job_alerts')->where('id', $alertId)->count());
+    }
+
+    public function test_jobs4_alert_actions_cannot_touch_another_members_alert(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $alertId = (int) DB::table('job_alerts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'keywords' => 'private',
+            'is_remote_only' => 0,
+            'is_active' => 1,
+            'created_at' => now(),
+        ]);
+
+        // A different member's pause/delete must be a no-op on the owner's alert.
+        $this->authenticatedUser(['name' => 'Intruder']);
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/alerts/{$alertId}/pause");
+        $this->assertSame(1, (int) DB::table('job_alerts')->where('id', $alertId)->value('is_active'));
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/alerts/{$alertId}/delete");
+        $this->assertSame(1, DB::table('job_alerts')->where('id', $alertId)->count());
+    }
+
     public function test_ideation_challenge_detail_submit_and_vote(): void
     {
         $member = $this->authenticatedUser(['name' => 'Idea Author']);

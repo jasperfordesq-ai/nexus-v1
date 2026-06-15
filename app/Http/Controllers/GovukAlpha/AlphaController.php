@@ -12320,4 +12320,120 @@ class AlphaController extends Controller
 
         return $messages !== [] ? $messages : [__('govuk_alpha.jobs_t3.error_generic')];
     }
+
+    // ===== WAVE JOBS-T4: job alerts =====
+
+    /** List the member's job alerts and the form to create a new one. */
+    public function jobAlerts(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $alerts = [];
+        try {
+            $alerts = app(\App\Services\JobVacancyService::class)->getAlerts($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::jobs-alerts', [
+            'title' => __('govuk_alpha.jobs_t4.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'jobsActiveTab' => 'alerts',
+            'alerts' => is_array($alerts) ? $alerts : [],
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Create a job alert subscription. */
+    public function subscribeJobAlert(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $data = [
+            'keywords' => trim(self::asStr($request->input('keywords'))),
+            'categories' => trim(self::asStr($request->input('categories'))),
+            'type' => self::asStr($this->allowed(self::asStr($request->input('type')), ['paid', 'volunteer', 'timebank'], '')),
+            'commitment' => self::asStr($this->allowed(self::asStr($request->input('commitment')), ['full_time', 'part_time', 'flexible', 'one_off'], '')),
+            'location' => trim(self::asStr($request->input('location'))),
+            'is_remote_only' => $request->input('is_remote_only') === '1',
+        ];
+
+        $newId = null;
+        try {
+            $newId = app(\App\Services\JobVacancyService::class)->subscribeAlert($userId, $data);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.jobs.alerts', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $newId !== null ? 'alert-created' : 'alert-failed',
+        ]);
+    }
+
+    /** Pause (deactivate) one of the member's alerts. */
+    public function pauseJobAlert(Request $request, string $tenantSlug, int $alertId): RedirectResponse
+    {
+        return $this->jobAlertAction($tenantSlug, $alertId, 'pause');
+    }
+
+    /** Resume (reactivate) one of the member's alerts. */
+    public function resumeJobAlert(Request $request, string $tenantSlug, int $alertId): RedirectResponse
+    {
+        return $this->jobAlertAction($tenantSlug, $alertId, 'resume');
+    }
+
+    /** Permanently delete one of the member's alerts. */
+    public function deleteJobAlert(Request $request, string $tenantSlug, int $alertId): RedirectResponse
+    {
+        return $this->jobAlertAction($tenantSlug, $alertId, 'delete');
+    }
+
+    /**
+     * Shared pause/resume/delete handler. Each service call is filtered by
+     * (id, user_id), so a member can only ever touch their own alerts.
+     */
+    private function jobAlertAction(string $tenantSlug, int $alertId, string $action): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $svc = app(\App\Services\JobVacancyService::class);
+        $status = 'alert-failed';
+        try {
+            switch ($action) {
+                case 'pause':
+                    $svc->unsubscribeAlert($alertId, $userId);
+                    $status = 'alert-paused';
+                    break;
+                case 'resume':
+                    $svc->resubscribeAlert($alertId, $userId);
+                    $status = 'alert-resumed';
+                    break;
+                case 'delete':
+                    $svc->deleteAlert($alertId, $userId);
+                    $status = 'alert-deleted';
+                    break;
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.jobs.alerts', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
 }

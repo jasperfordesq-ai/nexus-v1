@@ -239,6 +239,11 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/jobs/mine', [AlphaController::class, 'myJobPostings'])->name('jobs.mine');
         Route::get('/jobs/create', [AlphaController::class, 'createJobForm'])->name('jobs.create');
         Route::post('/jobs', [AlphaController::class, 'storeJob'])->middleware('throttle:10,1')->name('jobs.store');
+        Route::get('/jobs/alerts', [AlphaController::class, 'jobAlerts'])->name('jobs.alerts');
+        Route::post('/jobs/alerts', [AlphaController::class, 'subscribeJobAlert'])->middleware('throttle:15,1')->name('jobs.alerts.subscribe');
+        Route::post('/jobs/alerts/{alertId}/pause', [AlphaController::class, 'pauseJobAlert'])->whereNumber('alertId')->middleware('throttle:30,1')->name('jobs.alerts.pause');
+        Route::post('/jobs/alerts/{alertId}/resume', [AlphaController::class, 'resumeJobAlert'])->whereNumber('alertId')->middleware('throttle:30,1')->name('jobs.alerts.resume');
+        Route::post('/jobs/alerts/{alertId}/delete', [AlphaController::class, 'deleteJobAlert'])->whereNumber('alertId')->middleware('throttle:30,1')->name('jobs.alerts.delete');
         Route::get('/jobs/{id}', [AlphaController::class, 'job'])->whereNumber('id')->name('jobs.show');
         Route::get('/jobs/{id}/edit', [AlphaController::class, 'editJobForm'])->whereNumber('id')->name('jobs.edit');
         Route::post('/jobs/{id}/update', [AlphaController::class, 'updateJob'])->whereNumber('id')->middleware('throttle:20,1')->name('jobs.update');
