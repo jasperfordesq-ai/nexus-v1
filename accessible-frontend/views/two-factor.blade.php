@@ -45,12 +45,10 @@
                     <input class="govuk-input govuk-input--width-10{{ $hasError ? ' govuk-input--error' : '' }}" id="code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" autocapitalize="none" spellcheck="false" aria-describedby="code-hint{{ $hasError ? ' code-error' : '' }}">
                 </div>
 
-                <div class="govuk-form-group">
-                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-                        <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="use_backup_code" name="use_backup_code" type="checkbox" value="1">
-                            <label class="govuk-label govuk-checkboxes__label" for="use_backup_code">{{ __('govuk_alpha.auth.two_factor_use_backup_label') }}</label>
-                        </div>
+                <div class="govuk-checkboxes govuk-checkboxes--small govuk-!-margin-bottom-4" data-module="govuk-checkboxes">
+                    <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="use_backup_code" name="use_backup_code" type="checkbox" value="1">
+                        <label class="govuk-label govuk-checkboxes__label" for="use_backup_code">{{ __('govuk_alpha.auth.two_factor_use_backup_label') }}</label>
                     </div>
                 </div>
 

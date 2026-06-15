@@ -46,6 +46,81 @@
 
     <div class="govuk-inset-text">{{ __('govuk_alpha.polls.how_it_works') }}</div>
 
+    {{-- ===== Create poll form ===== --}}
+    <details class="govuk-details govuk-!-margin-bottom-6" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">{{ __('govuk_alpha.polish_discovery.polls_create_summary') }}</span>
+        </summary>
+        <div class="govuk-details__text">
+            @if ($status === 'poll-created')
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="poll-create-status" aria-live="polite">
+                    <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="poll-create-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
+                    <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.polish_discovery.polls_create_success') }}</p></div>
+                </div>
+            @elseif ($status === 'poll-create-failed')
+                <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+                    <div role="alert">
+                        <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                        <div class="govuk-error-summary__body"><p class="govuk-body">{{ __('govuk_alpha.polish_discovery.polls_create_failed') }}</p></div>
+                    </div>
+                </div>
+            @endif
+            <form method="post" action="{{ route('govuk-alpha.polls.store', ['tenantSlug' => $tenantSlug]) }}" novalidate>
+                @csrf
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-label--s" for="poll-question">{{ __('govuk_alpha.polish_discovery.polls_create_title_label') }}</label>
+                    <div id="poll-question-hint" class="govuk-hint">{{ __('govuk_alpha.polish_discovery.polls_create_title_hint') }}</div>
+                    <input class="govuk-input" id="poll-question" name="question" type="text" aria-describedby="poll-question-hint" required maxlength="500">
+                </div>
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-label--s" for="poll-description">{{ __('govuk_alpha.polish_discovery.polls_create_desc_label') }}</label>
+                    <div id="poll-desc-hint" class="govuk-hint">{{ __('govuk_alpha.polish_discovery.polls_create_desc_hint') }}</div>
+                    <textarea class="govuk-textarea" id="poll-description" name="description" rows="3" aria-describedby="poll-desc-hint" maxlength="2000"></textarea>
+                </div>
+                <fieldset class="govuk-fieldset govuk-!-margin-bottom-4">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        {{ __('govuk_alpha.polish_discovery.polls_create_options_legend') }}
+                        <span class="govuk-hint">{{ __('govuk_alpha.polish_discovery.polls_create_options_hint') }}</span>
+                    </legend>
+                    @foreach ([1, 2, 3, 4] as $n)
+                        <div class="govuk-form-group govuk-!-margin-bottom-2">
+                            <label class="govuk-label" for="poll-option-{{ $n }}">{{ __('govuk_alpha.polish_discovery.polls_create_option_label', ['num' => $n]) }}</label>
+                            <input class="govuk-input govuk-input--width-30" id="poll-option-{{ $n }}" name="options[]" type="text" maxlength="500"{{ $n <= 2 ? ' required' : '' }}>
+                        </div>
+                    @endforeach
+                </fieldset>
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-label--s" for="poll-expires">{{ __('govuk_alpha.polish_discovery.polls_create_expires_label') }}</label>
+                    <input class="govuk-input govuk-input--width-10" id="poll-expires" name="expires_at" type="date" min="{{ now()->addDay()->format('Y-m-d') }}">
+                </div>
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha.polish_discovery.polls_create_type_legend') }}</legend>
+                        <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="poll-type-single" name="poll_type" type="radio" value="standard" checked>
+                                <label class="govuk-label govuk-radios__label" for="poll-type-single">{{ __('govuk_alpha.polish_discovery.polls_create_type_single') }}</label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="poll-type-multiple" name="poll_type" type="radio" value="multiple">
+                                <label class="govuk-label govuk-radios__label" for="poll-type-multiple">{{ __('govuk_alpha.polish_discovery.polls_create_type_multiple') }}</label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="govuk-form-group">
+                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="poll-anonymous" name="is_anonymous" type="checkbox" value="1">
+                            <label class="govuk-label govuk-checkboxes__label" for="poll-anonymous">{{ __('govuk_alpha.polish_discovery.polls_create_anon_label') }}</label>
+                        </div>
+                    </div>
+                </div>
+                <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.polish_discovery.polls_create_submit') }}</button>
+            </form>
+        </div>
+    </details>
+
     @if (empty($polls))
         <p class="govuk-inset-text">{{ __('govuk_alpha.polls.empty') }}</p>
     @else
@@ -158,7 +233,7 @@
                                     @if ($isLeading)<strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.polls.leading') }}</strong>@endif
                                     @if ($isMine)<strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha.polls.your_choice') }}</strong>@endif
                                 </p>
-                                <progress max="100" value="{{ $pct }}" aria-label="{{ $pct }}%">{{ $pct }}%</progress>
+                                <progress max="100" value="{{ $pct }}" aria-label="{{ ($opt['text'] ?? ($opt['label'] ?? '')) }}: {{ $pct }}%">{{ $pct }}%</progress>
                                 <span class="govuk-body-s">{{ $pct }}% — {{ __('govuk_alpha.polls.per_option_votes', ['count' => $cnt]) }}</span>
                             </div>
                         @endforeach

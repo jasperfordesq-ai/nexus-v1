@@ -89,4 +89,65 @@
             </article>
         @endforeach
     </div>
+
+    {{-- ===== Live content: recent listings + upcoming events ===== --}}
+    @if (!empty($exploreRecentListings ?? []))
+        <h2 class="govuk-heading-l govuk-!-margin-top-8">{{ __('govuk_alpha.polish_discovery.explore_listings_title') }}</h2>
+        <ul class="govuk-list govuk-list--spaced govuk-!-margin-bottom-2">
+            @foreach ($exploreRecentListings as $lr)
+                @php
+                    $lrTitle = trim((string) ($lr['title'] ?? ''));
+                    $lrId = (int) ($lr['id'] ?? 0);
+                    $lrType = (($lr['type'] ?? 'offer') === 'request') ? 'request' : 'offer';
+                    $lrTagClass = $lrType === 'request' ? 'govuk-tag--purple' : 'govuk-tag--blue';
+                    $lrUrl = ($lrId > 0 && \Illuminate\Support\Facades\Route::has('govuk-alpha.listings.show'))
+                        ? route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $lrId])
+                        : '';
+                @endphp
+                @if ($lrTitle !== '')
+                    <li>
+                        @if ($lrUrl !== '')
+                            <a class="govuk-link" href="{{ $lrUrl }}">{{ $lrTitle }}</a>
+                        @else
+                            {{ $lrTitle }}
+                        @endif
+                        <strong class="govuk-tag {{ $lrTagClass }} govuk-!-margin-left-1">{{ __('govuk_alpha.listings.' . $lrType) }}</strong>
+                    </li>
+                @endif
+            @endforeach
+        </ul>
+        @if (\Illuminate\Support\Facades\Route::has('govuk-alpha.listings.index'))
+            <p class="govuk-body"><a class="govuk-link" href="{{ route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.polish_discovery.explore_view_all_listings') }}</a></p>
+        @endif
+    @endif
+
+    @if (!empty($exploreUpcomingEvents ?? []))
+        <h2 class="govuk-heading-l govuk-!-margin-top-6">{{ __('govuk_alpha.polish_discovery.explore_events_title') }}</h2>
+        <ul class="govuk-list govuk-list--spaced govuk-!-margin-bottom-2">
+            @foreach ($exploreUpcomingEvents as $ev)
+                @php
+                    $evTitle = trim((string) ($ev['title'] ?? ''));
+                    $evId = (int) ($ev['id'] ?? 0);
+                    $evDate = $ev['start_date'] ?? ($ev['event_date'] ?? null);
+                    $evWhen = $evDate ? \Illuminate\Support\Carbon::parse($evDate)->format('j M Y') : null;
+                    $evUrl = ($evId > 0 && \Illuminate\Support\Facades\Route::has('govuk-alpha.events.show'))
+                        ? route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $evId])
+                        : '';
+                @endphp
+                @if ($evTitle !== '')
+                    <li>
+                        @if ($evUrl !== '')
+                            <a class="govuk-link" href="{{ $evUrl }}">{{ $evTitle }}</a>
+                        @else
+                            {{ $evTitle }}
+                        @endif
+                        @if ($evWhen) <span class="govuk-body-s nexus-alpha-meta">— {{ $evWhen }}</span>@endif
+                    </li>
+                @endif
+            @endforeach
+        </ul>
+        @if (\Illuminate\Support\Facades\Route::has('govuk-alpha.events.index'))
+            <p class="govuk-body"><a class="govuk-link" href="{{ route('govuk-alpha.events.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.polish_discovery.explore_view_all_events') }}</a></p>
+        @endif
+    @endif
 @endsection

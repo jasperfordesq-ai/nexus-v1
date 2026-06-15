@@ -76,12 +76,12 @@
 
                 @if (($status ?? null) === 'comment-added')
                     <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="comment-status">
-                        <div class="govuk-notification-banner__header"><h3 class="govuk-notification-banner__title" id="comment-status">{{ __('govuk_alpha.states.success_title') }}</h3></div>
+                        <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="comment-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
                         <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.blog.comment_states.comment-added') }}</p></div>
                     </div>
                 @elseif (in_array($status ?? null, ['comment-invalid', 'comment-failed'], true))
                     <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
-                        <div role="alert"><h3 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h3>
+                        <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                             <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li><a href="#body">{{ __('govuk_alpha.blog.comment_states.' . $status) }}</a></li></ul></div></div>
                     </div>
                 @endif

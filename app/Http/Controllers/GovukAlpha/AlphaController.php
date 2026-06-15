@@ -3890,10 +3890,29 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
+        $recentListings = [];
+        $upcomingEvents = [];
+        try {
+            if (TenantContext::hasModule('listings')) {
+                $recentListings = \App\Services\ListingService::getAll(['limit' => 5, 'status' => 'active'])['items'] ?? [];
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        try {
+            if (TenantContext::hasFeature('events')) {
+                $upcomingEvents = \App\Services\EventService::getAll(['limit' => 5, 'when' => 'upcoming'])['items'] ?? [];
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         return $this->view('accessible-frontend::explore', [
             'title' => __('govuk_alpha.explore.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
+            'exploreRecentListings' => is_array($recentListings) ? $recentListings : [],
+            'exploreUpcomingEvents' => is_array($upcomingEvents) ? $upcomingEvents : [],
         ]);
     }
 
@@ -5218,9 +5237,11 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
+        $typeFilter = self::asStr($request->query('type'));
         $items = [];
         try {
-            $paginator = app(\App\Services\BookmarkService::class)->getUserBookmarks($userId, null, null, 1, 50);
+            $typeArg = $typeFilter !== '' ? $typeFilter : null;
+            $paginator = app(\App\Services\BookmarkService::class)->getUserBookmarks($userId, $typeArg, null, 1, 50);
             $items = method_exists($paginator, 'items') ? $paginator->items() : (array) $paginator;
             $items = array_map(static fn ($b) => is_array($b) ? $b : (array) $b, $items);
         } catch (\Throwable $e) {
@@ -5232,7 +5253,35 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'saved',
             'savedItems' => is_array($items) ? $items : [],
+            'savedTypeFilter' => $typeFilter,
             'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Remove a single bookmarked item (toggle off). */
+    public function destroySaved(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $type = self::asStr($request->input('type'));
+        $id = (int) $request->input('id');
+        $ok = false;
+        if ($type !== '' && $id > 0) {
+            try {
+                app(\App\Services\BookmarkService::class)->toggle($userId, $type, $id);
+                $ok = true;
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return redirect()->route('govuk-alpha.saved.index', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'bookmark-removed' : 'bookmark-failed',
         ]);
     }
 
@@ -5505,9 +5554,18 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
+        $statusFilter = self::asStr($request->query('status'));
+        $query = trim(self::asStr($request->query('q')));
+        $filters = ['limit' => 30];
+        if ($statusFilter !== '') {
+            $filters['status'] = $statusFilter;
+        }
+        if ($query !== '') {
+            $filters['search'] = $query;
+        }
         $items = [];
         try {
-            $items = app(\App\Services\IdeationChallengeService::class)->getAll(['limit' => 30])['items'] ?? [];
+            $items = app(\App\Services\IdeationChallengeService::class)->getAll($filters)['items'] ?? [];
         } catch (\Throwable $e) {
             report($e);
         }
@@ -5517,6 +5575,8 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
             'challenges' => is_array($items) ? $items : [],
+            'ideationStatus' => $statusFilter,
+            'ideationQuery' => $query,
         ]);
     }
 
@@ -7192,6 +7252,47 @@ class AlphaController extends Controller
         return redirect()->route('govuk-alpha.polls.index', [
             'tenantSlug' => $tenantSlug, 'status' => $ok ? 'voted' : 'vote-failed',
         ])->withFragment('poll-' . $pollId);
+    }
+
+    /** Create a new poll from the polls page form. */
+    public function storePoll(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('polls'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $question = trim(self::asStr($request->input('question')));
+        $rawOptions = $request->input('options', []);
+        $options = array_values(array_filter(
+            array_map(static fn ($o) => trim((string) $o), is_array($rawOptions) ? $rawOptions : [])
+        ));
+
+        if ($question === '' || count($options) < 2) {
+            return redirect()->route('govuk-alpha.polls.index', [
+                'tenantSlug' => $tenantSlug, 'status' => 'poll-create-failed',
+            ]);
+        }
+
+        $status = 'poll-create-failed';
+        try {
+            \App\Services\PollService::create($userId, [
+                'question'    => $question,
+                'description' => trim(self::asStr($request->input('description'))),
+                'expires_at'  => self::asStr($request->input('expires_at')) ?: null,
+                'poll_type'   => in_array($request->input('poll_type'), ['standard', 'multiple'], true)
+                    ? (string) $request->input('poll_type')
+                    : 'standard',
+                'options'     => $options,
+            ]);
+            $status = 'poll-created';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.polls.index', ['tenantSlug' => $tenantSlug, 'status' => $status]);
     }
 
     // === Group exchanges (multi-party time-credit exchanges) ===

@@ -65,20 +65,43 @@
         </div>
     @endif
 
-    <div class="nexus-alpha-actions govuk-!-margin-bottom-4">
-        <a class="govuk-link govuk-link--no-visited-state @if (!$notificationsUnreadOnly) govuk-!-font-weight-bold @endif" href="{{ route('govuk-alpha.notifications.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.notifications.all_filter') }}</a>
-        <a class="govuk-link govuk-link--no-visited-state @if ($notificationsUnreadOnly) govuk-!-font-weight-bold @endif" href="{{ route('govuk-alpha.notifications.index', ['tenantSlug' => $tenantSlug, 'filter' => 'unread']) }}">{{ __('govuk_alpha.notifications.unread_filter') }}@if ($unreadTotal > 0) ({{ $unreadTotal }})@endif</a>
-        @if ($unreadTotal > 0)
-            <form method="post" action="{{ route('govuk-alpha.notifications.read-all', ['tenantSlug' => $tenantSlug]) }}" class="nexus-alpha-linkform">
-                @csrf
-                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.notifications.mark_all_read') }}</button>
-            </form>
-        @endif
+    <div class="govuk-!-margin-bottom-4">
+        <p class="govuk-body govuk-!-margin-bottom-2">
+            <a class="govuk-link govuk-link--no-visited-state @if (!$notificationsUnreadOnly) govuk-!-font-weight-bold @endif"
+               href="{{ route('govuk-alpha.notifications.index', ['tenantSlug' => $tenantSlug]) }}"
+               @if (!$notificationsUnreadOnly) aria-current="true" @endif>{{ __('govuk_alpha.notifications.all_filter') }}</a>
+            &nbsp;·&nbsp;
+            <a class="govuk-link govuk-link--no-visited-state @if ($notificationsUnreadOnly) govuk-!-font-weight-bold @endif"
+               href="{{ route('govuk-alpha.notifications.index', ['tenantSlug' => $tenantSlug, 'filter' => 'unread']) }}"
+               @if ($notificationsUnreadOnly) aria-current="true" @endif>{{ __('govuk_alpha.notifications.unread_filter') }}@if ($unreadTotal > 0) ({{ $unreadTotal }})@endif</a>
+        </p>
+        <div class="govuk-button-group govuk-!-margin-bottom-2">
+            @if ($unreadTotal > 0)
+                <form method="post" action="{{ route('govuk-alpha.notifications.read-all', ['tenantSlug' => $tenantSlug]) }}">
+                    @csrf
+                    <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.notifications.mark_all_read') }}</button>
+                </form>
+            @endif
+        </div>
         @if (!empty($notifications))
-            <form method="post" action="{{ route('govuk-alpha.notifications.delete-all', ['tenantSlug' => $tenantSlug]) }}" class="nexus-alpha-linkform">
-                @csrf
-                <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.notifications.delete_all') }}</button>
-            </form>
+            <details class="govuk-details govuk-!-margin-bottom-2" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">{{ __('govuk_alpha.notifications.delete_all') }}</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <div class="govuk-warning-text">
+                        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                        <strong class="govuk-warning-text__text">
+                            <span class="govuk-warning-text__assistive">{{ __('govuk_alpha.states.warning_prefix') }}</span>
+                            {{ __('govuk_alpha.polish_discovery.notifications_delete_confirm_warning') }}
+                        </strong>
+                    </div>
+                    <form method="post" action="{{ route('govuk-alpha.notifications.delete-all', ['tenantSlug' => $tenantSlug]) }}">
+                        @csrf
+                        <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.polish_discovery.notifications_delete_confirm_button') }}</button>
+                    </form>
+                </div>
+            </details>
         @endif
     </div>
 

@@ -61,7 +61,7 @@
             <div class="govuk-notification-banner__content">
                 <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.states.auth_required') }}</p>
                 <p class="govuk-body">{{ __('govuk_alpha.feed.auth_required_detail', ['community' => $communityName]) }}</p>
-                <div class="nexus-alpha-actions">
+                <div class="govuk-button-group">
                     <a class="govuk-button" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.nav.login') }}</a>
                     <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.register', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.nav.register') }}</a>
                 </div>
@@ -86,7 +86,7 @@
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
                     <ul class="govuk-list govuk-error-summary__list">
-                        <li><a href="#content">{{ __('govuk_alpha.states.post_empty') }}</a></li>
+                        <li><a href="#content">{{ __('govuk_alpha.polish_discovery.feed_error_link_text') }}</a> — {{ __('govuk_alpha.states.post_empty') }}</li>
                     </ul>
                 </div>
             </div>
@@ -97,7 +97,7 @@
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
                     <ul class="govuk-list govuk-error-summary__list">
-                        <li><a href="#content">{{ __('govuk_alpha.states.post_failed') }}</a></li>
+                        <li><a href="#content">{{ __('govuk_alpha.polish_discovery.feed_error_link_text') }}</a> — {{ __('govuk_alpha.states.post_failed') }}</li>
                     </ul>
                 </div>
             </div>
@@ -368,7 +368,7 @@
                         {{ trans_choice('govuk_alpha.feed.comments', $commentCount, ['count' => $commentCount]) }}
                     </p>
                     @if (!$requiresAuth)
-                        <div class="nexus-alpha-actions govuk-!-margin-bottom-3">
+                        <div class="govuk-button-group govuk-!-margin-bottom-3">
                             <form method="post" action="{{ route('govuk-alpha.feed.items.like', ['tenantSlug' => $tenantSlug, 'type' => $itemType, 'id' => $itemId]) }}">
                                 @csrf
                                 @foreach ($preservedFeedInputs as $name => $value)
@@ -435,7 +435,13 @@
                                         <span class="govuk-details__summary-text">{{ __('govuk_alpha.feed.delete_post') }}</span>
                                     </summary>
                                     <div class="govuk-details__text">
-                                        <p class="govuk-body">{{ __('govuk_alpha.feed.delete_post_confirm') }}</p>
+                                        <div class="govuk-warning-text">
+                                            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                            <strong class="govuk-warning-text__text">
+                                                <span class="govuk-warning-text__assistive">{{ __('govuk_alpha.states.warning_prefix') }}</span>
+                                                {{ __('govuk_alpha.polish_discovery.delete_post_warning') }}
+                                            </strong>
+                                        </div>
                                         <form method="post" action="{{ route('govuk-alpha.feed.posts.delete', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}">
                                             @csrf
                                             <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.feed.delete_post_button') }}</button>
