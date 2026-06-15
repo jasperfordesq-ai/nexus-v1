@@ -90,4 +90,15 @@ return [
         'redirect_base' => env('SSO_REDIRECT_BASE'),
     ],
 
+    'slack' => [
+        // Incoming-webhook URL used by `email:health-alert` to page the
+        // operator when email deliverability degrades. When empty the command
+        // logs only (safe no-op) — email is deliberately NOT used as the alert
+        // channel because email problems are exactly what it watches for.
+        'email_alerts_webhook' => env('SLACK_EMAIL_ALERTS_WEBHOOK'),
+        // Base URL of the React app, used to deep-link Slack alerts to the
+        // /admin/email-deliverability dashboard.
+        'dashboard_url' => env('ADMIN_DASHBOARD_URL', 'https://app.project-nexus.ie'),
+    ],
+
 ];

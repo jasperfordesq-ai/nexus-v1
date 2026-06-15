@@ -91,6 +91,17 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('queue-verify-liveness');
 
+        // Proactive email-deliverability pager: runs the existing
+        // EmailMonitorService warning checks and pushes critical/warning issues
+        // to Slack (SLACK_EMAIL_ALERTS_WEBHOOK) so delivery problems surface
+        // before users report them. De-dupes identical issue sets internally,
+        // so hourly cadence will not spam a persistent problem.
+        $schedule->command('email:health-alert')
+            ->hourly()
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->name('email-health-alert');
+
         $schedule->command('safeguarding:purge-message-copies')
             ->weekly()
             ->withoutOverlapping()
