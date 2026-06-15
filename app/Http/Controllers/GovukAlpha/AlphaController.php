@@ -3357,11 +3357,35 @@ class AlphaController extends Controller
             $searchResults = $this->messageUserSearch($searchQuery, $userId);
         }
 
+        // Conversation name filter (parity: React inbox search).
+        $convFilter = trim(self::asStr($request->query('filter')));
+        $items = $result['items'] ?? [];
+        if ($convFilter !== '') {
+            $lcFilter = mb_strtolower($convFilter);
+            $items = array_values(array_filter($items, static function (array $conv) use ($lcFilter): bool {
+                $other = $conv['other_user'] ?? [];
+                $name = mb_strtolower(trim(
+                    ($other['name'] ?? '') !== ''
+                        ? (string) $other['name']
+                        : (string) ($other['first_name'] ?? '') . ' ' . (string) ($other['last_name'] ?? '')
+                ));
+                return $name === '' || str_contains($name, $lcFilter);
+            }));
+        }
+
+        // Total unread count across all conversations.
+        $totalUnread = 0;
+        try {
+            $totalUnread = (int) MessageService::getUnreadCount($userId);
+        } catch (\Throwable $e) {
+            // Unread count is best-effort.
+        }
+
         return $this->view('accessible-frontend::messages', [
             'title' => __('govuk_alpha.messages.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'messages',
-            'items' => $result['items'] ?? [],
+            'items' => $items,
             'meta' => ['has_more' => (bool) ($result['has_more'] ?? false), 'cursor' => $result['cursor'] ?? null],
             'showArchived' => $showArchived,
             'directMessagingEnabled' => BrokerControlConfigService::isDirectMessagingEnabled(),
@@ -3370,6 +3394,8 @@ class AlphaController extends Controller
             'currentUserId' => $userId,
             'searchQuery' => $searchQuery,
             'searchResults' => $searchResults,
+            'convFilter' => $convFilter,
+            'totalUnread' => $totalUnread,
         ]);
     }
 
@@ -7167,12 +7193,31 @@ class AlphaController extends Controller
         $received = [];
         $sent = [];
         $counts = ['received' => 0, 'sent' => 0, 'total_friends' => 0];
+        $connSearch = trim(self::asStr($request->query('q')));
 
         try {
-            $accepted = \App\Services\ConnectionService::getConnections($userId, ['status' => 'accepted', 'limit' => 50])['items'] ?? [];
+            $searchFilter = $connSearch !== '' ? ['q' => $connSearch] : [];
+            $accepted = \App\Services\ConnectionService::getConnections($userId, array_merge(['status' => 'accepted', 'limit' => 50], $searchFilter))['items'] ?? [];
             $received = \App\Services\ConnectionService::getConnections($userId, ['status' => 'pending_received', 'limit' => 50])['items'] ?? [];
             $sent = \App\Services\ConnectionService::getConnections($userId, ['status' => 'pending_sent', 'limit' => 50])['items'] ?? [];
             $counts = \App\Services\ConnectionService::getPendingCounts($userId);
+
+            // Client-side name filter fallback: if the service doesn't accept 'q', filter in PHP.
+            if ($connSearch !== '') {
+                $lcSearch = mb_strtolower($connSearch);
+                $nameOf = static function (array $c) use ($lcSearch): bool {
+                    $p = $c['partner'] ?? $c['user'] ?? [];
+                    $name = mb_strtolower(trim(
+                        ($p['name'] ?? '') !== ''
+                            ? (string) $p['name']
+                            : (string) ($p['first_name'] ?? '') . ' ' . (string) ($p['last_name'] ?? '')
+                    ));
+                    return $name === '' || str_contains($name, $lcSearch);
+                };
+                $accepted = array_values(array_filter($accepted, $nameOf));
+                $received = array_values(array_filter($received, $nameOf));
+                $sent     = array_values(array_filter($sent, $nameOf));
+            }
         } catch (\Throwable $e) {
             report($e);
         }
@@ -7185,6 +7230,7 @@ class AlphaController extends Controller
             'receivedRequests' => $received,
             'sentRequests' => $sent,
             'connectionCounts' => $counts,
+            'connSearch' => $connSearch,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -12862,5 +12908,170 @@ class AlphaController extends Controller
             'returnStatus' => $returnStatus,
             'tierName' => $tierName,
         ]);
+    }
+
+    // ===== WAVE NIGHT-MEMBERS: messages/connections/members/profile parity + polish =====
+
+    /**
+     * Store a review written directly from a member's profile page.
+     * Mirrors storeReview() but redirects back to the member's profile.
+     */
+    public function storeProfileReview(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('reviews'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Cross-tenant guard: member must belong to this tenant.
+        $memberExists = DB::table('users')
+            ->where('id', $id)
+            ->where('tenant_id', TenantContext::getId())
+            ->where('status', 'active')
+            ->exists();
+        if (!$memberExists) {
+            abort(404);
+        }
+
+        // Block self-review.
+        if ($id === $userId) {
+            return redirect()->route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'review-invalid']);
+        }
+
+        $receiverId = $id;
+        $rating     = (int) $request->input('rating');
+        $comment    = trim(self::asStr($request->input('comment')));
+
+        $data = [
+            'receiver_id' => $receiverId,
+            'rating'      => $rating,
+            'comment'     => $comment !== '' ? $comment : null,
+        ];
+
+        $status = 'review-submitted';
+        try {
+            $review = app(\App\Services\ReviewService::class)->create($userId, $data);
+
+            try {
+                \App\Services\GamificationService::awardXP($userId, \App\Services\GamificationService::XP_VALUES['leave_review'], 'leave_review', 'Left a review');
+            } catch (\Throwable $e) {
+                // Gamification is best-effort.
+            }
+
+            try {
+                app(\App\Services\FeedActivityService::class)->recordActivity(
+                    (int) TenantContext::getId(),
+                    $userId,
+                    'review',
+                    (int) ($review['id'] ?? 0),
+                    [
+                        'content'  => $review['comment'] ?? null,
+                        'metadata' => ['rating' => $review['rating'] ?? $rating, 'receiver_id' => $receiverId],
+                    ]
+                );
+            } catch (\Throwable $e) {
+                // Feed activity is best-effort.
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $status = 'review-invalid';
+        } catch (\RuntimeException $e) {
+            $status = str_contains($e->getMessage(), 'yourself') ? 'review-invalid' : 'review-duplicate';
+        } catch (\Throwable $e) {
+            report($e);
+            $status = 'review-failed';
+        }
+
+        return redirect()->route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
+    }
+
+    /**
+     * Transfer time credits directly from a member's profile page.
+     * Mirrors transferCredits() but redirects back to the member's profile.
+     */
+    public function profileTransferCredits(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('wallet'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $fail = fn (string $code): RedirectResponse => redirect()->route(
+            'govuk-alpha.members.show',
+            ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'transfer-' . $code]
+        );
+
+        // Block self-transfer.
+        if ($id === $userId) {
+            return $fail('self');
+        }
+
+        // Cross-tenant guard.
+        $sameTenant = DB::table('users')
+            ->where('id', $id)
+            ->where('tenant_id', TenantContext::getId())
+            ->exists();
+        if (!$sameTenant) {
+            abort(404);
+        }
+
+        $amount = (float) $request->input('amount');
+        $note   = trim(self::asStr($request->input('note')));
+
+        if ($amount <= 0 || floor($amount) !== $amount) {
+            return $fail('failed');
+        }
+
+        try {
+            app(\App\Services\WalletService::class)->transfer($userId, [
+                'recipient'   => $id,
+                'amount'      => $amount,
+                'description' => mb_substr($note, 0, 255),
+            ]);
+        } catch (\Throwable $e) {
+            $msg = $e->getMessage();
+            return $fail(match (true) {
+                str_contains($msg, 'Insufficient') => 'insufficient',
+                str_contains($msg, 'yourself')     => 'self',
+                default                            => 'failed',
+            });
+        }
+
+        return redirect()->route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'transfer-sent']);
+    }
+
+    /**
+     * Delete a review the current user wrote (given reviews).
+     * Parity: React allows deleting reviews from the reviews page.
+     */
+    public function deleteReview(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('reviews'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $status = 'review-delete-failed';
+        try {
+            $reviewSvc = app(\App\Services\ReviewService::class);
+            $review = $reviewSvc->getById($id);
+            // Only the reviewer may delete their own review.
+            if ($review && (int) ($review['reviewer_id'] ?? 0) === $userId) {
+                $reviewSvc->delete($id);
+                $status = 'review-deleted';
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.reviews.index', ['tenantSlug' => $tenantSlug, 'status' => $status]);
     }
 }

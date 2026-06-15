@@ -26,6 +26,21 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.connections.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.connections.description') }}</p>
 
+    {{-- Connection search/filter (parity: React connections search) --}}
+    <form method="get" action="{{ route('govuk-alpha.connections.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-5">
+        <div class="govuk-form-group govuk-!-margin-bottom-2">
+            <label class="govuk-label" for="conn-search">{{ __('govuk_alpha.polish_members.connections_search_label') }}</label>
+            <div id="conn-search-hint" class="govuk-hint">{{ __('govuk_alpha.polish_members.connections_search_hint') }}</div>
+            <input class="govuk-input govuk-!-width-two-thirds" id="conn-search" name="q" type="search" value="{{ $connSearch ?? '' }}" aria-describedby="conn-search-hint">
+        </div>
+        <div class="govuk-button-group">
+            <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.polish_members.connections_search_submit') }}</button>
+            @if (($connSearch ?? '') !== '')
+                <a class="govuk-link" href="{{ route('govuk-alpha.connections.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.polish_members.connections_search_clear') }}</a>
+            @endif
+        </div>
+    </form>
+
     @if (in_array($status, ['connection-accepted', 'connection-declined', 'connection-removed'], true))
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="conn-status-title">
             <div class="govuk-notification-banner__header">
@@ -67,14 +82,14 @@
                         <p class="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-2">{{ $partnerLoc($p) }}</p>
                     @endif
                     <p class="govuk-body-s govuk-!-margin-bottom-3">{{ __('govuk_alpha.connections.wants_to_connect') }}</p>
-                    <div class="nexus-alpha-actions">
-                        <form method="post" action="{{ route('govuk-alpha.connections.accept', ['tenantSlug' => $tenantSlug, 'id' => $cid]) }}" class="nexus-alpha-linkform">
+                    <div class="govuk-button-group">
+                        <form method="post" action="{{ route('govuk-alpha.connections.accept', ['tenantSlug' => $tenantSlug, 'id' => $cid]) }}">
                             @csrf
-                            <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.connections.accept_button') }}</button>
+                            <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.connections.accept_button') }}</button>
                         </form>
-                        <form method="post" action="{{ route('govuk-alpha.connections.decline', ['tenantSlug' => $tenantSlug, 'id' => $cid]) }}" class="nexus-alpha-linkform">
+                        <form method="post" action="{{ route('govuk-alpha.connections.decline', ['tenantSlug' => $tenantSlug, 'id' => $cid]) }}">
                             @csrf
-                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.connections.decline_button') }}</button>
+                            <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.connections.decline_button') }}</button>
                         </form>
                         @if (!empty($p['id']))
                             <a class="govuk-link govuk-link--no-visited-state" href="{{ route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $p['id']]) }}">{{ __('govuk_alpha.connections.view_profile') }}</a>
@@ -97,13 +112,13 @@
                     @if ($partnerLoc($p) !== '')
                         <p class="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-2">{{ $partnerLoc($p) }}</p>
                     @endif
-                    <div class="nexus-alpha-actions">
+                    <div class="govuk-button-group">
                         @if (!empty($p['id']))
                             <a class="govuk-link govuk-link--no-visited-state" href="{{ route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $p['id']]) }}">{{ __('govuk_alpha.connections.view_profile') }}</a>
                         @endif
-                        <form method="post" action="{{ route('govuk-alpha.connections.remove', ['tenantSlug' => $tenantSlug, 'id' => $cid]) }}" class="nexus-alpha-linkform">
+                        <form method="post" action="{{ route('govuk-alpha.connections.remove', ['tenantSlug' => $tenantSlug, 'id' => $cid]) }}">
                             @csrf
-                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.connections.remove_button') }}</button>
+                            <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.connections.remove_button') }}</button>
                         </form>
                     </div>
                 </div>
@@ -121,13 +136,13 @@
                 <div class="nexus-alpha-card govuk-!-margin-bottom-4">
                     <h3 class="govuk-heading-s govuk-!-margin-bottom-1">{{ $partnerName($p) }}</h3>
                     <p class="govuk-body-s govuk-!-margin-bottom-3">{{ __('govuk_alpha.connections.awaiting_response') }}</p>
-                    <div class="nexus-alpha-actions">
+                    <div class="govuk-button-group">
                         @if (!empty($p['id']))
                             <a class="govuk-link govuk-link--no-visited-state" href="{{ route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $p['id']]) }}">{{ __('govuk_alpha.connections.view_profile') }}</a>
                         @endif
-                        <form method="post" action="{{ route('govuk-alpha.connections.remove', ['tenantSlug' => $tenantSlug, 'id' => $cid]) }}" class="nexus-alpha-linkform">
+                        <form method="post" action="{{ route('govuk-alpha.connections.remove', ['tenantSlug' => $tenantSlug, 'id' => $cid]) }}">
                             @csrf
-                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.connections.cancel_button') }}</button>
+                            <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.connections.cancel_button') }}</button>
                         </form>
                     </div>
                 </div>

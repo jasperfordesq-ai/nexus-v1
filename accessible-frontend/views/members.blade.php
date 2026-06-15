@@ -123,6 +123,9 @@
                                     @if (!empty($member['is_verified']))
                                         <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.members.verified') }}</strong>
                                     @endif
+                                    @if (!empty($member['level']) && (int) $member['level'] > 0)
+                                        <strong class="govuk-tag govuk-tag--turquoise">{{ __('govuk_alpha.polish_members.member_level_label', ['n' => (int) $member['level']]) }}</strong>
+                                    @endif
                                     @switch($member['connection_state'] ?? 'none')
                                         @case('connected')
                                             <strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha.members.connection_connected') }}</strong>
@@ -135,6 +138,16 @@
                                             @break
                                     @endswitch
                                 </div>
+                                @if (!empty($member['badges']) && is_array($member['badges']))
+                                    <ul class="govuk-list" style="display:flex;gap:.25rem;flex-wrap:wrap;margin:0 0 .5rem;padding:0;list-style:none" aria-label="{{ __('govuk_alpha.polish_members.member_badges_label') }}">
+                                        @foreach (array_slice($member['badges'], 0, 5) as $badge)
+                                            <li>
+                                                @if (!empty($badge['icon']))<span aria-hidden="true">{{ $badge['icon'] }}</span>@endif
+                                                <strong class="govuk-tag govuk-tag--blue">{{ $badge['name'] ?? '' }}</strong>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
 
                                 @if (!empty($member['tagline']))
                                     <p class="govuk-body">{{ $member['tagline'] }}</p>
