@@ -354,4 +354,14 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/podcasts/{id}/subscribe', [AlphaController::class, 'podcastSubscribe'])->whereNumber('id')->middleware('throttle:30,1')->name('podcasts.subscribe');
         Route::get('/podcasts/{showId}/episodes/{id}', [AlphaController::class, 'podcastEpisode'])->whereNumber('showId')->whereNumber('id')->name('podcasts.episode');
         Route::get('/coupons/{id}', [AlphaController::class, 'couponShow'])->whereNumber('id')->name('coupons.show');
+
+        // ===== WAVE NIGHT-LISTINGS: save/unsave, renew, report, matches dismiss =====
+        // Static segments (save, unsave, renew, report) declared before {id} wildcard
+        // to prevent any routing collision. POSTs are rate-limited.
+        Route::post('/listings/{id}/save', [AlphaController::class, 'saveListing'])->whereNumber('id')->middleware('throttle:30,1')->name('listings.save');
+        Route::post('/listings/{id}/unsave', [AlphaController::class, 'unsaveListing'])->whereNumber('id')->middleware('throttle:30,1')->name('listings.unsave');
+        Route::post('/listings/{id}/renew', [AlphaController::class, 'renewListing'])->whereNumber('id')->middleware('throttle:10,1')->name('listings.renew');
+        Route::get('/listings/{id}/report', [AlphaController::class, 'listingReport'])->whereNumber('id')->name('listings.report');
+        Route::post('/listings/{id}/report', [AlphaController::class, 'storeListingReport'])->whereNumber('id')->middleware('throttle:5,60')->name('listings.report.store');
+        Route::post('/matches/{id}/dismiss', [AlphaController::class, 'dismissMatch'])->whereNumber('id')->middleware('throttle:60,1')->name('matches.dismiss');
     });

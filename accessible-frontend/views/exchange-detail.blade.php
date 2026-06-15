@@ -163,44 +163,54 @@
     @if (!$hasActions)
         <div class="govuk-inset-text">{{ __('govuk_alpha.exchanges.no_action') }}</div>
     @else
-        @if ($canAccept)
-            <form method="post" action="{{ route('govuk-alpha.exchanges.action.store', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}" class="govuk-!-margin-bottom-3">
-                @csrf
-                <input type="hidden" name="action" value="accept">
-                <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.accept') }}</button>
-            </form>
+        {{-- Primary / forward actions group: accept, start, complete, confirm --}}
+        @if ($canAccept || $canStart || $canComplete || $canConfirm)
+            <div class="govuk-button-group govuk-!-margin-bottom-5">
+                @if ($canAccept)
+                    <form method="post" action="{{ route('govuk-alpha.exchanges.action.store', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}">
+                        @csrf
+                        <input type="hidden" name="action" value="accept">
+                        <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.accept') }}</button>
+                    </form>
+                @endif
+                @if ($canStart)
+                    <form method="post" action="{{ route('govuk-alpha.exchanges.action.store', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}">
+                        @csrf
+                        <input type="hidden" name="action" value="start">
+                        <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.start_exchange') }}</button>
+                    </form>
+                @endif
+                @if ($canComplete)
+                    <form method="post" action="{{ route('govuk-alpha.exchanges.action.store', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}">
+                        @csrf
+                        <input type="hidden" name="action" value="complete">
+                        <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.mark_ready') }}</button>
+                    </form>
+                @endif
+            </div>
+            @if ($canConfirm)
+                <form method="post" action="{{ route('govuk-alpha.exchanges.action.store', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}" class="govuk-!-margin-bottom-5">
+                    @csrf
+                    <input type="hidden" name="action" value="confirm">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="hours">{{ __('govuk_alpha.exchanges.confirm_hours_label') }}</label>
+                        <div id="hours-hint" class="govuk-hint">{{ __('govuk_alpha.exchanges.confirm_hours_hint') }}</div>
+                        <input class="govuk-input govuk-input--width-5" id="hours" name="hours" type="number" min="0.25" max="24" step="0.25" value="{{ (float) ($exchange['proposed_hours'] ?? 1) }}" aria-describedby="hours-hint" required>
+                    </div>
+                    <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.confirm_hours') }}</button>
+                </form>
+            @endif
         @endif
 
-        @if ($canStart)
-            <form method="post" action="{{ route('govuk-alpha.exchanges.action.store', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}" class="govuk-!-margin-bottom-3">
-                @csrf
-                <input type="hidden" name="action" value="start">
-                <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.start_exchange') }}</button>
-            </form>
-        @endif
-
-        @if ($canComplete)
-            <form method="post" action="{{ route('govuk-alpha.exchanges.action.store', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}" class="govuk-!-margin-bottom-3">
-                @csrf
-                <input type="hidden" name="action" value="complete">
-                <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.mark_ready') }}</button>
-            </form>
-        @endif
-
-        @if ($canConfirm)
-            <form method="post" action="{{ route('govuk-alpha.exchanges.action.store', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}" class="govuk-!-margin-bottom-5">
-                @csrf
-                <input type="hidden" name="action" value="confirm">
-                <div class="govuk-form-group">
-                    <label class="govuk-label" for="hours">{{ __('govuk_alpha.exchanges.confirm_hours_label') }}</label>
-                    <div id="hours-hint" class="govuk-hint">{{ __('govuk_alpha.exchanges.confirm_hours_hint') }}</div>
-                    <input class="govuk-input govuk-input--width-5" id="hours" name="hours" type="number" min="0.25" max="24" step="0.25" value="{{ (float) ($exchange['proposed_hours'] ?? 1) }}" aria-describedby="hours-hint" required>
-                </div>
-                <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.confirm_hours') }}</button>
-            </form>
-        @endif
-
+        {{-- Destructive actions: decline, cancel — each gets a warning-text above the button --}}
         @if ($canDecline)
+            <div class="govuk-warning-text">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <strong class="govuk-warning-text__text">
+                    <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.important') }}</span>
+                    {{ __('govuk_alpha.polish_listings.exchange_warning_decline') }}
+                </strong>
+            </div>
             <form method="post" action="{{ route('govuk-alpha.exchanges.action.store', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}" class="govuk-!-margin-bottom-5">
                 @csrf
                 <input type="hidden" name="action" value="decline">
@@ -208,11 +218,20 @@
                     <label class="govuk-label" for="decline-reason">{{ __('govuk_alpha.exchanges.reason_label') }}</label>
                     <textarea class="govuk-textarea" id="decline-reason" name="reason" rows="3"></textarea>
                 </div>
-                <button class="govuk-button govuk-button--warning" data-module="govuk-button">{{ __('govuk_alpha.actions.decline') }}</button>
+                <div class="govuk-button-group">
+                    <button class="govuk-button govuk-button--warning" data-module="govuk-button">{{ __('govuk_alpha.actions.decline') }}</button>
+                </div>
             </form>
         @endif
 
         @if ($canCancel)
+            <div class="govuk-warning-text">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <strong class="govuk-warning-text__text">
+                    <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.important') }}</span>
+                    {{ __('govuk_alpha.polish_listings.exchange_warning_cancel') }}
+                </strong>
+            </div>
             <form method="post" action="{{ route('govuk-alpha.exchanges.action.store', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}">
                 @csrf
                 <input type="hidden" name="action" value="cancel">
@@ -220,7 +239,9 @@
                     <label class="govuk-label" for="cancel-reason">{{ __('govuk_alpha.exchanges.reason_label') }}</label>
                     <textarea class="govuk-textarea" id="cancel-reason" name="reason" rows="3"></textarea>
                 </div>
-                <button class="govuk-button govuk-button--warning" data-module="govuk-button">{{ __('govuk_alpha.actions.cancel_exchange') }}</button>
+                <div class="govuk-button-group">
+                    <button class="govuk-button govuk-button--warning" data-module="govuk-button">{{ __('govuk_alpha.actions.cancel_exchange') }}</button>
+                </div>
             </form>
         @endif
     @endif

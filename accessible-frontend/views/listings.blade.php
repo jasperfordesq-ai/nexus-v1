@@ -153,7 +153,7 @@
                     </div>
                 </details>
 
-                <div class="nexus-alpha-actions">
+                <div class="govuk-button-group">
                     <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.search') }}</button>
                     @if ($hasFilters)
                         <a class="govuk-link" href="{{ route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.clear_filters') }}</a>
@@ -212,6 +212,9 @@
                                 @endif
                                 @if ($showServiceBadge)
                                     <strong class="govuk-tag govuk-tag--turquoise">{{ __('govuk_alpha.listings.service_types.' . $serviceType) }}</strong>
+                                @endif
+                                @if ($isAuthenticated && in_array((int) $listing['id'], $savedListingIds ?? [], true))
+                                    <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.polish_listings.saved_tag') }}</strong>
                                 @endif
                                 <h3 class="govuk-heading-m govuk-!-margin-top-2 govuk-!-margin-bottom-2">
                                     <a class="govuk-link" href="{{ route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}">{{ $listing['title'] }}</a>

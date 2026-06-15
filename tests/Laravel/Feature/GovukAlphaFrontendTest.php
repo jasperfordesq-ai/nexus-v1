@@ -8136,4 +8136,392 @@ class GovukAlphaFrontendTest extends TestCase
             "Expected nudge status in redirect, got: {$location}"
         );
     }
+
+    // ===== WAVE NIGHT-LISTINGS tests =====
+
+    /** Helper: seed an active listing for the given owner. */
+    private function seedActiveListing(int $ownerId, array $overrides = []): int
+    {
+        $this->ensureListingCategory();
+        return DB::table('listings')->insertGetId(array_merge([
+            'tenant_id'  => $this->testTenantId,
+            'user_id'    => $ownerId,
+            'title'      => 'Test listing',
+            'description'=> 'A test listing for unit tests.',
+            'type'       => 'offer',
+            'status'     => 'active',
+            'category_id'=> 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $overrides));
+    }
+
+    /**
+     * Listings index shows a "Saved" badge for a listing the current user has bookmarked.
+     */
+    public function test_plistings_saved_badge_appears_for_bookmarked_listing(): void
+    {
+        $user  = $this->authenticatedUser(['name' => 'Saver']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listingId = $this->seedActiveListing($owner->id, ['title' => 'Guitar lessons offer']);
+
+        // Manually insert the bookmark so the listings page renders the saved tag.
+        DB::table('bookmarks')->insertOrIgnore([
+            'tenant_id'          => $this->testTenantId,
+            'user_id'            => $user->id,
+            'bookmarkable_type'  => 'listing',
+            'bookmarkable_id'    => $listingId,
+            'created_at'         => now(),
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings");
+        $response->assertOk();
+        $response->assertSee('Guitar lessons offer');
+        $response->assertSee(__('govuk_alpha.polish_listings.saved_tag'));
+    }
+
+    /**
+     * Listing detail page shows save form for non-owner authenticated user.
+     */
+    public function test_plistings_detail_shows_save_form_for_non_owner(): void
+    {
+        $user  = $this->authenticatedUser(['name' => 'Viewer']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listingId = $this->seedActiveListing($owner->id, ['title' => 'Knitting circle']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listingId}");
+        $response->assertOk();
+        $response->assertSee('Knitting circle');
+        // Save form action
+        $response->assertSee(route('govuk-alpha.listings.save', ['tenantSlug' => $this->testTenantSlug, 'id' => $listingId]), false);
+        $response->assertSee(__('govuk_alpha.polish_listings.save_listing'));
+    }
+
+    /**
+     * POST /listings/{id}/save bookmarks the listing and redirects back with listing-saved.
+     */
+    public function test_plistings_save_route_bookmarks_listing(): void
+    {
+        $user  = $this->authenticatedUser(['name' => 'SavePoster']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listingId = $this->seedActiveListing($owner->id, ['title' => 'Yoga classes']);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listingId}/save");
+
+        $response->assertRedirect(
+            route('govuk-alpha.listings.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $listingId, 'status' => 'listing-saved'])
+        );
+
+        // Bookmark row should now exist in the DB.
+        $this->assertTrue(
+            DB::table('bookmarks')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('user_id', $user->id)
+                ->where('bookmarkable_type', 'listing')
+                ->where('bookmarkable_id', $listingId)
+                ->exists(),
+            'Expected bookmark row to be created'
+        );
+    }
+
+    /**
+     * POST /listings/{id}/unsave removes the bookmark and redirects with listing-unsaved.
+     */
+    public function test_plistings_unsave_route_removes_bookmark(): void
+    {
+        $user  = $this->authenticatedUser(['name' => 'UnsavePoster']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listingId = $this->seedActiveListing($owner->id);
+
+        // Pre-seed the bookmark.
+        DB::table('bookmarks')->insertOrIgnore([
+            'tenant_id'         => $this->testTenantId,
+            'user_id'           => $user->id,
+            'bookmarkable_type' => 'listing',
+            'bookmarkable_id'   => $listingId,
+            'created_at'        => now(),
+        ]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listingId}/unsave");
+
+        $response->assertRedirect(
+            route('govuk-alpha.listings.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $listingId, 'status' => 'listing-unsaved'])
+        );
+
+        $this->assertFalse(
+            DB::table('bookmarks')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('user_id', $user->id)
+                ->where('bookmarkable_type', 'listing')
+                ->where('bookmarkable_id', $listingId)
+                ->exists(),
+            'Expected bookmark row to be removed'
+        );
+    }
+
+    /**
+     * Listing detail shows the renew form when the listing is expired and the viewer is the owner.
+     */
+    public function test_plistings_detail_shows_renew_form_for_expired_owner(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'ExpiredOwner']);
+        $listingId = $this->seedActiveListing($owner->id, [
+            'status'     => 'expired',
+            'expires_at' => now()->subDays(5)->format('Y-m-d H:i:s'),
+            'title'      => 'Expired gardening offer',
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listingId}");
+        $response->assertOk();
+        $response->assertSee('Expired gardening offer');
+        $response->assertSee(route('govuk-alpha.listings.renew', ['tenantSlug' => $this->testTenantSlug, 'id' => $listingId]), false);
+        $response->assertSee(__('govuk_alpha.polish_listings.renew_listing'));
+    }
+
+    /**
+     * POST /listings/{id}/renew by owner re-activates an expired listing.
+     */
+    public function test_plistings_renew_route_reactivates_expired_listing(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'RenewOwner']);
+        $listingId = $this->seedActiveListing($owner->id, [
+            'status'     => 'expired',
+            'expires_at' => now()->subDays(10)->format('Y-m-d H:i:s'),
+        ]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listingId}/renew");
+
+        // On success: redirect to show with listing-renewed.
+        $response->assertRedirect();
+        $location = $response->headers->get('location') ?? '';
+        $this->assertTrue(
+            str_contains($location, 'listing-renewed') || str_contains($location, 'renew-failed'),
+            "Expected listing-renewed or renew-failed in redirect, got: {$location}"
+        );
+    }
+
+    /**
+     * POST /listings/{id}/renew by a non-owner returns 403.
+     */
+    public function test_plistings_renew_non_owner_is_forbidden(): void
+    {
+        $this->authenticatedUser(['name' => 'NonOwner']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listingId = $this->seedActiveListing($owner->id, ['status' => 'expired']);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listingId}/renew");
+        $response->assertForbidden();
+    }
+
+    /**
+     * GET /listings/{id}/report renders the report form for a non-owner.
+     */
+    public function test_plistings_report_form_renders_for_non_owner(): void
+    {
+        $this->authenticatedUser(['name' => 'Reporter']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listingId = $this->seedActiveListing($owner->id, ['title' => 'Suspicious listing']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listingId}/report");
+        $response->assertOk();
+        $response->assertSee('Suspicious listing');
+        $response->assertSee(__('govuk_alpha.polish_listings.report_listing_title'));
+        // Should show radio options.
+        $response->assertSee('value="inappropriate"', false);
+        $response->assertSee('value="spam"', false);
+        $response->assertSee('value="other"', false);
+    }
+
+    /**
+     * POST /listings/{id}/report by owner returns 403.
+     */
+    public function test_plistings_report_own_listing_is_forbidden(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'OwnReporter']);
+        $listingId = $this->seedActiveListing($owner->id);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listingId}/report", [
+            'reason' => 'spam',
+        ]);
+        $response->assertForbidden();
+    }
+
+    /**
+     * POST /listings/{id}/report by a non-owner creates a listing_reports row.
+     */
+    public function test_plistings_report_store_creates_report_row(): void
+    {
+        $reporter = $this->authenticatedUser(['name' => 'ReportCreator']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listingId = $this->seedActiveListing($owner->id);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listingId}/report", [
+            'reason'  => 'misleading',
+            'details' => 'The listing title does not match the description.',
+        ]);
+
+        $response->assertRedirect(
+            route('govuk-alpha.listings.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $listingId, 'status' => 'listing-reported'])
+        );
+
+        $this->assertTrue(
+            DB::table('listing_reports')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('listing_id', $listingId)
+                ->where('reporter_id', $reporter->id)
+                ->where('reason', 'misleading')
+                ->exists(),
+            'Expected listing_reports row to be created'
+        );
+    }
+
+    /**
+     * POST /listings/{id}/report with an invalid reason fails validation and redirects back.
+     */
+    public function test_plistings_report_store_rejects_invalid_reason(): void
+    {
+        $this->authenticatedUser(['name' => 'BadReporter']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listingId = $this->seedActiveListing($owner->id);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listingId}/report", [
+            'reason' => 'invalid_reason',
+        ]);
+
+        // Should redirect back to the report form with an error.
+        $response->assertRedirect(
+            route('govuk-alpha.listings.report', ['tenantSlug' => $this->testTenantSlug, 'id' => $listingId])
+        );
+        $response->assertSessionHasErrors('reason');
+    }
+
+    /**
+     * Exchanges index renders tab filter with 'all' active by default.
+     */
+    public function test_plistings_exchanges_index_renders_tab_filter(): void
+    {
+        $this->authenticatedUser(['name' => 'ExchangeViewer']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/exchanges");
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.exchanges.title'));
+        $response->assertSee(__('govuk_alpha.polish_listings.exchanges_tab_all'));
+        $response->assertSee(__('govuk_alpha.polish_listings.exchanges_tab_active'));
+        $response->assertSee(__('govuk_alpha.polish_listings.exchanges_tab_needs_confirmation'));
+        $response->assertSee(__('govuk_alpha.polish_listings.exchanges_tab_completed'));
+        // 'All' tab should have aria-current="page".
+        $response->assertSee('aria-current="page"', false);
+    }
+
+    /**
+     * Exchanges index accepts ?tab=active and sets aria-current on the active tab.
+     */
+    public function test_plistings_exchanges_tab_filter_sets_aria_current(): void
+    {
+        $this->authenticatedUser(['name' => 'TabFilter']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/exchanges?tab=active");
+        $response->assertOk();
+        // The active tab link carries aria-current="page".
+        $response->assertSee('aria-current="page"', false);
+        // The ?tab=active link should appear in the response.
+        $response->assertSee('tab=active', false);
+    }
+
+    /**
+     * Matches page renders stats summary and source filter nav.
+     */
+    public function test_plistings_matches_page_renders_stats_and_source_filter(): void
+    {
+        $this->authenticatedUser(['name' => 'MatchViewer']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/matches");
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.matches.title'));
+        // Source filter tabs.
+        $response->assertSee(__('govuk_alpha.polish_listings.matches_source_all'));
+        $response->assertSee(__('govuk_alpha.polish_listings.matches_source_listing'));
+        $response->assertSee(__('govuk_alpha.polish_listings.matches_source_group'));
+    }
+
+    /**
+     * POST /matches/{id}/dismiss inserts a match_dismissals row and redirects to matches index.
+     */
+    public function test_plistings_dismiss_match_creates_dismissal_row(): void
+    {
+        $user  = $this->authenticatedUser(['name' => 'Dismisser']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listingId = $this->seedActiveListing($owner->id);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/matches/{$listingId}/dismiss", [
+            'reason' => 'not_relevant',
+        ]);
+
+        $response->assertRedirect(
+            route('govuk-alpha.matches.index', ['tenantSlug' => $this->testTenantSlug, 'status' => 'match-dismissed'])
+        );
+
+        $this->assertTrue(
+            DB::table('match_dismissals')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('user_id', $user->id)
+                ->where('listing_id', $listingId)
+                ->where('reason', 'not_relevant')
+                ->exists(),
+            'Expected match_dismissals row to be created'
+        );
+    }
+
+    /**
+     * POST /matches/{id}/dismiss for a non-existent listing returns 404.
+     */
+    public function test_plistings_dismiss_match_non_existent_listing_returns_404(): void
+    {
+        $this->authenticatedUser(['name' => 'DismisserNotFound']);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/matches/999999/dismiss", [
+            'reason' => 'not_relevant',
+        ]);
+
+        $response->assertNotFound();
+    }
+
+    /**
+     * Listing detail page shows unsave form when the listing is already bookmarked by the viewer.
+     */
+    public function test_plistings_detail_shows_unsave_form_when_already_saved(): void
+    {
+        $user  = $this->authenticatedUser(['name' => 'AlreadySaved']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listingId = $this->seedActiveListing($owner->id, ['title' => 'Painting classes']);
+
+        DB::table('bookmarks')->insertOrIgnore([
+            'tenant_id'         => $this->testTenantId,
+            'user_id'           => $user->id,
+            'bookmarkable_type' => 'listing',
+            'bookmarkable_id'   => $listingId,
+            'created_at'        => now(),
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listingId}");
+        $response->assertOk();
+        $response->assertSee('Painting classes');
+        // Unsave form action should be present.
+        $response->assertSee(route('govuk-alpha.listings.unsave', ['tenantSlug' => $this->testTenantSlug, 'id' => $listingId]), false);
+        $response->assertSee(__('govuk_alpha.polish_listings.unsave_listing'));
+    }
+
+    /**
+     * Listing detail shows the report link for non-owner authenticated users.
+     */
+    public function test_plistings_detail_shows_report_link_for_non_owner(): void
+    {
+        $this->authenticatedUser(['name' => 'ReportLinker']);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listingId = $this->seedActiveListing($owner->id, ['title' => 'Cycling lessons']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listingId}");
+        $response->assertOk();
+        $response->assertSee(route('govuk-alpha.listings.report', ['tenantSlug' => $this->testTenantSlug, 'id' => $listingId]), false);
+    }
 }

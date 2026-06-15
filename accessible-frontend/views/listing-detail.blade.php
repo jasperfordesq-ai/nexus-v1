@@ -110,6 +110,8 @@
         </div>
     </div>
 
+    <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
     <h2 class="govuk-heading-l">{{ __('govuk_alpha.listings.summary_title') }}</h2>
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
@@ -181,7 +183,7 @@
     </dl>
 
     @if ($authorName)
-        <h2 class="govuk-heading-l">{{ __('govuk_alpha.listings.author_title') }}</h2>
+        <h2 class="govuk-heading-l govuk-!-margin-top-6">{{ __('govuk_alpha.listings.author_title') }}</h2>
         <div class="nexus-alpha-summary govuk-!-margin-bottom-7">
             <div>
                 @if (!empty($authorAvatar))
@@ -218,6 +220,40 @@
         </div>
     @endif
 
+    {{-- Save / unsave action + share URL + report link --}}
+    <div class="govuk-button-group govuk-!-margin-top-4 govuk-!-margin-bottom-2">
+        @if ($isAuthenticated && !$isOwner)
+            @if ($isSaved ?? false)
+                <form method="post" action="{{ route('govuk-alpha.listings.unsave', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}">
+                    @csrf
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        {{ __('govuk_alpha.polish_listings.unsave_listing') }}
+                        <span class="govuk-visually-hidden">{{ __('govuk_alpha.polish_listings.unsave_listing_for', ['title' => $listing['title']]) }}</span>
+                    </button>
+                </form>
+            @else
+                <form method="post" action="{{ route('govuk-alpha.listings.save', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}">
+                    @csrf
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        {{ __('govuk_alpha.polish_listings.save_listing') }}
+                        <span class="govuk-visually-hidden">{{ __('govuk_alpha.polish_listings.save_listing_for', ['title' => $listing['title']]) }}</span>
+                    </button>
+                </form>
+            @endif
+        @endif
+        @if ($isAuthenticated && !$isOwner)
+            <a class="govuk-link" href="{{ route('govuk-alpha.listings.report', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}">{{ __('govuk_alpha.polish_listings.report_listing_title') }}</a>
+        @endif
+    </div>
+
+    <div class="govuk-inset-text govuk-!-margin-bottom-7">
+        <p class="govuk-body govuk-!-margin-bottom-1"><strong>{{ __('govuk_alpha.listings.share_link_label') }}</strong></p>
+        <p class="govuk-body govuk-!-margin-bottom-0" style="word-break:break-all;">{{ url()->current() }}</p>
+    </div>
+
+    </div>{{-- /govuk-grid-column-two-thirds (summary + author) --}}
+    </div>{{-- /govuk-grid-row --}}
+
     <section class="govuk-!-margin-top-7 govuk-!-margin-bottom-8" aria-labelledby="listing-exchange-title">
         <h2 class="govuk-heading-l" id="listing-exchange-title">{{ __('govuk_alpha.listings.exchange_title') }}</h2>
 
@@ -228,7 +264,7 @@
                 </div>
                 <div class="govuk-notification-banner__content">
                     <p class="govuk-body">{{ __('govuk_alpha.listings.auth_required_detail') }}</p>
-                    <div class="nexus-alpha-actions">
+                    <div class="govuk-button-group">
                         <a class="govuk-button" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.nav.login') }}</a>
                         <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.register', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.nav.register') }}</a>
                     </div>
@@ -236,9 +272,18 @@
             </div>
         @elseif ($isOwner)
             <div class="govuk-inset-text">{{ __('govuk_alpha.listings.own_listing_detail') }}</div>
-            <div class="nexus-alpha-actions">
+            <div class="govuk-button-group">
                 <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.listings.edit', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.listings.edit.edit_listing') }}</a>
             </div>
+            @if (($statusValue ?? '') === 'expired' || !empty($listing['expires_at']))
+                @if (($statusValue ?? '') === 'expired')
+                    <p class="govuk-hint">{{ __('govuk_alpha.polish_listings.renew_listing_hint') }}</p>
+                    <form method="post" action="{{ route('govuk-alpha.listings.renew', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}">
+                        @csrf
+                        <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.polish_listings.renew_listing') }}</button>
+                    </form>
+                @endif
+            @endif
         @elseif ($exchangeWorkflowEnabled)
             @if ($activeExchange)
                 <div class="govuk-inset-text">
