@@ -6713,4 +6713,228 @@ class GovukAlphaFrontendTest extends TestCase
         $this->get("/{$this->testTenantSlug}/alpha/federation/connections")->assertForbidden();
         $this->get("/{$this->testTenantSlug}/alpha/federation/messages")->assertForbidden();
     }
+
+    // ===== WAVE T1-FEED: feed engagement =====
+
+    /**
+     * Seed a public feed post (with a feed_activity row so it surfaces in the
+     * feed) owned by the given user and return its id.
+     */
+    private function t1feedSeedPost(int $ownerId, string $content = 'T1 feed post'): int
+    {
+        $post = FeedPost::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $ownerId,
+            'content' => $content,
+            'visibility' => 'public',
+        ]);
+        FeedActivity::factory()->forTenant($this->testTenantId)->create([
+            'source_type' => 'post',
+            'source_id' => $post->id,
+            'user_id' => $ownerId,
+            'content' => $content,
+            'created_at' => now()->addMinute(),
+        ]);
+
+        return (int) $post->id;
+    }
+
+    public function test_t1feed_post_reaction_toggles_a_reactions_row(): void
+    {
+        $user = $this->authenticatedUser();
+        $postId = $this->t1feedSeedPost((int) $user->id);
+
+        // Add a reaction.
+        $add = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$postId}/react", ['emoji' => 'like']);
+        $add->assertRedirectContains('status=reaction-added');
+        $this->assertDatabaseHas('reactions', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'emoji' => 'like',
+        ]);
+
+        // Submitting the same reaction again removes it (toggle off).
+        $remove = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$postId}/react", ['emoji' => 'like']);
+        $remove->assertRedirectContains('status=reaction-removed');
+        $this->assertDatabaseMissing('reactions', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'emoji' => 'like',
+        ]);
+    }
+
+    public function test_t1feed_post_reaction_rejects_unsupported_emoji(): void
+    {
+        $user = $this->authenticatedUser();
+        $postId = $this->t1feedSeedPost((int) $user->id);
+
+        // 'wow' is a backend-valid type but NOT in the accessible curated set —
+        // it must be rejected before touching the reactions table.
+        $resp = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$postId}/react", ['emoji' => 'wow']);
+        $resp->assertRedirectContains('status=reaction-failed');
+        $this->assertDatabaseMissing('reactions', [
+            'tenant_id' => $this->testTenantId,
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'emoji' => 'wow',
+        ]);
+    }
+
+    public function test_t1feed_comment_reaction_toggles_a_reactions_row(): void
+    {
+        $user = $this->authenticatedUser();
+        $postId = $this->t1feedSeedPost((int) $user->id);
+
+        $commentId = (int) DB::table('comments')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'content' => 'A comment to react to.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $add = $this->post("/{$this->testTenantSlug}/alpha/feed/comments/{$commentId}/react", ['emoji' => 'love']);
+        $add->assertRedirectContains('status=reaction-added');
+        $this->assertDatabaseHas('reactions', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'target_type' => 'comment',
+            'target_id' => $commentId,
+            'emoji' => 'love',
+        ]);
+    }
+
+    public function test_t1feed_share_creates_a_post_share(): void
+    {
+        $author = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $postId = $this->t1feedSeedPost((int) $author->id, 'Shareable post');
+
+        // A DIFFERENT member shares it (self-share is blocked by the service).
+        $sharer = $this->authenticatedUser();
+        $share = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$postId}/share");
+        $share->assertRedirectContains('status=share-added');
+        $this->assertDatabaseHas('post_shares', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $sharer->id,
+            'original_type' => 'post',
+            'original_post_id' => $postId,
+        ]);
+
+        // Toggling again removes the share.
+        $unshare = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$postId}/share");
+        $unshare->assertRedirectContains('status=share-removed');
+        $this->assertDatabaseMissing('post_shares', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $sharer->id,
+            'original_type' => 'post',
+            'original_post_id' => $postId,
+        ]);
+    }
+
+    public function test_t1feed_share_blocks_self_share(): void
+    {
+        $user = $this->authenticatedUser();
+        $postId = $this->t1feedSeedPost((int) $user->id, 'My own post');
+
+        $resp = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$postId}/share");
+        $resp->assertRedirectContains('status=share-own');
+        $this->assertDatabaseMissing('post_shares', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'original_type' => 'post',
+            'original_post_id' => $postId,
+        ]);
+    }
+
+    public function test_t1feed_save_bookmarks_the_post(): void
+    {
+        $user = $this->authenticatedUser();
+        $postId = $this->t1feedSeedPost((int) $user->id);
+
+        $save = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$postId}/save");
+        $save->assertRedirectContains('status=save-added');
+        $this->assertDatabaseHas('bookmarks', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'bookmarkable_type' => 'post',
+            'bookmarkable_id' => $postId,
+        ]);
+
+        // Toggling again removes the bookmark.
+        $unsave = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$postId}/save");
+        $unsave->assertRedirectContains('status=save-removed');
+        $this->assertDatabaseMissing('bookmarks', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'bookmarkable_type' => 'post',
+            'bookmarkable_id' => $postId,
+        ]);
+    }
+
+    public function test_t1feed_permalink_renders_post_and_comment(): void
+    {
+        $user = $this->authenticatedUser();
+        $postId = $this->t1feedSeedPost((int) $user->id, 'Permalink target post body');
+
+        DB::table('comments')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'target_type' => 'post',
+            'target_id' => $postId,
+            'content' => 'A permalink comment shows here.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $resp = $this->get("/{$this->testTenantSlug}/alpha/feed/posts/{$postId}");
+        $resp->assertOk();
+        $resp->assertHeader('content-type', 'text/html; charset=UTF-8');
+        $resp->assertSee('Permalink target post body');
+        $resp->assertSee('A permalink comment shows here.');
+        // The reaction + save submit-buttons render for the post (the post is the
+        // viewer's own, so the share button is intentionally hidden — self-share
+        // is not allowed).
+        $resp->assertSee(route('govuk-alpha.feed.posts.react', ['tenantSlug' => $this->testTenantSlug, 'id' => $postId]), false);
+        $resp->assertSee(route('govuk-alpha.feed.posts.save', ['tenantSlug' => $this->testTenantSlug, 'id' => $postId]), false);
+        $resp->assertSee(__('govuk_alpha.feed_t1.save_button'));
+    }
+
+    public function test_t1feed_permalink_404s_for_missing_post(): void
+    {
+        $this->authenticatedUser();
+        $this->get("/{$this->testTenantSlug}/alpha/feed/posts/99999999")->assertNotFound();
+    }
+
+    public function test_t1feed_engagement_requires_auth(): void
+    {
+        $author = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $postId = $this->t1feedSeedPost((int) $author->id);
+
+        // Anonymous (no Sanctum acting-as) — every mutation redirects to the
+        // feed with auth-required and writes nothing.
+        $react = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$postId}/react", ['emoji' => 'like']);
+        $react->assertRedirectContains('status=auth-required');
+        $this->assertDatabaseMissing('reactions', [
+            'target_type' => 'post',
+            'target_id' => $postId,
+        ]);
+
+        $save = $this->post("/{$this->testTenantSlug}/alpha/feed/posts/{$postId}/save");
+        $save->assertRedirectContains('status=auth-required');
+        $this->assertDatabaseMissing('bookmarks', [
+            'bookmarkable_type' => 'post',
+            'bookmarkable_id' => $postId,
+        ]);
+    }
 }

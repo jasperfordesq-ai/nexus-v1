@@ -9,8 +9,13 @@
         $communityName = $tenant['name'] ?? $tenantSlug;
         $hasPostError = in_array($status ?? '', ['post-empty', 'post-failed'], true);
         $postErrorMessage = ($status ?? '') === 'post-failed' ? __('govuk_alpha.states.post_failed') : __('govuk_alpha.states.post_empty');
-        $successStatuses = ['post-created', 'like-added', 'like-removed', 'comment-created', 'poll-voted', 'post-updated', 'post-deleted', 'comment-updated', 'comment-deleted', 'content-hidden', 'author-muted', 'content-reported'];
-        $errorStatuses = ['comment-empty', 'comment-too-long', 'comment-failed', 'like-failed', 'poll-vote-failed', 'post-update-failed', 'post-delete-failed', 'comment-update-failed', 'comment-delete-failed', 'moderation-failed'];
+        $successStatuses = ['post-created', 'like-added', 'like-removed', 'comment-created', 'poll-voted', 'post-updated', 'post-deleted', 'comment-updated', 'comment-deleted', 'content-hidden', 'author-muted', 'content-reported', 'reaction-added', 'reaction-removed', 'share-added', 'share-removed', 'save-added', 'save-removed'];
+        $errorStatuses = ['comment-empty', 'comment-too-long', 'comment-failed', 'like-failed', 'poll-vote-failed', 'post-update-failed', 'post-delete-failed', 'comment-update-failed', 'comment-delete-failed', 'moderation-failed', 'reaction-failed', 'share-failed', 'save-failed', 'share-own'];
+        // WAVE T1-FEED statuses keep their message under the feed_t1 namespace.
+        $t1StatusKeys = ['reaction-added', 'reaction-removed', 'reaction-failed', 'share-added', 'share-removed', 'share-failed', 'share-own', 'save-added', 'save-removed', 'save-failed'];
+        $statusMessage = fn (?string $s): string => in_array($s, $t1StatusKeys, true)
+            ? __('govuk_alpha.feed_t1.status_' . str_replace('-', '_', (string) $s))
+            : __('govuk_alpha.states.' . $s);
         $hasItems = !empty($items);
         $visibleCount = count($items);
         $typeOptions = ['all', 'following', 'saved', 'posts', 'listings', 'events', 'goals', 'polls', 'jobs', 'challenges', 'volunteering', 'blogs', 'discussions'];
@@ -70,7 +75,7 @@
                 <h2 class="govuk-notification-banner__title" id="post-created-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
             <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.states.' . $status) }}</p>
+                <p class="govuk-notification-banner__heading">{{ $statusMessage($status) }}</p>
             </div>
         </div>
     @elseif ($status === 'post-empty')
@@ -103,7 +108,7 @@
                 <h2 class="govuk-notification-banner__title" id="feed-action-error-title">{{ __('govuk_alpha.states.error_title') }}</h2>
             </div>
             <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.states.' . $status) }}</p>
+                <p class="govuk-notification-banner__heading">{{ $statusMessage($status) }}</p>
             </div>
         </div>
     @endif
@@ -375,6 +380,38 @@
                                 </button>
                             </form>
                         </div>
+                        @php
+                            $itemReactions = $reactionsByTarget[$itemType][$itemId] ?? null;
+                        @endphp
+                        @if ($itemType === 'post' && $itemReactions !== null)
+                            @include('accessible-frontend::partials.feed-reactions', [
+                                'reactionAction' => route('govuk-alpha.feed.posts.react', ['tenantSlug' => $tenantSlug, 'id' => $itemId]),
+                                'alphaReactions' => $alphaReactions,
+                                'reactionLegend' => __('govuk_alpha.feed_t1.reactions_legend'),
+                                'reactionTargetLabel' => __('govuk_alpha.feed_t1.reaction_for', ['name' => $authorName]),
+                                'reactionCounts' => $itemReactions['counts'] ?? [],
+                                'userReactionTypes' => !empty($itemReactions['user_reaction']) ? [$itemReactions['user_reaction']] : [],
+                                'reactionPreserved' => $preservedFeedInputs,
+                            ])
+                        @endif
+                        @if ($itemType === 'post')
+                            @include('accessible-frontend::partials.feed-post-engagement', [
+                                'engagementPostId' => $itemId,
+                                'engagementTitle' => $itemTitle,
+                                'engagementTenant' => $tenantSlug,
+                                'engagementShared' => (bool) ($item['is_shared'] ?? false),
+                                'engagementSaved' => (bool) ($item['is_bookmarked'] ?? false),
+                                'engagementShareCount' => (int) ($item['share_count'] ?? 0),
+                                'engagementOwn' => $isOwnPost,
+                                'engagementPreserved' => $preservedFeedInputs,
+                            ])
+                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-3">
+                                <a class="govuk-link govuk-link--no-visited-state" href="{{ route('govuk-alpha.feed.posts.show', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}">
+                                    {{ __('govuk_alpha.feed_t1.view_post') }}
+                                    <span class="govuk-visually-hidden">{{ __('govuk_alpha.feed_t1.view_post_for', ['name' => $authorName]) }}</span>
+                                </a>
+                            </p>
+                        @endif
                         @if ($isOwnPost)
                             <div class="govuk-!-margin-bottom-3">
                                 <details class="govuk-details govuk-!-margin-bottom-2" data-module="govuk-details">
@@ -457,6 +494,7 @@
                                         'requiresAuth' => $requiresAuth,
                                         'currentUserId' => $currentUserId ?? null,
                                         'preservedFeedInputs' => $preservedFeedInputs,
+                                        'alphaReactions' => $alphaReactions,
                                     ])
                                 @else
                                     <p class="govuk-body">{{ __('govuk_alpha.feed.no_comments') }}</p>

@@ -8,6 +8,9 @@
     $currentUserId = $currentUserId ?? null;
     $preservedFeedInputs = $preservedFeedInputs ?? [];
     $canReply = !$requiresAuth && ($depth < 4);
+    // The accessible reaction set (type => emoji). Passed down from the feed /
+    // permalink page; default to empty so the partial stays render-safe if absent.
+    $alphaReactions = $alphaReactions ?? [];
 @endphp
 
 <ol class="govuk-list nexus-alpha-comments-list{{ $depth > 0 ? ' nexus-alpha-comments-list--nested' : '' }}">
@@ -33,6 +36,25 @@
                 @endif
             </p>
             <p class="govuk-body govuk-!-margin-bottom-2">{{ $comment['content'] ?? '' }}</p>
+
+            @if (!$requiresAuth && $commentId > 0 && !empty($alphaReactions))
+                @php
+                    // CommentService::getForEntity returns reactions as an emoji=>count
+                    // map (an empty object when there are none) and user_reactions as a
+                    // list of the viewer's chosen reaction types.
+                    $commentReactionCounts = (array) ($comment['reactions'] ?? []);
+                    $commentUserReactions = array_values((array) ($comment['user_reactions'] ?? []));
+                @endphp
+                @include('accessible-frontend::partials.feed-reactions', [
+                    'reactionAction' => route('govuk-alpha.feed.comments.react', ['tenantSlug' => $tenantSlug, 'id' => $commentId]),
+                    'alphaReactions' => $alphaReactions,
+                    'reactionLegend' => __('govuk_alpha.feed_t1.reactions_comment_legend'),
+                    'reactionTargetLabel' => __('govuk_alpha.feed_t1.reaction_for', ['name' => $authorName]),
+                    'reactionCounts' => $commentReactionCounts,
+                    'userReactionTypes' => $commentUserReactions,
+                    'reactionPreserved' => $preservedFeedInputs,
+                ])
+            @endif
 
             @if (($canReply || $isOwnComment) && $commentId > 0)
                 <div class="nexus-alpha-comment-actions govuk-!-margin-bottom-2">
@@ -99,6 +121,7 @@
                     'requiresAuth' => $requiresAuth,
                     'currentUserId' => $currentUserId,
                     'preservedFeedInputs' => $preservedFeedInputs,
+                    'alphaReactions' => $alphaReactions,
                 ])
             @endif
         </li>
