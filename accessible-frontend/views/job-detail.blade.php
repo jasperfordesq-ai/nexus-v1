@@ -67,10 +67,19 @@
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="job-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t2.states.unsaved') }}</p></div>
         </div>
-    @elseif ($status === 'apply-failed' || $status === 'save-failed')
+    @elseif (in_array($status, ['created', 'updated', 'renewed'], true))
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="job-status">
+            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="job-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
+            <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t3.states.' . $status) }}</p></div>
+        </div>
+    @elseif ($status === 'apply-failed' || $status === 'save-failed' || $status === 'renew-failed')
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ $status === 'save-failed' ? __('govuk_alpha.jobs_t2.states.save-failed') : __('govuk_alpha.jobs.states.apply-failed') }}</li></ul></div></div>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>
+                    @if ($status === 'save-failed'){{ __('govuk_alpha.jobs_t2.states.save-failed') }}
+                    @elseif ($status === 'renew-failed'){{ __('govuk_alpha.jobs_t3.states.renew-failed') }}
+                    @else{{ __('govuk_alpha.jobs.states.apply-failed') }}@endif
+                </li></ul></div></div>
         </div>
     @endif
 
@@ -173,6 +182,14 @@
     {{-- Apply / owner / already-applied. --}}
     @if ($isOwner)
         <div class="govuk-inset-text govuk-!-margin-top-6">{{ __('govuk_alpha.jobs_t2.owner_notice') }}</div>
+        <div class="nexus-alpha-actions govuk-!-margin-bottom-2">
+            <a class="govuk-link" href="{{ route('govuk-alpha.jobs.applicants', ['tenantSlug' => $tenantSlug, 'id' => $job['id']]) }}">{{ __('govuk_alpha.jobs_t3.manage_button') }}</a>
+            <a class="govuk-link" href="{{ route('govuk-alpha.jobs.edit', ['tenantSlug' => $tenantSlug, 'id' => $job['id']]) }}">{{ __('govuk_alpha.jobs_t3.edit_button') }}</a>
+        </div>
+        <form method="post" action="{{ route('govuk-alpha.jobs.renew', ['tenantSlug' => $tenantSlug, 'id' => $job['id']]) }}">
+            @csrf
+            <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.jobs_t3.renew_button') }}</button>
+        </form>
     @else
         <h2 class="govuk-heading-l govuk-!-margin-top-6" id="apply">{{ __('govuk_alpha.jobs.apply_title') }}</h2>
         @if ($hasApplied)

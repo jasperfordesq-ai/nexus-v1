@@ -4463,6 +4463,176 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertSame(0, DB::table('saved_jobs')->where('job_id', $foreignJobId)->count());
     }
 
+    // ===== WAVE JOBS-T3: employer suite =====
+
+    public function test_jobs3_create_form_renders_and_stores_opportunity(): void
+    {
+        $member = $this->authenticatedUser(['name' => 'Poster']);
+
+        $form = $this->get("/{$this->testTenantSlug}/alpha/jobs/create");
+        $form->assertOk();
+        $form->assertSee(__('govuk_alpha.jobs_t3.label_title'));
+        $form->assertSee(__('govuk_alpha.jobs_t3.submit_create'));
+
+        $store = $this->post("/{$this->testTenantSlug}/alpha/jobs", [
+            'title' => 'New Volunteer Role',
+            'description' => 'Help out at the weekend market.',
+            'type' => 'volunteer',
+            'commitment' => 'flexible',
+            'status' => 'open',
+        ]);
+        $store->assertRedirectContains('status=created');
+
+        $this->assertSame(1, DB::table('job_vacancies')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $member->id)
+            ->where('title', 'New Volunteer Role')
+            ->count());
+    }
+
+    public function test_jobs3_create_rejects_paid_without_salary(): void
+    {
+        $this->authenticatedUser(['name' => 'Poster']);
+
+        $store = $this->post("/{$this->testTenantSlug}/alpha/jobs", [
+            'title' => 'Paid Role No Salary',
+            'description' => 'A paid role.',
+            'type' => 'paid',
+            'commitment' => 'full_time',
+            'status' => 'open',
+        ]);
+        // EU pay-transparency: a paid role needs a salary range unless negotiable.
+        $store->assertRedirect();
+        $this->assertSame(0, DB::table('job_vacancies')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('title', 'Paid Role No Salary')
+            ->count());
+    }
+
+    public function test_jobs3_mine_lists_owned_postings(): void
+    {
+        $member = $this->authenticatedUser(['name' => 'Owner']);
+        $this->insertJob($member->id, ['title' => 'My Posted Role']);
+
+        $mine = $this->get("/{$this->testTenantSlug}/alpha/jobs/mine");
+        $mine->assertOk();
+        $mine->assertSee('My Posted Role');
+        $mine->assertSee(__('govuk_alpha.jobs_t3.manage_button'));
+        $mine->assertSee(__('govuk_alpha.jobs_t3.edit_button'));
+        $mine->assertSee(__('govuk_alpha.jobs_t3.post_button'));
+    }
+
+    public function test_jobs3_edit_updates_owned_job_and_blocks_non_owner(): void
+    {
+        $member = $this->authenticatedUser(['name' => 'Editor']);
+        $jobId = $this->insertJob($member->id, ['title' => 'Editable Role']);
+
+        $edit = $this->get("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/edit");
+        $edit->assertOk();
+        $edit->assertSee('Editable Role', false);
+
+        $update = $this->post("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/update", [
+            'title' => 'Renamed Role',
+            'description' => 'Updated description.',
+            'type' => 'volunteer',
+            'commitment' => 'part_time',
+            'status' => 'open',
+        ]);
+        $update->assertRedirectContains('status=updated');
+        $this->assertSame('Renamed Role', DB::table('job_vacancies')->where('id', $jobId)->value('title'));
+
+        // A different member cannot edit it.
+        $other = $this->authenticatedUser(['name' => 'Intruder']);
+        $this->get("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/edit")->assertForbidden();
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/update", ['title' => 'Hijacked'])->assertForbidden();
+        $this->assertSame('Renamed Role', DB::table('job_vacancies')->where('id', $jobId)->value('title'));
+    }
+
+    public function test_jobs3_delete_owned_job_and_blocks_non_owner(): void
+    {
+        $member = $this->authenticatedUser(['name' => 'Deleter']);
+        $jobId = $this->insertJob($member->id, ['title' => 'Deletable Role']);
+
+        // Non-owner cannot delete.
+        $other = $this->authenticatedUser(['name' => 'Intruder']);
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/delete")->assertForbidden();
+        $this->assertSame(1, DB::table('job_vacancies')->where('id', $jobId)->count());
+
+        // Owner can.
+        \Laravel\Sanctum\Sanctum::actingAs($member, ['*']);
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/delete")
+            ->assertRedirectContains('status=deleted');
+        $this->assertSame(0, DB::table('job_vacancies')->where('id', $jobId)->count());
+    }
+
+    public function test_jobs3_renew_extends_deadline(): void
+    {
+        $member = $this->authenticatedUser(['name' => 'Renewer']);
+        $jobId = $this->insertJob($member->id, ['title' => 'Expiring Role', 'deadline' => now()->subDays(5)->toDateString()]);
+
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/renew")
+            ->assertRedirectContains('status=renewed');
+
+        $deadline = DB::table('job_vacancies')->where('id', $jobId)->value('deadline');
+        $this->assertTrue(\Illuminate\Support\Carbon::parse($deadline)->isFuture());
+    }
+
+    public function test_jobs3_applicants_pipeline_lists_and_updates_status(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Hiring Owner']);
+        $jobId = $this->insertJob($owner->id, ['title' => 'Pipeline Role']);
+
+        $applicant = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        \Laravel\Sanctum\Sanctum::actingAs($applicant, ['*']);
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/apply", ['cover_letter' => 'I am keen.'])
+            ->assertRedirectContains('status=applied');
+
+        // Back to the owner to manage the pipeline.
+        \Laravel\Sanctum\Sanctum::actingAs($owner, ['*']);
+        $appId = (int) DB::table('job_vacancy_applications')->where('vacancy_id', $jobId)->value('id');
+
+        $pipeline = $this->get("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/applications");
+        $pipeline->assertOk();
+        $pipeline->assertSee(__('govuk_alpha.jobs_t3.applicants_title'));
+        $pipeline->assertSee(__('govuk_alpha.jobs_t3.analytics_heading'));
+        $pipeline->assertSee(__('govuk_alpha.jobs_t3.status_change_button'));
+
+        $this->post("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/applications/{$appId}/status", ['app_status' => 'shortlisted'])
+            ->assertRedirectContains('status=status-updated');
+        $this->assertSame('shortlisted', DB::table('job_vacancy_applications')->where('id', $appId)->value('status'));
+    }
+
+    public function test_jobs3_applicants_forbidden_for_non_owner(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $jobId = $this->insertJob($owner->id, ['title' => 'Private Pipeline']);
+
+        // A member who does not own the job cannot view its applicants.
+        $this->authenticatedUser(['name' => 'Snoop']);
+        $this->get("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/applications")->assertForbidden();
+    }
+
+    public function test_jobs3_export_csv_for_owner(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Exporter']);
+        $jobId = $this->insertJob($owner->id, ['title' => 'Exportable Role']);
+
+        $export = $this->get("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/applications/export.csv");
+        $export->assertOk();
+        $export->assertHeader('content-type', 'text/csv; charset=utf-8');
+    }
+
+    public function test_jobs3_export_csv_blocked_for_non_owner(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $jobId = $this->insertJob($owner->id, ['title' => 'Confidential Applicants']);
+
+        // A non-owner must never receive the applicant CSV — it redirects, not 200.
+        $this->authenticatedUser(['name' => 'Snoop']);
+        $resp = $this->get("/{$this->testTenantSlug}/alpha/jobs/{$jobId}/applications/export.csv");
+        $resp->assertRedirectContains('status=export-failed');
+    }
+
     public function test_ideation_challenge_detail_submit_and_vote(): void
     {
         $member = $this->authenticatedUser(['name' => 'Idea Author']);

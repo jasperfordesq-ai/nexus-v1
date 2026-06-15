@@ -26,6 +26,18 @@
             'href' => route('govuk-alpha.jobs.applications', ['tenantSlug' => $tenantSlug]),
         ];
     }
+    if (\Illuminate\Support\Facades\Route::has('govuk-alpha.jobs.mine')) {
+        $jobsTabs['mine'] = [
+            'label' => __('govuk_alpha.jobs_t3.nav_mine'),
+            'href' => route('govuk-alpha.jobs.mine', ['tenantSlug' => $tenantSlug]),
+        ];
+    }
+    if (\Illuminate\Support\Facades\Route::has('govuk-alpha.jobs.create')) {
+        $jobsTabs['create'] = [
+            'label' => __('govuk_alpha.jobs_t3.nav_create'),
+            'href' => route('govuk-alpha.jobs.create', ['tenantSlug' => $tenantSlug]),
+        ];
+    }
     $jobsActive = $jobsActiveTab ?? 'browse';
 @endphp
 <div class="govuk-tabs govuk-!-margin-top-2 govuk-!-margin-bottom-4">

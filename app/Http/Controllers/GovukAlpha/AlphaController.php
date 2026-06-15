@@ -11943,4 +11943,381 @@ class AlphaController extends Controller
             'status' => $ok ? 'withdrawn' : 'withdraw-failed',
         ]);
     }
+
+    // ===== WAVE JOBS-T3: employer suite (postings, create/edit/delete/renew, pipeline) =====
+
+    /**
+     * Collect the create/edit form fields from the request, normalising the
+     * constrained ones to a whitelist. The service does the heavy validation
+     * (salary transparency, type-enabled, spam) and reports its own errors.
+     *
+     * @return array<string, mixed>
+     */
+    private function jobFormInput(Request $request): array
+    {
+        return [
+            'title' => trim(self::asStr($request->input('title'))),
+            'description' => trim(self::asStr($request->input('description'))),
+            'type' => self::asStr($this->allowed(self::asStr($request->input('type')), ['paid', 'volunteer', 'timebank'], 'volunteer')),
+            'commitment' => self::asStr($this->allowed(self::asStr($request->input('commitment')), ['full_time', 'part_time', 'flexible', 'one_off'], 'flexible')),
+            'category' => trim(self::asStr($request->input('category'))),
+            'location' => trim(self::asStr($request->input('location'))),
+            'is_remote' => $request->input('is_remote') === '1',
+            'skills_required' => trim(self::asStr($request->input('skills_required'))),
+            'hours_per_week' => trim(self::asStr($request->input('hours_per_week'))),
+            'time_credits' => trim(self::asStr($request->input('time_credits'))),
+            'deadline' => trim(self::asStr($request->input('deadline'))),
+            'salary_min' => trim(self::asStr($request->input('salary_min'))),
+            'salary_max' => trim(self::asStr($request->input('salary_max'))),
+            'salary_currency' => trim(self::asStr($request->input('salary_currency'))),
+            'salary_type' => self::asStr($this->allowed(self::asStr($request->input('salary_type')), ['hourly', 'monthly', 'annual'], '')),
+            'salary_negotiable' => $request->input('salary_negotiable') === '1',
+            'contact_email' => trim(self::asStr($request->input('contact_email'))),
+            'status' => self::asStr($this->allowed(self::asStr($request->input('status')), ['open', 'draft'], 'open')),
+        ];
+    }
+
+    /** Shared view payload for the create/edit form (mode drives the action + copy). */
+    private function jobFormViewData(string $tenantSlug, string $mode, array $job, string $formAction): array
+    {
+        return [
+            'title' => $mode === 'edit' ? __('govuk_alpha.jobs_t3.edit_title') : __('govuk_alpha.jobs_t3.create_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'jobsActiveTab' => 'create',
+            'formMode' => $mode,
+            'formAction' => $formAction,
+            'jobForm' => $job,
+            'jobFormErrors' => session('jobFormErrors', []),
+        ];
+    }
+
+    /** The current member's own opportunities, with manage/edit links. */
+    public function myJobPostings(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $cursor = self::asStr($request->query('cursor')) ?: null;
+        $items = [];
+        $meta = ['has_more' => false, 'cursor' => null];
+        try {
+            $result = app(\App\Services\JobVacancyService::class)->getMyPostings($userId, TenantContext::getId(), ['limit' => 12, 'cursor' => $cursor]);
+            $items = is_array($result['items'] ?? null) ? $result['items'] : [];
+            $meta['has_more'] = (bool) ($result['has_more'] ?? false);
+            $meta['cursor'] = $result['cursor'] ?? null;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::jobs-postings', [
+            'title' => __('govuk_alpha.jobs_t3.mine_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'jobsActiveTab' => 'mine',
+            'jobs' => $items,
+            'jobsMeta' => $meta,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Show the post-an-opportunity form. */
+    public function createJobForm(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        return $this->view('accessible-frontend::jobs-form', $this->jobFormViewData(
+            $tenantSlug,
+            'create',
+            [],
+            route('govuk-alpha.jobs.store', ['tenantSlug' => $tenantSlug]),
+        ));
+    }
+
+    /** Create a new opportunity. */
+    public function storeJob(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $data = $this->jobFormInput($request);
+        if ($data['title'] === '') {
+            return redirect()->route('govuk-alpha.jobs.create', ['tenantSlug' => $tenantSlug])
+                ->withInput()->with('jobFormErrors', [__('govuk_alpha.jobs_t3.error_title_required')]);
+        }
+
+        $svc = app(\App\Services\JobVacancyService::class);
+        $newId = 0;
+        try {
+            $newId = $svc->create($userId, $data);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($newId > 0) {
+            return redirect()->route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $newId, 'status' => 'created']);
+        }
+
+        return redirect()->route('govuk-alpha.jobs.create', ['tenantSlug' => $tenantSlug])
+            ->withInput()->with('jobFormErrors', $this->jobServiceErrors($svc));
+    }
+
+    /** Show the edit form for one of the member's own opportunities. */
+    public function editJobForm(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $job = $this->ownedJobOr404($id, $userId);
+
+        return $this->view('accessible-frontend::jobs-form', $this->jobFormViewData(
+            $tenantSlug,
+            'edit',
+            $job,
+            route('govuk-alpha.jobs.update', ['tenantSlug' => $tenantSlug, 'id' => $id]),
+        ));
+    }
+
+    /** Persist edits to one of the member's own opportunities. */
+    public function updateJob(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $this->ownedJobOr404($id, $userId);
+
+        $data = $this->jobFormInput($request);
+        if ($data['title'] === '') {
+            return redirect()->route('govuk-alpha.jobs.edit', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withInput()->with('jobFormErrors', [__('govuk_alpha.jobs_t3.error_title_required')]);
+        }
+
+        $svc = app(\App\Services\JobVacancyService::class);
+        $ok = false;
+        try {
+            $ok = $svc->update($id, $userId, $data);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($ok) {
+            return redirect()->route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'updated']);
+        }
+
+        return redirect()->route('govuk-alpha.jobs.edit', ['tenantSlug' => $tenantSlug, 'id' => $id])
+            ->withInput()->with('jobFormErrors', $this->jobServiceErrors($svc));
+    }
+
+    /** Delete one of the member's own opportunities. */
+    public function deleteJob(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $this->ownedJobOr404($id, $userId);
+
+        $ok = false;
+        try {
+            $ok = app(\App\Services\JobVacancyService::class)->delete($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.jobs.mine', ['tenantSlug' => $tenantSlug, 'status' => $ok ? 'deleted' : 'delete-failed']);
+    }
+
+    /** Renew (extend the deadline of) one of the member's own opportunities. */
+    public function renewJobPosting(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $this->ownedJobOr404($id, $userId);
+
+        $ok = false;
+        try {
+            $ok = app(\App\Services\JobVacancyService::class)->renewJob($id, $userId, 30);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $ok ? 'renewed' : 'renew-failed']);
+    }
+
+    /** Owner pipeline: the applications to one of the member's own opportunities + analytics. */
+    public function jobApplicants(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $svc = app(\App\Services\JobVacancyService::class);
+        $job = null;
+        try {
+            $job = $svc->legacyGetById($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($job === null, 404);
+
+        // getApplications enforces owner/admin/hiring-team management rights; a null
+        // return on an existing job means the viewer may not manage it.
+        $applications = null;
+        try {
+            $applications = $svc->getApplications($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($applications === null, 403);
+
+        $analytics = null;
+        try {
+            $analytics = $svc->getAnalytics($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::jobs-applicants', [
+            'title' => __('govuk_alpha.jobs_t3.applicants_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'jobsActiveTab' => 'mine',
+            'job' => $job,
+            'applications' => is_array($applications) ? $applications : [],
+            'analytics' => is_array($analytics) ? $analytics : null,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Move an applicant to a new stage in the owner pipeline. */
+    public function setApplicationStatus(Request $request, string $tenantSlug, int $id, int $appId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $newStatus = self::asStr($this->allowed(
+            self::asStr($request->input('app_status')),
+            ['applied', 'pending', 'screening', 'reviewed', 'shortlisted', 'interview', 'offer', 'accepted', 'rejected'],
+            ''
+        ));
+        if ($newStatus === '') {
+            return redirect()->route('govuk-alpha.jobs.applicants', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'status-failed']);
+        }
+
+        $notes = trim(self::asStr($request->input('notes')));
+        $ok = false;
+        try {
+            $ok = app(\App\Services\JobVacancyService::class)->updateApplicationStatus($appId, $userId, $newStatus, $notes !== '' ? mb_substr($notes, 0, 2000) : null);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.jobs.applicants', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $ok ? 'status-updated' : 'status-failed']);
+    }
+
+    /** Download the applications for one of the member's own opportunities as CSV. */
+    public function exportJobApplications(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $csv = null;
+        try {
+            $csv = app(\App\Services\JobVacancyService::class)->exportApplicationsCsv($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($csv === null) {
+            return redirect()->route('govuk-alpha.jobs.applicants', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'export-failed']);
+        }
+
+        $filename = 'job_' . $id . '_applications_' . date('Ymd_His') . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+        ]);
+    }
+
+    /**
+     * Fetch a vacancy the member owns, or abort: 404 when it does not exist in the
+     * current tenant (HasTenantScope makes a cross-tenant id invisible), 403 when
+     * it exists but belongs to someone else.
+     *
+     * @return array<string, mixed>
+     */
+    private function ownedJobOr404(int $id, int $userId): array
+    {
+        $job = null;
+        try {
+            $job = app(\App\Services\JobVacancyService::class)->legacyGetById($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($job === null, 404);
+        abort_unless((int) ($job['user_id'] ?? 0) === $userId, 403);
+
+        return $job;
+    }
+
+    /**
+     * Flatten the service's error bag to a list of human messages for the form
+     * error summary, with a generic fallback when the bag is empty.
+     *
+     * @return list<string>
+     */
+    private function jobServiceErrors(\App\Services\JobVacancyService $svc): array
+    {
+        $messages = [];
+        foreach ($svc->getErrors() as $err) {
+            $msg = is_array($err) ? ($err['message'] ?? '') : (string) $err;
+            if ($msg !== '') {
+                $messages[] = $msg;
+            }
+        }
+
+        return $messages !== [] ? $messages : [__('govuk_alpha.jobs_t3.error_generic')];
+    }
 }
