@@ -285,3 +285,6 @@ DPO_Confidentiality_Agreement_*.docx
 
 # Agent brainstorm / tooling state
 .superpowers/
+
+# Temp audit working files (dev machine only)
+.audit-groups/
