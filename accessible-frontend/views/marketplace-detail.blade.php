@@ -12,10 +12,13 @@
         $money = (float) ($item['price'] ?? 0);
         if ($tc > 0) {
             $priceLabel = rtrim(rtrim(number_format($tc, 2), '0'), '.') . ' ' . __('govuk_alpha.marketplace.credits_label');
+            $priceTagClass = 'govuk-tag--blue';
         } elseif ($money > 0) {
             $priceLabel = trim(trim((string) ($item['price_currency'] ?? '')) . ' ' . number_format($money, 2));
+            $priceTagClass = 'govuk-tag--grey';
         } else {
             $priceLabel = __('govuk_alpha.marketplace.free');
+            $priceTagClass = 'govuk-tag--green';
         }
         // Images: detail returns an `images` array; fall back to the single `image`.
         $images = [];
@@ -28,6 +31,7 @@
             if ($u !== '') { $images[] = $u; }
         }
         $seller = trim((string) ($item['user']['name'] ?? ($item['seller_type'] ?? '')));
+        $sellerId = (int) ($item['user']['id'] ?? ($item['user_id'] ?? 0));
         $loc = trim((string) ($item['location'] ?? ''));
         $condition = trim((string) ($item['condition'] ?? ''));
         $delivery = trim((string) ($item['delivery_method'] ?? ''));
@@ -36,15 +40,23 @@
     <a href="{{ route('govuk-alpha.marketplace.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-back-link">{{ __('govuk_alpha.marketplace.back') }}</a>
 
     <span class="govuk-caption-xl">{{ __('govuk_alpha.marketplace.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
-    <div class="nexus-alpha-module-row">
-        <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ $iTitle }}</h1>
-        <strong class="govuk-tag govuk-tag--green">{{ $priceLabel }}</strong>
-    </div>
+    <h1 class="govuk-heading-xl">{{ $iTitle }}</h1>
+    <p><strong class="govuk-tag {{ $priceTagClass }}">{{ $priceLabel }}</strong></p>
 
-    @if (!empty($images))
+    @if (count($images) === 1)
         <div class="nexus-alpha-detail-hero">
             <img src="{{ $images[0] }}" alt="{{ $iTitle }}" loading="lazy" decoding="async">
         </div>
+    @elseif (count($images) > 1)
+        <ul class="govuk-list nexus-alpha-image-strip govuk-!-margin-bottom-4">
+            @foreach ($images as $imgIdx => $imgUrl)
+                <li>
+                    <a href="{{ $imgUrl }}" target="_blank" rel="noopener noreferrer">
+                        <img src="{{ $imgUrl }}" alt="{{ __('govuk_alpha.listings.gallery_image_alt', ['number' => $imgIdx + 1, 'title' => $iTitle]) }}" loading="lazy" decoding="async">
+                    </a>
+                </li>
+            @endforeach
+        </ul>
     @endif
 
     @if (trim((string) ($item['description'] ?? '')) !== '')
@@ -78,4 +90,10 @@
             </div>
         @endif
     </dl>
+
+    @if ($currentUserId && $sellerId > 0 && $sellerId !== $currentUserId)
+        <div class="govuk-button-group govuk-!-margin-top-4">
+            <a class="govuk-button" href="{{ route('govuk-alpha.messages.new', ['tenantSlug' => $tenantSlug, 'userId' => $sellerId]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.polish_commerce.marketplace_message_seller') }}</a>
+        </div>
+    @endif
 @endsection

@@ -341,4 +341,11 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/volunteering/swaps', [AlphaController::class, 'requestVolunteerSwap'])->middleware('throttle:10,1')->name('volunteering.swaps.request');
         Route::post('/volunteering/swaps/{id}/respond', [AlphaController::class, 'respondVolunteerSwap'])->whereNumber('id')->middleware('throttle:20,1')->name('volunteering.swaps.respond');
         Route::post('/volunteering/swaps/{id}/cancel', [AlphaController::class, 'cancelVolunteerSwap'])->whereNumber('id')->middleware('throttle:20,1')->name('volunteering.swaps.cancel');
+
+        // ===== WAVE POLISH-COMMERCE =====
+        // Static segments are declared before any {id} wildcards so they always win.
+        Route::get('/premium/return', [AlphaController::class, 'premiumReturn'])->name('premium.return');
+        Route::post('/podcasts/{id}/subscribe', [AlphaController::class, 'podcastSubscribe'])->whereNumber('id')->middleware('throttle:30,1')->name('podcasts.subscribe');
+        Route::get('/podcasts/{showId}/episodes/{id}', [AlphaController::class, 'podcastEpisode'])->whereNumber('showId')->whereNumber('id')->name('podcasts.episode');
+        Route::get('/coupons/{id}', [AlphaController::class, 'couponShow'])->whereNumber('id')->name('coupons.show');
     });

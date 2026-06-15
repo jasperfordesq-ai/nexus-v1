@@ -5671,14 +5671,21 @@ class AlphaController extends Controller
         }
 
         $q = trim(self::asStr($request->query('q')));
+        $categoryId = (int) self::asStr($request->query('category_id'));
         $filters = ['limit' => 30, 'current_user_id' => $userId];
         if ($q !== '') {
             $filters['search'] = $q;
         }
+        if ($categoryId > 0) {
+            $filters['category_id'] = $categoryId;
+        }
         $items = [];
+        $categories = [];
         try {
             $items = \App\Services\MarketplaceListingService::getAll($filters)['items'] ?? [];
             $items = array_map(static fn ($i) => is_array($i) ? $i : (array) $i, $items);
+            $rawCats = \App\Services\MarketplaceListingService::getCategories();
+            $categories = is_array($rawCats) ? array_map(static fn ($c) => is_array($c) ? $c : (array) $c, $rawCats) : [];
         } catch (\Throwable $e) {
             report($e);
         }
@@ -5689,6 +5696,8 @@ class AlphaController extends Controller
             'activeNav' => 'explore',
             'listings' => is_array($items) ? $items : [],
             'marketplaceQuery' => $q,
+            'categories' => $categories,
+            'marketplaceCategoryId' => $categoryId > 0 ? $categoryId : null,
         ]);
     }
 
@@ -5714,6 +5723,7 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
             'item' => $item,
+            'currentUserId' => $userId,
         ]);
     }
 
@@ -5823,9 +5833,20 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
+        $podcastQuery = trim(self::asStr($request->query('q')));
+        $podcastSort  = trim(self::asStr($request->query('sort')));
+        $allowedSorts = ['newest', 'title', 'episodes', 'followers'];
+        if (!in_array($podcastSort, $allowedSorts, true)) {
+            $podcastSort = 'newest';
+        }
+        $browseFilters = ['per_page' => 30, 'sort' => $podcastSort];
+        if ($podcastQuery !== '') {
+            $browseFilters['search'] = $podcastQuery;
+        }
+
         $items = [];
         try {
-            $items = \App\Services\PodcastService::browse(['per_page' => 30])['items'] ?? [];
+            $items = \App\Services\PodcastService::browse($browseFilters)['items'] ?? [];
             $items = array_map(static fn ($s) => is_array($s) ? $s : $s->toArray(), $items);
         } catch (\Throwable $e) {
             report($e);
@@ -5836,6 +5857,8 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
             'shows' => is_array($items) ? $items : [],
+            'podcastQuery' => $podcastQuery,
+            'podcastSort' => $podcastSort,
         ]);
     }
 
@@ -5849,6 +5872,7 @@ class AlphaController extends Controller
 
         $show = null;
         $episodes = [];
+        $isSubscribed = false;
         try {
             $show = \App\Services\PodcastService::findShowById($id);
             // Defence in depth: never surface another tenant's show by id.
@@ -5856,6 +5880,12 @@ class AlphaController extends Controller
                 $show = null;
             }
             if ($show !== null) {
+                // Check subscription status for the current member.
+                $isSubscribed = \Illuminate\Support\Facades\DB::table('podcast_show_subscriptions')
+                    ->where('show_id', $show->id)
+                    ->where('user_id', $this->currentUserId())
+                    ->exists();
+
                 // Only published, approved, released episodes — findShowById does not
                 // scope the episodes relation, so the raw relation would include
                 // drafts/pending uploads.
@@ -5890,6 +5920,8 @@ class AlphaController extends Controller
             'activeNav' => 'explore',
             'show' => $show->toArray(),
             'episodes' => $episodes,
+            'isSubscribed' => $isSubscribed,
+            'currentUserId' => $this->currentUserId(),
         ]);
     }
 
@@ -5972,8 +6004,9 @@ class AlphaController extends Controller
         }
 
         $tierId = (int) $request->input('tier_id');
-        $interval = self::asStr($request->input('interval')) === 'year' ? 'yearly' : 'monthly';
-        $returnUrl = route('govuk-alpha.premium.index', ['tenantSlug' => $tenantSlug]);
+        $rawInterval = self::asStr($request->input('interval'));
+        $interval = $rawInterval === 'yearly' ? 'yearly' : ($rawInterval === 'year' ? 'yearly' : 'monthly');
+        $returnUrl = route('govuk-alpha.premium.return', ['tenantSlug' => $tenantSlug, 'status' => 'success']);
 
         try {
             $session = \App\Services\MemberPremiumService::createCheckoutSession($userId, $tierId, $interval, $returnUrl);
@@ -12536,5 +12569,154 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.jobs.alerts', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    // ===== WAVE POLISH-COMMERCE =====
+
+    public function podcastSubscribe(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('podcasts'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $status = 'subscribe-failed';
+        try {
+            $show = \App\Services\PodcastService::findShowById($id);
+            if ($show !== null && (int) $show->tenant_id === TenantContext::getId()) {
+                $subscribed = \App\Services\PodcastService::toggleSubscription($show, $userId);
+                $status = $subscribed ? 'subscribed' : 'unsubscribed';
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()
+            ->route('govuk-alpha.podcasts.show', ['tenantSlug' => $tenantSlug, 'id' => $id])
+            ->with('podcast_status', $status);
+    }
+
+    public function podcastEpisode(Request $request, string $tenantSlug, int $showId, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('podcasts'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $show = null;
+        $episode = null;
+        try {
+            $show = \App\Services\PodcastService::findShowById($showId);
+            if ($show !== null && (int) $show->tenant_id !== TenantContext::getId()) {
+                $show = null;
+            }
+            if ($show !== null) {
+                $ep = $show->episodes()->published()->where('id', $id)->first();
+                if ($ep !== null) {
+                    $url = '';
+                    try {
+                        $url = \App\Services\PodcastService::episodeAudioUrl($ep, true);
+                    } catch (\Throwable $e) {
+                        $url = '';
+                    }
+                    $episode = [
+                        'id' => (int) $ep->id,
+                        'title' => (string) ($ep->title ?? ''),
+                        'description' => (string) ($ep->description ?? ''),
+                        'audio_url' => $url,
+                        'transcript' => (string) ($ep->transcript ?? ''),
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($show === null || $episode === null, 404);
+
+        return $this->view('accessible-frontend::podcast-episode', [
+            'title' => ($episode['title'] ?: ($show->title ?? '')) ?: __('govuk_alpha.podcasts.episodes_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'show' => $show->toArray(),
+            'episode' => $episode,
+        ]);
+    }
+
+    public function couponShow(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('merchant_coupons'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $coupon = null;
+        try {
+            $rows = \App\Services\MerchantCouponService::listForMember();
+            foreach ($rows as $c) {
+                $c = is_array($c) ? (object) $c : $c;
+                if ((int) ($c->id ?? 0) === $id) {
+                    $coupon = [
+                        'id' => (int) ($c->id ?? 0),
+                        'code' => (string) ($c->code ?? ''),
+                        'title' => (string) ($c->title ?? ''),
+                        'description' => (string) ($c->description ?? ''),
+                        'discount_type' => (string) ($c->discount_type ?? ''),
+                        'discount_value' => $c->discount_value ?? null,
+                        'valid_until' => $c->valid_until ?? null,
+                        'merchant' => is_object($c->merchant ?? null) ? (array) $c->merchant : ($c->merchant ?? []),
+                        'merchant_name' => (string) ($c->merchant_name ?? ''),
+                    ];
+                    break;
+                }
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($coupon === null, 404);
+
+        return $this->view('accessible-frontend::coupons-detail', [
+            'title' => ($coupon['title'] ?: $coupon['code']) ?: __('govuk_alpha.coupons.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'coupon' => $coupon,
+        ]);
+    }
+
+    public function premiumReturn(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('member_premium'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $returnStatus = self::asStr($request->query('status'));
+        if (!in_array($returnStatus, ['success', 'pending', 'failed'], true)) {
+            $returnStatus = 'failed';
+        }
+
+        $tierName = '';
+        if ($returnStatus === 'success') {
+            try {
+                $currentTier = \App\Services\MemberPremiumService::getMemberTier($userId);
+                $tierName = trim((string) ($currentTier['tier_name'] ?? ''));
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return $this->view('accessible-frontend::premium-return', [
+            'title' => __('govuk_alpha.polish_commerce.premium_success_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'returnStatus' => $returnStatus,
+            'tierName' => $tierName,
+        ]);
     }
 }

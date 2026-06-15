@@ -7646,4 +7646,337 @@ class GovukAlphaFrontendTest extends TestCase
         // Download link is present for the seeded resource.
         $page->assertSee(__('govuk_alpha.resources.download'));
     }
+
+    // ===== WAVE POLISH-COMMERCE =====
+
+    /**
+     * Marketplace index now renders a category filter select and the search form
+     * inside a fieldset with a legend.
+     */
+    public function test_pcommerce_marketplace_index_shows_category_filter(): void
+    {
+        $this->authenticatedUser(['name' => 'Market Browser']);
+        $this->enableAlphaFeatures(['marketplace']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace");
+        $res->assertOk();
+        $res->assertSee('category_id', false);
+        $res->assertSee(__('govuk_alpha.polish_commerce.marketplace_filter_heading'));
+    }
+
+    /**
+     * Marketplace detail page shows the "Message seller" button only when the
+     * viewer is NOT the seller.
+     */
+    public function test_pcommerce_marketplace_detail_shows_message_seller_button(): void
+    {
+        $buyer = $this->authenticatedUser(['name' => 'Buyer One']);
+        $this->enableAlphaFeatures(['marketplace']);
+
+        $seller = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true,
+            'first_name' => 'Seller', 'last_name' => 'Sam',
+        ]);
+
+        $id = DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'title' => 'Handmade Pot',
+            'description' => 'A beautiful clay pot.',
+            'price_type' => 'free',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/{$id}");
+        $res->assertOk();
+        $res->assertSee('Handmade Pot');
+        $res->assertSee(__('govuk_alpha.polish_commerce.marketplace_message_seller'));
+    }
+
+    /**
+     * Marketplace detail page does NOT show "Message seller" when the viewer owns the listing.
+     */
+    public function test_pcommerce_marketplace_detail_hides_message_seller_for_owner(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Seller Two']);
+        $this->enableAlphaFeatures(['marketplace']);
+
+        $id = DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'title' => 'My Own Pot',
+            'description' => 'Listed by me.',
+            'price_type' => 'free',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/{$id}");
+        $res->assertOk();
+        $res->assertDontSee(__('govuk_alpha.polish_commerce.marketplace_message_seller'));
+    }
+
+    /**
+     * Podcasts index now accepts a search query param and a sort param without erroring.
+     */
+    public function test_pcommerce_podcast_index_search_and_sort_params(): void
+    {
+        $this->authenticatedUser(['name' => 'Listener']);
+        $this->enableAlphaFeatures(['podcasts']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/podcasts?q=tech&sort=title");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.podcasts.title'));
+        // The search input should carry the query value.
+        $res->assertSee('value="tech"', false);
+    }
+
+    /**
+     * Podcast detail page shows subscribe button and episode links now link to the episode detail route.
+     */
+    public function test_pcommerce_podcast_detail_shows_subscribe_and_episode_links(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Podcast Fan']);
+        $this->enableAlphaFeatures(['podcasts']);
+
+        $showId = DB::table('podcast_shows')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_user_id' => $user->id,
+            'title' => 'Tech Talks',
+            'slug' => 'tech-talks-' . $user->id,
+            'status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/podcasts/{$showId}");
+        $res->assertOk();
+        $res->assertSee('Tech Talks');
+        // Subscribe button visible to logged-in user.
+        $res->assertSee(__('govuk_alpha.polish_commerce.podcast_subscribe'));
+        // Subscribe form action targets the correct route.
+        $res->assertSee("/podcasts/{$showId}/subscribe", false);
+    }
+
+    /**
+     * POST to podcast subscribe route toggles subscription and redirects back.
+     */
+    public function test_pcommerce_podcast_subscribe_toggles(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Subscriber']);
+        $this->enableAlphaFeatures(['podcasts']);
+
+        $showId = DB::table('podcast_shows')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_user_id' => $user->id,
+            'title' => 'History Hour',
+            'slug' => 'history-hour-' . $user->id,
+            'status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // First subscribe.
+        $this->post("/{$this->testTenantSlug}/alpha/podcasts/{$showId}/subscribe")
+            ->assertRedirectContains("/podcasts/{$showId}");
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        // Subscription record should now exist.
+        $this->assertTrue(
+            DB::table('podcast_show_subscriptions')
+                ->where('show_id', $showId)
+                ->where('user_id', $user->id)
+                ->exists()
+        );
+    }
+
+    /**
+     * Coupon index links each coupon title to its detail route.
+     */
+    public function test_pcommerce_coupon_index_links_to_detail(): void
+    {
+        $member = $this->authenticatedUser(['name' => 'Coupon Hunter']);
+        $this->enableAlphaFeatures(['merchant_coupons']);
+
+        // Insert a merchant coupon visible to all members (no user_id restriction).
+        $couponId = DB::table('merchant_coupons')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'code' => 'SAVE10',
+            'title' => 'Ten Percent Off',
+            'description' => 'Use at checkout.',
+            'discount_type' => 'percentage',
+            'discount_value' => 10,
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/coupons");
+        $res->assertOk();
+        $res->assertSee('Ten Percent Off');
+        // Title must link to the detail route.
+        $res->assertSee("/coupons/{$couponId}", false);
+    }
+
+    /**
+     * Coupon detail page shows the code in a confirmation panel.
+     */
+    public function test_pcommerce_coupon_detail_shows_code_panel(): void
+    {
+        $member = $this->authenticatedUser(['name' => 'Deal Finder']);
+        $this->enableAlphaFeatures(['merchant_coupons']);
+
+        $couponId = DB::table('merchant_coupons')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'code' => 'WELCOME20',
+            'title' => 'Welcome Discount',
+            'description' => 'New member discount.',
+            'discount_type' => 'percentage',
+            'discount_value' => 20,
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/coupons/{$couponId}");
+        $res->assertOk();
+        $res->assertSee('Welcome Discount');
+        $res->assertSee('WELCOME20');
+        $res->assertSee(__('govuk_alpha.polish_commerce.coupon_code_panel_title'));
+        $res->assertSee('govuk-panel--confirmation', false);
+    }
+
+    /**
+     * Premium index renders the global interval fieldset (not per-card radios) when
+     * at least one tier has both monthly and yearly prices.
+     */
+    public function test_pcommerce_premium_shows_global_interval_toggle(): void
+    {
+        $this->authenticatedUser(['name' => 'Premium Shopper']);
+        $this->enableAlphaFeatures(['member_premium']);
+
+        DB::table('premium_tiers')->insert([
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Gold',
+            'slug' => 'gold-' . $this->testTenantId,
+            'monthly_price_cents' => 500,
+            'yearly_price_cents' => 5000,
+            'description' => 'Full access.',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/premium");
+        $res->assertOk();
+        $res->assertSee('Gold');
+        $res->assertSee(__('govuk_alpha.polish_commerce.premium_interval_heading'));
+        $res->assertSee('global-interval-monthly', false);
+        // Per-card interval radios should NOT appear.
+        $res->assertDontSee('interval-month-', false);
+    }
+
+    /**
+     * Premium return page shows success panel when status=success.
+     */
+    public function test_pcommerce_premium_return_success_panel(): void
+    {
+        $this->authenticatedUser(['name' => 'New Subscriber']);
+        $this->enableAlphaFeatures(['member_premium']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/premium/return?status=success");
+        $res->assertOk();
+        $res->assertSee('govuk-panel--confirmation', false);
+        $res->assertSee(__('govuk_alpha.polish_commerce.premium_success_title'));
+    }
+
+    /**
+     * Premium return page shows error summary when status=failed.
+     */
+    public function test_pcommerce_premium_return_failed_shows_error(): void
+    {
+        $this->authenticatedUser(['name' => 'Failed Subscriber']);
+        $this->enableAlphaFeatures(['member_premium']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/premium/return?status=failed");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.polish_commerce.premium_failed_title'));
+        $res->assertSee('govuk-error-summary', false);
+    }
+
+    /**
+     * Course detail enrolled state now renders a govuk-panel--confirmation
+     * instead of the old notification-banner.
+     */
+    public function test_pcommerce_course_enrolled_shows_confirmation_panel(): void
+    {
+        $learner = $this->authenticatedUser(['name' => 'Course Learner']);
+        $author = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true,
+        ]);
+        $this->enableAlphaFeatures(['courses']);
+
+        $courseId = DB::table('courses')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'author_user_id' => $author->id,
+            'title' => 'Pottery Basics',
+            'slug' => 'pottery-basics-' . $author->id,
+            'level' => 'beginner',
+            'visibility' => 'public',
+            'status' => 'published',
+            'moderation_status' => 'approved',
+            'credit_cost' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Enrol first.
+        $this->post("/{$this->testTenantSlug}/alpha/courses/{$courseId}/enrol")
+            ->assertRedirectContains('status=enrolled');
+
+        // The redirect lands on the detail page with ?status=enrolled which now shows
+        // a govuk-panel--confirmation, not a notification-banner.
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/courses/{$courseId}?status=enrolled");
+        $detail->assertOk();
+        $detail->assertSee('govuk-panel--confirmation', false);
+        $detail->assertDontSee('govuk-notification-banner--success', false);
+    }
+
+    /**
+     * Course detail page enrol section heading uses the dedicated translation key,
+     * not the button key (which would duplicate "Enrol" twice in the HTML).
+     */
+    public function test_pcommerce_course_detail_enrol_heading_key(): void
+    {
+        $learner = $this->authenticatedUser(['name' => 'Heading Checker']);
+        $author = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true,
+        ]);
+        $this->enableAlphaFeatures(['courses']);
+
+        $courseId = DB::table('courses')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'author_user_id' => $author->id,
+            'title' => 'Candle Making',
+            'slug' => 'candle-making-' . $author->id,
+            'level' => 'beginner',
+            'visibility' => 'public',
+            'status' => 'published',
+            'moderation_status' => 'approved',
+            'credit_cost' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $detail = $this->get("/{$this->testTenantSlug}/alpha/courses/{$courseId}");
+        $detail->assertOk();
+        $detail->assertSee(__('govuk_alpha.polish_commerce.course_enrol_section_heading'));
+    }
 }
