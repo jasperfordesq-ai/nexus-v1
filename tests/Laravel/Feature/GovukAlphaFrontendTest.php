@@ -6290,4 +6290,304 @@ class GovukAlphaFrontendTest extends TestCase
             $page->assertForbidden();
         }
     }
+
+    // ==================================================================
+    // WAVE FED2 — Federation heavy slice (connections, messaging, transfer)
+    // ==================================================================
+
+    /**
+     * Enable the system-level cross-tenant messaging + transactions flags. The
+     * base enableFederationSystem() only turns on profiles/listings/events, but
+     * FederationFeatureService::isOperationAllowed('messaging'|'transactions')
+     * additionally requires these system columns (DB default 0).
+     */
+    private function enableFederationMessagingAndTransactions(): void
+    {
+        DB::table('federation_system_control')->where('id', 1)->update([
+            'cross_tenant_messaging_enabled' => 1,
+            'cross_tenant_transactions_enabled' => 1,
+        ]);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        app()->forgetInstance(\App\Services\FederationFeatureService::class);
+    }
+
+    /**
+     * Seed a federated member who additionally has messaging + transactions
+     * enabled (the base seedFederatedMember leaves those off). Returns user id.
+     */
+    private function seedTransactingFederatedMember(int $partnerTenantId, string $first, string $last): int
+    {
+        $memberId = $this->seedFederatedMember($partnerTenantId, $first, $last, 'Gardening');
+        $this->setFederationUserSettings($memberId, [
+            'federation_optin' => 1,
+            'profile_visible_federated' => 1,
+            'appear_in_federated_search' => 1,
+            'show_skills_federated' => 1,
+            'show_location_federated' => 1,
+            'messaging_enabled_federated' => 1,
+            'transactions_enabled_federated' => 1,
+        ]);
+        return $memberId;
+    }
+
+    public function test_fed2_member_profile_shows_connect_action_for_opted_in_viewer(): void
+    {
+        $viewer = $this->authenticatedUser(['name' => 'Connecting Viewer']);
+        $this->enableFederationSystem();
+        $this->enableFederationMessagingAndTransactions();
+        $this->setFederationUserSettings($viewer->id, [
+            'federation_optin' => 1,
+            'messaging_enabled_federated' => 1,
+            'transactions_enabled_federated' => 1,
+        ]);
+        $partnerTenantId = $this->seedFederationPartner('Connect Timebank');
+        $partnerUserId = $this->seedTransactingFederatedMember($partnerTenantId, 'Connectable', 'Member');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/members/{$partnerUserId}?tenant_id={$partnerTenantId}");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.fed2.member_actions.connect'));
+        $res->assertSee(route('govuk-alpha.federation.connections.store', ['tenantSlug' => $this->testTenantSlug]), false);
+        // Transfer action is offered because both sides enable transactions.
+        $res->assertSee(route('govuk-alpha.federation.transfer', [
+            'tenantSlug' => $this->testTenantSlug, 'id' => $partnerUserId, 'tenant_id' => $partnerTenantId,
+        ]), false);
+    }
+
+    public function test_fed2_connection_send_then_accept_flow(): void
+    {
+        // Requester is in the partner tenant; receiver is the local test-tenant user.
+        $receiver = $this->authenticatedUser(['name' => 'Request Receiver']);
+        $this->enableFederationSystem();
+        $this->setFederationUserSettings($receiver->id, [
+            'federation_optin' => 1,
+            'messaging_enabled_federated' => 1,
+        ]);
+        $partnerTenantId = $this->seedFederationPartner('Requester Timebank');
+        $requesterId = $this->seedTransactingFederatedMember($partnerTenantId, 'Eager', 'Requester');
+
+        // Directly insert the pending request FROM the partner member TO our user
+        // (the send endpoint is owner-scoped to the sender; here we exercise accept).
+        DB::table('federation_connections')->insert([
+            'requester_user_id' => $requesterId,
+            'requester_tenant_id' => $partnerTenantId,
+            'receiver_user_id' => $receiver->id,
+            'receiver_tenant_id' => $this->testTenantId,
+            'status' => 'pending',
+            'created_at' => now(),
+        ]);
+        $connId = (int) DB::table('federation_connections')
+            ->where('receiver_user_id', $receiver->id)
+            ->where('requester_user_id', $requesterId)
+            ->value('id');
+
+        // Accept it as the receiver.
+        $this->post("/{$this->testTenantSlug}/alpha/federation/connections/{$connId}/accept")
+            ->assertRedirect("/{$this->testTenantSlug}/alpha/federation/connections?tab=received&status=connection-accepted");
+
+        $this->assertSame('accepted', DB::table('federation_connections')->where('id', $connId)->value('status'));
+    }
+
+    public function test_fed2_connection_send_creates_pending_request(): void
+    {
+        $viewer = $this->authenticatedUser(['name' => 'Sender User']);
+        $this->enableFederationSystem();
+        $this->setFederationUserSettings($viewer->id, [
+            'federation_optin' => 1,
+            'messaging_enabled_federated' => 1,
+        ]);
+        $partnerTenantId = $this->seedFederationPartner('Target Timebank');
+        $targetId = $this->seedTransactingFederatedMember($partnerTenantId, 'Target', 'Member');
+
+        $this->post("/{$this->testTenantSlug}/alpha/federation/connections", [
+            'receiver_id' => $targetId,
+            'receiver_tenant_id' => $partnerTenantId,
+            'message' => 'Hello from the network',
+        ])->assertRedirect(route('govuk-alpha.federation.members.show', [
+            'tenantSlug' => $this->testTenantSlug, 'id' => $targetId, 'tenant_id' => $partnerTenantId, 'status' => 'connect-sent',
+        ]));
+
+        $this->assertDatabaseHas('federation_connections', [
+            'requester_user_id' => $viewer->id,
+            'requester_tenant_id' => $this->testTenantId,
+            'receiver_user_id' => $targetId,
+            'receiver_tenant_id' => $partnerTenantId,
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_fed2_message_send_creates_both_inbound_and_outbound_rows(): void
+    {
+        $viewer = $this->authenticatedUser(['name' => 'Message Sender']);
+        $this->enableFederationSystem();
+        $this->enableFederationMessagingAndTransactions();
+        $this->setFederationUserSettings($viewer->id, [
+            'federation_optin' => 1,
+            'messaging_enabled_federated' => 1,
+        ]);
+        $partnerTenantId = $this->seedFederationPartner('Inbox Timebank');
+        $recipientId = $this->seedTransactingFederatedMember($partnerTenantId, 'Inbox', 'Recipient');
+
+        $this->post("/{$this->testTenantSlug}/alpha/federation/messages", [
+            'receiver_id' => $recipientId,
+            'receiver_tenant_id' => $partnerTenantId,
+            'subject' => 'Across the network',
+            'body' => 'Can you help with my garden?',
+        ])->assertRedirect(route('govuk-alpha.federation.members.show', [
+            'tenantSlug' => $this->testTenantSlug, 'id' => $recipientId, 'tenant_id' => $partnerTenantId, 'status' => 'message-sent',
+        ]));
+
+        // EXACTLY one outbound (sender copy) + one inbound (receiver copy).
+        $outbound = DB::table('federation_messages')
+            ->where('sender_user_id', $viewer->id)
+            ->where('sender_tenant_id', $this->testTenantId)
+            ->where('receiver_user_id', $recipientId)
+            ->where('receiver_tenant_id', $partnerTenantId)
+            ->where('direction', 'outbound')
+            ->count();
+        $inbound = DB::table('federation_messages')
+            ->where('sender_user_id', $viewer->id)
+            ->where('sender_tenant_id', $this->testTenantId)
+            ->where('receiver_user_id', $recipientId)
+            ->where('receiver_tenant_id', $partnerTenantId)
+            ->where('direction', 'inbound')
+            ->count();
+        $this->assertSame(1, $outbound, 'exactly one outbound row');
+        $this->assertSame(1, $inbound, 'exactly one inbound row');
+    }
+
+    public function test_fed2_local_hour_transfer_moves_exact_credits(): void
+    {
+        // Whole-hour amounts only (nexus_test balance/amount columns are int).
+        $sender = $this->authenticatedUser(['name' => 'Credit Sender', 'balance' => 10]);
+        $this->enableFederationSystem();
+        $this->enableFederationMessagingAndTransactions();
+        $this->setFederationUserSettings($sender->id, [
+            'federation_optin' => 1,
+            'transactions_enabled_federated' => 1,
+        ]);
+        $partnerTenantId = $this->seedFederationPartner('Credit Timebank');
+        $recipientId = $this->seedTransactingFederatedMember($partnerTenantId, 'Credit', 'Recipient');
+        DB::table('users')->where('id', $recipientId)->update(['balance' => 3]);
+
+        $this->post("/{$this->testTenantSlug}/alpha/federation/members/{$recipientId}/transfer", [
+            'receiver_tenant_id' => $partnerTenantId,
+            'amount' => 4,
+            'description' => 'Thanks for the help',
+        ])->assertRedirect(route('govuk-alpha.federation.members.show', [
+            'tenantSlug' => $this->testTenantSlug, 'id' => $recipientId, 'tenant_id' => $partnerTenantId, 'status' => 'transfer-sent',
+        ]));
+
+        // Exact balances: sender 10 - 4 = 6, recipient 3 + 4 = 7.
+        $this->assertSame(6, (int) DB::table('users')->where('id', $sender->id)->value('balance'));
+        $this->assertSame(7, (int) DB::table('users')->where('id', $recipientId)->value('balance'));
+
+        // A single completed federated transaction row records the move.
+        $this->assertDatabaseHas('transactions', [
+            'sender_id' => $sender->id,
+            'sender_tenant_id' => $this->testTenantId,
+            'receiver_id' => $recipientId,
+            'receiver_tenant_id' => $partnerTenantId,
+            'amount' => 4,
+            'status' => 'completed',
+            'is_federated' => 1,
+        ]);
+    }
+
+    public function test_fed2_transfer_rejects_insufficient_balance_without_moving_credits(): void
+    {
+        $sender = $this->authenticatedUser(['name' => 'Poor Sender', 'balance' => 2]);
+        $this->enableFederationSystem();
+        $this->enableFederationMessagingAndTransactions();
+        $this->setFederationUserSettings($sender->id, [
+            'federation_optin' => 1,
+            'transactions_enabled_federated' => 1,
+        ]);
+        $partnerTenantId = $this->seedFederationPartner('NoFunds Timebank');
+        $recipientId = $this->seedTransactingFederatedMember($partnerTenantId, 'NoFunds', 'Recipient');
+        DB::table('users')->where('id', $recipientId)->update(['balance' => 5]);
+
+        $this->post("/{$this->testTenantSlug}/alpha/federation/members/{$recipientId}/transfer", [
+            'receiver_tenant_id' => $partnerTenantId,
+            'amount' => 10,
+            'description' => 'Too much',
+        ])->assertRedirect(route('govuk-alpha.federation.transfer', [
+            'tenantSlug' => $this->testTenantSlug, 'id' => $recipientId, 'tenant_id' => $partnerTenantId, 'status' => 'transfer-insufficient',
+        ]));
+
+        // No credits moved.
+        $this->assertSame(2, (int) DB::table('users')->where('id', $sender->id)->value('balance'));
+        $this->assertSame(5, (int) DB::table('users')->where('id', $recipientId)->value('balance'));
+    }
+
+    public function test_fed2_member_cannot_accept_another_members_connection_request(): void
+    {
+        // Attacker is the authenticated user. The pending request belongs to a
+        // DIFFERENT receiver, so the attacker must not be able to accept it.
+        $attacker = $this->authenticatedUser(['name' => 'Connection Attacker']);
+        $this->enableFederationSystem();
+        $this->setFederationUserSettings($attacker->id, ['federation_optin' => 1]);
+
+        $partnerTenantId = $this->seedFederationPartner('Victim Timebank');
+        $requesterId = $this->seedFederatedMember($partnerTenantId, 'Some', 'Requester', 'Skill');
+        // A different local user is the real receiver of the request.
+        $victim = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Real Receiver', 'status' => 'active', 'is_approved' => true,
+        ]);
+
+        DB::table('federation_connections')->insert([
+            'requester_user_id' => $requesterId,
+            'requester_tenant_id' => $partnerTenantId,
+            'receiver_user_id' => $victim->id,
+            'receiver_tenant_id' => $this->testTenantId,
+            'status' => 'pending',
+            'created_at' => now(),
+        ]);
+        $connId = (int) DB::table('federation_connections')->where('receiver_user_id', $victim->id)->value('id');
+
+        // The attacker tries to accept it → service returns failure, redirect carries
+        // the failed status, and the row stays pending (no privilege escalation).
+        $this->post("/{$this->testTenantSlug}/alpha/federation/connections/{$connId}/accept")
+            ->assertRedirect("/{$this->testTenantSlug}/alpha/federation/connections?tab=received&status=connection-action-failed");
+
+        $this->assertSame('pending', DB::table('federation_connections')->where('id', $connId)->value('status'));
+    }
+
+    public function test_fed2_transfer_requires_viewer_transactions_enabled(): void
+    {
+        // Viewer opted in but did NOT enable federated transactions → blocked.
+        $sender = $this->authenticatedUser(['name' => 'Unenabled Sender', 'balance' => 10]);
+        $this->enableFederationSystem();
+        $this->enableFederationMessagingAndTransactions();
+        $this->setFederationUserSettings($sender->id, ['federation_optin' => 1]);
+        $partnerTenantId = $this->seedFederationPartner('Gate Timebank');
+        $recipientId = $this->seedTransactingFederatedMember($partnerTenantId, 'Gate', 'Recipient');
+        DB::table('users')->where('id', $recipientId)->update(['balance' => 0]);
+
+        $this->post("/{$this->testTenantSlug}/alpha/federation/members/{$recipientId}/transfer", [
+            'receiver_tenant_id' => $partnerTenantId,
+            'amount' => 3,
+            'description' => 'Should be blocked',
+        ])->assertRedirect(route('govuk-alpha.federation.transfer', [
+            'tenantSlug' => $this->testTenantSlug, 'id' => $recipientId, 'tenant_id' => $partnerTenantId, 'status' => 'transfer-not-enabled',
+        ]));
+
+        $this->assertSame(10, (int) DB::table('users')->where('id', $sender->id)->value('balance'));
+        $this->assertSame(0, (int) DB::table('users')->where('id', $recipientId)->value('balance'));
+    }
+
+    public function test_fed2_connections_and_messages_require_federation_feature(): void
+    {
+        $this->authenticatedUser();
+        // Federation feature OFF for the tenant.
+        $row = DB::table('tenants')->where('id', $this->testTenantId)->value('features');
+        $features = $row ? (json_decode($row, true) ?: []) : [];
+        $features['federation'] = false;
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['features' => json_encode($features)]);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        $this->get("/{$this->testTenantSlug}/alpha/federation/connections")->assertForbidden();
+        $this->get("/{$this->testTenantSlug}/alpha/federation/messages")->assertForbidden();
+    }
 }

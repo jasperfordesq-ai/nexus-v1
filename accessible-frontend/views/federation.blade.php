@@ -132,6 +132,8 @@
     <h2 class="govuk-heading-l">{{ __('govuk_alpha.federation.hub.quick_links_heading') }}</h2>
     <ul class="govuk-list">
         <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.members.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.quick_link_members') }}</a></li>
+        <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.connections.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.fed2.connections.title') }}</a></li>
+        <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.messages.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.fed2.messages.title') }}</a></li>
         <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.listings.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.quick_link_listings') }}</a></li>
         <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.events.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.quick_link_events') }}</a></li>
         <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.settings', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.quick_link_settings') }}</a></li>
