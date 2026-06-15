@@ -7353,9 +7353,24 @@ class AlphaController extends Controller
             report($e);
         }
 
-        $transactions = [];
+        // WAVE T1-WALLET: server-rendered transaction filter (all/earned/spent/pending)
+        // + page-based pagination. The filter is a sanitised GET param so the no-JS
+        // path can switch tabs and load further pages with plain links.
+        $filter = self::walletFilterParam(self::asStr($request->query('filter')));
+        $page = max(1, (int) $request->query('page', '1'));
+        $perPage = 20;
+
+        $txPage = ['items' => [], 'has_more' => false, 'page' => $page, 'filter' => $filter];
         try {
-            $transactions = $walletService->getTransactions($userId, ['type' => 'all', 'limit' => 20])['items'] ?? [];
+            $txPage = $this->walletTransactionsPage($userId, $filter, $page, $perPage);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // WAVE T1-WALLET: community fund balance (read-only display + a donate target).
+        $fund = null;
+        try {
+            $fund = \App\Services\CommunityFundService::getBalance();
         } catch (\Throwable $e) {
             report($e);
         }
@@ -7379,11 +7394,16 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'wallet',
             'wallet' => $wallet,
-            'transactions' => $transactions,
+            'transactions' => $txPage['items'],
+            'txFilter' => $filter,
+            'txPage' => $txPage['page'],
+            'txHasMore' => $txPage['has_more'],
+            'fund' => $fund,
             'recipientQuery' => $recipientQuery,
             'recipientResults' => $recipientResults,
             'status' => self::asStr($request->query('status')) ?: null,
             'transferError' => self::asStr($request->query('error')) ?: null,
+            'donateError' => self::asStr($request->query('donate_error')) ?: null,
         ]);
     }
 
@@ -10784,6 +10804,257 @@ class AlphaController extends Controller
             'id' => $receiverId,
             'tenant_id' => $receiverTenantId,
             'status' => 'transfer-sent',
+        ]);
+    }
+
+    // ===== WAVE T1-WALLET: donate + fund + tx depth =====
+
+    /**
+     * Allowed transaction filter tabs for the accessible wallet history.
+     * Anything outside this whitelist collapses to 'all'.
+     */
+    private const WALLET_TX_FILTERS = ['all', 'earned', 'spent', 'pending'];
+
+    /** Sanitise the wallet transaction filter GET param to a known tab. */
+    private static function walletFilterParam(string $value): string
+    {
+        $value = strtolower(trim($value));
+
+        return in_array($value, self::WALLET_TX_FILTERS, true) ? $value : 'all';
+    }
+
+    /**
+     * Load one page of the caller's OWN transactions for the accessible wallet,
+     * filtered by tab (all / earned / spent / pending) with offset pagination.
+     *
+     * Every row is tenant-scoped (transactions.tenant_id) AND constrained to the
+     * caller as sender or receiver — a user can never page into another member's
+     * history. Soft-delete flags (deleted_for_sender / deleted_for_receiver) are
+     * honoured so hidden rows stay hidden, mirroring WalletService::getTransactions.
+     *
+     * @return array{items: array<int, array<string, mixed>>, has_more: bool, page: int, filter: string}
+     */
+    private function walletTransactionsPage(int $userId, string $filter, int $page, int $perPage): array
+    {
+        $tenantId = TenantContext::getId();
+        $perPage = max(1, min($perPage, 100));
+        $page = max(1, $page);
+        $offset = ($page - 1) * $perPage;
+
+        $query = DB::table('transactions as t')
+            ->leftJoin('users as s', 's.id', '=', 't.sender_id')
+            ->leftJoin('users as r', 'r.id', '=', 't.receiver_id')
+            ->where('t.tenant_id', $tenantId);
+
+        // Constrain to the caller's own rows (as sender or receiver), respecting
+        // the per-side soft-delete flags. This is the IDOR guard.
+        switch ($filter) {
+            case 'earned':
+                // Credits IN to the caller: they are the receiver, completed only.
+                $query->where('t.receiver_id', $userId)
+                    ->where('t.deleted_for_receiver', 0)
+                    ->where('t.status', 'completed');
+                break;
+            case 'spent':
+                // Credits OUT from the caller: they are the sender, completed only.
+                $query->where('t.sender_id', $userId)
+                    ->where('t.deleted_for_sender', 0)
+                    ->where('t.status', 'completed');
+                break;
+            case 'pending':
+                $query->where('t.status', 'pending')
+                    ->where(function ($q) use ($userId) {
+                        $q->where(function ($q2) use ($userId) {
+                            $q2->where('t.sender_id', $userId)->where('t.deleted_for_sender', 0);
+                        })->orWhere(function ($q2) use ($userId) {
+                            $q2->where('t.receiver_id', $userId)->where('t.deleted_for_receiver', 0);
+                        });
+                    });
+                break;
+            case 'all':
+            default:
+                $query->where('t.status', 'completed')
+                    ->where(function ($q) use ($userId) {
+                        $q->where(function ($q2) use ($userId) {
+                            $q2->where('t.sender_id', $userId)->where('t.deleted_for_sender', 0);
+                        })->orWhere(function ($q2) use ($userId) {
+                            $q2->where('t.receiver_id', $userId)->where('t.deleted_for_receiver', 0);
+                        });
+                    });
+                break;
+        }
+
+        // Fetch one extra row to detect whether a further page exists.
+        $rows = $query
+            ->orderByDesc('t.id')
+            ->offset($offset)
+            ->limit($perPage + 1)
+            ->get([
+                't.id',
+                't.sender_id',
+                't.receiver_id',
+                't.amount',
+                't.description',
+                't.transaction_type',
+                't.status',
+                't.created_at',
+                DB::raw("CASE WHEN s.profile_type = 'organisation' AND s.organization_name IS NOT NULL AND s.organization_name != '' THEN s.organization_name ELSE TRIM(CONCAT(COALESCE(s.first_name, ''), ' ', COALESCE(s.last_name, ''))) END as sender_name"),
+                DB::raw("CASE WHEN r.profile_type = 'organisation' AND r.organization_name IS NOT NULL AND r.organization_name != '' THEN r.organization_name ELSE TRIM(CONCAT(COALESCE(r.first_name, ''), ' ', COALESCE(r.last_name, ''))) END as receiver_name"),
+            ]);
+
+        $hasMore = $rows->count() > $perPage;
+        if ($hasMore) {
+            $rows = $rows->take($perPage);
+        }
+
+        $fundLabel = __('govuk_alpha.wallet.community_fund_label');
+
+        $items = $rows->map(function ($row) use ($userId, $fundLabel): array {
+            // A community-fund grant has sender_id = NULL; the caller is the receiver.
+            $isCredit = ((int) $row->receiver_id === $userId);
+            $otherName = $isCredit
+                ? trim((string) ($row->sender_name ?? ''))
+                : trim((string) ($row->receiver_name ?? ''));
+
+            // System rows (fund grant / donation to fund) have no counterparty user.
+            if ($otherName === '') {
+                $otherName = $fundLabel;
+            }
+
+            return [
+                'id' => (int) $row->id,
+                'type' => $isCredit ? 'credit' : 'debit',
+                'status' => $row->status ?? 'completed',
+                'amount' => (float) $row->amount,
+                'description' => (string) ($row->description ?? ''),
+                'transaction_type' => (string) ($row->transaction_type ?? 'transfer'),
+                'other_user' => ['name' => $otherName],
+                'created_at' => $row->created_at,
+            ];
+        })->all();
+
+        return ['items' => $items, 'has_more' => $hasMore, 'page' => $page, 'filter' => $filter];
+    }
+
+    /**
+     * Donate the caller's OWN time credits to the community fund (and, when the
+     * backend supports it, to another member). This mirrors the
+     * WalletFeaturesController::donate / communityFundDonate contract EXACTLY —
+     * it never hand-rolls the money math, it calls the same CreditDonationService
+     * the API calls, which deducts atomically with a balance>=amount guard.
+     *
+     * The donor is ALWAYS the authenticated caller; a posted user id can only ever
+     * be the RECIPIENT, never the debited account.
+     */
+    public function donateCredits(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('wallet'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $fail = fn (string $error): RedirectResponse => redirect()->route('govuk-alpha.wallet.index', [
+            'tenantSlug' => $tenantSlug, 'status' => 'donate-failed', 'donate_error' => $error,
+        ])->withFragment('donate');
+
+        $amount = (float) $request->input('amount');
+        $message = trim(self::asStr($request->input('message')));
+        $target = self::asStr($request->input('target')) ?: 'community_fund';
+
+        // Positive, whole-hour, sane-maximum amount. Donations move credits one way
+        // and cannot be undone, so reject anything outside a tight band.
+        if ($amount <= 0) {
+            return $fail('invalid');
+        }
+        if (round($amount) != $amount) {
+            return $fail('decimals');
+        }
+        if ($amount > 1000) {
+            return $fail('too-large');
+        }
+
+        $donationService = app(\App\Services\CreditDonationService::class);
+
+        if ($target === 'user') {
+            $recipientId = (int) $request->input('recipient_id');
+            if ($recipientId <= 0) {
+                return $fail('invalid');
+            }
+            if ($recipientId === $userId) {
+                return $fail('self');
+            }
+            // Defensive tenant check: only ever donate to a member of THIS tenant.
+            $sameTenant = DB::table('users')
+                ->where('id', $recipientId)
+                ->where('tenant_id', TenantContext::getId())
+                ->exists();
+            if (!$sameTenant) {
+                return $fail('not-found');
+            }
+
+            $result = $donationService->donateToMember(
+                $userId,
+                $recipientId,
+                $amount,
+                mb_substr($message, 0, 255)
+            );
+        } else {
+            $result = $donationService->donateToCommunityFund(
+                $userId,
+                $amount,
+                mb_substr($message, 0, 255)
+            );
+        }
+
+        if (empty($result['success'])) {
+            $error = (string) ($result['error'] ?? '');
+            return $fail(match (true) {
+                stripos($error, 'insufficient') !== false => 'insufficient',
+                stripos($error, 'not found') !== false || stripos($error, 'recipient') !== false => 'not-found',
+                default => 'failed',
+            });
+        }
+
+        return redirect()->route('govuk-alpha.wallet.index', [
+            'tenantSlug' => $tenantSlug, 'status' => 'donate-sent',
+        ])->withFragment('transactions');
+    }
+
+    /**
+     * Stream the caller's OWN transaction history as a CSV download.
+     *
+     * Delegates to the canonical TransactionExportService, which builds a
+     * tenant + user-scoped statement (WHERE tenant_id = ? AND (sender = ? OR
+     * receiver = ?)) with CSV-injection escaping. There is no IDOR surface: the
+     * user id is taken from the authenticated session, never from the request.
+     */
+    public function exportTransactions(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('wallet'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $result = app(\App\Services\TransactionExportService::class)
+            ->exportPersonalStatementCSV($userId, []);
+
+        if (empty($result['success']) || !isset($result['csv'])) {
+            return redirect()->route('govuk-alpha.wallet.index', [
+                'tenantSlug' => $tenantSlug, 'status' => 'export-failed',
+            ]);
+        }
+
+        $filename = (string) ($result['filename'] ?? ('wallet_statement_' . date('Ymd_His') . '.csv'));
+
+        return response((string) $result['csv'], 200, [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
         ]);
     }
 }
