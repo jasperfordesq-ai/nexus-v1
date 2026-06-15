@@ -23,7 +23,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.coupons.description') }}</p>
 
     @if (empty($coupons))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.coupons.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.coupons.empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($coupons as $c)
@@ -35,7 +35,7 @@
                 @endphp
                 <article class="nexus-alpha-card">
                     <div class="nexus-alpha-module-row">
-                        <h2 class="govuk-heading-s govuk-!-margin-bottom-1">{{ $cTitle }}</h2>
+                        <h2 class="govuk-heading-s govuk-!-margin-bottom-1"><a class="govuk-link" href="{{ route('govuk-alpha.coupons.show', ['tenantSlug' => $tenantSlug, 'id' => $c['id']]) }}">{{ $cTitle }}</a></h2>
                         @if ($discount !== '')<strong class="govuk-tag govuk-tag--green">{{ $discount }}</strong>@endif
                     </div>
                     @if (trim((string) ($c['description'] ?? '')) !== '')

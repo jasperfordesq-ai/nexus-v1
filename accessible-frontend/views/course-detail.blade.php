@@ -19,9 +19,9 @@
     <a href="{{ route('govuk-alpha.courses.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-back-link">{{ __('govuk_alpha.courses.back') }}</a>
 
     @if ($status === 'enrolled')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="course-status">
-            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="course-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
-            <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.courses.states.enrolled') }}</p></div>
+        <div class="govuk-panel govuk-panel--confirmation govuk-!-margin-bottom-6">
+            <h1 class="govuk-panel__title">{{ __('govuk_alpha.states.success_title') }}</h1>
+            <div class="govuk-panel__body">{{ __('govuk_alpha.courses.states.enrolled') }}</div>
         </div>
     @elseif (in_array($status, ['insufficient-credits', 'enrol-failed'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
@@ -65,7 +65,7 @@
         @endforeach
     @endif
 
-    <h2 class="govuk-heading-l govuk-!-margin-top-6">{{ __('govuk_alpha.courses.enrol_button') }}</h2>
+    <h2 class="govuk-heading-l govuk-!-margin-top-6">{{ __('govuk_alpha.polish_commerce.course_enrol_section_heading') }}</h2>
     @if ($isEnrolled)
         <p class="govuk-inset-text">{{ __('govuk_alpha.courses.enrolled_notice') }}</p>
     @else
