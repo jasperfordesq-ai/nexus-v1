@@ -10,19 +10,16 @@
             <a class="govuk-back-link" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.auth.back_to_sign_in') }}</a>
 
             @if (($status ?? null) === 'forgot-sent')
-                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="forgot-sent-title">
-                    <div class="govuk-notification-banner__header">
-                        <h2 class="govuk-notification-banner__title" id="forgot-sent-title">{{ __('govuk_alpha.auth.forgot_sent_title') }}</h2>
-                    </div>
-                    <div class="govuk-notification-banner__content">
-                        <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.auth.forgot_sent_detail') }}</p>
-                    </div>
-                </div>
-                <p class="govuk-body">
-                    <a class="govuk-link" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.auth.back_to_sign_in') }}</a>
-                </p>
+                {{-- Authentic GOV.UK "check your email" confirmation: a page-level
+                     heading + body, not a notification banner (which is for in-page
+                     updates). Ensures a single visible h1 on the success path. --}}
+                <h1 class="govuk-heading-xl">{{ __('govuk_alpha.auth.forgot_sent_title') }}</h1>
+                <p class="govuk-body-l">{{ __('govuk_alpha.auth.forgot_sent_detail') }}</p>
                 <p class="govuk-body">
                     <a class="govuk-link" href="{{ route('govuk-alpha.login.forgot', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.auth.forgot_resend') }}</a>
+                </p>
+                <p class="govuk-body">
+                    <a class="govuk-link" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.auth.back_to_sign_in') }}</a>
                 </p>
             @else
                 @if (in_array($status ?? '', ['forgot-invalid', 'forgot-rate-limited'], true))
