@@ -345,7 +345,16 @@
             <section aria-labelledby="security-heading">
                 <h2 class="govuk-heading-l" id="security-heading">{{ __('govuk_alpha.profile_settings.security_title') }}</h2>
 
-                <h3 class="govuk-heading-m">{{ __('govuk_alpha.profile_settings.email_heading') }}</h3>
+                <h3 class="govuk-heading-m">{{ __('govuk_alpha.profile_settings.two_factor_heading') }}</h3>
+                <p class="govuk-body">{{ __('govuk_alpha.profile_settings.two_factor_intro') }}</p>
+                <p class="govuk-body">
+                    <a class="govuk-link" href="{{ route('govuk-alpha.profile.2fa', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.profile_settings.two_factor_link') }}</a>
+                </p>
+                <p class="govuk-body">
+                    <a class="govuk-link" href="{{ route('govuk-alpha.profile.blocked', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.profile_settings.blocked_link') }}</a>
+                </p>
+
+                <h3 class="govuk-heading-m govuk-!-margin-top-6">{{ __('govuk_alpha.profile_settings.email_heading') }}</h3>
                 <form method="post" action="{{ route('govuk-alpha.profile.email.update', ['tenantSlug' => $tenantSlug]) }}" novalidate>
                     @csrf
                     @php $newEmailError = $fieldErrorFor('new_email'); @endphp

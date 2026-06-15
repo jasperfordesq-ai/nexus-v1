@@ -2751,6 +2751,69 @@ class GovukAlphaFrontendTest extends TestCase
         $self->assertRedirectContains('status=endorsement-failed');
     }
 
+    public function test_t1safety_member_can_be_blocked_and_unblocked(): void
+    {
+        $viewer = $this->authenticatedUser(['name' => 'Blocker']);
+        $target = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Blocked Member',
+            'first_name' => 'Blocked',
+            'last_name' => 'Member',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($viewer, ['*']);
+
+        $block = $this->post("/{$this->testTenantSlug}/alpha/members/{$target->id}/block");
+        $block->assertRedirect("/{$this->testTenantSlug}/alpha/members/{$target->id}?status=member-blocked");
+        $this->assertDatabaseHas('user_blocks', [
+            'user_id' => $viewer->id,
+            'blocked_user_id' => $target->id,
+        ]);
+
+        // The blocked-users settings page lists them.
+        $page = $this->get("/{$this->testTenantSlug}/alpha/profile/blocked");
+        $page->assertOk();
+        $page->assertSee('Blocked Member');
+
+        // Unblock from the list.
+        $unblock = $this->post("/{$this->testTenantSlug}/alpha/members/{$target->id}/unblock", ['from' => 'list']);
+        $unblock->assertRedirect("/{$this->testTenantSlug}/alpha/profile/blocked?status=member-unblocked");
+        $this->assertDatabaseMissing('user_blocks', [
+            'user_id' => $viewer->id,
+            'blocked_user_id' => $target->id,
+        ]);
+    }
+
+    public function test_t1safety_cannot_block_yourself(): void
+    {
+        $viewer = $this->authenticatedUser(['name' => 'Self Blocker']);
+        Sanctum::actingAs($viewer, ['*']);
+
+        $block = $this->post("/{$this->testTenantSlug}/alpha/members/{$viewer->id}/block");
+        $block->assertRedirect("/{$this->testTenantSlug}/alpha/members/{$viewer->id}?status=block-self");
+        $this->assertDatabaseMissing('user_blocks', [
+            'user_id' => $viewer->id,
+            'blocked_user_id' => $viewer->id,
+        ]);
+    }
+
+    public function test_t1safety_two_factor_setup_renders_and_rejects_bad_code(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'TwoFactor Member']);
+        Sanctum::actingAs($user, ['*']);
+
+        // Setup page renders the QR + the verify form (2FA is off by default).
+        $setup = $this->get("/{$this->testTenantSlug}/alpha/profile/two-factor");
+        $setup->assertOk();
+        $setup->assertSee(__('govuk_alpha.security_2fa.verify_button'));
+        $setup->assertSee('name="code"', false);
+
+        // A wrong code is rejected and does not enable 2FA.
+        $verify = $this->post("/{$this->testTenantSlug}/alpha/profile/two-factor/verify", ['code' => '000000']);
+        $verify->assertRedirect("/{$this->testTenantSlug}/alpha/profile/two-factor?status=2fa-code-invalid");
+        $this->assertFalse(app(\App\Services\TotpService::class)->isEnabled($user->id));
+    }
+
     public function test_my_profile_and_settings_update_stay_inside_accessible_frontend(): void
     {
         $user = $this->authenticatedUser([

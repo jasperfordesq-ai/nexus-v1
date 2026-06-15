@@ -43,6 +43,19 @@
         </div>
     @endif
 
+    @php $blockStatuses = ['member-blocked' => true, 'member-unblocked' => true, 'block-self' => false, 'block-failed' => false]; @endphp
+    @if (array_key_exists(($status ?? ''), $blockStatuses))
+        @php $blockOk = $blockStatuses[$status]; @endphp
+        <div class="govuk-notification-banner {{ $blockOk ? 'govuk-notification-banner--success' : '' }}" data-module="govuk-notification-banner" role="region" aria-labelledby="block-status-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="block-status-title">{{ $blockOk ? __('govuk_alpha.states.success_title') : __('govuk_alpha.states.important') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.profile.block.status_' . str_replace('-', '_', $status)) }}</p>
+            </div>
+        </div>
+    @endif
+
     <div class="nexus-alpha-profile-hero">
         <div class="nexus-alpha-profile-hero__media">
             @if ($avatar)
@@ -111,6 +124,29 @@
                         </form>
                     @endif
                 </div>
+
+                @if ($isBlocked ?? false)
+                    <div class="govuk-inset-text govuk-!-margin-top-4">
+                        <p class="govuk-body govuk-!-margin-bottom-2">{{ __('govuk_alpha.profile.block.is_blocked', ['name' => $displayName]) }}</p>
+                        <form method="post" action="{{ route('govuk-alpha.members.unblock', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
+                            @csrf
+                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile.block.unblock') }}</button>
+                        </form>
+                    </div>
+                @else
+                    <details class="govuk-details govuk-!-margin-top-4" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">{{ __('govuk_alpha.profile.block.toggle') }}</span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            <p class="govuk-body">{{ __('govuk_alpha.profile.block.explain') }}</p>
+                            <form method="post" action="{{ route('govuk-alpha.members.block', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
+                                @csrf
+                                <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile.block.block') }}</button>
+                            </form>
+                        </div>
+                    </details>
+                @endif
             @endif
         </div>
     </div>

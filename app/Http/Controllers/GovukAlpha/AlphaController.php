@@ -7684,7 +7684,238 @@ class AlphaController extends Controller
             'endorsements' => $this->memberEndorsements($id, $viewerId),
             'canEndorse' => $id !== $viewerId,
             'profileActivity' => $this->profileActivity($id),
+            'isBlocked' => $id === $viewerId ? false : \App\Services\BlockUserService::isBlocked($viewerId, $id),
         ]);
+    }
+
+    // ===== WAVE T1-SAFETY: block users + authenticator-app 2FA enrolment =====
+
+    /**
+     * Block another member (mirrors POST /v2/users/{id}/block). Auto-disconnects
+     * any connection (handled by the service). Tenant + self scoped.
+     */
+    public function blockMember(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('connections'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        if ($id === $userId) {
+            return redirect()->route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'block-self']);
+        }
+
+        $exists = DB::table('users')->where('id', $id)->where('tenant_id', TenantContext::getId())->exists();
+        abort_unless($exists, 404);
+
+        $status = 'member-blocked';
+        try {
+            \App\Services\BlockUserService::block($userId, $id, self::asStr($request->input('reason')) ?: null);
+        } catch (\RuntimeException $e) {
+            $status = 'block-self';
+        } catch (\Throwable $e) {
+            report($e);
+            $status = 'block-failed';
+        }
+
+        return redirect()->route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
+    }
+
+    /**
+     * Unblock a member (mirrors DELETE /v2/users/{id}/block). 'from=list' returns
+     * to the blocked-users settings page; otherwise back to the member profile.
+     */
+    public function unblockMember(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('connections'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        \App\Services\BlockUserService::unblock($userId, $id);
+
+        if (self::asStr($request->input('from')) === 'list') {
+            return redirect()->route('govuk-alpha.profile.blocked', ['tenantSlug' => $tenantSlug, 'status' => 'member-unblocked']);
+        }
+
+        return redirect()->route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'member-unblocked']);
+    }
+
+    /**
+     * Blocked-users management page (mirrors GET /v2/users/blocked).
+     */
+    public function blockedUsers(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $blocked = \App\Services\BlockUserService::getBlockedUsers($userId);
+
+        return $this->view('accessible-frontend::blocked-users', [
+            'title' => __('govuk_alpha.blocked_users.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'profile',
+            'blocked' => $blocked->all(),
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Authenticator-app (TOTP) 2FA setup page. When 2FA is off this initialises a
+     * fresh secret + QR (server-rendered SVG, no JS) and shows a verify form; when
+     * on it shows status + a password-gated disable form. Mirrors the React
+     * Security tab's TOTP flow (only the passkey ceremony is JS-only/excluded).
+     */
+    public function twoFactorSetup(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $totp = app(\App\Services\TotpService::class);
+        $enabled = $totp->isEnabled($userId);
+
+        $setup = null;
+        if (!$enabled) {
+            try {
+                $init = $totp->initializeSetup($userId);
+                $setup = [
+                    'qr_data_uri' => 'data:image/svg+xml;base64,' . base64_encode((string) ($init['qr_code'] ?? '')),
+                    'secret' => self::asStr($init['secret'] ?? ''),
+                ];
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return $this->view('accessible-frontend::two-factor-setup', [
+            'title' => __('govuk_alpha.security_2fa.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'profile',
+            'enabled' => $enabled,
+            'setup' => $setup,
+            'backupCodesRemaining' => $enabled ? (int) $totp->getBackupCodeCount($userId) : 0,
+            'status' => self::asStr($request->query('status')) ?: null,
+            'backupCodes' => [],
+        ]);
+    }
+
+    /**
+     * Verify the 6-digit code and enable TOTP 2FA. On success the one-time backup
+     * codes are rendered once (this is the only moment they are shown).
+     */
+    public function verifyTwoFactorSetup(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $code = trim(self::asStr($request->input('code')));
+        if ($code === '') {
+            return redirect()->route('govuk-alpha.profile.2fa', ['tenantSlug' => $tenantSlug, 'status' => '2fa-code-required']);
+        }
+
+        $result = app(\App\Services\TotpService::class)->completeSetup($userId, $code);
+        if (empty($result['success'])) {
+            return redirect()->route('govuk-alpha.profile.2fa', ['tenantSlug' => $tenantSlug, 'status' => '2fa-code-invalid']);
+        }
+
+        $this->dispatch2faSecurityAlert($userId, true);
+
+        // Backup codes are shown exactly once, so render them on the POST response
+        // rather than redirecting (a redirect would lose them).
+        return $this->view('accessible-frontend::two-factor-setup', [
+            'title' => __('govuk_alpha.security_2fa.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'profile',
+            'enabled' => true,
+            'setup' => null,
+            'backupCodesRemaining' => count($result['backup_codes'] ?? []),
+            'status' => '2fa-enabled',
+            'backupCodes' => is_array($result['backup_codes'] ?? null) ? $result['backup_codes'] : [],
+        ]);
+    }
+
+    /**
+     * Disable TOTP 2FA. Requires the account password (mirrors the API disable).
+     */
+    public function disableTwoFactor(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $password = self::asStr($request->input('password'));
+        if ($password === '') {
+            return redirect()->route('govuk-alpha.profile.2fa', ['tenantSlug' => $tenantSlug, 'status' => '2fa-password-required']);
+        }
+
+        $result = app(\App\Services\TotpService::class)->disable($userId, $password);
+        if (empty($result['success'])) {
+            return redirect()->route('govuk-alpha.profile.2fa', ['tenantSlug' => $tenantSlug, 'status' => '2fa-disable-failed']);
+        }
+
+        $this->dispatch2faSecurityAlert($userId, false);
+
+        return redirect()->route('govuk-alpha.profile.2fa', ['tenantSlug' => $tenantSlug, 'status' => '2fa-disabled']);
+    }
+
+    /**
+     * Bell + email security alert when 2FA is enabled/disabled, rendered in the
+     * member's own preferred_language. Best-effort: never changes the outcome.
+     */
+    private function dispatch2faSecurityAlert(int $userId, bool $enabled): void
+    {
+        try {
+            $user = \App\Models\User::query()->find($userId);
+            if ($user === null) {
+                return;
+            }
+            $locale = $user->preferred_language ?? null;
+            $tpl = $enabled ? '2fa_enabled' : '2fa_disabled';
+            $event = $enabled ? '2fa_enabled' : '2fa_disabled';
+            $msgKey = $enabled ? 'api_controllers_2.two_factor.enabled_notification' : 'api_controllers_2.two_factor.disabled_notification';
+
+            \App\I18n\LocaleContext::withLocale($locale, function () use ($userId, $msgKey, $event) {
+                \App\Models\Notification::createNotification($userId, __($msgKey), null, $event);
+                \App\Services\NotificationDispatcher::fanOutPush($userId, $event, __($msgKey), null);
+            });
+
+            if (!empty($user->email)) {
+                $tenantId = (int) ($user->tenant_id ?? TenantContext::getId());
+                $theme = $enabled ? 'success' : 'danger';
+                TenantContext::runForTenant($tenantId, function () use ($user, $locale, $tenantId, $tpl, $theme) {
+                    \App\I18n\LocaleContext::withLocale($locale, function () use ($user, $tenantId, $tpl, $theme) {
+                        $tenantName = TenantContext::get()['name'] ?? 'Project NEXUS';
+                        $html = \App\Core\EmailTemplateBuilder::make()
+                            ->theme($theme)
+                            ->title(__("emails_security_alerts.{$tpl}.title"))
+                            ->previewText(__("emails_security_alerts.{$tpl}.preview"))
+                            ->greeting(self::asStr($user->first_name ?? $user->name ?? ''))
+                            ->paragraph(__("emails_security_alerts.{$tpl}.body"))
+                            ->paragraph(__("emails_security_alerts.{$tpl}.warning"))
+                            ->render();
+                        $subject = __("emails_security_alerts.{$tpl}.subject", ['community' => $tenantName]);
+                        \App\Services\EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'security_alert', ['tenant_id' => $tenantId]);
+                    });
+                });
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     /**

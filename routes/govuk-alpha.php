@@ -155,6 +155,9 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/members/{id}', [AlphaController::class, 'memberProfile'])->whereNumber('id')->name('members.show');
         Route::post('/members/{id}/connection', [AlphaController::class, 'updateMemberConnection'])->middleware('throttle:20,1')->whereNumber('id')->name('members.connection');
         Route::post('/members/{id}/endorse', [AlphaController::class, 'endorseMemberSkill'])->middleware('throttle:30,1')->whereNumber('id')->name('members.endorse');
+        // ===== WAVE T1-SAFETY: block / unblock a member =====
+        Route::post('/members/{id}/block', [AlphaController::class, 'blockMember'])->middleware('throttle:20,1')->whereNumber('id')->name('members.block');
+        Route::post('/members/{id}/unblock', [AlphaController::class, 'unblockMember'])->middleware('throttle:20,1')->whereNumber('id')->name('members.unblock');
         Route::get('/connections', [AlphaController::class, 'connections'])->name('connections.index');
         Route::post('/connections/{id}/accept', [AlphaController::class, 'acceptConnection'])->middleware('throttle:30,1')->whereNumber('id')->name('connections.accept');
         Route::post('/connections/{id}/decline', [AlphaController::class, 'declineConnection'])->middleware('throttle:30,1')->whereNumber('id')->name('connections.decline');
@@ -261,6 +264,11 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/profile', [AlphaController::class, 'myProfile'])->name('profile.me');
         Route::get('/profile/settings', [AlphaController::class, 'profileSettings'])->name('profile.settings');
         Route::post('/profile/settings', [AlphaController::class, 'updateProfileSettings'])->middleware('throttle:20,1')->name('profile.settings.update');
+        // ===== WAVE T1-SAFETY: authenticator-app 2FA enrolment + blocked-users page =====
+        Route::get('/profile/two-factor', [AlphaController::class, 'twoFactorSetup'])->name('profile.2fa');
+        Route::post('/profile/two-factor/verify', [AlphaController::class, 'verifyTwoFactorSetup'])->middleware('throttle:10,1')->name('profile.2fa.verify');
+        Route::post('/profile/two-factor/disable', [AlphaController::class, 'disableTwoFactor'])->middleware('throttle:5,1')->name('profile.2fa.disable');
+        Route::get('/profile/blocked', [AlphaController::class, 'blockedUsers'])->name('profile.blocked');
         Route::post('/profile/email', [AlphaController::class, 'updateProfileEmail'])->middleware('throttle:10,1')->name('profile.email.update');
         Route::post('/profile/password', [AlphaController::class, 'updateProfilePassword'])->middleware('throttle:10,1')->name('profile.password.update');
         Route::post('/profile/language', [AlphaController::class, 'updateProfileLanguage'])->middleware('throttle:20,1')->name('profile.language.update');
