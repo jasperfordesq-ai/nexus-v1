@@ -383,7 +383,7 @@
                         @php
                             $itemReactions = $reactionsByTarget[$itemType][$itemId] ?? null;
                         @endphp
-                        @if ($itemReactions !== null)
+                        @if ($itemType === 'post' && $itemReactions !== null)
                             @include('accessible-frontend::partials.feed-reactions', [
                                 'reactionAction' => route('govuk-alpha.feed.posts.react', ['tenantSlug' => $tenantSlug, 'id' => $itemId]),
                                 'alphaReactions' => $alphaReactions,
