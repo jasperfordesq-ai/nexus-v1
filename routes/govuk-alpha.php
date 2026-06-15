@@ -147,6 +147,11 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/polls', [AlphaController::class, 'polls'])->name('polls.index');
         Route::post('/polls/{pollId}/vote', [AlphaController::class, 'storePollVote'])->whereNumber('pollId')->middleware('throttle:30,1')->name('polls.vote');
         Route::get('/wallet', [AlphaController::class, 'wallet'])->name('wallet.index');
+        // ===== WAVE T1-WALLET =====
+        // CSV export registered before any /wallet/* sibling so a future wildcard
+        // can never shadow it. Credit-moving donate is rate-limited tightly.
+        Route::get('/wallet/export.csv', [AlphaController::class, 'exportTransactions'])->middleware('throttle:10,1')->name('wallet.export');
+        Route::post('/wallet/donate', [AlphaController::class, 'donateCredits'])->middleware('throttle:10,1')->name('wallet.donate');
         Route::post('/wallet/transfer', [AlphaController::class, 'transferCredits'])->middleware('throttle:15,1')->name('wallet.transfer');
         Route::get('/wallet/recipients', [AlphaController::class, 'walletRecipients'])->middleware('throttle:60,1')->name('wallet.recipients');
         Route::get('/messages', [AlphaController::class, 'messages'])->name('messages.index');

@@ -21,6 +21,20 @@
             'decimals' => __('govuk_alpha.wallet.errors.decimals'),
             'failed' => __('govuk_alpha.wallet.errors.failed'),
         ];
+        // WAVE T1-WALLET: donate error map + transaction-filter state.
+        $donateErrorMessages = [
+            'invalid' => __('govuk_alpha.wallet_t1.errors.invalid'),
+            'insufficient' => __('govuk_alpha.wallet_t1.errors.insufficient'),
+            'not-found' => __('govuk_alpha.wallet_t1.errors.not_found'),
+            'self' => __('govuk_alpha.wallet_t1.errors.self'),
+            'too-large' => __('govuk_alpha.wallet_t1.errors.too_large'),
+            'decimals' => __('govuk_alpha.wallet_t1.errors.decimals'),
+            'failed' => __('govuk_alpha.wallet_t1.errors.failed'),
+        ];
+        $activeFilter = $txFilter ?? 'all';
+        $currentPage = (int) ($txPage ?? 1);
+        $fundBalance = (float) ($fund['balance'] ?? 0);
+        $fundDonated = (float) ($fund['total_donated'] ?? 0);
     @endphp
 
     <span class="govuk-caption-l">{{ __('govuk_alpha.wallet.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
@@ -47,6 +61,37 @@
                 </div>
             </div>
         </div>
+    @elseif ($status === 'donate-sent')
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="wallet-donate-status-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="wallet-donate-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.wallet_t1.donate_success') }}</p>
+            </div>
+        </div>
+    @elseif ($status === 'donate-failed')
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li><a href="#donate">{{ $donateErrorMessages[$donateError ?? 'failed'] ?? $donateErrorMessages['failed'] }}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    @elseif ($status === 'export-failed')
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li><a href="#transactions">{{ __('govuk_alpha.wallet_t1.export_failed') }}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     @endif
 
     <dl class="nexus-alpha-stat-grid">
@@ -63,6 +108,54 @@
             <dd>{{ __('govuk_alpha.wallet.hours_value', ['value' => $fmtHours($spent)]) }}</dd>
         </div>
     </dl>
+
+    {{-- WAVE T1-WALLET: community fund balance (read-only) --}}
+    @if ($fund !== null)
+        <section aria-labelledby="fund-heading" id="community-fund">
+            <h2 class="govuk-heading-l govuk-!-margin-top-7" id="fund-heading">{{ __('govuk_alpha.wallet_t1.fund_heading') }}</h2>
+            <p class="govuk-body">{{ __('govuk_alpha.wallet_t1.fund_description') }}</p>
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">{{ __('govuk_alpha.wallet_t1.fund_balance_label') }}</dt>
+                    <dd class="govuk-summary-list__value">{{ __('govuk_alpha.wallet.hours_value', ['value' => $fmtHours($fundBalance)]) }}</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">{{ __('govuk_alpha.wallet_t1.fund_donated_label') }}</dt>
+                    <dd class="govuk-summary-list__value">{{ __('govuk_alpha.wallet.hours_value', ['value' => $fmtHours($fundDonated)]) }}</dd>
+                </div>
+            </dl>
+        </section>
+    @endif
+
+    {{-- WAVE T1-WALLET: donate to the community fund --}}
+    <section aria-labelledby="donate-heading" id="donate">
+        <h2 class="govuk-heading-l govuk-!-margin-top-7" id="donate-heading">{{ __('govuk_alpha.wallet_t1.donate_title') }}</h2>
+        <p class="govuk-body">{{ __('govuk_alpha.wallet_t1.donate_description') }}</p>
+
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning') }}</span>
+                {{ __('govuk_alpha.wallet_t1.donate_warning') }}
+            </strong>
+        </div>
+
+        <form method="post" action="{{ route('govuk-alpha.wallet.donate', ['tenantSlug' => $tenantSlug]) }}">
+            @csrf
+            <input type="hidden" name="target" value="community_fund">
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="donate-amount">{{ __('govuk_alpha.wallet_t1.donate_amount_label') }}</label>
+                <div id="donate-amount-hint" class="govuk-hint">{{ __('govuk_alpha.wallet_t1.donate_amount_hint') }}</div>
+                <input class="govuk-input govuk-input--width-5" id="donate-amount" name="amount" type="number" min="1" max="1000" step="1" inputmode="numeric" aria-describedby="donate-amount-hint" required>
+            </div>
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="donate-message">{{ __('govuk_alpha.wallet_t1.donate_message_label') }}</label>
+                <div id="donate-message-hint" class="govuk-hint">{{ __('govuk_alpha.wallet_t1.donate_message_hint') }}</div>
+                <input class="govuk-input" id="donate-message" name="message" type="text" maxlength="255" aria-describedby="donate-message-hint">
+            </div>
+            <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.wallet_t1.donate_button') }}</button>
+        </form>
+    </section>
 
     <section aria-labelledby="transfer-heading" id="transfer">
         <h2 class="govuk-heading-l govuk-!-margin-top-7" id="transfer-heading">{{ __('govuk_alpha.wallet.transfer_title') }}</h2>
@@ -129,6 +222,33 @@
 
     <section aria-labelledby="transactions-heading" id="transactions">
         <h2 class="govuk-heading-l govuk-!-margin-top-7" id="transactions-heading">{{ __('govuk_alpha.wallet.history_title') }}</h2>
+
+        {{-- WAVE T1-WALLET: export the caller's own history as CSV (no-JS download) --}}
+        <p class="govuk-body">
+            <a class="govuk-link" href="{{ route('govuk-alpha.wallet.export', ['tenantSlug' => $tenantSlug]) }}" download>{{ __('govuk_alpha.wallet_t1.export_button') }}</a>
+            <span class="govuk-hint govuk-!-display-inline">— {{ __('govuk_alpha.wallet_t1.export_description') }}</span>
+        </p>
+
+        {{-- WAVE T1-WALLET: server-rendered filter tabs (plain links, no JS) --}}
+        <div class="govuk-tabs govuk-!-margin-top-4">
+            <h3 class="govuk-tabs__title">{{ __('govuk_alpha.wallet_t1.filter_heading') }}</h3>
+            <ul class="govuk-tabs__list">
+                @php
+                    $filterTabs = [
+                        'all' => __('govuk_alpha.wallet_t1.filter_all'),
+                        'earned' => __('govuk_alpha.wallet_t1.filter_earned'),
+                        'spent' => __('govuk_alpha.wallet_t1.filter_spent'),
+                        'pending' => __('govuk_alpha.wallet_t1.filter_pending'),
+                    ];
+                @endphp
+                @foreach ($filterTabs as $tabKey => $tabLabel)
+                    <li class="govuk-tabs__list-item{{ $activeFilter === $tabKey ? ' govuk-tabs__list-item--selected' : '' }}">
+                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.wallet.index', $tabKey === 'all' ? ['tenantSlug' => $tenantSlug] : ['tenantSlug' => $tenantSlug, 'filter' => $tabKey]) }}#transactions" @if ($activeFilter === $tabKey) aria-current="page" @endif>{{ $tabLabel }}</a>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+
         @if (empty($transactions))
             <p class="govuk-inset-text">{{ __('govuk_alpha.wallet.history_empty') }}</p>
         @else
@@ -162,6 +282,32 @@
                     @endforeach
                 </tbody>
             </table>
+
+            {{-- WAVE T1-WALLET: GOV.UK pagination (previous / next page links, no JS) --}}
+            @if ($currentPage > 1 || $txHasMore)
+                <nav class="govuk-pagination" aria-label="{{ __('govuk_alpha.wallet.history_title') }}">
+                    @if ($currentPage > 1)
+                        <div class="govuk-pagination__prev">
+                            <a class="govuk-link govuk-pagination__link" href="{{ route('govuk-alpha.wallet.index', array_filter(['tenantSlug' => $tenantSlug, 'filter' => $activeFilter === 'all' ? null : $activeFilter, 'page' => $currentPage - 1 > 1 ? $currentPage - 1 : null])) }}#transactions" rel="prev">
+                                <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                                    <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                                </svg>
+                                <span class="govuk-pagination__link-title">{{ __('govuk_alpha.wallet_t1.pagination_previous') }}</span>
+                            </a>
+                        </div>
+                    @endif
+                    @if ($txHasMore)
+                        <div class="govuk-pagination__next">
+                            <a class="govuk-link govuk-pagination__link" href="{{ route('govuk-alpha.wallet.index', array_filter(['tenantSlug' => $tenantSlug, 'filter' => $activeFilter === 'all' ? null : $activeFilter, 'page' => $currentPage + 1])) }}#transactions" rel="next">
+                                <span class="govuk-pagination__link-title">{{ __('govuk_alpha.wallet_t1.pagination_next') }}</span>
+                                <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                                    <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    @endif
+                </nav>
+            @endif
         @endif
     </section>
 @endsection

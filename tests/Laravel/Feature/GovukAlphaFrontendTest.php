@@ -6937,4 +6937,187 @@ class GovukAlphaFrontendTest extends TestCase
             'bookmarkable_id' => $postId,
         ]);
     }
+
+    // ==================================================================
+    // WAVE T1-WALLET — donate + community fund + tx filters/pagination/CSV
+    // ==================================================================
+
+    /**
+     * A donation to the community fund moves the EXACT credits out of the member
+     * and into the fund. We assert BOTH ledgers: the donor's wallet balance falls
+     * by exactly the amount, and the fund's balance rises by exactly the amount.
+     */
+    public function test_t1wallet_donate_to_community_fund_moves_exact_credits(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Generous Donor']);
+        DB::table('users')->where('id', $user->id)->update(['balance' => 30]);
+
+        // Read the fund's starting balance (auto-created on first read).
+        $fundBefore = (float) \App\Services\CommunityFundService::getBalance()['balance'];
+
+        $this->post("/{$this->testTenantSlug}/alpha/wallet/donate", [
+            'target' => 'community_fund',
+            'amount' => '10',
+            'message' => 'For the shared pool',
+        ])->assertRedirectContains('status=donate-sent');
+
+        // Donor wallet: 30 − 10 = 20 (whole hours; nexus_test balance is int).
+        $this->assertSame(20, (int) DB::table('users')->where('id', $user->id)->value('balance'));
+
+        // Fund balance rose by exactly 10.
+        $fundAfter = (float) \App\Services\CommunityFundService::getBalance()['balance'];
+        $this->assertEqualsWithDelta($fundBefore + 10, $fundAfter, 0.001);
+
+        // A donor-side ledger row exists for the donation (sender = donor, no receiver).
+        $this->assertTrue(
+            DB::table('transactions')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('sender_id', $user->id)
+                ->whereNull('receiver_id')
+                ->where('amount', 10)
+                ->where('transaction_type', 'donation')
+                ->exists()
+        );
+    }
+
+    /**
+     * A donation larger than the member's balance is refused: no credits move
+     * from the member and nothing is added to the fund.
+     */
+    public function test_t1wallet_donate_refused_on_insufficient_balance(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Broke Donor']);
+        DB::table('users')->where('id', $user->id)->update(['balance' => 3]);
+
+        $fundBefore = (float) \App\Services\CommunityFundService::getBalance()['balance'];
+
+        $this->post("/{$this->testTenantSlug}/alpha/wallet/donate", [
+            'target' => 'community_fund',
+            'amount' => '10',
+        ])->assertRedirectContains('donate_error=insufficient');
+
+        // Donor balance untouched.
+        $this->assertSame(3, (int) DB::table('users')->where('id', $user->id)->value('balance'));
+
+        // Fund balance untouched.
+        $fundAfter = (float) \App\Services\CommunityFundService::getBalance()['balance'];
+        $this->assertEqualsWithDelta($fundBefore, $fundAfter, 0.001);
+    }
+
+    /**
+     * The "spent" filter narrows the history to outgoing transactions only:
+     * a transfer the caller sent appears, a transfer they received does not.
+     */
+    public function test_t1wallet_transaction_filter_narrows_results(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Filter Owner']);
+        DB::table('users')->where('id', $user->id)->update(['balance' => 50]);
+
+        $other = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true,
+            'first_name' => 'Counter', 'last_name' => 'Party',
+        ]);
+        DB::table('users')->where('id', $other->id)->update(['balance' => 50]);
+
+        // Outgoing (caller is sender) — should appear under "spent".
+        $this->post("/{$this->testTenantSlug}/alpha/wallet/transfer", [
+            'recipient_id' => $other->id,
+            'amount' => '7',
+            'note' => 'OUTGOING-SPENT-ROW',
+        ])->assertRedirectContains('status=transfer-sent');
+
+        // Incoming (caller is receiver) — should appear under "earned" but NOT "spent".
+        Sanctum::actingAs($other, ['*']);
+        $this->post("/{$this->testTenantSlug}/alpha/wallet/transfer", [
+            'recipient_id' => $user->id,
+            'amount' => '4',
+            'note' => 'INCOMING-EARNED-ROW',
+        ])->assertRedirectContains('status=transfer-sent');
+
+        // Back to the original caller for the filtered views.
+        Sanctum::actingAs($user, ['*']);
+
+        $spent = $this->get("/{$this->testTenantSlug}/alpha/wallet?filter=spent");
+        $spent->assertOk();
+        $spent->assertSee('OUTGOING-SPENT-ROW');
+        $spent->assertDontSee('INCOMING-EARNED-ROW');
+
+        $earned = $this->get("/{$this->testTenantSlug}/alpha/wallet?filter=earned");
+        $earned->assertOk();
+        $earned->assertSee('INCOMING-EARNED-ROW');
+        $earned->assertDontSee('OUTGOING-SPENT-ROW');
+    }
+
+    /**
+     * The CSV export returns a text/csv attachment containing a seeded row, and
+     * only the caller's own history (tenant + user scoped via the export service).
+     */
+    public function test_t1wallet_csv_export_returns_text_csv_with_seeded_row(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Export Owner']);
+        DB::table('users')->where('id', $user->id)->update(['balance' => 25]);
+
+        $other = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true,
+            'first_name' => 'Csv', 'last_name' => 'Recipient',
+        ]);
+        DB::table('users')->where('id', $other->id)->update(['balance' => 0]);
+
+        $this->post("/{$this->testTenantSlug}/alpha/wallet/transfer", [
+            'recipient_id' => $other->id,
+            'amount' => '6',
+            'note' => 'CSVEXPORTSEEDEDROW',
+        ])->assertRedirectContains('status=transfer-sent');
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/wallet/export.csv");
+
+        $response->assertOk();
+        $this->assertStringContainsString('text/csv', strtolower($response->headers->get('content-type') ?? ''));
+        $this->assertStringContainsString('attachment', strtolower($response->headers->get('content-disposition') ?? ''));
+        $response->assertSee('CSVEXPORTSEEDEDROW', false);
+        // CSV header row from TransactionExportService.
+        $response->assertSee('Description', false);
+    }
+
+    /**
+     * Pagination: with more than one page of transactions, page 2 shows the
+     * oldest rows and the "next" control appears on page 1.
+     */
+    public function test_t1wallet_pagination_shows_second_page(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Paginator']);
+
+        $other = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true,
+            'first_name' => 'Page', 'last_name' => 'Partner',
+        ]);
+
+        // Seed 22 completed outgoing transactions directly (whole-hour amounts).
+        // The oldest row carries a unique marker we expect only on page 2 (perPage = 20).
+        $now = now();
+        for ($i = 1; $i <= 22; $i++) {
+            DB::table('transactions')->insert([
+                'tenant_id' => $this->testTenantId,
+                'sender_id' => $user->id,
+                'receiver_id' => $other->id,
+                'amount' => 1,
+                'description' => $i === 1 ? 'OLDESTROWPAGE2MARKER' : ('row ' . $i),
+                'transaction_type' => 'transfer',
+                'status' => 'completed',
+                'created_at' => (clone $now)->subMinutes(60 - $i),
+                'updated_at' => (clone $now)->subMinutes(60 - $i),
+            ]);
+        }
+
+        // Page 1: newest 20 rows; the oldest marker is NOT here, but a "next" link is.
+        $page1 = $this->get("/{$this->testTenantSlug}/alpha/wallet");
+        $page1->assertOk();
+        $page1->assertDontSee('OLDESTROWPAGE2MARKER');
+        $page1->assertSee('page=2', false);
+
+        // Page 2: the 2 remaining (oldest) rows, including the marker.
+        $page2 = $this->get("/{$this->testTenantSlug}/alpha/wallet?page=2");
+        $page2->assertOk();
+        $page2->assertSee('OLDESTROWPAGE2MARKER');
+    }
 }
