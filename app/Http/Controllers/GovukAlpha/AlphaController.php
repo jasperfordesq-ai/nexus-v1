@@ -3543,6 +3543,35 @@ class AlphaController extends Controller
             report($e);
         }
 
+        // ===== WAVE POLISH-GAMIFY: daily reward + challenges =====
+        $dailyCanClaim = false;
+        $dailyStreak = 0;
+        $dailyBaseXp = 5; // DailyRewardService::BASE_XP (private const)
+        $dailyNextXp = $dailyBaseXp;
+        $challenges = [];
+        try {
+            $rewardConfig = \App\Services\DailyRewardService::getRewardConfig(TenantContext::getId());
+            $dailyBaseXp = (int) ($rewardConfig['base_xp'] ?? 5);
+            $dailyCanClaim = \App\Services\DailyRewardService::canClaim(TenantContext::getId(), $userId);
+            $dailyStreak = \App\Services\DailyRewardService::getStreak(TenantContext::getId(), $userId);
+            $streakBonuses = $rewardConfig['streak_bonuses'] ?? [3 => 5, 7 => 15, 14 => 25, 30 => 45, 60 => 70, 90 => 95];
+            $dailyNextXp = $dailyBaseXp;
+            foreach ($streakBonuses as $days => $bonus) {
+                if ($dailyStreak < (int) $days) {
+                    $dailyNextXp = $dailyBaseXp + (int) $bonus;
+                    break;
+                }
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        try {
+            $raw = app(\App\Services\ChallengeService::class)->getChallengesWithProgress($userId);
+            $challenges = is_array($raw) ? $raw : [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         return $this->view('accessible-frontend::achievements', [
             'title' => __('govuk_alpha.achievements.title'),
             'tenantSlug' => $tenantSlug,
@@ -3550,6 +3579,13 @@ class AlphaController extends Controller
             'gamProfile' => is_array($profile) ? $profile : [],
             'earnedBadges' => is_array($badges) ? $badges : [],
             'badgeProgress' => is_array($progress) ? $progress : [],
+            'dailyCanClaim' => $dailyCanClaim,
+            'dailyStreak' => $dailyStreak,
+            'dailyNextXp' => $dailyNextXp,
+            'dailyRewardXp' => $dailyBaseXp,
+            'dailyRewardStatus' => self::asStr($request->query('status')) ?: null,
+            'challenges' => $challenges,
+            'challengeStatus' => self::asStr($request->query('status')) ?: null,
         ]);
     }
 
@@ -3581,6 +3617,14 @@ class AlphaController extends Controller
             $rows = [];
         }
 
+        // ===== WAVE POLISH-GAMIFY: community impact stats =====
+        $communityImpact = [];
+        try {
+            $communityImpact = app(\App\Services\CommunityDashboardService::class)->getCommunityImpact(TenantContext::getId());
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         return $this->view('accessible-frontend::leaderboard', [
             'title' => __('govuk_alpha.leaderboard.title'),
             'tenantSlug' => $tenantSlug,
@@ -3590,6 +3634,7 @@ class AlphaController extends Controller
             'leaderboardPeriod' => $period,
             'leaderboardTypes' => $validTypes,
             'leaderboardPeriods' => $validPeriods,
+            'communityImpact' => is_array($communityImpact) ? $communityImpact : [],
         ]);
     }
 
@@ -12532,6 +12577,105 @@ class AlphaController extends Controller
     public function deleteJobAlert(Request $request, string $tenantSlug, int $alertId): RedirectResponse
     {
         return $this->jobAlertAction($tenantSlug, $alertId, 'delete');
+    }
+
+    // ===== WAVE POLISH-GAMIFY =====
+
+    /** POST: claim today's daily reward. Redirects back with status. */
+    public function dailyReward(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('gamification'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $status = 'daily-reward-failed';
+        try {
+            $result = \App\Services\DailyRewardService::claim(TenantContext::getId(), $userId);
+            if ($result !== null) {
+                $status = 'daily-reward-claimed';
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.achievements', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    /** POST: claim XP reward for a completed challenge. */
+    public function claimChallengeReward(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('gamification'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $status = 'challenge-claim-failed';
+        try {
+            $ok = app(\App\Services\ChallengeService::class)->claim($id, $userId, TenantContext::getId());
+            if ($ok) {
+                $status = 'challenge-claimed';
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.achievements', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    /** GET: Discover public goals you can buddy for. */
+    public function goalDiscover(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('goals'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $discoverGoals = [];
+        try {
+            $raw = app(\App\Services\GoalService::class)->getPublicForBuddy($userId, []);
+            $discoverGoals = is_array($raw['items'] ?? null) ? $raw['items'] : [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::goals-discover', [
+            'title' => __('govuk_alpha.polish_gamify.goals_discover_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'goals',
+            'discoverGoals' => $discoverGoals,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** POST: send a nudge/encouragement to a goal you are buddying. */
+    public function buddyNudge(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('goals'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $status = 'buddy-nudge-failed';
+        try {
+            // createBuddyNote() verifies mentor_id === buddyId internally (tenant-scoped).
+            $result = app(\App\Services\GoalService::class)->createBuddyNote($id, $userId, ['type' => 'nudge']);
+            if ($result !== null) {
+                $status = 'buddy-nudge-sent';
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.goals.buddying', ['tenantSlug' => $tenantSlug, 'status' => $status]);
     }
 
     /**

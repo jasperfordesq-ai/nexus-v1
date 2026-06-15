@@ -176,6 +176,9 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/connections/{id}/remove', [AlphaController::class, 'cancelConnection'])->middleware('throttle:30,1')->whereNumber('id')->name('connections.remove');
         Route::get('/account', [AlphaController::class, 'account'])->name('account');
         Route::get('/achievements', [AlphaController::class, 'achievements'])->name('achievements');
+        // ===== WAVE POLISH-GAMIFY: daily reward + challenge claim (static before any {id}) =====
+        Route::post('/achievements/daily-reward', [AlphaController::class, 'dailyReward'])->middleware('throttle:5,1')->name('achievements.daily-reward');
+        Route::post('/achievements/challenges/{id}/claim', [AlphaController::class, 'claimChallengeReward'])->whereNumber('id')->middleware('throttle:20,1')->name('achievements.claim-challenge');
         Route::get('/leaderboard', [AlphaController::class, 'leaderboard'])->name('leaderboard');
         Route::get('/nexus-score', [AlphaController::class, 'nexusScore'])->name('nexus-score');
         Route::get('/notifications', [AlphaController::class, 'notifications'])->name('notifications.index');
@@ -220,11 +223,14 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/goals/templates', [AlphaController::class, 'goalTemplates'])->name('goals.templates');
         Route::post('/goals/templates/{id}', [AlphaController::class, 'storeGoalFromTemplate'])->whereNumber('id')->middleware('throttle:15,1')->name('goals.templates.use');
         Route::get('/goals/buddying', [AlphaController::class, 'goalBuddying'])->name('goals.buddying');
+        // Static segment /discover registered before {id} so it is never shadowed.
+        Route::get('/goals/discover', [AlphaController::class, 'goalDiscover'])->name('goals.discover');
         Route::get('/goals/{id}', [AlphaController::class, 'goal'])->whereNumber('id')->name('goals.show');
         Route::get('/goals/{id}/edit', [AlphaController::class, 'editGoalForm'])->whereNumber('id')->name('goals.edit');
         Route::post('/goals/{id}/edit', [AlphaController::class, 'updateGoal'])->whereNumber('id')->middleware('throttle:15,1')->name('goals.update');
         Route::post('/goals/{id}/delete', [AlphaController::class, 'deleteGoal'])->whereNumber('id')->middleware('throttle:15,1')->name('goals.delete');
         Route::post('/goals/{id}/buddy', [AlphaController::class, 'becomeGoalBuddy'])->whereNumber('id')->middleware('throttle:15,1')->name('goals.buddy');
+        Route::post('/goals/{id}/buddy-nudge', [AlphaController::class, 'buddyNudge'])->whereNumber('id')->middleware('throttle:10,1')->name('goals.buddy-nudge');
         Route::post('/goals/{id}/progress', [AlphaController::class, 'incrementGoal'])->whereNumber('id')->middleware('throttle:30,1')->name('goals.progress');
         Route::post('/goals/{id}/complete', [AlphaController::class, 'completeGoal'])->whereNumber('id')->middleware('throttle:15,1')->name('goals.complete');
         Route::get('/organisations', [AlphaController::class, 'organisations'])->name('organisations.index');

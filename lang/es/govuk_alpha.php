@@ -1857,6 +1857,56 @@ return [
         'download' => 'Download',
         'no_file' => 'No file attached.',
     ],
+    'polish_gamify' => [
+        // ===== ACHIEVEMENTS =====
+        'daily_reward_title'         => 'Daily reward',
+        'daily_reward_description'   => 'Claim your daily login reward to build your streak and earn bonus XP.',
+        'daily_reward_streak'        => 'Current streak: :days day(s)',
+        'daily_reward_next_xp'       => 'Claim today to earn :xp XP',
+        'daily_reward_button'        => 'Claim daily reward',
+        'daily_reward_claimed'       => 'Daily reward already claimed today.',
+        'daily_reward_success'       => 'Daily reward claimed! You earned :xp XP.',
+        'daily_reward_failed'        => 'Unable to claim your reward. Please try again later.',
+        'daily_reward_milestone'     => 'Streak milestone bonus: +:bonus XP',
+        // ===== CHALLENGES =====
+        'challenges_title'           => 'Active challenges',
+        'challenges_description'     => 'Complete these challenges to earn XP rewards.',
+        'challenges_empty'           => 'There are no active challenges right now.',
+        'challenge_progress_label'   => ':current of :target',
+        'challenge_ends'             => 'Ends: :date',
+        'challenge_days_left'        => ':days day(s) left',
+        'challenge_reward_xp'        => 'Reward: :xp XP',
+        'challenge_completed_tag'    => 'Completed',
+        'challenge_claimed_tag'      => 'Reward claimed',
+        'challenge_claim_button'     => 'Claim reward',
+        'challenge_claim_success'    => 'Challenge reward claimed!',
+        'challenge_claim_failed'     => 'Unable to claim reward. Please try again.',
+        // ===== LEADERBOARD COMMUNITY IMPACT =====
+        'community_impact_title'     => 'Community impact',
+        'community_impact_desc'      => 'Aggregate activity across this timebank community.',
+        'stat_total_members'         => 'Total members',
+        'stat_total_exchanges'       => 'Exchanges completed',
+        'stat_total_hours'           => 'Hours exchanged',
+        'stat_total_listings'        => 'Active listings',
+        'stat_total_connections'     => 'Connections made',
+        'stat_total_badges'          => 'Badges awarded',
+        // ===== GOALS DISCOVER =====
+        'goals_discover_title'       => 'Discover goals',
+        'goals_discover_description' => 'Browse public goals from community members and offer to become a buddy.',
+        'goals_discover_empty'       => 'There are no public goals available for buddying right now.',
+        'goals_discover_become_buddy' => 'Become buddy',
+        // ===== GOALS POLISH =====
+        'goals_streak_label'         => 'Streak: :count day(s)',
+        'goals_overdue_label'        => 'Overdue',
+        // ===== BUDDY NUDGE =====
+        'buddy_nudge_button'         => 'Send encouragement',
+        'buddy_nudge_success'        => 'Encouragement sent!',
+        'buddy_nudge_failed'         => 'Unable to send encouragement. Please try again.',
+        // ===== VOLUNTEERING-ORGS POLISH =====
+        'vol_about_heading'          => 'About this opportunity',
+        // ===== LEADERBOARD FILTER =====
+        'leaderboard_filter_heading' => 'Filter leaderboard',
+    ],
     'jobs' => [
         'title' => 'Opportunities',
         'caption' => ':community',

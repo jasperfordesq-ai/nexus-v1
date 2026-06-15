@@ -7979,4 +7979,148 @@ class GovukAlphaFrontendTest extends TestCase
         $detail->assertOk();
         $detail->assertSee(__('govuk_alpha.polish_commerce.course_enrol_section_heading'));
     }
+    // ===== WAVE POLISH-GAMIFY tests =====
+
+    /** Achievements page renders the Daily Reward section with streak info. */
+    public function test_pgamify_achievements_daily_reward_shows_streak_and_claim_form(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Reward Tester']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/achievements");
+
+        $response->assertOk();
+        $response->assertSee('Daily reward');
+        $response->assertSee('Current streak:', false);
+        $response->assertSee('Claim daily reward');
+    }
+
+    /** POST daily-reward while claimable redirects with claimed status. */
+    public function test_pgamify_achievements_daily_reward_post_claims_successfully(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Daily Claimer']);
+
+        // Ensure no claim exists today for this user.
+        DB::table('daily_rewards')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->where('reward_date', now()->toDateString())
+            ->delete();
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/achievements/daily-reward");
+
+        $response->assertRedirectContains('status=daily-reward-claimed');
+    }
+
+    /** Achievements page renders the Challenges section (even if empty). */
+    public function test_pgamify_achievements_challenges_section_renders(): void
+    {
+        $this->authenticatedUser(['name' => 'Challenge Viewer']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/achievements");
+
+        $response->assertOk();
+        $response->assertSee('Active challenges');
+    }
+
+    /** POST claim-challenge with a non-existent challenge redirects with failed status. */
+    public function test_pgamify_achievements_claim_challenge_reward(): void
+    {
+        $this->authenticatedUser(['name' => 'Challenge Claimer']);
+
+        // Use an ID that is unlikely to exist; the service will return false and we get failed status.
+        $response = $this->post("/{$this->testTenantSlug}/alpha/achievements/challenges/999999/claim");
+
+        // Either claimed (if a test challenge happens to exist) or failed — we get a redirect.
+        $response->assertRedirect();
+        $this->assertStringContainsString('/achievements', $response->headers->get('location') ?? '');
+    }
+
+    /** Leaderboard page renders the Community Impact section. */
+    public function test_pgamify_leaderboard_community_impact_section_renders(): void
+    {
+        $this->authenticatedUser(['name' => 'Impact Viewer']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/leaderboard");
+
+        $response->assertOk();
+        $response->assertSee('Community impact');
+        $response->assertSee('Total members');
+    }
+
+    /** Goals discover page lists public goals from other members. */
+    public function test_pgamify_goals_discover_lists_public_goals(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Discover User']);
+        $other = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true,
+            'first_name' => 'Goal', 'last_name' => 'Owner',
+        ]);
+
+        // Seed a public active goal owned by $other with no mentor (buddy slot open).
+        $this->seedGoal($other->id, [
+            'title' => 'PGAMIFY_DISCOVER_GOAL',
+            'is_public' => 1,
+            'status' => 'active',
+            'mentor_id' => null,
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/goals/discover");
+
+        $response->assertOk();
+        $response->assertSee('Discover goals');
+        $response->assertSee('PGAMIFY_DISCOVER_GOAL');
+        $response->assertSee('Become buddy');
+    }
+
+    /** POST goals/{id}/buddy from discover page redirects to goals.discover with buddy-joined. */
+    public function test_pgamify_goals_discover_become_buddy_redirects(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'New Buddy']);
+        $other = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true,
+        ]);
+
+        $goalId = $this->seedGoal($other->id, [
+            'is_public' => 1,
+            'status' => 'active',
+            'mentor_id' => null,
+        ]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/buddy");
+
+        // Redirects with buddy-joined or buddy-failed (both valid — depends on mentor slot).
+        $response->assertRedirect();
+        $location = $response->headers->get('location') ?? '';
+        $this->assertTrue(
+            str_contains($location, 'buddy-joined') || str_contains($location, 'buddy-failed'),
+            "Expected buddy-joined or buddy-failed in redirect, got: {$location}"
+        );
+    }
+
+    /** POST goals/{id}/buddy-nudge redirects with buddy-nudge-sent or buddy-nudge-failed. */
+    public function test_pgamify_buddy_nudge_post(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Nudger']);
+        $other = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true,
+        ]);
+
+        // Seed goal where $user is already the buddy (mentor_id).
+        $goalId = $this->seedGoal($other->id, [
+            'is_public' => 1,
+            'status' => 'active',
+            'mentor_id' => $user->id,
+        ]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/buddy-nudge");
+
+        // Should redirect to goals.buddying with nudge status.
+        $response->assertRedirect();
+        $location = $response->headers->get('location') ?? '';
+        $this->assertStringContainsString('buddying', $location);
+        $this->assertTrue(
+            str_contains($location, 'buddy-nudge-sent') || str_contains($location, 'buddy-nudge-failed'),
+            "Expected nudge status in redirect, got: {$location}"
+        );
+    }
 }

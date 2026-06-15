@@ -25,7 +25,17 @@
         };
     @endphp
 
-    @if ($status === 'buddy-joined')
+    @if ($status === 'buddy-nudge-sent')
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="nudge-status">
+            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="nudge-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
+            <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.polish_gamify.buddy_nudge_success') }}</p></div>
+        </div>
+    @elseif ($status === 'buddy-nudge-failed')
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+            <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ __('govuk_alpha.polish_gamify.buddy_nudge_failed') }}</li></ul></div></div>
+        </div>
+    @elseif ($status === 'buddy-joined')
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="buddy-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="buddy-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.goals.states.buddy-joined') }}</p></div>
@@ -62,6 +72,13 @@
                     </div>
                     <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.goals.owned_by', ['name' => $ownerName($g)]) }}</p>
                     <progress max="100" value="{{ $p }}" aria-label="{{ $p }}%">{{ $p }}%</progress>
+                    {{-- POLISH: buddy nudge/encouragement action --}}
+                    @if (!$done && ($g['id'] ?? 0) > 0)
+                        <form method="post" action="{{ route('govuk-alpha.goals.buddy-nudge', ['tenantSlug' => $tenantSlug, 'id' => $g['id']]) }}" class="govuk-!-margin-top-2">
+                            @csrf
+                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" type="submit">{{ __('govuk_alpha.polish_gamify.buddy_nudge_button') }}</button>
+                        </form>
+                    @endif
                 </article>
             @endforeach
         </div>

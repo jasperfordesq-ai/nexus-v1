@@ -9,9 +9,13 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.goals.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.goals.description') }}</p>
 
-    <nav class="govuk-body govuk-!-margin-bottom-6" aria-label="{{ __('govuk_alpha.goals.title') }}">
-        <a class="govuk-link govuk-!-margin-right-4" href="{{ route('govuk-alpha.goals.templates', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.goals.templates_link') }}</a>
-        <a class="govuk-link" href="{{ route('govuk-alpha.goals.buddying', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.goals.buddying_link') }}</a>
+    {{-- POLISH: use govuk-list--inline inside nav for proper responsive spacing --}}
+    <nav class="govuk-!-margin-bottom-6" aria-label="{{ __('govuk_alpha.goals.title') }}">
+        <ul class="govuk-list govuk-list--inline">
+            <li><a class="govuk-link" href="{{ route('govuk-alpha.goals.templates', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.goals.templates_link') }}</a></li>
+            <li><a class="govuk-link" href="{{ route('govuk-alpha.goals.buddying', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.goals.buddying_link') }}</a></li>
+            <li><a class="govuk-link" href="{{ route('govuk-alpha.goals.discover', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.polish_gamify.goals_discover_title') }}</a></li>
+        </ul>
     </nav>
 
     @if (in_array($status, ['goal-created', 'goal-completed', 'goal-deleted'], true))
@@ -37,12 +41,22 @@
                     $tgt = (float) ($g['target_value'] ?? 0);
                     $pct = $tgt > 0 ? (int) round(min(100, ($cur / $tgt) * 100)) : 0;
                     $done = in_array($g['status'] ?? 'active', ['completed', 'achieved'], true);
+                    // POLISH: streak + overdue
+                    $streak = (int) ($g['streak_count'] ?? 0);
+                    $deadline = trim((string) ($g['deadline'] ?? ''));
+                    $isOverdue = !$done && $deadline !== '' && strtotime($deadline) < time();
                 @endphp
                 <article class="nexus-alpha-card">
                     <div class="nexus-alpha-module-row">
                         <h2 class="govuk-heading-s govuk-!-margin-bottom-1"><a class="govuk-link" href="{{ route('govuk-alpha.goals.show', ['tenantSlug' => $tenantSlug, 'id' => $g['id']]) }}">{{ $gTitle }}</a></h2>
                         <strong class="govuk-tag {{ $done ? 'govuk-tag--green' : 'govuk-tag--blue' }}">{{ $done ? __('govuk_alpha.goals.status_completed') : __('govuk_alpha.goals.status_active') }}</strong>
                     </div>
+                    @if ($isOverdue)
+                        <strong class="govuk-tag govuk-tag--red govuk-!-margin-bottom-1">{{ __('govuk_alpha.polish_gamify.goals_overdue_label') }}</strong>
+                    @endif
+                    @if ($streak > 0)
+                        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.polish_gamify.goals_streak_label', ['count' => $streak]) }}</p>
+                    @endif
                     <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.goals.progress_label', ['current' => rtrim(rtrim(number_format($cur, 2), '0'), '.'), 'target' => rtrim(rtrim(number_format($tgt, 2), '0'), '.')]) }}</p>
                     <progress max="100" value="{{ $pct }}" aria-label="{{ $pct }}%">{{ $pct }}%</progress>
                 </article>
@@ -50,7 +64,12 @@
         </div>
     @endif
 
-    <h2 class="govuk-heading-l">{{ __('govuk_alpha.goals.create_title') }}</h2>
+    {{-- POLISH: h2 heading inside the grid column so it aligns with form fields --}}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-l">{{ __('govuk_alpha.goals.create_title') }}</h2>
+        </div>
+    </div>
     <form method="post" action="{{ route('govuk-alpha.goals.store', ['tenantSlug' => $tenantSlug]) }}" class="govuk-grid-row">
         @csrf
         <div class="govuk-grid-column-two-thirds">
