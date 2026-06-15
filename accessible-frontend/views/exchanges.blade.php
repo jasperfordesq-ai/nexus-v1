@@ -37,28 +37,28 @@
         </div>
     @endif
 
-    <form method="get" action="{{ route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-7">
-        <fieldset class="govuk-fieldset">
-            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha.exchanges.filters_title') }}</h2>
-            </legend>
-            <div class="govuk-form-group">
-                <label class="govuk-label" for="status_filter">{{ __('govuk_alpha.exchanges.status_label') }}</label>
-                <select class="govuk-select" id="status_filter" name="status_filter">
-                    <option value="">{{ __('govuk_alpha.exchanges.statuses.all') }}</option>
-                    @foreach ($statusOptions as $statusOption)
-                        <option value="{{ $statusOption }}" @selected(($filters['status_filter'] ?? null) === $statusOption)>{{ __('govuk_alpha.exchanges.statuses.' . $statusOption) }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="nexus-alpha-actions">
-                <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.apply_filters') }}</button>
-                @if (!empty($filters['status_filter']))
-                    <a class="govuk-link" href="{{ route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.clear_filters') }}</a>
-                @endif
-            </div>
-        </fieldset>
-    </form>
+    @php
+        $activeTab = $filters['tab'] ?? 'all';
+        $exchangeTabs = [
+            'all'                  => __('govuk_alpha.polish_listings.exchanges_tab_all'),
+            'active'               => __('govuk_alpha.polish_listings.exchanges_tab_active'),
+            'needs_confirmation'   => __('govuk_alpha.polish_listings.exchanges_tab_needs_confirmation'),
+            'completed'            => __('govuk_alpha.polish_listings.exchanges_tab_completed'),
+        ];
+    @endphp
+    <nav aria-label="{{ __('govuk_alpha.polish_listings.exchanges_tab_filter_label') }}" class="govuk-!-margin-bottom-7">
+        <ul class="govuk-list" style="display:flex;gap:0.5rem;flex-wrap:wrap;list-style:none;padding:0;margin:0 0 1.5rem 0;">
+            @foreach ($exchangeTabs as $tabKey => $tabLabel)
+                <li>
+                    <a class="govuk-link{{ $activeTab === $tabKey ? ' govuk-link--no-visited-state' : '' }}"
+                       href="{{ route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug, 'tab' => $tabKey]) }}"
+                       @if ($activeTab === $tabKey) aria-current="page" @endif>
+                        {{ $tabLabel }}
+                    </a>
+                </li>
+            @endforeach
+        </ul>
+    </nav>
 
     <h2 class="govuk-heading-l">{{ __('govuk_alpha.exchanges.results_title') }}</h2>
     <p class="govuk-body nexus-alpha-result-count" aria-live="polite">

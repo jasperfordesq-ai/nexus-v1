@@ -513,6 +513,7 @@ return [
         'comment_posted_on_prefix' => 'Trácht postáilte ar',
     ],
     'listings' => [
+        'share_link_label' => 'Share this listing',
         'sort_label' => 'Sórtáil de réir',
         'sort_newest' => 'is nuaí',
         'sort_recommended' => 'Molta',
@@ -3616,5 +3617,80 @@ return [
         'status_save_added' => 'This post has been saved.',
         'status_save_removed' => 'This post has been removed from your saved items.',
         'status_save_failed' => 'We could not update your saved items. Please try again.',
+    ],
+    'polish_listings' => [
+        // Listing save / unsave
+        'save_listing' => 'Save listing',
+        'unsave_listing' => 'Remove from saved',
+        'save_listing_for' => 'Save the listing: :title',
+        'unsave_listing_for' => 'Remove saved listing: :title',
+        'status_listing_saved' => 'This listing has been saved.',
+        'status_listing_unsaved' => 'This listing has been removed from your saved items.',
+        'status_listing_save_failed' => 'We could not update your saved listings. Please try again.',
+        'saved_tag' => 'Saved',
+
+        // Listing renew
+        'renew_listing' => 'Renew listing',
+        'renew_listing_hint' => 'This listing has expired. Renewing it will make it visible again for another 30 days.',
+        'status_listing_renewed' => 'Your listing has been renewed and is now active.',
+        'status_listing_renew_failed' => 'We could not renew this listing. Please try again.',
+
+        // Listing report
+        'report_listing_title' => 'Report listing',
+        'report_listing_caption' => 'Report',
+        'report_listing_intro' => 'Tell us why you are reporting this listing. We review all reports and take action where needed.',
+        'report_reason_label' => 'Reason for report',
+        'report_reason_hint' => 'Select the reason that best describes the problem.',
+        'report_reason_spam' => 'Spam or misleading',
+        'report_reason_inappropriate' => 'Inappropriate content',
+        'report_reason_safety_concern' => 'Safety concern',
+        'report_reason_misleading' => 'Misleading information',
+        'report_reason_not_timebank_service' => 'Not a timebank service',
+        'report_reason_fraud' => 'Suspected fraud or scam',
+        'report_reason_duplicate' => 'Duplicate listing',
+        'report_reason_other' => 'Other',
+        'report_details_label' => 'Additional details (optional)',
+        'report_details_hint' => 'Give us any other information that will help us investigate.',
+        'report_submit' => 'Send report',
+        'status_listing_reported' => 'Your report has been submitted. Thank you for helping keep the community safe.',
+        'status_listing_report_failed' => 'We could not submit your report. Please try again.',
+        'status_listing_already_reported' => 'You have already reported this listing.',
+        'report_own_listing' => 'You cannot report your own listing.',
+        'report_back' => 'Back to listing',
+
+        // Matches — stats, dismiss, source filter
+        'matches_stats_title' => 'Your match summary',
+        'matches_total_label' => 'Total matches',
+        'matches_avg_score_label' => 'Average score',
+        'matches_source_filter_legend' => 'Filter by source',
+        'matches_source_all' => 'All matches',
+        'matches_source_listing' => 'Listings',
+        'matches_source_group' => 'Groups',
+        'matches_source_volunteering' => 'Volunteering',
+        'matches_source_event' => 'Events',
+        'matches_dismiss_label' => 'Not relevant',
+        'matches_dismiss_hint' => 'Hide this match from your results.',
+        'matches_dismiss_sr' => 'Hide match: :title',
+        'status_match_dismissed' => 'This match has been hidden.',
+        'status_match_dismiss_failed' => 'We could not hide this match. Please try again.',
+        'matches_module_listing' => 'Listing',
+        'matches_module_group' => 'Group',
+        'matches_module_volunteering' => 'Volunteering',
+        'matches_module_event' => 'Event',
+        'matches_source_filter_label' => 'Source',
+
+        // Exchanges — tab-based status filter
+        'exchanges_tab_all' => 'All',
+        'exchanges_tab_active' => 'Active',
+        'exchanges_tab_needs_confirmation' => 'Needs confirmation',
+        'exchanges_tab_completed' => 'Completed',
+        'exchanges_tab_filter_label' => 'Filter exchanges',
+
+        // Exchange-detail action grouping
+        'exchange_warning_decline' => 'Declining will close this exchange request permanently.',
+        'exchange_warning_cancel' => 'Cancelling will close this exchange permanently.',
+
+        // Exchange-request — validation error summary
+        'exchange_request_error_summary_title' => 'There is a problem with your exchange request',
     ],
 ];

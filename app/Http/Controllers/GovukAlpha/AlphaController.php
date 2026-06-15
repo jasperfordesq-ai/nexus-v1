@@ -2900,6 +2900,23 @@ class AlphaController extends Controller
             ->get(['id', 'name'])
             ->toArray();
 
+        // Collect saved listing IDs for the current user so the card loop can
+        // show a "Saved" badge inline — mirrors the React saved state indicator.
+        $savedListingIds = [];
+        $userId = $this->currentUserId();
+        if ($userId !== null && !empty($items)) {
+            try {
+                $savedListingIds = \App\Models\Bookmark::where('user_id', $userId)
+                    ->where('bookmarkable_type', 'listing')
+                    ->whereIn('bookmarkable_id', array_column($items, 'id'))
+                    ->pluck('bookmarkable_id')
+                    ->map(fn ($v) => (int) $v)
+                    ->all();
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
         return $this->view('accessible-frontend::listings', [
             'title' => __('govuk_alpha.listings.title'),
             'tenantSlug' => $tenantSlug,
@@ -2911,6 +2928,8 @@ class AlphaController extends Controller
             'moduleDisabled' => false,
             'error' => $error,
             'status' => self::asStr($request->query('status')) ?: null,
+            'isAuthenticated' => $userId !== null,
+            'savedListingIds' => $savedListingIds,
         ]);
     }
 
@@ -2934,13 +2953,25 @@ class AlphaController extends Controller
             $listing['author_avatar'] ?? $listing['user']['avatar_url'] ?? $listing['user']['avatar'] ?? null
         );
 
+        // Check whether the current user has saved this listing.
+        $isSaved = false;
+        if ($userId !== null && !$isOwner) {
+            try {
+                $isSaved = app(\App\Services\BookmarkService::class)->isBookmarked($userId, 'listing', $id);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
         return $this->view('accessible-frontend::listing-detail', [
             'title' => $listing['title'] ?? __('govuk_alpha.listings.detail_title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'listings',
             'listing' => $listing,
             'requiresAuth' => $userId === null,
+            'isAuthenticated' => $userId !== null,
             'isOwner' => $isOwner,
+            'isSaved' => $isSaved,
             'exchangeWorkflowEnabled' => BrokerControlConfigService::isExchangeWorkflowEnabled(),
             'directMessagingEnabled' => BrokerControlConfigService::isDirectMessagingEnabled(),
             'activeExchange' => $userId && !$isOwner ? ExchangeWorkflowService::getActiveExchangeForListing($userId, $id) : null,
@@ -3192,10 +3223,24 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
-        $status = $this->allowed($request->query('status_filter'), ['active', 'pending_provider', 'pending_broker', 'accepted', 'in_progress', 'pending_confirmation', 'completed', 'cancelled', 'disputed'], null);
+        // Tab-based filter: maps 'all'/'active'/'needs_confirmation'/'completed'
+        // to the ExchangeService status values. A raw ?status_filter= param is
+        // still supported for backwards compatibility.
+        $tab = $this->allowed($request->query('tab'), ['all', 'active', 'needs_confirmation', 'completed'], 'all');
+        $statusFilter = match ($tab) {
+            'active'               => 'active',
+            'needs_confirmation'   => 'needs_confirmation',
+            'completed'            => 'completed',
+            default                => null,
+        };
+        // Legacy ?status_filter= param fallback (keep existing REST callers working).
+        if ($statusFilter === null && $request->query('status_filter') !== null) {
+            $statusFilter = $this->allowed($request->query('status_filter'), ['active', 'pending_provider', 'pending_broker', 'accepted', 'in_progress', 'pending_confirmation', 'completed', 'cancelled', 'disputed'], null);
+        }
+
         $filters = ['limit' => 20];
-        if ($status) {
-            $filters['status'] = $status;
+        if ($statusFilter !== null) {
+            $filters['status'] = $statusFilter;
         }
         $cursorParam = self::asStr($request->query('cursor'));
         if ($cursorParam !== '') {
@@ -3210,7 +3255,7 @@ class AlphaController extends Controller
             'activeNav' => 'explore',
             'items' => $result['items'] ?? [],
             'meta' => ['has_more' => (bool) ($result['has_more'] ?? false), 'cursor' => $result['cursor'] ?? null],
-            'filters' => ['status_filter' => $status],
+            'filters' => ['status_filter' => $statusFilter, 'tab' => $tab],
             'workflowEnabled' => BrokerControlConfigService::isExchangeWorkflowEnabled(),
             'currentUserId' => $userId,
         ]);
@@ -7255,9 +7300,29 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
-        $matches = [];
+        // Source filter maps UI tab keys to module names understood by CrossModuleMatchingService.
+        $source = $this->allowed($request->query('source'), ['all', 'listing', 'group', 'volunteering', 'event'], 'all');
+        $modules = match ($source) {
+            'listing'      => ['listings'],
+            'group'        => ['groups'],
+            'volunteering' => ['volunteering'],
+            'event'        => ['events'],
+            default        => ['listings', 'groups', 'volunteering', 'events'],
+        };
+
+        $allMatches = [];
+        $matchStats = ['total' => 0, 'avg_score' => 0];
         try {
-            $matches = app(\App\Services\SmartMatchingEngine::class)->findMatchesForUser($userId, ['limit' => 20]);
+            $result = app(\App\Services\CrossModuleMatchingService::class)->getAllMatches($userId, [
+                'limit'   => 30,
+                'modules' => $modules,
+            ]);
+            $allMatches = $result['matches'] ?? [];
+            $total = count($allMatches);
+            $avgScore = $total > 0
+                ? (int) round(array_sum(array_map(fn ($m) => (float) ($m['match_score'] ?? 0) > 1 ? (float) ($m['match_score'] ?? 0) : (float) ($m['match_score'] ?? 0) * 100, $allMatches)) / $total)
+                : 0;
+            $matchStats = ['total' => $total, 'avg_score' => $avgScore];
         } catch (\Throwable $e) {
             report($e);
         }
@@ -7266,7 +7331,8 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.matches.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'matches',
-            'matches' => is_array($matches) ? $matches : [],
+            'matches' => $allMatches,
+            'matchStats' => $matchStats,
         ]);
     }
 
@@ -12861,6 +12927,252 @@ class AlphaController extends Controller
             'activeNav' => 'explore',
             'returnStatus' => $returnStatus,
             'tierName' => $tierName,
+        ]);
+    }
+
+    // ===== WAVE NIGHT-LISTINGS =====
+
+    /**
+     * Save a listing (add bookmark) for the current user.
+     */
+    public function saveListing(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Verify the listing exists and belongs to this tenant (cross-tenant → 404).
+        $listing = $this->listingService->getById($id, false, $userId);
+        abort_if($listing === null, 404);
+
+        // Cannot bookmark your own listing (same guard as the React UI).
+        $ownerId = (int) ($listing['user_id'] ?? $listing['author_id'] ?? $listing['user']['id'] ?? 0);
+        abort_if($ownerId === $userId, 403);
+
+        try {
+            app(\App\Services\BookmarkService::class)->toggle($userId, 'listing', $id);
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'save-failed']);
+        }
+
+        return redirect()->route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'listing-saved']);
+    }
+
+    /**
+     * Unsave a listing (remove bookmark) for the current user.
+     */
+    public function unsaveListing(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Verify listing exists and is tenant-scoped.
+        $listing = $this->listingService->getById($id, false, $userId);
+        abort_if($listing === null, 404);
+
+        try {
+            app(\App\Services\BookmarkService::class)->toggle($userId, 'listing', $id);
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'unsave-failed']);
+        }
+
+        return redirect()->route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'listing-unsaved']);
+    }
+
+    /**
+     * Renew an expired listing (extend its expiry date).
+     * Only the owner may renew their own listing.
+     */
+    public function renewListing(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Use a raw DB query so expired listings are reachable for ownership check.
+        // getById() hides non-active listings from non-owners, which would turn a
+        // 403 (not your listing) into a 404 (not found) for the expired case.
+        $raw = DB::table('listings')
+            ->where('id', $id)
+            ->where('tenant_id', TenantContext::getId())
+            ->whereNull('deleted_at')
+            ->select('id', 'user_id')
+            ->first();
+        abort_if($raw === null, 404);
+        abort_unless((int) $raw->user_id === $userId, 403);
+
+        $ok = false;
+        try {
+            $result = app(\App\Services\ListingExpiryService::class)->renewListing($id, $userId);
+            $ok = (bool) ($result['success'] ?? false);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.listings.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'listing-renewed' : 'renew-failed',
+        ]);
+    }
+
+    /**
+     * Show the report-a-listing form.
+     * Cannot report your own listing.
+     */
+    public function listingReport(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $listing = $this->listingService->getById($id, false, $userId);
+        abort_if($listing === null, 404);
+
+        // Cannot report your own listing.
+        $ownerId = (int) ($listing['user_id'] ?? $listing['author_id'] ?? $listing['user']['id'] ?? 0);
+        abort_if($ownerId === $userId, 403);
+
+        return $this->view('accessible-frontend::listing-report', [
+            'title' => __('govuk_alpha.polish_listings.report_form_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'listings',
+            'listing' => $listing,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Submit a report against a listing.
+     * Valid reasons: inappropriate, safety_concern, misleading, spam, not_timebank_service, other.
+     */
+    public function storeListingReport(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $listing = $this->listingService->getById($id, false, $userId);
+        abort_if($listing === null, 404);
+
+        // Cannot report your own listing.
+        $ownerId = (int) ($listing['user_id'] ?? $listing['author_id'] ?? $listing['user']['id'] ?? 0);
+        abort_if($ownerId === $userId, 403);
+
+        $validReasons = ['inappropriate', 'safety_concern', 'misleading', 'spam', 'not_timebank_service', 'other'];
+        $reason = $this->allowed($request->input('reason'), $validReasons, '');
+        if ($reason === '') {
+            return redirect()
+                ->route('govuk-alpha.listings.report', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withErrors(['reason' => __('govuk_alpha.polish_listings.report_reason_required')])
+                ->withInput();
+        }
+
+        $details = trim(self::asStr($request->input('details')));
+        if (mb_strlen($details) > 500) {
+            $details = mb_substr($details, 0, 500);
+        }
+
+        $tenantId = TenantContext::getId();
+
+        // Duplicate check — one report per user per listing (mirrors ListingsController::report).
+        $alreadyReported = \App\Models\ListingReport::withoutGlobalScopes()
+            ->where('tenant_id', $tenantId)
+            ->where('listing_id', $id)
+            ->where('reporter_id', $userId)
+            ->exists();
+
+        if ($alreadyReported) {
+            return redirect()->route('govuk-alpha.listings.show', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => 'already-reported',
+            ]);
+        }
+
+        $ok = false;
+        try {
+            \App\Models\ListingReport::create([
+                'tenant_id'   => $tenantId,
+                'listing_id'  => $id,
+                'reporter_id' => $userId,
+                'reason'      => $reason,
+                'details'     => $details !== '' ? $details : null,
+                'status'      => 'pending',
+            ]);
+            $ok = true;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.listings.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'listing-reported' : 'report-failed',
+        ]);
+    }
+
+    /**
+     * Dismiss a match so it no longer appears in the user's matches list.
+     * Only listing-module matches are currently dismissible.
+     */
+    public function dismissMatch(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+
+        // Verify the listing exists and is tenant-scoped before inserting a dismissal.
+        $exists = DB::table('listings')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $id)
+            ->exists();
+        abort_unless($exists, 404);
+
+        $reason = $this->allowed($request->input('reason'), ['not_relevant', 'already_done', 'not_interested'], 'not_relevant');
+
+        try {
+            // INSERT IGNORE equivalent — duplicate silently ignored via updateOrInsert.
+            DB::table('match_dismissals')->updateOrInsert(
+                ['tenant_id' => $tenantId, 'user_id' => $userId, 'listing_id' => $id],
+                ['reason' => $reason, 'created_at' => now()]
+            );
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.matches.index', [
+            'tenantSlug' => $tenantSlug,
+            'status' => 'match-dismissed',
         ]);
     }
 }

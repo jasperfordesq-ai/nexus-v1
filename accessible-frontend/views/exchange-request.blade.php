@@ -14,7 +14,20 @@
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}">{{ __('govuk_alpha.actions.back_to_listings') }}</a>
 
-    @if ($status === 'exchange-failed' || $status === 'compliance-failed')
+    @if ($errors->any())
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1" autofocus>
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.polish_listings.exchange_request_error_summary_title') }}</h2>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        @foreach ($errors->all() as $error)
+                            <li><a href="#proposed_hours">{{ $error }}</a></li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        </div>
+    @elseif ($status === 'exchange-failed' || $status === 'compliance-failed')
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
@@ -77,10 +90,13 @@
 
     <form method="post" action="{{ route('govuk-alpha.exchanges.request.store', ['tenantSlug' => $tenantSlug, 'listingId' => $listing['id']]) }}">
         @csrf
-        <div class="govuk-form-group">
+        <div class="govuk-form-group{{ $errors->has('proposed_hours') ? ' govuk-form-group--error' : '' }}">
             <label class="govuk-label" for="proposed_hours">{{ __('govuk_alpha.exchanges.hours_label') }}</label>
             <div id="proposed-hours-hint" class="govuk-hint">{{ __('govuk_alpha.exchanges.hours_hint') }}</div>
-            <input class="govuk-input govuk-input--width-5" id="proposed_hours" name="proposed_hours" type="number" min="0.25" max="24" step="0.25" value="{{ $suggestedHours }}" aria-describedby="proposed-hours-hint" required>
+            @error('proposed_hours')
+                <p id="proposed-hours-error" class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ $message }}</p>
+            @enderror
+            <input class="govuk-input govuk-input--width-5{{ $errors->has('proposed_hours') ? ' govuk-input--error' : '' }}" id="proposed_hours" name="proposed_hours" type="number" min="0.25" max="24" step="0.25" value="{{ old('proposed_hours', $suggestedHours) }}" aria-describedby="proposed-hours-hint{{ $errors->has('proposed_hours') ? ' proposed-hours-error' : '' }}" required>
         </div>
 
         <div class="govuk-form-group">
