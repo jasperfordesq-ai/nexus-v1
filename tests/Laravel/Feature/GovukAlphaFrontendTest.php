@@ -8860,4 +8860,248 @@ class GovukAlphaFrontendTest extends TestCase
         $res->assertSee('video_url', false);
     }
 
+    // ===== WAVE NIGHT-GROUPS =====
+
+    private function insertGroup(int $ownerId, array $extra = []): int
+    {
+        return DB::table('groups')->insertGetId(array_merge([
+            'tenant_id'  => $this->testTenantId,
+            'owner_id'   => $ownerId,
+            'name'       => 'Test Group ' . uniqid(),
+            'visibility' => 'public',
+            'status'     => 'active',
+            'is_active'  => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $extra));
+    }
+
+    private function joinGroup(int $groupId, int $userId, string $role = 'member'): void
+    {
+        DB::table('group_members')->insert([
+            'tenant_id'  => $this->testTenantId,
+            'group_id'   => $groupId,
+            'user_id'    => $userId,
+            'role'       => $role,
+            'status'     => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    public function test_pgroups_list_shows_create_cta_with_button_role(): void
+    {
+        $this->authenticatedUser(['name' => 'List Viewer']);
+        $this->enableAlphaFeatures(['groups']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/groups");
+        $res->assertOk();
+        $res->assertSee('role="button"', false);
+        $res->assertSee('draggable="false"', false);
+    }
+
+    public function test_pgroups_detail_h1_appears_before_notification_banner(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Detail Viewer']);
+        $this->enableAlphaFeatures(['groups']);
+        $gid = $this->insertGroup($user->id, ['name' => 'Heading First Group']);
+        $this->joinGroup($gid, $user->id);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/groups/{$gid}?status=group-joined");
+        $res->assertOk();
+        $html = $res->getContent();
+        $h1Pos = strpos($html, '<h1');
+        $bannerPos = strpos($html, 'govuk-notification-banner');
+        $this->assertIsInt($h1Pos, 'h1 not found in page');
+        if ($bannerPos !== false) {
+            $this->assertLessThan($bannerPos, $h1Pos, 'h1 must appear before notification banner');
+        }
+    }
+
+    public function test_pgroups_detail_shows_summary_list_meta(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Meta Viewer']);
+        $this->enableAlphaFeatures(['groups']);
+        $gid = $this->insertGroup($user->id, [
+            'name'       => 'Meta Group',
+            'visibility' => 'public',
+            'location'   => 'Dublin',
+        ]);
+        $this->joinGroup($gid, $user->id);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/groups/{$gid}");
+        $res->assertOk();
+        $res->assertSee('govuk-summary-list', false);
+        $res->assertSee(__('govuk_alpha.polish_groups.meta_visibility_label'));
+        $res->assertSee(__('govuk_alpha.polish_groups.meta_members_label'));
+        $res->assertSee('Dublin');
+    }
+
+    public function test_pgroups_detail_admin_actions_use_button_group(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Admin User']);
+        $this->enableAlphaFeatures(['groups']);
+        $gid = $this->insertGroup($user->id, ['name' => 'Admin Group']);
+        $this->joinGroup($gid, $user->id, 'owner');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/groups/{$gid}");
+        $res->assertOk();
+        $res->assertSee('govuk-button-group', false);
+        $res->assertSee(__('govuk_alpha.polish_groups.edit_link'));
+        $res->assertSee(__('govuk_alpha.polish_groups.manage_link'));
+    }
+
+    public function test_pgroups_detail_pinned_announcements_shown(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Ann Viewer']);
+        $this->enableAlphaFeatures(['groups']);
+        $gid = $this->insertGroup($user->id, ['name' => 'Ann Group']);
+        $this->joinGroup($gid, $user->id);
+
+        DB::table('group_announcements')->insert([
+            'group_id'   => $gid,
+            'tenant_id'  => $this->testTenantId,
+            'title'      => 'Pinned Notice',
+            'content'    => 'This is pinned.',
+            'is_pinned'  => 1,
+            'priority'   => 1,
+            'created_by' => $user->id,
+            'created_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/groups/{$gid}");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.polish_groups.announcements_heading'));
+        $res->assertSee('Pinned Notice');
+        $res->assertSee(__('govuk_alpha.polish_groups.announcement_pinned_tag'));
+    }
+
+    public function test_pgroups_create_form_has_location_field(): void
+    {
+        $this->authenticatedUser(['name' => 'Creator']);
+        $this->enableAlphaFeatures(['groups']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/groups/new");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.polish_groups.location_label'));
+        $res->assertSee('name="location"', false);
+    }
+
+    public function test_pgroups_create_failed_uses_error_summary(): void
+    {
+        $this->authenticatedUser(['name' => 'Create Fail']);
+        $this->enableAlphaFeatures(['groups']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/groups/new?status=group-create-failed");
+        $res->assertOk();
+        $res->assertSee('govuk-error-summary', false);
+        $res->assertSee(__('govuk_alpha.polish_groups.create_failed_heading'));
+    }
+
+    public function test_pgroups_store_persists_location(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Store Loc']);
+        $this->enableAlphaFeatures(['groups']);
+        $this->disableMeiliSearch();
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/groups", [
+            '_token'      => csrf_token(),
+            'name'        => 'Location Group ' . uniqid(),
+            'description' => 'With location.',
+            'visibility'  => 'public',
+            'location'    => 'Cork City',
+        ]);
+        $res->assertRedirect();
+
+        $row = DB::table('groups')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('owner_id', $user->id)
+            ->where('location', 'Cork City')
+            ->first();
+        $this->assertNotNull($row, 'Group with location Cork City not found in DB');
+    }
+
+    public function test_pgroups_edit_form_has_location_and_tags_fields(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Edit Fields']);
+        $this->enableAlphaFeatures(['groups']);
+        $gid = $this->insertGroup($user->id, [
+            'name'     => 'Editable Group',
+            'location' => 'Galway',
+        ]);
+        $this->joinGroup($gid, $user->id, 'owner');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/groups/{$gid}/edit");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.polish_groups.location_label'));
+        $res->assertSee('name="location"', false);
+        $res->assertSee(__('govuk_alpha.polish_groups.tags_label'));
+        $res->assertSee('name="tags"', false);
+        $res->assertSee('Galway');
+    }
+
+    public function test_pgroups_edit_update_failed_uses_error_summary(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Update Fail']);
+        $this->enableAlphaFeatures(['groups']);
+        $gid = $this->insertGroup($user->id, ['name' => 'Fail Update Group']);
+        $this->joinGroup($gid, $user->id, 'owner');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/groups/{$gid}/edit?status=group-update-failed");
+        $res->assertOk();
+        $res->assertSee('govuk-error-summary', false);
+        $res->assertSee(__('govuk_alpha.polish_groups.update_failed_heading'));
+    }
+
+    public function test_pgroups_manage_member_actions_use_button_group(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Manage Owner']);
+        $this->enableAlphaFeatures(['groups']);
+        $gid = $this->insertGroup($owner->id, ['name' => 'Manage Group']);
+        $this->joinGroup($gid, $owner->id, 'owner');
+
+        $memberId = DB::table('users')->insertGetId([
+            'tenant_id'  => $this->testTenantId,
+            'name'       => 'Other Member',
+            'email'      => 'othermember-' . uniqid() . '@example.com',
+            'password'   => bcrypt('password'),
+            'status'     => 'active',
+            'is_approved' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->joinGroup($gid, $memberId, 'member');
+
+        // The owner is still the authenticated user (Sanctum::actingAs set in authenticatedUser).
+        $res = $this->get("/{$this->testTenantSlug}/alpha/groups/{$gid}/manage");
+        $res->assertOk();
+        $res->assertSee('govuk-button-group', false);
+    }
+
+    public function test_pgroups_discussion_create_failed_uses_error_summary(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Disc Create Fail']);
+        $this->enableAlphaFeatures(['groups']);
+        $gid = $this->insertGroup($user->id, ['name' => 'Disc Fail Group']);
+        $this->joinGroup($gid, $user->id, 'member');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/groups/{$gid}/discussions/new?status=discussion-failed");
+        $res->assertOk();
+        $res->assertSee('govuk-error-summary', false);
+        $res->assertSee(__('govuk_alpha.polish_groups.discussion_failed_heading'));
+    }
+
+    public function test_pgroups_discussions_list_cta_has_button_role(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Disc List Viewer']);
+        $this->enableAlphaFeatures(['groups']);
+        $gid = $this->insertGroup($user->id, ['name' => 'Disc List Group']);
+        $this->joinGroup($gid, $user->id, 'member');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/groups/{$gid}/discussions");
+        $res->assertOk();
+        $res->assertSee('role="button"', false);
+        $res->assertSee('draggable="false"', false);
+    }
+
 }

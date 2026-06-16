@@ -33,7 +33,8 @@
         <p class="govuk-inset-text">{{ __('govuk_alpha.groups.pending_member') }}</p>
     @else
         <p class="govuk-body">
-            <a class="govuk-button" data-module="govuk-button" href="{{ route('govuk-alpha.groups.discussions.create', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha.groups.discussions.new_link') }}</a>
+            <a class="govuk-button" role="button" draggable="false" data-module="govuk-button"
+               href="{{ route('govuk-alpha.groups.discussions.create', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha.groups.discussions.new_link') }}</a>
         </p>
 
         @if (empty($discussions))

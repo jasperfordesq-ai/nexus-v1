@@ -10,6 +10,8 @@
         $gPrivate = ($group['visibility'] ?? 'public') !== 'public';
         $gCount = (int) ($group['member_count'] ?? count($groupMembers));
         $gId = (int) ($group['id'] ?? 0);
+        $gLocation = trim((string) ($group['location'] ?? ''));
+        $gCreatedAt = !empty($group['created_at']) ? \Illuminate\Support\Carbon::parse($group['created_at'])->translatedFormat('j F Y') : null;
         $viewerRole = $group['viewer_membership']['role'] ?? ($group['my_role'] ?? null);
         $isAdmin = in_array((string) $viewerRole, ['owner', 'admin'], true);
         $isPending = (($group['viewer_membership']['status'] ?? ($group['my_status'] ?? null)) === 'pending');
@@ -18,7 +20,15 @@
         // WAVE T1-GROUPS feed-compose outcomes (keyed under groups_t1.states).
         $t1SuccessStates = ['group-posted'];
         $t1FailStates = ['group-post-empty', 'group-post-failed', 'group-post-forbidden'];
+        $pinnedAnnouncements = $pinnedAnnouncements ?? [];
     @endphp
+
+    {{-- GOV.UK pattern: h1 (caption + heading) BEFORE notification banners --}}
+    <span class="govuk-caption-xl">{{ __('govuk_alpha.groups.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
+    <div class="nexus-alpha-module-row">
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ $gName }}</h1>
+        <strong class="govuk-tag {{ $gPrivate ? 'govuk-tag--grey' : 'govuk-tag--green' }}">{{ $gPrivate ? __('govuk_alpha.groups.visibility_private') : __('govuk_alpha.groups.visibility_public') }}</strong>
+    </div>
 
     @if (in_array($status, $successStates, true))
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="grp-status">
@@ -42,16 +52,40 @@
         </div>
     @endif
 
-    <span class="govuk-caption-xl">{{ __('govuk_alpha.groups.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
-    <div class="nexus-alpha-module-row">
-        <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ $gName }}</h1>
-        <strong class="govuk-tag {{ $gPrivate ? 'govuk-tag--grey' : 'govuk-tag--green' }}">{{ $gPrivate ? __('govuk_alpha.groups.visibility_private') : __('govuk_alpha.groups.visibility_public') }}</strong>
-    </div>
-    <p class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha.groups.members_count', ['count' => $gCount]) }}</p>
-
     @if (trim((string) ($group['description'] ?? '')) !== '')
         <p class="govuk-body-l">{{ $group['description'] }}</p>
     @endif
+
+    {{-- govuk-summary-list for group meta --}}
+    <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-6">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ __('govuk_alpha.polish_groups.meta_visibility_label') }}</dt>
+            <dd class="govuk-summary-list__value">
+                <strong class="govuk-tag {{ $gPrivate ? 'govuk-tag--grey' : 'govuk-tag--green' }}">{{ $gPrivate ? __('govuk_alpha.groups.visibility_private') : __('govuk_alpha.groups.visibility_public') }}</strong>
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ __('govuk_alpha.polish_groups.meta_members_label') }}</dt>
+            <dd class="govuk-summary-list__value">
+                {{ $gCount }}
+                @if ($isAdmin)
+                    &ensp;<a class="govuk-link" href="{{ route('govuk-alpha.groups.manage', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha.polish_groups.meta_manage_link') }}</a>
+                @endif
+            </dd>
+        </div>
+        @if ($gLocation !== '')
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.polish_groups.location_label') }}</dt>
+                <dd class="govuk-summary-list__value">{{ $gLocation }}</dd>
+            </div>
+        @endif
+        @if ($gCreatedAt)
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.polish_groups.meta_created_label') }}</dt>
+                <dd class="govuk-summary-list__value">{{ $gCreatedAt }}</dd>
+            </div>
+        @endif
+    </dl>
 
     <div class="govuk-!-margin-bottom-6">
         @if ($isMember)
@@ -74,9 +108,35 @@
     </div>
 
     @if ($isAdmin)
-        <div class="nexus-alpha-actions govuk-!-margin-bottom-6">
-            <a class="govuk-link govuk-!-margin-right-4" href="{{ route('govuk-alpha.groups.edit', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha.groups.edit.link') }}</a>
-            <a class="govuk-link govuk-!-margin-right-4" href="{{ route('govuk-alpha.groups.manage', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha.groups.manage.link') }}</a>
+        <div class="govuk-button-group govuk-!-margin-bottom-6">
+            <a class="govuk-button govuk-button--secondary" role="button" draggable="false" data-module="govuk-button"
+               href="{{ route('govuk-alpha.groups.edit', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha.polish_groups.edit_link') }}</a>
+            <a class="govuk-button govuk-button--secondary" role="button" draggable="false" data-module="govuk-button"
+               href="{{ route('govuk-alpha.groups.manage', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha.polish_groups.manage_link') }}</a>
+        </div>
+    @endif
+
+    {{-- Pinned announcements --}}
+    @if (!empty($pinnedAnnouncements))
+        <h2 class="govuk-heading-l">{{ __('govuk_alpha.polish_groups.announcements_heading') }}</h2>
+        <div class="nexus-alpha-card-list govuk-!-margin-bottom-6">
+            @foreach ($pinnedAnnouncements as $ann)
+                @php
+                    $annTitle = trim((string) ($ann->title ?? ($ann['title'] ?? '')));
+                    $annContent = trim((string) ($ann->content ?? ($ann['content'] ?? '')));
+                @endphp
+                @if ($annTitle !== '')
+                    <article class="nexus-alpha-card">
+                        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">
+                            <strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha.polish_groups.announcement_pinned_tag') }}</strong>
+                        </p>
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">{{ $annTitle }}</h3>
+                        @if ($annContent !== '')
+                            <p class="govuk-body">{{ $annContent }}</p>
+                        @endif
+                    </article>
+                @endif
+            @endforeach
         </div>
     @endif
 
