@@ -1614,7 +1614,9 @@ class GovukAlphaFrontendTest extends TestCase
 
         $index = $this->get("/{$this->testTenantSlug}/alpha/messages");
         $index->assertOk();
-        $index->assertSee('class="govuk-tabs"', false);
+        // Inbox/archived switching is a nav with aria-current (not a misused
+        // govuk-tabs component, which is for JS-driven tab panels).
+        $index->assertSee('aria-current="page"', false);
         $index->assertSee('Accessible message workflow verification.');
         $index->assertSee(route('govuk-alpha.messages.show', ['tenantSlug' => $this->testTenantSlug, 'userId' => $recipient->id]), false);
         // The index offers a way to start a new conversation (link to the directory).
