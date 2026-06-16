@@ -47,7 +47,7 @@
         ];
     @endphp
     <nav aria-label="{{ __('govuk_alpha.polish_listings.exchanges_tab_filter_label') }}" class="govuk-!-margin-bottom-7">
-        <ul class="govuk-list" style="display:flex;gap:0.5rem;flex-wrap:wrap;list-style:none;padding:0;margin:0 0 1.5rem 0;">
+        <ul class="nexus-alpha-filter-nav">
             @foreach ($exchangeTabs as $tabKey => $tabLabel)
                 <li>
                     <a class="govuk-link{{ $activeTab === $tabKey ? ' govuk-link--no-visited-state' : '' }}"

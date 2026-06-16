@@ -248,7 +248,7 @@
 
     <div class="govuk-inset-text govuk-!-margin-bottom-7">
         <p class="govuk-body govuk-!-margin-bottom-1"><strong>{{ __('govuk_alpha.listings.share_link_label') }}</strong></p>
-        <p class="govuk-body govuk-!-margin-bottom-0" style="word-break:break-all;">{{ url()->current() }}</p>
+        <p class="govuk-body nexus-alpha-share-url govuk-!-margin-bottom-0">{{ url()->current() }}</p>
     </div>
 
     </div>{{-- /govuk-grid-column-two-thirds (summary + author) --}}

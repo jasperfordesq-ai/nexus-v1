@@ -290,7 +290,7 @@
                 <p class="govuk-body">{{ __('govuk_alpha.profile_settings.skills.description') }}</p>
 
                 @if (empty($mySkills))
-                    <p class="govuk-inset-text">{{ __('govuk_alpha.profile_settings.skills.none') }}</p>
+                    <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.profile_settings.skills.none') }}</p></div>
                 @else
                     <ul class="govuk-list nexus-alpha-skill-list">
                         @foreach ($mySkills as $skill)
@@ -416,7 +416,7 @@
                 @endphp
 
                 @if (empty($passkeys))
-                    <p class="govuk-inset-text">{{ __('govuk_alpha.profile_settings.passkeys.none') }}</p>
+                    <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.profile_settings.passkeys.none') }}</p></div>
                 @else
                     @foreach ($passkeys as $pk)
                         @php
@@ -426,7 +426,7 @@
                                 : __('govuk_alpha.profile_settings.passkeys.type_cross_platform');
                         @endphp
                         <div class="nexus-alpha-card govuk-!-margin-bottom-4">
-                            <h4 class="govuk-heading-s govuk-!-margin-bottom-2">{{ $pkName }}</h4>
+                            <h3 class="govuk-heading-s govuk-!-margin-bottom-2">{{ $pkName }}</h3>
                             <dl class="nexus-alpha-inline-list govuk-!-margin-bottom-3">
                                 <div>
                                     <dt>{{ __('govuk_alpha.profile_settings.passkeys.type') }}</dt>
@@ -471,7 +471,7 @@
                 <h3 class="govuk-heading-m govuk-!-margin-top-6" id="sessions">{{ __('govuk_alpha.profile_settings.sessions.title') }}</h3>
                 <p class="govuk-body">{{ __('govuk_alpha.profile_settings.sessions.description') }}</p>
                 @if (empty($sessions))
-                    <p class="govuk-inset-text">{{ __('govuk_alpha.profile_settings.sessions.none') }}</p>
+                    <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.profile_settings.sessions.none') }}</p></div>
                 @else
                     <table class="govuk-table">
                         <caption class="govuk-table__caption govuk-table__caption--s govuk-visually-hidden">{{ __('govuk_alpha.profile_settings.sessions.title') }}</caption>
@@ -643,7 +643,7 @@
                 <h2 class="govuk-heading-l" id="safeguarding-heading">{{ __('govuk_alpha.profile_settings.safeguarding.title') }}</h2>
                 <p class="govuk-body">{{ __('govuk_alpha.profile_settings.safeguarding.description') }}</p>
                 @if (empty($safeguarding))
-                    <p class="govuk-inset-text">{{ __('govuk_alpha.profile_settings.safeguarding.none') }}</p>
+                    <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.profile_settings.safeguarding.none') }}</p></div>
                 @else
                     @foreach ($safeguarding as $pref)
                         @php

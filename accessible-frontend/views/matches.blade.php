@@ -41,7 +41,7 @@
 
         {{-- Source filter tabs --}}
         <nav aria-label="{{ __('govuk_alpha.polish_listings.matches_source_filter_legend') }}" class="govuk-!-margin-bottom-6">
-            <ul class="govuk-list" style="display:flex;gap:0.5rem;flex-wrap:wrap;list-style:none;padding:0;margin:0;">
+            <ul class="nexus-alpha-filter-nav">
                 @foreach ($sourceTabs as $srcKey => $srcLabel)
                     <li>
                         <a class="govuk-link{{ $activeSource === $srcKey ? ' govuk-link--no-visited-state' : '' }}"
