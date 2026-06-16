@@ -312,9 +312,11 @@ class VolunteerCertificateService
             $orgRows .= "<tr><td style=\"padding:8px;border:1px solid #ddd;\">{$orgName}</td><td style=\"padding:8px;border:1px solid #ddd;text-align:center;\">{$orgHours}</td></tr>";
         }
 
+        $lang = htmlspecialchars(app()->getLocale() ?: 'en', ENT_QUOTES, 'UTF-8');
+
         return <<<HTML
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{$lang}">
 <head>
 <meta charset="utf-8">
 <title>{$htmlTitle}</title>

@@ -92,10 +92,11 @@ class CourseCertificateService
         $name = $e($userName);
         $courseName = $e($courseTitle);
         $serial = $e($cert->serial);
+        $lang = $e(app()->getLocale() ?: 'en');
 
         return <<<HTML
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{$lang}">
 <head>
 <meta charset="utf-8">
 <title>{$title}</title>
