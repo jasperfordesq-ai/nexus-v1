@@ -3803,4 +3803,49 @@ return [
         'member_level_label' => 'Level :n',
         'member_badges_label' => 'Badges',
     ],
+    'polish_groups' => [
+        // group-detail: govuk-summary-list for group meta
+        'meta_title' => 'About this group',
+        'meta_visibility_label' => 'Visibility',
+        'meta_members_label' => 'Members',
+        'meta_created_label' => 'Created',
+        'meta_manage_link' => 'Manage group',
+        // group-detail: admin actions button group
+        'edit_link' => 'Edit group',
+        'manage_link' => 'Manage members',
+        // group-detail: pinned announcements
+        'announcements_heading' => 'Pinned announcements',
+        'announcement_pinned_tag' => 'Pinned',
+        // group-create/edit: location field
+        'location_label' => 'Location (optional)',
+        'location_hint' => 'Town, city or area where the group meets.',
+        // group-edit: tags field
+        'tags_label' => 'Tags (optional)',
+        'tags_hint' => 'Separate tags with commas, for example gardening, cookery.',
+        // group-edit: error notification banner replaced by govuk-error-summary
+        'update_failed_heading' => 'There is a problem saving your changes',
+        'delete_failed_heading' => 'There is a problem deleting this group',
+        // group-create: error notification banner replaced by govuk-error-summary
+        'create_failed_heading' => 'There is a problem creating your group',
+        // group-discussion-create: error notification banner replaced by govuk-error-summary
+        'discussion_failed_heading' => 'There is a problem posting your discussion',
+        // group-manage: invite by email section
+        'invite_title' => 'Invite someone by email',
+        'invite_description' => 'Send an invitation email to someone who is not yet a member.',
+        'invite_email_label' => 'Email address',
+        'invite_email_hint' => 'Enter the email address of the person you want to invite.',
+        'invite_submit' => 'Send invitation',
+        'invite_success' => 'The invitation has been sent.',
+        'invite_failed' => 'The invitation could not be sent. Please check the email address and try again.',
+        // groups list: pagination
+        'pagination_previous' => 'Previous',
+        'pagination_next' => 'Next',
+        // group-discussion-detail: reply author prefix
+        'reply_posted_by' => 'Reply by :name',
+        // groups.blade: create CTA
+        'create_group_cta' => 'Create a group',
+        // group-manage: invite state keys
+        'states_invite_success' => 'group-invite-sent',
+        'states_invite_failed' => 'group-invite-failed',
+    ],
 ];
