@@ -7,11 +7,13 @@
 @section('content')
     <a href="{{ route('govuk-alpha.federation.settings', ['tenantSlug' => $tenantSlug]) }}" class="govuk-back-link">{{ __('govuk_alpha.federation.optout.back') }}</a>
 
+    <span class="govuk-caption-xl">{{ __('govuk_alpha.federation.optout.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
+    <h1 class="govuk-heading-xl">{{ __('govuk_alpha.federation.optout.title') }}</h1>
+
+    @include('accessible-frontend::partials.federation-nav')
+
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <span class="govuk-caption-xl">{{ __('govuk_alpha.federation.optout.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
-            <h1 class="govuk-heading-xl">{{ __('govuk_alpha.federation.optout.title') }}</h1>
-
             <div class="govuk-warning-text">
                 <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
                 <strong class="govuk-warning-text__text">

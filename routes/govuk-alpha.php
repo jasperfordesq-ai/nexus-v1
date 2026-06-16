@@ -301,8 +301,14 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/federation/members', [AlphaController::class, 'federationMembers'])->name('federation.members.index');
         Route::get('/federation/members/{id}', [AlphaController::class, 'federationMember'])->whereNumber('id')->name('federation.members.show');
         Route::get('/federation/listings', [AlphaController::class, 'federationListings'])->name('federation.listings.index');
+        // Listing DETAIL: two numeric segments so it never collides with the
+        // /federation/listings index above.
+        Route::get('/federation/listings/{tenantId}/{id}', [AlphaController::class, 'federationListingShow'])->whereNumber('tenantId')->whereNumber('id')->name('federation.listings.show');
         Route::get('/federation/events', [AlphaController::class, 'federationEvents'])->name('federation.events.index');
         Route::get('/federation/groups', [AlphaController::class, 'federationGroups'])->name('federation.groups.index');
+        // Partners LIST must be declared before the /partners/{id} wildcard so the
+        // static "partners" segment matches the index first.
+        Route::get('/federation/partners', [AlphaController::class, 'federationPartners'])->name('federation.partners.index');
         Route::get('/federation/partners/{id}', [AlphaController::class, 'federationPartner'])->where('id', '[0-9]+|ext-[0-9]+')->name('federation.partners.show');
         // ===== WAVE FED2 — federated connections, messaging, hour transfer =====
         // Credit-moving POSTs are throttled (the transfer most tightly). Static
@@ -313,7 +319,12 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/federation/connections/{id}/reject', [AlphaController::class, 'rejectFederationConnection'])->whereNumber('id')->middleware('throttle:20,1')->name('federation.connections.reject');
         Route::post('/federation/connections/{id}/remove', [AlphaController::class, 'removeFederationConnection'])->whereNumber('id')->middleware('throttle:20,1')->name('federation.connections.remove');
         Route::get('/federation/messages', [AlphaController::class, 'federationMessages'])->name('federation.messages.index');
+        // Conversation/thread view + per-message translate. Static segments
+        // ("conversation", "translate") are declared so they are never captured
+        // as a wildcard. The reply form posts to federation.messages.store.
+        Route::get('/federation/messages/conversation/{partnerId}', [AlphaController::class, 'federationConversation'])->whereNumber('partnerId')->name('federation.messages.conversation');
         Route::post('/federation/messages', [AlphaController::class, 'storeFederationMessage'])->middleware('throttle:15,1')->name('federation.messages.store');
+        Route::post('/federation/messages/translate/{id}', [AlphaController::class, 'translateFederationMessage'])->whereNumber('id')->middleware('throttle:20,1')->name('federation.messages.translate');
         Route::get('/federation/members/{id}/transfer', [AlphaController::class, 'federationTransfer'])->whereNumber('id')->name('federation.transfer');
         Route::post('/federation/members/{id}/transfer', [AlphaController::class, 'storeFederationTransfer'])->whereNumber('id')->middleware('throttle:10,1')->name('federation.transfer.store');
         Route::get('/profile', [AlphaController::class, 'myProfile'])->name('profile.me');

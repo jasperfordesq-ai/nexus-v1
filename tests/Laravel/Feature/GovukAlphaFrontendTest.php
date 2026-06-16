@@ -5266,8 +5266,9 @@ class GovukAlphaFrontendTest extends TestCase
         $res = $this->get("/{$this->testTenantSlug}/alpha/federation");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.federation.title'));
-        // Not opted in → the opt-in CTA banner + button are shown.
-        $res->assertSee(__('govuk_alpha.federation.hub.optin_banner_title'));
+        // Not opted in → the opted-out marketing hero + opt-in CTA button are shown.
+        $res->assertSee(__('govuk_alpha.federation.hub.hero_title'));
+        $res->assertSee(__('govuk_alpha.federation.hub.how_it_works_heading'));
         $res->assertSee(route('govuk-alpha.federation.opt-in', ['tenantSlug' => $this->testTenantSlug]), false);
         $res->assertSee(__('govuk_alpha.federation.hub.optin_off'));
     }
@@ -5421,6 +5422,191 @@ class GovukAlphaFrontendTest extends TestCase
         $res = $this->get("/{$this->testTenantSlug}/alpha/federation/events");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.federation.events_browse.title'));
+    }
+
+    // ── Federation parity (partners list, detail, filters, reputation, threads) ──
+
+    public function test_federation_partners_index_lists_every_partner(): void
+    {
+        $this->authenticatedUser(['name' => 'Partners Lister']);
+        $this->enableFederationSystem();
+        $this->seedFederationPartner('Alpha Timebank');
+        $this->seedFederationPartner('Bravo Timebank');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/partners");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.federation.partners_list.title'));
+        $res->assertSee('Alpha Timebank');
+        $res->assertSee('Bravo Timebank');
+    }
+
+    public function test_federation_partner_level_name_uses_source_of_truth(): void
+    {
+        $this->authenticatedUser(['name' => 'Level Viewer']);
+        $this->enableFederationSystem();
+        $partnerTenantId = $this->seedFederationPartner('Social Timebank');
+        // Level 2 must read "Social" (source of truth), not the old "Connected".
+        DB::table('federation_partnerships')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('partner_tenant_id', $partnerTenantId)
+            ->update(['federation_level' => 2]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/partners/{$partnerTenantId}");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.federation.levels.social'));
+        $res->assertDontSee('Connected');
+    }
+
+    public function test_federation_listing_detail_renders_full_description(): void
+    {
+        $this->authenticatedUser(['name' => 'Listing Detailer']);
+        $this->enableFederationSystem();
+        $partnerTenantId = $this->seedFederationPartner('Detail Timebank');
+        $partnerUserId = $this->seedFederatedMember($partnerTenantId, 'Detail', 'Owner', 'Joinery');
+        $listingId = DB::table('listings')->insertGetId([
+            'tenant_id' => $partnerTenantId,
+            'user_id' => $partnerUserId,
+            'title' => 'Hedge trimming offer',
+            'description' => 'I can trim hedges and tidy gardens across the network.',
+            'type' => 'offer',
+            'status' => 'active',
+            'price' => 2,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/listings/{$partnerTenantId}/{$listingId}");
+        $res->assertOk();
+        $res->assertSee('Hedge trimming offer');
+        $res->assertSee('I can trim hedges and tidy gardens across the network.');
+        $res->assertSee(__('govuk_alpha.federation.listings_browse.detail_description_heading'));
+    }
+
+    public function test_federation_members_partner_filter_scopes_results(): void
+    {
+        $this->authenticatedUser(['name' => 'Filter User']);
+        $this->enableFederationSystem();
+        $partnerA = $this->seedFederationPartner('Filter Alpha');
+        $partnerB = $this->seedFederationPartner('Filter Bravo');
+        $this->seedFederatedMember($partnerA, 'Alpha', 'Person', 'Cooking');
+        $this->seedFederatedMember($partnerB, 'Bravo', 'Person', 'Cleaning');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/members?partner_id={$partnerA}");
+        $res->assertOk();
+        $res->assertSee('Alpha Person');
+        $res->assertDontSee('Bravo Person');
+    }
+
+    public function test_federation_member_profile_shows_reputation_and_reach(): void
+    {
+        $viewer = $this->authenticatedUser(['name' => 'Reputation Viewer']);
+        $this->enableFederationSystem();
+        $partnerTenantId = $this->seedFederationPartner('Reputation Timebank');
+        $partnerUserId = $this->seedFederatedMember($partnerTenantId, 'Trusted', 'Member', 'Tutoring');
+        $this->setFederationUserSettings($partnerUserId, [
+            'federation_optin' => 1,
+            'profile_visible_federated' => 1,
+            'appear_in_federated_search' => 1,
+            'show_reviews_federated' => 1,
+            'service_reach' => 'travel_ok',
+        ]);
+        DB::table('reviews')->insert([
+            'tenant_id' => $partnerTenantId,
+            'reviewer_id' => $viewer->id,
+            'receiver_id' => $partnerUserId,
+            'receiver_tenant_id' => $partnerTenantId,
+            'rating' => 5,
+            'comment' => 'Wonderful help.',
+            'review_type' => 'federated',
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/members/{$partnerUserId}?tenant_id={$partnerTenantId}");
+        $res->assertOk();
+        // Reputation tag (score out of 5) + service-reach row are surfaced.
+        $res->assertSee(__('govuk_alpha.federation.member.reach_label'));
+        $res->assertSee(__('govuk_alpha.federation.settings.reach_travel_ok'));
+        $res->assertSee('Wonderful help.');
+    }
+
+    public function test_federation_settings_saves_travel_radius(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Radius Saver']);
+        $this->enableFederationSystem();
+        $this->setFederationUserSettings($user->id, ['federation_optin' => 1]);
+
+        $this->post("/{$this->testTenantSlug}/alpha/federation/settings", [
+            'profile_visible_federated' => '1',
+            'service_reach' => 'travel_ok',
+            'travel_radius_km' => '42',
+        ])->assertRedirect("/{$this->testTenantSlug}/alpha/federation/settings?status=settings-saved");
+
+        $settings = \App\Services\FederationUserService::getUserSettings($user->id);
+        $this->assertSame('travel_ok', $settings['service_reach']);
+        $this->assertSame(42, (int) ($settings['travel_radius_km'] ?? 0));
+    }
+
+    public function test_federation_transfer_rejects_overlong_description(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Transfer Sender']);
+        $this->enableFederationSystem();
+        $this->enableFederationMessagingAndTransactions();
+        $this->setFederationUserSettings($user->id, [
+            'federation_optin' => 1,
+            'transactions_enabled_federated' => 1,
+        ]);
+        $partnerTenantId = $this->seedFederationPartner('Transfer Timebank');
+        $partnerUserId = $this->seedFederatedMember($partnerTenantId, 'Transfer', 'Target', 'DIY');
+
+        $this->post("/{$this->testTenantSlug}/alpha/federation/members/{$partnerUserId}/transfer", [
+            'receiver_tenant_id' => $partnerTenantId,
+            'amount' => '5',
+            'description' => str_repeat('x', 600),
+        ])->assertRedirect("/{$this->testTenantSlug}/alpha/federation/members/{$partnerUserId}/transfer?tenant_id={$partnerTenantId}&status=transfer-description-too-long");
+    }
+
+    public function test_federation_messages_thread_list_and_conversation_marks_read(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Thread Reader']);
+        $this->enableFederationSystem();
+        $this->enableFederationMessagingAndTransactions();
+        $this->setFederationUserSettings($user->id, [
+            'federation_optin' => 1,
+            'messaging_enabled_federated' => 1,
+        ]);
+        $partnerTenantId = $this->seedFederationPartner('Thread Timebank');
+        $partnerUserId = $this->seedFederatedMember($partnerTenantId, 'Chatty', 'Partner', 'Music');
+        $this->setFederationUserSettings($partnerUserId, [
+            'federation_optin' => 1,
+            'messaging_enabled_federated' => 1,
+            'profile_visible_federated' => 1,
+            'appear_in_federated_search' => 1,
+        ]);
+        // Inbound message FROM the partner TO the viewer (the viewer's received copy).
+        $msgId = DB::table('federation_messages')->insertGetId([
+            'sender_tenant_id' => $partnerTenantId,
+            'sender_user_id' => $partnerUserId,
+            'receiver_tenant_id' => $this->testTenantId,
+            'receiver_user_id' => $user->id,
+            'subject' => 'Hello there',
+            'body' => 'Looking forward to working together.',
+            'direction' => 'inbound',
+            'status' => 'unread',
+            'created_at' => now(),
+        ]);
+
+        // Thread list groups the message under the partner.
+        $list = $this->get("/{$this->testTenantSlug}/alpha/federation/messages");
+        $list->assertOk();
+        $list->assertSee('Chatty Partner');
+
+        // Opening the conversation renders the body and marks it read.
+        $conv = $this->get("/{$this->testTenantSlug}/alpha/federation/messages/conversation/{$partnerUserId}?tenant_id={$partnerTenantId}");
+        $conv->assertOk();
+        $conv->assertSee('Looking forward to working together.');
+        $this->assertSame('read', DB::table('federation_messages')->where('id', $msgId)->value('status'));
     }
 
     // === WAVE F — Groups management (create / edit / delete / roles / requests / discussions) ===
@@ -9554,7 +9740,7 @@ class GovukAlphaFrontendTest extends TestCase
         $res = $this->get("/{$this->testTenantSlug}/alpha/federation");
         $res->assertOk();
         $res->assertSee(route('govuk-alpha.federation.groups.index', ['tenantSlug' => $this->testTenantSlug]), false);
-        $res->assertSee(__('govuk_alpha.polish_federation.groups_title'));
+        $res->assertSee(__('govuk_alpha.federation.hub.quick_link_groups'));
     }
 
     /** Core polish: inset-text empty states use div wrapper across core blades. */

@@ -6520,20 +6520,47 @@ class AlphaController extends Controller
 
         $tenantId = TenantContext::getId();
         $stats = $this->federationStats($tenantId, $userId);
+        $loadError = false;
 
         $partners = [];
         try {
             $partners = $this->federationPartnersForDisplay($tenantId);
         } catch (\Throwable $e) {
             report($e);
+            $loadError = true;
+        }
+
+        // Recent federation activity — opted-in members only. Mark read on view
+        // (a server round-trip is in scope; mirrors the API activity() side-effect).
+        $activity = [];
+        if (($stats['enabled'] ?? false)) {
+            try {
+                $rawActivity = \App\Services\FederationActivityService::getActivityFeed($userId, 5);
+                $activity = array_map(static function (array $a): array {
+                    return [
+                        'type' => (string) ($a['type'] ?? 'activity'),
+                        'title' => (string) ($a['title'] ?? ''),
+                        'description' => (string) ($a['description'] ?? ($a['preview'] ?? '')),
+                        'community' => (string) ($a['subtitle'] ?? ''),
+                        'created_at' => $a['timestamp'] ?? null,
+                    ];
+                }, $rawActivity);
+                \App\Services\FederationActivityService::markAllRead($userId);
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         return $this->view('accessible-frontend::federation', [
             'title' => __('govuk_alpha.federation.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
+            'federationActiveTab' => 'overview',
             'partners' => array_slice($partners, 0, 6),
+            'partnerTotal' => count($partners),
+            'activity' => $activity,
             'stats' => $stats,
+            'loadError' => $loadError,
         ]);
     }
 
@@ -6548,7 +6575,9 @@ class AlphaController extends Controller
     {
         // Emit lowercase slugs; the blade resolves them through
         // govuk_alpha.federation.levels.* so the tag label is translatable.
-        $levelNames = [1 => 'discovery', 2 => 'connected', 3 => 'integrated', 4 => 'unified'];
+        // Slugs MUST mirror the source-of-truth FederationV2Controller::LEVEL_NAMES
+        // (1=Discovery, 2=Social, 3=Economic, 4=Integrated) — keep in sync.
+        $levelNames = [1 => 'discovery', 2 => 'social', 3 => 'economic', 4 => 'integrated'];
 
         $rows = \Illuminate\Support\Facades\DB::select("
             SELECT
@@ -6721,7 +6750,9 @@ class AlphaController extends Controller
      */
     private static function federationLevelSlug(int $level): string
     {
-        return [1 => 'discovery', 2 => 'connected', 3 => 'integrated', 4 => 'unified'][$level] ?? 'discovery';
+        // Mirror the source-of-truth FederationV2Controller::LEVEL_NAMES
+        // (1=Discovery, 2=Social, 3=Economic, 4=Integrated).
+        return [1 => 'discovery', 2 => 'social', 3 => 'economic', 4 => 'integrated'][$level] ?? 'discovery';
     }
 
     /**
@@ -6840,7 +6871,38 @@ class AlphaController extends Controller
             'title' => $partner['name'] ?: __('govuk_alpha.federation.partner.caption'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
+            'federationActiveTab' => 'partners',
             'partner' => $partner,
+        ]);
+    }
+
+    /**
+     * Partners LIST — `/federation/partners` (GET). The full list of partner
+     * communities (internal + external), mirroring the React FederationPartnersPage.
+     * The hub only shows a capped preview; this page shows every partner.
+     */
+    public function federationPartners(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $partners = [];
+        try {
+            $partners = $this->federationPartnersForDisplay($tenantId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::federation-partners', [
+            'title' => __('govuk_alpha.federation.partners_list.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'federationActiveTab' => 'partners',
+            'partners' => $partners,
         ]);
     }
 
@@ -6861,10 +6923,21 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.federation.settings', ['tenantSlug' => $tenantSlug]);
         }
 
+        // A short partner-community preview on the confirmation form (FEDONB-07),
+        // so members can see who they will connect with before opting in.
+        $partners = [];
+        try {
+            $partners = array_slice($this->federationPartnersForDisplay(TenantContext::getId()), 0, 5);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         return $this->view('accessible-frontend::federation-opt-in', [
             'title' => __('govuk_alpha.federation.optin.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
+            'federationActiveTab' => 'overview',
+            'partners' => $partners,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -6895,18 +6968,44 @@ class AlphaController extends Controller
         }
 
         $current = \App\Services\FederationUserService::getUserSettings($userId);
-        $settings = array_merge($current, [
-            'federation_optin' => true,
-            'profile_visible_federated' => true,
-            'appear_in_federated_search' => true,
-            'show_skills_federated' => true,
-            // Location is personal data — leave it off by default; members enable
-            // it explicitly in federation settings (GDPR data-minimisation).
-            'show_location_federated' => $current['show_location_federated'] ?? false,
-            'show_reviews_federated' => true,
-            'email_notifications' => true,
-            'service_reach' => $current['service_reach'] ?? 'local_only',
-        ]);
+
+        // The rich opt-in form posts an explicit preference set (marked by the
+        // preferences_submitted hidden field). When present we honour the member's
+        // choices; otherwise we apply React-style sensible defaults (location off
+        // for GDPR data-minimisation). Either path now explicitly sets the
+        // messaging/transactions flags, which the old path silently omitted.
+        if ($request->boolean('preferences_submitted')) {
+            $reachRaw = self::asStr($request->input('service_reach'));
+            $reach = in_array($reachRaw, ['local_only', 'remote_ok', 'travel_ok'], true) ? $reachRaw : 'local_only';
+            $settings = array_merge($current, [
+                'federation_optin' => true,
+                'profile_visible_federated' => $request->boolean('profile_visible_federated'),
+                'appear_in_federated_search' => $request->boolean('appear_in_federated_search'),
+                'show_skills_federated' => $request->boolean('show_skills_federated'),
+                'show_location_federated' => $request->boolean('show_location_federated'),
+                'show_reviews_federated' => $request->boolean('show_reviews_federated'),
+                'email_notifications' => $request->boolean('email_notifications'),
+                'messaging_enabled_federated' => $request->boolean('messaging_enabled_federated'),
+                'transactions_enabled_federated' => $request->boolean('transactions_enabled_federated'),
+                'service_reach' => $reach,
+                'travel_radius_km' => max(0, min(500, (int) $request->input('travel_radius_km'))),
+            ]);
+        } else {
+            $settings = array_merge($current, [
+                'federation_optin' => true,
+                'profile_visible_federated' => true,
+                'appear_in_federated_search' => true,
+                'show_skills_federated' => true,
+                // Location is personal data — leave it off by default; members enable
+                // it explicitly (GDPR data-minimisation).
+                'show_location_federated' => $current['show_location_federated'] ?? false,
+                'show_reviews_federated' => true,
+                'email_notifications' => true,
+                'messaging_enabled_federated' => true,
+                'transactions_enabled_federated' => true,
+                'service_reach' => $current['service_reach'] ?? 'local_only',
+            ]);
+        }
 
         $ok = \App\Services\FederationUserService::updateSettings($userId, $settings);
 
@@ -6933,6 +7032,7 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.federation.optout.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
+            'federationActiveTab' => 'overview',
         ]);
     }
 
@@ -6986,6 +7086,7 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.federation.settings.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
+            'federationActiveTab' => 'settings',
             'settings' => $settings,
             'optedIn' => (bool) ($settings['federation_optin'] ?? false),
             'status' => self::asStr($request->query('status')) ?: null,
@@ -7027,6 +7128,9 @@ class AlphaController extends Controller
             'messaging_enabled_federated' => $request->boolean('messaging_enabled_federated'),
             'transactions_enabled_federated' => $request->boolean('transactions_enabled_federated'),
             'service_reach' => $reach,
+            // Travel radius is only meaningful for travel_ok; clamp 0–500km to match
+            // the React/API bounds. Previously omitted, so it could never be edited.
+            'travel_radius_km' => max(0, min(500, (int) $request->input('travel_radius_km'))),
         ]);
 
         $ok = \App\Services\FederationUserService::updateSettings($userId, $settings);
@@ -7045,25 +7149,39 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('federation'), 403);
-        if ($this->currentUserId() === null) {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
         $tenantId = TenantContext::getId();
         $allowed = $this->federationOperationAllowed('profiles', $tenantId);
         $q = trim(self::asStr($request->query('q')));
+        $skills = trim(self::asStr($request->query('skills')));
+        $partnerId = (int) $request->query('partner_id');
+        $reachRaw = self::asStr($request->query('service_reach'));
+        $reach = in_array($reachRaw, ['local_only', 'remote_ok', 'travel_ok'], true) ? $reachRaw : '';
         $members = [];
         $nextCursor = null;
+        $total = null;
+        $loadError = false;
+
+        // Partner options for the community filter + the no-partnerships empty state.
+        $partnerOptions = $allowed ? $this->federationInternalPartnerOptions($tenantId) : [];
+
+        // Viewer participation gates the per-card "Send message" action.
+        $viewerSettings = \App\Services\FederationUserService::getUserSettings($userId);
+        $viewerCanMessage = (bool) ($viewerSettings['federation_optin'] ?? false) && (bool) ($viewerSettings['messaging_enabled_federated'] ?? false);
 
         if ($allowed) {
             $perPage = 20;
             $cursorId = $this->decodeFederationCursor(self::asStr($request->query('cursor')));
 
             try {
-                $sql = "
-                    SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.bio, u.skills,
+                $selectCols = "SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.bio, u.skills,
                         u.location, u.tenant_id, t.name as tenant_name,
-                        fus.service_reach, fus.show_skills_federated, fus.show_location_federated
+                        fus.service_reach, fus.show_skills_federated, fus.show_location_federated";
+                $fromWhere = "
                     FROM users u
                     JOIN federation_user_settings fus ON fus.user_id = u.id
                     JOIN tenants t ON t.id = u.tenant_id
@@ -7073,18 +7191,46 @@ class AlphaController extends Controller
                     )
                     WHERE fp.status = 'active' AND fp.profiles_enabled = 1
                     AND fus.federation_optin = 1 AND fus.appear_in_federated_search = 1
-                    AND u.status = 'active' AND u.tenant_id != :tid3
-                ";
-                $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
+                    AND u.status = 'active' AND u.tenant_id != :tid3";
+                $filterParams = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
 
                 if ($q !== '') {
-                    $sql .= " AND (u.first_name LIKE :q1 OR u.last_name LIKE :q2 OR (fus.show_skills_federated = 1 AND u.skills LIKE :q3) OR u.bio LIKE :q4)";
+                    $fromWhere .= " AND (u.first_name LIKE :q1 OR u.last_name LIKE :q2 OR (fus.show_skills_federated = 1 AND u.skills LIKE :q3) OR u.bio LIKE :q4)";
                     $term = "%{$q}%";
-                    $params[':q1'] = $term;
-                    $params[':q2'] = $term;
-                    $params[':q3'] = $term;
-                    $params[':q4'] = $term;
+                    $filterParams[':q1'] = $term;
+                    $filterParams[':q2'] = $term;
+                    $filterParams[':q3'] = $term;
+                    $filterParams[':q4'] = $term;
                 }
+                // Skills filter: comma-separated, capped at 10, each ANDed and gated
+                // on the member exposing skills federated (mirrors the API).
+                $skillTerms = array_slice(array_values(array_filter(array_map('trim', explode(',', $skills)))), 0, 10);
+                foreach ($skillTerms as $i => $st) {
+                    $key = ":sk{$i}";
+                    $fromWhere .= " AND (fus.show_skills_federated = 1 AND u.skills LIKE {$key})";
+                    $filterParams[$key] = "%{$st}%";
+                }
+                // Service reach: remote_ok matches remote_ok+travel_ok (API parity).
+                if ($reach === 'remote_ok') {
+                    $fromWhere .= " AND fus.service_reach IN ('remote_ok','travel_ok')";
+                } elseif ($reach === 'local_only' || $reach === 'travel_ok') {
+                    $fromWhere .= " AND fus.service_reach = :reach";
+                    $filterParams[':reach'] = $reach;
+                }
+                // Partner-community filter (internal partners only).
+                if ($partnerId > 0) {
+                    $fromWhere .= " AND u.tenant_id = :partner_id";
+                    $filterParams[':partner_id'] = $partnerId;
+                }
+
+                // Total count — first page only (mirrors the React showing X of Y chip).
+                if ($cursorId === null) {
+                    $countRows = $this->federationSelect("SELECT COUNT(DISTINCT u.id) as cnt" . $fromWhere, $filterParams);
+                    $total = (int) ($countRows[0]['cnt'] ?? 0);
+                }
+
+                $sql = $selectCols . $fromWhere;
+                $params = $filterParams;
                 if ($cursorId !== null) {
                     $sql .= " AND u.id < :cursor_id";
                     $params[':cursor_id'] = $cursorId;
@@ -7109,6 +7255,7 @@ class AlphaController extends Controller
                             ? array_values(array_filter(array_map('trim', explode(',', (string) $m['skills']))))
                             : [],
                         'location' => !empty($m['show_location_federated']) ? ($m['location'] ?? null) : null,
+                        'service_reach' => in_array(($m['service_reach'] ?? 'local_only'), ['local_only', 'remote_ok', 'travel_ok'], true) ? (string) $m['service_reach'] : 'local_only',
                         'tenant_id' => (int) $m['tenant_id'],
                         'tenant_name' => (string) ($m['tenant_name'] ?? ''),
                     ];
@@ -7120,6 +7267,7 @@ class AlphaController extends Controller
                 }
             } catch (\Throwable $e) {
                 report($e);
+                $loadError = true;
             }
         }
 
@@ -7127,11 +7275,51 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.federation.members_browse.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
+            'federationActiveTab' => 'members',
             'allowed' => $allowed,
             'members' => $members,
             'query' => $q,
+            'skills' => $skills,
+            'partnerId' => $partnerId,
+            'serviceReach' => $reach,
+            'partnerOptions' => $partnerOptions,
+            'total' => $total,
+            'viewerCanMessage' => $viewerCanMessage,
+            'loadError' => $loadError,
             'nextCursor' => $nextCursor,
         ]);
+    }
+
+    /**
+     * Active INTERNAL federation partner options for browse filter dropdowns
+     * (members / listings / events / groups). External (ext-N) partners are
+     * intentionally excluded from these server-rendered browse filters — the
+     * cross-platform "ext-N" federation saga is out of scope for the accessible
+     * surface. Defensive: any failure yields an empty list (no filter shown).
+     *
+     * @return array<int,array{id:int,name:string}>
+     */
+    private function federationInternalPartnerOptions(int $tenantId): array
+    {
+        try {
+            $rows = DB::select("
+                SELECT DISTINCT
+                    CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END as partner_tenant_id,
+                    CASE WHEN fp.tenant_id = ? THEN t2.name ELSE t1.name END as partner_name
+                FROM federation_partnerships fp
+                LEFT JOIN tenants t1 ON fp.tenant_id = t1.id
+                LEFT JOIN tenants t2 ON fp.partner_tenant_id = t2.id
+                WHERE (fp.tenant_id = ? OR fp.partner_tenant_id = ?) AND fp.status = 'active'
+                ORDER BY partner_name ASC
+            ", [$tenantId, $tenantId, $tenantId, $tenantId]);
+
+            return array_values(array_filter(array_map(static function ($r): array {
+                return ['id' => (int) ($r->partner_tenant_id ?? 0), 'name' => (string) ($r->partner_name ?? '')];
+            }, $rows), static fn ($p) => $p['id'] > 0 && $p['name'] !== ''));
+        } catch (\Throwable $e) {
+            report($e);
+            return [];
+        }
     }
 
     /**
@@ -7159,7 +7347,7 @@ class AlphaController extends Controller
                 SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.bio, u.skills,
                     u.location, u.tenant_id, t.name as tenant_name,
                     fus.show_skills_federated, fus.show_location_federated,
-                    fus.show_reviews_federated,
+                    fus.show_reviews_federated, fus.service_reach,
                     fus.messaging_enabled_federated, fus.transactions_enabled_federated,
                     fp.messaging_enabled as partner_messaging_enabled,
                     fp.transactions_enabled as partner_transactions_enabled
@@ -7194,18 +7382,28 @@ class AlphaController extends Controller
                         ? array_values(array_filter(array_map('trim', explode(',', (string) $m['skills']))))
                         : [],
                     'location' => !empty($m['show_location_federated']) ? ($m['location'] ?? null) : null,
+                    'service_reach' => in_array(($m['service_reach'] ?? 'local_only'), ['local_only', 'remote_ok', 'travel_ok'], true) ? (string) $m['service_reach'] : 'local_only',
                     'tenant_id' => (int) $m['tenant_id'],
                     'tenant_name' => (string) ($m['tenant_name'] ?? ''),
                     // Capability flags — a member-side opt-in AND a partnership-level
                     // permission must BOTH be set before the action is offered.
                     'messaging_enabled' => !empty($m['messaging_enabled_federated']) && !empty($m['partner_messaging_enabled']),
                     'transactions_enabled' => !empty($m['transactions_enabled_federated']) && !empty($m['partner_transactions_enabled']),
+                    // Reputation tag in the header (mirrors React FederatedTrustBadge);
+                    // only surfaced when the member exposes reviews federated.
+                    'reputation_score' => null,
+                    'reputation_count' => 0,
+                    'show_reviews' => !empty($m['show_reviews_federated']),
                 ];
 
                 // Reviews — only when the member exposes them federated. Mirrors
                 // FederationV2Controller::memberReviews (local member path).
                 if (!empty($m['show_reviews_federated'])) {
                     $reviews = $this->federationMemberReviewList((int) $m['id'], (int) $m['tenant_id']);
+                    // Reputation aggregate over ALL active reviews (mirrors API member()).
+                    [$repScore, $repCount] = $this->federationMemberReputation((int) $m['id'], (int) $m['tenant_id']);
+                    $member['reputation_score'] = $repScore;
+                    $member['reputation_count'] = $repCount;
                 }
             }
         } catch (\Throwable $e) {
@@ -7232,6 +7430,7 @@ class AlphaController extends Controller
             'title' => $member['name'] ?: __('govuk_alpha.federation.member.caption'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
+            'federationActiveTab' => 'members',
             'member' => $member,
             'reviews' => $reviews,
             'connectionStatus' => $connectionStatus,
@@ -7272,15 +7471,40 @@ class AlphaController extends Controller
                     $q->whereNull('status')->orWhereIn('status', ['active', 'approved']);
                 })
                 ->orderByDesc('id')
-                ->limit(20)
+                // Match the API memberReviews() cap (100) so members with many
+                // reviews are not silently truncated at 20.
+                ->limit(100)
                 ->get();
 
-            return $rows->map(function (\App\Models\Review $r): array {
+            // Resolve the names of any cross-tenant (partner) communities a review
+            // originated from, so each card can show a "From {community}" chip
+            // mirroring the React reviews panel. One query for all distinct tenants.
+            $originTenantIds = [];
+            foreach ($rows as $r) {
+                $origin = (int) ($r->reviewer_tenant_id ?: $r->tenant_id);
+                if ($origin > 0 && $origin !== $memberTenantId) {
+                    $originTenantIds[$origin] = true;
+                }
+            }
+            $tenantNames = [];
+            if (!empty($originTenantIds)) {
+                $tenantNames = DB::table('tenants')
+                    ->whereIn('id', array_keys($originTenantIds))
+                    ->pluck('name', 'id')
+                    ->all();
+            }
+
+            return $rows->map(function (\App\Models\Review $r) use ($memberTenantId, $tenantNames): array {
                 $reviewer = $r->reviewer;
                 $isAnon = (bool) ($r->is_anonymous ?? false);
                 $reviewerName = ($reviewer && ($reviewer->profile_type ?? null) === 'organisation' && !empty($reviewer->organization_name))
                     ? $reviewer->organization_name
                     : trim(((string) ($reviewer->first_name ?? '')) . ' ' . ((string) ($reviewer->last_name ?? '')));
+
+                $origin = (int) ($r->reviewer_tenant_id ?: $r->tenant_id);
+                $partnerName = ($origin > 0 && $origin !== $memberTenantId)
+                    ? (string) ($tenantNames[$origin] ?? '')
+                    : '';
 
                 return [
                     'id' => (int) $r->id,
@@ -7288,11 +7512,55 @@ class AlphaController extends Controller
                     'comment' => (string) ($r->comment ?? ''),
                     'reviewer_name' => $isAnon ? __('govuk_alpha.fed2.reviews.anonymous') : ($reviewerName ?: __('govuk_alpha.fed2.reviews.anonymous')),
                     'created_at' => $r->created_at?->toIso8601String(),
+                    // Cross-tenant origin chip + verified (federated) badge.
+                    'partner_name' => $partnerName,
+                    'verified' => (string) ($r->review_type ?? '') === 'federated',
                 ];
             })->all();
         } catch (\Throwable $e) {
             report($e);
             return [];
+        }
+    }
+
+    /**
+     * Reputation aggregate for a federated member — [score, count] over their
+     * active/approved reviews, scoped to the member's owning tenant. Mirrors the
+     * reputation_score/reputation_count returned by FederationV2Controller::member().
+     * Read-only; any failure yields [null, 0].
+     *
+     * @return array{0: float|null, 1: int}
+     */
+    private function federationMemberReputation(int $memberId, int $memberTenantId): array
+    {
+        if ($memberId <= 0 || $memberTenantId <= 0) {
+            return [null, 0];
+        }
+
+        try {
+            $row = \App\Models\Review::query()
+                ->withoutGlobalScope(\App\Scopes\TenantScope::class)
+                ->where('receiver_id', $memberId)
+                ->where(function ($q) use ($memberTenantId) {
+                    $q->where('receiver_tenant_id', $memberTenantId)
+                      ->orWhere(function ($q2) use ($memberTenantId) {
+                          $q2->where('tenant_id', $memberTenantId)
+                             ->whereNull('receiver_tenant_id');
+                      });
+                })
+                ->where(function ($q) {
+                    $q->whereNull('status')->orWhereIn('status', ['active', 'approved']);
+                })
+                ->selectRaw('COUNT(*) as cnt, AVG(rating) as avg_rating')
+                ->first();
+
+            $count = (int) ($row->cnt ?? 0);
+            $score = ($count > 0 && $row->avg_rating !== null) ? round((float) $row->avg_rating, 2) : null;
+
+            return [$score, $count];
+        } catch (\Throwable $e) {
+            report($e);
+            return [null, 0];
         }
     }
 
@@ -7312,8 +7580,13 @@ class AlphaController extends Controller
         $tenantId = TenantContext::getId();
         $allowed = $this->federationOperationAllowed('listings', $tenantId);
         $q = trim(self::asStr($request->query('q')));
+        $typeRaw = self::asStr($request->query('type'));
+        $type = in_array($typeRaw, ['offer', 'request'], true) ? $typeRaw : '';
+        $partnerId = (int) $request->query('partner_id');
         $listings = [];
         $nextCursor = null;
+        $loadError = false;
+        $partnerOptions = $allowed ? $this->federationInternalPartnerOptions($tenantId) : [];
 
         if ($allowed) {
             $perPage = 20;
@@ -7322,7 +7595,8 @@ class AlphaController extends Controller
             try {
                 $sql = "
                     SELECT l.id, l.title, l.description, l.type, c.name as category_name,
-                        l.location, l.tenant_id, l.created_at, l.user_id,
+                        l.location, l.tenant_id, l.created_at, l.user_id, l.image_url,
+                        l.price as estimated_hours,
                         u.first_name, u.last_name, t.name as tenant_name
                     FROM listings l
                     JOIN users u ON u.id = l.user_id AND u.tenant_id = l.tenant_id
@@ -7344,6 +7618,14 @@ class AlphaController extends Controller
                     $term = "%{$q}%";
                     $params[':q1'] = $term;
                     $params[':q2'] = $term;
+                }
+                if ($type !== '') {
+                    $sql .= " AND l.type = :type";
+                    $params[':type'] = $type;
+                }
+                if ($partnerId > 0) {
+                    $sql .= " AND l.tenant_id = :partner_id";
+                    $params[':partner_id'] = $partnerId;
                 }
                 if ($cursorId !== null) {
                     $sql .= " AND l.id < :cursor_id";
@@ -7367,6 +7649,9 @@ class AlphaController extends Controller
                         'type' => (string) ($l['type'] ?? 'offer'),
                         'category_name' => $l['category_name'] ?? null,
                         'location' => $l['location'] ?? null,
+                        'image_url' => $l['image_url'] ?: null,
+                        'estimated_hours' => ($l['estimated_hours'] !== null && $l['estimated_hours'] !== '') ? (float) $l['estimated_hours'] : null,
+                        'created_at' => $l['created_at'] ?? null,
                         'author_name' => trim(((string) ($l['first_name'] ?? '')) . ' ' . ((string) ($l['last_name'] ?? ''))),
                         'user_id' => (int) $l['user_id'],
                         'tenant_id' => (int) $l['tenant_id'],
@@ -7380,6 +7665,7 @@ class AlphaController extends Controller
                 }
             } catch (\Throwable $e) {
                 report($e);
+                $loadError = true;
             }
         }
 
@@ -7387,10 +7673,94 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.federation.listings_browse.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
+            'federationActiveTab' => 'listings',
             'allowed' => $allowed,
             'listings' => $listings,
             'query' => $q,
+            'type' => $type,
+            'partnerId' => $partnerId,
+            'partnerOptions' => $partnerOptions,
+            'loadError' => $loadError,
             'nextCursor' => $nextCursor,
+        ]);
+    }
+
+    /**
+     * Listing DETAIL — `/federation/listings/{tenantId}/{id}` (GET). Renders the
+     * full federated listing (full description, image, estimated hours, location,
+     * posted date, author profile link, contact-author messaging link), mirroring
+     * the React FederationListingsPage detail modal. Re-runs the same
+     * partnership/visibility gate as the browse so only a genuinely shareable
+     * listing is shown. Internal partners only.
+     */
+    public function federationListingShow(Request $request, string $tenantSlug, int $tenantId, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $viewerTenantId = TenantContext::getId();
+        abort_unless($this->federationOperationAllowed('listings', $viewerTenantId), 404);
+
+        $listing = null;
+        try {
+            $rows = $this->federationSelect("
+                SELECT l.id, l.title, l.description, l.type, c.name as category_name,
+                    l.location, l.tenant_id, l.created_at, l.user_id, l.image_url,
+                    l.price as estimated_hours,
+                    u.first_name, u.last_name, t.name as tenant_name,
+                    fus.messaging_enabled_federated, fp.messaging_enabled as partner_messaging_enabled
+                FROM listings l
+                JOIN users u ON u.id = l.user_id AND u.tenant_id = l.tenant_id
+                JOIN tenants t ON t.id = l.tenant_id
+                LEFT JOIN categories c ON c.id = l.category_id
+                JOIN federation_partnerships fp ON (
+                    (fp.tenant_id = :tid1 AND fp.partner_tenant_id = l.tenant_id)
+                    OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = l.tenant_id)
+                )
+                JOIN federation_user_settings fus ON fus.user_id = l.user_id
+                WHERE l.id = :lid AND l.tenant_id = :listing_tenant
+                AND fp.status = 'active' AND fp.listings_enabled = 1
+                AND l.status = 'active' AND l.tenant_id != :tid3
+                AND fus.federation_optin = 1 AND fus.appear_in_federated_search = 1
+                LIMIT 1
+            ", [
+                ':tid1' => $viewerTenantId, ':tid2' => $viewerTenantId, ':tid3' => $viewerTenantId,
+                ':lid' => $id, ':listing_tenant' => $tenantId,
+            ]);
+            $l = $rows[0] ?? null;
+            if ($l) {
+                $listing = [
+                    'id' => (int) $l['id'],
+                    'title' => (string) ($l['title'] ?? ''),
+                    'description' => (string) ($l['description'] ?? ''),
+                    'type' => (string) ($l['type'] ?? 'offer'),
+                    'category_name' => $l['category_name'] ?? null,
+                    'location' => $l['location'] ?? null,
+                    'image_url' => $l['image_url'] ?: null,
+                    'estimated_hours' => ($l['estimated_hours'] !== null && $l['estimated_hours'] !== '') ? (float) $l['estimated_hours'] : null,
+                    'created_at' => $l['created_at'] ?? null,
+                    'author_name' => trim(((string) ($l['first_name'] ?? '')) . ' ' . ((string) ($l['last_name'] ?? ''))),
+                    'user_id' => (int) $l['user_id'],
+                    'tenant_id' => (int) $l['tenant_id'],
+                    'tenant_name' => (string) ($l['tenant_name'] ?? ''),
+                    'can_contact' => !empty($l['messaging_enabled_federated']) && !empty($l['partner_messaging_enabled']),
+                ];
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        abort_if($listing === null, 404);
+
+        return $this->view('accessible-frontend::federation-listing-show', [
+            'title' => $listing['title'] ?: __('govuk_alpha.federation.listings_browse.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'federationActiveTab' => 'listings',
+            'listing' => $listing,
         ]);
     }
 
@@ -7408,8 +7778,15 @@ class AlphaController extends Controller
 
         $tenantId = TenantContext::getId();
         $allowed = $this->federationOperationAllowed('events', $tenantId);
+        $q = trim(self::asStr($request->query('q')));
+        $partnerId = (int) $request->query('partner_id');
+        // Upcoming-only defaults ON (mirrors React's default), off only when
+        // explicitly ?upcoming=false.
+        $upcoming = self::asStr($request->query('upcoming')) !== 'false';
         $events = [];
         $nextCursor = null;
+        $loadError = false;
+        $partnerOptions = $allowed ? $this->federationInternalPartnerOptions($tenantId) : [];
 
         if ($allowed) {
             $perPage = 20;
@@ -7419,7 +7796,8 @@ class AlphaController extends Controller
                 $sql = "
                     SELECT e.id, e.title, e.description, e.start_time as start_date,
                         e.location, e.allow_remote_attendance as is_online, e.max_attendees,
-                        e.tenant_id, t.name as tenant_name,
+                        e.tenant_id, t.name as tenant_name, e.cover_image, e.user_id,
+                        u.first_name, u.last_name, u.avatar_url,
                         (SELECT COUNT(*) FROM event_rsvps er WHERE er.event_id = e.id AND er.status = 'going') as attendees_count
                     FROM events e
                     JOIN users u ON u.id = e.user_id AND u.tenant_id = e.tenant_id
@@ -7434,6 +7812,19 @@ class AlphaController extends Controller
                 ";
                 $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
 
+                if ($q !== '') {
+                    $sql .= " AND (e.title LIKE :q1 OR e.description LIKE :q2)";
+                    $term = "%{$q}%";
+                    $params[':q1'] = $term;
+                    $params[':q2'] = $term;
+                }
+                if ($partnerId > 0) {
+                    $sql .= " AND e.tenant_id = :partner_id";
+                    $params[':partner_id'] = $partnerId;
+                }
+                if ($upcoming) {
+                    $sql .= " AND e.start_time >= NOW()";
+                }
                 if ($cursorId !== null) {
                     $sql .= " AND e.id < :cursor_id";
                     $params[':cursor_id'] = $cursorId;
@@ -7458,6 +7849,8 @@ class AlphaController extends Controller
                         'is_online' => (bool) ($e['is_online'] ?? false),
                         'attendees_count' => (int) ($e['attendees_count'] ?? 0),
                         'max_attendees' => !empty($e['max_attendees']) ? (int) $e['max_attendees'] : null,
+                        'cover_image' => $e['cover_image'] ?: null,
+                        'organiser_name' => trim(((string) ($e['first_name'] ?? '')) . ' ' . ((string) ($e['last_name'] ?? ''))),
                         'tenant_id' => (int) $e['tenant_id'],
                         'tenant_name' => (string) ($e['tenant_name'] ?? ''),
                     ];
@@ -7469,6 +7862,7 @@ class AlphaController extends Controller
                 }
             } catch (\Throwable $e) {
                 report($e);
+                $loadError = true;
             }
         }
 
@@ -7476,8 +7870,14 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.federation.events_browse.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
+            'federationActiveTab' => 'events',
             'allowed' => $allowed,
             'events' => $events,
+            'query' => $q,
+            'partnerId' => $partnerId,
+            'upcoming' => $upcoming,
+            'partnerOptions' => $partnerOptions,
+            'loadError' => $loadError,
             'nextCursor' => $nextCursor,
         ]);
     }
@@ -11262,12 +11662,14 @@ class AlphaController extends Controller
         }
 
         $connections = [];
+        $loadError = false;
         if ($allowed) {
             try {
                 $connections = app(\App\Services\FederatedConnectionService::class)
                     ->getConnections($userId, $statusFilter, 100, 0);
             } catch (\Throwable $e) {
                 report($e);
+                $loadError = true;
             }
         }
 
@@ -11275,9 +11677,11 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.fed2.connections.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
+            'federationActiveTab' => 'connections',
             'allowed' => $allowed,
             'connections' => $connections,
             'tab' => $tab,
+            'loadError' => $loadError,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -11412,10 +11816,21 @@ class AlphaController extends Controller
 
         $tenantId = TenantContext::getId();
         $allowed = $this->federationOperationAllowed('messaging', $tenantId);
+        $q = trim(self::asStr($request->query('q')));
 
-        $messages = [];
+        // Viewer participation differentiates "feature off for this community" from
+        // "you have not opted in" so the gating notice can offer an opt-in CTA.
+        $viewerSettings = \App\Services\FederationUserService::getUserSettings($userId);
+        $viewerOptedIn = (bool) ($viewerSettings['federation_optin'] ?? false);
+        $viewerCanMessage = $viewerOptedIn && (bool) ($viewerSettings['messaging_enabled_federated'] ?? false);
+
+        $threads = [];
+        $loadError = false;
         if ($allowed) {
             try {
+                // Select ONLY the viewer's own copy of each message (outbound rows
+                // they sent + inbound rows they received) so the dual-insert does
+                // not surface duplicate cards. Then group into per-partner threads.
                 $rows = DB::select("
                     SELECT fm.id, fm.subject, fm.body, fm.direction, fm.status, fm.read_at,
                         fm.created_at, fm.sender_tenant_id, fm.sender_user_id,
@@ -11433,34 +11848,57 @@ class AlphaController extends Controller
                     LEFT JOIN tenants rt ON rt.id = fm.receiver_tenant_id
                     WHERE fm.external_partner_id IS NULL
                       AND (
-                        (fm.sender_tenant_id = ? AND fm.sender_user_id = ?)
-                        OR (fm.receiver_tenant_id = ? AND fm.receiver_user_id = ?)
+                        (fm.direction = 'outbound' AND fm.sender_user_id = ? AND fm.sender_tenant_id = ?)
+                        OR (fm.direction = 'inbound' AND fm.receiver_user_id = ? AND fm.receiver_tenant_id = ?)
                       )
-                    ORDER BY fm.created_at DESC, fm.id DESC LIMIT 200
-                ", [$tenantId, $userId, $tenantId, $userId]);
+                    ORDER BY fm.created_at DESC, fm.id DESC LIMIT 500
+                ", [$userId, $tenantId, $userId, $tenantId]);
 
-                $messages = array_map(static function ($r): array {
-                    $direction = ($r->direction === 'outbound') ? 'outbound' : 'inbound';
-                    return [
-                        'id' => (int) $r->id,
-                        'subject' => (string) ($r->subject ?? ''),
-                        'body' => (string) ($r->body ?? ''),
-                        'direction' => $direction,
-                        'status' => (string) ($r->status ?? 'delivered'),
-                        'read_at' => $r->read_at ?: null,
-                        'created_at' => $r->created_at,
-                        'sender_name' => trim(((string) ($r->sender_first_name ?? '')) . ' ' . ((string) ($r->sender_last_name ?? ''))),
-                        'sender_tenant_name' => (string) ($r->sender_tenant_name ?? ''),
-                        'sender_user_id' => (int) $r->sender_user_id,
-                        'sender_tenant_id' => (int) $r->sender_tenant_id,
-                        'receiver_name' => trim(((string) ($r->receiver_first_name ?? '')) . ' ' . ((string) ($r->receiver_last_name ?? ''))),
-                        'receiver_tenant_name' => (string) ($r->receiver_tenant_name ?? ''),
-                        'receiver_user_id' => (int) $r->receiver_user_id,
-                        'receiver_tenant_id' => (int) $r->receiver_tenant_id,
-                    ];
-                }, $rows);
+                $byThread = [];
+                foreach ($rows as $r) {
+                    $outbound = ($r->direction === 'outbound');
+                    $partnerUserId = $outbound ? (int) $r->receiver_user_id : (int) $r->sender_user_id;
+                    $partnerTenantId = $outbound ? (int) $r->receiver_tenant_id : (int) $r->sender_tenant_id;
+                    $partnerName = $outbound
+                        ? trim(((string) $r->receiver_first_name) . ' ' . ((string) $r->receiver_last_name))
+                        : trim(((string) $r->sender_first_name) . ' ' . ((string) $r->sender_last_name));
+                    $partnerTenantName = $outbound ? (string) ($r->receiver_tenant_name ?? '') : (string) ($r->sender_tenant_name ?? '');
+                    $key = $partnerUserId . '-' . $partnerTenantId;
+
+                    if (!isset($byThread[$key])) {
+                        // Rows are newest-first, so the first row seen is the latest.
+                        $byThread[$key] = [
+                            'partner_user_id' => $partnerUserId,
+                            'partner_tenant_id' => $partnerTenantId,
+                            'partner_name' => $partnerName ?: __('govuk_alpha.members.unknown_member'),
+                            'partner_tenant_name' => $partnerTenantName,
+                            'last_subject' => (string) ($r->subject ?? ''),
+                            'last_preview' => mb_substr(trim((string) ($r->body ?? '')), 0, 120),
+                            'last_created_at' => $r->created_at,
+                            'last_outbound' => $outbound,
+                            'unread_count' => 0,
+                        ];
+                    }
+                    // Unread = an inbound copy the viewer has not read yet.
+                    if (!$outbound && (string) ($r->status ?? '') !== 'read' && empty($r->read_at)) {
+                        $byThread[$key]['unread_count']++;
+                    }
+                }
+
+                $threads = array_values($byThread);
+
+                // Thread search (partner name / community / last subject).
+                if ($q !== '') {
+                    $needle = mb_strtolower($q);
+                    $threads = array_values(array_filter($threads, static function (array $t) use ($needle): bool {
+                        return str_contains(mb_strtolower($t['partner_name']), $needle)
+                            || str_contains(mb_strtolower($t['partner_tenant_name']), $needle)
+                            || str_contains(mb_strtolower($t['last_subject']), $needle);
+                    }));
+                }
             } catch (\Throwable $e) {
                 report($e);
+                $loadError = true;
             }
         }
 
@@ -11468,10 +11906,180 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.fed2.messages.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
+            'federationActiveTab' => 'messages',
             'allowed' => $allowed,
-            'messages' => $messages,
+            'threads' => $threads,
+            'query' => $q,
+            'viewerOptedIn' => $viewerOptedIn,
+            'viewerCanMessage' => $viewerCanMessage,
+            'loadError' => $loadError,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
+    }
+
+    /**
+     * CONVERSATION view — `/federation/messages/conversation/{partnerId}?tenant_id=`.
+     * Renders the chronological message history between the viewer and one partner
+     * member, marks the viewer's unread inbound messages from that partner as read
+     * (a server round-trip, in scope), and offers a reply form + per-message
+     * translate (feature-gated). Internal partners only.
+     */
+    public function federationConversation(Request $request, string $tenantSlug, int $partnerId): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        if (!$this->federationOperationAllowed('messaging', $tenantId)) {
+            return redirect()->route('govuk-alpha.federation.messages.index', ['tenantSlug' => $tenantSlug]);
+        }
+
+        $partnerTenantId = (int) $request->query('tenant_id');
+        if ($partnerId <= 0 || $partnerTenantId <= 0) {
+            return redirect()->route('govuk-alpha.federation.messages.index', ['tenantSlug' => $tenantSlug]);
+        }
+
+        $messages = [];
+        $partnerName = '';
+        $partnerTenantName = '';
+        try {
+            $rows = DB::select("
+                SELECT fm.id, fm.subject, fm.body, fm.direction, fm.status, fm.read_at, fm.created_at,
+                    fm.sender_user_id, fm.sender_tenant_id, fm.receiver_user_id, fm.receiver_tenant_id,
+                    COALESCE(su.first_name, '') as sender_first_name, COALESCE(su.last_name, '') as sender_last_name,
+                    st.name as sender_tenant_name,
+                    COALESCE(ru.first_name, '') as receiver_first_name, COALESCE(ru.last_name, '') as receiver_last_name,
+                    rt.name as receiver_tenant_name
+                FROM federation_messages fm
+                LEFT JOIN users su ON su.id = fm.sender_user_id AND su.tenant_id = fm.sender_tenant_id
+                LEFT JOIN tenants st ON st.id = fm.sender_tenant_id
+                LEFT JOIN users ru ON ru.id = fm.receiver_user_id AND ru.tenant_id = fm.receiver_tenant_id
+                LEFT JOIN tenants rt ON rt.id = fm.receiver_tenant_id
+                WHERE fm.external_partner_id IS NULL AND (
+                    (fm.direction = 'outbound' AND fm.sender_user_id = ? AND fm.sender_tenant_id = ? AND fm.receiver_user_id = ? AND fm.receiver_tenant_id = ?)
+                    OR (fm.direction = 'inbound' AND fm.receiver_user_id = ? AND fm.receiver_tenant_id = ? AND fm.sender_user_id = ? AND fm.sender_tenant_id = ?)
+                )
+                ORDER BY fm.created_at ASC, fm.id ASC LIMIT 500
+            ", [$userId, $tenantId, $partnerId, $partnerTenantId, $userId, $tenantId, $partnerId, $partnerTenantId]);
+
+            foreach ($rows as $r) {
+                $outbound = ($r->direction === 'outbound');
+                if ($partnerName === '') {
+                    $partnerName = $outbound
+                        ? trim(((string) $r->receiver_first_name) . ' ' . ((string) $r->receiver_last_name))
+                        : trim(((string) $r->sender_first_name) . ' ' . ((string) $r->sender_last_name));
+                    $partnerTenantName = $outbound ? (string) ($r->receiver_tenant_name ?? '') : (string) ($r->sender_tenant_name ?? '');
+                }
+                $messages[] = [
+                    'id' => (int) $r->id,
+                    'subject' => (string) ($r->subject ?? ''),
+                    'body' => (string) ($r->body ?? ''),
+                    'outbound' => $outbound,
+                    'read' => ((string) ($r->status ?? '') === 'read' || !empty($r->read_at)),
+                    'created_at' => $r->created_at,
+                ];
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // A conversation must already exist (threads are reached from the inbox).
+        if (empty($messages)) {
+            return redirect()->route('govuk-alpha.federation.messages.index', ['tenantSlug' => $tenantSlug]);
+        }
+
+        // Mark the viewer's unread inbound messages from this partner as read.
+        try {
+            DB::update("
+                UPDATE federation_messages SET status = 'read', read_at = NOW()
+                WHERE external_partner_id IS NULL AND direction = 'inbound'
+                  AND receiver_user_id = ? AND receiver_tenant_id = ?
+                  AND sender_user_id = ? AND sender_tenant_id = ?
+                  AND status != 'read'
+            ", [$userId, $tenantId, $partnerId, $partnerTenantId]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $viewerSettings = \App\Services\FederationUserService::getUserSettings($userId);
+        $canReply = (bool) ($viewerSettings['federation_optin'] ?? false) && (bool) ($viewerSettings['messaging_enabled_federated'] ?? false);
+
+        return $this->view('accessible-frontend::federation-conversation', [
+            'title' => $partnerName ?: __('govuk_alpha.fed2.messages.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'federationActiveTab' => 'messages',
+            'partnerId' => $partnerId,
+            'partnerTenantId' => $partnerTenantId,
+            'partnerName' => $partnerName ?: __('govuk_alpha.members.unknown_member'),
+            'partnerTenantName' => $partnerTenantName,
+            'messages' => $messages,
+            'canReply' => $canReply,
+            'translateEnabled' => TenantContext::hasFeature('message_translation'),
+            'translation' => session('fed_translation'),
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Translate a federated MESSAGE — `/federation/messages/translate/{id}` (POST).
+     * Server-side POST-and-rerender equivalent of the React per-message Translate
+     * button: translates into the viewer's locale via TranscriptionService and
+     * flashes the result so the conversation view can show it inline with a
+     * "show original" toggle. Feature-gated on message_translation.
+     */
+    public function translateFederationMessage(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $partnerId = (int) $request->input('partner_id');
+        $partnerTenantId = (int) $request->input('partner_tenant_id');
+
+        $back = fn (array $extra = []): RedirectResponse => redirect()->route(
+            'govuk-alpha.federation.messages.conversation',
+            array_merge(['tenantSlug' => $tenantSlug, 'partnerId' => $partnerId, 'tenant_id' => $partnerTenantId], $extra)
+        );
+
+        if (!TenantContext::hasFeature('message_translation') || !$this->federationOperationAllowed('messaging', $tenantId)) {
+            return $back(['status' => 'translate-unavailable']);
+        }
+
+        // Viewer must be sender or receiver of the message.
+        $message = DB::selectOne("
+            SELECT id, body FROM federation_messages
+            WHERE id = ? AND external_partner_id IS NULL
+              AND ((sender_user_id = ? AND sender_tenant_id = ?) OR (receiver_user_id = ? AND receiver_tenant_id = ?))
+        ", [$id, $userId, $tenantId, $userId, $tenantId]);
+
+        if (!$message || trim((string) ($message->body ?? '')) === '') {
+            return $back(['status' => 'translate-failed']);
+        }
+
+        $target = app()->getLocale();
+        $translated = null;
+        try {
+            $translated = \App\Services\TranscriptionService::translate((string) $message->body, 'auto', $target);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($translated === null || $translated === '') {
+            return $back(['status' => 'translate-failed']);
+        }
+
+        // Pass the translated text to the re-rendered conversation via flash.
+        session()->flash('fed_translation', ['id' => $id, 'text' => $translated]);
+        return $back();
     }
 
     /**
@@ -11499,10 +12107,23 @@ class AlphaController extends Controller
         $subject = trim(self::asStr($request->input('subject')));
         $body = trim(self::asStr($request->input('body')));
 
-        $backToMember = fn (string $status): RedirectResponse => redirect()->route(
-            'govuk-alpha.federation.members.show',
-            ['tenantSlug' => $tenantSlug, 'id' => $receiverId, 'tenant_id' => $receiverTenantId, 'status' => $status]
-        );
+        // A reply from the conversation thread carries context=conversation and a
+        // reference_message_id; it returns to the conversation, while a first
+        // message from a member profile returns to that profile.
+        $isConversationReply = self::asStr($request->input('context')) === 'conversation';
+        $referenceMessageId = (int) $request->input('reference_message_id');
+        $referenceMessageId = $referenceMessageId > 0 ? $referenceMessageId : null;
+
+        $backToMember = function (string $status) use ($isConversationReply, $tenantSlug, $receiverId, $receiverTenantId): RedirectResponse {
+            if ($isConversationReply) {
+                return redirect()->route('govuk-alpha.federation.messages.conversation', [
+                    'tenantSlug' => $tenantSlug, 'partnerId' => $receiverId, 'tenant_id' => $receiverTenantId, 'status' => $status,
+                ]);
+            }
+            return redirect()->route('govuk-alpha.federation.members.show', [
+                'tenantSlug' => $tenantSlug, 'id' => $receiverId, 'tenant_id' => $receiverTenantId, 'status' => $status,
+            ]);
+        };
 
         if (!$this->federationOperationAllowed('messaging', $tenantId)) {
             return redirect()->route('govuk-alpha.federation.members.index', ['tenantSlug' => $tenantSlug, 'status' => 'message-unavailable']);
@@ -11555,17 +12176,17 @@ class AlphaController extends Controller
             DB::insert("
                 INSERT INTO federation_messages
                 (sender_tenant_id, sender_user_id, receiver_tenant_id, receiver_user_id,
-                 subject, body, direction, status, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, 'outbound', 'delivered', NOW())
-            ", [$tenantId, $userId, $receiverTenantId, $receiverId, $subject, $bodyClean]);
+                 subject, body, direction, status, reference_message_id, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, 'outbound', 'delivered', ?, NOW())
+            ", [$tenantId, $userId, $receiverTenantId, $receiverId, $subject, $bodyClean, $referenceMessageId]);
             $outboundId = (int) DB::getPdo()->lastInsertId();
 
             DB::insert("
                 INSERT INTO federation_messages
                 (sender_tenant_id, sender_user_id, receiver_tenant_id, receiver_user_id,
-                 subject, body, direction, status, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, 'inbound', 'unread', NOW())
-            ", [$tenantId, $userId, $receiverTenantId, $receiverId, $subject, $bodyClean]);
+                 subject, body, direction, status, reference_message_id, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, 'inbound', 'unread', ?, NOW())
+            ", [$tenantId, $userId, $receiverTenantId, $receiverId, $subject, $bodyClean, $referenceMessageId]);
             $inboundId = (int) DB::getPdo()->lastInsertId();
 
             // Audit (best-effort).
@@ -11647,6 +12268,7 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.fed2.transfer.title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
+            'federationActiveTab' => 'members',
             'member' => $member,
             'balance' => $balance,
             'viewerEnabled' => (bool) ($viewerSettings['federation_optin'] ?? false) && (bool) ($viewerSettings['transactions_enabled_federated'] ?? false),
@@ -11772,7 +12394,7 @@ class AlphaController extends Controller
             return $backToTransfer('transfer-description-required');
         }
         if (mb_strlen($description) > 500) {
-            return $backToTransfer('transfer-description-required');
+            return $backToTransfer('transfer-description-too-long');
         }
         $description = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
 
@@ -13757,8 +14379,11 @@ class AlphaController extends Controller
         $tenantId = TenantContext::getId();
         $allowed = $this->federationOperationAllowed('groups', $tenantId);
         $q = trim(self::asStr($request->query('q')));
+        $partnerId = (int) $request->query('partner_id');
         $groups = [];
         $nextCursor = null;
+        $loadError = false;
+        $partnerOptions = $allowed ? $this->federationInternalPartnerOptions($tenantId) : [];
 
         if ($allowed) {
             $perPage = 20;
@@ -13767,7 +14392,7 @@ class AlphaController extends Controller
             try {
                 $sql = "
                     SELECT g.id, g.name, g.description, g.tenant_id, g.cached_member_count as member_count,
-                        t.name as tenant_name
+                        g.visibility, t.name as tenant_name
                     FROM groups g
                     JOIN tenants t ON t.id = g.tenant_id
                     JOIN federation_partnerships fp ON (
@@ -13786,6 +14411,10 @@ class AlphaController extends Controller
                     $term = "%{$q}%";
                     $params[':q1'] = $term;
                     $params[':q2'] = $term;
+                }
+                if ($partnerId > 0) {
+                    $sql .= " AND g.tenant_id = :partner_id";
+                    $params[':partner_id'] = $partnerId;
                 }
                 if ($cursorId !== null) {
                     $sql .= " AND g.id < :cursor_id";
@@ -13807,6 +14436,7 @@ class AlphaController extends Controller
                         'name' => (string) ($g['name'] ?? ''),
                         'description' => (string) ($g['description'] ?? ''),
                         'member_count' => (int) ($g['member_count'] ?? 0),
+                        'privacy' => (string) ($g['visibility'] ?? 'public'),
                         'tenant_id' => (int) $g['tenant_id'],
                         'tenant_name' => (string) ($g['tenant_name'] ?? ''),
                     ];
@@ -13818,6 +14448,7 @@ class AlphaController extends Controller
                 }
             } catch (\Throwable $e) {
                 report($e);
+                $loadError = true;
             }
         }
 
@@ -13825,9 +14456,13 @@ class AlphaController extends Controller
             'title' => __('govuk_alpha.polish_federation.groups_title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
+            'federationActiveTab' => 'groups',
             'allowed' => $allowed,
             'groups' => $groups,
             'query' => $q,
+            'partnerId' => $partnerId,
+            'partnerOptions' => $partnerOptions,
+            'loadError' => $loadError,
             'nextCursor' => $nextCursor,
         ]);
     }

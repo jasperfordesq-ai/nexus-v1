@@ -6,7 +6,8 @@
 
 @section('content')
     @php
-        $dateFmt = fn ($v): ?string => $v ? \Illuminate\Support\Carbon::parse($v)->translatedFormat('F Y') : null;
+        $partner = $partner ?? [];
+        $dateFmt = fn ($v): ?string => $v ? \Illuminate\Support\Carbon::parse($v)->translatedFormat('j F Y') : null;
         $pName = trim((string) ($partner['name'] ?? '')) ?: __('govuk_alpha.federation.partner.caption');
         $levelSlug = trim((string) ($partner['level_name'] ?? ''));
         $levelName = $levelSlug !== '' ? __('govuk_alpha.federation.levels.' . $levelSlug) : '';
@@ -14,6 +15,7 @@
         $loc = trim((string) ($partner['location'] ?? ''));
         $country = trim((string) ($partner['country'] ?? ''));
         $isExternal = (bool) ($partner['is_external'] ?? false);
+        $partnerId = (int) ($partner['id'] ?? 0);
         $permissions = (array) ($partner['permissions'] ?? []);
         $permissionLabels = [
             'profiles' => __('govuk_alpha.federation.permissions.profiles'),
@@ -36,6 +38,8 @@
             <strong class="govuk-tag govuk-tag--purple">{{ $levelName }}</strong>
         @endif
     </div>
+
+    @include('accessible-frontend::partials.federation-nav')
 
     @if (trim((string) ($partner['tagline'] ?? '')) !== '')
         <h2 class="govuk-heading-l">{{ __('govuk_alpha.federation.partner.about_label') }}</h2>
@@ -90,10 +94,22 @@
     <h2 class="govuk-heading-m">{{ __('govuk_alpha.federation.partner.browse_heading') }}</h2>
     <ul class="govuk-list">
         @if (in_array('profiles', $permissions, true))
-            <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.members.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.partner.browse_members') }}</a></li>
+            <li>
+                @if (!$isExternal && $partnerId > 0)
+                    <a class="govuk-link" href="{{ route('govuk-alpha.federation.members.index', ['tenantSlug' => $tenantSlug, 'partner_id' => $partnerId]) }}">{{ __('govuk_alpha.federation.partner.browse_members') }}</a>
+                @else
+                    <a class="govuk-link" href="{{ route('govuk-alpha.federation.members.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.partner.browse_members') }}</a>
+                @endif
+            </li>
         @endif
         @if (in_array('listings', $permissions, true))
-            <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.listings.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.partner.browse_listings') }}</a></li>
+            <li>
+                @if (!$isExternal && $partnerId > 0)
+                    <a class="govuk-link" href="{{ route('govuk-alpha.federation.listings.index', ['tenantSlug' => $tenantSlug, 'partner_id' => $partnerId]) }}">{{ __('govuk_alpha.federation.partner.browse_listings') }}</a>
+                @else
+                    <a class="govuk-link" href="{{ route('govuk-alpha.federation.listings.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.partner.browse_listings') }}</a>
+                @endif
+            </li>
         @endif
         @if (in_array('events', $permissions, true))
             <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.events.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.partner.browse_events') }}</a></li>

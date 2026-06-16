@@ -7,10 +7,12 @@
 @section('content')
     @php
         $asUrl = fn (string $p): string => $p === '' ? '' : (\Illuminate\Support\Str::startsWith($p, ['http://', 'https://', '/']) ? $p : '/' . ltrim($p, '/'));
+        $member = $member ?? [];
         $mName = trim((string) ($member['name'] ?? '')) ?: __('govuk_alpha.federation.member.caption');
         $avatar = $asUrl(trim((string) ($member['avatar'] ?? '')));
         $loc = trim((string) ($member['location'] ?? ''));
         $skills = (array) ($member['skills'] ?? []);
+        $serviceReach = (string) ($member['service_reach'] ?? '');
         $reviews = $reviews ?? [];
         $connectionStatus = $connectionStatus ?? ['status' => 'none', 'connection_id' => null];
         $viewerOptedIn = (bool) ($viewerOptedIn ?? false);
@@ -21,6 +23,28 @@
         $memberId = (int) ($member['id'] ?? 0);
         $memberTenantId = (int) ($member['tenant_id'] ?? 0);
         $connStatus = (string) ($connectionStatus['status'] ?? 'none');
+
+        $showReviews = (bool) ($member['show_reviews'] ?? false);
+        $reputationCount = (int) ($member['reputation_count'] ?? 0);
+        $reputationScore = $member['reputation_score'] ?? null;
+        $reputationScore = ($reputationScore === null || $reputationScore === '') ? null : (float) $reputationScore;
+        // Tier colour: green if score >= 4.5, blue if >= 3.5, yellow otherwise.
+        $reputationTagClass = 'govuk-tag--yellow';
+        if ($reputationScore !== null) {
+            if ($reputationScore >= 4.5) {
+                $reputationTagClass = 'govuk-tag--green';
+            } elseif ($reputationScore >= 3.5) {
+                $reputationTagClass = 'govuk-tag--blue';
+            }
+        }
+
+        // Service reach label: federation.settings.reach_<service_reach>.
+        $reachLabels = [
+            'local_only' => __('govuk_alpha.federation.settings.reach_local_only'),
+            'remote_ok' => __('govuk_alpha.federation.settings.reach_remote_ok'),
+            'travel_ok' => __('govuk_alpha.federation.settings.reach_travel_ok'),
+        ];
+        $reachLabel = $reachLabels[$serviceReach] ?? '';
 
         // Status banner: surface the result of a connect / message / transfer
         // action via the ?status= query param. Errors render an error-summary,
@@ -73,7 +97,16 @@
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ $mName }}</h1>
     </div>
 
-    <p class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha.federation.member.community_label') }}: {{ $member['tenant_name'] ?? '' }}</p>
+    @if ($reputationCount > 0)
+        <p class="govuk-body govuk-!-margin-bottom-2">
+            <strong class="govuk-tag {{ $reputationTagClass }} govuk-!-margin-right-1">{{ __('govuk_alpha.fed2.reviews.reputation_label', ['score' => number_format((float) ($reputationScore ?? 0), 1)]) }}</strong>
+            <span class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha.fed2.reviews.reputation_count', ['count' => $reputationCount]) }}</span>
+        </p>
+    @endif
+
+    <p class="govuk-body-l">{{ __('govuk_alpha.federation.member.community_label') }}: {{ $member['tenant_name'] ?? '' }}</p>
+
+    @include('accessible-frontend::partials.federation-nav')
 
     @if (trim((string) ($member['bio'] ?? '')) !== '')
         <h2 class="govuk-heading-l">{{ __('govuk_alpha.federation.member.about_label') }}</h2>
@@ -81,10 +114,20 @@
     @endif
 
     <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ __('govuk_alpha.federation.member.community_label') }}</dt>
+            <dd class="govuk-summary-list__value">{{ $member['tenant_name'] ?? '' }}</dd>
+        </div>
         @if ($loc !== '')
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">{{ __('govuk_alpha.federation.member.location_label') }}</dt>
                 <dd class="govuk-summary-list__value">{{ $loc }}</dd>
+            </div>
+        @endif
+        @if ($reachLabel !== '')
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.federation.member.reach_label') }}</dt>
+                <dd class="govuk-summary-list__value">{{ $reachLabel }}</dd>
             </div>
         @endif
         <div class="govuk-summary-list__row">
@@ -162,25 +205,50 @@
     </section>
 
     {{-- ===== WAVE FED2: reviews ===== --}}
-    @if (!empty($reviews))
+    @if ($showReviews)
         <section class="govuk-!-margin-top-6" aria-labelledby="fed-reviews-heading">
             <h2 id="fed-reviews-heading" class="govuk-heading-l">{{ __('govuk_alpha.fed2.reviews.heading') }}</h2>
-            <div class="nexus-alpha-card-list">
-                @foreach ($reviews as $review)
-                    @php
-                        $rating = (int) ($review['rating'] ?? 0);
-                        $reviewerName = trim((string) ($review['reviewer_name'] ?? '')) ?: __('govuk_alpha.fed2.reviews.anonymous');
-                        $comment = trim((string) ($review['comment'] ?? ''));
-                    @endphp
-                    <article class="nexus-alpha-card">
-                        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">{{ $reviewerName }}</h3>
-                        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.fed2.reviews.rating_label') }}: {{ $rating }}/5</p>
-                        @if ($comment !== '')
-                            <p class="govuk-body govuk-!-margin-bottom-0">{{ $comment }}</p>
-                        @endif
-                    </article>
-                @endforeach
-            </div>
+
+            @if (empty($reviews))
+                <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.fed2.reviews.empty') }}</p></div>
+            @else
+                <div class="nexus-alpha-card-list">
+                    @foreach ($reviews as $review)
+                        @php
+                            $rating = (int) ($review['rating'] ?? 0);
+                            $reviewerName = trim((string) ($review['reviewer_name'] ?? '')) ?: __('govuk_alpha.fed2.reviews.anonymous');
+                            $comment = trim((string) ($review['comment'] ?? ''));
+                            $partnerName = trim((string) ($review['partner_name'] ?? ''));
+                            $verified = (bool) ($review['verified'] ?? false);
+                            $createdAt = $review['created_at'] ?? null;
+                            $createdAtLabel = $createdAt ? \Illuminate\Support\Carbon::parse($createdAt)->translatedFormat('j F Y') : '';
+                        @endphp
+                        <article class="nexus-alpha-card">
+                            <h3 class="govuk-heading-s govuk-!-margin-bottom-1">{{ $reviewerName }}</h3>
+                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.fed2.reviews.rating_value', ['rating' => $rating]) }}</p>
+
+                            @if ($createdAtLabel !== '')
+                                <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.fed2.reviews.date_label') }}: {{ $createdAtLabel }}</p>
+                            @endif
+
+                            @if ($partnerName !== '' || $verified)
+                                <p class="govuk-body-s govuk-!-margin-bottom-1 nexus-alpha-inline-list">
+                                    @if ($partnerName !== '')
+                                        <strong class="govuk-tag govuk-tag--grey govuk-!-margin-right-1">{{ __('govuk_alpha.fed2.reviews.from_partner', ['community' => $partnerName]) }}</strong>
+                                    @endif
+                                    @if ($verified)
+                                        <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.fed2.reviews.verified') }}</strong>
+                                    @endif
+                                </p>
+                            @endif
+
+                            @if ($comment !== '')
+                                <p class="govuk-body govuk-!-margin-bottom-0">{{ $comment }}</p>
+                            @endif
+                        </article>
+                    @endforeach
+                </div>
+            @endif
         </section>
     @endif
 @endsection

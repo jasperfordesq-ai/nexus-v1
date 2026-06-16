@@ -14,6 +14,10 @@
         $memberTenantId = (int) ($member['tenant_id'] ?? 0);
         $statusKey = (string) ($status ?? '');
         $statusText = $statusKey !== '' ? __('govuk_alpha.fed2.transfer.status.' . $statusKey) : '';
+        // transfer-sent is the only success state; every other status.* key is an error
+        // (this includes the new transfer-description-too-long key, which is resolved
+        // generically above and surfaced through the error summary below).
+        $statusIsSuccess = ($statusKey === 'transfer-sent');
         $backHref = route('govuk-alpha.federation.members.show', ['tenantSlug' => $tenantSlug, 'id' => $memberId, 'tenant_id' => $memberTenantId]);
     @endphp
 
@@ -25,17 +29,30 @@
             <h1 class="govuk-heading-xl">{{ __('govuk_alpha.fed2.transfer.title') }}</h1>
             <p class="govuk-body-l">{{ __('govuk_alpha.fed2.transfer.description') }}</p>
 
+            @include('accessible-frontend::partials.federation-nav')
+
             @if ($statusText !== '')
-                <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
-                    <div role="alert">
-                        <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                        <div class="govuk-error-summary__body">
-                            <ul class="govuk-list govuk-error-summary__list">
-                                <li><a href="#amount">{{ $statusText }}</a></li>
-                            </ul>
+                @if ($statusIsSuccess)
+                    <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="fed-transfer-status">
+                        <div class="govuk-notification-banner__header">
+                            <h2 class="govuk-notification-banner__title" id="fed-transfer-status">{{ __('govuk_alpha.states.success_title') }}</h2>
+                        </div>
+                        <div class="govuk-notification-banner__content">
+                            <p class="govuk-notification-banner__heading">{{ $statusText }}</p>
                         </div>
                     </div>
-                </div>
+                @else
+                    <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+                        <div role="alert">
+                            <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                            <div class="govuk-error-summary__body">
+                                <ul class="govuk-list govuk-error-summary__list">
+                                    <li><a href="#amount">{{ $statusText }}</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                @endif
             @endif
 
             <dl class="govuk-summary-list govuk-!-margin-bottom-6">

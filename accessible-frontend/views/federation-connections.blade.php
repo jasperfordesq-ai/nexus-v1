@@ -9,18 +9,17 @@
         $allowed = (bool) ($allowed ?? false);
         $connections = $connections ?? [];
         $tab = (string) ($tab ?? 'accepted');
+        $loadError = (bool) ($loadError ?? false);
         $statusKey = (string) ($status ?? '');
         $statusText = $statusKey !== '' ? __('govuk_alpha.fed2.connections.status.' . $statusKey) : '';
         $statusIsError = in_array($statusKey, ['connection-action-failed'], true);
 
-        $emptyKey = match ($tab) {
-            'received' => 'empty_received',
-            'sent' => 'empty_sent',
-            default => 'empty_accepted',
-        };
-
         $tabHref = fn (string $t): string => route('govuk-alpha.federation.connections.index', ['tenantSlug' => $tenantSlug, 'tab' => $t]);
+
+        $membersIndexHref = route('govuk-alpha.federation.members.index', ['tenantSlug' => $tenantSlug]);
+
         $memberHref = function (array $c) use ($tenantSlug): string {
+            // tenant_id is REQUIRED so the profile (where compose lives) scopes to the owning community.
             return route('govuk-alpha.federation.members.show', [
                 'tenantSlug' => $tenantSlug,
                 'id' => (int) ($c['user_id'] ?? 0),
@@ -34,6 +33,8 @@
     <span class="govuk-caption-xl">{{ __('govuk_alpha.fed2.connections.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.fed2.connections.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.fed2.connections.description') }}</p>
+
+    @include('accessible-frontend::partials.federation-nav')
 
     @if ($statusText !== '')
         @if ($statusIsError)
@@ -92,8 +93,25 @@
                 <div class="govuk-tabs__panel {{ !$isActive ? 'govuk-tabs__panel--hidden' : '' }}" id="panel-{{ $panelTab }}" role="tabpanel" aria-labelledby="tab-{{ $panelTab }}">
                     @if (!$isActive)
                         {{-- Non-active panels show nothing when JS is disabled. --}}
+                    @elseif ($loadError)
+                        {{-- FC-1: load failure replaces the empty state with an error summary + try-again link. --}}
+                        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+                            <div role="alert">
+                                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                                <div class="govuk-error-summary__body">
+                                    <p class="govuk-body">{{ __('govuk_alpha.fed2.connections.load_error') }}</p>
+                                    <ul class="govuk-list govuk-error-summary__list">
+                                        <li><a href="{{ $tabHref($panelTab) }}">{{ __('govuk_alpha.fed2.connections.try_again') }}</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     @elseif (empty($connections))
                         <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.fed2.connections.' . $panelEmptyKey) }}</p></div>
+                        @if ($panelTab === 'accepted')
+                            {{-- FC-4: accepted empty state offers a route to browse members. --}}
+                            <a href="{{ $membersIndexHref }}" role="button" draggable="false" class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.fed2.connections.browse_members') }}</a>
+                        @endif
                     @else
                         <div class="nexus-alpha-card-list" id="connections-list">
                             @foreach ($connections as $c)
@@ -102,32 +120,57 @@
                                     $cId = (int) ($c['id'] ?? 0);
                                     $cStatus = (string) ($c['status'] ?? '');
                                     $cDirection = (string) ($c['direction'] ?? '');
-                                    $acceptHidden = ['tenantSlug' => $tenantSlug, 'id' => $cId];
+                                    $cMessage = trim((string) ($c['message'] ?? ''));
+                                    $cCreatedRaw = $c['created_at'] ?? null;
+                                    $cCreated = $cCreatedRaw ? \Illuminate\Support\Carbon::parse($cCreatedRaw)->translatedFormat('j F Y') : '';
+                                    $isReceived = ($cStatus === 'pending' && $cDirection === 'incoming');
+                                    $isSent = ($cStatus === 'pending' && $cDirection === 'outgoing');
+                                    $isAccepted = ($cStatus === 'accepted');
+                                    $actionHidden = ['tenantSlug' => $tenantSlug, 'id' => $cId];
                                 @endphp
                                 <article class="nexus-alpha-card">
                                     <h2 class="govuk-heading-s govuk-!-margin-bottom-1"><a class="govuk-link" href="{{ $memberHref($c) }}">{{ $cName }}</a></h2>
-                                    <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.fed2.connections.community_label') }}: {{ $c['tenant_name'] ?? '' }}</p>
+                                    <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">
+                                        <strong class="govuk-tag govuk-tag--grey">{{ __('govuk_alpha.fed2.connections.community_label') }}: {{ $c['tenant_name'] ?? '' }}</strong>
+                                    </p>
 
-                                    @if ($cStatus === 'pending')
+                                    {{-- FC-3: every card shows when the request was made. --}}
+                                    @if ($cCreated !== '')
+                                        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.fed2.connections.created_label') }}: {{ $cCreated }}</p>
+                                    @endif
+
+                                    {{-- FC-5: the yellow "Pending" tag is for OUTGOING/sent requests only. --}}
+                                    @if ($isSent)
                                         <p class="govuk-body-s govuk-!-margin-bottom-2"><strong class="govuk-tag govuk-tag--yellow">{{ __('govuk_alpha.fed2.connections.pending_label') }}</strong></p>
                                     @endif
 
-                                    {{-- Pending-incoming: accept and decline in ONE form with two submit buttons.
-                                         This keeps both inside a single govuk-button-group with no wrapping form per button. --}}
-                                    @if ($cStatus === 'pending' && $cDirection === 'incoming')
+                                    {{-- FC-2: incoming requests with a note show the requester's message. --}}
+                                    @if ($isReceived && $cMessage !== '')
+                                        <div class="govuk-inset-text govuk-!-margin-top-2 govuk-!-margin-bottom-2">
+                                            <p class="govuk-body govuk-!-margin-bottom-0">
+                                                <span class="govuk-visually-hidden">{{ __('govuk_alpha.fed2.connections.request_message_label') }}: </span>{{ $cMessage }}
+                                            </p>
+                                        </div>
+                                    @endif
+
+                                    {{-- Pending-incoming: accept and decline in two forms inside one button group;
+                                         no wrapping form per button. --}}
+                                    @if ($isReceived)
                                         <div class="govuk-button-group">
-                                            <form method="post" action="{{ route('govuk-alpha.federation.connections.accept', $acceptHidden) }}">
+                                            <form method="post" action="{{ route('govuk-alpha.federation.connections.accept', $actionHidden) }}">
                                                 @csrf
                                                 <button type="submit" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.fed2.connections.accept') }}</button>
                                             </form>
-                                            <form method="post" action="{{ route('govuk-alpha.federation.connections.reject', $acceptHidden) }}">
+                                            <form method="post" action="{{ route('govuk-alpha.federation.connections.reject', $actionHidden) }}">
                                                 @csrf
                                                 <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.fed2.connections.reject') }}</button>
                                             </form>
                                         </div>
-                                    @elseif ($cStatus === 'accepted')
+                                    @elseif ($isAccepted)
+                                        {{-- FC-1 (FC-5 list): accepted cards get a "Send a message" link to the profile (compose) plus Remove. --}}
                                         <div class="govuk-button-group">
-                                            <form method="post" action="{{ route('govuk-alpha.federation.connections.remove', ['tenantSlug' => $tenantSlug, 'id' => $cId]) }}">
+                                            <a class="govuk-link" href="{{ $memberHref($c) }}">{{ __('govuk_alpha.fed2.connections.message') }}</a>
+                                            <form method="post" action="{{ route('govuk-alpha.federation.connections.remove', $actionHidden) }}">
                                                 @csrf
                                                 <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.fed2.connections.remove') }}</button>
                                             </form>
