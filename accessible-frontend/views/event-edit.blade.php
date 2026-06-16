@@ -31,7 +31,7 @@
                 </div>
             @endif
 
-            <form method="post" action="{{ route('govuk-alpha.events.update', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" novalidate>
+            <form method="post" action="{{ route('govuk-alpha.events.update', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" enctype="multipart/form-data" novalidate>
                 @csrf
 
                 <fieldset class="govuk-fieldset">
@@ -64,6 +64,24 @@
                                 <option value="{{ $category['id'] }}" @selected((string) old('category_id', $event['category_id'] ?? '') === (string) $category['id'])>{{ $category['name'] }}</option>
                             @endforeach
                         </select>
+                    </div>
+
+                    {{-- Cover image — WAVE NIGHT-EVENTS --}}
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="image">{{ __('govuk_alpha.events.polish_events.edit_image_label') }}</label>
+                        <div id="image-hint" class="govuk-hint">{{ __('govuk_alpha.events.polish_events.edit_image_hint') }}</div>
+                        @if (!empty($event['cover_image']))
+                            <figure class="govuk-!-margin-bottom-4 govuk-!-margin-top-2">
+                                <img src="{{ $event['cover_image'] }}" alt="{{ __('govuk_alpha.events.polish_events.edit_current_image_alt', ['title' => $event['title'] ?? '']) }}" style="max-width:100%;max-height:240px;" loading="lazy">
+                            </figure>
+                            <div class="govuk-checkboxes govuk-!-margin-bottom-4" data-module="govuk-checkboxes">
+                                <div class="govuk-checkboxes__item">
+                                    <input class="govuk-checkboxes__input" id="remove_cover_image" name="remove_cover_image" type="checkbox" value="1" @checked(old('remove_cover_image'))>
+                                    <label class="govuk-label govuk-checkboxes__label" for="remove_cover_image">{{ __('govuk_alpha.events.polish_events.edit_remove_image_label') }}</label>
+                                </div>
+                            </div>
+                        @endif
+                        <input class="govuk-file-upload" id="image" name="image" type="file" accept="image/jpeg,image/png,image/gif,image/webp" aria-describedby="image-hint">
                     </div>
                 </fieldset>
 
@@ -101,18 +119,40 @@
                         <input class="govuk-input" id="location" name="location" type="text" value="{{ old('location', $event['location'] ?? '') }}" maxlength="255">
                     </div>
 
+                    {{-- is_online with conditional-reveal for online_link — govuk-frontend JS handles show/hide --}}
                     <div class="govuk-form-group">
                         <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="is_online" name="is_online" type="checkbox" value="1" @checked(old('is_online', $event['is_online'] ?? false))>
+                                @php $isOnlineChecked = (bool) old('is_online', $event['is_online'] ?? false); @endphp
+                                <input class="govuk-checkboxes__input" id="is_online" name="is_online" type="checkbox" value="1" @checked($isOnlineChecked) data-aria-controls="is-online-conditional">
                                 <label class="govuk-label govuk-checkboxes__label" for="is_online">{{ __('govuk_alpha.events.is_online_label') }}</label>
+                            </div>
+                            <div class="govuk-checkboxes__conditional{{ $isOnlineChecked ? '' : ' govuk-checkboxes__conditional--hidden' }}" id="is-online-conditional">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="online_link">{{ __('govuk_alpha.events.online_link_label') }}</label>
+                                    <input class="govuk-input" id="online_link" name="online_link" type="url" value="{{ old('online_link', $event['online_link'] ?? '') }}">
+                                </div>
                             </div>
                         </div>
                     </div>
 
+                    {{-- allow_remote_attendance with conditional-reveal for video_url — WAVE NIGHT-EVENTS --}}
                     <div class="govuk-form-group">
-                        <label class="govuk-label" for="online_link">{{ __('govuk_alpha.events.online_link_label') }}</label>
-                        <input class="govuk-input" id="online_link" name="online_link" type="url" value="{{ old('online_link', $event['online_link'] ?? '') }}">
+                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                @php $allowRemoteChecked = (bool) old('allow_remote_attendance', $event['allow_remote_attendance'] ?? false); @endphp
+                                <input class="govuk-checkboxes__input" id="allow_remote_attendance" name="allow_remote_attendance" type="checkbox" value="1" @checked($allowRemoteChecked) data-aria-controls="remote-attendance-conditional">
+                                <label class="govuk-label govuk-checkboxes__label" for="allow_remote_attendance">{{ __('govuk_alpha.events.polish_events.allow_remote_label') }}</label>
+                                <div id="allow-remote-hint" class="govuk-hint govuk-checkboxes__hint">{{ __('govuk_alpha.events.polish_events.allow_remote_hint') }}</div>
+                            </div>
+                            <div class="govuk-checkboxes__conditional{{ $allowRemoteChecked ? '' : ' govuk-checkboxes__conditional--hidden' }}" id="remote-attendance-conditional">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="video_url">{{ __('govuk_alpha.events.polish_events.video_url_label') }}</label>
+                                    <div id="video-url-hint" class="govuk-hint">{{ __('govuk_alpha.events.polish_events.video_url_hint') }}</div>
+                                    <input class="govuk-input" id="video_url" name="video_url" type="url" value="{{ old('video_url', $event['video_url'] ?? '') }}" aria-describedby="video-url-hint">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </fieldset>
 

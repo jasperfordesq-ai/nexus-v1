@@ -365,6 +365,7 @@ class EventService
             'title', 'description', 'start_time', 'end_time', 'location',
             'latitude', 'longitude', 'category_id', 'group_id', 'max_attendees',
             'is_online', 'online_link', 'image_url', 'federated_visibility',
+            'allow_remote_attendance', 'video_url',
         ];
 
         $meaningfulKeys = ['title', 'start_time', 'end_time', 'location'];

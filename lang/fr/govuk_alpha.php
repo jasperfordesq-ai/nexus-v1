@@ -123,6 +123,7 @@ return [
         'cancel_exchange' => 'Annuler l\'échange',
     ],
     'states' => [
+        'warning_prefix' => 'Warning',
         'content-hidden' => 'This item is now hidden from your feed.',
         'author-muted' => 'You will no longer see posts from this member in your feed.',
         'content-reported' => 'Thank you. Your report has been sent to the moderators.',
@@ -954,6 +955,52 @@ return [
             'waitlist-failed' => 'You could not be added to the waitlist. Try again.',
             'poll-voted' => 'Your vote has been recorded.',
             'poll-vote-failed' => 'Your vote could not be recorded. Try again.',
+        ],
+        // polish_events — WAVE NIGHT-EVENTS
+        'polish_events' => [
+            // Cancelled event banner
+            'cancelled_banner_heading' => 'This event has been cancelled.',
+            'cancelled_reason_prefix' => 'Reason:',
+            // Remote attendance conditional-reveal
+            'allow_remote_label' => 'Allow remote attendance',
+            'allow_remote_hint' => 'Participants can join online as well as in person.',
+            'video_url_label' => 'Video or meeting link (optional)',
+            'video_url_hint' => 'Paste the URL for your video call or meeting room. Only shown to attendees.',
+            'video_url_summary_label' => 'Join remotely',
+            'video_url_link_text' => 'Join the meeting online',
+            // Recurring events
+            'recurrence_section_title' => 'Recurring event',
+            'recurrence_repeat_label' => 'Repeat this event',
+            'recurrence_frequency_legend' => 'How often should it repeat?',
+            'recurrence_freq_daily' => 'Daily',
+            'recurrence_freq_weekly' => 'Weekly',
+            'recurrence_freq_biweekly' => 'Every two weeks',
+            'recurrence_freq_monthly' => 'Monthly',
+            'recurrence_end_legend' => 'When should it end?',
+            'recurrence_end_after' => 'After a number of occurrences',
+            'recurrence_end_on_date' => 'On a specific date',
+            'recurrence_count_label' => 'Number of occurrences',
+            'recurrence_count_hint' => 'Maximum 52.',
+            'recurrence_end_date_label' => 'End date',
+            'recurrence_end_date_hint' => 'The series will end on or before this date.',
+            'recurrence_hint' => 'Creates copies of this event at the selected frequency.',
+            // Check-in panel (organiser)
+            'checkin_heading' => 'Attendance check-in',
+            'checkin_intro' => 'Mark who attended this event.',
+            'checkin_button' => 'Mark as attended',
+            'checkin_done_tag' => 'Attended',
+            'checkin_failed' => 'Check-in could not be recorded. Try again.',
+            'checkin_success' => 'Attendance marked.',
+            'checkin_empty' => 'No RSVPs yet.',
+            'checkin_failed_status' => 'check-in-failed',
+            // Share event
+            'share_heading' => 'Share this event',
+            'share_email_label' => 'Share by email',
+            // Event image on edit
+            'edit_image_label' => 'Cover image',
+            'edit_image_hint' => 'JPG, PNG, GIF or WEBP, up to 8MB.',
+            'edit_current_image_alt' => 'Current cover image for :title',
+            'edit_remove_image_label' => 'Remove current cover image',
         ],
     ],
     'volunteering' => [

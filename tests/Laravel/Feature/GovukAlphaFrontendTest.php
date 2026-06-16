@@ -8820,4 +8820,42 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertContains($response->getStatusCode(), [200, 403]);
     }
 
+
+    // ===== WAVE NIGHT-EVENTS =====
+
+    public function test_pevents_cancelled_event_shows_warning_and_hides_rsvp(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Event Goer']);
+        $this->enableAlphaFeatures(['events']);
+        $eventId = DB::table('events')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Cancelled Workshop',
+            'description' => 'This was called off.',
+            'location' => 'Hall',
+            'start_time' => now()->addDays(3),
+            'end_time' => now()->addDays(3)->addHours(2),
+            'status' => 'cancelled',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.events.polish_events.cancelled_banner_heading'));
+        // The RSVP "going" control must not be offered for a cancelled event.
+        $res->assertDontSee(route('govuk-alpha.events.rsvp.store', ['tenantSlug' => $this->testTenantSlug, 'id' => $eventId]), false);
+    }
+
+    public function test_pevents_create_form_has_remote_attendance_fields(): void
+    {
+        $this->authenticatedUser(['name' => 'Organiser']);
+        $this->enableAlphaFeatures(['events']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/events/new");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.events.polish_events.allow_remote_label'));
+        $res->assertSee('video_url', false);
+    }
+
 }

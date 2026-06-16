@@ -1533,8 +1533,26 @@ class AlphaController extends Controller
         }
 
         try {
-            $event = EventService::create($userId, $this->eventInput($request));
-            $eventId = (int) $event->id;
+            $isRecurring = $request->boolean('is_recurring');
+            $inputData = $this->eventInput($request);
+
+            if ($isRecurring) {
+                // Merge recurrence fields and call the recurring path.
+                $recurrenceData = array_merge($inputData, [
+                    'recurrence_frequency' => self::asStr($request->input('recurrence_frequency')) ?: 'weekly',
+                    'recurrence_interval' => max(1, (int) ($request->input('recurrence_interval') ?? 1)),
+                    'recurrence_ends_type' => self::asStr($request->input('recurrence_ends_type')) ?: 'after_count',
+                    'recurrence_ends_after_count' => max(1, min(52, (int) ($request->input('recurrence_ends_after_count') ?? 10))),
+                    'recurrence_ends_on_date' => self::asStr($request->input('recurrence_ends_on_date')) ?: null,
+                ]);
+                $recurResult = EventService::createRecurring($userId, $recurrenceData);
+                $eventId = (int) ($recurResult['template_id'] ?? 0);
+                // Retrieve the created template event for XP/feed recording.
+                $event = EventService::getById($eventId, $userId);
+            } else {
+                $event = EventService::create($userId, $inputData);
+                $eventId = (int) $event->id;
+            }
 
             $this->attachEventCoverImage($request, $eventId, $userId);
 
@@ -1551,10 +1569,10 @@ class AlphaController extends Controller
                     'event',
                     $eventId,
                     [
-                        'title' => $event->title,
-                        'content' => $event->description,
-                        'image_url' => $event->image_url,
-                        'group_id' => $event->group_id,
+                        'title' => is_array($event) ? ($event['title'] ?? '') : ($event->title ?? ''),
+                        'content' => is_array($event) ? ($event['description'] ?? '') : ($event->description ?? ''),
+                        'image_url' => is_array($event) ? ($event['image_url'] ?? null) : ($event->image_url ?? null),
+                        'group_id' => is_array($event) ? ($event['group_id'] ?? null) : ($event->group_id ?? null),
                     ]
                 );
             } catch (\Throwable $e) {
@@ -1634,9 +1652,20 @@ class AlphaController extends Controller
             $ok = false;
         }
 
-        // Notify everyone who RSVP'd of meaningful changes (parity with
-        // EventsController::update). EventService tracks the changes internally.
         if ($ok) {
+            // Handle image removal before attaching a new one.
+            if ($request->boolean('remove_cover_image')) {
+                try {
+                    EventService::updateImage($id, $userId, '');
+                } catch (\Throwable $e) {
+                    report($e);
+                }
+            }
+            // Attach a newly uploaded cover image (no-op if no file was sent).
+            $this->attachEventCoverImage($request, $id, $userId);
+
+            // Notify everyone who RSVP'd of meaningful changes (parity with
+            // EventsController::update). EventService tracks the changes internally.
             try {
                 $meaningfulChanges = EventService::getLastMeaningfulUpdateChanges();
                 if (!empty($meaningfulChanges)) {
@@ -10353,6 +10382,7 @@ class AlphaController extends Controller
         $maxAttendees = trim(self::asStr($request->input('max_attendees')));
         $location = trim(self::asStr($request->input('location')));
         $onlineLink = trim(self::asStr($request->input('online_link')));
+        $videoUrl = trim(self::asStr($request->input('video_url')));
         $endTime = trim(self::asStr($request->input('end_time')));
         $categoryId = self::asStr($request->input('category_id'));
 
@@ -10366,6 +10396,8 @@ class AlphaController extends Controller
             'max_attendees' => $maxAttendees !== '' ? max(1, (int) $maxAttendees) : null,
             'is_online' => $request->boolean('is_online'),
             'online_link' => $onlineLink !== '' ? $onlineLink : null,
+            'allow_remote_attendance' => $request->boolean('allow_remote_attendance'),
+            'video_url' => $videoUrl !== '' ? $videoUrl : null,
         ];
     }
 
@@ -13385,5 +13417,32 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.reviews.index', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    // ===== WAVE NIGHT-EVENTS =====
+
+    /**
+     * POST /events/{id}/attendees/{attendeeId}/check-in
+     *
+     * Owner-only check-in: mark an RSVP'd attendee as having attended.
+     * Cross-tenant → 404 (assertTenantSlug); non-owner → 403 (ownedEventOrAbort).
+     * EventService::markAttended also validates canManageEventAttendance internally.
+     */
+    public function storeEventCheckin(Request $request, string $tenantSlug, int $id, int $attendeeId): RedirectResponse
+    {
+        [, $userId] = $this->ownedEventOrAbort($tenantSlug, $id);
+
+        $ok = false;
+        try {
+            $ok = \App\Services\EventService::markAttended($id, $attendeeId, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.events.show', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'checkin-success' : 'checkin-failed',
+        ]);
     }
 }

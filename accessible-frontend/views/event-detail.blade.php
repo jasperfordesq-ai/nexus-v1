@@ -43,6 +43,24 @@
                 <p class="govuk-notification-banner__heading">{{ $status === 'event-updated' ? __('govuk_alpha.events.updated') : __('govuk_alpha.events.cancelled') }}</p>
             </div>
         </div>
+    @elseif ($status === 'checkin-success')
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="checkin-success-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="checkin-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.events.polish_events.checkin_success') }}</p>
+            </div>
+        </div>
+    @elseif ($status === 'checkin-failed')
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                <div class="govuk-error-summary__body">
+                    <p>{{ __('govuk_alpha.events.polish_events.checkin_failed') }}</p>
+                </div>
+            </div>
+        </div>
     @elseif (in_array($status, ['waitlist-joined', 'waitlist-left', 'poll-voted'], true))
         @php
             $depthMessage = match ($status) {
@@ -79,29 +97,55 @@
         </div>
     @endif
 
+    @php $isCancelled = ($event['status'] ?? '') === 'cancelled'; @endphp
+
+    {{-- Cancelled event warning — rendered ABOVE the grid so it spans full width --}}
+    @if ($isCancelled)
+        <div class="govuk-warning-text govuk-!-margin-bottom-6">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning_prefix') }}</span>
+                {{ __('govuk_alpha.events.polish_events.cancelled_banner_heading') }}
+                @if (!empty($event['cancellation_reason']))
+                    <br>
+                    <span class="govuk-body govuk-!-margin-top-1">{{ __('govuk_alpha.events.polish_events.cancelled_reason_prefix') }} {{ $event['cancellation_reason'] }}</span>
+                @endif
+            </strong>
+        </div>
+    @endif
+
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <span class="govuk-caption-l">{{ __('govuk_alpha.events.detail_title') }}</span>
             <h1 class="govuk-heading-xl">{{ $event['title'] }}</h1>
 
+            {{-- Capacity tag — moved into two-thirds column, immediately after h1, before image --}}
+            @if (!empty($event['is_full']))
+                <p class="govuk-!-margin-bottom-4"><strong class="govuk-tag govuk-tag--red">{{ __('govuk_alpha.events.full') }}</strong></p>
+            @elseif (array_key_exists('spots_left', $event) && $event['spots_left'] !== null)
+                <p class="govuk-!-margin-bottom-4"><strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.events.spots_left', ['count' => $event['spots_left']]) }}</strong></p>
+            @endif
+
             @if ($isOwner ?? false)
-                <div class="nexus-alpha-actions govuk-!-margin-bottom-4">
+                <div class="govuk-button-group govuk-!-margin-bottom-4">
                     <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ route('govuk-alpha.events.edit', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.events.edit_event') }}</a>
                 </div>
-                <details class="govuk-details govuk-!-margin-bottom-2" data-module="govuk-details">
-                    <summary class="govuk-details__summary"><span class="govuk-details__summary-text">{{ __('govuk_alpha.events.cancel_event') }}</span></summary>
-                    <div class="govuk-details__text">
-                        <p class="govuk-body">{{ __('govuk_alpha.events.cancel_confirm') }}</p>
-                        <form method="post" action="{{ route('govuk-alpha.events.cancel', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
-                            @csrf
-                            <div class="govuk-form-group">
-                                <label class="govuk-label" for="cancel-reason">{{ __('govuk_alpha.events.cancel_reason_label') }}</label>
-                                <textarea class="govuk-textarea" id="cancel-reason" name="reason" rows="3"></textarea>
-                            </div>
-                            <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.cancel_event_button') }}</button>
-                        </form>
-                    </div>
-                </details>
+                @unless($isCancelled)
+                    <details class="govuk-details govuk-!-margin-bottom-2" data-module="govuk-details">
+                        <summary class="govuk-details__summary"><span class="govuk-details__summary-text">{{ __('govuk_alpha.events.cancel_event') }}</span></summary>
+                        <div class="govuk-details__text">
+                            <p class="govuk-body">{{ __('govuk_alpha.events.cancel_confirm') }}</p>
+                            <form method="post" action="{{ route('govuk-alpha.events.cancel', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">
+                                @csrf
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="cancel-reason">{{ __('govuk_alpha.events.cancel_reason_label') }}</label>
+                                    <textarea class="govuk-textarea" id="cancel-reason" name="reason" rows="3"></textarea>
+                                </div>
+                                <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.cancel_event_button') }}</button>
+                            </form>
+                        </div>
+                    </details>
+                @endunless
                 <details class="govuk-details govuk-!-margin-bottom-4" data-module="govuk-details">
                     <summary class="govuk-details__summary"><span class="govuk-details__summary-text">{{ __('govuk_alpha.events.delete_event') }}</span></summary>
                     <div class="govuk-details__text">
@@ -122,13 +166,6 @@
 
             <h2 class="govuk-heading-l">{{ __('govuk_alpha.events.description_title') }}</h2>
             <div class="govuk-body">{!! nl2br(e((string) ($event['description'] ?? ''))) !!}</div>
-        </div>
-        <div class="govuk-grid-column-one-third">
-            @if (!empty($event['is_full']))
-                <strong class="govuk-tag govuk-tag--red">{{ __('govuk_alpha.events.full') }}</strong>
-            @elseif (array_key_exists('spots_left', $event) && $event['spots_left'] !== null)
-                <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.events.spots_left', ['count' => $event['spots_left']]) }}</strong>
-            @endif
         </div>
     </div>
 
@@ -158,6 +195,15 @@
                 </dd>
             </div>
         @endif
+        @php $videoUrl = $event['video_url'] ?? null; @endphp
+        @if (!empty($videoUrl) && \Illuminate\Support\Str::startsWith((string) $videoUrl, ['http://', 'https://']))
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.events.polish_events.video_url_summary_label') }}</dt>
+                <dd class="govuk-summary-list__value">
+                    <a class="govuk-link" href="{{ $videoUrl }}" rel="noopener noreferrer">{{ __('govuk_alpha.events.polish_events.video_url_link_text') }}</a>
+                </dd>
+            </div>
+        @endif
         @if ($organiserName !== '')
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">{{ __('govuk_alpha.events.organiser') }}</dt>
@@ -180,6 +226,19 @@
         </div>
     </dl>
 
+    {{-- Share link — zero-JS mailto: fallback. Shown for all authenticated visitors on non-cancelled events. --}}
+    @if (!$requiresAuth)
+        @php
+            $shareUrl = route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]);
+            $shareSubject = rawurlencode($event['title'] ?? '');
+            $shareBody = rawurlencode($shareUrl);
+        @endphp
+        <p class="govuk-body govuk-!-margin-top-4">
+            <a class="govuk-link" href="mailto:?subject={{ $shareSubject }}&body={{ $shareBody }}">{{ __('govuk_alpha.events.polish_events.share_email_label') }}</a>
+        </p>
+    @endif
+
+    @unless($isCancelled)
     @if ($requiresAuth)
         <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="events-auth-title">
             <div class="govuk-notification-banner__header">
@@ -187,7 +246,7 @@
             </div>
             <div class="govuk-notification-banner__content">
                 <p class="govuk-body">{{ __('govuk_alpha.events.auth_required_detail', ['community' => $tenant['name'] ?? $tenantSlug]) }}</p>
-                <div class="nexus-alpha-actions">
+                <div class="govuk-button-group">
                     <a class="govuk-button" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.nav.login') }}</a>
                     <a class="govuk-link" href="{{ route('govuk-alpha.register', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.nav.register') }}</a>
                 </div>
@@ -335,6 +394,7 @@
             </section>
         @endif
     @endif
+    @endunless {{-- /isCancelled --}}
 
     {{-- ===== Recurring series navigation ===== --}}
     @if (!empty($seriesEvents) && count($seriesEvents) > 1)
@@ -367,22 +427,63 @@
         </details>
     @endif
 
+    {{-- ===== Attendee list (govuk-list, no custom class on <li>) ===== --}}
     @if (!empty($attendees))
         <h2 class="govuk-heading-l govuk-!-margin-top-8">{{ __('govuk_alpha.events.attendees_title') }}</h2>
+
+        {{-- ===== Organiser check-in panel (owner only) — WAVE NIGHT-EVENTS ===== --}}
+        @if ($isOwner ?? false)
+            <section class="govuk-!-margin-bottom-6" aria-labelledby="checkin-heading">
+                <h3 class="govuk-heading-m" id="checkin-heading">{{ __('govuk_alpha.events.polish_events.checkin_heading') }}</h3>
+                <p class="govuk-body">{{ __('govuk_alpha.events.polish_events.checkin_intro') }}</p>
+                @if (empty($attendees))
+                    <p class="govuk-body">{{ __('govuk_alpha.events.polish_events.checkin_empty') }}</p>
+                @else
+                    <dl class="govuk-summary-list">
+                        @foreach ($attendees as $attendee)
+                            @php
+                                $attendeeName = trim((string) ($attendee['name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
+                                $attendeeId = (int) ($attendee['id'] ?? $attendee['user_id'] ?? 0);
+                                $isAttended = ($attendee['rsvp_status'] ?? '') === 'attended';
+                            @endphp
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">{{ $attendeeName }}</dt>
+                                <dd class="govuk-summary-list__value">
+                                    @if ($isAttended)
+                                        <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.events.polish_events.checkin_done_tag') }}</strong>
+                                    @else
+                                        <strong class="govuk-tag govuk-tag--grey">{{ __('govuk_alpha.events.rsvp_status.going') }}</strong>
+                                    @endif
+                                </dd>
+                                <dd class="govuk-summary-list__actions">
+                                    @unless($isAttended)
+                                        <form method="post" action="{{ route('govuk-alpha.events.checkin', ['tenantSlug' => $tenantSlug, 'id' => $event['id'], 'attendeeId' => $attendeeId]) }}">
+                                            @csrf
+                                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.polish_events.checkin_button') }}</button>
+                                        </form>
+                                    @endunless
+                                </dd>
+                            </div>
+                        @endforeach
+                    </dl>
+                @endif
+            </section>
+        @endif
+
         <ul class="govuk-list">
             @foreach ($attendees as $attendee)
                 @php
                     $attendeeName = trim((string) ($attendee['name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
-                    $rsvp = ($attendee['rsvp_status'] ?? '') === 'going' ? 'going' : 'interested';
+                    $rsvpDisplay = in_array(($attendee['rsvp_status'] ?? ''), ['going', 'attended'], true) ? 'going' : 'interested';
                 @endphp
-                <li class="nexus-alpha-card-head">
+                <li>
                     @if (!empty($attendee['avatar_url']))
                         <img class="nexus-alpha-avatar" src="{{ $attendee['avatar_url'] }}" alt="" loading="lazy" decoding="async" width="48" height="48">
                     @else
                         <span class="nexus-alpha-avatar nexus-alpha-avatar--placeholder" aria-hidden="true">{{ mb_strtoupper(mb_substr($attendeeName, 0, 1)) }}</span>
                     @endif
                     <span class="govuk-body govuk-!-margin-bottom-0 govuk-!-font-weight-bold">{{ $attendeeName }}</span>
-                    <strong class="govuk-tag {{ $rsvp === 'going' ? 'govuk-tag--green' : 'govuk-tag--grey' }}">{{ __('govuk_alpha.events.rsvp_status.' . $rsvp) }}</strong>
+                    <strong class="govuk-tag {{ $rsvpDisplay === 'going' ? 'govuk-tag--green' : 'govuk-tag--grey' }}">{{ __('govuk_alpha.events.rsvp_status.' . $rsvpDisplay) }}</strong>
                 </li>
             @endforeach
         </ul>
