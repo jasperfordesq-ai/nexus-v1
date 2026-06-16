@@ -52,7 +52,7 @@
                 <li>
                     <a class="govuk-link{{ $activeTab === $tabKey ? ' govuk-link--no-visited-state' : '' }}"
                        href="{{ route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug, 'tab' => $tabKey]) }}"
-                       @if ($activeTab === $tabKey) aria-current="page" @endif>
+                       @if ($activeTab === $tabKey) aria-current="true" @endif>
                         {{ $tabLabel }}
                     </a>
                 </li>

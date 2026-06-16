@@ -59,7 +59,7 @@
                             <td class="govuk-table__cell">{{ __('govuk_alpha.nexus_score.categories.' . $key) }}</td>
                             <td class="govuk-table__cell">
                                 <span class="govuk-!-margin-right-2">{{ $cScore }} / {{ $cMax }}</span>
-                                <progress max="100" value="{{ $cPct }}" aria-label="{{ $cPct }}%">{{ $cPct }}%</progress>
+                                <progress max="100" value="{{ $cPct }}" aria-label="{{ __('govuk_alpha.nexus_score.categories.' . $key) }}: {{ $cPct }}%">{{ $cPct }}%</progress>
                             </td>
                         </tr>
                     @endif

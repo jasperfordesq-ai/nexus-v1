@@ -50,6 +50,7 @@
                     <div class="nexus-alpha-module-row">
                         <h2 class="govuk-heading-s govuk-!-margin-bottom-1"><a class="govuk-link" href="{{ route('govuk-alpha.goals.show', ['tenantSlug' => $tenantSlug, 'id' => $g['id']]) }}">{{ $gTitle }}</a></h2>
                         <strong class="govuk-tag {{ $done ? 'govuk-tag--green' : 'govuk-tag--blue' }}">{{ $done ? __('govuk_alpha.goals.status_completed') : __('govuk_alpha.goals.status_active') }}</strong>
+                        <strong class="govuk-tag {{ ($g['is_public'] ?? false) ? 'govuk-tag--blue' : 'govuk-tag--grey' }}">{{ ($g['is_public'] ?? false) ? __('govuk_alpha.groups.visibility_public') : __('govuk_alpha.groups.visibility_private') }}</strong>
                     </div>
                     @if ($isOverdue)
                         <strong class="govuk-tag govuk-tag--red govuk-!-margin-bottom-1">{{ __('govuk_alpha.polish_gamify.goals_overdue_label') }}</strong>

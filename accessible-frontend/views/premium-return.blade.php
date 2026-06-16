@@ -30,14 +30,11 @@
     @else
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
-                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.polish_commerce.premium_failed_title') }}</h2>
-                <div class="govuk-error-summary__body">
-                    <p class="govuk-body">{{ __('govuk_alpha.polish_commerce.premium_failed_body') }}</p>
-                </div>
+                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ __('govuk_alpha.polish_commerce.premium_failed_body') }}</li></ul></div>
             </div>
         </div>
         <h1 class="govuk-heading-l">{{ __('govuk_alpha.polish_commerce.premium_failed_title') }}</h1>
-        <p class="govuk-body">{{ __('govuk_alpha.polish_commerce.premium_failed_body') }}</p>
         <div class="govuk-button-group">
             <a class="govuk-button" href="{{ route('govuk-alpha.premium.index', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.premium.subscribe_button') }}</a>
         </div>

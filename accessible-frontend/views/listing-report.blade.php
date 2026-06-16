@@ -30,12 +30,12 @@
         @csrf
 
         <div class="govuk-form-group{{ $errors->has('reason') ? ' govuk-form-group--error' : '' }}">
-            <fieldset class="govuk-fieldset">
+            <fieldset class="govuk-fieldset"@if ($errors->has('reason')) aria-describedby="reason-error"@endif>
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
                     <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha.polish_listings.report_reason_label') }}</h2>
                 </legend>
                 @error('reason')
-                    <p id="reason-error" class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ $message }}</p>
+                    <p id="reason-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $message }}</p>
                 @enderror
                 <div class="govuk-radios" data-module="govuk-radios" id="reason">
                     @foreach ([

@@ -130,10 +130,9 @@
                         <div class="govuk-body">{!! nl2br(e((string) ($message['body'] ?? ''))) !!}</div>
                     @endif
 
-                </li>
                     @if ($canManageMessage)
-                        {{-- Edit/delete controls live outside the <li> so the list item is not a
-                             mixed content node; the details element is still semantically adjacent. --}}
+                        {{-- Edit/delete controls live INSIDE the <li> so the <ol> only ever has
+                             <li> children (a <details> directly under <ol> is invalid HTML). --}}
                         <details class="govuk-details" data-module="govuk-details">
                             <summary class="govuk-details__summary">
                                 <span class="govuk-details__summary-text">{{ __('govuk_alpha.messages.edit_delete_toggle') }}</span>
@@ -175,6 +174,7 @@
                             </div>
                         </details>
                     @endif
+                </li>
             @endforeach
         </ol>
     @endif

@@ -47,10 +47,12 @@
                 </div>
             </fieldset>
         </div>
-        <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.polish_discovery.ideation_search_button') }}</button>
-        @if ($activeStatus !== '' || $activeQuery !== '')
-            <a class="govuk-link govuk-!-margin-left-4" href="{{ route('govuk-alpha.ideation.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.clear_filters') }}</a>
-        @endif
+        <div class="govuk-button-group">
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.polish_discovery.ideation_search_button') }}</button>
+            @if ($activeStatus !== '' || $activeQuery !== '')
+                <a class="govuk-link" href="{{ route('govuk-alpha.ideation.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.clear_filters') }}</a>
+            @endif
+        </div>
     </form>
 
     @if (empty($challenges))

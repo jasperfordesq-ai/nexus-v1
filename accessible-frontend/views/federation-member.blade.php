@@ -140,7 +140,7 @@
                         <input class="govuk-input govuk-!-width-two-thirds" id="message-subject" name="subject" type="text" maxlength="255">
                     </div>
                     <div class="govuk-form-group">
-                        <label class="govuk-label" for="message-body">{{ __('govuk_alpha.fed2.member_actions.message') }}</label>
+                        <label class="govuk-label" for="message-body">{{ __('govuk_alpha.messages.message_label') }}</label>
                         <textarea class="govuk-textarea" id="message-body" name="body" rows="4" maxlength="10000"></textarea>
                     </div>
                     <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.fed2.member_actions.message') }}</button>

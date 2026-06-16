@@ -63,7 +63,7 @@
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">{{ __('govuk_alpha.group_exchanges.status_label') }}</dt>
-            <dd class="govuk-summary-list__value">{{ __('govuk_alpha.group_exchanges.statuses.' . $exStatus) }}</dd>
+            <dd class="govuk-summary-list__value">{{ $statusLabel($exStatus) }}</dd>
         </div>
     </dl>
 

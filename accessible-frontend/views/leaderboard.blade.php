@@ -98,7 +98,8 @@
                     <tr class="govuk-table__row @if ($isMe) nexus-alpha-row--active @endif">
                         <td class="govuk-table__cell govuk-table__cell--numeric">{{ (int) ($row['rank'] ?? 0) }}</td>
                         <td class="govuk-table__cell">
-                            {{ $rowName }}
+                            @php $rowUserId = (int) ($row['user_id'] ?? 0); @endphp
+                            @if ($rowUserId > 0 && \App\Core\TenantContext::hasFeature('connections'))<a class="govuk-link" href="{{ route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $rowUserId]) }}">{{ $rowName }}</a>@else{{ $rowName }}@endif
                             @if ($isMe)<strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha.leaderboard.you') }}</strong>@endif
                         </td>
                         <td class="govuk-table__cell govuk-table__cell--numeric">{{ $row['score_display'] ?? $row['score'] ?? 0 }}</td>

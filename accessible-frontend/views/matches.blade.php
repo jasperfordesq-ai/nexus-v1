@@ -46,7 +46,7 @@
                     <li>
                         <a class="govuk-link{{ $activeSource === $srcKey ? ' govuk-link--no-visited-state' : '' }}"
                            href="{{ route('govuk-alpha.matches.index', ['tenantSlug' => $tenantSlug, 'source' => $srcKey]) }}"
-                           @if ($activeSource === $srcKey) aria-current="page" @endif>{{ $srcLabel }}</a>
+                           @if ($activeSource === $srcKey) aria-current="true" @endif>{{ $srcLabel }}</a>
                     </li>
                 @endforeach
             </ul>
