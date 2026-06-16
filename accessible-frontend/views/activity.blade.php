@@ -107,7 +107,7 @@
 
     <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.activity.timeline_title') }}</h2>
     @if (empty($timeline))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.activity.timeline_empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.activity.timeline_empty') }}</p></div>
     @else
         <ul class="govuk-list govuk-list--spaced">
             @foreach ($timeline as $item)

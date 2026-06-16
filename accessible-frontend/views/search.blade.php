@@ -19,26 +19,31 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.search.description') }}</p>
 
     <form method="get" action="{{ route('govuk-alpha.search', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-6">
-        <div class="govuk-form-group">
-            <label class="govuk-label" for="q">{{ __('govuk_alpha.search.label') }}</label>
-            <div id="q-hint" class="govuk-hint">{{ __('govuk_alpha.search.hint') }}</div>
-            <input class="govuk-input govuk-!-width-two-thirds" id="q" name="q" type="search" value="{{ $searchQuery }}" aria-describedby="q-hint">
-        </div>
-        <div class="govuk-form-group">
-            <label class="govuk-label" for="type">{{ __('govuk_alpha.search.type_label') }}</label>
-            <select class="govuk-select" id="type" name="type">
-                @foreach (['all', 'listing', 'user', 'event', 'group'] as $t)
-                    <option value="{{ $t }}" @selected($t === $searchType)>{{ __('govuk_alpha.search.type_' . $t) }}</option>
-                @endforeach
-            </select>
-        </div>
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha.polish_core_a.search_filters_legend') }}</h2>
+            </legend>
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="q">{{ __('govuk_alpha.search.label') }}</label>
+                <div id="q-hint" class="govuk-hint">{{ __('govuk_alpha.search.hint') }}</div>
+                <input class="govuk-input govuk-!-width-two-thirds" id="q" name="q" type="search" value="{{ $searchQuery }}" aria-describedby="q-hint">
+            </div>
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="type">{{ __('govuk_alpha.search.type_label') }}</label>
+                <select class="govuk-select" id="type" name="type">
+                    @foreach (['all', 'listing', 'user', 'event', 'group'] as $t)
+                        <option value="{{ $t }}" @selected($t === $searchType)>{{ __('govuk_alpha.search.type_' . $t) }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </fieldset>
         <button type="submit" class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.search.button') }}</button>
     </form>
 
     @if ($searchQuery === '')
-        <p class="govuk-inset-text">{{ __('govuk_alpha.search.no_query') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.search.no_query') }}</p></div>
     @elseif (empty($searchResults))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.search.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.search.empty') }}</p></div>
     @else
         <p class="govuk-body">{{ __('govuk_alpha.search.results_count', ['count' => $searchTotal]) }}</p>
         @foreach ($searchResults as $item)

@@ -9273,4 +9273,32 @@ class GovukAlphaFrontendTest extends TestCase
         $res->assertSee(__('govuk_alpha.polish_federation.groups_title'));
     }
 
+    /** Core polish: inset-text empty states use div wrapper across core blades. */
+    public function test_pcorea_inset_text_empty_states_use_div_in_core_blades(): void
+    {
+        $viewRoot = dirname(__DIR__, 3) . '/accessible-frontend/views';
+        $blades = ['notifications', 'activity', 'saved', 'connections', 'skills', 'search'];
+        foreach ($blades as $blade) {
+            $src = file_get_contents("{$viewRoot}/{$blade}.blade.php");
+            $this->assertStringNotContainsString(
+                '<p class="govuk-inset-text">',
+                $src,
+                "{$blade}.blade.php must not use <p class=\"govuk-inset-text\"> (use <div> wrapper)"
+            );
+        }
+    }
+
+    /** Core polish: feed-post uses status-specific heading and govuk-button-group for auth prompt. */
+    public function test_pcorea_feed_post_has_status_specific_banner_and_button_group(): void
+    {
+        $viewRoot = dirname(__DIR__, 3) . '/accessible-frontend/views';
+        $src = file_get_contents("{$viewRoot}/feed-post.blade.php");
+        // Status-specific lookup map is present.
+        $this->assertStringContainsString('$successMessages', $src);
+        $this->assertStringContainsString('status_reaction_added', $src);
+        // Auth prompt uses govuk-button-group, not nexus-alpha-actions.
+        $this->assertStringNotContainsString('"nexus-alpha-actions"', $src);
+        $this->assertStringContainsString('govuk-button-group', $src);
+    }
+
 }

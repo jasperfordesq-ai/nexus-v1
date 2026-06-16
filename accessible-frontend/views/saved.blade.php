@@ -56,7 +56,7 @@
     </form>
 
     @if (empty($savedItems))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.saved.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.saved.empty') }}</p></div>
     @else
         <ul class="govuk-list govuk-list--spaced">
             @foreach ($savedItems as $s)
