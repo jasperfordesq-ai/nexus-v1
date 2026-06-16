@@ -174,7 +174,7 @@
                     @endif
 
                     @if ($swapId > 0 && $direction === 'received' && $swapStatus === 'pending')
-                        <div class="nexus-alpha-actions">
+                        <div class="govuk-button-group">
                             <form method="post" action="{{ route('govuk-alpha.volunteering.swaps.respond', ['tenantSlug' => $tenantSlug, 'id' => $swapId]) }}">
                                 @csrf
                                 <input type="hidden" name="action" value="accept">

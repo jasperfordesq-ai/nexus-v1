@@ -107,9 +107,9 @@
                 <form method="post" action="{{ $postAction }}">
                     @csrf
                     <div class="govuk-form-group">
-                        <fieldset class="govuk-fieldset">
+                        <fieldset class="govuk-fieldset" aria-describedby="offers-hint">
                             <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha.onboarding.skills.offers_label') }}</legend>
-                            <div class="govuk-hint">{{ __('govuk_alpha.onboarding.skills.offers_hint') }}</div>
+                            <div id="offers-hint" class="govuk-hint">{{ __('govuk_alpha.onboarding.skills.offers_hint') }}</div>
                             <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                                 @foreach ($categories as $cat)
                                     <div class="govuk-checkboxes__item">
@@ -121,9 +121,9 @@
                         </fieldset>
                     </div>
                     <div class="govuk-form-group">
-                        <fieldset class="govuk-fieldset">
+                        <fieldset class="govuk-fieldset" aria-describedby="needs-hint">
                             <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha.onboarding.skills.needs_label') }}</legend>
-                            <div class="govuk-hint">{{ __('govuk_alpha.onboarding.skills.needs_hint') }}</div>
+                            <div id="needs-hint" class="govuk-hint">{{ __('govuk_alpha.onboarding.skills.needs_hint') }}</div>
                             <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                                 @foreach ($categories as $cat)
                                     <div class="govuk-checkboxes__item">
@@ -222,6 +222,11 @@
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">{{ __('govuk_alpha.onboarding.confirm.skills_offers_row') }}</dt>
                         <dd class="govuk-summary-list__value">{{ __('govuk_alpha.onboarding.count_selected', ['count' => count($bagOffers)]) }}</dd>
+                        <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ route('govuk-alpha.onboarding.step', ['tenantSlug' => $tenantSlug, 'step' => 'skills']) }}">{{ __('govuk_alpha.onboarding.confirm.change') }}</a></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">{{ __('govuk_alpha.onboarding.confirm.skills_needs_row') }}</dt>
+                        <dd class="govuk-summary-list__value">{{ __('govuk_alpha.onboarding.count_selected', ['count' => count($bagNeeds)]) }}</dd>
                         <dd class="govuk-summary-list__actions"><a class="govuk-link" href="{{ route('govuk-alpha.onboarding.step', ['tenantSlug' => $tenantSlug, 'step' => 'skills']) }}">{{ __('govuk_alpha.onboarding.confirm.change') }}</a></dd>
                     </div>
                 </dl>

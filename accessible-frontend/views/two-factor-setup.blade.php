@@ -90,7 +90,9 @@
                 <img class="nexus-alpha-qr" src="{{ $setup['qr_data_uri'] }}" alt="{{ __('govuk_alpha.security_2fa.qr_alt') }}" width="200" height="200">
 
                 <p class="govuk-body govuk-!-margin-top-4">{{ __('govuk_alpha.security_2fa.manual_intro') }}</p>
-                <p class="govuk-body"><code class="nexus-alpha-totp-secret">{{ $setup['secret'] }}</code></p>
+                <div class="govuk-inset-text">
+                    <p class="govuk-body"><code class="nexus-alpha-totp-secret">{{ $setup['secret'] }}</code></p>
+                </div>
 
                 <form id="tfa-form" method="post" action="{{ route('govuk-alpha.profile.2fa.verify', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-top-4">
                     @csrf

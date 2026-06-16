@@ -88,7 +88,7 @@
                 <li><a class="govuk-link" href="{{ route('govuk-alpha.volunteering.swaps', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_depth.swaps_link') }}</a></li>
             </ul>
 
-            <div class="govuk-tabs govuk-!-margin-top-6" data-module="govuk-tabs">
+            <div class="govuk-tabs govuk-!-margin-top-6">
                 <h2 class="govuk-tabs__title">{{ __('govuk_alpha.volunteering.tabs_title') }}</h2>
                 <ul class="govuk-tabs__list">
                     <li class="govuk-tabs__list-item{{ $selectedTab === 'opportunities' ? ' govuk-tabs__list-item--selected' : '' }}">
@@ -123,7 +123,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="nexus-alpha-actions">
+                <div class="govuk-button-group">
                     <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.actions.apply_filters') }}</button>
                     @if (!empty($applicationsStatus))
                         <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'applications']) }}">{{ __('govuk_alpha.actions.clear_filters') }}</a>
@@ -274,7 +274,13 @@
                             $websiteHref = in_array($websiteScheme, ['http', 'https'], true) ? $website : null;
                         @endphp
                         <article class="nexus-alpha-card">
-                            <h3 class="govuk-heading-m govuk-!-margin-bottom-2">{{ $organization['name'] }}</h3>
+                            <h3 class="govuk-heading-m govuk-!-margin-bottom-2">
+                                @if (!empty($organization['id']))
+                                    <a class="govuk-link" href="{{ route('govuk-alpha.organisations.show', ['tenantSlug' => $tenantSlug, 'id' => $organization['id']]) }}">{{ $organization['name'] }}</a>
+                                @else
+                                    {{ $organization['name'] }}
+                                @endif
+                            </h3>
                             <dl class="govuk-summary-list govuk-!-margin-bottom-0">
                                 <div class="govuk-summary-list__row">
                                     <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.status') }}</dt>
@@ -337,7 +343,7 @@
                         </div>
                     </div>
                     <div class="govuk-grid-column-one-quarter">
-                        <div class="govuk-form-group govuk-!-margin-top-6">
+                        <div class="govuk-form-group">
                             <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                                 <div class="govuk-checkboxes__item">
                                     <input class="govuk-checkboxes__input" id="is_remote" name="is_remote" type="checkbox" value="1" @checked(!empty($filters['is_remote']))>
@@ -347,7 +353,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="nexus-alpha-actions">
+                <div class="govuk-button-group">
                     <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.search') }}</button>
                     @if ($hasFilters)
                         <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.clear_filters') }}</a>

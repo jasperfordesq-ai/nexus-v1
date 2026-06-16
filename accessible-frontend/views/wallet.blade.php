@@ -42,13 +42,9 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.wallet.description') }}</p>
 
     @if ($status === 'transfer-sent')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="wallet-status-title">
-            <div class="govuk-notification-banner__header">
-                <h2 class="govuk-notification-banner__title" id="wallet-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
-            </div>
-            <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.wallet.sent') }}</p>
-            </div>
+        <div class="govuk-panel govuk-panel--confirmation">
+            <h2 class="govuk-panel__title">{{ __('govuk_alpha.states.success_title') }}</h2>
+            <div class="govuk-panel__body">{{ __('govuk_alpha.wallet.sent') }}</div>
         </div>
     @elseif ($status === 'transfer-failed')
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
@@ -229,8 +225,8 @@
             <span class="govuk-hint govuk-!-display-inline">— {{ __('govuk_alpha.wallet_t1.export_description') }}</span>
         </p>
 
-        {{-- WAVE T1-WALLET: server-rendered filter tabs (plain links, no JS) --}}
-        <div class="govuk-tabs govuk-!-margin-top-4">
+        {{-- WAVE T1-WALLET: server-rendered filter tabs (plain links, no JS panels) --}}
+        <div class="govuk-tabs govuk-!-margin-top-4" aria-label="{{ __('govuk_alpha.wallet_t1.filter_heading') }}">
             <h3 class="govuk-tabs__title">{{ __('govuk_alpha.wallet_t1.filter_heading') }}</h3>
             <ul class="govuk-tabs__list">
                 @php
@@ -250,7 +246,7 @@
         </div>
 
         @if (empty($transactions))
-            <p class="govuk-inset-text">{{ __('govuk_alpha.wallet.history_empty') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.wallet.history_empty') }}</p></div>
         @else
             <table class="govuk-table">
                 <caption class="govuk-table__caption govuk-table__caption--s govuk-visually-hidden">{{ __('govuk_alpha.wallet.history_title') }}</caption>

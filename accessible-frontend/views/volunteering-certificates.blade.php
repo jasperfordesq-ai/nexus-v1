@@ -95,9 +95,7 @@
                         </ul>
                     @endif
                     @if ($code !== '')
-                        <div class="nexus-alpha-actions">
-                            <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" href="{{ route('govuk-alpha.volunteering.certificates.download', ['tenantSlug' => $tenantSlug, 'code' => $code]) }}">{{ __('govuk_alpha.vol_depth.certificate_download') }}</a>
-                        </div>
+                        <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" href="{{ route('govuk-alpha.volunteering.certificates.download', ['tenantSlug' => $tenantSlug, 'code' => $code]) }}">{{ __('govuk_alpha.vol_depth.certificate_download') }}</a>
                     @endif
                 </article>
             @endforeach

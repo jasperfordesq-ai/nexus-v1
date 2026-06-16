@@ -143,7 +143,7 @@
                         @endif
                         <input class="govuk-input govuk-input--width-10{{ $registerErrorField === 'invite_code' ? ' govuk-input--error' : '' }}" id="invite_code" name="invite_code" type="text"
                                aria-describedby="invite_code-hint{{ $registerErrorField === 'invite_code' ? ' invite_code-error' : '' }}" autocomplete="off"
-                               style="text-transform: uppercase;" value="{{ old('invite_code') }}" required>
+                               value="{{ old('invite_code') }}" required>
                     </div>
                 @endif
 

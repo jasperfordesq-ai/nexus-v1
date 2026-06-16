@@ -9103,5 +9103,52 @@ class GovukAlphaFrontendTest extends TestCase
         $res->assertSee('role="button"', false);
         $res->assertSee('draggable="false"', false);
     }
+    // ===== WAVE POLISH-SWEEP =====
+
+    /** govuk-inset-text empty states use a div wrapper, not a bare p element. */
+    public function test_psweep_inset_text_empty_states_use_div_not_p(): void
+    {
+        // Verify the leaderboard, nexus-score, and wallet blades all use
+        // <div class="govuk-inset-text"> not <p class="govuk-inset-text">.
+        $viewRoot = dirname(__DIR__, 3) . '/accessible-frontend/views';
+        foreach (['leaderboard', 'nexus-score', 'wallet'] as $blade) {
+            $src = file_get_contents("{$viewRoot}/{$blade}.blade.php");
+            $this->assertStringNotContainsString(
+                '<p class="govuk-inset-text">',
+                $src,
+                "{$blade}.blade.php must not use <p class=\"govuk-inset-text\"> (use <div> wrapper)"
+            );
+        }
+    }
+
+    /** Error states on token-based pages render govuk-error-summary, not notification-banner. */
+    public function test_psweep_error_pages_use_govuk_error_summary(): void
+    {
+        $viewRoot = dirname(__DIR__, 3) . '/accessible-frontend/views';
+        // email-verify: error state must be govuk-error-summary.
+        $src = file_get_contents("{$viewRoot}/email-verify.blade.php");
+        $this->assertStringContainsString('govuk-error-summary', $src);
+        $this->assertStringNotContainsString('govuk-notification-banner', $src);
+        // newsletter-unsubscribe: same.
+        $src = file_get_contents("{$viewRoot}/newsletter-unsubscribe.blade.php");
+        $this->assertStringContainsString('govuk-error-summary', $src);
+        $this->assertStringNotContainsString('govuk-notification-banner', $src);
+    }
+
+    /** Onboarding confirm step includes both offers and needs rows; volunteering tabs have no data-module. */
+    public function test_psweep_onboarding_confirm_has_needs_row_and_volunteering_tabs_fixed(): void
+    {
+        $viewRoot = dirname(__DIR__, 3) . '/accessible-frontend/views';
+        // Both summary-list rows must be present.
+        $src = file_get_contents("{$viewRoot}/onboarding.blade.php");
+        $this->assertStringContainsString('skills_needs_row', $src);
+        $this->assertStringContainsString('skills_offers_row', $src);
+        // volunteering tabs must NOT have data-module="govuk-tabs" (no JS panel).
+        $src = file_get_contents("{$viewRoot}/volunteering.blade.php");
+        $this->assertStringNotContainsString('govuk-tabs" data-module="govuk-tabs"', $src);
+        $this->assertStringNotContainsString('"govuk-tabs govuk-!-margin-top-6" data-module="govuk-tabs"', $src);
+        // govuk-button-group must replace nexus-alpha-actions in key blades.
+        $this->assertStringNotContainsString('"nexus-alpha-actions"', $src);
+    }
 
 }
