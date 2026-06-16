@@ -358,12 +358,21 @@ class OrgWalletService
             return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.only_requester_can_cancel')];
         }
 
-        DB::table('org_transfer_requests')
+        // Atomic status update — only cancel if still pending, to prevent a race
+        // where a concurrent approve has already debited the wallet and credited
+        // the recipient. Mirrors the guard already used in rejectRequest().
+        $affected = DB::table('org_transfer_requests')
             ->where('id', $requestId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'pending')
             ->update([
                 'status' => 'cancelled',
                 'updated_at' => now(),
             ]);
+
+        if ($affected === 0) {
+            return ['success' => false, 'message' => __('svc_notifications_2.org_wallet.transfer_request_already_processed')];
+        }
 
         return ['success' => true];
     }

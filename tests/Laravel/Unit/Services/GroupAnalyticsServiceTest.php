@@ -34,10 +34,12 @@ class GroupAnalyticsServiceTest extends TestCase
                 'visibility' => 'public',
             ]);
 
-        // 6 count queries: members, discussions, posts (with join), events, files, pending requests
-        DB::shouldReceive('table->where->where->count')->times(4)->andReturn(5);
-        DB::shouldReceive('table->join->where->where->count')->once()->andReturn(12);
-        DB::shouldReceive('table->where->where->count')->once()->andReturn(2);
+        // 6 count queries: members, discussions, posts (with join), events, files, pending requests.
+        // group_members queries (members + pending_requests) are tenant-scoped with an extra
+        // ->where('tenant_id', ...) clause; the other tables were already tenant-scoped.
+        DB::shouldReceive('table->where->where->where->count')->times(2)->andReturn(5); // members, pending_requests (group_members)
+        DB::shouldReceive('table->where->where->count')->times(3)->andReturn(5);        // discussions, events, files
+        DB::shouldReceive('table->join->where->where->count')->once()->andReturn(12);   // posts (join)
 
         $result = GroupAnalyticsService::getOverview(1);
 

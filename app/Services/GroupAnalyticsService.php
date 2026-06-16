@@ -50,6 +50,7 @@ class GroupAnalyticsService
 
         $totalMembers = DB::table('group_members')
             ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'active')
             ->count();
 
@@ -76,6 +77,7 @@ class GroupAnalyticsService
 
         $pendingRequests = DB::table('group_members')
             ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'pending')
             ->count();
 
@@ -96,10 +98,12 @@ class GroupAnalyticsService
      */
     public static function getMemberGrowth(int $groupId, int $days = 30): array
     {
+        $tenantId = TenantContext::getId();
         $since = now()->subDays($days)->startOfDay();
 
         $joins = DB::table('group_members')
             ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'active')
             ->where('created_at', '>=', $since)
             ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
@@ -113,6 +117,7 @@ class GroupAnalyticsService
         $current = $since->copy();
         $cumulative = DB::table('group_members')
             ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'active')
             ->where('created_at', '<', $since)
             ->count();
@@ -191,6 +196,7 @@ class GroupAnalyticsService
         // Summary
         $totalMembers = DB::table('group_members')
             ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'active')
             ->count();
 
@@ -294,6 +300,7 @@ class GroupAnalyticsService
 
         $memberJoins = DB::table('group_members')
             ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
             ->where('status', 'active')
             ->where('created_at', '>=', $since)
             ->count();
@@ -324,6 +331,7 @@ class GroupAnalyticsService
             // Members who joined this month
             $joinedIds = DB::table('group_members')
                 ->where('group_id', $groupId)
+                ->where('tenant_id', $tenantId)
                 ->where('status', 'active')
                 ->whereBetween('created_at', [$monthStart, $monthEnd])
                 ->pluck('user_id')

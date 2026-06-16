@@ -209,9 +209,11 @@ class GroupFileService
             return null;
         }
 
-        // Increment download count
+        // Increment download count (tenant-scoped for defense-in-depth; the
+        // row was already confirmed to belong to this tenant above)
         DB::table('group_files')
             ->where('id', $fileId)
+            ->where('tenant_id', $tenantId)
             ->increment('download_count');
 
         return [
