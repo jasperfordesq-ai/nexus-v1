@@ -156,5 +156,10 @@
   },
   "podcast": {
     "new_episode": "Clár nua ó {{show}}: {{title}}"
+  },
+  "group_chatroom": {
+    "preview": ":sender · :group: :preview",
+    "fallback_sender": "Duine éigin",
+    "fallback_group": "grúpa"
   }
 }

@@ -156,5 +156,10 @@
   },
   "shift_waitlist": {
     "spot_available": "A spot opened up on a shift you're waitlisted for — claim it before it expires"
+  },
+  "group_chatroom": {
+    "preview": ":sender · :group: :preview",
+    "fallback_sender": "Someone",
+    "fallback_group": "a group"
   }
 }

@@ -156,5 +156,10 @@
   },
   "podcast": {
     "new_episode": "Nuevo episodio de {{show}}: {{title}}"
+  },
+  "group_chatroom": {
+    "preview": ":sender · :group: :preview",
+    "fallback_sender": "Alguien",
+    "fallback_group": "un grupo"
   }
 }

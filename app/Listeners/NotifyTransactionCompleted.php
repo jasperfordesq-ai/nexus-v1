@@ -117,7 +117,7 @@ class NotifyTransactionCompleted implements ShouldQueue
                 }
 
                 if ($senderEmailEnabled) {
-                    $recipientName = $receiver->first_name ?? $receiver->name ?? 'someone';
+                    $recipientName = $receiver->first_name ?? $receiver->name ?? __('emails.common.fallback_someone');
                     self::deliverTransactionEmail((int) $transaction->id, (int) $sender->id, 'credit_sent', function () use ($sender, $recipientName, $amount, $description): ?bool {
                         return NotificationDispatcher::sendCreditSentEmail(
                             $sender->id,
@@ -131,18 +131,21 @@ class NotifyTransactionCompleted implements ShouldQueue
 
             // 3. Review requests — each party gets one in THEIR language.
             try {
-                $senderName = $sender->first_name ?? $sender->name ?? __('emails.common.fallback_someone');
-                $recipientNameForReview = $receiver->first_name ?? $receiver->name ?? 'someone';
-                LocaleContext::withLocale($receiver, fn () =>
+                // Compute each fallback name INSIDE the recipient's locale closure so a
+                // deleted-account 'someone' fallback renders in that recipient's language
+                // rather than the queue worker's default locale.
+                LocaleContext::withLocale($receiver, function () use ($receiver, $sender, $transaction) {
+                    $senderName = $sender->first_name ?? $sender->name ?? __('emails.common.fallback_someone');
                     self::deliverTransactionEmail((int) $transaction->id, (int) $receiver->id, 'review_request', fn (): ?bool =>
                         NotificationDispatcher::sendReviewRequestEmail($receiver->id, $senderName, $transaction->id)
-                    )
-                );
-                LocaleContext::withLocale($sender, fn () =>
+                    );
+                });
+                LocaleContext::withLocale($sender, function () use ($sender, $receiver, $transaction) {
+                    $recipientNameForReview = $receiver->first_name ?? $receiver->name ?? __('emails.common.fallback_someone');
                     self::deliverTransactionEmail((int) $transaction->id, (int) $sender->id, 'review_request', fn (): ?bool =>
                         NotificationDispatcher::sendReviewRequestEmail($sender->id, $recipientNameForReview, $transaction->id)
-                    )
-                );
+                    );
+                });
             } catch (\Throwable $reviewError) {
                 Log::warning('NotifyTransactionCompleted: sendReviewRequestEmail failed', [
                     'transaction_id' => $transaction->id ?? null,

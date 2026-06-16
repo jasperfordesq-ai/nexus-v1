@@ -10,6 +10,7 @@ namespace App\Listeners;
 
 use App\Core\TenantContext;
 use App\Events\GroupChatroomMessagePosted;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Cache;
@@ -81,13 +82,15 @@ class NotifyGroupChatroomMessage implements ShouldQueue
                 return;
             }
 
-            // Resolve sender name once for the notification preview.
+            // Resolve sender/group names once. The null fallbacks are resolved
+            // per-recipient below so they render in each recipient's language,
+            // not the queue worker's default locale.
             $sender = DB::table('users')
                 ->where('id', $senderId)
                 ->where('tenant_id', $event->tenantId)
                 ->select(['first_name', 'name'])
                 ->first();
-            $senderName = $sender->first_name ?? $sender->name ?? 'Someone';
+            $senderRealName = $sender->first_name ?? $sender->name ?? null;
 
             // Resolve group name for the link/preview.
             $group = DB::table('groups')
@@ -95,10 +98,9 @@ class NotifyGroupChatroomMessage implements ShouldQueue
                 ->where('tenant_id', $event->tenantId)
                 ->select(['name', 'slug'])
                 ->first();
-            $groupName = $group->name ?? 'a group';
+            $groupRealName = $group->name ?? null;
 
             $previewBody = mb_substr(strip_tags($messageBody), 0, 120);
-            $content = "{$senderName} in {$groupName}: {$previewBody}";
             $link    = '/groups/' . $event->groupId . '/chat';
 
             // All active group members EXCEPT the sender and anyone who muted
@@ -115,12 +117,14 @@ class NotifyGroupChatroomMessage implements ShouldQueue
                       ->where('muted_user_id', $senderId)
                       ->where('tenant_id', $event->tenantId);
                 })
-                ->pluck('u.id')
-                ->all();
+                ->select('u.id', 'u.preferred_language')
+                ->get();
 
-            if (empty($recipients)) {
+            if ($recipients->isEmpty()) {
                 return;
             }
+
+            $recipientIds = $recipients->pluck('id')->all();
 
             // Dedup window: if the recipient already has a chatroom-message
             // bell from the same group within the last 5 minutes, don't add
@@ -130,25 +134,42 @@ class NotifyGroupChatroomMessage implements ShouldQueue
                 ->where('type', 'group_chatroom_message')
                 ->where('link', $link)
                 ->where('created_at', '>=', now()->subMinutes(5))
-                ->whereIn('user_id', $recipients)
+                ->whereIn('user_id', $recipientIds)
                 ->pluck('user_id')
                 ->all();
 
-            $newRecipients = array_diff($recipients, $recentlyNotified);
-            if (empty($newRecipients)) {
+            $newRecipientIds = array_diff($recipientIds, $recentlyNotified);
+            if (empty($newRecipientIds)) {
                 return;
             }
 
-            foreach ($newRecipients as $userId) {
-                Notification::createNotification(
-                    (int) $userId,
-                    $content,
-                    $link,
-                    'group_chatroom_message',
-                    false,
-                    $event->tenantId
-                );
-                \App\Services\NotificationDispatcher::fanOutPush((int) $userId, 'group_chatroom_message', $content, $link);
+            $langByUser = $recipients->keyBy('id');
+
+            foreach ($newRecipientIds as $userId) {
+                $lang = $langByUser[$userId]->preferred_language ?? null;
+
+                // Render the preview in THIS recipient's language so the fallback
+                // names are not hardcoded English. The ':sender · :group: :preview'
+                // template is locale-neutral (no preposition to mistranslate).
+                LocaleContext::withLocale($lang, function () use ($userId, $senderRealName, $groupRealName, $previewBody, $link, $event) {
+                    $senderName = $senderRealName ?? __('svc_notifications.group_chatroom.fallback_sender');
+                    $groupName  = $groupRealName ?? __('svc_notifications.group_chatroom.fallback_group');
+                    $content    = __('svc_notifications.group_chatroom.preview', [
+                        'sender'  => $senderName,
+                        'group'   => $groupName,
+                        'preview' => $previewBody,
+                    ]);
+
+                    Notification::createNotification(
+                        (int) $userId,
+                        $content,
+                        $link,
+                        'group_chatroom_message',
+                        false,
+                        $event->tenantId
+                    );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $userId, 'group_chatroom_message', $content, $link);
+                });
             }
 
             Log::debug('NotifyGroupChatroomMessage: notified members', [
@@ -156,7 +177,7 @@ class NotifyGroupChatroomMessage implements ShouldQueue
                 'group_id'    => $event->groupId,
                 'chatroom_id' => $event->chatroomId,
                 'sender_id'   => $senderId,
-                'sent'        => count($newRecipients),
+                'sent'        => count($newRecipientIds),
                 'deduped'     => count($recentlyNotified),
             ]);
 
