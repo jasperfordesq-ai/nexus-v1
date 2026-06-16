@@ -8860,4 +8860,127 @@ class GovukAlphaFrontendTest extends TestCase
         $res->assertSee('video_url', false);
     }
 
+    // ===== WAVE NIGHT-FED: federation + static polish tests =====
+
+    public function test_pfed_settings_shows_communications_fieldset_when_opted_in(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Comms Settings User']);
+        $this->enableFederationSystem();
+        $this->setFederationUserSettings($user->id, [
+            'federation_optin' => 1,
+            'messaging_enabled_federated' => 1,
+            'transactions_enabled_federated' => 0,
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/settings");
+        $res->assertOk();
+        $res->assertSee('messaging_enabled_federated', false);
+        $res->assertSee('transactions_enabled_federated', false);
+        $res->assertSee(__('govuk_alpha.polish_federation.settings_communications_legend'));
+        $res->assertSee(__('govuk_alpha.polish_federation.settings_messaging_label'));
+        $res->assertSee(__('govuk_alpha.polish_federation.settings_transactions_label'));
+    }
+
+    public function test_pfed_settings_post_persists_communications_toggles(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Comms Saver']);
+        $this->enableFederationSystem();
+        $this->setFederationUserSettings($user->id, [
+            'federation_optin' => 1,
+            'messaging_enabled_federated' => 0,
+            'transactions_enabled_federated' => 0,
+        ]);
+
+        $this->post("/{$this->testTenantSlug}/alpha/federation/settings", [
+            'profile_visible_federated' => '1',
+            'messaging_enabled_federated' => '1',
+            'transactions_enabled_federated' => '1',
+            'service_reach' => 'local_only',
+        ])->assertRedirect("/{$this->testTenantSlug}/alpha/federation/settings?status=settings-saved");
+
+        $settings = \App\Services\FederationUserService::getUserSettings($user->id);
+        $this->assertTrue((bool) $settings['messaging_enabled_federated']);
+        $this->assertTrue((bool) $settings['transactions_enabled_federated']);
+    }
+
+    public function test_pfed_settings_post_clears_communications_when_unchecked(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Comms Clearer']);
+        $this->enableFederationSystem();
+        $this->setFederationUserSettings($user->id, [
+            'federation_optin' => 1,
+            'messaging_enabled_federated' => 1,
+            'transactions_enabled_federated' => 1,
+        ]);
+
+        // Submit form without either checkbox checked.
+        $this->post("/{$this->testTenantSlug}/alpha/federation/settings", [
+            'service_reach' => 'local_only',
+        ])->assertRedirect("/{$this->testTenantSlug}/alpha/federation/settings?status=settings-saved");
+
+        $settings = \App\Services\FederationUserService::getUserSettings($user->id);
+        $this->assertFalse((bool) $settings['messaging_enabled_federated']);
+        $this->assertFalse((bool) $settings['transactions_enabled_federated']);
+    }
+
+    public function test_pfed_connections_renders_govuk_tabs(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Connections Tab User']);
+        $this->enableFederationSystem();
+        $this->setFederationUserSettings($user->id, ['federation_optin' => 1]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/connections");
+        $res->assertOk();
+        $res->assertSee('govuk-tabs', false);
+        $res->assertSee('govuk-tabs__list', false);
+        $res->assertSee('panel-accepted', false);
+        $res->assertSee('panel-received', false);
+        $res->assertSee('panel-sent', false);
+        $res->assertSee(__('govuk_alpha.fed2.connections.tab_accepted'));
+    }
+
+    public function test_pfed_groups_page_renders_when_groups_enabled(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Groups Browser']);
+        $this->enableFederationSystem();
+        // Enable cross_tenant_groups_enabled which enableFederationSystem does not include.
+        DB::table('federation_system_control')->where('id', 1)->update(['cross_tenant_groups_enabled' => 1]);
+        DB::table('federation_tenant_features')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'feature_key' => 'tenant_groups_enabled'],
+            ['is_enabled' => 1]
+        );
+        app()->forgetInstance(\App\Services\FederationFeatureService::class);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/groups");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.polish_federation.groups_title'));
+        $res->assertSee(__('govuk_alpha.polish_federation.groups_description'));
+    }
+
+    public function test_pfed_groups_page_shows_not_available_when_groups_disabled(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Groups Blocked User']);
+        $this->enableFederationSystem();
+        // cross_tenant_groups_enabled defaults to 0 in enableFederationSystem.
+        DB::table('federation_system_control')->where('id', 1)->update(['cross_tenant_groups_enabled' => 0]);
+        app()->forgetInstance(\App\Services\FederationFeatureService::class);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation/groups");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.polish_federation.groups_not_available'));
+    }
+
+    public function test_pfed_federation_hub_has_groups_quick_link(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Hub Viewer']);
+        $this->enableFederationSystem();
+        $this->setFederationUserSettings($user->id, ['federation_optin' => 1]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/federation");
+        $res->assertOk();
+        $res->assertSee(route('govuk-alpha.federation.groups.index', ['tenantSlug' => $this->testTenantSlug]), false);
+        $res->assertSee(__('govuk_alpha.polish_federation.groups_title'));
+    }
+
 }
+

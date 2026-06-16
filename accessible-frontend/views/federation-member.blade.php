@@ -136,7 +136,7 @@
                     <input type="hidden" name="receiver_tenant_id" value="{{ $memberTenantId }}">
                     <h3 class="govuk-heading-m">{{ __('govuk_alpha.fed2.member_actions.message') }}</h3>
                     <div class="govuk-form-group">
-                        <label class="govuk-label" for="message-subject">{{ __('govuk_alpha.fed2.messages.no_subject') }}</label>
+                        <label class="govuk-label" for="message-subject">{{ __('govuk_alpha.polish_federation.message_subject_label') }}</label>
                         <input class="govuk-input govuk-!-width-two-thirds" id="message-subject" name="subject" type="text" maxlength="255">
                     </div>
                     <div class="govuk-form-group">
@@ -151,9 +151,10 @@
 
             {{-- Hour transfer action: links to the confirm form (warning + amount). --}}
             @if ($canTransfer && $viewerTransactionsEnabled)
-                <p class="govuk-body">
+                <div class="govuk-button-group">
                     <a class="govuk-button govuk-button--warning" data-module="govuk-button" href="{{ route('govuk-alpha.federation.transfer', ['tenantSlug' => $tenantSlug, 'id' => $memberId, 'tenant_id' => $memberTenantId]) }}">{{ __('govuk_alpha.fed2.member_actions.transfer') }}</a>
-                </p>
+                    <a class="govuk-link" href="{{ route('govuk-alpha.federation.members.show', ['tenantSlug' => $tenantSlug, 'id' => $memberId, 'tenant_id' => $memberTenantId]) }}">{{ __('govuk_alpha.polish_federation.transfer_cancel') }}</a>
+                </div>
             @elseif (!$canTransfer)
                 <p class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha.fed2.member_actions.transactions_off') }}</p>
             @endif

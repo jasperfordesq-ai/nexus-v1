@@ -62,62 +62,83 @@
     @if (!$allowed)
         <p class="govuk-inset-text">{{ __('govuk_alpha.fed2.connections.not_available') }}</p>
     @else
-        <nav class="govuk-!-margin-bottom-6" aria-label="{{ __('govuk_alpha.fed2.connections.title') }}">
-            <ul class="govuk-list">
-                <li class="govuk-!-display-inline govuk-!-margin-right-4">
-                    <a class="govuk-link {{ $tab === 'accepted' ? 'govuk-!-font-weight-bold' : '' }}" href="{{ $tabHref('accepted') }}" @if($tab === 'accepted') aria-current="page" @endif>{{ __('govuk_alpha.fed2.connections.tab_accepted') }}</a>
+        {{-- govuk-tabs progressive-enhancement: server pre-selects the active panel
+             by omitting govuk-tabs__panel--hidden. Without JS the panels are all
+             visible and the tab links navigate via full page reload (aria-current). --}}
+        <div class="govuk-tabs" data-module="govuk-tabs">
+            <h2 class="govuk-tabs__title">{{ __('govuk_alpha.polish_federation.connections_tabs_label') }}</h2>
+            <ul class="govuk-tabs__list" role="tablist">
+                <li class="govuk-tabs__list-item {{ $tab === 'accepted' ? 'govuk-tabs__list-item--selected' : '' }}" role="presentation">
+                    <a class="govuk-tabs__tab" href="{{ $tabHref('accepted') }}" id="tab-accepted" role="tab" aria-controls="panel-accepted" @if($tab === 'accepted') aria-selected="true" @else aria-selected="false" tabindex="-1" @endif>{{ __('govuk_alpha.fed2.connections.tab_accepted') }}</a>
                 </li>
-                <li class="govuk-!-display-inline govuk-!-margin-right-4">
-                    <a class="govuk-link {{ $tab === 'received' ? 'govuk-!-font-weight-bold' : '' }}" href="{{ $tabHref('received') }}" @if($tab === 'received') aria-current="page" @endif>{{ __('govuk_alpha.fed2.connections.tab_received') }}</a>
+                <li class="govuk-tabs__list-item {{ $tab === 'received' ? 'govuk-tabs__list-item--selected' : '' }}" role="presentation">
+                    <a class="govuk-tabs__tab" href="{{ $tabHref('received') }}" id="tab-received" role="tab" aria-controls="panel-received" @if($tab === 'received') aria-selected="true" @else aria-selected="false" tabindex="-1" @endif>{{ __('govuk_alpha.fed2.connections.tab_received') }}</a>
                 </li>
-                <li class="govuk-!-display-inline">
-                    <a class="govuk-link {{ $tab === 'sent' ? 'govuk-!-font-weight-bold' : '' }}" href="{{ $tabHref('sent') }}" @if($tab === 'sent') aria-current="page" @endif>{{ __('govuk_alpha.fed2.connections.tab_sent') }}</a>
+                <li class="govuk-tabs__list-item {{ $tab === 'sent' ? 'govuk-tabs__list-item--selected' : '' }}" role="presentation">
+                    <a class="govuk-tabs__tab" href="{{ $tabHref('sent') }}" id="tab-sent" role="tab" aria-controls="panel-sent" @if($tab === 'sent') aria-selected="true" @else aria-selected="false" tabindex="-1" @endif>{{ __('govuk_alpha.fed2.connections.tab_sent') }}</a>
                 </li>
             </ul>
-        </nav>
 
-        <div id="connections-list">
-            @if (empty($connections))
-                <p class="govuk-inset-text">{{ __('govuk_alpha.fed2.connections.' . $emptyKey) }}</p>
-            @else
-                <div class="nexus-alpha-card-list">
-                    @foreach ($connections as $c)
-                        @php
-                            $cName = trim((string) ($c['name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
-                            $cId = (int) ($c['id'] ?? 0);
-                            $cStatus = (string) ($c['status'] ?? '');
-                            $cDirection = (string) ($c['direction'] ?? '');
-                        @endphp
-                        <article class="nexus-alpha-card">
-                            <h2 class="govuk-heading-s govuk-!-margin-bottom-1"><a class="govuk-link" href="{{ $memberHref($c) }}">{{ $cName }}</a></h2>
-                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.fed2.connections.community_label') }}: {{ $c['tenant_name'] ?? '' }}</p>
+            {{-- Each panel contains the card list for that tab. --}}
+            @foreach (['accepted', 'received', 'sent'] as $panelTab)
+                @php
+                    $isActive = ($tab === $panelTab);
+                    $panelEmptyKey = match ($panelTab) {
+                        'received' => 'empty_received',
+                        'sent' => 'empty_sent',
+                        default => 'empty_accepted',
+                    };
+                @endphp
+                <div class="govuk-tabs__panel {{ !$isActive ? 'govuk-tabs__panel--hidden' : '' }}" id="panel-{{ $panelTab }}" role="tabpanel" aria-labelledby="tab-{{ $panelTab }}">
+                    @if (!$isActive)
+                        {{-- Non-active panels show nothing when JS is disabled. --}}
+                    @elseif (empty($connections))
+                        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.fed2.connections.' . $panelEmptyKey) }}</p></div>
+                    @else
+                        <div class="nexus-alpha-card-list" id="connections-list">
+                            @foreach ($connections as $c)
+                                @php
+                                    $cName = trim((string) ($c['name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
+                                    $cId = (int) ($c['id'] ?? 0);
+                                    $cStatus = (string) ($c['status'] ?? '');
+                                    $cDirection = (string) ($c['direction'] ?? '');
+                                    $acceptHidden = ['tenantSlug' => $tenantSlug, 'id' => $cId];
+                                @endphp
+                                <article class="nexus-alpha-card">
+                                    <h2 class="govuk-heading-s govuk-!-margin-bottom-1"><a class="govuk-link" href="{{ $memberHref($c) }}">{{ $cName }}</a></h2>
+                                    <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.fed2.connections.community_label') }}: {{ $c['tenant_name'] ?? '' }}</p>
 
-                            @if ($cStatus === 'pending')
-                                <p class="govuk-body-s govuk-!-margin-bottom-2"><strong class="govuk-tag govuk-tag--yellow">{{ __('govuk_alpha.fed2.connections.pending_label') }}</strong></p>
-                            @endif
+                                    @if ($cStatus === 'pending')
+                                        <p class="govuk-body-s govuk-!-margin-bottom-2"><strong class="govuk-tag govuk-tag--yellow">{{ __('govuk_alpha.fed2.connections.pending_label') }}</strong></p>
+                                    @endif
 
-                            <div class="nexus-alpha-actions govuk-button-group">
-                                {{-- Received pending → accept / decline. Owner-scoped server-side. --}}
-                                @if ($cStatus === 'pending' && $cDirection === 'incoming')
-                                    <form method="post" action="{{ route('govuk-alpha.federation.connections.accept', ['tenantSlug' => $tenantSlug, 'id' => $cId]) }}" class="govuk-!-display-inline">
-                                        @csrf
-                                        <button type="submit" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.fed2.connections.accept') }}</button>
-                                    </form>
-                                    <form method="post" action="{{ route('govuk-alpha.federation.connections.reject', ['tenantSlug' => $tenantSlug, 'id' => $cId]) }}" class="govuk-!-display-inline">
-                                        @csrf
-                                        <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.fed2.connections.reject') }}</button>
-                                    </form>
-                                @elseif ($cStatus === 'accepted')
-                                    <form method="post" action="{{ route('govuk-alpha.federation.connections.remove', ['tenantSlug' => $tenantSlug, 'id' => $cId]) }}" class="govuk-!-display-inline">
-                                        @csrf
-                                        <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.fed2.connections.remove') }}</button>
-                                    </form>
-                                @endif
-                            </div>
-                        </article>
-                    @endforeach
+                                    {{-- Pending-incoming: accept and decline in ONE form with two submit buttons.
+                                         This keeps both inside a single govuk-button-group with no wrapping form per button. --}}
+                                    @if ($cStatus === 'pending' && $cDirection === 'incoming')
+                                        <div class="govuk-button-group">
+                                            <form method="post" action="{{ route('govuk-alpha.federation.connections.accept', $acceptHidden) }}">
+                                                @csrf
+                                                <button type="submit" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.fed2.connections.accept') }}</button>
+                                            </form>
+                                            <form method="post" action="{{ route('govuk-alpha.federation.connections.reject', $acceptHidden) }}">
+                                                @csrf
+                                                <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.fed2.connections.reject') }}</button>
+                                            </form>
+                                        </div>
+                                    @elseif ($cStatus === 'accepted')
+                                        <div class="govuk-button-group">
+                                            <form method="post" action="{{ route('govuk-alpha.federation.connections.remove', ['tenantSlug' => $tenantSlug, 'id' => $cId]) }}">
+                                                @csrf
+                                                <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.fed2.connections.remove') }}</button>
+                                            </form>
+                                        </div>
+                                    @endif
+                                </article>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
-            @endif
+            @endforeach
         </div>
     @endif
 @endsection

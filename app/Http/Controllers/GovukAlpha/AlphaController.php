@@ -6743,6 +6743,8 @@ class AlphaController extends Controller
             'show_location_federated' => $request->boolean('show_location_federated'),
             'show_reviews_federated' => $request->boolean('show_reviews_federated'),
             'email_notifications' => $request->boolean('email_notifications'),
+            'messaging_enabled_federated' => $request->boolean('messaging_enabled_federated'),
+            'transactions_enabled_federated' => $request->boolean('transactions_enabled_federated'),
             'service_reach' => $reach,
         ]);
 
@@ -7039,7 +7041,7 @@ class AlphaController extends Controller
             try {
                 $sql = "
                     SELECT l.id, l.title, l.description, l.type, c.name as category_name,
-                        l.location, l.tenant_id, l.created_at,
+                        l.location, l.tenant_id, l.created_at, l.user_id,
                         u.first_name, u.last_name, t.name as tenant_name
                     FROM listings l
                     JOIN users u ON u.id = l.user_id AND u.tenant_id = l.tenant_id
@@ -7085,6 +7087,7 @@ class AlphaController extends Controller
                         'category_name' => $l['category_name'] ?? null,
                         'location' => $l['location'] ?? null,
                         'author_name' => trim(((string) ($l['first_name'] ?? '')) . ' ' . ((string) ($l['last_name'] ?? ''))),
+                        'user_id' => (int) $l['user_id'],
                         'tenant_id' => (int) $l['tenant_id'],
                         'tenant_name' => (string) ($l['tenant_name'] ?? ''),
                     ];
@@ -13443,6 +13446,101 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'id' => $id,
             'status' => $ok ? 'checkin-success' : 'checkin-failed',
+        ]);
+    }
+
+    // ===== WAVE NIGHT-FED: federation groups browsing =====
+
+    /**
+     * FEDERATION GROUPS BROWSE — `/federation/groups` (GET, cursor pagination via ?cursor=, ?q=).
+     * Mirrors FederationV2Controller::groups() — shows groups from partner communities
+     * that have opened their groups to federation (federated_visibility or allow_federated_members).
+     * Only shows groups from tenants where federation_optin + appear_in_federated_search apply
+     * at the partnership level (groups_enabled = 1).
+     */
+    public function federationGroups(Request $request, string $tenantSlug): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('federation'), 403);
+        if ($this->currentUserId() === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $allowed = $this->federationOperationAllowed('groups', $tenantId);
+        $q = trim(self::asStr($request->query('q')));
+        $groups = [];
+        $nextCursor = null;
+
+        if ($allowed) {
+            $perPage = 20;
+            $cursorId = $this->decodeFederationCursor(self::asStr($request->query('cursor')));
+
+            try {
+                $sql = "
+                    SELECT g.id, g.name, g.description, g.tenant_id, g.cached_member_count as member_count,
+                        t.name as tenant_name
+                    FROM groups g
+                    JOIN tenants t ON t.id = g.tenant_id
+                    JOIN federation_partnerships fp ON (
+                        (fp.tenant_id = :tid1 AND fp.partner_tenant_id = g.tenant_id)
+                        OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = g.tenant_id)
+                    )
+                    WHERE fp.status = 'active' AND fp.groups_enabled = 1
+                    AND g.tenant_id != :tid3
+                    AND g.status = 'active'
+                    AND (g.federated_visibility IN ('listed', 'joinable') OR g.allow_federated_members = 1)
+                ";
+                $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
+
+                if ($q !== '') {
+                    $sql .= " AND (g.name LIKE :q1 OR g.description LIKE :q2)";
+                    $term = "%{$q}%";
+                    $params[':q1'] = $term;
+                    $params[':q2'] = $term;
+                }
+                if ($cursorId !== null) {
+                    $sql .= " AND g.id < :cursor_id";
+                    $params[':cursor_id'] = $cursorId;
+                }
+                $sql .= " ORDER BY g.id DESC LIMIT :lim";
+                $params[':lim'] = $perPage + 1;
+
+                $rows = $this->federationSelect($sql, $params);
+
+                $hasMore = count($rows) > $perPage;
+                if ($hasMore) {
+                    $rows = array_slice($rows, 0, $perPage);
+                }
+
+                $groups = array_map(static function (array $g): array {
+                    return [
+                        'id' => (int) $g['id'],
+                        'name' => (string) ($g['name'] ?? ''),
+                        'description' => (string) ($g['description'] ?? ''),
+                        'member_count' => (int) ($g['member_count'] ?? 0),
+                        'tenant_id' => (int) $g['tenant_id'],
+                        'tenant_name' => (string) ($g['tenant_name'] ?? ''),
+                    ];
+                }, $rows);
+
+                if ($hasMore && !empty($rows)) {
+                    $last = end($rows);
+                    $nextCursor = base64_encode((string) ((int) $last['id']));
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return $this->view('accessible-frontend::federation-groups', [
+            'title' => __('govuk_alpha.polish_federation.groups_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'allowed' => $allowed,
+            'groups' => $groups,
+            'query' => $q,
+            'nextCursor' => $nextCursor,
         ]);
     }
 }

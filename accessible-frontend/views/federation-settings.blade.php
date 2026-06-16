@@ -92,6 +92,20 @@
                         </div>
                     </fieldset>
 
+                    <fieldset class="govuk-fieldset govuk-!-margin-bottom-6">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">{{ __('govuk_alpha.polish_federation.settings_communications_legend') }}</legend>
+                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="messaging_enabled_federated" name="messaging_enabled_federated" type="checkbox" value="1" @checked($checked('messaging_enabled_federated'))>
+                                <label class="govuk-label govuk-checkboxes__label" for="messaging_enabled_federated">{{ __('govuk_alpha.polish_federation.settings_messaging_label') }}</label>
+                            </div>
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="transactions_enabled_federated" name="transactions_enabled_federated" type="checkbox" value="1" @checked($checked('transactions_enabled_federated'))>
+                                <label class="govuk-label govuk-checkboxes__label" for="transactions_enabled_federated">{{ __('govuk_alpha.polish_federation.settings_transactions_label') }}</label>
+                            </div>
+                        </div>
+                    </fieldset>
+
                     <div class="govuk-form-group govuk-!-margin-bottom-6">
                         <label class="govuk-label govuk-label--m" for="service_reach">{{ __('govuk_alpha.federation.settings.reach_legend') }}</label>
                         <div id="service_reach-hint" class="govuk-hint">{{ __('govuk_alpha.federation.settings.reach_hint') }}</div>
