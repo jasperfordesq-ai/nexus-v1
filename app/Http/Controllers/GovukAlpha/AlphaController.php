@@ -9675,12 +9675,6 @@ class AlphaController extends Controller
             $items['volunteering'] = route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]);
         }
 
-        // Jobs is surfaced as a first-class nav item (not only an Explore card) so
-        // members can always find employment opportunities; gated on the feature.
-        if (TenantContext::hasFeature('job_vacancies')) {
-            $items['jobs'] = route('govuk-alpha.jobs.index', ['tenantSlug' => $tenantSlug]);
-        }
-
         // "Explore" is the gateway to discovery facilities (groups, goals, skills,
         // organisations, marketplace, jobs, courses, exchanges, polls, …) so the
         // flat bar stays lean. Exchanges and Polls live there too, not in the bar.

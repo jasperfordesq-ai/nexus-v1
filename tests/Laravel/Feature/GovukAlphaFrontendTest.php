@@ -3773,6 +3773,10 @@ class GovukAlphaFrontendTest extends TestCase
         // Polls moved here from the service nav (polls feature is on by default).
         $explore->assertSee(route('govuk-alpha.polls.index', ['tenantSlug' => $this->testTenantSlug]), false);
         $explore->assertSee(__('govuk_alpha.polls.title'));
+        // Jobs is a discovery facility surfaced on Explore (job_vacancies on by
+        // default), not in the lean service nav.
+        $explore->assertSee(route('govuk-alpha.jobs.index', ['tenantSlug' => $this->testTenantSlug]), false);
+        $explore->assertSee(__('govuk_alpha.jobs.title'));
     }
 
     public function test_header_surfaces_account_link_when_signed_in(): void
