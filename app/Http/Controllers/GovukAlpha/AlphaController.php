@@ -4109,13 +4109,18 @@ class AlphaController extends Controller
         }
 
         $q = trim(self::asStr($request->query('q')));
-        $filters = ['limit' => 30, 'viewer_user_id' => $userId];
+        $page = max(1, (int) $request->query('page', 1));
+        $perPage = 30;
+        $filters = ['limit' => $perPage, 'offset' => ($page - 1) * $perPage, 'viewer_user_id' => $userId];
         if ($q !== '') {
             $filters['search'] = $q;
         }
         $items = [];
+        $total = 0;
         try {
-            $items = \App\Services\GroupService::getAll($filters)['items'] ?? [];
+            $result = \App\Services\GroupService::getAll($filters);
+            $items = $result['items'] ?? [];
+            $total = (int) ($result['total'] ?? count($items));
         } catch (\Throwable $e) {
             report($e);
         }
@@ -4126,6 +4131,8 @@ class AlphaController extends Controller
             'activeNav' => 'explore',
             'groups' => is_array($items) ? $items : [],
             'groupsQuery' => $q,
+            'groupsTotal' => $total,
+            'groupsPerPage' => $perPage,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -4174,6 +4181,26 @@ class AlphaController extends Controller
         //     non-member viewer of a private group), so we never leak posts.
         [$groupEvents, $groupFeed] = $this->loadGroupTabData($group, $userId, $isParticipant);
 
+        // Pinned announcements — direct DB query (no GroupService wrapper exists).
+        $pinnedAnnouncements = [];
+        try {
+            $tenantId = TenantContext::getId();
+            $pinnedAnnouncements = DB::table('group_announcements')
+                ->where('group_id', $id)
+                ->where('tenant_id', $tenantId)
+                ->where('is_pinned', 1)
+                ->where(function ($q) {
+                    $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                })
+                ->orderBy('priority', 'asc')
+                ->orderBy('created_at', 'desc')
+                ->limit(5)
+                ->get()
+                ->toArray();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         return $this->view('accessible-frontend::group-detail', [
             'title' => ($group['name'] ?? '') ?: __('govuk_alpha.groups.title'),
             'tenantSlug' => $tenantSlug,
@@ -4184,6 +4211,7 @@ class AlphaController extends Controller
             'groupCanParticipate' => $isParticipant,
             'groupEvents' => $groupEvents,
             'groupFeed' => $groupFeed,
+            'pinnedAnnouncements' => $pinnedAnnouncements,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -4397,6 +4425,7 @@ class AlphaController extends Controller
         $name = trim(self::asStr($request->input('name')));
         $description = trim(self::asStr($request->input('description')));
         $visibility = self::asStr($request->input('visibility')) === 'private' ? 'private' : 'public';
+        $location = trim(self::asStr($request->input('location')));
         $tags = trim(self::asStr($request->input('tags')));
 
         $errors = [];
@@ -4417,6 +4446,9 @@ class AlphaController extends Controller
             'description' => $description,
             'visibility' => $visibility,
         ];
+        if ($location !== '') {
+            $data['location'] = $location;
+        }
         if ($tags !== '') {
             // Normalise comma-separated tags; appended to the description so the
             // accessible group keeps a single text body (the API tags pipeline is
@@ -4479,6 +4511,8 @@ class AlphaController extends Controller
         $name = trim(self::asStr($request->input('name')));
         $description = trim(self::asStr($request->input('description')));
         $visibility = self::asStr($request->input('visibility')) === 'private' ? 'private' : 'public';
+        $location = trim(self::asStr($request->input('location')));
+        $tags = trim(self::asStr($request->input('tags')));
 
         $errors = [];
         if ($name === '') {
@@ -4493,13 +4527,24 @@ class AlphaController extends Controller
                 ->withInput();
         }
 
+        $updateData = [
+            'name' => $name,
+            'description' => $description,
+            'visibility' => $visibility,
+            'location' => $location,
+        ];
+        if ($tags !== '') {
+            $tagList = array_values(array_filter(array_map('trim', explode(',', $tags))));
+            if ($tagList !== []) {
+                $updateData['tags'] = $tagList;
+            }
+        } else {
+            $updateData['tags'] = [];
+        }
+
         $ok = false;
         try {
-            $ok = \App\Services\GroupService::update($id, $userId, [
-                'name' => $name,
-                'description' => $description,
-                'visibility' => $visibility,
-            ]);
+            $ok = \App\Services\GroupService::update($id, $userId, $updateData);
         } catch (\Throwable $e) {
             report($e);
         }

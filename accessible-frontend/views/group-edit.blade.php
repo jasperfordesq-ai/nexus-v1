@@ -10,6 +10,9 @@
         $gName = trim((string) ($group['name'] ?? ''));
         $gDescription = (string) ($group['description'] ?? '');
         $gVisibility = ($group['visibility'] ?? 'public') === 'private' ? 'private' : 'public';
+        $gLocation = trim((string) ($group['location'] ?? ''));
+        $gTagsRaw = $group['tags'] ?? [];
+        $gTags = is_array($gTagsRaw) ? implode(', ', $gTagsRaw) : (string) $gTagsRaw;
         $describedBy = fn (string $field, string $hintId): string => $hintId . ($errors->has($field) ? ' ' . $field . '-error' : '');
     @endphp
 
@@ -20,21 +23,21 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.groups.edit.description') }}</p>
 
     @if (($status ?? null) === 'group-update-failed')
-        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="group-update-failed-title">
-            <div class="govuk-notification-banner__header">
-                <h2 class="govuk-notification-banner__title" id="group-update-failed-title">{{ __('govuk_alpha.states.error_title') }}</h2>
-            </div>
-            <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.groups.edit.failed') }}</p>
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.polish_groups.update_failed_heading') }}</h2>
+                <div class="govuk-error-summary__body">
+                    <p class="govuk-body">{{ __('govuk_alpha.groups.edit.failed') }}</p>
+                </div>
             </div>
         </div>
     @elseif (($status ?? null) === 'group-delete-failed')
-        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="group-delete-failed-title">
-            <div class="govuk-notification-banner__header">
-                <h2 class="govuk-notification-banner__title" id="group-delete-failed-title">{{ __('govuk_alpha.states.error_title') }}</h2>
-            </div>
-            <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.groups.delete.failed') }}</p>
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.polish_groups.delete_failed_heading') }}</h2>
+                <div class="govuk-error-summary__body">
+                    <p class="govuk-body">{{ __('govuk_alpha.groups.delete.failed') }}</p>
+                </div>
             </div>
         </div>
     @endif
@@ -73,6 +76,12 @@
         </div>
 
         <div class="govuk-form-group">
+            <label class="govuk-label" for="location">{{ __('govuk_alpha.polish_groups.location_label') }}</label>
+            <div id="location-hint" class="govuk-hint">{{ __('govuk_alpha.polish_groups.location_hint') }}</div>
+            <input class="govuk-input govuk-!-width-two-thirds" id="location" name="location" type="text" maxlength="255" value="{{ old('location', $gLocation) }}" aria-describedby="location-hint">
+        </div>
+
+        <div class="govuk-form-group">
             <fieldset class="govuk-fieldset" aria-describedby="visibility-hint">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
                     <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha.groups.create.visibility_legend') }}</h2>
@@ -89,6 +98,12 @@
                     </div>
                 </div>
             </fieldset>
+        </div>
+
+        <div class="govuk-form-group">
+            <label class="govuk-label" for="tags">{{ __('govuk_alpha.polish_groups.tags_label') }}</label>
+            <div id="tags-hint" class="govuk-hint">{{ __('govuk_alpha.polish_groups.tags_hint') }}</div>
+            <input class="govuk-input govuk-!-width-two-thirds" id="tags" name="tags" type="text" maxlength="255" value="{{ old('tags', $gTags) }}" aria-describedby="tags-hint">
         </div>
 
         <div class="govuk-form-group">

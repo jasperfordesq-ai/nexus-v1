@@ -44,13 +44,13 @@
                             <div class="nexus-alpha-module-row">
                                 <h3 class="govuk-heading-s govuk-!-margin-bottom-0">{{ $rName !== '' ? $rName : '#' . $rId }}</h3>
                             </div>
-                            <div class="nexus-alpha-actions govuk-!-margin-top-2">
-                                <form method="post" action="{{ route('govuk-alpha.groups.requests.handle', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'requesterId' => $rId]) }}" class="govuk-!-display-inline">
+                            <div class="govuk-button-group govuk-!-margin-top-2">
+                                <form method="post" action="{{ route('govuk-alpha.groups.requests.handle', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'requesterId' => $rId]) }}">
                                     @csrf
                                     <input type="hidden" name="action" value="accept">
                                     <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.approve') }}</button>
                                 </form>
-                                <form method="post" action="{{ route('govuk-alpha.groups.requests.handle', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'requesterId' => $rId]) }}" class="govuk-!-display-inline">
+                                <form method="post" action="{{ route('govuk-alpha.groups.requests.handle', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'requesterId' => $rId]) }}">
                                     @csrf
                                     <input type="hidden" name="action" value="reject">
                                     <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.reject') }}</button>
@@ -88,21 +88,21 @@
                             <strong class="govuk-tag {{ $isOwner || $mRole === 'admin' ? 'govuk-tag--blue' : 'govuk-tag--grey' }}">{{ __('govuk_alpha.groups.manage.' . $roleKey) }}</strong>
                         </div>
                         @unless ($isOwner)
-                            <div class="nexus-alpha-actions govuk-!-margin-top-2">
+                            <div class="govuk-button-group govuk-!-margin-top-2">
                                 @if ($mRole === 'admin')
-                                    <form method="post" action="{{ route('govuk-alpha.groups.members.update', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'memberId' => $mId]) }}" class="govuk-!-display-inline">
+                                    <form method="post" action="{{ route('govuk-alpha.groups.members.update', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'memberId' => $mId]) }}">
                                         @csrf
                                         <input type="hidden" name="action" value="demote">
                                         <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.demote') }}</button>
                                     </form>
                                 @else
-                                    <form method="post" action="{{ route('govuk-alpha.groups.members.update', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'memberId' => $mId]) }}" class="govuk-!-display-inline">
+                                    <form method="post" action="{{ route('govuk-alpha.groups.members.update', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'memberId' => $mId]) }}">
                                         @csrf
                                         <input type="hidden" name="action" value="promote">
                                         <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.promote') }}</button>
                                     </form>
                                 @endif
-                                <form method="post" action="{{ route('govuk-alpha.groups.members.update', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'memberId' => $mId]) }}" class="govuk-!-display-inline">
+                                <form method="post" action="{{ route('govuk-alpha.groups.members.update', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'memberId' => $mId]) }}">
                                     @csrf
                                     <input type="hidden" name="action" value="remove">
                                     <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.remove') }}</button>

@@ -18,12 +18,12 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.groups.discussions.new_description') }}</p>
 
     @if (($status ?? null) === 'discussion-failed')
-        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="discussion-failed-title">
-            <div class="govuk-notification-banner__header">
-                <h2 class="govuk-notification-banner__title" id="discussion-failed-title">{{ __('govuk_alpha.states.error_title') }}</h2>
-            </div>
-            <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.groups.discussions.create_failed') }}</p>
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.polish_groups.discussion_failed_heading') }}</h2>
+                <div class="govuk-error-summary__body">
+                    <p class="govuk-body">{{ __('govuk_alpha.groups.discussions.create_failed') }}</p>
+                </div>
             </div>
         </div>
     @endif

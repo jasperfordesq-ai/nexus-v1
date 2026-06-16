@@ -12,6 +12,7 @@
         $dTitle = trim((string) ($discussion['title'] ?? ''));
         $dAuthor = trim((string) ($discussion['author']['name'] ?? ''));
         $dContent = (string) ($discussion['content'] ?? '');
+        $dCreatedAt = !empty($discussion['created_at']) ? \Illuminate\Support\Carbon::parse($discussion['created_at']) : null;
     @endphp
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.groups.discussions.index', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha.groups.discussions.back') }}</a>
@@ -47,7 +48,13 @@
 
     <article class="nexus-alpha-card govuk-!-margin-bottom-4">
         @if ($dAuthor !== '')
-            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.groups.discussions.started_by', ['name' => $dAuthor]) }}</p>
+            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">
+                {{ __('govuk_alpha.groups.discussions.started_by', ['name' => $dAuthor]) }}
+                @if ($dCreatedAt)
+                    <span aria-hidden="true"> · </span>
+                    <time datetime="{{ $dCreatedAt->toIso8601String() }}">{{ $dCreatedAt->translatedFormat('j F Y') }}</time>
+                @endif
+            </p>
         @endif
         <div class="govuk-body">{!! nl2br(e(strip_tags($dContent))) !!}</div>
     </article>
@@ -57,20 +64,25 @@
     @if (empty($messages))
         <p class="govuk-inset-text">{{ __('govuk_alpha.groups.discussions.no_replies') }}</p>
     @else
-        <ul class="govuk-list">
-            @foreach ($messages as $msg)
-                @php
-                    $msgAuthor = trim((string) ($msg['author']['name'] ?? ''));
-                    $msgContent = (string) ($msg['content'] ?? '');
-                @endphp
-                <li class="nexus-alpha-card govuk-!-margin-bottom-3">
-                    @if ($msgAuthor !== '')
-                        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ $msgAuthor }}</p>
-                    @endif
-                    <div class="govuk-body govuk-!-margin-bottom-0">{!! nl2br(e(strip_tags($msgContent))) !!}</div>
-                </li>
-            @endforeach
-        </ul>
+        @foreach ($messages as $msg)
+            @php
+                $msgAuthor = trim((string) ($msg['author']['name'] ?? ''));
+                $msgContent = (string) ($msg['content'] ?? '');
+                $msgCreatedAt = !empty($msg['created_at']) ? \Illuminate\Support\Carbon::parse($msg['created_at']) : null;
+            @endphp
+            <article class="nexus-alpha-card govuk-!-margin-bottom-3">
+                @if ($msgAuthor !== '')
+                    <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">
+                        {{ __('govuk_alpha.polish_groups.reply_posted_by', ['name' => $msgAuthor]) }}
+                        @if ($msgCreatedAt)
+                            <span aria-hidden="true"> · </span>
+                            <time datetime="{{ $msgCreatedAt->toIso8601String() }}">{{ $msgCreatedAt->translatedFormat('j F Y, H:i') }}</time>
+                        @endif
+                    </p>
+                @endif
+                <div class="govuk-body govuk-!-margin-bottom-0">{!! nl2br(e(strip_tags($msgContent))) !!}</div>
+            </article>
+        @endforeach
     @endif
 
     <form method="post" action="{{ route('govuk-alpha.groups.discussions.reply', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'discussionId' => $dId]) }}" novalidate>
