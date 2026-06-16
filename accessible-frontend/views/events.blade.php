@@ -100,7 +100,7 @@
                     </div>
                 </div>
 
-                <div class="nexus-alpha-actions">
+                <div class="govuk-button-group">
                     <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.search') }}</button>
                     @if ($hasFilters)
                         <a class="govuk-link" href="{{ route('govuk-alpha.events.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.clear_filters') }}</a>

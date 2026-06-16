@@ -32,6 +32,9 @@
          null key, which errored ~8000 tests at bootstrap. The 'null' broadcaster
          (config/broadcasting.php) is the standard test driver. -->
     <env name="BROADCAST_CONNECTION" value="null"/>
+    <!-- Force Blade compiled-views into this worktree's storage so worktree
+         blade edits are picked up during tests (not staging's storage). -->
+    <env name="VIEW_COMPILED_PATH" value="C:\platforms\htdocs\staging\.claude\worktrees\agent-ab4795ce1fa7d4be9\storage\framework\views" force="true"/>
   </php>
   <coverage>
     <report>
