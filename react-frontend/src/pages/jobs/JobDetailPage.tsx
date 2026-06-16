@@ -301,7 +301,7 @@ export function JobDetailPage() {
   useEffect(() => {
     if (!vacancy || !isOwner) return;
     const controller = new AbortController();
-    api.get<{ role_keyword: string; salary_min: number; salary_max: number; salary_median: number; salary_type: string; currency: string }>(`/v2/jobs/salary-benchmark?title=${encodeURIComponent(vacancy.title)}`)
+    api.get<{ role_keyword: string; salary_min: number; salary_max: number; salary_median: number; salary_type: string; currency: string }>(`/v2/jobs/salary-benchmark?title=${encodeURIComponent(vacancy.title)}`, { signal: controller.signal })
       .then((res) => {
         if (!controller.signal.aborted && res.success && res.data) {
           setBenchmark(res.data);
@@ -315,7 +315,7 @@ export function JobDetailPage() {
   useEffect(() => {
     if (!vacancy?.category || !vacancy?.id) return;
     const controller = new AbortController();
-    api.get<{ data: JobVacancy[] } | JobVacancy[]>(`/v2/jobs?category=${encodeURIComponent(vacancy.category)}&per_page=5&exclude=${vacancy.id}&status=open`)
+    api.get<{ data: JobVacancy[] } | JobVacancy[]>(`/v2/jobs?category=${encodeURIComponent(vacancy.category)}&per_page=5&exclude=${vacancy.id}&status=open`, { signal: controller.signal })
       .then((res) => {
         if (controller.signal.aborted || !res.success || !res.data) return;
         const items = parseArrayResponse<JobVacancy>(res.data);
@@ -612,7 +612,7 @@ export function JobDetailPage() {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30000);
     try {
-      const response = await api.get<QualificationResult>(`/v2/jobs/${id}/qualified`);
+      const response = await api.get<QualificationResult>(`/v2/jobs/${id}/qualified`, { signal: controller.signal });
       if (response.success && response.data) {
         setQualification(response.data);
       }

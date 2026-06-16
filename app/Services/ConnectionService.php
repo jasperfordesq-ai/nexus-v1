@@ -77,7 +77,7 @@ class ConnectionService
             $data['user'] = $partner;               // Alias: frontend expects 'user'
             $data['connection_id'] = $conn->id;      // Alias: frontend expects 'connection_id'
             return $data;
-        })->all();
+        })->filter(fn ($d) => $d['user'] !== null)->values()->all(); // drop deleted-account partners (frontend contract: user is non-null)
 
         return [
             'items'    => array_values($result),
@@ -440,7 +440,7 @@ class ConnectionService
             $data['user'] = $partner;
             $data['connection_id'] = $conn->id;
             return $data;
-        })->all();
+        })->filter(fn ($d) => $d['user'] !== null)->values()->all(); // drop deleted-account partners (frontend contract: user is non-null)
 
         return [
             'items'    => array_values($result),

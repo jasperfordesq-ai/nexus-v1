@@ -1091,18 +1091,42 @@ class GroupService
             return null;
         }
 
+        $tenantId = \App\Core\TenantContext::getId();
+
         $pending = DB::table('group_members')
             ->join('users', 'group_members.user_id', '=', 'users.id')
             ->where('group_members.group_id', $groupId)
+            ->where('group_members.tenant_id', $tenantId)
             ->where('group_members.status', 'pending')
-            ->select(['users.id', 'users.first_name', 'users.last_name', 'users.avatar_url'])
+            ->select([
+                'users.id',
+                'users.first_name',
+                'users.last_name',
+                'users.avatar_url',
+                'group_members.created_at as requested_at',
+            ])
             ->get();
 
-        return $pending->map(fn ($p) => [
-            'id'         => (int) $p->id,
-            'name'       => trim(($p->first_name ?? '') . ' ' . ($p->last_name ?? '')),
-            'avatar_url' => $p->avatar_url,
-        ])->all();
+        return $pending->map(function ($p) {
+            $name = trim(($p->first_name ?? '') . ' ' . ($p->last_name ?? ''));
+
+            return [
+                // Legacy flat keys (kept for backward compatibility with existing clients)
+                'id'         => (int) $p->id,
+                'name'       => $name,
+                'avatar_url' => $p->avatar_url,
+                // Shape the React frontend's JoinRequest contract expects
+                // (user_id + nested user + created_at). Without these the join-
+                // requests panel crashed on request.user.avatar being undefined.
+                'user_id'    => (int) $p->id,
+                'user'       => [
+                    'id'     => (int) $p->id,
+                    'name'   => $name,
+                    'avatar' => $p->avatar_url,
+                ],
+                'created_at' => $p->requested_at,
+            ];
+        })->all();
     }
 
     /**

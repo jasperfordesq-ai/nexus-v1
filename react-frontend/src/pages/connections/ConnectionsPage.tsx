@@ -554,8 +554,8 @@ export default function ConnectionsPage() {
     if (!searchQuery.trim()) return items;
     const q = searchQuery.toLowerCase();
     return items.filter(c =>
-      c.user.name.toLowerCase().includes(q) ||
-      (c.user.location ?? '').toLowerCase().includes(q)
+      (c.user?.name ?? '').toLowerCase().includes(q) ||
+      (c.user?.location ?? '').toLowerCase().includes(q)
     );
   };
 

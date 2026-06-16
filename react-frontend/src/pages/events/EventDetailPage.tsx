@@ -80,7 +80,6 @@ interface AttendeeWithCheckIn extends User {
 
 export function EventDetailPage() {
   const { t } = useTranslation('events');
-  usePageTitle(t('title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
@@ -88,6 +87,8 @@ export function EventDetailPage() {
   const toast = useToast();
 
   const [event, setEvent] = useState<Event | null>(null);
+  // Reflect the loaded event name in the tab/title; falls back to the static label while loading.
+  usePageTitle(event?.title ?? t('title'));
   const [translatedEventDesc, setTranslatedEventDesc] = useState<string | null>(null);
   const [attendees, setAttendees] = useState<AttendeeWithCheckIn[]>([]);
   const [isLoading, setIsLoading] = useState(true);
