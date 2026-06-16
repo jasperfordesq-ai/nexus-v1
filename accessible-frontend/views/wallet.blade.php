@@ -128,6 +128,12 @@
         <h2 class="govuk-heading-l govuk-!-margin-top-7" id="donate-heading">{{ __('govuk_alpha.wallet_t1.donate_title') }}</h2>
         <p class="govuk-body">{{ __('govuk_alpha.wallet_t1.donate_description') }}</p>
 
+        {{-- Crystal-clear that this donates TIME CREDITS to a shared community pool —
+             it is NOT a money donation. --}}
+        <div class="govuk-inset-text" role="note">
+            <p class="govuk-body govuk-!-margin-bottom-0">{{ __('govuk_alpha.vol_clarity.donate_credits_not_money') }}</p>
+        </div>
+
         <div class="govuk-warning-text">
             <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
             <strong class="govuk-warning-text__text">

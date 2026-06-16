@@ -103,4 +103,118 @@ class VolunteerServiceTest extends TestCase
         $this->assertNotNull($mainTx);
         $this->assertEquals(2, (int) $mainTx->amount);
     }
+
+    /**
+     * Classic timebanking: approving hours ALWAYS mints credits to the volunteer,
+     * even when the org wallet is empty and auto-pay is disabled. The org wallet
+     * is a reconciliation figure and is allowed to go negative.
+     */
+    public function test_verifyHours_mints_credits_even_when_org_wallet_empty(): void
+    {
+        $admin = User::factory()->forTenant(2)->create(['balance' => 0]);
+        $volunteer = User::factory()->forTenant(2)->create(['balance' => 0]);
+
+        $orgId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => 2,
+            'user_id' => $admin->id,
+            'name' => 'Empty Wallet Org',
+            'slug' => 'empty-wallet-org-' . uniqid(),
+            'description' => 'A volunteer organisation with an empty wallet and auto-pay off.',
+            'contact_email' => 'empty@example.test',
+            'status' => 'active',
+            'auto_pay_enabled' => 0, // auto-pay OFF — approval must still mint
+            'balance' => 0.00,        // empty wallet — approval must still mint
+            'created_at' => now(),
+        ]);
+
+        $logId = DB::table('vol_logs')->insertGetId([
+            'tenant_id' => 2,
+            'user_id' => $volunteer->id,
+            'organization_id' => $orgId,
+            'opportunity_id' => null,
+            'date_logged' => now()->subDay()->toDateString(),
+            'hours' => 3,
+            'description' => 'Three whole hours',
+            'status' => 'pending',
+            'created_at' => now(),
+        ]);
+
+        TenantContext::setById(2);
+
+        $this->assertTrue(VolunteerService::verifyHours($logId, $admin->id, 'approve'));
+        $this->assertSame('paid', VolunteerService::getLastPaymentOutcome());
+
+        // Volunteer credited 3 whole hours.
+        $this->assertEquals(3, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
+
+        // Org wallet driven NEGATIVE (0 - 3).
+        $this->assertEquals(-3.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+
+        // Log is approved.
+        $this->assertSame('approved', DB::table('vol_logs')->where('id', $logId)->value('status'));
+
+        // Ledger row recorded with the negative post-debit balance.
+        $orgTx = DB::table('vol_org_transactions')->where('vol_log_id', $logId)->first();
+        $this->assertNotNull($orgTx);
+        $this->assertEquals(-3.00, (float) $orgTx->amount);
+        $this->assertEquals(-3.00, (float) $orgTx->balance_after);
+
+        $mainTx = DB::table('transactions')
+            ->where('tenant_id', 2)
+            ->where('receiver_id', $volunteer->id)
+            ->where('transaction_type', 'volunteer')
+            ->latest('id')
+            ->first();
+        $this->assertNotNull($mainTx);
+        $this->assertEquals(3, (int) $mainTx->amount);
+    }
+
+    /**
+     * Double-approval must not double-credit: the second call is idempotent.
+     */
+    public function test_verifyHours_double_approve_does_not_double_credit(): void
+    {
+        $admin = User::factory()->forTenant(2)->create(['balance' => 0]);
+        $volunteer = User::factory()->forTenant(2)->create(['balance' => 0]);
+
+        $orgId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => 2,
+            'user_id' => $admin->id,
+            'name' => 'Idempotency Org',
+            'slug' => 'idempotency-org-' . uniqid(),
+            'description' => 'A volunteer organisation used for idempotency coverage.',
+            'contact_email' => 'idempotency@example.test',
+            'status' => 'active',
+            'auto_pay_enabled' => 1,
+            'balance' => 5.00,
+            'created_at' => now(),
+        ]);
+
+        $logId = DB::table('vol_logs')->insertGetId([
+            'tenant_id' => 2,
+            'user_id' => $volunteer->id,
+            'organization_id' => $orgId,
+            'opportunity_id' => null,
+            'date_logged' => now()->subDay()->toDateString(),
+            'hours' => 2,
+            'description' => 'Two whole hours',
+            'status' => 'pending',
+            'created_at' => now(),
+        ]);
+
+        TenantContext::setById(2);
+
+        // First approval mints credits.
+        $this->assertTrue(VolunteerService::verifyHours($logId, $admin->id, 'approve'));
+        $this->assertSame('paid', VolunteerService::getLastPaymentOutcome());
+
+        // Second approval: the log is no longer pending, so the pre-transaction
+        // "only pending can be verified" guard rejects it — no re-credit.
+        $this->assertFalse(VolunteerService::verifyHours($logId, $admin->id, 'approve'));
+
+        // Credited exactly once.
+        $this->assertEquals(2, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
+        $this->assertEquals(3.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertSame(1, DB::table('vol_org_transactions')->where('vol_log_id', $logId)->where('type', 'volunteer_payment')->count());
+    }
 }

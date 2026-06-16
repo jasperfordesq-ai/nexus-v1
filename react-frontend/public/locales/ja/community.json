@@ -185,7 +185,8 @@
     "terms_required": "組織を登録するには、規約に同意する必要があります。",
     "opportunity_count_one": "{{count}} の機会",
     "opportunity_count_other": "{{count}} の機会",
-    "loading": "組織を読み込んでいます"
+    "loading": "組織を読み込んでいます",
+    "manage_my_button": "Manage my organisation"
   },
   "organisation_detail": {
     "page_title": "組織",
@@ -219,7 +220,8 @@
     "cancel": "キャンセル",
     "submit_application": "申請書の提出",
     "job_openings": "求人情報",
-    "rating_sr": "{{n}} 5つ星のうち"
+    "rating_sr": "{{n}} 5つ星のうち",
+    "manage_button": "Manage this organisation"
   },
   "emergency_alerts": {
     "heading": "緊急アラート",

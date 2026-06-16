@@ -346,7 +346,7 @@ class AdminVolunteerController extends BaseApiController
             }
 
             $newStatus = $action === 'approve' ? 'approved' : 'declined';
-            $paymentOutcome = null; // null | 'paid' | 'insufficient' | 'already_paid' | 'no_org' | 'auto_pay_disabled'
+            $paymentOutcome = null; // null | 'paid' | 'no_whole_hours' | 'already_paid' | 'no_org'
 
             DB::transaction(function () use ($id, $tenantId, $newStatus, $action, $log, &$paymentOutcome) {
                 DB::update(
@@ -379,49 +379,61 @@ class AdminVolunteerController extends BaseApiController
                     return;
                 }
 
+                // Lock org row (serialises concurrent payouts). Approval ALWAYS mints
+                // credits — classic timebanking. Credits are minted on confirmation
+                // and are never gated by the org wallet balance or the auto_pay flag;
+                // the org wallet is a reconciliation figure (it may go negative), not
+                // a spending limit. This mirrors VolunteerService::verifyHours().
                 $org = DB::selectOne(
-                    "SELECT id, balance, auto_pay_enabled FROM vol_organizations WHERE id = ? AND tenant_id = ?",
+                    "SELECT id, balance, user_id FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
                     [$orgId, $tenantId]
                 );
                 if (!$org) {
                     $paymentOutcome = 'no_org';
                     return;
                 }
-                if (empty($org->auto_pay_enabled)) {
-                    $paymentOutcome = 'auto_pay_disabled';
-                    return;
-                }
-                if ((float) $org->balance <= 0) {
-                    $paymentOutcome = 'insufficient';
-                    return;
-                }
 
-                // Pay only the integer-floor portion (mirrors VolunteerService::verifyHours)
+                // users.balance stores whole hours; mint the integer-floor portion
+                // and retain any fractional remainder in the org wallet.
                 $intHours = (int) floor($hours);
                 if ($intHours <= 0) {
-                    $paymentOutcome = 'insufficient';
+                    $paymentOutcome = 'no_whole_hours';
                     return;
                 }
-                if ((float) $org->balance < (float) $intHours) {
-                    $paymentOutcome = 'insufficient';
-                    return;
-                }
+                $orgDebit = (float) $intHours;
 
-                $payResult = \App\Services\VolOrgWalletService::payVolunteer(
-                    $orgId,
-                    $volunteerId,
-                    (float) $intHours,
-                    $this->getUserId(),
-                    null,
-                    $id
+                // Debit the org wallet unconditionally — allow it to go NEGATIVE.
+                DB::update(
+                    "UPDATE vol_organizations SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
+                    [$orgDebit, $orgId, $tenantId]
                 );
-                $paymentOutcome = !empty($payResult['success']) ? 'paid' : 'insufficient';
+                $newOrgBalance = (float) $org->balance - $orgDebit; // may be negative
+
+                // Credit (mint) to volunteer
+                DB::update(
+                    "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                    [$intHours, $volunteerId, $tenantId]
+                );
+
+                // Record in vol_org_transactions (balance_after may be negative)
+                $description = __('api.volunteer_auto_payment_description', ['hours' => $intHours]);
+                DB::insert("
+                    INSERT INTO vol_org_transactions (tenant_id, vol_organization_id, user_id, vol_log_id, type, amount, balance_after, description, created_at)
+                    VALUES (?, ?, ?, ?, 'volunteer_payment', ?, ?, ?, NOW())
+                ", [$tenantId, $orgId, $volunteerId, $id, -$orgDebit, $newOrgBalance, $description]);
+
+                // Record in main transactions table
+                DB::insert("
+                    INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, transaction_type, status, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, 'volunteer', 'completed', NOW(), NOW())
+                ", [$tenantId, (int) $org->user_id, $volunteerId, $intHours, $description]);
+
+                $paymentOutcome = 'paid';
             });
 
             // Send hours approved/declined notification after the data mutation.
-            // If auto-pay succeeded, VolOrgWalletService already sent the wallet
-            // payment email, so create only the bell entry here to avoid duplicate
-            // volunteer emails for the same approval.
+            // The minting happens inline above (mirrors VolunteerService::verifyHours),
+            // so this is the single place that notifies the volunteer of the outcome.
             try {
                 $volDetail = DB::selectOne(
                     "SELECT u.id as user_id, u.email, u.first_name, u.name, u.preferred_language, vl.hours, vo.title as opportunity_title, org.name as organization_name
@@ -440,15 +452,15 @@ class AdminVolunteerController extends BaseApiController
                         $orgName = (string) ($volDetail->organization_name ?? __('emails.common.fallback_organization'));
 
                         if ($newStatus === 'approved' && $paymentOutcome === 'paid') {
-                            Notification::createNotification(
+                            NotificationDispatcher::dispatch(
                                 $userId,
+                                'global',
+                                0,
+                                'vol_hours_approved',
                                 __('notifications.vol_hours_approved_paid_body', ['hours' => $hours]),
                                 '/wallet',
-                                'vol_hours_approved',
-                                true,
-                                $tenantId
+                                NotificationDispatcher::buildVolHoursApprovedPaidEmail($hours, $orgName)
                             );
-                            \App\Services\NotificationDispatcher::fanOutPush((int) $userId, 'vol_hours_approved', __('notifications.vol_hours_approved_paid_body', ['hours' => $hours]), '/wallet');
                             return;
                         }
 

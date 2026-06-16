@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import ClipboardList from 'lucide-react/icons/clipboard-list';
@@ -13,8 +14,9 @@ import MessageSquare from 'lucide-react/icons/message-square';
 import Clock from 'lucide-react/icons/clock';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import Users from 'lucide-react/icons/users';
+import Plus from 'lucide-react/icons/plus';
 import { GlassCard, Button, Chip, Spinner, SearchField, Avatar, Checkbox } from '@/components/ui';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { formatDateValue, resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
@@ -68,6 +70,7 @@ function formatDate(d: string) { return formatDateValue(d); }
 function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
   const toast = useToast();
   const { t } = useTranslation('volunteering');
+  const { tenantPath } = useTenant();
 
   const [applications, setApplications] = useState<OrgApplication[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -321,11 +324,24 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
         </div>
       )}
 
-      {/* Empty state */}
+      {/* Empty state — action-led: tell the owner what to do next. */}
       {!isLoading && filteredApplications.length === 0 && (
-        <div className="flex flex-col items-center gap-2 py-8 text-theme-muted">
-          <Users className="w-10 h-10 opacity-40" />
-          <p className="text-sm">{t('applications.empty')}</p>
+        <div className="flex flex-col items-center gap-3 py-10 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
+            <Users className="w-7 h-7 text-indigo-400" aria-hidden="true" />
+          </div>
+          <div>
+            <p className="text-theme-primary font-semibold">{t('applications.empty_title')}</p>
+            <p className="text-sm text-theme-muted max-w-sm mx-auto">{t('applications.empty_desc')}</p>
+          </div>
+          <Button
+            as={Link}
+            to={tenantPath('/volunteering/create')}
+            variant="secondary"
+            startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+          >
+            {t('applications.empty_cta')}
+          </Button>
         </div>
       )}
 

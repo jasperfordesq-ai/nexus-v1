@@ -29,7 +29,10 @@
     "tab_hours_review": "Urenoverzicht",
     "tab_volunteers": "Vrijwilligers",
     "tab_wallet": "Portemonnee",
-    "tab_settings": "Instellingen"
+    "tab_settings": "Instellingen",
+    "overview_intro": "This is your organisation's dashboard. Approve people who apply to volunteer, and approve the hours they log — approving hours credits the volunteer automatically, 1 time credit per hour.",
+    "autocredit_title": "Volunteers are paid automatically",
+    "autocredit_desc": "When you approve someone's logged hours, the time credits go to their wallet straight away — 1 credit per hour. You don't need to fund anything first."
   },
   "page_title": "Vrijwilligerswerk",
   "heading": "Vrijwilligerswerk",
@@ -376,7 +379,9 @@
     "receipt_method": "Betaalmethode",
     "receipt_message": "Bericht",
     "receipt_error": "Kan de bon niet laden.",
-    "receipt_not_found": "Ontvangstbewijs niet gevonden."
+    "receipt_not_found": "Ontvangstbewijs niet gevonden.",
+    "intro_title": "What donations are",
+    "intro_desc": "A donation here is a gift of money — in your local currency, paid by card — to support this community. It is NOT the same as time credits, which you earn by volunteering. Choose an active fundraising campaign below, or make a general donation to the community."
   },
   "safeguarding": {
     "heading": "Beveiliging",
@@ -643,7 +648,10 @@
     "aria_select_all": "Selecteer alle zichtbare aanvragen die in behandeling zijn",
     "aria_select_application": "Selecteer een applicatie uit {{name}}",
     "aria_search_volunteers": "Zoek vrijwilligers op naam",
-    "filter_label": "Toepassingen filteren"
+    "filter_label": "Toepassingen filteren",
+    "empty_title": "No applications yet",
+    "empty_desc": "When someone applies to one of your opportunities, they'll appear here for you to approve or decline. Post an opportunity to start attracting volunteers.",
+    "empty_cta": "Post an opportunity"
   },
   "org_wallet_balance": "Wallet-saldo:",
   "auto_pay_on": "Automatisch betalen AAN",
@@ -842,7 +850,10 @@
       "volunteer_payment": "Vrijwilligersbetaling",
       "withdrawal": "Opname",
       "admin_adjustment": "Beheeraanpassing"
-    }
+    },
+    "balance_helper": "This is a record of the time credits your organisation has given out and received. You don't need a balance to pay volunteers — approving their hours credits them automatically.",
+    "autocredit_title": "Volunteers are paid automatically",
+    "autocredit_description": "When you approve a volunteer's logged hours, the matching time credits (1 credit per hour) are added to their wallet straight away. There's nothing to switch on and no balance to top up first."
   },
   "my_organisations": "Mijn organisaties",
   "my_organisations_title": "Mijn organisaties",
@@ -883,5 +894,42 @@
     "verify_error_body": "De goedkeuringslink is ongeldig, verlopen of al gebruikt. Vraag je jongere om een nieuw verzoek te sturen vanaf de vrijwilligerspagina.",
     "verify_confirm_intro": "Tik op de knop hieronder om te bevestigen dat je toestemming geeft voor deelname van je jongere aan vrijwilligerswerk in deze gemeenschap.",
     "verify_confirm_button": "Mijn goedkeuring bevestigen"
-  }
+  },
+  "volunteer_view_subtitle": "Find opportunities, sign up, and log the hours you give.",
+  "for_organisations": "For organisations",
+  "org_callout_you_manage_one": "You manage {{name}}",
+  "org_callout_you_manage_many": "You manage {{count}} organisations",
+  "org_callout_desc": "Post opportunities, review applications, and approve volunteer hours.",
+  "manage_organisation": "Manage organisation",
+  "org_pending_title": "Your organisation is awaiting approval",
+  "org_pending_desc": "Once {{name}} is approved, you'll manage it and approve volunteer hours here.",
+  "org_register_title": "Run an organisation?",
+  "org_register_desc": "Register your organisation to post opportunities and approve volunteer hours.",
+  "more_sections": "More ({{count}})",
+  "show_fewer_sections": "Show fewer",
+  "org_hours_autocredit_note": "Approving credits the volunteer 1 time credit per hour — automatically.",
+  "how_it_works_title": "How volunteering works",
+  "how_it_works": "Find an opportunity and apply. Once you're accepted, log the hours you give. When the organisation approves your hours, you receive 1 time credit for every hour — added straight to your wallet.",
+  "welcome": {
+    "title": "Welcome to volunteering",
+    "subtitle": "Here's how it works, in three steps.",
+    "step1_title": "Find & apply",
+    "step1_desc": "Browse opportunities and apply to ones you like.",
+    "step2_title": "Log your hours",
+    "step2_desc": "After you volunteer, record the hours you gave.",
+    "step3_title": "Get time credits",
+    "step3_desc": "When the organisation approves, you're credited 1 per hour — automatically.",
+    "dismiss": "Got it",
+    "find_cta": "Find opportunities"
+  },
+  "more_sections_caption": "Other sections — optional extras like recommendations, certificates, wellbeing, alerts and donations.",
+  "hours_journey_title": "What happens to the hours you log",
+  "hours_journey_step1_title": "You log your hours",
+  "hours_journey_step1_desc": "They're saved as 'awaiting approval'.",
+  "hours_journey_step2_title": "The organisation approves",
+  "hours_journey_step2_desc": "They review and approve your logged hours.",
+  "hours_journey_step3_title": "You're credited automatically",
+  "hours_journey_step3_desc": "1 time credit per hour is added to your wallet.",
+  "applications_empty_cta": "Browse opportunities",
+  "hero_eyebrow": "Volunteer & earn time credits"
 }

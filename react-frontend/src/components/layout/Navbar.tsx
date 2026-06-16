@@ -297,6 +297,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       { label: t('nav.events'), desc: t('nav_desc.events'), path: '/events', href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
       { label: t('nav.groups'), desc: t('nav_desc.groups'), path: '/groups', href: tenantPath('/groups'), icon: Users, feature: 'groups' as const },
       { label: t('nav.volunteering'), desc: t('nav_desc.volunteering'), path: '/volunteering', href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
+      { label: t('nav.organisations'), desc: t('nav_desc.organisations'), path: '/organisations', href: tenantPath('/organisations'), icon: Building2, feature: 'organisations' as const },
     );
     // Partner Communities — authenticated users with federation; sits directly below Volunteering
     if (isAuthenticated && hasFeature('federation')) {
@@ -321,7 +322,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   );
   const communityLeftSections = useMemo<DesktopNavPanelSection[]>(() => {
     const mainPaths = new Set(['/dashboard']);
-    const communityPathsSet = new Set(['/members', '/connections', '/events', '/groups', '/volunteering', '/federation', CARING_COMMUNITY_ROUTE.href]);
+    const communityPathsSet = new Set(['/members', '/connections', '/events', '/groups', '/volunteering', '/organisations', '/federation', CARING_COMMUNITY_ROUTE.href]);
     const toPanelItem = (item: CommunityNavItem) => ({
       label: item.label,
       desc: item.desc,
@@ -350,7 +351,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   }, [visibleCommunityItems, t]);
   const communityRightSections = useMemo<DesktopNavPanelSection[]>(() => {
     const mainPaths = new Set(['/dashboard']);
-    const communityPathsSet = new Set(['/members', '/connections', '/events', '/groups', '/volunteering', '/federation', CARING_COMMUNITY_ROUTE.href]);
+    const communityPathsSet = new Set(['/members', '/connections', '/events', '/groups', '/volunteering', '/organisations', '/federation', CARING_COMMUNITY_ROUTE.href]);
     const toPanelItem = (item: CommunityNavItem) => ({
       label: item.label,
       desc: item.desc,

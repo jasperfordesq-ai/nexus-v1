@@ -10,6 +10,7 @@ import Clock from 'lucide-react/icons/clock';
 import Wallet from 'lucide-react/icons/wallet';
 import Briefcase from 'lucide-react/icons/briefcase';
 import ArrowRight from 'lucide-react/icons/arrow-right';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
 import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -125,6 +126,12 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
 
   return (
     <div className="space-y-6">
+      {/* Plain-language intro so an org owner immediately understands what this
+          dashboard is for. */}
+      <GlassCard className="p-4 border border-rose-500/20">
+        <p className="text-sm text-theme-muted">{t('org_dashboard.overview_intro')}</p>
+      </GlassCard>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {statCards.map((card) => {
@@ -182,46 +189,35 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
           )}
           <Button
             variant="primary"
-            className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
-            startContent={<Wallet className="w-4 h-4" />}
-            onPress={() => onTabChange('wallet')}
-          >
-            {t('org_dashboard.fund_wallet')}
-          </Button>
-          <Button
-            variant="tertiary"
+            className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
             startContent={<Briefcase className="w-4 h-4" />}
             onPress={() => navigate(tenantPath('/volunteering/create'))}
           >
             {t('org_dashboard.post_opportunity')}
           </Button>
+          <Button
+            variant="tertiary"
+            startContent={<Wallet className="w-4 h-4" />}
+            onPress={() => onTabChange('wallet')}
+          >
+            {t('org_dashboard.tab_wallet')}
+          </Button>
         </div>
       </GlassCard>
 
-      {/* Auto-pay Status */}
-      <GlassCard className={`p-4 ${stats.auto_pay_enabled ? 'border-emerald-500/30' : 'border-amber-500/30'}`}>
-        <div className="flex items-center gap-3">
-          <Wallet className={`w-5 h-5 ${stats.auto_pay_enabled ? 'text-emerald-400' : 'text-amber-400'}`} />
-          <div>
+      {/* How volunteers get paid — a fixed reassurance, not a toggle. Approving
+          a volunteer's hours always credits them automatically. */}
+      <GlassCard className="p-4 border border-emerald-500/30">
+        <div className="flex items-start gap-3">
+          <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" aria-hidden="true" />
+          <div className="min-w-0">
             <p className="text-sm font-medium text-theme-primary">
-              {stats.auto_pay_enabled
-                ? t('org_dashboard.autopay_on')
-                : t('org_dashboard.autopay_off')}
+              {t('org_dashboard.autocredit_title')}
             </p>
             <p className="text-xs text-theme-muted">
-              {stats.auto_pay_enabled
-                ? t('org_dashboard.autopay_on_desc')
-                : t('org_dashboard.autopay_off_desc')}
+              {t('org_dashboard.autocredit_desc')}
             </p>
           </div>
-          <Button
-            size="sm"
-            variant="tertiary"
-            className="ml-auto"
-            onPress={() => onTabChange('wallet')}
-          >
-            {t('org_dashboard.configure')}
-          </Button>
         </div>
       </GlassCard>
     </div>

@@ -185,7 +185,8 @@
     "terms_required": "يجب عليك الموافقة على الشروط لتسجيل مؤسستك.",
     "opportunity_count_one": "فرصة {{count}}",
     "opportunity_count_other": "{{count}} الفرص",
-    "loading": "تحميل المنظمات"
+    "loading": "تحميل المنظمات",
+    "manage_my_button": "Manage my organisation"
   },
   "organisation_detail": {
     "page_title": "منظمة",
@@ -219,7 +220,8 @@
     "cancel": "يلغي",
     "submit_application": "تقديم الطلب",
     "job_openings": "الوظائف الشاغرة",
-    "rating_sr": "{{n}} من أصل 5 نجوم"
+    "rating_sr": "{{n}} من أصل 5 نجوم",
+    "manage_button": "Manage this organisation"
   },
   "emergency_alerts": {
     "heading": "التنبيهات الطارئة",

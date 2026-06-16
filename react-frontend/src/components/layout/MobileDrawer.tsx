@@ -192,6 +192,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.events'), href: '/events', icon: Calendar, feature: 'events' as const },
     { label: t('nav.groups'), href: '/groups', icon: Users, feature: 'groups' as const },
     { label: t('nav.volunteering'), href: '/volunteering', icon: Heart, feature: 'volunteering' as const },
+    { label: t('nav.organisations'), href: '/organisations', icon: Building2, feature: 'organisations' as const },
     { label: t('nav.resources'), href: '/resources', icon: FolderOpen, feature: 'resources' as const },
     { label: t('nav.jobs'), href: '/jobs', icon: Briefcase, feature: 'job_vacancies' as const },
     { label: t('nav.marketplace'), href: '/marketplace', icon: ShoppingBag, feature: 'marketplace' as const },

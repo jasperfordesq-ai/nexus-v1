@@ -2115,6 +2115,223 @@ class AlphaController extends Controller
         ]);
     }
 
+    // ===== WAVE V-ORG: organisation-admin dashboard (the "two hats" admin side) =====
+
+    /**
+     * Guard for the organisation-admin screens: feature on + signed in + the
+     * current user owns or admins the (tenant-scoped) volunteer organisation.
+     * Returns the org's display name on success, or a RedirectResponse / aborts
+     * exactly the way the group-management guard does (404 for a non-existent or
+     * cross-tenant org, 403 when the user is not an owner/admin).
+     *
+     * @return array{0:int,1:string}|RedirectResponse  [userId, orgName] on success.
+     */
+    private function volunteerOrgGuard(string $tenantSlug, int $orgId): array|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $org = \Illuminate\Support\Facades\DB::selectOne(
+            'SELECT id, name, user_id, status FROM vol_organizations WHERE id = ? AND tenant_id = ?',
+            [$orgId, $tenantId]
+        );
+        abort_if($org === null, 404);
+
+        // Owner of the org row, OR an active owner/admin org member, may manage it.
+        // Mirrors VolunteerController::ensureOrgAccess (minus the site-admin branch,
+        // which the accessible member UI does not surface).
+        $canManage = (int) $org->user_id === $userId;
+        if (!$canManage) {
+            $membership = \Illuminate\Support\Facades\DB::selectOne(
+                "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND org_type = 'volunteer' AND user_id = ? AND status = 'active'",
+                [$tenantId, $orgId, $userId]
+            );
+            $canManage = $membership !== null && in_array($membership->role, ['owner', 'admin'], true);
+        }
+        abort_unless($canManage, 403);
+
+        return [$userId, (string) ($org->name ?? '')];
+    }
+
+    public function manageVolunteerOrg(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $guard = $this->volunteerOrgGuard($tenantSlug, $id);
+        if ($guard instanceof RedirectResponse) {
+            return $guard;
+        }
+        [, $orgName] = $guard;
+
+        // Pending applications awaiting an org decision, and pending hours awaiting
+        // approval — both fetched via the same SQL the React org dashboard uses
+        // (VolunteerController::orgApplications / orgHoursPending).
+        $applications = [];
+        $hours = [];
+        try {
+            $applications = $this->volunteerOrgPendingApplications($id);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        try {
+            $hours = $this->volunteerOrgPendingHours($id);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::volunteer-org-manage', [
+            'title' => __('govuk_alpha.vol_org.manage_title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'volunteering',
+            'orgId' => $id,
+            'orgName' => $orgName,
+            'applications' => $applications,
+            'hours' => $hours,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function handleVolunteerOrgApplication(Request $request, string $tenantSlug, int $id, int $appId): RedirectResponse
+    {
+        $guard = $this->volunteerOrgGuard($tenantSlug, $id);
+        if ($guard instanceof RedirectResponse) {
+            return $guard;
+        }
+        [$userId] = $guard;
+
+        $action = self::asStr($request->input('action')) === 'decline' ? 'decline' : 'approve';
+
+        // Confirm the application belongs to THIS organisation before acting — the
+        // service-layer ownership check is org-membership-based, so this scopes the
+        // mutation to the org whose dashboard the admin is on.
+        $belongs = \Illuminate\Support\Facades\DB::selectOne(
+            'SELECT va.id FROM vol_applications va
+             INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id AND vo.tenant_id = va.tenant_id
+             WHERE va.id = ? AND va.tenant_id = ? AND vo.organization_id = ?',
+            [$appId, TenantContext::getId(), $id]
+        );
+
+        $ok = false;
+        if ($belongs !== null) {
+            try {
+                $ok = VolunteerService::handleApplication($appId, $userId, $action, trim(self::asStr($request->input('org_note'))));
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        $status = $ok
+            ? ($action === 'approve' ? 'application-approved' : 'application-declined')
+            : 'application-failed';
+
+        return redirect()->route('govuk-alpha.volunteering.org.manage', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
+    }
+
+    public function verifyVolunteerOrgHours(Request $request, string $tenantSlug, int $id, int $logId): RedirectResponse
+    {
+        $guard = $this->volunteerOrgGuard($tenantSlug, $id);
+        if ($guard instanceof RedirectResponse) {
+            return $guard;
+        }
+        [$userId] = $guard;
+
+        $action = self::asStr($request->input('action')) === 'decline' ? 'decline' : 'approve';
+
+        // Confirm the log belongs to THIS organisation before acting. verifyHours()
+        // also re-checks org ownership and auto-mints credits on approval (1 credit
+        // per whole hour, regardless of org wallet balance) — identical to React.
+        $belongs = \Illuminate\Support\Facades\DB::selectOne(
+            'SELECT id FROM vol_logs WHERE id = ? AND tenant_id = ? AND organization_id = ?',
+            [$logId, TenantContext::getId(), $id]
+        );
+
+        $ok = false;
+        if ($belongs !== null) {
+            try {
+                $ok = VolunteerService::verifyHours($logId, $userId, $action);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        $status = $ok
+            ? ($action === 'approve' ? 'hours-approved' : 'hours-declined')
+            : 'hours-verify-failed';
+
+        return redirect()->route('govuk-alpha.volunteering.org.manage', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
+    }
+
+    /**
+     * Pending applications for an organisation, shaped for the manage view. Mirrors
+     * the SELECT in VolunteerController::orgApplications (status = 'pending').
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function volunteerOrgPendingApplications(int $orgId): array
+    {
+        $tenantId = TenantContext::getId();
+        $rows = \Illuminate\Support\Facades\DB::select(
+            "SELECT va.id, va.message, va.created_at, va.shift_id,
+                    u.id as user_id, u.name as user_name,
+                    vo.id as opportunity_id, vo.title as opportunity_title,
+                    vs.start_time as shift_start, vs.end_time as shift_end
+             FROM vol_applications va
+             INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id AND vo.organization_id = ? AND vo.tenant_id = va.tenant_id
+             INNER JOIN users u ON va.user_id = u.id AND u.tenant_id = va.tenant_id
+             LEFT JOIN vol_shifts vs ON va.shift_id = vs.id AND vs.tenant_id = va.tenant_id
+             WHERE va.tenant_id = ? AND va.status = 'pending'
+             ORDER BY va.id DESC
+             LIMIT 100",
+            [$orgId, $tenantId]
+        );
+
+        return array_map(static fn (object $r): array => [
+            'id' => (int) $r->id,
+            'message' => $r->message,
+            'created_at' => $r->created_at,
+            'user' => ['id' => (int) $r->user_id, 'name' => $r->user_name],
+            'opportunity' => ['id' => (int) $r->opportunity_id, 'title' => $r->opportunity_title],
+            'shift' => $r->shift_start ? ['start_time' => $r->shift_start, 'end_time' => $r->shift_end] : null,
+        ], $rows);
+    }
+
+    /**
+     * Pending logged hours for an organisation, shaped for the manage view. Mirrors
+     * the SELECT in VolunteerController::orgHoursPending (status = 'pending').
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function volunteerOrgPendingHours(int $orgId): array
+    {
+        $tenantId = TenantContext::getId();
+        $rows = \Illuminate\Support\Facades\DB::select(
+            "SELECT vl.id, vl.hours, vl.date_logged as date, vl.description, vl.created_at,
+                    u.id as user_id, u.name as user_name,
+                    vo.id as opportunity_id, vo.title as opportunity_title
+             FROM vol_logs vl
+             INNER JOIN users u ON vl.user_id = u.id AND u.tenant_id = vl.tenant_id
+             LEFT JOIN vol_opportunities vo ON vl.opportunity_id = vo.id AND vo.tenant_id = vl.tenant_id
+             WHERE vl.organization_id = ? AND vl.tenant_id = ? AND vl.status = 'pending'
+             ORDER BY vl.id DESC
+             LIMIT 100",
+            [$orgId, $tenantId]
+        );
+
+        return array_map(static fn (object $r): array => [
+            'id' => (int) $r->id,
+            'hours' => (float) $r->hours,
+            'date' => $r->date,
+            'description' => $r->description,
+            'created_at' => $r->created_at,
+            'user' => ['id' => (int) $r->user_id, 'name' => $r->user_name],
+            'opportunity' => $r->opportunity_id ? ['id' => (int) $r->opportunity_id, 'title' => $r->opportunity_title] : null,
+        ], $rows);
+    }
+
     public function withdrawVolunteerApplication(Request $request, string $tenantSlug, int $id): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
@@ -5396,18 +5613,37 @@ class AlphaController extends Controller
         }
         abort_unless(TenantContext::hasFeature('organisations'), 403);
 
+        // Bona-fide organisations only: registration is gated behind required
+        // identity fields and an explicit terms agreement. Individual volunteers
+        // never register — they browse opportunities and log hours instead. The
+        // org is created with status=pending so an administrator vets it before
+        // it is publicly listed (preserved via VolunteerService::createOrganization).
         $name = trim(self::asStr($request->input('name')));
-        if ($name === '') {
-            return redirect()->route('govuk-alpha.organisations.index', ['tenantSlug' => $tenantSlug, 'status' => 'org-invalid']);
+        $description = trim(self::asStr($request->input('description')));
+        $email = trim(self::asStr($request->input('email')));
+        $website = trim(self::asStr($request->input('website')));
+        $agreedTerms = self::asStr($request->input('agreed_terms'));
+        $termsAccepted = in_array(strtolower($agreedTerms), ['1', 'on', 'true'], true);
+
+        $valid = mb_strlen($name) >= 3
+            && mb_strlen($description) >= 20
+            && filter_var($email, FILTER_VALIDATE_EMAIL) !== false
+            && ($website === '' || preg_match('#^https?://#i', $website) === 1)
+            && $termsAccepted;
+
+        if (! $valid) {
+            return redirect()
+                ->route('govuk-alpha.organisations.index', ['tenantSlug' => $tenantSlug, 'status' => 'org-invalid'])
+                ->withInput();
         }
 
         $ok = false;
         try {
             $id = \App\Services\VolunteerService::createOrganization($userId, [
                 'name' => mb_substr($name, 0, 255),
-                'description' => trim(self::asStr($request->input('description'))) ?: null,
-                'email' => trim(self::asStr($request->input('email'))) ?: null,
-                'website' => trim(self::asStr($request->input('website'))) ?: null,
+                'description' => $description,
+                'contact_email' => $email,
+                'website' => $website ?: null,
             ]);
             $ok = $id !== null;
         } catch (\Throwable $e) {
@@ -9673,6 +9909,13 @@ class AlphaController extends Controller
 
         if (TenantContext::hasFeature('volunteering')) {
             $items['volunteering'] = route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]);
+        }
+
+        // Organisations sits beside Volunteering as its own landing page so that
+        // "an organisation can register here" is obvious, mirroring the React
+        // Community menu. (It is also reachable from Explore.)
+        if (TenantContext::hasFeature('organisations')) {
+            $items['organisations'] = route('govuk-alpha.organisations.index', ['tenantSlug' => $tenantSlug]);
         }
 
         // "Explore" is the gateway to discovery facilities (groups, goals, skills,

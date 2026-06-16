@@ -38,14 +38,15 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import Users from 'lucide-react/icons/users';
 import MessageSquare from 'lucide-react/icons/message-square';
-import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import Receipt from 'lucide-react/icons/receipt';
 import Shield from 'lucide-react/icons/shield';
 import Lightbulb from 'lucide-react/icons/lightbulb';
 import HandHeart from 'lucide-react/icons/hand-heart';
+import Info from 'lucide-react/icons/info';
 import Accessibility from 'lucide-react/icons/accessibility';
 import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo';
+import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -61,7 +62,7 @@ import { CredentialVerificationTab } from './CredentialVerificationTab';
 import { WaitlistTab } from './WaitlistTab';
 import { ShiftSwapsTab } from './ShiftSwapsTab';
 import { GroupSignUpTab } from './GroupSignUpTab';
-import { HoursReviewTab } from './HoursReviewTab';
+import { VolunteeringWelcome } from './VolunteeringWelcome';
 const ExpensesTab = React.lazy(() => import('./ExpensesTab'));
 const SafeguardingTab = React.lazy(() => import('./SafeguardingTab'));
 const CommunityProjectsTab = React.lazy(() => import('./CommunityProjectsTab'));
@@ -144,9 +145,13 @@ function extractCollectionItems<T>(payload: unknown): T[] {
   return [];
 }
 
-type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' | 'certificates' | 'alerts' | 'wellbeing' | 'credentials' | 'waitlist' | 'swaps' | 'group-signups' | 'hours-review' | 'expenses' | 'safeguarding' | 'community-projects' | 'donations' | 'accessibility';
+type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' | 'certificates' | 'alerts' | 'wellbeing' | 'credentials' | 'waitlist' | 'swaps' | 'group-signups' | 'expenses' | 'safeguarding' | 'community-projects' | 'donations' | 'accessibility';
 
-const VOLUNTEER_TABS: VolunteerTab[] = ['opportunities', 'applications', 'hours', 'recommended', 'certificates', 'alerts', 'wellbeing', 'credentials', 'waitlist', 'swaps', 'group-signups', 'hours-review', 'expenses', 'safeguarding', 'community-projects', 'donations', 'accessibility'];
+const VOLUNTEER_TABS: VolunteerTab[] = ['opportunities', 'applications', 'hours', 'recommended', 'certificates', 'alerts', 'wellbeing', 'credentials', 'waitlist', 'swaps', 'group-signups', 'expenses', 'safeguarding', 'community-projects', 'donations', 'accessibility'];
+
+// The handful of tabs a volunteer reaches for constantly. Everything else is
+// tucked behind a "More" toggle so the page doesn't open as a wall of tabs.
+const PRIMARY_VOLUNTEER_TABS: VolunteerTab[] = ['opportunities', 'applications', 'hours', 'recommended', 'certificates'];
 
 // Volunteering brand gradient — centralized so it can be themed later via tokens.
 const VOL_GRADIENT_BASE = 'bg-linear-to-r from-rose-500 to-pink-600';
@@ -184,7 +189,26 @@ export function VolunteeringPage() {
       return next;
     }, { replace: true });
   }, [setSearchParams]);
-  const [hasApprovedOrg, setHasApprovedOrg] = useState(false);
+  type MyOrg = { id: number; name: string; status: string; role: string };
+  const [myOrgs, setMyOrgs] = useState<MyOrg[]>([]);
+  const [showMoreTabs, setShowMoreTabs] = useState(false);
+  // Orgs the user can actually manage (owner/admin) and that are live.
+  const manageableOrgs = myOrgs.filter(
+    (o) => ['approved', 'active'].includes(o.status) && ['owner', 'admin'].includes(o.role),
+  );
+  // Orgs the user registered that are still awaiting platform approval.
+  const pendingOrgs = myOrgs.filter(
+    (o) => o.status === 'pending' && ['owner', 'admin'].includes(o.role),
+  );
+  const hasApprovedOrg = manageableOrgs.length > 0;
+  // Captured so TS narrows the index access (noUncheckedIndexedAccess).
+  const soleManagedOrg = manageableOrgs.length === 1 ? manageableOrgs[0] : undefined;
+  const firstPendingOrg = pendingOrgs[0];
+  // Where the "manage" CTA points: straight to the dashboard for a single org,
+  // otherwise the chooser page.
+  const manageHref = soleManagedOrg
+    ? tenantPath(`/volunteering/org/${soleManagedOrg.id}/dashboard`)
+    : tenantPath('/volunteering/my-organisations');
 
   const isTabAllowed = useCallback((tabKey: VolunteerTab): boolean => (
     VOLUNTEER_TABS.includes(tabKey) && (tabKey === 'opportunities' || isAuthenticated) && isTabEnabled(tabKey)
@@ -215,12 +239,10 @@ export function VolunteeringPage() {
             // respondWithData wraps in { data: { items: [...] } } or may return array directly
             const raw = res.data as { data?: { items?: unknown[] }; items?: unknown[] };
             const items = (raw.data?.items ?? raw.items ?? (Array.isArray(res.data) ? res.data : [])) as Array<{ id: number; name: string; status: string; member_role: string; balance?: number }>;
-            setHasApprovedOrg(
-              items.some((org) => ['approved', 'active'].includes(org.status) && ['owner', 'admin'].includes(org.member_role)),
-            );
+            setMyOrgs(items.map((o) => ({ id: o.id, name: o.name, status: o.status, role: o.member_role })));
           }
         })
-        .catch(() => { /* silent — button just won't show */ });
+        .catch(() => { /* silent — org tools just won't show */ });
     }
     return () => { cancelled = true; };
   }, [isAuthenticated, hasFeature]);
@@ -249,39 +271,28 @@ export function VolunteeringPage() {
         description={t('page_description')}
       />
 
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6">
-        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="rounded-lg bg-rose-500/10 p-2 text-rose-600 dark:text-rose-400">
-                <Heart className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <h1 className="text-xl font-bold text-theme-primary">{t('heading')}</h1>
-            </div>
-            <p className="text-sm text-theme-muted">{t('subtitle')}</p>
-          </div>
-          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:shrink-0">
-            {hasApprovedOrg && (
+      {/* One-time welcome for signed-in members (dismissible, localStorage). */}
+      {isAuthenticated && <VolunteeringWelcome />}
+
+      {/* Hero — the VOLUNTEER view. Uses the shared PublicPageHero so it matches
+          the Organisations landing for a consistent, professional look. */}
+      <PublicPageHero
+        eyebrow={t('hero_eyebrow')}
+        title={t('heading')}
+        description={t('volunteer_view_subtitle')}
+        accent="rose"
+        icon={<Heart className="h-7 w-7" aria-hidden="true" />}
+        action={
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            {isAuthenticated && (
               <Button
                 as={Link}
-                to={tenantPath('/volunteering/create')}
+                to={tenantPath('/volunteering?tab=hours')}
                 variant="primary"
-                className="w-full sm:w-auto"
-                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+                className="w-full sm:w-auto bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+                startContent={<Timer className="w-4 h-4" aria-hidden="true" />}
               >
-                {t('post_opportunity')}
-              </Button>
-            )}
-            {hasApprovedOrg && (
-              <Button
-                as={Link}
-                to={tenantPath('/volunteering/my-organisations')}
-                variant="secondary"
-                className="w-full sm:w-auto"
-                startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
-              >
-                {t('my_organisations')}
+                {t('log_hours')}
               </Button>
             )}
             <Button
@@ -294,8 +305,109 @@ export function VolunteeringPage() {
               {t('browse_organisations')}
             </Button>
           </div>
+        }
+      />
+
+      {/* Plain-language "how it works" so a first-time volunteer isn't guessing
+          what to do or how they get their time credits. */}
+      <GlassCard className="p-4 sm:p-5">
+        <div className="flex items-start gap-3">
+          <div className="rounded-lg bg-rose-500/10 p-2 text-rose-600 dark:text-rose-400 shrink-0">
+            <Info className="w-5 h-5" aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-base font-semibold text-theme-primary">{t('how_it_works_title')}</h2>
+            <p className="text-sm text-theme-muted">{t('how_it_works')}</p>
+          </div>
         </div>
-      </div>
+      </GlassCard>
+
+      {/* ───────── The ORGANISATION door — the second "hat". ─────────
+          Kept visually separate from the volunteer hero above so it's obvious
+          these are two different modes: "I volunteer" vs "I run an organisation".
+          Previously the only entry was a button hidden behind hasApprovedOrg, so
+          owners with a pending org saw nothing at all. */}
+      {isAuthenticated && hasApprovedOrg && (
+        <GlassCard className="p-4 sm:p-5 border border-rose-500/20">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3 min-w-0">
+              <div className="rounded-lg bg-rose-500/10 p-2 text-rose-600 dark:text-rose-400 shrink-0">
+                <Building2 className="w-5 h-5" aria-hidden="true" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wide text-rose-500">{t('for_organisations')}</p>
+                <h2 className="text-base font-semibold text-theme-primary">
+                  {soleManagedOrg
+                    ? t('org_callout_you_manage_one', { name: soleManagedOrg.name })
+                    : t('org_callout_you_manage_many', { count: manageableOrgs.length })}
+                </h2>
+                <p className="text-sm text-theme-muted">{t('org_callout_desc')}</p>
+              </div>
+            </div>
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:shrink-0">
+              <Button
+                as={Link}
+                to={manageHref}
+                variant="primary"
+                className="w-full sm:w-auto"
+                startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('manage_organisation')}
+              </Button>
+              <Button
+                as={Link}
+                to={tenantPath('/volunteering/create')}
+                variant="secondary"
+                className="w-full sm:w-auto"
+                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('post_opportunity')}
+              </Button>
+            </div>
+          </div>
+        </GlassCard>
+      )}
+
+      {/* Org awaiting approval — previously rendered NOTHING, stranding the owner. */}
+      {isAuthenticated && !hasApprovedOrg && pendingOrgs.length > 0 && (
+        <GlassCard className="p-4 sm:p-5 border border-amber-500/20">
+          <div className="flex items-start gap-3">
+            <div className="rounded-lg bg-amber-500/10 p-2 text-amber-600 dark:text-amber-400 shrink-0">
+              <Hourglass className="w-5 h-5" aria-hidden="true" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-base font-semibold text-theme-primary">{t('org_pending_title')}</h2>
+              <p className="text-sm text-theme-muted">{t('org_pending_desc', { name: firstPendingOrg?.name ?? '' })}</p>
+            </div>
+          </div>
+        </GlassCard>
+      )}
+
+      {/* No org yet — a quiet nudge that explains the second hat exists. */}
+      {isAuthenticated && !hasApprovedOrg && pendingOrgs.length === 0 && (
+        <GlassCard className="p-4 sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3 min-w-0">
+              <div className="rounded-lg bg-theme-elevated p-2 text-theme-muted shrink-0">
+                <Building2 className="w-5 h-5" aria-hidden="true" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-base font-semibold text-theme-primary">{t('org_register_title')}</h2>
+                <p className="text-sm text-theme-muted">{t('org_register_desc')}</p>
+              </div>
+            </div>
+            <Button
+              as={Link}
+              to={tenantPath('/organisations/register')}
+              variant="secondary"
+              className="w-full sm:w-auto sm:shrink-0"
+              startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('register_organisation')}
+            </Button>
+          </div>
+        </GlassCard>
+      )}
 
       {/* Tabs */}
       {/* Tabs — data-driven with config-based visibility */}
@@ -313,7 +425,6 @@ export function VolunteeringPage() {
           { key: 'waitlist', icon: Clock, label: t('tab_waitlist'), authOnly: true },
           { key: 'swaps', icon: ArrowLeftRight, label: t('tab_swap_requests'), authOnly: true },
           { key: 'group-signups', icon: Users, label: t('tab_group_signups'), authOnly: true },
-          { key: 'hours-review', icon: ClipboardCheck, label: t('tab_hours_review'), authOnly: true },
           { key: 'expenses', icon: Receipt, label: t('tab_expenses'), authOnly: true },
           { key: 'safeguarding', icon: Shield, label: t('tab_safeguarding'), authOnly: true },
           { key: 'community-projects', icon: Lightbulb, label: t('tab_community_projects'), authOnly: true },
@@ -329,6 +440,40 @@ export function VolunteeringPage() {
           ? tab
           : visibleTabs[0]?.key;
 
+        const primaryTabs = visibleTabs.filter(({ key }) => PRIMARY_VOLUNTEER_TABS.includes(key));
+        const moreTabs = visibleTabs.filter(({ key }) => !PRIMARY_VOLUNTEER_TABS.includes(key));
+        const activeIsMore = !!activeTab && moreTabs.some(({ key }) => key === activeTab);
+        const moreExpanded = showMoreTabs || activeIsMore;
+
+        const renderToggle = (tabsToRender: TabDef[]) => (
+          <ToggleButtonGroup
+            isDetached
+            selectionMode="single"
+            selectedKeys={activeTab ? new Set([activeTab]) : new Set()}
+            onSelectionChange={(keys) => {
+              const [nextTab] = Array.from(keys as Set<Key>);
+              const nextVolunteerTab = String(nextTab) as VolunteerTab;
+              if (nextTab && VOLUNTEER_TABS.includes(nextVolunteerTab)) {
+                setTab(nextVolunteerTab);
+              }
+            }}
+            className="flex flex-wrap gap-2"
+            aria-label={t('aria.volunteering_sections')}
+          >
+            {tabsToRender.map(({ key, icon: Icon, label }) => (
+              <ToggleButton
+                key={key}
+                id={key}
+                aria-label={label}
+                className={activeTab === key ? VOL_GRADIENT : 'bg-theme-elevated text-theme-muted'}
+              >
+                <Icon className="w-4 h-4" aria-hidden="true" />
+                {label}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        );
+
         return (
           <>
             {visibleTabs.length === 0 && (
@@ -338,32 +483,30 @@ export function VolunteeringPage() {
                 description={t('no_tabs_available_desc')}
               />
             )}
-            <ToggleButtonGroup
-              isDetached
-              selectionMode="single"
-              selectedKeys={activeTab ? new Set([activeTab]) : new Set()}
-              onSelectionChange={(keys) => {
-                const [nextTab] = Array.from(keys as Set<Key>);
-                const nextVolunteerTab = String(nextTab) as VolunteerTab;
-                if (nextTab && VOLUNTEER_TABS.includes(nextVolunteerTab)) {
-                  setTab(nextVolunteerTab);
-                }
-              }}
-              className="flex flex-wrap gap-2"
-              aria-label={t('aria.volunteering_sections')}
-            >
-              {visibleTabs.map(({ key, icon: Icon, label }) => (
-                <ToggleButton
-                  key={key}
-                  id={key}
-                  aria-label={label}
-                  className={activeTab === key ? VOL_GRADIENT : 'bg-theme-elevated text-theme-muted'}
-                >
-                  <Icon className="w-4 h-4" aria-hidden="true" />
-                  {label}
-                </ToggleButton>
-              ))}
-            </ToggleButtonGroup>
+            {visibleTabs.length > 0 && (
+              <div className="space-y-2">
+                {renderToggle(primaryTabs)}
+                {moreTabs.length > 0 && (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="tertiary"
+                      onPress={() => setShowMoreTabs((v) => !v)}
+                      endContent={<ChevronRight className={`w-4 h-4 transition-transform ${moreExpanded ? 'rotate-90' : ''}`} aria-hidden="true" />}
+                      aria-expanded={moreExpanded}
+                    >
+                      {moreExpanded ? t('show_fewer_sections') : t('more_sections', { count: moreTabs.length })}
+                    </Button>
+                    {moreExpanded && (
+                      <div className="space-y-1">
+                        <p className="text-xs text-theme-subtle">{t('more_sections_caption')}</p>
+                        {renderToggle(moreTabs)}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Tab Content — wrapped in a keyed ErrorBoundary so a render error in
                 any single tab (eager OR lazy) is contained to the tab instead of
@@ -381,7 +524,6 @@ export function VolunteeringPage() {
               {activeTab === 'waitlist' && isTabEnabled('waitlist') && <WaitlistTab />}
               {activeTab === 'swaps' && isTabEnabled('swaps') && <ShiftSwapsTab />}
               {activeTab === 'group-signups' && isTabEnabled('group-signups') && <GroupSignUpTab />}
-              {activeTab === 'hours-review' && isTabEnabled('hours-review') && <HoursReviewTab />}
               <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-12"><Spinner size="lg" /></div>}>
                 {activeTab === 'expenses' && isTabEnabled('expenses') && <ExpensesTab />}
                 {activeTab === 'safeguarding' && isTabEnabled('safeguarding') && <SafeguardingTab />}
@@ -939,6 +1081,16 @@ function ApplicationsTab() {
               icon={<Send className="w-12 h-12" aria-hidden="true" />}
               title={t('no_applications')}
               description={statusFilter ? t('no_status_applications', { status: statusFilter }) : t('no_applications_yet')}
+              action={!statusFilter ? (
+                <Button
+                  as={Link}
+                  to={tenantPath('/volunteering')}
+                  variant="secondary"
+                  startContent={<Briefcase className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('applications_empty_cta')}
+                </Button>
+              ) : undefined}
             />
           ) : (
             <div className="space-y-4">
@@ -1241,6 +1393,27 @@ function HoursTab() {
                   </div>
                 </GlassCard>
               </div>
+
+              {/* Your hours journey — makes "pending" vs "approved" obvious and
+                  shows the volunteer that approval credits them automatically. */}
+              <GlassCard className="p-4 sm:p-5">
+                <h3 className="text-sm font-semibold text-theme-primary mb-3">{t('hours_journey_title')}</h3>
+                <ol className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {[
+                    { n: 1, title: t('hours_journey_step1_title'), desc: t('hours_journey_step1_desc'), tone: 'bg-amber-500/10 text-amber-500' },
+                    { n: 2, title: t('hours_journey_step2_title'), desc: t('hours_journey_step2_desc'), tone: 'bg-sky-500/10 text-sky-500' },
+                    { n: 3, title: t('hours_journey_step3_title'), desc: t('hours_journey_step3_desc'), tone: 'bg-emerald-500/10 text-emerald-500' },
+                  ].map((s) => (
+                    <li key={s.n} className="flex items-start gap-3">
+                      <span className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${s.tone}`} aria-hidden="true">{s.n}</span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-theme-primary">{s.title}</p>
+                        <p className="text-xs text-theme-muted">{s.desc}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </GlassCard>
 
               {/* Progress toward a round number goal */}
               {totalHours > 0 && (

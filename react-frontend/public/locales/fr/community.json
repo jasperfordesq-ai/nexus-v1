@@ -185,7 +185,8 @@
     "terms_required": "Vous devez accepter les conditions pour enregistrer votre organisation.",
     "opportunity_count_one": "{{count}} opportunité",
     "opportunity_count_other": "{{count}} opportunités",
-    "loading": "Chargement des organisations"
+    "loading": "Chargement des organisations",
+    "manage_my_button": "Manage my organisation"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -219,7 +220,8 @@
     "cancel": "Annuler",
     "submit_application": "Envoyer la candidature",
     "job_openings": "Offres d'emploi",
-    "rating_sr": "{{n}} étoiles sur 5"
+    "rating_sr": "{{n}} étoiles sur 5",
+    "manage_button": "Manage this organisation"
   },
   "emergency_alerts": {
     "heading": "Alertes d'urgence",

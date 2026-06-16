@@ -70,8 +70,33 @@ export function OrganisationsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [manageableOrgs, setManageableOrgs] = useState<{ id: number }[]>([]);
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Does the signed-in user own/admin any (live) organisation? If so we surface a
+  // clear "Manage my organisation" entry here, not just on the volunteering page.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let cancelled = false;
+    api.get<unknown>('/v2/volunteering/my-organisations')
+      .then((res) => {
+        if (cancelled || !res.success || !res.data) return;
+        const raw = res.data as { data?: { items?: unknown[] }; items?: unknown[] };
+        const items = (raw.data?.items ?? raw.items ?? (Array.isArray(res.data) ? res.data : [])) as Array<{ id: number; status: string; member_role: string }>;
+        setManageableOrgs(
+          items
+            .filter((o) => ['approved', 'active'].includes(o.status) && ['owner', 'admin'].includes(o.member_role))
+            .map((o) => ({ id: o.id })),
+        );
+      })
+      .catch(() => { /* silent — the manage entry just won't show */ });
+    return () => { cancelled = true; };
+  }, [isAuthenticated]);
+  const soleManagedOrg = manageableOrgs.length === 1 ? manageableOrgs[0] : undefined;
+  const manageHref = soleManagedOrg
+    ? tenantPath(`/volunteering/org/${soleManagedOrg.id}/dashboard`)
+    : tenantPath('/volunteering/my-organisations');
 
   // Debounce search
   useEffect(() => {
@@ -158,14 +183,27 @@ export function OrganisationsPage() {
         stats={organisations.length > 0 && !isLoading ? [{ label: t('organisations.hero_partners_label'), value: organisations.length.toLocaleString() }] : undefined}
         action={
           isAuthenticated ? (
-            <Link to={tenantPath('/organisations/register')}>
-              <Button
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-              >
-                {t('organisations.register_button')}
-              </Button>
-            </Link>
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+              {manageableOrgs.length > 0 && (
+                <Link to={manageHref}>
+                  <Button
+                    className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                    startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
+                  >
+                    {t('organisations.manage_my_button')}
+                  </Button>
+                </Link>
+              )}
+              <Link to={tenantPath('/organisations/register')}>
+                <Button
+                  variant={manageableOrgs.length > 0 ? 'secondary' : 'primary'}
+                  className={manageableOrgs.length > 0 ? 'w-full sm:w-auto' : 'w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white'}
+                  startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('organisations.register_button')}
+                </Button>
+              </Link>
+            </div>
           ) : undefined
         }
       />

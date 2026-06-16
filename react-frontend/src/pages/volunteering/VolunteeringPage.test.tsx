@@ -77,6 +77,7 @@ vi.mock("react-i18next", () => ({
       const translations: Record<string, string> = {
         "volunteering.heading": "Volunteering",
         "volunteering.subtitle": "Find opportunities and track your impact",
+        "volunteering.volunteer_view_subtitle": "Find opportunities, sign up, and log the hours you give.",
         "volunteering.tab_opportunities": "Opportunities",
         "volunteering.tab_applications": "My Applications",
         "volunteering.tab_hours": "My Hours",
@@ -128,7 +129,7 @@ describe('VolunteeringPage', () => {
   it('renders the page heading and description', () => {
     render(<VolunteeringPage />);
     expect(screen.getByText('Volunteering')).toBeInTheDocument();
-    expect(screen.getByText('Find opportunities and track your impact')).toBeInTheDocument();
+    expect(screen.getByText('Find opportunities, sign up, and log the hours you give.')).toBeInTheDocument();
   });
 
   it('shows Opportunities tab button', () => {

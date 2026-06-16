@@ -35,6 +35,12 @@
     <span class="govuk-caption-l">{{ __('govuk_alpha.volunteering.title') }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.volunteering.hours_title') }}</h1>
 
+    {{-- Make the credit flow explicit: logged hours are reviewed by the
+         organisation, and approval automatically credits the wallet. --}}
+    <div class="govuk-inset-text" role="note">
+        <p class="govuk-body govuk-!-margin-bottom-0">{{ __('govuk_alpha.vol_clarity.hours_autocredit_note') }}</p>
+    </div>
+
     <dl class="nexus-alpha-stat-grid">
         <div class="nexus-alpha-stat">
             <dt>{{ __('govuk_alpha.volunteering.approved_hours') }}</dt>
@@ -123,11 +129,13 @@
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
                 <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha.volunteering.log_hours_title') }}</h2>
             </legend>
+            <div class="govuk-hint">{{ __('govuk_alpha.vol_clarity.log_hours_form_hint') }}</div>
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-one-half">
                     <div class="govuk-form-group">
                         <label class="govuk-label" for="organization_id">{{ __('govuk_alpha.volunteering.organization_label') }}</label>
-                        <select class="govuk-select" id="organization_id" name="organization_id" required>
+                        <div id="organization-id-hint" class="govuk-hint">{{ __('govuk_alpha.vol_clarity.log_hours_organisation_hint') }}</div>
+                        <select class="govuk-select" id="organization_id" name="organization_id" aria-describedby="organization-id-hint" required>
                             @foreach ($organizations as $organization)
                                 <option value="{{ $organization['id'] }}">{{ $organization['name'] }}</option>
                             @endforeach
@@ -150,7 +158,8 @@
                 <div class="govuk-grid-column-one-half">
                     <div class="govuk-form-group">
                         <label class="govuk-label" for="date">{{ __('govuk_alpha.volunteering.date_label') }}</label>
-                        <input class="govuk-input govuk-input--width-10" id="date" name="date" type="date" value="{{ now()->toDateString() }}" required>
+                        <div id="date-hint" class="govuk-hint">{{ __('govuk_alpha.vol_clarity.log_hours_date_hint') }}</div>
+                        <input class="govuk-input govuk-input--width-10" id="date" name="date" type="date" value="{{ now()->toDateString() }}" aria-describedby="date-hint" required>
                     </div>
                 </div>
                 <div class="govuk-grid-column-one-half">
@@ -163,7 +172,8 @@
             </div>
             <div class="govuk-form-group">
                 <label class="govuk-label" for="description">{{ __('govuk_alpha.volunteering.description_label') }}</label>
-                <textarea class="govuk-textarea" id="description" name="description" rows="5"></textarea>
+                <div id="description-hint" class="govuk-hint">{{ __('govuk_alpha.vol_clarity.log_hours_description_hint') }}</div>
+                <textarea class="govuk-textarea" id="description" name="description" rows="5" aria-describedby="description-hint"></textarea>
             </div>
         </fieldset>
         <button class="govuk-button" data-module="govuk-button" @disabled(empty($organizations))>{{ __('govuk_alpha.actions.log_hours') }}</button>
@@ -171,12 +181,43 @@
 
     <h2 class="govuk-heading-l govuk-!-margin-top-8">{{ __('govuk_alpha.volunteering.recent_hours_title') }}</h2>
     @if (empty($logs))
-        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.volunteering.empty_hours') }}</p></div>
+        <div class="govuk-inset-text">
+            <p class="govuk-body">{{ __('govuk_alpha.volunteering.empty_hours') }}</p>
+            <p class="govuk-body govuk-!-margin-bottom-0">{{ __('govuk_alpha.vol_clarity.empty_hours_cta') }}</p>
+        </div>
     @else
+        {{-- Status trail: each logged hour is "Submitted" (pending review) → "Approved".
+             Approved hours are credited automatically, 1 time credit per hour. --}}
+        <p class="govuk-body">{{ __('govuk_alpha.vol_clarity.status_trail_intro') }}</p>
         <div class="nexus-alpha-card-list">
             @foreach ($logs as $log)
+                @php
+                    $logStatus = (string) ($log['status'] ?? 'pending');
+                    // Map the raw vol_logs status to a clear label + GOV.UK tag colour.
+                    // 'pending' is shown as "Submitted" so the volunteer understands it
+                    // is awaiting the organisation's approval.
+                    $statusTag = [
+                        'pending'   => ['label' => __('govuk_alpha.vol_clarity.status_submitted'), 'class' => 'govuk-tag--yellow'],
+                        'approved'  => ['label' => __('govuk_alpha.volunteering.status_values.approved'), 'class' => 'govuk-tag--green'],
+                        'declined'  => ['label' => __('govuk_alpha.volunteering.status_values.declined'), 'class' => 'govuk-tag--red'],
+                        'rejected'  => ['label' => __('govuk_alpha.volunteering.status_values.declined'), 'class' => 'govuk-tag--red'],
+                    ][$logStatus] ?? [
+                        'label' => \Illuminate\Support\Facades\Lang::has('govuk_alpha.volunteering.status_values.' . $logStatus)
+                            ? __('govuk_alpha.volunteering.status_values.' . $logStatus)
+                            : \Illuminate\Support\Str::headline($logStatus),
+                        'class' => 'govuk-tag--grey',
+                    ];
+                @endphp
                 <article class="nexus-alpha-card">
                     <h3 class="govuk-heading-m govuk-!-margin-bottom-2">{{ $formatDate($log['date'] ?? $log['logged_at'] ?? $log['created_at'] ?? null) }}</h3>
+                    <p class="govuk-!-margin-bottom-2">
+                        <strong class="govuk-tag {{ $statusTag['class'] }}">{{ $statusTag['label'] }}</strong>
+                    </p>
+                    @if ($logStatus === 'approved')
+                        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">{{ __('govuk_alpha.vol_clarity.status_approved_credited') }}</p>
+                    @elseif ($logStatus === 'pending')
+                        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">{{ __('govuk_alpha.vol_clarity.status_pending_note') }}</p>
+                    @endif
                     <dl class="nexus-alpha-inline-list">
                         <div>
                             <dt>{{ __('govuk_alpha.volunteering.hours_label') }}</dt>
@@ -186,12 +227,6 @@
                             <div>
                                 <dt>{{ __('govuk_alpha.volunteering.organization') }}</dt>
                                 <dd>{{ $log['organization']['name'] }}</dd>
-                            </div>
-                        @endif
-                        @if (!empty($log['status']))
-                            <div>
-                                <dt>{{ __('govuk_alpha.volunteering.status') }}</dt>
-                                <dd>{{ \Illuminate\Support\Facades\Lang::has('govuk_alpha.volunteering.status_values.' . $log['status']) ? __('govuk_alpha.volunteering.status_values.' . $log['status']) : \Illuminate\Support\Str::headline((string) $log['status']) }}</dd>
                             </div>
                         @endif
                     </dl>

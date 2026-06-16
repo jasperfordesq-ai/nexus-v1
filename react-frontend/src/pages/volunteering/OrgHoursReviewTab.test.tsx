@@ -6,10 +6,10 @@
 /**
  * Tests for OrgHoursReviewTab — the org-owner hours approval surface.
  *
- * Focus: the approve toast must reflect the backend's actual payment_result
- * (paid vs insufficient_balance) rather than blindly claiming "paid" whenever
- * auto-pay is on. This guards the regression where an org with an empty wallet
- * was told a volunteer had been paid when they had not.
+ * Focus: under the auto-mint model, approving logged hours ALWAYS credits the
+ * volunteer 1 credit per whole hour, regardless of the org wallet balance.
+ * There is no longer an "insufficient_balance" outcome, so the approve action
+ * is always a success — never a warning that the volunteer went unpaid.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -87,16 +87,26 @@ describe('OrgHoursReviewTab', () => {
     expect(toastMock.warning).not.toHaveBeenCalled();
   });
 
-  it('shows a WARNING (not a "paid" success) when payment_result = insufficient_balance', async () => {
-    // The core regression: auto-pay is ON but the wallet was empty, so the
-    // backend approved the hours WITHOUT paying. The UI must not claim "paid".
+  it('credits the volunteer (success, never a warning) even with a zero org balance — auto-mint', async () => {
+    // Auto-mint: approving ALWAYS credits the volunteer, so even an empty wallet
+    // yields a success toast and never the old "approved but unpaid" warning.
     vi.mocked(api.get).mockResolvedValue({ success: true, data: [makeEntry(1)], meta: { cursor: null, has_more: false } });
-    vi.mocked(api.put).mockResolvedValue({ success: true, data: { id: 1, status: 'approved', payment_result: 'insufficient_balance' } });
+    vi.mocked(api.put).mockResolvedValue({ success: true, data: { id: 1, status: 'approved', payment_result: 'paid' } });
+    render(<OrgHoursReviewTab {...baseProps} balance={0} />);
+    await waitFor(() => screen.getByRole('button', { name: /Approve hours for Jane Doe/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Approve hours for Jane Doe/i }));
+    await waitFor(() => expect(toastMock.success).toHaveBeenCalled());
+    expect(toastMock.warning).not.toHaveBeenCalled();
+  });
+
+  it('still approves (no warning) when the log is under an hour — no_whole_hours', async () => {
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: [makeEntry(1)], meta: { cursor: null, has_more: false } });
+    vi.mocked(api.put).mockResolvedValue({ success: true, data: { id: 1, status: 'approved', payment_result: 'no_whole_hours' } });
     render(<OrgHoursReviewTab {...baseProps} />);
     await waitFor(() => screen.getByRole('button', { name: /Approve hours for Jane Doe/i }));
     fireEvent.click(screen.getByRole('button', { name: /Approve hours for Jane Doe/i }));
-    await waitFor(() => expect(toastMock.warning).toHaveBeenCalled());
-    expect(toastMock.success).not.toHaveBeenCalled();
+    await waitFor(() => expect(toastMock.success).toHaveBeenCalled());
+    expect(toastMock.warning).not.toHaveBeenCalled();
   });
 
   it('calls PUT with action=decline when Decline is clicked', async () => {

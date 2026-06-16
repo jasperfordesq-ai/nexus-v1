@@ -185,7 +185,8 @@
     "terms_required": "Deve accettare i termini per registrare la Sua organizzazione.",
     "opportunity_count_one": "{{count}} opportunità",
     "opportunity_count_other": "{{count}} opportunità",
-    "loading": "Caricamento organizzazioni"
+    "loading": "Caricamento organizzazioni",
+    "manage_my_button": "Manage my organisation"
   },
   "organisation_detail": {
     "page_title": "Organizzazione",
@@ -219,7 +220,8 @@
     "cancel": "Annulla",
     "submit_application": "Invia candidatura",
     "job_openings": "Posizioni aperte",
-    "rating_sr": "{{n}} su 5 stelle"
+    "rating_sr": "{{n}} su 5 stelle",
+    "manage_button": "Manage this organisation"
   },
   "emergency_alerts": {
     "heading": "Avvisi di Emergenza",

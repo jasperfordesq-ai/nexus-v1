@@ -20,6 +20,22 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.volunteering.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.volunteering.description') }}</p>
 
+    {{-- Plain-language "how volunteering works" so a first-time volunteer isn't
+         guessing what to do or how they earn time credits. Mirrors the React
+         how_it_works copy, presented as a numbered list for clear, scannable steps. --}}
+    @unless ($moduleDisabled)
+        <div class="govuk-inset-text" role="note" aria-labelledby="how-it-works-heading">
+            <h2 class="govuk-heading-s govuk-!-margin-bottom-2" id="how-it-works-heading">{{ __('govuk_alpha.vol_clarity.how_it_works_title') }}</h2>
+            <ol class="govuk-list govuk-list--number govuk-!-margin-bottom-0">
+                <li>{{ __('govuk_alpha.vol_clarity.how_step_find') }}</li>
+                <li>{{ __('govuk_alpha.vol_clarity.how_step_apply') }}</li>
+                <li>{{ __('govuk_alpha.vol_clarity.how_step_log') }}</li>
+                <li>{{ __('govuk_alpha.vol_clarity.how_step_approve') }}</li>
+                <li>{{ __('govuk_alpha.vol_clarity.how_step_credit') }}</li>
+            </ol>
+        </div>
+    @endunless
+
     @if ($moduleDisabled)
         <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="volunteering-disabled-title">
             <div class="govuk-notification-banner__header">
@@ -131,7 +147,11 @@
                 </div>
             </form>
             @if (empty($applications))
-                <div class="govuk-inset-text">{{ __('govuk_alpha.volunteering.empty_applications') }}</div>
+                <div class="govuk-inset-text">
+                    <p class="govuk-body">{{ __('govuk_alpha.volunteering.empty_applications') }}</p>
+                    <p class="govuk-body govuk-!-margin-bottom-0">{{ __('govuk_alpha.vol_clarity.empty_applications_cta') }}</p>
+                    <a class="govuk-button govuk-button--secondary govuk-!-margin-top-2 govuk-!-margin-bottom-0" data-module="govuk-button" role="button" draggable="false" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_clarity.browse_opportunities') }}</a>
+                </div>
             @else
                 <div class="nexus-alpha-card-list">
                     @foreach ($applications as $application)
@@ -272,6 +292,11 @@
                             $website = (string) ($organization['website'] ?? '');
                             $websiteScheme = $website !== '' ? parse_url($website, PHP_URL_SCHEME) : null;
                             $websiteHref = in_array($websiteScheme, ['http', 'https'], true) ? $website : null;
+                            // The "two hats" admin entry point: owners/admins of an approved
+                            // org get a Manage link; a still-pending org shows an
+                            // awaiting-approval note instead (mirrors the React side).
+                            $canManageOrg = in_array($roleValue, ['owner', 'admin'], true);
+                            $orgIsApproved = in_array($statusValue, ['approved', 'active'], true);
                         @endphp
                         <article class="nexus-alpha-card">
                             <h3 class="govuk-heading-m govuk-!-margin-bottom-2">
@@ -311,6 +336,16 @@
                             </dl>
                             @if (!empty($organization['description']))
                                 <p class="govuk-body govuk-!-margin-top-3">{{ \Illuminate\Support\Str::limit(strip_tags((string) $organization['description']), 220) }}</p>
+                            @endif
+                            @if ($canManageOrg && $orgIsApproved && !empty($organization['id']))
+                                <a class="govuk-button govuk-button--secondary govuk-!-margin-top-2 govuk-!-margin-bottom-0" data-module="govuk-button" role="button" draggable="false" href="{{ route('govuk-alpha.volunteering.org.manage', ['tenantSlug' => $tenantSlug, 'id' => $organization['id']]) }}">
+                                    {{ __('govuk_alpha.vol_org.manage_link') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.vol_org.manage_link_for', ['name' => $organization['name'] ?? '']) }}</span>
+                                </a>
+                            @elseif ($canManageOrg && !$orgIsApproved)
+                                <p class="govuk-body govuk-!-margin-top-2 govuk-!-margin-bottom-0">
+                                    <strong class="govuk-tag govuk-tag--yellow">{{ __('govuk_alpha.vol_org.awaiting_approval') }}</strong>
+                                </p>
+                                <p class="govuk-hint govuk-!-margin-top-1 govuk-!-margin-bottom-0">{{ __('govuk_alpha.vol_org.awaiting_approval_hint') }}</p>
                             @endif
                         </article>
                     @endforeach
@@ -380,6 +415,14 @@
             <div class="govuk-inset-text">
                 <h2 class="govuk-heading-m">{{ __('govuk_alpha.states.empty_title') }}</h2>
                 <p class="govuk-body">{{ __('govuk_alpha.volunteering.empty') }}</p>
+                <p class="govuk-body govuk-!-margin-bottom-0">
+                    @if ($hasFilters)
+                        {{ __('govuk_alpha.vol_clarity.empty_opportunities_filtered_cta') }}
+                        <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.clear_filters') }}</a>.
+                    @else
+                        {{ __('govuk_alpha.vol_clarity.empty_opportunities_cta') }}
+                    @endif
+                </p>
             </div>
         @else
             <div class="nexus-alpha-card-list">

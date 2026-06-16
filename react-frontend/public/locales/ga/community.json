@@ -185,7 +185,8 @@
     "terms_required": "Ní mór duit aontú leis na téarmaí chun d'eagras a chlárú.",
     "opportunity_count_one": "{{count}} deis",
     "opportunity_count_other": "{{count}} deiseanna",
-    "loading": "Eagraíochtaí á lódáil"
+    "loading": "Eagraíochtaí á lódáil",
+    "manage_my_button": "Manage my organisation"
   },
   "organisation_detail": {
     "page_title": "Eagras",
@@ -219,7 +220,8 @@
     "cancel": "Cealaigh",
     "submit_application": "Cuir Iarratas Isteach",
     "job_openings": "Oscailtí Poist",
-    "rating_sr": "{{n}} as 5 réalta"
+    "rating_sr": "{{n}} as 5 réalta",
+    "manage_button": "Manage this organisation"
   },
   "emergency_alerts": {
     "heading": "Foláirimh Éigeandála",

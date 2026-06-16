@@ -185,7 +185,8 @@
     "terms_required": "Aby zarejestrować swoją organizację, musisz zaakceptować warunki.",
     "opportunity_count_one": "Możliwość {{count}}",
     "opportunity_count_other": "{{count}} możliwości",
-    "loading": "Ładowanie organizacji"
+    "loading": "Ładowanie organizacji",
+    "manage_my_button": "Manage my organisation"
   },
   "organisation_detail": {
     "page_title": "Organizacja",
@@ -219,7 +220,8 @@
     "cancel": "Anulować",
     "submit_application": "Prześlij wniosek",
     "job_openings": "Oferty pracy",
-    "rating_sr": "{{n}} z 5 gwiazdek"
+    "rating_sr": "{{n}} z 5 gwiazdek",
+    "manage_button": "Manage this organisation"
   },
   "emergency_alerts": {
     "heading": "Alerty awaryjne",

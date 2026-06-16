@@ -9,7 +9,6 @@ import Clock from 'lucide-react/icons/clock';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import Wallet from 'lucide-react/icons/wallet';
-import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import { GlassCard, Button, Chip, Spinner, Avatar } from '@/components/ui';
 import { useToast } from '@/contexts';
@@ -42,7 +41,7 @@ interface PendingHoursResponse {
   has_more: boolean;
 }
 
-function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHoursReviewTabProps) {
+function OrgHoursReviewTab({ orgId, balance, onBalanceChange }: OrgHoursReviewTabProps) {
   const toast = useToast();
   const { t } = useTranslation('volunteering');
   const [entries, setEntries] = useState<PendingHourEntry[]>([]);
@@ -60,8 +59,6 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
   const toastRef = useRef(toast);
   toastRef.current = toast;
 
-  const totalPendingHours = entries.reduce((sum, e) => sum + e.hours, 0);
-  const isBalanceLow = autoPay && balance < totalPendingHours;
 
   const loadEntries = useCallback(async (append = false) => {
     abortRef.current?.abort();
@@ -135,17 +132,14 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
 
       if (response.success) {
         if (action === 'approve') {
-          // The backend approves regardless of balance and only pays when the
-          // wallet can cover it. Trust the backend's payment_result, not the
-          // autoPay flag — otherwise we'd claim "paid" when the org actually ran
-          // out of balance and the volunteer was NOT paid.
+          // Auto-mint: approving ALWAYS credits the volunteer 1 credit per whole
+          // hour, regardless of the org wallet balance. 'no_whole_hours' means the
+          // log was under an hour, so nothing whole was minted — still approved.
           const outcome = (response.data as { payment_result?: string | null } | undefined)?.payment_result ?? null;
-          if (outcome === 'paid' || outcome === 'already_paid') {
-            toastRef.current.success(tRef.current('org_hours_approved_paid'));
-          } else if (outcome === 'insufficient_balance') {
-            toastRef.current.warning(tRef.current('org_hours_approved_unpaid'));
-          } else {
+          if (outcome === 'no_whole_hours') {
             toastRef.current.success(tRef.current('org_hours_approved'));
+          } else {
+            toastRef.current.success(tRef.current('org_hours_approved_paid'));
           }
           onBalanceChange();
         } else {
@@ -209,49 +203,25 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
 
   return (
     <div className="space-y-4">
-      {/* Wallet balance info bar */}
-      <GlassCard
-        className={`p-4 rounded-xl border ${
-          isBalanceLow
-            ? 'bg-amber-500/10 border-amber-500/30'
-            : 'bg-emerald-500/10 border-emerald-500/30'
-        }`}
-      >
+      {/* Auto-credit notice — approving a log credits the volunteer automatically,
+          1 time credit per whole hour, no wallet funding required. */}
+      <GlassCard className="p-4 rounded-xl border bg-emerald-500/10 border-emerald-500/30">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Wallet
-              className={`w-5 h-5 ${isBalanceLow ? 'text-[var(--color-warning)]' : 'text-emerald-500'}`}
-              aria-hidden="true"
-            />
-            <span className="text-theme-primary font-semibold">
-              {t('org_wallet_balance')}
-            </span>
-            <span className={`font-bold text-lg ${isBalanceLow ? 'text-[var(--color-warning)]' : 'text-emerald-500'}`}>
-              {balance} {balance === 1 ? t('hour') : t('hours')}
+          <div className="flex items-center gap-2 min-w-0">
+            <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" aria-hidden="true" />
+            <span className="text-theme-primary text-sm">
+              {t('org_hours_autocredit_note')}
             </span>
           </div>
-
           <Chip
             size="sm"
             variant="soft"
-            color={autoPay ? 'success' : 'default'}
+            color="default"
+            className="sm:ml-auto"
+            startContent={<Wallet className="w-3.5 h-3.5" aria-hidden="true" />}
           >
-            {autoPay
-              ? t('auto_pay_on')
-              : t('auto_pay_off')}
+            {t('org_wallet_balance')}: {balance} {balance === 1 ? t('hour') : t('hours')}
           </Chip>
-
-          {isBalanceLow && (
-            <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 text-sm">
-              <AlertTriangle className="w-4 h-4 shrink-0" aria-hidden="true" />
-              <span>
-                {t(
-                  'org_balance_low_warning',
-                  { count: totalPendingHours },
-                )}
-              </span>
-            </div>
-          )}
         </div>
       </GlassCard>
 

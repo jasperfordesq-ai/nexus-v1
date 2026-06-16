@@ -97,6 +97,14 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/volunteering/applications/{id}/withdraw', [AlphaController::class, 'withdrawVolunteerApplication'])->middleware('throttle:20,1')->whereNumber('id')->name('volunteering.applications.withdraw');
         Route::post('/volunteering/opportunities/{id}/shifts/{shiftId}/signup', [AlphaController::class, 'signUpForVolunteerShift'])->middleware('throttle:20,1')->whereNumber('id')->whereNumber('shiftId')->name('volunteering.shifts.signup');
         Route::post('/volunteering/opportunities/{id}/shifts/{shiftId}/cancel', [AlphaController::class, 'cancelVolunteerShift'])->middleware('throttle:20,1')->whereNumber('id')->whereNumber('shiftId')->name('volunteering.shifts.cancel');
+        // ===== WAVE V-ORG: organisation-admin dashboard (the "two hats" admin side) =====
+        // Owner/admin-only screen to approve volunteer applications and approve logged
+        // hours. Ownership is re-verified in the service layer for every POST. The
+        // 'organisations' segment is distinct from opportunities/applications/hours so
+        // there is no routing collision with the volunteer-facing paths above.
+        Route::get('/volunteering/organisations/{id}/manage', [AlphaController::class, 'manageVolunteerOrg'])->whereNumber('id')->name('volunteering.org.manage');
+        Route::post('/volunteering/organisations/{id}/applications/{appId}', [AlphaController::class, 'handleVolunteerOrgApplication'])->whereNumber('id')->whereNumber('appId')->middleware('throttle:30,1')->name('volunteering.org.applications.handle');
+        Route::post('/volunteering/organisations/{id}/hours/{logId}', [AlphaController::class, 'verifyVolunteerOrgHours'])->whereNumber('id')->whereNumber('logId')->middleware('throttle:30,1')->name('volunteering.org.hours.verify');
         Route::get('/feed', [AlphaController::class, 'feed'])->name('feed');
         Route::post('/feed/posts', [AlphaController::class, 'storeFeedPost'])->middleware('throttle:20,1')->name('feed.posts.store');
         Route::post('/feed/polls/{pollId}/vote', [AlphaController::class, 'storeFeedPollVote'])->whereNumber('pollId')->middleware('throttle:30,1')->name('feed.polls.vote');

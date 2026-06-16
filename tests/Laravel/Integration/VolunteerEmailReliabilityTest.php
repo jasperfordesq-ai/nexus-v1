@@ -219,17 +219,21 @@ class VolunteerEmailReliabilityTest extends TestCase
             ->count());
     }
 
-    public function test_admin_hours_verification_no_longer_sends_duplicate_raw_email_after_wallet_payment(): void
+    public function test_admin_hours_verification_notifies_through_dispatcher_not_raw_email(): void
     {
         $source = file_get_contents(app_path('Http/Controllers/Api/AdminVolunteerController.php'));
         $start = strpos($source, 'public function verifyHours');
         $end = strpos($source, '/** GET /api/v2/admin/volunteering */', $start);
         $method = substr($source, $start, $end - $start);
 
+        // Approval mints inline (no VolOrgWalletService::payVolunteer call), so all
+        // volunteer notifications go through NotificationDispatcher — never a raw
+        // EmailDispatchService::sendRaw and never the balance-gated wallet payout.
         $this->assertStringNotContainsString('EmailDispatchService::sendRaw', $method);
+        $this->assertStringNotContainsString('VolOrgWalletService::payVolunteer', $method);
         $this->assertStringContainsString("\$paymentOutcome === 'paid'", $method);
-        $this->assertStringContainsString('Notification::createNotification', $method);
         $this->assertStringContainsString('NotificationDispatcher::dispatch', $method);
+        $this->assertStringContainsString('buildVolHoursApprovedPaidEmail', $method);
     }
 
     public function test_safeguarding_status_email_restores_previous_tenant_context(): void

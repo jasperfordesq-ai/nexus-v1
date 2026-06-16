@@ -19,6 +19,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Plus from 'lucide-react/icons/plus';
 import Banknote from 'lucide-react/icons/banknote';
 import EyeOff from 'lucide-react/icons/eye-off';
+import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, Progress, useDisclosure, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, RadioGroup, Radio, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
@@ -263,6 +264,20 @@ export function DonationsTab() {
           </Button>
         </div>
       </div>
+
+      {/* What donations actually are — money to support the community, NOT time
+          credits. This distinction was a persistent source of confusion. */}
+      <GlassCard className="p-4 sm:p-5">
+        <div className="flex items-start gap-3">
+          <div className="rounded-lg bg-rose-500/10 p-2 text-rose-600 dark:text-rose-400 shrink-0">
+            <Info className="w-5 h-5" aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-base font-semibold text-theme-primary">{t('donations.intro_title')}</h3>
+            <p className="text-sm text-theme-muted">{t('donations.intro_desc')}</p>
+          </div>
+        </div>
+      </GlassCard>
 
       {/* Stats */}
       {!error && !isLoading && stats && (

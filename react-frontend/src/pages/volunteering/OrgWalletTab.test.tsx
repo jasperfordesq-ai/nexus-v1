@@ -4,12 +4,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Tests for OrgWalletTab — the org wallet (deposit / auto-pay / history).
+ * Tests for OrgWalletTab — the org credit record (deposit / history).
  *
- * Focus on the two money-flow safeguards:
- *  - the per-deposit cap must match the backend (1,000), rejecting larger
- *    amounts client-side with a clear error instead of a generic server 4xx;
- *  - the auto-pay toggle must revert its optimistic state when the API fails.
+ * The per-deposit cap must match the backend (1,000), rejecting larger amounts
+ * client-side with a clear error instead of a generic server 4xx.
+ *
+ * Note: the auto-pay toggle was removed — under auto-mint, approving hours always
+ * credits the volunteer, so there is nothing to toggle.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -99,20 +100,10 @@ describe('OrgWalletTab', () => {
     });
   });
 
-  it('reverts the auto-pay toggle and shows an error when the API fails', async () => {
-    vi.mocked(api.put).mockResolvedValue({ success: false, error: 'nope' });
-    render(<OrgWalletTab {...baseProps} autoPay={false} />);
-
-    const toggle = await screen.findByRole('checkbox', { name: /Toggle auto-pay/i });
-    expect(toggle).not.toBeChecked();
-
-    fireEvent.click(toggle);
-
-    await waitFor(() => {
-      expect(api.put).toHaveBeenCalledWith('/v2/volunteering/organisations/5/wallet/auto-pay', { enabled: true });
-    });
-    await waitFor(() => expect(toastMock.error).toHaveBeenCalled());
-    // Optimistic enable was rolled back.
-    expect(toggle).not.toBeChecked();
+  it('explains that volunteers are paid automatically (no auto-pay toggle)', async () => {
+    render(<OrgWalletTab {...baseProps} />);
+    expect(await screen.findByText('Volunteers are paid automatically')).toBeInTheDocument();
+    // The old auto-pay switch is gone.
+    expect(screen.queryByRole('checkbox', { name: /auto-pay/i })).not.toBeInTheDocument();
   });
 });

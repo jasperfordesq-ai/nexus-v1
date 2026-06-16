@@ -2504,6 +2504,235 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertSee('Alpha hours opportunity');
     }
 
+    // ===== WAVE V-ORG: organisation-admin dashboard (the "two hats" admin side) =====
+
+    /**
+     * Seed an organisation owned by $ownerId with one pending application (from a
+     * separate applicant) and one pending logged-hours entry. Returns the ids so
+     * the caller can drive approve/decline POSTs.
+     *
+     * @return array{org_id:int, opportunity_id:int, app_id:int, log_id:int, applicant_id:int, volunteer_id:int}
+     */
+    private function seedManagedVolunteerOrg(int $ownerId, array $orgOverrides = []): array
+    {
+        $orgId = DB::table('vol_organizations')->insertGetId(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $ownerId,
+            'name' => 'Managed Vol Org',
+            'slug' => 'managed-vol-org-' . uniqid(),
+            'description' => 'An organisation managed in the accessible alpha dashboard.',
+            'contact_email' => 'managed-vol-' . uniqid() . '@example.test',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $orgOverrides));
+
+        $opportunityId = DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $orgId,
+            'created_by' => $ownerId,
+            'title' => 'Managed opportunity',
+            'description' => 'Opportunity with a pending application.',
+            'location' => 'Centre',
+            'is_remote' => 0,
+            'skills_needed' => 'Support',
+            'start_date' => now()->addWeek()->toDateString(),
+            'end_date' => now()->addMonth()->toDateString(),
+            'is_active' => 1,
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $applicant = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Pending Applicant',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $appId = DB::table('vol_applications')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $opportunityId,
+            'user_id' => $applicant->id,
+            'status' => 'pending',
+            'message' => 'I would love to help out.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Hours logged by a DIFFERENT volunteer (verifyHours blocks self-approval).
+        $volunteer = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Hours Volunteer',
+            'status' => 'active',
+            'is_approved' => true,
+            'balance' => 0,
+        ]);
+        $logId = DB::table('vol_logs')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $volunteer->id,
+            'organization_id' => $orgId,
+            'opportunity_id' => $opportunityId,
+            'date_logged' => now()->toDateString(),
+            'hours' => 2,
+            'description' => 'Helped at the centre.',
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return [
+            'org_id' => $orgId,
+            'opportunity_id' => $opportunityId,
+            'app_id' => $appId,
+            'log_id' => $logId,
+            'applicant_id' => $applicant->id,
+            'volunteer_id' => $volunteer->id,
+        ];
+    }
+
+    public function test_volunteer_org_manage_renders_pending_applications_and_hours_for_owner(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Org Owner']);
+        $seed = $this->seedManagedVolunteerOrg($owner->id);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$seed['org_id']}/manage");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.vol_org.manage_title'));
+        $res->assertSee(__('govuk_alpha.vol_org.applications_title'));
+        $res->assertSee(__('govuk_alpha.vol_org.hours_title'));
+        // Auto-mint notice must be present so the admin understands credits are issued.
+        $res->assertSee(__('govuk_alpha.vol_org.hours_credit_notice'));
+        $res->assertSee('Pending Applicant');
+        $res->assertSee('Hours Volunteer');
+        $res->assertSee('govuk-button-group', false);
+        // Both POST routes are wired into the page.
+        $res->assertSee(route('govuk-alpha.volunteering.org.applications.handle', ['tenantSlug' => $this->testTenantSlug, 'id' => $seed['org_id'], 'appId' => $seed['app_id']]), false);
+        $res->assertSee(route('govuk-alpha.volunteering.org.hours.verify', ['tenantSlug' => $this->testTenantSlug, 'id' => $seed['org_id'], 'logId' => $seed['log_id']]), false);
+    }
+
+    public function test_volunteer_org_manage_owner_can_approve_an_application(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Approving Owner']);
+        $seed = $this->seedManagedVolunteerOrg($owner->id);
+
+        $url = route('govuk-alpha.volunteering.org.applications.handle', ['tenantSlug' => $this->testTenantSlug, 'id' => $seed['org_id'], 'appId' => $seed['app_id']]);
+        $res = $this->post($url, ['action' => 'approve']);
+        $res->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$seed['org_id']}/manage?status=application-approved");
+        $this->assertDatabaseHas('vol_applications', ['id' => $seed['app_id'], 'status' => 'approved']);
+    }
+
+    public function test_volunteer_org_manage_owner_can_decline_an_application(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Declining Owner']);
+        $seed = $this->seedManagedVolunteerOrg($owner->id);
+
+        $url = route('govuk-alpha.volunteering.org.applications.handle', ['tenantSlug' => $this->testTenantSlug, 'id' => $seed['org_id'], 'appId' => $seed['app_id']]);
+        $res = $this->post($url, ['action' => 'decline']);
+        $res->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$seed['org_id']}/manage?status=application-declined");
+        $this->assertDatabaseHas('vol_applications', ['id' => $seed['app_id'], 'status' => 'declined']);
+    }
+
+    public function test_volunteer_org_manage_owner_approval_of_hours_auto_mints_credit(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Hours Owner']);
+        $seed = $this->seedManagedVolunteerOrg($owner->id);
+
+        $startBalance = (int) DB::table('users')->where('id', $seed['volunteer_id'])->value('balance');
+
+        $url = route('govuk-alpha.volunteering.org.hours.verify', ['tenantSlug' => $this->testTenantSlug, 'id' => $seed['org_id'], 'logId' => $seed['log_id']]);
+        $res = $this->post($url, ['action' => 'approve']);
+        $res->assertRedirect("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$seed['org_id']}/manage?status=hours-approved");
+
+        $this->assertDatabaseHas('vol_logs', ['id' => $seed['log_id'], 'status' => 'approved']);
+        // Approving 2 whole hours mints 2 credits to the volunteer (auto-mint parity).
+        $endBalance = (int) DB::table('users')->where('id', $seed['volunteer_id'])->value('balance');
+        $this->assertSame($startBalance + 2, $endBalance);
+    }
+
+    public function test_volunteer_org_manage_rejects_a_non_owner_with_403(): void
+    {
+        // Org owned by someone else; the signed-in user is not an owner/admin.
+        $orgOwner = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Real Org Owner',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $this->authenticatedUser(['name' => 'Random Member']);
+        $seed = $this->seedManagedVolunteerOrg($orgOwner->id);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$seed['org_id']}/manage");
+        $res->assertStatus(403);
+
+        // The POST actions are equally guarded.
+        $postRes = $this->post(route('govuk-alpha.volunteering.org.hours.verify', ['tenantSlug' => $this->testTenantSlug, 'id' => $seed['org_id'], 'logId' => $seed['log_id']]), ['action' => 'approve']);
+        $postRes->assertStatus(403);
+        $this->assertDatabaseHas('vol_logs', ['id' => $seed['log_id'], 'status' => 'pending']);
+    }
+
+    public function test_volunteer_org_manage_grants_access_to_an_active_org_admin_member(): void
+    {
+        $orgOwner = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Owner Of Record',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $adminMember = $this->authenticatedUser(['name' => 'Org Admin Member']);
+        $seed = $this->seedManagedVolunteerOrg($orgOwner->id);
+
+        // Make the signed-in user an active 'admin' org member (not the org row owner).
+        DB::table('org_members')->insert([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $seed['org_id'],
+            'org_type' => 'volunteer',
+            'user_id' => $adminMember->id,
+            'role' => 'admin',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$seed['org_id']}/manage");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha.vol_org.manage_title'));
+    }
+
+    public function test_volunteer_org_manage_unknown_org_404s(): void
+    {
+        $this->authenticatedUser(['name' => 'Manage 404 User']);
+        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering/organisations/99999999/manage");
+        $res->assertStatus(404);
+    }
+
+    public function test_volunteering_organisations_tab_shows_manage_link_for_owned_approved_org(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Discover Owner']);
+        $seed = $this->seedManagedVolunteerOrg($owner->id, [
+            'name' => 'Discoverable Org',
+            'status' => 'approved',
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering?tab=organisations");
+        $res->assertOk();
+        $res->assertSee('Discoverable Org');
+        $res->assertSee(__('govuk_alpha.vol_org.manage_link'));
+        $res->assertSee(route('govuk-alpha.volunteering.org.manage', ['tenantSlug' => $this->testTenantSlug, 'id' => $seed['org_id']]), false);
+    }
+
+    public function test_volunteering_organisations_tab_shows_awaiting_approval_for_pending_owned_org(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Pending Owner']);
+        $this->seedManagedVolunteerOrg($owner->id, [
+            'name' => 'Pending Org',
+            'status' => 'pending',
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering?tab=organisations");
+        $res->assertOk();
+        $res->assertSee('Pending Org');
+        $res->assertSee(__('govuk_alpha.vol_org.awaiting_approval'));
+        // No Manage link for a pending org.
+        $res->assertDontSee(__('govuk_alpha.vol_org.manage_link'));
+    }
+
     public function test_members_page_renders_directory_for_authenticated_user(): void
     {
         $viewer = $this->authenticatedUser(['name' => 'Viewer Member']);
@@ -6308,6 +6537,52 @@ class GovukAlphaFrontendTest extends TestCase
 
         $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/{$foreignOrgId}");
         $res->assertNotFound();
+    }
+
+    public function test_register_organisation_requires_terms_agreement(): void
+    {
+        // Bona-fide gating: a complete, valid submission that omits the mandatory
+        // terms checkbox must be rejected and must NOT create an organisation.
+        $this->authenticatedUser(['name' => 'No Terms Member']);
+
+        $store = $this->post("/{$this->testTenantSlug}/alpha/organisations", [
+            'name' => 'Helping Hands Charity',
+            'description' => 'We coordinate community volunteers for local good causes.',
+            'email' => 'contact@helping-hands.example',
+            // agreed_terms intentionally omitted.
+        ]);
+
+        $store->assertRedirect("/{$this->testTenantSlug}/alpha/organisations?status=org-invalid");
+
+        $this->assertDatabaseMissing('vol_organizations', [
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Helping Hands Charity',
+        ]);
+    }
+
+    public function test_register_organisation_with_terms_creates_pending_org(): void
+    {
+        // A valid submission with required fields + terms agreement creates a
+        // pending organisation (admin approval remains the vetting gate).
+        $owner = $this->authenticatedUser(['name' => 'Bona Fide Owner']);
+
+        $store = $this->post("/{$this->testTenantSlug}/alpha/organisations", [
+            'name' => 'Riverside Community Trust',
+            'description' => 'A registered non-profit supporting riverside community projects.',
+            'email' => 'admin@riverside-trust.example',
+            'website' => 'https://riverside-trust.example',
+            'agreed_terms' => '1',
+        ]);
+
+        $store->assertRedirect("/{$this->testTenantSlug}/alpha/organisations?status=org-submitted");
+
+        $this->assertDatabaseHas('vol_organizations', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'name' => 'Riverside Community Trust',
+            'contact_email' => 'admin@riverside-trust.example',
+            'status' => 'pending',
+        ]);
     }
 
     public function test_o_apply_to_org_opportunity_uses_existing_volunteer_path(): void

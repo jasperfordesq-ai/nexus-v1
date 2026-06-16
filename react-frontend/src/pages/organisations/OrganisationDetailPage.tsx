@@ -31,6 +31,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Send from 'lucide-react/icons/send';
+import Building2 from 'lucide-react/icons/building-2';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, useDisclosure, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { EmptyState, LoadingScreen } from '@/components/feedback';
@@ -109,6 +110,7 @@ export function OrganisationDetailPage() {
   const [orgJobs, setOrgJobs] = useState<MinimalJob[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [canManage, setCanManage] = useState(false);
 
   // Apply modal
   const applyModal = useDisclosure();
@@ -181,6 +183,22 @@ export function OrganisationDetailPage() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Detect whether the signed-in user owns/admins THIS org, to show a "Manage"
+  // shortcut straight to the organisation dashboard.
+  useEffect(() => {
+    if (!isAuthenticated || !id) return;
+    let cancelled = false;
+    api.get<unknown>('/v2/volunteering/my-organisations')
+      .then((res) => {
+        if (cancelled || !res.success || !res.data) return;
+        const raw = res.data as { data?: { items?: unknown[] }; items?: unknown[] };
+        const items = (raw.data?.items ?? raw.items ?? (Array.isArray(res.data) ? res.data : [])) as Array<{ id: number; status: string; member_role: string }>;
+        setCanManage(items.some((o) => o.id === Number(id) && ['approved', 'active'].includes(o.status) && ['owner', 'admin'].includes(o.member_role)));
+      })
+      .catch(() => { /* silent — manage shortcut just won't show */ });
+    return () => { cancelled = true; };
+  }, [isAuthenticated, id]);
 
   const handleApply = async () => {
     if (!selectedOpp) return;
@@ -310,6 +328,16 @@ export function OrganisationDetailPage() {
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3 mt-4">
+              {canManage && (
+                <Link to={tenantPath(`/volunteering/org/${organisation.id}/dashboard`)}>
+                  <Button
+                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                    startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
+                  >
+                    {t('organisation_detail.manage_button')}
+                  </Button>
+                </Link>
+              )}
               {organisation.website && (
                 <a href={organisation.website} target="_blank" rel="noopener noreferrer">
                   <Button

@@ -40,6 +40,7 @@ return [
         'members' => 'Leden',
         'events' => 'Evenementen',
         'volunteering' => 'Vrijwilligerswerk',
+        'organisations' => 'Organisations',
         'jobs' => 'Vacatures',
         'profile' => 'Mijn profiel',
         'contact' => 'Contacteer',
@@ -1856,9 +1857,20 @@ return [
         'website_label' => 'Website (optioneel)',
         'register_button' => 'Indienen ter goedkeuring',
         'register_note' => 'Nieuwe organisaties worden beoordeeld voordat ze verschijnen.',
+        'register_intro' => 'Only registered organisations — charities, community groups, voluntary bodies and non-profits — should register here. Individual volunteers do not need to register: you can browse opportunities and log your hours using the timebanking tools without creating an organisation.',
+        'terms_heading' => 'Organisation registration terms',
+        'terms_item_1' => 'I confirm this is a legitimate organisation engaged in volunteering, community service, charity work, or non-profit activities.',
+        'terms_item_2' => 'The information I provide is accurate and I am authorised to register this organisation on the platform.',
+        'terms_item_3' => 'I understand that the organisation will be reviewed by an administrator before it is publicly listed.',
+        'terms_item_4' => 'I agree to use the platform responsibly and ensure all volunteer opportunities posted are genuine and lawful.',
+        'terms_item_5' => 'I understand that the platform administrators may remove the organisation or its listings if they violate community guidelines.',
+        'terms_agree' => 'I have read and agree to the organisation registration terms above.',
+        'terms_required' => 'You must read and agree to the organisation registration terms.',
+        'description_hint' => 'Describe what your organisation does. Enter at least 20 characters.',
+        'pending_notice' => 'Your organisation is pending admin approval. Once approved, it will appear publicly and you can post volunteer opportunities.',
         'states' => [
             'org-submitted' => 'Dank u. Uw organisatie is ingediend ter goedkeuring.',
-            'org-invalid' => 'Voer een naam voor de organisatie in.',
+            'org-invalid' => 'Enter the organisation name, a 20+ character description, a valid email, and confirm you agree to the terms.',
             'org-failed' => 'De organisatie kon niet worden ingediend. Probeer het opnieuw.',
         ],
     ],
@@ -3622,6 +3634,82 @@ return [
         'swap_request_failed' => 'We konden uw ruilverzoek niet verzenden. Controleer het dienst- en ledennummer en probeer het opnieuw.',
         'swap_respond_failed' => 'We konden uw reactie op dit ruilverzoek niet verwerken.',
         'swap_cancel_failed' => 'We konden dit ruilverzoek niet annuleren.',
+    ],
+    // ===== WAVE V-ORG: organisation-admin dashboard (the "two hats" admin side) =====
+    'vol_org' => [
+        // Discoverability (shown on the volunteering "Organisations" tab)
+        'manage_link' => 'Manage your organisation',
+        'manage_link_for' => 'for :name',
+        'awaiting_approval' => 'Awaiting approval',
+        'awaiting_approval_hint' => 'A community administrator is reviewing your organisation. You will be able to manage applications and hours once it is approved.',
+        // Dashboard
+        'manage_title' => 'Manage your organisation',
+        'manage_description' => 'Approve volunteer applications and approve the hours volunteers have logged.',
+        'back_to_organisations' => 'Back to your organisations',
+        // Applications section
+        'applications_title' => 'Applications awaiting a decision',
+        'applications_description' => 'Approve or decline volunteers who have applied to your opportunities.',
+        'applications_empty' => 'There are no applications awaiting a decision.',
+        'applicant_message' => 'Message from the applicant',
+        'applicant_unknown' => 'A volunteer',
+        'application_for' => 'for :name',
+        'opportunity_label' => 'Opportunity',
+        'shift_label' => 'Shift',
+        'applied_on' => 'Applied on',
+        // Hours section
+        'hours_title' => 'Hours awaiting approval',
+        'hours_description' => 'Approve or decline the hours volunteers have logged for your organisation.',
+        'hours_empty' => 'There are no hours awaiting approval.',
+        'hours_credit_notice' => 'Approving logged hours automatically credits the volunteer one time credit for each whole hour. This happens regardless of your organisation wallet balance.',
+        'hours_label' => 'Hours',
+        'date_label' => 'Date',
+        'hours_for' => 'for :name',
+        // Shared actions
+        'approve' => 'Approve',
+        'decline' => 'Decline',
+        // Flash status messages
+        'states' => [
+            'application-approved' => 'The application has been approved.',
+            'application-declined' => 'The application has been declined.',
+            'application-failed' => 'The application could not be updated. Try again.',
+            'hours-approved' => 'The hours have been approved and the volunteer has been credited.',
+            'hours-declined' => 'The hours have been declined.',
+            'hours-verify-failed' => 'The hours could not be updated. They may already have been reviewed.',
+        ],
+    ],
+    // ===== Volunteering clarity: on-screen guidance so nothing is a guessing game =====
+    'vol_clarity' => [
+        // "How volunteering works" helper on the landing page (mirrors React copy)
+        'how_it_works_title' => 'How volunteering works',
+        'how_step_find' => 'Find an opportunity that suits you.',
+        'how_step_apply' => 'Apply, and tell the organiser about yourself.',
+        'how_step_log' => 'Once you are accepted, log the hours you give.',
+        'how_step_approve' => 'The organisation reviews and approves your hours.',
+        'how_step_credit' => 'You receive 1 time credit for every hour — added straight to your wallet.',
+        // Action-led empty states (say what to do next + offer a way to do it)
+        'browse_opportunities' => 'Browse opportunities',
+        'empty_applications_cta' => 'Find an opportunity that suits you and apply — your applications will then appear here so you can track them.',
+        'empty_opportunities_cta' => 'There are no opportunities listed right now. Check back soon, or follow the community feed for new openings.',
+        'empty_opportunities_filtered_cta' => 'No opportunities match your filters. Try widening your search or',
+        'empty_hours_cta' => 'When you have given some time, use the form above to log your hours. Once an organisation approves them, the time credits are added to your wallet automatically.',
+        // Logged-hours status trail
+        'status_trail_intro' => 'Each entry shows where your logged hours are: submitted for review, then approved. Approved hours are credited to your wallet automatically — 1 time credit for every hour.',
+        'status_submitted' => 'Submitted',
+        'status_pending_note' => 'Waiting for the organisation to review and approve these hours.',
+        'status_approved_credited' => 'Approved. The time credits for these hours have been added to your wallet automatically.',
+        'hours_autocredit_note' => 'When an organisation approves your hours, the time credits are added to your wallet automatically — 1 time credit for every hour you give.',
+        // Self-explanatory hints on the log-hours form
+        'log_hours_form_hint' => 'Record the time you have already volunteered. The organisation reviews each entry, and approved hours become time credits in your wallet automatically.',
+        'log_hours_organisation_hint' => 'Choose the organisation you volunteered for. They will review and approve the hours.',
+        'log_hours_date_hint' => 'The day you did the volunteering, not today\'s date.',
+        'log_hours_description_hint' => 'Briefly describe what you did. This helps the organisation recognise and approve your hours.',
+        // Org-dashboard empty-state CTAs and action hints
+        'org_applications_empty_cta' => 'No one has applied yet — share your opportunities to attract volunteers.',
+        'org_hours_empty_cta' => 'No hours awaiting approval — volunteers\' logged hours will appear here for you to approve.',
+        'org_application_action_hint' => 'Approving accepts this volunteer for the opportunity. Declining lets them know they were not selected.',
+        'org_hours_action_hint' => 'Approving credits the volunteer automatically — 1 time credit for every hour. This cannot be undone.',
+        // Community-fund donate clarity (time credits, not money)
+        'donate_credits_not_money' => 'This donates your time credits — not money — to a shared community pool that members and the community can draw on. It is not a cash or card payment.',
     ],
     'feed_t1' => [
         'permalink_title' => 'Bericht',

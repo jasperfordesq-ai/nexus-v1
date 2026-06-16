@@ -714,7 +714,7 @@ class VolunteerService
     /** Status assigned by the last successful hour-log operation. */
     private static string $lastLogStatus = 'pending';
 
-    /** Payment outcome of the last verifyHours() call: paid|insufficient_balance|already_paid|already_processed|null */
+    /** Payment outcome of the last verifyHours() call: paid|no_whole_hours|already_paid|already_processed|null */
     private static ?string $lastPaymentOutcome = null;
 
     /**
@@ -727,8 +727,9 @@ class VolunteerService
 
     /**
      * Payment outcome of the most recent verifyHours() call.
-     * Values: 'paid', 'insufficient_balance', 'already_paid', 'already_processed',
-     * or null (declined, or approved with auto-pay disabled).
+     * Values: 'paid', 'no_whole_hours', 'already_paid', 'already_processed',
+     * or null (declined). Approval always mints credits ('paid') unless the
+     * log floors to zero whole hours ('no_whole_hours') or was already paid.
      */
     public static function getLastPaymentOutcome(): ?string
     {
@@ -1674,11 +1675,16 @@ class VolunteerService
                 }
                 $transitioned = true;
 
-                // 2. If approved and org has auto-pay enabled, pay inline (avoid nested transaction)
-                if ($action === 'approve' && $org->auto_pay_enabled) {
+                // 2. Approval ALWAYS mints time credits — classic timebanking.
+                //    Credits are minted on confirmation of volunteered hours; they
+                //    are never gated by the org wallet balance or the auto_pay flag.
+                //    The org wallet is a reconciliation figure (it may go negative),
+                //    not a spending limit.
+                if ($action === 'approve') {
                     $intHours = (int) floor($hours); // users.balance stores whole hours.
                     $orgDebit = (float) $intHours; // keep fractional remainders in the org wallet.
                     if ($intHours <= 0) {
+                        $paymentResult = 'no_whole_hours';
                         return;
                     }
 
@@ -1693,47 +1699,40 @@ class VolunteerService
                         return;
                     }
 
-                    // Lock org row
+                    // Lock org row (serialises concurrent payouts).
                     $orgLocked = DB::selectOne(
                         "SELECT id, balance, user_id FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
                         [(int) $org->id, $tenantId]
                     );
 
-                    if ($orgLocked && (float) $orgLocked->balance >= $orgDebit) {
-                        // Deduct from org
-                        if ($orgDebit > 0) {
-                            DB::update(
-                                "UPDATE vol_organizations SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
-                                [$orgDebit, (int) $org->id, $tenantId]
-                            );
-                        }
-                        $newOrgBalance = (float) $orgLocked->balance - $orgDebit;
+                    // Debit the org wallet unconditionally — allow it to go NEGATIVE.
+                    $startBalance = $orgLocked ? (float) $orgLocked->balance : 0.0;
+                    DB::update(
+                        "UPDATE vol_organizations SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
+                        [$orgDebit, (int) $org->id, $tenantId]
+                    );
+                    $newOrgBalance = $startBalance - $orgDebit; // may be negative
 
-                        // Credit to volunteer (INT — use floor to match deduction)
-                        if ($intHours > 0) {
-                            DB::update(
-                                "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
-                                [$intHours, $volunteerId, $tenantId]
-                            );
-                        }
+                    // Credit (mint) to volunteer (INT — use floor to match deduction)
+                    DB::update(
+                        "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                        [$intHours, $volunteerId, $tenantId]
+                    );
 
-                        // Record in vol_org_transactions
-                        $description = __('api.volunteer_auto_payment_description', ['hours' => $intHours]);
-                        DB::insert("
-                            INSERT INTO vol_org_transactions (tenant_id, vol_organization_id, user_id, vol_log_id, type, amount, balance_after, description, created_at)
-                            VALUES (?, ?, ?, ?, 'volunteer_payment', ?, ?, ?, NOW())
-                        ", [$tenantId, (int) $org->id, $volunteerId, $logId, -$orgDebit, $newOrgBalance, $description]);
+                    // Record in vol_org_transactions (balance_after may be negative)
+                    $description = __('api.volunteer_auto_payment_description', ['hours' => $intHours]);
+                    DB::insert("
+                        INSERT INTO vol_org_transactions (tenant_id, vol_organization_id, user_id, vol_log_id, type, amount, balance_after, description, created_at)
+                        VALUES (?, ?, ?, ?, 'volunteer_payment', ?, ?, ?, NOW())
+                    ", [$tenantId, (int) $org->id, $volunteerId, $logId, -$orgDebit, $newOrgBalance, $description]);
 
-                        // Record in main transactions table
-                        DB::insert("
-                            INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, transaction_type, status, created_at, updated_at)
-                            VALUES (?, ?, ?, ?, ?, 'volunteer', 'completed', NOW(), NOW())
-                        ", [$tenantId, (int) $org->user_id, $volunteerId, $intHours, $description]);
+                    // Record in main transactions table
+                    DB::insert("
+                        INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, transaction_type, status, created_at, updated_at)
+                        VALUES (?, ?, ?, ?, ?, 'volunteer', 'completed', NOW(), NOW())
+                    ", [$tenantId, (int) $org->user_id, $volunteerId, $intHours, $description]);
 
-                        $paymentResult = 'paid';
-                    } else {
-                        $paymentResult = 'insufficient_balance';
-                    }
+                    $paymentResult = 'paid';
                 }
             });
 
@@ -1779,29 +1778,6 @@ class VolunteerService
                             __('notifications.vol_hours_approved_paid_body', ['hours' => $hours]),
                             '/wallet',
                             NotificationDispatcher::buildVolHoursApprovedPaidEmail($hours, $orgName)
-                        );
-                    });
-                } elseif ($action === 'approve' && $paymentResult === 'insufficient_balance') {
-                    LocaleContext::withLocale($volunteerRow, function () use ($volunteerId, $hours, $orgName) {
-                        NotificationDispatcher::dispatch(
-                            $volunteerId, 'global', 0, 'vol_hours_approved',
-                            __('notifications.vol_hours_approved_unpaid_body', ['hours' => $hours]),
-                            '/volunteering?tab=hours',
-                            NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
-                        );
-                    });
-                    $ownerId = (int) $org->user_id;
-                    $ownerRow = DB::table('users')
-                        ->where('id', $ownerId)
-                        ->where('tenant_id', $tenantId)
-                        ->select(['id', 'preferred_language'])
-                        ->first();
-                    LocaleContext::withLocale($ownerRow, function () use ($ownerId, $hours, $org) {
-                        NotificationDispatcher::dispatch(
-                            $ownerId, 'global', 0, 'vol_hours_approved',
-                            __('notifications.vol_hours_org_wallet_insufficient_body', ['hours' => $hours]),
-                            '/volunteering/org/' . (int) $org->id . '/dashboard?tab=wallet',
-                            null
                         );
                     });
                 } elseif ($action === 'approve') {

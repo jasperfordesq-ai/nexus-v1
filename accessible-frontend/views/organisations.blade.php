@@ -47,26 +47,57 @@
 
     <h2 class="govuk-heading-l">{{ __('govuk_alpha.organisations.register_title') }}</h2>
     <p class="govuk-body">{{ __('govuk_alpha.organisations.register_note') }}</p>
+    <p class="govuk-body">{{ __('govuk_alpha.organisations.register_intro') }}</p>
+
     <form method="post" action="{{ route('govuk-alpha.organisations.store', ['tenantSlug' => $tenantSlug]) }}" class="govuk-grid-row">
         @csrf
         <div class="govuk-grid-column-two-thirds">
             <div class="govuk-form-group">
                 <label class="govuk-label" for="name">{{ __('govuk_alpha.organisations.name_label') }}</label>
-                <input class="govuk-input" id="name" name="name" type="text" maxlength="255" required>
+                <input class="govuk-input" id="name" name="name" type="text" minlength="3" maxlength="255" value="{{ old('name') }}" required>
             </div>
             <div class="govuk-form-group">
                 <label class="govuk-label" for="description">{{ __('govuk_alpha.organisations.description_label') }}</label>
-                <textarea class="govuk-textarea" id="description" name="description" rows="3" maxlength="2000"></textarea>
+                <div id="description-hint" class="govuk-hint">{{ __('govuk_alpha.organisations.description_hint') }}</div>
+                <textarea class="govuk-textarea" id="description" name="description" rows="3" minlength="20" maxlength="2000" aria-describedby="description-hint" required>{{ old('description') }}</textarea>
             </div>
             <div class="govuk-form-group">
                 <label class="govuk-label" for="email">{{ __('govuk_alpha.organisations.email_label') }}</label>
-                <input class="govuk-input" id="email" name="email" type="email" autocomplete="email">
+                <input class="govuk-input" id="email" name="email" type="email" autocomplete="email" value="{{ old('email') }}" required>
             </div>
             <div class="govuk-form-group">
                 <label class="govuk-label" for="website">{{ __('govuk_alpha.organisations.website_label') }}</label>
-                <input class="govuk-input" id="website" name="website" type="url" inputmode="url">
+                <input class="govuk-input" id="website" name="website" type="url" inputmode="url" value="{{ old('website') }}">
             </div>
+
+            <div class="govuk-inset-text">
+                <h3 class="govuk-heading-s">{{ __('govuk_alpha.organisations.terms_heading') }}</h3>
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>{{ __('govuk_alpha.organisations.terms_item_1') }}</li>
+                    <li>{{ __('govuk_alpha.organisations.terms_item_2') }}</li>
+                    <li>{{ __('govuk_alpha.organisations.terms_item_3') }}</li>
+                    <li>{{ __('govuk_alpha.organisations.terms_item_4') }}</li>
+                    <li>{{ __('govuk_alpha.organisations.terms_item_5') }}</li>
+                </ul>
+            </div>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-visually-hidden">{{ __('govuk_alpha.organisations.terms_heading') }}</legend>
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="agreed_terms" name="agreed_terms" type="checkbox" value="1" {{ old('agreed_terms') ? 'checked' : '' }} required>
+                            <label class="govuk-label govuk-checkboxes__label" for="agreed_terms">{{ __('govuk_alpha.organisations.terms_agree') }}</label>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
             <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.organisations.register_button') }}</button>
+
+            <div class="govuk-inset-text">
+                <p class="govuk-body">{{ __('govuk_alpha.organisations.pending_notice') }}</p>
+            </div>
         </div>
     </form>
 @endsection

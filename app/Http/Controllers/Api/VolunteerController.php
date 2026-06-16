@@ -527,8 +527,8 @@ class VolunteerController extends BaseApiController
         return $this->respondWithData([
             'id' => (int) $id,
             'status' => $action === 'approve' ? 'approved' : 'declined',
-            // 'paid' | 'insufficient_balance' | 'already_paid' | 'already_processed' | null
-            // Lets the org dashboard show an accurate toast instead of always claiming "paid".
+            // 'paid' | 'no_whole_hours' | 'already_paid' | 'already_processed' | null
+            // Approval always mints credits; lets the org dashboard show an accurate toast.
             'payment_result' => $this->volunteerService->getLastPaymentOutcome(),
         ]);
     }

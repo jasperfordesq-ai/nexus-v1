@@ -4,7 +4,12 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * OrgWalletTab - Organisation wallet balance, deposit, auto-pay toggle, and transaction history
+ * OrgWalletTab - Organisation credit record: balance, deposits, and history.
+ *
+ * Note: under the auto-mint model, approving a volunteer's hours ALWAYS credits
+ * them automatically — the org does not need to fund a wallet first. This tab is
+ * therefore a record/ledger, not a spending account, and there is no auto-pay
+ * toggle (approval is always "on").
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -18,8 +23,9 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import User from 'lucide-react/icons/user';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, CardRowsSkeleton } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -62,7 +68,7 @@ const TYPE_COLOR: Record<WalletTransaction['type'], 'success' | 'warning' | 'dan
 
 /* ───────────────────────── Component ───────────────────────── */
 
-export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWalletTabProps) {
+export function OrgWalletTab({ orgId, balance, onBalanceChange }: OrgWalletTabProps) {
   const { t } = useTranslation('volunteering');
   const toast = useToast();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -75,10 +81,6 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Auto-pay toggle state
-  const [autoPayEnabled, setAutoPayEnabled] = useState(autoPay);
-  const [isTogglingAutoPay, setIsTogglingAutoPay] = useState(false);
-
   // Deposit form state
   const [depositAmount, setDepositAmount] = useState('');
   const [depositNote, setDepositNote] = useState('');
@@ -90,11 +92,6 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
   const toastRef = useRef(toast);
   toastRef.current = toast;
   const abortRef = useRef<AbortController | null>(null);
-
-  // Sync autoPay prop
-  useEffect(() => {
-    setAutoPayEnabled(autoPay);
-  }, [autoPay]);
 
   /* ───────────────────────── Data fetching ───────────────────────── */
 
@@ -158,38 +155,6 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
     loadRef.current();
     return () => { abortRef.current?.abort(); };
   }, [orgId]);
-
-  /* ───────────────────────── Auto-pay toggle ───────────────────────── */
-
-  const handleAutoPayToggle = async (enabled: boolean) => {
-    try {
-      setIsTogglingAutoPay(true);
-      setAutoPayEnabled(enabled);
-
-      const response = await api.put(`/v2/volunteering/organisations/${orgId}/wallet/auto-pay`, {
-        enabled,
-      });
-
-      if (response.success) {
-        toastRef.current.success(
-          enabled
-            ? tRef.current('org_wallet.auto_pay_enabled')
-            : tRef.current('org_wallet.auto_pay_disabled')
-        );
-        onBalanceChange();
-      } else {
-        // Revert on failure
-        setAutoPayEnabled(!enabled);
-        toastRef.current.error(response.error || tRef.current('org_wallet.auto_pay_error'));
-      }
-    } catch (err) {
-      setAutoPayEnabled(!enabled);
-      logError('Failed to toggle auto-pay', err);
-      toastRef.current.error(tRef.current('org_wallet.auto_pay_error'));
-    } finally {
-      setIsTogglingAutoPay(false);
-    }
-  };
 
   /* ───────────────────────── Deposit ───────────────────────── */
 
@@ -299,6 +264,9 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
           <p className="text-sm text-theme-muted mt-1">
             {t('org_wallet.hours_label')}
           </p>
+          <p className="text-xs text-theme-subtle mt-2 max-w-sm mx-auto">
+            {t('org_wallet.balance_helper')}
+          </p>
         </div>
 
         <Button
@@ -310,23 +278,22 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
         </Button>
       </GlassCard>
 
-      {/* Auto-pay Card */}
-      <GlassCard className="p-6 space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex-1 min-w-0">
+      {/* How volunteers get paid — replaces the old auto-pay toggle. Approving a
+          volunteer's hours always credits them automatically, so there is nothing
+          to switch on/off and no balance to keep topped up. */}
+      <GlassCard className="p-5 border border-emerald-500/20">
+        <div className="flex items-start gap-3">
+          <div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-600 dark:text-emerald-400 shrink-0">
+            <CheckCircle className="w-5 h-5" aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
             <h3 className="font-semibold text-theme-primary">
-              {t('org_wallet.auto_pay_title')}
+              {t('org_wallet.autocredit_title')}
             </h3>
             <p className="text-sm text-theme-muted mt-1">
-              {t('org_wallet.auto_pay_description')}
+              {t('org_wallet.autocredit_description')}
             </p>
           </div>
-          <Switch
-            isSelected={autoPayEnabled}
-            onValueChange={handleAutoPayToggle}
-            isDisabled={isTogglingAutoPay}
-            aria-label={t('org_wallet.auto_pay_toggle')}
-          />
         </div>
       </GlassCard>
 
