@@ -172,7 +172,7 @@
             </div>
             <div class="govuk-notification-banner__content">
                 <p class="govuk-body">{{ __('govuk_alpha.volunteering.auth_required_detail') }}</p>
-                <div class="nexus-alpha-actions">
+                <div class="govuk-button-group">
                     <a class="govuk-button" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.nav.login') }}</a>
                     <a class="govuk-link" href="{{ route('govuk-alpha.register', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.nav.register') }}</a>
                 </div>

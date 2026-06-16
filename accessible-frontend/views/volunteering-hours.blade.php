@@ -171,7 +171,7 @@
 
     <h2 class="govuk-heading-l govuk-!-margin-top-8">{{ __('govuk_alpha.volunteering.recent_hours_title') }}</h2>
     @if (empty($logs))
-        <div class="govuk-inset-text">{{ __('govuk_alpha.volunteering.empty_hours') }}</div>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.volunteering.empty_hours') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($logs as $log)

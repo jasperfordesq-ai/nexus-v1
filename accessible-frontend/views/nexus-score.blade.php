@@ -25,7 +25,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.nexus_score.description') }}</p>
 
     @if (!$hasScore)
-        <p class="govuk-inset-text">{{ __('govuk_alpha.nexus_score.unavailable') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.nexus_score.unavailable') }}</p></div>
     @else
         <div class="govuk-panel govuk-panel--confirmation nexus-alpha-panel">
             <h2 class="govuk-panel__title">{{ $scoreTitle }}</h2>

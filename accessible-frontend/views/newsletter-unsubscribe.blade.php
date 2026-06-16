@@ -18,18 +18,20 @@
                 </p>
             @else
                 <h1 class="govuk-heading-xl">{{ __('govuk_alpha.auth.unsubscribe_title') }}</h1>
-                <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="unsubscribe-banner-title">
-                    <div class="govuk-notification-banner__header">
-                        <h2 class="govuk-notification-banner__title" id="unsubscribe-banner-title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                    </div>
-                    <div class="govuk-notification-banner__content">
-                        <p class="govuk-notification-banner__heading">
-                            @if ($state === 'missing')
-                                {{ __('govuk_alpha.auth.unsubscribe_missing') }}
-                            @else
-                                {{ __('govuk_alpha.auth.unsubscribe_invalid') }}
-                            @endif
-                        </p>
+                <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+                    <div role="alert">
+                        <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                        <div class="govuk-error-summary__body">
+                            <ul class="govuk-list govuk-error-summary__list">
+                                <li>
+                                    @if ($state === 'missing')
+                                        {{ __('govuk_alpha.auth.unsubscribe_missing') }}
+                                    @else
+                                        {{ __('govuk_alpha.auth.unsubscribe_invalid') }}
+                                    @endif
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <p class="govuk-body">

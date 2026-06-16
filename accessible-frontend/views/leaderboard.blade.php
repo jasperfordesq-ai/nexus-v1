@@ -77,7 +77,7 @@
     </form>
 
     @if (empty($leaderboardRows))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.leaderboard.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.leaderboard.empty') }}</p></div>
     @else
         <table class="govuk-table">
             <caption class="govuk-table__caption govuk-table__caption--s govuk-visually-hidden">{{ __('govuk_alpha.leaderboard.metrics.' . $leaderboardType) }}</caption>
