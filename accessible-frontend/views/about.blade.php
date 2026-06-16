@@ -140,7 +140,7 @@
 
             <h2 class="govuk-heading-l">{{ __('govuk_alpha.about.cta.title') }}</h2>
             <p class="govuk-body">{{ __('govuk_alpha.about.cta.description') }}</p>
-            <div class="nexus-alpha-actions">
+            <div class="govuk-button-group">
                 @if ($isAuthenticated ?? false)
                     <a class="govuk-button" data-module="govuk-button" href="{{ route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.about.cta.dashboard') }}</a>
                 @else

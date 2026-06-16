@@ -22,9 +22,13 @@
         };
     @endphp
 
-    <span class="govuk-caption-xl">{{ __('govuk_alpha.federation.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
-    <h1 class="govuk-heading-xl">{{ __('govuk_alpha.federation.title') }}</h1>
-    <p class="govuk-body-l">{{ __('govuk_alpha.federation.description') }}</p>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <span class="govuk-caption-xl">{{ __('govuk_alpha.federation.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
+            <h1 class="govuk-heading-xl">{{ __('govuk_alpha.federation.title') }}</h1>
+            <p class="govuk-body-l">{{ __('govuk_alpha.federation.description') }}</p>
+        </div>
+    </div>
 
     @if ($banner)
         @if ($banner[0] === 'error')
@@ -59,7 +63,9 @@
             </div>
             <div class="govuk-notification-banner__content">
                 <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.federation.hub.optin_banner_body') }}</p>
-                <a class="govuk-button" data-module="govuk-button" href="{{ route('govuk-alpha.federation.opt-in', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.optin_banner_cta') }}</a>
+                <div class="govuk-button-group">
+                    <a class="govuk-button" data-module="govuk-button" href="{{ route('govuk-alpha.federation.opt-in', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.optin_banner_cta') }}</a>
+                </div>
             </div>
         </div>
     @endif
@@ -129,13 +135,18 @@
     @endif
 
     {{-- Quick links into the rest of the federation surface --}}
-    <h2 class="govuk-heading-l">{{ __('govuk_alpha.federation.hub.quick_links_heading') }}</h2>
-    <ul class="govuk-list">
-        <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.members.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.quick_link_members') }}</a></li>
-        <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.connections.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.fed2.connections.title') }}</a></li>
-        <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.messages.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.fed2.messages.title') }}</a></li>
-        <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.listings.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.quick_link_listings') }}</a></li>
-        <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.events.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.quick_link_events') }}</a></li>
-        <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.settings', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.quick_link_settings') }}</a></li>
-    </ul>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-l">{{ __('govuk_alpha.federation.hub.quick_links_heading') }}</h2>
+            <ul class="govuk-list">
+                <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.members.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.quick_link_members') }}</a></li>
+                <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.connections.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.fed2.connections.title') }}</a></li>
+                <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.messages.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.fed2.messages.title') }}</a></li>
+                <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.listings.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.quick_link_listings') }}</a></li>
+                <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.events.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.quick_link_events') }}</a></li>
+                <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.groups.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.polish_federation.groups_title') }}</a></li>
+                <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.settings', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.quick_link_settings') }}</a></li>
+            </ul>
+        </div>
+    </div>
 @endsection

@@ -57,10 +57,15 @@
                             <p class="govuk-body govuk-!-margin-bottom-1">{{ \Illuminate\Support\Str::limit($l['description'], 160) }}</p>
                         @endif
                         @if ($cat !== '')
-                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-0">{{ $cat }}@if ($loc !== '') &middot; {{ $loc }}@endif</p>
+                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ $cat }}@if ($loc !== '') &middot; {{ $loc }}@endif</p>
                         @elseif ($loc !== '')
-                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-0">{{ $loc }}</p>
+                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ $loc }}</p>
                         @endif
+                        @auth
+                            <p class="govuk-body-s govuk-!-margin-bottom-0">
+                                <a class="govuk-link" href="{{ route('govuk-alpha.federation.members.show', ['tenantSlug' => $tenantSlug, 'id' => (int) ($l['user_id'] ?? 0), 'tenant_id' => (int) ($l['tenant_id'] ?? 0)]) }}">{{ __('govuk_alpha.polish_federation.listings_contact') }}</a>
+                            </p>
+                        @endauth
                     </article>
                 @endforeach
             </div>

@@ -23,16 +23,16 @@
             <h1 class="govuk-heading-xl">{{ __('govuk_alpha.legal.hub_title') }}</h1>
             <p class="govuk-body-l">{{ __('govuk_alpha.legal.hub_intro', ['name' => $communityName]) }}</p>
 
-            <ul class="govuk-list">
+            <div class="nexus-alpha-card-list" aria-label="{{ __('govuk_alpha.polish_federation.legal_hub_list_label') }}">
                 @foreach ($documents as $key => $href)
-                    <li class="nexus-alpha-card">
+                    <article class="nexus-alpha-card">
                         <h2 class="govuk-heading-m govuk-!-margin-bottom-1">
                             <a class="govuk-link" href="{{ $href }}">{{ __('govuk_alpha.legal.documents.' . $key . '.title') }}</a>
                         </h2>
                         <p class="govuk-body govuk-!-margin-bottom-0">{{ __('govuk_alpha.legal.documents.' . $key . '.summary') }}</p>
-                    </li>
+                    </article>
                 @endforeach
-            </ul>
+            </div>
         </div>
     </div>
 @endsection

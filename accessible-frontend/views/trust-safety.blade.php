@@ -51,7 +51,7 @@
 
             <h2 class="govuk-heading-m">{{ __('govuk_alpha.trust_safety.contact_cta_title') }}</h2>
             <p class="govuk-body">{{ __('govuk_alpha.trust_safety.contact_cta_body') }}</p>
-            <div class="nexus-alpha-actions">
+            <div class="govuk-button-group">
                 <a class="govuk-button" data-module="govuk-button" href="{{ $contactHref }}">{{ __('govuk_alpha.trust_safety.contact_cta_button') }}</a>
                 <a class="govuk-link" href="{{ $guidelinesHref }}">{{ __('govuk_alpha.trust_safety.community_guidelines_link') }}</a>
             </div>

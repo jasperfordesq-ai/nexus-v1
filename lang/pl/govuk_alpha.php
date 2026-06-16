@@ -3848,4 +3848,44 @@ return [
         'states_invite_success' => 'group-invite-sent',
         'states_invite_failed' => 'group-invite-failed',
     ],
+    'polish_federation' => [
+        // federation-settings — communications fieldset
+        'settings_communications_legend' => 'Communications',
+        'settings_messaging_label' => 'Allow messaging from partner community members',
+        'settings_transactions_label' => 'Allow time-credit transactions with partner members',
+
+        // federation-connections — govuk-tabs aria labels
+        'connections_tabs_label' => 'Connection status filter',
+
+        // federation-member — subject field label
+        'message_subject_label' => 'Subject (optional)',
+
+        // federation-member — transfer button-group cancel
+        'transfer_cancel' => 'Cancel',
+
+        // federation-events — view on community link
+        'events_view_on' => 'View on :community',
+
+        // federation-listings — contact member link
+        'listings_contact' => 'Message member',
+
+        // federation.blade.php — grid description notice
+        'hub_optin_cta_group' => 'Join the network',
+
+        // federation-groups index
+        'groups_title' => 'Groups from partner communities',
+        'groups_caption' => ':community federation',
+        'groups_description' => 'Browse groups from communities in the network that have opened their groups to federation.',
+        'groups_back' => 'Back to Federation',
+        'groups_empty' => 'No groups from partner communities are available right now.',
+        'groups_not_available' => 'Federated groups browsing is not available for this community.',
+        'groups_search_label' => 'Search groups',
+        'groups_search_hint' => 'Filter by group name or description.',
+        'groups_community_label' => 'Community',
+        'groups_members_label' => 'Members',
+        'groups_load_more' => 'Load more groups',
+
+        // legal-hub — card list a11y
+        'legal_hub_list_label' => 'Legal documents',
+    ],
 ];

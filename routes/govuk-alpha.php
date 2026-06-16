@@ -294,6 +294,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/federation/members/{id}', [AlphaController::class, 'federationMember'])->whereNumber('id')->name('federation.members.show');
         Route::get('/federation/listings', [AlphaController::class, 'federationListings'])->name('federation.listings.index');
         Route::get('/federation/events', [AlphaController::class, 'federationEvents'])->name('federation.events.index');
+        Route::get('/federation/groups', [AlphaController::class, 'federationGroups'])->name('federation.groups.index');
         Route::get('/federation/partners/{id}', [AlphaController::class, 'federationPartner'])->where('id', '[0-9]+|ext-[0-9]+')->name('federation.partners.show');
         // ===== WAVE FED2 — federated connections, messaging, hour transfer =====
         // Credit-moving POSTs are throttled (the transfer most tightly). Static

@@ -24,7 +24,7 @@
             <h2 class="govuk-heading-l">{{ __('govuk_alpha.guide.getting_started_title') }}</h2>
             <p class="govuk-body">{{ __('govuk_alpha.guide.getting_started_body') }}</p>
 
-            <div class="nexus-alpha-actions govuk-!-margin-top-4">
+            <div class="govuk-button-group govuk-!-margin-top-4">
                 @if ($isAuthenticated ?? false)
                     @if (\App\Core\TenantContext::hasModule('listings'))
                         <a class="govuk-button" href="{{ route('govuk-alpha.listings.index', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.guide.browse_listings') }}</a>
