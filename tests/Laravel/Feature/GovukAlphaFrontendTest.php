@@ -9004,7 +9004,7 @@ class GovukAlphaFrontendTest extends TestCase
         $this->enableAlphaFeatures(['groups']);
         $this->disableMeiliSearch();
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/groups", [
+        $res = $this->post("/{$this->testTenantSlug}/alpha/groups/new", [
             '_token'      => csrf_token(),
             'name'        => 'Location Group ' . uniqid(),
             'description' => 'With location.',
