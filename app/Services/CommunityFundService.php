@@ -33,11 +33,21 @@ class CommunityFundService
             return $fund->toArray();
         }
 
-        // Auto-create
-        $fund = CommunityFundAccount::create([
-            'balance' => 0.00,
-            'description' => 'Community time credit fund',
-        ]);
+        // Auto-create. Guard against a concurrent first-creation race: the table
+        // has a UNIQUE(tenant_id) constraint, so two simultaneous first-time
+        // operations (e.g. two donations) would otherwise throw an uncaught 500.
+        try {
+            $fund = CommunityFundAccount::create([
+                'balance' => 0.00,
+                'description' => 'Community time credit fund',
+            ]);
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            $existing = CommunityFundAccount::first();
+            if ($existing) {
+                return $existing->toArray();
+            }
+            throw $e;
+        }
 
         return [
             'id' => $fund->id,

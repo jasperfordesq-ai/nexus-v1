@@ -465,6 +465,17 @@ class JobVacanciesController extends BaseApiController
         ]);
 
         if ($applicationId === null) {
+            // The application was rejected after the CV was already written to disk
+            // (e.g. vacancy closed, already applied, ineligible). Remove the orphaned
+            // upload so failed attempts don't accumulate files on the server.
+            if ($cvPath !== null) {
+                try {
+                    \Illuminate\Support\Facades\Storage::disk('local')->delete($cvPath);
+                } catch (\Throwable $e) {
+                    // best-effort cleanup; never fail the request because cleanup failed
+                }
+            }
+
             $errors = $this->jobService->getErrors();
             $status = 400;
 
