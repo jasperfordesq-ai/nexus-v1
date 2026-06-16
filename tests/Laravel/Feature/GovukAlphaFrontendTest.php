@@ -9273,4 +9273,89 @@ class GovukAlphaFrontendTest extends TestCase
         $res->assertSee(__('govuk_alpha.polish_federation.groups_title'));
     }
 
+    // ── GOV.UK core polish C — inset-text + markup consistency ──────────────
+
+    public function test_pcorec_empty_state_inset_text_uses_div_wrapper(): void
+    {
+        // Verify that empty-state inset-texts are rendered as <div> (not bare <p>)
+        // for polls, clubs, resources (pages expected to be empty in the test DB).
+        $this->enableAlphaFeatures(['courses', 'podcasts', 'merchant_coupons', 'member_premium']);
+        $user = $this->authenticatedUser(['name' => 'Inset Checker']);
+
+        // Polls — no polls in DB → empty state
+        $polls = $this->get("/{$this->testTenantSlug}/alpha/polls");
+        $polls->assertOk();
+        $polls->assertSee(__('govuk_alpha.polls.empty'));
+        // Must be wrapped in <div class="govuk-inset-text">, not bare <p>
+        $this->assertStringContainsString(
+            '<div class="govuk-inset-text">',
+            $polls->getContent(),
+            'polls empty state must use <div class="govuk-inset-text">'
+        );
+        $this->assertStringNotContainsString(
+            '<p class="govuk-inset-text">',
+            $polls->getContent(),
+            'polls must not use bare <p class="govuk-inset-text">'
+        );
+
+        // Resources — no resources → empty state
+        $resources = $this->get("/{$this->testTenantSlug}/alpha/resources");
+        $resources->assertOk();
+        $resources->assertSee(__('govuk_alpha.resources.empty'));
+        $this->assertStringContainsString(
+            '<div class="govuk-inset-text">',
+            $resources->getContent(),
+            'resources empty state must use <div class="govuk-inset-text">'
+        );
+        $this->assertStringNotContainsString(
+            '<p class="govuk-inset-text">',
+            $resources->getContent(),
+            'resources must not use bare <p class="govuk-inset-text">'
+        );
+
+        // blog-post — authenticated user with no prior comments → empty comment state
+        $slug = 'pcorec-blog-post-' . uniqid();
+        DB::table('posts')->insert([
+            'tenant_id' => $this->testTenantId, 'author_id' => $user->id,
+            'title' => 'Core Polish C Test Post', 'slug' => $slug,
+            'content' => 'Testing inset-text div wrapper.', 'status' => 'published',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        $blogPost = $this->get("/{$this->testTenantSlug}/alpha/blog/{$slug}");
+        $blogPost->assertOk();
+        $blogPost->assertSee(__('govuk_alpha.blog.comments_empty'));
+        $this->assertStringContainsString(
+            '<div class="govuk-inset-text">',
+            $blogPost->getContent(),
+            'blog-post empty comments must use <div class="govuk-inset-text">'
+        );
+        $this->assertStringNotContainsString(
+            '<p class="govuk-inset-text">',
+            $blogPost->getContent(),
+            'blog-post must not use bare <p class="govuk-inset-text">'
+        );
+    }
+
+    public function test_pcorec_premium_return_pending_h1_outside_inset_text(): void
+    {
+        // premium-return pending: h1 must appear before (outside) the inset-text div.
+        $this->enableAlphaFeatures(['member_premium']);
+        $this->authenticatedUser(['name' => 'Premium Pending User']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/premium/return?status=pending");
+        $res->assertOk();
+
+        $html = $res->getContent();
+        $h1Pos      = strpos($html, '<h1 class="govuk-heading-l">');
+        $insetPos   = strpos($html, '<div class="govuk-inset-text">');
+
+        $this->assertNotFalse($h1Pos,    'h1 must be present on premium-return pending page');
+        $this->assertNotFalse($insetPos, 'govuk-inset-text must be present on premium-return pending page');
+        $this->assertLessThan(
+            $insetPos,
+            $h1Pos,
+            'h1 must appear before govuk-inset-text (h1 must NOT be nested inside inset-text)'
+        );
+    }
+
 }

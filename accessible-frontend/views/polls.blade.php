@@ -122,7 +122,7 @@
     </details>
 
     @if (empty($polls))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.polls.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.polls.empty') }}</p></div>
     @else
         {{-- ===== Open polls (vote) ===== --}}
         <h2 class="govuk-heading-l">{{ __('govuk_alpha.polls.open_section_title') }}</h2>
@@ -153,7 +153,7 @@
                     @endif
 
                     @if (empty($options))
-                        <p class="govuk-inset-text">{{ __('govuk_alpha.polls.no_options') }}</p>
+                        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.polls.no_options') }}</p></div>
                     @elseif (!$hasVoted)
                         <form method="post" action="{{ route('govuk-alpha.polls.vote', ['tenantSlug' => $tenantSlug, 'pollId' => $pollId]) }}">
                             @csrf
@@ -218,7 +218,7 @@
                     @endif
 
                     @if (empty($options))
-                        <p class="govuk-inset-text">{{ __('govuk_alpha.polls.no_options') }}</p>
+                        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.polls.no_options') }}</p></div>
                     @elseif ($resultsVisible)
                         @foreach ($options as $opt)
                             @php

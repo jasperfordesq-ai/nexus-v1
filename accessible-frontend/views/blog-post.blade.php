@@ -87,10 +87,10 @@
                 @endif
 
                 @if (empty($isAuthenticated))
-                    <p class="govuk-inset-text">{{ __('govuk_alpha.blog.comments_signin') }}</p>
+                    <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.blog.comments_signin') }}</p></div>
                 @else
                     @if (empty($comments))
-                        <p class="govuk-inset-text">{{ __('govuk_alpha.blog.comments_empty') }}</p>
+                        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.blog.comments_empty') }}</p></div>
                     @else
                         <ul class="govuk-list">
                             @foreach ($comments as $comment)

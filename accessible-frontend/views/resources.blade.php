@@ -19,7 +19,7 @@
     </form>
 
     @if (empty($resources))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.resources.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.resources.empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($resources as $r)

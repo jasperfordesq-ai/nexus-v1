@@ -23,7 +23,7 @@
     </form>
 
     @if (empty($clubs))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.clubs.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.clubs.empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($clubs as $club)
@@ -33,9 +33,13 @@
                     $schedule = trim((string) ($club['meeting_schedule'] ?? ''));
                     $email = trim((string) ($club['contact_email'] ?? ''));
                     $website = trim((string) ($club['website'] ?? ''));
+                    $logo = trim((string) ($club['logo_url'] ?? ''));
                 @endphp
                 <article class="nexus-alpha-card">
                     <div class="nexus-alpha-module-row">
+                        @if ($logo !== '')
+                            <img class="nexus-alpha-avatar" src="{{ $logo }}" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                        @endif
                         <h2 class="govuk-heading-s govuk-!-margin-bottom-1">{{ $name }}</h2>
                         <strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha.clubs.members_count', ['count' => $members]) }}</strong>
                     </div>

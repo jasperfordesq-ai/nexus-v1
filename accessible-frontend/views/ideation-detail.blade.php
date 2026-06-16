@@ -60,7 +60,7 @@
 
     <h2 class="govuk-heading-l govuk-!-margin-top-6" id="ideas">{{ __('govuk_alpha.ideation.ideas_title') }}</h2>
     @if (empty($ideas))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.ideation.ideas_empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.ideation.ideas_empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($ideas as $idea)
