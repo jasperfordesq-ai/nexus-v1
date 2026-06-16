@@ -137,13 +137,22 @@
     "leave_waitlist_aria": "Opuść listę oczekujących na to wydarzenie",
     "tabs_aria": "Sekcje szczegółów wydarzenia",
     "delete_series_note": "To wydarzenie cykliczne. Jego usunięcie spowoduje również usunięcie wszystkich przyszłych wystąpień.",
-    "cancel_series_note": "To wydarzenie cykliczne. Jego odwołanie spowoduje również odwołanie wszystkich przyszłych wystąpień i powiadomienie ich uczestników."
+    "cancel_series_note": "To wydarzenie cykliczne. Jego odwołanie spowoduje również odwołanie wszystkich przyszłych wystąpień i powiadomienie ich uczestników.",
+    "series_dates_title": "Upcoming dates in this series",
+    "series_this_date": "This date"
   },
   "card": {
     "cancelled": "Odwołany",
     "spots_left": "Pozostało {{count}} miejsc",
     "full": "Pełny",
-    "open_aria": "{{title}} on {{date}}"
+    "open_aria": "{{title}} on {{date}}",
+    "repeats_daily": "Repeats daily",
+    "repeats_weekly": "Repeats weekly",
+    "repeats_monthly": "Repeats monthly",
+    "repeats_yearly": "Repeats yearly",
+    "repeats_generic": "Recurring",
+    "series_dates_one": "{{count}} date",
+    "series_dates_other": "{{count}} dates"
   },
   "form": {
     "create_title": "Utwórz nowe wydarzenie",
@@ -235,7 +244,8 @@
       "created": "Wydarzenie zostało utworzone",
       "updated": "Wydarzenie zaktualizowane",
       "image_failed": "Wydarzenie zostało utworzone, ale przesyłanie obrazu nie powiodło się",
-      "error": "Coś poszło nie tak"
+      "error": "Coś poszło nie tak",
+      "fix_errors": "Please fix the highlighted fields before saving"
     },
     "attach_polls_label": "Dołącz ankiety (opcjonalnie)",
     "attach_polls_placeholder": "Wybierz ankiety do załączenia...",
@@ -253,7 +263,8 @@
     "edit_scope_message": "To wydarzenie jest częścią cyklicznej serii. Co chcesz zaktualizować?",
     "edit_scope_single": "Tylko to wydarzenie",
     "edit_scope_all": "To i wszystkie przyszłe wydarzenia",
-    "edit_scope_all_note": "Zmiany daty i godziny dotyczą tylko tego wydarzenia."
+    "edit_scope_all_note": "Zmiany daty i godziny dotyczą tylko tego wydarzenia.",
+    "recurrence_count_hint": "Between 2 and 52 occurrences"
   },
   "toast": {
     "rsvp_removed": "Odpowiedź została usunięta",

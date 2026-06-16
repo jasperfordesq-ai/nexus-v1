@@ -137,13 +137,22 @@
     "leave_waitlist_aria": "Fág liosta feithimh an imeachta seo",
     "tabs_aria": "Rannóga sonraí imeachta",
     "delete_series_note": "Imeacht athfhillteach é seo. Má scriostar é, scriosfar gach teagmhas amach anseo freisin.",
-    "cancel_series_note": "Imeacht athfhillteach é seo. Má chuirtear ar ceal é, cuirfear gach teagmhas amach anseo ar ceal freisin agus cuirfear a rannpháirtithe ar an eolas."
+    "cancel_series_note": "Imeacht athfhillteach é seo. Má chuirtear ar ceal é, cuirfear gach teagmhas amach anseo ar ceal freisin agus cuirfear a rannpháirtithe ar an eolas.",
+    "series_dates_title": "Upcoming dates in this series",
+    "series_this_date": "This date"
   },
   "card": {
     "cancelled": "Cealaithe",
     "spots_left": "{{count}} áit fágtha",
     "full": "Lán",
-    "open_aria": "{{title}} on {{date}}"
+    "open_aria": "{{title}} on {{date}}",
+    "repeats_daily": "Repeats daily",
+    "repeats_weekly": "Repeats weekly",
+    "repeats_monthly": "Repeats monthly",
+    "repeats_yearly": "Repeats yearly",
+    "repeats_generic": "Recurring",
+    "series_dates_one": "{{count}} date",
+    "series_dates_other": "{{count}} dates"
   },
   "form": {
     "create_title": "Cruthaigh Imeacht Nua",
@@ -235,7 +244,8 @@
       "created": "Imeacht cruthaithe",
       "updated": "Imeacht nuashonraithe",
       "image_failed": "Imeacht cruthaithe ach theip ar uaslódáil íomhá",
-      "error": "Chuaigh rud éigin mícheart"
+      "error": "Chuaigh rud éigin mícheart",
+      "fix_errors": "Please fix the highlighted fields before saving"
     },
     "attach_polls_label": "Ceangail pobalbhreitheanna (roghnach)",
     "attach_polls_placeholder": "Roghnaigh pobalbhreitheanna le ceangal...",
@@ -253,7 +263,8 @@
     "edit_scope_message": "Tá an imeacht seo mar chuid de shraith athfhillteach. Cad ba mhaith leat a nuashonrú?",
     "edit_scope_single": "An imeacht seo amháin",
     "edit_scope_all": "É seo agus gach imeacht amach anseo",
-    "edit_scope_all_note": "Ní bhaineann athruithe dáta agus ama ach leis an imeacht seo."
+    "edit_scope_all_note": "Ní bhaineann athruithe dáta agus ama ach leis an imeacht seo.",
+    "recurrence_count_hint": "Between 2 and 52 occurrences"
   },
   "toast": {
     "rsvp_removed": "RSVP bainte",

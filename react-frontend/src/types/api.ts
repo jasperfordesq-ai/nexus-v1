@@ -742,6 +742,14 @@ export interface Event {
   // E1: Recurrence
   parent_event_id?: number | null;
   is_recurring?: boolean;
+  is_recurring_template?: number | boolean;
+  recurrence_frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom';
+  /** True when this event belongs to a recurring series (template or occurrence) */
+  is_series?: boolean;
+  /** Number of occurrences in the series within the active time window */
+  series_count?: number;
+  /** Upcoming dates in the series (detail page only) */
+  series_occurrences?: Array<{ id: number; start_time: string; date?: string | null }>;
   // INF6: Video conferencing
   video_url?: string | null;
   allow_remote_attendance?: boolean;

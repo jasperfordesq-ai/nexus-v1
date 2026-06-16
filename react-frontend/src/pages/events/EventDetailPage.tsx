@@ -1364,6 +1364,57 @@ export function EventDetailPage() {
         />
       </GlassCard>
 
+      {/* E1: Upcoming dates in this recurring series */}
+      {event.series_occurrences && event.series_occurrences.length > 1 && (
+        <GlassCard className="p-6">
+          <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+            <Repeat className="w-5 h-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+            {t('detail.series_dates_title')}
+          </h2>
+          <div className="space-y-3">
+            {event.series_occurrences.map((occ) => {
+              const occDate = new Date(occ.start_time);
+              const monthLabel = formatMonthShort(occDate, true);
+              const dateLabel = formatDateTime(occDate, {
+                weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+              });
+              const isCurrent = occ.id === event.id;
+              return (
+                <Link
+                  key={occ.id}
+                  to={tenantPath(`/events/${occ.id}`)}
+                  aria-current={isCurrent ? 'true' : undefined}
+                >
+                  <Card
+                    isPressable
+                    className={`bg-theme-elevated border transition-colors ${isCurrent ? 'border-purple-500/60' : 'border-theme-default hover:border-purple-500/50'}`}
+                  >
+                    <CardBody className="flex flex-row items-center gap-4 p-3">
+                      <div className="bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-lg p-2 text-center min-w-[48px]">
+                        <div className="text-purple-700 dark:text-purple-400 text-[10px] font-medium uppercase leading-none">
+                          {monthLabel}
+                        </div>
+                        <div className="text-theme-primary text-lg font-bold leading-tight">
+                          {occDate.getDate()}
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-theme-primary font-medium truncate">{dateLabel}</p>
+                      </div>
+                      {isCurrent ? (
+                        <Chip size="sm" variant="flat" color="primary">{t('detail.series_this_date')}</Chip>
+                      ) : (
+                        <ArrowRight className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
+                      )}
+                    </CardBody>
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
+        </GlassCard>
+      )}
+
       {/* E7: Other Events in This Series */}
       {event.series && (
         <GlassCard className="p-6">

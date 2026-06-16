@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Recurring events now show their cover image on every date, not just one.** When you create a repeating event with a photo, the photo now appears on all of its dates. Previously it only attached to a single date in the series (which showed up last in the list), leaving the rest with no image.
+
+### Changed
+
+- **The Events page now shows one card per repeating series instead of every single date.** A repeating event now appears once — as its next upcoming date — with a "Repeats weekly · N dates" label, so the page no longer fills up with the same event over and over. Open the event to see the full list of its upcoming dates.
+- **Clearer limit when choosing how many times an event repeats.** The "number of occurrences" field now states the allowed range (2–52). Entering a number outside it shows a clear error, flags the field in red and jumps you straight to it, instead of the form silently doing nothing.
+
 ### Changed
 
 - **Accessibility and visual polish across every page of the accessible site.** A platform-wide pass to the GOV.UK Design System standard: status labels are now colour-coded by state (so an approved application looks different from a declined one at a glance), the keyboard now jumps straight to errors and confirmations, the current section is announced to screen readers, images reserve their space so the page doesn't jump as it loads, and the sign-out control and message-count badge are cleaner and fully keyboard-accessible.

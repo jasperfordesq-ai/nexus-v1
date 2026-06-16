@@ -26,6 +26,7 @@ import Tag from 'lucide-react/icons/tag';
 import Star from 'lucide-react/icons/star';
 import Ban from 'lucide-react/icons/ban';
 import X from 'lucide-react/icons/x';
+import Repeat from 'lucide-react/icons/repeat';
 import { useTranslation } from 'react-i18next';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -509,6 +510,11 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
   const weekdayLabel = formatDateValue(startDate, { weekday: 'short' });
   const timeLabel = formatDateTime(startDate, { hour: '2-digit', minute: '2-digit' });
   const coverImage = event.cover_image ? resolveAssetUrl(event.cover_image) : null;
+  const freq = event.recurrence_frequency;
+  const repeatsLabel = freq && ['daily', 'weekly', 'monthly', 'yearly'].includes(freq)
+    ? t(`card.repeats_${freq}`)
+    : t('card.repeats_generic');
+  const seriesCount = event.series_count ?? 0;
 
   return (
     <Link to={tenantPath(`/events/${event.id}`)} aria-label={t('card.open_aria', { title: event.title, date: eventDateLabel })}>
@@ -563,6 +569,18 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
               </div>
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
+                {event.is_series && (
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    color="secondary"
+                    startContent={<Repeat className="h-3.5 w-3.5" aria-hidden="true" />}
+                  >
+                    {seriesCount > 1
+                      ? `${repeatsLabel} · ${t('card.series_dates', { count: seriesCount })}`
+                      : repeatsLabel}
+                  </Chip>
+                )}
                 {isCancelled && (
                   <Chip size="sm" variant="flat" color="danger" startContent={<Ban className="h-3.5 w-3.5" aria-hidden="true" />}>
                     {t('card.cancelled')}

@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
+use App\Services\EventService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
@@ -711,5 +712,75 @@ class EventsControllerTest extends TestCase
 
         // Should return 404 because event belongs to different tenant
         $this->assertContains($response->getStatusCode(), [404, 403]);
+    }
+
+    // ================================================================
+    // RECURRING — series collapse + image cascade
+    // ================================================================
+
+    public function test_get_all_collapses_recurring_series_to_next_occurrence(): void
+    {
+        $user = $this->authenticatedUser();
+
+        // A standalone event must still pass through un-collapsed.
+        $standalone = $this->createEvent($user->id, [
+            'start_time' => now()->addDays(3)->format('Y-m-d H:i:s'),
+        ]);
+
+        // A recurring series: template (soonest) + two future occurrences.
+        $templateId = $this->createEvent($user->id, [
+            'start_time' => now()->addDays(7)->format('Y-m-d H:i:s'),
+            'is_recurring_template' => 1,
+        ]);
+        $occ1 = $this->createEvent($user->id, [
+            'start_time' => now()->addDays(14)->format('Y-m-d H:i:s'),
+            'parent_event_id' => $templateId,
+        ]);
+        $occ2 = $this->createEvent($user->id, [
+            'start_time' => now()->addDays(21)->format('Y-m-d H:i:s'),
+            'parent_event_id' => $templateId,
+        ]);
+
+        // Scope to this user so baseline fixtures in the test DB don't interfere.
+        $result = EventService::getAll(['when' => 'upcoming', 'limit' => 50, 'user_id' => $user->id]);
+        $ids = array_column($result['items'], 'id');
+
+        // Exactly one representative for the series (the soonest = the template),
+        // plus the standalone event.
+        $this->assertContains($standalone, $ids);
+        $this->assertContains($templateId, $ids);
+        $this->assertNotContains($occ1, $ids);
+        $this->assertNotContains($occ2, $ids);
+        $this->assertCount(2, $result['items']);
+
+        $rep = collect($result['items'])->firstWhere('id', $templateId);
+        $this->assertTrue($rep['is_series'] ?? false);
+        $this->assertSame(3, $rep['series_count'] ?? null);
+    }
+
+    public function test_update_image_cascades_cover_to_whole_series(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $templateId = $this->createEvent($user->id, [
+            'start_time' => now()->addDays(7)->format('Y-m-d H:i:s'),
+            'is_recurring_template' => 1,
+        ]);
+        $occ1 = $this->createEvent($user->id, [
+            'start_time' => now()->addDays(14)->format('Y-m-d H:i:s'),
+            'parent_event_id' => $templateId,
+        ]);
+        $occ2 = $this->createEvent($user->id, [
+            'start_time' => now()->addDays(21)->format('Y-m-d H:i:s'),
+            'parent_event_id' => $templateId,
+        ]);
+
+        // Uploading the cover to the template (as the frontend does) must land on
+        // every occurrence, not just the row the upload targeted.
+        $this->assertTrue(EventService::updateImage($templateId, $user->id, '/uploads/cover.jpg'));
+
+        $this->assertSame('/uploads/cover.jpg', DB::table('events')->where('id', $templateId)->value('cover_image'));
+        $this->assertSame('/uploads/cover.jpg', DB::table('events')->where('id', $occ1)->value('cover_image'));
+        $this->assertSame('/uploads/cover.jpg', DB::table('events')->where('id', $occ2)->value('cover_image'));
     }
 }

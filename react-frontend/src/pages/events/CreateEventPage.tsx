@@ -167,6 +167,7 @@ export function CreateEventPage() {
   const [existingImage, setExistingImage] = useState<string | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   // Poll attachment state
   const [availablePolls, setAvailablePolls] = useState<{ id: number; question: string }[]>([]);
@@ -410,7 +411,19 @@ export function CreateEventPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      // Make the failure visible — a silent early-return looked like "nothing
+      // happened" when an out-of-range value (e.g. 100 occurrences) was entered.
+      toast.error(t('form.toast.fix_errors'));
+      requestAnimationFrame(() => {
+        const el = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"], [data-invalid="true"]');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.focus?.();
+        }
+      });
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -655,7 +668,7 @@ export function CreateEventPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
           {/* Cover Image Upload */}
           <div>
             <label className="block text-sm font-medium text-theme-muted mb-2">
@@ -967,25 +980,30 @@ export function CreateEventPage() {
                   </Select>
 
                   {formData.recurrenceEndType === 'after_count' ? (
-                    <Input
-                      type="number"
-                      label={t('form.recurrence_count')}
-                      placeholder={t('form.recurrence_count_placeholder')}
-                      value={formData.recurrenceCount}
-                      onChange={(e) => {
-                        setFormData((prev) => ({ ...prev, recurrenceCount: e.target.value }));
-                        if (errors.recurrenceCount) setErrors((prev) => ({ ...prev, recurrenceCount: '' }));
-                      }}
-                      min={2}
-                      max={52}
-                      isInvalid={!!errors.recurrenceCount}
-                      errorMessage={errors.recurrenceCount}
-                      classNames={{
-                        input: 'bg-transparent text-theme-primary',
-                        inputWrapper: 'bg-theme-elevated border-theme-default',
-                        label: 'text-theme-muted',
-                      }}
-                    />
+                    <div>
+                      <Input
+                        type="number"
+                        label={t('form.recurrence_count')}
+                        placeholder={t('form.recurrence_count_placeholder')}
+                        value={formData.recurrenceCount}
+                        onChange={(e) => {
+                          setFormData((prev) => ({ ...prev, recurrenceCount: e.target.value }));
+                          if (errors.recurrenceCount) setErrors((prev) => ({ ...prev, recurrenceCount: '' }));
+                        }}
+                        min={2}
+                        max={52}
+                        isInvalid={!!errors.recurrenceCount}
+                        errorMessage={errors.recurrenceCount}
+                        classNames={{
+                          input: 'bg-transparent text-theme-primary',
+                          inputWrapper: 'bg-theme-elevated border-theme-default',
+                          label: 'text-theme-muted',
+                        }}
+                      />
+                      {!errors.recurrenceCount && (
+                        <p className="text-xs text-theme-subtle mt-1">{t('form.recurrence_count_hint')}</p>
+                      )}
+                    </div>
                   ) : (
                     <DatePicker
                       label={t('form.recurrence_end_date')}

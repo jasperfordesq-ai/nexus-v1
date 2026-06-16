@@ -137,13 +137,22 @@
     "leave_waitlist_aria": "Sair da lista de espera deste evento",
     "tabs_aria": "Seções de detalhes do evento",
     "delete_series_note": "Este é um evento recorrente. Ao eliminá-lo, todas as ocorrências futuras também serão eliminadas.",
-    "cancel_series_note": "Este é um evento recorrente. Ao cancelá-lo, todas as ocorrências futuras também serão canceladas e os participantes serão notificados."
+    "cancel_series_note": "Este é um evento recorrente. Ao cancelá-lo, todas as ocorrências futuras também serão canceladas e os participantes serão notificados.",
+    "series_dates_title": "Upcoming dates in this series",
+    "series_this_date": "This date"
   },
   "card": {
     "cancelled": "Cancelado",
     "spots_left": "{{count}} lugares restantes",
     "full": "Cheio",
-    "open_aria": "{{title}} on {{date}}"
+    "open_aria": "{{title}} on {{date}}",
+    "repeats_daily": "Repeats daily",
+    "repeats_weekly": "Repeats weekly",
+    "repeats_monthly": "Repeats monthly",
+    "repeats_yearly": "Repeats yearly",
+    "repeats_generic": "Recurring",
+    "series_dates_one": "{{count}} date",
+    "series_dates_other": "{{count}} dates"
   },
   "form": {
     "create_title": "Criar Novo Evento",
@@ -235,7 +244,8 @@
       "created": "Evento criado",
       "updated": "Evento atualizado",
       "image_failed": "Evento criado mas o carregamento da imagem falhou",
-      "error": "Algo correu mal"
+      "error": "Algo correu mal",
+      "fix_errors": "Please fix the highlighted fields before saving"
     },
     "attach_polls_label": "Anexar sondagens (opcional)",
     "attach_polls_placeholder": "Selecionar sondagens para anexar...",
@@ -253,7 +263,8 @@
     "edit_scope_message": "Este evento faz parte de uma série recorrente. O que pretende atualizar?",
     "edit_scope_single": "Apenas este evento",
     "edit_scope_all": "Este e todos os eventos futuros",
-    "edit_scope_all_note": "As alterações de data e hora aplicam-se apenas a este evento."
+    "edit_scope_all_note": "As alterações de data e hora aplicam-se apenas a este evento.",
+    "recurrence_count_hint": "Between 2 and 52 occurrences"
   },
   "toast": {
     "rsvp_removed": "Confirmação removida",

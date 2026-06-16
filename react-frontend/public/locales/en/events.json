@@ -137,13 +137,22 @@
     "leave_waitlist_aria": "Leave the waitlist for this event",
     "tabs_aria": "Event detail sections",
     "delete_series_note": "This is a recurring event. Deleting it will also delete all of its future occurrences.",
-    "cancel_series_note": "This is a recurring event. Cancelling it will also cancel all future occurrences and notify their attendees."
+    "cancel_series_note": "This is a recurring event. Cancelling it will also cancel all future occurrences and notify their attendees.",
+    "series_dates_title": "Upcoming dates in this series",
+    "series_this_date": "This date"
   },
   "card": {
     "cancelled": "Cancelled",
     "spots_left": "{{count}} spots left",
     "full": "Full",
-    "open_aria": "{{title}} on {{date}}"
+    "open_aria": "{{title}} on {{date}}",
+    "repeats_daily": "Repeats daily",
+    "repeats_weekly": "Repeats weekly",
+    "repeats_monthly": "Repeats monthly",
+    "repeats_yearly": "Repeats yearly",
+    "repeats_generic": "Recurring",
+    "series_dates_one": "{{count}} date",
+    "series_dates_other": "{{count}} dates"
   },
   "form": {
     "create_title": "Create New Event",
@@ -206,6 +215,7 @@
     "end_on_date": "On a specific date",
     "recurrence_count": "Number of occurrences",
     "recurrence_count_placeholder": "10",
+    "recurrence_count_hint": "Between 2 and 52 occurrences",
     "recurrence_end_date": "Series end date",
     "recurrence_preview_empty": "RRULE:...",
     "weekday_mon": "Mon",
@@ -235,7 +245,8 @@
       "created": "Event created",
       "updated": "Event updated",
       "image_failed": "Event created but image upload failed",
-      "error": "Something went wrong"
+      "error": "Something went wrong",
+      "fix_errors": "Please fix the highlighted fields before saving"
     },
     "attach_polls_label": "Attach Polls (optional)",
     "attach_polls_placeholder": "Select polls to attach...",

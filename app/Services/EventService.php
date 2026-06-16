@@ -100,6 +100,39 @@ class EventService
             }
         }
 
+        // Collapse recurring series so the list shows ONE card per series — the
+        // next upcoming occurrence — instead of flooding the page with every
+        // occurrence. A row is kept only when no *preferred* sibling exists in
+        // the same series within the current time window. Standalone events have
+        // no siblings (their series key is their own id), so they always pass.
+        // Skipped for proximity, which uses a separate offset-paginated query.
+        if (! $hasProximity) {
+            $query->whereNotExists(function ($sub) use ($when) {
+                $sub->selectRaw('1')
+                    ->from('events as e2')
+                    ->whereColumn('e2.tenant_id', 'events.tenant_id')
+                    ->whereRaw('COALESCE(e2.parent_event_id, e2.id) = COALESCE(events.parent_event_id, events.id)')
+                    ->whereColumn('e2.id', '!=', 'events.id');
+
+                if ($when === 'past') {
+                    // Keep the most recent past occurrence.
+                    $sub->whereRaw('e2.start_time < NOW()')
+                        ->whereRaw('(e2.start_time > events.start_time OR (e2.start_time = events.start_time AND e2.id > events.id))');
+                } elseif ($when === 'all') {
+                    // Prefer the next upcoming occurrence; if the whole series is
+                    // past, fall back to its most recent occurrence.
+                    $sub->whereRaw(
+                        '((e2.start_time >= NOW() AND (events.start_time < NOW() OR e2.start_time < events.start_time OR (e2.start_time = events.start_time AND e2.id < events.id)))'
+                        . ' OR (e2.start_time < NOW() AND events.start_time < NOW() AND (e2.start_time > events.start_time OR (e2.start_time = events.start_time AND e2.id > events.id))))'
+                    );
+                } else {
+                    // upcoming: keep the soonest occurrence.
+                    $sub->whereRaw('e2.start_time >= NOW()')
+                        ->whereRaw('(e2.start_time < events.start_time OR (e2.start_time = events.start_time AND e2.id < events.id))');
+                }
+            });
+        }
+
         if ($hasProximity) {
             $haversine = '(6371 * acos(LEAST(1.0, GREATEST(-1.0, '
                 . 'cos(radians(?)) * cos(radians(events.latitude)) * cos(radians(events.longitude) - radians(?)) + '
@@ -137,8 +170,54 @@ class EventService
             ->groupBy('event_id')
             ->pluck('count', 'event_id');
 
-        $result = $items->map(function (Event $event) use ($rsvpCounts, $interestedCounts) {
+        // Series metadata for the collapsed representatives, so the card can show
+        // "Repeats weekly · N dates". Keyed by series root (parent_event_id ?? id).
+        $tenantIdForSeries = \App\Core\TenantContext::getId();
+        $seriesRoots = [];
+        foreach ($items as $it) {
+            if (! empty($it->is_recurring_template) || ! empty($it->parent_event_id)) {
+                $seriesRoots[(int) ($it->parent_event_id ?? $it->id)] = true;
+            }
+        }
+        $seriesRoots = array_keys($seriesRoots);
+        $seriesCounts = [];
+        $seriesFreq = [];
+        if (! empty($seriesRoots)) {
+            $placeholders = implode(',', array_fill(0, count($seriesRoots), '?'));
+            // Count occurrences per series within the current time window so the
+            // badge reflects what the user can actually still attend.
+            $windowSql = $when === 'past'
+                ? ' AND start_time < NOW()'
+                : ($when === 'upcoming' ? ' AND start_time >= NOW()' : '');
+            $countRows = DB::select(
+                "SELECT COALESCE(parent_event_id, id) AS skey, COUNT(*) AS c
+                 FROM events
+                 WHERE tenant_id = ? AND (id IN ($placeholders) OR parent_event_id IN ($placeholders))" . $windowSql . "
+                 GROUP BY COALESCE(parent_event_id, id)",
+                array_merge([$tenantIdForSeries], $seriesRoots, $seriesRoots)
+            );
+            foreach ($countRows as $row) {
+                $seriesCounts[(int) $row->skey] = (int) $row->c;
+            }
+            $freqRows = DB::select(
+                "SELECT event_id, frequency FROM event_recurrence_rules
+                 WHERE tenant_id = ? AND event_id IN ($placeholders)",
+                array_merge([$tenantIdForSeries], $seriesRoots)
+            );
+            foreach ($freqRows as $row) {
+                $seriesFreq[(int) $row->event_id] = $row->frequency;
+            }
+        }
+
+        $result = $items->map(function (Event $event) use ($rsvpCounts, $interestedCounts, $seriesCounts, $seriesFreq) {
             $data = $event->toArray();
+
+            if (! empty($event->is_recurring_template) || ! empty($event->parent_event_id)) {
+                $root = (int) ($event->parent_event_id ?? $event->id);
+                $data['is_series'] = true;
+                $data['series_count'] = $seriesCounts[$root] ?? 1;
+                $data['recurrence_frequency'] = $seriesFreq[$root] ?? null;
+            }
             $goingCount = (int) ($rsvpCounts[$event->id] ?? 0);
             $interestedCount = (int) ($interestedCounts[$event->id] ?? 0);
             $maxAttendees = $event->max_attendees;
@@ -219,6 +298,35 @@ class EventService
             $data['my_rsvp'] = $event->rsvps
                 ->where('user_id', $currentUserId)
                 ->first()?->status;
+        }
+
+        // Recurring-series metadata + upcoming dates so the detail page can show
+        // the full schedule that the collapsed list card links through to.
+        if (! empty($event->is_recurring_template) || ! empty($event->parent_event_id)) {
+            $tenantId = \App\Core\TenantContext::getId();
+            $rootId = (int) ($event->parent_event_id ?? $event->id);
+            $data['is_series'] = true;
+
+            $freq = DB::selectOne(
+                "SELECT frequency FROM event_recurrence_rules WHERE tenant_id = ? AND event_id = ?",
+                [$tenantId, $rootId]
+            );
+            $data['recurrence_frequency'] = $freq->frequency ?? null;
+
+            $occRows = DB::select(
+                "SELECT id, start_time, occurrence_date
+                 FROM events
+                 WHERE tenant_id = ? AND (id = ? OR parent_event_id = ?) AND start_time >= NOW()
+                 ORDER BY start_time ASC
+                 LIMIT 50",
+                [$tenantId, $rootId, $rootId]
+            );
+            $data['series_occurrences'] = array_map(static fn ($row) => [
+                'id'         => (int) $row->id,
+                'start_time' => $row->start_time,
+                'date'       => $row->occurrence_date,
+            ], $occRows);
+            $data['series_count'] = count($occRows);
         }
 
         return $data;
@@ -1114,7 +1222,7 @@ class EventService
         self::$errors = [];
         $tenantId = \App\Core\TenantContext::getId();
 
-        $event = DB::selectOne("SELECT id, user_id FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
+        $event = DB::selectOne("SELECT id, user_id, is_recurring_template, parent_event_id FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.event_not_found')];
             return false;
@@ -1131,6 +1239,18 @@ class EventService
 
         try {
             DB::update("UPDATE events SET cover_image = ? WHERE id = ? AND tenant_id = ?", [$imageUrl, $eventId, $tenantId]);
+
+            // Recurring series: the image is uploaded to the template AFTER its
+            // occurrences are generated, so without this the cover only lands on
+            // the one row the upload targeted (which sorts last in the DESC list).
+            // Propagate it to the whole series so every occurrence shows it.
+            if (!empty($event->is_recurring_template) || !empty($event->parent_event_id)) {
+                $rootId = !empty($event->parent_event_id) ? (int) $event->parent_event_id : (int) $event->id;
+                DB::update(
+                    "UPDATE events SET cover_image = ? WHERE tenant_id = ? AND (id = ? OR parent_event_id = ?)",
+                    [$imageUrl, $tenantId, $rootId, $rootId]
+                );
+            }
             return true;
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("EventService::updateImage error: " . $e->getMessage());
@@ -1924,8 +2044,8 @@ class EventService
                 DB::statement(
                     "INSERT INTO events (tenant_id, user_id, title, description, location, start_time, end_time,
                      group_id, category_id, latitude, longitude, federated_visibility, parent_event_id, occurrence_date,
-                     max_attendees, series_id, created_at, updated_at)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+                     max_attendees, series_id, cover_image, image_url, created_at, updated_at)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
                     [
                         $tenantId, (int) $template->user_id, $template->title,
                         $template->description ?? '', $template->location ?? '',
@@ -1935,6 +2055,7 @@ class EventService
                         $template->federated_visibility ?? 'none',
                         $templateId, $occ['date'],
                         $template->max_attendees, $template->series_id,
+                        $template->cover_image ?? null, $template->image_url ?? null,
                     ]
                 );
                 $count++;

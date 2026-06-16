@@ -137,13 +137,22 @@
     "leave_waitlist_aria": "مغادرة قائمة انتظار هذه الفعالية",
     "tabs_aria": "أقسام تفاصيل الحدث",
     "delete_series_note": "هذه فعالية متكررة. سيؤدي حذفها أيضًا إلى حذف جميع مواعيدها القادمة.",
-    "cancel_series_note": "هذه فعالية متكررة. سيؤدي إلغاؤها أيضًا إلى إلغاء جميع المواعيد القادمة وإخطار الحضور."
+    "cancel_series_note": "هذه فعالية متكررة. سيؤدي إلغاؤها أيضًا إلى إلغاء جميع المواعيد القادمة وإخطار الحضور.",
+    "series_dates_title": "Upcoming dates in this series",
+    "series_this_date": "This date"
   },
   "card": {
     "cancelled": "تم الإلغاء",
     "spots_left": "{{count}} البقع المتبقية",
     "full": "ممتلىء",
-    "open_aria": "{{title}} on {{date}}"
+    "open_aria": "{{title}} on {{date}}",
+    "repeats_daily": "Repeats daily",
+    "repeats_weekly": "Repeats weekly",
+    "repeats_monthly": "Repeats monthly",
+    "repeats_yearly": "Repeats yearly",
+    "repeats_generic": "Recurring",
+    "series_dates_one": "{{count}} date",
+    "series_dates_other": "{{count}} dates"
   },
   "form": {
     "create_title": "إنشاء حدث جديد",
@@ -235,7 +244,8 @@
       "created": "تم إنشاء الحدث",
       "updated": "تم تحديث الحدث",
       "image_failed": "تم إنشاء الحدث ولكن فشل تحميل الصورة",
-      "error": "حدث خطأ ما"
+      "error": "حدث خطأ ما",
+      "fix_errors": "Please fix the highlighted fields before saving"
     },
     "attach_polls_label": "إرفاق استطلاعات الرأي (اختياري)",
     "attach_polls_placeholder": "تحديد استطلاعات الرأي لإرفاقها...",
@@ -253,7 +263,8 @@
     "edit_scope_message": "هذه الفعالية جزء من سلسلة متكررة. ماذا تريد أن تُحدِّث؟",
     "edit_scope_single": "هذه الفعالية فقط",
     "edit_scope_all": "هذه الفعالية وجميع الفعاليات القادمة",
-    "edit_scope_all_note": "تنطبق تغييرات التاريخ والوقت على هذه الفعالية فقط."
+    "edit_scope_all_note": "تنطبق تغييرات التاريخ والوقت على هذه الفعالية فقط.",
+    "recurrence_count_hint": "Between 2 and 52 occurrences"
   },
   "toast": {
     "rsvp_removed": "تمت إزالة الرد على الدعوة",

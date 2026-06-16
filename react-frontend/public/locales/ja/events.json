@@ -137,13 +137,22 @@
     "leave_waitlist_aria": "このイベントのキャンセル待ちから外れる",
     "tabs_aria": "イベント詳細セクション",
     "delete_series_note": "これは定期イベントです。削除すると、今後のすべての開催回も削除されます。",
-    "cancel_series_note": "これは定期イベントです。中止すると、今後のすべての開催回も中止され、参加者に通知されます。"
+    "cancel_series_note": "これは定期イベントです。中止すると、今後のすべての開催回も中止され、参加者に通知されます。",
+    "series_dates_title": "Upcoming dates in this series",
+    "series_this_date": "This date"
   },
   "card": {
     "cancelled": "キャンセル",
     "spots_left": "{{count}} 枠が残っています",
     "full": "満杯",
-    "open_aria": "{{title}} on {{date}}"
+    "open_aria": "{{title}} on {{date}}",
+    "repeats_daily": "Repeats daily",
+    "repeats_weekly": "Repeats weekly",
+    "repeats_monthly": "Repeats monthly",
+    "repeats_yearly": "Repeats yearly",
+    "repeats_generic": "Recurring",
+    "series_dates_one": "{{count}} date",
+    "series_dates_other": "{{count}} dates"
   },
   "form": {
     "create_title": "新しいイベントの作成",
@@ -235,7 +244,8 @@
       "created": "イベントが作成されました",
       "updated": "イベントを更新しました",
       "image_failed": "イベントが作成されましたが、画像のアップロードに失敗しました",
-      "error": "何か問題が発生しました"
+      "error": "何か問題が発生しました",
+      "fix_errors": "Please fix the highlighted fields before saving"
     },
     "attach_polls_label": "投票の添付 (オプション)",
     "attach_polls_placeholder": "添付する投票を選択してください...",
@@ -253,7 +263,8 @@
     "edit_scope_message": "このイベントは定期シリーズの一部です。どちらを更新しますか？",
     "edit_scope_single": "このイベントのみ",
     "edit_scope_all": "このイベントと今後すべて",
-    "edit_scope_all_note": "日時の変更はこのイベントにのみ適用されます。"
+    "edit_scope_all_note": "日時の変更はこのイベントにのみ適用されます。",
+    "recurrence_count_hint": "Between 2 and 52 occurrences"
   },
   "toast": {
     "rsvp_removed": "出欠確認を削除しました",
