@@ -20,7 +20,7 @@ class UserXpLog extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'tenant_id', 'user_id', 'xp_amount', 'action', 'description',
+        'tenant_id', 'user_id', 'xp_amount', 'action', 'description', 'source_reference',
     ];
 
     protected $casts = [

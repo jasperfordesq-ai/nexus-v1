@@ -57,12 +57,19 @@ class UpdateWalletBalance implements ShouldQueue
             $senderId = $event->sender->id;
             $receiverId = $event->receiver->id;
 
+            // Per-transaction idempotency key for the XP awards below. Backs up the
+            // 1h Cache claim above with a permanent DB-level guard (uniq index on
+            // user_xp_log(tenant_id, user_id, action, source_reference)).
+            $transactionRef = (string) ($event->transaction->id ?? '');
+            $sendRef = $transactionRef !== '' ? $transactionRef : null;
+
             // Award XP to sender for sending credits
             $gamification->awardXP(
                 $senderId,
                 GamificationService::XP_VALUES['send_credits'],
                 'send_credits',
-                'Sent time credits in transaction #' . $event->transaction->id
+                'Sent time credits in transaction #' . $event->transaction->id,
+                $sendRef
             );
 
             // Award XP to receiver for receiving credits
@@ -70,7 +77,8 @@ class UpdateWalletBalance implements ShouldQueue
                 $receiverId,
                 GamificationService::XP_VALUES['receive_credits'],
                 'receive_credits',
-                'Received time credits in transaction #' . $event->transaction->id
+                'Received time credits in transaction #' . $event->transaction->id,
+                $sendRef
             );
 
             // Run badge checks for both users

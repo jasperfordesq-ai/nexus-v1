@@ -43,12 +43,12 @@ class UpdateWalletBalanceTest extends TestCase
         // Expect XP award for sender
         $gamificationMock->shouldReceive('awardXP')
             ->once()
-            ->with(10, GamificationService::XP_VALUES['send_credits'], 'send_credits', Mockery::type('string'));
+            ->with(10, GamificationService::XP_VALUES['send_credits'], 'send_credits', Mockery::type('string'), '500');
 
         // Expect XP award for receiver
         $gamificationMock->shouldReceive('awardXP')
             ->once()
-            ->with(20, GamificationService::XP_VALUES['receive_credits'], 'receive_credits', Mockery::type('string'));
+            ->with(20, GamificationService::XP_VALUES['receive_credits'], 'receive_credits', Mockery::type('string'), '500');
 
         // Expect badge checks for both users
         $gamificationMock->shouldReceive('runAllBadgeChecks')

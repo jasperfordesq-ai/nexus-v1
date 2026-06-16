@@ -111,9 +111,11 @@ class EnsureIsAdmin
             ->join('permissions as p', 'p.id', '=', 'rp.permission_id')
             ->where('ur.user_id', $userId)
             ->where('p.name', 'verein.members.import')
-            ->where(function ($query) use ($tenantId): void {
-                $query->where('ur.tenant_id', $tenantId)->orWhereNull('ur.tenant_id');
-            })
+            // ur.tenant_id MUST match the current tenant. assignVereinAdmin() always
+            // writes a concrete tenant_id, so a NULL ('global') row here can only be a
+            // malicious/misconfigured grant — it must not bypass tenant isolation.
+            // (rp/p tenant_id keep orWhereNull: the migration seeds those rows with NULL.)
+            ->where('ur.tenant_id', $tenantId)
             ->where(function ($query) use ($tenantId): void {
                 $query->where('rp.tenant_id', $tenantId)->orWhereNull('rp.tenant_id');
             })

@@ -573,14 +573,14 @@ class GamificationService
     /**
      * Award XP to a user and check for level up.
      */
-    public static function awardXP(int $userId, int $amount, string $action, string $description = ''): void
+    public static function awardXP(int $userId, int $amount, string $action, string $description = '', ?string $reference = null): void
     {
         if ($amount <= 0) {
             return;
         }
 
         try {
-            DB::transaction(function () use ($userId, $amount, $action, $description) {
+            DB::transaction(function () use ($userId, $amount, $action, $description, $reference) {
                 // Prevent duplicate one-time XP awards — lock user row to serialize
                 $oneTimeActions = ['complete_profile'];
                 if (in_array($action, $oneTimeActions)) {
@@ -597,10 +597,11 @@ class GamificationService
 
                 // Log XP
                 UserXpLog::create([
-                    'user_id'     => $userId,
-                    'xp_amount'   => $amount,
-                    'action'      => $action,
-                    'description' => $description,
+                    'user_id'          => $userId,
+                    'xp_amount'        => $amount,
+                    'action'           => $action,
+                    'description'      => $description,
+                    'source_reference' => $reference,
                 ]);
 
                 // Update user XP (atomic increment)
@@ -626,6 +627,11 @@ class GamificationService
 
             // Check for level up (outside transaction — non-critical)
             self::checkLevelUp($userId);
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            // A reference-scoped award already exists for this
+            // (tenant, user, action, source_reference) — idempotent no-op.
+            // Do not re-award or log this as an error.
+            return;
         } catch (\Throwable $e) {
             Log::error('XP Award Error: ' . $e->getMessage());
         }
