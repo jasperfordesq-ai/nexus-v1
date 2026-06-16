@@ -41,7 +41,7 @@
     @endif
 
     @if ($artwork !== '')
-        <img class="nexus-alpha-avatar" src="{{ $artwork }}" alt="" aria-hidden="true" loading="lazy" decoding="async" style="float:right;margin:0 0 1rem 1.5rem;">
+        <img class="nexus-alpha-avatar nexus-alpha-avatar--xl govuk-!-margin-bottom-4" src="{{ $artwork }}" alt="" aria-hidden="true" loading="lazy" decoding="async">
     @endif
 
     <span class="govuk-caption-xl">{{ $owner !== '' ? __('govuk_alpha.podcasts.by_label', ['name' => $owner]) : ($tenant['name'] ?? $tenantSlug) }}</span>

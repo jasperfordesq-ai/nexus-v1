@@ -29,7 +29,7 @@
     </form>
 
     @if (empty($courses))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.courses.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.courses.empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($courses as $c)

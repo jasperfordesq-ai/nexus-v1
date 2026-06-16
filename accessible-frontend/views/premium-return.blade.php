@@ -23,8 +23,8 @@
             </div>
         </div>
     @elseif ($returnStatus === 'pending')
+        <h1 class="govuk-heading-l">{{ __('govuk_alpha.polish_commerce.premium_pending_title') }}</h1>
         <div class="govuk-inset-text">
-            <h1 class="govuk-heading-l">{{ __('govuk_alpha.polish_commerce.premium_pending_title') }}</h1>
             <p class="govuk-body">{{ __('govuk_alpha.polish_commerce.premium_pending_body') }}</p>
         </div>
     @else
