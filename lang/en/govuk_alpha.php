@@ -40,6 +40,7 @@ return [
         'members' => 'Members',
         'events' => 'Events',
         'volunteering' => 'Volunteering',
+        'jobs' => 'Jobs',
         'profile' => 'My Profile',
         'contact' => 'Contact',
         'login' => 'Sign in',

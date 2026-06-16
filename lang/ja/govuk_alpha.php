@@ -24,6 +24,7 @@ return [
     'service_information_label' => 'コミュニティサービス情報',
     'navigation_label' => 'コミュニティナビゲーション',
     'nav' => [
+        'jobs' => 'Jobs',
         'wallet' => 'Wallet',
         'account' => 'My account',
         'explore' => 'Explore',

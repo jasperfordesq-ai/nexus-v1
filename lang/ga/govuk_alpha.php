@@ -24,6 +24,7 @@ return [
     'service_information_label' => 'Faisnéis seirbhíse pobail',
     'navigation_label' => 'Loingseoireacht pobail',
     'nav' => [
+        'jobs' => 'Jobs',
         'wallet' => 'Wallet',
         'account' => 'My account',
         'explore' => 'Explore',

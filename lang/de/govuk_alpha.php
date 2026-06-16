@@ -24,6 +24,7 @@ return [
     'service_information_label' => 'Informationen zum Zivildienst',
     'navigation_label' => 'Community-Navigation',
     'nav' => [
+        'jobs' => 'Jobs',
         'wallet' => 'Wallet',
         'account' => 'My account',
         'explore' => 'Explore',

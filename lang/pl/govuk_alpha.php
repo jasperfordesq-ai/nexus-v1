@@ -24,6 +24,7 @@ return [
     'service_information_label' => 'Informacje o usługach społecznych',
     'navigation_label' => 'Nawigacja społecznościowa',
     'nav' => [
+        'jobs' => 'Jobs',
         'wallet' => 'Wallet',
         'account' => 'My account',
         'explore' => 'Explore',

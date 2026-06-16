@@ -24,6 +24,7 @@ return [
     'service_information_label' => 'Informations sur le service communautaire',
     'navigation_label' => 'Navigation communautaire',
     'nav' => [
+        'jobs' => 'Jobs',
         'wallet' => 'Wallet',
         'account' => 'My account',
         'explore' => 'Explore',

@@ -24,6 +24,7 @@ return [
     'service_information_label' => 'معلومات خدمة المجتمع',
     'navigation_label' => 'الملاحة المجتمعية',
     'nav' => [
+        'jobs' => 'Jobs',
         'wallet' => 'Wallet',
         'account' => 'My account',
         'explore' => 'Explore',
