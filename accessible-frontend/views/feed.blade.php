@@ -114,6 +114,15 @@
     @endif
 
     @if (!$requiresAuth)
+        @if (\App\Core\TenantContext::hasModule('listings'))
+            {{-- The feed compose box is for community updates, NOT offers/requests —
+                 those are listings, an entirely separate mechanism. Make that obvious
+                 and route people to the listing form. --}}
+            <div class="govuk-inset-text">
+                <p class="govuk-body">{{ __('govuk_alpha.feed.compose_listing_notice') }}</p>
+                <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" role="button" draggable="false" data-module="govuk-button" href="{{ route('govuk-alpha.listings.create', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.feed.post_offer_request') }}</a>
+            </div>
+        @endif
         <form method="post" action="{{ route('govuk-alpha.feed.posts.store', ['tenantSlug' => $tenantSlug]) }}" enctype="multipart/form-data" class="govuk-!-margin-bottom-7">
             @csrf
             <div class="govuk-form-group{{ $hasPostError ? ' govuk-form-group--error' : '' }}">
@@ -220,15 +229,26 @@
                     $likeCount = (int) ($item['likes_count'] ?? 0);
                     $isLiked = (bool) ($item['is_liked'] ?? false);
                     $isCommentable = in_array($itemType, $commentableTypes, true);
-                    // Link typed cards through to the accessible detail page that exists
-                    // for that module ($itemId is the source entity id). Types with no
-                    // accessible page (post/poll/goal/job/blog/discussion) stay in-feed.
+                    // Link typed cards through to the accessible detail page for that
+                    // module ($itemId is the feed source_id = the source entity id).
+                    // post/poll are interactive in-feed; blog/discussion need a slug or
+                    // group context the feed row does not carry, so they stay in-feed.
                     $detailUrl = $itemId > 0 ? match ($itemType) {
                         'listing' => route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $itemId]),
                         'event' => route('govuk-alpha.events.show', ['tenantSlug' => $tenantSlug, 'id' => $itemId]),
                         'volunteer' => route('govuk-alpha.volunteering.show', ['tenantSlug' => $tenantSlug, 'id' => $itemId]),
+                        'goal' => route('govuk-alpha.goals.show', ['tenantSlug' => $tenantSlug, 'id' => $itemId]),
+                        'job' => route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $itemId]),
+                        'challenge' => route('govuk-alpha.ideation.show', ['tenantSlug' => $tenantSlug, 'id' => $itemId]),
+                        'course' => route('govuk-alpha.courses.show', ['tenantSlug' => $tenantSlug, 'id' => $itemId]),
                         default => null,
                     } : null;
+                    // Self-describing call-to-action ("View this listing") so the link
+                    // purpose is clear out of context (WCAG 2.4.4); falls back to a
+                    // generic label for any typed item without a bespoke string.
+                    $viewTypedLabel = \Illuminate\Support\Facades\Lang::has('govuk_alpha.feed.view_typed.' . $itemType)
+                        ? __('govuk_alpha.feed.view_typed.' . $itemType)
+                        : __('govuk_alpha.actions.view_details');
                     $authorAvatar = $item['author']['avatar_url'] ?? null;
                     $authorId = (int) ($item['author']['id'] ?? 0);
                     $isOwnPost = $itemType === 'post' && !$requiresAuth && ($currentUserId ?? 0) > 0 && $authorId === (int) $currentUserId;
@@ -237,7 +257,9 @@
                     <div class="nexus-alpha-feed-row">
                         <div>
                             <strong class="govuk-tag {{ $feedItemType($itemType) }}">{{ $feedItemTypeLabel($itemType) }}</strong>
-                            <h3 class="govuk-heading-m govuk-!-margin-top-2 govuk-!-margin-bottom-2">{{ $itemTitle }}</h3>
+                            <h3 class="govuk-heading-m govuk-!-margin-top-2 govuk-!-margin-bottom-2">
+                                @if ($detailUrl)<a class="govuk-link" href="{{ $detailUrl }}">{{ $itemTitle }}</a>@else{{ $itemTitle }}@endif
+                            </h3>
                             <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">
                                 @if (!empty($authorAvatar))
                                     <img class="nexus-alpha-avatar nexus-alpha-avatar--small" src="{{ $authorAvatar }}" alt="" loading="lazy" decoding="async" width="32" height="32">
@@ -252,9 +274,8 @@
                         </div>
                         @if ($detailUrl)
                             <div class="nexus-alpha-feed-row__action">
-                                <a class="govuk-link govuk-link--no-visited-state" href="{{ $detailUrl }}">
-                                    {{ __('govuk_alpha.actions.view_details') }}
-                                    <span class="govuk-visually-hidden">{{ __('govuk_alpha.feed.detail_for', ['title' => $itemTitle]) }}</span>
+                                <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" role="button" draggable="false" data-module="govuk-button" href="{{ $detailUrl }}">
+                                    {{ $viewTypedLabel }}<span class="govuk-visually-hidden">{{ __('govuk_alpha.feed.detail_for', ['title' => $itemTitle]) }}</span>
                                 </a>
                             </div>
                         @endif

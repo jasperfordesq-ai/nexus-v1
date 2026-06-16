@@ -187,7 +187,7 @@ class AlphaController extends Controller
             }
 
             return redirect()
-                ->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'signed-in'])
+                ->route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug])
                 ->withCookie(cookie(
                     'auth_token',
                     $token,
@@ -380,7 +380,7 @@ class AlphaController extends Controller
             }
 
             return redirect()
-                ->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug, 'status' => 'signed-in'])
+                ->route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug])
                 ->withCookie(cookie('auth_token', $accessToken, 60 * 24 * 7, '/', null, $request->isSecure(), true, false, 'Lax'));
         }
 

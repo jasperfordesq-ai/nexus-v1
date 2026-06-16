@@ -565,7 +565,7 @@ class GovukAlphaFrontendTest extends TestCase
             'password' => 'CorrectPassword123',
         ]);
 
-        $login->assertRedirect("/{$this->testTenantSlug}/alpha/feed?status=signed-in");
+        $login->assertRedirect("/{$this->testTenantSlug}/alpha/dashboard");
         $login->assertCookie('auth_token');
 
         $cookie = null;
@@ -644,7 +644,12 @@ class GovukAlphaFrontendTest extends TestCase
         $response->assertOk();
         // Previously only listing cards linked through; event cards were dead ends.
         $response->assertSee(route('govuk-alpha.events.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $eventId]), false);
-        $response->assertSee(__('govuk_alpha.actions.view_details'));
+        // Typed cards now carry a self-describing CTA ("View this event").
+        $response->assertSee(__('govuk_alpha.feed.view_typed.event'));
+        // The compose area routes people to the (separate) listing form so they
+        // do not mistake a feed post for posting an offer or request.
+        $response->assertSee(__('govuk_alpha.feed.post_offer_request'));
+        $response->assertSee(route('govuk-alpha.listings.create', ['tenantSlug' => $this->testTenantSlug]), false);
     }
 
     public function test_feed_author_can_reply_edit_and_delete_own_post_and_comments(): void
