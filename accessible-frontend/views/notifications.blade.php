@@ -106,7 +106,7 @@
     </div>
 
     @if (empty($notifications))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.notifications.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.notifications.empty') }}</p></div>
     @else
         @foreach ($notifications as $n)
             @php

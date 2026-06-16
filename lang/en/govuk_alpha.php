@@ -3852,6 +3852,10 @@ return [
         'states_invite_success' => 'group-invite-sent',
         'states_invite_failed' => 'group-invite-failed',
     ],
+    'polish_core_a' => [
+        // search.blade.php — fieldset legend grouping the query + type inputs
+        'search_filters_legend' => 'Search and filter',
+    ],
     'polish_federation' => [
         // federation-settings — communications fieldset
         'settings_communications_legend' => 'Communications',

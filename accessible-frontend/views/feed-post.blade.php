@@ -28,13 +28,26 @@
     <span class="govuk-caption-l">{{ __('govuk_alpha.feed.caption', ['community' => ($tenant['name'] ?? $tenantSlug)]) }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.feed_t1.permalink_heading') }}</h1>
 
-    @if (in_array($status ?? '', ['reaction-added', 'reaction-removed', 'comment-created', 'comment-updated', 'comment-deleted', 'share-added', 'share-removed', 'save-added', 'save-removed'], true))
+    @php
+        $successMessages = [
+            'reaction-added'    => 'govuk_alpha.feed_t1.status_reaction_added',
+            'reaction-removed'  => 'govuk_alpha.feed_t1.status_reaction_removed',
+            'comment-created'   => 'govuk_alpha.states.comment-created',
+            'comment-updated'   => 'govuk_alpha.states.comment-updated',
+            'comment-deleted'   => 'govuk_alpha.states.comment-deleted',
+            'share-added'       => 'govuk_alpha.feed_t1.status_share_added',
+            'share-removed'     => 'govuk_alpha.feed_t1.status_share_removed',
+            'save-added'        => 'govuk_alpha.feed_t1.status_save_added',
+            'save-removed'      => 'govuk_alpha.feed_t1.status_save_removed',
+        ];
+    @endphp
+    @if (isset($successMessages[$status ?? '']))
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="permalink-status-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="permalink-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
             <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.states.success_title') }}</p>
+                <p class="govuk-notification-banner__heading">{{ __($successMessages[$status]) }}</p>
             </div>
         </div>
     @endif
@@ -46,7 +59,7 @@
             </div>
             <div class="govuk-notification-banner__content">
                 <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.states.auth_required') }}</p>
-                <div class="nexus-alpha-actions">
+                <div class="govuk-button-group">
                     <a class="govuk-button" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.nav.login') }}</a>
                 </div>
             </div>

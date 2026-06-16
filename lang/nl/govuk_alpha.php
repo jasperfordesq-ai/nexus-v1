@@ -3888,4 +3888,8 @@ return [
         // legal-hub — card list a11y
         'legal_hub_list_label' => 'Legal documents',
     ],
+    'polish_core_a' => [
+        // search.blade.php — fieldset legend grouping the query + type inputs
+        'search_filters_legend' => 'Search and filter',
+    ],
 ];

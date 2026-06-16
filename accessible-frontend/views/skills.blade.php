@@ -41,7 +41,7 @@
     @if (($skillQuery ?? '') !== '')
         <h2 class="govuk-heading-l">{{ __('govuk_alpha.skills.members_with', ['skill' => $skillQuery]) }}</h2>
         @if (empty($skillMembers))
-            <p class="govuk-inset-text">{{ __('govuk_alpha.skills.no_members') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.skills.no_members') }}</p></div>
         @else
             <ul class="govuk-list">
                 @foreach ($skillMembers as $m)
@@ -65,6 +65,6 @@
             @endforeach
         </ul>
     @else
-        <p class="govuk-inset-text">{{ __('govuk_alpha.skills.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.skills.empty') }}</p></div>
     @endif
 @endsection

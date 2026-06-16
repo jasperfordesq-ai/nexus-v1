@@ -72,7 +72,7 @@
     <section aria-labelledby="received-heading">
         <h2 class="govuk-heading-l govuk-!-margin-top-6" id="received-heading">{{ __('govuk_alpha.connections.received_title') }}</h2>
         @if (empty($receivedRequests))
-            <p class="govuk-inset-text">{{ __('govuk_alpha.connections.received_empty') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.connections.received_empty') }}</p></div>
         @else
             @foreach ($receivedRequests as $c)
                 @php $p = $c['partner'] ?? $c['user'] ?? []; $cid = (int) ($c['connection_id'] ?? $c['id'] ?? 0); @endphp
@@ -103,7 +103,7 @@
     <section aria-labelledby="accepted-heading">
         <h2 class="govuk-heading-l govuk-!-margin-top-6" id="accepted-heading">{{ __('govuk_alpha.connections.accepted_title') }}</h2>
         @if (empty($acceptedConnections))
-            <p class="govuk-inset-text">{{ __('govuk_alpha.connections.accepted_empty') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.connections.accepted_empty') }}</p></div>
         @else
             @foreach ($acceptedConnections as $c)
                 @php $p = $c['partner'] ?? $c['user'] ?? []; $cid = (int) ($c['connection_id'] ?? $c['id'] ?? 0); @endphp
@@ -129,7 +129,7 @@
     <section aria-labelledby="sent-heading">
         <h2 class="govuk-heading-l govuk-!-margin-top-6" id="sent-heading">{{ __('govuk_alpha.connections.sent_title') }}</h2>
         @if (empty($sentRequests))
-            <p class="govuk-inset-text">{{ __('govuk_alpha.connections.sent_empty') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.connections.sent_empty') }}</p></div>
         @else
             @foreach ($sentRequests as $c)
                 @php $p = $c['partner'] ?? $c['user'] ?? []; $cid = (int) ($c['connection_id'] ?? $c['id'] ?? 0); @endphp
