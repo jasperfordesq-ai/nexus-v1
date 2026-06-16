@@ -33,7 +33,7 @@
     </div>
 
     @if (in_array($status, $successStates, true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="ge-status-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="ge-status-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="ge-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -70,7 +70,7 @@
     {{-- Participants --}}
     <h2 class="govuk-heading-l">{{ __('govuk_alpha.group_exchanges.participants_title') }}</h2>
     @if (empty($participants))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.group_exchanges.no_participants') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.group_exchanges.no_participants') }}</p></div>
     @else
         <table class="govuk-table">
             <caption class="govuk-table__caption govuk-table__caption--s govuk-visually-hidden">{{ __('govuk_alpha.group_exchanges.participants_title') }}</caption>
@@ -126,7 +126,7 @@
         <section aria-labelledby="confirm-heading" class="govuk-!-margin-top-6">
             <h2 class="govuk-heading-l" id="confirm-heading">{{ __('govuk_alpha.group_exchanges.confirm_title') }}</h2>
             @if ($viewerConfirmed)
-                <p class="govuk-inset-text">{{ __('govuk_alpha.group_exchanges.confirmed_already') }}</p>
+                <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.group_exchanges.confirmed_already') }}</p></div>
             @else
                 <p class="govuk-body">{{ __('govuk_alpha.group_exchanges.confirm_body') }}</p>
                 <form method="post" action="{{ route('govuk-alpha.group-exchanges.confirm', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}">

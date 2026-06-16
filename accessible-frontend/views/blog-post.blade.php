@@ -75,7 +75,7 @@
                 <h2 class="govuk-heading-l">{{ __('govuk_alpha.blog.comments_heading') }} <span class="govuk-!-font-weight-regular">({{ (int) ($commentsCount ?? 0) }})</span></h2>
 
                 @if (($status ?? null) === 'comment-added')
-                    <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="comment-status">
+                    <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="comment-status">
                         <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="comment-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
                         <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.blog.comment_states.comment-added') }}</p></div>
                     </div>

@@ -29,7 +29,7 @@
     <a class="govuk-back-link" href="{{ route('govuk-alpha.messages.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_messages') }}</a>
 
     @if (isset($successStatuses[$status]))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="message-success-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="message-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="message-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -82,7 +82,7 @@
     @endif
 
     @if (empty($messages))
-        <div class="govuk-inset-text">{{ __('govuk_alpha.messages.empty') }}</div>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.messages.empty') }}</p></div>
     @else
         @if (!empty($meta['has_more']) && !empty($meta['cursor']))
             {{-- Older messages live above the latest 50; this loads the previous page (no JS). --}}
@@ -197,6 +197,8 @@
     </div>
 
     @if ($canSend)
+        {{-- Reply and archive are two independent POST targets, so they must be sibling
+             forms — never nested (nested <form> is invalid HTML and the browser drops it). --}}
         <form method="post" action="{{ route('govuk-alpha.messages.store', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}" class="govuk-!-margin-top-7">
             @csrf
             @if ($listing)
@@ -208,13 +210,11 @@
                 <div id="body-hint" class="govuk-hint">{{ __('govuk_alpha.messages.message_hint') }}</div>
                 <textarea class="govuk-textarea" id="body" name="body" rows="5" aria-describedby="body-hint" required></textarea>
             </div>
-            <div class="govuk-button-group">
-                <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.reply') }}</button>
-                <form method="post" action="{{ route('govuk-alpha.messages.archive', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}" style="display:inline">
-                    @csrf
-                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.actions.archive_conversation') }}</button>
-                </form>
-            </div>
+            <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.reply') }}</button>
+        </form>
+        <form method="post" action="{{ route('govuk-alpha.messages.archive', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}">
+            @csrf
+            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.actions.archive_conversation') }}</button>
         </form>
     @else
         <div class="govuk-button-group govuk-!-margin-top-4">

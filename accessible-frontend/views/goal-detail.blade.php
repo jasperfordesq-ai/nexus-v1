@@ -19,14 +19,16 @@
     @endphp
 
     @if (in_array($status, $successStates, true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="gd-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="gd-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="gd-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.goals.states.' . $status) }}</p></div>
         </div>
     @elseif (in_array($status, ['goal-failed', 'goal-invalid', 'buddy-failed'], true))
-        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="gd-status2">
-            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="gd-status2">{{ __('govuk_alpha.states.error_title') }}</h2></div>
-            <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.goals.states.' . $status) }}</p></div>
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                <div class="govuk-error-summary__body"><p class="govuk-body">{{ __('govuk_alpha.goals.states.' . $status) }}</p></div>
+            </div>
         </div>
     @endif
 
@@ -68,7 +70,7 @@
     {{-- Buddy system --}}
     @if ($isBuddy)
         <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.goals.buddy_section_title') }}</h2>
-        <p class="govuk-inset-text">{{ __('govuk_alpha.goals.buddy_you_are_buddy') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.goals.buddy_you_are_buddy') }}</p></div>
     @elseif (!empty($canBecomeBuddy))
         <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.goals.become_buddy_title') }}</h2>
         <p class="govuk-body">{{ __('govuk_alpha.goals.become_buddy_intro') }}</p>
@@ -78,7 +80,7 @@
         </form>
     @elseif ($isOwner && ($goal['mentor_id'] ?? null) !== null)
         <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.goals.buddy_section_title') }}</h2>
-        <p class="govuk-inset-text">{{ __('govuk_alpha.goals.buddy_has_buddy') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.goals.buddy_has_buddy') }}</p></div>
     @endif
 
     {{-- Buddy updates (notes left by the buddy, visible to owner + buddy) --}}
@@ -103,7 +105,7 @@
     @if ($isOwner || $isBuddy)
         <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.goals.history_title') }}</h2>
         @if (empty($goalHistory))
-            <p class="govuk-inset-text">{{ __('govuk_alpha.goals.history_empty') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.goals.history_empty') }}</p></div>
         @else
             <dl class="govuk-summary-list">
                 @foreach ($goalHistory as $event)

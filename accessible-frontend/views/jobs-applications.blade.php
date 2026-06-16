@@ -36,7 +36,7 @@
     @include('accessible-frontend::partials.jobs-nav', ['jobsActiveTab' => 'applications'])
 
     @if (($status ?? null) === 'withdrawn')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="apps-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="apps-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="apps-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t2.states.withdrawn') }}</p></div>
         </div>
@@ -60,7 +60,7 @@
     </form>
 
     @if (empty($applications))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.jobs_t2.applications_empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.jobs_t2.applications_empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($applications as $app)

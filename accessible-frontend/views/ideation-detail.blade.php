@@ -24,7 +24,7 @@
     <a href="{{ route('govuk-alpha.ideation.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-back-link">{{ __('govuk_alpha.ideation.back') }}</a>
 
     @if (in_array($status, ['idea-submitted', 'idea-voted'], true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="idea-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="idea-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="idea-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.ideation.states.' . $status) }}</p></div>
         </div>

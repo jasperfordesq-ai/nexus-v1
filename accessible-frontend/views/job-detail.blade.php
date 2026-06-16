@@ -53,22 +53,22 @@
     <a href="{{ route('govuk-alpha.jobs.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-back-link">{{ __('govuk_alpha.jobs.back') }}</a>
 
     @if ($status === 'applied')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="job-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="job-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="job-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs.states.applied') }}</p></div>
         </div>
     @elseif ($status === 'saved')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="job-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="job-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="job-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t2.states.saved') }}</p></div>
         </div>
     @elseif ($status === 'unsaved')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="job-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="job-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="job-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t2.states.unsaved') }}</p></div>
         </div>
     @elseif (in_array($status, ['created', 'updated', 'renewed'], true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="job-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="job-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="job-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t3.states.' . $status) }}</p></div>
         </div>
@@ -193,7 +193,7 @@
     @else
         <h2 class="govuk-heading-l govuk-!-margin-top-6" id="apply">{{ __('govuk_alpha.jobs.apply_title') }}</h2>
         @if ($hasApplied)
-            <p class="govuk-inset-text">{{ __('govuk_alpha.jobs.already_applied') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.jobs.already_applied') }}</p></div>
         @else
             <form method="post" action="{{ route('govuk-alpha.jobs.apply', ['tenantSlug' => $tenantSlug, 'id' => $job['id']]) }}">
                 @csrf

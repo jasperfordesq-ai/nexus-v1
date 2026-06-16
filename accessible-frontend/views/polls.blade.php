@@ -25,7 +25,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.polls.description') }}</p>
 
     @if ($status === 'voted')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="polls-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="polls-status">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="polls-status">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -53,7 +53,7 @@
         </summary>
         <div class="govuk-details__text">
             @if ($status === 'poll-created')
-                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="poll-create-status" aria-live="polite">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="poll-create-status">
                     <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="poll-create-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
                     <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.polish_discovery.polls_create_success') }}</p></div>
                 </div>
@@ -127,7 +127,7 @@
         {{-- ===== Open polls (vote) ===== --}}
         <h2 class="govuk-heading-l">{{ __('govuk_alpha.polls.open_section_title') }}</h2>
         @if (empty($openPolls))
-            <p class="govuk-inset-text">{{ __('govuk_alpha.polls.no_open') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.polls.no_open') }}</p></div>
         @else
             @foreach ($openPolls as $poll)
                 @php

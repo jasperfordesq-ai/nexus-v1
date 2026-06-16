@@ -54,7 +54,7 @@
                 </div>
             </div>
         @else
-            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="fed-member-status">
+            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="fed-member-status">
                 <div class="govuk-notification-banner__header">
                     <h2 class="govuk-notification-banner__title" id="fed-member-status">{{ __('govuk_alpha.states.success_title') }}</h2>
                 </div>
@@ -106,7 +106,7 @@
         <h2 id="fed-actions-heading" class="govuk-heading-l">{{ __('govuk_alpha.fed2.member_actions.heading') }}</h2>
 
         @if (!$viewerOptedIn)
-            <p class="govuk-inset-text">{{ __('govuk_alpha.fed2.member_actions.not_opted_in') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.fed2.member_actions.not_opted_in') }}</p></div>
             <a class="govuk-button" data-module="govuk-button" href="{{ route('govuk-alpha.federation.opt-in', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.fed2.member_actions.optin_link') }}</a>
         @else
             {{-- Connection action: depends on the existing connection status. --}}

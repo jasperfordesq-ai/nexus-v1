@@ -32,7 +32,7 @@
                 </div>
             </div>
         @else
-            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="fed-msg-status">
+            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="fed-msg-status">
                 <div class="govuk-notification-banner__header">
                     <h2 class="govuk-notification-banner__title" id="fed-msg-status">{{ __('govuk_alpha.states.success_title') }}</h2>
                 </div>
@@ -44,11 +44,11 @@
     @endif
 
     @if (!$allowed)
-        <p class="govuk-inset-text">{{ __('govuk_alpha.fed2.messages.not_available') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.fed2.messages.not_available') }}</p></div>
     @else
         <div id="messages-list">
             @if (empty($messages))
-                <p class="govuk-inset-text">{{ __('govuk_alpha.fed2.messages.empty') }}</p>
+                <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.fed2.messages.empty') }}</p></div>
             @else
                 <div class="nexus-alpha-card-list">
                     @foreach ($messages as $msg)

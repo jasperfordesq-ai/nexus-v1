@@ -19,7 +19,7 @@
     <a class="govuk-back-link" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_volunteering') }}</a>
 
     @if ($status === 'apply-created')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="apply-success-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="apply-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="apply-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -37,7 +37,7 @@
             </div>
         </div>
     @elseif (in_array($status, ['shift-signed-up', 'shift-cancelled'], true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="shift-success-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="shift-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="shift-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>

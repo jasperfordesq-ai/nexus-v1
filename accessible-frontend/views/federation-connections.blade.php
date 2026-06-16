@@ -48,7 +48,7 @@
                 </div>
             </div>
         @else
-            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="fed-conn-status">
+            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="fed-conn-status">
                 <div class="govuk-notification-banner__header">
                     <h2 class="govuk-notification-banner__title" id="fed-conn-status">{{ __('govuk_alpha.states.success_title') }}</h2>
                 </div>
@@ -60,7 +60,7 @@
     @endif
 
     @if (!$allowed)
-        <p class="govuk-inset-text">{{ __('govuk_alpha.fed2.connections.not_available') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.fed2.connections.not_available') }}</p></div>
     @else
         {{-- govuk-tabs progressive-enhancement: server pre-selects the active panel
              by omitting govuk-tabs__panel--hidden. Without JS the panels are all

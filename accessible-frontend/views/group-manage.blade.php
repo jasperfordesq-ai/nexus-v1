@@ -19,7 +19,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.groups.manage.description') }}</p>
 
     @if (in_array($status, $successStates, true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="manage-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="manage-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="manage-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.groups.states.' . $status) }}</p></div>
         </div>
@@ -33,7 +33,7 @@
     @if ($isPrivate)
         <h2 class="govuk-heading-l">{{ __('govuk_alpha.groups.manage.requests_title') }}</h2>
         @if (empty($pendingRequests))
-            <p class="govuk-inset-text">{{ __('govuk_alpha.groups.manage.requests_empty') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.groups.manage.requests_empty') }}</p></div>
         @else
             <p class="govuk-body">{{ __('govuk_alpha.groups.manage.requests_description') }}</p>
             <div class="nexus-alpha-card-list">
@@ -44,18 +44,16 @@
                             <div class="nexus-alpha-module-row">
                                 <h3 class="govuk-heading-s govuk-!-margin-bottom-0">{{ $rName !== '' ? $rName : '#' . $rId }}</h3>
                             </div>
-                            <div class="govuk-button-group govuk-!-margin-top-2">
-                                <form method="post" action="{{ route('govuk-alpha.groups.requests.handle', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'requesterId' => $rId]) }}">
-                                    @csrf
-                                    <input type="hidden" name="action" value="accept">
-                                    <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.approve') }}</button>
-                                </form>
-                                <form method="post" action="{{ route('govuk-alpha.groups.requests.handle', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'requesterId' => $rId]) }}">
-                                    @csrf
-                                    <input type="hidden" name="action" value="reject">
-                                    <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.reject') }}</button>
-                                </form>
-                            </div>
+                            {{-- Single form: approve and reject post to the same route, differing
+                                 only by the button's name="action" value, so govuk-button-group
+                                 directly wraps buttons (valid) rather than nesting two forms. --}}
+                            <form method="post" action="{{ route('govuk-alpha.groups.requests.handle', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'requesterId' => $rId]) }}">
+                                @csrf
+                                <div class="govuk-button-group govuk-!-margin-top-2">
+                                    <button class="govuk-button govuk-!-margin-bottom-0" name="action" value="accept" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.approve') }}</button>
+                                    <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" name="action" value="reject" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.reject') }}</button>
+                                </div>
+                            </form>
                         </article>
                     @endif
                 @endforeach
@@ -68,7 +66,7 @@
         $others = collect($groupMembers)->filter(fn ($m) => (int) ($m['id'] ?? ($m['user_id'] ?? 0)) !== (int) $currentUserId)->values();
     @endphp
     @if ($others->isEmpty())
-        <p class="govuk-inset-text">{{ __('govuk_alpha.groups.manage.members_empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.groups.manage.members_empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($others as $m)
@@ -88,26 +86,19 @@
                             <strong class="govuk-tag {{ $isOwner || $mRole === 'admin' ? 'govuk-tag--blue' : 'govuk-tag--grey' }}">{{ __('govuk_alpha.groups.manage.' . $roleKey) }}</strong>
                         </div>
                         @unless ($isOwner)
-                            <div class="govuk-button-group govuk-!-margin-top-2">
-                                @if ($mRole === 'admin')
-                                    <form method="post" action="{{ route('govuk-alpha.groups.members.update', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'memberId' => $mId]) }}">
-                                        @csrf
-                                        <input type="hidden" name="action" value="demote">
-                                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.demote') }}</button>
-                                    </form>
-                                @else
-                                    <form method="post" action="{{ route('govuk-alpha.groups.members.update', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'memberId' => $mId]) }}">
-                                        @csrf
-                                        <input type="hidden" name="action" value="promote">
-                                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.promote') }}</button>
-                                    </form>
-                                @endif
-                                <form method="post" action="{{ route('govuk-alpha.groups.members.update', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'memberId' => $mId]) }}">
-                                    @csrf
-                                    <input type="hidden" name="action" value="remove">
-                                    <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.remove') }}</button>
-                                </form>
-                            </div>
+                            {{-- Single form: promote/demote and remove all post to the same route,
+                                 differing only by the button's name="action" value. --}}
+                            <form method="post" action="{{ route('govuk-alpha.groups.members.update', ['tenantSlug' => $tenantSlug, 'id' => $gId, 'memberId' => $mId]) }}">
+                                @csrf
+                                <div class="govuk-button-group govuk-!-margin-top-2">
+                                    @if ($mRole === 'admin')
+                                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" name="action" value="demote" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.demote') }}</button>
+                                    @else
+                                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" name="action" value="promote" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.promote') }}</button>
+                                    @endif
+                                    <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" name="action" value="remove" data-module="govuk-button">{{ __('govuk_alpha.groups.manage.remove') }}</button>
+                                </div>
+                            </form>
                         @endunless
                     </article>
                 @endif

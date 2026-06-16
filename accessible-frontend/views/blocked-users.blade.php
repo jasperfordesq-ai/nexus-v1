@@ -10,7 +10,7 @@
             <a class="govuk-back-link" href="{{ route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.blocked_users.back') }}</a>
 
             @if ($status === 'member-unblocked')
-                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="blocked-status-title">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="blocked-status-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="blocked-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                     </div>

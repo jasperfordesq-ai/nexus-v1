@@ -8,7 +8,7 @@
     <a class="govuk-back-link" href="{{ route('govuk-alpha.goals.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.goals.back_to_goals') }}</a>
 
     @if ($status === 'buddy-joined')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="disc-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="disc-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="disc-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.goals.states.buddy-joined') }}</p></div>
         </div>

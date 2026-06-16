@@ -24,7 +24,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.reviews_page.description') }}</p>
 
     @if (($status ?? null) === 'review-submitted')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="review-success-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="review-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="review-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -58,7 +58,7 @@
             </div>
         </div>
     @elseif (($status ?? null) === 'review-deleted')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="review-delete-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="review-delete-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="review-delete-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -100,7 +100,7 @@
             </div>
             <div id="accordion-received-content" class="govuk-accordion__section-content">
                 @if (empty($reviewsReceived))
-                    <p class="govuk-inset-text">{{ __('govuk_alpha.reviews_page.received_empty') }}</p>
+                    <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.reviews_page.received_empty') }}</p></div>
                 @else
                     @foreach ($reviewsReceived as $r)
                         @php $name = ($r['is_anonymous'] ?? false) ? __('govuk_alpha.reviews_page.anonymous') : $otherName($r, ['reviewer', 'user']); @endphp
@@ -125,7 +125,7 @@
             </div>
             <div id="accordion-given-content" class="govuk-accordion__section-content">
                 @if (empty($reviewsGiven))
-                    <p class="govuk-inset-text">{{ __('govuk_alpha.reviews_page.given_empty') }}</p>
+                    <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.reviews_page.given_empty') }}</p></div>
                 @else
                     @foreach ($reviewsGiven as $r)
                         @php
@@ -168,7 +168,7 @@
             </div>
             <div id="accordion-pending-content" class="govuk-accordion__section-content">
                 @if (empty($reviewsPending))
-                    <p class="govuk-inset-text">{{ __('govuk_alpha.reviews_page.pending_empty') }}</p>
+                    <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.reviews_page.pending_empty') }}</p></div>
                 @else
                     @foreach ($reviewsPending as $p)
                         @php

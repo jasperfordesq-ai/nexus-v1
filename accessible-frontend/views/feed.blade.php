@@ -70,7 +70,7 @@
     @endif
 
     @if (in_array($status, $successStatuses, true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="post-created-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="post-created-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="post-created-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>

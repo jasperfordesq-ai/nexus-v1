@@ -38,7 +38,7 @@
                         </div>
                     </div>
                 @else
-                    <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="fed-settings-status">
+                    <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="fed-settings-status">
                         <div class="govuk-notification-banner__header">
                             <h2 class="govuk-notification-banner__title" id="fed-settings-status">{{ __('govuk_alpha.states.success_title') }}</h2>
                         </div>
@@ -50,7 +50,7 @@
             @endif
 
             @if (!$optedIn)
-                <p class="govuk-inset-text">{{ __('govuk_alpha.federation.settings.not_opted_in') }}</p>
+                <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.federation.settings.not_opted_in') }}</p></div>
                 <a class="govuk-button" data-module="govuk-button" href="{{ route('govuk-alpha.federation.opt-in', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.settings.optin_cta') }}</a>
             @else
                 <form method="post" action="{{ route('govuk-alpha.federation.settings.update', ['tenantSlug' => $tenantSlug]) }}">

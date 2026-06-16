@@ -13,7 +13,7 @@
     @endphp
 
     @if (($status ?? null) === 'onboarding-complete')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="ob-done-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="ob-done-title">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="ob-done-title">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.onboarding.complete_banner') }}</p></div>
         </div>
@@ -28,7 +28,7 @@
     @endif
 
     @if (!($onboardingCompleted ?? true))
-        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="dashboard-onboarding-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="dashboard-onboarding-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="dashboard-onboarding-title">{{ __('govuk_alpha.dashboard.onboarding_title') }}</h2>
             </div>
@@ -42,7 +42,7 @@
     @endif
 
     @if (($pendingReviewCount ?? 0) > 0 && \App\Core\TenantContext::hasModule('listings'))
-        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="dashboard-reviews-title">
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="dashboard-reviews-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="dashboard-reviews-title">{{ __('govuk_alpha.dashboard.pending_reviews_title') }}</h2>
             </div>

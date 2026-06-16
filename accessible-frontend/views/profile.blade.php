@@ -34,7 +34,7 @@
         ];
     @endphp
     @if (in_array(($status ?? ''), $profileSuccessStatuses, true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="profile-status-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="profile-status-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="profile-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -58,7 +58,7 @@
     @endphp
     @if (in_array(($status ?? ''), $connectionStatuses, true))
         @php $isFailure = in_array($status, ['connection-failed', 'endorsement-failed'], true); @endphp
-        <div class="govuk-notification-banner {{ $isFailure ? '' : 'govuk-notification-banner--success' }}" data-module="govuk-notification-banner" role="region" aria-labelledby="connection-status-title">
+        <div class="govuk-notification-banner {{ $isFailure ? '' : 'govuk-notification-banner--success' }}" data-module="govuk-notification-banner" role="alert" aria-labelledby="connection-status-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="connection-status-title">{{ $isFailure ? __('govuk_alpha.states.important') : __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -71,7 +71,7 @@
     @php $blockStatuses = ['member-blocked' => true, 'member-unblocked' => true, 'block-self' => false, 'block-failed' => false]; @endphp
     @if (array_key_exists(($status ?? ''), $blockStatuses))
         @php $blockOk = $blockStatuses[$status]; @endphp
-        <div class="govuk-notification-banner {{ $blockOk ? 'govuk-notification-banner--success' : '' }}" data-module="govuk-notification-banner" role="region" aria-labelledby="block-status-title">
+        <div class="govuk-notification-banner {{ $blockOk ? 'govuk-notification-banner--success' : '' }}" data-module="govuk-notification-banner" role="alert" aria-labelledby="block-status-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="block-status-title">{{ $blockOk ? __('govuk_alpha.states.success_title') : __('govuk_alpha.states.important') }}</h2>
             </div>

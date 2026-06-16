@@ -18,7 +18,7 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.groups.discussions.title') }}</h1>
 
     @if (in_array($status, $successStates, true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="disc-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="disc-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="disc-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.groups.states.' . $status) }}</p></div>
         </div>
@@ -30,7 +30,7 @@
     @endif
 
     @if (!$isMember)
-        <p class="govuk-inset-text">{{ __('govuk_alpha.groups.pending_member') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.groups.pending_member') }}</p></div>
     @else
         <p class="govuk-body">
             <a class="govuk-button" role="button" draggable="false" data-module="govuk-button"
@@ -38,7 +38,7 @@
         </p>
 
         @if (empty($discussions))
-            <p class="govuk-inset-text">{{ __('govuk_alpha.groups.discussions.empty') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.groups.discussions.empty') }}</p></div>
         @else
             <div class="nexus-alpha-card-list">
                 @foreach ($discussions as $d)

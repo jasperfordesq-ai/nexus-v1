@@ -26,7 +26,7 @@
                         <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>@if ($errAnchor)<a href="#{{ $errAnchor }}">{{ __('govuk_alpha.onboarding.states.' . $status) }}</a>@else{{ __('govuk_alpha.onboarding.states.' . $status) }}@endif</li></ul></div></div>
                 </div>
             @elseif ($status === 'avatar-saved')
-                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="ob-status">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="ob-status">
                     <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="ob-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
                     <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.onboarding.states.avatar-saved') }}</p></div>
                 </div>

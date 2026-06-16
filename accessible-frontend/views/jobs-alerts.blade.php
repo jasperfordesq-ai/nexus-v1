@@ -33,7 +33,7 @@
 
     @php $st = $status ?? null; @endphp
     @if (in_array($st, ['alert-created', 'alert-paused', 'alert-resumed', 'alert-deleted'], true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="alert-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="alert-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="alert-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t4.states.' . $st) }}</p></div>
         </div>
@@ -98,7 +98,7 @@
 
     <h2 class="govuk-heading-l">{{ __('govuk_alpha.jobs_t4.your_alerts_heading') }}</h2>
     @if (empty($alerts))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.jobs_t4.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.jobs_t4.empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($alerts as $alert)

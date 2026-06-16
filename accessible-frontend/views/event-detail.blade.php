@@ -17,7 +17,7 @@
     <a class="govuk-back-link" href="{{ route('govuk-alpha.events.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_events') }}</a>
 
     @if ($status === 'event-created')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="event-created-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="event-created-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="event-created-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -26,7 +26,7 @@
             </div>
         </div>
     @elseif ($status === 'rsvp-updated')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="rsvp-success-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="rsvp-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="rsvp-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -35,7 +35,7 @@
             </div>
         </div>
     @elseif (in_array($status, ['event-updated', 'event-cancelled'], true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="event-organiser-success-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="event-organiser-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="event-organiser-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -44,7 +44,7 @@
             </div>
         </div>
     @elseif ($status === 'checkin-success')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="checkin-success-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="checkin-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="checkin-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -69,7 +69,7 @@
                 default => __('govuk_alpha.events.states.poll-voted'),
             };
         @endphp
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="event-depth-success-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="event-depth-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="event-depth-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -166,9 +166,9 @@
 
             <h2 class="govuk-heading-l">{{ __('govuk_alpha.events.description_title') }}</h2>
             <div class="govuk-body">{!! nl2br(e((string) ($event['description'] ?? ''))) !!}</div>
-        </div>
-    </div>
 
+    {{-- Summary, RSVP, polls, series and attendees stay inside the same two-thirds
+         reading column as the title/description — the column closes before @endsection. --}}
     <h2 class="govuk-heading-l">{{ __('govuk_alpha.events.summary_title') }}</h2>
     <dl class="govuk-summary-list">
         @if ($start)
@@ -337,7 +337,7 @@
                         @endif
 
                         @if (empty($options))
-                            <p class="govuk-inset-text">{{ __('govuk_alpha.events.poll_no_options') }}</p>
+                            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.events.poll_no_options') }}</p></div>
                         @elseif ($pollOpen && !$hasVoted)
                             {{-- Open + not voted: show the vote form. Totals stay hidden (ballot secrecy). --}}
                             <form method="post" action="{{ route('govuk-alpha.events.polls.vote', ['tenantSlug' => $tenantSlug, 'id' => $event['id'], 'pollId' => $pollId]) }}">
@@ -365,14 +365,15 @@
                                     $cnt = (int) ($opt['vote_count'] ?? 0);
                                     $isMine = $votedOptionId !== null && (int) ($opt['id'] ?? 0) === (int) $votedOptionId;
                                     $isLeading = $totalVotes > 0 && $cnt === $maxVotes;
+                                    $optLabel = (string) ($opt['text'] ?? ($opt['label'] ?? ''));
                                 @endphp
                                 <div class="govuk-!-margin-bottom-3">
                                     <p class="govuk-body govuk-!-margin-bottom-1">
-                                        {{ $opt['text'] ?? ($opt['label'] ?? '') }}
+                                        {{ $optLabel }}
                                         @if ($isLeading)<strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.events.poll_leading') }}</strong>@endif
                                         @if ($isMine)<strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha.events.poll_your_choice') }}</strong>@endif
                                     </p>
-                                    <progress max="100" value="{{ $pct }}" aria-label="{{ $pct }}%">{{ $pct }}%</progress>
+                                    <progress max="100" value="{{ $pct }}" aria-label="{{ $optLabel }}: {{ $pct }}%">{{ $pct }}%</progress>
                                     <span class="govuk-body-s">{{ $pct }}% — {{ trans_choice('govuk_alpha.events.poll_per_option_votes', $cnt, ['count' => $cnt]) }}</span>
                                 </div>
                             @endforeach
@@ -488,4 +489,6 @@
             @endforeach
         </ul>
     @endif
+        </div>
+    </div>
 @endsection

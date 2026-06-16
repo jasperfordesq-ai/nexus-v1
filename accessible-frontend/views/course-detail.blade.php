@@ -67,7 +67,7 @@
 
     <h2 class="govuk-heading-l govuk-!-margin-top-6">{{ __('govuk_alpha.polish_commerce.course_enrol_section_heading') }}</h2>
     @if ($isEnrolled)
-        <p class="govuk-inset-text">{{ __('govuk_alpha.courses.enrolled_notice') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.courses.enrolled_notice') }}</p></div>
     @else
         @if ($cost > 0)
             <p class="govuk-body">{{ __('govuk_alpha.courses.cost_notice', ['count' => rtrim(rtrim(number_format($cost, 2), '0'), '.')]) }}</p>

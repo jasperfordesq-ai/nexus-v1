@@ -26,7 +26,7 @@
     @endphp
 
     @if ($status === 'buddy-nudge-sent')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="nudge-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="nudge-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="nudge-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.polish_gamify.buddy_nudge_success') }}</p></div>
         </div>
@@ -36,7 +36,7 @@
                 <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ __('govuk_alpha.polish_gamify.buddy_nudge_failed') }}</li></ul></div></div>
         </div>
     @elseif ($status === 'buddy-joined')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="buddy-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="buddy-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="buddy-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.goals.states.buddy-joined') }}</p></div>
         </div>
@@ -56,7 +56,7 @@
 
     <h2 class="govuk-heading-l">{{ __('govuk_alpha.goals.buddying_yours_heading') }}</h2>
     @if (empty($buddying))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.goals.buddying_yours_empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.goals.buddying_yours_empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list govuk-!-margin-bottom-8">
             @foreach ($buddying as $g)
@@ -86,7 +86,7 @@
 
     <h2 class="govuk-heading-l" id="available-goals">{{ __('govuk_alpha.goals.buddying_available_heading') }}</h2>
     @if (empty($available))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.goals.buddying_available_empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.goals.buddying_available_empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($available as $g)

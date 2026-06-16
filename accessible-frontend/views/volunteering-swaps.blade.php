@@ -43,7 +43,7 @@
         ];
     @endphp
     @if (isset($successStatuses[$status]))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="swap-success-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="swap-success-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="swap-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -174,18 +174,15 @@
                     @endif
 
                     @if ($swapId > 0 && $direction === 'received' && $swapStatus === 'pending')
-                        <div class="govuk-button-group">
-                            <form method="post" action="{{ route('govuk-alpha.volunteering.swaps.respond', ['tenantSlug' => $tenantSlug, 'id' => $swapId]) }}">
-                                @csrf
-                                <input type="hidden" name="action" value="accept">
-                                <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.vol_depth.swap_accept') }}</button>
-                            </form>
-                            <form method="post" action="{{ route('govuk-alpha.volunteering.swaps.respond', ['tenantSlug' => $tenantSlug, 'id' => $swapId]) }}">
-                                @csrf
-                                <input type="hidden" name="action" value="reject">
-                                <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.vol_depth.swap_reject') }}</button>
-                            </form>
-                        </div>
+                        {{-- Single form: accept and reject post to the same route, differing only
+                             by the button's name="action" value, so the button-group wraps buttons. --}}
+                        <form method="post" action="{{ route('govuk-alpha.volunteering.swaps.respond', ['tenantSlug' => $tenantSlug, 'id' => $swapId]) }}">
+                            @csrf
+                            <div class="govuk-button-group">
+                                <button class="govuk-button govuk-!-margin-bottom-0" name="action" value="accept" data-module="govuk-button">{{ __('govuk_alpha.vol_depth.swap_accept') }}</button>
+                                <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" name="action" value="reject" data-module="govuk-button">{{ __('govuk_alpha.vol_depth.swap_reject') }}</button>
+                            </div>
+                        </form>
                     @elseif ($swapId > 0 && $direction === 'sent' && in_array($swapStatus, ['pending', 'admin_pending'], true))
                         <form method="post" action="{{ route('govuk-alpha.volunteering.swaps.cancel', ['tenantSlug' => $tenantSlug, 'id' => $swapId]) }}">
                             @csrf

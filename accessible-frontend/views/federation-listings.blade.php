@@ -26,7 +26,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.federation.listings_browse.description') }}</p>
 
     @if (!$allowed)
-        <p class="govuk-inset-text">{{ __('govuk_alpha.federation.listings_browse.not_available') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.federation.listings_browse.not_available') }}</p></div>
     @else
         <form method="get" action="{{ route('govuk-alpha.federation.listings.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-6">
             <div class="govuk-form-group">
@@ -38,7 +38,7 @@
         </form>
 
         @if (empty($listings))
-            <p class="govuk-inset-text">{{ __('govuk_alpha.federation.listings_browse.empty') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.federation.listings_browse.empty') }}</p></div>
         @else
             <div class="nexus-alpha-card-list">
                 @foreach ($listings as $l)

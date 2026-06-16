@@ -22,12 +22,12 @@
     <a href="{{ route('govuk-alpha.podcasts.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-back-link">{{ __('govuk_alpha.podcasts.back') }}</a>
 
     @if (session('podcast_status') === 'subscribed')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="podcast-status-heading">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="podcast-status-heading">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="podcast-status-heading">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.polish_commerce.podcast_subscribe_success') }}</p></div>
         </div>
     @elseif (session('podcast_status') === 'unsubscribed')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="podcast-status-heading">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="podcast-status-heading">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="podcast-status-heading">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.polish_commerce.podcast_unsubscribe_success') }}</p></div>
         </div>

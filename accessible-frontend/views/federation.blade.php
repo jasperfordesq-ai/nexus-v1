@@ -43,7 +43,7 @@
                 </div>
             </div>
         @else
-            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="fed-status-title">
+            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="fed-status-title">
                 <div class="govuk-notification-banner__header">
                     <h2 class="govuk-notification-banner__title" id="fed-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                 </div>
@@ -55,7 +55,7 @@
     @endif
 
     @if (!$tenantEnabled)
-        <p class="govuk-inset-text">{{ __('govuk_alpha.federation.hub.disabled_notice') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.federation.hub.disabled_notice') }}</p></div>
     @elseif (!$optedIn)
         <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="fed-optin-title">
             <div class="govuk-notification-banner__header">
@@ -100,7 +100,7 @@
     {{-- Partner preview --}}
     <h2 class="govuk-heading-l">{{ __('govuk_alpha.federation.hub.partners_heading') }}</h2>
     @if (empty($partners))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.federation.hub.partners_empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.federation.hub.partners_empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($partners as $p)

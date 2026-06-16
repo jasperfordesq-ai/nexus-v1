@@ -16,7 +16,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.events.description') }}</p>
 
     @if (($status ?? '') === 'event-deleted')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="event-deleted-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="event-deleted-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="event-deleted-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>
@@ -57,14 +57,17 @@
                 <div id="events-filter-hint" class="govuk-hint">{{ __('govuk_alpha.events.filters_hint') }}</div>
 
                 <div class="govuk-grid-row">
-                    <div class="govuk-grid-column-one-half">
+                    <div class="govuk-grid-column-full">
                         <div class="govuk-form-group">
                             <label class="govuk-label" for="q">{{ __('govuk_alpha.events.search_label') }}</label>
                             <div id="q-hint" class="govuk-hint">{{ __('govuk_alpha.events.search_hint') }}</div>
-                            <input class="govuk-input" id="q" name="q" type="search" value="{{ $filters['search'] ?? '' }}" aria-describedby="q-hint">
+                            <input class="govuk-input govuk-!-width-two-thirds" id="q" name="q" type="search" value="{{ $filters['search'] ?? '' }}" aria-describedby="q-hint">
                         </div>
                     </div>
-                    <div class="govuk-grid-column-one-quarter">
+                </div>
+
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-one-third">
                         <div class="govuk-form-group">
                             <label class="govuk-label" for="when">{{ __('govuk_alpha.events.when_label') }}</label>
                             <select class="govuk-select" id="when" name="when">
@@ -74,7 +77,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="govuk-grid-column-one-quarter">
+                    <div class="govuk-grid-column-one-third">
                         <div class="govuk-form-group">
                             <label class="govuk-label" for="category_id">{{ __('govuk_alpha.events.category_label') }}</label>
                             <select class="govuk-select" id="category_id" name="category_id">
@@ -85,7 +88,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="govuk-grid-column-one-quarter">
+                    <div class="govuk-grid-column-one-third">
                         <div class="govuk-form-group">
                             <label class="govuk-label" for="near">{{ __('govuk_alpha.near_me.label') }}</label>
                             <select class="govuk-select" id="near" name="near" aria-describedby="events-near-hint">

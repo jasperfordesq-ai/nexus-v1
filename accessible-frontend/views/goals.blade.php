@@ -19,7 +19,7 @@
     </nav>
 
     @if (in_array($status, ['goal-created', 'goal-completed', 'goal-deleted'], true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="goal-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="goal-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="goal-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.goals.states.' . $status) }}</p></div>
         </div>
@@ -31,7 +31,7 @@
     @endif
 
     @if (empty($goals))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.goals.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.goals.empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list govuk-!-margin-bottom-8">
             @foreach ($goals as $g)

@@ -31,7 +31,7 @@
     </div>
 
     @if (in_array($status, $successStates, true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="grp-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="grp-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="grp-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.groups.states.' . $status) }}</p></div>
         </div>
@@ -41,8 +41,8 @@
                 <div class="govuk-error-summary__body"><p class="govuk-body">{{ __('govuk_alpha.groups.states.' . $status) }}</p></div></div>
         </div>
     @elseif (in_array($status, $t1SuccessStates, true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="grp-status">
-            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="grp-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="grp-feed-status">
+            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="grp-feed-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.groups_t1.states.' . $status) }}</p></div>
         </div>
     @elseif (in_array($status, $t1FailStates, true))
@@ -89,7 +89,7 @@
 
     <div class="govuk-!-margin-bottom-6">
         @if ($isMember)
-            <p class="govuk-inset-text">{{ __('govuk_alpha.groups.you_are_member') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.groups.you_are_member') }}</p></div>
             <p class="govuk-body">
                 <a class="govuk-link" href="{{ route('govuk-alpha.groups.discussions.index', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha.groups.discussions.link') }}</a>
             </p>
@@ -98,7 +98,7 @@
                 <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.groups.leave') }}</button>
             </form>
         @elseif ($isPending)
-            <p class="govuk-inset-text">{{ __('govuk_alpha.groups.pending_member') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.groups.pending_member') }}</p></div>
         @else
             <form method="post" action="{{ route('govuk-alpha.groups.join', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">
                 @csrf
@@ -166,9 +166,9 @@
     <h2 class="govuk-heading-l" id="group-events">{{ __('govuk_alpha.groups_t1.events_title') }}</h2>
     <p class="govuk-body">{{ __('govuk_alpha.groups_t1.events_description') }}</p>
     @if (!$groupCanParticipate && $gPrivate)
-        <p class="govuk-inset-text">{{ __('govuk_alpha.groups_t1.events_members_only') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.groups_t1.events_members_only') }}</p></div>
     @elseif (empty($groupEvents))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.groups_t1.events_empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.groups_t1.events_empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($groupEvents as $event)
@@ -216,7 +216,7 @@
     <p class="govuk-body">{{ __('govuk_alpha.groups_t1.feed_description') }}</p>
 
     @if (!$groupCanParticipate)
-        <p class="govuk-inset-text">{{ __('govuk_alpha.groups_t1.feed_members_only') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.groups_t1.feed_members_only') }}</p></div>
     @else
         <form method="post" action="{{ route('govuk-alpha.groups.feed.store', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}" enctype="multipart/form-data" class="govuk-!-margin-bottom-7">
             @csrf
@@ -239,7 +239,7 @@
         </form>
 
         @if (empty($groupFeed))
-            <p class="govuk-inset-text">{{ __('govuk_alpha.groups_t1.feed_empty') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.groups_t1.feed_empty') }}</p></div>
         @else
             <div class="nexus-alpha-card-list">
                 @foreach ($groupFeed as $item)

@@ -21,7 +21,7 @@
     @include('accessible-frontend::partials.jobs-nav', ['jobsActiveTab' => 'mine'])
 
     @if (($status ?? null) === 'deleted')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="mine-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="mine-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="mine-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t3.states.deleted') }}</p></div>
         </div>
@@ -37,7 +37,7 @@
     </p>
 
     @if (empty($jobs))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.jobs_t3.mine_empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.jobs_t3.mine_empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($jobs as $job)

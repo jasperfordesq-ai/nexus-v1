@@ -54,7 +54,7 @@
             </dl>
 
             @if (!$viewerEnabled)
-                <p class="govuk-inset-text">{{ __('govuk_alpha.fed2.transfer.not_enabled') }}</p>
+                <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.fed2.transfer.not_enabled') }}</p></div>
                 <a class="govuk-link" href="{{ route('govuk-alpha.federation.settings', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.fed2.transfer.optin_link') }}</a>
             @else
                 <div class="govuk-warning-text">

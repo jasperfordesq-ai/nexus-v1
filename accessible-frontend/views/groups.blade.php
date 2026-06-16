@@ -10,7 +10,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.groups.description') }}</p>
 
     @if (($status ?? null) === 'group-deleted')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="groups-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="groups-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="groups-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.groups.states.group-deleted') }}</p></div>
         </div>
@@ -31,7 +31,7 @@
     </form>
 
     @if (empty($groups))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.groups.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.groups.empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($groups as $g)

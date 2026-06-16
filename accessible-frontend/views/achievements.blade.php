@@ -50,7 +50,7 @@
     @if ($dailyRewardStatus ?? null)
         {{-- Success / already-claimed notification --}}
         @if ($dailyRewardStatus === 'daily-reward-claimed')
-            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="dr-status">
+            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="dr-status">
                 <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="dr-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
                 <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.polish_gamify.daily_reward_success', ['xp' => (int) ($dailyRewardXp ?? 5)]) }}</p></div>
             </div>
@@ -90,7 +90,7 @@
 
     @if ($challengeStatus ?? null)
         @if ($challengeStatus === 'challenge-claimed')
-            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="ch-status">
+            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="ch-status">
                 <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="ch-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
                 <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.polish_gamify.challenge_claim_success') }}</p></div>
             </div>

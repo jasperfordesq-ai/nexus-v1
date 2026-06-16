@@ -55,7 +55,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.notifications.description') }}</p>
 
     @if (in_array($status, ['marked-read', 'notification-deleted', 'notification-marked-read', 'all-notifications-deleted'], true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="notif-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="notif-status">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="notif-status">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>

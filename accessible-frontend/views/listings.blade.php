@@ -13,7 +13,7 @@
     @endphp
 
     @if (($status ?? null) === 'listing-deleted')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="listing-deleted-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="listing-deleted-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="listing-deleted-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>

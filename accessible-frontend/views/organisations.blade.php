@@ -10,7 +10,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.organisations.description') }}</p>
 
     @if ($status === 'org-submitted')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="org-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="org-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="org-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.organisations.states.org-submitted') }}</p></div>
         </div>

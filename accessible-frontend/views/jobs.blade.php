@@ -12,7 +12,7 @@
     @include('accessible-frontend::partials.jobs-nav')
 
     @if (($status ?? null) === 'saved')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="jobs-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="jobs-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="jobs-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t2.states.saved') }}</p></div>
         </div>
@@ -95,7 +95,7 @@
     </form>
 
     @if (empty($jobs))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.jobs.empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.jobs.empty') }}</p></div>
     @else
         <p class="govuk-body govuk-!-font-weight-bold">{{ trans_choice('govuk_alpha.jobs_t2.results_count', (int) ($meta['total'] ?? 0), ['count' => (int) ($meta['total'] ?? 0)]) }}</p>
         <div class="nexus-alpha-card-list">

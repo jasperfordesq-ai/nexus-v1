@@ -54,7 +54,7 @@
                     </form>
                 @endif
             @elseif (($status ?? '') === 'verification-resent')
-                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="verification-resent-title">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="verification-resent-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="verification-resent-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                     </div>
@@ -63,7 +63,7 @@
                     </div>
                 </div>
             @elseif (($status ?? '') === 'register-created')
-                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="register-status-title">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="register-status-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="register-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                     </div>
@@ -72,7 +72,7 @@
                     </div>
                 </div>
             @elseif (($status ?? '') === 'account-deletion-requested')
-                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="account-deleted-title">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="account-deleted-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="account-deleted-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                     </div>
@@ -81,7 +81,7 @@
                     </div>
                 </div>
             @elseif (($status ?? '') === 'password-reset')
-                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="password-reset-title">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="password-reset-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="password-reset-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                     </div>

@@ -39,7 +39,7 @@
             <p class="govuk-body-l">{{ __('govuk_alpha.contact.subtitle', ['name' => $communityName]) }}</p>
 
             @if (($status ?? '') === 'contact-sent')
-                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="contact-success-title">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="contact-success-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="contact-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                     </div>

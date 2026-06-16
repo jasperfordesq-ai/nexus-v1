@@ -32,7 +32,7 @@
         </div>
     @else
         @if (($status ?? null) === 'application-withdrawn')
-            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="application-withdrawn-title">
+            <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="application-withdrawn-title">
                 <div class="govuk-notification-banner__header">
                     <h2 class="govuk-notification-banner__title" id="application-withdrawn-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                 </div>

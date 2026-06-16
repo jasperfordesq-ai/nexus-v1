@@ -38,7 +38,7 @@
 
     <div id="templates-list">
         @if (empty($templates))
-            <p class="govuk-inset-text">{{ __('govuk_alpha.goals.templates_empty') }}</p>
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.goals.templates_empty') }}</p></div>
         @else
             <div class="nexus-alpha-card-list">
                 @foreach ($templates as $t)

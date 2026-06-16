@@ -21,7 +21,7 @@
     <h1 class="govuk-heading-xl">{{ $dTitle !== '' ? $dTitle : __('govuk_alpha.groups.discussions.title') }}</h1>
 
     @if (($status ?? null) === 'reply-posted')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="reply-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="reply-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="reply-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.groups.states.reply-posted') }}</p></div>
         </div>
@@ -62,7 +62,7 @@
     <h2 class="govuk-heading-l" id="discussion-replies">{{ __('govuk_alpha.groups.discussions.replies_count', ['count' => count($messages)]) }}</h2>
 
     @if (empty($messages))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.groups.discussions.no_replies') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.groups.discussions.no_replies') }}</p></div>
     @else
         @foreach ($messages as $msg)
             @php

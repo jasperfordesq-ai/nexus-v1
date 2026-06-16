@@ -24,7 +24,8 @@
             <a class="govuk-back-link" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.auth.back_to_sign_in') }}</a>
 
             @if ($invalidLink)
-                <h1 class="govuk-heading-xl">{{ __('govuk_alpha.auth.reset_link_invalid_title') }}</h1>
+                {{-- GOV.UK pattern: error summary is the first thing in the content so
+                     auto-focus lands on it before the page heading. --}}
                 <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                     <div role="alert">
                         <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
@@ -33,6 +34,7 @@
                         </div>
                     </div>
                 </div>
+                <h1 class="govuk-heading-xl">{{ __('govuk_alpha.auth.reset_link_invalid_title') }}</h1>
                 <a class="govuk-button" href="{{ route('govuk-alpha.login.forgot', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.auth.reset_request_new') }}</a>
             @else
                 @if (in_array($status ?? '', $fieldErrors, true))

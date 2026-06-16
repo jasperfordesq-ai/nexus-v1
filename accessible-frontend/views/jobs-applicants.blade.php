@@ -25,7 +25,7 @@
     <p class="govuk-body-l">{{ __('govuk_alpha.jobs_t3.applicants_description') }}</p>
 
     @if (($status ?? null) === 'status-updated')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="ap-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="ap-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="ap-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t3.states.status-updated') }}</p></div>
         </div>
@@ -63,7 +63,7 @@
     </p>
 
     @if (empty($applications))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.jobs_t3.applicants_empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.jobs_t3.applicants_empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($applications as $app)

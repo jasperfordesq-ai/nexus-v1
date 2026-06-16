@@ -12,7 +12,7 @@
     @include('accessible-frontend::partials.jobs-nav', ['jobsActiveTab' => 'saved'])
 
     @if (($status ?? null) === 'unsaved')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="saved-status">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="saved-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="saved-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t2.states.unsaved') }}</p></div>
         </div>
@@ -21,7 +21,7 @@
     @php $meta = $jobsMeta ?? ['has_more' => false, 'cursor' => null]; @endphp
 
     @if (empty($jobs))
-        <p class="govuk-inset-text">{{ __('govuk_alpha.jobs_t2.saved_empty') }}</p>
+        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.jobs_t2.saved_empty') }}</p></div>
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($jobs as $job)

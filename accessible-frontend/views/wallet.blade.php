@@ -58,7 +58,7 @@
             </div>
         </div>
     @elseif ($status === 'donate-sent')
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-live="polite" aria-labelledby="wallet-donate-status-title">
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="wallet-donate-status-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="wallet-donate-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
             </div>

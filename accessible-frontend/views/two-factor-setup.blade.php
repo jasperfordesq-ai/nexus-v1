@@ -23,7 +23,7 @@
             @endphp
 
             @if (isset($successStatuses[$status]))
-                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="region" aria-labelledby="tfa-success-title">
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="tfa-success-title">
                     <div class="govuk-notification-banner__header">
                         <h2 class="govuk-notification-banner__title" id="tfa-success-title">{{ __('govuk_alpha.states.success_title') }}</h2>
                     </div>
