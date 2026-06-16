@@ -9300,5 +9300,64 @@ class GovukAlphaFrontendTest extends TestCase
         $this->assertStringNotContainsString('"nexus-alpha-actions"', $src);
         $this->assertStringContainsString('govuk-button-group', $src);
     }
+    // ===== WAVE PCORE-B: listings/exchanges/profile GOV.UK polish =====
+
+    /**
+     * Verifies structural GOV.UK polish applied in the core-B pass:
+     * – exchanges + matches filter navs use nexus-alpha-filter-nav (no inline style=)
+     * – profile-delete uses govuk-button-group, not nexus-alpha-actions
+     * – blocked-users and profile-settings empty-state inset-text uses div wrapper
+     * – profile-settings passkey device heading uses h3 not h4
+     * – listing-detail share-URL uses nexus-alpha-share-url class (no inline style=)
+     */
+    public function test_pcoreb_blade_structural_govuk_patterns(): void
+    {
+        $viewRoot = dirname(__DIR__, 3) . '/accessible-frontend/views';
+
+        // Filter navs must not carry inline style= attributes (replaced by nexus-alpha-filter-nav).
+        foreach (['exchanges', 'matches'] as $blade) {
+            $src = file_get_contents("{$viewRoot}/{$blade}.blade.php");
+            $this->assertStringContainsString('nexus-alpha-filter-nav', $src, "{$blade}: missing nexus-alpha-filter-nav");
+            $this->assertStringNotContainsString('display:flex', $src, "{$blade}: inline display:flex must be removed");
+        }
+
+        // profile-delete must use govuk-button-group, not nexus-alpha-actions.
+        $src = file_get_contents("{$viewRoot}/profile-delete.blade.php");
+        $this->assertStringContainsString('govuk-button-group', $src, 'profile-delete: missing govuk-button-group');
+        $this->assertStringNotContainsString('nexus-alpha-actions', $src, 'profile-delete: nexus-alpha-actions must be replaced');
+
+        // blocked-users empty state must use <div class="govuk-inset-text">, not <p>.
+        $src = file_get_contents("{$viewRoot}/blocked-users.blade.php");
+        $this->assertStringNotContainsString('<p class="govuk-inset-text">', $src, 'blocked-users: bare <p class="govuk-inset-text"> must be div');
+
+        // profile-settings: passkey empty state uses div wrapper; device heading uses h3 not h4.
+        $src = file_get_contents("{$viewRoot}/profile-settings.blade.php");
+        $this->assertStringNotContainsString('<p class="govuk-inset-text">', $src, 'profile-settings: bare <p class="govuk-inset-text"> must be div');
+        $this->assertStringNotContainsString('<h4 class="govuk-heading-s', $src, 'profile-settings: passkey heading must be h3 not h4');
+
+        // listing-detail share URL must use nexus-alpha-share-url class, not inline style=.
+        $src = file_get_contents("{$viewRoot}/listing-detail.blade.php");
+        $this->assertStringContainsString('nexus-alpha-share-url', $src, 'listing-detail: missing nexus-alpha-share-url class');
+        $this->assertStringNotContainsString('word-break:break-all', $src, 'listing-detail: inline word-break style must be removed');
+    }
+
+    /**
+     * Static source-level check: profile-delete and blocked-users GOV.UK patterns.
+     * (Verifies the worktree blade source; complements the structural test above.)
+     */
+    public function test_pcoreb_profile_delete_and_blocked_users_render(): void
+    {
+        $viewRoot = dirname(__DIR__, 3) . '/accessible-frontend/views';
+
+        // profile-delete: govuk-button-group replaces nexus-alpha-actions; no inline style=.
+        $src = file_get_contents("{$viewRoot}/profile-delete.blade.php");
+        $this->assertStringContainsString('govuk-button-group', $src, 'profile-delete: must use govuk-button-group');
+        $this->assertStringContainsString('govuk-warning-text', $src, 'profile-delete: must include govuk-warning-text before destructive action');
+
+        // blocked-users: empty state uses div-wrapped inset-text.
+        $src = file_get_contents("{$viewRoot}/blocked-users.blade.php");
+        $this->assertStringNotContainsString('<p class="govuk-inset-text">', $src, 'blocked-users: must use <div> wrapper for govuk-inset-text');
+        $this->assertStringContainsString('<div class="govuk-inset-text">', $src, 'blocked-users: must have div-wrapped govuk-inset-text for empty state');
+    }
 
 }

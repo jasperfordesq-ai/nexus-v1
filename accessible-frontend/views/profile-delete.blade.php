@@ -81,7 +81,7 @@
                     </div>
                 </div>
 
-                <div class="nexus-alpha-actions">
+                <div class="govuk-button-group">
                     <button class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit">{{ __('govuk_alpha.delete_account.submit') }}</button>
                     <a class="govuk-link" href="{{ route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.delete_account.cancel') }}</a>
                 </div>

@@ -666,6 +666,22 @@ $govuk-assets-path: "/build/accessible-frontend/assets/";
   border-bottom: 1px solid $govuk-border-colour;
 }
 
+// Tab-style filter navigation (exchanges, matches source filter).
+// Replaces inline style="display:flex;..." on <ul> list nav elements.
+.nexus-alpha-filter-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: govuk-spacing(2);
+  list-style: none;
+  padding: 0;
+  margin: 0 0 govuk-spacing(6) 0;
+}
+
+// Share URL block — word-break so long URLs do not overflow narrow columns.
+.nexus-alpha-share-url {
+  word-break: break-all;
+}
+
 @include govuk-media-query($until: tablet) {
   .nexus-alpha-profile-hero {
     grid-template-columns: 72px minmax(0, 1fr);

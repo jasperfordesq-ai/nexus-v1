@@ -24,7 +24,7 @@
             <p class="govuk-body">{{ __('govuk_alpha.blocked_users.description') }}</p>
 
             @if (empty($blocked))
-                <p class="govuk-inset-text">{{ __('govuk_alpha.blocked_users.empty') }}</p>
+                <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.blocked_users.empty') }}</p></div>
             @else
                 <ul class="govuk-list nexus-alpha-card-list">
                     @foreach ($blocked as $b)
