@@ -1947,7 +1947,7 @@ return [
         'leaderboard_filter_heading' => 'リーダーボードを絞り込む',
     ],
     'jobs' => [
-        'title' => '募集',
+        'title' => '求人',
         'caption' => ':community',
         'description' => 'このコミュニティの役割と募集。',
         'empty' => '現在、募集中の機会はありません。',

@@ -1968,7 +1968,7 @@ return [
         'leaderboard_filter_heading' => 'Filter leaderboard',
     ],
     'jobs' => [
-        'title' => 'Opportunities',
+        'title' => 'Jobs',
         'caption' => ':community',
         'description' => 'Roles and opportunities in this community.',
         'empty' => 'There are no open opportunities right now.',

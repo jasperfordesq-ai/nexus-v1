@@ -1947,7 +1947,7 @@ return [
         'leaderboard_filter_heading' => 'Filtrar clasificación',
     ],
     'jobs' => [
-        'title' => 'Oportunidades',
+        'title' => 'Empleos',
         'caption' => ':community',
         'description' => 'Puestos y oportunidades en esta comunidad.',
         'empty' => 'En este momento no hay oportunidades abiertas.',

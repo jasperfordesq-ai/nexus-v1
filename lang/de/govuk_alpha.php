@@ -1947,7 +1947,7 @@ return [
         'leaderboard_filter_heading' => 'Bestenliste filtern',
     ],
     'jobs' => [
-        'title' => 'Stellen',
+        'title' => 'Jobs',
         'caption' => ':community',
         'description' => 'Stellen und Möglichkeiten in dieser Gemeinschaft.',
         'empty' => 'Derzeit gibt es keine offenen Stellen.',

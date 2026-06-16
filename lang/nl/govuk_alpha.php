@@ -1947,7 +1947,7 @@ return [
         'leaderboard_filter_heading' => 'Ranglijst filteren',
     ],
     'jobs' => [
-        'title' => 'Mogelijkheden',
+        'title' => 'Vacatures',
         'caption' => ':community',
         'description' => 'Functies en mogelijkheden in deze gemeenschap.',
         'empty' => 'Er zijn momenteel geen openstaande mogelijkheden.',

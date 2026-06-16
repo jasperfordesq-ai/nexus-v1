@@ -1947,7 +1947,7 @@ return [
         'leaderboard_filter_heading' => 'Filtruj ranking',
     ],
     'jobs' => [
-        'title' => 'Oferty',
+        'title' => 'Oferty pracy',
         'caption' => ':community',
         'description' => 'Role i możliwości w tej społeczności.',
         'empty' => 'Nie ma teraz żadnych otwartych ofert.',

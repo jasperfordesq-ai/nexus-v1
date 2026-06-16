@@ -1947,7 +1947,7 @@ return [
         'leaderboard_filter_heading' => 'تصفية لوحة المتصدرين',
     ],
     'jobs' => [
-        'title' => 'الفرص',
+        'title' => 'الوظائف',
         'caption' => ':community',
         'description' => 'الأدوار والفرص في هذا المجتمع.',
         'empty' => 'لا توجد فرص مفتوحة الآن.',

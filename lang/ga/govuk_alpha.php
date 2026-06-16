@@ -1947,7 +1947,7 @@ return [
         'leaderboard_filter_heading' => 'Scagaigh an clárcéimseata',
     ],
     'jobs' => [
-        'title' => 'Deiseanna',
+        'title' => 'Poist',
         'caption' => ':community',
         'description' => 'Róil agus deiseanna sa phobal seo.',
         'empty' => 'Níl aon deiseanna oscailte ann faoi láthair.',
