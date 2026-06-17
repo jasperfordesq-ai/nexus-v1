@@ -836,6 +836,7 @@ class GdprServiceTest extends \Tests\Laravel\TestCase
             'DELETE FROM vol_shift_waitlist',
             'DELETE FROM vol_shift_swap_requests',
             'DELETE FROM vol_emergency_alert_recipients',
+            'DELETE FROM vol_shift_checkins',
             'DELETE FROM vol_reviews',
             'DELETE FROM vol_custom_field_values',
             // Anonymization — records kept for org accounting
@@ -852,6 +853,20 @@ class GdprServiceTest extends \Tests\Laravel\TestCase
                 "GDPR account deletion lost volunteering coverage: {$needle}"
             );
         }
+
+        // 2026-06-17 audit: uploaded credential documents (vetting/Garda scans,
+        // ID PDFs) must be deleted from disk before the vol_credentials rows —
+        // otherwise identity-bearing PII files survive Article 17 erasure.
+        $this->assertStringContainsString(
+            'SELECT file_url FROM vol_credentials',
+            $deletionSrc,
+            'GDPR erasure no longer reads credential file paths for on-disk deletion'
+        );
+        $this->assertStringContainsString(
+            'foreach ($credentialPaths',
+            $deletionSrc,
+            'GDPR erasure no longer deletes uploaded credential files from disk'
+        );
     }
 
     /**

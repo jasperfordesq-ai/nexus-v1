@@ -1112,6 +1112,24 @@ class GdprService
             // emergency contacts, guardian PII, training certs, achievement
             // certificates, future-facing queue entries, reviews authored).
             try {
+                // Delete uploaded credential documents (vetting/Garda-disclosure
+                // scans, ID PDFs/images) from the 'local' disk BEFORE removing the
+                // rows — mirroring the job-CV cleanup in 3q below. file_url is stored
+                // as 'private:<path>' by VolunteerCertificateController::uploadCredential;
+                // without this, identity-bearing PII files survive erasure (Art. 17).
+                $credentialPaths = $this->query(
+                    "SELECT file_url FROM vol_credentials WHERE user_id = ? AND tenant_id = ? AND file_url IS NOT NULL",
+                    [$userId, $this->tenantId]
+                )->fetchAll(\PDO::FETCH_COLUMN);
+                foreach ($credentialPaths as $storedPath) {
+                    $path = preg_replace('/^private:/', '', (string) $storedPath);
+                    if ($path === '') { continue; }
+                    try {
+                        \Illuminate\Support\Facades\Storage::disk('local')->delete($path);
+                    } catch (\Throwable $e) {
+                        // best-effort file cleanup
+                    }
+                }
                 $this->query("DELETE FROM vol_credentials WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 $this->query("DELETE FROM vol_mood_checkins WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 $this->query("DELETE FROM vol_wellbeing_alerts WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
@@ -1122,6 +1140,11 @@ class GdprService
                 $this->query("DELETE FROM vol_shift_waitlist WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 $this->query("DELETE FROM vol_shift_swap_requests WHERE (from_user_id = ? OR to_user_id = ?) AND tenant_id = ?", [$userId, $userId, $this->tenantId]);
                 $this->query("DELETE FROM vol_emergency_alert_recipients WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                // Shift check-in presence PII (place + checked_in/out timestamps).
+                // The users-row ON DELETE CASCADE never fires because erasure
+                // anonymises the users row in place rather than deleting it, so
+                // these rows must be removed explicitly.
+                $this->query("DELETE FROM vol_shift_checkins WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 $this->query("DELETE FROM vol_reviews WHERE reviewer_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 // Custom form answers attached to the user's applications
                 $this->query(
