@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Users from 'lucide-react/icons/users';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
@@ -12,6 +12,7 @@ import Wallet from 'lucide-react/icons/wallet';
 import Briefcase from 'lucide-react/icons/briefcase';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -40,35 +41,59 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
   const navigate = useNavigate();
   const [stats, setStats] = useState<OrgStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  useEffect(() => {
+  const loadStats = useCallback(() => {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
 
     setIsLoading(true);
+    setError(false);
     api.get<OrgStats>(`/v2/volunteering/organisations/${orgId}/stats`)
       .then((res) => {
         if (controller.signal.aborted) return;
         if (res.success && res.data) setStats(res.data);
+        // A failed request must not look identical to "no stats yet" — surface
+        // a retryable error instead.
+        else setError(true);
       })
       .catch((err) => {
         if (controller.signal.aborted) return;
         logError('Failed to load org stats', err);
+        setError(true);
       })
       .finally(() => {
         if (!controller.signal.aborted) setIsLoading(false);
       });
-
-    return () => { abortRef.current?.abort(); };
   }, [orgId]);
+
+  useEffect(() => {
+    loadStats();
+    return () => { abortRef.current?.abort(); };
+  }, [loadStats]);
 
   if (isLoading) {
     return (
       <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-16">
         <Spinner size="lg" />
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <GlassCard className="p-8 text-center" role="alert">
+        <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
+        <p className="text-theme-muted mb-4">{t('org_dashboard.load_error')}</p>
+        <Button
+          className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+          onPress={loadStats}
+        >
+          {t('try_again')}
+        </Button>
+      </GlassCard>
     );
   }
 
@@ -106,7 +131,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
     },
     {
       label: t('org_dashboard.wallet_balance'),
-      value: `${stats.wallet_balance}h`,
+      value: t('hours_abbrev', { hours: stats.wallet_balance }),
       icon: Wallet,
       color: 'from-emerald-500 to-teal-500',
       tab: 'wallet',

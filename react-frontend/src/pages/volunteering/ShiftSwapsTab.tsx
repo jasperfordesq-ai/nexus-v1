@@ -420,7 +420,7 @@ export function ShiftSwapsTab() {
                         variant="danger-soft"
                         startContent={<X className="w-4 h-4" aria-hidden="true" />}
                         onPress={() => setRejectTarget(swap.id)}
-                        isLoading={actioningId === swap.id}
+                        isDisabled={actioningId === swap.id}
                       >
                         {t('swaps.reject')}
                       </Button>
