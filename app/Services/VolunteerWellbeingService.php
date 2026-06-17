@@ -270,15 +270,19 @@ class VolunteerWellbeingService
     {
         $tenantId = TenantContext::getId();
 
-        // Get users who have volunteered (have approved logs or shift signups)
+        // Get users who have volunteered (have approved logs or live shift
+        // signups). Live signups are vol_applications rows carrying a shift_id —
+        // the legacy vol_shift_signups table is no longer written to, so reading
+        // it here silently dropped shift-only volunteers from the scan.
         $volunteerIds = DB::table('vol_logs')
             ->where('tenant_id', $tenantId)
             ->where('status', 'approved')
             ->distinct()
             ->pluck('user_id')
             ->merge(
-                DB::table('vol_shift_signups')
+                DB::table('vol_applications')
                     ->where('tenant_id', $tenantId)
+                    ->whereNotNull('shift_id')
                     ->distinct()
                     ->pluck('user_id')
             )
@@ -422,7 +426,7 @@ class VolunteerWellbeingService
             return true;
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("VolunteerWellbeingService::updateAlert error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update alert'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.alert_update_failed')];
             return false;
         }
     }

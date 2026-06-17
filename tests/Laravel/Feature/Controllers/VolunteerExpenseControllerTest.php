@@ -92,6 +92,55 @@ class VolunteerExpenseControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    /**
+     * 2026-06-17 audit: the admin expenses endpoint returned only the paged
+     * list, so the React admin summary cards (Total Submitted / Pending /
+     * Approved / Paid) were permanently zero. The payload must carry a stats
+     * block aggregated over the full tenant-scoped set.
+     */
+    public function test_admin_expenses_includes_full_set_stats_summary(): void
+    {
+        $this->enableVolunteeringFeature($this->testTenantId);
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $volunteer = User::factory()->forTenant($this->testTenantId)->create();
+        $organization = VolOrganization::factory()->forTenant($this->testTenantId)->create();
+
+        VolExpense::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $volunteer->id,
+            'organization_id' => $organization->id,
+            'opportunity_id' => null,
+            'status' => 'pending',
+            'amount' => 30,
+            'submitted_at' => now(),
+        ]);
+        VolExpense::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $volunteer->id,
+            'organization_id' => $organization->id,
+            'opportunity_id' => null,
+            'status' => 'paid',
+            'amount' => 20,
+            'submitted_at' => now(),
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet('/v2/admin/volunteering/expenses');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'data' => [
+                'items',
+                'stats' => ['total_submitted', 'pending_review', 'approved_total', 'paid_total'],
+            ],
+        ]);
+        $stats = $response->json('data.stats');
+        $this->assertEqualsWithDelta(50.0, (float) $stats['total_submitted'], 0.001);
+        $this->assertEqualsWithDelta(30.0, (float) $stats['pending_review'], 0.001);
+        $this->assertEqualsWithDelta(20.0, (float) $stats['paid_total'], 0.001);
+        $this->assertEqualsWithDelta(20.0, (float) $stats['approved_total'], 0.001);
+    }
+
     public function test_review_expense_validates_status(): void
     {
         $this->enableVolunteeringFeature($this->testTenantId);

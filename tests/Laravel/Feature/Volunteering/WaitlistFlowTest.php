@@ -164,6 +164,38 @@ class WaitlistFlowTest extends TestCase
         $this->assertSame('notified', $this->waitlistStatus($entry));
     }
 
+    /**
+     * 2026-06-17 audit: switching to another shift in the same opportunity
+     * silently freed the original shift's slot without offering it to that
+     * shift's waitlist (signUpForShift overwrote shift_id with no notifyNext).
+     */
+    public function test_switching_shifts_notifies_the_vacated_shifts_waitlist(): void
+    {
+        ['shiftId' => $shiftA, 'oppId' => $oppId] = $this->createShift(1);
+        TenantContext::setById($this->testTenantId);
+        $shiftB = (int) DB::table('vol_shifts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $oppId,
+            'start_time' => now()->addDays(2),
+            'end_time' => now()->addDays(2)->addHours(2),
+            'capacity' => 1,
+        ]);
+
+        $mover = User::factory()->forTenant($this->testTenantId)->create();
+        $waiter = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+        // Mover is approved on the opportunity and currently attached to shift A.
+        $this->addApprovedSignup($oppId, $shiftA, (int) $mover->id);
+        // Someone is waiting on shift A.
+        $entry = $this->addWaitlistEntry($shiftA, (int) $waiter->id, 1);
+
+        // Mover switches to shift B — shift A's spot frees.
+        $ok = VolunteerService::signUpForShift($shiftB, (int) $mover->id);
+
+        $this->assertTrue($ok, json_encode(VolunteerService::getErrors()));
+        $this->assertSame('notified', $this->waitlistStatus($entry));
+    }
+
     // ================================================================
     // promoteUser (claim)
     // ================================================================

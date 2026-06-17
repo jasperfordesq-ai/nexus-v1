@@ -284,8 +284,12 @@ class ShiftWaitlistService
     {
         self::$errors = [];
 
+        // If reactivating the user's application moves it off a different shift,
+        // that shift frees a slot and its own waitlist must be offered the spot.
+        $displacedShiftId = null;
+
         try {
-            return DB::transaction(function () use ($waitlistId, $tenantId) {
+            $ok = DB::transaction(function () use ($waitlistId, $tenantId, &$displacedShiftId) {
                 $entry = DB::table('vol_shift_waitlist')
                     ->where('id', $waitlistId)
                     ->where('tenant_id', $tenantId)
@@ -349,7 +353,12 @@ class ShiftWaitlistService
                     ->first();
 
                 if ($existingApp) {
-                    // Reactivate existing application and attach the shift
+                    // Reactivate existing application and attach the shift. If it
+                    // was already attached to a different shift, capture that so
+                    // its waitlist gets the freed slot after we commit.
+                    if (!empty($existingApp->shift_id) && (int) $existingApp->shift_id !== (int) $entry->shift_id) {
+                        $displacedShiftId = (int) $existingApp->shift_id;
+                    }
                     DB::table('vol_applications')
                         ->where('id', $existingApp->id)
                         ->where('tenant_id', $tenantId)
@@ -368,6 +377,12 @@ class ShiftWaitlistService
 
                 return true;
             });
+
+            if ($ok && $displacedShiftId) {
+                self::notifyNext($displacedShiftId, $tenantId);
+            }
+
+            return $ok;
         } catch (\Exception $e) {
             Log::error('ShiftWaitlistService::promoteUser error: ' . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.vol_waitlist_claim_failed')];

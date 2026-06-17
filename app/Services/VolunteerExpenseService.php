@@ -250,6 +250,50 @@ class VolunteerExpenseService
     }
 
     /**
+     * Aggregate expense totals over the FULL filtered set (not just the current
+     * page). Used by the admin expenses screen's summary cards — a page-scoped
+     * reduce would under-count once there is more than one page. Tenant-scoped
+     * via the VolExpense model's global scope; honours the same filters as
+     * getExpenses().
+     *
+     * @return array{total_submitted: float, pending_review: float, approved_total: float, paid_total: float}
+     */
+    public static function getExpenseStats(array $filters = []): array
+    {
+        $query = VolExpense::query();
+
+        if (!empty($filters['user_id'])) {
+            $query->where('user_id', (int) $filters['user_id']);
+        }
+        if (!empty($filters['organization_id'])) {
+            $query->where('organization_id', (int) $filters['organization_id']);
+        }
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+        if (!empty($filters['date_from'])) {
+            $query->where('submitted_at', '>=', $filters['date_from']);
+        }
+        if (!empty($filters['date_to'])) {
+            $query->where('submitted_at', '<=', $filters['date_to']);
+        }
+
+        $row = $query->selectRaw(
+            "COALESCE(SUM(amount), 0) as total_submitted,
+             COALESCE(SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END), 0) as pending_review,
+             COALESCE(SUM(CASE WHEN status IN ('approved', 'paid') THEN amount ELSE 0 END), 0) as approved_total,
+             COALESCE(SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END), 0) as paid_total"
+        )->first();
+
+        return [
+            'total_submitted' => (float) ($row->total_submitted ?? 0),
+            'pending_review' => (float) ($row->pending_review ?? 0),
+            'approved_total' => (float) ($row->approved_total ?? 0),
+            'paid_total' => (float) ($row->paid_total ?? 0),
+        ];
+    }
+
+    /**
      * Get a single expense by ID (tenant-scoped).
      */
     public static function getExpense(int $id): ?array

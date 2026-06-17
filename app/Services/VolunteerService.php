@@ -1226,7 +1226,7 @@ class VolunteerService
         $opportunityId = (int) $shift->opportunity_id;
 
         $app = DB::selectOne(
-            "SELECT id FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND status = 'approved' AND tenant_id = ?",
+            "SELECT id, shift_id FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND status = 'approved' AND tenant_id = ?",
             [$opportunityId, $userId, $tenantId]
         );
 
@@ -1234,6 +1234,11 @@ class VolunteerService
             self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_shift_approved_application_required')];
             return false;
         }
+
+        // If the application is already attached to a different shift in this
+        // opportunity, signing up for a new one frees the old shift's slot — we
+        // must offer it to that shift's waitlist after committing.
+        $previousShiftId = $app->shift_id ? (int) $app->shift_id : null;
 
         // Check shift hasn't passed
         if (strtotime($shift->start_time) < time()) {
@@ -1243,7 +1248,7 @@ class VolunteerService
 
         // Atomic capacity check + signup inside a transaction with row lock
         try {
-            return DB::transaction(function () use ($shiftId, $tenantId, $app, $userId, $shift) {
+            $ok = DB::transaction(function () use ($shiftId, $tenantId, $app, $userId, $shift) {
                 // Lock the shift row to prevent concurrent signups from exceeding capacity
                 $lockedShift = DB::selectOne(
                     "SELECT * FROM vol_shifts WHERE id = ? AND tenant_id = ? FOR UPDATE",
@@ -1296,6 +1301,15 @@ class VolunteerService
 
                 return true;
             });
+
+            // The volunteer moved off $previousShiftId onto $shiftId — that old
+            // shift now has a free slot, so offer it to its waitlist (the same
+            // courtesy cancelShiftSignup/decline already provide).
+            if ($ok && $previousShiftId && $previousShiftId !== $shiftId) {
+                ShiftWaitlistService::notifyNext($previousShiftId, $tenantId);
+            }
+
+            return $ok;
         } catch (\Exception $e) {
             Log::warning("VolunteerService::signUpForShift error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.volunteer_shift_signup_failed')];

@@ -135,7 +135,14 @@ class VolunteerExpenseController extends BaseApiController
         ];
 
         $result = $this->volunteerExpenseService->getExpenses($filters);
-        return $this->respondWithData($result);
+        $stats = $this->volunteerExpenseService->getExpenseStats($filters);
+
+        return $this->respondWithData([
+            'items' => $result['items'],
+            'stats' => $stats,
+            'cursor' => $result['cursor'],
+            'has_more' => $result['has_more'],
+        ]);
     }
 
     public function reviewExpense($id): JsonResponse
