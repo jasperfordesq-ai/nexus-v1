@@ -59,7 +59,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <span class="govuk-caption-l">{{ __('govuk_alpha.volunteering.detail_title') }}</span>
-            <h1 class="govuk-heading-xl">{{ $opportunity['title'] }}</h1>
+            <h1 class="govuk-heading-xl">{{ $opportunity['title'] ?? __('govuk_alpha.volunteering.detail_title') }}</h1>
             @if (!empty($opportunity['is_remote']))
                 <strong class="govuk-tag govuk-tag--turquoise">{{ __('govuk_alpha.volunteering.remote') }}</strong>
             @endif

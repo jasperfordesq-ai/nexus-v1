@@ -45,6 +45,8 @@ export default function OrgVolunteersTab({ orgId }: OrgVolunteersTabProps) {
   const abortRef = useRef<AbortController | null>(null);
   const toastRef = useRef(toast);
   toastRef.current = toast;
+  const tRef = useRef(t);
+  tRef.current = t;
 
   const loadVolunteers = useCallback(async (append = false) => {
     abortRef.current?.abort();
@@ -77,7 +79,7 @@ export default function OrgVolunteersTab({ orgId }: OrgVolunteersTabProps) {
         cursorRef.current = cursor;
         setHasMore(has_more);
       } else {
-        toastRef.current.error(t('org_volunteers.load_failed'));
+        toastRef.current.error(tRef.current('org_volunteers.load_failed'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
@@ -89,7 +91,7 @@ export default function OrgVolunteersTab({ orgId }: OrgVolunteersTabProps) {
         setIsLoadingMore(false);
       }
     }
-  }, [orgId, t]);
+  }, [orgId]);
 
   useEffect(() => {
     cursorRef.current = null;

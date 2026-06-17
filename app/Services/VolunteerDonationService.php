@@ -260,22 +260,31 @@ class VolunteerDonationService
      */
     public static function getGivingDays(): array
     {
-        return VolGivingDay::where('is_active', true)
+        $rows = VolGivingDay::where('is_active', true)
             ->orderByDesc('start_date')
             ->get([
                 'id', 'title', 'description', 'start_date', 'end_date',
                 'goal_amount', 'raised_amount', 'is_active', 'created_at',
-            ])
-            ->map(function ($row) {
-                $day = $row->toArray();
-                $day['donor_count'] = VolDonation::where('giving_day_id', $row->id)
-                    ->where('tenant_id', TenantContext::getId())
-                    ->where('status', 'completed')
-                    ->distinct('user_id')
-                    ->count('user_id');
-                return self::formatGivingDay($day);
-            })
-            ->toArray();
+            ]);
+
+        if ($rows->isEmpty()) {
+            return [];
+        }
+
+        // Resolve donor counts for every giving day in ONE grouped query instead
+        // of a COUNT per row (N+1).
+        $donorCounts = VolDonation::whereIn('giving_day_id', $rows->pluck('id'))
+            ->where('tenant_id', TenantContext::getId())
+            ->where('status', 'completed')
+            ->groupBy('giving_day_id')
+            ->selectRaw('giving_day_id, COUNT(DISTINCT user_id) as donor_count')
+            ->pluck('donor_count', 'giving_day_id');
+
+        return $rows->map(function ($row) use ($donorCounts) {
+            $day = $row->toArray();
+            $day['donor_count'] = (int) ($donorCounts[$row->id] ?? 0);
+            return self::formatGivingDay($day);
+        })->toArray();
     }
 
     /**
@@ -318,25 +327,35 @@ class VolunteerDonationService
      */
     public static function adminGetGivingDays(): array
     {
-        return VolGivingDay::orderByDesc('created_at')
+        $rows = VolGivingDay::orderByDesc('created_at')
             ->get([
                 'id', 'title', 'description', 'start_date', 'end_date',
                 'goal_amount', 'raised_amount', 'target_hours', 'is_active', 'created_at',
-            ])
-            ->map(function ($row) {
-                $day = $row->toArray();
-                $tenantId = TenantContext::getId();
-                $stats = VolDonation::where('giving_day_id', $row->id)
-                    ->where('tenant_id', $tenantId)
-                    ->where('status', 'completed')
-                    ->selectRaw('COUNT(*) as total_donations, COUNT(DISTINCT COALESCE(user_id, id)) as donor_count, COALESCE(SUM(amount), 0) as total_amount')
-                    ->first();
-                $day['donor_count'] = (int) ($stats->donor_count ?? 0);
-                $day['donation_count'] = (int) ($stats->total_donations ?? 0);
-                $day['raised_amount'] = (float) ($stats->total_amount ?? $day['raised_amount'] ?? 0);
-                return self::formatGivingDay($day);
-            })
-            ->toArray();
+            ]);
+
+        if ($rows->isEmpty()) {
+            return [];
+        }
+
+        // Resolve per-day aggregates in ONE grouped query instead of three columns
+        // per row (N+1). Days with no completed donations are absent from the
+        // result and fall back to zeroes — matching the prior COALESCE(SUM)=0.
+        $statsByDay = VolDonation::whereIn('giving_day_id', $rows->pluck('id'))
+            ->where('tenant_id', TenantContext::getId())
+            ->where('status', 'completed')
+            ->groupBy('giving_day_id')
+            ->selectRaw('giving_day_id, COUNT(*) as total_donations, COUNT(DISTINCT COALESCE(user_id, id)) as donor_count, COALESCE(SUM(amount), 0) as total_amount')
+            ->get()
+            ->keyBy('giving_day_id');
+
+        return $rows->map(function ($row) use ($statsByDay) {
+            $day = $row->toArray();
+            $stats = $statsByDay->get($row->id);
+            $day['donor_count'] = (int) ($stats->donor_count ?? 0);
+            $day['donation_count'] = (int) ($stats->total_donations ?? 0);
+            $day['raised_amount'] = (float) ($stats->total_amount ?? 0);
+            return self::formatGivingDay($day);
+        })->toArray();
     }
 
     /**

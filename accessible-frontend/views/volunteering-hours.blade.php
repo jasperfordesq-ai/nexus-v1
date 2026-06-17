@@ -148,7 +148,8 @@
                         <select class="govuk-select" id="opportunity_id" name="opportunity_id">
                             <option value="">{{ __('govuk_alpha.volunteering.no_related_opportunity') }}</option>
                             @foreach ($applications as $application)
-                                <option value="{{ $application['opportunity']['id'] }}">{{ $application['opportunity']['title'] }}</option>
+                                @continue(empty($application['opportunity']['id']))
+                                <option value="{{ $application['opportunity']['id'] }}">{{ $application['opportunity']['title'] ?? '' }}</option>
                             @endforeach
                         </select>
                     </div>

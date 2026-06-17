@@ -34,6 +34,7 @@
     @else
         <div class="nexus-alpha-card-list govuk-!-margin-bottom-8">
             @foreach ($organisations as $o)
+                @continue(empty($o['id']))
                 @php $oName = trim((string) ($o['name'] ?? '')) ?: __('govuk_alpha.organisations.title'); @endphp
                 <article class="nexus-alpha-card">
                     <h2 class="govuk-heading-s govuk-!-margin-bottom-1"><a class="govuk-link" href="{{ route('govuk-alpha.organisations.show', ['tenantSlug' => $tenantSlug, 'id' => $o['id']]) }}">{{ $oName }}</a></h2>
