@@ -101,8 +101,12 @@ function OrgHoursReviewTab({ orgId, balance, onBalanceChange }: OrgHoursReviewTa
         toastRef.current.error(tRef.current('hours_load_failed'));
       }
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      // Don't clear the spinner if this request was superseded by a newer one
+      // (e.g. a rapid org switch) — that would hide the new request's loading state.
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
   }, [orgId]);
 
