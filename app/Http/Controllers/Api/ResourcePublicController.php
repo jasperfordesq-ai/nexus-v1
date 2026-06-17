@@ -202,16 +202,30 @@ class ResourcePublicController extends BaseApiController
             return $this->respondWithError('FILE_TYPE_NOT_ALLOWED', __('api.file_type_not_allowed'), 'file', 400);
         }
 
-        // Double-check MIME type via file content inspection (not just extension)
-        // Blocks HTML/SVG/PHP disguised as allowed extensions
-        $detectedMime = $file->getMimeType();
-        $blockedMimes = ['text/html', 'application/xhtml+xml', 'image/svg+xml', 'application/x-httpd-php'];
-        if ($detectedMime && in_array($detectedMime, $blockedMimes, true)) {
+        // Double-check MIME type via file content inspection (not just extension).
+        // Each extension has a positive allowlist so arbitrary binaries cannot
+        // pass just because they avoid a small blocklist.
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $detectedMime = $finfo->file($tmpPath) ?: null;
+        $allowedMimesByExt = [
+            'pdf'  => ['application/pdf'],
+            'doc'  => ['application/msword', 'application/vnd.ms-office', 'application/x-cfb'],
+            'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip'],
+            'xls'  => ['application/vnd.ms-excel', 'application/vnd.ms-office', 'application/x-cfb'],
+            'xlsx' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip'],
+            'txt'  => ['text/plain'],
+            'csv'  => ['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel'],
+            'jpg'  => ['image/jpeg'],
+            'png'  => ['image/png'],
+            'gif'  => ['image/gif'],
+            'webp' => ['image/webp'],
+        ];
+        if (!$detectedMime || !in_array($detectedMime, $allowedMimesByExt[$ext] ?? [], true)) {
             return $this->respondWithError('FILE_TYPE_NOT_ALLOWED', __('api.file_type_blocked'), 'file', 400);
         }
 
         // Capture MIME type BEFORE move() invalidates the temp file
-        $fileType = $file->getClientMimeType();
+        $fileType = $detectedMime;
 
         // Generate secure unique filename (cryptographic randomness)
         $filename = bin2hex(random_bytes(16)) . '.' . $ext;

@@ -6,7 +6,11 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Core\TenantContext;
+use App\Http\Middleware\FederationApiAuth;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
 /**
@@ -52,5 +56,52 @@ class FederationKomunitinControllerTest extends TestCase
     {
         $response = $this->apiPost('/v2/federation/komunitin/XYZ/transfers', []);
         $this->assertContains($response->status(), [401, 403, 400, 404, 422]);
+    }
+
+    public function test_update_transfer_to_completed_settles_balances_once(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $this->withoutMiddleware(FederationApiAuth::class);
+
+        $payer = User::factory()->forTenant($this->testTenantId)->create([
+            'balance' => 10,
+            'federation_optin' => 1,
+        ]);
+        $payee = User::factory()->forTenant($this->testTenantId)->create([
+            'balance' => 0,
+        ]);
+
+        $txId = DB::table('transactions')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $payer->id,
+            'receiver_id' => $payee->id,
+            'amount' => 3,
+            'description' => 'Deferred federation transfer',
+            'status' => 'pending',
+            'is_federated' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->patchJson(
+            "/api/v2/federation/komunitin/HOURS/transfers/{$txId}",
+            ['data' => ['attributes' => ['state' => 'committed']]],
+            $this->withTenantHeader()
+        );
+
+        $response->assertStatus(200);
+        $this->assertSame('completed', DB::table('transactions')->where('id', $txId)->value('status'));
+        $this->assertSame(7, (int) DB::table('users')->where('id', $payer->id)->value('balance'));
+        $this->assertSame(3, (int) DB::table('users')->where('id', $payee->id)->value('balance'));
+
+        $again = $this->patchJson(
+            "/api/v2/federation/komunitin/HOURS/transfers/{$txId}",
+            ['data' => ['attributes' => ['state' => 'committed']]],
+            $this->withTenantHeader()
+        );
+
+        $again->assertStatus(422);
+        $this->assertSame(7, (int) DB::table('users')->where('id', $payer->id)->value('balance'));
+        $this->assertSame(3, (int) DB::table('users')->where('id', $payee->id)->value('balance'));
     }
 }

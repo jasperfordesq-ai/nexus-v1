@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -153,6 +154,41 @@ class AdminLegalDocControllerTest extends TestCase
     // ================================================================
     // ACCEPTANCES — GET /v2/admin/legal-documents/versions/{vid}/acceptances
     // ================================================================
+
+    public function test_create_version_sanitizes_html_before_storage(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $docId = DB::table('legal_documents')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'document_type' => 'terms',
+            'title' => 'Terms',
+            'slug' => 'terms-test-' . uniqid(),
+            'requires_acceptance' => 1,
+            'is_active' => 1,
+            'created_by' => $admin->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPost("/v2/admin/legal-documents/{$docId}/versions", [
+            'version_number' => '99.1',
+            'content' => '<p onclick="alert(1)">Safe</p><script>alert(2)</script><a href="javascript:alert(3)">bad</a>',
+            'effective_date' => '2026-04-01',
+        ]);
+
+        $response->assertStatus(201);
+
+        $stored = (string) DB::table('legal_document_versions')
+            ->where('document_id', $docId)
+            ->value('content');
+
+        $this->assertStringContainsString('<p>Safe</p>', $stored);
+        $this->assertStringNotContainsString('<script', $stored);
+        $this->assertStringNotContainsString('onclick', $stored);
+        $this->assertStringNotContainsString('javascript:', $stored);
+    }
 
     public function test_acceptances_returns_403_for_regular_member(): void
     {

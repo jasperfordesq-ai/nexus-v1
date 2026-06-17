@@ -68,9 +68,9 @@ class FederationKomunitinController extends BaseApiController
      *   rejected, completed — terminal states, no further transitions
      */
     private const VALID_TRANSITIONS = [
-        'new'       => ['pending'],
-        'pending'   => ['accepted', 'rejected'],
-        'accepted'  => ['completed', 'failed'],
+        'new'       => ['pending', 'accepted', 'committed', 'completed', 'rejected', 'failed'],
+        'pending'   => ['accepted', 'committed', 'completed', 'rejected', 'failed'],
+        'accepted'  => ['committed', 'completed', 'failed'],
         'rejected'  => [],
         'completed' => [],
         'failed'    => ['pending'],
@@ -641,11 +641,11 @@ class FederationKomunitinController extends BaseApiController
         $statusMap = [
             'new'       => 'pending',
             'pending'   => 'pending',
-            'accepted'  => 'processing',
+            'accepted'  => 'pending',
             'committed' => 'completed',
             'completed' => 'completed',
             'rejected'  => 'cancelled',
-            'failed'    => 'failed',
+            'failed'    => 'cancelled',
         ];
         $nexusStatus = $statusMap[$state] ?? 'pending';
 
@@ -777,11 +777,13 @@ class FederationKomunitinController extends BaseApiController
                 'Missing state in request body', 400);
         }
 
-        // Map Nexus internal status back to Komunitin state for transition validation
+        // Map Nexus internal status back to Komunitin state for transition validation.
+        // The transactions.status schema is pending/completed/cancelled; accepted
+        // remains pending until committed/completed settles funds.
         $nexusToKomunitin = [
-            'pending'    => 'new',
-            'processing' => 'pending',
-            'completed'  => 'accepted',
+            'pending'    => 'pending',
+            'processing' => 'accepted',
+            'completed'  => 'completed',
             'cancelled'  => 'rejected',
             'failed'     => 'failed',
         ];
@@ -794,12 +796,10 @@ class FederationKomunitinController extends BaseApiController
         }
 
         $newNexusStatus = match ($newState) {
-            'committed', 'accepted', 'completed' => 'completed',
-            'pending'   => 'processing',
-            'new'       => 'pending',
-            'rejected'  => 'cancelled',
-            'failed'    => 'failed',
-            default     => null,
+            'committed', 'completed' => 'completed',
+            'accepted', 'pending', 'new' => 'pending',
+            'rejected', 'failed' => 'cancelled',
+            default => null,
         };
 
         if (!$newNexusStatus) {
@@ -807,16 +807,101 @@ class FederationKomunitinController extends BaseApiController
                 "Invalid state: {$newState}", 400);
         }
 
-        DB::table('transactions')
-            ->where('id', (int) $id)
-            ->where('tenant_id', $tenantId)
-            ->update([
-                'status' => $newNexusStatus,
-                'updated_at' => now(),
-            ]);
+        $shouldSettle = $newNexusStatus === 'completed' && ($tx->status ?? '') !== 'completed';
+
+        if ($shouldSettle) {
+            $payerId = (int) ($tx->sender_id ?? 0);
+            $payeeId = (int) ($tx->receiver_id ?? 0);
+            $amount = (float) ($tx->amount ?? 0);
+
+            if (!$payerId || !$payeeId || $amount <= 0) {
+                return $this->jsonApiError('BadRequest', 'Bad Request',
+                    'Transfer is missing payer, payee, or amount', 400);
+            }
+
+            if (!SecurityBounds::isAcceptableHourAmount($amount)) {
+                return $this->jsonApiError('BadRequest', 'Bad Request',
+                    'Amount exceeds maximum allowed value', 400);
+            }
+
+            $payer = DB::table('users')
+                ->where('id', $payerId)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'active')
+                ->first(['id', 'federation_optin']);
+
+            if (!$payer) {
+                return $this->jsonApiError('NotFound', 'Not Found',
+                    "Payer account not found in currency {$code}", 404);
+            }
+
+            if ((int) ($payer->federation_optin ?? 0) !== 1) {
+                return $this->jsonApiError('Forbidden', 'Forbidden',
+                    'Payer has not opted into federation; their balance cannot be debited by a federated transfer', 403);
+            }
+
+            $payeeExists = DB::table('users')
+                ->where('id', $payeeId)
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'active')
+                ->exists();
+
+            if (!$payeeExists) {
+                return $this->jsonApiError('NotFound', 'Not Found',
+                    "Payee account not found in currency {$code}", 404);
+            }
+        }
+
+        DB::beginTransaction();
+        try {
+            $claimed = DB::table('transactions')
+                ->where('id', (int) $id)
+                ->where('tenant_id', $tenantId)
+                ->where('status', $tx->status)
+                ->update([
+                    'status' => $newNexusStatus,
+                    'updated_at' => now(),
+                ]);
+
+            if ($claimed === 0) {
+                DB::rollBack();
+                return $this->jsonApiError('Conflict', 'Conflict',
+                    'Transfer state changed while processing this update', 409);
+            }
+
+            if ($shouldSettle) {
+                $amount = (float) $tx->amount;
+                $payerId = (int) $tx->sender_id;
+                $payeeId = (int) $tx->receiver_id;
+
+                $debited = DB::update(
+                    "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND status = 'active' AND federation_optin = 1 AND balance >= ?",
+                    [$amount, $payerId, $tenantId, $amount]
+                );
+
+                if ($debited === 0) {
+                    DB::rollBack();
+                    return $this->jsonApiError('Forbidden', 'Forbidden',
+                        'Insufficient balance for this transfer', 403);
+                }
+
+                DB::update(
+                    "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ? AND status = 'active'",
+                    [$amount, $payeeId, $tenantId]
+                );
+            }
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('[FederationKomunitin] Transfer update failed', ['error' => $e->getMessage()]);
+            return $this->jsonApiError('InternalError', 'Internal Server Error',
+                'Transfer update failed', 500);
+        }
 
         $tx = DB::table('transactions')
             ->where('id', (int) $id)
+            ->where('tenant_id', $tenantId)
             ->first();
 
         return $this->jsonApiResponse(

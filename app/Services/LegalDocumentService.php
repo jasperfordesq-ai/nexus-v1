@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\EmailTemplateBuilder;
 use App\Core\Mailer;
 use App\Core\TenantContext;
+use App\Helpers\HtmlSanitizer;
 use App\I18n\LocaleContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -211,13 +212,14 @@ class LegalDocumentService
             throw new \InvalidArgumentException('Document not found for this tenant');
         }
 
-        $plainText = ! empty($data['content']) ? strip_tags($data['content']) : null;
+        $content = HtmlSanitizer::sanitize((string) ($data['content'] ?? ''), false);
+        $plainText = $content !== '' ? strip_tags($content) : null;
 
         return DB::table('legal_document_versions')->insertGetId([
             'document_id'        => $docId,
             'version_number'     => $data['version_number'],
             'version_label'      => $data['version_label'] ?? null,
-            'content'            => $data['content'],
+            'content'            => $content,
             'content_plain'      => $plainText,
             'summary_of_changes' => $data['summary_of_changes'] ?? null,
             'effective_date'     => $data['effective_date'],
@@ -231,7 +233,7 @@ class LegalDocumentService
      */
     public static function updateVersion(int $vid, array $data): bool
     {
-        $allowedFields = ['version_number', 'version_label', 'content', 'summary_of_changes', 'effective_date', 'is_draft'];
+        $allowedFields = ['version_number', 'version_label', 'summary_of_changes', 'effective_date', 'is_draft'];
 
         $updates = [];
         foreach ($allowedFields as $field) {
@@ -241,8 +243,10 @@ class LegalDocumentService
         }
 
         // Update plain text if content changed
-        if (isset($data['content'])) {
-            $updates['content_plain'] = strip_tags($data['content']);
+        if (array_key_exists('content', $data)) {
+            $content = HtmlSanitizer::sanitize((string) $data['content'], false);
+            $updates['content'] = $content;
+            $updates['content_plain'] = strip_tags($content);
         }
 
         if (empty($updates)) {

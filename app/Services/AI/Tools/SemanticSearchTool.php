@@ -8,6 +8,7 @@ namespace App\Services\AI\Tools;
 
 use App\Core\TenantContext;
 use App\Services\EmbeddingService;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -83,7 +84,7 @@ class SemanticSearchTool extends AbstractTool
             return $this->ok('No semantic matches found for "' . $query . '".', [], 'generic');
         }
 
-        $hydrated = $this->hydrate($hits, $tenantId);
+        $hydrated = $this->hydrate($hits, $tenantId, $userId);
         $cardType = count(array_unique(array_column($hydrated, '_card_type'))) === 1
             ? $hydrated[0]['_card_type']
             : 'generic';
@@ -106,7 +107,7 @@ class SemanticSearchTool extends AbstractTool
      * @param array<int, array{content_type:string, content_id:int, score:float}> $hits
      * @return array<int, array<string, mixed>>
      */
-    private function hydrate(array $hits, int $tenantId): array
+    private function hydrate(array $hits, int $tenantId, int $userId): array
     {
         $slugPrefix = TenantContext::getSlugPrefix();
         $byType = [];
@@ -120,10 +121,11 @@ class SemanticSearchTool extends AbstractTool
                 continue;
             }
             $table = self::TYPE_MAP[$type]['table'];
-            $rows = DB::table($table)
+            $query = DB::table($table)
                 ->where('tenant_id', $tenantId)
-                ->whereIn('id', array_keys($ids))
-                ->get();
+                ->whereIn('id', array_keys($ids));
+            $this->applyVisibilityFilters($query, $type, $userId);
+            $rows = $query->get();
             foreach ($rows as $row) {
                 $byId[$type][(int) $row->id] = $row;
             }
@@ -144,6 +146,59 @@ class SemanticSearchTool extends AbstractTool
             $out[] = $card;
         }
         return $out;
+    }
+
+    private function applyVisibilityFilters(Builder $query, string $type, int $userId): void
+    {
+        switch ($type) {
+            case 'listing':
+                $query->where('status', 'active')
+                    ->where(function ($q) {
+                        $q->whereNull('moderation_status')
+                            ->orWhere('moderation_status', 'approved');
+                    });
+                break;
+
+            case 'user':
+                $query->where('status', 'active')
+                    ->where('id', '!=', $userId);
+                break;
+
+            case 'event':
+                $query->where('status', 'active')
+                    ->where('start_time', '>=', now());
+                break;
+
+            case 'group':
+                $query->where('visibility', 'public')
+                    ->where('is_active', 1)
+                    ->where('status', 'active');
+                break;
+
+            case 'job':
+                $query->whereIn('status', ['active', 'open'])
+                    ->where(function ($q) {
+                        $q->whereNull('moderation_status')
+                            ->orWhere('moderation_status', 'approved');
+                    })
+                    ->where(function ($q) {
+                        $q->whereNull('expired_at')
+                            ->orWhere('expired_at', '>', now());
+                    });
+                break;
+
+            case 'marketplace':
+                $query->where('status', 'active')
+                    ->where(function ($q) {
+                        $q->whereNull('moderation_status')
+                            ->orWhere('moderation_status', 'approved');
+                    });
+                break;
+
+            case 'kb_article':
+                $query->where('is_published', true);
+                break;
+        }
     }
 
     private function rowToCard(string $type, $row, string $slugPrefix): ?array

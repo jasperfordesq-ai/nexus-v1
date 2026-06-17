@@ -6,10 +6,11 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
-use Tests\Laravel\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Laravel\Sanctum\Sanctum;
 use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\UploadedFile;
+use Laravel\Sanctum\Sanctum;
+use Tests\Laravel\TestCase;
 
 /**
  * Feature tests for ResourcePublicController — public resource library.
@@ -75,6 +76,25 @@ class ResourcePublicControllerTest extends TestCase
         ]);
 
         $response->assertStatus(401);
+    }
+
+    public function test_store_rejects_allowed_extension_when_detected_mime_is_not_allowed(): void
+    {
+        $this->authenticatedUser();
+        $uploadDir = base_path('httpdocs/uploads/' . $this->testTenantId . '/resources');
+        $before = is_dir($uploadDir) ? glob($uploadDir . '/*') ?: [] : [];
+
+        $response = $this->apiPost('/v2/resources', [
+            'title' => 'Disguised executable',
+            'file' => UploadedFile::fake()->createWithContent('not-a-real.pdf', 'MZ' . str_repeat("\0", 512)),
+        ]);
+
+        $after = is_dir($uploadDir) ? glob($uploadDir . '/*') ?: [] : [];
+        foreach (array_diff($after, $before) as $createdFile) {
+            @unlink($createdFile);
+        }
+
+        $response->assertStatus(400);
     }
 
     // ------------------------------------------------------------------
