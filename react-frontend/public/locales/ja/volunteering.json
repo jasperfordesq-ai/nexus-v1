@@ -119,6 +119,7 @@
   "form_skills_placeholder": "例: ガーデニング、教育、応急処置",
   "form_start_date_label": "開始日",
   "form_end_date_label": "終了日",
+  "form_end_before_start": "End date cannot be before the start date",
   "form_submit_opportunity": "機会を投稿する",
   "form_cancel": "キャンセル",
   "form_save_error": "機会の投稿に失敗しました。もう一度お試しください。",

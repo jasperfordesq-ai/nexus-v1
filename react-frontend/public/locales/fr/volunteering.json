@@ -119,6 +119,7 @@
   "form_skills_placeholder": "p. ex., jardinage, enseignement, premiers secours",
   "form_start_date_label": "Date de début",
   "form_end_date_label": "Date de fin",
+  "form_end_before_start": "End date cannot be before the start date",
   "form_submit_opportunity": "Publier l'opportunité",
   "form_cancel": "Annuler",
   "form_save_error": "Impossible de publier l'opportunité. Veuillez réessayer.",

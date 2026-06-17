@@ -83,9 +83,9 @@ export function SafeguardingTab() {
         setError(tRef.current('safeguarding.load_error'));
       }
     } catch (err) { if (controller.signal.aborted) return; logError('Failed to load safeguarding data', err); setError(tRef.current('safeguarding.load_error')); }
-    finally { setIsLoading(false); }
+    finally { if (!controller.signal.aborted) setIsLoading(false); }
   }, []);
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(); return () => { abortRef.current?.abort(); }; }, [load]);
 
   const handleSubmitTraining = async () => {
     if (!trainingForm.training_name.trim() || !trainingForm.completed_at) { toastRef.current.error(tRef.current('safeguarding.fill_required')); return; }

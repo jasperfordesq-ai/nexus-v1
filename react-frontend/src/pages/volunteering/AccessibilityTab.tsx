@@ -99,11 +99,11 @@ export function AccessibilityTab() {
       logError('Failed to load accessibility needs', err);
       setError(tRef.current('accessibility.load_error'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) setIsLoading(false);
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(); return () => { abortRef.current?.abort(); }; }, [load]);
 
   const handleSave = async () => {
     try {

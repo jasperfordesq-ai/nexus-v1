@@ -119,6 +119,7 @@
   "form_skills_placeholder": "m.sh., garraíodóireacht, múinteoireacht, garchabhair",
   "form_start_date_label": "Dáta Tosaigh",
   "form_end_date_label": "Dáta Deiridh",
+  "form_end_before_start": "End date cannot be before the start date",
   "form_submit_opportunity": "Foilsigh Deis",
   "form_cancel": "Cealaigh",
   "form_save_error": "Theip ar fhoilsiú na deise. Bain triail eile as le do thoil.",

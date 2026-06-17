@@ -119,6 +119,7 @@
   "form_skills_placeholder": "z.B. Gartenarbeit, Unterrichten, Erste Hilfe",
   "form_start_date_label": "Startdatum",
   "form_end_date_label": "Enddatum",
+  "form_end_before_start": "End date cannot be before the start date",
   "form_submit_opportunity": "Einsatz veröffentlichen",
   "form_cancel": "Abbrechen",
   "form_save_error": "Einsatz konnte nicht veröffentlicht werden. Bitte versuchen Sie es erneut.",

@@ -127,6 +127,18 @@ export default function CreateOpportunityPage() {
       newErrors.description = t('form_desc_min_length');
     }
 
+    // The end-date picker's minValue only constrains selection AT pick time; if
+    // the user later moves start_date past a chosen end_date the range inverts.
+    // ISO date strings (YYYY-MM-DD) sort lexicographically, so a string compare
+    // is a safe range check across DateInputValue implementations.
+    if (
+      formData.start_date &&
+      formData.end_date &&
+      formData.end_date.toString() < formData.start_date.toString()
+    ) {
+      newErrors.end_date = t('form_end_before_start');
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
@@ -362,6 +374,8 @@ export default function CreateOpportunityPage() {
                 value={formData.end_date}
                 onChange={(val) => updateField('end_date', val)}
                 minValue={formData.start_date || today(getLocalTimeZone())}
+                isInvalid={!!errors.end_date}
+                errorMessage={errors.end_date}
                 classNames={{
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',

@@ -122,12 +122,15 @@ export function GroupSignUpTab() {
       logError('Failed to load group reservations', err);
       setError(tRef.current('group_signup.error_load_generic'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
     load();
+    return () => {
+      abortRef.current?.abort();
+    };
   }, [load]);
 
   const searchMembers = useCallback((query: string) => {

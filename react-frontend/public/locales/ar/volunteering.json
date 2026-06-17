@@ -119,6 +119,7 @@
   "form_skills_placeholder": "على سبيل المثال، البستنة، التدريس، الإسعافات الأولية",
   "form_start_date_label": "تاريخ البدء",
   "form_end_date_label": "تاريخ الانتهاء",
+  "form_end_before_start": "End date cannot be before the start date",
   "form_submit_opportunity": "فرصة النشر",
   "form_cancel": "يلغي",
   "form_save_error": "فشل في نشر الفرصة. يرجى المحاولة مرة أخرى.",

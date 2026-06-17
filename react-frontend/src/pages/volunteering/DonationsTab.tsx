@@ -161,12 +161,15 @@ export function DonationsTab() {
       logError('Failed to load donations data', err);
       setError(tRef.current('donations.load_error'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
     load();
+    return () => {
+      abortRef.current?.abort();
+    };
   }, [load]);
 
   const openStripeCheckout = (dayId?: number) => {

@@ -158,6 +158,7 @@
   "form_skills_placeholder": "e.g., gardening, teaching, first aid",
   "form_start_date_label": "Start Date",
   "form_end_date_label": "End Date",
+  "form_end_before_start": "End date cannot be before the start date",
   "form_submit_opportunity": "Post Opportunity",
   "form_cancel": "Cancel",
   "form_save_error": "Failed to post opportunity. Please try again.",

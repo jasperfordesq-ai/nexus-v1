@@ -182,7 +182,15 @@ export default function VolOrgDashboardPage() {
   }, [orgId]);
 
   useEffect(() => {
-    if (!isAuthenticated || !orgId) return;
+    if (!isAuthenticated) return;
+    // A malformed :orgId (non-numeric → NaN, or 0) must surface the retryable
+    // error UI rather than trapping the user on an infinite LoadingScreen
+    // (isLoading is only ever reset inside loadOrg()).
+    if (!Number.isInteger(orgId) || orgId <= 0) {
+      setIsLoading(false);
+      setLoadError(true);
+      return;
+    }
     loadOrg();
     return () => { abortRef.current?.abort(); };
   }, [isAuthenticated, orgId, loadOrg]);

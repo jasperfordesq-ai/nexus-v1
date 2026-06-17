@@ -107,12 +107,15 @@ export function ShiftSwapsTab() {
       logError('Failed to load shift swaps', err);
       setError(tRef.current('swaps.load_error'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
     load();
+    return () => {
+      abortRef.current?.abort();
+    };
   }, [load]);
 
   const handleAccept = async (swapId: number) => {

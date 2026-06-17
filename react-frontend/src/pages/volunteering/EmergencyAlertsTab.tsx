@@ -93,12 +93,15 @@ export function EmergencyAlertsTab() {
       logError('Failed to load emergency alerts', err);
       setError(tRef.current('emergency.error_load_generic'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
     load();
+    return () => {
+      abortRef.current?.abort();
+    };
   }, [load]);
 
   const handleRespond = async (alertId: number, response: 'accepted' | 'declined') => {

@@ -119,6 +119,7 @@
   "form_skills_placeholder": "bijvoorbeeld tuinieren, lesgeven, eerste hulp",
   "form_start_date_label": "Startdatum",
   "form_end_date_label": "Einddatum",
+  "form_end_before_start": "End date cannot be before the start date",
   "form_submit_opportunity": "Mogelijkheid plaatsen",
   "form_cancel": "Annuleren",
   "form_save_error": "Het is niet gelukt om de mogelijkheid te posten. Probeer het opnieuw.",

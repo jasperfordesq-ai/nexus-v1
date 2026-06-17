@@ -118,6 +118,9 @@ export function HoursReviewTab() {
 
   useEffect(() => {
     loadEntries();
+    return () => {
+      abortRef.current?.abort();
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount
   }, []);
 

@@ -153,12 +153,15 @@ export function RecommendedShiftsTab() {
       logError('Failed to load recommended shifts', err);
       setError(tRef.current('recommendations.error_load_generic'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
     load();
+    return () => {
+      abortRef.current?.abort();
+    };
   }, [load]);
 
   const getMatchColor = (score: number): 'success' | 'warning' | 'primary' | 'default' => {
