@@ -42,6 +42,8 @@ class TenantFeatureConfig
         'member_premium' => false,
         'ai_agents' => false,
         'partner_api' => false,
+        'fadp_compliance' => false,
+        'local_advertising' => false,
         'regional_analytics' => false,
         'newsletter' => true,
         // Maps default OFF platform-wide: the map system has had display issues

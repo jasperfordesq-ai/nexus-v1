@@ -71,7 +71,8 @@ class TenantFeatureConfigTest extends TestCase
         $expected = ['events', 'groups', 'gamification', 'goals', 'blog', 'resources',
             'volunteering', 'exchange_workflow', 'organisations', 'federation',
             'connections', 'reviews', 'polls', 'job_vacancies', 'ideation_challenges',
-            'direct_messaging', 'group_exchanges', 'search', 'ai_chat'];
+            'direct_messaging', 'group_exchanges', 'search', 'ai_chat',
+            'fadp_compliance', 'local_advertising'];
 
         foreach ($expected as $key) {
             $this->assertArrayHasKey($key, TenantFeatureConfig::FEATURE_DEFAULTS);
