@@ -303,7 +303,10 @@ describe('CreateJobPage', () => {
     });
 
     it('handles salary benchmark data returned inside the API benchmark envelope', async () => {
-      vi.useFakeTimers();
+      // shouldAdvanceTime lets real time progress so Testing Library's waitFor
+      // (which polls on timers) isn't frozen by the fake clock, while
+      // advanceTimersByTimeAsync still drives the salary-benchmark debounce.
+      vi.useFakeTimers({ shouldAdvanceTime: true });
       try {
         vi.mocked(api.get).mockImplementation((url: string) => {
           if (url.includes('/v2/jobs/salary-benchmark')) {
