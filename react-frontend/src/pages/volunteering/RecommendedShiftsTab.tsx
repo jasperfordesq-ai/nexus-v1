@@ -25,7 +25,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Target from 'lucide-react/icons/target';
 import Zap from 'lucide-react/icons/zap';
 import ExternalLink from 'lucide-react/icons/external-link';
-import { GlassCard, Progress, Button, Chip, CardRowsSkeleton } from '@/components/ui';
+import { GlassCard, Button, Chip, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -295,20 +295,21 @@ export function RecommendedShiftsTab() {
                   </div>
 
                   <div className="flex flex-col items-stretch gap-2 sm:flex-shrink-0 sm:items-center">
-                    <div className="w-14 h-14 relative">
-                      <Progress
-                        value={item.match_score}
-                        classNames={{
-                          indicator: item.match_score >= 75
-                            ? 'bg-emerald-500'
-                            : item.match_score >= 50
-                              ? 'bg-indigo-500'
-                              : 'bg-amber-500',
-                          track: 'bg-theme-hover',
-                        }}
-                        size="md"
-                        aria-label={t('recommendations.match_aria', { score: item.match_score })}
-                      />
+                    {/* Circular match-score badge. A horizontal Progress bar squashed
+                        into a 14×14 square rendered as a broken sliver, so show the
+                        score directly in a colour-coded ring instead. */}
+                    <div
+                      className={`w-14 h-14 flex items-center justify-center rounded-full border-4 text-sm font-bold ${
+                        item.match_score >= 75
+                          ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+                          : item.match_score >= 50
+                            ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                            : 'border-amber-500 text-amber-600 dark:text-amber-400'
+                      }`}
+                      role="img"
+                      aria-label={t('recommendations.match_aria', { score: item.match_score })}
+                    >
+                      {item.match_score}%
                     </div>
                     <Button
                       size="sm"
