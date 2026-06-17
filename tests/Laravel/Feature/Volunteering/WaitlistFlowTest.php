@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Services\ShiftSwapService;
 use App\Services\ShiftWaitlistService;
 use App\Services\VolunteerService;
+use App\Services\VolunteeringConfigurationService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
@@ -162,6 +163,42 @@ class WaitlistFlowTest extends TestCase
 
         $this->assertTrue($ok, json_encode(VolunteerService::getErrors()));
         $this->assertSame('notified', $this->waitlistStatus($entry));
+    }
+
+    /**
+     * 2026-06-17 audit: the admin-configurable cancellation_deadline_hours
+     * setting was a no-op (cancelShiftSignup only blocked after a shift had
+     * already started). It now binds — a cancellation inside the configured
+     * advance-notice window is rejected. Unset (default 0) preserves the old
+     * "cancel any time before start" behaviour (covered by the test above).
+     */
+    public function test_cancellation_blocked_within_configured_deadline(): void
+    {
+        ['oppId' => $oppId] = $this->createShift(1);
+        TenantContext::setById($this->testTenantId);
+        // A shift starting in 6 hours — inside a 24h cancellation deadline.
+        $soonShiftId = (int) DB::table('vol_shifts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $oppId,
+            'start_time' => now()->addHours(6),
+            'end_time' => now()->addHours(8),
+            'capacity' => 1,
+        ]);
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+        $this->addApprovedSignup($oppId, $soonShiftId, (int) $user->id);
+
+        VolunteeringConfigurationService::set(
+            VolunteeringConfigurationService::CONFIG_CANCELLATION_DEADLINE_HOURS,
+            24,
+        );
+
+        $ok = VolunteerService::cancelShiftSignup($soonShiftId, (int) $user->id);
+
+        $this->assertFalse($ok, 'cancellation within the configured deadline should be rejected');
+        $errors = VolunteerService::getErrors();
+        $this->assertNotEmpty($errors);
+        $this->assertSame('VALIDATION_ERROR', $errors[0]['code']);
     }
 
     /**

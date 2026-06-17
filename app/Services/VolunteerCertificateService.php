@@ -75,6 +75,15 @@ class VolunteerCertificateService
             return null;
         }
 
+        // Minimum-hours threshold: admin-configurable (volunteering.min_hours_for_certificate).
+        // Defaults to 0 (any positive hours qualifies = current behaviour) when
+        // unset; a configured value gates certificate issuance.
+        $minHours = (float) VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_MIN_HOURS_FOR_CERTIFICATE, 0);
+        if ($minHours > 0 && $totalHours < $minHours) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_certificate_below_minimum', ['min' => rtrim(rtrim(number_format($minHours, 1), '0'), '.')])];
+            return null;
+        }
+
         // Determine date range from actual logged hours
         $dateRange = (clone $query)->selectRaw('MIN(date_logged) as start_date, MAX(date_logged) as end_date')->first();
         $dateRangeStart = $dateRange->start_date ?? now()->format('Y-m-d');

@@ -9,7 +9,6 @@ namespace App\Services;
 use App\Core\TenantContext;
 use App\Models\VolAccessibilityNeed;
 use App\Models\VolCustomField;
-use App\Models\VolCustomFieldValue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -195,55 +194,6 @@ class VolunteerFormService
         } catch (\Exception $e) {
             Log::error('VolunteerFormService::deleteField error: ' . $e->getMessage());
             return false;
-        }
-    }
-
-    /**
-     * Save (upsert) custom field values for a given entity.
-     *
-     * @param string $entityType e.g. 'application', 'profile', 'shift'
-     * @param int $entityId The entity ID
-     * @param array $values Associative array [field_id => value]
-     */
-    public static function saveFieldValues(string $entityType, int $entityId, array $values): void
-    {
-        $tenantId = TenantContext::getId();
-
-        try {
-            $fieldIds = array_map('intval', array_keys($values));
-            if (empty($fieldIds)) {
-                return;
-            }
-
-            $allowedFieldIds = VolCustomField::where('tenant_id', $tenantId)
-                ->whereIn('id', $fieldIds)
-                ->where('applies_to', $entityType)
-                ->where('is_active', true)
-                ->pluck('id')
-                ->map(fn ($id) => (int) $id)
-                ->all();
-            $allowedFieldIds = array_flip($allowedFieldIds);
-
-            foreach ($values as $fieldId => $value) {
-                $fieldId = (int) $fieldId;
-                if (!isset($allowedFieldIds[$fieldId])) {
-                    continue;
-                }
-
-                VolCustomFieldValue::updateOrCreate(
-                    [
-                        'tenant_id' => $tenantId,
-                        'custom_field_id' => $fieldId,
-                        'entity_type' => $entityType,
-                        'entity_id' => $entityId,
-                    ],
-                    [
-                        'field_value' => is_array($value) ? json_encode($value) : (string) $value,
-                    ]
-                );
-            }
-        } catch (\Exception $e) {
-            Log::error('VolunteerFormService::saveFieldValues error: ' . $e->getMessage());
         }
     }
 

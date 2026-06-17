@@ -1336,6 +1336,15 @@ class VolunteerService
             return false;
         }
 
+        // Advance-notice policy: admin-configurable (volunteering.cancellation_deadline_hours).
+        // Defaults to 0 (no deadline = current behaviour) when unset, so existing
+        // tenants are unchanged; a configured value blocks last-minute cancels.
+        $cancellationDeadlineHours = (int) VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_CANCELLATION_DEADLINE_HOURS, 0);
+        if ($cancellationDeadlineHours > 0 && (strtotime($shift->start_time) - time()) < $cancellationDeadlineHours * 3600) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_shift_cancel_deadline', ['hours' => $cancellationDeadlineHours])];
+            return false;
+        }
+
         try {
             $affected = DB::update(
                 "UPDATE vol_applications SET shift_id = NULL WHERE opportunity_id = ? AND user_id = ? AND shift_id = ? AND tenant_id = ?",
@@ -1416,8 +1425,15 @@ class VolunteerService
             return null;
         }
 
-        if ($data['hours'] > 24) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_log_hours_max'), 'field' => 'hours'];
+        // Per-entry hours ceiling: admin-configurable (volunteering.max_hours_per_shift),
+        // defaulting to the legacy 24h cap when unset so existing tenants are
+        // unchanged. 24h also remains an absolute sanity ceiling.
+        $maxHours = (int) VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_MAX_HOURS_PER_SHIFT, 24);
+        if ($maxHours <= 0 || $maxHours > 24) {
+            $maxHours = 24;
+        }
+        if ($data['hours'] > $maxHours) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_log_hours_over_max', ['max' => $maxHours]), 'field' => 'hours'];
             return null;
         }
 

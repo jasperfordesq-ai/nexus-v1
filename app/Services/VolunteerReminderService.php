@@ -1044,6 +1044,36 @@ class VolunteerReminderService
                         continue;
                     }
 
+                    // The lapsed-volunteer nudge keys its dedup on the stable
+                    // user id, so the unique (tenant,user,type,reference,channel)
+                    // row written on the first send would block it forever. This
+                    // is a *recurring* re-engagement reminder: re-send only when
+                    // the last nudge was more than 90 days ago, clearing the
+                    // stale dedup/claim rows so a fresh send can be recorded.
+                    $lastNudgeAt = DB::table('vol_reminders_sent')
+                        ->where('tenant_id', $tenantId)
+                        ->where('user_id', $userId)
+                        ->where('reminder_type', 'lapsed_volunteer')
+                        ->where('channel', 'email')
+                        ->max('sent_at');
+                    if ($lastNudgeAt !== null) {
+                        if (strtotime((string) $lastNudgeAt) > strtotime('-90 days')) {
+                            continue; // nudged within the window — don't re-send
+                        }
+                        DB::table('vol_reminders_sent')
+                            ->where('tenant_id', $tenantId)
+                            ->where('user_id', $userId)
+                            ->where('reminder_type', 'lapsed_volunteer')
+                            ->where('channel', 'email')
+                            ->delete();
+                        DB::table('vol_reminder_delivery_claims')
+                            ->where('tenant_id', $tenantId)
+                            ->where('user_id', $userId)
+                            ->where('reminder_type', 'lapsed_volunteer')
+                            ->where('channel', 'email')
+                            ->delete();
+                    }
+
                     $sent = self::deliverEmailReminder(
                         $tenantId,
                         $userId,
