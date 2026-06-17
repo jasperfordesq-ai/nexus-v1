@@ -66,8 +66,15 @@ jobs:
           # PR checks must not depend on live production tenant state. Run this
           # workflow only when a target E2E environment is configured explicitly;
           # the local Docker smoke job remains the blocking PR environment gate.
+          # IMPORTANT: when a target environment / credentials are not configured
+          # this job exits 0 (green) WITHOUT running any tests. To avoid a false
+          # sense of safety, that state is surfaced as a loud ::warning:: and a job
+          # summary — a green check here does NOT mean the E2E suite passed unless
+          # the summary confirms tests actually ran. (Stays non-blocking by design;
+          # the real gate is a self-contained run — see the E2E coverage notes.)
           if [ -z "$E2E_BASE_URL" ]; then
-            echo "::notice::Skipping ${PROJECT} E2E tests - E2E_BASE_URL secret is not configured."
+            echo "::warning::E2E NOT RUN (${PROJECT}) — E2E_BASE_URL is not configured. This check is GREEN but executed ZERO tests and is NOT a safety gate."
+            { echo "### ⚠️ E2E tests did NOT run (${PROJECT})"; echo "No \`E2E_BASE_URL\` configured — this green check executed **zero** tests and is **not** a real gate."; } >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           # Skip credential-dependent projects when secrets are not configured.
@@ -75,11 +82,13 @@ jobs:
           # exhaust the 30-minute job timeout. Public unauthenticated checks
           # can still run without secrets.
           if [ "$PROJECT" != "unauthenticated" ] && [ "$PROJECT" != "admin" ] && [ -z "$E2E_USER_EMAIL" ]; then
-            echo "::notice::Skipping ${PROJECT} E2E tests - E2E_USER_EMAIL secret not configured in this repo."
+            echo "::warning::E2E NOT RUN (${PROJECT}) — E2E_USER_EMAIL not configured. Green but executed ZERO authenticated tests; not a gate."
+            { echo "### ⚠️ Authenticated E2E did NOT run (${PROJECT})"; echo "No \`E2E_USER_EMAIL\` configured — zero authenticated tests ran."; } >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           if [ "$PROJECT" = "admin" ] && [ -z "$E2E_ADMIN_EMAIL" ]; then
-            echo "::notice::Skipping admin E2E tests - E2E_ADMIN_EMAIL secret not configured in this repo."
+            echo "::warning::E2E NOT RUN (admin) — E2E_ADMIN_EMAIL not configured. Green but executed ZERO admin tests; not a gate."
+            { echo "### ⚠️ Admin E2E did NOT run"; echo "No \`E2E_ADMIN_EMAIL\` configured — zero admin tests ran."; } >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           npx playwright test --project=$PROJECT
@@ -131,11 +140,13 @@ jobs:
       - name: Run E2E tests
         run: |
           if [ -z "$E2E_BASE_URL" ]; then
-            echo "::notice::Skipping ${{ matrix.project }} E2E tests - E2E_BASE_URL secret is not configured."
+            echo "::warning::E2E NOT RUN (${{ matrix.project }}) — E2E_BASE_URL not configured. Green but executed ZERO tests; not a gate."
+            { echo "### ⚠️ Cross-browser E2E did NOT run (${{ matrix.project }})"; echo "No \`E2E_BASE_URL\` configured — zero tests ran."; } >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           if [ -z "$E2E_USER_EMAIL" ]; then
-            echo "::notice::Skipping ${{ matrix.project }} E2E tests - E2E_USER_EMAIL secret not configured in this repo."
+            echo "::warning::E2E NOT RUN (${{ matrix.project }}) — E2E_USER_EMAIL not configured. Green but executed ZERO tests; not a gate."
+            { echo "### ⚠️ Cross-browser E2E did NOT run (${{ matrix.project }})"; echo "No \`E2E_USER_EMAIL\` configured — zero tests ran."; } >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           npx playwright test --project=${{ matrix.project }}
