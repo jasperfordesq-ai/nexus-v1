@@ -873,7 +873,7 @@ export function OpportunityDetailPage() {
               <div className="flex items-center gap-2 text-sm text-theme-muted">
                 <Calendar className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 {formatDate(opp.start_date)}
-                {opp.end_date && ` — ${formatDate(opp.end_date)}`}
+                {opp.end_date && `${t('date_range_separator')}${formatDate(opp.end_date)}`}
               </div>
             )}
             {opp.skills_needed && (

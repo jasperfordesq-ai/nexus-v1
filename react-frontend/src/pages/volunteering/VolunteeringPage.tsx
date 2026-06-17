@@ -849,8 +849,8 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
               <span className="flex items-center gap-1 text-accent font-medium">
                 <MapPin className="w-3 h-3" aria-hidden="true" />
                 {opportunity.distance_km < 1
-                  ? `${Math.round(opportunity.distance_km * 1000)} m`
-                  : `${opportunity.distance_km.toFixed(1)} km`}
+                  ? t('distance_m', { value: Math.round(opportunity.distance_km * 1000) })
+                  : t('distance_km', { value: opportunity.distance_km.toFixed(1) })}
               </span>
             )}
             {opportunity.is_remote && (
@@ -862,7 +862,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3" aria-hidden="true" />
                 {startDate.toLocaleDateString()}
-                {endDate ? ` - ${endDate.toLocaleDateString()}` : ''}
+                {endDate ? `${t('date_range_separator')}${endDate.toLocaleDateString()}` : ''}
               </span>
             )}
             {opportunity.category && (

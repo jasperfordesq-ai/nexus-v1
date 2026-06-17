@@ -941,5 +941,8 @@
   "hours_journey_step3_desc": "1 time credit per hour is added to your wallet.",
   "applications_empty_cta": "Browse opportunities",
   "hero_eyebrow": "Volunteer & earn time credits",
-  "my_organisations_load_error": "Unable to load your organisations. Please try again."
+  "my_organisations_load_error": "Unable to load your organisations. Please try again.",
+  "distance_m": "{{value}} m",
+  "distance_km": "{{value}} km",
+  "date_range_separator": " – "
 }
