@@ -3,6 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { expect } from '@playwright/test';
+
 /**
  * Test user credentials and data
  */
