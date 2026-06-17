@@ -130,11 +130,17 @@ jobs:
           cd react-frontend && npm ci --ignore-scripts
           cd ../e2e && npm ci --ignore-scripts
 
-      - name: NPM Audit
+      # The BLOCKING gate audits the production dependency tree only
+      # (--omit=dev). Build/test/CI tooling — Vite's dev server, Lighthouse,
+      # @lhci/cli, heroui-cli — never ships in the deployed bundle, so its
+      # advisories are not a production attack surface and must not gate
+      # releases. Dev-dependency advisories are documented in SECURITY-POSTURE.md
+      # and remain visible in the non-blocking OWASP/Trivy SARIF uploads.
+      - name: NPM Audit (production deps — blocking)
         run: |
-          npm audit --audit-level=high
-          cd react-frontend && npm audit --audit-level=high
-          cd ../e2e && npm audit --audit-level=high
+          npm audit --omit=dev --audit-level=high
+          cd react-frontend && npm audit --omit=dev --audit-level=high
+          cd ../e2e && npm audit --omit=dev --audit-level=high
 
       - name: OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main

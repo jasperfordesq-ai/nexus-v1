@@ -116,3 +116,14 @@ CVE-2026-2229
 # in our stack, never installed, vendor/ not deployed. Same false-positive class.
 # (added 2026-06-06)
 CVE-2026-44431
+
+# ── react-frontend dev-tooling (HIGH) — NOT in the production bundle ─────────
+# vite and ws are devDependencies in react-frontend (confirmed: not in any
+# production dependency tree). vite is the local dev server; ws arrives via
+# Lighthouse (performance tooling). Neither runs in the deployed app — the
+# production frontend is static built assets served by Apache, with no Vite or
+# Lighthouse process. The production npm tree audits clean (--omit=dev). Full
+# triage in SECURITY-POSTURE.md. Review quarterly. (added 2026-06-17)
+GHSA-v6wh-96g9-6wx3
+GHSA-fx2h-pf6j-xcff
+GHSA-96hv-2xvq-fx4p

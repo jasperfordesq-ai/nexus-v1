@@ -327,4 +327,45 @@
     <vulnerabilityName>CVE-2023-29827</vulnerabilityName>
   </suppress>
 
+  <!--
+    DEV-TOOLING ONLY: react-frontend build/CI dependencies (added 2026-06-17).
+    These four packages are devDependencies in react-frontend (confirmed: none
+    appear in any production dependency tree). They run only during local
+    development, the production build, or CI performance audits — they are NOT
+    part of the deployed bundle served to users, so their advisories are not a
+    production attack surface. See SECURITY-POSTURE.md for the full triage.
+      - vite        → the dev server (the advisories concern the local dev
+                      server on Windows; production serves static built assets,
+                      no Vite process runs).
+      - ws          → pulled in by Lighthouse (performance tooling).
+      - js-yaml     → pulled in by @lhci/cli (Lighthouse CI).
+      - tar         → pulled in by heroui-cli (scaffolding CLI).
+    Review quarterly; remove an entry if the package becomes a runtime dep.
+  -->
+  <suppress>
+    <notes><![CDATA[ DEV-TOOLING: vite dev server (react-frontend devDependency). Not in the production bundle. GHSA-v6wh-96g9-6wx3 (launch-editor NTLMv2 on Windows dev server). ]]></notes>
+    <packageUrl regex="true">^pkg:npm/vite@7\.[0-3]\..*$</packageUrl>
+    <vulnerabilityName>GHSA-v6wh-96g9-6wx3</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[ DEV-TOOLING: vite dev server (react-frontend devDependency). Not in the production bundle. GHSA-fx2h-pf6j-xcff (server.fs.deny bypass on Windows dev server). ]]></notes>
+    <packageUrl regex="true">^pkg:npm/vite@7\.[0-3]\..*$</packageUrl>
+    <vulnerabilityName>GHSA-fx2h-pf6j-xcff</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[ DEV-TOOLING: ws via Lighthouse (devDependency). Not in the production bundle. GHSA-96hv-2xvq-fx4p (memory-exhaustion DoS). ]]></notes>
+    <packageUrl regex="true">^pkg:npm/ws@7\..*$</packageUrl>
+    <vulnerabilityName>GHSA-96hv-2xvq-fx4p</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[ DEV-TOOLING: js-yaml via @lhci/cli (devDependency). Not in the production bundle. GHSA-h67p-54hq-rp68 (quadratic merge-key DoS). ]]></notes>
+    <packageUrl regex="true">^pkg:npm/js-yaml@.*$</packageUrl>
+    <vulnerabilityName>GHSA-h67p-54hq-rp68</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[ DEV-TOOLING: tar via heroui-cli (devDependency). Not in the production bundle. GHSA-vmf3-w455-68vh (PAX header parser differential). ]]></notes>
+    <packageUrl regex="true">^pkg:npm/tar@.*$</packageUrl>
+    <vulnerabilityName>GHSA-vmf3-w455-68vh</vulnerabilityName>
+  </suppress>
+
 </suppressions>
