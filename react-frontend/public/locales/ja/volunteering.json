@@ -613,6 +613,7 @@
     "description": "説明",
     "contact_email": "連絡先メールアドレス",
     "website": "Webサイト",
+    "website_placeholder": "https://example.org",
     "save": "変更を保存",
     "name_required": "組織名は必須です。",
     "saved": "組織設定が保存されました。",

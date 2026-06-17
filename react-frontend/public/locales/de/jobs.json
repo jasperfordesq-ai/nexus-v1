@@ -519,6 +519,7 @@
     "tagline_label": "Unternehmens-Slogan",
     "tagline_placeholder": "Was macht Ihr Unternehmen grossartig?",
     "video_label": "Kultur-Video-URL",
+    "video_placeholder": "https://www.youtube.com/watch?v=...",
     "size_label": "Unternehmensgrösse",
     "benefits_label": "Vorteile & Vergünstigungen",
     "benefits_placeholder": "Einen Vorteil eingeben und Enter drücken",

@@ -104,7 +104,7 @@ export default function OrgSettingsTab({ orgId, orgData, onOrgUpdate }: OrgSetti
           onValueChange={setWebsite}
           type="url"
           variant="secondary"
-          placeholder="https://"
+          placeholder={t('org_settings.website_placeholder')}
           classNames={{ inputWrapper: 'bg-theme-elevated' }}
         />
 

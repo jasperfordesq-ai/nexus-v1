@@ -392,6 +392,26 @@ class JobVacanciesControllerTest extends TestCase
         $response->assertStatus(201);
     }
 
+    public function test_apply_notification_links_to_existing_react_applications_anchor(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $vacancy = $this->createVacancy(['user_id' => $owner->id, 'status' => 'open']);
+
+        $this->authenticatedUser();
+
+        $response = $this->apiPost("/v2/jobs/{$vacancy->id}/apply", [
+            'message' => 'I would love to contribute to this role.',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'type' => 'job_application',
+            'link' => "/jobs/{$vacancy->id}#applications",
+        ]);
+    }
+
     public function test_apply_rejects_vacancy_owner(): void
     {
         $owner = $this->authenticatedUser();

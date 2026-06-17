@@ -72,7 +72,7 @@ export function ApplySection({
         <div className="text-center">
           <p className="text-theme-muted mb-3">{t('apply.login_required')}</p>
           <Link to={tenantPath('/login')}>
-            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white w-full">
+            <Button color="primary" className="w-full">
               {t('apply.button')}
             </Button>
           </Link>
@@ -117,7 +117,8 @@ export function ApplySection({
       ) : (
         <div className="flex flex-col gap-2">
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white w-full"
+            color="primary"
+            className="w-full"
             size="lg"
             onPress={onApplyOpen}
             aria-label={t('apply.button_label', { title: vacancy.title ?? t('apply.this_job') })}

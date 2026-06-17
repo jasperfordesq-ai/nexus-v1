@@ -519,6 +519,7 @@
     "tagline_label": "Slogan Firmy",
     "tagline_placeholder": "Co sprawia, że Twoja firma jest wspaniała?",
     "video_label": "URL do filmu o kulturze",
+    "video_placeholder": "https://www.youtube.com/watch?v=...",
     "size_label": "Wielkość firmy",
     "benefits_label": "Korzyści i dodatki",
     "benefits_placeholder": "Wpisz korzyść i naciśnij Enter",

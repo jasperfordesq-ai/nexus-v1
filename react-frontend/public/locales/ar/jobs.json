@@ -519,6 +519,7 @@
     "tagline_label": "شعار الشركة",
     "tagline_placeholder": "ما الذي يجعل شركتك رائعة؟",
     "video_label": "رابط فيديو الثقافة",
+    "video_placeholder": "https://www.youtube.com/watch?v=...",
     "size_label": "حجم الشركة",
     "benefits_label": "المزايا والفوائد",
     "benefits_placeholder": "اكتب ميزة واضغط Enter",

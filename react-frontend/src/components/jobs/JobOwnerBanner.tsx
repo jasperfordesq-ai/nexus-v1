@@ -63,11 +63,11 @@ export function JobOwnerBanner({ vacancy, tenantPath, onVacancyUpdated }: JobOwn
   };
 
   return (
-    <GlassCard className="p-4 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
+    <GlassCard className="p-4 bg-theme-elevated border border-theme-default">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center">
-            <Briefcase className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+          <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+            <Briefcase className="w-5 h-5 text-accent" aria-hidden="true" />
           </div>
           <div>
             <p className="font-semibold text-theme-primary">{t('detail.owner_banner_title')}</p>

@@ -519,6 +519,7 @@
     "tagline_label": "Bedrijfsslogan",
     "tagline_placeholder": "Wat maakt uw bedrijf geweldig?",
     "video_label": "Cultuur Video URL",
+    "video_placeholder": "https://www.youtube.com/watch?v=...",
     "size_label": "Bedrijfsgrootte",
     "benefits_label": "Voordelen & Extra's",
     "benefits_placeholder": "Typ een voordeel en druk op Enter",

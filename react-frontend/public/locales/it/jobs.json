@@ -518,6 +518,7 @@
     "tagline_label": "Slogan Aziendale",
     "tagline_placeholder": "Cosa rende la tua azienda speciale?",
     "video_label": "URL Video Aziendale",
+    "video_placeholder": "https://www.youtube.com/watch?v=...",
     "size_label": "Dimensione Azienda",
     "benefits_label": "Benefit e Vantaggi",
     "benefits_placeholder": "Digita un benefit e premi Invio",

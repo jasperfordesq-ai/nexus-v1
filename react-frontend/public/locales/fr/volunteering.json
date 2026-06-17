@@ -613,6 +613,7 @@
     "description": "Description",
     "contact_email": "E-mail de contact",
     "website": "Site web",
+    "website_placeholder": "https://example.org",
     "save": "Enregistrer les modifications",
     "name_required": "Le nom de l’organisation est requis.",
     "saved": "Paramètres de l'organisation enregistrés.",

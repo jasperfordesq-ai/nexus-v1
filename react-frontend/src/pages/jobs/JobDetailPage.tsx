@@ -67,6 +67,39 @@ import {
 import { SimilarJobs } from '@/components/jobs/SimilarJobs';
 import { AiChatDrawer } from '@/components/jobs/AiChatDrawer';
 
+interface SavedProfile {
+  cv_filename?: string;
+  cover_text?: string;
+}
+
+interface SalaryBenchmark {
+  role_keyword: string;
+  salary_min: number;
+  salary_max: number;
+  salary_median: number;
+  salary_type: string;
+  currency: string;
+}
+
+type SavedProfilePayload = SavedProfile | { profile?: SavedProfile | null };
+type SalaryBenchmarkPayload = SalaryBenchmark | { benchmark?: SalaryBenchmark | null };
+
+function extractSavedProfile(payload: SavedProfilePayload | null | undefined): SavedProfile | null {
+  if (!payload || typeof payload !== 'object') return null;
+  if (Object.prototype.hasOwnProperty.call(payload, 'profile')) {
+    return (payload as { profile?: SavedProfile | null }).profile ?? null;
+  }
+  return payload as SavedProfile;
+}
+
+function extractSalaryBenchmark(payload: SalaryBenchmarkPayload | null | undefined): SalaryBenchmark | null {
+  if (!payload || typeof payload !== 'object') return null;
+  if (Object.prototype.hasOwnProperty.call(payload, 'benchmark')) {
+    return (payload as { benchmark?: SalaryBenchmark | null }).benchmark ?? null;
+  }
+  return payload as SalaryBenchmark;
+}
+
 // ---------------------------------------------------------------------------
 // JSON-LD helper
 // ---------------------------------------------------------------------------
@@ -139,9 +172,9 @@ export function JobDetailPage() {
   const applyModal = useDisclosure({
     onOpen: async () => {
       try {
-        const res = await api.get<{cv_filename?: string; cover_text?: string}>('/v2/jobs/saved-profile');
+        const res = await api.get<SavedProfilePayload>('/v2/jobs/saved-profile');
         if (res.success && res.data) {
-          setSavedProfile(res.data);
+          setSavedProfile(extractSavedProfile(res.data));
         } else {
           setSavedProfile(null);
         }
@@ -187,18 +220,11 @@ export function JobDetailPage() {
   const [isRenewing, setIsRenewing] = useState(false);
 
   // Feature 5: Saved profile (one-click apply)
-  const [savedProfile, setSavedProfile] = useState<{cv_filename?: string; cover_text?: string} | null>(null);
+  const [savedProfile, setSavedProfile] = useState<SavedProfile | null>(null);
   const [usingSavedProfile, setUsingSavedProfile] = useState(false);
 
   // Feature 2: Salary benchmark for owners
-  const [benchmark, setBenchmark] = useState<{
-    role_keyword: string;
-    salary_min: number;
-    salary_max: number;
-    salary_median: number;
-    salary_type: string;
-    currency: string;
-  } | null>(null);
+  const [benchmark, setBenchmark] = useState<SalaryBenchmark | null>(null);
 
   // Similar jobs
   const [similarJobs, setSimilarJobs] = useState<JobVacancy[]>([]);
@@ -262,8 +288,8 @@ export function JobDetailPage() {
   // Eagerly fetch saved profile
   useEffect(() => {
     if (!isAuthenticated || isOwner || !vacancy || vacancy.has_applied) return;
-    api.get<{cv_filename?: string; cover_text?: string}>('/v2/jobs/saved-profile')
-      .then((res) => { if (res.success && res.data) setSavedProfile(res.data as {cv_filename?: string; cover_text?: string}); })
+    api.get<SavedProfilePayload>('/v2/jobs/saved-profile')
+      .then((res) => { if (res.success && res.data) setSavedProfile(extractSavedProfile(res.data)); })
       .catch(() => {});
   }, [isAuthenticated, isOwner, vacancy]);
 
@@ -301,10 +327,10 @@ export function JobDetailPage() {
   useEffect(() => {
     if (!vacancy || !isOwner) return;
     const controller = new AbortController();
-    api.get<{ role_keyword: string; salary_min: number; salary_max: number; salary_median: number; salary_type: string; currency: string }>(`/v2/jobs/salary-benchmark?title=${encodeURIComponent(vacancy.title)}`, { signal: controller.signal })
+    api.get<SalaryBenchmarkPayload>(`/v2/jobs/salary-benchmark?title=${encodeURIComponent(vacancy.title)}`, { signal: controller.signal })
       .then((res) => {
         if (!controller.signal.aborted && res.success && res.data) {
-          setBenchmark(res.data);
+          setBenchmark(extractSalaryBenchmark(res.data));
         }
       })
       .catch((err) => { if (import.meta.env.DEV) console.warn('Non-critical:', err); });

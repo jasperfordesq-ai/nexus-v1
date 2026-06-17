@@ -519,6 +519,7 @@
     "tagline_label": "Eslogan de la Empresa",
     "tagline_placeholder": "¿Qué hace grande a tu empresa?",
     "video_label": "URL del Vídeo de Cultura",
+    "video_placeholder": "https://www.youtube.com/watch?v=...",
     "size_label": "Tamaño de la Empresa",
     "benefits_label": "Beneficios y Ventajas",
     "benefits_placeholder": "Escribe un beneficio y pulsa Enter",

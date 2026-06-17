@@ -23,5 +23,30 @@
     "body": "Go raibh maith agat as do shealaíocht deonachais a chríochnú le <strong>{{title}}</strong>. Déanann do rannchuidiú difríocht fíor!",
     "log_hours_prompt": "Cuimhnigh le do thoil do chuid uaireanta a logáil ionas go dtaifeadfar do rannchuidiú.",
     "cta": "Logáil Do Chuid Uaireanta"
+  },
+  "lapsed_volunteer": {
+    "subject": "We miss seeing you volunteer",
+    "title": "Ready for another volunteer shift?",
+    "preview": "There are new volunteering opportunities waiting for you",
+    "body": "It has been a while since your last recorded volunteer shift. If you are available again, your community would be glad to have your help.",
+    "cta": "Browse Opportunities"
+  },
+  "credential_expiry": {
+    "subject": "Your volunteer credential expires soon",
+    "title": "Credential Expiring Soon",
+    "preview": "A verified volunteer credential is nearing its expiry date",
+    "body": "One of your verified volunteer credentials is nearing its expiry date. Please update it so organisers can continue assigning you to suitable opportunities.",
+    "label_type": "Credential",
+    "label_expires": "Expires",
+    "cta": "Review Credentials"
+  },
+  "training_expiry": {
+    "subject": "Your volunteer training expires soon",
+    "title": "Training Expiring Soon",
+    "preview": "A verified volunteer training record is nearing its expiry date",
+    "body": "One of your verified volunteer training records is nearing its expiry date. Please update it so organisers can continue assigning you to suitable opportunities.",
+    "label_type": "Training",
+    "label_expires": "Expires",
+    "cta": "Review Training"
   }
 }

@@ -650,6 +650,7 @@
     "description": "Description",
     "contact_email": "Contact Email",
     "website": "Website",
+    "website_placeholder": "https://example.org",
     "save": "Save Changes",
     "name_required": "Organization name is required.",
     "saved": "Organization settings saved.",

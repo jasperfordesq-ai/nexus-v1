@@ -301,5 +301,49 @@ describe('CreateJobPage', () => {
       });
       expect(screen.getByDisplayValue('Existing description')).toBeInTheDocument();
     });
+
+    it('handles salary benchmark data returned inside the API benchmark envelope', async () => {
+      vi.useFakeTimers();
+      try {
+        vi.mocked(api.get).mockImplementation((url: string) => {
+          if (url.includes('/v2/jobs/salary-benchmark')) {
+            return Promise.resolve({
+              success: true,
+              data: {
+                benchmark: {
+                  role_keyword: 'Existing Vacancy',
+                  salary_min: 30000,
+                  salary_max: 50000,
+                  salary_median: 40000,
+                  salary_type: 'annual',
+                  currency: 'EUR',
+                },
+              },
+              meta: {},
+            });
+          }
+          if (url.includes('/v2/jobs/5')) {
+            return Promise.resolve({ success: true, data: mockVacancy, meta: {} });
+          }
+          return Promise.resolve({ success: true, data: [], meta: {} });
+        });
+
+        render(<CreateJobPage />);
+        await waitFor(() => {
+          expect(screen.getByDisplayValue('Existing Vacancy')).toBeInTheDocument();
+        });
+
+        await vi.advanceTimersByTimeAsync(650);
+
+        await waitFor(() => {
+          expect(vi.mocked(api.get)).toHaveBeenCalledWith(
+            expect.stringContaining('/v2/jobs/salary-benchmark?title=Existing%20Vacancy'),
+          );
+        });
+        expect(screen.getByDisplayValue('Existing Vacancy')).toBeInTheDocument();
+      } finally {
+        vi.useRealTimers();
+      }
+    });
   });
 });

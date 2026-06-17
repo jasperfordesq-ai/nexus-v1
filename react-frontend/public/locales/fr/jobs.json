@@ -519,6 +519,7 @@
     "tagline_label": "Slogan de l'entreprise",
     "tagline_placeholder": "Ce qui rend votre entreprise formidable ?",
     "video_label": "URL de la vidéo culturelle",
+    "video_placeholder": "https://www.youtube.com/watch?v=...",
     "size_label": "Taille de l'entreprise",
     "benefits_label": "Avantages et bénéfices",
     "benefits_placeholder": "Saisissez un avantage et appuyez sur Entrée",

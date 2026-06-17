@@ -519,6 +519,7 @@
     "tagline_label": "Company Tagline",
     "tagline_placeholder": "What makes your company great?",
     "video_label": "Culture Video URL",
+    "video_placeholder": "https://www.youtube.com/watch?v=...",
     "size_label": "Company Size",
     "benefits_label": "Benefits & Perks",
     "benefits_placeholder": "Type a benefit and press Enter",

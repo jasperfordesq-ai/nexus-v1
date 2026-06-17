@@ -613,6 +613,7 @@
     "description": "وصف",
     "contact_email": "البريد الإلكتروني للاتصال",
     "website": "موقع إلكتروني",
+    "website_placeholder": "https://example.org",
     "save": "حفظ التغييرات",
     "name_required": "اسم المنظمة مطلوب.",
     "saved": "تم حفظ إعدادات المؤسسة.",

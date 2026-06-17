@@ -74,6 +74,16 @@ interface SalaryBenchmark {
   currency: string;
 }
 
+type SalaryBenchmarkPayload = SalaryBenchmark | { benchmark?: SalaryBenchmark | null };
+
+function extractSalaryBenchmark(payload: SalaryBenchmarkPayload | null | undefined): SalaryBenchmark | null {
+  if (!payload || typeof payload !== 'object') return null;
+  if (Object.prototype.hasOwnProperty.call(payload, 'benchmark')) {
+    return (payload as { benchmark?: SalaryBenchmark | null }).benchmark ?? null;
+  }
+  return payload as SalaryBenchmark;
+}
+
 interface JobTemplate {
   id: number;
   name: string;
@@ -297,9 +307,9 @@ export function CreateJobPage() {
     }
     benchmarkDebounceRef.current = setTimeout(async () => {
       try {
-        const response = await api.get<SalaryBenchmark>(`/v2/jobs/salary-benchmark?title=${encodeURIComponent(title)}`);
+        const response = await api.get<SalaryBenchmarkPayload>(`/v2/jobs/salary-benchmark?title=${encodeURIComponent(title)}`);
         if (response.success && response.data) {
-          setBenchmark(response.data);
+          setBenchmark(extractSalaryBenchmark(response.data));
         } else {
           setBenchmark(null);
         }
@@ -1192,7 +1202,7 @@ export function CreateJobPage() {
                 <Input
                   type="url"
                   label={t('branding.video_label')}
-                  placeholder="https://www.youtube.com/watch?v=..."
+                  placeholder={t('branding.video_placeholder')}
                   value={videoUrl}
                   onChange={(e) => setVideoUrl(e.target.value)}
                   classNames={{

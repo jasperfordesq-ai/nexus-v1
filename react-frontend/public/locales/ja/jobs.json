@@ -519,6 +519,7 @@
     "tagline_label": "会社のキャッチフレーズ",
     "tagline_placeholder": "あなたの会社の素晴らしいところは何ですか？",
     "video_label": "カルチャービデオのURL",
+    "video_placeholder": "https://www.youtube.com/watch?v=...",
     "size_label": "会社の規模",
     "benefits_label": "福利厚生",
     "benefits_placeholder": "福利厚生を入力してEnterを押してください",

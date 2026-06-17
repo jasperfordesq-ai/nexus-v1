@@ -613,6 +613,7 @@
     "description": "Cur síos",
     "contact_email": "Ríomhphost Teagmhála",
     "website": "Suíomh Gréasáin",
+    "website_placeholder": "https://example.org",
     "save": "Sábháil Athruithe",
     "name_required": "Tá ainm eagraíochta ag teastáil.",
     "saved": "Socruithe eagraíochta sábháilte.",

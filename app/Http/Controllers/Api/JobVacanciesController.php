@@ -525,7 +525,7 @@ class JobVacanciesController extends BaseApiController
                             'name' => $applicantName,
                             'title' => $job->title,
                         ]),
-                        "/jobs/{$id}/applications",
+                        "/jobs/{$id}#applications",
                         'job_application'
                     );
                     \App\Services\NotificationDispatcher::fanOutPush(
@@ -535,7 +535,7 @@ class JobVacanciesController extends BaseApiController
                             'name' => $applicantName,
                             'title' => $job->title,
                         ]),
-                        "/jobs/{$id}/applications"
+                        "/jobs/{$id}#applications"
                     );
                 });
             }
@@ -608,7 +608,7 @@ class JobVacanciesController extends BaseApiController
                         $applicantName = $applicant
                             ? trim(($applicant->first_name ?? '') . ' ' . ($applicant->last_name ?? '')) ?: ($applicant->name ?? __('emails.common.fallback_someone'))
                             : __('emails.common.fallback_someone');
-                        $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/jobs/' . $id . '/applications';
+                        $reviewUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/jobs/' . $id . '#applications';
                         $html = EmailTemplateBuilder::make()
                             ->theme('federation')
                             ->title(__('emails_commerce.job_application_employer.title'))

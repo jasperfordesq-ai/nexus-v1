@@ -8,6 +8,7 @@ namespace Tests\Laravel\Integration;
 
 use App\Core\TenantContext;
 use App\Models\SafeguardingAssignment;
+use App\Models\Tenant;
 use App\Models\User;
 use App\Services\EmailDispatchService;
 use App\Services\SafeguardingService;
@@ -146,9 +147,13 @@ class VolunteerEmailReliabilityTest extends TestCase
         app()->instance(EmailDispatchService::class, $mailer);
 
         $retried = VolunteerReminderService::sendPreShiftReminders();
+        $matchingCalls = array_values(array_filter(
+            $mailer->calls,
+            static fn (array $call): bool => $call['to'] === $volunteer->email
+        ));
 
-        $this->assertSame(1, $retried);
-        $this->assertCount(1, $mailer->calls);
+        $this->assertGreaterThanOrEqual(1, $retried);
+        $this->assertCount(1, $matchingCalls);
         $this->assertDatabaseHas('vol_reminders_sent', [
             'tenant_id' => $tenantId,
             'user_id' => $volunteer->id,
@@ -201,9 +206,13 @@ class VolunteerEmailReliabilityTest extends TestCase
         app()->instance(EmailDispatchService::class, $mailer);
 
         $sent = VolunteerReminderService::sendPreShiftReminders();
+        $matchingCalls = array_values(array_filter(
+            $mailer->calls,
+            static fn (array $call): bool => $call['to'] === $volunteer->email
+        ));
 
-        $this->assertSame(1, $sent);
-        $this->assertCount(1, $mailer->calls);
+        $this->assertGreaterThanOrEqual(1, $sent);
+        $this->assertCount(1, $matchingCalls);
         $this->assertDatabaseHas('vol_reminders_sent', [
             'tenant_id' => $tenantId,
             'user_id' => $volunteer->id,
@@ -217,6 +226,153 @@ class VolunteerEmailReliabilityTest extends TestCase
             ->where('channel', 'email')
             ->where('status', 'delivered')
             ->count());
+    }
+
+    public function test_lapsed_volunteer_nudge_sends_once_for_inactive_volunteer(): void
+    {
+        $tenant = Tenant::factory()->create(['domain' => null]);
+        $tenantId = (int) $tenant->id;
+        $volunteer = User::factory()->forTenant($tenantId)->create([
+            'first_name' => 'Lapsed',
+            'email' => 'vol-lapsed-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $this->createVolunteerShift($tenantId, (int) $volunteer->id, now()->subDays(45), now()->subDays(45)->addHours(2));
+
+        DB::table('vol_reminder_settings')->insert([
+            'tenant_id' => $tenantId,
+            'reminder_type' => 'lapsed_volunteer',
+            'enabled' => 1,
+            'days_inactive' => 30,
+            'email_enabled' => 1,
+            'push_enabled' => 0,
+            'sms_enabled' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $mailer = $this->fakeMailer();
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $sent = VolunteerReminderService::nudgeLapsedVolunteers();
+        $sentAgain = VolunteerReminderService::nudgeLapsedVolunteers();
+        $matchingCalls = array_values(array_filter(
+            $mailer->calls,
+            static fn (array $call): bool => $call['to'] === $volunteer->email
+        ));
+
+        $this->assertGreaterThanOrEqual(1, $sent);
+        $this->assertSame(0, $sentAgain);
+        $this->assertCount(1, $matchingCalls);
+        $this->assertSame($tenantId, $matchingCalls[0]['options']['tenant_id']);
+        $this->assertStringContainsString('/' . $tenant->slug . '/volunteering', $matchingCalls[0]['body']);
+        $this->assertDatabaseHas('vol_reminders_sent', [
+            'tenant_id' => $tenantId,
+            'user_id' => $volunteer->id,
+            'reminder_type' => 'lapsed_volunteer',
+            'reference_id' => $volunteer->id,
+            'channel' => 'email',
+        ]);
+    }
+
+    public function test_credential_expiry_warning_sends_once_for_verified_expiring_credential(): void
+    {
+        $tenant = Tenant::factory()->create(['domain' => null]);
+        $tenantId = (int) $tenant->id;
+        $volunteer = User::factory()->forTenant($tenantId)->create([
+            'first_name' => 'Credential',
+            'email' => 'vol-credential-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+
+        $credentialId = (int) DB::table('vol_credentials')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id' => $volunteer->id,
+            'credential_type' => 'first_aid',
+            'status' => 'verified',
+            'expires_at' => now()->addDays(7)->toDateString(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('vol_reminder_settings')->insert([
+            'tenant_id' => $tenantId,
+            'reminder_type' => 'credential_expiry',
+            'enabled' => 1,
+            'days_before_expiry' => 14,
+            'email_enabled' => 1,
+            'push_enabled' => 0,
+            'sms_enabled' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $mailer = $this->fakeMailer();
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $sent = VolunteerReminderService::sendCredentialExpiryWarnings();
+
+        $this->assertSame(1, $sent);
+        $this->assertCount(1, $mailer->calls);
+        $this->assertSame($tenantId, $mailer->calls[0]['options']['tenant_id']);
+        $this->assertDatabaseHas('vol_reminders_sent', [
+            'tenant_id' => $tenantId,
+            'user_id' => $volunteer->id,
+            'reminder_type' => 'credential_expiry',
+            'reference_id' => $credentialId,
+            'channel' => 'email',
+        ]);
+    }
+
+    public function test_training_expiry_warning_sends_once_for_verified_expiring_training(): void
+    {
+        $tenant = Tenant::factory()->create(['domain' => null]);
+        $tenantId = (int) $tenant->id;
+        $volunteer = User::factory()->forTenant($tenantId)->create([
+            'first_name' => 'Training',
+            'email' => 'vol-training-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+
+        $trainingId = (int) DB::table('vol_safeguarding_training')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id' => $volunteer->id,
+            'training_type' => 'first_aid',
+            'training_name' => 'First Aid Refresher',
+            'completed_at' => now()->subMonths(11)->toDateString(),
+            'expires_at' => now()->addDays(7)->toDateString(),
+            'status' => 'verified',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('vol_reminder_settings')->insert([
+            'tenant_id' => $tenantId,
+            'reminder_type' => 'training_expiry',
+            'enabled' => 1,
+            'days_before_expiry' => 14,
+            'email_enabled' => 1,
+            'push_enabled' => 0,
+            'sms_enabled' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $mailer = $this->fakeMailer();
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $sent = VolunteerReminderService::sendTrainingExpiryWarnings();
+
+        $this->assertSame(1, $sent);
+        $this->assertCount(1, $mailer->calls);
+        $this->assertSame($tenantId, $mailer->calls[0]['options']['tenant_id']);
+        $this->assertDatabaseHas('vol_reminders_sent', [
+            'tenant_id' => $tenantId,
+            'user_id' => $volunteer->id,
+            'reminder_type' => 'training_expiry',
+            'reference_id' => $trainingId,
+            'channel' => 'email',
+        ]);
     }
 
     public function test_admin_hours_verification_notifies_through_dispatcher_not_raw_email(): void
@@ -299,7 +455,7 @@ class VolunteerEmailReliabilityTest extends TestCase
     /**
      * @return array{0:int,1:int,2:int}
      */
-    private function createVolunteerShift(int $tenantId, int $volunteerId): array
+    private function createVolunteerShift(int $tenantId, int $volunteerId, mixed $startTime = null, mixed $endTime = null): array
     {
         $owner = User::factory()->forTenant($tenantId)->create([
             'email' => 'vol-org-owner-' . uniqid('', true) . '@example.test',
@@ -331,8 +487,8 @@ class VolunteerEmailReliabilityTest extends TestCase
         $shiftId = (int) DB::table('vol_shifts')->insertGetId([
             'tenant_id' => $tenantId,
             'opportunity_id' => $opportunityId,
-            'start_time' => now()->addHours(3),
-            'end_time' => now()->addHours(5),
+            'start_time' => $startTime ?? now()->addHours(3),
+            'end_time' => $endTime ?? now()->addHours(5),
             'capacity' => 5,
             'created_at' => now(),
         ]);

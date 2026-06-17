@@ -519,6 +519,7 @@
     "tagline_label": "Slogan da Empresa",
     "tagline_placeholder": "O que torna a sua empresa especial?",
     "video_label": "URL do Vídeo de Cultura",
+    "video_placeholder": "https://www.youtube.com/watch?v=...",
     "size_label": "Dimensão da Empresa",
     "benefits_label": "Benefícios e Vantagens",
     "benefits_placeholder": "Escreva um benefício e prima Enter",

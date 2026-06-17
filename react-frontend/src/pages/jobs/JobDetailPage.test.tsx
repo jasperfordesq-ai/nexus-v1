@@ -195,6 +195,29 @@ describe('JobDetailPage', () => {
     }, { timeout: 3000 });
   });
 
+  it('shows quick apply when saved profile is returned inside the API profile envelope', async () => {
+    vi.mocked(api.get).mockImplementation((url: string) => {
+      if (url.includes('/v2/jobs/saved-profile')) {
+        return Promise.resolve({
+          success: true,
+          data: { profile: { cover_text: 'Saved cover message', cv_filename: 'cv.pdf' } },
+          meta: {},
+        });
+      }
+      if (url.includes('/match')) return Promise.resolve({ success: false, data: null, meta: {} });
+      if (url.includes('/applications')) return Promise.resolve({ success: true, data: [], meta: {} });
+      if (url.includes('/history')) return Promise.resolve({ success: true, data: [], meta: {} });
+      if (url.includes('salary-benchmark')) return Promise.resolve({ success: false, data: null, meta: {} });
+      return Promise.resolve({ success: true, data: makeVacancy({ has_applied: false, user_id: 999 }), meta: {} });
+    });
+
+    render(<JobDetailPage />);
+
+    await waitFor(() => {
+      expect(screen.getAllByText('apply.quick_apply').length).toBeGreaterThan(0);
+    }, { timeout: 3000 });
+  });
+
   it('does NOT show Apply button when already applied', async () => {
     vi.mocked(api.get).mockImplementation((url: string) => {
       if (url.includes('/match')) return Promise.resolve({ success: false, data: null, meta: {} });

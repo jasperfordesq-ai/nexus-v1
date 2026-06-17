@@ -613,6 +613,7 @@
     "description": "Beschrijving",
     "contact_email": "Neem contact op met E-mail",
     "website": "Website",
+    "website_placeholder": "https://example.org",
     "save": "Wijzigingen opslaan",
     "name_required": "Organisatienaam is vereist.",
     "saved": "Organisatie-instellingen opgeslagen.",

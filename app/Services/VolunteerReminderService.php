@@ -171,6 +171,79 @@ class VolunteerReminderService
     }
 
     /**
+     * Send one email-backed reminder with the same idempotency and failure
+     * semantics used by shift reminders.
+     *
+     * @param callable(object):array{subject:string,html:string} $messageFactory
+     */
+    private static function deliverEmailReminder(
+        int $tenantId,
+        int $userId,
+        string $reminderType,
+        int $referenceId,
+        callable $messageFactory
+    ): bool {
+        $alreadySent = DB::table('vol_reminders_sent')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->where('reminder_type', $reminderType)
+            ->where('reference_id', $referenceId)
+            ->where('channel', 'email')
+            ->exists();
+
+        if ($alreadySent) {
+            return false;
+        }
+
+        if (!self::claimReminderDelivery($tenantId, $userId, $reminderType, $referenceId, 'email')) {
+            return false;
+        }
+
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->first(['email', 'first_name', 'name', 'preferred_language']);
+
+        if (!$user || empty($user->email) || !filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+            Log::warning('[VolunteerReminderService] ' . $reminderType . ' email channel claimed without valid recipient email', [
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'reference_id' => $referenceId,
+            ]);
+            self::releaseReminderDeliveryClaim($tenantId, $userId, $reminderType, $referenceId, 'email');
+            return false;
+        }
+
+        if (self::recipientSuppressed((string) $user->email, $tenantId, $userId, $referenceId)) {
+            return self::markReminderDeliverySent($tenantId, $userId, $reminderType, $referenceId, 'email');
+        }
+
+        $emailOk = self::withTenantContext($tenantId, function () use ($user, $tenantId, $messageFactory): bool {
+            return LocaleContext::withLocale($user, function () use ($user, $tenantId, $messageFactory): bool {
+                $message = $messageFactory($user);
+
+                return \App\Services\EmailDispatchService::sendRaw(
+                    (string) $user->email,
+                    $message['subject'],
+                    $message['html'],
+                    null,
+                    null,
+                    null,
+                    'volunteer_reminder',
+                    ['tenant_id' => $tenantId]
+                );
+            });
+        });
+
+        if (!$emailOk) {
+            self::releaseReminderDeliveryClaim($tenantId, $userId, $reminderType, $referenceId, 'email');
+            return false;
+        }
+
+        return self::markReminderDeliverySent($tenantId, $userId, $reminderType, $referenceId, 'email');
+    }
+
+    /**
      * Send reminders for an opportunity's upcoming shifts.
      *
      * Finds confirmed volunteers for shifts belonging to the given opportunity
@@ -519,10 +592,7 @@ class VolunteerReminderService
         return $settings;
     }
 
-    // ─── Cron-callable stubs ───────────────────────────────────────────
-    // These methods are called by CronJobRunner but the actual sending logic
-    // is not yet implemented. They log a warning and return 0 so the cron
-    // runner doesn't crash.
+    // ─── Cron-callable reminder jobs ───────────────────────────────────────────
 
     /**
      * Send pre-shift reminders to volunteers with upcoming shifts.
@@ -911,44 +981,246 @@ class VolunteerReminderService
 
     /**
      * Nudge volunteers who have been inactive/lapsed.
-     * Stub — not yet implemented; logs a warning and returns 0.
      *
      * @return int Number of nudges sent
      */
     public static function nudgeLapsedVolunteers(): int
     {
-        \Illuminate\Support\Facades\Log::warning(
-            '[VolunteerReminderService] nudgeLapsedVolunteers() is not yet implemented — returning 0.'
-        );
-        return 0;
+        self::releaseStaleReminderDeliveryClaims();
+
+        $totalSent = 0;
+        $settingsByTenant = DB::table('vol_reminder_settings')
+            ->where('reminder_type', 'lapsed_volunteer')
+            ->get()
+            ->keyBy('tenant_id');
+
+        $tenantsWithInactiveVolunteers = DB::table('vol_applications as va')
+            ->join('vol_shifts as vs', function ($join): void {
+                $join->on('vs.id', '=', 'va.shift_id')
+                    ->on('vs.tenant_id', '=', 'va.tenant_id');
+            })
+            ->where('va.status', 'approved')
+            ->where('vs.end_time', '<=', now()->subDays(30))
+            ->pluck('va.tenant_id')
+            ->unique()
+            ->all();
+
+        $allTenantIds = array_unique(array_merge(
+            $settingsByTenant->keys()->all(),
+            $tenantsWithInactiveVolunteers
+        ));
+
+        foreach ($allTenantIds as $tenantId) {
+            try {
+                $tenantId = (int) $tenantId;
+                $setting = $settingsByTenant->get($tenantId);
+
+                if ($setting !== null && !(bool) $setting->enabled) {
+                    continue;
+                }
+
+                $daysInactive = max(1, (int) ($setting->days_inactive ?? 30));
+                $emailEnabled = (bool) ($setting->email_enabled ?? true);
+                if (!$emailEnabled) {
+                    continue;
+                }
+
+                $cutoff = now()->subDays($daysInactive)->toDateTimeString();
+                $volunteers = DB::table('vol_applications as va')
+                    ->join('vol_shifts as vs', function ($join): void {
+                        $join->on('vs.id', '=', 'va.shift_id')
+                            ->on('vs.tenant_id', '=', 'va.tenant_id');
+                    })
+                    ->where('va.tenant_id', $tenantId)
+                    ->where('va.status', 'approved')
+                    ->select('va.user_id', DB::raw('MAX(vs.end_time) as last_shift_at'))
+                    ->groupBy('va.user_id')
+                    ->havingRaw('MAX(vs.end_time) <= ?', [$cutoff])
+                    ->get();
+
+                foreach ($volunteers as $volunteer) {
+                    $userId = (int) $volunteer->user_id;
+                    if ($userId <= 0) {
+                        continue;
+                    }
+
+                    $sent = self::deliverEmailReminder(
+                        $tenantId,
+                        $userId,
+                        'lapsed_volunteer',
+                        $userId,
+                        function (object $user): array {
+                            $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                            $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteering';
+                            $html = EmailTemplateBuilder::make()
+                                ->theme('brand')
+                                ->title(__('emails_volunteer.lapsed_volunteer.title'))
+                                ->previewText(__('emails_volunteer.lapsed_volunteer.preview'))
+                                ->greeting($firstName)
+                                ->paragraph(__('emails_volunteer.lapsed_volunteer.body'))
+                                ->button(__('emails_volunteer.lapsed_volunteer.cta'), $url)
+                                ->render();
+
+                            return [
+                                'subject' => __('emails_volunteer.lapsed_volunteer.subject'),
+                                'html' => $html,
+                            ];
+                        }
+                    );
+
+                    if ($sent) {
+                        $totalSent++;
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[VolunteerReminderService] nudgeLapsedVolunteers tenant error for tenant ' . $tenantId . ': ' . $e->getMessage());
+            }
+        }
+
+        return $totalSent;
     }
 
     /**
      * Send warnings to volunteers whose credentials are about to expire.
-     * Stub — not yet implemented; logs a warning and returns 0.
      *
      * @return int Number of warnings sent
      */
     public static function sendCredentialExpiryWarnings(): int
     {
-        \Illuminate\Support\Facades\Log::warning(
-            '[VolunteerReminderService] sendCredentialExpiryWarnings() is not yet implemented — returning 0.'
+        return self::sendExpiryWarnings(
+            'credential_expiry',
+            'vol_credentials',
+            'credential_type',
+            null,
+            '/volunteering?tab=credentials'
         );
-        return 0;
     }
 
     /**
      * Send warnings to volunteers whose training certifications are about to expire.
-     * Stub — not yet implemented; logs a warning and returns 0.
      *
      * @return int Number of warnings sent
      */
     public static function sendTrainingExpiryWarnings(): int
     {
-        \Illuminate\Support\Facades\Log::warning(
-            '[VolunteerReminderService] sendTrainingExpiryWarnings() is not yet implemented — returning 0.'
+        return self::sendExpiryWarnings(
+            'training_expiry',
+            'vol_safeguarding_training',
+            'training_type',
+            'training_name',
+            '/volunteering?tab=training'
         );
-        return 0;
+    }
+
+    private static function sendExpiryWarnings(
+        string $reminderType,
+        string $table,
+        string $typeColumn,
+        ?string $nameColumn,
+        string $frontendPath
+    ): int {
+        self::releaseStaleReminderDeliveryClaims();
+
+        $totalSent = 0;
+        $settingsByTenant = DB::table('vol_reminder_settings')
+            ->where('reminder_type', $reminderType)
+            ->get()
+            ->keyBy('tenant_id');
+
+        $tenantsWithExpiringRecords = DB::table($table)
+            ->where('status', 'verified')
+            ->whereNotNull('expires_at')
+            ->whereDate('expires_at', '>=', now()->toDateString())
+            ->whereDate('expires_at', '<=', now()->addDays(14)->toDateString())
+            ->pluck('tenant_id')
+            ->unique()
+            ->all();
+
+        $allTenantIds = array_unique(array_merge(
+            $settingsByTenant->keys()->all(),
+            $tenantsWithExpiringRecords
+        ));
+
+        foreach ($allTenantIds as $tenantId) {
+            try {
+                $tenantId = (int) $tenantId;
+                $setting = $settingsByTenant->get($tenantId);
+
+                if ($setting !== null && !(bool) $setting->enabled) {
+                    continue;
+                }
+
+                $daysBeforeExpiry = max(1, (int) ($setting->days_before_expiry ?? 14));
+                $emailEnabled = (bool) ($setting->email_enabled ?? true);
+                if (!$emailEnabled) {
+                    continue;
+                }
+
+                $records = DB::table($table)
+                    ->where('tenant_id', $tenantId)
+                    ->where('status', 'verified')
+                    ->whereNotNull('expires_at')
+                    ->whereDate('expires_at', '>=', now()->toDateString())
+                    ->whereDate('expires_at', '<=', now()->addDays($daysBeforeExpiry)->toDateString())
+                    ->get();
+
+                foreach ($records as $record) {
+                    $recordId = (int) $record->id;
+                    $userId = (int) $record->user_id;
+                    if ($recordId <= 0 || $userId <= 0) {
+                        continue;
+                    }
+
+                    $label = trim((string) ($nameColumn !== null && !empty($record->{$nameColumn})
+                        ? $record->{$nameColumn}
+                        : $record->{$typeColumn}));
+                    if ($label === '') {
+                        $label = (string) $record->{$typeColumn};
+                    }
+
+                    $expiresAt = (string) $record->expires_at;
+                    $sent = self::deliverEmailReminder(
+                        $tenantId,
+                        $userId,
+                        $reminderType,
+                        $recordId,
+                        function (object $user) use ($reminderType, $label, $expiresAt, $frontendPath): array {
+                            $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
+                            $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $frontendPath;
+                            $formattedExpiry = \Carbon\Carbon::parse($expiresAt)
+                                ->locale((string) app()->getLocale())
+                                ->isoFormat('LL');
+
+                            $html = EmailTemplateBuilder::make()
+                                ->theme('warning')
+                                ->title(__('emails_volunteer.' . $reminderType . '.title'))
+                                ->previewText(__('emails_volunteer.' . $reminderType . '.preview'))
+                                ->greeting($firstName)
+                                ->paragraph(__('emails_volunteer.' . $reminderType . '.body'))
+                                ->infoCard([
+                                    __('emails_volunteer.' . $reminderType . '.label_type') => $label,
+                                    __('emails_volunteer.' . $reminderType . '.label_expires') => $formattedExpiry,
+                                ])
+                                ->button(__('emails_volunteer.' . $reminderType . '.cta'), $url)
+                                ->render();
+
+                            return [
+                                'subject' => __('emails_volunteer.' . $reminderType . '.subject'),
+                                'html' => $html,
+                            ];
+                        }
+                    );
+
+                    if ($sent) {
+                        $totalSent++;
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[VolunteerReminderService] ' . $reminderType . ' tenant error for tenant ' . $tenantId . ': ' . $e->getMessage());
+            }
+        }
+
+        return $totalSent;
     }
 
     /**
