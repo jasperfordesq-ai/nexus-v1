@@ -303,6 +303,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
   const [actionLoading, setActionLoading] = useState<Record<number, boolean>>({});
   const [nameSearch, setNameSearch] = useState('');
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [isBulkRunning, setIsBulkRunning] = useState(false);
   const tRef = useRef(t);
   tRef.current = t;
   const toastRef = useRef(toast);
@@ -404,12 +405,18 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
     pendingFiltered.some((a) => selected.has(a.id)) && !allPendingSelected;
 
   async function handleBulkAction(action: 'approve' | 'decline') {
-    const ids = Array.from(selected);
-    for (const id of ids) {
-      await handleAction(id, action);
+    if (isBulkRunning) return;
+    setIsBulkRunning(true);
+    try {
+      const ids = Array.from(selected);
+      for (const id of ids) {
+        await handleAction(id, action);
+      }
+      setSelected(new Set());
+      loadApplications(statusFilter);
+    } finally {
+      setIsBulkRunning(false);
     }
-    setSelected(new Set());
-    loadApplications(statusFilter);
   }
 
   return (
@@ -484,7 +491,9 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
               size="sm"
               variant="secondary"
               className="bg-success/10 text-success"
-              startContent={<CheckCircle className="w-3.5 h-3.5" />}
+              isLoading={isBulkRunning}
+              isDisabled={isBulkRunning}
+              startContent={!isBulkRunning ? <CheckCircle className="w-3.5 h-3.5" /> : undefined}
               onPress={() => handleBulkAction('approve')}
             >
               {t('applications.approve_all')}
@@ -492,12 +501,14 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
             <Button
               size="sm"
               variant="danger-soft"
-              startContent={<XCircle className="w-3.5 h-3.5" />}
+              isLoading={isBulkRunning}
+              isDisabled={isBulkRunning}
+              startContent={!isBulkRunning ? <XCircle className="w-3.5 h-3.5" /> : undefined}
               onPress={() => handleBulkAction('decline')}
             >
               {t('applications.decline_all')}
             </Button>
-            <Button size="sm" variant="tertiary" onPress={() => setSelected(new Set())}>
+            <Button size="sm" variant="tertiary" isDisabled={isBulkRunning} onPress={() => setSelected(new Set())}>
               {t('applications.clear')}
             </Button>
           </div>

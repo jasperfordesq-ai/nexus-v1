@@ -468,7 +468,7 @@ export function OrganisationDetailPage() {
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" aria-hidden="true" />
                           {new Date(opp.start_date).toLocaleDateString()}
-                          {opp.end_date ? ` – ${new Date(opp.end_date).toLocaleDateString()}` : ''}
+                          {opp.end_date ? `${t('date_range_separator', { ns: 'volunteering' })}${new Date(opp.end_date).toLocaleDateString()}` : ''}
                         </span>
                       )}
                       {opp.category && (

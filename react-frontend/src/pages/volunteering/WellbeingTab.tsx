@@ -377,15 +377,18 @@ export function WellbeingTab() {
                   {t('wellbeing.rest_days_desc')}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {data.suggested_rest_days.map((day, i) => (
+                  {data.suggested_rest_days
+                    .map((day) => ({ day, parsed: new Date(day) }))
+                    .filter(({ parsed }) => !Number.isNaN(parsed.getTime()))
+                    .map(({ day, parsed }) => (
                     <Chip
-                      key={i}
+                      key={day}
                       size="sm"
                       variant="soft"
                       color="accent"
                       startContent={<Sun className="w-3 h-3" />}
                     >
-                      {new Date(day).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                      {parsed.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
                     </Chip>
                   ))}
                 </div>

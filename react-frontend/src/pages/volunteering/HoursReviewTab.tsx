@@ -109,8 +109,10 @@ export function HoursReviewTab() {
         toastRef.current.error(tRef.current('hours_load_failed'));
       }
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
   }, []);
 

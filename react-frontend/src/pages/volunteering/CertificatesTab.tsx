@@ -89,7 +89,7 @@ export function CertificatesTab() {
       logError('Failed to load certificates', err);
       setError(tRef.current('certificates.error_load_generic'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) setIsLoading(false);
     }
   }, []);
 
@@ -212,7 +212,7 @@ export function CertificatesTab() {
                     <div className="flex flex-wrap items-center gap-3 text-xs text-theme-subtle mb-3">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" aria-hidden="true" />
-                        {new Date(cert.date_range.start).toLocaleDateString()} - {new Date(cert.date_range.end).toLocaleDateString()}
+                        {new Date(cert.date_range.start).toLocaleDateString()}{t('date_range_separator')}{new Date(cert.date_range.end).toLocaleDateString()}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" aria-hidden="true" />

@@ -78,7 +78,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [actionLoading, setActionLoading] = useState<Record<number, boolean>>({});
+  const [actionLoading, setActionLoading] = useState<Record<number, 'approve' | 'decline' | undefined>>({});
   const [nameSearch, setNameSearch] = useState('');
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [isBulkRunning, setIsBulkRunning] = useState(false);
@@ -152,7 +152,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
   /* ---- Single action ---- */
 
   async function handleAction(applicationId: number, action: 'approve' | 'decline') {
-    setActionLoading((prev) => ({ ...prev, [applicationId]: true }));
+    setActionLoading((prev) => ({ ...prev, [applicationId]: action }));
 
     // Optimistic update
     const newStatus = action === 'approve' ? 'approved' : 'declined';
@@ -183,7 +183,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
       logError(`Failed to ${action} application`, err);
       toast.error(t('something_wrong'));
     } finally {
-      setActionLoading((prev) => ({ ...prev, [applicationId]: false }));
+      setActionLoading((prev) => ({ ...prev, [applicationId]: undefined }));
     }
   }
 
@@ -431,8 +431,9 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
                     size="sm"
                     variant="secondary"
                     className="bg-success-soft text-success hover:bg-success-soft/80"
-                    isLoading={!!actionLoading[app.id]}
-                    startContent={!actionLoading[app.id] ? <CheckCircle className="w-3.5 h-3.5" /> : undefined}
+                    isLoading={actionLoading[app.id] === 'approve'}
+                    isDisabled={!!actionLoading[app.id]}
+                    startContent={actionLoading[app.id] !== 'approve' ? <CheckCircle className="w-3.5 h-3.5" /> : undefined}
                     onPress={() => handleAction(app.id, 'approve')}
                   >
                     {t('applications.approve')}
@@ -440,8 +441,9 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
                   <Button
                     size="sm"
                     variant="danger-soft"
-                    isLoading={!!actionLoading[app.id]}
-                    startContent={!actionLoading[app.id] ? <XCircle className="w-3.5 h-3.5" /> : undefined}
+                    isLoading={actionLoading[app.id] === 'decline'}
+                    isDisabled={!!actionLoading[app.id]}
+                    startContent={actionLoading[app.id] !== 'decline' ? <XCircle className="w-3.5 h-3.5" /> : undefined}
                     onPress={() => handleAction(app.id, 'decline')}
                   >
                     {t('applications.decline')}
