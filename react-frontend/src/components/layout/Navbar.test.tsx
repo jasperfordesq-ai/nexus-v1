@@ -99,6 +99,8 @@ const i18nMap: Record<string, string> = {
   'nav.connections': 'Connections',
   'nav.events': 'Events',
   'nav.groups': 'Groups',
+  'nav.volunteering': 'Volunteering',
+  'nav.organisations': 'Organisations',
   'nav.resources': 'Resources',
   'nav.marketplace': 'Marketplace',
   'nav.more': 'More',
@@ -113,6 +115,8 @@ const i18nMap: Record<string, string> = {
   'nav_desc.connections': 'Your connections & requests',
   'nav_desc.events': 'Upcoming community events',
   'nav_desc.groups': 'Join interest groups',
+  'nav_desc.volunteering': 'Find ways to help',
+  'nav_desc.organisations': 'Browse volunteer organisations',
   'nav_desc.resources': 'Shared files & documents',
   'nav_desc.marketplace': 'Buy & sell in your community',
   'nav_desc.ideation': 'Ideas & innovation challenges',
@@ -171,6 +175,7 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | undefined) => url || '/default-avatar.png',
+  resolveAssetUrl: (url: string | null | undefined) => url ?? null,
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
 }));
 
@@ -257,7 +262,7 @@ describe('Navbar', () => {
         },
       });
       render(<Navbar />);
-      const img = screen.getByAltText('Logo Tenant');
+      const img = screen.getAllByAltText('Logo Tenant')[0];
       expect(img).toBeInTheDocument();
       expect(img).toHaveAttribute('src', '/logo.png');
     });
@@ -609,6 +614,22 @@ describe('Navbar', () => {
       });
       render(<Navbar />);
       expect(screen.queryByText('Community')).not.toBeInTheDocument();
+    });
+
+    it('shows Organisations when the volunteering module feature is enabled', async () => {
+      const user = userEvent.setup();
+      setupDefaultMocks({
+        tenant: {
+          hasFeature: vi.fn((feature: string) => feature === 'volunteering'),
+          hasModule: vi.fn(() => false),
+        },
+      });
+
+      render(<Navbar />);
+      await user.click(screen.getByRole('button', { name: 'Community' }));
+
+      expect(screen.getByRole('button', { name: /^Volunteering\b/ })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^Organisations\b/ })).toBeInTheDocument();
     });
 
     it('routes Partner Communities to the Federation Hub', async () => {

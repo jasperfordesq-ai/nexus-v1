@@ -65,6 +65,7 @@
   "status_pending": "Ausstehend",
   "status_approved": "Genehmigt",
   "status_declined": "Abgelehnt",
+  "status_unknown": "Unbekannt",
   "error_load_applications": "Laden der Bewerbungen fehlgeschlagen.",
   "error_load_applications_retry": "Laden der Bewerbungen fehlgeschlagen. Bitte versuchen Sie es erneut.",
   "no_applications": "Keine Bewerbungen",
@@ -863,6 +864,11 @@
   "my_organisations_none_desc": "Registrieren Sie eine Freiwilligenorganisation, um Einsätze zu veröffentlichen, Freiwillige zu verwalten und Zeitguthaben zu vergeben.",
   "my_organisations_pending": "Genehmigung ausstehend",
   "my_organisations_pending_desc": "Wartet auf Admin-Genehmigung",
+  "member_roles": {
+    "owner": "Eigentümer",
+    "admin": "Administrator",
+    "member": "Mitglied"
+  },
   "federation_share_label": "Mit Partnergemeinschaften teilen",
   "federation_share_description": "Machen Sie diesen Einsatz für Partnergemeinschaften in Ihrem Föderationsnetzwerk sichtbar.",
   "federation_share_updated": "Freigabeeinstellung aktualisiert.",

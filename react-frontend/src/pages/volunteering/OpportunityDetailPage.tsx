@@ -1,4 +1,3 @@
-import { Card, GlassCard, useDisclosure, Button, Chip, Spinner, SearchField, Switch, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Checkbox, ToggleButton, ToggleButtonGroup } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,6 +13,7 @@ import { Card, GlassCard, useDisclosure, Button, Chip, Spinner, SearchField, Swi
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
+import { Card, GlassCard, useDisclosure, Button, Chip, Spinner, SearchField, Switch, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Checkbox, ToggleButton, ToggleButtonGroup } from '@/components/ui';
 
 import MapPin from 'lucide-react/icons/map-pin';
 import Calendar from 'lucide-react/icons/calendar';
@@ -128,6 +128,13 @@ function statusColor(status: string): 'warning' | 'success' | 'danger' | 'defaul
   if (status === 'approved') return 'success';
   if (status === 'declined') return 'danger';
   return 'default';
+}
+
+function statusLabelKey(status: string): string {
+  if (status === 'approved') return 'status_approved';
+  if (status === 'declined') return 'status_declined';
+  if (status === 'pending') return 'status_pending';
+  return 'status_unknown';
 }
 
 /* ─────────────────── Shift Check-in Panel ─────────────────── */
@@ -903,7 +910,7 @@ export function OpportunityDetailPage() {
                   {t('opportunity.you_have_applied')}
                 </p>
                 <p className="text-xs text-theme-subtle">
-                  {t('opportunity.application_status', { status: opp.application.status })} &middot; {t('opportunity.applied_on', { date: formatDate(opp.application.created_at) })}
+                  {t('opportunity.application_status', { status: t(statusLabelKey(opp.application.status)) })} &middot; {t('opportunity.applied_on', { date: formatDate(opp.application.created_at) })}
                 </p>
               </div>
             </div>

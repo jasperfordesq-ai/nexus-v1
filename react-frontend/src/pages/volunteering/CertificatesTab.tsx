@@ -9,7 +9,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion } from '@/lib/motion';import Award from 'lucide-react/icons/award';
+import { motion } from '@/lib/motion';
+import Award from 'lucide-react/icons/award';
 import Download from 'lucide-react/icons/download';
 import Plus from 'lucide-react/icons/plus';
 import ExternalLink from 'lucide-react/icons/external-link';

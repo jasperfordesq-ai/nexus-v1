@@ -120,7 +120,7 @@ const GROUPS: GroupDef[] = [
 const moduleCards: ActionDef[] = [
   { key: 'timebank', href: '/listings', icon: ListChecks, module: 'listings' },
   { key: 'volunteering', href: '/volunteering', icon: Heart, feature: 'volunteering' },
-  { key: 'organisations', href: '/organisations', icon: Building2, feature: 'organisations' },
+  { key: 'organisations', href: '/organisations', icon: Building2, feature: 'volunteering' },
   { key: 'events', href: '/events', icon: Calendar, feature: 'events' },
   { key: 'groups', href: '/groups', icon: Users, feature: 'groups' },
   { key: 'resources', href: '/resources', icon: FileText, feature: 'resources' },

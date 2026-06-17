@@ -1,4 +1,3 @@
-import { CardBody, Card, Progress, Button, Chip, SearchField, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,6 +7,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
+import { CardBody, Card, Progress, Button, Chip, SearchField, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
 import Search from 'lucide-react/icons/search';
 import Users from 'lucide-react/icons/users';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
@@ -1485,7 +1485,7 @@ export default function ExplorePage() {
       )}
 
       {/* ─── Organisations (Phase 2) ───────────────────────────────────── */}
-      {showSection('all') && hasFeature('organisations') && data?.active_organisations && data.active_organisations.length > 0 && (
+      {showSection('all') && hasFeature('volunteering') && data?.active_organisations && data.active_organisations.length > 0 && (
         <ExploreSection
           title={t('organisations.title')}
           subtitle={t('organisations.subtitle')}

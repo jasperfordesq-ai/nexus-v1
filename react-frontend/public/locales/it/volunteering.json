@@ -65,6 +65,7 @@
   "status_pending": "In Attesa",
   "status_approved": "Approvato",
   "status_declined": "Rifiutato",
+  "status_unknown": "Sconosciuto",
   "error_load_applications": "Caricamento delle candidature non riuscito.",
   "error_load_applications_retry": "Caricamento delle candidature non riuscito. La preghiamo di riprovare.",
   "no_applications": "Nessuna candidatura",
@@ -863,6 +864,11 @@
   "my_organisations_none_desc": "Registra un'organizzazione di volontariato per iniziare a pubblicare opportunità, gestire i volontari e assegnare crediti di tempo.",
   "my_organisations_pending": "In attesa di approvazione",
   "my_organisations_pending_desc": "In attesa di approvazione da parte dell'amministratore",
+  "member_roles": {
+    "owner": "Proprietario",
+    "admin": "Amministratore",
+    "member": "Membro"
+  },
   "federation_share_label": "Condivida con le comunità partner",
   "federation_share_description": "Renda questa opportunità visibile alle comunità partner della Sua rete di federazione.",
   "federation_share_updated": "Preferenza di condivisione aggiornata.",

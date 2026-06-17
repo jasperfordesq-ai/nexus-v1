@@ -65,6 +65,7 @@
   "status_pending": "Aż do",
   "status_approved": "Zatwierdzony",
   "status_declined": "Odrzucony",
+  "status_unknown": "Nieznany",
   "error_load_applications": "Nie udało się załadować aplikacji. Spróbuj ponownie.",
   "error_load_applications_retry": "Nie udało się załadować aplikacji. Spróbuj ponownie.",
   "no_applications": "Brak aplikacji",
@@ -863,6 +864,11 @@
   "my_organisations_none_desc": "Zarejestruj organizację wolontariacką, aby rozpocząć publikowanie ofert pracy, zarządzanie wolontariuszami i przyznawanie punktów czasowych.",
   "my_organisations_pending": "Oczekujące na zatwierdzenie",
   "my_organisations_pending_desc": "Oczekiwanie na zgodę administratora",
+  "member_roles": {
+    "owner": "Właściciel",
+    "admin": "Administrator",
+    "member": "Członek"
+  },
   "federation_share_label": "Udostępnij społecznościom partnerskim",
   "federation_share_description": "Spraw, aby ta okazja była widoczna dla społeczności partnerskich w Twojej sieci federacji.",
   "federation_share_updated": "Zaktualizowano preferencję udostępniania.",

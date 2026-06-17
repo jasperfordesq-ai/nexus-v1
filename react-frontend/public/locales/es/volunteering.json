@@ -65,6 +65,7 @@
   "status_pending": "Pendiente",
   "status_approved": "Aprobado",
   "status_declined": "Rechazado",
+  "status_unknown": "Desconocido",
   "error_load_applications": "Error al cargar las solicitudes.",
   "error_load_applications_retry": "Error al cargar las solicitudes. Por favor intenta de nuevo.",
   "no_applications": "Sin solicitudes",
@@ -863,6 +864,11 @@
   "my_organisations_none_desc": "Registre una organización de voluntarios para comenzar a publicar oportunidades, administrar voluntarios y otorgar créditos de tiempo.",
   "my_organisations_pending": "Pendiente de aprobación",
   "my_organisations_pending_desc": "Esperando la aprobación del administrador",
+  "member_roles": {
+    "owner": "Propietario",
+    "admin": "Administrador",
+    "member": "Miembro"
+  },
   "federation_share_label": "Compartir con comunidades asociadas",
   "federation_share_description": "Haz que esta oportunidad sea visible para las comunidades asociadas de tu red de federación.",
   "federation_share_updated": "Preferencia de compartición actualizada.",

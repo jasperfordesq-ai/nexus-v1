@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Events\VolunteerOpportunityCreated;
 use Tests\Laravel\TestCase;
 use App\Core\Database;
 use App\Core\TenantContext;
@@ -15,6 +16,7 @@ use App\Services\ShiftSwapService;
 use App\Services\ShiftWaitlistService;
 use App\Services\VolunteerCheckInService;
 use App\Services\VolunteerService;
+use Illuminate\Support\Facades\Event;
 
 /**
  * VolunteerFlowIntegrationTest
@@ -39,6 +41,7 @@ class VolunteerFlowIntegrationTest extends \Tests\Laravel\TestCase
     public function testFullLifecycleCreateOppApplyApproveLogHours(): void
     {
         $this->requireTables(['vol_organizations', 'vol_opportunities', 'vol_applications', 'vol_logs']);
+        Event::fake([VolunteerOpportunityCreated::class]);
 
         $ownerId  = $this->createUser('lifecycle-owner');
         $userId   = $this->createUser('lifecycle-volunteer');
@@ -52,6 +55,7 @@ class VolunteerFlowIntegrationTest extends \Tests\Laravel\TestCase
             'location'        => 'Remote',
         ]);
         $this->assertNotNull($opportunity, 'createOpportunity should succeed');
+        Event::assertDispatched(VolunteerOpportunityCreated::class);
         $oppId = (int) $opportunity->id;
 
         // Apply

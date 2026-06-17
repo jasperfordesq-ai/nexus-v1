@@ -25,8 +25,11 @@ vi.mock('react-i18next', () => ({
   },
   useTranslation: () => ({
     i18n: { language: 'en' },
-    t: (key: string, opts?: Record<string, unknown>) =>
-      (opts?.fallbackValue as string | undefined) ?? key,
+    t: (key: string, opts?: Record<string, unknown>) => {
+      if (opts?.fallbackValue) return opts.fallbackValue as string;
+      if (key === 'opportunity.application_status') return `Status: ${String(opts?.status ?? '')}`;
+      return key;
+    },
   }),
 }));
 
@@ -200,6 +203,23 @@ describe('OpportunityDetailPage', () => {
       expect(screen.getAllByText('Park Cleanup Drive')[0]).toBeInTheDocument();
     });
     expect(screen.getByText('opportunity.you_have_applied')).toBeInTheDocument();
+  });
+
+  it('renders translated already-applied status instead of the raw backend value', async () => {
+    const applied = {
+      ...mockOpportunity,
+      has_applied: true,
+      application: { id: 99, status: 'pending', message: null, created_at: '2026-02-01T00:00:00Z' },
+    };
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: applied });
+
+    render(<OpportunityDetailPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText((text) => text.includes('Status: status_pending'))).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText((text) => text.includes('Status: pending'))).not.toBeInTheDocument();
   });
 
   it('shows shift information when shifts are present', async () => {

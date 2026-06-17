@@ -127,7 +127,7 @@ class LlmsController
         if (($features['job_vacancies'] ?? true)) {
             $optional[] = "- [Jobs]({$baseUrl}/jobs): paid roles in the community";
         }
-        if (($features['organisations'] ?? true)) {
+        if (($features['volunteering'] ?? true)) {
             $optional[] = "- [Organisations]({$baseUrl}/organisations): partner groups and charities";
         }
         if (!empty($optional)) {

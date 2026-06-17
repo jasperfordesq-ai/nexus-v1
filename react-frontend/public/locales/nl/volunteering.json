@@ -65,6 +65,7 @@
   "status_pending": "In behandeling",
   "status_approved": "Goedgekeurd",
   "status_declined": "Afgewezen",
+  "status_unknown": "Onbekend",
   "error_load_applications": "Kan applicaties niet laden. Probeer het opnieuw.",
   "error_load_applications_retry": "Kan applicaties niet laden. Probeer het opnieuw.",
   "no_applications": "Geen toepassingen",
@@ -863,6 +864,11 @@
   "my_organisations_none_desc": "Registreer een vrijwilligersorganisatie om vacatures te plaatsen, vrijwilligers te beheren en tijdskredieten toe te kennen.",
   "my_organisations_pending": "In afwachting van goedkeuring",
   "my_organisations_pending_desc": "In afwachting van goedkeuring door de beheerder",
+  "member_roles": {
+    "owner": "Eigenaar",
+    "admin": "Beheerder",
+    "member": "Lid"
+  },
   "federation_share_label": "Delen met partnergemeenschappen",
   "federation_share_description": "Maak deze kans zichtbaar voor partnergemeenschappen in je federatienetwerk.",
   "federation_share_updated": "Deelvoorkeur bijgewerkt.",

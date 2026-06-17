@@ -20,8 +20,11 @@ vi.mock('@/lib/motion', () => ({
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, opts?: Record<string, unknown>) =>
-      (opts?.fallbackValue as string | undefined) ?? key,
+    t: (key: string, opts?: Record<string, unknown>) => {
+      if (opts?.fallbackValue) return opts.fallbackValue as string;
+      if (opts?.ns) return `${String(opts.ns)}:${key}`;
+      return key;
+    },
   }),
   initReactI18next: { type: '3rdParty', init: () => {} },
 }));
@@ -127,6 +130,17 @@ const mockReviews = [
   },
 ];
 
+const mockJobs = [
+  {
+    id: 55,
+    title: 'Community Tool Library Helper',
+    type: 'timebank',
+    location: 'Cork',
+    is_remote: false,
+    deadline: null,
+  },
+];
+
 function setupSuccessfulMocks() {
   vi.mocked(api.get).mockImplementation((url: string) => {
     if (url.includes('/reviews/organization/')) {
@@ -137,6 +151,9 @@ function setupSuccessfulMocks() {
     }
     if (url.includes('/organisations/')) {
       return Promise.resolve({ success: true, data: mockOrganisation });
+    }
+    if (url.includes('/v2/jobs')) {
+      return Promise.resolve({ success: true, data: [] });
     }
     return Promise.resolve({ success: true, data: null });
   });
@@ -233,5 +250,29 @@ describe('OrganisationDetailPage', () => {
       expect(screen.getAllByText('Green Community Trust')[0]).toBeInTheDocument();
     });
     expect(screen.getByText('organisation_detail.no_active_opportunities')).toBeInTheDocument();
+  });
+
+  it('renders translated job type labels instead of raw backend values', async () => {
+    vi.mocked(api.get).mockImplementation((url: string) => {
+      if (url.includes('/reviews/organization/')) {
+        return Promise.resolve({ success: true, data: { reviews: [] } });
+      }
+      if (url.includes('/opportunities')) {
+        return Promise.resolve({ success: true, data: [] });
+      }
+      if (url.includes('/v2/jobs')) {
+        return Promise.resolve({ success: true, data: mockJobs });
+      }
+      return Promise.resolve({ success: true, data: mockOrganisation });
+    });
+
+    render(<OrganisationDetailPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Community Tool Library Helper')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('jobs:type.timebank')).toBeInTheDocument();
+    expect(screen.queryByText('timebank')).not.toBeInTheDocument();
   });
 });

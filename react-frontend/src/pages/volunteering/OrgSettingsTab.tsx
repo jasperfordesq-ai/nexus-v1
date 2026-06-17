@@ -3,7 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';import Save from 'lucide-react/icons/save';
+import { useState } from 'react';
+import Save from 'lucide-react/icons/save';
 import Building2 from 'lucide-react/icons/building-2';
 import { GlassCard, Button, Input, Textarea } from '@/components/ui';
 import { useToast } from '@/contexts';

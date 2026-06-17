@@ -138,6 +138,7 @@ vi.mock('@/components/feedback/ReportProblemButton', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | undefined) => url || '/default-avatar.png',
+  resolveAssetUrl: (url: string | null | undefined) => url ?? null,
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
 }));
 
@@ -502,6 +503,21 @@ describe('MobileDrawer', () => {
       // Community section is hidden when no community features are enabled,
       // so Events will not appear regardless.
       expect(screen.queryByText('Events')).not.toBeInTheDocument();
+    });
+
+    it('shows Organisations when the volunteering module feature is enabled', () => {
+      setupDefaultMocks({
+        tenant: {
+          hasFeature: vi.fn((feature: string) => feature === 'volunteering'),
+          hasModule: vi.fn(() => false),
+        },
+      });
+
+      render(<MobileDrawer {...defaultProps} />);
+      expandSection(/^community$/i);
+
+      expect(screen.getByText('Volunteering')).toBeInTheDocument();
+      expect(screen.getByText('Organisations')).toBeInTheDocument();
     });
 
     it('shows Explore section when gamification feature is enabled', () => {

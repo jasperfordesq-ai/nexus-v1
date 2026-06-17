@@ -14,7 +14,8 @@
 
 import React, { Suspense, useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { motion } from '@/lib/motion';import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
+import { motion } from '@/lib/motion';
+import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';
@@ -63,6 +64,27 @@ const TAB_DEFS: { key: OrgDashTab; icon: typeof LayoutDashboard }[] = [
 ];
 
 const ORG_DASH_TABS = TAB_DEFS.map((tab) => tab.key);
+
+function orgStatusColor(status: string): 'success' | 'warning' | 'default' {
+  if (status === 'active' || status === 'approved') return 'success';
+  if (status === 'pending') return 'warning';
+  return 'default';
+}
+
+function orgStatusLabelKey(status: string): string {
+  switch (status) {
+    case 'active':
+      return 'status_active';
+    case 'approved':
+      return 'status_approved';
+    case 'pending':
+      return 'status_pending';
+    case 'declined':
+      return 'status_declined';
+    default:
+      return 'status_unknown';
+  }
+}
 
 export default function VolOrgDashboardPage() {
   const { orgId: orgIdParam } = useParams<{ orgId: string }>();
@@ -207,8 +229,8 @@ export default function VolOrgDashboardPage() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-2xl font-bold text-theme-primary">{org.name}</h1>
-                <Chip size="sm" color={org.status === 'active' ? 'success' : 'warning'} variant="soft">
-                  {org.status}
+                <Chip size="sm" color={orgStatusColor(org.status)} variant="soft">
+                  {t(orgStatusLabelKey(org.status))}
                 </Chip>
               </div>
               {org.description && (

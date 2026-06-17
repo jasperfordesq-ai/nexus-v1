@@ -1,4 +1,3 @@
-import { Autocomplete, AutocompleteItem, GlassCard, Button, Input, Switch, Textarea } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,7 +15,7 @@ import type { DateInputValue } from '@/components/ui';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';
-import { DatePicker } from '@/components/ui';
+import { Autocomplete, AutocompleteItem, DatePicker, GlassCard, Button, Input, Switch, Textarea } from '@/components/ui';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import Save from 'lucide-react/icons/save';
 import Heart from 'lucide-react/icons/heart';

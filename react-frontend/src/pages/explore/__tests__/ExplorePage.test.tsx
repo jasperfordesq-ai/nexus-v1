@@ -410,6 +410,15 @@ describe('ExplorePage', () => {
     expect(screen.getByText('Community Org')).toBeInTheDocument();
   });
 
+  it('renders organisations section when volunteering is enabled', () => {
+    mockHasFeature.mockImplementation((feature?: string) => feature !== 'organisations');
+
+    render(<ExplorePage />);
+
+    expect(screen.getByText('organisations.title')).toBeInTheDocument();
+    expect(screen.getByText('Community Org')).toBeInTheDocument();
+  });
+
   it('renders job opportunities section', () => {
     render(<ExplorePage />);
     expect(screen.getByText('jobs.title')).toBeInTheDocument();

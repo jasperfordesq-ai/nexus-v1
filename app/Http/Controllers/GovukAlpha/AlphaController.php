@@ -5544,7 +5544,7 @@ class AlphaController extends Controller
     public function organisations(Request $request, string $tenantSlug): Response|RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
-        abort_unless(TenantContext::hasFeature('organisations'), 403);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
         $userId = $this->currentUserId();
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
@@ -5575,7 +5575,7 @@ class AlphaController extends Controller
     public function organisation(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
-        abort_unless(TenantContext::hasFeature('organisations'), 403);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
         if ($this->currentUserId() === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
@@ -5611,7 +5611,7 @@ class AlphaController extends Controller
         if (is_object($userId)) {
             return $userId;
         }
-        abort_unless(TenantContext::hasFeature('organisations'), 403);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
 
         // Bona-fide organisations only: registration is gated behind required
         // identity fields and an explicit terms agreement. Individual volunteers
@@ -10311,10 +10311,9 @@ class AlphaController extends Controller
             $items['volunteering'] = route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]);
         }
 
-        // Organisations sits beside Volunteering as its own landing page so that
-        // "an organisation can register here" is obvious, mirroring the React
-        // Community menu. (It is also reachable from Explore.)
-        if (TenantContext::hasFeature('organisations')) {
+        // Organisations sits beside Volunteering as its own landing page, but it
+        // is backed by the same volunteering services and feature gate.
+        if (TenantContext::hasFeature('volunteering')) {
             $items['organisations'] = route('govuk-alpha.organisations.index', ['tenantSlug' => $tenantSlug]);
         }
 

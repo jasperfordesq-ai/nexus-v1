@@ -98,7 +98,7 @@ interface MinimalJob {
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function OrganisationDetailPage() {
-  const { t } = useTranslation(['community', 'volunteering']);
+  const { t } = useTranslation(['community', 'volunteering', 'jobs']);
   const { id } = useParams<{ id: string }>();
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
@@ -222,6 +222,14 @@ export function OrganisationDetailPage() {
     } finally {
       setIsApplying(false);
     }
+  };
+
+  const jobTypeLabel = (type: string) => {
+    if (type === 'paid' || type === 'volunteer' || type === 'timebank') {
+      return t(`type.${type}`, { ns: 'jobs' });
+    }
+
+    return type;
   };
 
   if (isLoading) {
@@ -517,7 +525,7 @@ export function OrganisationDetailPage() {
                           variant="soft"
                           color={job.type === 'paid' ? 'success' : job.type === 'timebank' ? 'warning' : 'accent'}
                         >
-                          {job.type}
+                          {jobTypeLabel(job.type)}
                         </Chip>
                         {job.is_remote ? (
                           <span>{t('remote')}</span>

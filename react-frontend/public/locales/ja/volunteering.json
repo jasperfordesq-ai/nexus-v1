@@ -65,6 +65,7 @@
   "status_pending": "保留中",
   "status_approved": "承認された",
   "status_declined": "拒否されました",
+  "status_unknown": "不明",
   "error_load_applications": "申請の読み込みに失敗しました。もう一度お試しください。",
   "error_load_applications_retry": "申請の読み込みに失敗しました。もう一度お試しください。",
   "no_applications": "申請はありません",
@@ -863,6 +864,11 @@
   "my_organisations_none_desc": "ボランティア組織を登録して、機会の投稿、ボランティアの管理、時間単位の付与を開始します。",
   "my_organisations_pending": "承認待ち",
   "my_organisations_pending_desc": "管理者の承認を待っています",
+  "member_roles": {
+    "owner": "所有者",
+    "admin": "管理者",
+    "member": "メンバー"
+  },
   "federation_share_label": "パートナーコミュニティと共有",
   "federation_share_description": "この機会をフェデレーションネットワーク内のパートナーコミュニティに公開します。",
   "federation_share_updated": "共有設定を更新しました。",

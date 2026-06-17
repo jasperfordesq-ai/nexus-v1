@@ -4,7 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';import Users from 'lucide-react/icons/users';
+import { useNavigate } from 'react-router-dom';
+import Users from 'lucide-react/icons/users';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import Clock from 'lucide-react/icons/clock';
 import Wallet from 'lucide-react/icons/wallet';

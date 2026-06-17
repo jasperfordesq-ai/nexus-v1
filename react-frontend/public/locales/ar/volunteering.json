@@ -65,6 +65,7 @@
   "status_pending": "قيد الانتظار",
   "status_approved": "موافقة",
   "status_declined": "انخفض",
+  "status_unknown": "غير معروف",
   "error_load_applications": "فشل في تحميل التطبيقات. يرجى المحاولة مرة أخرى.",
   "error_load_applications_retry": "فشل في تحميل التطبيقات. يرجى المحاولة مرة أخرى.",
   "no_applications": "لا توجد تطبيقات",
@@ -863,6 +864,11 @@
   "my_organisations_none_desc": "قم بتسجيل منظمة تطوعية لبدء نشر الفرص وإدارة المتطوعين ومنح الاعتمادات الزمنية.",
   "my_organisations_pending": "في انتظار الموافقة",
   "my_organisations_pending_desc": "في انتظار موافقة المشرف",
+  "member_roles": {
+    "owner": "المالك",
+    "admin": "المسؤول",
+    "member": "عضو"
+  },
   "federation_share_label": "المشاركة مع المجتمعات الشريكة",
   "federation_share_description": "اجعل هذه الفرصة مرئية للمجتمعات الشريكة في شبكة الاتحاد الخاصة بك.",
   "federation_share_updated": "تم تحديث تفضيل المشاركة.",

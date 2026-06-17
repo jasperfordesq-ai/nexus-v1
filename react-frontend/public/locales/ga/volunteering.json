@@ -65,6 +65,7 @@
   "status_pending": "Ar Feitheamh",
   "status_approved": "Ceadaithe",
   "status_declined": "Diúltaithe",
+  "status_unknown": "Anaithnid",
   "error_load_applications": "Theip ar luchtú na n-iarratas.",
   "error_load_applications_retry": "Theip ar luchtú na n-iarratas. Bain triail eile as.",
   "no_applications": "Gan iarratais",
@@ -863,6 +864,11 @@
   "my_organisations_none_desc": "Cláraigh eagraíocht dheonach chun tús a chur le deiseanna postála, oibrithe deonacha a bhainistiú, agus creidmheasanna ama a bhronnadh.",
   "my_organisations_pending": "Ceadú ar Feitheamh",
   "my_organisations_pending_desc": "Ag feitheamh le ceadú riarthóir",
+  "member_roles": {
+    "owner": "Úinéir",
+    "admin": "Riarthóir",
+    "member": "Ball"
+  },
   "federation_share_label": "Comhroinn le pobail chomhpháirtíochta",
   "federation_share_description": "Déan an deis seo infheicthe do phobail chomhpháirtíochta i do líonra cónaidhme.",
   "federation_share_updated": "Sainrogha comhroinnte nuashonraithe.",

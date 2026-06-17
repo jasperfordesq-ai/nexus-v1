@@ -12,7 +12,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from '@/lib/motion';import Building2 from 'lucide-react/icons/building-2';
+import { motion } from '@/lib/motion';
+import Building2 from 'lucide-react/icons/building-2';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import Plus from 'lucide-react/icons/plus';
 import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
@@ -35,6 +36,17 @@ interface MyOrg {
   balance?: number;
   auto_pay_enabled?: boolean;
   logo_url?: string | null;
+}
+
+function memberRoleLabelKey(role: string): string {
+  switch (role) {
+    case 'owner':
+      return 'member_roles.owner';
+    case 'admin':
+      return 'member_roles.admin';
+    default:
+      return 'member_roles.member';
+  }
 }
 
 export default function MyOrganisationsPage() {
@@ -174,7 +186,7 @@ export default function MyOrganisationsPage() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <h2 className="text-lg font-bold text-theme-primary">{org.name}</h2>
                         <Chip size="sm" color="success" variant="soft">{t('status_active')}</Chip>
-                        <Chip size="sm" variant="soft" className="capitalize">{org.member_role}</Chip>
+                        <Chip size="sm" variant="soft">{t(memberRoleLabelKey(org.member_role))}</Chip>
                       </div>
                       {org.description && (
                         <p className="text-sm text-theme-muted mt-1 line-clamp-2">{org.description}</p>

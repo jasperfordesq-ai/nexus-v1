@@ -9,7 +9,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion } from '@/lib/motion';import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import { motion } from '@/lib/motion';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Bell from 'lucide-react/icons/bell';
 import Calendar from 'lucide-react/icons/calendar';
 import Clock from 'lucide-react/icons/clock';
