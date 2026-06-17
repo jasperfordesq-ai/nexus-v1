@@ -19,6 +19,7 @@ class VolunteerWellbeingServiceTest extends TestCase
         DB::shouldReceive('join')->andReturnSelf();
         DB::shouldReceive('on')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereNotNull')->andReturnSelf();
         DB::shouldReceive('count')->andReturn(0);
         DB::shouldReceive('sum')->andReturn(0.0);
         DB::shouldReceive('max')->andReturn(null);
@@ -41,6 +42,7 @@ class VolunteerWellbeingServiceTest extends TestCase
         DB::shouldReceive('join')->andReturnSelf();
         DB::shouldReceive('on')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereNotNull')->andReturnSelf();
         DB::shouldReceive('count')->andReturn(0);
         DB::shouldReceive('sum')->andReturn(0.0);
         DB::shouldReceive('max')->andReturn(null);

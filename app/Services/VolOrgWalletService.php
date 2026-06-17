@@ -106,7 +106,7 @@ class VolOrgWalletService
             'vol_log_id' => $row->vol_log_id ? (int) $row->vol_log_id : null,
             'user' => $row->user_id ? [
                 'id' => (int) $row->user_id,
-                'name' => $row->user_name ?? 'Unknown',
+                'name' => $row->user_name ?? __('api.unknown_user'),
                 'avatar_url' => $row->user_avatar_url,
             ] : null,
         ], $rows);

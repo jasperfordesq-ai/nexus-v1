@@ -55,18 +55,26 @@ class VolunteerWellbeingService
         $riskPoints = 0;
 
         // ── 1. Shift frequency trend ──
-        // Compare shifts in the last 30 days vs the 30 days before that
-        $recentShifts = (int) DB::table('vol_shift_signups as ss')
-            ->join('vol_shifts as s', 'ss.shift_id', '=', 's.id')
-            ->where('ss.user_id', $userId)
-            ->where('ss.tenant_id', $tenantId)
+        // Live shift signups are vol_applications rows carrying a shift_id — the
+        // legacy vol_shift_signups table is no longer written to, so reading it
+        // here always returned 0 and silently disabled this indicator. Compare
+        // approved shift signups whose shift starts in the last 30 days vs the
+        // 30 days before that.
+        $recentShifts = (int) DB::table('vol_applications as a')
+            ->join('vol_shifts as s', 'a.shift_id', '=', 's.id')
+            ->where('a.user_id', $userId)
+            ->where('a.tenant_id', $tenantId)
+            ->whereNotNull('a.shift_id')
+            ->where('a.status', 'approved')
             ->where('s.start_time', '>=', now()->subDays(30))
             ->count();
 
-        $previousShifts = (int) DB::table('vol_shift_signups as ss')
-            ->join('vol_shifts as s', 'ss.shift_id', '=', 's.id')
-            ->where('ss.user_id', $userId)
-            ->where('ss.tenant_id', $tenantId)
+        $previousShifts = (int) DB::table('vol_applications as a')
+            ->join('vol_shifts as s', 'a.shift_id', '=', 's.id')
+            ->where('a.user_id', $userId)
+            ->where('a.tenant_id', $tenantId)
+            ->whereNotNull('a.shift_id')
+            ->where('a.status', 'approved')
             ->where('s.start_time', '>=', now()->subDays(60))
             ->where('s.start_time', '<', now()->subDays(30))
             ->count();
@@ -89,16 +97,20 @@ class VolunteerWellbeingService
         ];
 
         // ── 2. Cancellation rate ──
-        $totalSignups = (int) DB::table('vol_shift_signups')
+        // Shift cancellations are no longer retained as discrete records:
+        // cancelling a shift nulls vol_applications.shift_id (see
+        // VolunteerService::cancelShiftSignup), so a historical cancellation
+        // rate cannot be reconstructed. Report total live shift signups with a
+        // 0% cancellation rate rather than reading the dead vol_shift_signups
+        // table. This indicator contributes no risk points until the platform
+        // tracks cancellations again.
+        $totalSignups = (int) DB::table('vol_applications')
             ->where('user_id', $userId)
             ->where('tenant_id', $tenantId)
+            ->whereNotNull('shift_id')
             ->count();
 
-        $cancelledSignups = (int) DB::table('vol_shift_signups')
-            ->where('user_id', $userId)
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'cancelled')
-            ->count();
+        $cancelledSignups = 0;
 
         $cancellationRate = $totalSignups > 0 ? round(($cancelledSignups / $totalSignups) * 100, 1) : 0;
 

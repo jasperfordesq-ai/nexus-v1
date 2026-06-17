@@ -351,10 +351,38 @@ class VolunteerEmergencyAlertService
             ])
             ->get();
 
-        return $alerts->map(function ($a) use ($tenantId) {
-            $totalNotified = VolEmergencyAlertRecipient::where('tenant_id', $tenantId)->where('alert_id', $a->id)->count();
-            $totalAccepted = VolEmergencyAlertRecipient::where('tenant_id', $tenantId)->where('alert_id', $a->id)->where('response', 'accepted')->count();
-            $totalDeclined = VolEmergencyAlertRecipient::where('tenant_id', $tenantId)->where('alert_id', $a->id)->where('response', 'declined')->count();
+        // Aggregate response stats for all alerts in a single grouped query
+        // instead of 3 COUNT round-trips per alert (N+1 — up to 150 queries for
+        // a coordinator with 50 alerts).
+        $alertIds = $alerts->pluck('id')->map(static fn ($id) => (int) $id)->all();
+        $statsByAlert = [];
+        if ($alertIds !== []) {
+            $statRows = VolEmergencyAlertRecipient::query()
+                ->where('tenant_id', $tenantId)
+                ->whereIn('alert_id', $alertIds)
+                ->selectRaw(
+                    "alert_id,
+                     COUNT(*) as total_notified,
+                     SUM(CASE WHEN response = 'accepted' THEN 1 ELSE 0 END) as total_accepted,
+                     SUM(CASE WHEN response = 'declined' THEN 1 ELSE 0 END) as total_declined"
+                )
+                ->groupBy('alert_id')
+                ->get();
+            foreach ($statRows as $statRow) {
+                $statsByAlert[(int) $statRow->alert_id] = [
+                    'total_notified' => (int) $statRow->total_notified,
+                    'total_accepted' => (int) $statRow->total_accepted,
+                    'total_declined' => (int) $statRow->total_declined,
+                ];
+            }
+        }
+
+        return $alerts->map(function ($a) use ($statsByAlert) {
+            $stats = $statsByAlert[(int) $a->id] ?? [
+                'total_notified' => 0,
+                'total_accepted' => 0,
+                'total_declined' => 0,
+            ];
 
             return [
                 'id' => $a->id,
@@ -367,11 +395,7 @@ class VolunteerEmergencyAlertService
                     'end_time' => $a->end_time,
                 ],
                 'opportunity_title' => $a->opp_title,
-                'stats' => [
-                    'total_notified' => $totalNotified,
-                    'total_accepted' => $totalAccepted,
-                    'total_declined' => $totalDeclined,
-                ],
+                'stats' => $stats,
                 'expires_at' => $a->expires_at?->toDateTimeString(),
                 'created_at' => $a->created_at?->toDateTimeString(),
             ];
