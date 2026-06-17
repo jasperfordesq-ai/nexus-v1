@@ -112,7 +112,13 @@
             </li>
         @endif
         @if (in_array('events', $permissions, true))
-            <li><a class="govuk-link" href="{{ route('govuk-alpha.federation.events.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.partner.browse_events') }}</a></li>
+            <li>
+                @if (!$isExternal && $partnerId > 0)
+                    <a class="govuk-link" href="{{ route('govuk-alpha.federation.events.index', ['tenantSlug' => $tenantSlug, 'partner_id' => $partnerId]) }}">{{ __('govuk_alpha.federation.partner.browse_events') }}</a>
+                @else
+                    <a class="govuk-link" href="{{ route('govuk-alpha.federation.events.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.partner.browse_events') }}</a>
+                @endif
+            </li>
         @endif
     </ul>
 @endsection

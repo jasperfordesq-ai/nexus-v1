@@ -118,7 +118,7 @@
                                 </p>
                                 <p class="govuk-body govuk-!-margin-bottom-1">{!! nl2br(e((string) ($translation['text'] ?? ''))) !!}</p>
                                 <p class="govuk-body-s govuk-!-margin-bottom-0">
-                                    <a class="govuk-link" href="{{ route('govuk-alpha.federation.messages.conversation', ['tenantSlug' => $tenantSlug, 'partner_id' => $partnerId, 'partner_tenant_id' => $partnerTenantId]) }}">{{ __('govuk_alpha.fed2.messages.view_original') }}</a>
+                                    <a class="govuk-link" href="{{ route('govuk-alpha.federation.messages.conversation', ['tenantSlug' => $tenantSlug, 'partnerId' => $partnerId, 'tenant_id' => $partnerTenantId]) }}">{{ __('govuk_alpha.fed2.messages.view_original') }}</a>
                                 </p>
                             </div>
                         @else

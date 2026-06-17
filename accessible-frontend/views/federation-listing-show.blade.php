@@ -68,7 +68,7 @@
 
         @if ($hasHours)
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.federation.listings_browse.hours_estimated', ['hours' => '']) }}</dt>
+                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.federation.listings_browse.hours_label') }}</dt>
                 <dd class="govuk-summary-list__value">{{ __('govuk_alpha.federation.listings_browse.hours_estimated', ['hours' => $estimatedHoursRaw]) }}</dd>
             </div>
         @endif
@@ -81,14 +81,14 @@
         @endif
 
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">{{ __('govuk_alpha.federation.listings_browse.posted_by', ['name' => '']) }}</dt>
-            <dd class="govuk-summary-list__value">{{ __('govuk_alpha.federation.listings_browse.posted_by', ['name' => $posterName]) }}</dd>
+            <dt class="govuk-summary-list__key">{{ __('govuk_alpha.federation.listings_browse.posted_by_label') }}</dt>
+            <dd class="govuk-summary-list__value">{{ $posterName }}</dd>
         </div>
 
         @if ($postedOn !== '')
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.federation.listings_browse.posted_on', ['date' => '']) }}</dt>
-                <dd class="govuk-summary-list__value">{{ __('govuk_alpha.federation.listings_browse.posted_on', ['date' => $postedOn]) }}</dd>
+                <dt class="govuk-summary-list__key">{{ __('govuk_alpha.federation.listings_browse.posted_on_label') }}</dt>
+                <dd class="govuk-summary-list__value">{{ $postedOn }}</dd>
             </div>
         @endif
     </dl>

@@ -63,20 +63,23 @@
     @if (!$allowed)
         <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.fed2.connections.not_available') }}</p></div>
     @else
-        {{-- govuk-tabs progressive-enhancement: server pre-selects the active panel
-             by omitting govuk-tabs__panel--hidden. Without JS the panels are all
-             visible and the tab links navigate via full page reload (aria-current). --}}
+        {{-- These tabs are full-page navigation links, NOT in-page JS tab panels:
+             each link reloads with ?tab=. So we deliberately do NOT use the
+             role="tab"/tablist/tabpanel + roving-tabindex ARIA (that would assert
+             in-page panel switching and pull inactive links out of the keyboard
+             tab order). Instead we mark the current tab with aria-current — the
+             same pattern as the shared federation sub-nav. --}}
         <div class="govuk-tabs" data-module="govuk-tabs">
             <h2 class="govuk-tabs__title">{{ __('govuk_alpha.polish_federation.connections_tabs_label') }}</h2>
-            <ul class="govuk-tabs__list" role="tablist">
-                <li class="govuk-tabs__list-item {{ $tab === 'accepted' ? 'govuk-tabs__list-item--selected' : '' }}" role="presentation">
-                    <a class="govuk-tabs__tab" href="{{ $tabHref('accepted') }}" id="tab-accepted" role="tab" aria-controls="panel-accepted" @if($tab === 'accepted') aria-selected="true" @else aria-selected="false" tabindex="-1" @endif>{{ __('govuk_alpha.fed2.connections.tab_accepted') }}</a>
+            <ul class="govuk-tabs__list">
+                <li class="govuk-tabs__list-item {{ $tab === 'accepted' ? 'govuk-tabs__list-item--selected' : '' }}">
+                    <a class="govuk-tabs__tab" href="{{ $tabHref('accepted') }}" id="tab-accepted" @if($tab === 'accepted') aria-current="page" @endif>{{ __('govuk_alpha.fed2.connections.tab_accepted') }}</a>
                 </li>
-                <li class="govuk-tabs__list-item {{ $tab === 'received' ? 'govuk-tabs__list-item--selected' : '' }}" role="presentation">
-                    <a class="govuk-tabs__tab" href="{{ $tabHref('received') }}" id="tab-received" role="tab" aria-controls="panel-received" @if($tab === 'received') aria-selected="true" @else aria-selected="false" tabindex="-1" @endif>{{ __('govuk_alpha.fed2.connections.tab_received') }}</a>
+                <li class="govuk-tabs__list-item {{ $tab === 'received' ? 'govuk-tabs__list-item--selected' : '' }}">
+                    <a class="govuk-tabs__tab" href="{{ $tabHref('received') }}" id="tab-received" @if($tab === 'received') aria-current="page" @endif>{{ __('govuk_alpha.fed2.connections.tab_received') }}</a>
                 </li>
-                <li class="govuk-tabs__list-item {{ $tab === 'sent' ? 'govuk-tabs__list-item--selected' : '' }}" role="presentation">
-                    <a class="govuk-tabs__tab" href="{{ $tabHref('sent') }}" id="tab-sent" role="tab" aria-controls="panel-sent" @if($tab === 'sent') aria-selected="true" @else aria-selected="false" tabindex="-1" @endif>{{ __('govuk_alpha.fed2.connections.tab_sent') }}</a>
+                <li class="govuk-tabs__list-item {{ $tab === 'sent' ? 'govuk-tabs__list-item--selected' : '' }}">
+                    <a class="govuk-tabs__tab" href="{{ $tabHref('sent') }}" id="tab-sent" @if($tab === 'sent') aria-current="page" @endif>{{ __('govuk_alpha.fed2.connections.tab_sent') }}</a>
                 </li>
             </ul>
 
@@ -90,7 +93,7 @@
                         default => 'empty_accepted',
                     };
                 @endphp
-                <div class="govuk-tabs__panel {{ !$isActive ? 'govuk-tabs__panel--hidden' : '' }}" id="panel-{{ $panelTab }}" role="tabpanel" aria-labelledby="tab-{{ $panelTab }}">
+                <div class="govuk-tabs__panel {{ !$isActive ? 'govuk-tabs__panel--hidden' : '' }}" id="panel-{{ $panelTab }}">
                     @if (!$isActive)
                         {{-- Non-active panels show nothing when JS is disabled. --}}
                     @elseif ($loadError)
