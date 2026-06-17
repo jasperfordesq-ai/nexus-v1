@@ -44,6 +44,35 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class AlphaController extends Controller
 {
+    // ===== ACCESSIBLE PARITY PHASE — per-module Concerns traits =====
+    // Each parity module's NEW methods live in a dedicated trait under
+    // Concerns/ so parallel module work never edits this shared file. Trait
+    // methods are composed into this class and may call its private helpers
+    // ($this->view, $this->currentUserId, $this->assertTenantSlug, self::asStr,
+    // $this->allowed). Method names are module-prefixed and unique.
+    use Concerns\FeedParity;
+    use Concerns\ListingsParity;
+    use Concerns\MessagesParity;
+    use Concerns\EventsParity;
+    use Concerns\GroupsParity;
+    use Concerns\MembersParity;
+    use Concerns\ConnectionsMatchesParity;
+    use Concerns\WalletParity;
+    use Concerns\VolunteeringParity;
+    use Concerns\OrganisationsParity;
+    use Concerns\FederationParity;
+    use Concerns\JobsParity;
+    use Concerns\IdeationParity;
+    use Concerns\ResourcesParity;
+    use Concerns\SavedCollectionsParity;
+    use Concerns\ActivityParity;
+    use Concerns\SearchParity;
+    use Concerns\GamificationParity;
+    use Concerns\CommerceParity;
+    use Concerns\BlogReviewsParity;
+    use Concerns\GoalsParity;
+    use Concerns\SettingsAuthParity;
+
     private const VALID_FEED_LIKE_TARGETS = [
         'post', 'listing', 'event', 'poll', 'goal',
         'resource', 'volunteer', 'volunteering', 'review', 'challenge', 'comment',

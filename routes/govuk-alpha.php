@@ -392,4 +392,16 @@ Route::prefix('{tenantSlug}/alpha')
         Route::post('/members/{id}/review', [AlphaController::class, 'storeProfileReview'])->whereNumber('id')->middleware('throttle:10,1')->name('profile.review.store');
         Route::post('/members/{id}/transfer', [AlphaController::class, 'profileTransferCredits'])->whereNumber('id')->middleware('throttle:20,1')->name('profile.transfer');
         Route::post('/reviews/{id}/delete', [AlphaController::class, 'deleteReview'])->whereNumber('id')->middleware('throttle:20,1')->name('reviews.delete');
+
+        // ===== PARITY PHASE: per-module route files =====
+        // Each accessible-frontend parity module registers its own routes in a
+        // dedicated file under routes/govuk-alpha-parity/. They are required here
+        // INSIDE the {tenantSlug}/alpha group, so they inherit its prefix
+        // ('{tenantSlug}/alpha'), name prefix ('govuk-alpha.') and middleware.
+        // This keeps parallel module work conflict-free: a new module = a new
+        // file, never an edit to this shared route file. Files load in sorted
+        // order; register static segments before wildcards within each file.
+        foreach ((glob(__DIR__ . '/govuk-alpha-parity/*.php') ?: []) as $__parityRoutes) {
+            require $__parityRoutes;
+        }
     });
