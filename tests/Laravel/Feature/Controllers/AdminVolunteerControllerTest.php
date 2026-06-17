@@ -6,8 +6,10 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Core\TenantContext;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -138,5 +140,64 @@ class AdminVolunteerControllerTest extends TestCase
         $response = $this->apiPost('/v2/admin/volunteering/approvals/1/decline');
 
         $response->assertStatus(403);
+    }
+
+    // ================================================================
+    // VERIFY HOURS — POST /v2/admin/volunteering/hours/{id}/verify
+    // Auto-mint on approval + concurrent/retry double-approve idempotency.
+    // ================================================================
+
+    public function test_verify_hours_approve_mints_once_and_second_approve_is_idempotent(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['balance' => 0]);
+        $volunteer = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
+
+        TenantContext::setById($this->testTenantId);
+
+        $orgId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $admin->id,
+            'name' => 'Idempotency Org',
+            'slug' => 'idempotency-org-' . uniqid(),
+            'description' => 'Organisation used for verify-hours idempotency coverage.',
+            'contact_email' => 'idem@example.test',
+            'status' => 'active',
+            'auto_pay_enabled' => 0,
+            'balance' => 10.00,
+            'created_at' => now(),
+        ]);
+
+        $logId = DB::table('vol_logs')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $volunteer->id,
+            'organization_id' => $orgId,
+            'opportunity_id' => null,
+            'date_logged' => now()->subDay()->toDateString(),
+            'hours' => 2.00,
+            'description' => 'Idempotency shift',
+            'status' => 'pending',
+            'created_at' => now(),
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        // First approval mints 1 credit per whole hour to the volunteer.
+        $first = $this->apiPost("/v2/admin/volunteering/hours/{$logId}/verify", ['action' => 'approve']);
+        $first->assertStatus(200);
+
+        $this->assertSame('approved', DB::table('vol_logs')->where('id', $logId)->value('status'));
+        $this->assertEquals(2, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
+        $this->assertEquals(8.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertSame(1, DB::table('vol_org_transactions')->where('vol_log_id', $logId)->where('type', 'volunteer_payment')->count());
+
+        // A second approval (a retry, or the loser of a concurrent race) must NOT
+        // double-mint. The status guard on the UPDATE returns the same 422 the
+        // pre-check returns and leaves all balances untouched.
+        $second = $this->apiPost("/v2/admin/volunteering/hours/{$logId}/verify", ['action' => 'approve']);
+        $second->assertStatus(422);
+
+        $this->assertEquals(2, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
+        $this->assertEquals(8.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertSame(1, DB::table('vol_org_transactions')->where('vol_log_id', $logId)->where('type', 'volunteer_payment')->count());
     }
 }

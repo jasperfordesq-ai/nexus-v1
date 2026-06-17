@@ -170,7 +170,7 @@ export function OrganisationsPage() {
       <PageMeta title={t('organisations.page_title')} description={t('organisations.page_description')} />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('organisations.breadcrumb_volunteering'), href: '/volunteering' },
+        { label: t('organisations.breadcrumb_volunteering'), href: tenantPath('/volunteering') },
         { label: t('organisations.breadcrumb_organisations') },
       ]} />
 

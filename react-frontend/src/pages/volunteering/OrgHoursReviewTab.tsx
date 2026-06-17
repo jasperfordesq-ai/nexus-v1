@@ -220,7 +220,7 @@ function OrgHoursReviewTab({ orgId, balance, onBalanceChange }: OrgHoursReviewTa
             className="sm:ml-auto"
             startContent={<Wallet className="w-3.5 h-3.5" aria-hidden="true" />}
           >
-            {t('org_wallet_balance')}: {balance} {balance === 1 ? t('hour') : t('hours')}
+            {t('org_wallet_balance')} {balance} {balance === 1 ? t('hour') : t('hours')}
           </Chip>
         </div>
       </GlassCard>

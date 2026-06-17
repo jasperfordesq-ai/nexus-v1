@@ -218,19 +218,19 @@ class VolunteerWellbeingService
         // Build recommendations based on risk indicators
         $recommendations = [];
         if ($shiftTrend === 'declining' || $hoursTrend === 'declining_significantly') {
-            $recommendations[] = 'Consider taking a break or reducing your commitments for a while.';
+            $recommendations[] = __('api.vol_wellbeing_recommendation_reduce_commitments');
         }
         if ($cancellationRate > 30) {
-            $recommendations[] = 'Try committing to fewer shifts that you can reliably attend.';
+            $recommendations[] = __('api.vol_wellbeing_recommendation_fewer_shifts');
         }
         if ($daysSinceLastActivity > 30) {
-            $recommendations[] = 'Start with a small, low-commitment opportunity to ease back in.';
+            $recommendations[] = __('api.vol_wellbeing_recommendation_ease_back');
         }
         if ($upcomingShifts > 7) {
-            $recommendations[] = 'You have many shifts coming up. Make sure to schedule rest days.';
+            $recommendations[] = __('api.vol_wellbeing_recommendation_schedule_rest');
         }
         if ($riskLevel === 'low' && empty($recommendations)) {
-            $recommendations[] = 'You are maintaining a healthy volunteering balance. Keep it up!';
+            $recommendations[] = __('api.vol_wellbeing_recommendation_healthy_balance');
         }
 
         // Persist alert if risk is moderate or higher
@@ -373,7 +373,7 @@ class VolunteerWellbeingService
 
         $allowedActions = ['acknowledged', 'resolved', 'dismissed'];
         if (!in_array($action, $allowedActions, true)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid action. Must be one of: ' . implode(', ', $allowedActions)];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_wellbeing_invalid_action', ['actions' => implode(', ', $allowedActions)])];
             return false;
         }
 
@@ -383,7 +383,7 @@ class VolunteerWellbeingService
             ->first();
 
         if (!$alert) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Alert not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.alert_not_found')];
             return false;
         }
 

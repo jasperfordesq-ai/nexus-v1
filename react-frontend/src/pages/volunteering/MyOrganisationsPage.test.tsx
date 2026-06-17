@@ -63,6 +63,9 @@ const translations: Record<string, string> = {
   hours_abbrev: '{{hours}}h',
   wallet: 'Wallet',
   manage: 'Manage',
+  my_organisations_none: 'No Organisations Yet',
+  my_organisations_load_error: 'Unable to load your organisations. Please try again.',
+  try_again: 'Try Again',
 };
 
 vi.mock('react-i18next', () => ({
@@ -109,5 +112,23 @@ describe('MyOrganisationsPage', () => {
 
     expect(screen.getByText('Owner')).toBeInTheDocument();
     expect(screen.queryByText('owner')).not.toBeInTheDocument();
+  });
+
+  it('shows a retryable error instead of the empty state when the fetch fails', async () => {
+    vi.mocked(api.get).mockResolvedValue({
+      success: false,
+      error: 'boom',
+      code: 'NETWORK_ERROR',
+    });
+
+    render(<MyOrganisationsPage />);
+
+    await waitFor(() =>
+      expect(screen.getByText('Unable to load your organisations. Please try again.')).toBeInTheDocument(),
+    );
+
+    // A failed request must NOT masquerade as "no organisations".
+    expect(screen.queryByText('No Organisations Yet')).not.toBeInTheDocument();
+    expect(screen.getByText('Try Again')).toBeInTheDocument();
   });
 });

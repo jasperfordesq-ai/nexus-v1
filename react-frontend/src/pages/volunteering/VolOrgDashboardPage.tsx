@@ -23,6 +23,8 @@ import Wallet from 'lucide-react/icons/wallet';
 import Settings from 'lucide-react/icons/settings';
 import Building2 from 'lucide-react/icons/building-2';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { Breadcrumbs } from '@/components/navigation';
@@ -65,6 +67,13 @@ const TAB_DEFS: { key: OrgDashTab; icon: typeof LayoutDashboard }[] = [
 
 const ORG_DASH_TABS = TAB_DEFS.map((tab) => tab.key);
 
+// API error codes that mean "you genuinely can't see this org" (vs a transient
+// network/server failure, which should be retryable rather than "Access Denied").
+const ACCESS_ERROR_CODES = new Set(['FORBIDDEN', 'NOT_FOUND', 'FEATURE_DISABLED', 'UNAUTHORIZED']);
+function isAccessError(code?: string): boolean {
+  return !!code && ACCESS_ERROR_CODES.has(code);
+}
+
 function orgStatusColor(status: string): 'success' | 'warning' | 'default' {
   if (status === 'active' || status === 'approved') return 'success';
   if (status === 'pending') return 'warning';
@@ -101,6 +110,7 @@ export default function VolOrgDashboardPage() {
   const [org, setOrg] = useState<OrgDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [accessDenied, setAccessDenied] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   usePageTitle(org ? `${org.name} ${t('dashboard')}` : t('org_dashboard.title'));
@@ -130,6 +140,8 @@ export default function VolOrgDashboardPage() {
     abortRef.current = controller;
 
     setIsLoading(true);
+    setAccessDenied(false);
+    setLoadError(false);
     try {
       // Load org details AND stats in parallel to get balance/autopay
       const [orgRes, statsRes] = await Promise.all([
@@ -139,14 +151,19 @@ export default function VolOrgDashboardPage() {
 
       if (controller.signal.aborted) return;
 
+      // Distinguish a genuine authorization failure (show "Access Denied") from a
+      // transient failure such as a network drop or 5xx (show a retryable error).
+      // Previously ANY failure showed "Access Denied", so a flaky connection looked
+      // like a permanent permissions problem with no way to recover.
       if (!orgRes.success || !orgRes.data) {
-        setAccessDenied(true);
+        if (isAccessError(orgRes.code)) setAccessDenied(true);
+        else setLoadError(true);
         return;
       }
 
       if (!statsRes.success) {
-        // Stats endpoint requires ownership — if it fails, access is denied
-        setAccessDenied(true);
+        if (isAccessError(statsRes.code)) setAccessDenied(true);
+        else setLoadError(true);
         return;
       }
 
@@ -158,7 +175,7 @@ export default function VolOrgDashboardPage() {
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load org', err);
-      setAccessDenied(true);
+      setLoadError(true);
     } finally {
       if (!controller.signal.aborted) setIsLoading(false);
     }
@@ -171,6 +188,41 @@ export default function VolOrgDashboardPage() {
   }, [isAuthenticated, orgId, loadOrg]);
 
   if (isLoading) return <LoadingScreen />;
+
+  if (loadError && !org) {
+    return (
+      <>
+        <PageMeta title={t('org_dashboard.title')} noIndex />
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 py-16 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 flex items-center justify-center mb-4">
+            <AlertTriangle className="w-8 h-8 text-[var(--color-warning)]" aria-hidden="true" />
+          </div>
+          <h2 className="text-xl font-semibold text-theme-primary mb-2">
+            {t('org_dashboard.load_error')}
+          </h2>
+          <p className="text-theme-muted max-w-sm mb-4">
+            {t('org_dashboard.load_error_desc')}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button
+              className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+              startContent={<RefreshCw className="w-4 h-4" />}
+              onPress={() => loadOrg()}
+            >
+              {t('try_again')}
+            </Button>
+            <Button
+              variant="tertiary"
+              startContent={<ArrowLeft className="w-4 h-4" />}
+              onPress={() => navigate(tenantPath('/volunteering'))}
+            >
+              {t('org_dashboard.back_to_volunteering')}
+            </Button>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   if (accessDenied || !org) {
     return (

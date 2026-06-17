@@ -140,7 +140,7 @@ export default function RegisterOrganisationPage() {
       <PageMeta title={t('page_meta.register_organisation.title')} noIndex />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: t('organisations.heading'), href: '/organisations' },
+        { label: t('organisations.heading'), href: tenantPath('/organisations') },
         { label: t('organisations.register_page_title') },
       ]} />
 

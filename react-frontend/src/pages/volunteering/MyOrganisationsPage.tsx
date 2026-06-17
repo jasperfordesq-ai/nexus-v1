@@ -10,12 +10,13 @@
  * API: GET /api/v2/volunteering/my-organisations
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 import Building2 from 'lucide-react/icons/building-2';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import Plus from 'lucide-react/icons/plus';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { Breadcrumbs } from '@/components/navigation';
@@ -54,16 +55,18 @@ export default function MyOrganisationsPage() {
   const { tenantPath } = useTenant();
   const [orgs, setOrgs] = useState<MyOrg[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   usePageTitle(t('my_organisations_title'));
 
-  useEffect(() => {
+  const loadOrgs = useCallback(() => {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
 
     setIsLoading(true);
+    setError(false);
     api.get<unknown>('/v2/volunteering/my-organisations')
       .then((res) => {
         if (controller.signal.aborted) return;
@@ -72,18 +75,26 @@ export default function MyOrganisationsPage() {
           const raw = res.data as { data?: { items?: unknown[] }; items?: unknown[] };
           const items = (raw.data?.items ?? raw.items ?? (Array.isArray(res.data) ? res.data : [])) as MyOrg[];
           setOrgs(items);
+        } else {
+          // A failed request must not masquerade as "no organisations" — surface
+          // a retryable error instead of the empty state.
+          setError(true);
         }
       })
       .catch((err) => {
         if (controller.signal.aborted) return;
         logError('Failed to load my organisations', err);
+        setError(true);
       })
       .finally(() => {
         if (!controller.signal.aborted) setIsLoading(false);
       });
-
-    return () => { abortRef.current?.abort(); };
   }, []);
+
+  useEffect(() => {
+    loadOrgs();
+    return () => { abortRef.current?.abort(); };
+  }, [loadOrgs]);
 
   const managedOrgs = orgs.filter(o => ['owner', 'admin'].includes(o.member_role));
   const pendingOrgs = orgs.filter(o => o.status === 'pending');
@@ -124,6 +135,17 @@ export default function MyOrganisationsPage() {
         <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
+      ) : error ? (
+        <GlassCard className="p-8 text-center" role="alert">
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
+          <p className="text-theme-muted mb-4">{t('my_organisations_load_error')}</p>
+          <Button
+            className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+            onPress={loadOrgs}
+          >
+            {t('try_again')}
+          </Button>
+        </GlassCard>
       ) : managedOrgs.length === 0 && pendingOrgs.length === 0 ? (
         <GlassCard className="p-12 text-center">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-100 to-pink-100 dark:from-rose-900/30 dark:to-pink-900/30 flex items-center justify-center mx-auto mb-4">

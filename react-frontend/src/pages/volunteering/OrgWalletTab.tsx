@@ -322,7 +322,7 @@ export function OrgWalletTab({ orgId, balance, onBalanceChange }: OrgWalletTabPr
 
         {/* Loading */}
         {!error && isLoading && (
-          <div className="space-y-4" role="status" aria-busy="true" aria-label={t('common:loading')}>
+          <div className="space-y-4" role="status" aria-busy="true" aria-label={t('loading')}>
             {[1, 2, 3].map((i) => (
               <CardRowsSkeleton key={i} />
             ))}
@@ -399,7 +399,7 @@ export function OrgWalletTab({ orgId, balance, onBalanceChange }: OrgWalletTabPr
                   variant="tertiary"
                   startContent={
                     isLoadingMore ? (
-                      <div role="status" aria-busy="true" aria-label={t('common:loading')} className="flex justify-center py-4"><Spinner size="sm" /></div>
+                      <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-4"><Spinner size="sm" /></div>
                     ) : (
                       <ChevronDown className="w-4 h-4" aria-hidden="true" />
                     )
@@ -421,7 +421,9 @@ export function OrgWalletTab({ orgId, balance, onBalanceChange }: OrgWalletTabPr
       <Modal
         isOpen={isOpen}
         onOpenChange={(open) => {
-          if (!open) resetDepositForm();
+          // Don't wipe the form mid-submit if the modal is dismissed (e.g. backdrop
+          // click) while a deposit request is still in flight.
+          if (!open && !isDepositing) resetDepositForm();
           onOpenChange();
         }}
         classNames={{

@@ -347,12 +347,23 @@ class AdminVolunteerController extends BaseApiController
 
             $newStatus = $action === 'approve' ? 'approved' : 'declined';
             $paymentOutcome = null; // null | 'paid' | 'no_whole_hours' | 'already_paid' | 'no_org'
+            $alreadyProcessed = false;
 
-            DB::transaction(function () use ($id, $tenantId, $newStatus, $action, $log, &$paymentOutcome) {
-                DB::update(
-                    "UPDATE vol_logs SET status = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+            DB::transaction(function () use ($id, $tenantId, $newStatus, $action, $log, &$paymentOutcome, &$alreadyProcessed) {
+                // Flip status conditional on the log still being pending. The status
+                // pre-check above runs OUTSIDE this transaction, so two concurrent
+                // approvals can both pass it. The row lock taken by this UPDATE
+                // serialises them; the second finds 0 rows affected and aborts
+                // before re-entering the payout branch, preventing a double mint.
+                // Mirrors the idempotency gate in VolunteerService::verifyHours().
+                $affected = DB::update(
+                    "UPDATE vol_logs SET status = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ? AND status = 'pending'",
                     [$newStatus, $id, $tenantId]
                 );
+                if ($affected === 0) {
+                    $alreadyProcessed = true;
+                    return;
+                }
 
                 if ($action !== 'approve') {
                     return;
@@ -430,6 +441,13 @@ class AdminVolunteerController extends BaseApiController
 
                 $paymentOutcome = 'paid';
             });
+
+            // A concurrent/retried request already verified this log between our
+            // pre-check and UPDATE — report the same conflict the pre-check returns,
+            // without minting again or sending a duplicate notification.
+            if ($alreadyProcessed) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.only_pending_can_be_verified'), null, 422);
+            }
 
             // Send hours approved/declined notification after the data mutation.
             // The minting happens inline above (mirrors VolunteerService::verifyHours),

@@ -32,7 +32,9 @@
     "tab_settings": "Ajustes",
     "overview_intro": "This is your organisation's dashboard. Approve people who apply to volunteer, and approve the hours they log — approving hours credits the volunteer automatically, 1 time credit per hour.",
     "autocredit_title": "Volunteers are paid automatically",
-    "autocredit_desc": "When you approve someone's logged hours, the time credits go to their wallet straight away — 1 credit per hour. You don't need to fund anything first."
+    "autocredit_desc": "When you approve someone's logged hours, the time credits go to their wallet straight away — 1 credit per hour. You don't need to fund anything first.",
+    "load_error": "Couldn't load this dashboard",
+    "load_error_desc": "Something went wrong while loading your organisation. Please check your connection and try again."
   },
   "page_title": "Voluntariado",
   "heading": "Voluntariado",
@@ -938,5 +940,6 @@
   "hours_journey_step3_title": "You're credited automatically",
   "hours_journey_step3_desc": "1 time credit per hour is added to your wallet.",
   "applications_empty_cta": "Browse opportunities",
-  "hero_eyebrow": "Volunteer & earn time credits"
+  "hero_eyebrow": "Volunteer & earn time credits",
+  "my_organisations_load_error": "Unable to load your organisations. Please try again."
 }
