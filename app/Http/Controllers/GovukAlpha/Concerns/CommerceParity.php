@@ -6,6 +6,26 @@
 
 namespace App\Http\Controllers\GovukAlpha\Concerns;
 
+use App\Core\TenantContext;
+use App\Models\Course;
+use App\Models\CourseEnrollment;
+use App\Models\MarketplaceListing;
+use App\Models\MarketplaceOffer;
+use App\Models\MarketplaceOrder;
+use App\Services\CourseEnrollmentService;
+use App\Services\CourseProgressService;
+use App\Services\CourseService;
+use App\Services\MarketplaceListingService;
+use App\Services\MarketplaceOfferService;
+use App\Services\MarketplaceOrderService;
+use App\Services\MarketplaceRatingService;
+use App\Services\MarketplaceReportService;
+use App\Services\MarketplaceSellerService;
+use App\Services\MemberPremiumService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+
 /**
  * Marketplace, courses, podcasts, coupons, premium & clubs — accessible (GOV.UK) frontend parity methods.
  *
@@ -14,8 +34,1371 @@ namespace App\Http\Controllers\GovukAlpha\Concerns;
  * $this->allowed, self::asStr). New method names MUST be module-prefixed and
  * unique across AlphaController and every sibling trait. Resolve services via
  * app(SomeService::class) rather than the constructor.
+ *
+ * Calls the SAME services the React API controllers call — never reimplements
+ * money/offer/order/rating/notification logic. Notifications are mirrored by
+ * the underlying services (e.g. MarketplaceOfferService::create sends the
+ * seller email + bell), wrapped there in LocaleContext.
  */
 trait CommerceParity
 {
-    // Parity methods are added here by the build. (Intentionally empty stub.)
+    // =================================================================
+    //  Marketplace — Create / Edit / My Listings
+    // =================================================================
+
+    /** Show the "create a listing" form (seller flow). */
+    public function commerceCreateListingForm(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        return $this->view('accessible-frontend::commerce-listing-form', $this->commerceListingFormData(
+            $tenantSlug,
+            'create',
+            null,
+            route('govuk-alpha.marketplace.store', ['tenantSlug' => $tenantSlug]),
+            self::asStr($request->query('status')) ?: null,
+        ));
+    }
+
+    /** Persist a new marketplace listing. */
+    public function commerceStoreListing(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        [$data, $errors] = $this->commerceListingInput($request);
+        if (!empty($errors)) {
+            return redirect()->route('govuk-alpha.marketplace.create', ['tenantSlug' => $tenantSlug])
+                ->withInput()->with('commerceListingErrors', $errors);
+        }
+
+        $newId = 0;
+        $failure = null;
+        try {
+            MarketplaceSellerService::getOrCreateProfile($userId);
+            $listing = MarketplaceListingService::create($userId, $data);
+            $newId = (int) $listing->id;
+        } catch (\DomainException $e) {
+            $failure = $e->getMessage() === 'SELLER_SUSPENDED'
+                ? __('govuk_alpha_commerce.listing_form.error_suspended')
+                : __('govuk_alpha_commerce.listing_form.error_create');
+        } catch (\InvalidArgumentException $e) {
+            $failure = e($e->getMessage());
+        } catch (\Throwable $e) {
+            report($e);
+            $failure = __('govuk_alpha_commerce.listing_form.error_create');
+        }
+
+        if ($newId > 0) {
+            return redirect()->route('govuk-alpha.marketplace.show', ['tenantSlug' => $tenantSlug, 'id' => $newId]);
+        }
+
+        return redirect()->route('govuk-alpha.marketplace.create', ['tenantSlug' => $tenantSlug])
+            ->withInput()->with('commerceListingErrors', [$failure ?? __('govuk_alpha_commerce.listing_form.error_create')]);
+    }
+
+    /** Show the edit form for one of the member's own listings. */
+    public function commerceEditListingForm(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $listing = $this->commerceOwnedListingOr404($id, $userId);
+
+        return $this->view('accessible-frontend::commerce-listing-form', $this->commerceListingFormData(
+            $tenantSlug,
+            'edit',
+            $listing,
+            route('govuk-alpha.marketplace.update', ['tenantSlug' => $tenantSlug, 'id' => $id]),
+            self::asStr($request->query('status')) ?: null,
+        ));
+    }
+
+    /** Persist edits to one of the member's own listings. */
+    public function commerceUpdateListing(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $listing = $this->commerceOwnedListingOr404($id, $userId);
+
+        [$data, $errors] = $this->commerceListingInput($request);
+        if (!empty($errors)) {
+            return redirect()->route('govuk-alpha.marketplace.edit', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withInput()->with('commerceListingErrors', $errors);
+        }
+
+        $ok = false;
+        try {
+            MarketplaceListingService::update($listing, $data);
+            $ok = true;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($ok) {
+            return redirect()->route('govuk-alpha.marketplace.show', ['tenantSlug' => $tenantSlug, 'id' => $id]);
+        }
+
+        return redirect()->route('govuk-alpha.marketplace.edit', ['tenantSlug' => $tenantSlug, 'id' => $id])
+            ->withInput()->with('commerceListingErrors', [__('govuk_alpha_commerce.listing_form.error_update')]);
+    }
+
+    /** Soft-remove one of the member's own listings. */
+    public function commerceDeleteListing(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $listing = $this->commerceOwnedListingOr404($id, $userId);
+
+        $ok = false;
+        try {
+            MarketplaceListingService::remove($listing);
+            $ok = true;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.marketplace.mine', ['tenantSlug' => $tenantSlug, 'status' => $ok ? 'deleted' : 'delete-failed']);
+    }
+
+    /** Renew (re-activate + extend) one of the member's own listings. */
+    public function commerceRenewListing(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $listing = $this->commerceOwnedListingOr404($id, $userId);
+
+        $ok = false;
+        try {
+            MarketplaceListingService::renew($listing);
+            $ok = true;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.marketplace.mine', ['tenantSlug' => $tenantSlug, 'status' => $ok ? 'renewed' : 'renew-failed']);
+    }
+
+    /** Seller dashboard: the member's own listings grouped by status. */
+    public function commerceMyListings(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tab = $this->allowed(self::asStr($request->query('tab')), ['active', 'draft', 'sold', 'expired'], 'active');
+
+        $items = [];
+        $counts = ['active' => 0, 'draft' => 0, 'sold' => 0, 'expired' => 0];
+        try {
+            // Fetch all the member's listings (own listings show every status).
+            $all = MarketplaceListingService::getAll([
+                'user_id' => $userId,
+                'limit' => 100,
+                'current_user_id' => $userId,
+            ])['items'] ?? [];
+            foreach ($all as $row) {
+                $row = is_array($row) ? $row : (array) $row;
+                $status = (string) ($row['status'] ?? '');
+                if (array_key_exists($status, $counts)) {
+                    $counts[$status]++;
+                }
+                if ($status === $tab) {
+                    $items[] = $row;
+                }
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::commerce-my-listings', [
+            'title' => __('govuk_alpha_commerce.my_listings.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'commerceActiveTab' => 'mine',
+            'listings' => $items,
+            'tab' => $tab,
+            'counts' => $counts,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    // =================================================================
+    //  Marketplace — Save / Collections / Free items / Seller profile / Category
+    // =================================================================
+
+    /** Save (bookmark) a listing. */
+    public function commerceSaveListing(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        try {
+            // 404 a cross-tenant / missing id (HasTenantScope on the model).
+            MarketplaceListing::findOrFail($id);
+            MarketplaceListingService::saveListing($userId, $id);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            abort(404);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.marketplace.show', ['tenantSlug' => $tenantSlug, 'id' => $id])
+            ->with('commerce_status', 'saved');
+    }
+
+    /** Unsave (remove bookmark) a listing. */
+    public function commerceUnsaveListing(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        try {
+            MarketplaceListingService::unsaveListing($userId, $id);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $back = self::asStr($request->input('redirect_to'));
+        if ($back === 'saved') {
+            return redirect()->route('govuk-alpha.marketplace.saved', ['tenantSlug' => $tenantSlug])
+                ->with('commerce_status', 'unsaved');
+        }
+
+        return redirect()->route('govuk-alpha.marketplace.show', ['tenantSlug' => $tenantSlug, 'id' => $id])
+            ->with('commerce_status', 'unsaved');
+    }
+
+    /** Saved / favourite listings collection. */
+    public function commerceSavedListings(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $items = [];
+        try {
+            $items = MarketplaceListingService::getSavedListings($userId, 50)['items'] ?? [];
+            $items = array_map(static fn ($i) => is_array($i) ? $i : (array) $i, $items);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::commerce-saved', [
+            'title' => __('govuk_alpha_commerce.saved.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'commerceActiveTab' => 'saved',
+            'listings' => $items,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Free items: marketplace filtered to free (price_type=free) listings. */
+    public function commerceFreeItems(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $items = [];
+        try {
+            $items = MarketplaceListingService::getAll([
+                'limit' => 50,
+                'price_type' => 'free',
+                'current_user_id' => $userId,
+            ])['items'] ?? [];
+            $items = array_map(static fn ($i) => is_array($i) ? $i : (array) $i, $items);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::commerce-free-items', [
+            'title' => __('govuk_alpha_commerce.free_items.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'commerceActiveTab' => 'free',
+            'listings' => $items,
+        ]);
+    }
+
+    /** A seller's public profile: their info + active listings. */
+    public function commerceSellerProfile(Request $request, string $tenantSlug, int $sellerId): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Seller must belong to this tenant.
+        $seller = \Illuminate\Support\Facades\DB::table('users')
+            ->where('id', $sellerId)
+            ->where('tenant_id', TenantContext::getId())
+            ->select(['id', 'first_name', 'last_name', 'name', 'avatar_url', 'is_verified', 'created_at'])
+            ->first();
+        abort_if($seller === null, 404);
+
+        $items = [];
+        $rating = null;
+        try {
+            $items = MarketplaceListingService::getAll([
+                'user_id' => $sellerId,
+                'status' => 'active',
+                'limit' => 50,
+                'current_user_id' => $userId,
+            ])['items'] ?? [];
+            $items = array_map(static fn ($i) => is_array($i) ? $i : (array) $i, $items);
+            // Aggregate rating columns live on the seller profile (keyed by user_id).
+            $profile = MarketplaceSellerService::getByUserId($sellerId);
+            if ($profile !== null) {
+                $rating = [
+                    'avg_rating' => (float) ($profile->avg_rating ?? 0),
+                    'total_ratings' => (int) ($profile->total_ratings ?? 0),
+                    'total_sales' => (int) ($profile->total_sales ?? 0),
+                ];
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $name = trim((string) ($seller->first_name ?? '') . ' ' . (string) ($seller->last_name ?? ''));
+        if ($name === '') {
+            $name = (string) ($seller->name ?? '');
+        }
+
+        return $this->view('accessible-frontend::commerce-seller', [
+            'title' => $name !== '' ? $name : __('govuk_alpha_commerce.seller.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'sellerName' => $name,
+            'sellerAvatar' => self::asStr($seller->avatar_url ?? ''),
+            'sellerVerified' => (bool) ($seller->is_verified ?? false),
+            'sellerSince' => isset($seller->created_at) ? (string) $seller->created_at : '',
+            'sellerRating' => is_array($rating) ? $rating : null,
+            'listings' => $items,
+        ]);
+    }
+
+    // =================================================================
+    //  Marketplace — Buy now / Make offer / Report
+    // =================================================================
+
+    /** Buy-now confirmation page (for fixed-price money listings). */
+    public function commerceBuyForm(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $item = $this->commercePurchasableOr404($id, $userId);
+
+        return $this->view('accessible-frontend::commerce-buy', [
+            'title' => __('govuk_alpha_commerce.buy.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'item' => $item,
+        ]);
+    }
+
+    /** Place a direct purchase order (creates a pending-payment order). */
+    public function commerceStoreBuy(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $this->commercePurchasableOr404($id, $userId);
+
+        $quantity = max(1, (int) self::asStr($request->input('quantity', '1')));
+        $deliveryNotes = trim(self::asStr($request->input('delivery_notes')));
+        $data = ['quantity' => $quantity];
+        if ($deliveryNotes !== '') {
+            $data['delivery_notes'] = $deliveryNotes;
+        }
+
+        $error = null;
+        try {
+            MarketplaceOrderService::createDirectPurchase($userId, $id, $data);
+        } catch (\InvalidArgumentException $e) {
+            $error = e($e->getMessage());
+        } catch (\Throwable $e) {
+            report($e);
+            $error = __('govuk_alpha_commerce.buy.error_generic');
+        }
+
+        if ($error !== null) {
+            return redirect()->route('govuk-alpha.marketplace.buy', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->with('commerceBuyError', $error);
+        }
+
+        return redirect()->route('govuk-alpha.marketplace.orders.buyer', ['tenantSlug' => $tenantSlug, 'status' => 'ordered']);
+    }
+
+    /** Make-an-offer form (for negotiable listings). */
+    public function commerceOfferForm(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $item = null;
+        try {
+            $item = MarketplaceListingService::getById($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($item === null, 404);
+        // Cannot offer on your own listing.
+        abort_if((bool) ($item['is_own'] ?? false), 403);
+
+        return $this->view('accessible-frontend::commerce-offer', [
+            'title' => __('govuk_alpha_commerce.offer.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'item' => $item,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Submit an offer on a listing. */
+    public function commerceStoreOffer(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $amount = (float) self::asStr($request->input('amount'));
+        $message = trim(self::asStr($request->input('message')));
+
+        if ($amount <= 0) {
+            return redirect()->route('govuk-alpha.marketplace.offer', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withInput()->with('commerceOfferErrors', [__('govuk_alpha_commerce.offer.error_amount')]);
+        }
+
+        $error = null;
+        try {
+            $data = ['amount' => $amount];
+            if ($message !== '') {
+                $data['message'] = $message;
+            }
+            // MarketplaceOfferService::create resolves the listing tenant + notifies the seller.
+            MarketplaceOfferService::create($userId, $id, $data);
+        } catch (\InvalidArgumentException $e) {
+            $error = e($e->getMessage());
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            abort(404);
+        } catch (\Throwable $e) {
+            report($e);
+            $error = __('govuk_alpha_commerce.offer.error_generic');
+        }
+
+        if ($error !== null) {
+            return redirect()->route('govuk-alpha.marketplace.offer', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withInput()->with('commerceOfferErrors', [$error]);
+        }
+
+        return redirect()->route('govuk-alpha.marketplace.offers', ['tenantSlug' => $tenantSlug, 'status' => 'offer-sent']);
+    }
+
+    /** Report a listing (content moderation). */
+    public function commerceReportForm(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $item = null;
+        try {
+            $item = MarketplaceListingService::getById($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($item === null, 404);
+
+        return $this->view('accessible-frontend::commerce-report', [
+            'title' => __('govuk_alpha_commerce.report.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'item' => $item,
+            'reasons' => self::COMMERCE_REPORT_REASONS,
+        ]);
+    }
+
+    /** Submit a listing report. */
+    public function commerceStoreReport(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $reason = $this->allowed(self::asStr($request->input('reason')), self::COMMERCE_REPORT_REASONS, '');
+        $description = trim(self::asStr($request->input('description')));
+
+        $errors = [];
+        if ($reason === '') {
+            $errors['reason'] = __('govuk_alpha_commerce.report.error_reason');
+        }
+        if ($description === '') {
+            $errors['description'] = __('govuk_alpha_commerce.report.error_description');
+        }
+        if (!empty($errors)) {
+            return redirect()->route('govuk-alpha.marketplace.report', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withInput()->withErrors($errors);
+        }
+
+        $ok = false;
+        try {
+            MarketplaceReportService::createReport($userId, $id, [
+                'reason' => $reason,
+                'description' => $description,
+            ]);
+            $ok = true;
+        } catch (\InvalidArgumentException $e) {
+            return redirect()->route('govuk-alpha.marketplace.report', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withInput()->withErrors(['description' => e($e->getMessage())]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.marketplace.show', ['tenantSlug' => $tenantSlug, 'id' => $id])
+            ->with('commerce_status', $ok ? 'reported' : 'report-failed');
+    }
+
+    // =================================================================
+    //  Marketplace — Offers dashboard
+    // =================================================================
+
+    /** My offers dashboard: sent (as buyer) and received (as seller). */
+    public function commerceMyOffers(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tab = $this->allowed(self::asStr($request->query('tab')), ['received', 'sent'], 'received');
+
+        $offers = [];
+        try {
+            if ($tab === 'sent') {
+                $offers = MarketplaceOfferService::getSentOffers($userId, 50)['items'] ?? [];
+            } else {
+                $offers = MarketplaceOfferService::getReceivedOffers($userId, 50)['items'] ?? [];
+            }
+            $offers = array_map(static fn ($o) => is_array($o) ? $o : (array) $o, $offers);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::commerce-offers', [
+            'title' => __('govuk_alpha_commerce.offers.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'commerceActiveTab' => 'offers',
+            'tab' => $tab,
+            'offers' => $offers,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Seller accepts a received offer. */
+    public function commerceAcceptOffer(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        return $this->commerceOfferAction($tenantSlug, $id, 'accept');
+    }
+
+    /** Seller declines a received offer. */
+    public function commerceDeclineOffer(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        return $this->commerceOfferAction($tenantSlug, $id, 'decline');
+    }
+
+    /** Buyer withdraws a sent offer. */
+    public function commerceWithdrawOffer(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        return $this->commerceOfferAction($tenantSlug, $id, 'withdraw');
+    }
+
+    // =================================================================
+    //  Marketplace — Orders dashboards
+    // =================================================================
+
+    /** Buyer's purchase orders. */
+    public function commerceBuyerOrders(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tab = $this->allowed(self::asStr($request->query('tab')), ['all', 'active', 'completed', 'cancelled'], 'all');
+        $statusFilter = $tab === 'all' ? null : $tab;
+
+        $orders = [];
+        try {
+            $orders = MarketplaceOrderService::getBuyerOrders($userId, $statusFilter, 50)['items'] ?? [];
+            $orders = array_map(static fn ($o) => is_array($o) ? $o : (array) $o, $orders);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::commerce-orders', [
+            'title' => __('govuk_alpha_commerce.orders_buyer.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'commerceActiveTab' => 'orders',
+            'orderRole' => 'buyer',
+            'tab' => $tab,
+            'orders' => $orders,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Seller's incoming sales orders. */
+    public function commerceSellerOrders(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tab = $this->allowed(self::asStr($request->query('tab')), ['all', 'paid', 'shipped', 'completed'], 'all');
+        $statusFilter = $tab === 'all' ? null : $tab;
+
+        $orders = [];
+        try {
+            $orders = MarketplaceOrderService::getSellerOrders($userId, $statusFilter, 50)['items'] ?? [];
+            $orders = array_map(static fn ($o) => is_array($o) ? $o : (array) $o, $orders);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::commerce-orders', [
+            'title' => __('govuk_alpha_commerce.orders_seller.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'commerceActiveTab' => 'sales',
+            'orderRole' => 'seller',
+            'tab' => $tab,
+            'orders' => $orders,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Seller marks an order as shipped. */
+    public function commerceShipOrder(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $order = $this->commerceOrderForRoleOr404($id, $userId, 'seller');
+
+        $status = 'ship-failed';
+        try {
+            $tracking = trim(self::asStr($request->input('tracking_number')));
+            $shipData = [];
+            if ($tracking !== '') {
+                $shipData['tracking_number'] = $tracking;
+            }
+            MarketplaceOrderService::markShipped($order, $shipData);
+            $status = 'shipped';
+        } catch (\InvalidArgumentException $e) {
+            $status = 'ship-failed';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.marketplace.orders.seller', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    /** Buyer confirms delivery / receipt. */
+    public function commerceConfirmOrder(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $order = $this->commerceOrderForRoleOr404($id, $userId, 'buyer');
+
+        $status = 'confirm-failed';
+        try {
+            MarketplaceOrderService::confirmDelivery($order);
+            $status = 'confirmed';
+        } catch (\InvalidArgumentException $e) {
+            $status = 'confirm-failed';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.marketplace.orders.buyer', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    /** Buyer or seller cancels an order. */
+    public function commerceCancelOrder(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $order = $this->commerceOrderForRoleOr404($id, $userId, 'either');
+        $isBuyer = (int) $order->buyer_id === $userId;
+
+        $reason = trim(self::asStr($request->input('reason')));
+        if ($reason === '') {
+            $reason = __('govuk_alpha_commerce.orders.cancel_default_reason');
+        }
+
+        $status = 'cancel-failed';
+        try {
+            MarketplaceOrderService::cancel($order, $reason);
+            $status = 'cancelled';
+        } catch (\InvalidArgumentException $e) {
+            $status = 'cancel-failed';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $route = $isBuyer ? 'govuk-alpha.marketplace.orders.buyer' : 'govuk-alpha.marketplace.orders.seller';
+        return redirect()->route($route, ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    /** Buyer or seller rates a completed order. */
+    public function commerceRateOrder(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $order = $this->commerceOrderForRoleOr404($id, $userId, 'either');
+        $role = (int) $order->buyer_id === $userId ? 'buyer' : 'seller';
+        $isBuyer = $role === 'buyer';
+
+        $rating = (int) self::asStr($request->input('rating'));
+        $comment = trim(self::asStr($request->input('comment')));
+
+        $route = $isBuyer ? 'govuk-alpha.marketplace.orders.buyer' : 'govuk-alpha.marketplace.orders.seller';
+
+        if ($rating < 1 || $rating > 5) {
+            return redirect()->route($route, ['tenantSlug' => $tenantSlug, 'status' => 'rate-invalid']);
+        }
+
+        $status = 'rate-failed';
+        try {
+            $data = ['rating' => $rating];
+            if ($comment !== '') {
+                $data['comment'] = $comment;
+            }
+            MarketplaceRatingService::rateOrder($id, $userId, $role, $data, TenantContext::getId());
+            $status = 'rated';
+        } catch (\InvalidArgumentException $e) {
+            $status = 'rate-failed';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route($route, ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    // =================================================================
+    //  Courses — My Learning + Lesson player
+    // =================================================================
+
+    /** Learner dashboard: courses the member is enrolled in. */
+    public function commerceMyLearning(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $enrollments = [];
+        try {
+            $enrollments = CourseEnrollmentService::forUser($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::commerce-my-learning', [
+            'title' => __('govuk_alpha_commerce.my_learning.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'enrollments' => is_array($enrollments) ? $enrollments : [],
+        ]);
+    }
+
+    /** Course lesson player / learn view. Enrolment required. */
+    public function commerceCourseLearn(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $course = null;
+        try {
+            $course = CourseService::findById($id);
+            if ($course !== null && (int) $course->tenant_id !== TenantContext::getId()) {
+                $course = null;
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($course === null, 404);
+
+        // Must be enrolled to access the player.
+        $enrollment = CourseEnrollmentService::find($id, $userId);
+        if ($enrollment === null) {
+            return redirect()->route('govuk-alpha.courses.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'enrol-required']);
+        }
+
+        // Build the section/lesson outline + per-lesson completion + availability.
+        $completedLessonIds = \Illuminate\Support\Facades\DB::table('course_lesson_progress')
+            ->where('enrollment_id', $enrollment->id)
+            ->where('status', 'completed')
+            ->pluck('lesson_id')
+            ->flip()
+            ->all();
+
+        $sections = [];
+        $currentLesson = null;
+        $requestedLessonId = (int) self::asStr($request->query('lesson'));
+
+        foreach ($course->sections->sortBy('position') as $section) {
+            $sectionLessons = [];
+            foreach ($section->lessons->sortBy('position') as $lesson) {
+                $availability = \App\Services\CourseLessonService::availability($lesson, $enrollment->enrolled_at);
+                $available = (bool) ($availability['available'] ?? true);
+                $entry = [
+                    'id' => (int) $lesson->id,
+                    'title' => (string) $lesson->title,
+                    'content_type' => (string) $lesson->content_type,
+                    'is_completed' => isset($completedLessonIds[$lesson->id]),
+                    'available' => $available,
+                ];
+                $sectionLessons[] = $entry;
+
+                if ($available) {
+                    if ($requestedLessonId > 0 && (int) $lesson->id === $requestedLessonId) {
+                        $currentLesson = $this->commerceLessonPayload($lesson, $entry);
+                    } elseif ($currentLesson === null && $requestedLessonId === 0 && !$entry['is_completed']) {
+                        $currentLesson = $this->commerceLessonPayload($lesson, $entry);
+                    }
+                }
+            }
+            $sections[] = [
+                'id' => (int) $section->id,
+                'title' => (string) $section->title,
+                'lessons' => $sectionLessons,
+            ];
+        }
+
+        // Fall back to the first available lesson if nothing matched.
+        if ($currentLesson === null) {
+            foreach ($course->sections->sortBy('position') as $section) {
+                foreach ($section->lessons->sortBy('position') as $lesson) {
+                    $availability = \App\Services\CourseLessonService::availability($lesson, $enrollment->enrolled_at);
+                    if ((bool) ($availability['available'] ?? true)) {
+                        $currentLesson = $this->commerceLessonPayload($lesson, [
+                            'id' => (int) $lesson->id,
+                            'is_completed' => isset($completedLessonIds[$lesson->id]),
+                        ]);
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        return $this->view('accessible-frontend::commerce-course-learn', [
+            'title' => (string) ($course->title ?? '') ?: __('govuk_alpha_commerce.learn.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'course' => ['id' => (int) $course->id, 'title' => (string) $course->title],
+            'sections' => $sections,
+            'currentLesson' => $currentLesson,
+            'progressPercent' => (float) ($enrollment->progress_percent ?? 0),
+            'isCompleted' => ($enrollment->status ?? '') === 'completed',
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Mark a lesson complete (advances course progress). */
+    public function commerceCompleteLesson(Request $request, string $tenantSlug, int $id, int $lessonId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $course = null;
+        try {
+            $course = CourseService::findById($id);
+            if ($course !== null && (int) $course->tenant_id !== TenantContext::getId()) {
+                $course = null;
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($course === null, 404);
+
+        $enrollment = CourseEnrollmentService::find($id, $userId);
+        if ($enrollment === null) {
+            return redirect()->route('govuk-alpha.courses.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'enrol-required']);
+        }
+
+        // The lesson must belong to this course (defence-in-depth).
+        $lessonBelongs = \Illuminate\Support\Facades\DB::table('course_lessons')
+            ->where('id', $lessonId)
+            ->where('course_id', $id)
+            ->exists();
+        abort_unless($lessonBelongs, 404);
+
+        $completed = false;
+        try {
+            $result = CourseProgressService::completeLesson($enrollment, $lessonId, $userId);
+            $completed = (bool) ($result['course_completed'] ?? false);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.courses.learn', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $completed ? 'course-completed' : 'lesson-completed',
+        ]);
+    }
+
+    // =================================================================
+    //  Premium — Manage subscription / cancel / billing portal
+    // =================================================================
+
+    /** Manage subscription page: current tier, status, billing actions. */
+    public function commercePremiumManage(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('member_premium'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $subscription = null;
+        try {
+            $subscription = MemberPremiumService::getMemberSubscription($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // No subscription → send them to the pricing page.
+        if ($subscription === null) {
+            return redirect()->route('govuk-alpha.premium.index', ['tenantSlug' => $tenantSlug, 'status' => 'no-subscription']);
+        }
+
+        return $this->view('accessible-frontend::commerce-premium-manage', [
+            'title' => __('govuk_alpha_commerce.premium_manage.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'subscription' => $subscription,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Cancel the member's subscription at period end. */
+    public function commercePremiumCancel(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('member_premium'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $ok = false;
+        try {
+            $ok = MemberPremiumService::cancel($userId, true);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.premium.manage', ['tenantSlug' => $tenantSlug, 'status' => $ok ? 'cancel-scheduled' : 'cancel-failed']);
+    }
+
+    /** Redirect to the Stripe billing portal to manage payment methods. */
+    public function commercePremiumPortal(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('member_premium'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $returnUrl = route('govuk-alpha.premium.manage', ['tenantSlug' => $tenantSlug]);
+        try {
+            $session = MemberPremiumService::createBillingPortalSession($userId, $returnUrl);
+            $url = self::asStr($session['portal_url'] ?? '');
+            if ($url !== '') {
+                return redirect()->away($url);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.premium.manage', ['tenantSlug' => $tenantSlug, 'status' => 'portal-failed']);
+    }
+
+    // =================================================================
+    //  Commerce private helpers (prefixed; do not collide with siblings)
+    // =================================================================
+
+    /** Marketplace report reasons — mirrors the API validation `in:` list. */
+    private const COMMERCE_REPORT_REASONS = [
+        'counterfeit', 'illegal', 'unsafe', 'misleading', 'discrimination', 'ip_violation', 'other',
+    ];
+
+    /** Marketplace listing price types — mirrors the enum. */
+    private const COMMERCE_PRICE_TYPES = ['fixed', 'negotiable', 'free', 'contact'];
+
+    /** Marketplace condition values — mirrors the enum. */
+    private const COMMERCE_CONDITIONS = ['new', 'like_new', 'good', 'fair', 'poor'];
+
+    /** Marketplace delivery methods — mirrors the enum. */
+    private const COMMERCE_DELIVERY_METHODS = ['pickup', 'shipping', 'both'];
+
+    /**
+     * Fetch one of the member's own listings or 404. HasTenantScope on the model
+     * makes a cross-tenant id resolve to ModelNotFound (→ 404); a different owner
+     * in the same tenant returns 403.
+     */
+    private function commerceOwnedListingOr404(int $id, int $userId): MarketplaceListing
+    {
+        try {
+            $listing = MarketplaceListing::findOrFail($id);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            abort(404);
+        }
+        abort_unless((int) $listing->user_id === $userId, 403);
+        return $listing;
+    }
+
+    /** Fetch a purchasable (fixed-price money) listing for buying, or abort. */
+    private function commercePurchasableOr404(int $id, int $userId): array
+    {
+        $item = null;
+        try {
+            $item = MarketplaceListingService::getById($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($item === null, 404);
+        // Cannot buy your own listing.
+        abort_if((bool) ($item['is_own'] ?? false), 403);
+        // Only money-priced, active, fixed listings are buyable here.
+        abort_unless((string) ($item['status'] ?? '') === 'active', 404);
+        $priceType = (string) ($item['price_type'] ?? '');
+        abort_unless(in_array($priceType, ['fixed'], true) && (float) ($item['price'] ?? 0) > 0, 404);
+        return $item;
+    }
+
+    /**
+     * Fetch an order the member participates in (buyer / seller / either) or abort.
+     * HasTenantScope makes cross-tenant ids 404; a non-participant gets 403.
+     */
+    private function commerceOrderForRoleOr404(int $id, int $userId, string $role): MarketplaceOrder
+    {
+        try {
+            $order = MarketplaceOrder::findOrFail($id);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            abort(404);
+        }
+
+        $isBuyer = (int) $order->buyer_id === $userId;
+        $isSeller = (int) $order->seller_id === $userId;
+
+        if ($role === 'buyer') {
+            abort_unless($isBuyer, 403);
+        } elseif ($role === 'seller') {
+            abort_unless($isSeller, 403);
+        } else {
+            abort_unless($isBuyer || $isSeller, 403);
+        }
+
+        return $order;
+    }
+
+    /**
+     * Shared offer action handler. Cross-tenant offer ids 404; the offer service
+     * enforces the seller/buyer relationship and notifies the counterparty.
+     */
+    private function commerceOfferAction(string $tenantSlug, int $id, string $action): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        try {
+            $offer = MarketplaceOffer::findOrFail($id);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            abort(404);
+        }
+
+        // Authorise: accept/decline are seller-only; withdraw is buyer-only.
+        if ($action === 'withdraw') {
+            abort_unless((int) $offer->buyer_id === $userId, 403);
+        } else {
+            abort_unless((int) $offer->seller_id === $userId, 403);
+        }
+
+        $status = $action . '-failed';
+        try {
+            if ($action === 'accept') {
+                MarketplaceOfferService::accept($offer, $userId);
+                $status = 'accepted';
+            } elseif ($action === 'decline') {
+                MarketplaceOfferService::decline($offer, $userId);
+                $status = 'declined';
+            } else {
+                MarketplaceOfferService::withdraw($offer, $userId);
+                $status = 'withdrawn';
+            }
+        } catch (\InvalidArgumentException $e) {
+            $status = $action . '-failed';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $tab = $action === 'withdraw' ? 'sent' : 'received';
+        return redirect()->route('govuk-alpha.marketplace.offers', ['tenantSlug' => $tenantSlug, 'tab' => $tab, 'status' => $status]);
+    }
+
+    /** Build a single lesson payload for the player view. */
+    private function commerceLessonPayload(\App\Models\CourseLesson $lesson, array $entry): array
+    {
+        $video = \App\Services\CourseLessonService::normalizeMediaUrl($lesson->video_url);
+        $embed = \App\Services\CourseLessonService::normalizeMediaUrl($lesson->embed_url);
+        $attachment = \App\Services\CourseLessonService::normalizeMediaUrl($lesson->attachment_url);
+
+        return [
+            'id' => (int) $lesson->id,
+            'title' => (string) $lesson->title,
+            'content_type' => (string) $lesson->content_type,
+            'body' => (string) ($lesson->body ?? ''),
+            'video_url' => is_string($video) ? $video : '',
+            'embed_url' => is_string($embed) ? $embed : '',
+            'attachment_url' => is_string($attachment) ? $attachment : '',
+            'is_completed' => (bool) ($entry['is_completed'] ?? false),
+        ];
+    }
+
+    /**
+     * Parse + lightly validate the listing form input.
+     *
+     * @return array{0: array<string,mixed>, 1: array<int,string>} [data, errors]
+     */
+    private function commerceListingInput(Request $request): array
+    {
+        $errors = [];
+
+        $title = trim(self::asStr($request->input('title')));
+        $description = trim(self::asStr($request->input('description')));
+        $priceType = $this->allowed(self::asStr($request->input('price_type')), self::COMMERCE_PRICE_TYPES, 'fixed');
+
+        if ($title === '') {
+            $errors[] = __('govuk_alpha_commerce.listing_form.error_title');
+        }
+        if ($description === '') {
+            $errors[] = __('govuk_alpha_commerce.listing_form.error_description');
+        }
+
+        $price = $request->input('price');
+        $timeCredit = $request->input('time_credit_price');
+
+        $data = [
+            'title' => mb_substr($title, 0, 200),
+            'description' => mb_substr($description, 0, 10000),
+            'price_type' => $priceType,
+            'status' => 'active',
+        ];
+
+        $tagline = trim(self::asStr($request->input('tagline')));
+        if ($tagline !== '') {
+            $data['tagline'] = mb_substr($tagline, 0, 300);
+        }
+
+        if ($priceType === 'free') {
+            $data['price'] = null;
+            $data['time_credit_price'] = null;
+        } else {
+            if ($price !== null && self::asStr($price) !== '' && is_numeric(self::asStr($price))) {
+                $data['price'] = max(0, (float) self::asStr($price));
+                $data['price_currency'] = mb_substr(strtoupper(trim(self::asStr($request->input('price_currency', 'EUR')))) ?: 'EUR', 0, 3);
+            }
+            if ($timeCredit !== null && self::asStr($timeCredit) !== '' && is_numeric(self::asStr($timeCredit))) {
+                $data['time_credit_price'] = max(0, (float) self::asStr($timeCredit));
+            }
+            // A priced listing must carry a money price or a time-credit price.
+            if ($priceType === 'fixed' && empty($data['price']) && empty($data['time_credit_price'])) {
+                $errors[] = __('govuk_alpha_commerce.listing_form.error_price');
+            }
+        }
+
+        $condition = $this->allowed(self::asStr($request->input('condition')), self::COMMERCE_CONDITIONS, '');
+        if ($condition !== '') {
+            $data['condition'] = $condition;
+        }
+        $delivery = $this->allowed(self::asStr($request->input('delivery_method')), self::COMMERCE_DELIVERY_METHODS, 'pickup');
+        $data['delivery_method'] = $delivery;
+
+        $categoryId = (int) self::asStr($request->input('category_id'));
+        if ($categoryId > 0) {
+            $data['category_id'] = $categoryId;
+        }
+
+        $location = trim(self::asStr($request->input('location')));
+        if ($location !== '') {
+            $data['location'] = mb_substr($location, 0, 255);
+        }
+
+        $quantity = (int) self::asStr($request->input('quantity', '1'));
+        if ($quantity >= 1) {
+            $data['quantity'] = $quantity;
+        }
+
+        return [$data, $errors];
+    }
+
+    /** Shared view-data for the create/edit listing form. */
+    private function commerceListingFormData(string $tenantSlug, string $mode, ?MarketplaceListing $listing, string $action, ?string $status): array
+    {
+        $categories = [];
+        try {
+            $rawCats = MarketplaceListingService::getCategories();
+            $categories = is_array($rawCats) ? array_map(static fn ($c) => is_array($c) ? $c : (array) $c, $rawCats) : [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return [
+            'title' => $mode === 'edit'
+                ? __('govuk_alpha_commerce.listing_form.title_edit')
+                : __('govuk_alpha_commerce.listing_form.title_create'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'commerceActiveTab' => 'mine',
+            'mode' => $mode,
+            'formAction' => $action,
+            'categories' => $categories,
+            'priceTypes' => self::COMMERCE_PRICE_TYPES,
+            'conditions' => self::COMMERCE_CONDITIONS,
+            'deliveryMethods' => self::COMMERCE_DELIVERY_METHODS,
+            'listing' => $listing !== null ? [
+                'id' => (int) $listing->id,
+                'title' => (string) $listing->title,
+                'description' => (string) $listing->description,
+                'tagline' => (string) ($listing->tagline ?? ''),
+                'price' => $listing->price,
+                'price_currency' => (string) ($listing->price_currency ?? 'EUR'),
+                'price_type' => (string) ($listing->price_type ?? 'fixed'),
+                'time_credit_price' => $listing->time_credit_price,
+                'condition' => (string) ($listing->condition ?? ''),
+                'delivery_method' => (string) ($listing->delivery_method ?? 'pickup'),
+                'category_id' => $listing->category_id,
+                'location' => (string) ($listing->location ?? ''),
+                'quantity' => (int) ($listing->quantity ?? 1),
+            ] : null,
+            'status' => $status,
+        ];
+    }
 }

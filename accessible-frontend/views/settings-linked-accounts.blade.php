@@ -1,0 +1,223 @@
+{{-- Copyright © 2024–2026 Jasper Ford --}}
+{{-- SPDX-License-Identifier: AGPL-3.0-or-later --}}
+{{-- Author: Jasper Ford --}}
+{{-- See NOTICE file for attribution and acknowledgements. --}}
+@extends('accessible-frontend::layout')
+
+@section('content')
+    @php
+        $successStates = ['link-requested', 'link-approved', 'link-revoked', 'link-permissions-saved'];
+        $errorStates = [
+            'link-email-invalid', 'link-user-not-found', 'link-self', 'link-exists',
+            'link-max', 'link-failed', 'appearance-invalid', 'appearance-failed',
+        ];
+        $linkTypes = $linkTypes ?? [];
+        $permissionKeys = $permissionKeys ?? [];
+        $children = $children ?? [];
+        $parents = $parents ?? [];
+    @endphp
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <a class="govuk-back-link" href="{{ route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_settings.common.back_to_settings') }}</a>
+
+            @if (in_array($status, $successStates, true))
+                <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="linked-status-title">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="linked-status-title">{{ __('govuk_alpha_settings.common.success_title') }}</h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-notification-banner__heading">{{ __('govuk_alpha_settings.states.' . $status) }}</p>
+                    </div>
+                </div>
+            @elseif (in_array($status, $errorStates, true))
+                <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+                    <div role="alert">
+                        <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_settings.common.error_title') }}</h2>
+                        <div class="govuk-error-summary__body">
+                            <ul class="govuk-list govuk-error-summary__list">
+                                <li><a href="#request">{{ __('govuk_alpha_settings.states.' . $status) }}</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <span class="govuk-caption-xl">{{ __('govuk_alpha_settings.linked.caption') }}</span>
+            <h1 class="govuk-heading-xl">{{ __('govuk_alpha_settings.linked.title') }}</h1>
+            <p class="govuk-body-l">{{ __('govuk_alpha_settings.linked.description') }}</p>
+
+            {{-- Accounts that manage me (parents) — approve incoming first --}}
+            <section aria-labelledby="parents-heading" id="parents">
+                <h2 class="govuk-heading-l" id="parents-heading">{{ __('govuk_alpha_settings.linked.parents_heading') }}</h2>
+                <p class="govuk-body">{{ __('govuk_alpha_settings.linked.parents_description') }}</p>
+                @if (empty($parents))
+                    <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha_settings.linked.parents_empty') }}</p></div>
+                @else
+                    <ul class="govuk-list nexus-alpha-card-list">
+                        @foreach ($parents as $p)
+                            @php
+                                $pName = trim((string) ($p['name'] ?? '')) !== '' ? $p['name'] : __('govuk_alpha_settings.common.unknown_member');
+                                $isPending = ($p['status'] ?? '') === 'pending';
+                            @endphp
+                            <li class="nexus-alpha-card">
+                                <div class="nexus-alpha-card-head">
+                                    @if (!empty($p['avatar_url']))
+                                        <img class="nexus-alpha-avatar" src="{{ $p['avatar_url'] }}" alt="" loading="lazy" decoding="async" width="48" height="48">
+                                    @else
+                                        <span class="nexus-alpha-avatar nexus-alpha-avatar--placeholder" aria-hidden="true">{{ mb_strtoupper(mb_substr($pName, 0, 1)) }}</span>
+                                    @endif
+                                    <div>
+                                        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">{{ $pName }}</p>
+                                        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-0">{{ __('govuk_alpha_settings.linked.types.' . ($p['relationship_type'] ?? 'family')) }}</p>
+                                    </div>
+                                </div>
+                                <p class="govuk-body-s govuk-!-margin-bottom-2">
+                                    <strong class="govuk-tag {{ $isPending ? 'govuk-tag--yellow' : 'govuk-tag--green' }}">
+                                        {{ $isPending ? __('govuk_alpha_settings.linked.status_pending') : __('govuk_alpha_settings.linked.status_active') }}
+                                    </strong>
+                                </p>
+                                <div class="nexus-alpha-actions">
+                                    @if ($isPending && (int) ($p['relationship_id'] ?? 0) > 0)
+                                        <form method="post" action="{{ route('govuk-alpha.settings.linked-accounts.approve', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-display-inline-block govuk-!-margin-right-2">
+                                            @csrf
+                                            <input type="hidden" name="relationship_id" value="{{ (int) $p['relationship_id'] }}">
+                                            <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_settings.linked.approve_button') }}<span class="govuk-visually-hidden"> {{ $pName }}</span></button>
+                                        </form>
+                                    @endif
+                                    @if ((int) ($p['relationship_id'] ?? 0) > 0)
+                                        <form method="post" action="{{ route('govuk-alpha.settings.linked-accounts.revoke', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-display-inline-block">
+                                            @csrf
+                                            <input type="hidden" name="relationship_id" value="{{ (int) $p['relationship_id'] }}">
+                                            <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_settings.linked.revoke_button') }}<span class="govuk-visually-hidden"> {{ $pName }}</span></button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </section>
+
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+            {{-- Accounts I manage (children) — with per-child permissions --}}
+            <section aria-labelledby="children-heading" id="children">
+                <h2 class="govuk-heading-l" id="children-heading">{{ __('govuk_alpha_settings.linked.children_heading') }}</h2>
+                <p class="govuk-body">{{ __('govuk_alpha_settings.linked.children_description') }}</p>
+                @if (empty($children))
+                    <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha_settings.linked.children_empty') }}</p></div>
+                @else
+                    <ul class="govuk-list nexus-alpha-card-list">
+                        @foreach ($children as $c)
+                            @php
+                                $cName = trim((string) ($c['name'] ?? '')) !== '' ? $c['name'] : __('govuk_alpha_settings.common.unknown_member');
+                                $cIsPending = ($c['status'] ?? '') === 'pending';
+                                $cId = (int) ($c['relationship_id'] ?? 0);
+                                $cPerms = $c['permissions'] ?? [];
+                            @endphp
+                            <li class="nexus-alpha-card">
+                                <div class="nexus-alpha-card-head">
+                                    @if (!empty($c['avatar_url']))
+                                        <img class="nexus-alpha-avatar" src="{{ $c['avatar_url'] }}" alt="" loading="lazy" decoding="async" width="48" height="48">
+                                    @else
+                                        <span class="nexus-alpha-avatar nexus-alpha-avatar--placeholder" aria-hidden="true">{{ mb_strtoupper(mb_substr($cName, 0, 1)) }}</span>
+                                    @endif
+                                    <div>
+                                        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">{{ $cName }}</p>
+                                        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-0">{{ __('govuk_alpha_settings.linked.types.' . ($c['relationship_type'] ?? 'family')) }}</p>
+                                    </div>
+                                </div>
+                                <p class="govuk-body-s govuk-!-margin-bottom-2">
+                                    <strong class="govuk-tag {{ $cIsPending ? 'govuk-tag--yellow' : 'govuk-tag--green' }}">
+                                        {{ $cIsPending ? __('govuk_alpha_settings.linked.status_pending') : __('govuk_alpha_settings.linked.status_active') }}
+                                    </strong>
+                                </p>
+
+                                @if ($cId > 0)
+                                    <form method="post" action="{{ route('govuk-alpha.settings.linked-accounts.permissions', ['tenantSlug' => $tenantSlug]) }}">
+                                        @csrf
+                                        <input type="hidden" name="relationship_id" value="{{ $cId }}">
+                                        <fieldset class="govuk-fieldset govuk-!-margin-bottom-2">
+                                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha_settings.linked.permissions_heading') }}</legend>
+                                            <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                                @foreach ($permissionKeys as $permKey)
+                                                    <div class="govuk-checkboxes__item">
+                                                        <input class="govuk-checkboxes__input" id="perm_{{ $cId }}_{{ $permKey }}" name="perm_{{ $permKey }}" type="checkbox" value="1" @checked($cPerms[$permKey] ?? false)>
+                                                        <label class="govuk-label govuk-checkboxes__label" for="perm_{{ $cId }}_{{ $permKey }}">{{ __('govuk_alpha_settings.linked.permissions.' . $permKey) }}</label>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </fieldset>
+                                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2" data-module="govuk-button">{{ __('govuk_alpha_settings.linked.save_permissions') }}<span class="govuk-visually-hidden"> {{ $cName }}</span></button>
+                                    </form>
+
+                                    <div class="govuk-warning-text govuk-!-margin-bottom-2">
+                                        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                        <strong class="govuk-warning-text__text">
+                                            <span class="govuk-visually-hidden">{{ __('govuk_alpha_settings.common.error_title') }}</span>
+                                            {{ __('govuk_alpha_settings.linked.revoke_warning') }}
+                                        </strong>
+                                    </div>
+                                    <form method="post" action="{{ route('govuk-alpha.settings.linked-accounts.revoke', ['tenantSlug' => $tenantSlug]) }}">
+                                        @csrf
+                                        <input type="hidden" name="relationship_id" value="{{ $cId }}">
+                                        <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_settings.linked.revoke_button') }}<span class="govuk-visually-hidden"> {{ $cName }}</span></button>
+                                    </form>
+                                @endif
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </section>
+
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+            {{-- Request a new link --}}
+            <section aria-labelledby="request-heading">
+                <h2 class="govuk-heading-l" id="request-heading">{{ __('govuk_alpha_settings.linked.request_heading') }}</h2>
+                <p class="govuk-body">{{ __('govuk_alpha_settings.linked.request_description') }}</p>
+                <p class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha_settings.linked.request_max', ['count' => $maxChildren ?? 20]) }}</p>
+
+                <form method="post" action="{{ route('govuk-alpha.settings.linked-accounts.request', ['tenantSlug' => $tenantSlug]) }}">
+                    @csrf
+                    <div class="govuk-form-group {{ in_array($status, ['link-email-invalid', 'link-user-not-found'], true) ? 'govuk-form-group--error' : '' }}">
+                        <label class="govuk-label" for="request">{{ __('govuk_alpha_settings.linked.email_label') }}</label>
+                        <div id="request-hint" class="govuk-hint">{{ __('govuk_alpha_settings.linked.email_hint') }}</div>
+                        @if (in_array($status, ['link-email-invalid', 'link-user-not-found'], true))
+                            <p id="request-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">{{ __('govuk_alpha_settings.common.error_title') }}:</span>
+                                {{ __('govuk_alpha_settings.states.' . $status) }}
+                            </p>
+                        @endif
+                        <input class="govuk-input" id="request" name="email" type="email" spellcheck="false" autocomplete="off"
+                            aria-describedby="request-hint{{ in_array($status, ['link-email-invalid', 'link-user-not-found'], true) ? ' request-error' : '' }}">
+                    </div>
+
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="relationship_type">{{ __('govuk_alpha_settings.linked.type_label') }}</label>
+                        <select class="govuk-select" id="relationship_type" name="relationship_type">
+                            @foreach ($linkTypes as $type)
+                                <option value="{{ $type }}" @selected($type === 'family')>{{ __('govuk_alpha_settings.linked.types.' . $type) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <fieldset class="govuk-fieldset govuk-!-margin-bottom-3">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha_settings.linked.permissions_heading') }}</legend>
+                        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                            @foreach ($permissionKeys as $permKey)
+                                <div class="govuk-checkboxes__item">
+                                    <input class="govuk-checkboxes__input" id="new_perm_{{ $permKey }}" name="perm_{{ $permKey }}" type="checkbox" value="1" @checked($permKey === 'can_view_activity')>
+                                    <label class="govuk-label govuk-checkboxes__label" for="new_perm_{{ $permKey }}">{{ __('govuk_alpha_settings.linked.permissions.' . $permKey) }}</label>
+                                </div>
+                            @endforeach
+                        </div>
+                    </fieldset>
+
+                    <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha_settings.linked.request_button') }}</button>
+                </form>
+            </section>
+        </div>
+    </div>
+@endsection

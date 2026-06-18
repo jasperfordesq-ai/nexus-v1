@@ -44,11 +44,57 @@
     <span class="govuk-caption-xl">{{ __('govuk_alpha.ideation.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
     <div class="nexus-alpha-module-row">
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ $cTitle }}</h1>
-        <strong class="govuk-tag {{ $tagClass }}">{{ $tagLabel }}</strong>
+        <span>
+            <strong class="govuk-tag {{ $tagClass }}">{{ $tagLabel }}</strong>
+            @if (! empty($challenge['is_featured']))
+                <strong class="govuk-tag govuk-tag--yellow">{{ __('govuk_alpha_ideation.detail.featured') }}</strong>
+            @endif
+        </span>
     </div>
+
+    @if ((auth()->user()?->role ?? '') && in_array(auth()->user()->role, ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin'], true) && \Illuminate\Support\Facades\Route::has('govuk-alpha.ideation.manage'))
+        <p class="govuk-body govuk-!-margin-bottom-4"><a class="govuk-link" href="{{ route('govuk-alpha.ideation.manage', ['tenantSlug' => $tenantSlug, 'id' => $challenge['id']]) }}">{{ __('govuk_alpha_ideation.detail.manage_link') }}</a></p>
+    @endif
 
     @if (trim((string) ($challenge['description'] ?? '')) !== '')
         <div class="govuk-body-l">{!! nl2br(e($challenge['description'])) !!}</div>
+    @endif
+
+    @php
+        $cTags = is_array($challenge['tags'] ?? null) ? array_values(array_filter($challenge['tags'])) : [];
+        $cSubDeadline = trim((string) ($challenge['submission_deadline'] ?? ''));
+        $cVoteDeadline = trim((string) ($challenge['voting_deadline'] ?? ''));
+        $cMaxIdeas = $challenge['max_ideas_per_user'] ?? null;
+        $cViews = (int) ($challenge['views_count'] ?? 0);
+        $cFavorites = (int) ($challenge['favorites_count'] ?? 0);
+        $cCategory = trim((string) ($challenge['category'] ?? ''));
+        $hasMeta = $cSubDeadline !== '' || $cVoteDeadline !== '' || $cMaxIdeas !== null || $cCategory !== '' || ! empty($cTags) || $cViews > 0 || $cFavorites > 0;
+    @endphp
+    @if ($hasMeta)
+        <h2 class="govuk-heading-m govuk-!-margin-top-4">{{ __('govuk_alpha_ideation.detail.meta_heading') }}</h2>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-4">
+            @if ($cCategory !== '')
+                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">{{ __('govuk_alpha_ideation.detail.category') }}</dt><dd class="govuk-summary-list__value">{{ $cCategory }}</dd></div>
+            @endif
+            @if ($cSubDeadline !== '')
+                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">{{ __('govuk_alpha_ideation.detail.submission_deadline') }}</dt><dd class="govuk-summary-list__value">{{ $cSubDeadline }}</dd></div>
+            @endif
+            @if ($cVoteDeadline !== '')
+                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">{{ __('govuk_alpha_ideation.detail.voting_deadline') }}</dt><dd class="govuk-summary-list__value">{{ $cVoteDeadline }}</dd></div>
+            @endif
+            @if ($cMaxIdeas !== null)
+                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">{{ __('govuk_alpha_ideation.detail.max_ideas') }}</dt><dd class="govuk-summary-list__value">{{ (int) $cMaxIdeas }}</dd></div>
+            @endif
+            @if ($cViews > 0)
+                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">{{ __('govuk_alpha_ideation.detail.views') }}</dt><dd class="govuk-summary-list__value">{{ $cViews }}</dd></div>
+            @endif
+            @if ($cFavorites > 0)
+                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">{{ __('govuk_alpha_ideation.detail.favorites') }}</dt><dd class="govuk-summary-list__value">{{ $cFavorites }}</dd></div>
+            @endif
+            @if (! empty($cTags))
+                <div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">{{ __('govuk_alpha_ideation.detail.tags') }}</dt><dd class="govuk-summary-list__value">@foreach ($cTags as $tag)<strong class="govuk-tag govuk-tag--grey govuk-!-margin-right-1">{{ $tag }}</strong>@endforeach</dd></div>
+            @endif
+        </dl>
     @endif
 
     @if (trim((string) ($challenge['prize_description'] ?? '')) !== '')
@@ -79,6 +125,9 @@
                     @endif
                     @if ($iAuthor !== '')
                         <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">{{ __('govuk_alpha.ideation.idea_by', ['name' => $iAuthor]) }}</p>
+                    @endif
+                    @if (\Illuminate\Support\Facades\Route::has('govuk-alpha.ideation.idea'))
+                        <p class="govuk-body-s govuk-!-margin-bottom-2"><a class="govuk-link" href="{{ route('govuk-alpha.ideation.idea', ['tenantSlug' => $tenantSlug, 'id' => $challenge['id'], 'ideaId' => $idea['id']]) }}">{{ __('govuk_alpha_ideation.idea.title') }}</a></p>
                     @endif
                     @if ($isOpenForVotes)
                         <form method="post" action="{{ route('govuk-alpha.ideation.ideas.vote', ['tenantSlug' => $tenantSlug, 'id' => $challenge['id'], 'ideaId' => $idea['id']]) }}">

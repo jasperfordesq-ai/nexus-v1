@@ -1,0 +1,120 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+return [
+    'library' => [
+        'title' => 'Resource library',
+        'caption' => 'Resources in :community',
+        'description' => 'Browse and download files, guides and templates shared by the community.',
+        'count' => '{0} No resources|{1} 1 resource|[2,*] :count resources',
+        'all_resources' => 'All resources',
+        'simple_view_link' => 'Switch to the simple list',
+    ],
+
+    'search' => [
+        'label' => 'Search resources',
+        'hint' => 'Search by title or description.',
+        'submit' => 'Search',
+        'clear' => 'Clear search',
+    ],
+
+    'categories' => [
+        'heading' => 'Categories',
+        'filter_legend' => 'Filter by category',
+        'all' => 'All categories',
+        'count_suffix' => ':count',
+        'empty' => 'No categories yet.',
+    ],
+
+    'card' => [
+        'uploaded_by' => 'Uploaded by :name',
+        'unknown_uploader' => 'Unknown',
+        'file_size' => 'Size',
+        'uploaded_on' => 'Uploaded',
+        'downloads_label' => 'Downloads',
+        'downloads' => '{0} No downloads|{1} 1 download|[2,*] :count downloads',
+        'type_label' => 'File type',
+    ],
+
+    'actions' => [
+        'download' => 'Download',
+        'download_aria' => 'Download :title',
+        'upload' => 'Upload a resource',
+        'delete' => 'Delete',
+        'delete_aria' => 'Delete :title',
+        'move_up' => 'Move up',
+        'move_up_aria' => 'Move :title up',
+        'move_down' => 'Move down',
+        'move_down_aria' => 'Move :title down',
+        'reorder_on' => 'Reorder resources',
+        'reorder_off' => 'Done reordering',
+        'load_more' => 'Load more resources',
+        'back_to_library' => 'Back to resource library',
+    ],
+
+    'states' => [
+        'uploaded' => 'Your resource was uploaded.',
+        'deleted' => 'The resource was deleted.',
+        'delete_failed' => 'We could not delete the resource. Please try again.',
+        'upload_failed' => 'We could not upload the resource. Please try again.',
+        'reorder_failed' => 'We could not save the new order. Please try again.',
+        'error_title' => 'There is a problem',
+        'load_error' => 'We could not load the resources. Please try again.',
+        'try_again' => 'Try again',
+        'success_title' => 'Success',
+    ],
+
+    'empty' => [
+        'title' => 'No resources found',
+        'no_resources' => 'No resources have been shared yet.',
+        'no_match' => 'No resources match your search. Try a different word or clear the filters.',
+        'tips_title' => 'You can share:',
+        'tip_guides' => 'How-to guides and instructions',
+        'tip_templates' => 'Reusable templates and forms',
+        'tip_files' => 'Documents, spreadsheets and images',
+    ],
+
+    'upload' => [
+        'title' => 'Upload a resource',
+        'caption' => 'Share with :community',
+        'description' => 'Share a file with everyone in your community.',
+        'title_label' => 'Title',
+        'title_hint' => 'Give the resource a short, clear name.',
+        'description_label' => 'Description',
+        'description_hint' => 'Explain what the resource is and how to use it. This is optional.',
+        'category_label' => 'Category',
+        'category_hint' => 'Choose a category to help people find this resource. This is optional.',
+        'category_none' => 'No category',
+        'file_label' => 'File',
+        'file_hint' => 'Maximum size :size. Allowed file types: :types.',
+        'submit' => 'Upload resource',
+        'cancel' => 'Cancel',
+        'error_title_required' => 'Enter a title for the resource',
+        'error_file_required' => 'Choose a file to upload',
+        'error_too_large' => 'The file must be smaller than 10MB',
+        'error_type' => 'The file type is not allowed',
+        'error_upload_failed' => 'The file could not be uploaded. Please try again.',
+    ],
+
+    'delete' => [
+        'title' => 'Delete resource',
+        'caption' => 'Delete a resource',
+        'warning_prefix' => 'Warning',
+        'warning' => 'Deleting a resource permanently removes the file. This cannot be undone.',
+        'confirm_question' => 'Are you sure you want to delete :title?',
+        'submit' => 'Delete resource',
+        'cancel' => 'Cancel',
+    ],
+
+    'file_types' => [
+        'pdf' => 'PDF document',
+        'doc' => 'Word document',
+        'spreadsheet' => 'Spreadsheet',
+        'image' => 'Image',
+        'text' => 'Text file',
+        'file' => 'File',
+    ],
+];

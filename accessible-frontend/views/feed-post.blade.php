@@ -91,6 +91,13 @@
             @endforeach
         @endif
 
+        @if (is_array($item['quoted_post'] ?? null))
+            @include('accessible-frontend::partials.feed-quoted-post', [
+                'quoted' => $item['quoted_post'],
+                'tenantSlug' => $tenantSlug,
+            ])
+        @endif
+
         @if (!empty($itemMedia))
             <ul class="nexus-alpha-feed-media" data-count="{{ min(count($itemMedia), 4) }}">
                 @foreach (array_slice($itemMedia, 0, 4) as $media)
