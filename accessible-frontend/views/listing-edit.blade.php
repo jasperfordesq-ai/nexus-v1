@@ -32,6 +32,17 @@
         </div>
     @endif
 
+    @if (in_array($status ?? null, ['ai-generated', 'ai-title-required', 'ai-failed', 'ai-disabled'], true))
+        <div class="govuk-notification-banner {{ ($status === 'ai-generated') ? 'govuk-notification-banner--success' : '' }}" data-module="govuk-notification-banner" role="{{ ($status === 'ai-generated') ? 'alert' : 'region' }}" aria-labelledby="ai-status-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="ai-status-title">{{ ($status === 'ai-generated') ? __('govuk_alpha.states.success_title') : __('govuk_alpha.states.error_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha_listings.ai.states.' . $status) }}</p>
+            </div>
+        </div>
+    @endif
+
     @if ($errors->any())
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
@@ -85,7 +96,14 @@
             @error('description')
                 <p id="description-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $message }}</p>
             @enderror
-            <textarea class="govuk-textarea{{ $errors->has('description') ? ' govuk-textarea--error' : '' }}" id="description" name="description" rows="6" aria-describedby="{{ $describedBy('description', 'description-hint') }}">{{ old('description', $listing['description'] ?? '') }}</textarea>
+            <textarea class="govuk-textarea{{ $errors->has('description') ? ' govuk-textarea--error' : '' }}" id="description" name="description" rows="6" aria-describedby="description-hint description-ai-hint{{ $errors->has('description') ? ' description-error' : '' }}">{{ old('description', $listing['description'] ?? '') }}</textarea>
+            <p id="description-ai-hint" class="govuk-hint govuk-!-margin-top-2">{{ __('govuk_alpha_listings.ai.hint') }}</p>
+            {{-- No-JS AI helper: posts the current field values (incl. listing_id) to the
+                 generate route, which round-trips a suggestion back into this textarea. --}}
+            <input type="hidden" name="listing_id" value="{{ $listing['id'] }}">
+            <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2" data-module="govuk-button" formaction="{{ route('govuk-alpha.listings.generate-description', ['tenantSlug' => $tenantSlug]) }}" formnovalidate>
+                {{ __('govuk_alpha_listings.ai.regenerate_button') }}
+            </button>
         </div>
 
         @if (!empty($categories))

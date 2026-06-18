@@ -42,6 +42,16 @@
             'publish-failed' => ['msg' => __('govuk_alpha_commerce.instructor.status_publish_failed'), 'error' => true],
             'unpublished' => ['msg' => __('govuk_alpha_commerce.instructor.status_unpublished'), 'error' => false],
             'unpublish-failed' => ['msg' => __('govuk_alpha_commerce.instructor.status_unpublish_failed'), 'error' => true],
+            'section-added' => ['msg' => __('govuk_alpha_commerce.instructor.status_section_added'), 'error' => false],
+            'section-saved' => ['msg' => __('govuk_alpha_commerce.instructor.status_section_saved'), 'error' => false],
+            'section-deleted' => ['msg' => __('govuk_alpha_commerce.instructor.status_section_deleted'), 'error' => false],
+            'section-failed' => ['msg' => __('govuk_alpha_commerce.instructor.status_section_failed'), 'error' => true],
+            'section-title-missing' => ['msg' => __('govuk_alpha_commerce.instructor.status_section_title_missing'), 'error' => true],
+            'lesson-added' => ['msg' => __('govuk_alpha_commerce.instructor.status_lesson_added'), 'error' => false],
+            'lesson-saved' => ['msg' => __('govuk_alpha_commerce.instructor.status_lesson_saved'), 'error' => false],
+            'lesson-deleted' => ['msg' => __('govuk_alpha_commerce.instructor.status_lesson_deleted'), 'error' => false],
+            'lesson-failed' => ['msg' => __('govuk_alpha_commerce.instructor.status_lesson_failed'), 'error' => true],
+            'lesson-title-missing' => ['msg' => __('govuk_alpha_commerce.instructor.status_lesson_title_missing'), 'error' => true],
         ];
         $statusEntry = $status !== null && isset($statusMessages[$status]) ? $statusMessages[$status] : null;
         $courseId = is_array($c) ? (int) ($c['id'] ?? 0) : 0;
@@ -196,10 +206,144 @@
     </form>
 
     @if ($isEdit && $courseId > 0)
-        <div class="govuk-inset-text govuk-!-margin-top-6">
-            <h2 class="govuk-heading-s">{{ __('govuk_alpha_commerce.instructor.builder_notice_title') }}</h2>
-            <p class="govuk-body">{{ __('govuk_alpha_commerce.instructor.builder_notice') }}</p>
-        </div>
+        @php
+            $bSections = $builderSections ?? [];
+            $bUnsectioned = $builderUnsectioned ?? [];
+            $bContentTypes = $contentTypes ?? ['text', 'video', 'pdf', 'embed'];
+            $contentTypeLabels = [
+                'text' => __('govuk_alpha_commerce.builder.content_type_text'),
+                'video' => __('govuk_alpha_commerce.builder.content_type_video'),
+                'pdf' => __('govuk_alpha_commerce.builder.content_type_pdf'),
+                'embed' => __('govuk_alpha_commerce.builder.content_type_embed'),
+            ];
+            $sectionOptions = [];
+            foreach ($bSections as $bs) {
+                $sectionOptions[(int) $bs['id']] = (string) $bs['title'];
+            }
+        @endphp
+
+        <h2 class="govuk-heading-m govuk-!-margin-top-8">{{ __('govuk_alpha_commerce.instructor.builder_notice_title') }}</h2>
+        <p class="govuk-body">{{ __('govuk_alpha_commerce.instructor.builder_notice') }}</p>
+
+        @if (empty($bSections) && empty($bUnsectioned))
+            <p class="govuk-inset-text">{{ __('govuk_alpha_commerce.builder.no_sections') }}</p>
+        @else
+            @foreach ($bSections as $bs)
+                <div class="nexus-alpha-card govuk-!-margin-bottom-4">
+                    <h3 class="govuk-heading-s govuk-!-margin-bottom-2">{{ $bs['title'] }}</h3>
+                    @if (empty($bs['lessons']))
+                        <p class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha_commerce.builder.no_lessons_in_section') }}</p>
+                    @else
+                        <ul class="govuk-list">
+                            @foreach ($bs['lessons'] as $lesson)
+                                <li class="nexus-alpha-module-row">
+                                    <span>{{ $lesson['title'] }} <span class="govuk-tag govuk-tag--grey">{{ $contentTypeLabels[$lesson['content_type']] ?? $lesson['content_type'] }}</span></span>
+                                    <form method="post" action="{{ route('govuk-alpha.courses.instructor.lessons.delete', ['tenantSlug' => $tenantSlug, 'id' => $courseId, 'lessonId' => $lesson['id']]) }}" class="govuk-!-display-inline">
+                                        @csrf
+                                        <button class="govuk-button govuk-button--warning govuk-button--small" data-module="govuk-button">{{ __('govuk_alpha_commerce.builder.delete_lesson_button') }}</button>
+                                    </form>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+
+                    <details class="govuk-details" data-module="govuk-details">
+                        <summary class="govuk-details__summary"><span class="govuk-details__summary-text">{{ __('govuk_alpha_commerce.builder.rename_section_button') }} / {{ __('govuk_alpha_commerce.builder.delete_section_button') }}</span></summary>
+                        <div class="govuk-details__text">
+                            <form method="post" action="{{ route('govuk-alpha.courses.instructor.sections.update', ['tenantSlug' => $tenantSlug, 'id' => $courseId, 'sectionId' => $bs['id']]) }}" class="govuk-!-margin-bottom-3">
+                                @csrf
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-label--s" for="rename-section-{{ $bs['id'] }}">{{ __('govuk_alpha_commerce.builder.rename_section_label') }}</label>
+                                    <input class="govuk-input" id="rename-section-{{ $bs['id'] }}" name="section_title" type="text" maxlength="200" value="{{ $bs['title'] }}">
+                                </div>
+                                <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha_commerce.builder.rename_section_button') }}</button>
+                            </form>
+                            <div class="govuk-warning-text">
+                                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                <strong class="govuk-warning-text__text"><span class="govuk-visually-hidden">{{ __('govuk_alpha_commerce.common.notice_title') }}</span>{{ __('govuk_alpha_commerce.builder.delete_section_warning') }}</strong>
+                            </div>
+                            <form method="post" action="{{ route('govuk-alpha.courses.instructor.sections.delete', ['tenantSlug' => $tenantSlug, 'id' => $courseId, 'sectionId' => $bs['id']]) }}">
+                                @csrf
+                                <button class="govuk-button govuk-button--warning" data-module="govuk-button">{{ __('govuk_alpha_commerce.builder.delete_section_button') }}</button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+            @endforeach
+
+            @if (!empty($bUnsectioned))
+                <div class="nexus-alpha-card govuk-!-margin-bottom-4">
+                    <h3 class="govuk-heading-s govuk-!-margin-bottom-2">{{ __('govuk_alpha_commerce.builder.unsectioned_heading') }}</h3>
+                    <ul class="govuk-list">
+                        @foreach ($bUnsectioned as $lesson)
+                            <li class="nexus-alpha-module-row">
+                                <span>{{ $lesson['title'] }} <span class="govuk-tag govuk-tag--grey">{{ $contentTypeLabels[$lesson['content_type']] ?? $lesson['content_type'] }}</span></span>
+                                <form method="post" action="{{ route('govuk-alpha.courses.instructor.lessons.delete', ['tenantSlug' => $tenantSlug, 'id' => $courseId, 'lessonId' => $lesson['id']]) }}" class="govuk-!-display-inline">
+                                    @csrf
+                                    <button class="govuk-button govuk-button--warning govuk-button--small" data-module="govuk-button">{{ __('govuk_alpha_commerce.builder.delete_lesson_button') }}</button>
+                                </form>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+        @endif
+
+        <h3 class="govuk-heading-s govuk-!-margin-top-4">{{ __('govuk_alpha_commerce.builder.add_section_heading') }}</h3>
+        <form method="post" action="{{ route('govuk-alpha.courses.instructor.sections.store', ['tenantSlug' => $tenantSlug, 'id' => $courseId]) }}" class="govuk-!-margin-bottom-6">
+            @csrf
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-label--s" for="section_title">{{ __('govuk_alpha_commerce.builder.section_title_label') }}</label>
+                <div id="section_title-hint" class="govuk-hint">{{ __('govuk_alpha_commerce.builder.section_title_hint') }}</div>
+                <input class="govuk-input" id="section_title" name="section_title" type="text" maxlength="200" aria-describedby="section_title-hint">
+            </div>
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha_commerce.builder.add_section_button') }}</button>
+        </form>
+
+        <h3 class="govuk-heading-s govuk-!-margin-top-4">{{ __('govuk_alpha_commerce.builder.add_lesson_heading') }}</h3>
+        <form method="post" action="{{ route('govuk-alpha.courses.instructor.lessons.store', ['tenantSlug' => $tenantSlug, 'id' => $courseId]) }}" class="govuk-!-margin-bottom-6">
+            @csrf
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-label--s" for="lesson_title">{{ __('govuk_alpha_commerce.builder.lesson_title_label') }}</label>
+                <div id="lesson_title-hint" class="govuk-hint">{{ __('govuk_alpha_commerce.builder.lesson_title_hint') }}</div>
+                <input class="govuk-input" id="lesson_title" name="lesson_title" type="text" maxlength="200" aria-describedby="lesson_title-hint">
+            </div>
+
+            @if (!empty($sectionOptions))
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-label--s" for="section_id">{{ __('govuk_alpha_commerce.builder.lesson_section_label') }}</label>
+                    <select class="govuk-select" id="section_id" name="section_id">
+                        <option value="">{{ __('govuk_alpha_commerce.builder.lesson_section_none') }}</option>
+                        @foreach ($sectionOptions as $sid => $stitle)
+                            <option value="{{ $sid }}">{{ $stitle }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
+
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-label--s" for="content_type">{{ __('govuk_alpha_commerce.builder.content_type_label') }}</label>
+                <select class="govuk-select" id="content_type" name="content_type">
+                    @foreach ($bContentTypes as $ct)
+                        <option value="{{ $ct }}">{{ $contentTypeLabels[$ct] ?? $ct }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-label--s" for="body">{{ __('govuk_alpha_commerce.builder.body_label') }} <span class="govuk-hint govuk-!-display-inline">({{ __('govuk_alpha_commerce.common.optional') }})</span></label>
+                <div id="body-hint" class="govuk-hint">{{ __('govuk_alpha_commerce.builder.body_hint') }}</div>
+                <textarea class="govuk-textarea" id="body" name="body" rows="4" aria-describedby="body-hint"></textarea>
+            </div>
+
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-label--s" for="media_url">{{ __('govuk_alpha_commerce.builder.media_url_label') }} <span class="govuk-hint govuk-!-display-inline">({{ __('govuk_alpha_commerce.common.optional') }})</span></label>
+                <div id="media_url-hint" class="govuk-hint">{{ __('govuk_alpha_commerce.builder.media_url_hint') }}</div>
+                <input class="govuk-input" id="media_url" name="media_url" type="url" inputmode="url" aria-describedby="media_url-hint">
+            </div>
+
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha_commerce.builder.add_lesson_button') }}</button>
+        </form>
 
         <h2 class="govuk-heading-m govuk-!-margin-top-6">{{ $isPublished ? __('govuk_alpha_commerce.instructor.action_unpublish') : __('govuk_alpha_commerce.instructor.action_publish') }}</h2>
         <form method="post" action="{{ $isPublished ? route('govuk-alpha.courses.instructor.unpublish', ['tenantSlug' => $tenantSlug, 'id' => $courseId]) : route('govuk-alpha.courses.instructor.publish', ['tenantSlug' => $tenantSlug, 'id' => $courseId]) }}">

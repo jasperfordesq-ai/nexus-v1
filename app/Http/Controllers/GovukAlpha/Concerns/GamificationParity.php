@@ -156,11 +156,24 @@ trait GamificationParity
         $type = $this->allowed($request->query('type'), $validTypes, 'xp');
         $period = $this->allowed($request->query('period'), $validPeriods, 'all');
 
+        // Load-more pagination. The React CompetitiveLeaderboard requests
+        // progressively larger windows; LeaderboardService is limit-based (no
+        // offset), so we mirror the V2 controller's "fetch limit+1, detect
+        // has_more" pattern by growing the visible window in page-size steps.
+        $pageSize = 20;
+        $maxLimit = 200;
+        $requestedLimit = (int) $request->query('limit', (string) $pageSize);
+        if ($requestedLimit < $pageSize) {
+            $requestedLimit = $pageSize;
+        }
+        $limit = (int) min($maxLimit, (int) (ceil($requestedLimit / $pageSize) * $pageSize));
+
         $rows = [];
         $yourRank = null;
         $unit = $type;
+        $hasMore = false;
         try {
-            [$rows, $yourRank, $unit] = $this->gamificationFetchCompetitive($tenantId, $userId, $type, $period);
+            [$rows, $yourRank, $unit, $hasMore] = $this->gamificationFetchCompetitive($tenantId, $userId, $type, $period, $limit);
         } catch (\Throwable $e) {
             report($e);
         }
@@ -185,16 +198,22 @@ trait GamificationParity
             'compUnit' => $unit,
             'compYourRank' => $yourRank,
             'compSeason' => is_array($season) ? $season : [],
+            'compLimit' => $limit,
+            'compPageSize' => $pageSize,
+            'compHasMore' => $hasMore,
+            'compNextLimit' => min($maxLimit, $limit + $pageSize),
         ]);
     }
 
     /**
      * Fetch competitive leaderboard rows for a metric/period, mirroring the V2
-     * controller's type/period maps and nexus_score special case.
+     * controller's type/period maps and nexus_score special case. Fetches one
+     * extra row (limit+1) to detect whether a further "load more" page exists,
+     * exactly as GamificationV2Controller::leaderboard does.
      *
-     * @return array{0: array<int,array<string,mixed>>, 1: int|null, 2: string}
+     * @return array{0: array<int,array<string,mixed>>, 1: int|null, 2: string, 3: bool}
      */
-    private function gamificationFetchCompetitive(int $tenantId, int $userId, string $type, string $period): array
+    private function gamificationFetchCompetitive(int $tenantId, int $userId, string $type, string $period, int $limit): array
     {
         $typeMap = [
             'xp' => 'xp',
@@ -213,7 +232,7 @@ trait GamificationParity
             // Mirrors GamificationV2Controller's nexus_score branch.
             $tableCheck = DB::select("SHOW TABLES LIKE 'nexus_score_cache'");
             if (empty($tableCheck)) {
-                return [[], null, 'nexus_score'];
+                return [[], null, 'nexus_score', false];
             }
             $result = DB::select(
                 "SELECT n.user_id, n.total_score, u.name, u.first_name, u.last_name
@@ -221,12 +240,16 @@ trait GamificationParity
                  JOIN users u ON u.id = n.user_id
                  WHERE n.tenant_id = ? AND u.tenant_id = ? AND u.is_approved = 1
                  ORDER BY n.total_score DESC
-                 LIMIT 20",
-                [$tenantId, $tenantId]
+                 LIMIT ?",
+                [$tenantId, $tenantId, $limit + 1]
             );
+            $result = array_map(static fn ($r): array => (array) $r, $result);
+            $hasMore = count($result) > $limit;
+            if ($hasMore) {
+                array_pop($result);
+            }
             $rank = 1;
             foreach ($result as $r) {
-                $r = (array) $r;
                 $isMe = (int) $r['user_id'] === $userId;
                 if ($isMe) {
                     $yourRank = $rank;
@@ -241,11 +264,15 @@ trait GamificationParity
                 ];
                 $rank++;
             }
-            return [$rows, $yourRank, 'nexus_score'];
+            return [$rows, $yourRank, 'nexus_score', $hasMore];
         }
 
         $svc = app(\App\Services\LeaderboardService::class);
-        $raw = $svc->getLeaderboardByType($tenantId, $serviceType, $servicePeriod, 20, $userId);
+        $raw = $svc->getLeaderboardByType($tenantId, $serviceType, $servicePeriod, $limit + 1, $userId);
+        $hasMore = count($raw) > $limit;
+        if ($hasMore) {
+            array_pop($raw);
+        }
         foreach ($raw as $r) {
             $isMe = (bool) ($r['is_current_user'] ?? false);
             if ($isMe) {
@@ -261,7 +288,7 @@ trait GamificationParity
             ];
         }
 
-        return [$rows, $yourRank, $serviceType];
+        return [$rows, $yourRank, $serviceType, $hasMore];
     }
 
     // ================================================================
@@ -810,5 +837,143 @@ trait GamificationParity
             'myPolls' => $polls,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
+    }
+
+    // ================================================================
+    // POLL DETAIL + SOCIAL (high) — /polls/{pollId}, like, comment
+    //
+    // Mirrors the React PollsPage SocialInteractionPanel (targetType="poll"):
+    // a poll detail/results page with like + threaded comments, calling the
+    // SAME services the V2 SocialController / CommentsController use — the
+    // `likes` table (via the controller's toggleFeedItemLike helper) and
+    // CommentService for the comment list + create. No new social logic.
+    // ================================================================
+
+    /**
+     * Poll detail/results page with social interactions (like + comments).
+     * Surfaces what the standalone polls list cannot: per-poll likes and a
+     * comment thread, matching the React poll card's SocialInteractionPanel.
+     */
+    public function gamificationPollDetail(Request $request, string $tenantSlug, int $pollId): Response|RedirectResponse
+    {
+        $userId = $this->gamificationPollGuard($tenantSlug);
+        if ($userId instanceof RedirectResponse) {
+            return $userId;
+        }
+
+        $poll = null;
+        try {
+            $poll = \App\Services\PollService::getById($pollId, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        // Cross-tenant / missing poll → 404 (PollService is tenant-scoped).
+        abort_if($poll === null, 404);
+
+        // Likes — same `likes` table the SocialController uses.
+        $likeCount = 0;
+        $isLiked = false;
+        try {
+            $likeCount = (int) DB::table('likes')
+                ->where('target_type', 'poll')
+                ->where('target_id', $pollId)
+                ->where('tenant_id', TenantContext::getId())
+                ->count();
+            $isLiked = DB::table('likes')
+                ->where('target_type', 'poll')
+                ->where('target_id', $pollId)
+                ->where('tenant_id', TenantContext::getId())
+                ->where('user_id', $userId)
+                ->exists();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // Comments — same CommentService the CommentsController uses.
+        $comments = [];
+        $commentCount = 0;
+        try {
+            $comments = \App\Services\CommentService::getForEntity('poll', $pollId, $userId);
+            $commentCount = \App\Services\CommentService::countAll($comments);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::gamification-poll-detail', [
+            'title' => trim((string) ($poll['question'] ?? '')) ?: __('govuk_alpha_gamification.poll_detail.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'poll' => $poll,
+            'pollLikeCount' => $likeCount,
+            'pollIsLiked' => $isLiked,
+            'pollComments' => is_array($comments) ? $comments : [],
+            'pollCommentCount' => $commentCount,
+            'currentUserId' => $userId,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** POST: like / unlike a poll, then return to the poll detail page. Uses the controller's shared like helper. */
+    public function gamificationPollLike(Request $request, string $tenantSlug, int $pollId): RedirectResponse
+    {
+        $userId = $this->gamificationPollGuard($tenantSlug);
+        if ($userId instanceof RedirectResponse) {
+            return $userId;
+        }
+
+        $status = 'poll-like-failed';
+        try {
+            // Visibility check mirrors SocialController::likeV2.
+            if (\App\Support\FeedItemTables::canView('poll', $pollId, $userId)) {
+                $result = $this->toggleFeedItemLike('poll', $pollId, $userId);
+                $status = ($result['liked'] ?? false) ? 'poll-liked' : 'poll-unliked';
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.gamification.poll.detail', [
+            'tenantSlug' => $tenantSlug, 'pollId' => $pollId, 'status' => $status,
+        ])->withFragment('poll-social');
+    }
+
+    /** POST: add a comment (or reply) to a poll, then return to the poll detail page. Uses CommentService. */
+    public function gamificationPollComment(Request $request, string $tenantSlug, int $pollId): RedirectResponse
+    {
+        $userId = $this->gamificationPollGuard($tenantSlug);
+        if ($userId instanceof RedirectResponse) {
+            return $userId;
+        }
+
+        $content = trim(self::asStr($request->input('content')));
+        if ($content === '') {
+            return redirect()->route('govuk-alpha.gamification.poll.detail', [
+                'tenantSlug' => $tenantSlug, 'pollId' => $pollId, 'status' => 'poll-comment-empty',
+            ])->withFragment('poll-comments');
+        }
+        if (mb_strlen($content) > 10000) {
+            return redirect()->route('govuk-alpha.gamification.poll.detail', [
+                'tenantSlug' => $tenantSlug, 'pollId' => $pollId, 'status' => 'poll-comment-too-long',
+            ])->withFragment('poll-comments');
+        }
+
+        $data = ['content' => $content];
+        $parentId = (int) $request->input('parent_id', 0);
+        if ($parentId > 0) {
+            $data['parent_id'] = $parentId;
+        }
+
+        $status = 'poll-comment-failed';
+        try {
+            // CommentService enforces commentability + visibility + nesting depth.
+            \App\Services\CommentService::create('poll', $pollId, $userId, TenantContext::getId(), $data);
+            $status = 'poll-comment-created';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.gamification.poll.detail', [
+            'tenantSlug' => $tenantSlug, 'pollId' => $pollId, 'status' => $status,
+        ])->withFragment('poll-comments');
     }
 }

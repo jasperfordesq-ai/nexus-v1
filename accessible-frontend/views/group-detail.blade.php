@@ -162,6 +162,52 @@
         </ul>
     @endif
 
+    {{-- ===== Subgroups (read-only list; data from GroupService::getById) ===== --}}
+    @php
+        $subGroups = is_array($group['sub_groups'] ?? null) ? $group['sub_groups'] : [];
+    @endphp
+    @if (!empty($subGroups))
+        <h2 class="govuk-heading-l" id="group-subgroups">{{ __('govuk_alpha_groups.subgroups.heading') }}</h2>
+        <p class="govuk-body">{{ __('govuk_alpha_groups.subgroups.intro') }}</p>
+        <div class="nexus-alpha-card-list govuk-!-margin-bottom-6">
+            @foreach ($subGroups as $sub)
+                @php
+                    $subId = (int) ($sub['id'] ?? 0);
+                    $subName = trim((string) ($sub['name'] ?? ''));
+                    $subDesc = trim((string) ($sub['description'] ?? ''));
+                    $subCount = (int) ($sub['member_count'] ?? 0);
+                    $subPrivate = ($sub['visibility'] ?? 'public') !== 'public';
+                    $subImage = trim((string) ($sub['image_url'] ?? ''));
+                @endphp
+                @if ($subId > 0 && $subName !== '')
+                    <article class="nexus-alpha-card">
+                        <div class="nexus-alpha-listing-row">
+                            @if ($subImage !== '')
+                                <div class="nexus-alpha-listing-row__media">
+                                    <img class="nexus-alpha-card-thumb" src="{{ $subImage }}" alt="" width="120" height="90" loading="lazy" decoding="async">
+                                </div>
+                            @endif
+                            <div class="nexus-alpha-listing-row__body">
+                                <h3 class="govuk-heading-m govuk-!-margin-bottom-1">
+                                    <a class="govuk-link" href="{{ route('govuk-alpha.groups.show', ['tenantSlug' => $tenantSlug, 'id' => $subId]) }}">{{ $subName }}</a>
+                                </h3>
+                                <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">
+                                    <strong class="govuk-tag {{ $subPrivate ? 'govuk-tag--grey' : 'govuk-tag--green' }}">{{ $subPrivate ? __('govuk_alpha_groups.subgroups.visibility_private') : __('govuk_alpha_groups.subgroups.visibility_public') }}</strong>
+                                    <span aria-hidden="true"> | </span>
+                                    {{ trans_choice('govuk_alpha_groups.subgroups.members_count', $subCount, ['count' => $subCount]) }}
+                                </p>
+                                @if ($subDesc !== '')
+                                    <p class="govuk-body">{{ \Illuminate\Support\Str::limit($subDesc, 160) }}</p>
+                                @endif
+                                <a class="govuk-link govuk-link--no-visited-state" href="{{ route('govuk-alpha.groups.show', ['tenantSlug' => $tenantSlug, 'id' => $subId]) }}">{{ __('govuk_alpha_groups.subgroups.view_link') }}</a>
+                            </div>
+                        </div>
+                    </article>
+                @endif
+            @endforeach
+        </div>
+    @endif
+
     {{-- ===== WAVE T1-GROUPS: events tab ===== --}}
     @php
         $groupEvents = $groupEvents ?? [];

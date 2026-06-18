@@ -372,6 +372,62 @@ class MessagesParityTest extends TestCase
     }
 
     // ----------------------------------------------------------------------
+    //  Per-message translation (1-to-1)
+    // ----------------------------------------------------------------------
+
+    public function test_messages_translate_requires_authentication(): void
+    {
+        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/5/m/9/translate");
+        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+    }
+
+    public function test_messages_conversation_shows_translate_button_for_a_text_message(): void
+    {
+        $viewer = $this->messagesAuthedUser(['name' => 'Translate Viewer']);
+        $other = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Translate Partner', 'status' => 'active', 'is_approved' => true,
+        ]);
+
+        $message = MessageService::send($other->id, [
+            'recipient_id' => $viewer->id,
+            'body' => 'Bonjour, comment allez-vous?',
+        ]);
+        $this->assertNotEmpty($message, 'Failed to seed 1-to-1 message: ' . json_encode(MessageService::getErrors()));
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/messages/{$other->id}");
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_messages.translate.button'));
+        $response->assertSee(route('govuk-alpha.messages.translate', [
+            'tenantSlug' => $this->testTenantSlug,
+            'userId' => $other->id,
+            'messageId' => (int) $message['id'],
+        ]), false);
+    }
+
+    public function test_messages_translate_fails_for_a_message_the_viewer_is_not_party_to(): void
+    {
+        // Two other members exchange a message the viewer is not part of.
+        $sender = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Outside Sender', 'status' => 'active', 'is_approved' => true,
+        ]);
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'name' => 'Outside Recipient', 'status' => 'active', 'is_approved' => true,
+        ]);
+        $message = MessageService::send($sender->id, [
+            'recipient_id' => $recipient->id,
+            'body' => 'A private exchange.',
+        ]);
+        $this->assertNotEmpty($message, 'Failed to seed 1-to-1 message: ' . json_encode(MessageService::getErrors()));
+
+        // The viewer is neither sender nor receiver.
+        $this->messagesAuthedUser(['name' => 'Nosy Viewer']);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/{$recipient->id}/m/{$message['id']}/translate");
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=translate-failed', $response->headers->get('Location'));
+    }
+
+    // ----------------------------------------------------------------------
     //  Helpers (module-prefixed, replicating base-test helpers privately)
     // ----------------------------------------------------------------------
 

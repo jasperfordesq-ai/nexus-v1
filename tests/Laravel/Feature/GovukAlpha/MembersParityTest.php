@@ -262,4 +262,140 @@ class MembersParityTest extends TestCase
         $response->assertSee(__('govuk_alpha_members.insights.intro_own'));
         $response->assertSee(__('govuk_alpha_members.insights.nexus_own_hint'));
     }
+
+    // ===== Quick filters on the core directory =====
+
+    public function test_members_directory_renders_quick_filter_links(): void
+    {
+        $this->authenticatedUser(['name' => 'Quick Filter Viewer']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/members");
+
+        $response->assertOk();
+        // All/New/Active quick filters point at the core members.index route.
+        $response->assertSee(__('govuk_alpha_members.filters.new'));
+        $response->assertSee(__('govuk_alpha_members.filters.active'));
+        $response->assertSee('sort=joined', false);
+        $response->assertSee('sort=hours_given', false);
+        // Links through to the Recommended + Near-me variants.
+        $response->assertSee(route('govuk-alpha.members.discover', ['tenantSlug' => $this->testTenantSlug]), false);
+        $response->assertSee(route('govuk-alpha.members.nearby', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
+    // ===== Recommended members (CommunityRank) directory =====
+
+    public function test_members_discover_redirects_anonymous_to_login(): void
+    {
+        $response = $this->get("/{$this->testTenantSlug}/alpha/members/discover");
+
+        $response->assertRedirect();
+        $response->assertRedirectContains('/alpha/login');
+    }
+
+    public function test_members_discover_renders_for_authenticated_member(): void
+    {
+        $viewer = $this->authenticatedUser(['name' => 'Discover Viewer']);
+        $this->makeVisibleMember(['name' => 'Discoverable Member', 'first_name' => 'Discoverable', 'last_name' => 'Member']);
+
+        Sanctum::actingAs($viewer, ['*']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/members/discover");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_members.discover.heading'));
+        $response->assertSee('AGPL-3.0-or-later');
+    }
+
+    public function test_members_discover_does_not_collide_with_member_id_route(): void
+    {
+        // The static /discover segment must resolve to the discover directory,
+        // not be swallowed by the numeric /members/{id} wildcard.
+        $viewer = $this->authenticatedUser(['name' => 'Collision Viewer']);
+
+        Sanctum::actingAs($viewer, ['*']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/members/discover");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_members.discover.heading'));
+    }
+
+    // ===== Members near me directory =====
+
+    public function test_members_nearby_redirects_anonymous_to_login(): void
+    {
+        $response = $this->get("/{$this->testTenantSlug}/alpha/members/nearby");
+
+        $response->assertRedirect();
+        $response->assertRedirectContains('/alpha/login');
+    }
+
+    public function test_members_nearby_shows_no_location_prompt_when_viewer_has_no_coordinates(): void
+    {
+        $viewer = $this->authenticatedUser([
+            'name' => 'No Location Viewer',
+            'latitude' => null,
+            'longitude' => null,
+        ]);
+
+        Sanctum::actingAs($viewer, ['*']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/members/nearby");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_members.nearby.no_location_title'));
+        $response->assertSee(route('govuk-alpha.profile.settings', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
+    public function test_members_nearby_lists_member_within_radius(): void
+    {
+        $viewer = $this->authenticatedUser([
+            'name' => 'Located Viewer',
+            'latitude' => 53.3498,
+            'longitude' => -6.2603,
+        ]);
+
+        // A member roughly 1km away — comfortably inside the default 25km radius.
+        $this->makeVisibleMember([
+            'name' => 'Nearby Member',
+            'first_name' => 'Nearby',
+            'last_name' => 'Member',
+            'latitude' => 53.3560,
+            'longitude' => -6.2660,
+        ]);
+
+        Sanctum::actingAs($viewer, ['*']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/members/nearby?radius=25");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_members.nearby.heading'));
+        $response->assertSee('Nearby Member');
+        $response->assertSee(__('govuk_alpha_members.nearby.distance_label'));
+    }
+
+    public function test_members_nearby_excludes_member_outside_radius(): void
+    {
+        $viewer = $this->authenticatedUser([
+            'name' => 'Tight Radius Viewer',
+            'latitude' => 53.3498,
+            'longitude' => -6.2603,
+        ]);
+
+        // A member ~200km+ away — outside the 5km radius.
+        $this->makeVisibleMember([
+            'name' => 'Far Away Member',
+            'first_name' => 'Far',
+            'last_name' => 'Member',
+            'latitude' => 51.8985,
+            'longitude' => -8.4756,
+        ]);
+
+        Sanctum::actingAs($viewer, ['*']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/members/nearby?radius=5");
+
+        $response->assertOk();
+        $response->assertDontSee('Far Away Member');
+    }
 }

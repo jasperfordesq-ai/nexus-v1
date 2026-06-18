@@ -10,13 +10,17 @@ use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
+use App\Services\CommentService;
 use App\Services\GoalCheckinService;
 use App\Services\GoalProgressService;
 use App\Services\GoalReminderService;
 use App\Services\GoalService;
+use App\Services\SocialNotificationService;
+use App\Support\FeedItemTables;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -438,6 +442,253 @@ trait GoalsParity
             });
         } catch (\Throwable $e) {
             Log::warning('Goal buddy action notification failed (accessible)', ['goal' => $id, 'error' => $e->getMessage()]);
+        }
+    }
+
+    // === Social: likes + comments ===
+
+    /**
+     * Goal social page — heart-like state + threaded comments.
+     *
+     * Mirrors the React GoalDetailPage's <SocialInteractionPanel targetType="goal">
+     * (likes via POST /v2/social/like, comments via CommentService). Only members
+     * who can already see the goal (owner, buddy, or a public goal) reach it; the
+     * underlying services re-check visibility server-side as defence in depth.
+     */
+    public function goalsSocial(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $goal = $this->goalsParityLoad($tenantSlug, $id);
+        if ($goal instanceof RedirectResponse) {
+            return $goal;
+        }
+
+        $userId = (int) $this->currentUserId();
+        // Same visibility gate as the goal detail page: owner, assigned buddy, or
+        // any member for a public goal. Stranger-private goals are 403.
+        abort_unless($this->goalsParityCanView($goal, $userId), 403);
+
+        $comments = [];
+        $likeCount = 0;
+        $liked = false;
+        try {
+            $comments = CommentService::getForEntity('goal', $id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        try {
+            [$likeCount, $liked] = $this->goalsParityLikeState($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::goals-social', [
+            'title' => __('govuk_alpha_goals.social.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'goal' => $goal,
+            'comments' => is_array($comments) ? $comments : [],
+            'commentCount' => CommentService::countAll(is_array($comments) ? $comments : []),
+            'likeCount' => $likeCount,
+            'liked' => $liked,
+            'currentUserId' => $userId,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Toggle the caller's heart-like on a goal.
+     *
+     * Mirrors SocialController::likeV2 exactly — INSERT IGNORE / DELETE on the
+     * tenant-scoped likes table, visibility-checked first, and a best-effort
+     * owner notification on the like (never on the unlike, never on self-like).
+     */
+    public function goalsToggleLike(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $goal = $this->goalsParityLoad($tenantSlug, $id);
+        if ($goal instanceof RedirectResponse) {
+            return $goal;
+        }
+
+        $userId = (int) $this->currentUserId();
+        abort_unless($this->goalsParityCanView($goal, $userId), 403);
+
+        $status = 'like-failed';
+        try {
+            $tenantId = (int) TenantContext::getId();
+            if (! FeedItemTables::canView('goal', $id, $userId)) {
+                return $this->goalsSocialRedirect($tenantSlug, $id, 'like-failed');
+            }
+
+            $existing = DB::table('likes')
+                ->where('user_id', $userId)
+                ->where('target_type', 'goal')
+                ->where('target_id', $id)
+                ->where('tenant_id', $tenantId)
+                ->first();
+
+            if ($existing) {
+                DB::table('likes')
+                    ->where('id', $existing->id)
+                    ->where('tenant_id', $tenantId)
+                    ->delete();
+                $status = 'unliked';
+            } else {
+                DB::affectingStatement(
+                    'INSERT IGNORE INTO likes (user_id, target_type, target_id, tenant_id, created_at) VALUES (?, ?, ?, ?, NOW())',
+                    [$userId, 'goal', $id, $tenantId]
+                );
+                $status = 'liked';
+                $this->goalsParityNotifyLike($id, $userId);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->goalsSocialRedirect($tenantSlug, $id, $status);
+    }
+
+    /** Add a comment (or reply) to a goal. Notifies the goal owner. */
+    public function goalsStoreComment(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $goal = $this->goalsParityLoad($tenantSlug, $id);
+        if ($goal instanceof RedirectResponse) {
+            return $goal;
+        }
+
+        $userId = (int) $this->currentUserId();
+        abort_unless($this->goalsParityCanView($goal, $userId), 403);
+
+        $body = trim(self::asStr($request->input('body')));
+        $parentRaw = self::asStr($request->input('parent_id'));
+        $parentId = ctype_digit($parentRaw) && (int) $parentRaw > 0 ? (int) $parentRaw : null;
+
+        if ($body === '') {
+            return $this->goalsSocialRedirect($tenantSlug, $id, 'comment-invalid');
+        }
+
+        $status = 'comment-failed';
+        $commentId = null;
+        try {
+            $result = CommentService::addComment(
+                $userId,
+                (int) TenantContext::getId(),
+                'goal',
+                $id,
+                mb_substr($body, 0, 5000),
+                $parentId
+            );
+            if (! empty($result['success'])) {
+                $status = $parentId !== null ? 'reply-added' : 'comment-added';
+                $commentId = isset($result['comment']['id']) ? (int) $result['comment']['id'] : null;
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if (in_array($status, ['comment-added', 'reply-added'], true)) {
+            $this->goalsParityNotifyComment($id, $userId, $goal, $body, $commentId);
+        }
+
+        return $this->goalsSocialRedirect($tenantSlug, $id, $status, 'comments');
+    }
+
+    /** Delete one of the caller's own comments on a goal (cascades to replies). */
+    public function goalsDeleteComment(Request $request, string $tenantSlug, int $id, int $commentId): RedirectResponse
+    {
+        $goal = $this->goalsParityLoad($tenantSlug, $id);
+        if ($goal instanceof RedirectResponse) {
+            return $goal;
+        }
+
+        $userId = (int) $this->currentUserId();
+        abort_unless($this->goalsParityCanView($goal, $userId), 403);
+
+        $status = 'comment-delete-failed';
+        try {
+            // CommentService::delete is filtered by (id, tenant_id, user_id) so a
+            // member can only ever remove their own comment.
+            $status = CommentService::delete($commentId, $userId) > 0
+                ? 'comment-deleted'
+                : 'comment-delete-failed';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->goalsSocialRedirect($tenantSlug, $id, $status, 'comments');
+    }
+
+    /**
+     * Like count + whether the caller has liked, from the tenant-scoped likes
+     * table (same source SocialController::likeV2 returns).
+     *
+     * @return array{0:int,1:bool}
+     */
+    private function goalsParityLikeState(int $id, int $userId): array
+    {
+        $tenantId = (int) TenantContext::getId();
+        $count = (int) DB::table('likes')
+            ->where('target_type', 'goal')
+            ->where('target_id', $id)
+            ->where('tenant_id', $tenantId)
+            ->count();
+        $liked = DB::table('likes')
+            ->where('user_id', $userId)
+            ->where('target_type', 'goal')
+            ->where('target_id', $id)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        return [$count, $liked];
+    }
+
+    /** Redirect back to the goal social page with a status flash. */
+    private function goalsSocialRedirect(string $tenantSlug, int $id, string $status, ?string $fragment = null): RedirectResponse
+    {
+        $url = route('govuk-alpha.goals.social', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $status,
+        ]);
+        if ($fragment !== null) {
+            $url .= '#' . $fragment;
+        }
+
+        return redirect()->to($url);
+    }
+
+    /**
+     * Mirror SocialController::likeV2's like notification. The service resolves
+     * the recipient's locale itself; we only guard self-likes and exceptions.
+     */
+    private function goalsParityNotifyLike(int $id, int $userId): void
+    {
+        try {
+            $ownerId = SocialNotificationService::getContentOwnerId('goal', $id);
+            if ($ownerId && $ownerId !== $userId) {
+                $preview = SocialNotificationService::getContentPreview('goal', $id);
+                SocialNotificationService::notifyLike($ownerId, $userId, 'goal', $id, $preview);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Goal like notification failed (accessible)', ['goal' => $id, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Mirror SocialController::addComment's owner notification. The service
+     * renders the bell + email in the recipient's preferred locale internally.
+     *
+     * @param array<string,mixed> $goal
+     */
+    private function goalsParityNotifyComment(int $id, int $userId, array $goal, string $body, ?int $commentId): void
+    {
+        try {
+            $ownerId = (int) ($goal['user_id'] ?? 0);
+            if ($ownerId === 0 || $ownerId === $userId) {
+                return;
+            }
+            SocialNotificationService::notifyComment($ownerId, $userId, 'goal', $id, $body, $commentId);
+        } catch (\Throwable $e) {
+            Log::warning('Goal comment notification failed (accessible)', ['goal' => $id, 'error' => $e->getMessage()]);
         }
     }
 }

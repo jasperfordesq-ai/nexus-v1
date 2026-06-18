@@ -9,6 +9,56 @@ return [
         'reputation' => 'Reputation and recognition',
     ],
 
+    // Quick-filter links wired into the core members directory + the two new
+    // directory variants (Recommended / Near me).
+    'filters' => [
+        'heading' => 'Quick filters',
+        'all' => 'All members',
+        'new' => 'New members',
+        'active' => 'Most active',
+        'recommended' => 'Recommended',
+        'near_me' => 'Members near me',
+        'directory' => 'Full directory',
+    ],
+
+    // "Recommended members" directory (React ?sort=communityrank).
+    'discover' => [
+        'title' => 'Recommended members',
+        'heading' => 'Recommended members',
+        'description' => 'Members ranked by their recent activity, contribution and standing in this community.',
+        'algorithm_note' => 'Ordering uses the CommunityRank algorithm: recent activity, hours contributed, reputation, connections and proximity.',
+        'search_label' => 'Search recommended members',
+        'search_hint' => 'Search by member or organisation name.',
+        'results_title' => 'Results',
+        'rank_score_label' => 'Community rank',
+        'rank_score' => ':percent% match',
+        'rank_score_aria' => 'Community rank score :percent per cent',
+        'empty' => 'No recommended members to show yet.',
+        'disabled_title' => 'Recommendations are not available',
+        'disabled_detail' => 'This community has not enabled member recommendations. Browse the full directory instead.',
+        'error_detail' => 'Recommended members could not be loaded. Try again.',
+        'more_results_label' => 'More recommended members',
+    ],
+
+    // "Members near me" directory (React /v2/members/nearby).
+    'nearby' => [
+        'title' => 'Members near me',
+        'heading' => 'Members near me',
+        'description' => 'Members within the chosen distance of the location saved on your profile.',
+        'radius_label' => 'Distance',
+        'search_label' => 'Search nearby members',
+        'search_hint' => 'Search by member or organisation name.',
+        'results_title' => 'Results',
+        'distance_label' => 'Distance',
+        'distance' => ':distance km away',
+        'empty' => 'No members found within this distance.',
+        'no_location_title' => 'Add your location first',
+        'no_location_detail' => 'Add a location to your profile to find members near you.',
+        'edit_profile' => 'Update your profile',
+        'error_detail' => 'Nearby members could not be loaded. Try again.',
+        'more_results_label' => 'More nearby members',
+    ],
+
     'insights' => [
         // Page chrome
         'title' => 'Reputation and recognition - :name',

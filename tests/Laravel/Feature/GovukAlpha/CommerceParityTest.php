@@ -760,8 +760,512 @@ class CommerceParityTest extends TestCase
     }
 
     // ==================================================================
+    //  Courses — section + lesson builder
+    // ==================================================================
+
+    public function test_commerce_builder_renders_on_edit_page(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Builder Owner']);
+        $this->enableAlphaFeatures(['courses']);
+        $id = $this->seedCourse($owner->id, 'Buildable Course');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/edit");
+        $res->assertOk();
+        $res->assertSee('name="section_title"', false);
+        $res->assertSee('name="lesson_title"', false);
+    }
+
+    public function test_commerce_store_section_persists(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Section Owner']);
+        $this->enableAlphaFeatures(['courses']);
+        $id = $this->seedCourse($owner->id, 'Course With Section');
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/sections", [
+            'section_title' => 'Week One',
+        ]);
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseHas('course_sections', [
+            'tenant_id' => $this->testTenantId,
+            'course_id' => $id,
+            'title' => 'Week One',
+        ]);
+    }
+
+    public function test_commerce_store_section_requires_title(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Blank Section']);
+        $this->enableAlphaFeatures(['courses']);
+        $id = $this->seedCourse($owner->id, 'No Title Section');
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/sections", [
+            'section_title' => '',
+        ]);
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseMissing('course_sections', ['course_id' => $id]);
+    }
+
+    public function test_commerce_store_lesson_persists(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Lesson Owner']);
+        $this->enableAlphaFeatures(['courses']);
+        $id = $this->seedCourse($owner->id, 'Course With Lesson');
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/lessons", [
+            'lesson_title' => 'Introduction',
+            'content_type' => 'text',
+            'body' => 'Welcome to the course.',
+        ]);
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseHas('course_lessons', [
+            'tenant_id' => $this->testTenantId,
+            'course_id' => $id,
+            'title' => 'Introduction',
+            'content_type' => 'text',
+        ]);
+    }
+
+    public function test_commerce_delete_lesson_removes_it(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Lesson Deleter']);
+        $this->enableAlphaFeatures(['courses']);
+        $id = $this->seedCourse($owner->id, 'Course Delete Lesson');
+        $lessonId = $this->seedLesson($id);
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/lessons/{$lessonId}/delete");
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseMissing('course_lessons', ['id' => $lessonId]);
+    }
+
+    public function test_commerce_store_section_owner_only(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Section Guard']);
+        $this->enableAlphaFeatures(['courses']);
+        $id = $this->seedCourse($owner->id, 'Guarded Course');
+
+        $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        Sanctum::actingAs($other, ['*']);
+        $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/sections", [
+            'section_title' => 'Sneaky',
+        ])->assertStatus(403);
+    }
+
+    // ==================================================================
+    //  Marketplace — category page
+    // ==================================================================
+
+    public function test_commerce_category_page_requires_auth(): void
+    {
+        $this->enableAlphaFeatures(['marketplace']);
+        $this->get("/{$this->testTenantSlug}/alpha/marketplace/category/some-slug")
+            ->assertRedirectContains('/alpha/login');
+    }
+
+    public function test_commerce_category_unknown_slug_404(): void
+    {
+        $this->authenticatedUser(['name' => 'Category Browser']);
+        $this->enableAlphaFeatures(['marketplace']);
+        $this->disableMeiliSearch();
+
+        $this->get("/{$this->testTenantSlug}/alpha/marketplace/category/no-such-category-xyz")
+            ->assertStatus(404);
+    }
+
+    // ==================================================================
+    //  Marketplace — buyer pickups
+    // ==================================================================
+
+    public function test_commerce_my_pickups_renders_empty(): void
+    {
+        $this->authenticatedUser(['name' => 'Pickup Buyer']);
+        $this->enableAlphaFeatures(['marketplace']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/pickups");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha_commerce.pickups.title'));
+    }
+
+    public function test_commerce_my_pickups_requires_auth(): void
+    {
+        $this->enableAlphaFeatures(['marketplace']);
+        $this->get("/{$this->testTenantSlug}/alpha/marketplace/pickups")
+            ->assertRedirectContains('/alpha/login');
+    }
+
+    // ==================================================================
+    //  Marketplace — merchant onboarding
+    // ==================================================================
+
+    public function test_commerce_merchant_onboarding_form_renders(): void
+    {
+        $this->authenticatedUser(['name' => 'New Seller']);
+        $this->enableAlphaFeatures(['marketplace']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/onboarding");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha_commerce.onboarding.title'));
+        $res->assertSee('name="display_name"', false);
+    }
+
+    public function test_commerce_merchant_onboarding_persists_profile(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Onboarding Seller']);
+        $this->enableAlphaFeatures(['marketplace']);
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/onboarding", [
+            'seller_type' => 'business',
+            'business_name' => 'Acme Crafts',
+            'display_name' => 'Acme',
+            'bio' => 'We make handmade crafts.',
+        ]);
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseHas('marketplace_seller_profiles', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'business_name' => 'Acme Crafts',
+        ]);
+    }
+
+    public function test_commerce_merchant_onboarding_requires_display_name(): void
+    {
+        $this->authenticatedUser(['name' => 'Blank Onboarding']);
+        $this->enableAlphaFeatures(['marketplace']);
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/onboarding", [
+            'seller_type' => 'private',
+            'display_name' => '',
+        ]);
+        $res->assertRedirect();
+        $res->assertSessionHas('commerceOnboardingErrors');
+    }
+
+    // ==================================================================
+    //  Seller — merchant coupon management
+    // ==================================================================
+
+    public function test_commerce_seller_coupons_gated_off_by_default(): void
+    {
+        $this->authenticatedUser(['name' => 'Coupon Gated']);
+        // marketplace on but merchant_coupons off → 403
+        $this->enableAlphaFeatures(['marketplace']);
+        $this->get("/{$this->testTenantSlug}/alpha/marketplace/coupons")->assertStatus(403);
+    }
+
+    public function test_commerce_seller_coupons_requires_seller_profile(): void
+    {
+        $this->authenticatedUser(['name' => 'No Profile Coupon']);
+        $this->enableAlphaFeatures(['marketplace', 'merchant_coupons']);
+        // No seller profile → 403
+        $this->get("/{$this->testTenantSlug}/alpha/marketplace/coupons")->assertStatus(403);
+    }
+
+    public function test_commerce_seller_coupons_lists_for_seller(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Coupon Seller']);
+        $this->enableAlphaFeatures(['marketplace', 'merchant_coupons']);
+        $this->seedSellerProfile($user->id);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/coupons");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha_commerce.coupons.title'));
+    }
+
+    public function test_commerce_store_coupon_persists(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Coupon Creator']);
+        $this->enableAlphaFeatures(['marketplace', 'merchant_coupons']);
+        $profileId = $this->seedSellerProfile($user->id);
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/coupons/new", [
+            'title' => 'Spring Sale',
+            'code' => 'SPRING10',
+            'discount_type' => 'percent',
+            'discount_value' => '10',
+            'status' => 'active',
+        ]);
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseHas('merchant_coupons', [
+            'tenant_id' => $this->testTenantId,
+            'seller_id' => $profileId,
+            'code' => 'SPRING10',
+            'title' => 'Spring Sale',
+        ]);
+    }
+
+    public function test_commerce_store_coupon_requires_title(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Blank Coupon']);
+        $this->enableAlphaFeatures(['marketplace', 'merchant_coupons']);
+        $this->seedSellerProfile($user->id);
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/coupons/new", [
+            'title' => '',
+            'discount_type' => 'percent',
+            'discount_value' => '10',
+        ]);
+        $res->assertRedirect();
+        $res->assertSessionHas('commerceCouponErrors');
+    }
+
+    public function test_commerce_edit_coupon_cross_seller_404(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Coupon Owner']);
+        $this->enableAlphaFeatures(['marketplace', 'merchant_coupons']);
+        $this->seedSellerProfile($user->id);
+
+        // A coupon belonging to a different seller profile in this tenant.
+        $otherProfileId = $this->seedSellerProfile(
+            User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true])->id
+        );
+        $couponId = (int) DB::table('merchant_coupons')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'seller_id' => $otherProfileId,
+            'code' => 'OTHER5',
+            'title' => 'Other coupon',
+            'discount_type' => 'percent',
+            'discount_value' => 5,
+            'status' => 'active',
+            'applies_to' => 'all_listings',
+            'max_uses_per_member' => 1,
+            'usage_count' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->get("/{$this->testTenantSlug}/alpha/marketplace/coupons/{$couponId}/edit")->assertStatus(404);
+    }
+
+    public function test_commerce_delete_coupon_removes_it(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Coupon Deleter']);
+        $this->enableAlphaFeatures(['marketplace', 'merchant_coupons']);
+        $profileId = $this->seedSellerProfile($user->id);
+        $couponId = (int) DB::table('merchant_coupons')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'seller_id' => $profileId,
+            'code' => 'KILLME',
+            'title' => 'Delete me',
+            'discount_type' => 'percent',
+            'discount_value' => 5,
+            'status' => 'active',
+            'applies_to' => 'all_listings',
+            'max_uses_per_member' => 1,
+            'usage_count' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/coupons/{$couponId}/delete");
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseMissing('merchant_coupons', ['id' => $couponId]);
+    }
+
+    // ==================================================================
+    //  Podcasts — studio
+    // ==================================================================
+
+    public function test_commerce_podcast_studio_requires_auth(): void
+    {
+        $this->enableAlphaFeatures(['podcasts']);
+        $this->get("/{$this->testTenantSlug}/alpha/podcasts/studio")
+            ->assertRedirectContains('/alpha/login');
+    }
+
+    public function test_commerce_podcast_studio_renders_for_authoring_member(): void
+    {
+        // The test tenant has podcasts enabled AND member show-creation allowed
+        // (PodcastConfigurationService::CONFIG_ALLOW_MEMBER_SHOW_CREATION), so an
+        // authenticated member reaches the studio. (The feature/author gates
+        // themselves — hasFeature('podcasts') + commerceCanAuthorPodcasts — are
+        // exercised by the requires_auth test and the controller abort_unless.)
+        $this->enableAlphaFeatures(['podcasts']);
+        $this->authenticatedUser(['name' => 'Podcaster']);
+        $this->get("/{$this->testTenantSlug}/alpha/podcasts/studio")->assertOk();
+    }
+
+    public function test_commerce_podcast_studio_renders(): void
+    {
+        $this->authenticatedUser(['name' => 'Podcaster']);
+        $this->enableAlphaFeatures(['podcasts']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/podcasts/studio");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha_commerce.podcast_studio.title'));
+    }
+
+    public function test_commerce_store_podcast_persists(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Show Creator']);
+        $this->enableAlphaFeatures(['podcasts']);
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/podcasts/studio/new", [
+            'title' => 'Community Voices',
+            'summary' => 'Stories from our timebank.',
+            'visibility' => 'public',
+        ]);
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseHas('podcast_shows', [
+            'tenant_id' => $this->testTenantId,
+            'owner_user_id' => $user->id,
+            'title' => 'Community Voices',
+            'status' => 'draft',
+        ]);
+    }
+
+    public function test_commerce_store_podcast_requires_title(): void
+    {
+        $this->authenticatedUser(['name' => 'Blank Show']);
+        $this->enableAlphaFeatures(['podcasts']);
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/podcasts/studio/new", [
+            'title' => '',
+        ]);
+        $res->assertRedirect();
+        $res->assertSessionHas('commercePodcastErrors');
+    }
+
+    public function test_commerce_podcast_manage_owner_only(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Show Owner']);
+        $this->enableAlphaFeatures(['podcasts']);
+        $showId = $this->seedPodcastShow($owner->id, 'Owned Show');
+
+        $this->get("/{$this->testTenantSlug}/alpha/podcasts/studio/{$showId}")->assertOk();
+
+        $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        Sanctum::actingAs($other, ['*']);
+        $this->get("/{$this->testTenantSlug}/alpha/podcasts/studio/{$showId}")->assertStatus(403);
+    }
+
+    public function test_commerce_store_podcast_episode_persists(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Episode Author']);
+        $this->enableAlphaFeatures(['podcasts']);
+        $showId = $this->seedPodcastShow($owner->id, 'Show With Episode');
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/podcasts/studio/{$showId}/episodes", [
+            'episode_title' => 'Episode One',
+            'audio_url' => 'https://example.com/audio/ep1.mp3',
+        ]);
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseHas('podcast_episodes', [
+            'tenant_id' => $this->testTenantId,
+            'show_id' => $showId,
+            'title' => 'Episode One',
+        ]);
+    }
+
+    public function test_commerce_store_podcast_episode_requires_audio(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'No Audio Author']);
+        $this->enableAlphaFeatures(['podcasts']);
+        $showId = $this->seedPodcastShow($owner->id, 'Show No Audio');
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/podcasts/studio/{$showId}/episodes", [
+            'episode_title' => 'Episode Without Audio',
+        ]);
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseMissing('podcast_episodes', [
+            'show_id' => $showId,
+            'title' => 'Episode Without Audio',
+        ]);
+    }
+
+    public function test_commerce_delete_podcast_episode_cross_show_404(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Cross Show Owner']);
+        $this->enableAlphaFeatures(['podcasts']);
+        $showId = $this->seedPodcastShow($owner->id, 'Show A');
+        $otherShowId = $this->seedPodcastShow($owner->id, 'Show B');
+        $foreignEpisodeId = $this->seedPodcastEpisode($otherShowId, $owner->id);
+
+        // Episode belongs to Show B, but we ask via Show A → 404.
+        $this->post("/{$this->testTenantSlug}/alpha/podcasts/studio/{$showId}/episodes/{$foreignEpisodeId}/delete")
+            ->assertStatus(404);
+    }
+
+    // ==================================================================
     //  Seed + base helpers (mirror GovukAlphaFrontendTest)
     // ==================================================================
+
+    private function seedSellerProfile(int $userId): int
+    {
+        return (int) DB::table('marketplace_seller_profiles')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'seller_type' => 'business',
+            'joined_marketplace_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function seedPodcastShow(int $ownerId, string $title = 'Seeded Show'): int
+    {
+        return (int) DB::table('podcast_shows')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_user_id' => $ownerId,
+            'title' => $title,
+            'slug' => 'seeded-show-' . uniqid(),
+            'language' => 'en',
+            'visibility' => 'public',
+            'status' => 'draft',
+            'moderation_status' => 'approved',
+            'episode_count' => 0,
+            'subscriber_count' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function seedPodcastEpisode(int $showId, int $authorId): int
+    {
+        return (int) DB::table('podcast_episodes')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'show_id' => $showId,
+            'author_user_id' => $authorId,
+            'title' => 'Seeded Episode',
+            'slug' => 'seeded-episode-' . uniqid(),
+            'audio_url' => 'https://example.com/audio.mp3',
+            'media_processing_status' => 'complete',
+            'media_scan_status' => 'not_required',
+            'visibility' => 'inherit',
+            'status' => 'draft',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
 
     /** @param array<string,mixed> $overrides */
     private function seedListing(int $userId, array $overrides = []): int

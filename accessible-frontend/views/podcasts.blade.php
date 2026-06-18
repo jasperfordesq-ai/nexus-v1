@@ -15,6 +15,10 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.podcasts.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.podcasts.description') }}</p>
 
+    @if (\Illuminate\Support\Facades\Route::has('govuk-alpha.podcasts.studio') && \App\Services\PodcastConfigurationService::get(\App\Services\PodcastConfigurationService::CONFIG_ALLOW_MEMBER_SHOW_CREATION))
+        <p class="govuk-body"><a class="govuk-link" href="{{ route('govuk-alpha.podcasts.studio', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_commerce.podcast_studio.title') }}</a></p>
+    @endif
+
     <form method="get" action="{{ route('govuk-alpha.podcasts.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-6">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-one-half">

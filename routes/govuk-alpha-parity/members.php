@@ -22,6 +22,21 @@ use Illuminate\Support\Facades\Route;
  * Distinct path from the /members/{id} core route (an extra /insights segment),
  * so there is no collision with the numeric members.show wildcard.
  */
+/*
+ * Static directory variants registered BEFORE the numeric /members/{id}
+ * wildcard so "discover" / "nearby" never collide with a member id.
+ *
+ * - members.discover: CommunityRank-sorted "Recommended members" directory
+ *   (React ?sort=communityrank), backed by MemberRankingService::rankMembers().
+ * - members.nearby:   location/radius directory (React /v2/members/nearby),
+ *   backed by UserService::getNearby().
+ */
+Route::get('/members/discover', [AlphaController::class, 'membersDiscover'])
+    ->name('members.discover');
+
+Route::get('/members/nearby', [AlphaController::class, 'membersNearby'])
+    ->name('members.nearby');
+
 Route::get('/members/{id}/insights', [AlphaController::class, 'membersInsights'])
     ->whereNumber('id')
     ->name('members.insights');

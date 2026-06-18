@@ -37,6 +37,15 @@ Route::get('/jobs/employers/{employerId}', [AlphaController::class, 'jobsEmploye
     ->whereNumber('employerId')
     ->name('jobs.employer');
 
+// Employer onboarding landing — guided funnel into the create-vacancy form
+// (static; registered before the wildcard {id} sub-routes below).
+Route::get('/jobs/employer-onboarding', [AlphaController::class, 'jobsEmployerOnboarding'])
+    ->name('jobs.onboarding');
+
+// Candidate interviews & offers inbox (static; before wildcards).
+Route::get('/jobs/responses', [AlphaController::class, 'jobsResponses'])
+    ->name('jobs.responses');
+
 // Per-vacancy owner tools.
 Route::get('/jobs/{id}/analytics', [AlphaController::class, 'jobsAnalytics'])
     ->whereNumber('id')
@@ -49,3 +58,22 @@ Route::get('/jobs/{id}/pipeline', [AlphaController::class, 'jobsPipeline'])
 Route::get('/jobs/{id}/qualified', [AlphaController::class, 'jobsQualification'])
     ->whereNumber('id')
     ->name('jobs.qualified');
+
+// Candidate responses — accept/decline an interview, accept/reject an offer.
+// Each service method carries its own owner + state checks; throttled POSTs.
+Route::post('/jobs/interviews/{interviewId}/accept', [AlphaController::class, 'jobsAcceptInterview'])
+    ->whereNumber('interviewId')
+    ->middleware('throttle:30,1')
+    ->name('jobs.interviews.accept');
+Route::post('/jobs/interviews/{interviewId}/decline', [AlphaController::class, 'jobsDeclineInterview'])
+    ->whereNumber('interviewId')
+    ->middleware('throttle:30,1')
+    ->name('jobs.interviews.decline');
+Route::post('/jobs/offers/{offerId}/accept', [AlphaController::class, 'jobsAcceptOffer'])
+    ->whereNumber('offerId')
+    ->middleware('throttle:20,1')
+    ->name('jobs.offers.accept');
+Route::post('/jobs/offers/{offerId}/reject', [AlphaController::class, 'jobsRejectOffer'])
+    ->whereNumber('offerId')
+    ->middleware('throttle:20,1')
+    ->name('jobs.offers.reject');

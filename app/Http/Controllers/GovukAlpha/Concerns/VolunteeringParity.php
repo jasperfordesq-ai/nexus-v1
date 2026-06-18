@@ -11,6 +11,7 @@ use App\Services\VolunteerService;
 use App\Services\VolunteerEmergencyAlertService;
 use App\Services\VolunteerWellbeingService;
 use App\Services\VolunteerMatchingService;
+use App\Services\VolunteerDonationService;
 use App\Services\VolOrgWalletService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -871,5 +872,151 @@ trait VolunteeringParity
             'activeNav' => 'volunteering',
             'shifts' => $shifts,
         ]);
+    }
+
+    // =========================================================================
+    // DONATIONS / GIVING — community fundraising page (React DonationsTab)
+    //
+    // Money donations (NOT time credits) towards the community and active
+    // giving-day campaigns, plus the donor's own giving history. Calls the SAME
+    // VolunteerDonationService the React API (VolunteerCommunityController) uses
+    // — no money logic is reimplemented. Stripe card checkout is a JS-only
+    // ceremony and is excluded; this HTML-first form records OFFLINE donations
+    // (bank transfer / PayPal) as 'pending', exactly as the service does for the
+    // React modal. An administrator later marks them completed.
+    // =========================================================================
+
+    /** Offline payment methods offered on the no-JS donate form. */
+    private const VOL_DONATION_PAYMENT_METHODS = ['bank_transfer', 'paypal'];
+
+    public function volunteeringDonations(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Active giving days (with completed-donation totals/counts) and the
+        // caller's own donation history — the same two reads the React tab does.
+        $givingDays = [];
+        $donations = [];
+        try {
+            $givingDays = VolunteerDonationService::getGivingDays();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        try {
+            $result = app(VolunteerDonationService::class)->getDonations([
+                'user_id' => $userId,
+                'limit' => 20,
+            ]);
+            $donations = $result['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // Header stats derived from the giving-day campaign totals, matching the
+        // React tab's client-side reduction.
+        $totalRaised = 0.0;
+        $totalDonors = 0;
+        $activeCampaigns = 0;
+        foreach ($givingDays as $day) {
+            $totalRaised += (float) ($day['raised_amount'] ?? 0);
+            $totalDonors += (int) ($day['donor_count'] ?? 0);
+            if (($day['status'] ?? '') === 'active' || !empty($day['is_active'])) {
+                $activeCampaigns++;
+            }
+        }
+
+        return $this->view('accessible-frontend::volunteering-donations', [
+            'title' => __('govuk_alpha_volunteering.donations.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'volunteering',
+            'givingDays' => $givingDays,
+            'donations' => $donations,
+            'paymentMethods' => self::VOL_DONATION_PAYMENT_METHODS,
+            'stats' => [
+                'total_raised' => $totalRaised,
+                'total_donors' => $totalDonors,
+                'active_campaigns' => $activeCampaigns,
+            ],
+            'status' => self::asStr($request->query('status')) ?: null,
+            'donateError' => self::asStr($request->query('donate_error')) ?: null,
+        ]);
+    }
+
+    public function volunteeringStoreDonation(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $redirect = fn (string $status, ?string $error = null): RedirectResponse => redirect()
+            ->route('govuk-alpha.volunteering.donations', array_filter([
+                'tenantSlug' => $tenantSlug,
+                'status' => $status,
+                'donate_error' => $error,
+            ], static fn ($v) => $v !== null))
+            ->withFragment('donate');
+
+        // Whole-currency-unit amount, positive and sanely capped (the service
+        // re-validates, but we give a friendly inline error here too).
+        $amount = (float) $request->input('amount', 0);
+        if ($amount <= 0) {
+            return $redirect('donate-failed', 'amount');
+        }
+        if ($amount > 1000000) {
+            return $redirect('donate-failed', 'amount-max');
+        }
+
+        // Whitelist the offline payment method — never trust the posted value.
+        $paymentMethod = $this->allowed(
+            $request->input('payment_method'),
+            self::VOL_DONATION_PAYMENT_METHODS,
+            'bank_transfer'
+        );
+
+        // Optional giving-day target. 0/empty means a general community donation.
+        $givingDayId = (int) $request->input('giving_day_id', 0);
+
+        $message = trim(self::asStr($request->input('message')));
+        if ($message !== '') {
+            $message = mb_substr($message, 0, 500);
+        }
+        $isAnonymous = $request->boolean('is_anonymous');
+
+        $data = [
+            'amount' => $amount,
+            'currency' => 'EUR',
+            'payment_method' => $paymentMethod,
+            'message' => $message,
+            'is_anonymous' => $isAnonymous,
+        ];
+        if ($givingDayId > 0) {
+            $data['giving_day_id'] = $givingDayId;
+        }
+
+        try {
+            // Same service + 'pending' status the React modal produces. The
+            // service does all money/validation/tenant-scoping itself.
+            VolunteerDonationService::createDonation($userId, $data);
+        } catch (\InvalidArgumentException $e) {
+            // Validation failure (bad amount/currency/giving-day) — surface a
+            // generic inline error; the detail came from a translated message.
+            report($e);
+            return $redirect('donate-failed', 'validation');
+        } catch (\Throwable $e) {
+            report($e);
+            return $redirect('donate-failed');
+        }
+
+        return $redirect('donate-recorded');
     }
 }

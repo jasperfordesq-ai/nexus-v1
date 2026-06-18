@@ -28,6 +28,7 @@ return [
         'cancel_request' => 'Cancel request',
         'message' => 'Message',
         'view_profile' => 'View profile',
+        'about' => 'About :name',
         'load_more' => 'Show more',
         'load_more_sr' => 'Show more :section',
     ],

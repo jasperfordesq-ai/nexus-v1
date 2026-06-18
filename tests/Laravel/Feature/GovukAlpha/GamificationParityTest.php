@@ -405,8 +405,122 @@ class GamificationParityTest extends TestCase
     }
 
     // ==================================================================
+    //  COMPETITIVE LEADERBOARD — load more
+    // ==================================================================
+
+    public function test_gamification_competitive_renders_with_load_more_param(): void
+    {
+        $this->authenticatedUser(['name' => 'Comp Viewer']);
+        // A larger limit window still renders the page (mirrors React load-more).
+        $res = $this->get("/{$this->testTenantSlug}/alpha/leaderboard/competitive?type=xp&period=all&limit=40");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha_gamification.competitive.title'));
+    }
+
+    // ==================================================================
+    //  POLL DETAIL + SOCIAL (like / comment)
+    // ==================================================================
+
+    public function test_gamification_poll_detail_requires_auth(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'PD Owner']);
+        $pollId = $this->seedStandardPoll($owner->id);
+        $this->get("/{$this->testTenantSlug}/alpha/polls/{$pollId}")
+            ->assertRedirectContains('/alpha/login');
+    }
+
+    public function test_gamification_poll_detail_renders(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'PD Author']);
+        $pollId = $this->seedStandardPoll($owner->id);
+        $res = $this->get("/{$this->testTenantSlug}/alpha/polls/{$pollId}");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha_gamification.poll_detail.social_heading'));
+        $res->assertSee(__('govuk_alpha_gamification.poll_detail.comments_heading'));
+    }
+
+    public function test_gamification_poll_detail_404_for_missing_poll(): void
+    {
+        $this->authenticatedUser(['name' => 'PD Missing']);
+        $this->get("/{$this->testTenantSlug}/alpha/polls/9999999")->assertStatus(404);
+    }
+
+    public function test_gamification_poll_like_persists_a_like_row(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Like Owner']);
+        $pollId = $this->seedStandardPoll($owner->id);
+
+        $liker = $this->authenticatedUser(['name' => 'Liker One']);
+        $res = $this->post("/{$this->testTenantSlug}/alpha/polls/{$pollId}/like");
+        $res->assertRedirectContains('status=poll-liked');
+
+        $this->assertDatabaseHas('likes', [
+            'target_type' => 'poll',
+            'target_id'   => $pollId,
+            'user_id'     => $liker->id,
+            'tenant_id'   => $this->testTenantId,
+        ]);
+
+        // A second toggle removes the like.
+        $res2 = $this->post("/{$this->testTenantSlug}/alpha/polls/{$pollId}/like");
+        $res2->assertRedirectContains('status=poll-unliked');
+        $this->assertDatabaseMissing('likes', [
+            'target_type' => 'poll',
+            'target_id'   => $pollId,
+            'user_id'     => $liker->id,
+            'tenant_id'   => $this->testTenantId,
+        ]);
+    }
+
+    public function test_gamification_poll_comment_persists(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Comment Owner']);
+        $pollId = $this->seedStandardPoll($owner->id);
+
+        $commenter = $this->authenticatedUser(['name' => 'Commenter One']);
+        $res = $this->post("/{$this->testTenantSlug}/alpha/polls/{$pollId}/comment", [
+            'content' => 'Great poll, thanks for setting this up.',
+        ]);
+        $res->assertRedirectContains('status=poll-comment-created');
+
+        $this->assertDatabaseHas('comments', [
+            'target_type' => 'poll',
+            'target_id'   => $pollId,
+            'user_id'     => $commenter->id,
+            'tenant_id'   => $this->testTenantId,
+        ]);
+    }
+
+    public function test_gamification_poll_comment_empty_redirects_back(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Empty Owner']);
+        $pollId = $this->seedStandardPoll($owner->id);
+
+        $this->authenticatedUser(['name' => 'Empty Commenter']);
+        $res = $this->post("/{$this->testTenantSlug}/alpha/polls/{$pollId}/comment", [
+            'content' => '   ',
+        ]);
+        $res->assertRedirectContains('status=poll-comment-empty');
+    }
+
+    // ==================================================================
     //  Helpers
     // ==================================================================
+
+    /** An open standard poll with two options (for detail/like/comment tests). */
+    private function seedStandardPoll(int $creatorId): int
+    {
+        $pollId = DB::table('polls')->insertGetId([
+            'tenant_id' => $this->testTenantId, 'user_id' => $creatorId, 'question' => 'What should we do next?',
+            'is_active' => 1, 'end_date' => null, 'created_at' => now(), 'poll_type' => 'standard',
+        ]);
+        DB::table('poll_options')->insert([
+            ['tenant_id' => $this->testTenantId, 'poll_id' => $pollId, 'label' => 'Plan A', 'votes' => 0],
+            ['tenant_id' => $this->testTenantId, 'poll_id' => $pollId, 'label' => 'Plan B', 'votes' => 0],
+        ]);
+
+        return $pollId;
+    }
 
     private function seedRankedPoll(int $creatorId): int
     {

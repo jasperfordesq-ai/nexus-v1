@@ -20,6 +20,9 @@
         $showServiceBadge = is_string($serviceType) && $serviceType !== '' && $serviceType !== 'physical_only'
             && Lang::has('govuk_alpha.listings.service_types.' . $serviceType);
         $statusValue = $listing['status'] ?? null;
+        // Authenticated viewer flag for the comments/report/delete controls below
+        // ($requiresAuth is set by the controller; true when the viewer is a guest).
+        $isAuthenticated = !($requiresAuth ?? true);
         $gallery = is_array($listing['images'] ?? null) ? $listing['images'] : [];
         $skillTags = collect($listing['skill_tags'] ?? [])
             ->map(fn ($tag) => is_array($tag) ? ($tag['name'] ?? $tag['tag'] ?? null) : (is_string($tag) ? $tag : (is_object($tag) ? ($tag->name ?? null) : null)))
@@ -168,7 +171,9 @@
             </div>
         @endif
         @if (!empty($listing['expires_at']))
-            @php($expiresAt = \Illuminate\Support\Carbon::parse($listing['expires_at'])->translatedFormat('j F Y'))
+            @php
+                $expiresAt = \Illuminate\Support\Carbon::parse($listing['expires_at'])->translatedFormat('j F Y');
+            @endphp
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">{{ __('govuk_alpha.listings.expires_label') }}</dt>
                 <dd class="govuk-summary-list__value">{{ $statusValue === 'expired' ? __('govuk_alpha.listings.expired_on', ['date' => $expiresAt]) : __('govuk_alpha.listings.expires_on', ['date' => $expiresAt]) }}</dd>
@@ -201,6 +206,34 @@
                 </p>
                 @if (!empty($authorTagline))
                     <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">{{ $authorTagline }}</p>
+                @endif
+                @php
+                    // Author verification badges — mirrors the React <VerificationBadgeRow>,
+                    // which self-fetches /v2/users/{id}/verification-badges. The accessible
+                    // frontend has no client fetch, so we read the same service directly.
+                    $authorBadges = [];
+                    if ($authorId > 0) {
+                        try {
+                            $authorBadges = app(\App\Services\MemberVerificationBadgeService::class)->getUserBadges($authorId);
+                        } catch (\Throwable $e) {
+                            report($e);
+                            $authorBadges = [];
+                        }
+                    }
+                @endphp
+                @if (!empty($authorBadges))
+                    <ul class="govuk-list nexus-alpha-actions govuk-!-margin-bottom-2" aria-label="{{ __('govuk_alpha_listings.detail.author_badges_heading') }}">
+                        @foreach ($authorBadges as $badge)
+                            @php
+                                $badgeType = (string) ($badge['badge_type'] ?? '');
+                                $badgeKey = 'govuk_alpha_listings.badges.' . $badgeType;
+                                $badgeLabel = \Illuminate\Support\Facades\Lang::has($badgeKey) ? __($badgeKey) : (string) ($badge['label'] ?? $badgeType);
+                            @endphp
+                            @if ($badgeLabel !== '')
+                                <li><strong class="govuk-tag govuk-tag--green">{{ $badgeLabel }}</strong></li>
+                            @endif
+                        @endforeach
+                    </ul>
                 @endif
                 <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">
                     @if (!empty($listing['author_rating']))
@@ -240,6 +273,15 @@
                     </button>
                 </form>
             @endif
+        @endif
+        @if ($isAuthenticated)
+            <a class="govuk-link" href="{{ route('govuk-alpha.listings.comments', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}">
+                @if ((int) ($listing['comments_count'] ?? 0) > 0)
+                    {{ __('govuk_alpha_listings.detail.comments_link_count', ['count' => (int) $listing['comments_count']]) }}
+                @else
+                    {{ __('govuk_alpha_listings.detail.comments_link') }}
+                @endif
+            </a>
         @endif
         @if ($isAuthenticated && !$isOwner)
             <a class="govuk-link" href="{{ route('govuk-alpha.listings.report', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}">{{ __('govuk_alpha.polish_listings.report_listing_title') }}</a>
@@ -285,6 +327,21 @@
                     </form>
                 @endif
             @endif
+
+            {{-- Delete is a clearly-warned, CSRF-protected action (route is owner-gated). --}}
+            <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--m govuk-!-margin-top-4">
+            <h3 class="govuk-heading-s">{{ __('govuk_alpha_listings.detail.delete_heading') }}</h3>
+            <div class="govuk-warning-text">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <strong class="govuk-warning-text__text">
+                    <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning') }}</span>
+                    {{ __('govuk_alpha_listings.detail.delete_warning') }}
+                </strong>
+            </div>
+            <form method="post" action="{{ route('govuk-alpha.listings.delete', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}">
+                @csrf
+                <button class="govuk-button govuk-button--warning" data-module="govuk-button">{{ __('govuk_alpha_listings.detail.delete_button') }}</button>
+            </form>
         @elseif ($exchangeWorkflowEnabled)
             @if ($activeExchange)
                 <div class="govuk-inset-text">

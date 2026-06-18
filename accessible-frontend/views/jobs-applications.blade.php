@@ -33,6 +33,12 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.jobs_t2.applications_title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.jobs_t2.applications_description') }}</p>
 
+    @if (\Illuminate\Support\Facades\Route::has('govuk-alpha.jobs.responses'))
+        <p class="govuk-body">
+            <a class="govuk-link" href="{{ route('govuk-alpha.jobs.responses', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_jobs.responses.title') }}</a>
+        </p>
+    @endif
+
     @include('accessible-frontend::partials.jobs-nav', ['jobsActiveTab' => 'applications'])
 
     @if (($status ?? null) === 'withdrawn')

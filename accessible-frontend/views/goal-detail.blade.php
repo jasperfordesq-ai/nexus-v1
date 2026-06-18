@@ -45,14 +45,15 @@
     <p class="govuk-body govuk-!-margin-bottom-1">{{ __('govuk_alpha.goals.progress_label', ['current' => $num($cur), 'target' => $num($tgt)]) }}</p>
     <progress max="100" value="{{ $pct }}" aria-label="{{ $pct }}%">{{ $pct }}%</progress>
 
-    @if ($isOwner || $isBuddy)
-        <p class="nexus-alpha-actions govuk-!-margin-top-4">
-            @if ($isOwner)
-                <a class="govuk-link" href="{{ route('govuk-alpha.goals.edit', ['tenantSlug' => $tenantSlug, 'id' => $goal['id']]) }}">{{ __('govuk_alpha.goals.edit_goal') }}</a>
-            @endif
+    <p class="nexus-alpha-actions govuk-!-margin-top-4">
+        @if ($isOwner)
+            <a class="govuk-link" href="{{ route('govuk-alpha.goals.edit', ['tenantSlug' => $tenantSlug, 'id' => $goal['id']]) }}">{{ __('govuk_alpha.goals.edit_goal') }}</a>
+        @endif
+        @if ($isOwner || $isBuddy)
             <a class="govuk-link" href="{{ route('govuk-alpha.goals.insights', ['tenantSlug' => $tenantSlug, 'id' => $goal['id']]) }}">{{ __('govuk_alpha_goals.nav.insights') }}</a>
-        </p>
-    @endif
+        @endif
+        <a class="govuk-link" href="{{ route('govuk-alpha.goals.social', ['tenantSlug' => $tenantSlug, 'id' => $goal['id']]) }}">{{ __('govuk_alpha_goals.nav.social') }}</a>
+    </p>
 
     @if ($isOwner && !$done)
         <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.goals.update_title') }}</h2>

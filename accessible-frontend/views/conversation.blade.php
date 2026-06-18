@@ -10,10 +10,14 @@
         $otherName = $otherUser['name'] ?? trim(($otherUser['first_name'] ?? '') . ' ' . ($otherUser['last_name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
         $formatDate = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y, g:ia') : null;
         $canSend = $directMessagingEnabled && empty($restriction['messaging_disabled']);
+        $translationEnabled = \App\Core\TenantContext::hasFeature('message_translation');
+        $translation = session('messages_translation');
+        $translatedMessageId = is_array($translation) ? (int) ($translation['id'] ?? 0) : 0;
         $successStatuses = [
             'message-sent' => 'govuk_alpha.messages.sent',
             'message-edited' => 'govuk_alpha.messages.edited_success',
             'message-deleted' => 'govuk_alpha.messages.deleted_success',
+            'translate-done' => 'govuk_alpha_messages.translate.done',
         ];
         $errorStatuses = [
             'message-empty' => 'govuk_alpha.messages.empty_message',
@@ -23,6 +27,9 @@
             'message-edit-expired' => 'govuk_alpha.messages.edit_expired',
             'message-edit-failed' => 'govuk_alpha.messages.edit_failed',
             'message-delete-failed' => 'govuk_alpha.messages.delete_failed',
+            'translate-failed' => 'govuk_alpha_messages.translate.failed',
+            'translate-unavailable' => 'govuk_alpha_messages.translate.unavailable',
+            'translate-empty' => 'govuk_alpha_messages.translate.empty',
         ];
     @endphp
 
@@ -111,7 +118,7 @@
                         && $createdAt && \Illuminate\Support\Carbon::parse($createdAt)->gt(now()->subHours(24));
                     $canManageMessage = $isOwn && !$isDeleted && $messageId > 0;
                 @endphp
-                <li class="nexus-alpha-card">
+                <li class="nexus-alpha-card" id="m-{{ $messageId }}">
                     <div class="nexus-alpha-card-head">
                         @php($senderAvatar = $message['sender']['avatar_url'] ?? null)
                         @if (!empty($senderAvatar))
@@ -128,6 +135,23 @@
                         <p class="govuk-body govuk-hint">{{ __('govuk_alpha.messages.deleted_placeholder') }}</p>
                     @else
                         <div class="govuk-body">{!! nl2br(e((string) ($message['body'] ?? ''))) !!}</div>
+                    @endif
+
+                    {{-- Per-message translation (parity: React MessageBubble translate button).
+                         The translated text is flashed by messagesTranslateMessage and rendered
+                         inline here, under the original. No-JS: a plain POST form per message. --}}
+                    @if (!$isDeleted && $translationEnabled && $messageId > 0 && trim((string) ($message['body'] ?? '')) !== '')
+                        @if ($translatedMessageId === $messageId && !empty($translation['text']))
+                            <div class="govuk-inset-text govuk-!-margin-top-2">
+                                <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">{{ __('govuk_alpha_messages.translate.translated_label') }}</p>
+                                <div class="govuk-body govuk-!-margin-bottom-0">{!! nl2br(e((string) $translation['text'])) !!}</div>
+                            </div>
+                        @else
+                            <form method="post" action="{{ route('govuk-alpha.messages.translate', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id'], 'messageId' => $messageId]) }}" class="govuk-!-margin-top-1">
+                                @csrf
+                                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_messages.translate.button') }}</button>
+                            </form>
+                        @endif
                     @endif
 
                     @if ($canManageMessage)

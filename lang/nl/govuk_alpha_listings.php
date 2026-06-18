@@ -61,4 +61,60 @@ return [
         'listing_created' => 'Listing created',
         'listing_expires' => 'Listing expires',
     ],
+
+    // ---- Listing detail extras (delete, comments link, author badges) ----
+    'detail' => [
+        'delete_heading' => 'Delete this listing',
+        'delete_warning' => 'Deleting this listing cannot be undone. It will be removed for everyone.',
+        'delete_button' => 'Delete listing',
+        'comments_link' => 'View and add comments',
+        'comments_link_count' => 'View and add comments (:count)',
+        'author_badges_heading' => 'Verified',
+    ],
+
+    // ---- Verification badge labels (mirrors MemberVerificationBadgeService) ----
+    'badges' => [
+        'email_verified' => 'Email verified',
+        'phone_verified' => 'Phone verified',
+        'id_verified' => 'ID verified',
+        'address_verified' => 'Address verified',
+        'admin_verified' => 'Admin verified',
+        'background_check' => 'Background check verified',
+        'organization_vouched' => 'Organisation vouched',
+        'peer_endorsed' => 'Peer endorsed',
+    ],
+
+    // ---- Comment thread ----------------------------------------------------
+    'comments' => [
+        'title' => 'Comments',
+        'caption' => 'Listing',
+        'back_to_listing' => 'Back to listing',
+        'heading' => 'Comments',
+        'empty' => 'No comments yet. Be the first to start the conversation.',
+        'add_heading' => 'Add a comment',
+        'body_label' => 'Your comment',
+        'body_hint' => 'Be kind and keep it relevant to this listing.',
+        'submit' => 'Post comment',
+        'edited' => 'Edited',
+        'states' => [
+            'comment-added' => 'Your comment has been posted.',
+            'reply-added' => 'Your reply has been posted.',
+            'comment-invalid' => 'Enter a comment before posting.',
+            'comment-failed' => 'Your comment could not be posted. Please try again.',
+        ],
+    ],
+
+    // ---- AI description helper (create / edit forms) -----------------------
+    'ai' => [
+        'heading' => 'Need help writing a description?',
+        'hint' => 'Add a title first, then generate a suggested description you can edit before saving.',
+        'generate_button' => 'Generate a description with AI',
+        'regenerate_button' => 'Generate a new suggestion',
+        'states' => [
+            'ai-generated' => 'We have suggested a description below. Review and edit it before you save.',
+            'ai-title-required' => 'Add a title before generating a description.',
+            'ai-failed' => 'We could not generate a description right now. Please write one yourself or try again later.',
+            'ai-disabled' => 'AI description suggestions are not available on this community.',
+        ],
+    ],
 ];

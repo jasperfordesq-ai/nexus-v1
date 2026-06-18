@@ -340,4 +340,40 @@ class GroupsParityTest extends GovukAlphaFrontendTest
 
         $resp->assertRedirect("/{$this->testTenantSlug}/alpha/groups/{$groupId}/image?status=image-missing");
     }
+
+    // ================================================================
+    // Subgroups (read-only list on group detail; data from getById)
+    // ================================================================
+
+    public function test_groups_detail_lists_public_subgroups(): void
+    {
+        $this->groupsParityEnableFeature();
+        $owner = $this->groupsParityUser();
+        $parentId = $this->groupsParityCreateGroup($owner->id, ['name' => 'Allotment Network']);
+        // A public child group nested under the parent.
+        $childId = $this->groupsParityCreateGroup($owner->id, [
+            'name' => 'Allotment Network — North Plot',
+            'visibility' => 'public',
+            'parent_id' => $parentId,
+        ]);
+
+        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$parentId}");
+
+        $resp->assertOk();
+        $resp->assertSee(__('govuk_alpha_groups.subgroups.heading'));
+        $resp->assertSee('Allotment Network — North Plot', false);
+        $resp->assertSee(route('govuk-alpha.groups.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $childId]), false);
+    }
+
+    public function test_groups_detail_hides_subgroups_heading_when_none(): void
+    {
+        $this->groupsParityEnableFeature();
+        $owner = $this->groupsParityUser();
+        $parentId = $this->groupsParityCreateGroup($owner->id, ['name' => 'Standalone Group']);
+
+        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$parentId}");
+
+        $resp->assertOk();
+        $resp->assertDontSee(__('govuk_alpha_groups.subgroups.heading'));
+    }
 }

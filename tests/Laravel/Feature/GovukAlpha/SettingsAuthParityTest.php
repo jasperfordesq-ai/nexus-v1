@@ -291,8 +291,234 @@ class SettingsAuthParityTest extends TestCase
     }
 
     // =====================================================================
+    //  GDPR data-subject requests
+    // =====================================================================
+
+    public function test_settings_data_rights_requires_authentication(): void
+    {
+        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/data-rights");
+
+        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+    }
+
+    public function test_settings_data_rights_request_requires_authentication(): void
+    {
+        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/data-rights", [
+            'request_type' => 'rectification',
+        ]);
+
+        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+    }
+
+    public function test_settings_data_rights_page_renders_request_types(): void
+    {
+        $this->authenticatedUser(['name' => 'Rights Me']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/data-rights");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_settings.gdpr.title'));
+        $response->assertSee(__('govuk_alpha_settings.gdpr.types.portability'));
+        $response->assertSee(__('govuk_alpha_settings.gdpr.types.rectification'));
+        $response->assertSee(__('govuk_alpha_settings.gdpr.types.restriction'));
+        $response->assertSee(__('govuk_alpha_settings.gdpr.types.objection'));
+        $response->assertSee(__('govuk_alpha_settings.gdpr.your_requests_empty'));
+    }
+
+    public function test_settings_data_rights_request_rejects_invalid_type(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/data-rights", [
+            'request_type' => 'erasure', // not one of the four self-service types here
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=gdpr-invalid', (string) $response->headers->get('Location'));
+    }
+
+    public function test_settings_data_rights_request_persists_request(): void
+    {
+        $me = $this->authenticatedUser(['name' => 'Submit Rights Me']);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/data-rights", [
+            'request_type' => 'rectification',
+            'notes' => 'My surname is misspelled.',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=gdpr-requested', (string) $response->headers->get('Location'));
+        $this->assertDatabaseHas('gdpr_requests', [
+            'user_id' => $me->id,
+            'tenant_id' => $this->testTenantId,
+            'request_type' => 'rectification',
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_settings_data_rights_request_blocks_duplicate(): void
+    {
+        $me = $this->authenticatedUser(['name' => 'Dup Rights Me']);
+
+        DB::table('gdpr_requests')->insert([
+            'user_id' => $me->id,
+            'tenant_id' => $this->testTenantId,
+            'request_type' => 'objection',
+            'status' => 'pending',
+            'priority' => 'normal',
+            'requested_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/data-rights", [
+            'request_type' => 'objection',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=gdpr-duplicate', (string) $response->headers->get('Location'));
+    }
+
+    // =====================================================================
+    //  Insurance certificates (compliance-gated)
+    // =====================================================================
+
+    public function test_settings_insurance_requires_authentication(): void
+    {
+        $this->enableInsurance();
+        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/insurance");
+
+        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+    }
+
+    public function test_settings_insurance_404_when_disabled(): void
+    {
+        $this->disableInsurance();
+        $this->authenticatedUser(['name' => 'No Insurance Me']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/insurance");
+
+        $response->assertNotFound();
+    }
+
+    public function test_settings_insurance_page_renders_when_enabled(): void
+    {
+        $this->enableInsurance();
+        $this->authenticatedUser(['name' => 'Insurance Me']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/insurance");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_settings.insurance.title'));
+        $response->assertSee(__('govuk_alpha_settings.insurance.certificates_empty'));
+        $response->assertSee(__('govuk_alpha_settings.insurance.upload_button'));
+    }
+
+    public function test_settings_insurance_page_shows_existing_certificate(): void
+    {
+        $this->enableInsurance();
+        $me = $this->authenticatedUser(['name' => 'Cert Me']);
+
+        DB::table('insurance_certificates')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $me->id,
+            'insurance_type' => 'public_liability',
+            'provider_name' => 'Acme Cover Ltd',
+            'status' => 'verified',
+            'created_at' => now(),
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/insurance");
+
+        $response->assertOk();
+        $response->assertSee('Acme Cover Ltd');
+        $response->assertSee(__('govuk_alpha_settings.insurance.types.public_liability'));
+        $response->assertSee(__('govuk_alpha_settings.insurance.statuses.verified'));
+    }
+
+    public function test_settings_insurance_upload_requires_authentication(): void
+    {
+        $this->enableInsurance();
+        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/insurance", [
+            'insurance_type' => 'public_liability',
+        ]);
+
+        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+    }
+
+    public function test_settings_insurance_upload_404_when_disabled(): void
+    {
+        $this->disableInsurance();
+        $this->authenticatedUser();
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/insurance", [
+            'insurance_type' => 'public_liability',
+        ]);
+
+        $response->assertNotFound();
+    }
+
+    public function test_settings_insurance_upload_requires_file(): void
+    {
+        $this->enableInsurance();
+        $this->authenticatedUser();
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/insurance", [
+            'insurance_type' => 'public_liability',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=insurance-file-required', (string) $response->headers->get('Location'));
+    }
+
+    public function test_settings_insurance_upload_persists_certificate(): void
+    {
+        $this->enableInsurance();
+        $me = $this->authenticatedUser(['name' => 'Upload Cert Me']);
+
+        // A valid PNG file so finfo reports image/png.
+        $pngBytes = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
+        $file = \Illuminate\Http\Testing\File::create('cert.png');
+        file_put_contents($file->getPathname(), $pngBytes);
+
+        // The uploaded file must travel in the data array — Laravel's test client
+        // extracts UploadedFile instances from there (post() has no separate files arg).
+        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/insurance", [
+            'insurance_type' => 'professional_indemnity',
+            'provider_name' => 'Indemnity Co',
+            'certificate_file' => $file,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=insurance-uploaded', (string) $response->headers->get('Location'));
+        $this->assertDatabaseHas('insurance_certificates', [
+            'user_id' => $me->id,
+            'tenant_id' => $this->testTenantId,
+            'insurance_type' => 'professional_indemnity',
+            'provider_name' => 'Indemnity Co',
+            'status' => 'submitted',
+        ]);
+    }
+
+    // =====================================================================
     //  Helpers (mirrored from GovukAlphaFrontendTest, which keeps them private)
     // =====================================================================
+
+    private function enableInsurance(): void
+    {
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'broker_config'],
+            ['setting_value' => json_encode(['insurance_enabled' => true]), 'setting_type' => 'json', 'updated_at' => now(), 'created_at' => now()],
+        );
+    }
+
+    private function disableInsurance(): void
+    {
+        DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('setting_key', 'broker_config')
+            ->delete();
+    }
 
     private function authenticatedUser(array $overrides = []): User
     {

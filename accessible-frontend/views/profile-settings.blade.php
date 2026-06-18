@@ -43,6 +43,19 @@
                         'href' => route('govuk-alpha.settings.appearance', ['tenantSlug' => $tenantSlug]),
                     ];
                 }
+                if (\Illuminate\Support\Facades\Route::has('govuk-alpha.settings.data-rights')) {
+                    $settingsTabs[] = [
+                        'label' => __('govuk_alpha_settings.nav.data_rights'),
+                        'href' => route('govuk-alpha.settings.data-rights', ['tenantSlug' => $tenantSlug]),
+                    ];
+                }
+                if (\Illuminate\Support\Facades\Route::has('govuk-alpha.settings.insurance')
+                    && \App\Services\BrokerControlConfigService::isInsuranceEnabled()) {
+                    $settingsTabs[] = [
+                        'label' => __('govuk_alpha_settings.nav.insurance'),
+                        'href' => route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug]),
+                    ];
+                }
             @endphp
             @if (!empty($settingsTabs))
                 <ul class="govuk-list govuk-!-margin-bottom-6">

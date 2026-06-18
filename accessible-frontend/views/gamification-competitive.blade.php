@@ -83,6 +83,8 @@
     @if (empty($compRows))
         <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha_gamification.competitive.empty') }}</p></div>
     @else
+        @php $compCount = count($compRows); @endphp
+        <p class="govuk-body-s nexus-alpha-meta">{{ trans_choice('govuk_alpha_gamification.competitive.showing_count', $compCount, ['count' => $compCount]) }}</p>
         <table class="govuk-table">
             <caption class="govuk-table__caption govuk-table__caption--s govuk-visually-hidden">{{ __('govuk_alpha_gamification.competitive.metrics.' . $compType) }}</caption>
             <thead class="govuk-table__head">
@@ -110,5 +112,11 @@
                 @endforeach
             </tbody>
         </table>
+
+        {{-- Load-more: a plain GET link that grows the visible window (no JS). --}}
+        @if (!empty($compHasMore))
+            <a class="govuk-button govuk-button--secondary" data-module="govuk-button" role="button" href="{{ route('govuk-alpha.gamification.competitive', ['tenantSlug' => $tenantSlug, 'type' => $compType, 'period' => $compPeriod, 'limit' => (int) ($compNextLimit ?? 0)]) }}#leaderboard-end">{{ __('govuk_alpha_gamification.competitive.load_more') }}</a>
+        @endif
+        <span id="leaderboard-end" tabindex="-1"></span>
     @endif
 @endsection

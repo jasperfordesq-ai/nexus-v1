@@ -45,6 +45,12 @@ Route::get('/volunteering/wellbeing', [AlphaController::class, 'volunteeringWell
 Route::post('/volunteering/wellbeing/checkin', [AlphaController::class, 'volunteeringWellbeingCheckin'])
     ->middleware('throttle:10,1')->name('volunteering.wellbeing.checkin');
 
+// Donations / giving — community fundraising page + offline donate form.
+Route::get('/volunteering/donations', [AlphaController::class, 'volunteeringDonations'])
+    ->name('volunteering.donations');
+Route::post('/volunteering/donations', [AlphaController::class, 'volunteeringStoreDonation'])
+    ->middleware('throttle:10,1')->name('volunteering.donations.store');
+
 // ----- Organisation management suite -----
 // "/opportunities/create" is declared here; the existing numeric show route
 // "/volunteering/opportunities/{id}" is constrained with whereNumber so the

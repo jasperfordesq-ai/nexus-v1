@@ -15,6 +15,37 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.members.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.members.description') }}</p>
 
+    @unless ($requiresAuth)
+        @php
+            $activeSort = $filters['sort'] ?? 'name';
+            $activeOrder = strtoupper($filters['order'] ?? 'ASC');
+            $isNew = $activeSort === 'joined' && $activeOrder === 'DESC';
+            $isActive = $activeSort === 'hours_given' && $activeOrder === 'DESC';
+            $isAll = !$isNew && !$isActive;
+        @endphp
+        {{-- Quick-filter links: All / New / Most active (reuse the core directory),
+             plus the Recommended (CommunityRank) and Members-near-me variants. --}}
+        <nav class="nexus-alpha-actions govuk-!-margin-bottom-6" aria-label="{{ __('govuk_alpha_members.filters.heading') }}">
+            @if ($isAll)
+                <strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha_members.filters.all') }}</strong>
+            @else
+                <a class="govuk-link" href="{{ route('govuk-alpha.members.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_members.filters.all') }}</a>
+            @endif
+            @if ($isNew)
+                <strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha_members.filters.new') }}</strong>
+            @else
+                <a class="govuk-link" href="{{ route('govuk-alpha.members.index', ['tenantSlug' => $tenantSlug, 'sort' => 'joined', 'order' => 'DESC']) }}">{{ __('govuk_alpha_members.filters.new') }}</a>
+            @endif
+            @if ($isActive)
+                <strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha_members.filters.active') }}</strong>
+            @else
+                <a class="govuk-link" href="{{ route('govuk-alpha.members.index', ['tenantSlug' => $tenantSlug, 'sort' => 'hours_given', 'order' => 'DESC']) }}">{{ __('govuk_alpha_members.filters.active') }}</a>
+            @endif
+            <a class="govuk-link" href="{{ route('govuk-alpha.members.discover', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_members.filters.recommended') }}</a>
+            <a class="govuk-link" href="{{ route('govuk-alpha.members.nearby', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_members.filters.near_me') }}</a>
+        </nav>
+    @endunless
+
     @if ($requiresAuth)
         <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="members-auth-required-title">
             <div class="govuk-notification-banner__header">

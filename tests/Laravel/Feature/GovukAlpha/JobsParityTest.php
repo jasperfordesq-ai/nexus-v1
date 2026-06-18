@@ -7,6 +7,9 @@
 namespace Tests\Laravel\Feature\GovukAlpha;
 
 use App\Core\TenantContext;
+use App\Models\JobApplication;
+use App\Models\JobInterview;
+use App\Models\JobOffer;
 use App\Models\JobVacancy;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -324,8 +327,177 @@ class JobsParityTest extends TestCase
     }
 
     // =====================================================================
+    // Employer onboarding
+    // =====================================================================
+
+    public function test_jobs_onboarding_renders_for_member(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/employer-onboarding");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_jobs.onboarding.title'));
+        $response->assertSee(__('govuk_alpha_jobs.onboarding.start_button'));
+    }
+
+    public function test_jobs_onboarding_requires_authentication(): void
+    {
+        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/employer-onboarding");
+        $response->assertRedirect();
+        $this->assertStringContainsString(
+            "/{$this->testTenantSlug}/alpha/login",
+            $response->headers->get('Location') ?? ''
+        );
+    }
+
+    // =====================================================================
+    // Responses inbox (interviews & offers)
+    // =====================================================================
+
+    public function test_jobs_responses_renders_with_interview_and_offer(): void
+    {
+        $candidate = $this->authenticatedUser();
+        $poster = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $job = $this->createJob((int) $poster->id, ['status' => 'open', 'title' => 'Allotment Helper Role']);
+        $application = $this->jobsSeedApplication((int) $job->id, (int) $candidate->id);
+        $this->createInterview((int) $job->id, (int) $application->id, (int) $poster->id, 'proposed');
+        $this->createOffer((int) $job->id, (int) $application->id, (int) $candidate->id, 'pending');
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/responses");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_jobs.responses.title'));
+        $response->assertSee(__('govuk_alpha_jobs.responses.accept_interview'));
+        $response->assertSee(__('govuk_alpha_jobs.responses.accept_offer'));
+        $response->assertSee('Allotment Helper Role');
+    }
+
+    public function test_jobs_responses_empty_state(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/responses");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_jobs.responses.no_interviews'));
+        $response->assertSee(__('govuk_alpha_jobs.responses.no_offers'));
+    }
+
+    public function test_jobs_responses_requires_authentication(): void
+    {
+        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/responses");
+        $response->assertRedirect();
+        $this->assertStringContainsString(
+            "/{$this->testTenantSlug}/alpha/login",
+            $response->headers->get('Location') ?? ''
+        );
+    }
+
+    public function test_jobs_accept_interview_persists_for_candidate(): void
+    {
+        $candidate = $this->authenticatedUser();
+        $poster = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $job = $this->createJob((int) $poster->id, ['status' => 'open']);
+        $application = $this->jobsSeedApplication((int) $job->id, (int) $candidate->id);
+        $interview = $this->createInterview((int) $job->id, (int) $application->id, (int) $poster->id, 'proposed');
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/jobs/interviews/{$interview->id}/accept", ['note' => '']);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=interview-accepted', $response->headers->get('Location') ?? '');
+        $this->assertSame('accepted', JobInterview::find($interview->id)->status);
+    }
+
+    public function test_jobs_decline_interview_persists_for_candidate(): void
+    {
+        $candidate = $this->authenticatedUser();
+        $poster = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $job = $this->createJob((int) $poster->id, ['status' => 'open']);
+        $application = $this->jobsSeedApplication((int) $job->id, (int) $candidate->id);
+        $interview = $this->createInterview((int) $job->id, (int) $application->id, (int) $poster->id, 'proposed');
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/jobs/interviews/{$interview->id}/decline", ['note' => '']);
+
+        $response->assertRedirect();
+        $this->assertSame('declined', JobInterview::find($interview->id)->status);
+    }
+
+    public function test_jobs_accept_interview_blocked_for_non_owner(): void
+    {
+        // An interview that belongs to a different candidate cannot be accepted —
+        // the service returns false and we redirect with the failure flash.
+        $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $poster = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $job = $this->createJob((int) $poster->id, ['status' => 'open']);
+        $application = $this->jobsSeedApplication((int) $job->id, (int) $other->id);
+        $interview = $this->createInterview((int) $job->id, (int) $application->id, (int) $poster->id, 'proposed');
+
+        // Authenticate as a DIFFERENT member (not the applicant).
+        $this->authenticatedUser();
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/jobs/interviews/{$interview->id}/accept", ['note' => '']);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=interview-failed', $response->headers->get('Location') ?? '');
+        $this->assertSame('proposed', JobInterview::find($interview->id)->status);
+    }
+
+    public function test_jobs_reject_offer_persists_for_candidate(): void
+    {
+        $candidate = $this->authenticatedUser();
+        $poster = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $job = $this->createJob((int) $poster->id, ['status' => 'open', 'type' => 'volunteer']);
+        $application = $this->jobsSeedApplication((int) $job->id, (int) $candidate->id);
+        $offer = $this->createOffer((int) $job->id, (int) $application->id, (int) $candidate->id, 'pending');
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/jobs/offers/{$offer->id}/reject");
+
+        $response->assertRedirect();
+        $this->assertSame('rejected', JobOffer::find($offer->id)->status);
+    }
+
+    // =====================================================================
     // Helpers
     // =====================================================================
+
+    private function jobsSeedApplication(int $vacancyId, int $userId): JobApplication
+    {
+        return JobApplication::factory()->forTenant($this->testTenantId)->create([
+            'vacancy_id' => $vacancyId,
+            'user_id' => $userId,
+            'status' => 'interview',
+            'stage' => 'interview',
+        ]);
+    }
+
+    private function createInterview(int $vacancyId, int $applicationId, int $proposedBy, string $status): JobInterview
+    {
+        return JobInterview::create([
+            'tenant_id' => $this->testTenantId,
+            'vacancy_id' => $vacancyId,
+            'application_id' => $applicationId,
+            'proposed_by' => $proposedBy,
+            'interview_type' => 'video',
+            'scheduled_at' => now()->addDays(3),
+            'duration_mins' => 30,
+            'location_notes' => 'https://meet.example.test/room',
+            'status' => $status,
+        ]);
+    }
+
+    private function createOffer(int $vacancyId, int $applicationId, int $userId, string $status): JobOffer
+    {
+        return JobOffer::create([
+            'tenant_id' => $this->testTenantId,
+            'vacancy_id' => $vacancyId,
+            'application_id' => $applicationId,
+            'user_id' => $userId,
+            'status' => $status,
+            'salary_offered' => 0,
+            'expires_at' => now()->addDays(7),
+        ]);
+    }
 
     private function enableJobsFeature(): void
     {

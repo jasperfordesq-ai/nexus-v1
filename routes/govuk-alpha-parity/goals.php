@@ -62,3 +62,22 @@ Route::post('/goals/{id}/buddy-actions', [AlphaController::class, 'goalsStoreBud
     ->whereNumber('id')
     ->middleware('throttle:20,1')
     ->name('goals.buddy-actions.send');
+
+// Social (owner / buddy / public viewer): heart-like + threaded comments,
+// mirroring the React GoalDetailPage <SocialInteractionPanel targetType="goal">.
+Route::get('/goals/{id}/social', [AlphaController::class, 'goalsSocial'])
+    ->whereNumber('id')
+    ->name('goals.social');
+Route::post('/goals/{id}/like', [AlphaController::class, 'goalsToggleLike'])
+    ->whereNumber('id')
+    ->middleware('throttle:60,1')
+    ->name('goals.like');
+Route::post('/goals/{id}/comments', [AlphaController::class, 'goalsStoreComment'])
+    ->whereNumber('id')
+    ->middleware('throttle:20,1')
+    ->name('goals.comments.store');
+Route::post('/goals/{id}/comments/{commentId}/delete', [AlphaController::class, 'goalsDeleteComment'])
+    ->whereNumber('id')
+    ->whereNumber('commentId')
+    ->middleware('throttle:30,1')
+    ->name('goals.comments.delete');

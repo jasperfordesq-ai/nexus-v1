@@ -377,6 +377,89 @@ trait MessagesParity
         return $back($result ? 'reaction-added' : 'reaction-removed');
     }
 
+    /**
+     * POST /messages/{userId}/m/{messageId}/translate — translate one 1-to-1
+     * message into the viewer's current UI language (no JS). Mirrors
+     * MessagesController::translateTranscript() (POST /v2/messages/{id}/translate)
+     * by calling the SAME backing service, TranscriptionService::translate, with
+     * identical sender/receiver authorisation and transcript-or-body selection.
+     *
+     * The translated text is flashed to the session and rendered inline below the
+     * original message when the conversation re-renders, anchored to that message.
+     */
+    public function messagesTranslateMessage(string $tenantSlug, int $userId, int $messageId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('messages'), 403);
+
+        $viewerId = $this->currentUserId();
+        if ($viewerId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $back = fn (string $status): RedirectResponse => redirect()->route('govuk-alpha.messages.show', [
+            'tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => $status,
+        ])->withFragment('m-' . $messageId);
+
+        // Feature gate mirrors the React MessageBubble (hasFeature('message_translation')).
+        if (!TenantContext::hasFeature('message_translation')) {
+            return $back('translate-unavailable');
+        }
+
+        // Viewer must be the sender or receiver of the message (tenant-scoped).
+        $message = DB::table('messages')
+            ->where('id', $messageId)
+            ->where('tenant_id', TenantContext::getId())
+            ->where(function ($q) use ($viewerId) {
+                $q->where('sender_id', $viewerId)->orWhere('receiver_id', $viewerId);
+            })
+            ->first();
+
+        if ($message === null) {
+            return $back('translate-failed');
+        }
+
+        // Prefer a voice transcript when present, else the text body (same order
+        // the API uses). A deleted message has no translatable content.
+        $sourceText = '';
+        $fromLanguage = 'auto';
+        if (!empty($message->transcript)) {
+            $sourceText = (string) $message->transcript;
+            $fromLanguage = self::asStr($message->transcript_language ?? '') ?: 'auto';
+        } elseif (empty($message->is_deleted) && !empty($message->body)) {
+            $sourceText = (string) $message->body;
+        }
+
+        if (trim($sourceText) === '') {
+            return $back('translate-empty');
+        }
+
+        // Target the viewer's current UI language base (mirrors userLangBase).
+        $target = explode('-', (string) app()->getLocale())[0] ?: 'en';
+
+        $translated = null;
+        try {
+            $translated = \App\Services\TranscriptionService::translate($sourceText, $fromLanguage, $target);
+        } catch (\Throwable $e) {
+            report($e);
+            $translated = null;
+        }
+
+        if ($translated === null || trim($translated) === '') {
+            return $back('translate-failed');
+        }
+
+        // Flash the translation; the conversation blade reads it back and renders
+        // it inline under the matching message (parity with the React bubble).
+        session()->flash('messages_translation', [
+            'id'     => $messageId,
+            'text'   => $translated,
+            'target' => $target,
+        ]);
+
+        return $back('translate-done');
+    }
+
     // ----------------------------------------------------------------------
     //  Private helpers (module-prefixed; not exposed as routes)
     // ----------------------------------------------------------------------

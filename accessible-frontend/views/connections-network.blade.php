@@ -19,6 +19,17 @@
             return $full !== '' ? $full : __('govuk_alpha_connections.common.unknown_member');
         };
         $partnerLoc = fn ($p): string => is_array($p) ? trim((string) ($p['location'] ?? '')) : '';
+        $partnerBio = function ($p): string {
+            if (!is_array($p)) {
+                return '';
+            }
+            $raw = trim((string) ($p['bio'] ?? ''));
+            if ($raw === '') {
+                return '';
+            }
+            $text = trim(preg_replace('/\s+/', ' ', strip_tags($raw)) ?? '');
+            return $text === '' ? '' : \Illuminate\Support\Str::limit($text, 160);
+        };
         $counts = $connectionCounts ?? ['received' => 0, 'sent' => 0, 'total_friends' => 0];
         $hasSearch = ($connSearch ?? '') !== '';
     @endphp
@@ -129,6 +140,9 @@
                         @if ($partnerLoc($p) !== '')
                             <p class="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-1">{{ $partnerLoc($p) }}</p>
                         @endif
+                        @if ($partnerBio($p) !== '')
+                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1"><span class="govuk-visually-hidden">{{ __('govuk_alpha_connections.network.about', ['name' => $partnerName($p)]) }}: </span>{{ $partnerBio($p) }}</p>
+                        @endif
                         @if ($since !== null)
                             <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-3">{{ __('govuk_alpha_connections.network.connected_since', ['date' => $since]) }}</p>
                         @endif
@@ -174,6 +188,9 @@
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-1">{{ $partnerName($p) }}</h3>
                         @if ($partnerLoc($p) !== '')
                             <p class="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-1">{{ $partnerLoc($p) }}</p>
+                        @endif
+                        @if ($partnerBio($p) !== '')
+                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1"><span class="govuk-visually-hidden">{{ __('govuk_alpha_connections.network.about', ['name' => $partnerName($p)]) }}: </span>{{ $partnerBio($p) }}</p>
                         @endif
                         <p class="govuk-body-s govuk-!-margin-bottom-3">{{ __('govuk_alpha_connections.network.wants_to_connect') }}</p>
                         <div class="govuk-button-group">
@@ -224,6 +241,9 @@
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-1">{{ $partnerName($p) }}</h3>
                         @if ($partnerLoc($p) !== '')
                             <p class="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-1">{{ $partnerLoc($p) }}</p>
+                        @endif
+                        @if ($partnerBio($p) !== '')
+                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1"><span class="govuk-visually-hidden">{{ __('govuk_alpha_connections.network.about', ['name' => $partnerName($p)]) }}: </span>{{ $partnerBio($p) }}</p>
                         @endif
                         <p class="govuk-body-s govuk-!-margin-bottom-3">{{ __('govuk_alpha_connections.network.request_pending') }}</p>
                         <div class="govuk-button-group">

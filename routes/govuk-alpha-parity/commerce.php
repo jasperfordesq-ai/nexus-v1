@@ -81,3 +81,44 @@ Route::post('/courses/instructor/{id}/publish', [AlphaController::class, 'commer
 Route::post('/courses/instructor/{id}/unpublish', [AlphaController::class, 'commerceUnpublishCourse'])->whereNumber('id')->middleware('throttle:10,1')->name('courses.instructor.unpublish');
 Route::post('/courses/instructor/{id}/delete', [AlphaController::class, 'commerceDeleteCourse'])->whereNumber('id')->middleware('throttle:10,1')->name('courses.instructor.delete');
 Route::get('/courses/instructor/{id}/analytics', [AlphaController::class, 'commerceCourseAnalytics'])->whereNumber('id')->name('courses.instructor.analytics');
+
+// ===== Courses — instructor section + lesson builder (no-JS CRUD) =====
+// All sub-paths of /courses/instructor/{id} so they never collide with the
+// public /courses/{id} route. The course id is numeric; section/lesson ids too.
+Route::post('/courses/instructor/{id}/sections', [AlphaController::class, 'commerceStoreCourseSection'])->whereNumber('id')->middleware('throttle:30,1')->name('courses.instructor.sections.store');
+Route::post('/courses/instructor/{id}/sections/{sectionId}/update', [AlphaController::class, 'commerceUpdateCourseSection'])->whereNumber('id')->whereNumber('sectionId')->middleware('throttle:30,1')->name('courses.instructor.sections.update');
+Route::post('/courses/instructor/{id}/sections/{sectionId}/delete', [AlphaController::class, 'commerceDeleteCourseSection'])->whereNumber('id')->whereNumber('sectionId')->middleware('throttle:30,1')->name('courses.instructor.sections.delete');
+Route::post('/courses/instructor/{id}/lessons', [AlphaController::class, 'commerceStoreCourseLesson'])->whereNumber('id')->middleware('throttle:30,1')->name('courses.instructor.lessons.store');
+Route::post('/courses/instructor/{id}/lessons/{lessonId}/update', [AlphaController::class, 'commerceUpdateCourseLesson'])->whereNumber('id')->whereNumber('lessonId')->middleware('throttle:30,1')->name('courses.instructor.lessons.update');
+Route::post('/courses/instructor/{id}/lessons/{lessonId}/delete', [AlphaController::class, 'commerceDeleteCourseLesson'])->whereNumber('id')->whereNumber('lessonId')->middleware('throttle:30,1')->name('courses.instructor.lessons.delete');
+
+// ===== Marketplace — category browse + buyer pickups + merchant onboarding =====
+// Static segments — declared here so they win over the numeric {id} wildcard
+// (which is whereNumber-constrained, so 'category'/'onboarding'/'pickups' could
+// never match it anyway, but we keep them explicit for clarity).
+Route::get('/marketplace/pickups', [AlphaController::class, 'commerceMyPickups'])->name('marketplace.pickups');
+Route::get('/marketplace/onboarding', [AlphaController::class, 'commerceMerchantOnboarding'])->name('marketplace.onboarding');
+Route::post('/marketplace/onboarding', [AlphaController::class, 'commerceStoreMerchantOnboarding'])->middleware('throttle:10,1')->name('marketplace.onboarding.store');
+Route::get('/marketplace/category/{slug}', [AlphaController::class, 'commerceCategoryListings'])->where('slug', '[A-Za-z0-9_-]+')->name('marketplace.category');
+
+// ===== Seller — merchant coupon management (create / edit / delete) =====
+Route::get('/marketplace/coupons', [AlphaController::class, 'commerceSellerCoupons'])->name('marketplace.coupons');
+Route::get('/marketplace/coupons/new', [AlphaController::class, 'commerceCreateCouponForm'])->name('marketplace.coupons.create');
+Route::post('/marketplace/coupons/new', [AlphaController::class, 'commerceStoreCoupon'])->middleware('throttle:20,1')->name('marketplace.coupons.store');
+Route::get('/marketplace/coupons/{id}/edit', [AlphaController::class, 'commerceEditCouponForm'])->whereNumber('id')->name('marketplace.coupons.edit');
+Route::post('/marketplace/coupons/{id}/update', [AlphaController::class, 'commerceUpdateCoupon'])->whereNumber('id')->middleware('throttle:20,1')->name('marketplace.coupons.update');
+Route::post('/marketplace/coupons/{id}/delete', [AlphaController::class, 'commerceDeleteCoupon'])->whereNumber('id')->middleware('throttle:10,1')->name('marketplace.coupons.delete');
+
+// ===== Podcasts — studio: show create/edit + episode management =====
+// `studio` is non-numeric so it never collides with the public /podcasts/{id}
+// (whereNumber) route in routes/govuk-alpha.php. Static before numeric sub-paths.
+Route::get('/podcasts/studio', [AlphaController::class, 'commercePodcastStudio'])->name('podcasts.studio');
+Route::get('/podcasts/studio/new', [AlphaController::class, 'commerceCreatePodcastForm'])->name('podcasts.studio.create');
+Route::post('/podcasts/studio/new', [AlphaController::class, 'commerceStorePodcast'])->middleware('throttle:10,1')->name('podcasts.studio.store');
+Route::get('/podcasts/studio/{id}', [AlphaController::class, 'commercePodcastManage'])->whereNumber('id')->name('podcasts.studio.manage');
+Route::post('/podcasts/studio/{id}/update', [AlphaController::class, 'commerceUpdatePodcast'])->whereNumber('id')->middleware('throttle:20,1')->name('podcasts.studio.update');
+Route::post('/podcasts/studio/{id}/publish', [AlphaController::class, 'commercePublishPodcast'])->whereNumber('id')->middleware('throttle:10,1')->name('podcasts.studio.publish');
+Route::post('/podcasts/studio/{id}/delete', [AlphaController::class, 'commerceDeletePodcast'])->whereNumber('id')->middleware('throttle:10,1')->name('podcasts.studio.delete');
+Route::post('/podcasts/studio/{id}/episodes', [AlphaController::class, 'commerceStorePodcastEpisode'])->whereNumber('id')->middleware('throttle:20,1')->name('podcasts.studio.episodes.store');
+Route::post('/podcasts/studio/{id}/episodes/{episodeId}/publish', [AlphaController::class, 'commercePublishPodcastEpisode'])->whereNumber('id')->whereNumber('episodeId')->middleware('throttle:20,1')->name('podcasts.studio.episodes.publish');
+Route::post('/podcasts/studio/{id}/episodes/{episodeId}/delete', [AlphaController::class, 'commerceDeletePodcastEpisode'])->whereNumber('id')->whereNumber('episodeId')->middleware('throttle:10,1')->name('podcasts.studio.episodes.delete');

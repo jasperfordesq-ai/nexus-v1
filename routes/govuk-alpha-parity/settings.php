@@ -48,3 +48,19 @@ Route::get('/settings/appearance', [AlphaController::class, 'settingsAppearance'
 Route::post('/settings/appearance', [AlphaController::class, 'settingsUpdateAppearance'])
     ->middleware('throttle:20,1')
     ->name('settings.appearance.update');
+
+// GDPR data-subject requests (portability / rectification / restriction / objection).
+Route::get('/settings/data-rights', [AlphaController::class, 'settingsDataRights'])
+    ->name('settings.data-rights');
+
+Route::post('/settings/data-rights', [AlphaController::class, 'settingsRequestDataRights'])
+    ->middleware('throttle:10,1')
+    ->name('settings.data-rights.request');
+
+// Insurance certificates (compliance-gated).
+Route::get('/settings/insurance', [AlphaController::class, 'settingsInsurance'])
+    ->name('settings.insurance');
+
+Route::post('/settings/insurance', [AlphaController::class, 'settingsUploadInsurance'])
+    ->middleware('throttle:10,1')
+    ->name('settings.insurance.upload');

@@ -55,3 +55,12 @@ Route::post('/messages/groups/{conversationId}/m/{messageId}/react', [AlphaContr
     ->whereNumber('conversationId')
     ->whereNumber('messageId')
     ->name('messages.groups.react');
+
+// --- per-message translation in a 1-to-1 conversation (no-JS, parity with
+//     the React MessageBubble translate button). The static "groups" segment
+//     above is registered first, so this {userId} route never swallows it. ---
+Route::post('/messages/{userId}/m/{messageId}/translate', [AlphaController::class, 'messagesTranslateMessage'])
+    ->middleware('throttle:20,1')
+    ->whereNumber('userId')
+    ->whereNumber('messageId')
+    ->name('messages.translate');

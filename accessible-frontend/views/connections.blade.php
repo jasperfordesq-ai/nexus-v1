@@ -19,6 +19,17 @@
             return $full !== '' ? $full : __('govuk_alpha.members.unknown_member');
         };
         $partnerLoc = fn ($p): string => is_array($p) ? trim((string) ($p['location'] ?? '')) : '';
+        $partnerBio = function ($p): string {
+            if (!is_array($p)) {
+                return '';
+            }
+            $raw = trim((string) ($p['bio'] ?? ''));
+            if ($raw === '') {
+                return '';
+            }
+            $text = trim(preg_replace('/\s+/', ' ', strip_tags($raw)) ?? '');
+            return $text === '' ? '' : \Illuminate\Support\Str::limit($text, 160);
+        };
         $counts = $connectionCounts ?? ['received' => 0, 'sent' => 0, 'total_friends' => 0];
     @endphp
 
@@ -85,6 +96,9 @@
                     @if ($partnerLoc($p) !== '')
                         <p class="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-2">{{ $partnerLoc($p) }}</p>
                     @endif
+                    @if ($partnerBio($p) !== '')
+                        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2"><span class="govuk-visually-hidden">{{ __('govuk_alpha_connections.network.about', ['name' => $partnerName($p)]) }}: </span>{{ $partnerBio($p) }}</p>
+                    @endif
                     <p class="govuk-body-s govuk-!-margin-bottom-3">{{ __('govuk_alpha.connections.wants_to_connect') }}</p>
                     <div class="govuk-button-group">
                         <form method="post" action="{{ route('govuk-alpha.connections.accept', ['tenantSlug' => $tenantSlug, 'id' => $cid]) }}">
@@ -116,6 +130,9 @@
                     @if ($partnerLoc($p) !== '')
                         <p class="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-2">{{ $partnerLoc($p) }}</p>
                     @endif
+                    @if ($partnerBio($p) !== '')
+                        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2"><span class="govuk-visually-hidden">{{ __('govuk_alpha_connections.network.about', ['name' => $partnerName($p)]) }}: </span>{{ $partnerBio($p) }}</p>
+                    @endif
                     <div class="govuk-button-group">
                         @if (!empty($p['id']))
                             <a class="govuk-link govuk-link--no-visited-state" href="{{ route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $p['id']]) }}">{{ __('govuk_alpha.connections.view_profile') }}</a>
@@ -139,6 +156,9 @@
                 @php $p = $c['partner'] ?? $c['user'] ?? []; $cid = (int) ($c['connection_id'] ?? $c['id'] ?? 0); @endphp
                 <div class="nexus-alpha-card govuk-!-margin-bottom-4">
                     <h3 class="govuk-heading-s govuk-!-margin-bottom-1">{{ $partnerName($p) }}</h3>
+                    @if ($partnerBio($p) !== '')
+                        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2"><span class="govuk-visually-hidden">{{ __('govuk_alpha_connections.network.about', ['name' => $partnerName($p)]) }}: </span>{{ $partnerBio($p) }}</p>
+                    @endif
                     <p class="govuk-body-s govuk-!-margin-bottom-3">{{ __('govuk_alpha.connections.awaiting_response') }}</p>
                     <div class="govuk-button-group">
                         @if (!empty($p['id']))

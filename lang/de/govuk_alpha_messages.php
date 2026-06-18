@@ -93,6 +93,18 @@ return [
         'admin_only_notice' => 'Only group administrators can add or remove members.',
     ],
 
+    'translate' => [
+        'toggle' => 'Translate this message',
+        'button' => 'Translate to my language',
+        'hint' => 'Translate this message into the language you are using now.',
+        'translated_label' => 'Translation',
+        'original_label' => 'Original message',
+        'done' => 'The message has been translated.',
+        'failed' => 'We could not translate this message. Please try again later.',
+        'unavailable' => 'Message translation is not available in this community.',
+        'empty' => 'There is nothing to translate in this message.',
+    ],
+
     'status' => [
         'group_created' => 'Your group conversation has been created.',
         'group_disabled' => 'Direct messaging is currently turned off, so group conversations are unavailable.',

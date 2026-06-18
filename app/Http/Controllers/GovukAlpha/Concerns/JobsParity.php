@@ -365,9 +365,225 @@ trait JobsParity
         ]);
     }
 
+    /**
+     * Employer onboarding — the no-JS equivalent of the React EmployerOnboarding
+     * wizard's welcome + tips steps. The React wizard's "organisation" step is
+     * cosmetic (localStorage only; nothing is persisted server-side) and its only
+     * real action is posting a first vacancy via POST /v2/jobs. The accessible
+     * create-vacancy form (govuk-alpha.jobs.create / .store) already provides that
+     * exact path, so this page is a guided landing that funnels first-time posters
+     * into it — no new mutation, no invented "create-org" endpoint. Any
+     * authenticated member who can see the jobs module may view it.
+     */
+    public function jobsEmployerOnboarding(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(\App\Core\TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Does the member already post opportunities? Used to soften the copy
+        // (returning posters see "post another" rather than "get started").
+        $hasPosted = false;
+        try {
+            $hasPosted = \App\Models\JobVacancy::where('tenant_id', \App\Core\TenantContext::getId())
+                ->where('user_id', $userId)
+                ->exists();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::jobs-onboarding', [
+            'title' => __('govuk_alpha_jobs.onboarding.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'jobsActiveTab' => 'mine',
+            'hasPosted' => $hasPosted,
+        ]);
+    }
+
+    /**
+     * Interviews & offers inbox — the candidate-side responses centre. Mirrors
+     * the React MyApplicationsPage inline interview/offer cards (which merge in
+     * /v2/jobs/my-interviews + /v2/jobs/my-offers). Lists the member's proposed
+     * interviews and pending/decided offers, each with the same accept / decline
+     * / reject actions. Reuses JobInterviewService::getForUser and
+     * JobOfferService::getForUser (both candidate-scoped to this tenant).
+     */
+    public function jobsResponses(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(\App\Core\TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        [$interviews, $offers] = $this->jobsResponsesData($userId);
+
+        return $this->view('accessible-frontend::jobs-responses', [
+            'title' => __('govuk_alpha_jobs.responses.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'jobsActiveTab' => 'responses',
+            'interviews' => $interviews,
+            'offers' => $offers,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Candidate accepts a proposed interview. JobInterviewService::accept enforces
+     * that only the applicant on the interview can accept (and only while still
+     * 'proposed'); it fires the poster notification internally, already wrapped in
+     * LocaleContext. We never re-implement that logic — false simply routes back
+     * with an error flash.
+     */
+    public function jobsAcceptInterview(Request $request, string $tenantSlug, int $interviewId): RedirectResponse
+    {
+        return $this->jobsHandleResponseAction(
+            $tenantSlug,
+            fn (int $uid) => \App\Services\JobInterviewService::accept($interviewId, $uid, $this->jobsResponseNote($request)),
+            'interview-accepted',
+            'interview-failed'
+        );
+    }
+
+    /** Candidate declines a proposed interview. See jobsAcceptInterview for the gating contract. */
+    public function jobsDeclineInterview(Request $request, string $tenantSlug, int $interviewId): RedirectResponse
+    {
+        return $this->jobsHandleResponseAction(
+            $tenantSlug,
+            fn (int $uid) => \App\Services\JobInterviewService::decline($interviewId, $uid, $this->jobsResponseNote($request)),
+            'interview-declined',
+            'interview-failed'
+        );
+    }
+
+    /**
+     * Candidate accepts a pending offer. JobOfferService::accept enforces that
+     * only the applicant can accept, atomically fills the vacancy, withdraws
+     * sibling offers and mints timebank credits inside a locked transaction. We
+     * call it as-is — no money logic is duplicated here.
+     */
+    public function jobsAcceptOffer(Request $request, string $tenantSlug, int $offerId): RedirectResponse
+    {
+        return $this->jobsHandleResponseAction(
+            $tenantSlug,
+            fn (int $uid) => \App\Services\JobOfferService::accept($offerId, $uid),
+            'offer-accepted',
+            'offer-failed'
+        );
+    }
+
+    /** Candidate rejects a pending offer. See jobsAcceptOffer for the gating/credit contract. */
+    public function jobsRejectOffer(Request $request, string $tenantSlug, int $offerId): RedirectResponse
+    {
+        return $this->jobsHandleResponseAction(
+            $tenantSlug,
+            fn (int $uid) => \App\Services\JobOfferService::reject($offerId, $uid),
+            'offer-rejected',
+            'offer-failed'
+        );
+    }
+
     // =====================================================================
     // Internal helpers (module-prefixed; not routed)
     // =====================================================================
+
+    /**
+     * Shared scaffold for the four candidate response POSTs: auth-gate, run the
+     * service closure (which carries its own owner/state checks), and redirect
+     * back to the responses inbox with a success or failure flash.
+     *
+     * @param callable(int): bool $action
+     */
+    private function jobsHandleResponseAction(string $tenantSlug, callable $action, string $okStatus, string $failStatus): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(\App\Core\TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $ok = false;
+        try {
+            $ok = (bool) $action($userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.jobs.responses', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? $okStatus : $failStatus,
+        ]);
+    }
+
+    /** Optional free-text note attached to an interview accept/decline (trimmed, capped). */
+    private function jobsResponseNote(Request $request): ?string
+    {
+        $note = trim(self::asStr($request->input('note')));
+        if ($note === '') {
+            return null;
+        }
+        return mb_substr($note, 0, 1000);
+    }
+
+    /**
+     * Build the candidate's interview + offer lists for the responses inbox.
+     * Normalises each to a flat, view-safe shape (the service returns full
+     * Eloquent arrays). Anything the member cannot act on (already-decided
+     * interviews/offers) still appears, read-only, so they have a record.
+     *
+     * @return array{0: array<int, array<string, mixed>>, 1: array<int, array<string, mixed>>}
+     */
+    private function jobsResponsesData(int $userId): array
+    {
+        $interviews = [];
+        try {
+            foreach (\App\Services\JobInterviewService::getForUser($userId) as $row) {
+                $vacancy = is_array($row['vacancy'] ?? null) ? $row['vacancy'] : [];
+                $interviews[] = [
+                    'id' => (int) ($row['id'] ?? 0),
+                    'vacancy_id' => (int) ($row['vacancy_id'] ?? ($vacancy['id'] ?? 0)),
+                    'vacancy_title' => trim((string) ($vacancy['title'] ?? '')),
+                    'interview_type' => (string) ($row['interview_type'] ?? 'video'),
+                    'scheduled_at' => $row['scheduled_at'] ?? null,
+                    'duration_mins' => isset($row['duration_mins']) ? (int) $row['duration_mins'] : null,
+                    'location_notes' => trim((string) ($row['location_notes'] ?? '')),
+                    'status' => (string) ($row['status'] ?? 'proposed'),
+                ];
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $offers = [];
+        try {
+            foreach (\App\Services\JobOfferService::getForUser($userId) as $row) {
+                $vacancy = is_array($row['vacancy'] ?? null) ? $row['vacancy'] : [];
+                $offers[] = [
+                    'id' => (int) ($row['id'] ?? 0),
+                    'vacancy_id' => (int) ($row['vacancy_id'] ?? ($vacancy['id'] ?? 0)),
+                    'vacancy_title' => trim((string) ($vacancy['title'] ?? '')),
+                    'salary_offered' => $row['salary_offered'] ?? null,
+                    'salary_currency' => trim((string) ($row['salary_currency'] ?? '')),
+                    'salary_type' => (string) ($row['salary_type'] ?? ''),
+                    'start_date' => $row['start_date'] ?? null,
+                    'message' => trim((string) ($row['message'] ?? '')),
+                    'status' => (string) ($row['status'] ?? 'pending'),
+                    'expires_at' => $row['expires_at'] ?? null,
+                ];
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return [$interviews, $offers];
+    }
 
     /**
      * True when the member may use talent search: any vacancy owner, or a

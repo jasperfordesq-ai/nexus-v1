@@ -102,6 +102,7 @@
                 <li><a class="govuk-link" href="{{ route('govuk-alpha.volunteering.certificates', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_depth.certificates_link') }}</a></li>
                 <li><a class="govuk-link" href="{{ route('govuk-alpha.volunteering.waitlist', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_depth.waitlist_link') }}</a></li>
                 <li><a class="govuk-link" href="{{ route('govuk-alpha.volunteering.swaps', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_depth.swaps_link') }}</a></li>
+                <li><a class="govuk-link" href="{{ route('govuk-alpha.volunteering.donations', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_volunteering.donations.nav_link') }}</a></li>
             </ul>
 
             <div class="govuk-tabs govuk-!-margin-top-6">

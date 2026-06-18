@@ -86,6 +86,16 @@ return [
         'cover_submit' => 'Save cover image',
     ],
 
+    // ---- Subgroups (read-only list on the group detail page) -----------
+    'subgroups' => [
+        'heading' => 'Subgroups',
+        'intro' => 'Smaller groups that sit within this group.',
+        'members_count' => '{0} No members|{1} 1 member|[2,*] :count members',
+        'visibility_public' => 'Public',
+        'visibility_private' => 'Private',
+        'view_link' => 'View subgroup',
+    ],
+
     // ---- Status banners (flash messages) -------------------------------
     'states' => [
         'invite-link-created' => 'A new invite link was generated.',

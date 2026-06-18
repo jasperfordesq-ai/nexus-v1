@@ -77,3 +77,13 @@ Route::get('/polls/{pollId}/export', [AlphaController::class, 'gamificationExpor
     ->whereNumber('pollId')->middleware('throttle:10,1')->name('gamification.poll.export');
 Route::post('/polls/{pollId}/delete', [AlphaController::class, 'gamificationDeletePoll'])
     ->whereNumber('pollId')->middleware('throttle:10,1')->name('gamification.poll.delete');
+
+// --- Polls: detail + social (like / comment), mirroring the React poll card's
+//     SocialInteractionPanel. Static sub-segments (/rank, /export, /delete,
+//     /like, /comment) are registered BEFORE the bare /polls/{pollId} detail. ---
+Route::post('/polls/{pollId}/like', [AlphaController::class, 'gamificationPollLike'])
+    ->whereNumber('pollId')->middleware('throttle:60,1')->name('gamification.poll.like');
+Route::post('/polls/{pollId}/comment', [AlphaController::class, 'gamificationPollComment'])
+    ->whereNumber('pollId')->middleware('throttle:30,1')->name('gamification.poll.comment');
+Route::get('/polls/{pollId}', [AlphaController::class, 'gamificationPollDetail'])
+    ->whereNumber('pollId')->name('gamification.poll.detail');

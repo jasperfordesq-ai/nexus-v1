@@ -29,6 +29,7 @@ return [
         'ranked_tag' => 'Ranked choice',
         'rank_this_poll' => 'Rank this poll',
         'view_ranked_poll' => 'View ranked results',
+        'view_and_discuss' => 'View and discuss',
     ],
 
     'common' => [
@@ -168,6 +169,8 @@ return [
         'season_days_remaining' => '{0} ends today|{1} 1 day remaining|[2,*] :count days remaining',
         'season_participants' => '{0} no participants|{1} 1 participant|[2,*] :count participants',
         'season_view_all' => 'View all seasons',
+        'showing_count' => '{0} No members shown|{1} Showing 1 member|[2,*] Showing :count members',
+        'load_more' => 'Load more members',
     ],
 
     // ---------------------------------------------------------------
@@ -338,6 +341,47 @@ return [
         'states' => [
             'poll-deleted' => 'The poll has been deleted.',
             'poll-delete-failed' => 'We could not delete that poll. It may not exist or may not be yours.',
+        ],
+    ],
+
+    // ---------------------------------------------------------------
+    //  POLL DETAIL + SOCIAL (like + comments)
+    // ---------------------------------------------------------------
+    'poll_detail' => [
+        'title' => 'Poll',
+        'caption' => 'Polls at :community',
+        'by_label' => 'Posted by :name',
+        'closes_on' => 'Closes :date',
+        'closed_on' => 'Closed :date',
+        'open_tag' => 'Open',
+        'closed_tag' => 'Closed',
+        'ranked_tag' => 'Ranked',
+        'votes_count' => '{0} no votes|{1} 1 vote|[2,*] :count votes',
+        'your_choice' => 'Your choice',
+        'leading' => 'Leading',
+        'results_heading' => 'Results',
+        'results_pending' => 'Results will be shown once voting closes or once you have voted.',
+        'no_options' => 'This poll has no options.',
+        'vote_link' => 'Vote on this poll',
+        'rank_link' => 'Rank this poll',
+        'social_heading' => 'Likes and comments',
+        'like_summary' => '{0} no likes|{1} 1 like|[2,*] :count likes',
+        'comment_summary' => '{0} no comments|{1} 1 comment|[2,*] :count comments',
+        'like_button' => 'Like',
+        'unlike_button' => 'Unlike',
+        'comments_heading' => 'Comments',
+        'no_comments' => 'No comments yet. Be the first to comment.',
+        'comment_label' => 'Add a comment',
+        'comment_hint' => 'Be respectful and keep it on topic.',
+        'comment_button' => 'Post comment',
+        'states' => [
+            'poll-liked' => 'You liked this poll.',
+            'poll-unliked' => 'You removed your like.',
+            'poll-like-failed' => 'We could not record your like. Please try again.',
+            'poll-comment-created' => 'Your comment has been posted.',
+            'poll-comment-empty' => 'Enter a comment before posting.',
+            'poll-comment-too-long' => 'Your comment is too long. Please shorten it.',
+            'poll-comment-failed' => 'We could not post your comment. Please try again.',
         ],
     ],
 ];

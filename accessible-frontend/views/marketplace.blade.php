@@ -32,6 +32,8 @@
         $activeCategoryId = (int) ($marketplaceCategoryId ?? 0);
     @endphp
 
+    @includeIf('accessible-frontend::partials.commerce-marketplace-nav', ['commerceActiveTab' => 'browse'])
+
     <span class="govuk-caption-xl">{{ __('govuk_alpha.marketplace.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.marketplace.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.marketplace.description') }}</p>
@@ -66,6 +68,17 @@
         </fieldset>
         <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.polish_commerce.marketplace_filter_submit') }}</button>
     </form>
+
+    @if (!empty($categories))
+        <h2 class="govuk-heading-s">{{ __('govuk_alpha_commerce.category.browse_heading') }}</h2>
+        <ul class="nexus-alpha-inline-list govuk-!-margin-bottom-6">
+            @foreach ($categories as $cat)
+                @if (!empty($cat['slug']))
+                    <li><a class="govuk-link" href="{{ route('govuk-alpha.marketplace.category', ['tenantSlug' => $tenantSlug, 'slug' => $cat['slug']]) }}">{{ $cat['name'] }}</a></li>
+                @endif
+            @endforeach
+        </ul>
+    @endif
 
     @if (empty($listings))
         <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.marketplace.empty') }}</p></div>

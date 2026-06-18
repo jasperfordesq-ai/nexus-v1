@@ -26,6 +26,12 @@
             'href' => route('govuk-alpha.jobs.applications', ['tenantSlug' => $tenantSlug]),
         ];
     }
+    if (\Illuminate\Support\Facades\Route::has('govuk-alpha.jobs.responses')) {
+        $jobsTabs['responses'] = [
+            'label' => __('govuk_alpha_jobs.responses.title'),
+            'href' => route('govuk-alpha.jobs.responses', ['tenantSlug' => $tenantSlug]),
+        ];
+    }
     if (\Illuminate\Support\Facades\Route::has('govuk-alpha.jobs.alerts')) {
         $jobsTabs['alerts'] = [
             'label' => __('govuk_alpha.jobs_t4.nav_alerts'),

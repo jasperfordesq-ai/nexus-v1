@@ -105,6 +105,50 @@ class ConnectionsMatchesParityTest extends TestCase
         $response->assertSee(__('govuk_alpha_connections.network.message'));
     }
 
+    public function test_connections_network_shows_partner_bio_excerpt(): void
+    {
+        $me = $this->authenticatedUser(['name' => 'Bio Me']);
+        $friend = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'name' => 'Bridget Bioholder',
+            'bio' => '<p>Keen gardener and woodwork tutor.</p>',
+        ]);
+
+        DB::table('connections')->insert([
+            ['tenant_id' => $this->testTenantId, 'requester_id' => $friend->id, 'receiver_id' => $me->id, 'status' => 'accepted', 'created_at' => now(), 'updated_at' => now()],
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/connections/network");
+
+        $response->assertOk();
+        // HTML is stripped from the stored bio before rendering (parity with
+        // React's stripHtmlToText), so the plain-text excerpt is shown without tags.
+        $response->assertSee('Keen gardener and woodwork tutor.');
+        $response->assertDontSee('<p>Keen gardener', false);
+        $response->assertSee(__('govuk_alpha_connections.network.about', ['name' => 'Bridget Bioholder']));
+    }
+
+    public function test_connections_index_shows_partner_bio_excerpt(): void
+    {
+        $me = $this->authenticatedUser(['name' => 'Index Bio Me']);
+        $friend = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'name' => 'Cormac Cardbio',
+            'bio' => 'Cycling buddy and bread baker.',
+        ]);
+
+        DB::table('connections')->insert([
+            ['tenant_id' => $this->testTenantId, 'requester_id' => $friend->id, 'receiver_id' => $me->id, 'status' => 'accepted', 'created_at' => now(), 'updated_at' => now()],
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/connections");
+
+        $response->assertOk();
+        $response->assertSee('Cycling buddy and bread baker.');
+    }
+
     public function test_connections_network_search_filters_by_name(): void
     {
         $me = $this->authenticatedUser(['name' => 'Search Me']);

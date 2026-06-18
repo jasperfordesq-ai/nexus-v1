@@ -7,6 +7,9 @@
 namespace App\Http\Controllers\GovukAlpha\Concerns;
 
 use App\Core\TenantContext;
+use App\Services\BrokerControlConfigService;
+use App\Services\Enterprise\GdprService;
+use App\Services\InsuranceCertificateService;
 use App\Services\SubAccountService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,11 +34,25 @@ use Symfony\Component\HttpFoundation\Response;
  *      child (accounts that manage you) relationships are both shown.
  *   2. Appearance / theme — React AppearanceSettings. Persists users.preferred_theme
  *      (enum light|dark|system) exactly as UsersController::updateTheme does.
+ *   3. GDPR data-subject requests beyond export+delete — React PrivacyTab GDPR
+ *      section: portability, rectification, restriction and objection requests.
+ *      Backed by the SAME App\Services\Enterprise\GdprService::createRequest the
+ *      React API (UsersController::createGdprRequest) calls; the four request
+ *      types are the ones createGdprRequest accepts other than the export/erasure
+ *      flows already present on the core profile-settings page.
+ *   4. Insurance certificate upload + list — React PrivacyTab insurance section.
+ *      Backed by the SAME App\Services\InsuranceCertificateService the React API
+ *      (UserInsuranceController) calls, gated on the tenant compliance toggle
+ *      (BrokerControlConfigService::isInsuranceEnabled), a plain no-JS HTML file
+ *      upload.
  *
- * The other audited "gaps" were verified already-present (safeguarding revoke,
- * GDPR export, digest frequency, translation prefs, read-only sessions) or are
- * not parity gaps (per-session revoke does not exist in React either; trust-device
- * 2FA needs the shared two-factor flow which lives in AlphaController).
+ * The other audited "gaps" were verified already-present on the core
+ * profile-settings page (safeguarding revoke, GDPR export + account deletion,
+ * skills add/remove, translation preference, digest frequency, read-only
+ * sessions) or are out of scope (OAuth connected-accounts is popup-JS only with
+ * no backing linked-providers service; per-session revoke does not exist in
+ * React either; trust-device 2FA needs the shared two-factor flow which lives in
+ * AlphaController).
  */
 trait SettingsAuthParity
 {
@@ -51,6 +68,31 @@ trait SettingsAuthParity
         'can_manage_listings',
         'can_transact',
         'can_view_messages',
+    ];
+
+    /**
+     * GDPR data-subject request types offered here. These are the types
+     * UsersController::createGdprRequest / GdprService::createRequest accept,
+     * minus the export ('access'/'portability'-as-download) and erasure flows
+     * that the core profile-settings page already covers via dedicated routes.
+     */
+    private const SETTINGS_GDPR_TYPES = ['portability', 'rectification', 'restriction', 'objection'];
+
+    /** Insurance certificate types (InsuranceCertificateService / UserInsuranceController). */
+    private const SETTINGS_INSURANCE_TYPES = [
+        'public_liability',
+        'professional_indemnity',
+        'employers_liability',
+        'product_liability',
+        'personal_accident',
+        'other',
+    ];
+
+    /** Allowed certificate upload MIME types → file extension (mirrors UserInsuranceController). */
+    private const SETTINGS_INSURANCE_MIMES = [
+        'application/pdf' => 'pdf',
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
     ];
 
     // =====================================================================
@@ -344,5 +386,226 @@ trait SettingsAuthParity
         }
 
         return redirect()->route('govuk-alpha.settings.appearance', ['tenantSlug' => $tenantSlug, 'status' => $status]);
+    }
+
+    // =====================================================================
+    //  GDPR data-subject requests (React PrivacyTab — portability /
+    //  rectification / restriction / objection)
+    // =====================================================================
+
+    /**
+     * Data-rights page: raise a GDPR data-subject request (portability,
+     * rectification, restriction or objection) and see requests already raised.
+     * Export and account deletion are handled by the core profile-settings page.
+     */
+    public function settingsDataRights(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $requests = [];
+        try {
+            $rows = app(GdprService::class)->getUserRequests($userId);
+            foreach ($rows as $row) {
+                $type = (string) ($row['request_type'] ?? '');
+                // Only surface the four self-service request types this page raises.
+                if (! in_array($type, self::SETTINGS_GDPR_TYPES, true)) {
+                    continue;
+                }
+                $requests[] = [
+                    'type' => $type,
+                    'status' => (string) ($row['status'] ?? 'pending'),
+                    'requested_at' => (string) ($row['requested_at'] ?? ''),
+                ];
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            $requests = [];
+        }
+
+        return $this->view('accessible-frontend::settings-data-rights', [
+            'title' => __('govuk_alpha_settings.gdpr.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'account',
+            'requestTypes' => self::SETTINGS_GDPR_TYPES,
+            'requests' => $requests,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Raise one GDPR data-subject request. Mirrors UsersController::createGdprRequest
+     * (same GdprService::createRequest call, same valid type set, same duplicate
+     * handling for an already-pending request of the same type).
+     */
+    public function settingsRequestDataRights(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $type = $this->allowed($request->input('request_type'), self::SETTINGS_GDPR_TYPES, null);
+        if ($type === null) {
+            return redirect()
+                ->route('govuk-alpha.settings.data-rights', ['tenantSlug' => $tenantSlug, 'status' => 'gdpr-invalid'])
+                ->withFragment('request');
+        }
+
+        $notes = trim(self::asStr($request->input('notes')));
+
+        try {
+            app(GdprService::class)->createRequest($userId, $type, [
+                'notes' => $notes !== '' ? $notes : null,
+                'metadata' => [
+                    'source' => 'accessible_settings',
+                    'user_agent' => self::asStr($request->header('User-Agent')),
+                    'requested_via' => 'accessible',
+                ],
+            ]);
+        } catch (\RuntimeException $e) {
+            // Already a pending request of this type (GdprService throws RuntimeException).
+            return redirect()
+                ->route('govuk-alpha.settings.data-rights', ['tenantSlug' => $tenantSlug, 'status' => 'gdpr-duplicate'])
+                ->withFragment('request');
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect()
+                ->route('govuk-alpha.settings.data-rights', ['tenantSlug' => $tenantSlug, 'status' => 'gdpr-failed'])
+                ->withFragment('request');
+        }
+
+        return redirect()
+            ->route('govuk-alpha.settings.data-rights', ['tenantSlug' => $tenantSlug, 'status' => 'gdpr-requested'])
+            ->withFragment('your-requests');
+    }
+
+    // =====================================================================
+    //  Insurance certificates (React PrivacyTab insurance section)
+    // =====================================================================
+
+    /**
+     * Insurance certificates page: list this member's certificates and upload a
+     * new one. Gated on the tenant compliance toggle exactly like the React
+     * PrivacyTab (which only renders the section when insurance_enabled is set).
+     */
+    public function settingsInsurance(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        abort_unless(BrokerControlConfigService::isInsuranceEnabled(), 404);
+
+        $certificates = [];
+        try {
+            $certificates = app(InsuranceCertificateService::class)->getUserCertificates($userId);
+        } catch (\Throwable $e) {
+            report($e);
+            $certificates = [];
+        }
+
+        return $this->view('accessible-frontend::settings-insurance', [
+            'title' => __('govuk_alpha_settings.insurance.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'account',
+            'certificates' => $certificates,
+            'insuranceTypes' => self::SETTINGS_INSURANCE_TYPES,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Upload a new insurance certificate. Mirrors UserInsuranceController::upload
+     * (same MIME/size validation, same storage path, same InsuranceCertificateService
+     * ::create call with status 'submitted').
+     */
+    public function settingsUploadInsurance(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        abort_unless(BrokerControlConfigService::isInsuranceEnabled(), 404);
+
+        $insuranceType = $this->allowed($request->input('insurance_type'), self::SETTINGS_INSURANCE_TYPES, null);
+        if ($insuranceType === null) {
+            return redirect()
+                ->route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug, 'status' => 'insurance-type-invalid'])
+                ->withFragment('upload');
+        }
+
+        $file = $request->file('certificate_file');
+        if (! $file || ! $file->isValid()) {
+            return redirect()
+                ->route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug, 'status' => 'insurance-file-required'])
+                ->withFragment('upload');
+        }
+
+        // Validate MIME from file content (not the user-supplied filename).
+        $mimeType = null;
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if ($finfo !== false) {
+            $detected = finfo_file($finfo, (string) $file->getRealPath());
+            finfo_close($finfo);
+            $mimeType = $detected !== false ? $detected : null;
+        }
+        if ($mimeType === null || ! isset(self::SETTINGS_INSURANCE_MIMES[$mimeType])) {
+            return redirect()
+                ->route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug, 'status' => 'insurance-file-type'])
+                ->withFragment('upload');
+        }
+
+        if ($file->getSize() > 10 * 1024 * 1024) {
+            return redirect()
+                ->route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug, 'status' => 'insurance-file-large'])
+                ->withFragment('upload');
+        }
+
+        $tenantId = TenantContext::getId();
+
+        try {
+            $uploadDir = base_path("httpdocs/uploads/insurance/{$tenantId}/{$userId}");
+            $ext = self::SETTINGS_INSURANCE_MIMES[$mimeType];
+            $filename = 'cert_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+
+            if (! is_dir($uploadDir) && ! mkdir($uploadDir, 0755, true) && ! is_dir($uploadDir)) {
+                throw new \RuntimeException('Could not create upload directory.');
+            }
+
+            $file->move($uploadDir, $filename);
+            $filePath = "/uploads/insurance/{$tenantId}/{$userId}/{$filename}";
+
+            $provider = trim(self::asStr($request->input('provider_name')));
+            $policy = trim(self::asStr($request->input('policy_number')));
+            $expiry = trim(self::asStr($request->input('expiry_date')));
+
+            app(InsuranceCertificateService::class)->create([
+                'user_id' => $userId,
+                'insurance_type' => $insuranceType,
+                'provider_name' => $provider !== '' ? $provider : null,
+                'policy_number' => $policy !== '' ? $policy : null,
+                'expiry_date' => $expiry !== '' ? $expiry : null,
+                'certificate_file_path' => $filePath,
+                'status' => 'submitted',
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect()
+                ->route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug, 'status' => 'insurance-failed'])
+                ->withFragment('upload');
+        }
+
+        return redirect()
+            ->route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug, 'status' => 'insurance-uploaded'])
+            ->withFragment('certificates');
     }
 }

@@ -24,3 +24,19 @@ use Illuminate\Support\Facades\Route;
 Route::get('/listings/{id}/analytics', [AlphaController::class, 'listingsAnalytics'])
     ->whereNumber('id')
     ->name('listings.analytics');
+
+// AI description helper — no-JS generate round-trip for the create/edit forms.
+// Static segment, registered before any wildcard listing routes in this file.
+Route::post('/listings/generate-description', [AlphaController::class, 'listingsGenerateDescription'])
+    ->middleware('throttle:5,1')
+    ->name('listings.generate-description');
+
+// Listing comment thread — server-rendered list + add-comment form. The
+// /comments segment is distinct from the core /listings/{id} detail route.
+Route::get('/listings/{id}/comments', [AlphaController::class, 'listingsComments'])
+    ->whereNumber('id')
+    ->name('listings.comments');
+Route::post('/listings/{id}/comments', [AlphaController::class, 'listingsStoreComment'])
+    ->whereNumber('id')
+    ->middleware('throttle:20,1')
+    ->name('listings.comments.store');

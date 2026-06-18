@@ -32,12 +32,22 @@
         </div>
     @endif
 
-    <p class="govuk-!-margin-bottom-6">
+    <div class="nexus-alpha-actions govuk-!-margin-bottom-6">
         <a class="govuk-button" data-module="govuk-button" href="{{ route('govuk-alpha.jobs.create', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.jobs_t3.post_button') }}</a>
-    </p>
+        @if (\Illuminate\Support\Facades\Route::has('govuk-alpha.jobs.onboarding'))
+            <a class="govuk-button govuk-button--secondary" data-module="govuk-button" href="{{ route('govuk-alpha.jobs.onboarding', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_jobs.onboarding.title') }}</a>
+        @endif
+    </div>
 
     @if (empty($jobs))
-        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.jobs_t3.mine_empty') }}</p></div>
+        @if (\Illuminate\Support\Facades\Route::has('govuk-alpha.jobs.onboarding'))
+            <div class="govuk-inset-text">
+                <p class="govuk-body">{{ __('govuk_alpha.jobs_t3.mine_empty') }}</p>
+                <p class="govuk-body govuk-!-margin-bottom-0"><a class="govuk-link" href="{{ route('govuk-alpha.jobs.onboarding', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_jobs.onboarding.title') }}</a></p>
+            </div>
+        @else
+            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.jobs_t3.mine_empty') }}</p></div>
+        @endif
     @else
         <div class="nexus-alpha-card-list">
             @foreach ($jobs as $job)

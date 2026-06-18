@@ -200,6 +200,10 @@
                             @endforeach
                         </ul>
                     @endif
+
+                    @if ($pollId > 0 && \Illuminate\Support\Facades\Route::has('govuk-alpha.gamification.poll.detail'))
+                        <p class="govuk-body govuk-!-margin-top-2 govuk-!-margin-bottom-0"><a class="govuk-link" href="{{ route('govuk-alpha.gamification.poll.detail', ['tenantSlug' => $tenantSlug, 'pollId' => $pollId]) }}">{{ __('govuk_alpha_gamification.nav.view_and_discuss') }}</a></p>
+                    @endif
                 </article>
             @endforeach
         @endif
@@ -254,6 +258,10 @@
                                 <span class="govuk-body-s">{{ $pct }}% — {{ __('govuk_alpha.polls.per_option_votes', ['count' => $cnt]) }}</span>
                             </div>
                         @endforeach
+                    @endif
+
+                    @if ($pollId > 0 && \Illuminate\Support\Facades\Route::has('govuk-alpha.gamification.poll.detail'))
+                        <p class="govuk-body govuk-!-margin-top-2 govuk-!-margin-bottom-0"><a class="govuk-link" href="{{ route('govuk-alpha.gamification.poll.detail', ['tenantSlug' => $tenantSlug, 'pollId' => $pollId]) }}">{{ __('govuk_alpha_gamification.nav.view_and_discuss') }}</a></p>
                     @endif
                 </article>
             @endforeach

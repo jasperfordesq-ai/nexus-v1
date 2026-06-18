@@ -129,6 +129,176 @@ class ListingsParityTest extends TestCase
     }
 
     // =====================================================================
+    // Listing comment thread
+    // =====================================================================
+
+    public function test_listings_comments_requires_authentication(): void
+    {
+        $loginPath = "/{$this->testTenantSlug}/alpha/login";
+
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listing = $this->createListing((int) $owner->id);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/comments");
+        $response->assertRedirect();
+        $this->assertStringContainsString($loginPath, $response->headers->get('Location') ?? '');
+    }
+
+    public function test_listings_comments_renders_for_member(): void
+    {
+        $this->authenticatedUser();
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listing = $this->createListing((int) $owner->id, ['title' => 'Commentable listing']);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/comments");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_listings.comments.heading'));
+        $response->assertSee(__('govuk_alpha_listings.comments.add_heading'));
+        $response->assertSee('Commentable listing');
+        $response->assertSee('name="body"', false);
+    }
+
+    public function test_listings_comments_not_found_for_missing_listing(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/99999002/comments");
+        $response->assertNotFound();
+    }
+
+    public function test_listings_comments_not_found_for_cross_tenant_listing(): void
+    {
+        $foreignOwner = User::factory()->forTenant(999)->create(['status' => 'active', 'is_approved' => true]);
+        $foreignListing = Listing::factory()->forTenant(999)->create([
+            'user_id' => $foreignOwner->id,
+            'title' => 'Foreign comment listing',
+            'description' => 'Not visible to the test tenant.',
+            'type' => 'offer',
+        ]);
+
+        $this->authenticatedUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$foreignListing->id}/comments");
+        $response->assertNotFound();
+    }
+
+    public function test_listings_store_comment_persists_and_redirects(): void
+    {
+        $author = $this->authenticatedUser();
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listing = $this->createListing((int) $owner->id);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/comments", [
+            'body' => 'A genuinely helpful comment about this listing.',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=comment-added', $response->headers->get('Location') ?? '');
+
+        $this->assertDatabaseHas('comments', [
+            'tenant_id' => $this->testTenantId,
+            'target_type' => 'listing',
+            'target_id' => $listing->id,
+            'user_id' => $author->id,
+        ]);
+    }
+
+    public function test_listings_store_comment_rejects_empty_body(): void
+    {
+        $this->authenticatedUser();
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listing = $this->createListing((int) $owner->id);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/comments", [
+            'body' => '   ',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=comment-invalid', $response->headers->get('Location') ?? '');
+    }
+
+    public function test_listings_store_comment_requires_authentication(): void
+    {
+        $loginPath = "/{$this->testTenantSlug}/alpha/login";
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $listing = $this->createListing((int) $owner->id);
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/comments", [
+            'body' => 'Should not persist.',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString($loginPath, $response->headers->get('Location') ?? '');
+        $this->assertDatabaseMissing('comments', [
+            'tenant_id' => $this->testTenantId,
+            'target_type' => 'listing',
+            'target_id' => $listing->id,
+        ]);
+    }
+
+    // =====================================================================
+    // AI description helper (no-JS round-trip)
+    // =====================================================================
+
+    public function test_listings_generate_description_requires_authentication(): void
+    {
+        $loginPath = "/{$this->testTenantSlug}/alpha/login";
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/generate-description", [
+            'title' => 'A listing title',
+            'type' => 'offer',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString($loginPath, $response->headers->get('Location') ?? '');
+    }
+
+    public function test_listings_generate_description_requires_title(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/generate-description", [
+            'title' => '',
+            'type' => 'offer',
+        ]);
+
+        $response->assertRedirect();
+        $location = $response->headers->get('Location') ?? '';
+        // Empty title cannot produce a suggestion — bounce back to create with the prompt.
+        $this->assertStringContainsString('status=ai-title-required', $location);
+        $this->assertStringContainsString("/{$this->testTenantSlug}/alpha/listings/new", $location);
+    }
+
+    // =====================================================================
+    // Listing detail — owner delete control + comments link wiring
+    // =====================================================================
+
+    public function test_listings_detail_shows_delete_for_owner(): void
+    {
+        $owner = $this->authenticatedUser();
+        $listing = $this->createListing((int) $owner->id);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}");
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_listings.detail.delete_button'));
+        // Owner-gated delete form posts to the existing delete route.
+        $deleteAction = route('govuk-alpha.listings.delete', ['tenantSlug' => $this->testTenantSlug, 'id' => $listing->id]);
+        $response->assertSee($deleteAction, false);
+    }
+
+    public function test_listings_detail_shows_comments_link(): void
+    {
+        $owner = $this->authenticatedUser();
+        $listing = $this->createListing((int) $owner->id);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}");
+        $response->assertOk();
+        $commentsHref = route('govuk-alpha.listings.comments', ['tenantSlug' => $this->testTenantSlug, 'id' => $listing->id]);
+        $response->assertSee($commentsHref, false);
+    }
+
+    // =====================================================================
     // Helpers (self-contained, mirroring GovukAlphaFrontendTest)
     // =====================================================================
 

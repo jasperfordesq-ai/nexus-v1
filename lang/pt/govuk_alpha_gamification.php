@@ -9,7 +9,6 @@ return [
         'success_title' => 'Success',
         'error_title' => 'There is a problem',
     ],
-
     'nav' => [
         'heading' => 'Achievements and rewards',
         'achievements' => 'Achievements',
@@ -29,8 +28,8 @@ return [
         'ranked_tag' => 'Ranked choice',
         'rank_this_poll' => 'Rank this poll',
         'view_ranked_poll' => 'View ranked results',
+        'view_and_discuss' => 'View and discuss',
     ],
-
     'common' => [
         'back_to_achievements' => 'Back to achievements',
         'back_to_leaderboard' => 'Back to leaderboard',
@@ -41,10 +40,6 @@ return [
         'locked' => 'Locked',
         'unknown_member' => 'Community member',
     ],
-
-    // ---------------------------------------------------------------
-    //  XP SHOP
-    // ---------------------------------------------------------------
     'shop' => [
         'title' => 'XP shop',
         'caption' => 'Achievements at :community',
@@ -67,10 +62,6 @@ return [
             'purchase-failed' => 'We could not complete that purchase. You may not have enough XP, or the item may be out of stock.',
         ],
     ],
-
-    // ---------------------------------------------------------------
-    //  COLLECTIONS
-    // ---------------------------------------------------------------
     'collections' => [
         'title' => 'Badge collections',
         'caption' => 'Achievements at :community',
@@ -81,10 +72,6 @@ return [
         'completed' => 'Completed',
         'bonus_claimed' => 'Bonus claimed',
     ],
-
-    // ---------------------------------------------------------------
-    //  SHOWCASE
-    // ---------------------------------------------------------------
     'showcase' => [
         'title' => 'Showcase badges',
         'caption' => 'Achievements at :community',
@@ -101,10 +88,6 @@ return [
             'showcase-not-owned' => 'You can only showcase badges you have earned.',
         ],
     ],
-
-    // ---------------------------------------------------------------
-    //  BADGE DETAIL
-    // ---------------------------------------------------------------
     'badge' => [
         'title' => 'Badge',
         'caption' => 'Achievements at :community',
@@ -118,10 +101,6 @@ return [
         'showcased' => 'Showcased on your profile',
         'view_all' => 'View all achievements',
     ],
-
-    // ---------------------------------------------------------------
-    //  ENGAGEMENT HISTORY
-    // ---------------------------------------------------------------
     'engagement' => [
         'title' => 'Engagement history',
         'caption' => 'Achievements at :community',
@@ -134,10 +113,6 @@ return [
         'active_no' => 'Inactive',
         'activities_count' => '{0} no activities|{1} 1 activity|[2,*] :count activities',
     ],
-
-    // ---------------------------------------------------------------
-    //  COMPETITIVE LEADERBOARD
-    // ---------------------------------------------------------------
     'competitive' => [
         'title' => 'Competitive leaderboard',
         'caption' => 'Leaderboard at :community',
@@ -168,11 +143,9 @@ return [
         'season_days_remaining' => '{0} ends today|{1} 1 day remaining|[2,*] :count days remaining',
         'season_participants' => '{0} no participants|{1} 1 participant|[2,*] :count participants',
         'season_view_all' => 'View all seasons',
+        'showing_count' => '{0} No members shown|{1} Showing 1 member|[2,*] Showing :count members',
+        'load_more' => 'Load more members',
     ],
-
-    // ---------------------------------------------------------------
-    //  SEASONS
-    // ---------------------------------------------------------------
     'seasons' => [
         'title' => 'Leaderboard seasons',
         'caption' => 'Leaderboard at :community',
@@ -197,10 +170,6 @@ return [
         'season_name_column' => 'Season',
         'period_column' => 'Period',
     ],
-
-    // ---------------------------------------------------------------
-    //  PERSONAL JOURNEY
-    // ---------------------------------------------------------------
     'journey' => [
         'title' => 'My journey',
         'caption' => 'Leaderboard at :community',
@@ -216,10 +185,6 @@ return [
         'badges_heading' => 'Badge progression',
         'no_badges' => 'No badge progression recorded yet.',
     ],
-
-    // ---------------------------------------------------------------
-    //  MEMBER SPOTLIGHT
-    // ---------------------------------------------------------------
     'spotlight' => [
         'title' => 'Member spotlight',
         'caption' => 'Leaderboard at :community',
@@ -230,10 +195,6 @@ return [
         'xp' => ':xp XP',
         'view_profile' => 'View profile',
     ],
-
-    // ---------------------------------------------------------------
-    //  NEXUS TIER LADDER
-    // ---------------------------------------------------------------
     'tiers' => [
         'title' => 'NEXUS tier ladder',
         'caption' => 'NEXUS score at :community',
@@ -261,10 +222,6 @@ return [
             'legendary' => 'Legendary',
         ],
     ],
-
-    // ---------------------------------------------------------------
-    //  RANKED POLLS
-    // ---------------------------------------------------------------
     'ranked' => [
         'title' => 'Ranked-choice poll',
         'caption' => 'Polls at :community',
@@ -288,10 +245,6 @@ return [
             'rank-failed' => 'We could not record your ranking. You may have already ranked this poll.',
         ],
     ],
-
-    // ---------------------------------------------------------------
-    //  POLL CREATE (parity — supports ranked)
-    // ---------------------------------------------------------------
     'poll_create' => [
         'title' => 'Create a poll',
         'caption' => 'Polls at :community',
@@ -315,10 +268,6 @@ return [
             'poll-create-failed' => 'We could not create your poll. Add a question and at least 2 options.',
         ],
     ],
-
-    // ---------------------------------------------------------------
-    //  POLL MANAGE (my polls + delete/export)
-    // ---------------------------------------------------------------
     'poll_manage' => [
         'title' => 'Manage my polls',
         'caption' => 'Polls at :community',
@@ -338,6 +287,43 @@ return [
         'states' => [
             'poll-deleted' => 'The poll has been deleted.',
             'poll-delete-failed' => 'We could not delete that poll. It may not exist or may not be yours.',
+        ],
+    ],
+    'poll_detail' => [
+        'title' => 'Poll',
+        'caption' => 'Polls at :community',
+        'by_label' => 'Posted by :name',
+        'closes_on' => 'Closes :date',
+        'closed_on' => 'Closed :date',
+        'open_tag' => 'Open',
+        'closed_tag' => 'Closed',
+        'ranked_tag' => 'Ranked',
+        'votes_count' => '{0} no votes|{1} 1 vote|[2,*] :count votes',
+        'your_choice' => 'Your choice',
+        'leading' => 'Leading',
+        'results_heading' => 'Results',
+        'results_pending' => 'Results will be shown once voting closes or once you have voted.',
+        'no_options' => 'This poll has no options.',
+        'vote_link' => 'Vote on this poll',
+        'rank_link' => 'Rank this poll',
+        'social_heading' => 'Likes and comments',
+        'like_summary' => '{0} no likes|{1} 1 like|[2,*] :count likes',
+        'comment_summary' => '{0} no comments|{1} 1 comment|[2,*] :count comments',
+        'like_button' => 'Like',
+        'unlike_button' => 'Unlike',
+        'comments_heading' => 'Comments',
+        'no_comments' => 'No comments yet. Be the first to comment.',
+        'comment_label' => 'Add a comment',
+        'comment_hint' => 'Be respectful and keep it on topic.',
+        'comment_button' => 'Post comment',
+        'states' => [
+            'poll-liked' => 'You liked this poll.',
+            'poll-unliked' => 'You removed your like.',
+            'poll-like-failed' => 'We could not record your like. Please try again.',
+            'poll-comment-created' => 'Your comment has been posted.',
+            'poll-comment-empty' => 'Enter a comment before posting.',
+            'poll-comment-too-long' => 'Your comment is too long. Please shorten it.',
+            'poll-comment-failed' => 'We could not post your comment. Please try again.',
         ],
     ],
 ];

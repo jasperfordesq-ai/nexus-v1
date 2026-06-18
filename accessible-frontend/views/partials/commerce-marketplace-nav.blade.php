@@ -32,6 +32,12 @@
             'href' => route('govuk-alpha.marketplace.orders.buyer', ['tenantSlug' => $tenantSlug]),
         ];
     }
+    if (\Illuminate\Support\Facades\Route::has('govuk-alpha.marketplace.pickups')) {
+        $commerceTabs['pickups'] = [
+            'label' => __('govuk_alpha_commerce.nav.pickups'),
+            'href' => route('govuk-alpha.marketplace.pickups', ['tenantSlug' => $tenantSlug]),
+        ];
+    }
     if (\Illuminate\Support\Facades\Route::has('govuk-alpha.marketplace.orders.seller')) {
         $commerceTabs['sales'] = [
             'label' => __('govuk_alpha_commerce.nav.sales'),
@@ -48,6 +54,18 @@
         $commerceTabs['sell'] = [
             'label' => __('govuk_alpha_commerce.nav.sell'),
             'href' => route('govuk-alpha.marketplace.create', ['tenantSlug' => $tenantSlug]),
+        ];
+    }
+    if (\Illuminate\Support\Facades\Route::has('govuk-alpha.marketplace.onboarding')) {
+        $commerceTabs['onboarding'] = [
+            'label' => __('govuk_alpha_commerce.nav.onboarding'),
+            'href' => route('govuk-alpha.marketplace.onboarding', ['tenantSlug' => $tenantSlug]),
+        ];
+    }
+    if (\Illuminate\Support\Facades\Route::has('govuk-alpha.marketplace.coupons') && \App\Core\TenantContext::hasFeature('merchant_coupons')) {
+        $commerceTabs['coupons'] = [
+            'label' => __('govuk_alpha_commerce.nav.coupons'),
+            'href' => route('govuk-alpha.marketplace.coupons', ['tenantSlug' => $tenantSlug]),
         ];
     }
     $commerceActive = $commerceActiveTab ?? 'browse';

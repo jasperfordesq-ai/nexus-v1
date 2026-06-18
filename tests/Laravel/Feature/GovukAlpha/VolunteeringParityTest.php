@@ -61,6 +61,7 @@ class VolunteeringParityTest extends TestCase
             '/volunteering/emergency-alerts',
             '/volunteering/credentials',
             '/volunteering/wellbeing',
+            '/volunteering/donations',
             '/volunteering/opportunities/create',
         ] as $path) {
             $response = $this->get("/{$this->testTenantSlug}/alpha{$path}");
@@ -401,6 +402,80 @@ class VolunteeringParityTest extends TestCase
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.recommended.title'));
+    }
+
+    // =====================================================================
+    // Donations / giving
+    // =====================================================================
+
+    public function test_volunteering_donations_renders_for_authenticated_user(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/donations");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_volunteering.donations.title'));
+        $response->assertSee(__('govuk_alpha_volunteering.donations.form_title'));
+    }
+
+    public function test_volunteering_donations_403_when_feature_disabled(): void
+    {
+        $this->authenticatedUser();
+
+        // Turn the volunteering feature off for this tenant.
+        $row = DB::table('tenants')->where('id', $this->testTenantId)->value('features');
+        $current = $row ? (json_decode($row, true) ?: []) : [];
+        $current['volunteering'] = false;
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['features' => json_encode($current)]);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/donations");
+
+        $response->assertForbidden();
+    }
+
+    public function test_volunteering_store_donation_persists_pending_offline_donation(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/donations", [
+            '_token' => csrf_token(),
+            'amount' => '25.50',
+            'payment_method' => 'bank_transfer',
+            'message' => 'Keep up the good work',
+            'is_anonymous' => '1',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('donate-recorded', $response->headers->get('Location') ?? '');
+
+        $this->assertDatabaseHas('vol_donations', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => (int) $user->id,
+            'payment_method' => 'bank_transfer',
+            'status' => 'pending',
+            'is_anonymous' => 1,
+        ]);
+    }
+
+    public function test_volunteering_store_donation_rejects_zero_amount(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/donations", [
+            '_token' => csrf_token(),
+            'amount' => '0',
+            'payment_method' => 'paypal',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('donate-failed', $response->headers->get('Location') ?? '');
+        $this->assertDatabaseMissing('vol_donations', [
+            'tenant_id' => $this->testTenantId,
+            'payment_method' => 'paypal',
+        ]);
     }
 
     // =====================================================================
