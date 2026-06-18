@@ -19,6 +19,8 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.courses.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.courses.description') }}</p>
 
+    @include('accessible-frontend::partials.commerce-courses-nav', ['coursesActiveTab' => 'browse'])
+
     <form method="get" action="{{ route('govuk-alpha.courses.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-6">
         <div class="govuk-form-group">
             <label class="govuk-label" for="q">{{ __('govuk_alpha.courses.search_label') }}</label>
