@@ -600,10 +600,8 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $admin = $this->ideationAdmin();
         $challengeId = $this->ideationCreateChallenge($admin->id, ['status' => 'closed']);
 
-        // Save status + impact only (no winning idea). The shared service's
-        // winning-idea validation queries challenge_ideas.tenant_id, which is not
-        // a column on that table, so supplying a winning idea is left to the
-        // upstream service owner; the no-winning-idea path is the safe one.
+        // Save status + impact only (no winning idea). The winning-idea path is
+        // covered separately by test_ideation_admin_can_save_outcome_with_winning_idea.
         $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/outcome", [
             'outcome_status' => 'implemented',
             'impact_description' => 'Trees were planted across the town.',
@@ -615,6 +613,56 @@ class IdeationParityTest extends GovukAlphaFrontendTest
             'tenant_id' => $this->testTenantId,
             'status' => 'implemented',
         ]);
+    }
+
+    public function test_ideation_admin_can_save_outcome_with_winning_idea(): void
+    {
+        $this->ideationEnableFeature();
+        $admin = $this->ideationAdmin();
+        $challengeId = $this->ideationCreateChallenge($admin->id, ['status' => 'closed']);
+        $ideaId = $this->ideationCreateIdea($challengeId, $admin->id, ['title' => 'The winning idea']);
+
+        // Regression guard (fix 8f56eeae9): challenge_ideas has no tenant_id
+        // column, but ChallengeOutcomeService::upsert() once validated the
+        // winning idea with ->where('tenant_id', ...) on that table — so saving
+        // an outcome WITH a winner threw "Unknown column 'tenant_id'" and 500'd
+        // on both the React (PUT /v2/ideation-challenges/{id}/outcome) and
+        // accessible frontends. If that clause is reintroduced, upsert() catches
+        // the SQL error and returns null, flipping this to ?status=outcome-failed
+        // with no persisted row — failing both assertions below.
+        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/outcome", [
+            'outcome_status' => 'implemented',
+            'impact_description' => 'The winning idea was rolled out town-wide.',
+            'winning_idea_id' => $ideaId,
+        ]);
+
+        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/outcome?status=outcome-saved");
+        $this->assertDatabaseHas('challenge_outcomes', [
+            'challenge_id' => $challengeId,
+            'tenant_id' => $this->testTenantId,
+            'status' => 'implemented',
+            'winning_idea_id' => $ideaId,
+        ]);
+    }
+
+    public function test_ideation_outcome_rejects_winning_idea_from_another_challenge(): void
+    {
+        $this->ideationEnableFeature();
+        $admin = $this->ideationAdmin();
+        $challengeA = $this->ideationCreateChallenge($admin->id);
+        $challengeB = $this->ideationCreateChallenge($admin->id, ['title' => 'Other challenge']);
+        // Idea belongs to challengeB, but we try to set it as challengeA's winner.
+        $foreignIdeaId = $this->ideationCreateIdea($challengeB, $admin->id);
+
+        // The remaining ->where('challenge_id', ...) filter must still reject a
+        // mismatched winner; dropping the tenant_id clause must not weaken this.
+        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeA}/outcome", [
+            'outcome_status' => 'implemented',
+            'winning_idea_id' => $foreignIdeaId,
+        ]);
+
+        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/{$challengeA}/outcome?status=outcome-failed");
+        $this->assertDatabaseMissing('challenge_outcomes', ['challenge_id' => $challengeA]);
     }
 
     // ================================================================
