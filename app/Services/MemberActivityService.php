@@ -116,9 +116,14 @@ class MemberActivityService
         $items = $items->merge($posts);
 
         // Transactions with user names
+        $activityTenantId = \App\Core\TenantContext::getId();
         $txns = Transaction::query()
-            ->leftJoin('users as s', 'transactions.sender_id', '=', 's.id')
-            ->leftJoin('users as r', 'transactions.receiver_id', '=', 'r.id')
+            ->leftJoin('users as s', function ($join) use ($activityTenantId) {
+                $join->on('transactions.sender_id', '=', 's.id')->where('s.tenant_id', $activityTenantId);
+            })
+            ->leftJoin('users as r', function ($join) use ($activityTenantId) {
+                $join->on('transactions.receiver_id', '=', 'r.id')->where('r.tenant_id', $activityTenantId);
+            })
             ->where(fn (Builder $q) => $q->where('transactions.sender_id', $userId)->orWhere('transactions.receiver_id', $userId))
             ->where('transactions.status', 'completed')
             ->selectRaw(
@@ -155,8 +160,12 @@ class MemberActivityService
         // Connections
         try {
             $connections = Connection::query()
-                ->leftJoin('users as u1', 'connections.requester_id', '=', 'u1.id')
-                ->leftJoin('users as u2', 'connections.receiver_id', '=', 'u2.id')
+                ->leftJoin('users as u1', function ($join) use ($activityTenantId) {
+                    $join->on('connections.requester_id', '=', 'u1.id')->where('u1.tenant_id', $activityTenantId);
+                })
+                ->leftJoin('users as u2', function ($join) use ($activityTenantId) {
+                    $join->on('connections.receiver_id', '=', 'u2.id')->where('u2.tenant_id', $activityTenantId);
+                })
                 ->where(fn (Builder $q) => $q->where('connections.requester_id', $userId)->orWhere('connections.receiver_id', $userId))
                 ->where('connections.status', 'accepted')
                 ->selectRaw(

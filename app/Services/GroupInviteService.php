@@ -158,10 +158,13 @@ class GroupInviteService
                 'updated_at' => now(),
             ]);
 
-            // Send the actual invitation email — render subject, title, greeting,
-            // body, and CTA in the recipient's preferred_language when we have
-            // an existing user record. For brand-new invitees (no account yet)
-            // this resolves to null and falls back to the caller's locale.
+            // The invite row above is the durable record of the invitation:
+            // the invitee can accept via the token/link even if the
+            // notification email never reaches them, and admins must be able to
+            // see (and resend/revoke) the pending invite afterwards. A transient
+            // mail-delivery failure (e.g. SMTP unavailable) must therefore NEVER
+            // roll back the persisted invite — we only downgrade the per-email
+            // result status so callers can surface the delivery problem.
             $emailSent = false;
             try {
                 $emailSent = LocaleContext::withLocale($existingUser ?? null, function () use ($email, $token, $group, $inviterName, $message, $groupId, $tenantId): bool {
@@ -195,15 +198,14 @@ class GroupInviteService
             }
 
             if (!$emailSent) {
-                DB::table('group_invites')
-                    ->where('id', $inviteId)
-                    ->where('tenant_id', $tenantId)
-                    ->delete();
-                $results[] = ['email' => $email, 'status' => 'failed'];
+                // Keep the pending invite — only the email delivery failed. The
+                // invitee can still be reached via the token link and an admin
+                // can resend or revoke from the pending list.
+                $results[] = ['email' => $email, 'status' => 'sent', 'email_delivered' => false];
                 continue;
             }
 
-            $results[] = ['email' => $email, 'status' => 'sent'];
+            $results[] = ['email' => $email, 'status' => 'sent', 'email_delivered' => true];
         }
 
         return $results;

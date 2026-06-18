@@ -46,7 +46,7 @@ class PollExportService
                 ->where('option_id', $option->id)
                 ->count();
             // CSV injection prevention: prefix formula-trigger characters
-            $text = $option->option_text;
+            $text = $option->label;
             if (is_string($text) && preg_match('/^[=+\-@\t\r]/', $text)) {
                 $text = "'" . $text;
             }

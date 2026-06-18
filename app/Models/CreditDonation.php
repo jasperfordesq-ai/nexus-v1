@@ -17,6 +17,11 @@ class CreditDonation extends Model
 
     protected $table = 'credit_donations';
 
+    // The credit_donations table has a created_at column but NO updated_at.
+    // Without this, Eloquent's default timestamps emit "Unknown column
+    // 'updated_at'" on create()/save() and donate-to-member 500s.
+    public const UPDATED_AT = null;
+
     protected $fillable = [
         'donor_id', 'recipient_type', 'recipient_id',
         'amount', 'message', 'transaction_id',
