@@ -42,6 +42,10 @@ class MessagesParityTest extends TestCase
 
         TenantContext::reset();
         TenantContext::setById($this->testTenantId);
+        // MessageService::send() (used to seed 1:1 messages for the translate tests)
+        // resolves the active tenant via app('tenant.id'), which the ResolveTenant
+        // middleware binds during a real request. Bind it for direct-call seeding.
+        $this->app->instance('tenant.id', $this->testTenantId);
 
         \Illuminate\Support\Facades\Cache::flush();
     }
@@ -383,6 +387,7 @@ class MessagesParityTest extends TestCase
 
     public function test_messages_conversation_shows_translate_button_for_a_text_message(): void
     {
+        $this->enableAlphaFeatures(['message_translation']);
         $viewer = $this->messagesAuthedUser(['name' => 'Translate Viewer']);
         $other = User::factory()->forTenant($this->testTenantId)->create([
             'name' => 'Translate Partner', 'status' => 'active', 'is_approved' => true,
@@ -406,6 +411,7 @@ class MessagesParityTest extends TestCase
 
     public function test_messages_translate_fails_for_a_message_the_viewer_is_not_party_to(): void
     {
+        $this->enableAlphaFeatures(['message_translation']);
         // Two other members exchange a message the viewer is not part of.
         $sender = User::factory()->forTenant($this->testTenantId)->create([
             'name' => 'Outside Sender', 'status' => 'active', 'is_approved' => true,
@@ -441,6 +447,20 @@ class MessagesParityTest extends TestCase
         Sanctum::actingAs($user, ['*']);
 
         return $user;
+    }
+
+    /** Enable off-by-default tenant features (e.g. message_translation) for a test. */
+    private function enableAlphaFeatures(array $features): void
+    {
+        $row = DB::table('tenants')->where('id', $this->testTenantId)->value('features');
+        $current = $row ? (json_decode($row, true) ?: []) : [];
+        foreach ($features as $f) {
+            $current[$f] = true;
+        }
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['features' => json_encode($current)]);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->app->instance('tenant.id', $this->testTenantId);
     }
 
     /**

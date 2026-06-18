@@ -198,8 +198,8 @@
                         <form method="post" action="{{ route('govuk-alpha.connections.matches-board.dismiss', ['tenantSlug' => $tenantSlug, 'listingId' => $listingId]) }}">
                             @csrf
                             <input type="hidden" name="source" value="{{ $activeSource }}">
-                            <fieldset class="govuk-fieldset" aria-describedby="dismiss-legend-{{ $listingId }}">
-                                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s" id="dismiss-legend-{{ $listingId }}">
+                            <fieldset class="govuk-fieldset">
+                                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                                     {{ __('govuk_alpha_connections.matches.dismiss_reason_label') }}
                                 </legend>
                                 <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">

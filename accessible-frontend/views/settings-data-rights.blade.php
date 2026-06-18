@@ -61,13 +61,13 @@
                     <div class="govuk-form-group">
                         <fieldset class="govuk-fieldset">
                             <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                                <h2 class="govuk-fieldset__heading" id="request_type">{{ __('govuk_alpha_settings.gdpr.type_label') }}</h2>
+                                <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha_settings.gdpr.type_label') }}</h2>
                             </legend>
                             <div class="govuk-radios" data-module="govuk-radios">
-                                @foreach ($requestTypes as $type)
+                                @foreach ($requestTypes as $typeIndex => $type)
                                     <div class="govuk-radios__item">
-                                        <input class="govuk-radios__input" id="request_type_{{ $type }}" name="request_type" type="radio" value="{{ $type }}" aria-describedby="request_type_{{ $type }}-hint">
-                                        <label class="govuk-label govuk-radios__label" for="request_type_{{ $type }}">{{ __('govuk_alpha_settings.gdpr.types.' . $type) }}</label>
+                                        <input class="govuk-radios__input" id="{{ $typeIndex === 0 ? 'request_type' : 'request_type_' . $type }}" name="request_type" type="radio" value="{{ $type }}" aria-describedby="request_type_{{ $type }}-hint">
+                                        <label class="govuk-label govuk-radios__label" for="{{ $typeIndex === 0 ? 'request_type' : 'request_type_' . $type }}">{{ __('govuk_alpha_settings.gdpr.types.' . $type) }}</label>
                                         <div id="request_type_{{ $type }}-hint" class="govuk-hint govuk-radios__hint">{{ __('govuk_alpha_settings.gdpr.type_descriptions.' . $type) }}</div>
                                     </div>
                                 @endforeach

@@ -28,7 +28,7 @@
 
     <span class="govuk-caption-xl" id="group-exchange-top">{{ __('govuk_alpha.group_exchanges.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
     <div class="nexus-alpha-module-row">
-        <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ $exchange['title'] ?: __('govuk_alpha.group_exchanges.title') }}</h1>
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ ($exchange['title'] ?? '') ?: __('govuk_alpha.group_exchanges.title') }}</h1>
         <strong class="govuk-tag {{ $statusTag[$exStatus] }}">{{ $statusLabel($exStatus) }}</strong>
     </div>
 
@@ -187,6 +187,13 @@
         <section aria-labelledby="complete-heading" class="govuk-!-margin-top-7">
             <h2 class="govuk-heading-l" id="complete-heading">{{ __('govuk_alpha.group_exchanges.complete_title') }}</h2>
             <p class="govuk-body">{{ __('govuk_alpha.group_exchanges.complete_body') }}</p>
+            <div class="govuk-warning-text">
+                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                <strong class="govuk-warning-text__text">
+                    <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning') }}</span>
+                    {{ __('govuk_alpha.group_exchanges.complete_warning') }}
+                </strong>
+            </div>
             <div class="nexus-alpha-actions">
                 <form method="post" action="{{ route('govuk-alpha.group-exchanges.complete', ['tenantSlug' => $tenantSlug, 'id' => $exchange['id']]) }}" class="nexus-alpha-linkform">
                     @csrf

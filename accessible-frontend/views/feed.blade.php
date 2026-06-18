@@ -370,13 +370,18 @@
                                             $count = $opt['vote_count'] ?? null;
                                             $pct = $opt['percentage'] ?? null;
                                         @endphp
+                                        @php $optLabel = $opt['text'] ?? $opt['label'] ?? ''; @endphp
                                         <li>
-                                            <span class="govuk-!-font-weight-bold">{{ $opt['text'] ?? $opt['label'] ?? '' }}</span>
+                                            <span class="govuk-!-font-weight-bold">{{ $optLabel }}</span>
                                             @if ($voted)
                                                 <strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha.feed.poll_your_choice') }}</strong>
                                             @endif
                                             @if ($count !== null)
                                                 <span class="govuk-body-s nexus-alpha-meta">{{ trans_choice('govuk_alpha.feed.poll_votes', (int) $count, ['count' => (int) $count]) }}@if ($pct !== null) ({{ (int) round((float) $pct) }}%)@endif</span>
+                                            @endif
+                                            @if ($pct !== null)
+                                                @php $pctRounded = max(0, min(100, (int) round((float) $pct))); @endphp
+                                                <progress class="nexus-alpha-poll-bar" max="100" value="{{ $pctRounded }}" aria-label="{{ __('govuk_alpha.feed.poll_result_share', ['option' => $optLabel, 'percent' => $pctRounded]) }}">{{ $pctRounded }}%</progress>
                                             @endif
                                         </li>
                                     @endforeach

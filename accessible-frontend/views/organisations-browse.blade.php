@@ -70,24 +70,24 @@
                     @endif
                     <dl class="nexus-alpha-inline-list nexus-alpha-meta">
                         <div>
-                            <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.browse.search_label') }}</dt>
+                            <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.browse.term_opportunities') }}</dt>
                             <dd>{{ trans_choice('govuk_alpha_organisations.browse.stat_opportunities', $oppCount, ['count' => $oppCount]) }}</dd>
                         </div>
                         @if ($volCount > 0)
                             <div>
-                                <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.browse.search_label') }}</dt>
+                                <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.browse.term_volunteers') }}</dt>
                                 <dd>{{ trans_choice('govuk_alpha_organisations.browse.stat_volunteers', $volCount, ['count' => $volCount]) }}</dd>
                             </div>
                         @endif
                         @if ($hours > 0)
                             <div>
-                                <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.browse.search_label') }}</dt>
+                                <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.browse.term_hours') }}</dt>
                                 <dd>{{ __('govuk_alpha_organisations.browse.stat_hours', ['count' => number_format($hours, ($hours == (int) $hours) ? 0 : 1)]) }}</dd>
                             </div>
                         @endif
                         @if ($rating > 0)
                             <div>
-                                <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.browse.search_label') }}</dt>
+                                <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.browse.term_rating') }}</dt>
                                 <dd>
                                     <progress max="5" value="{{ number_format($rating, 1, '.', '') }}" aria-label="{{ __('govuk_alpha_organisations.browse.stat_rating', ['rating' => number_format($rating, 1)]) }}">{{ __('govuk_alpha_organisations.browse.stat_rating', ['rating' => number_format($rating, 1)]) }}</progress>
                                     <span class="govuk-!-margin-left-2">{{ number_format($rating, 1) }}</span>
@@ -96,7 +96,7 @@
                         @endif
                         @if ($hasWebsite)
                             <div>
-                                <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.browse.search_label') }}</dt>
+                                <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.browse.term_website') }}</dt>
                                 <dd>{{ __('govuk_alpha_organisations.browse.has_website') }}</dd>
                             </div>
                         @endif

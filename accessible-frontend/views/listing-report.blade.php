@@ -14,7 +14,7 @@
                 <div class="govuk-error-summary__body">
                     <ul class="govuk-list govuk-error-summary__list">
                         @foreach ($errors->all() as $error)
-                            <li><a href="#reason">{{ $error }}</a></li>
+                            <li><a href="#reason-inappropriate">{{ $error }}</a></li>
                         @endforeach
                     </ul>
                 </div>

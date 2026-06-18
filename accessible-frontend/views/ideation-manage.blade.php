@@ -55,7 +55,7 @@
     <form method="post" action="{{ route('govuk-alpha.ideation.favorite', ['tenantSlug' => $tenantSlug, 'id' => $cId]) }}" class="govuk-!-margin-bottom-4">
         @csrf
         <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">
-            {{ $isFavorited ? __('govuk_alpha_ideation.states.unfavorited') : __('govuk_alpha_ideation.states.favorited') }}
+            {{ $isFavorited ? __('govuk_alpha_ideation.manage.remove_favorite') : __('govuk_alpha_ideation.manage.add_favorite') }}
         </button>
     </form>
 

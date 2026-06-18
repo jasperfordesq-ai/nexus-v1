@@ -90,7 +90,11 @@
 
         <div id="messages-list">
             @if ($loadError)
-                <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.states.error_title') }}</p></div>
+                <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+                    <div role="alert">
+                        <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                    </div>
+                </div>
             @elseif (empty($threads))
                 @if ($query !== '')
                     <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.fed2.messages.no_conversations_match') }}</p></div>

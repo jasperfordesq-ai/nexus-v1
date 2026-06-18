@@ -307,7 +307,7 @@
                 <div class="govuk-warning-text">
                     <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
                     <strong class="govuk-warning-text__text">
-                        <span class="govuk-visually-hidden">{{ __('govuk_alpha_federation.onboarding.error_title') }}</span>
+                        <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning') }}</span>
                         {{ __('govuk_alpha_federation.onboarding.confirm_warning') }}
                     </strong>
                 </div>

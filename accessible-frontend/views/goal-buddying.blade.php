@@ -33,7 +33,7 @@
     @elseif ($status === 'buddy-nudge-failed')
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ __('govuk_alpha.polish_gamify.buddy_nudge_failed') }}</li></ul></div></div>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li><a href="#your-buddied-goals">{{ __('govuk_alpha.polish_gamify.buddy_nudge_failed') }}</a></li></ul></div></div>
         </div>
     @elseif ($status === 'buddy-joined')
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="buddy-status">
@@ -54,7 +54,7 @@
     <span class="govuk-caption-xl">{{ __('govuk_alpha.goals.buddying_caption') }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.goals.buddying_title') }}</h1>
 
-    <h2 class="govuk-heading-l">{{ __('govuk_alpha.goals.buddying_yours_heading') }}</h2>
+    <h2 class="govuk-heading-l" id="your-buddied-goals">{{ __('govuk_alpha.goals.buddying_yours_heading') }}</h2>
     @if (empty($buddying))
         <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.goals.buddying_yours_empty') }}</p></div>
     @else

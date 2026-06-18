@@ -11,10 +11,8 @@
         $nameError = $status === 'collection-name-required';
     @endphp
 
-    <span class="govuk-caption-xl">{{ __('govuk_alpha_saved.collections.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
-    <h1 class="govuk-heading-xl">{{ __('govuk_alpha_saved.collections.title') }}</h1>
-
-    {{-- Error summary (validation) BEFORE any success banner --}}
+    {{-- Error summary (validation) MUST come before the <h1> so it receives
+         focus on load and reads first for assistive technology. --}}
     @if ($nameError)
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
@@ -27,6 +25,9 @@
             </div>
         </div>
     @endif
+
+    <span class="govuk-caption-xl">{{ __('govuk_alpha_saved.collections.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
+    <h1 class="govuk-heading-xl">{{ __('govuk_alpha_saved.collections.title') }}</h1>
 
     {{-- Success / failure banners --}}
     @if (in_array($status, ['collection-created', 'collection-updated', 'collection-deleted'], true))

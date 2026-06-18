@@ -139,6 +139,7 @@ return [
         'location_label' => 'Location',
         'location_hint' => 'Where the volunteering takes place.',
         'remote_label' => 'This opportunity can be done remotely',
+        'visibility_legend' => 'Visibility options',
         'skills_label' => 'Skills needed',
         'skills_hint' => 'Separate skills with commas, for example: driving, first aid.',
         'category_label' => 'Category',

@@ -21,6 +21,10 @@
         </p>
     @endif
 
+    {{-- Direct messages / Groups switch (parity with the group surfaces, and the
+         only way to reach group conversations from the inbox). --}}
+    @include('accessible-frontend::partials.messages-subnav', ['tenantSlug' => $tenantSlug, 'messagesActive' => 'direct'])
+
     @php
         $canStartConversation = $directMessagingEnabled
             && empty($restriction['messaging_disabled'])

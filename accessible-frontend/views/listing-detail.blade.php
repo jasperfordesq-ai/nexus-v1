@@ -50,6 +50,34 @@
         </div>
     @endif
 
+    @php
+        $actionSuccessStates = [
+            'listing-saved' => 'govuk_alpha.polish_listings.status_listing_saved',
+            'listing-unsaved' => 'govuk_alpha.polish_listings.status_listing_unsaved',
+            'listing-renewed' => 'govuk_alpha.polish_listings.status_listing_renewed',
+        ];
+        $actionErrorStates = [
+            'save-failed' => 'govuk_alpha.polish_listings.status_listing_save_failed',
+            'unsave-failed' => 'govuk_alpha.polish_listings.status_listing_save_failed',
+            'renew-failed' => 'govuk_alpha.polish_listings.status_listing_renew_failed',
+        ];
+    @endphp
+    @if (isset($actionSuccessStates[$status]))
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="listing-action-status-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="listing-action-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ __($actionSuccessStates[$status]) }}</p>
+            </div>
+        </div>
+    @elseif (isset($actionErrorStates[$status]))
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+            <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ __($actionErrorStates[$status]) }}</li></ul></div></div>
+        </div>
+    @endif
+
     @if ($status === 'exchange-disabled' || $status === 'own-listing')
         <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="listing-status-title">
             <div class="govuk-notification-banner__header">

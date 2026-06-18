@@ -433,6 +433,7 @@ return [
         'poll_your_choice' => 'Your choice',
         'poll_you_voted' => 'You have voted in this poll.',
         'poll_closed' => 'This poll is closed.',
+        'poll_result_share' => ':option — :percent% of votes',
         'poll_votes' => '{0} No votes|{1} 1 vote|[2,*] :count votes',
         'image_label' => 'Add a photo (optional)',
         'image_hint' => 'JPG, PNG, GIF or WEBP, up to 8MB.',
@@ -1360,6 +1361,7 @@ return [
         'confirmed_already' => 'You have confirmed your participation.',
         'complete_title' => 'Complete the exchange',
         'complete_body' => 'Once everyone has confirmed, completing the exchange moves the time credits. This cannot be undone.',
+        'complete_warning' => 'Completing this exchange transfers time credits immediately and cannot be reversed.',
         'complete_button' => 'Complete and move credits',
         'cancel_button' => 'Cancel this exchange',
         'split_preview_title' => 'Hours each person will give or receive',
@@ -1620,6 +1622,7 @@ return [
         'you_are_member' => 'You are a member of this group.',
         'pending_member' => 'Your request to join is waiting for an admin to approve it.',
         'back_to_group' => 'Back to group',
+        'pagination_label' => 'Group pages',
         'errors' => [
             'name_required' => 'Enter a name for the group.',
             'name_too_long' => 'The group name must be 255 characters or fewer.',
@@ -2938,6 +2941,7 @@ return [
             '10' => 'Within 10 km',
             '25' => 'Within 25 km',
             '50' => 'Within 50 km',
+            '100' => 'Within 100 km',
         ],
     ],
     'polish_discovery' => [
@@ -3971,6 +3975,7 @@ return [
 
         // Listing report
         'report_listing_title' => 'Report listing',
+        'report_form_title' => 'Report a listing',
         'report_listing_caption' => 'Report',
         'report_listing_intro' => 'Tell us why you are reporting this listing. We review all reports and take action where needed.',
         'report_reason_label' => 'Reason for report',

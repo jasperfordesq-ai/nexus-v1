@@ -20,6 +20,9 @@
         $cCount = $collection !== null ? (int) ($collection['items_count'] ?? 0) : 0;
         $cPublic = $collection !== null ? (bool) ($collection['is_public'] ?? false) : false;
         $cId = $collection !== null ? (int) ($collection['id'] ?? 0) : 0;
+        // A missing-name error only originates from the edit form, so open the
+        // (otherwise collapsed) edit panel and flag the field when it occurs.
+        $editNameError = $status === 'collection-name-required';
 
         // Resolve a browseable URL for each saved item type (Route::has guarded,
         // mirroring the React ITEM_LINKS map). Returns '' when no route exists.
@@ -42,13 +45,37 @@
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.saved.collections', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_saved.collections.title') }}</a>
 
+    {{-- Error summary (validation / failure) MUST come before the <h1> so it
+         receives focus on load and reads first for assistive technology. --}}
+    @if (in_array($status, ['item-remove-failed', 'collection-failed', 'collection-name-required'], true))
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+            <div role="alert">
+                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_saved.errors.summary_title') }}</h2>
+                <div class="govuk-error-summary__body">
+                    @if ($editNameError)
+                        <ul class="govuk-list govuk-error-summary__list">
+                            <li><a href="#edit-collection-name">{{ __('govuk_alpha_saved.status.collection_name_required') }}</a></li>
+                        </ul>
+                    @else
+                        <p class="govuk-body">
+                            @switch($status)
+                                @case('item-remove-failed'){{ __('govuk_alpha_saved.status.item_remove_failed') }}@break
+                                @default{{ __('govuk_alpha_saved.status.collection_failed') }}
+                            @endswitch
+                        </p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
     <span class="govuk-caption-xl">{{ __('govuk_alpha_saved.detail.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
     <h1 class="govuk-heading-xl">
         <span class="nexus-alpha-avatar" style="background-color: {{ $cColorSafe }}; width: 1.25rem; height: 1.25rem; display: inline-block; border-radius: 50%; vertical-align: middle;" aria-hidden="true"></span>
         {{ $cName !== '' ? $cName : __('govuk_alpha_saved.detail.title') }}
     </h1>
 
-    {{-- Status banners --}}
+    {{-- Success banner (failures are surfaced by the error summary above the h1) --}}
     @if (in_array($status, ['item-removed', 'collection-updated'], true))
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="saved-detail-status-title">
             <div class="govuk-notification-banner__header">
@@ -58,21 +85,6 @@
                 <p class="govuk-notification-banner__heading">
                     {{ $status === 'item-removed' ? __('govuk_alpha_saved.status.item_removed') : __('govuk_alpha_saved.status.collection_updated') }}
                 </p>
-            </div>
-        </div>
-    @elseif (in_array($status, ['item-remove-failed', 'collection-failed', 'collection-name-required'], true))
-        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
-            <div role="alert">
-                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_saved.errors.summary_title') }}</h2>
-                <div class="govuk-error-summary__body">
-                    <p class="govuk-body">
-                        @switch($status)
-                            @case('item-remove-failed'){{ __('govuk_alpha_saved.status.item_remove_failed') }}@break
-                            @case('collection-name-required'){{ __('govuk_alpha_saved.status.collection_name_required') }}@break
-                            @default{{ __('govuk_alpha_saved.status.collection_failed') }}
-                        @endswitch
-                    </p>
-                </div>
             </div>
         </div>
     @endif
@@ -173,16 +185,22 @@
     {{-- Owner-only: edit / delete --}}
     @if ($isOwner && $cId > 0)
         <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--l">
-        <details class="govuk-details" data-module="govuk-details">
+        <details class="govuk-details" data-module="govuk-details"{{ $editNameError ? ' open' : '' }}>
             <summary class="govuk-details__summary">
                 <span class="govuk-details__summary-text">{{ __('govuk_alpha_saved.edit.heading') }}</span>
             </summary>
             <div class="govuk-details__text">
                 <form method="post" action="{{ route('govuk-alpha.saved.collections.update', ['tenantSlug' => $tenantSlug, 'id' => $cId]) }}">
                     @csrf
-                    <div class="govuk-form-group">
+                    <div class="govuk-form-group{{ $editNameError ? ' govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="edit-collection-name">{{ __('govuk_alpha_saved.edit.name_label') }}</label>
-                        <input class="govuk-input govuk-!-width-two-thirds" id="edit-collection-name" name="name" type="text" maxlength="255" value="{{ $cName }}">
+                        @if ($editNameError)
+                            <p id="edit-collection-name-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">{{ __('govuk_alpha_saved.errors.summary_title') }}:</span>
+                                {{ __('govuk_alpha_saved.status.collection_name_required') }}
+                            </p>
+                        @endif
+                        <input class="govuk-input govuk-!-width-two-thirds{{ $editNameError ? ' govuk-input--error' : '' }}" id="edit-collection-name" name="name" type="text" maxlength="255" value="{{ $cName }}"{{ $editNameError ? ' aria-describedby=edit-collection-name-error' : '' }}>
                     </div>
                     <div class="govuk-form-group">
                         <label class="govuk-label" for="edit-collection-description">{{ __('govuk_alpha_saved.edit.description_label') }}</label>

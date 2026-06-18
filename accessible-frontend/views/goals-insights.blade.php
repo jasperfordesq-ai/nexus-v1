@@ -116,7 +116,8 @@
                 @foreach ($buddyNotes as $note)
                     @php
                         $noteType = (string) ($note['type'] ?? 'encouragement');
-                        $typeLabel = array_key_exists($noteType, __('govuk_alpha_goals.buddy_type')) ? __('govuk_alpha_goals.buddy_type.' . $noteType) : $noteType;
+                        $buddyTypeLabels = __('govuk_alpha_goals.buddy_type');
+                        $typeLabel = (is_array($buddyTypeLabels) && array_key_exists($noteType, $buddyTypeLabels)) ? __('govuk_alpha_goals.buddy_type.' . $noteType) : $noteType;
                         $noteWhen = $fmtDate($note['created_at'] ?? null);
                     @endphp
                     <li class="nexus-alpha-card">

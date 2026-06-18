@@ -42,7 +42,7 @@
         @csrf
 
         <div class="govuk-form-group{{ $errors->has('reason') ? ' govuk-form-group--error' : '' }}">
-            <fieldset class="govuk-fieldset" aria-describedby="{{ $errors->has('reason') ? 'reason-error' : '' }}">
+            <fieldset class="govuk-fieldset" @if ($errors->has('reason')) aria-describedby="reason-error" @endif>
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
                     <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha_commerce.report.reason_label') }}</h2>
                 </legend>

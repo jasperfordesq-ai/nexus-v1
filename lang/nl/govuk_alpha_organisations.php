@@ -41,6 +41,11 @@ return [
         'stat_hours' => ':count hours logged',
         'stat_rating' => 'Rating :rating out of 5',
         'has_website' => 'Has a website',
+        'term_opportunities' => 'Opportunities',
+        'term_volunteers' => 'Volunteers',
+        'term_hours' => 'Hours logged',
+        'term_rating' => 'Average rating',
+        'term_website' => 'Website',
     ],
 
     'register' => [
@@ -103,6 +108,9 @@ return [
         'remote' => 'Remote',
         'closes' => 'Closes :date',
         'count' => '{0} No openings|{1} 1 opening|[2,*] :count openings',
+        'term_type' => 'Type of role',
+        'term_location' => 'Location',
+        'term_deadline' => 'Application deadline',
     ],
 
     'apply' => [

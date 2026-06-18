@@ -12,18 +12,18 @@
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_feed.hashtags.back_to_feed') }}</a>
 
-    <span class="govuk-caption-l">{{ __('govuk_alpha_feed.hashtags.caption', ['community' => $communityName]) }}</span>
-    <h1 class="govuk-heading-xl">{{ __('govuk_alpha_feed.hashtags.title') }}</h1>
-    <p class="govuk-body-l">{{ __('govuk_alpha_feed.hashtags.subtitle') }}</p>
-
     @if (!empty($error))
-        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1" role="alert">
             <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_feed.states.error_title') }}</h2>
             <div class="govuk-error-summary__body">
                 <p class="govuk-body">{{ $error }}</p>
             </div>
         </div>
     @endif
+
+    <span class="govuk-caption-l">{{ __('govuk_alpha_feed.hashtags.caption', ['community' => $communityName]) }}</span>
+    <h1 class="govuk-heading-xl">{{ __('govuk_alpha_feed.hashtags.title') }}</h1>
+    <p class="govuk-body-l">{{ __('govuk_alpha_feed.hashtags.subtitle') }}</p>
 
     <form method="get" action="{{ route('govuk-alpha.feed.hashtags', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-6">
         <div class="govuk-form-group">

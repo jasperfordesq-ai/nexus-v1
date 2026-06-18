@@ -25,18 +25,18 @@
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.feed.hashtags', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_feed.hashtag.back_to_hashtags') }}</a>
 
-    <span class="govuk-caption-l">{{ __('govuk_alpha_feed.hashtag.caption', ['community' => $communityName]) }}</span>
-    <h1 class="govuk-heading-xl">#{{ $tag }}</h1>
-    <p class="govuk-body-l">{{ trans_choice('govuk_alpha_feed.hashtag.total_posts', (int) ($totalCount ?? 0), ['count' => (int) ($totalCount ?? 0)]) }}</p>
-
     @if (!empty($error))
-        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1" role="alert">
             <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_feed.states.error_title') }}</h2>
             <div class="govuk-error-summary__body">
                 <p class="govuk-body">{{ $error }}</p>
             </div>
         </div>
     @endif
+
+    <span class="govuk-caption-l">{{ __('govuk_alpha_feed.hashtag.caption', ['community' => $communityName]) }}</span>
+    <h1 class="govuk-heading-xl">#{{ $tag }}</h1>
+    <p class="govuk-body-l">{{ trans_choice('govuk_alpha_feed.hashtag.total_posts', (int) ($totalCount ?? 0), ['count' => (int) ($totalCount ?? 0)]) }}</p>
 
     @php $statusKey = $statusKeyMap[$status ?? ''] ?? null; @endphp
     @if ($statusKey !== null)

@@ -27,7 +27,11 @@
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><p class="govuk-body">{{ __('govuk_alpha.goals.states.' . $status) }}</p></div>
+                <div class="govuk-error-summary__body">
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li><a href="{{ $status === 'buddy-failed' ? '#buddy-section' : '#increment' }}">{{ __('govuk_alpha.goals.states.' . $status) }}</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     @endif
@@ -76,7 +80,7 @@
         <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.goals.buddy_section_title') }}</h2>
         <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.goals.buddy_you_are_buddy') }}</p></div>
     @elseif (!empty($canBecomeBuddy))
-        <h2 class="govuk-heading-l govuk-!-margin-top-7">{{ __('govuk_alpha.goals.become_buddy_title') }}</h2>
+        <h2 class="govuk-heading-l govuk-!-margin-top-7" id="buddy-section">{{ __('govuk_alpha.goals.become_buddy_title') }}</h2>
         <p class="govuk-body">{{ __('govuk_alpha.goals.become_buddy_intro') }}</p>
         <form method="post" action="{{ route('govuk-alpha.goals.buddy', ['tenantSlug' => $tenantSlug, 'id' => $goal['id']]) }}">
             @csrf

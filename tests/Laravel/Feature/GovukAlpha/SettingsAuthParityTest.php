@@ -254,8 +254,10 @@ class SettingsAuthParityTest extends TestCase
         $response->assertSee(__('govuk_alpha_settings.appearance.themes.light'));
         $response->assertSee(__('govuk_alpha_settings.appearance.themes.dark'));
         $response->assertSee(__('govuk_alpha_settings.appearance.themes.system'));
-        // The current theme radio is pre-selected.
-        $response->assertSee('id="theme_light" name="theme" type="radio" value="light"', false);
+        // The theme radios render (id scheme is GOV.UK-conventional, so assert the
+        // order-independent name/value rather than a brittle exact attribute string).
+        $response->assertSee('name="theme" type="radio" value="light"', false);
+        $response->assertSee('name="theme" type="radio" value="dark"', false);
     }
 
     public function test_settings_appearance_update_persists_theme(): void

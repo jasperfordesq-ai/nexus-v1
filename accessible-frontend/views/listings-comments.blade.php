@@ -15,19 +15,7 @@
 
     <a class="govuk-back-link" href="{{ route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $listingId]) }}">{{ __('govuk_alpha_listings.comments.back_to_listing') }}</a>
 
-    <span class="govuk-caption-xl">{{ $listingTitle }}</span>
-    <h1 class="govuk-heading-xl">{{ __('govuk_alpha_listings.comments.title') }} <span class="govuk-!-font-weight-regular">({{ $count }})</span></h1>
-
-    @if (in_array($statusValue, $successStates, true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="comment-status-title">
-            <div class="govuk-notification-banner__header">
-                <h2 class="govuk-notification-banner__title" id="comment-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
-            </div>
-            <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha_listings.comments.states.' . $statusValue) }}</p>
-            </div>
-        </div>
-    @elseif (in_array($statusValue, $errorStates, true))
+    @if (in_array($statusValue, $errorStates, true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
@@ -38,7 +26,19 @@
                 </div>
             </div>
         </div>
+    @elseif (in_array($statusValue, $successStates, true))
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="comment-status-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="comment-status-title">{{ __('govuk_alpha.states.success_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ __('govuk_alpha_listings.comments.states.' . $statusValue) }}</p>
+            </div>
+        </div>
     @endif
+
+    <span class="govuk-caption-xl">{{ $listingTitle }}</span>
+    <h1 class="govuk-heading-xl">{{ __('govuk_alpha_listings.comments.title') }} <span class="govuk-!-font-weight-regular">({{ $count }})</span></h1>
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">

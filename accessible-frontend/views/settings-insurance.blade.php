@@ -97,9 +97,16 @@
 
                 <form method="post" action="{{ route('govuk-alpha.settings.insurance.upload', ['tenantSlug' => $tenantSlug]) }}" enctype="multipart/form-data" novalidate>
                     @csrf
-                    <div class="govuk-form-group">
+                    @php($typeError = ($errorAnchors[$status ?? ''] ?? null) === 'insurance_type')
+                    <div class="govuk-form-group {{ $typeError ? 'govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="insurance_type">{{ __('govuk_alpha_settings.insurance.type_label') }}</label>
-                        <select class="govuk-select" id="insurance_type" name="insurance_type">
+                        @if ($typeError)
+                            <p id="insurance-type-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">{{ __('govuk_alpha_settings.common.error_title') }}:</span>
+                                {{ __('govuk_alpha_settings.states.' . $status) }}
+                            </p>
+                        @endif
+                        <select class="govuk-select" id="insurance_type" name="insurance_type" @if ($typeError) aria-describedby="insurance-type-error" @endif>
                             @foreach ($insuranceTypes as $type)
                                 <option value="{{ $type }}">{{ __('govuk_alpha_settings.insurance.types.' . $type) }}</option>
                             @endforeach
@@ -122,10 +129,17 @@
                         <input class="govuk-input govuk-input--width-10" id="expiry_date" name="expiry_date" type="date" aria-describedby="expiry-date-hint">
                     </div>
 
-                    <div class="govuk-form-group">
+                    @php($fileError = ($errorAnchors[$status ?? ''] ?? null) === 'certificate_file')
+                    <div class="govuk-form-group {{ $fileError ? 'govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="certificate_file">{{ __('govuk_alpha_settings.insurance.file_label') }}</label>
                         <div id="certificate-file-hint" class="govuk-hint">{{ __('govuk_alpha_settings.insurance.file_hint') }}</div>
-                        <input class="govuk-file-upload" id="certificate_file" name="certificate_file" type="file" accept="application/pdf,image/jpeg,image/png" aria-describedby="certificate-file-hint">
+                        @if ($fileError)
+                            <p id="certificate-file-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">{{ __('govuk_alpha_settings.common.error_title') }}:</span>
+                                {{ __('govuk_alpha_settings.states.' . $status) }}
+                            </p>
+                        @endif
+                        <input class="govuk-file-upload" id="certificate_file" name="certificate_file" type="file" accept="application/pdf,image/jpeg,image/png" aria-describedby="certificate-file-hint{{ $fileError ? ' certificate-file-error' : '' }}">
                     </div>
 
                     <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha_settings.insurance.upload_button') }}</button>

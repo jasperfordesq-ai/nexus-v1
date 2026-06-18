@@ -146,6 +146,8 @@ return [
         'link_campaign_submit' => 'Link to campaign',
         'link_campaign_none' => 'No campaigns are available to link to yet.',
         'update_status' => 'Update status',
+        'add_favorite' => 'Add to favourites',
+        'remove_favorite' => 'Remove from favourites',
     ],
 
     'campaigns' => [

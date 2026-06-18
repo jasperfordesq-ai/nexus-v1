@@ -79,24 +79,24 @@
                         <dl class="nexus-alpha-inline-list nexus-alpha-meta">
                             @if ($jobType !== '')
                                 <div>
-                                    <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.jobs.title') }}</dt>
+                                    <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.jobs.term_type') }}</dt>
                                     <dd><strong class="govuk-tag {{ $typeTag($jobType) }}">{{ $typeLabel($jobType) }}</strong></dd>
                                 </div>
                             @endif
                             @if ($jobRemote)
                                 <div>
-                                    <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.jobs.title') }}</dt>
+                                    <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.jobs.term_location') }}</dt>
                                     <dd>{{ __('govuk_alpha_organisations.jobs.remote') }}</dd>
                                 </div>
                             @elseif ($jobLocation !== '')
                                 <div>
-                                    <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.jobs.title') }}</dt>
+                                    <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.jobs.term_location') }}</dt>
                                     <dd>{{ $jobLocation }}</dd>
                                 </div>
                             @endif
                             @if (!empty($jobDeadline))
                                 <div>
-                                    <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.jobs.title') }}</dt>
+                                    <dt class="govuk-visually-hidden">{{ __('govuk_alpha_organisations.jobs.term_deadline') }}</dt>
                                     <dd>{{ __('govuk_alpha_organisations.jobs.closes', ['date' => \Illuminate\Support\Carbon::parse($jobDeadline)->isoFormat('LL')]) }}</dd>
                                 </div>
                             @endif

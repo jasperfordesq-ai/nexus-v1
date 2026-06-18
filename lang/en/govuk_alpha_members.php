@@ -66,7 +66,7 @@ return [
         'unknown_member' => 'this member',
         'back_to_profile' => 'Back to profile',
         'intro_own' => 'A summary of your standing in the community: your NEXUS score, activity totals, verifications and earned badges.',
-        'intro_other' => 'A summary of :name&rsquo;s standing in the community: NEXUS score, activity totals, verifications and earned badges.',
+        'intro_other' => 'A summary of :name’s standing in the community: NEXUS score, activity totals, verifications and earned badges.',
 
         // NEXUS score
         'nexus_score_title' => 'NEXUS score',

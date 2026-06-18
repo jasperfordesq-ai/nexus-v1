@@ -32,10 +32,10 @@
         <div class="govuk-grid-column-two-thirds">
             <a class="govuk-back-link" href="{{ $reviewsListHref }}">{{ __('govuk_alpha_blogreviews.review_comments.back_to_reviews') }}</a>
 
+            @include('accessible-frontend::partials.blogreviews-comment-status', ['status' => $status ?? null, 'errorAnchor' => '#body'])
+
             <span class="govuk-caption-l">{{ __('govuk_alpha_blogreviews.review_comments.caption') }}</span>
             <h1 class="govuk-heading-xl">{{ __('govuk_alpha_blogreviews.review_comments.heading') }}</h1>
-
-            @include('accessible-frontend::partials.blogreviews-comment-status', ['status' => $status ?? null, 'errorAnchor' => '#body'])
 
             {{-- The review being moderated --}}
             <div class="nexus-alpha-card govuk-!-margin-bottom-6">
@@ -83,7 +83,7 @@
 
             <section id="comments">
                 <h2 class="govuk-heading-l">
-                    {{ __('govuk_alpha_blogreviews.review_comments.review_summary') }}
+                    {{ __('govuk_alpha_blogreviews.comments.heading') }}
                     <span class="govuk-!-font-weight-regular">({{ (int) ($commentsCount ?? 0) }})</span>
                 </h2>
 

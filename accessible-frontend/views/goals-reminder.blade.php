@@ -36,7 +36,7 @@
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_goals.common.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li><a href="#frequency">{{ __('govuk_alpha_goals.states.reminder-failed') }}</a></li></ul></div>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li><a href="#frequency-{{ $frequencies[0] ?? 'weekly' }}">{{ __('govuk_alpha_goals.states.reminder-failed') }}</a></li></ul></div>
             </div>
         </div>
     @endif
@@ -80,7 +80,7 @@
                 </div>
             </div>
 
-            <button class="govuk-button" data-module="govuk-button" id="frequency">{{ __('govuk_alpha_goals.reminder.save') }}</button>
+            <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha_goals.reminder.save') }}</button>
         </div>
     </form>
 

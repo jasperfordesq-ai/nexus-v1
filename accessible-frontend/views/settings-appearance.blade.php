@@ -43,16 +43,16 @@
             <form method="post" action="{{ route('govuk-alpha.settings.appearance.update', ['tenantSlug' => $tenantSlug]) }}">
                 @csrf
                 <div class="govuk-form-group">
-                    <fieldset class="govuk-fieldset" aria-describedby="theme-hint">
+                    <fieldset class="govuk-fieldset">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                            <h2 class="govuk-fieldset__heading" id="theme">{{ __('govuk_alpha_settings.appearance.theme_legend') }}</h2>
+                            <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha_settings.appearance.theme_legend') }}</h2>
                         </legend>
                         <div class="govuk-radios" data-module="govuk-radios">
-                            @foreach ($themes as $theme)
+                            @foreach ($themes as $themeIndex => $theme)
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="theme_{{ $theme }}" name="theme" type="radio" value="{{ $theme }}"
+                                    <input class="govuk-radios__input" id="{{ $themeIndex === 0 ? 'theme' : 'theme_' . $theme }}" name="theme" type="radio" value="{{ $theme }}"
                                         @checked($currentTheme === $theme) aria-describedby="theme_{{ $theme }}-hint">
-                                    <label class="govuk-label govuk-radios__label" for="theme_{{ $theme }}">{{ __('govuk_alpha_settings.appearance.themes.' . $theme) }}</label>
+                                    <label class="govuk-label govuk-radios__label" for="{{ $themeIndex === 0 ? 'theme' : 'theme_' . $theme }}">{{ __('govuk_alpha_settings.appearance.themes.' . $theme) }}</label>
                                     <div id="theme_{{ $theme }}-hint" class="govuk-hint govuk-radios__hint">{{ __('govuk_alpha_settings.appearance.theme_hints.' . $theme) }}</div>
                                 </div>
                             @endforeach

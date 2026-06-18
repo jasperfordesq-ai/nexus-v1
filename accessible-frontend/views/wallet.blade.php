@@ -37,14 +37,9 @@
         $fundDonated = (float) ($fund['total_donated'] ?? 0);
     @endphp
 
-    <span class="govuk-caption-l">{{ __('govuk_alpha.wallet.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
-    <h1 class="govuk-heading-xl">{{ __('govuk_alpha.wallet.title') }}</h1>
-    <p class="govuk-body-l">{{ __('govuk_alpha.wallet.description') }}</p>
-
-    <p class="govuk-body">
-        <a class="govuk-link" href="{{ route('govuk-alpha.wallet.manage', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_wallet.nav.manage') }}</a>
-    </p>
-
+    {{-- GOV.UK: the error summary must be the first thing in the main content,
+         before the <h1>, so it receives focus on page load. Success panels/banners
+         are shown at the top too. --}}
     @if ($status === 'transfer-sent')
         <div class="govuk-panel govuk-panel--confirmation">
             <h2 class="govuk-panel__title">{{ __('govuk_alpha.states.success_title') }}</h2>
@@ -93,6 +88,14 @@
             </div>
         </div>
     @endif
+
+    <span class="govuk-caption-l">{{ __('govuk_alpha.wallet.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
+    <h1 class="govuk-heading-xl">{{ __('govuk_alpha.wallet.title') }}</h1>
+    <p class="govuk-body-l">{{ __('govuk_alpha.wallet.description') }}</p>
+
+    <p class="govuk-body">
+        <a class="govuk-link" href="{{ route('govuk-alpha.wallet.manage', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_wallet.nav.manage') }}</a>
+    </p>
 
     <dl class="nexus-alpha-stat-grid">
         <div class="nexus-alpha-stat">

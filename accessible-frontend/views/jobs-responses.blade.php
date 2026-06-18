@@ -91,22 +91,24 @@
                         <p class="govuk-body-s govuk-!-margin-bottom-2"><a class="govuk-link" href="{{ route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $ivVacId]) }}">{{ __('govuk_alpha_jobs.responses.view_opportunity') }}</a></p>
                     @endif
                     @if ($ivStatus === 'proposed' && $ivId > 0)
-                        <div class="govuk-form-group govuk-!-margin-bottom-2">
-                            <label class="govuk-label govuk-label--s" for="iv-note-{{ $ivId }}">{{ __('govuk_alpha_jobs.responses.note_label') }}</label>
-                            <div id="iv-note-{{ $ivId }}-hint" class="govuk-hint">{{ __('govuk_alpha_jobs.responses.note_hint') }}</div>
-                        </div>
-                        <div class="nexus-alpha-actions">
-                            <form method="post" action="{{ route('govuk-alpha.jobs.interviews.accept', ['tenantSlug' => $tenantSlug, 'interviewId' => $ivId]) }}" class="nexus-alpha-linkform">
-                                @csrf
-                                <input type="hidden" name="note" value="" />
-                                <button type="submit" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_jobs.responses.accept_interview') }}</button>
-                            </form>
-                            <form method="post" action="{{ route('govuk-alpha.jobs.interviews.decline', ['tenantSlug' => $tenantSlug, 'interviewId' => $ivId]) }}" class="nexus-alpha-linkform">
-                                @csrf
-                                <input type="hidden" name="note" value="" />
-                                <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_jobs.responses.decline_interview') }}</button>
-                            </form>
-                        </div>
+                        <form method="post" action="{{ route('govuk-alpha.jobs.interviews.accept', ['tenantSlug' => $tenantSlug, 'interviewId' => $ivId]) }}" class="govuk-!-margin-bottom-2">
+                            @csrf
+                            <div class="govuk-form-group govuk-!-margin-bottom-2">
+                                <label class="govuk-label govuk-label--s" for="iv-accept-note-{{ $ivId }}">{{ __('govuk_alpha_jobs.responses.note_label') }}</label>
+                                <div id="iv-accept-note-{{ $ivId }}-hint" class="govuk-hint">{{ __('govuk_alpha_jobs.responses.note_hint') }}</div>
+                                <input class="govuk-input govuk-!-width-two-thirds" id="iv-accept-note-{{ $ivId }}" name="note" type="text" maxlength="1000" aria-describedby="iv-accept-note-{{ $ivId }}-hint">
+                            </div>
+                            <button type="submit" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_jobs.responses.accept_interview') }}</button>
+                        </form>
+                        <form method="post" action="{{ route('govuk-alpha.jobs.interviews.decline', ['tenantSlug' => $tenantSlug, 'interviewId' => $ivId]) }}">
+                            @csrf
+                            <div class="govuk-form-group govuk-!-margin-bottom-2">
+                                <label class="govuk-label govuk-label--s" for="iv-decline-note-{{ $ivId }}">{{ __('govuk_alpha_jobs.responses.note_label') }}</label>
+                                <div id="iv-decline-note-{{ $ivId }}-hint" class="govuk-hint">{{ __('govuk_alpha_jobs.responses.note_hint') }}</div>
+                                <input class="govuk-input govuk-!-width-two-thirds" id="iv-decline-note-{{ $ivId }}" name="note" type="text" maxlength="1000" aria-describedby="iv-decline-note-{{ $ivId }}-hint">
+                            </div>
+                            <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_jobs.responses.decline_interview') }}</button>
+                        </form>
                     @endif
                 </article>
             @endforeach

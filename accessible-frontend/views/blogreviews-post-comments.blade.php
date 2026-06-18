@@ -22,10 +22,10 @@
         <div class="govuk-grid-column-two-thirds">
             <a class="govuk-back-link" href="{{ route('govuk-alpha.blog.show', ['tenantSlug' => $tenantSlug, 'slug' => $slug]) }}">{{ __('govuk_alpha_blogreviews.comments.back_to_post') }}</a>
 
+            @include('accessible-frontend::partials.blogreviews-comment-status', ['status' => $status ?? null, 'errorAnchor' => '#body'])
+
             <span class="govuk-caption-l">{{ __('govuk_alpha_blogreviews.comments.caption') }}</span>
             <h1 class="govuk-heading-xl">{{ $postTitle }}</h1>
-
-            @include('accessible-frontend::partials.blogreviews-comment-status', ['status' => $status ?? null, 'errorAnchor' => '#body'])
 
             {{-- Post-level reaction panel (likes), parity with SocialInteractionPanel --}}
             <section id="post-reactions" class="govuk-!-margin-bottom-6">

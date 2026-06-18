@@ -83,7 +83,8 @@
                 @php
                     $cp = $checkin['progress_value'] ?? $checkin['progress_percent'] ?? null;
                     $cMood = (string) ($checkin['mood'] ?? '');
-                    $cMoodLabel = ($cMood !== '' && array_key_exists($cMood, __('govuk_alpha_goals.mood'))) ? __('govuk_alpha_goals.mood.' . $cMood) : null;
+                    $moodLabels = __('govuk_alpha_goals.mood');
+                    $cMoodLabel = ($cMood !== '' && is_array($moodLabels) && array_key_exists($cMood, $moodLabels)) ? __('govuk_alpha_goals.mood.' . $cMood) : null;
                     $cWhen = $fmtDate($checkin['created_at'] ?? null);
                 @endphp
                 <li class="nexus-alpha-card">

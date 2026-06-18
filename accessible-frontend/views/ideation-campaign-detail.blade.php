@@ -67,7 +67,7 @@
                     <div class="nexus-alpha-module-row">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-1"><a class="govuk-link" href="{{ route('govuk-alpha.ideation.show', ['tenantSlug' => $tenantSlug, 'id' => $chId]) }}">{{ $chTitle }}</a></h3>
                     </div>
-                    <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ trans_choice('govuk_alpha_ideation.idea.votes', $chIdeas, ['count' => $chIdeas]) }}</p>
+                    <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ trans_choice('govuk_alpha.ideation.ideas_count', $chIdeas, ['count' => $chIdeas]) }}</p>
                     @if ($ideationIsAdmin)
                         <form method="post" action="{{ route('govuk-alpha.ideation.campaign.unlink', ['tenantSlug' => $tenantSlug, 'id' => $camId, 'challengeId' => $chId]) }}">
                             @csrf

@@ -49,24 +49,28 @@
             </div>
         </div>
     @elseif (in_array($status ?? null, ['search-save-failed', 'search-delete-failed'], true))
-        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
-            <div role="alert">
-                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_search.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body">
-                    <p>{{ ($status === 'search-save-failed') ? __('govuk_alpha_search.saved.save_failed_banner') : __('govuk_alpha_search.saved.delete_failed_banner') }}</p>
-                </div>
+        <div class="govuk-error-summary" data-module="govuk-error-summary" role="alert" tabindex="-1">
+            <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_search.states.error_title') }}</h2>
+            <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list">
+                    @if ($status === 'search-save-failed')
+                        <li><a href="#saved-name">{{ __('govuk_alpha_search.saved.save_failed_banner') }}</a></li>
+                    @else
+                        <li>{{ __('govuk_alpha_search.saved.delete_failed_banner') }}</li>
+                    @endif
+                </ul>
             </div>
         </div>
     @endif
 
     @if ($hasSearched && !empty($searchError))
-        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
-            <div role="alert">
-                <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_search.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body">
-                    <p>{{ __('govuk_alpha_search.states.error') }}</p>
-                    <p><a class="govuk-link" href="{{ url()->full() }}">{{ __('govuk_alpha_search.states.try_again') }}</a></p>
-                </div>
+        <div class="govuk-error-summary" data-module="govuk-error-summary" role="alert" tabindex="-1">
+            <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_search.states.error_title') }}</h2>
+            <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list">
+                    <li><a href="#q">{{ __('govuk_alpha_search.states.error') }}</a></li>
+                </ul>
+                <p class="govuk-body govuk-!-margin-bottom-0"><a class="govuk-link" href="{{ url()->full() }}">{{ __('govuk_alpha_search.states.try_again') }}</a></p>
             </div>
         </div>
     @endif
@@ -291,11 +295,11 @@
         {{-- Tabs (rendered as a no-JS nav of links that re-request with ?tab=) --}}
         <nav class="govuk-!-margin-bottom-4" aria-label="{{ __('govuk_alpha_search.advanced.title') }}">
             <ul class="govuk-list nexus-alpha-inline-list">
-                <li><a class="govuk-link {{ $activeTab === 'all' ? 'govuk-!-font-weight-bold' : '' }}" @if ($activeTab === 'all') aria-current="true" @endif href="{{ $tabHref('all') }}">{{ __('govuk_alpha_search.results.tab_all', ['count' => $total]) }}</a></li>
-                <li><a class="govuk-link {{ $activeTab === 'listings' ? 'govuk-!-font-weight-bold' : '' }}" @if ($activeTab === 'listings') aria-current="true" @endif href="{{ $tabHref('listings') }}">{{ __('govuk_alpha_search.results.tab_listings', ['count' => $countListings]) }}</a></li>
-                <li><a class="govuk-link {{ $activeTab === 'users' ? 'govuk-!-font-weight-bold' : '' }}" @if ($activeTab === 'users') aria-current="true" @endif href="{{ $tabHref('users') }}">{{ __('govuk_alpha_search.results.tab_users', ['count' => $countUsers]) }}</a></li>
-                <li><a class="govuk-link {{ $activeTab === 'events' ? 'govuk-!-font-weight-bold' : '' }}" @if ($activeTab === 'events') aria-current="true" @endif href="{{ $tabHref('events') }}">{{ __('govuk_alpha_search.results.tab_events', ['count' => $countEvents]) }}</a></li>
-                <li><a class="govuk-link {{ $activeTab === 'groups' ? 'govuk-!-font-weight-bold' : '' }}" @if ($activeTab === 'groups') aria-current="true" @endif href="{{ $tabHref('groups') }}">{{ __('govuk_alpha_search.results.tab_groups', ['count' => $countGroups]) }}</a></li>
+                <li><a class="govuk-link {{ $activeTab === 'all' ? 'govuk-!-font-weight-bold' : '' }}" @if ($activeTab === 'all') aria-current="page" @endif href="{{ $tabHref('all') }}">{{ __('govuk_alpha_search.results.tab_all', ['count' => $total]) }}</a></li>
+                <li><a class="govuk-link {{ $activeTab === 'listings' ? 'govuk-!-font-weight-bold' : '' }}" @if ($activeTab === 'listings') aria-current="page" @endif href="{{ $tabHref('listings') }}">{{ __('govuk_alpha_search.results.tab_listings', ['count' => $countListings]) }}</a></li>
+                <li><a class="govuk-link {{ $activeTab === 'users' ? 'govuk-!-font-weight-bold' : '' }}" @if ($activeTab === 'users') aria-current="page" @endif href="{{ $tabHref('users') }}">{{ __('govuk_alpha_search.results.tab_users', ['count' => $countUsers]) }}</a></li>
+                <li><a class="govuk-link {{ $activeTab === 'events' ? 'govuk-!-font-weight-bold' : '' }}" @if ($activeTab === 'events') aria-current="page" @endif href="{{ $tabHref('events') }}">{{ __('govuk_alpha_search.results.tab_events', ['count' => $countEvents]) }}</a></li>
+                <li><a class="govuk-link {{ $activeTab === 'groups' ? 'govuk-!-font-weight-bold' : '' }}" @if ($activeTab === 'groups') aria-current="page" @endif href="{{ $tabHref('groups') }}">{{ __('govuk_alpha_search.results.tab_groups', ['count' => $countGroups]) }}</a></li>
             </ul>
         </nav>
 

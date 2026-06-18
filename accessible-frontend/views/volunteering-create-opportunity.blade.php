@@ -115,7 +115,7 @@
             </div>
 
             <fieldset class="govuk-fieldset govuk-!-margin-bottom-4">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha_volunteering.create_opp.opp_title_label') }}</legend>
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha_volunteering.create_opp.visibility_legend') }}</legend>
                 <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                     <div class="govuk-checkboxes__item">
                         <input class="govuk-checkboxes__input" id="is_remote" name="is_remote" type="checkbox" value="1">

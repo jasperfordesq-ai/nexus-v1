@@ -5,6 +5,18 @@
 @extends('accessible-frontend::layout')
 
 @section('content')
+    @if (in_array($status, ['goal-created', 'goal-completed', 'goal-deleted'], true))
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="goal-status">
+            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="goal-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
+            <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.goals.states.' . $status) }}</p></div>
+        </div>
+    @elseif (in_array($status, ['goal-failed', 'goal-invalid'], true))
+        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+            <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
+                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li><a href="#title">{{ __('govuk_alpha.goals.states.' . $status) }}</a></li></ul></div></div>
+        </div>
+    @endif
+
     <span class="govuk-caption-xl">{{ __('govuk_alpha.goals.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.goals.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.goals.description') }}</p>
@@ -17,18 +29,6 @@
             <li><a class="govuk-link" href="{{ route('govuk-alpha.goals.discover', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.polish_gamify.goals_discover_title') }}</a></li>
         </ul>
     </nav>
-
-    @if (in_array($status, ['goal-created', 'goal-completed', 'goal-deleted'], true))
-        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="goal-status">
-            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="goal-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
-            <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.goals.states.' . $status) }}</p></div>
-        </div>
-    @elseif (in_array($status, ['goal-failed', 'goal-invalid'], true))
-        <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
-            <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
-                <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li><a href="#title">{{ __('govuk_alpha.goals.states.' . $status) }}</a></li></ul></div></div>
-        </div>
-    @endif
 
     @if (empty($goals))
         <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.goals.empty') }}</p></div>
