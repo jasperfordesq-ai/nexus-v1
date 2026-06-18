@@ -35,6 +35,10 @@ return [
         'orders' => 'My orders',
         'sales' => 'Sales',
         'sell' => 'Sell an item',
+        'detail_buy' => 'Buy this item',
+        'detail_offer' => 'Make an offer',
+        'detail_save' => 'Save this item',
+        'detail_report' => 'Report this item',
     ],
 
     'listing_form' => [

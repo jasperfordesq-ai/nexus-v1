@@ -5,6 +5,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    'nav' => [
+        'reputation' => 'Reputation and recognition',
+    ],
+
     'insights' => [
         // Page chrome
         'title' => 'Reputation and recognition - :name',

@@ -5,6 +5,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    'nav' => [
+        'insights' => 'View detailed insights',
+    ],
     'insights' => [
         'title' => 'Activity insights',
         'heading' => 'Activity insights',

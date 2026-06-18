@@ -18,6 +18,10 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.search.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.search.description') }}</p>
 
+    <p class="govuk-body govuk-!-margin-bottom-6">
+        <a class="govuk-link" href="{{ route('govuk-alpha.search.advanced', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_search.nav.advanced') }}</a>
+    </p>
+
     <form method="get" action="{{ route('govuk-alpha.search', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-6">
         <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">

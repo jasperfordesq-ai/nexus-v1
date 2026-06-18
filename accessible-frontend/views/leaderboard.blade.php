@@ -5,6 +5,8 @@
 @extends('accessible-frontend::layout')
 
 @section('content')
+    @include('accessible-frontend::partials.gamification-nav', ['gamificationNavGroup' => 'leaderboard', 'gamificationActiveTab' => ''])
+
     <span class="govuk-caption-xl">{{ __('govuk_alpha.leaderboard.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.leaderboard.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.leaderboard.description') }}</p>

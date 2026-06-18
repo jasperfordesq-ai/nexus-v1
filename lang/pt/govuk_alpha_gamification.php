@@ -23,6 +23,12 @@ return [
         'journey' => 'My journey',
         'spotlight' => 'Member spotlight',
         'tiers' => 'Tier ladder',
+        'tiers_related_heading' => 'NEXUS score',
+        'create_poll' => 'Create a poll',
+        'manage_polls' => 'Manage my polls',
+        'ranked_tag' => 'Ranked choice',
+        'rank_this_poll' => 'Rank this poll',
+        'view_ranked_poll' => 'View ranked results',
     ],
 
     'common' => [

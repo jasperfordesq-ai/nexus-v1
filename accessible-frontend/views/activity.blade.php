@@ -9,7 +9,10 @@
         $hs = is_array($activity['hours_summary'] ?? null) ? $activity['hours_summary'] : [];
         $cs = is_array($activity['connection_stats'] ?? null) ? $activity['connection_stats'] : [];
         $eng = is_array($activity['engagement'] ?? null) ? $activity['engagement'] : [];
-        $skills = is_array($activity['skills_breakdown'] ?? null) ? $activity['skills_breakdown'] : [];
+        // getSkillsBreakdown() returns {skills, offering_count, requesting_count};
+        // the per-skill rows live under the inner 'skills' key.
+        $skillsBreakdown = is_array($activity['skills_breakdown'] ?? null) ? $activity['skills_breakdown'] : [];
+        $skills = is_array($skillsBreakdown['skills'] ?? null) ? $skillsBreakdown['skills'] : [];
         $monthly = is_array($activity['monthly_hours'] ?? null) ? $activity['monthly_hours'] : [];
         $timeline = is_array($activity['timeline'] ?? null) ? $activity['timeline'] : [];
         $maxMonth = 0;
@@ -20,6 +23,10 @@
     <span class="govuk-caption-xl">{{ __('govuk_alpha.activity.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.activity.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.activity.description') }}</p>
+
+    <p class="govuk-body govuk-!-margin-bottom-6">
+        <a class="govuk-link" href="{{ route('govuk-alpha.activity.insights', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_activity.nav.insights') }}</a>
+    </p>
 
     <dl class="nexus-alpha-stat-grid govuk-!-margin-bottom-8">
         <div class="nexus-alpha-stat">
@@ -75,13 +82,22 @@
         <dl class="govuk-summary-list govuk-!-margin-bottom-6">
             @foreach ($skills as $skill)
                 @php
-                    $skillName = trim((string) ($skill['name'] ?? ($skill['category'] ?? '')));
-                    $skillHours = number_format((float) ($skill['hours'] ?? ($skill['total_hours'] ?? 0)), 1);
+                    // MemberActivityService::getSkillsBreakdown() exposes skill_name,
+                    // is_offering, is_requesting, proficiency and endorsements — there is
+                    // no name/hours key, so read the real columns.
+                    $skillName = trim((string) ($skill['skill_name'] ?? ''));
+                    $isOffering = (bool) ($skill['is_offering'] ?? false);
+                    $isRequesting = (bool) ($skill['is_requesting'] ?? false);
+                    $endorsements = (int) ($skill['endorsements'] ?? 0);
                 @endphp
                 @if ($skillName !== '')
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">{{ $skillName }}</dt>
-                        <dd class="govuk-summary-list__value">{{ __('govuk_alpha.polish_discovery.activity_skills_hours_label', ['hours' => $skillHours]) }}</dd>
+                        <dd class="govuk-summary-list__value">
+                            @if ($isOffering)<strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha_activity.insights.skill_offering') }}</strong>@endif
+                            @if ($isRequesting)<strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha_activity.insights.skill_requesting') }}</strong>@endif
+                            @if ($endorsements > 0)<span class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha_activity.insights.skill_endorsements', ['count' => $endorsements]) }}</span>@endif
+                        </dd>
                     </div>
                 @endif
             @endforeach

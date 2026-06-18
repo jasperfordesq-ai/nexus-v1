@@ -120,12 +120,13 @@ class ChallengeOutcomeService
         $winningIdeaId = isset($data['winning_idea_id']) ? (int) $data['winning_idea_id'] : null;
         $impactDescription = !empty($data['impact_description']) ? trim($data['impact_description']) : null;
 
-        // Validate winning idea belongs to this challenge
+        // Validate winning idea belongs to this challenge. challenge_ideas has no
+        // tenant_id column; tenant scoping is enforced transitively because the
+        // parent $challengeId was already verified to belong to $tenantId above.
         if ($winningIdeaId) {
             $idea = DB::table('challenge_ideas')
                 ->where('id', $winningIdeaId)
                 ->where('challenge_id', $challengeId)
-                ->where('tenant_id', $tenantId)
                 ->first(['id']);
 
             if (!$idea) {

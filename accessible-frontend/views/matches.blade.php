@@ -9,6 +9,10 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.matches.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.matches.description') }}</p>
 
+    <p class="govuk-body">
+        <a class="govuk-link" href="{{ route('govuk-alpha.connections.matches-board', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_connections.nav.matches_board') }}</a>
+    </p>
+
     @php
         $activeSource = request()->query('source', 'all');
         $allMatchItems = $matches; // full set from controller (already source-filtered if ?source= passed)

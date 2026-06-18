@@ -91,9 +91,26 @@
         @endif
     </dl>
 
+    @php
+        $itemId = (int) ($item['id'] ?? 0);
+        $isOwnItem = $currentUserId && $sellerId > 0 && $sellerId === $currentUserId;
+    @endphp
+
+    @if ($currentUserId && $itemId > 0 && !$isOwnItem)
+        <div class="govuk-button-group govuk-!-margin-top-4">
+            <a class="govuk-button" href="{{ route('govuk-alpha.marketplace.buy', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha_commerce.nav.detail_buy') }}</a>
+            <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.marketplace.offer', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha_commerce.nav.detail_offer') }}</a>
+            <form method="post" action="{{ route('govuk-alpha.marketplace.save', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}">
+                @csrf
+                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_commerce.nav.detail_save') }}</button>
+            </form>
+        </div>
+    @endif
+
     @if ($currentUserId && $sellerId > 0 && $sellerId !== $currentUserId)
         <div class="govuk-button-group govuk-!-margin-top-4">
             <a class="govuk-button" href="{{ route('govuk-alpha.messages.new', ['tenantSlug' => $tenantSlug, 'userId' => $sellerId]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.polish_commerce.marketplace_message_seller') }}</a>
+            <a class="govuk-link" href="{{ route('govuk-alpha.marketplace.report', ['tenantSlug' => $tenantSlug, 'id' => $itemId]) }}">{{ __('govuk_alpha_commerce.nav.detail_report') }}</a>
         </div>
     @endif
 @endsection

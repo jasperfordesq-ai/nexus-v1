@@ -50,6 +50,12 @@
         </dl>
     @endif
 
+    @if ((int) ($organisation['id'] ?? 0) > 0)
+        <p class="govuk-body">
+            <a class="govuk-link" href="{{ route('govuk-alpha.organisations.jobs', ['tenantSlug' => $tenantSlug, 'id' => (int) $organisation['id']]) }}">{{ __('govuk_alpha_organisations.nav.jobs') }}</a>
+        </p>
+    @endif
+
     {{-- WAVE O: Organisation stats -------------------------------------------------- --}}
     <h2 class="govuk-heading-l">{{ __('govuk_alpha.org_depth.stats_heading') }}</h2>
     <dl class="nexus-alpha-inline-list">
@@ -109,6 +115,7 @@
                         @endif
                         <div class="nexus-alpha-actions">
                             <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.show', ['tenantSlug' => $tenantSlug, 'id' => $oppId]) }}">{{ __('govuk_alpha.org_depth.opportunity_view') }}</a>
+                            <a class="govuk-link" href="{{ route('govuk-alpha.organisations.apply.form', ['tenantSlug' => $tenantSlug, 'id' => $oppId]) }}">{{ __('govuk_alpha_organisations.nav.apply') }}</a>
                         </div>
                     </article>
                 @endif

@@ -22,6 +22,9 @@
     <span class="govuk-caption-xl">{{ __('govuk_alpha.reviews_page.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.reviews_page.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.reviews_page.description') }}</p>
+    <p class="govuk-body">
+        <a class="govuk-link" href="{{ route('govuk-alpha.blogreviews.reviews.list', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_blogreviews.nav.all_reviews') }}</a>
+    </p>
 
     @if (($status ?? null) === 'review-submitted')
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="review-success-title">

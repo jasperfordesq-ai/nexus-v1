@@ -5,6 +5,14 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    'nav' => [
+        'browse' => 'Browse all organisations',
+        'register' => 'Register an organisation',
+        'manage' => 'Manage my organisations',
+        'apply' => 'Apply to volunteer',
+        'jobs' => 'View job openings',
+    ],
+
     'common' => [
         'caption' => 'Organisations in :community',
         'back_to_organisations' => 'Back to organisations',

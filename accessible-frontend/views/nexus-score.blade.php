@@ -24,6 +24,15 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.nexus_score.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.nexus_score.description') }}</p>
 
+    @if (\Illuminate\Support\Facades\Route::has('govuk-alpha.gamification.tiers'))
+        <nav class="govuk-!-margin-bottom-6" aria-label="{{ __('govuk_alpha_gamification.nav.tiers_related_heading') }}">
+            <h2 class="govuk-heading-s govuk-!-margin-bottom-1">{{ __('govuk_alpha_gamification.nav.tiers_related_heading') }}</h2>
+            <ul class="govuk-list">
+                <li><a class="govuk-link" href="{{ route('govuk-alpha.gamification.tiers', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_gamification.nav.tiers') }}</a></li>
+            </ul>
+        </nav>
+    @endif
+
     @if (!$hasScore)
         <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.nexus_score.unavailable') }}</p></div>
     @else

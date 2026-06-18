@@ -29,6 +29,29 @@
             <h1 class="govuk-heading-xl">{{ __('govuk_alpha.profile_settings.title') }}</h1>
             <p class="govuk-body-l">{{ __('govuk_alpha.profile_settings.description') }}</p>
 
+            @php
+                $settingsTabs = [];
+                if (\Illuminate\Support\Facades\Route::has('govuk-alpha.settings.linked-accounts')) {
+                    $settingsTabs[] = [
+                        'label' => __('govuk_alpha_settings.nav.linked_accounts'),
+                        'href' => route('govuk-alpha.settings.linked-accounts', ['tenantSlug' => $tenantSlug]),
+                    ];
+                }
+                if (\Illuminate\Support\Facades\Route::has('govuk-alpha.settings.appearance')) {
+                    $settingsTabs[] = [
+                        'label' => __('govuk_alpha_settings.nav.appearance'),
+                        'href' => route('govuk-alpha.settings.appearance', ['tenantSlug' => $tenantSlug]),
+                    ];
+                }
+            @endphp
+            @if (!empty($settingsTabs))
+                <ul class="govuk-list govuk-!-margin-bottom-6">
+                    @foreach ($settingsTabs as $settingsTab)
+                        <li><a class="govuk-link" href="{{ $settingsTab['href'] }}">{{ $settingsTab['label'] }}</a></li>
+                    @endforeach
+                </ul>
+            @endif
+
             @if (($status ?? '') === 'profile-update-failed')
                 <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                     <div role="alert">

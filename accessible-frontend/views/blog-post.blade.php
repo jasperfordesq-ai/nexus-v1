@@ -74,6 +74,12 @@
             <section id="comments">
                 <h2 class="govuk-heading-l">{{ __('govuk_alpha.blog.comments_heading') }} <span class="govuk-!-font-weight-regular">({{ (int) ($commentsCount ?? 0) }})</span></h2>
 
+                @if (!empty($post['slug']))
+                    <p class="govuk-body">
+                        <a class="govuk-link" href="{{ route('govuk-alpha.blogreviews.blog.comments', ['tenantSlug' => $tenantSlug, 'slug' => $post['slug']]) }}">{{ __('govuk_alpha_blogreviews.nav.view_discussion') }}</a>
+                    </p>
+                @endif
+
                 @if (($status ?? null) === 'comment-added')
                     <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="comment-status">
                         <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="comment-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>

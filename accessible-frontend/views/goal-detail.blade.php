@@ -45,9 +45,12 @@
     <p class="govuk-body govuk-!-margin-bottom-1">{{ __('govuk_alpha.goals.progress_label', ['current' => $num($cur), 'target' => $num($tgt)]) }}</p>
     <progress max="100" value="{{ $pct }}" aria-label="{{ $pct }}%">{{ $pct }}%</progress>
 
-    @if ($isOwner)
+    @if ($isOwner || $isBuddy)
         <p class="nexus-alpha-actions govuk-!-margin-top-4">
-            <a class="govuk-link" href="{{ route('govuk-alpha.goals.edit', ['tenantSlug' => $tenantSlug, 'id' => $goal['id']]) }}">{{ __('govuk_alpha.goals.edit_goal') }}</a>
+            @if ($isOwner)
+                <a class="govuk-link" href="{{ route('govuk-alpha.goals.edit', ['tenantSlug' => $tenantSlug, 'id' => $goal['id']]) }}">{{ __('govuk_alpha.goals.edit_goal') }}</a>
+            @endif
+            <a class="govuk-link" href="{{ route('govuk-alpha.goals.insights', ['tenantSlug' => $tenantSlug, 'id' => $goal['id']]) }}">{{ __('govuk_alpha_goals.nav.insights') }}</a>
         </p>
     @endif
 

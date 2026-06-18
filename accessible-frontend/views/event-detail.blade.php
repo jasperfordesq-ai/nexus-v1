@@ -126,9 +126,21 @@
                 <p class="govuk-!-margin-bottom-4"><strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.events.spots_left', ['count' => $event['spots_left']]) }}</strong></p>
             @endif
 
+            @php
+                // Mirror EventsParity::eventsIsSeries — only recurring events get the
+                // series-edit flow; a non-series event would just be redirected.
+                $eventIsSeries = !empty($event['is_series'])
+                    || !empty($event['is_recurring_template'])
+                    || !empty($event['parent_event_id'])
+                    || (!empty($seriesEvents) && count($seriesEvents) > 1);
+            @endphp
             @if ($isOwner ?? false)
                 <div class="govuk-button-group govuk-!-margin-bottom-4">
                     <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ route('govuk-alpha.events.edit', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.events.edit_event') }}</a>
+                    @if ($eventIsSeries)
+                        <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ route('govuk-alpha.events.recurring.edit', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha_events.nav.edit_series') }}</a>
+                    @endif
+                    <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ route('govuk-alpha.events.polls', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha_events.nav.manage_polls') }}</a>
                 </div>
                 @unless($isCancelled)
                     <details class="govuk-details govuk-!-margin-bottom-2" data-module="govuk-details">
@@ -185,7 +197,17 @@
         @endif
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">{{ __('govuk_alpha.events.location') }}</dt>
-            <dd class="govuk-summary-list__value">{{ $event['location'] ?? __('govuk_alpha.events.online') }}</dd>
+            <dd class="govuk-summary-list__value">
+                {{ $event['location'] ?? __('govuk_alpha.events.online') }}
+                @php
+                    $eventHasCoords = isset($event['latitude'], $event['longitude'])
+                        && $event['latitude'] !== null && $event['longitude'] !== null
+                        && empty($event['is_online']);
+                @endphp
+                @if ($eventHasCoords && \App\Core\TenantContext::hasFeature('maps'))
+                    <br><a class="govuk-link" href="{{ route('govuk-alpha.events.map', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('govuk_alpha_events.nav.view_location') }}</a>
+                @endif
+            </dd>
         </div>
         @if (!empty($event['online_link']) && \Illuminate\Support\Str::startsWith((string) $event['online_link'], ['http://', 'https://']))
             <div class="govuk-summary-list__row">
@@ -235,6 +257,8 @@
         @endphp
         <p class="govuk-body govuk-!-margin-top-4">
             <a class="govuk-link" href="mailto:?subject={{ $shareSubject }}&body={{ $shareBody }}">{{ __('govuk_alpha.events.polish_events.share_email_label') }}</a>
+            <span aria-hidden="true"> &middot; </span>
+            <a class="govuk-link" href="{{ route('govuk-alpha.events.translate', ['tenantSlug' => $tenantSlug, 'id' => $event['id']]) }}">{{ __('govuk_alpha_events.nav.translate_description') }}</a>
         </p>
     @endif
 

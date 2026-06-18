@@ -85,4 +85,10 @@ return [
         'appearance-invalid' => 'Choose one of the available themes.',
         'appearance-failed' => 'Sorry, we could not save your appearance settings. Please try again.',
     ],
+
+    'nav' => [
+        'linked_accounts' => 'Linked accounts',
+        'appearance' => 'Appearance',
+        'trust_device' => 'Remember this device for 30 days',
+    ],
 ];

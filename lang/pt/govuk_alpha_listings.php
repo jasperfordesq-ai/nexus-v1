@@ -5,6 +5,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // ---- Navigation links (added by nav-consolidation) ----------------
+    'nav' => [
+        'view_analytics' => 'View listing analytics',
+    ],
     // Gap #12 — owner-only listing analytics panel.
     'analytics' => [
         'title' => 'Listing analytics',

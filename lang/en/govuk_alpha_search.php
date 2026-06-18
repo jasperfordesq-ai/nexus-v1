@@ -5,6 +5,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    'nav' => [
+        'advanced' => 'Use advanced search and filters',
+    ],
+
     'advanced' => [
         'title' => 'Advanced search',
         'caption' => 'Search :community',

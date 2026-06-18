@@ -5,6 +5,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    'nav' => [
+        'library' => 'Open the full resource library',
+    ],
+
     'library' => [
         'title' => 'Resource library',
         'caption' => 'Resources in :community',

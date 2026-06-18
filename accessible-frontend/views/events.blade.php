@@ -15,6 +15,12 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.events.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.events.description') }}</p>
 
+    @unless ($moduleDisabled)
+        <p class="govuk-body">
+            <a class="govuk-link" href="{{ route('govuk-alpha.events.browse', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_events.nav.browse_by_category') }}</a>
+        </p>
+    @endunless
+
     @if (($status ?? '') === 'event-deleted')
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="event-deleted-title">
             <div class="govuk-notification-banner__header">

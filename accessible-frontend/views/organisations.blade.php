@@ -9,6 +9,14 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.organisations.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.organisations.description') }}</p>
 
+    <nav class="govuk-!-margin-bottom-6" aria-label="{{ __('govuk_alpha.organisations.title') }}">
+        <ul class="govuk-list">
+            <li><a class="govuk-link" href="{{ route('govuk-alpha.organisations.browse', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_organisations.nav.browse') }}</a></li>
+            <li><a class="govuk-link" href="{{ route('govuk-alpha.organisations.register.form', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_organisations.nav.register') }}</a></li>
+            <li><a class="govuk-link" href="{{ route('govuk-alpha.organisations.manage', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_organisations.nav.manage') }}</a></li>
+        </ul>
+    </nav>
+
     @if ($status === 'org-submitted')
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="org-status">
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="org-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>

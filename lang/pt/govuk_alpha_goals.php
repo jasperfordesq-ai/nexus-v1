@@ -129,4 +129,8 @@ return [
         'buddy-action-sent' => 'Your support has been sent to the goal owner.',
         'buddy-action-failed' => 'We could not send your support. You must be the goal buddy.',
     ],
+
+    'nav' => [
+        'insights' => 'View goal insights',
+    ],
 ];

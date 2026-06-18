@@ -274,6 +274,7 @@
             <div class="govuk-inset-text">{{ __('govuk_alpha.listings.own_listing_detail') }}</div>
             <div class="govuk-button-group">
                 <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.listings.edit', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.listings.edit.edit_listing') }}</a>
+                <a class="govuk-button govuk-button--secondary" href="{{ route('govuk-alpha.listings.analytics', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha_listings.nav.view_analytics') }}</a>
             </div>
             @if (($statusValue ?? '') === 'expired' || !empty($listing['expires_at']))
                 @if (($statusValue ?? '') === 'expired')

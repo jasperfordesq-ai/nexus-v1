@@ -92,4 +92,8 @@ return [
     'footer' => [
         'wallet_link' => 'View your full wallet and transaction history',
     ],
+
+    'nav' => [
+        'manage' => 'Manage your credits',
+    ],
 ];

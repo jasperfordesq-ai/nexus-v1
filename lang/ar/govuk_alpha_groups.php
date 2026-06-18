@@ -5,6 +5,12 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // ---- Navigation links (added by nav-consolidation) ----------------
+    'nav' => [
+        'invite_members' => 'Invite members',
+        'group_image' => 'Group photo',
+        'notification_settings' => 'Notification settings',
+    ],
     'common' => [
         'back_to_group' => 'Back to group',
         'error_title' => 'There is a problem',

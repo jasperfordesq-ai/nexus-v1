@@ -9,6 +9,10 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.resources.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.resources.description') }}</p>
 
+    <p class="govuk-body govuk-!-margin-bottom-6">
+        <a class="govuk-link" href="{{ route('govuk-alpha.resources.library', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_resources.nav.library') }}</a>
+    </p>
+
     <form method="get" action="{{ route('govuk-alpha.resources.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-6">
         <div class="govuk-form-group">
             <label class="govuk-label" for="q">{{ __('govuk_alpha.resources.search_label') }}</label>

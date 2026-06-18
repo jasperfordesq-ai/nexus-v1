@@ -11,6 +11,7 @@
         $joinedAt = !empty($profile['created_at']) ? \Illuminate\Support\Carbon::parse($profile['created_at'])->translatedFormat('j F Y') : null;
         $profileType = ($profile['profile_type'] ?? 'individual') === 'organisation' ? 'organisation' : 'individual';
         $rating = $profileStats['rating'] ?? null;
+        $insightsMemberId = (int) ($memberId ?? ($profile['id'] ?? 0));
     @endphp
 
     @if (!($isOwnProfile ?? false))
@@ -103,6 +104,11 @@
             </div>
             @if (!empty($profile['tagline']))
                 <p class="govuk-body-l govuk-!-margin-top-2">{{ $profile['tagline'] }}</p>
+            @endif
+            @if ($insightsMemberId > 0)
+                <p class="govuk-body govuk-!-margin-top-2">
+                    <a class="govuk-link" href="{{ route('govuk-alpha.members.insights', ['tenantSlug' => $tenantSlug, 'id' => $insightsMemberId]) }}">{{ __('govuk_alpha_members.nav.reputation') }}</a>
+                </p>
             @endif
             @if ($isOwnProfile ?? false)
                 <div class="govuk-button-group govuk-!-margin-top-4">

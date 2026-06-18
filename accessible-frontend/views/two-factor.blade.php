@@ -52,6 +52,16 @@
                     </div>
                 </div>
 
+                <fieldset class="govuk-fieldset govuk-!-margin-bottom-4">
+                    <legend class="govuk-fieldset__legend govuk-visually-hidden">{{ __('govuk_alpha_settings.nav.trust_device') }}</legend>
+                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="trust_device" name="trust_device" type="checkbox" value="1">
+                            <label class="govuk-label govuk-checkboxes__label" for="trust_device">{{ __('govuk_alpha_settings.nav.trust_device') }}</label>
+                        </div>
+                    </div>
+                </fieldset>
+
                 <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.auth.two_factor_submit') }}</button>
             </form>
 

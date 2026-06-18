@@ -111,4 +111,8 @@ return [
         'days_ago' => ':count day ago|:count days ago',
         'on_date' => 'on :date',
     ],
+    'nav' => [
+        'network' => 'View your full network',
+        'matches_board' => 'Open the matches board',
+    ],
 ];

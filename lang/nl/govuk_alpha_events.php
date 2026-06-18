@@ -5,6 +5,14 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // ---- Navigation links (added by nav-consolidation) ----------------
+    'nav' => [
+        'browse_by_category' => 'Browse by category',
+        'view_location' => 'View location and directions',
+        'edit_series' => 'Edit the recurring series',
+        'manage_polls' => 'Manage event polls',
+        'translate_description' => 'Translate this event',
+    ],
     'common' => [
         'back_to_event' => 'Back to event',
         'back_to_events' => 'Back to events',

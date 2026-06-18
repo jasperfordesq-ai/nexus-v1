@@ -381,6 +381,7 @@ class AlphaController extends Controller
             'two_factor_token' => $token,
             'code' => $code,
             'use_backup_code' => $request->boolean('use_backup_code'),
+            'trust_device' => $request->boolean('trust_device'),
         ]);
 
         try {

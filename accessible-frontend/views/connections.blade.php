@@ -26,6 +26,10 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.connections.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.connections.description') }}</p>
 
+    <p class="govuk-body">
+        <a class="govuk-link" href="{{ route('govuk-alpha.connections.network', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_connections.nav.network') }}</a>
+    </p>
+
     {{-- Connection search/filter (parity: React connections search) --}}
     <form method="get" action="{{ route('govuk-alpha.connections.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-5">
         <div class="govuk-form-group govuk-!-margin-bottom-2">

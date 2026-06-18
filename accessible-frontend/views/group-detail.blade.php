@@ -93,6 +93,9 @@
             <p class="govuk-body">
                 <a class="govuk-link" href="{{ route('govuk-alpha.groups.discussions.index', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha.groups.discussions.link') }}</a>
             </p>
+            <p class="govuk-body">
+                <a class="govuk-link" href="{{ route('govuk-alpha.groups.notifications', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha_groups.nav.notification_settings') }}</a>
+            </p>
             <form method="post" action="{{ route('govuk-alpha.groups.leave', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">
                 @csrf
                 <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.groups.leave') }}</button>
@@ -113,6 +116,10 @@
                href="{{ route('govuk-alpha.groups.edit', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha.polish_groups.edit_link') }}</a>
             <a class="govuk-button govuk-button--secondary" role="button" draggable="false" data-module="govuk-button"
                href="{{ route('govuk-alpha.groups.manage', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha.polish_groups.manage_link') }}</a>
+            <a class="govuk-button govuk-button--secondary" role="button" draggable="false" data-module="govuk-button"
+               href="{{ route('govuk-alpha.groups.invite', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha_groups.nav.invite_members') }}</a>
+            <a class="govuk-button govuk-button--secondary" role="button" draggable="false" data-module="govuk-button"
+               href="{{ route('govuk-alpha.groups.image', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha_groups.nav.group_image') }}</a>
         </div>
     @endif
 

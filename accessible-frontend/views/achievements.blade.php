@@ -5,6 +5,8 @@
 @extends('accessible-frontend::layout')
 
 @section('content')
+    @include('accessible-frontend::partials.gamification-nav', ['gamificationNavGroup' => 'achievements', 'gamificationActiveTab' => ''])
+
     @php
         $p = is_array($gamProfile ?? null) ? $gamProfile : [];
         $level = (int) ($p['level'] ?? 0);

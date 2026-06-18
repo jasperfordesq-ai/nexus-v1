@@ -5,6 +5,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    'nav' => [
+        'view_discussion' => 'View the full discussion',
+        'all_reviews' => 'View all reviews',
+    ],
+
     'comments' => [
         'title' => 'Comments on :title',
         'heading' => 'Comments',

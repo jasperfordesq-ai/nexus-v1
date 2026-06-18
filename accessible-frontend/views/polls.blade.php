@@ -46,6 +46,16 @@
 
     <div class="govuk-inset-text">{{ __('govuk_alpha.polls.how_it_works') }}</div>
 
+    {{-- ===== Page actions: advanced poll creation + management (parity links) ===== --}}
+    <div class="govuk-button-group">
+        @if (\Illuminate\Support\Facades\Route::has('govuk-alpha.gamification.poll.create'))
+            <a class="govuk-button govuk-button--secondary" data-module="govuk-button" role="button" href="{{ route('govuk-alpha.gamification.poll.create', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_gamification.nav.create_poll') }}</a>
+        @endif
+        @if (\Illuminate\Support\Facades\Route::has('govuk-alpha.gamification.poll.manage'))
+            <a class="govuk-button govuk-button--secondary" data-module="govuk-button" role="button" href="{{ route('govuk-alpha.gamification.poll.manage', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_gamification.nav.manage_polls') }}</a>
+        @endif
+    </div>
+
     {{-- ===== Create poll form ===== --}}
     <details class="govuk-details govuk-!-margin-bottom-6" data-module="govuk-details">
         <summary class="govuk-details__summary">
@@ -138,11 +148,15 @@
                     $options = is_array($poll['options'] ?? null) ? $poll['options'] : [];
                     $creatorName = trim((string) ($poll['creator']['name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
                     $closesOn = $pollDate($poll['expires_at'] ?? null);
+                    $pollType = trim((string) ($poll['poll_type'] ?? 'standard'));
+                    $isRanked = $pollType === 'ranked';
+                    $canRank = $isRanked && $pollId > 0 && \Illuminate\Support\Facades\Route::has('govuk-alpha.gamification.poll.rank');
                 @endphp
                 <article class="nexus-alpha-card govuk-!-margin-bottom-6" id="poll-{{ $pollId }}">
                     <div class="nexus-alpha-module-row">
                         <h3 class="govuk-heading-m govuk-!-margin-bottom-1">{{ $question }}</h3>
                         <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.polls.open_tag') }}</strong>
+                        @if ($isRanked)<strong class="govuk-tag govuk-tag--purple">{{ __('govuk_alpha_gamification.nav.ranked_tag') }}</strong>@endif
                     </div>
                     <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-3">
                         {{ __('govuk_alpha.polls.by_label', ['name' => $creatorName]) }}@if ($closesOn) · {{ __('govuk_alpha.polls.closes_on', ['date' => $closesOn]) }}@endif
@@ -152,7 +166,10 @@
                         <p class="govuk-body">{{ $poll['description'] }}</p>
                     @endif
 
-                    @if (empty($options))
+                    @if ($canRank)
+                        {{-- Ranked-choice polls are voted on a dedicated reorder page, not single-choice radios. --}}
+                        <a class="govuk-button" data-module="govuk-button" role="button" href="{{ route('govuk-alpha.gamification.poll.rank', ['tenantSlug' => $tenantSlug, 'pollId' => $pollId]) }}">{{ $hasVoted ? __('govuk_alpha_gamification.nav.view_ranked_poll') : __('govuk_alpha_gamification.nav.rank_this_poll') }}</a>
+                    @elseif (empty($options))
                         <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.polls.no_options') }}</p></div>
                     @elseif (!$hasVoted)
                         <form method="post" action="{{ route('govuk-alpha.polls.vote', ['tenantSlug' => $tenantSlug, 'pollId' => $pollId]) }}">

@@ -126,6 +126,21 @@
             'description' => __('govuk_alpha.account.settings_description'),
             'href' => route('govuk-alpha.profile.settings', ['tenantSlug' => $tenantSlug]),
         ];
+
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.settings.linked-accounts')) {
+            $accountLinks[] = [
+                'title' => __('govuk_alpha_settings.nav.linked_accounts'),
+                'description' => __('govuk_alpha_settings.linked.description'),
+                'href' => route('govuk-alpha.settings.linked-accounts', ['tenantSlug' => $tenantSlug]),
+            ];
+        }
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.settings.appearance')) {
+            $accountLinks[] = [
+                'title' => __('govuk_alpha_settings.nav.appearance'),
+                'description' => __('govuk_alpha_settings.appearance.description'),
+                'href' => route('govuk-alpha.settings.appearance', ['tenantSlug' => $tenantSlug]),
+            ];
+        }
     @endphp
 
     <span class="govuk-caption-xl">{{ __('govuk_alpha.account.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>

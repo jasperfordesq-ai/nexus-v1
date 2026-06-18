@@ -5,6 +5,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    'nav' => [
+        'hashtags' => 'Discover hashtags and trending topics',
+    ],
     // ---- Shared states / status banners ----
     'states' => [
         'error' => 'Sorry, there is a problem with this page. Try again later.',

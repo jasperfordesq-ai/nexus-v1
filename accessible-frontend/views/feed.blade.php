@@ -53,6 +53,10 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.feed.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.feed.description') }}</p>
 
+    <p class="govuk-body govuk-!-margin-bottom-6">
+        <a class="govuk-link" href="{{ route('govuk-alpha.feed.hashtags', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_feed.nav.hashtags') }}</a>
+    </p>
+
     @if ($requiresAuth)
         <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="feed-auth-required-title">
             <div class="govuk-notification-banner__header">

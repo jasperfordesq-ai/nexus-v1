@@ -41,6 +41,10 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.wallet.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.wallet.description') }}</p>
 
+    <p class="govuk-body">
+        <a class="govuk-link" href="{{ route('govuk-alpha.wallet.manage', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_wallet.nav.manage') }}</a>
+    </p>
+
     @if ($status === 'transfer-sent')
         <div class="govuk-panel govuk-panel--confirmation">
             <h2 class="govuk-panel__title">{{ __('govuk_alpha.states.success_title') }}</h2>
