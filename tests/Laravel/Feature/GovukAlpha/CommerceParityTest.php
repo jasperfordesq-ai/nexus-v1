@@ -543,6 +543,223 @@ class CommerceParityTest extends TestCase
     }
 
     // ==================================================================
+    //  Courses — instructor / creator suite
+    // ==================================================================
+
+    public function test_commerce_instructor_courses_requires_auth(): void
+    {
+        $this->enableAlphaFeatures(['courses']);
+        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor")
+            ->assertRedirectContains('/alpha/login');
+    }
+
+    public function test_commerce_instructor_courses_gated_off_by_default(): void
+    {
+        $this->authenticatedUser();
+        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor")->assertStatus(403);
+    }
+
+    public function test_commerce_instructor_courses_lists_authored(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Teacher One']);
+        $this->enableAlphaFeatures(['courses']);
+        $this->seedCourse($user->id, 'My Taught Course');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/instructor");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha_commerce.instructor.title'));
+        $res->assertSee('My Taught Course');
+    }
+
+    public function test_commerce_create_course_form_renders(): void
+    {
+        $this->authenticatedUser(['name' => 'Teacher Form']);
+        $this->enableAlphaFeatures(['courses']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/new");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha_commerce.instructor.title_create'));
+        $res->assertSee('name="title"', false);
+    }
+
+    public function test_commerce_store_course_persists_and_redirects(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Teacher Store']);
+        $this->enableAlphaFeatures(['courses']);
+        $this->disableMeiliSearch();
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/new", [
+            'title' => 'Intro to Timebanking',
+            'summary' => 'A short course about timebanking.',
+            'level' => 'beginner',
+            'visibility' => 'members',
+            'enrollment_type' => 'self_paced',
+            'credit_cost' => '0',
+        ]);
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseHas('courses', [
+            'tenant_id' => $this->testTenantId,
+            'author_user_id' => $user->id,
+            'title' => 'Intro to Timebanking',
+            'status' => 'draft',
+        ]);
+    }
+
+    public function test_commerce_store_course_validation_redirects_back(): void
+    {
+        $this->authenticatedUser(['name' => 'Teacher Blank']);
+        $this->enableAlphaFeatures(['courses']);
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/new", [
+            'title' => '',
+        ]);
+        $res->assertRedirect();
+        $res->assertSessionHas('commerceCourseErrors');
+    }
+
+    public function test_commerce_edit_course_owner_only(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Course Owner']);
+        $this->enableAlphaFeatures(['courses']);
+        $id = $this->seedCourse($owner->id, 'Owned Course');
+
+        // Owner can open the edit form.
+        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/edit")->assertOk();
+
+        // Another member in the same tenant is forbidden.
+        $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        Sanctum::actingAs($other, ['*']);
+        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/edit")->assertStatus(403);
+    }
+
+    public function test_commerce_edit_course_cross_tenant_404(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Course Owner X']);
+        $this->enableAlphaFeatures(['courses']);
+
+        // A course belonging to a DIFFERENT tenant must resolve to 404 (tenant scope).
+        $otherTenantId = $this->testTenantId + 9999;
+        $foreignId = (int) DB::table('courses')->insertGetId([
+            'tenant_id' => $otherTenantId,
+            'author_user_id' => $owner->id,
+            'title' => 'Foreign Course',
+            'slug' => 'foreign-course-' . uniqid(),
+            'level' => 'beginner',
+            'visibility' => 'public',
+            'status' => 'draft',
+            'moderation_status' => 'pending',
+            'credit_cost' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$foreignId}/edit")->assertStatus(404);
+    }
+
+    public function test_commerce_update_course_persists_changes(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Course Updater']);
+        $this->enableAlphaFeatures(['courses']);
+        $this->disableMeiliSearch();
+        $id = $this->seedCourse($owner->id, 'Before Title');
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/update", [
+            'title' => 'After Title',
+            'summary' => 'Updated summary.',
+            'level' => 'intermediate',
+            'visibility' => 'public',
+            'enrollment_type' => 'self_paced',
+            'credit_cost' => '2',
+        ]);
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseHas('courses', [
+            'id' => $id,
+            'tenant_id' => $this->testTenantId,
+            'title' => 'After Title',
+            'level' => 'intermediate',
+        ]);
+    }
+
+    public function test_commerce_publish_course_owner_only(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Publisher']);
+        $this->enableAlphaFeatures(['courses']);
+        $this->disableMeiliSearch();
+        $id = (int) DB::table('courses')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'author_user_id' => $owner->id,
+            'title' => 'Draft To Publish',
+            'slug' => 'draft-to-publish-' . uniqid(),
+            'level' => 'beginner',
+            'visibility' => 'public',
+            'status' => 'draft',
+            'moderation_status' => 'pending',
+            'credit_cost' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/publish")->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseHas('courses', [
+            'id' => $id,
+            'status' => 'published',
+        ]);
+
+        // A non-owner cannot publish.
+        $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        Sanctum::actingAs($other, ['*']);
+        $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/unpublish")->assertStatus(403);
+    }
+
+    public function test_commerce_delete_course_owner_only(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Deleter']);
+        $this->enableAlphaFeatures(['courses']);
+        $this->disableMeiliSearch();
+        $id = $this->seedCourse($owner->id, 'To Delete');
+
+        $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/delete")
+            ->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseMissing('courses', ['id' => $id]);
+    }
+
+    public function test_commerce_course_analytics_renders_for_owner(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Analyst']);
+        $this->enableAlphaFeatures(['courses']);
+        $id = $this->seedCourse($owner->id, 'Measured Course');
+        $this->seedEnrolment($id, $owner->id);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/analytics");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha_commerce.analytics.total_enrollments'));
+        $res->assertSee('Measured Course');
+    }
+
+    public function test_commerce_course_analytics_owner_only(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Owner Analytics']);
+        $this->enableAlphaFeatures(['courses']);
+        $id = $this->seedCourse($owner->id, 'Private Analytics');
+
+        $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        Sanctum::actingAs($other, ['*']);
+        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/analytics")->assertStatus(403);
+    }
+
+    // ==================================================================
     //  Seed + base helpers (mirror GovukAlphaFrontendTest)
     // ==================================================================
 

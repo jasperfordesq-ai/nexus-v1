@@ -13,6 +13,7 @@ use App\Models\MarketplaceListing;
 use App\Models\MarketplaceOffer;
 use App\Models\MarketplaceOrder;
 use App\Services\CourseEnrollmentService;
+use App\Services\CourseInstructorService;
 use App\Services\CourseProgressService;
 use App\Services\CourseService;
 use App\Services\MarketplaceListingService;
@@ -1137,6 +1138,282 @@ trait CommerceParity
     }
 
     // =================================================================
+    //  Courses — Instructor / creator suite
+    // =================================================================
+
+    /** Instructor dashboard: the courses the member teaches (authored), any status. */
+    public function commerceInstructorCourses(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $courses = [];
+        try {
+            $courses = CourseService::authoredBy($userId);
+            $courses = is_array($courses) ? array_map(static fn ($c) => is_array($c) ? $c : (array) $c, $courses) : [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::commerce-instructor-courses', [
+            'title' => __('govuk_alpha_commerce.instructor.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'courses' => $courses,
+            'canAuthor' => $this->commerceCanAuthorCourses($userId),
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Show the "create a course" form. */
+    public function commerceCreateCourseForm(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Respect the tenant's authoring policy (open by default).
+        abort_unless($this->commerceCanAuthorCourses($userId), 403);
+
+        return $this->view('accessible-frontend::commerce-course-form', $this->commerceCourseFormData(
+            $tenantSlug,
+            'create',
+            null,
+            route('govuk-alpha.courses.instructor.store', ['tenantSlug' => $tenantSlug]),
+        ));
+    }
+
+    /** Persist a new (draft) course, then redirect to the edit form. */
+    public function commerceStoreCourse(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        abort_unless($this->commerceCanAuthorCourses($userId), 403);
+
+        [$data, $errors] = $this->commerceCourseInput($request);
+        if (!empty($errors)) {
+            return redirect()->route('govuk-alpha.courses.instructor.create', ['tenantSlug' => $tenantSlug])
+                ->withInput()->with('commerceCourseErrors', $errors);
+        }
+
+        $newId = 0;
+        try {
+            $course = CourseService::create($userId, $data);
+            $newId = (int) $course->id;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($newId > 0) {
+            return redirect()->route('govuk-alpha.courses.instructor.edit', ['tenantSlug' => $tenantSlug, 'id' => $newId, 'status' => 'created']);
+        }
+
+        return redirect()->route('govuk-alpha.courses.instructor.create', ['tenantSlug' => $tenantSlug])
+            ->withInput()->with('commerceCourseErrors', [__('govuk_alpha_commerce.instructor.error_create')]);
+    }
+
+    /** Show the edit form for one of the member's own courses. */
+    public function commerceEditCourseForm(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $course = $this->commerceOwnedCourseOr404($id, $userId);
+
+        return $this->view('accessible-frontend::commerce-course-form', $this->commerceCourseFormData(
+            $tenantSlug,
+            'edit',
+            $course,
+            route('govuk-alpha.courses.instructor.update', ['tenantSlug' => $tenantSlug, 'id' => $id]),
+            self::asStr($request->query('status')) ?: null,
+        ));
+    }
+
+    /** Persist edits to one of the member's own courses. */
+    public function commerceUpdateCourse(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $course = $this->commerceOwnedCourseOr404($id, $userId);
+
+        [$data, $errors] = $this->commerceCourseInput($request);
+        if (!empty($errors)) {
+            return redirect()->route('govuk-alpha.courses.instructor.edit', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withInput()->with('commerceCourseErrors', $errors);
+        }
+
+        $ok = false;
+        try {
+            CourseService::update($course, $data);
+            $ok = true;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.courses.instructor.edit', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'saved' : 'save-failed',
+        ]);
+    }
+
+    /** Publish one of the member's own courses (subject to tenant moderation). */
+    public function commercePublishCourse(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $course = $this->commerceOwnedCourseOr404($id, $userId);
+
+        $status = 'publish-failed';
+        try {
+            $updated = CourseService::publish($course, true);
+            $status = ($updated->moderation_status ?? '') === 'approved' ? 'published' : 'pending-review';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.courses.instructor.edit', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
+    }
+
+    /** Revert one of the member's own courses to draft. */
+    public function commerceUnpublishCourse(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $course = $this->commerceOwnedCourseOr404($id, $userId);
+
+        $status = 'unpublish-failed';
+        try {
+            CourseService::unpublish($course);
+            $status = 'unpublished';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.courses.instructor.edit', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
+    }
+
+    /** Delete one of the member's own courses. */
+    public function commerceDeleteCourse(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $course = $this->commerceOwnedCourseOr404($id, $userId);
+
+        $ok = false;
+        try {
+            CourseService::delete($course);
+            $ok = true;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.courses.instructor', ['tenantSlug' => $tenantSlug, 'status' => $ok ? 'deleted' : 'delete-failed']);
+    }
+
+    /** Per-course analytics for the owner: enrolment funnel, completion, per-lesson drop-off. */
+    public function commerceCourseAnalytics(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $course = $this->commerceOwnedCourseOr404($id, $userId);
+
+        // Mirror CourseController::analytics — the SAME aggregation queries.
+        $enrollments = \App\Models\CourseEnrollment::where('course_id', $id);
+        $total = (clone $enrollments)->count();
+        $completed = (clone $enrollments)->where('status', 'completed')->count();
+        $active = (clone $enrollments)->where('status', 'active')->count();
+        $dropped = (clone $enrollments)->where('status', 'dropped')->count();
+        $avgProgress = (float) (clone $enrollments)->avg('progress_percent');
+
+        $lessons = \App\Models\CourseLesson::where('course_id', $id)
+            ->orderBy('position')
+            ->get(['id', 'title']);
+        $perLesson = $lessons->map(static function ($lesson) {
+            return [
+                'lesson_id' => (int) $lesson->id,
+                'title' => (string) $lesson->title,
+                'completed' => \App\Models\CourseLessonProgress::where('lesson_id', $lesson->id)
+                    ->where('status', 'completed')
+                    ->count(),
+            ];
+        })->all();
+
+        $quizIds = \App\Models\CourseQuiz::where('course_id', $id)->pluck('id')->all();
+        $avgQuizScore = $quizIds
+            ? (float) \App\Models\CourseQuizAttempt::whereIn('quiz_id', $quizIds)->avg('score_percent')
+            : 0.0;
+        $quizAttempts = $quizIds
+            ? \App\Models\CourseQuizAttempt::whereIn('quiz_id', $quizIds)->count()
+            : 0;
+
+        $maxLessonCompleted = 0;
+        foreach ($perLesson as $row) {
+            $maxLessonCompleted = max($maxLessonCompleted, (int) ($row['completed'] ?? 0));
+        }
+
+        return $this->view('accessible-frontend::commerce-course-analytics', [
+            'title' => __('govuk_alpha_commerce.analytics.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'courseTitle' => (string) $course->title,
+            'analytics' => [
+                'total' => $total,
+                'active' => $active,
+                'completed' => $completed,
+                'dropped' => $dropped,
+                'completion_rate' => $total > 0 ? round(($completed / $total) * 100, 1) : 0.0,
+                'avg_progress' => round($avgProgress, 1),
+                'avg_quiz_score' => round($avgQuizScore, 1),
+                'quiz_attempts' => $quizAttempts,
+            ],
+            'perLesson' => $perLesson,
+            'maxLessonCompleted' => $maxLessonCompleted,
+        ]);
+    }
+
+    // =================================================================
     //  Commerce private helpers (prefixed; do not collide with siblings)
     // =================================================================
 
@@ -1397,6 +1674,134 @@ trait CommerceParity
                 'category_id' => $listing->category_id,
                 'location' => (string) ($listing->location ?? ''),
                 'quantity' => (int) ($listing->quantity ?? 1),
+            ] : null,
+            'status' => $status,
+        ];
+    }
+
+    /** Course level enum — mirrors CourseService::LEVELS. */
+    private const COMMERCE_COURSE_LEVELS = ['beginner', 'intermediate', 'advanced'];
+
+    /** Course visibility — the accessible UI offers the same two the React builder does. */
+    private const COMMERCE_COURSE_VISIBILITIES = ['members', 'public'];
+
+    /** Course enrolment type enum — mirrors CourseService::ENROLLMENT_TYPES. */
+    private const COMMERCE_COURSE_ENROLLMENT_TYPES = ['self_paced', 'cohort'];
+
+    /**
+     * Whether the member may author a course. Mirrors
+     * InteractsWithCourses::requireCourseAuthor: open to any member by default;
+     * a tenant may restrict to granted instructors via the
+     * `courses.allow_member_authoring` setting.
+     */
+    private function commerceCanAuthorCourses(int $userId): bool
+    {
+        $allowMembers = filter_var(
+            TenantContext::getSetting('courses.allow_member_authoring', true),
+            FILTER_VALIDATE_BOOLEAN
+        );
+        if ($allowMembers) {
+            return true;
+        }
+
+        try {
+            return CourseInstructorService::isInstructor($userId);
+        } catch (\Throwable $e) {
+            report($e);
+            return false;
+        }
+    }
+
+    /**
+     * Fetch one of the member's own courses or abort. Course has HasTenantScope,
+     * so a cross-tenant id resolves to null (→ 404); a course authored by another
+     * member in the same tenant returns 403 (owner-only management).
+     */
+    private function commerceOwnedCourseOr404(int $id, int $userId): Course
+    {
+        $course = null;
+        try {
+            $course = CourseService::findById($id);
+            if ($course !== null && (int) $course->tenant_id !== TenantContext::getId()) {
+                $course = null;
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($course === null, 404);
+        abort_unless((int) $course->author_user_id === $userId, 403);
+        return $course;
+    }
+
+    /**
+     * Parse + lightly validate the course form input.
+     *
+     * @return array{0: array<string,mixed>, 1: array<int,string>} [data, errors]
+     */
+    private function commerceCourseInput(Request $request): array
+    {
+        $errors = [];
+
+        $title = trim(self::asStr($request->input('title')));
+        if ($title === '') {
+            $errors[] = __('govuk_alpha_commerce.instructor.error_title');
+        }
+
+        $data = [
+            'title' => mb_substr($title, 0, 200),
+            'summary' => mb_substr(trim(self::asStr($request->input('summary'))), 0, 500),
+            'description' => mb_substr(trim(self::asStr($request->input('description'))), 0, 20000),
+            'level' => $this->allowed(self::asStr($request->input('level')), self::COMMERCE_COURSE_LEVELS, 'beginner'),
+            'visibility' => $this->allowed(self::asStr($request->input('visibility')), self::COMMERCE_COURSE_VISIBILITIES, 'members'),
+            'enrollment_type' => $this->allowed(self::asStr($request->input('enrollment_type')), self::COMMERCE_COURSE_ENROLLMENT_TYPES, 'self_paced'),
+        ];
+
+        $creditCost = self::asStr($request->input('credit_cost'));
+        if ($creditCost !== '' && is_numeric($creditCost)) {
+            $data['credit_cost'] = max(0, (float) $creditCost);
+        }
+
+        $categoryId = (int) self::asStr($request->input('category_id'));
+        $data['category_id'] = $categoryId > 0 ? $categoryId : null;
+
+        return [$data, $errors];
+    }
+
+    /** Shared view-data for the create/edit course form. */
+    private function commerceCourseFormData(string $tenantSlug, string $mode, ?Course $course, string $action, ?string $status = null): array
+    {
+        $categories = [];
+        try {
+            $rawCats = \App\Services\CourseCategoryService::all();
+            $categories = is_array($rawCats) ? array_map(static fn ($c) => is_array($c) ? $c : (array) $c, $rawCats) : [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return [
+            'title' => $mode === 'edit'
+                ? __('govuk_alpha_commerce.instructor.title_edit')
+                : __('govuk_alpha_commerce.instructor.title_create'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'mode' => $mode,
+            'formAction' => $action,
+            'categories' => $categories,
+            'levels' => self::COMMERCE_COURSE_LEVELS,
+            'visibilities' => self::COMMERCE_COURSE_VISIBILITIES,
+            'enrollmentTypes' => self::COMMERCE_COURSE_ENROLLMENT_TYPES,
+            'course' => $course !== null ? [
+                'id' => (int) $course->id,
+                'title' => (string) $course->title,
+                'summary' => (string) ($course->summary ?? ''),
+                'description' => (string) ($course->description ?? ''),
+                'level' => (string) ($course->level ?? 'beginner'),
+                'visibility' => (string) ($course->visibility ?? 'members'),
+                'enrollment_type' => (string) ($course->enrollment_type ?? 'self_paced'),
+                'credit_cost' => $course->credit_cost,
+                'category_id' => $course->category_id,
+                'status' => (string) ($course->status ?? 'draft'),
+                'moderation_status' => (string) ($course->moderation_status ?? 'pending'),
             ] : null,
             'status' => $status,
         ];

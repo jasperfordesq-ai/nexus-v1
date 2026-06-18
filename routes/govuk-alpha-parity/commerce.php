@@ -67,3 +67,17 @@ Route::post('/courses/{id}/lessons/{lessonId}/complete', [AlphaController::class
 Route::get('/premium/manage', [AlphaController::class, 'commercePremiumManage'])->name('premium.manage');
 Route::post('/premium/cancel', [AlphaController::class, 'commercePremiumCancel'])->middleware('throttle:5,1')->name('premium.cancel');
 Route::post('/premium/portal', [AlphaController::class, 'commercePremiumPortal'])->middleware('throttle:10,1')->name('premium.portal');
+
+// ===== Courses — instructor / creator suite =====
+// `instructor` and `new` are non-numeric, so they never collide with the
+// existing /courses/{id} (whereNumber) route in routes/govuk-alpha.php. Static
+// segments are declared before the numeric {id} sub-paths within this block.
+Route::get('/courses/instructor', [AlphaController::class, 'commerceInstructorCourses'])->name('courses.instructor');
+Route::get('/courses/instructor/new', [AlphaController::class, 'commerceCreateCourseForm'])->name('courses.instructor.create');
+Route::post('/courses/instructor/new', [AlphaController::class, 'commerceStoreCourse'])->middleware('throttle:10,1')->name('courses.instructor.store');
+Route::get('/courses/instructor/{id}/edit', [AlphaController::class, 'commerceEditCourseForm'])->whereNumber('id')->name('courses.instructor.edit');
+Route::post('/courses/instructor/{id}/update', [AlphaController::class, 'commerceUpdateCourse'])->whereNumber('id')->middleware('throttle:20,1')->name('courses.instructor.update');
+Route::post('/courses/instructor/{id}/publish', [AlphaController::class, 'commercePublishCourse'])->whereNumber('id')->middleware('throttle:10,1')->name('courses.instructor.publish');
+Route::post('/courses/instructor/{id}/unpublish', [AlphaController::class, 'commerceUnpublishCourse'])->whereNumber('id')->middleware('throttle:10,1')->name('courses.instructor.unpublish');
+Route::post('/courses/instructor/{id}/delete', [AlphaController::class, 'commerceDeleteCourse'])->whereNumber('id')->middleware('throttle:10,1')->name('courses.instructor.delete');
+Route::get('/courses/instructor/{id}/analytics', [AlphaController::class, 'commerceCourseAnalytics'])->whereNumber('id')->name('courses.instructor.analytics');
