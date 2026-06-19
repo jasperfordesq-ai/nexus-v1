@@ -2359,10 +2359,17 @@ return [
         'enrolled_notice' => 'You are enrolled on this course.',
         'cost_notice' => 'This course costs :count time credits.',
         'free_notice' => 'This course is free to join.',
+        'prerequisites_label' => 'Before you start',
+        'prerequisite_done' => 'Completed',
+        'prerequisite_todo' => 'Not yet completed',
+        'certificate_label' => 'Your certificate',
+        'certificate_download' => 'Download your certificate',
         'states' => [
             'enrolled' => 'You are now enrolled. Enjoy the course.',
             'insufficient-credits' => 'You do not have enough time credits to enrol on this course.',
             'enrol-failed' => 'We could not enrol you on this course. Please try again.',
+            'certificate-locked' => 'You can download your certificate once you have completed the course.',
+            'certificate-failed' => 'We could not produce your certificate. Please try again.',
         ],
     ],
     'podcasts' => [

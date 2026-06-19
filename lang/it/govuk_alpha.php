@@ -2338,10 +2338,17 @@ return [
         'enrolled_notice' => 'Sei iscritto a questo corso.',
         'cost_notice' => 'Questo corso costa :count crediti orari.',
         'free_notice' => 'Questo corso è gratuito.',
+        'prerequisites_label' => 'Before you start',
+        'prerequisite_done' => 'Completed',
+        'prerequisite_todo' => 'Not yet completed',
+        'certificate_label' => 'Your certificate',
+        'certificate_download' => 'Download your certificate',
         'states' => [
             'enrolled' => 'Sei ora iscritto. Buona fruizione del corso.',
             'insufficient-credits' => 'Non hai abbastanza crediti orari per iscriverti a questo corso.',
             'enrol-failed' => 'Non è stato possibile iscriverti a questo corso. Riprova.',
+            'certificate-locked' => 'You can download your certificate once you have completed the course.',
+            'certificate-failed' => 'We could not produce your certificate. Please try again.',
         ],
     ],
     'podcasts' => [

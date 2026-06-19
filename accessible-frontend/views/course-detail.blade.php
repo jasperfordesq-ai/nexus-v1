@@ -23,7 +23,7 @@
             <h1 class="govuk-panel__title">{{ __('govuk_alpha.states.success_title') }}</h1>
             <div class="govuk-panel__body">{{ __('govuk_alpha.courses.states.enrolled') }}</div>
         </div>
-    @elseif (in_array($status, ['insufficient-credits', 'enrol-failed'], true))
+    @elseif (in_array($status, ['insufficient-credits', 'enrol-failed', 'certificate-locked', 'certificate-failed'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ __('govuk_alpha.courses.states.' . $status) }}</li></ul></div></div>
@@ -42,6 +42,34 @@
     @if (trim((string) ($course['description'] ?? '')) !== '')
         <h2 class="govuk-heading-l">{{ __('govuk_alpha.courses.about_label') }}</h2>
         <div class="govuk-body">{!! nl2br(e(strip_tags((string) $course['description']))) !!}</div>
+    @endif
+
+    {{-- Prerequisites (with per-learner completion status) --}}
+    @if (!empty($prerequisites))
+        <h2 class="govuk-heading-l">{{ __('govuk_alpha.courses.prerequisites_label') }}</h2>
+        <ul class="govuk-list">
+            @foreach ($prerequisites as $pre)
+                @php
+                    $preTitle = trim((string) ($pre['title'] ?? ''));
+                    $preId = (int) ($pre['id'] ?? 0);
+                    $preDone = !empty($pre['completed']);
+                @endphp
+                @if ($preTitle !== '')
+                    <li class="govuk-!-margin-bottom-1">
+                        @if ($preId > 0)<a class="govuk-link" href="{{ route('govuk-alpha.courses.show', ['tenantSlug' => $tenantSlug, 'id' => $preId]) }}">{{ $preTitle }}</a>@else{{ $preTitle }}@endif
+                        @if ($preDone)<strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.courses.prerequisite_done') }}</strong>@else<strong class="govuk-tag govuk-tag--grey">{{ __('govuk_alpha.courses.prerequisite_todo') }}</strong>@endif
+                    </li>
+                @endif
+            @endforeach
+        </ul>
+    @endif
+
+    {{-- Certificate download (once the course is completed) --}}
+    @if (!empty($isCompleted))
+        <h2 class="govuk-heading-l">{{ __('govuk_alpha.courses.certificate_label') }}</h2>
+        <p class="govuk-body">
+            <a class="govuk-button govuk-button--secondary" role="button" data-module="govuk-button" href="{{ route('govuk-alpha.courses.certificate', ['tenantSlug' => $tenantSlug, 'id' => $course['id']]) }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha.courses.certificate_download') }}</a>
+        </p>
     @endif
 
     @if (!empty($sections))

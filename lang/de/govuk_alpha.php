@@ -2338,10 +2338,17 @@ return [
         'enrolled_notice' => 'Sie sind für diesen Kurs angemeldet.',
         'cost_notice' => 'Dieser Kurs kostet :count Zeitguthaben.',
         'free_notice' => 'Dieser Kurs ist kostenlos.',
+        'prerequisites_label' => 'Before you start',
+        'prerequisite_done' => 'Completed',
+        'prerequisite_todo' => 'Not yet completed',
+        'certificate_label' => 'Your certificate',
+        'certificate_download' => 'Download your certificate',
         'states' => [
             'enrolled' => 'Sie sind jetzt angemeldet. Viel Freude beim Kurs.',
             'insufficient-credits' => 'Sie haben nicht genügend Zeitguthaben, um sich für diesen Kurs anzumelden.',
             'enrol-failed' => 'Ihre Anmeldung für diesen Kurs ist fehlgeschlagen. Bitte versuchen Sie es erneut.',
+            'certificate-locked' => 'You can download your certificate once you have completed the course.',
+            'certificate-failed' => 'We could not produce your certificate. Please try again.',
         ],
     ],
     'podcasts' => [

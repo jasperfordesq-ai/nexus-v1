@@ -2338,10 +2338,17 @@ return [
         'enrolled_notice' => 'このコースに登録されています。',
         'cost_notice' => 'このコースは :countタイムクレジットが必要です。',
         'free_notice' => 'このコースは無料で参加できます。',
+        'prerequisites_label' => 'Before you start',
+        'prerequisite_done' => 'Completed',
+        'prerequisite_todo' => 'Not yet completed',
+        'certificate_label' => 'Your certificate',
+        'certificate_download' => 'Download your certificate',
         'states' => [
             'enrolled' => '登録が完了しました。コースをお楽しみください。',
             'insufficient-credits' => 'このコースに登録するためのタイムクレジットが不足しています。',
             'enrol-failed' => 'このコースに登録できませんでした。もう一度お試しください。',
+            'certificate-locked' => 'You can download your certificate once you have completed the course.',
+            'certificate-failed' => 'We could not produce your certificate. Please try again.',
         ],
     ],
     'podcasts' => [

@@ -6477,10 +6477,17 @@ class AlphaController extends Controller
 
         $course = null;
         $isEnrolled = false;
+        $isCompleted = false;
+        $prerequisites = [];
         try {
             $course = \App\Services\CourseService::findById($id);
             if ($course !== null) {
                 $isEnrolled = \App\Services\CourseEnrollmentService::isEnrolled($id, $userId);
+                // Completion drives the certificate-download affordance.
+                $enrollment = \App\Services\CourseEnrollmentService::find($id, $userId);
+                $isCompleted = $enrollment !== null && ($enrollment->status ?? '') === 'completed';
+                // Prerequisite courses + per-learner completion (mirrors React).
+                $prerequisites = \App\Services\CoursePrerequisiteService::statusFor($course, $userId);
             }
         } catch (\Throwable $e) {
             report($e);
@@ -6493,6 +6500,8 @@ class AlphaController extends Controller
             'activeNav' => 'explore',
             'course' => $course->toArray(),
             'isEnrolled' => $isEnrolled,
+            'isCompleted' => $isCompleted,
+            'prerequisites' => is_array($prerequisites) ? $prerequisites : [],
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -6528,6 +6537,43 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.courses.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]);
+    }
+
+    /**
+     * Download (view) the completion certificate for a course. Mirrors
+     * CourseEnrollmentController::certificate: requires an enrolment in the
+     * 'completed' state, then issues (idempotently) + renders the certificate
+     * HTML as a standalone printable page.
+     */
+    public function courseCertificate(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $enrollment = \App\Services\CourseEnrollmentService::find($id, $userId);
+        if ($enrollment === null) {
+            return redirect()->route('govuk-alpha.courses.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'enrol-required']);
+        }
+        if (($enrollment->status ?? '') !== 'completed') {
+            return redirect()->route('govuk-alpha.courses.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'certificate-locked']);
+        }
+
+        try {
+            $cert = \App\Services\CourseCertificateService::issue($id, $userId);
+            $html = \App\Services\CourseCertificateService::generateHtml($cert);
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.courses.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'certificate-failed']);
+        }
+
+        // The generated HTML is a complete, self-contained certificate document
+        // (its own <html>), so it is returned directly rather than wrapped in the
+        // alpha layout — the learner can print or save it.
+        return response($html, 200)->header('Content-Type', 'text/html; charset=UTF-8');
     }
 
     // === Podcasts ===

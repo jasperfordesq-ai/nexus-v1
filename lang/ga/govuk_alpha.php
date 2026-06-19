@@ -2338,10 +2338,17 @@ return [
         'enrolled_notice' => 'Tá tú cláraithe ar an gcúrsa seo.',
         'cost_notice' => 'Cosnaíonn an cúrsa seo :count creidiúint ama.',
         'free_notice' => 'Tá an cúrsa seo saor in aisce le páirt a ghlacadh ann.',
+        'prerequisites_label' => 'Before you start',
+        'prerequisite_done' => 'Completed',
+        'prerequisite_todo' => 'Not yet completed',
+        'certificate_label' => 'Your certificate',
+        'certificate_download' => 'Download your certificate',
         'states' => [
             'enrolled' => 'Tá tú cláraithe anois. Bain taitneamh as an gcúrsa.',
             'insufficient-credits' => 'Níl go leor creidiúintí ama agat le clárú ar an gcúrsa seo.',
             'enrol-failed' => 'Níorbh fhéidir tú a chlárú ar an gcúrsa seo. Bain triail eile as.',
+            'certificate-locked' => 'You can download your certificate once you have completed the course.',
+            'certificate-failed' => 'We could not produce your certificate. Please try again.',
         ],
     ],
     'podcasts' => [

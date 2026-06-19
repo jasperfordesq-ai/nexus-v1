@@ -2338,10 +2338,17 @@ return [
         'enrolled_notice' => 'Jesteś zapisany na ten kurs.',
         'cost_notice' => 'Ten kurs kosztuje :count kredytów czasowych.',
         'free_notice' => 'Dołączenie do tego kursu jest bezpłatne.',
+        'prerequisites_label' => 'Before you start',
+        'prerequisite_done' => 'Completed',
+        'prerequisite_todo' => 'Not yet completed',
+        'certificate_label' => 'Your certificate',
+        'certificate_download' => 'Download your certificate',
         'states' => [
             'enrolled' => 'Jesteś teraz zapisany. Miłej nauki.',
             'insufficient-credits' => 'Nie masz wystarczającej liczby kredytów czasowych, aby zapisać się na ten kurs.',
             'enrol-failed' => 'Nie udało się zapisać Cię na ten kurs. Spróbuj ponownie.',
+            'certificate-locked' => 'You can download your certificate once you have completed the course.',
+            'certificate-failed' => 'We could not produce your certificate. Please try again.',
         ],
     ],
     'podcasts' => [

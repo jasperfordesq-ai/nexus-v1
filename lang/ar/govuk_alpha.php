@@ -2338,10 +2338,17 @@ return [
         'enrolled_notice' => 'أنت مسجّل في هذه الدورة.',
         'cost_notice' => 'تكلّف هذه الدورة :count اعتمادًا زمنيًا.',
         'free_notice' => 'هذه الدورة مجانية للانضمام.',
+        'prerequisites_label' => 'Before you start',
+        'prerequisite_done' => 'Completed',
+        'prerequisite_todo' => 'Not yet completed',
+        'certificate_label' => 'Your certificate',
+        'certificate_download' => 'Download your certificate',
         'states' => [
             'enrolled' => 'تم تسجيلك الآن. استمتع بالدورة.',
             'insufficient-credits' => 'ليس لديك اعتمادات زمنية كافية للتسجيل في هذه الدورة.',
             'enrol-failed' => 'تعذّر تسجيلك في هذه الدورة. يُرجى المحاولة مجددًا.',
+            'certificate-locked' => 'You can download your certificate once you have completed the course.',
+            'certificate-failed' => 'We could not produce your certificate. Please try again.',
         ],
     ],
     'podcasts' => [

@@ -2338,10 +2338,17 @@ return [
         'enrolled_notice' => 'U bent ingeschreven voor deze cursus.',
         'cost_notice' => 'Deze cursus kost :count tijdkredieten.',
         'free_notice' => 'Deze cursus is gratis om aan deel te nemen.',
+        'prerequisites_label' => 'Before you start',
+        'prerequisite_done' => 'Completed',
+        'prerequisite_todo' => 'Not yet completed',
+        'certificate_label' => 'Your certificate',
+        'certificate_download' => 'Download your certificate',
         'states' => [
             'enrolled' => 'U bent nu ingeschreven. Veel plezier met de cursus.',
             'insufficient-credits' => 'U hebt niet genoeg tijdkredieten om u in te schrijven voor deze cursus.',
             'enrol-failed' => 'We konden u niet inschrijven voor deze cursus. Probeer het opnieuw.',
+            'certificate-locked' => 'You can download your certificate once you have completed the course.',
+            'certificate-failed' => 'We could not produce your certificate. Please try again.',
         ],
     ],
     'podcasts' => [
