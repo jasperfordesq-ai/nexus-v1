@@ -12,6 +12,7 @@ use App\Services\BrokerMessageVisibilityService;
 use App\Services\TranscriptionService;
 use App\Services\TranslationConfigurationService;
 use App\Core\AudioUploader;
+use App\Core\MessageAttachmentUploader;
 use App\Models\Message;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -120,7 +121,38 @@ class MessagesController extends BaseApiController
         $body = trim($data['body'] ?? '');
         $voiceUrl = $data['voice_url'] ?? null;
 
-        if (empty($body) && empty($voiceUrl)) {
+        // File/image attachments (multipart). Store each up front so a failure is
+        // reported before the message is created; pass metadata to the service.
+        $uploaded = request()->file('attachments');
+        $files = is_array($uploaded) ? $uploaded : ($uploaded ? [$uploaded] : []);
+        if (count($files) > MessageAttachmentUploader::MAX_FILES) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.message_attachment_too_many', ['max' => MessageAttachmentUploader::MAX_FILES]), 'attachments', 422);
+        }
+        $attachments = [];
+        foreach ($files as $file) {
+            if (!$file || !$file->isValid()) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.message_attachment_upload_error'), 'attachments', 422);
+            }
+            try {
+                $attachments[] = MessageAttachmentUploader::upload([
+                    'name'     => $file->getClientOriginalName(),
+                    'type'     => $file->getMimeType(),
+                    'tmp_name' => $file->getRealPath(),
+                    'error'    => UPLOAD_ERR_OK,
+                    'size'     => $file->getSize(),
+                ]);
+            } catch (\InvalidArgumentException $e) {
+                return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), 'attachments', 422);
+            } catch (\Throwable $e) {
+                Log::error('Message attachment upload failed', ['error' => $e->getMessage()]);
+                return $this->respondWithError('UPLOAD_FAILED', __('api.message_attachment_upload_error'), 'attachments', 400);
+            }
+        }
+        if (!empty($attachments)) {
+            $data['attachments'] = $attachments;
+        }
+
+        if (empty($body) && empty($voiceUrl) && empty($attachments)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.message_body_or_voice_required'), 'body', 422);
         }
 

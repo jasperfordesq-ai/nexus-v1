@@ -5,6 +5,15 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Message file/image attachments (no-JS composer) — added 2026-06-19
+    'attachments' => [
+        'label' => 'Attach files (optional)',
+        'hint' => 'You can attach up to 5 images or documents (max 10 MB each).',
+        'default_name' => 'Attachment',
+        'error_too_many' => 'You can attach up to 5 files.',
+        'error_failed' => 'Your attachment could not be uploaded. Please try again.',
+        'error_invalid' => 'That attachment type is not allowed.',
+    ],
     'groups' => [
         'title' => 'Group conversations',
         'caption' => 'Messages',

@@ -5,6 +5,15 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Message file/image attachments (no-JS composer) — added 2026-06-19
+    'attachments' => [
+        'label' => 'إرفاق ملفات (اختياري)',
+        'hint' => 'يمكنك إرفاق ما يصل إلى 5 صور أو مستندات (بحد أقصى 10 ميغابايت لكل منها).',
+        'default_name' => 'مرفق',
+        'error_too_many' => 'يمكنك إرفاق ما يصل إلى 5 ملفات.',
+        'error_failed' => 'تعذّر رفع المرفق. يرجى المحاولة مرة أخرى.',
+        'error_invalid' => 'نوع المرفق هذا غير مسموح به.',
+    ],
     'groups' => [
         'title' => 'Group conversations',
         'caption' => 'Messages',

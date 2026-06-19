@@ -175,6 +175,7 @@ class MessageService
             ->with([
                 'sender:id,first_name,last_name,avatar_url',
                 'receiver:id,first_name,last_name,avatar_url',
+                'attachments:id,message_id,file_url,file_name,file_size,mime_type,created_at',
             ])
             ->betweenUsers($userId, $partnerId);
 
@@ -330,7 +331,27 @@ class MessageService
         $voiceUrl = $data['voice_url'] ?? ($data['audio_url'] ?? null);
         $isVoice = !empty($data['is_voice']) || !empty($voiceUrl);
 
-        if (empty($content) && !$isVoice) {
+        // File/image attachments: the caller (controller) has already validated +
+        // stored each file and passes metadata rows [url,name,size,mime]. A message
+        // may carry attachments with no text body (e.g. "here's the photo").
+        $attachments = [];
+        if (is_array($data['attachments'] ?? null)) {
+            foreach ($data['attachments'] as $att) {
+                $url = is_array($att) ? trim((string) ($att['url'] ?? '')) : '';
+                if ($url === '') {
+                    continue;
+                }
+                $attachments[] = [
+                    'url'  => $url,
+                    'name' => mb_substr((string) ($att['name'] ?? 'attachment'), 0, 255),
+                    'size' => isset($att['size']) ? (int) $att['size'] : null,
+                    'mime' => $att['mime'] ?? null,
+                ];
+            }
+        }
+        $hasAttachments = count($attachments) > 0;
+
+        if (empty($content) && !$isVoice && !$hasAttachments) {
             self::$errors = [['code' => 'VALIDATION_ERROR', 'message' => __('api.message_body_required')]];
             return [];
         }
@@ -364,6 +385,24 @@ class MessageService
 
         $message->save();
 
+        // Persist file/image attachment rows (tenant_id auto-filled by HasTenantScope).
+        if ($hasAttachments) {
+            foreach ($attachments as $att) {
+                try {
+                    \App\Models\MessageAttachment::create([
+                        'message_id' => $message->id,
+                        'file_url'   => $att['url'],
+                        'file_name'  => $att['name'],
+                        'file_size'  => $att['size'],
+                        'mime_type'  => $att['mime'],
+                        'created_at' => now(),
+                    ]);
+                } catch (\Throwable $e) {
+                    Log::warning('Message attachment persist failed', ['error' => $e->getMessage(), 'message_id' => $message->id]);
+                }
+            }
+        }
+
         // Broadcast the new message event for real-time delivery
         try {
             $sender = User::withoutGlobalScopes()->find($senderId);
@@ -378,7 +417,7 @@ class MessageService
             Log::warning('MessageSent broadcast failed', ['error' => $e->getMessage(), 'message_id' => $message->id]);
         }
 
-        return $message->fresh(['sender', 'receiver'])->toArray();
+        return $message->fresh(['sender', 'receiver', 'attachments'])->toArray();
     }
 
     /**

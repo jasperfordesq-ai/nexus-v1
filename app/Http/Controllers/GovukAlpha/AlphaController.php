@@ -8736,20 +8736,56 @@ class AlphaController extends Controller
         }
 
         $body = trim(self::asStr($request->input('body')));
-        if ($body === '') {
-            return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'message-empty']);
-        }
 
         if (!BrokerControlConfigService::isDirectMessagingEnabled()) {
             return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'message-disabled']);
         }
 
-        $message = MessageService::send($currentUserId, [
+        // File/image attachments (no-JS multipart). Store each before sending so a
+        // bad file is reported rather than silently dropped. Mirrors the React
+        // composer + the API MessagesController::send attachment handling.
+        $uploaded = $request->file('attachments');
+        $files = is_array($uploaded) ? $uploaded : ($uploaded ? [$uploaded] : []);
+        if (count($files) > \App\Core\MessageAttachmentUploader::MAX_FILES) {
+            return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'attachment-too-many']);
+        }
+        $attachments = [];
+        foreach ($files as $file) {
+            if (!$file || !$file->isValid()) {
+                return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'attachment-failed']);
+            }
+            try {
+                $attachments[] = \App\Core\MessageAttachmentUploader::upload([
+                    'name'     => $file->getClientOriginalName(),
+                    'type'     => $file->getMimeType(),
+                    'tmp_name' => $file->getRealPath(),
+                    'error'    => UPLOAD_ERR_OK,
+                    'size'     => $file->getSize(),
+                ]);
+            } catch (\InvalidArgumentException $e) {
+                return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'attachment-invalid']);
+            } catch (\Throwable $e) {
+                report($e);
+                return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'attachment-failed']);
+            }
+        }
+
+        // A message needs either text or at least one attachment.
+        if ($body === '' && empty($attachments)) {
+            return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'message-empty']);
+        }
+
+        $payload = [
             'recipient_id' => $userId,
             'body' => $body,
             'context_type' => $request->input('context_type') ?: null,
             'context_id' => $request->input('context_id') ?: null,
-        ]);
+        ];
+        if (!empty($attachments)) {
+            $payload['attachments'] = $attachments;
+        }
+
+        $message = MessageService::send($currentUserId, $payload);
 
         return redirect()->route('govuk-alpha.messages.show', [
             'tenantSlug' => $tenantSlug,

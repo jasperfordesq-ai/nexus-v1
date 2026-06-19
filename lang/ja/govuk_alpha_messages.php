@@ -5,6 +5,15 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Message file/image attachments (no-JS composer) — added 2026-06-19
+    'attachments' => [
+        'label' => 'ファイルを添付（任意）',
+        'hint' => '画像または書類を最大5件まで添付できます（各最大10MB）。',
+        'default_name' => '添付ファイル',
+        'error_too_many' => '添付できるファイルは最大5件です。',
+        'error_failed' => '添付ファイルをアップロードできませんでした。もう一度お試しください。',
+        'error_invalid' => 'その添付ファイルの種類は許可されていません。',
+    ],
     'groups' => [
         'title' => 'Group conversations',
         'caption' => 'Messages',

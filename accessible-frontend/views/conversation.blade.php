@@ -30,6 +30,9 @@
             'translate-failed' => 'govuk_alpha_messages.translate.failed',
             'translate-unavailable' => 'govuk_alpha_messages.translate.unavailable',
             'translate-empty' => 'govuk_alpha_messages.translate.empty',
+            'attachment-too-many' => 'govuk_alpha_messages.attachments.error_too_many',
+            'attachment-failed' => 'govuk_alpha_messages.attachments.error_failed',
+            'attachment-invalid' => 'govuk_alpha_messages.attachments.error_invalid',
         ];
     @endphp
 
@@ -135,6 +138,23 @@
                         <p class="govuk-body govuk-hint">{{ __('govuk_alpha.messages.deleted_placeholder') }}</p>
                     @else
                         <div class="govuk-body">{!! nl2br(e((string) ($message['body'] ?? ''))) !!}</div>
+                        @if (!empty($message['attachments']))
+                            <ul class="govuk-list govuk-!-margin-top-2 govuk-!-margin-bottom-0">
+                                @foreach ($message['attachments'] as $att)
+                                    @if (!empty($att['file_url']))
+                                        <li>
+                                            @if (str_starts_with((string) ($att['mime_type'] ?? ''), 'image/'))
+                                                <a class="govuk-link" href="{{ $att['file_url'] }}" target="_blank" rel="noopener">
+                                                    <img src="{{ $att['file_url'] }}" alt="{{ $att['file_name'] ?? __('govuk_alpha_messages.attachments.default_name') }}" width="220" loading="lazy" decoding="async">
+                                                </a>
+                                            @else
+                                                <a class="govuk-link" href="{{ $att['file_url'] }}" download>{{ $att['file_name'] ?? __('govuk_alpha_messages.attachments.default_name') }}</a>
+                                            @endif
+                                        </li>
+                                    @endif
+                                @endforeach
+                            </ul>
+                        @endif
                     @endif
 
                     {{-- Per-message translation (parity: React MessageBubble translate button).
@@ -223,7 +243,7 @@
     @if ($canSend)
         {{-- Reply and archive are two independent POST targets, so they must be sibling
              forms — never nested (nested <form> is invalid HTML and the browser drops it). --}}
-        <form method="post" action="{{ route('govuk-alpha.messages.store', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}" class="govuk-!-margin-top-7">
+        <form method="post" enctype="multipart/form-data" action="{{ route('govuk-alpha.messages.store', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}" class="govuk-!-margin-top-7">
             @csrf
             @if ($listing)
                 <input type="hidden" name="context_type" value="listing">
@@ -232,7 +252,14 @@
             <div class="govuk-form-group">
                 <label class="govuk-label govuk-label--m" for="body">{{ __('govuk_alpha.messages.message_label') }}</label>
                 <div id="body-hint" class="govuk-hint">{{ __('govuk_alpha.messages.message_hint') }}</div>
-                <textarea class="govuk-textarea" id="body" name="body" rows="5" aria-describedby="body-hint" required></textarea>
+                <textarea class="govuk-textarea" id="body" name="body" rows="5" aria-describedby="body-hint"></textarea>
+            </div>
+            {{-- File/image attachments (no-JS). A message may be attachments-only,
+                 so the textarea above is no longer `required`. --}}
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-label--s" for="attachments">{{ __('govuk_alpha_messages.attachments.label') }}</label>
+                <div id="attachments-hint" class="govuk-hint">{{ __('govuk_alpha_messages.attachments.hint') }}</div>
+                <input class="govuk-file-upload" id="attachments" name="attachments[]" type="file" multiple aria-describedby="attachments-hint" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.txt,.csv,.doc,.docx,.xls,.xlsx">
             </div>
             <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.reply') }}</button>
         </form>

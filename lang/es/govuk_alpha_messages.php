@@ -5,6 +5,15 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Message file/image attachments (no-JS composer) — added 2026-06-19
+    'attachments' => [
+        'label' => 'Adjuntar archivos (opcional)',
+        'hint' => 'Puedes adjuntar hasta 5 imágenes o documentos (máx. 10 MB cada uno).',
+        'default_name' => 'Archivo adjunto',
+        'error_too_many' => 'Puedes adjuntar hasta 5 archivos.',
+        'error_failed' => 'No se pudo subir tu archivo adjunto. Inténtalo de nuevo.',
+        'error_invalid' => 'Ese tipo de archivo adjunto no está permitido.',
+    ],
     'groups' => [
         'title' => 'Group conversations',
         'caption' => 'Messages',

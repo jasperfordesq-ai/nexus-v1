@@ -5,6 +5,15 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Message file/image attachments (no-JS composer) — added 2026-06-19
+    'attachments' => [
+        'label' => 'Bestanden bijvoegen (optioneel)',
+        'hint' => 'U kunt maximaal 5 afbeeldingen of documenten bijvoegen (max. 10 MB per stuk).',
+        'default_name' => 'Bijlage',
+        'error_too_many' => 'U kunt maximaal 5 bestanden bijvoegen.',
+        'error_failed' => 'Uw bijlage kon niet worden geüpload. Probeer het opnieuw.',
+        'error_invalid' => 'Dat type bijlage is niet toegestaan.',
+    ],
     'groups' => [
         'title' => 'Group conversations',
         'caption' => 'Messages',

@@ -5,6 +5,15 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Message file/image attachments (no-JS composer) — added 2026-06-19
+    'attachments' => [
+        'label' => 'Allega file (facoltativo)',
+        'hint' => 'Puoi allegare fino a 5 immagini o documenti (max 10 MB ciascuno).',
+        'default_name' => 'Allegato',
+        'error_too_many' => 'Puoi allegare fino a 5 file.',
+        'error_failed' => 'Impossibile caricare il tuo allegato. Riprova.',
+        'error_invalid' => 'Questo tipo di allegato non è consentito.',
+    ],
     'groups' => [
         'title' => 'Group conversations',
         'caption' => 'Messages',

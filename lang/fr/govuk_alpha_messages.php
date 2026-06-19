@@ -5,6 +5,15 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Message file/image attachments (no-JS composer) — added 2026-06-19
+    'attachments' => [
+        'label' => 'Joindre des fichiers (facultatif)',
+        'hint' => 'Vous pouvez joindre jusqu\'à 5 images ou documents (max. 10 Mo chacun).',
+        'default_name' => 'Pièce jointe',
+        'error_too_many' => 'Vous pouvez joindre jusqu\'à 5 fichiers.',
+        'error_failed' => 'Votre pièce jointe n\'a pas pu être téléversée. Veuillez réessayer.',
+        'error_invalid' => 'Ce type de pièce jointe n\'est pas autorisé.',
+    ],
     'groups' => [
         'title' => 'Group conversations',
         'caption' => 'Messages',

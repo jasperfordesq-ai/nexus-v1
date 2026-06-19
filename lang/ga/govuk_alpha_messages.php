@@ -5,6 +5,15 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Message file/image attachments (no-JS composer) — added 2026-06-19
+    'attachments' => [
+        'label' => 'Ceangail comhaid (roghnach)',
+        'hint' => 'Is féidir leat suas le 5 íomhá nó cáipéis a cheangal (uasmhéid 10 MB an ceann).',
+        'default_name' => 'Ceangaltán',
+        'error_too_many' => 'Is féidir leat suas le 5 chomhad a cheangal.',
+        'error_failed' => 'Níorbh fhéidir do cheangaltán a uaslódáil. Bain triail eile as le do thoil.',
+        'error_invalid' => 'Níl an cineál ceangaltáin sin ceadaithe.',
+    ],
     'groups' => [
         'title' => 'Group conversations',
         'caption' => 'Messages',

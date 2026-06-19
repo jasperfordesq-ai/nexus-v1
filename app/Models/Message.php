@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 
@@ -58,6 +59,15 @@ class Message extends Model
     public function listing(): BelongsTo
     {
         return $this->belongsTo(Listing::class);
+    }
+
+    /**
+     * File/image attachments on this message (separate from the audio_url voice
+     * field). A message may carry several. Tenant-scoped via the model.
+     */
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(MessageAttachment::class, 'message_id');
     }
 
     public function scopeUnread(Builder $query): Builder

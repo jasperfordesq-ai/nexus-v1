@@ -5,6 +5,15 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Message file/image attachments (no-JS composer) — added 2026-06-19
+    'attachments' => [
+        'label' => 'Dateien anhängen (optional)',
+        'hint' => 'Sie können bis zu 5 Bilder oder Dokumente anhängen (max. 10 MB pro Datei).',
+        'default_name' => 'Anhang',
+        'error_too_many' => 'Sie können bis zu 5 Dateien anhängen.',
+        'error_failed' => 'Ihr Anhang konnte nicht hochgeladen werden. Bitte versuchen Sie es erneut.',
+        'error_invalid' => 'Dieser Anhangstyp ist nicht zulässig.',
+    ],
     'groups' => [
         'title' => 'Group conversations',
         'caption' => 'Messages',
