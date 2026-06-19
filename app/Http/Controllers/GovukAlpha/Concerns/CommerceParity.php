@@ -3422,4 +3422,97 @@ trait CommerceParity
             'status' => $status,
         ];
     }
+
+    /**
+     * Marketplace advanced search — faceted filters (condition, price range,
+     * delivery method, seller type, posted-within, sort). All of these are
+     * already honoured by MarketplaceListingService::getAll; this page just
+     * exposes them in a no-JS GOV.UK form. Mirrors React's advanced search.
+     */
+    public function commerceMarketplaceAdvancedSearch(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $q = trim(self::asStr($request->query('q')));
+        $categoryId = (int) self::asStr($request->query('category_id'));
+        $priceMinRaw = self::asStr($request->query('price_min'));
+        $priceMaxRaw = self::asStr($request->query('price_max'));
+        $priceMin = $priceMinRaw !== '' ? max(0.0, (float) $priceMinRaw) : null;
+        $priceMax = $priceMaxRaw !== '' ? max(0.0, (float) $priceMaxRaw) : null;
+
+        // Condition: multi-select checkbox group, whitelisted.
+        $allowedConditions = ['new', 'like_new', 'good', 'fair', 'poor'];
+        $conditions = array_values(array_intersect(
+            (array) $request->query('condition', []),
+            $allowedConditions
+        ));
+
+        $sellerType = $this->allowed(self::asStr($request->query('seller_type')), ['private', 'business'], '');
+        $deliveryMethod = $this->allowed(self::asStr($request->query('delivery_method')), ['pickup', 'shipping', 'both', 'community_delivery'], '');
+        $postedWithinRaw = self::asStr($request->query('posted_within'));
+        $postedWithin = in_array($postedWithinRaw, ['1', '7', '30', '90'], true) ? (int) $postedWithinRaw : null;
+        $sort = $this->allowed(self::asStr($request->query('sort')), ['newest', 'price_asc', 'price_desc', 'popular'], 'newest');
+
+        $filters = ['limit' => 30, 'current_user_id' => $userId];
+        if ($q !== '') {
+            $filters['search'] = $q;
+        }
+        if ($categoryId > 0) {
+            $filters['category_id'] = $categoryId;
+        }
+        if ($priceMin !== null) {
+            $filters['price_min'] = $priceMin;
+        }
+        if ($priceMax !== null) {
+            $filters['price_max'] = $priceMax;
+        }
+        if (! empty($conditions)) {
+            $filters['condition'] = $conditions;
+        }
+        if ($sellerType !== '') {
+            $filters['seller_type'] = $sellerType;
+        }
+        if ($deliveryMethod !== '') {
+            $filters['delivery_method'] = $deliveryMethod;
+        }
+        if ($postedWithin !== null) {
+            $filters['posted_within'] = $postedWithin;
+        }
+        if ($sort !== 'newest') {
+            $filters['sort'] = $sort;
+        }
+
+        $items = [];
+        $categories = [];
+        try {
+            $items = \App\Services\MarketplaceListingService::getAll($filters)['items'] ?? [];
+            $items = array_map(static fn ($i) => is_array($i) ? $i : (array) $i, $items);
+            $rawCats = \App\Services\MarketplaceListingService::getCategories();
+            $categories = is_array($rawCats) ? array_map(static fn ($c) => is_array($c) ? $c : (array) $c, $rawCats) : [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::marketplace-advanced-search', [
+            'title' => __('govuk_alpha_commerce.marketplace_advanced.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'listings' => is_array($items) ? $items : [],
+            'marketplaceQuery' => $q,
+            'categories' => $categories,
+            'marketplaceCategoryId' => $categoryId > 0 ? $categoryId : null,
+            'priceMin' => $priceMin,
+            'priceMax' => $priceMax,
+            'selectedConditions' => $conditions,
+            'sellerType' => $sellerType,
+            'deliveryMethod' => $deliveryMethod,
+            'postedWithin' => $postedWithin,
+            'sort' => $sort,
+        ]);
+    }
 }

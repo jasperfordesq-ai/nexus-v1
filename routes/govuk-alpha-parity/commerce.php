@@ -41,6 +41,10 @@ Route::post('/marketplace/orders/{id}/confirm', [AlphaController::class, 'commer
 Route::post('/marketplace/orders/{id}/cancel', [AlphaController::class, 'commerceCancelOrder'])->whereNumber('id')->middleware('throttle:20,1')->name('marketplace.orders.cancel');
 Route::post('/marketplace/orders/{id}/rate', [AlphaController::class, 'commerceRateOrder'])->whereNumber('id')->middleware('throttle:10,1')->name('marketplace.orders.rate');
 
+// ===== Marketplace — advanced (faceted) search =====
+// Static path; safe ahead of the numeric /marketplace/{id} route (whereNumber).
+Route::get('/marketplace/search', [AlphaController::class, 'commerceMarketplaceAdvancedSearch'])->name('marketplace.search');
+
 // ===== Marketplace — seller public profile =====
 Route::get('/marketplace/seller/{sellerId}', [AlphaController::class, 'commerceSellerProfile'])->whereNumber('sellerId')->name('marketplace.seller');
 

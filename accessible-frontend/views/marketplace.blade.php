@@ -67,6 +67,7 @@
             </div>
         </fieldset>
         <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.polish_commerce.marketplace_filter_submit') }}</button>
+        <a class="govuk-link govuk-!-margin-left-3" href="{{ route('govuk-alpha.marketplace.search', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_commerce.marketplace_advanced.title') }}</a>
     </form>
 
     @if (!empty($categories))
