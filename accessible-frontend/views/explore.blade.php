@@ -43,6 +43,17 @@
             ];
         }
 
+        // AI assistant — gated on the ai_chat feature; uses its own lang namespace
+        // (govuk_alpha_aichat) rather than the govuk_alpha.<key> card convention.
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.chat.index')
+            && \App\Core\TenantContext::hasFeature('ai_chat')) {
+            $exploreLinks[] = [
+                'title' => __('govuk_alpha_aichat.title'),
+                'description' => __('govuk_alpha_aichat.description'),
+                'href' => route('govuk-alpha.chat.index', ['tenantSlug' => $tenantSlug]),
+            ];
+        }
+
         foreach ($candidates as [$routeName, $langKey, $feature]) {
             if (!\Illuminate\Support\Facades\Route::has($routeName)) {
                 continue;
