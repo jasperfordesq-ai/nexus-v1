@@ -5,6 +5,16 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Voice messages (no-JS audio upload) — added 2026-06-19
+    'voice' => [
+        'label' => 'Seol teachtaireacht ghutha',
+        'hint' => 'Uaslódáil gearrthóg fhuaime ghairid. Ar fhón is féidir leat ceann a thaifeadadh go díreach.',
+        'submit' => 'Seol teachtaireacht ghutha',
+        'no_audio_support' => 'Ní féidir le do bhrabhsálaí an ghearrthóg fhuaime seo a sheinm.',
+        'transcript_toggle' => 'Taispeáin tras-scríbhinn',
+        'error_required' => 'Roghnaigh comhad fuaime le seoladh mar theachtaireacht ghutha.',
+        'error_failed' => 'Níorbh fhéidir do theachtaireacht ghutha a sheoladh. Bain triail eile as le do thoil.',
+    ],
     // Message file/image attachments (no-JS composer) — added 2026-06-19
     'attachments' => [
         'label' => 'Ceangail comhaid (roghnach)',

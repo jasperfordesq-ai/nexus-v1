@@ -5,6 +5,16 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Voice messages (no-JS audio upload) — added 2026-06-19
+    'voice' => [
+        'label' => 'Enviar uma mensagem de voz',
+        'hint' => 'Carregue um pequeno clipe de áudio. No telemóvel pode gravar um diretamente.',
+        'submit' => 'Enviar mensagem de voz',
+        'no_audio_support' => 'O seu navegador não consegue reproduzir este clipe de áudio.',
+        'transcript_toggle' => 'Mostrar transcrição',
+        'error_required' => 'Escolha um ficheiro de áudio para enviar como mensagem de voz.',
+        'error_failed' => 'Não foi possível enviar a sua mensagem de voz. Tente novamente.',
+    ],
     // Message file/image attachments (no-JS composer) — added 2026-06-19
     'attachments' => [
         'label' => 'Anexar ficheiros (opcional)',

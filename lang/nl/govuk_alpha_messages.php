@@ -5,6 +5,16 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Voice messages (no-JS audio upload) — added 2026-06-19
+    'voice' => [
+        'label' => 'Een spraakbericht verzenden',
+        'hint' => 'Upload een kort audiofragment. Op een telefoon kunt u er direct een opnemen.',
+        'submit' => 'Spraakbericht verzenden',
+        'no_audio_support' => 'Uw browser kan dit audiofragment niet afspelen.',
+        'transcript_toggle' => 'Transcriptie tonen',
+        'error_required' => 'Kies een audiobestand om als spraakbericht te verzenden.',
+        'error_failed' => 'Uw spraakbericht kon niet worden verzonden. Probeer het opnieuw.',
+    ],
     // Message file/image attachments (no-JS composer) — added 2026-06-19
     'attachments' => [
         'label' => 'Bestanden bijvoegen (optioneel)',

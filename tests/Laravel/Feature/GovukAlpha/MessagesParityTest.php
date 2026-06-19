@@ -437,6 +437,34 @@ class MessagesParityTest extends TestCase
     //  Helpers (module-prefixed, replicating base-test helpers privately)
     // ----------------------------------------------------------------------
 
+    // =====================================================================
+    // Voice messages (no-JS audio upload) — wiring + gates. The actual upload
+    // path reuses the proven AudioUploader (no test-friendly fallback), so we
+    // assert routing/auth/empty-file handling rather than a real file move.
+    // =====================================================================
+
+    public function test_voice_message_requires_authentication(): void
+    {
+        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/123/voice", []);
+        $response->assertRedirect();
+        $this->assertStringContainsString("/{$this->testTenantSlug}/alpha/login", $response->headers->get('Location') ?? '');
+    }
+
+    public function test_voice_message_without_file_redirects_back_to_conversation(): void
+    {
+        $this->messagesAuthedUser();
+        $other = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true,
+        ]);
+
+        // No 'voice' file present → the handler must redirect back to the
+        // conversation (voice-required, or message-disabled if DMs are off),
+        // never 500.
+        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/{$other->id}/voice", []);
+        $response->assertRedirect();
+        $this->assertStringContainsString("/{$this->testTenantSlug}/alpha/messages/{$other->id}", $response->headers->get('Location') ?? '');
+    }
+
     private function messagesAuthedUser(array $overrides = []): User
     {
         $user = User::factory()->forTenant($this->testTenantId)->create(array_merge([

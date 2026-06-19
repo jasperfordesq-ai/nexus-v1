@@ -64,3 +64,11 @@ Route::post('/messages/{userId}/m/{messageId}/translate', [AlphaController::clas
     ->whereNumber('userId')
     ->whereNumber('messageId')
     ->name('messages.translate');
+
+// --- send a voice message in a 1-to-1 conversation (no-JS): upload a recorded
+//     audio clip (mobile `capture` opens the recorder). Mirrors the React
+//     MediaRecorder voice send via the same AudioUploader + voice send path. ---
+Route::post('/messages/{userId}/voice', [AlphaController::class, 'storeVoiceMessage'])
+    ->middleware('throttle:10,1')
+    ->whereNumber('userId')
+    ->name('messages.voice');

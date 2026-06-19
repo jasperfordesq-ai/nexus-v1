@@ -5,6 +5,16 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Voice messages (no-JS audio upload) — added 2026-06-19
+    'voice' => [
+        'label' => '音声メッセージを送信',
+        'hint' => '短い音声クリップをアップロードします。スマートフォンでは直接録音できます。',
+        'submit' => '音声メッセージを送信する',
+        'no_audio_support' => 'お使いのブラウザはこの音声クリップを再生できません。',
+        'transcript_toggle' => '文字起こしを表示',
+        'error_required' => '音声メッセージとして送信する音声ファイルを選択してください。',
+        'error_failed' => '音声メッセージを送信できませんでした。もう一度お試しください。',
+    ],
     // Message file/image attachments (no-JS composer) — added 2026-06-19
     'attachments' => [
         'label' => 'ファイルを添付（任意）',

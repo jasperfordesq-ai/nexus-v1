@@ -33,6 +33,8 @@
             'attachment-too-many' => 'govuk_alpha_messages.attachments.error_too_many',
             'attachment-failed' => 'govuk_alpha_messages.attachments.error_failed',
             'attachment-invalid' => 'govuk_alpha_messages.attachments.error_invalid',
+            'voice-required' => 'govuk_alpha_messages.voice.error_required',
+            'voice-failed' => 'govuk_alpha_messages.voice.error_failed',
         ];
     @endphp
 
@@ -138,6 +140,17 @@
                         <p class="govuk-body govuk-hint">{{ __('govuk_alpha.messages.deleted_placeholder') }}</p>
                     @else
                         <div class="govuk-body">{!! nl2br(e((string) ($message['body'] ?? ''))) !!}</div>
+                        @if (!empty($message['is_voice']) && !empty($message['audio_url']))
+                            <audio controls preload="none" src="{{ $message['audio_url'] }}" class="govuk-!-margin-top-1">
+                                {{ __('govuk_alpha_messages.voice.no_audio_support') }}
+                            </audio>
+                            @if (!empty($message['transcript']))
+                                <details class="govuk-details" data-module="govuk-details">
+                                    <summary class="govuk-details__summary"><span class="govuk-details__summary-text">{{ __('govuk_alpha_messages.voice.transcript_toggle') }}</span></summary>
+                                    <div class="govuk-details__text">{!! nl2br(e((string) $message['transcript'])) !!}</div>
+                                </details>
+                            @endif
+                        @endif
                         @if (!empty($message['attachments']))
                             <ul class="govuk-list govuk-!-margin-top-2 govuk-!-margin-bottom-0">
                                 @foreach ($message['attachments'] as $att)
@@ -263,7 +276,20 @@
             </div>
             <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.actions.reply') }}</button>
         </form>
-        <form method="post" action="{{ route('govuk-alpha.messages.archive', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}">
+
+        {{-- Voice message (no-JS): upload a recorded clip. On mobile the `capture`
+             attribute opens the recorder directly; on desktop it picks an audio file. --}}
+        <form method="post" enctype="multipart/form-data" action="{{ route('govuk-alpha.messages.voice', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}" class="govuk-!-margin-top-4">
+            @csrf
+            <div class="govuk-form-group govuk-!-margin-bottom-2">
+                <label class="govuk-label govuk-label--s" for="voice">{{ __('govuk_alpha_messages.voice.label') }}</label>
+                <div id="voice-hint" class="govuk-hint">{{ __('govuk_alpha_messages.voice.hint') }}</div>
+                <input class="govuk-file-upload" id="voice" name="voice" type="file" accept="audio/*" capture aria-describedby="voice-hint">
+            </div>
+            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_messages.voice.submit') }}</button>
+        </form>
+
+        <form method="post" action="{{ route('govuk-alpha.messages.archive', ['tenantSlug' => $tenantSlug, 'userId' => $conversation['id']]) }}" class="govuk-!-margin-top-4">
             @csrf
             <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.actions.archive_conversation') }}</button>
         </form>

@@ -8794,6 +8794,86 @@ class AlphaController extends Controller
         ]);
     }
 
+    /**
+     * Send a voice message in a 1-to-1 conversation (no-JS): the user uploads a
+     * recorded audio clip (on mobile, the file input's `capture` opens the
+     * recorder directly). Mirrors the React MediaRecorder flow via the same
+     * AudioUploader + voice send path. The clip is transcribed best-effort BEFORE
+     * upload so it is captioned for deaf/hard-of-hearing recipients.
+     */
+    public function storeVoiceMessage(Request $request, string $tenantSlug, int $userId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('messages'), 403);
+
+        $currentUserId = $this->currentUserId();
+        if ($currentUserId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        if (!BrokerControlConfigService::isDirectMessagingEnabled()) {
+            return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'message-disabled']);
+        }
+
+        $file = $request->file('voice');
+        if (!$file || !$file->isValid()) {
+            return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'voice-required']);
+        }
+
+        // Transcribe BEFORE the upload moves the temp file (best-effort; a failure
+        // or missing transcription provider never blocks the send).
+        $transcript = null;
+        try {
+            $tmpPath = $file->getRealPath();
+            if ($tmpPath && is_file($tmpPath)) {
+                $result = \App\Services\TranscriptionService::transcribe($tmpPath);
+                if (is_array($result) && !empty($result['text'])) {
+                    $transcript = (string) $result['text'];
+                }
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        try {
+            $audioResult = \App\Core\AudioUploader::upload([
+                'name'     => $file->getClientOriginalName(),
+                'type'     => $file->getMimeType(),
+                'tmp_name' => $file->getRealPath(),
+                'error'    => UPLOAD_ERR_OK,
+                'size'     => $file->getSize(),
+            ], 0);
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'voice-failed']);
+        }
+
+        $message = MessageService::send($currentUserId, [
+            'recipient_id'   => $userId,
+            'body'           => '',
+            'is_voice'       => true,
+            'audio_url'      => $audioResult['url'] ?? '',
+            'audio_duration' => (int) ($audioResult['duration'] ?? 0),
+        ]);
+
+        if (empty($message)) {
+            return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'voice-failed']);
+        }
+
+        if ($transcript !== null && !empty($message['id'])) {
+            try {
+                \Illuminate\Support\Facades\DB::table('messages')
+                    ->where('id', (int) $message['id'])
+                    ->where('tenant_id', TenantContext::getId())
+                    ->update(['transcript' => $transcript]);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        return redirect()->route('govuk-alpha.messages.show', ['tenantSlug' => $tenantSlug, 'userId' => $userId, 'status' => 'message-sent']);
+    }
+
     public function archiveConversation(string $tenantSlug, int $userId): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);

@@ -5,6 +5,16 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Voice messages (no-JS audio upload) — added 2026-06-19
+    'voice' => [
+        'label' => 'Sprachnachricht senden',
+        'hint' => 'Laden Sie einen kurzen Audioclip hoch. Auf dem Smartphone können Sie direkt einen aufnehmen.',
+        'submit' => 'Sprachnachricht senden',
+        'no_audio_support' => 'Ihr Browser kann diesen Audioclip nicht abspielen.',
+        'transcript_toggle' => 'Transkript anzeigen',
+        'error_required' => 'Wählen Sie eine Audiodatei aus, die als Sprachnachricht gesendet werden soll.',
+        'error_failed' => 'Ihre Sprachnachricht konnte nicht gesendet werden. Bitte versuchen Sie es erneut.',
+    ],
     // Message file/image attachments (no-JS composer) — added 2026-06-19
     'attachments' => [
         'label' => 'Dateien anhängen (optional)',

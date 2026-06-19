@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Voice messages on the accessible site.** You can send a voice message by uploading a short audio clip — on a phone, the file picker opens the recorder directly. Voice messages play with the browser's built-in audio player and, where a transcription is available, include a "Show transcript" panel so they're accessible to everyone.
 - **You can now attach files and images to messages.** Both the main site and the accessible site let you send up to 5 images or documents (max 10 MB each) with a message — and a message can be just an attachment with no text. Previously the main site's message box let you pick files but they were silently dropped on the way to the server; now they're stored and shown in the conversation. Attachments are type-checked (images, PDF, text, and common Office documents only).
 - **Group announcements can now be managed on the accessible site.** Group owners and admins can post, edit, delete and pin announcements directly from the accessible group page — previously you could only *see* pinned announcements there, not manage them. Pinned items are clearly flagged and shown first.
 - **Job hiring "bias audit" is now available on the accessible site.** Admins get the same hiring-fairness report as the main site — application funnel, rejection rates by stage, time in each stage, outcome breakdown and where applicants came from — rendered as clear tables (no charts needed), with date-range and per-job filters.

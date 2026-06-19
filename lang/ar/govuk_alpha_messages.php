@@ -5,6 +5,16 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    // Voice messages (no-JS audio upload) — added 2026-06-19
+    'voice' => [
+        'label' => 'إرسال رسالة صوتية',
+        'hint' => 'ارفع مقطعًا صوتيًا قصيرًا. على الهاتف يمكنك تسجيله مباشرة.',
+        'submit' => 'إرسال الرسالة الصوتية',
+        'no_audio_support' => 'متصفحك لا يستطيع تشغيل هذا المقطع الصوتي.',
+        'transcript_toggle' => 'إظهار النص',
+        'error_required' => 'اختر ملفًا صوتيًا لإرساله كرسالة صوتية.',
+        'error_failed' => 'تعذّر إرسال رسالتك الصوتية. يرجى المحاولة مرة أخرى.',
+    ],
     // Message file/image attachments (no-JS composer) — added 2026-06-19
     'attachments' => [
         'label' => 'إرفاق ملفات (اختياري)',
