@@ -160,4 +160,33 @@ class MarketplaceCardCheckoutParityTest extends TestCase
         MarketplacePaymentService::handleWebhookEvent('checkout.session.completed', $session);
         $this->assertTrue(true);
     }
+
+    public function test_webhook_throws_to_retry_when_paid_but_pi_not_linked(): void
+    {
+        // A genuine paid marketplace order whose PaymentIntent is not yet linked
+        // to the session (Stripe async lag) must THROW so the controller marks the
+        // event failed and Stripe retries — never silently drop a paid order.
+        $session = (object) [
+            'id' => 'cs_test_w',
+            'payment_status' => 'paid',
+            'payment_intent' => null,
+            'metadata' => (object) ['nexus_type' => 'marketplace', 'nexus_order_id' => '5'],
+        ];
+        $this->expectException(\RuntimeException::class);
+        MarketplacePaymentService::handleWebhookEvent('checkout.session.completed', $session);
+    }
+
+    public function test_webhook_routes_marketplace_by_order_id_without_nexus_type(): void
+    {
+        // nexus_type missing but nexus_order_id present → still treated as
+        // marketplace (defence-in-depth), and a missing order is a safe no-op.
+        $session = (object) [
+            'id' => 'cs_test_v',
+            'payment_status' => 'paid',
+            'payment_intent' => 'pi_test_v',
+            'metadata' => (object) ['nexus_order_id' => '88888888'],
+        ];
+        MarketplacePaymentService::handleWebhookEvent('checkout.session.completed', $session);
+        $this->assertTrue(true);
+    }
 }

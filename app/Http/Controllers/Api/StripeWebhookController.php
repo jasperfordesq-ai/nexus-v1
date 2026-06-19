@@ -231,8 +231,14 @@ class StripeWebhookController extends BaseApiController
     {
         // Marketplace card checkout (accessible no-JS flow) and subscription
         // checkout share the checkout.session.completed event. Route by the
-        // nexus_type we stamp into the session metadata at creation time.
-        if (($session->metadata->nexus_type ?? null) === 'marketplace') {
+        // nexus_type we stamp at creation; also treat a present nexus_order_id as
+        // a marketplace marker so a session that somehow lost nexus_type is still
+        // reconciled (the buyer has already paid) rather than misrouted to the
+        // subscription handler and dropped.
+        $meta = $session->metadata ?? null;
+        $isMarketplace = (($meta->nexus_type ?? null) === 'marketplace')
+            || !empty($meta->nexus_order_id ?? null);
+        if ($isMarketplace) {
             MarketplacePaymentService::handleWebhookEvent('checkout.session.completed', $session);
             return;
         }

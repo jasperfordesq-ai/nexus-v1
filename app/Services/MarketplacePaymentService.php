@@ -362,8 +362,11 @@ class MarketplacePaymentService
 
         try {
             // Idempotency: a network retry of this create() returns the same
-            // session rather than charging twice. Scoped to order + tenant.
-            $idempotencyKey = "market-checkout-{$tenantId}-{$order->id}";
+            // session rather than charging twice. Scoped to order + tenant + the
+            // exact amount/fee — orders snapshot their price at creation so this
+            // is normally constant, but binding the amount guarantees a stale
+            // cached session can never be reused for a different total.
+            $idempotencyKey = "market-checkout-{$tenantId}-{$order->id}-{$amountCents}-{$feeCents}";
             $session = $client->checkout->sessions->create([
                 'mode' => 'payment',
                 'line_items' => [[
@@ -765,7 +768,13 @@ class MarketplacePaymentService
      */
     private static function handleCheckoutSessionCompleted(object $session): void
     {
-        if (($session->metadata->nexus_type ?? null) !== 'marketplace') {
+        // A marketplace session always carries nexus_order_id (and normally
+        // nexus_type='marketplace'). Treat EITHER marker as marketplace so a
+        // session that somehow lost nexus_type is still reconciled rather than
+        // silently dropped after the buyer has paid.
+        $orderId = (int) ($session->metadata->nexus_order_id ?? $session->client_reference_id ?? 0);
+        $isMarketplace = (($session->metadata->nexus_type ?? null) === 'marketplace') || $orderId > 0;
+        if (!$isMarketplace) {
             return; // not a marketplace checkout
         }
         // Stripe only fires this once the buyer has actually paid.
@@ -773,14 +782,25 @@ class MarketplacePaymentService
             return;
         }
 
-        $orderId = (int) ($session->metadata->nexus_order_id ?? $session->client_reference_id ?? 0);
         $piId = $session->payment_intent ?? null;
         $piId = is_string($piId) ? $piId : ($piId->id ?? null);
-        if ($orderId <= 0 || !$piId) {
-            Log::warning('MarketplacePayment webhook: checkout.session.completed missing order/PI', [
+
+        // A genuine marketplace order whose PaymentIntent is not yet linked to the
+        // session (Stripe async lag) must NOT be silently dropped — throw so the
+        // controller marks the event failed and Stripe retries it. A missing
+        // order id is a malformed/foreign event: log and drop (no retry storm).
+        if ($orderId <= 0) {
+            Log::warning('MarketplacePayment webhook: checkout.session.completed has no order id', [
                 'session_id' => $session->id ?? null,
             ]);
             return;
+        }
+        if (!$piId) {
+            Log::warning('MarketplacePayment webhook: PaymentIntent not yet linked to session; will retry', [
+                'order_id' => $orderId,
+                'session_id' => $session->id ?? null,
+            ]);
+            throw new \RuntimeException('PaymentIntent not yet linked to checkout session');
         }
 
         // Trust ONLY our own DB for the order + its tenant. Stripe signature
@@ -806,11 +826,19 @@ class MarketplacePaymentService
             TenantContext::setById($tenantId);
 
             // Associate the PaymentIntent so confirmPayment() can find the order.
-            $order = MarketplaceOrder::where('id', $orderId)->where('tenant_id', $tenantId)->first();
-            if ($order && empty($order->payment_intent_id)) {
-                $order->payment_intent_id = $piId;
-                $order->save();
-            }
+            // Row-locked so a concurrent payment_intent.succeeded webhook for the
+            // same purchase can't race the association (confirmPayment is itself
+            // idempotent, but this keeps the write single-writer).
+            DB::transaction(function () use ($orderId, $tenantId, $piId) {
+                $order = MarketplaceOrder::where('id', $orderId)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first();
+                if ($order && empty($order->payment_intent_id)) {
+                    $order->payment_intent_id = $piId;
+                    $order->save();
+                }
+            });
 
             self::confirmPayment($piId);
         } catch (\Exception $e) {
