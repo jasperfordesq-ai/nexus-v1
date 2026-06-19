@@ -165,6 +165,8 @@ class PollService
 
         $data['total_votes'] = $totalVotes;
         $data['results_visible'] = $canSeeCounts;
+        // Expose ownership so frontends can show owner-only controls (e.g. delete).
+        $data['is_creator'] = $isCreator;
 
         $data['has_voted'] = $currentUserId
             ? DB::table('poll_votes')

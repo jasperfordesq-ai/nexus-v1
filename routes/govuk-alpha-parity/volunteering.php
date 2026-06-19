@@ -90,3 +90,16 @@ Route::get('/volunteering/expenses', [AlphaController::class, 'volunteeringExpen
     ->name('volunteering.expenses');
 Route::post('/volunteering/expenses', [AlphaController::class, 'volunteeringSubmitExpense'])
     ->middleware('throttle:10,1')->name('volunteering.expenses.submit');
+
+// ----- Safeguarding (training records + incident reports) -----
+// Static "training" and "incidents" segments are declared before any wildcard so
+// they can never collide with a future numeric route.
+Route::get('/volunteering/training', [AlphaController::class, 'volunteeringSafeguarding'])
+    ->name('volunteering.training');
+Route::post('/volunteering/training', [AlphaController::class, 'volunteeringSafeguardingLogTraining'])
+    ->middleware('throttle:10,1')->name('volunteering.training.store');
+
+Route::get('/volunteering/incidents', [AlphaController::class, 'volunteeringSafeguarding'])
+    ->name('volunteering.incidents');
+Route::post('/volunteering/incidents', [AlphaController::class, 'volunteeringSafeguardingReportIncident'])
+    ->middleware('throttle:10,1')->name('volunteering.incidents.store');

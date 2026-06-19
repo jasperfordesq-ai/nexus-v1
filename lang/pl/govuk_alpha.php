@@ -1375,6 +1375,7 @@ return [
         'description' => 'Wyraź swoją opinię w kwestiach poddanych pod głosowanie społeczności.',
         'empty' => 'W tej chwili nie ma żadnych ankiet.',
         'open_tag' => 'Otwarta',
+        'delete_button' => 'Usuń ankietę',
         'closed_tag' => 'Zamknięta',
         'by_label' => 'autor: :name',
         'votes_count' => ':count głosów łącznie',
@@ -1399,6 +1400,8 @@ return [
         'states' => [
             'voted' => 'Dziękujemy — Twój głos został zarejestrowany.',
             'vote-failed' => 'Nie udało się zarejestrować Twojego głosu. Być może już głosowałeś(-aś) lub ankieta została zamknięta.',
+            'deleted' => 'Ankieta usunięta.',
+            'delete-failed' => 'Nie można usunąć ankiety. Możesz usuwać tylko ankiety, które utworzyłeś.',
         ],
     ],
     'achievements' => [

@@ -96,6 +96,33 @@ return [
         'view_link' => 'View subgroup',
     ],
 
+    // ---- Files (list, upload, download, delete) ------------------------
+    'files' => [
+        'title'             => 'Groepsbestanden',
+        'caption'           => 'Bestanden voor :group',
+        'intro'             => 'Bestanden gedeeld met alle leden van deze groep.',
+        'empty'             => 'Er zijn nog geen bestanden gedeeld in deze groep.',
+        'upload_heading'    => 'Bestand uploaden',
+        'file_label'        => 'Kies een bestand',
+        'file_hint'         => 'Geaccepteerde formaten: afbeeldingen, PDF, Word, Excel, PowerPoint, tekst, CSV, ZIP, video en audio. Maximale grootte: 25 MB.',
+        'folder_label'      => 'Map (optioneel)',
+        'folder_hint'       => 'Groepeer bestanden in een benoemde map, bijvoorbeeld: Notulen.',
+        'description_label' => 'Beschrijving (optioneel)',
+        'description_hint'  => 'Een korte notitie over dit bestand.',
+        'submit_upload'     => 'Bestand uploaden',
+        'col_name'          => 'Bestandsnaam',
+        'col_size'          => 'Grootte',
+        'col_uploaded_by'   => 'Geüpload door',
+        'col_date'          => 'Datum',
+        'col_actions'       => 'Acties',
+        'download_link'     => 'Downloaden',
+        'download_aria'     => ':name downloaden',
+        'delete_button'     => 'Verwijderen',
+        'delete_aria'       => ':name verwijderen',
+        'manage_link'       => 'Bestanden bekijken',
+        'nav_files'         => 'Bestanden',
+    ],
+
     // ---- Status banners (flash messages) -------------------------------
     'states' => [
         'invite-link-created' => 'A new invite link was generated.',
@@ -126,6 +153,15 @@ return [
         'ann-not-found'         => 'Die aankondiging kon niet worden gevonden.',
         'ann-title-required'    => 'Voer een titel in voor de aankondiging.',
         'ann-content-required'  => 'Voer inhoud in voor de aankondiging.',
+        'file-uploaded'         => 'Het bestand is geüpload.',
+        'file-upload-failed'    => 'Het bestand kon niet worden geüpload. Probeer het opnieuw.',
+        'file-too-large'        => 'Het bestand overschrijdt de limiet van 25 MB. Kies een kleiner bestand.',
+        'file-type-invalid'     => 'Dit bestandstype is niet toegestaan. Controleer de geaccepteerde formaten.',
+        'file-missing'          => 'Kies een bestand om te uploaden.',
+        'file-deleted'          => 'Het bestand is verwijderd.',
+        'file-delete-failed'    => 'Het bestand kon niet worden verwijderd. Probeer het opnieuw.',
+        'file-forbidden'        => 'Je hebt geen toestemming voor deze actie.',
+        'file-not-found'        => 'Dit bestand kon niet worden gevonden.',
     ],
 
     // ---- Announcements (list, create, edit, delete, pin) ---------------

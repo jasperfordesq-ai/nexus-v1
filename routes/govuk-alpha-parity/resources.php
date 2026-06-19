@@ -44,3 +44,23 @@ Route::post('/resources/{id}/delete', [AlphaController::class, 'resourcesDelete'
     ->whereNumber('id')
     ->middleware('throttle:30,1')
     ->name('resources.delete');
+
+// Social interactions — react + comment thread.
+// NOTE: /comments/add avoids clobbering a potential base GET thread route
+// (same pattern as blogreviews.blog.comments.store).
+Route::post('/resources/{id}/react', [AlphaController::class, 'resourcesReact'])
+    ->whereNumber('id')
+    ->middleware('throttle:30,1')
+    ->name('resources.react');
+Route::get('/resources/{id}/comments', [AlphaController::class, 'resourcesComments'])
+    ->whereNumber('id')
+    ->name('resources.comments');
+Route::post('/resources/{id}/comments/add', [AlphaController::class, 'resourcesStoreComment'])
+    ->whereNumber('id')
+    ->middleware('throttle:30,1')
+    ->name('resources.comments.store');
+Route::post('/resources/{id}/comments/{commentId}/delete', [AlphaController::class, 'resourcesDeleteComment'])
+    ->whereNumber('id')
+    ->whereNumber('commentId')
+    ->middleware('throttle:30,1')
+    ->name('resources.comments.delete');

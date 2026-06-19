@@ -96,6 +96,33 @@ return [
         'view_link' => 'View subgroup',
     ],
 
+    // ---- Files (list, upload, download, delete) ------------------------
+    'files' => [
+        'title'             => 'Archivos del grupo',
+        'caption'           => 'Archivos de :group',
+        'intro'             => 'Archivos compartidos con todos los miembros de este grupo.',
+        'empty'             => 'Aún no se han compartido archivos en este grupo.',
+        'upload_heading'    => 'Subir un archivo',
+        'file_label'        => 'Elegir archivo',
+        'file_hint'         => 'Formatos aceptados: imágenes, PDF, Word, Excel, PowerPoint, texto, CSV, ZIP, vídeo y audio. Tamaño máximo: 25 MB.',
+        'folder_label'      => 'Carpeta (opcional)',
+        'folder_hint'       => 'Agrupa los archivos en una carpeta con nombre, por ejemplo: Actas.',
+        'description_label' => 'Descripción (opcional)',
+        'description_hint'  => 'Una nota breve sobre este archivo.',
+        'submit_upload'     => 'Subir archivo',
+        'col_name'          => 'Nombre del archivo',
+        'col_size'          => 'Tamaño',
+        'col_uploaded_by'   => 'Subido por',
+        'col_date'          => 'Fecha',
+        'col_actions'       => 'Acciones',
+        'download_link'     => 'Descargar',
+        'download_aria'     => 'Descargar :name',
+        'delete_button'     => 'Eliminar',
+        'delete_aria'       => 'Eliminar :name',
+        'manage_link'       => 'Ver archivos',
+        'nav_files'         => 'Archivos',
+    ],
+
     // ---- Status banners (flash messages) -------------------------------
     'states' => [
         'invite-link-created' => 'A new invite link was generated.',
@@ -126,6 +153,15 @@ return [
         'ann-not-found'         => 'No se encontró ese anuncio.',
         'ann-title-required'    => 'Introduce un título para el anuncio.',
         'ann-content-required'  => 'Introduce el contenido del anuncio.',
+        'file-uploaded'         => 'El archivo ha sido subido.',
+        'file-upload-failed'    => 'No se pudo subir el archivo. Por favor, inténtalo de nuevo.',
+        'file-too-large'        => 'El archivo supera el límite de 25 MB. Elige un archivo más pequeño.',
+        'file-type-invalid'     => 'Este tipo de archivo no está permitido. Comprueba los formatos aceptados.',
+        'file-missing'          => 'Elige un archivo para subir.',
+        'file-deleted'          => 'El archivo ha sido eliminado.',
+        'file-delete-failed'    => 'No se pudo eliminar el archivo. Por favor, inténtalo de nuevo.',
+        'file-forbidden'        => 'No tienes permiso para realizar esta acción.',
+        'file-not-found'        => 'No se encontró ese archivo.',
     ],
 
     // ---- Announcements (list, create, edit, delete, pin) ---------------

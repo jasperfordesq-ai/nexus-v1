@@ -40,6 +40,16 @@ Route::get('/groups/{id}/image', [AlphaController::class, 'groupsImage'])
 Route::post('/groups/{id}/image', [AlphaController::class, 'groupsUpdateImage'])
     ->whereNumber('id')->middleware('throttle:15,1')->name('groups.image.update');
 
+// --- Files (list + upload visible to members; delete by uploader or admin) ---
+Route::get('/groups/{id}/files', [AlphaController::class, 'groupsFiles'])
+    ->whereNumber('id')->name('groups.files.index');
+Route::post('/groups/{id}/files', [AlphaController::class, 'groupsUploadFile'])
+    ->whereNumber('id')->middleware('throttle:20,1')->name('groups.files.upload');
+Route::get('/groups/{id}/files/{fileId}/download', [AlphaController::class, 'groupsDownloadFile'])
+    ->whereNumber('id')->whereNumber('fileId')->name('groups.files.download');
+Route::post('/groups/{id}/files/{fileId}/delete', [AlphaController::class, 'groupsDeleteFile'])
+    ->whereNumber('id')->whereNumber('fileId')->middleware('throttle:20,1')->name('groups.files.delete');
+
 // --- Announcements (list visible to members; create/edit/delete/pin admin-only) ---
 Route::get('/groups/{id}/announcements', [AlphaController::class, 'groupsAnnouncements'])
     ->whereNumber('id')->name('groups.announcements');

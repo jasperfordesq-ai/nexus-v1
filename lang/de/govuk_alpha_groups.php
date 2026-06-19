@@ -96,6 +96,33 @@ return [
         'view_link' => 'View subgroup',
     ],
 
+    // ---- Files (list, upload, download, delete) ------------------------
+    'files' => [
+        'title'             => 'Gruppendateien',
+        'caption'           => 'Dateien für :group',
+        'intro'             => 'Dateien, die mit allen Mitgliedern dieser Gruppe geteilt werden.',
+        'empty'             => 'In dieser Gruppe wurden noch keine Dateien geteilt.',
+        'upload_heading'    => 'Datei hochladen',
+        'file_label'        => 'Datei auswählen',
+        'file_hint'         => 'Akzeptierte Formate: Bilder, PDF, Word, Excel, PowerPoint, Text, CSV, ZIP, Video und Audio. Maximale Größe: 25 MB.',
+        'folder_label'      => 'Ordner (optional)',
+        'folder_hint'       => 'Dateien in einem benannten Ordner gruppieren, z. B.: Protokolle.',
+        'description_label' => 'Beschreibung (optional)',
+        'description_hint'  => 'Eine kurze Notiz zu dieser Datei.',
+        'submit_upload'     => 'Datei hochladen',
+        'col_name'          => 'Dateiname',
+        'col_size'          => 'Größe',
+        'col_uploaded_by'   => 'Hochgeladen von',
+        'col_date'          => 'Datum',
+        'col_actions'       => 'Aktionen',
+        'download_link'     => 'Herunterladen',
+        'download_aria'     => ':name herunterladen',
+        'delete_button'     => 'Löschen',
+        'delete_aria'       => ':name löschen',
+        'manage_link'       => 'Dateien anzeigen',
+        'nav_files'         => 'Dateien',
+    ],
+
     // ---- Status banners (flash messages) -------------------------------
     'states' => [
         'invite-link-created' => 'A new invite link was generated.',
@@ -126,6 +153,15 @@ return [
         'ann-not-found'         => 'Diese Ankündigung konnte nicht gefunden werden.',
         'ann-title-required'    => 'Gib einen Titel für die Ankündigung ein.',
         'ann-content-required'  => 'Gib Inhalt für die Ankündigung ein.',
+        'file-uploaded'         => 'Die Datei wurde hochgeladen.',
+        'file-upload-failed'    => 'Die Datei konnte nicht hochgeladen werden. Bitte versuche es erneut.',
+        'file-too-large'        => 'Die Datei überschreitet das Limit von 25 MB. Wähle eine kleinere Datei.',
+        'file-type-invalid'     => 'Dieser Dateityp ist nicht erlaubt. Überprüfe die akzeptierten Formate.',
+        'file-missing'          => 'Wähle eine Datei zum Hochladen aus.',
+        'file-deleted'          => 'Die Datei wurde gelöscht.',
+        'file-delete-failed'    => 'Die Datei konnte nicht gelöscht werden. Bitte versuche es erneut.',
+        'file-forbidden'        => 'Du hast keine Berechtigung für diese Aktion.',
+        'file-not-found'        => 'Diese Datei konnte nicht gefunden werden.',
     ],
 
     // ---- Announcements (list, create, edit, delete, pin) ---------------

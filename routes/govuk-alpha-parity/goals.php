@@ -63,6 +63,12 @@ Route::post('/goals/{id}/buddy-actions', [AlphaController::class, 'goalsStoreBud
     ->middleware('throttle:20,1')
     ->name('goals.buddy-actions.send');
 
+// Full progress-history timeline (owner / buddy / public viewer).
+// Must appear BEFORE the social route to avoid any ordering ambiguity.
+Route::get('/goals/{id}/history', [AlphaController::class, 'goalsHistory'])
+    ->whereNumber('id')
+    ->name('goals.history');
+
 // Social (owner / buddy / public viewer): heart-like + threaded comments,
 // mirroring the React GoalDetailPage <SocialInteractionPanel targetType="goal">.
 Route::get('/goals/{id}/social', [AlphaController::class, 'goalsSocial'])

@@ -1375,6 +1375,7 @@ return [
         'description' => 'Dê a sua opinião sobre questões colocadas à comunidade.',
         'empty' => 'Não há votações de momento.',
         'open_tag' => 'Aberto',
+        'delete_button' => 'Eliminar sondagem',
         'closed_tag' => 'Encerrado',
         'by_label' => 'por :name',
         'votes_count' => ':count votos no total',
@@ -1399,6 +1400,8 @@ return [
         'states' => [
             'voted' => 'Obrigado — o seu voto foi registado.',
             'vote-failed' => 'Não foi possível registar o seu voto. Pode já ter votado ou a votação encerrou.',
+            'deleted' => 'Sondagem eliminada.',
+            'delete-failed' => 'Não foi possível eliminar a sondagem. Só pode eliminar sondagens que criou.',
         ],
     ],
     'achievements' => [

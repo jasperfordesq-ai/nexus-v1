@@ -96,6 +96,33 @@ return [
         'view_link' => 'View subgroup',
     ],
 
+    // ---- Files (list, upload, download, delete) ------------------------
+    'files' => [
+        'title'             => 'グループファイル',
+        'caption'           => ':group のファイル',
+        'intro'             => 'このグループのすべてのメンバーと共有されているファイルです。',
+        'empty'             => 'このグループにはまだファイルが共有されていません。',
+        'upload_heading'    => 'ファイルをアップロード',
+        'file_label'        => 'ファイルを選択',
+        'file_hint'         => '対応形式：画像、PDF、Word、Excel、PowerPoint、テキスト、CSV、ZIP、動画、音声。最大サイズ：25 MB。',
+        'folder_label'      => 'フォルダー（任意）',
+        'folder_hint'       => '名前付きフォルダーにファイルをまとめます（例：議事録）。',
+        'description_label' => '説明（任意）',
+        'description_hint'  => 'このファイルに関する短いメモ。',
+        'submit_upload'     => 'ファイルをアップロード',
+        'col_name'          => 'ファイル名',
+        'col_size'          => 'サイズ',
+        'col_uploaded_by'   => 'アップロード者',
+        'col_date'          => '日付',
+        'col_actions'       => '操作',
+        'download_link'     => 'ダウンロード',
+        'download_aria'     => ':name をダウンロード',
+        'delete_button'     => '削除',
+        'delete_aria'       => ':name を削除',
+        'manage_link'       => 'ファイルを表示',
+        'nav_files'         => 'ファイル',
+    ],
+
     // ---- Status banners (flash messages) -------------------------------
     'states' => [
         'invite-link-created' => 'A new invite link was generated.',
@@ -126,6 +153,15 @@ return [
         'ann-not-found'         => 'そのお知らせは見つかりませんでした。',
         'ann-title-required'    => 'お知らせのタイトルを入力してください。',
         'ann-content-required'  => 'お知らせの内容を入力してください。',
+        'file-uploaded'         => 'ファイルがアップロードされました。',
+        'file-upload-failed'    => 'ファイルをアップロードできませんでした。もう一度お試しください。',
+        'file-too-large'        => 'ファイルが25MBの上限を超えています。小さいファイルを選択してください。',
+        'file-type-invalid'     => 'このファイル形式は許可されていません。対応形式を確認してください。',
+        'file-missing'          => 'アップロードするファイルを選択してください。',
+        'file-deleted'          => 'ファイルが削除されました。',
+        'file-delete-failed'    => 'ファイルを削除できませんでした。もう一度お試しください。',
+        'file-forbidden'        => 'この操作を行う権限がありません。',
+        'file-not-found'        => 'そのファイルは見つかりませんでした。',
     ],
 
     // ---- Announcements (list, create, edit, delete, pin) ---------------

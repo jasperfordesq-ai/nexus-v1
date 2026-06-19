@@ -129,6 +129,33 @@ return [
         'back_to_announcements'=> 'Back to announcements',
     ],
 
+    // ---- Files (list, upload, download, delete) ------------------------
+    'files' => [
+        'title'             => 'Group files',
+        'caption'           => 'Files for :group',
+        'intro'             => 'Files shared with all members of this group.',
+        'empty'             => 'No files have been shared in this group yet.',
+        'upload_heading'    => 'Upload a file',
+        'file_label'        => 'Choose a file',
+        'file_hint'         => 'Accepted formats: images, PDF, Word, Excel, PowerPoint, text, CSV, ZIP, video and audio. Maximum size: 25 MB.',
+        'folder_label'      => 'Folder (optional)',
+        'folder_hint'       => 'Group files into a named folder, for example: Minutes.',
+        'description_label' => 'Description (optional)',
+        'description_hint'  => 'A short note about this file.',
+        'submit_upload'     => 'Upload file',
+        'col_name'          => 'File name',
+        'col_size'          => 'Size',
+        'col_uploaded_by'   => 'Uploaded by',
+        'col_date'          => 'Date',
+        'col_actions'       => 'Actions',
+        'download_link'     => 'Download',
+        'download_aria'     => 'Download :name',
+        'delete_button'     => 'Delete',
+        'delete_aria'       => 'Delete :name',
+        'manage_link'       => 'View files',
+        'nav_files'         => 'Files',
+    ],
+
     // ---- Status banners (flash messages) -------------------------------
     'states' => [
         'invite-link-created' => 'A new invite link was generated.',
@@ -159,5 +186,14 @@ return [
         'ann-not-found'         => 'That announcement could not be found.',
         'ann-title-required'    => 'Enter a title for the announcement.',
         'ann-content-required'  => 'Enter content for the announcement.',
+        'file-uploaded'         => 'The file has been uploaded.',
+        'file-upload-failed'    => 'The file could not be uploaded. Please try again.',
+        'file-too-large'        => 'The file exceeds the 25 MB limit. Choose a smaller file.',
+        'file-type-invalid'     => 'That file type is not allowed. Check the accepted formats and try again.',
+        'file-missing'          => 'Choose a file to upload.',
+        'file-deleted'          => 'The file has been deleted.',
+        'file-delete-failed'    => 'The file could not be deleted. Please try again.',
+        'file-forbidden'        => 'You do not have permission to perform this action.',
+        'file-not-found'        => 'That file could not be found.',
     ],
 ];

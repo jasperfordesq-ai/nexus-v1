@@ -1375,6 +1375,7 @@ return [
         'description' => 'Donnez votre avis sur les questions soumises à la communauté.',
         'empty' => 'Il n\'y a aucun sondage pour le moment.',
         'open_tag' => 'Ouvert',
+        'delete_button' => 'Supprimer le sondage',
         'closed_tag' => 'Clôturé',
         'by_label' => 'par :name',
         'votes_count' => ':count votes au total',
@@ -1399,6 +1400,8 @@ return [
         'states' => [
             'voted' => 'Merci — votre vote a été enregistré.',
             'vote-failed' => 'Nous n\'avons pas pu enregistrer votre vote. Vous avez peut-être déjà voté, ou le sondage est clôturé.',
+            'deleted' => 'Sondage supprimé.',
+            'delete-failed' => 'Le sondage n\'a pas pu être supprimé. Vous ne pouvez supprimer que les sondages que vous avez créés.',
         ],
     ],
     'achievements' => [

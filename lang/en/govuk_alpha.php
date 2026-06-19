@@ -1383,6 +1383,7 @@ return [
         'description' => 'Have your say on questions put to the community.',
         'empty' => 'There are no polls at the moment.',
         'open_tag' => 'Open',
+        'delete_button' => 'Delete poll',
         'closed_tag' => 'Closed',
         'by_label' => 'by :name',
         'votes_count' => ':count total votes',
@@ -1407,6 +1408,8 @@ return [
         'states' => [
             'voted' => 'Thank you — your vote has been recorded.',
             'vote-failed' => 'We could not record your vote. You may have already voted, or the poll has closed.',
+            'deleted' => 'Poll deleted.',
+            'delete-failed' => 'The poll could not be deleted. You can only delete polls you created.',
         ],
     ],
     'achievements' => [

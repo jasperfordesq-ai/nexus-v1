@@ -170,5 +170,22 @@ return [
     'nav' => [
         'insights' => 'View goal insights',
         'social' => 'Likes and comments',
+        'history' => 'Féach ar stair iomlán',
+    ],
+
+    'history' => [
+        'title'       => 'Stair dul chun cinn',
+        'caption'     => 'Sprioc',
+        'intro'       => 'Taifead cróineolaíoch de gach imeacht don sprioc seo — seiceálacha isteach, garspriocanna, gníomhaíocht comrádaí agus níos mó.',
+        'empty'       => 'Níl aon imeacht taifeadta don sprioc seo go fóill.',
+        'list_aria'   => 'Stair dul chun cinn sprice',
+        'load_more'   => 'Luchtaigh imeachtaí níos sine',
+        'type_created'         => 'Cruthaithe',
+        'type_progress_update' => 'Nuashonrú dul chun cinn',
+        'type_checkin'         => 'Seiceáil isteach',
+        'type_milestone'       => 'Garsprioc',
+        'type_buddy_joined'    => 'Comrádaí ag dul isteach',
+        'type_buddy_action'    => 'Gníomh comrádaí',
+        'type_completed'       => 'Críochnaithe',
     ],
 ];

@@ -1375,6 +1375,7 @@ return [
         'description' => 'Geef uw mening over vragen die aan de gemeenschap worden gesteld.',
         'empty' => 'Er zijn momenteel geen peilingen.',
         'open_tag' => 'Open',
+        'delete_button' => 'Peiling verwijderen',
         'closed_tag' => 'Gesloten',
         'by_label' => 'door :name',
         'votes_count' => ':count stemmen in totaal',
@@ -1399,6 +1400,8 @@ return [
         'states' => [
             'voted' => 'Bedankt — uw stem is geregistreerd.',
             'vote-failed' => 'Uw stem kon niet worden geregistreerd. Mogelijk heeft u al gestemd, of de peiling is gesloten.',
+            'deleted' => 'Peiling verwijderd.',
+            'delete-failed' => 'De peiling kon niet worden verwijderd. U kunt alleen peilingen verwijderen die u hebt gemaakt.',
         ],
     ],
     'achievements' => [

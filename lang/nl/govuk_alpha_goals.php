@@ -170,5 +170,22 @@ return [
     'nav' => [
         'insights' => 'View goal insights',
         'social' => 'Likes and comments',
+        'history' => 'Volledige geschiedenis bekijken',
+    ],
+
+    'history' => [
+        'title'       => 'Voortgangsgeschiedenis',
+        'caption'     => 'Doel',
+        'intro'       => 'Een chronologisch overzicht van alle gebeurtenissen voor dit doel — check-ins, mijlpalen, buddy-activiteit en meer.',
+        'empty'       => 'Er zijn nog geen gebeurtenissen geregistreerd voor dit doel.',
+        'list_aria'   => 'Voortgangsgeschiedenis van het doel',
+        'load_more'   => 'Oudere gebeurtenissen laden',
+        'type_created'         => 'Aangemaakt',
+        'type_progress_update' => 'Voortgangsupdate',
+        'type_checkin'         => 'Check-in',
+        'type_milestone'       => 'Mijlpaal',
+        'type_buddy_joined'    => 'Buddy toegetreden',
+        'type_buddy_action'    => 'Buddy-actie',
+        'type_completed'       => 'Voltooid',
     ],
 ];

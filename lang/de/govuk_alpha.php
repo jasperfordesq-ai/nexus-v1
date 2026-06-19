@@ -1375,6 +1375,7 @@ return [
         'description' => 'Äußern Sie Ihre Meinung zu Fragen, die der Gemeinschaft gestellt werden.',
         'empty' => 'Derzeit sind keine Abstimmungen vorhanden.',
         'open_tag' => 'Offen',
+        'delete_button' => 'Umfrage löschen',
         'closed_tag' => 'Geschlossen',
         'by_label' => 'von :name',
         'votes_count' => ':count Stimmen insgesamt',
@@ -1399,6 +1400,8 @@ return [
         'states' => [
             'voted' => 'Vielen Dank — Ihre Stimme wurde erfasst.',
             'vote-failed' => 'Ihre Stimme konnte nicht erfasst werden. Möglicherweise haben Sie bereits abgestimmt, oder die Abstimmung wurde geschlossen.',
+            'deleted' => 'Umfrage gelöscht.',
+            'delete-failed' => 'Die Umfrage konnte nicht gelöscht werden. Sie können nur von Ihnen erstellte Umfragen löschen.',
         ],
     ],
     'achievements' => [

@@ -170,5 +170,22 @@ return [
     'nav' => [
         'insights' => 'View goal insights',
         'social' => 'Likes and comments',
+        'history' => 'Ver histórico completo',
+    ],
+
+    'history' => [
+        'title'       => 'Histórico de progresso',
+        'caption'     => 'Objetivo',
+        'intro'       => 'Um registo cronológico de cada evento deste objetivo — registos, marcos, atividade do parceiro e muito mais.',
+        'empty'       => 'Ainda não foram registados eventos para este objetivo.',
+        'list_aria'   => 'Histórico de progresso do objetivo',
+        'load_more'   => 'Carregar eventos mais antigos',
+        'type_created'         => 'Criado',
+        'type_progress_update' => 'Atualização de progresso',
+        'type_checkin'         => 'Registo',
+        'type_milestone'       => 'Marco',
+        'type_buddy_joined'    => 'Parceiro aderiu',
+        'type_buddy_action'    => 'Ação do parceiro',
+        'type_completed'       => 'Concluído',
     ],
 ];

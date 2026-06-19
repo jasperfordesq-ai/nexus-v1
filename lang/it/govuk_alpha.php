@@ -1375,6 +1375,7 @@ return [
         'description' => 'Esprimi la tua opinione sulle domande rivolte alla comunità.',
         'empty' => 'Al momento non ci sono sondaggi.',
         'open_tag' => 'Aperto',
+        'delete_button' => 'Elimina sondaggio',
         'closed_tag' => 'Chiuso',
         'by_label' => 'di :name',
         'votes_count' => ':count voti totali',
@@ -1399,6 +1400,8 @@ return [
         'states' => [
             'voted' => 'Grazie — il tuo voto è stato registrato.',
             'vote-failed' => 'Non è stato possibile registrare il tuo voto. Potresti aver già votato oppure il sondaggio è stato chiuso.',
+            'deleted' => 'Sondaggio eliminato.',
+            'delete-failed' => 'Impossibile eliminare il sondaggio. Puoi eliminare solo i sondaggi che hai creato.',
         ],
     ],
     'achievements' => [

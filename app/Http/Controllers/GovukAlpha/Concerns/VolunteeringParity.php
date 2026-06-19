@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\GovukAlpha\Concerns;
 
 use App\Core\TenantContext;
+use App\Services\SafeguardingService;
 use App\Services\VolunteerService;
 use App\Services\VolunteerEmergencyAlertService;
 use App\Services\VolunteerWellbeingService;
@@ -1296,6 +1297,191 @@ trait VolunteeringParity
 
         return redirect()->route('govuk-alpha.volunteering.expenses', [
             'tenantSlug' => $tenantSlug, 'status' => 'expense-submitted',
+        ]);
+    }
+
+    // =========================================================================
+    // SAFEGUARDING — training records + incident reports
+    // Mirrors React SafeguardingTab (GET /v2/volunteering/training + incidents,
+    // POST /v2/volunteering/training, POST /v2/volunteering/incidents).
+    // Backing service: SafeguardingService::getTrainingForUser,
+    //   recordTraining, getIncidentsByReporter, reportIncident.
+    // =========================================================================
+
+    /**
+     * Render the safeguarding page (training records + incident reports list).
+     */
+    public function volunteeringSafeguarding(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $svc = app(SafeguardingService::class);
+
+        try {
+            $trainingResult = $svc->getTrainingForUser($userId, $tenantId);
+            $trainings = $trainingResult['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+            $trainings = [];
+        }
+
+        try {
+            $incidentResult = $svc->getIncidentsByReporter($userId, $tenantId);
+            $incidents = $incidentResult['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+            $incidents = [];
+        }
+
+        $status = self::asStr($request->query('status')) ?: null;
+
+        return $this->view('accessible-frontend::volunteering-safeguarding', [
+            'trainings' => $trainings,
+            'incidents' => $incidents,
+            'status'    => $status,
+            'subView'   => $this->allowed(
+                self::asStr($request->query('tab')),
+                ['training', 'incidents'],
+                'training'
+            ),
+        ]);
+    }
+
+    /**
+     * Handle POST — log a new training record.
+     */
+    public function volunteeringSafeguardingLogTraining(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+
+        $trainingType = $this->allowed(
+            self::asStr($request->input('training_type')),
+            ['children_first', 'vulnerable_adults', 'first_aid', 'manual_handling', 'other'],
+            ''
+        );
+        if ($trainingType === '') {
+            return redirect()->route('govuk-alpha.volunteering.training', [
+                'tenantSlug' => $tenantSlug, 'status' => 'training-type-required', 'tab' => 'training',
+            ]);
+        }
+
+        $trainingName = trim(self::asStr($request->input('training_name')));
+        if ($trainingName === '') {
+            return redirect()->route('govuk-alpha.volunteering.training', [
+                'tenantSlug' => $tenantSlug, 'status' => 'training-name-required', 'tab' => 'training',
+            ]);
+        }
+
+        $completedAt = self::asStr($request->input('completed_at'));
+        if ($completedAt === '') {
+            return redirect()->route('govuk-alpha.volunteering.training', [
+                'tenantSlug' => $tenantSlug, 'status' => 'training-date-required', 'tab' => 'training',
+            ]);
+        }
+
+        $provider   = trim(self::asStr($request->input('provider'))) ?: null;
+        $expiresAt  = trim(self::asStr($request->input('expires_at'))) ?: null;
+
+        try {
+            $result = app(SafeguardingService::class)->recordTraining($userId, [
+                'training_type' => $trainingType,
+                'training_name' => $trainingName,
+                'provider'      => $provider,
+                'completed_at'  => $completedAt,
+                'expires_at'    => $expiresAt,
+            ], $tenantId);
+
+            if ($result === false) {
+                return redirect()->route('govuk-alpha.volunteering.training', [
+                    'tenantSlug' => $tenantSlug, 'status' => 'training-failed', 'tab' => 'training',
+                ]);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.volunteering.training', [
+                'tenantSlug' => $tenantSlug, 'status' => 'training-failed', 'tab' => 'training',
+            ]);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.training', [
+            'tenantSlug' => $tenantSlug, 'status' => 'training-added', 'tab' => 'training',
+        ]);
+    }
+
+    /**
+     * Handle POST — report a safeguarding incident.
+     */
+    public function volunteeringSafeguardingReportIncident(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+
+        $title = trim(self::asStr($request->input('title')));
+        if ($title === '') {
+            return redirect()->route('govuk-alpha.volunteering.incidents', [
+                'tenantSlug' => $tenantSlug, 'status' => 'incident-title-required', 'tab' => 'incidents',
+            ]);
+        }
+
+        $description = trim(self::asStr($request->input('description')));
+        if ($description === '' || mb_strlen($description) < 20) {
+            return redirect()->route('govuk-alpha.volunteering.incidents', [
+                'tenantSlug' => $tenantSlug, 'status' => 'incident-description-too-short', 'tab' => 'incidents',
+            ]);
+        }
+
+        $severity = $this->allowed(
+            self::asStr($request->input('severity')),
+            ['low', 'medium', 'high', 'critical'],
+            'low'
+        );
+        $category = trim(self::asStr($request->input('category'))) ?: 'general';
+
+        try {
+            $result = app(SafeguardingService::class)->reportIncident($userId, [
+                'title'         => $title,
+                'description'   => $description,
+                'severity'      => $severity,
+                'category'      => $category,
+                'incident_type' => 'other',
+            ], $tenantId);
+
+            if ($result === false) {
+                return redirect()->route('govuk-alpha.volunteering.incidents', [
+                    'tenantSlug' => $tenantSlug, 'status' => 'incident-failed', 'tab' => 'incidents',
+                ]);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.volunteering.incidents', [
+                'tenantSlug' => $tenantSlug, 'status' => 'incident-failed', 'tab' => 'incidents',
+            ]);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.incidents', [
+            'tenantSlug' => $tenantSlug, 'status' => 'incident-reported', 'tab' => 'incidents',
         ]);
     }
 }

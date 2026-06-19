@@ -170,5 +170,22 @@ return [
     'nav' => [
         'insights' => 'View goal insights',
         'social' => 'Likes and comments',
+        'history' => 'عرض السجل الكامل',
+    ],
+
+    'history' => [
+        'title'       => 'سجل التقدم',
+        'caption'     => 'الهدف',
+        'intro'       => 'سجل زمني لكل حدث لهذا الهدف — تسجيلات الدخول، والمعالم، ونشاط الرفيق والمزيد.',
+        'empty'       => 'لم يتم تسجيل أي أحداث لهذا الهدف بعد.',
+        'list_aria'   => 'سجل تقدم الهدف',
+        'load_more'   => 'تحميل الأحداث الأقدم',
+        'type_created'         => 'تم الإنشاء',
+        'type_progress_update' => 'تحديث التقدم',
+        'type_checkin'         => 'تسجيل الدخول',
+        'type_milestone'       => 'معلم',
+        'type_buddy_joined'    => 'انضم الرفيق',
+        'type_buddy_action'    => 'إجراء الرفيق',
+        'type_completed'       => 'مكتمل',
     ],
 ];

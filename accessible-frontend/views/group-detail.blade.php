@@ -96,6 +96,9 @@
             <p class="govuk-body">
                 <a class="govuk-link" href="{{ route('govuk-alpha.groups.notifications', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha_groups.nav.notification_settings') }}</a>
             </p>
+            <p class="govuk-body">
+                <a class="govuk-link" href="{{ route('govuk-alpha.groups.files.index', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">{{ __('govuk_alpha_groups.files.nav_files') }}</a>
+            </p>
             <form method="post" action="{{ route('govuk-alpha.groups.leave', ['tenantSlug' => $tenantSlug, 'id' => $gId]) }}">
                 @csrf
                 <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.groups.leave') }}</button>

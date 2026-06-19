@@ -8,9 +8,11 @@ namespace App\Http\Controllers\GovukAlpha\Concerns;
 
 use App\Core\TenantContext;
 use App\Services\GroupAnnouncementService;
+use App\Services\GroupFileService;
 use App\Services\GroupInviteService;
 use App\Services\GroupNotificationPreferenceService;
 use App\Services\GroupService;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -622,6 +624,203 @@ trait GroupsParity
         }
 
         return $back($ok ? 'ann-deleted' : 'ann-delete-failed');
+    }
+
+    // -----------------------------------------------------------------
+    //  Files
+    // -----------------------------------------------------------------
+
+    /**
+     * GET /{tenantSlug}/alpha/groups/{id}/files
+     * List files for a group. Visible to active members and admins only.
+     */
+    public function groupsFiles(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $userId = $this->groupsParityGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $group = null;
+        try {
+            $group = GroupService::getById($id, $userId, false);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($group === null, 404);
+        abort_unless(
+            GroupService::isActiveMember($id, $userId) || GroupService::canModify($id, $userId),
+            403
+        );
+
+        $isAdmin = GroupService::canModify($id, $userId);
+
+        /** @var GroupFileService $service */
+        $service = app(GroupFileService::class);
+        $result  = null;
+        try {
+            $result = $service->list($id, $userId, ['limit' => 50]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        $files = is_array($result) ? ($result['items'] ?? []) : [];
+
+        return $this->view('accessible-frontend::group-files', [
+            'title'         => __('govuk_alpha_groups.files.title'),
+            'tenantSlug'    => $tenantSlug,
+            'activeNav'     => 'explore',
+            'group'         => $group,
+            'files'         => $files,
+            'isAdmin'       => $isAdmin,
+            'currentUserId' => $userId,
+            'status'        => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * POST /{tenantSlug}/alpha/groups/{id}/files
+     * Upload a file to a group. All active members may upload (service enforces membership).
+     */
+    public function groupsUploadFile(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $userId = $this->groupsParityGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $back = fn (string $status): RedirectResponse => redirect()->route(
+            'govuk-alpha.groups.files.index',
+            ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]
+        );
+
+        abort_unless(
+            GroupService::isActiveMember($id, $userId) || GroupService::canModify($id, $userId),
+            403
+        );
+
+        $file = $request->file('file');
+        if (!$file) {
+            return $back('file-missing');
+        }
+
+        /** @var GroupFileService $service */
+        $service = app(GroupFileService::class);
+        $result  = null;
+        try {
+            $result = $service->upload($id, $userId, [
+                'file'        => $file,
+                'folder'      => self::asStr($request->input('folder')) ?: null,
+                'description' => self::asStr($request->input('description')) ?: null,
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($result === null) {
+            $errors = $service->getErrors();
+            $code   = $errors[0]['code'] ?? '';
+            return $back(match ($code) {
+                'FORBIDDEN'    => 'file-forbidden',
+                'FILE_TOO_LARGE' => 'file-too-large',
+                'INVALID_TYPE' => 'file-type-invalid',
+                'INVALID_FILE' => 'file-missing',
+                default        => 'file-upload-failed',
+            });
+        }
+
+        return $back('file-uploaded');
+    }
+
+    /**
+     * GET /{tenantSlug}/alpha/groups/{id}/files/{fileId}/download
+     * Stream a file download. Members only (service enforces membership).
+     */
+    public function groupsDownloadFile(Request $request, string $tenantSlug, int $id, int $fileId): Response|RedirectResponse
+    {
+        $userId = $this->groupsParityGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        abort_unless(
+            GroupService::isActiveMember($id, $userId) || GroupService::canModify($id, $userId),
+            403
+        );
+
+        /** @var GroupFileService $service */
+        $service = app(GroupFileService::class);
+        $result  = null;
+        try {
+            $result = $service->download($id, $fileId, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($result === null) {
+            $errors = $service->getErrors();
+            $code   = $errors[0]['code'] ?? '';
+            if ($code === 'NOT_FOUND') {
+                abort(404);
+            }
+            if ($code === 'FORBIDDEN') {
+                abort(403);
+            }
+            abort(400);
+        }
+
+        $disk = Storage::disk('local');
+        if (!$disk->exists($result['file_path'])) {
+            abort(404);
+        }
+
+        return $disk->download(
+            $result['file_path'],
+            $result['file_name'],
+            ['Content-Type' => $result['file_type']]
+        );
+    }
+
+    /**
+     * POST /{tenantSlug}/alpha/groups/{id}/files/{fileId}/delete
+     * Delete a file. Allowed for the uploader or an admin (service enforces).
+     */
+    public function groupsDeleteFile(Request $request, string $tenantSlug, int $id, int $fileId): RedirectResponse
+    {
+        $userId = $this->groupsParityGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $back = fn (string $status): RedirectResponse => redirect()->route(
+            'govuk-alpha.groups.files.index',
+            ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]
+        );
+
+        abort_unless(
+            GroupService::isActiveMember($id, $userId) || GroupService::canModify($id, $userId),
+            403
+        );
+
+        /** @var GroupFileService $service */
+        $service = app(GroupFileService::class);
+        $ok      = false;
+        try {
+            $ok = $service->delete($id, $fileId, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if (!$ok) {
+            $errors = $service->getErrors();
+            $code   = $errors[0]['code'] ?? '';
+            return $back(match ($code) {
+                'NOT_FOUND' => 'file-not-found',
+                'FORBIDDEN' => 'file-forbidden',
+                default     => 'file-delete-failed',
+            });
+        }
+
+        return $back('file-deleted');
     }
 
     /**

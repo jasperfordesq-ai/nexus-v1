@@ -1375,6 +1375,7 @@ return [
         'description' => 'コミュニティへの質問に意見を表明してください。',
         'empty' => '現在投票はありません。',
         'open_tag' => '公開中',
+        'delete_button' => '投票を削除',
         'closed_tag' => '終了',
         'by_label' => ':name による',
         'votes_count' => '合計 :count 票',
@@ -1399,6 +1400,8 @@ return [
         'states' => [
             'voted' => 'ありがとうございます。投票が記録されました。',
             'vote-failed' => '投票を記録できませんでした。すでに投票済みか、投票が終了している可能性があります。',
+            'deleted' => '投票を削除しました。',
+            'delete-failed' => '投票を削除できませんでした。削除できるのは自分が作成した投票のみです。',
         ],
     ],
     'achievements' => [

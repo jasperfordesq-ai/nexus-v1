@@ -1375,6 +1375,7 @@ return [
         'description' => 'Exprese su opinión sobre las preguntas planteadas a la comunidad.',
         'empty' => 'No hay encuestas en este momento.',
         'open_tag' => 'Abierto',
+        'delete_button' => 'Eliminar encuesta',
         'closed_tag' => 'Cerrado',
         'by_label' => 'por :name',
         'votes_count' => ':count votos en total',
@@ -1399,6 +1400,8 @@ return [
         'states' => [
             'voted' => 'Gracias — su voto ha sido registrado.',
             'vote-failed' => 'No hemos podido registrar su voto. Es posible que ya haya votado o que la encuesta esté cerrada.',
+            'deleted' => 'Encuesta eliminada.',
+            'delete-failed' => 'No se pudo eliminar la encuesta. Solo puedes eliminar las encuestas que has creado.',
         ],
     ],
     'achievements' => [

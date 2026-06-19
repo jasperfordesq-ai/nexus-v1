@@ -96,6 +96,33 @@ return [
         'view_link' => 'View subgroup',
     ],
 
+    // ---- Files (list, upload, download, delete) ------------------------
+    'files' => [
+        'title'             => 'Fichiers du groupe',
+        'caption'           => 'Fichiers pour :group',
+        'intro'             => 'Fichiers partagés avec tous les membres de ce groupe.',
+        'empty'             => 'Aucun fichier n\'a encore été partagé dans ce groupe.',
+        'upload_heading'    => 'Téléverser un fichier',
+        'file_label'        => 'Choisir un fichier',
+        'file_hint'         => 'Formats acceptés : images, PDF, Word, Excel, PowerPoint, texte, CSV, ZIP, vidéo et audio. Taille maximale : 25 Mo.',
+        'folder_label'      => 'Dossier (facultatif)',
+        'folder_hint'       => 'Regrouper les fichiers dans un dossier nommé, par exemple : Procès-verbaux.',
+        'description_label' => 'Description (facultatif)',
+        'description_hint'  => 'Une courte note sur ce fichier.',
+        'submit_upload'     => 'Téléverser le fichier',
+        'col_name'          => 'Nom du fichier',
+        'col_size'          => 'Taille',
+        'col_uploaded_by'   => 'Téléversé par',
+        'col_date'          => 'Date',
+        'col_actions'       => 'Actions',
+        'download_link'     => 'Télécharger',
+        'download_aria'     => 'Télécharger :name',
+        'delete_button'     => 'Supprimer',
+        'delete_aria'       => 'Supprimer :name',
+        'manage_link'       => 'Voir les fichiers',
+        'nav_files'         => 'Fichiers',
+    ],
+
     // ---- Status banners (flash messages) -------------------------------
     'states' => [
         'invite-link-created' => 'A new invite link was generated.',
@@ -126,6 +153,15 @@ return [
         'ann-not-found'         => 'Cette annonce est introuvable.',
         'ann-title-required'    => 'Saisissez un titre pour l\'annonce.',
         'ann-content-required'  => 'Saisissez un contenu pour l\'annonce.',
+        'file-uploaded'         => 'Le fichier a été téléversé.',
+        'file-upload-failed'    => 'Le fichier n\'a pas pu être téléversé. Veuillez réessayer.',
+        'file-too-large'        => 'Le fichier dépasse la limite de 25 Mo. Choisissez un fichier plus petit.',
+        'file-type-invalid'     => 'Ce type de fichier n\'est pas autorisé. Vérifiez les formats acceptés.',
+        'file-missing'          => 'Choisissez un fichier à téléverser.',
+        'file-deleted'          => 'Le fichier a été supprimé.',
+        'file-delete-failed'    => 'Le fichier n\'a pas pu être supprimé. Veuillez réessayer.',
+        'file-forbidden'        => 'Vous n\'avez pas la permission d\'effectuer cette action.',
+        'file-not-found'        => 'Ce fichier est introuvable.',
     ],
 
     // ---- Announcements (list, create, edit, delete, pin) ---------------

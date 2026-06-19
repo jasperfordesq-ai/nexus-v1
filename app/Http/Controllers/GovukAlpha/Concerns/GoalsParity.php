@@ -445,6 +445,59 @@ trait GoalsParity
         }
     }
 
+    // === Progress history timeline ===
+
+    /**
+     * Full chronological event timeline for a goal.
+     *
+     * Mirrors React GoalProgressHistory.tsx + GET /api/v2/goals/{id}/history.
+     * Visibility: owner, assigned buddy, or any member for a public goal (same
+     * gate as the goal detail page / GoalsController::history canViewGoal).
+     * Calls GoalProgressService::getProgressHistory() — identical to the API.
+     * Supports simple cursor-based pagination via ?cursor= query param.
+     */
+    public function goalsHistory(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $goal = $this->goalsParityLoad($tenantSlug, $id);
+        if ($goal instanceof RedirectResponse) {
+            return $goal;
+        }
+
+        $userId = (int) $this->currentUserId();
+        // Mirrors GoalsController::history canViewGoal — private goals are 404
+        // for strangers (same as the React API which returns 403; we use 403 here).
+        abort_unless($this->goalsParityCanView($goal, $userId), 403);
+
+        $cursor   = self::asStr($request->query('cursor')) ?: null;
+        $filters  = ['limit' => 30];
+        if ($cursor !== null) {
+            $filters['cursor'] = $cursor;
+        }
+
+        $items   = [];
+        $hasMore = false;
+        $nextCursor = null;
+        try {
+            $result   = app(GoalProgressService::class)->getProgressHistory($id, $filters);
+            $items    = is_array($result['items'] ?? null)  ? $result['items']  : [];
+            $hasMore  = (bool) ($result['has_more'] ?? false);
+            $nextCursor = $result['cursor'] ?? null;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::goal-history', [
+            'title'      => __('govuk_alpha_goals.history.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav'  => 'explore',
+            'goal'       => $goal,
+            'items'      => $items,
+            'hasMore'    => $hasMore,
+            'nextCursor' => $nextCursor,
+            'status'     => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
     // === Social: likes + comments ===
 
     /**

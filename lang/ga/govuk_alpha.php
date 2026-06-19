@@ -1375,6 +1375,7 @@ return [
         'description' => 'Cuir do thuairim in iúl ar cheisteanna a chuirtear faoin bpobal.',
         'empty' => 'Níl aon phobalbhreith ar siúl faoi láthair.',
         'open_tag' => 'Oscailte',
+        'delete_button' => 'Scrios pobalbhreith',
         'closed_tag' => 'Dúnta',
         'by_label' => 'le :name',
         'votes_count' => ':count vóta san iomlán',
@@ -1399,6 +1400,8 @@ return [
         'states' => [
             'voted' => 'Go raibh maith agat — tá do vóta cláraithe.',
             'vote-failed' => 'Níorbh fhéidir linn do vóta a chlárú. Is féidir go bhfuil vóta caite agat cheana féin, nó go bhfuil an phobalbhreith dúnta.',
+            'deleted' => 'Scriosadh an phobalbhreith.',
+            'delete-failed' => 'Níorbh fhéidir an phobalbhreith a scriosadh. Ní féidir leat ach pobalbhreitheanna a chruthaigh tú a scriosadh.',
         ],
     ],
     'achievements' => [

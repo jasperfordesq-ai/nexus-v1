@@ -96,6 +96,33 @@ return [
         'view_link' => 'View subgroup',
     ],
 
+    // ---- Files (list, upload, download, delete) ------------------------
+    'files' => [
+        'title'             => 'ملفات المجموعة',
+        'caption'           => 'ملفات :group',
+        'intro'             => 'ملفات مشتركة مع جميع أعضاء هذه المجموعة.',
+        'empty'             => 'لم يتم مشاركة أي ملفات في هذه المجموعة بعد.',
+        'upload_heading'    => 'رفع ملف',
+        'file_label'        => 'اختر ملفًا',
+        'file_hint'         => 'الصيغ المقبولة: صور، PDF، Word، Excel، PowerPoint، نصوص، CSV، ZIP، فيديو وصوت. الحجم الأقصى: 25 ميغابايت.',
+        'folder_label'      => 'مجلد (اختياري)',
+        'folder_hint'       => 'اجمع الملفات في مجلد مسمى، مثال: محاضر.',
+        'description_label' => 'وصف (اختياري)',
+        'description_hint'  => 'ملاحظة قصيرة حول هذا الملف.',
+        'submit_upload'     => 'رفع الملف',
+        'col_name'          => 'اسم الملف',
+        'col_size'          => 'الحجم',
+        'col_uploaded_by'   => 'رُفع بواسطة',
+        'col_date'          => 'التاريخ',
+        'col_actions'       => 'إجراءات',
+        'download_link'     => 'تنزيل',
+        'download_aria'     => 'تنزيل :name',
+        'delete_button'     => 'حذف',
+        'delete_aria'       => 'حذف :name',
+        'manage_link'       => 'عرض الملفات',
+        'nav_files'         => 'الملفات',
+    ],
+
     // ---- Status banners (flash messages) -------------------------------
     'states' => [
         'invite-link-created' => 'A new invite link was generated.',
@@ -126,6 +153,15 @@ return [
         'ann-not-found'         => 'تعذّر العثور على هذا الإعلان.',
         'ann-title-required'    => 'أدخل عنوانًا للإعلان.',
         'ann-content-required'  => 'أدخل محتوى الإعلان.',
+        'file-uploaded'         => 'تم رفع الملف.',
+        'file-upload-failed'    => 'تعذّر رفع الملف. يرجى المحاولة مرة أخرى.',
+        'file-too-large'        => 'حجم الملف يتجاوز الحد الأقصى البالغ 25 ميغابايت. اختر ملفًا أصغر.',
+        'file-type-invalid'     => 'نوع الملف هذا غير مسموح به. تحقق من الصيغ المقبولة.',
+        'file-missing'          => 'اختر ملفًا للرفع.',
+        'file-deleted'          => 'تم حذف الملف.',
+        'file-delete-failed'    => 'تعذّر حذف الملف. يرجى المحاولة مرة أخرى.',
+        'file-forbidden'        => 'ليس لديك صلاحية تنفيذ هذا الإجراء.',
+        'file-not-found'        => 'تعذّر العثور على هذا الملف.',
     ],
 
     // ---- Announcements (list, create, edit, delete, pin) ---------------

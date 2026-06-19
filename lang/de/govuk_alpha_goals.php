@@ -170,5 +170,22 @@ return [
     'nav' => [
         'insights' => 'View goal insights',
         'social' => 'Likes and comments',
+        'history' => 'Vollständigen Verlauf anzeigen',
+    ],
+
+    'history' => [
+        'title'       => 'Fortschrittsverlauf',
+        'caption'     => 'Ziel',
+        'intro'       => 'Eine chronologische Aufzeichnung aller Ereignisse für dieses Ziel — Eincheckvorgänge, Meilensteine, Buddy-Aktivitäten und mehr.',
+        'empty'       => 'Für dieses Ziel wurden noch keine Ereignisse aufgezeichnet.',
+        'list_aria'   => 'Fortschrittsverlauf des Ziels',
+        'load_more'   => 'Ältere Ereignisse laden',
+        'type_created'         => 'Erstellt',
+        'type_progress_update' => 'Fortschrittsupdate',
+        'type_checkin'         => 'Eincheck-Vorgang',
+        'type_milestone'       => 'Meilenstein',
+        'type_buddy_joined'    => 'Buddy beigetreten',
+        'type_buddy_action'    => 'Buddy-Aktion',
+        'type_completed'       => 'Abgeschlossen',
     ],
 ];

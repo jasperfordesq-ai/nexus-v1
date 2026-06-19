@@ -232,6 +232,31 @@
                                 @endif
                             </div>
 
+                            {{-- Social panel: like toggle + comment count --}}
+                            @php
+                                $rLikeCount = (int) (($reactionCountsByResource ?? [])[$r['id']] ?? 0);
+                                $rCommentCount = (int) (($commentCountsByResource ?? [])[$r['id']] ?? 0);
+                            @endphp
+                            <div class="nexus-alpha-actions govuk-!-margin-top-2" aria-label="{{ __('govuk_alpha_resources.social.panel_label') }}">
+                                <form method="post" action="{{ route('govuk-alpha.resources.react', ['tenantSlug' => $tenantSlug, 'id' => $r['id']]) }}" class="nexus-alpha-reaction-form govuk-!-display-inline">
+                                    @csrf
+                                    <input type="hidden" name="emoji" value="like">
+                                    <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button"
+                                            aria-label="{{ __('govuk_alpha_resources.social.like_aria', ['title' => $rTitle]) }}">
+                                        <span aria-hidden="true">&#128077;</span>
+                                        {{ __('govuk_alpha_resources.social.like') }}
+                                        @if ($rLikeCount > 0)
+                                            ({{ $rLikeCount }})
+                                        @endif
+                                    </button>
+                                </form>
+                                <a class="govuk-link" href="{{ route('govuk-alpha.resources.comments', ['tenantSlug' => $tenantSlug, 'id' => $r['id']]) }}"
+                                   aria-label="{{ __('govuk_alpha_resources.social.comments_link_aria', ['title' => $rTitle]) }}">
+                                    &#128172;
+                                    {{ trans_choice('govuk_alpha_resources.social.comment_count', $rCommentCount, ['count' => $rCommentCount]) }}
+                                </a>
+                            </div>
+
                             @if ($reorderMode && $isAdmin)
                                 <div class="nexus-alpha-actions govuk-!-margin-top-2">
                                     @if ($i > 0)

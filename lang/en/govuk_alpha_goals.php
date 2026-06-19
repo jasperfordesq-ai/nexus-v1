@@ -170,5 +170,22 @@ return [
     'nav' => [
         'insights' => 'View goal insights',
         'social' => 'Likes and comments',
+        'history' => 'View full history',
+    ],
+
+    'history' => [
+        'title'       => 'Progress history',
+        'caption'     => 'Goal',
+        'intro'       => 'A chronological record of every event for this goal — check-ins, milestones, buddy activity and more.',
+        'empty'       => 'No events have been recorded for this goal yet.',
+        'list_aria'   => 'Goal progress history',
+        'load_more'   => 'Load older events',
+        'type_created'         => 'Created',
+        'type_progress_update' => 'Progress update',
+        'type_checkin'         => 'Check-in',
+        'type_milestone'       => 'Milestone',
+        'type_buddy_joined'    => 'Buddy joined',
+        'type_buddy_action'    => 'Buddy action',
+        'type_completed'       => 'Completed',
     ],
 ];

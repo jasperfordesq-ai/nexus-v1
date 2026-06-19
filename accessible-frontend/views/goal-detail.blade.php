@@ -57,6 +57,7 @@
             <a class="govuk-link" href="{{ route('govuk-alpha.goals.insights', ['tenantSlug' => $tenantSlug, 'id' => $goal['id']]) }}">{{ __('govuk_alpha_goals.nav.insights') }}</a>
         @endif
         <a class="govuk-link" href="{{ route('govuk-alpha.goals.social', ['tenantSlug' => $tenantSlug, 'id' => $goal['id']]) }}">{{ __('govuk_alpha_goals.nav.social') }}</a>
+        <a class="govuk-link" href="{{ route('govuk-alpha.goals.history', ['tenantSlug' => $tenantSlug, 'id' => $goal['id']]) }}">{{ __('govuk_alpha_goals.nav.history') }}</a>
     </p>
 
     @if ($isOwner && !$done)

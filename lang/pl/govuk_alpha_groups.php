@@ -96,6 +96,33 @@ return [
         'view_link' => 'View subgroup',
     ],
 
+    // ---- Files (list, upload, download, delete) ------------------------
+    'files' => [
+        'title'             => 'Pliki grupy',
+        'caption'           => 'Pliki dla :group',
+        'intro'             => 'Pliki udostępnione wszystkim członkom tej grupy.',
+        'empty'             => 'W tej grupie nie zostały jeszcze udostępnione żadne pliki.',
+        'upload_heading'    => 'Prześlij plik',
+        'file_label'        => 'Wybierz plik',
+        'file_hint'         => 'Akceptowane formaty: obrazy, PDF, Word, Excel, PowerPoint, tekst, CSV, ZIP, wideo i audio. Maksymalny rozmiar: 25 MB.',
+        'folder_label'      => 'Folder (opcjonalnie)',
+        'folder_hint'       => 'Grupuj pliki w nazwanym folderze, np.: Protokoły.',
+        'description_label' => 'Opis (opcjonalnie)',
+        'description_hint'  => 'Krótka notatka dotycząca tego pliku.',
+        'submit_upload'     => 'Prześlij plik',
+        'col_name'          => 'Nazwa pliku',
+        'col_size'          => 'Rozmiar',
+        'col_uploaded_by'   => 'Przesłane przez',
+        'col_date'          => 'Data',
+        'col_actions'       => 'Działania',
+        'download_link'     => 'Pobierz',
+        'download_aria'     => 'Pobierz :name',
+        'delete_button'     => 'Usuń',
+        'delete_aria'       => 'Usuń :name',
+        'manage_link'       => 'Zobacz pliki',
+        'nav_files'         => 'Pliki',
+    ],
+
     // ---- Status banners (flash messages) -------------------------------
     'states' => [
         'invite-link-created' => 'A new invite link was generated.',
@@ -126,6 +153,15 @@ return [
         'ann-not-found'         => 'Nie znaleziono tego ogłoszenia.',
         'ann-title-required'    => 'Wprowadź tytuł ogłoszenia.',
         'ann-content-required'  => 'Wprowadź treść ogłoszenia.',
+        'file-uploaded'         => 'Plik został przesłany.',
+        'file-upload-failed'    => 'Nie udało się przesłać pliku. Spróbuj ponownie.',
+        'file-too-large'        => 'Plik przekracza limit 25 MB. Wybierz mniejszy plik.',
+        'file-type-invalid'     => 'Ten typ pliku nie jest dozwolony. Sprawdź akceptowane formaty.',
+        'file-missing'          => 'Wybierz plik do przesłania.',
+        'file-deleted'          => 'Plik został usunięty.',
+        'file-delete-failed'    => 'Nie udało się usunąć pliku. Spróbuj ponownie.',
+        'file-forbidden'        => 'Nie masz uprawnień do wykonania tej czynności.',
+        'file-not-found'        => 'Nie znaleziono tego pliku.',
     ],
 
     // ---- Announcements (list, create, edit, delete, pin) ---------------

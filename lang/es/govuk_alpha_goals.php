@@ -170,5 +170,22 @@ return [
     'nav' => [
         'insights' => 'View goal insights',
         'social' => 'Likes and comments',
+        'history' => 'Ver historial completo',
+    ],
+
+    'history' => [
+        'title'       => 'Historial de progreso',
+        'caption'     => 'Objetivo',
+        'intro'       => 'Un registro cronológico de cada evento de este objetivo — registros, hitos, actividad del compañero y más.',
+        'empty'       => 'Aún no se han registrado eventos para este objetivo.',
+        'list_aria'   => 'Historial de progreso del objetivo',
+        'load_more'   => 'Cargar eventos anteriores',
+        'type_created'         => 'Creado',
+        'type_progress_update' => 'Actualización de progreso',
+        'type_checkin'         => 'Registro',
+        'type_milestone'       => 'Hito',
+        'type_buddy_joined'    => 'Compañero unido',
+        'type_buddy_action'    => 'Acción del compañero',
+        'type_completed'       => 'Completado',
     ],
 ];

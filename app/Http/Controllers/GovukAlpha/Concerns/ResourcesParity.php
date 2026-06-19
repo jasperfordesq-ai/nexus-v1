@@ -8,11 +8,15 @@ namespace App\Http\Controllers\GovukAlpha\Concerns;
 
 use App\Core\TenantContext;
 use App\Helpers\UrlHelper;
+use App\Services\CommentService;
+use App\Services\ReactionService;
+use App\Services\SocialNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -78,6 +82,42 @@ trait ResourcesParity
             $error = true;
         }
 
+        // Batch-load reaction + comment counts for all resources on this page
+        // to avoid N+1 queries (mirrors how blogreviews loads counts).
+        $resourceIds = array_column($resources, 'id');
+        $reactionCountsByResource = [];
+        $commentCountsByResource = [];
+        if (!empty($resourceIds)) {
+            try {
+                // Reaction counts: group by target_id for all resource ids.
+                $reactionRows = DB::table('reactions')
+                    ->whereIn('target_id', $resourceIds)
+                    ->where('target_type', 'resource')
+                    ->select('target_id', DB::raw('COUNT(*) as total'))
+                    ->groupBy('target_id')
+                    ->get();
+                foreach ($reactionRows as $row) {
+                    $reactionCountsByResource[(int) $row->target_id] = (int) $row->total;
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
+            try {
+                // Comment counts (top-level + replies) — comments table.
+                $commentRows = DB::table('comments')
+                    ->whereIn('target_id', $resourceIds)
+                    ->where('target_type', 'resource')
+                    ->select('target_id', DB::raw('COUNT(*) as total'))
+                    ->groupBy('target_id')
+                    ->get();
+                foreach ($commentRows as $row) {
+                    $commentCountsByResource[(int) $row->target_id] = (int) $row->total;
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
         $isAdmin = $this->resourcesUserIsAdmin();
 
         return $this->view('accessible-frontend::resources-library', [
@@ -96,6 +136,8 @@ trait ResourcesParity
             'isAdmin' => $isAdmin,
             'reorderMode' => $reorder && $isAdmin,
             'currentUserId' => $userId,
+            'reactionCountsByResource' => $reactionCountsByResource,
+            'commentCountsByResource' => $commentCountsByResource,
         ]);
     }
 
@@ -478,6 +520,228 @@ trait ResourcesParity
         }
 
         return redirect()->route('govuk-alpha.resources.library', $redirectParams);
+    }
+
+    // =====================================================================
+    // Social interactions — like/react + comment thread per resource
+    // =====================================================================
+
+    /**
+     * Curated accessible reaction set for resource surfaces.
+     * Subset of ReactionService::VALID_TYPES; matches the React SocialInteractionPanel.
+     */
+    private const ALPHA_RESOURCES_REACTIONS = [
+        'like'      => "\u{1F44D}", // thumbs up
+        'love'      => "\u{2764}\u{FE0F}", // heart
+        'laugh'     => "\u{1F602}", // tears of joy
+        'wow'       => "\u{1F62E}", // astonished
+        'sad'       => "\u{1F622}", // crying
+        'celebrate' => "\u{1F389}", // party popper
+    ];
+
+    /**
+     * Toggle an emoji reaction on a resource.  Mirrors the React
+     * SocialInteractionPanel like-button (targetType='resource').
+     */
+    public function resourcesReact(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('resources'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        // Scope the resource to this tenant to prevent cross-tenant reactions.
+        $exists = DB::table('resources')->where('id', $id)->where('tenant_id', $tenantId)->exists();
+        abort_if(!$exists, 404);
+
+        $emoji = self::asStr($request->input('emoji'));
+        $status = $this->resourcesToggleReaction($userId, $id, $emoji);
+
+        return redirect()->route('govuk-alpha.resources.comments', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $status,
+        ])->withFragment('resource-reactions');
+    }
+
+    /**
+     * Comment thread for a resource: list + add-comment form.
+     * Mirrors the React SocialInteractionPanel comment thread (targetType='resource').
+     */
+    public function resourcesComments(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('resources'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $resource = DB::table('resources')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->first(['id', 'title', 'description', 'file_path']);
+
+        abort_if($resource === null, 404);
+
+        $comments = [];
+        $reactions = ['counts' => [], 'total' => 0, 'user_reaction' => null];
+        try {
+            $comments = CommentService::getForEntity('resource', $id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        try {
+            $reactions = app(ReactionService::class)->getReactions($id, 'resource', $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::resources-comments', [
+            'title' => __('govuk_alpha_resources.social.comments_title', ['title' => (string) ($resource->title ?? '')]),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'resource' => (array) $resource,
+            'resourceId' => $id,
+            'comments' => is_array($comments) ? $comments : [],
+            'commentsCount' => CommentService::countAll(is_array($comments) ? $comments : []),
+            'currentUserId' => $userId,
+            'alphaReactions' => self::ALPHA_RESOURCES_REACTIONS,
+            'resourceReactionCounts' => (array) ($reactions['counts'] ?? []),
+            'resourceReactionTotal' => (int) ($reactions['total'] ?? 0),
+            'resourceUserReaction' => $reactions['user_reaction'] ?? null,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * POST — add a comment (or reply) to a resource.
+     * Uses /comments/add path to avoid colliding with the GET comments thread.
+     */
+    public function resourcesStoreComment(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('resources'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $exists = DB::table('resources')->where('id', $id)->where('tenant_id', $tenantId)->exists();
+        abort_if(!$exists, 404);
+
+        $body = trim(self::asStr($request->input('body')));
+        $parentRaw = self::asStr($request->input('parent_id'));
+        $parentId = ctype_digit($parentRaw) && (int) $parentRaw > 0 ? (int) $parentRaw : null;
+
+        if ($body === '') {
+            return $this->resourcesCommentsRedirect($tenantSlug, $id, 'comment-invalid');
+        }
+
+        $status = 'comment-failed';
+        try {
+            $result = CommentService::addComment(
+                $userId,
+                (int) $tenantId,
+                'resource',
+                $id,
+                mb_substr($body, 0, 5000),
+                $parentId
+            );
+            $status = !empty($result['success']) ? ($parentId !== null ? 'reply-added' : 'comment-added') : 'comment-failed';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->resourcesCommentsRedirect($tenantSlug, $id, $status);
+    }
+
+    /**
+     * POST — delete a comment on a resource (owner-only; CommentService is owner-scoped).
+     */
+    public function resourcesDeleteComment(Request $request, string $tenantSlug, int $id, int $commentId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('resources'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $status = 'comment-delete-failed';
+        try {
+            $status = CommentService::delete($commentId, $userId) > 0 ? 'comment-deleted' : 'comment-delete-failed';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->resourcesCommentsRedirect($tenantSlug, $id, $status, 'comments');
+    }
+
+    // ---------------------------------------------------------------
+    // Private social helpers (resources-prefixed)
+    // ---------------------------------------------------------------
+
+    /**
+     * Toggle a reaction on a resource; fires a best-effort like notification.
+     * Only the curated accessible reaction set is accepted.
+     */
+    private function resourcesToggleReaction(int $userId, int $resourceId, string $emoji): string
+    {
+        if (!array_key_exists($emoji, self::ALPHA_RESOURCES_REACTIONS)
+            || !in_array($emoji, ReactionService::VALID_TYPES, true)) {
+            return 'reaction-failed';
+        }
+
+        try {
+            $result = app(ReactionService::class)->toggleReaction($resourceId, 'resource', $emoji, $userId);
+            $status = ($result['action'] ?? '') === 'removed' ? 'reaction-removed' : 'reaction-added';
+
+            if ($status === 'reaction-added') {
+                try {
+                    $ownerId = SocialNotificationService::getContentOwnerId('resource', $resourceId);
+                    if ($ownerId && $ownerId !== $userId) {
+                        $recipient = \App\Models\User::query()
+                            ->where('id', $ownerId)
+                            ->where('tenant_id', TenantContext::getId())
+                            ->first(['id', 'preferred_language']);
+                        \App\I18n\LocaleContext::withLocale($recipient, function () use ($ownerId, $userId, $resourceId, $emoji): void {
+                            SocialNotificationService::notifyLike($ownerId, $userId, 'resource', $resourceId, $emoji);
+                        });
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('Resources reaction notification failed: ' . $e->getMessage());
+                }
+            }
+
+            return $status;
+        } catch (\Throwable $e) {
+            report($e);
+            return 'reaction-failed';
+        }
+    }
+
+    /**
+     * Redirect back to the resource comment thread with a status + optional anchor.
+     */
+    private function resourcesCommentsRedirect(string $tenantSlug, int $id, string $status, ?string $fragment = 'comments'): RedirectResponse
+    {
+        $redirect = redirect()->route('govuk-alpha.resources.comments', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $status,
+        ]);
+
+        return $fragment !== null ? $redirect->withFragment($fragment) : $redirect;
     }
 
     // ---------------------------------------------------------------

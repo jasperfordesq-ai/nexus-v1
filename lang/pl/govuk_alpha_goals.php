@@ -170,5 +170,22 @@ return [
     'nav' => [
         'insights' => 'View goal insights',
         'social' => 'Likes and comments',
+        'history' => 'Zobacz pełną historię',
+    ],
+
+    'history' => [
+        'title'       => 'Historia postępów',
+        'caption'     => 'Cel',
+        'intro'       => 'Chronologiczny zapis każdego zdarzenia dla tego celu — zameldowania, kamienie milowe, aktywność partnera i nie tylko.',
+        'empty'       => 'Dla tego celu nie zarejestrowano jeszcze żadnych zdarzeń.',
+        'list_aria'   => 'Historia postępów celu',
+        'load_more'   => 'Załaduj starsze zdarzenia',
+        'type_created'         => 'Utworzono',
+        'type_progress_update' => 'Aktualizacja postępów',
+        'type_checkin'         => 'Zameldowanie',
+        'type_milestone'       => 'Kamień milowy',
+        'type_buddy_joined'    => 'Partner dołączył',
+        'type_buddy_action'    => 'Działanie partnera',
+        'type_completed'       => 'Ukończono',
     ],
 ];

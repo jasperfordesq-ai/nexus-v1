@@ -96,6 +96,33 @@ return [
         'view_link' => 'View subgroup',
     ],
 
+    // ---- Files (list, upload, download, delete) ------------------------
+    'files' => [
+        'title'             => 'Comhaid an ghrúpa',
+        'caption'           => 'Comhaid do :group',
+        'intro'             => 'Comhaid arna gcomhroinnt le gach comhalta den ghrúpa seo.',
+        'empty'             => 'Níl aon chomhaid roinnte sa ghrúpa seo go fóill.',
+        'upload_heading'    => 'Comhad a uaslódáil',
+        'file_label'        => 'Roghnaigh comhad',
+        'file_hint'         => 'Formáidí inghlactha: íomhánna, PDF, Word, Excel, PowerPoint, téacs, CSV, ZIP, físeán agus fuaim. Uasmhéid: 25 MB.',
+        'folder_label'      => 'Fillteán (roghnach)',
+        'folder_hint'       => 'Comhaidí a ghrúpáil i bhfillteán ainmnithe, mar shampla: Miontuairiscí.',
+        'description_label' => 'Cur síos (roghnach)',
+        'description_hint'  => 'Nóta gearr faoin gcomhad seo.',
+        'submit_upload'     => 'Comhad a uaslódáil',
+        'col_name'          => 'Ainm an chomhaid',
+        'col_size'          => 'Méid',
+        'col_uploaded_by'   => 'Uaslódáilte ag',
+        'col_date'          => 'Dáta',
+        'col_actions'       => 'Gníomhartha',
+        'download_link'     => 'Íosluchtaigh',
+        'download_aria'     => 'Íosluchtaigh :name',
+        'delete_button'     => 'Scrios',
+        'delete_aria'       => 'Scrios :name',
+        'manage_link'       => 'Féach ar chomhaid',
+        'nav_files'         => 'Comhaid',
+    ],
+
     // ---- Status banners (flash messages) -------------------------------
     'states' => [
         'invite-link-created' => 'A new invite link was generated.',
@@ -126,6 +153,15 @@ return [
         'ann-not-found'         => 'Níorbh fhéidir an fógra sin a aimsiú.',
         'ann-title-required'    => 'Iontráil teideal don fhógra.',
         'ann-content-required'  => 'Iontráil ábhar don fhógra.',
+        'file-uploaded'         => 'Uaslódáladh an comhad.',
+        'file-upload-failed'    => 'Níorbh fhéidir an comhad a uaslódáil. Bain triail eile as.',
+        'file-too-large'        => 'Tá an comhad níos mó ná 25 MB. Roghnaigh comhad níos lú.',
+        'file-type-invalid'     => 'Ní ceadaítear an cineál comhaid sin. Seiceáil na formáidí inghlactha.',
+        'file-missing'          => 'Roghnaigh comhad le uaslódáil.',
+        'file-deleted'          => 'Scriosadh an comhad.',
+        'file-delete-failed'    => 'Níorbh fhéidir an comhad a scriosadh. Bain triail eile as.',
+        'file-forbidden'        => 'Níl cead agat an gníomh seo a dhéanamh.',
+        'file-not-found'        => 'Níorbh fhéidir an comhad sin a aimsiú.',
     ],
 
     // ---- Announcements (list, create, edit, delete, pin) ---------------

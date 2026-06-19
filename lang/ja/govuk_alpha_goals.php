@@ -170,5 +170,22 @@ return [
     'nav' => [
         'insights' => 'View goal insights',
         'social' => 'Likes and comments',
+        'history' => '完全な履歴を見る',
+    ],
+
+    'history' => [
+        'title'       => '進捗履歴',
+        'caption'     => '目標',
+        'intro'       => 'この目標のすべてのイベントの時系列記録 — チェックイン、マイルストーン、バディの活動など。',
+        'empty'       => 'この目標にはまだイベントが記録されていません。',
+        'list_aria'   => '目標の進捗履歴',
+        'load_more'   => '古いイベントを読み込む',
+        'type_created'         => '作成済み',
+        'type_progress_update' => '進捗の更新',
+        'type_checkin'         => 'チェックイン',
+        'type_milestone'       => 'マイルストーン',
+        'type_buddy_joined'    => 'バディが参加',
+        'type_buddy_action'    => 'バディのアクション',
+        'type_completed'       => '完了',
     ],
 ];

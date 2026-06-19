@@ -443,4 +443,86 @@ return [
         'error_not_found' => 'That organisation could not be found.',
         'error_failed' => 'Your claim could not be submitted. Please try again.',
     ],
+
+    // Safeguarding — training records + incident reports
+    'safeguarding' => [
+        'title'                               => 'Safeguarding',
+        'description'                         => 'Log your safeguarding training and report any concerns or incidents. All information is handled confidentially by your community administrators.',
+        'tab_nav_label'                       => 'Safeguarding sections',
+        'tab_training'                        => 'Training records',
+        'tab_incidents'                       => 'Incident reports',
+
+        // Training form
+        'add_training_title'                  => 'Log a training record',
+        'training_type_label'                 => 'Training type',
+        'training_type_choose'                => 'Choose a training type',
+        'training_type_children_first'        => 'Children First',
+        'training_type_vulnerable_adults'     => 'Vulnerable Adults',
+        'training_type_first_aid'             => 'First Aid',
+        'training_type_manual_handling'       => 'Manual Handling',
+        'training_type_other'                 => 'Other',
+        'training_name_label'                 => 'Course or programme name',
+        'provider_label'                      => 'Training provider',
+        'completed_at_label'                  => 'Date completed',
+        'expires_at_label'                    => 'Expiry date',
+        'submit_training'                     => 'Log training record',
+
+        // Training list
+        'training_list_title'                 => 'Your training records',
+        'no_training'                         => 'You have not logged any training records yet.',
+        'col_training_name'                   => 'Course name',
+        'col_type'                            => 'Type',
+        'col_completed'                       => 'Completed',
+        'col_expires'                         => 'Expires',
+        'col_status'                          => 'Status',
+
+        // Training statuses
+        'status_pending'                      => 'Pending',
+        'status_verified'                     => 'Verified',
+        'status_expired'                      => 'Expired',
+        'status_rejected'                     => 'Not approved',
+
+        // Incident report form
+        'report_incident_title'               => 'Report a safeguarding concern or incident',
+        'report_notice'                       => 'Use this form to report a concern, allegation, near-miss, or any incident that may relate to the safety or welfare of a person. Your report will be reviewed confidentially by a designated person.',
+        'incident_title_label'                => 'Brief title',
+        'incident_description_label'          => 'Description',
+        'incident_description_hint'           => 'Describe what happened, when, and who was involved. Be as specific as possible. Minimum 20 characters.',
+        'severity_label'                      => 'Severity',
+        'severity_low'                        => 'Low',
+        'severity_medium'                     => 'Medium',
+        'severity_high'                       => 'High',
+        'severity_critical'                   => 'Critical',
+        'category_label'                      => 'Category',
+        'submit_incident'                     => 'Submit report',
+
+        // Incidents list
+        'incidents_list_title'                => 'Your submitted reports',
+        'no_incidents'                        => 'You have not submitted any incident reports.',
+        'col_incident_title'                  => 'Title',
+        'col_severity'                        => 'Severity',
+        'col_incident_status'                 => 'Status',
+        'col_reported'                        => 'Reported',
+
+        // Incident statuses
+        'incident_status_open'                => 'Open',
+        'incident_status_investigating'       => 'Under review',
+        'incident_status_escalated'           => 'Escalated',
+        'incident_status_resolved'            => 'Resolved',
+        'incident_status_closed'              => 'Closed',
+
+        // Success messages
+        'success_training_added'              => 'Your training record has been logged and is awaiting verification.',
+        'success_incident_reported'           => 'Your report has been submitted. A designated person will review it confidentially.',
+
+        // Validation / error messages
+        'error_training_type_required'        => 'Select a training type',
+        'error_training_name_required'        => 'Enter the name of the course or programme',
+        'error_training_date_required'        => 'Enter the date you completed the training',
+        'error_training_failed'               => 'Your training record could not be saved. Please try again.',
+        'error_incident_title_required'       => 'Enter a brief title for the incident',
+        'error_incident_description_short'    => 'Describe what happened in at least 20 characters',
+        'error_incident_failed'               => 'Your report could not be submitted. Please try again.',
+        'error_generic'                       => 'There was a problem. Please check your answers and try again.',
+    ],
 ];
