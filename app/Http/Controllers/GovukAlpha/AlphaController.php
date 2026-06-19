@@ -6491,7 +6491,11 @@ class AlphaController extends Controller
         $course = null;
         $isEnrolled = false;
         $isCompleted = false;
+        $canReview = false;
         $prerequisites = [];
+        $reviews = [];
+        $ratingAvg = 0.0;
+        $ratingCount = 0;
         try {
             $course = \App\Services\CourseService::findById($id);
             if ($course !== null) {
@@ -6499,8 +6503,28 @@ class AlphaController extends Controller
                 // Completion drives the certificate-download affordance.
                 $enrollment = \App\Services\CourseEnrollmentService::find($id, $userId);
                 $isCompleted = $enrollment !== null && ($enrollment->status ?? '') === 'completed';
+                // Only active/completed enrolees may review (mirrors the API).
+                $canReview = $enrollment !== null && in_array($enrollment->status ?? '', ['active', 'completed'], true);
                 // Prerequisite courses + per-learner completion (mirrors React).
                 $prerequisites = \App\Services\CoursePrerequisiteService::statusFor($course, $userId);
+
+                // Approved ratings/reviews + the cached aggregate (CourseReview is
+                // tenant-scoped via HasTenantScope; bodies are escaped in the view).
+                $ratingAvg = (float) ($course->rating_avg ?? 0);
+                $ratingCount = (int) ($course->rating_count ?? 0);
+                $reviews = \App\Models\CourseReview::where('course_id', $id)
+                    ->where('status', 'approved')
+                    ->with('user:id,first_name,last_name')
+                    ->orderByDesc('created_at')
+                    ->limit(50)
+                    ->get(['id', 'course_id', 'user_id', 'rating', 'body', 'created_at'])
+                    ->map(static fn ($r) => [
+                        'rating' => (int) $r->rating,
+                        'body' => (string) ($r->body ?? ''),
+                        'created_at' => $r->created_at?->toIso8601String(),
+                        'name' => $r->user ? trim(($r->user->first_name ?? '') . ' ' . ($r->user->last_name ?? '')) : '',
+                    ])
+                    ->all();
             }
         } catch (\Throwable $e) {
             report($e);
@@ -6514,7 +6538,11 @@ class AlphaController extends Controller
             'course' => $course->toArray(),
             'isEnrolled' => $isEnrolled,
             'isCompleted' => $isCompleted,
+            'canReview' => $canReview,
             'prerequisites' => is_array($prerequisites) ? $prerequisites : [],
+            'reviews' => is_array($reviews) ? $reviews : [],
+            'ratingAvg' => $ratingAvg,
+            'ratingCount' => $ratingCount,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -6587,6 +6615,57 @@ class AlphaController extends Controller
         // (its own <html>), so it is returned directly rather than wrapped in the
         // alpha layout — the learner can print or save it.
         return response($html, 200)->header('Content-Type', 'text/html; charset=UTF-8');
+    }
+
+    /**
+     * Submit (or update) a course rating/review. Mirrors
+     * CourseEnrollmentController::review: only an active/completed enrolee may
+     * review, rating 1–5, one row per (course,user) via updateOrCreate, then the
+     * cached course aggregate is recomputed. CourseReview is tenant-scoped.
+     */
+    public function submitCourseReview(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $enrollment = \App\Services\CourseEnrollmentService::find($id, $userId);
+        if ($enrollment === null || ! in_array($enrollment->status ?? '', ['active', 'completed'], true)) {
+            return redirect()->route('govuk-alpha.courses.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'review-not-enrolled'])->withFragment('reviews');
+        }
+
+        $rating = (int) $request->input('rating');
+        if ($rating < 1 || $rating > 5) {
+            return redirect()->route('govuk-alpha.courses.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'review-invalid'])->withFragment('reviews');
+        }
+
+        try {
+            \App\Models\CourseReview::updateOrCreate(
+                ['course_id' => $id, 'user_id' => $userId],
+                ['rating' => $rating, 'body' => mb_substr(trim(self::asStr($request->input('body'))), 0, 2000), 'status' => 'approved']
+            );
+
+            // Recompute the cached aggregate from approved reviews (tenant-scoped
+            // via the CourseReview model scope), then write it to the course.
+            $agg = \App\Models\CourseReview::where('course_id', $id)
+                ->where('status', 'approved')
+                ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as cnt')
+                ->first();
+            \App\Models\Course::where('id', $id)
+                ->where('tenant_id', TenantContext::getId())
+                ->update([
+                    'rating_avg' => round((float) ($agg->avg_rating ?? 0), 2),
+                    'rating_count' => (int) ($agg->cnt ?? 0),
+                ]);
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.courses.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'review-failed'])->withFragment('reviews');
+        }
+
+        return redirect()->route('govuk-alpha.courses.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'review-saved'])->withFragment('reviews');
     }
 
     // === Podcasts ===

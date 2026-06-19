@@ -285,6 +285,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/courses/{id}', [AlphaController::class, 'course'])->whereNumber('id')->name('courses.show');
         Route::post('/courses/{id}/enrol', [AlphaController::class, 'enrolCourse'])->whereNumber('id')->middleware('throttle:10,1')->name('courses.enrol');
         Route::get('/courses/{id}/certificate', [AlphaController::class, 'courseCertificate'])->whereNumber('id')->middleware('throttle:20,1')->name('courses.certificate');
+        Route::post('/courses/{id}/reviews', [AlphaController::class, 'submitCourseReview'])->whereNumber('id')->middleware('throttle:10,1')->name('courses.reviews.store');
         Route::get('/podcasts', [AlphaController::class, 'podcasts'])->name('podcasts.index');
         Route::get('/podcasts/{id}', [AlphaController::class, 'podcast'])->whereNumber('id')->name('podcasts.show');
         Route::get('/coupons', [AlphaController::class, 'coupons'])->name('coupons.index');

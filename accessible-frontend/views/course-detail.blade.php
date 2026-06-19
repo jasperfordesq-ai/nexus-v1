@@ -23,7 +23,12 @@
             <h1 class="govuk-panel__title">{{ __('govuk_alpha.states.success_title') }}</h1>
             <div class="govuk-panel__body">{{ __('govuk_alpha.courses.states.enrolled') }}</div>
         </div>
-    @elseif (in_array($status, ['insufficient-credits', 'enrol-failed', 'certificate-locked', 'certificate-failed'], true))
+    @elseif ($status === 'review-saved')
+        <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="course-review-status">
+            <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="course-review-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
+            <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.courses.states.review-saved') }}</p></div>
+        </div>
+    @elseif (in_array($status, ['insufficient-credits', 'enrol-failed', 'certificate-locked', 'certificate-failed', 'review-invalid', 'review-not-enrolled', 'review-failed'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>{{ __('govuk_alpha.courses.states.' . $status) }}</li></ul></div></div>
@@ -70,6 +75,65 @@
         <p class="govuk-body">
             <a class="govuk-button govuk-button--secondary" role="button" data-module="govuk-button" href="{{ route('govuk-alpha.courses.certificate', ['tenantSlug' => $tenantSlug, 'id' => $course['id']]) }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha.courses.certificate_download') }}</a>
         </p>
+    @endif
+
+    {{-- Ratings & reviews --}}
+    @php
+        $reviews = is_array($reviews ?? null) ? $reviews : [];
+        $ratingAvg = (float) ($ratingAvg ?? 0);
+        $ratingCount = (int) ($ratingCount ?? 0);
+        $stars = fn (int $n): string => str_repeat('★', max(0, min(5, $n))) . str_repeat('☆', max(0, 5 - max(0, min(5, $n))));
+    @endphp
+    <h2 class="govuk-heading-l govuk-!-margin-top-6" id="reviews">{{ __('govuk_alpha.courses.reviews_label') }}</h2>
+    @if ($ratingCount > 0)
+        <p class="govuk-body-l govuk-!-margin-bottom-1">
+            <span aria-hidden="true">{{ $stars((int) round($ratingAvg)) }}</span>
+            <strong>{{ number_format($ratingAvg, 1) }}</strong> {{ __('govuk_alpha.courses.out_of_5') }}
+        </p>
+        <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-4">{{ trans_choice('govuk_alpha.courses.based_on', $ratingCount, ['count' => $ratingCount]) }}</p>
+    @endif
+
+    @if (!empty($reviews))
+        <ul class="govuk-list govuk-!-margin-bottom-6">
+            @foreach ($reviews as $review)
+                @php
+                    $rName = trim((string) ($review['name'] ?? '')) ?: __('govuk_alpha.courses.review_anonymous');
+                    $rRating = (int) ($review['rating'] ?? 0);
+                    $rBody = trim((string) ($review['body'] ?? ''));
+                    $rDate = !empty($review['created_at']) ? \Illuminate\Support\Carbon::parse($review['created_at'])->translatedFormat('j F Y') : null;
+                @endphp
+                <li class="govuk-!-margin-bottom-3">
+                    <p class="govuk-body-s govuk-!-margin-bottom-1">
+                        <span aria-hidden="true">{{ $stars($rRating) }}</span>
+                        <span class="govuk-visually-hidden">{{ __('govuk_alpha.courses.rating_of_5', ['rating' => $rRating]) }}</span>
+                        <strong>{{ $rName }}</strong>@if ($rDate) · {{ $rDate }}@endif
+                    </p>
+                    @if ($rBody !== '')<p class="govuk-body govuk-!-margin-bottom-0">{{ $rBody }}</p>@endif
+                </li>
+            @endforeach
+        </ul>
+    @elseif ($ratingCount === 0)
+        <p class="govuk-body">{{ __('govuk_alpha.courses.no_reviews_yet') }}</p>
+    @endif
+
+    @if (!empty($canReview))
+        <h3 class="govuk-heading-m">{{ __('govuk_alpha.courses.leave_review_heading') }}</h3>
+        <form method="post" action="{{ route('govuk-alpha.courses.reviews.store', ['tenantSlug' => $tenantSlug, 'id' => $course['id']]) }}">
+            @csrf
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="rating">{{ __('govuk_alpha.courses.rating_label') }}</label>
+                <select class="govuk-select" id="rating" name="rating">
+                    @foreach ([5, 4, 3, 2, 1] as $r)
+                        <option value="{{ $r }}">{{ __('govuk_alpha.courses.rating_option', ['rating' => $r]) }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="body">{{ __('govuk_alpha.courses.review_body_label') }}</label>
+                <textarea class="govuk-textarea" id="body" name="body" rows="4" maxlength="2000"></textarea>
+            </div>
+            <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.courses.review_submit') }}</button>
+        </form>
     @endif
 
     @if (!empty($sections))
