@@ -72,6 +72,9 @@
             <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.org.manage', ['tenantSlug' => $tenantSlug, 'id' => $orgId]) }}">{{ __('govuk_alpha_volunteering.org_dashboard.action_applications') }}</a>
         </li>
         <li>
+            <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.org.volunteers', ['tenantSlug' => $tenantSlug, 'id' => $orgId]) }}">{{ __('govuk_alpha_volunteering.org_volunteers.title') }}</a>
+        </li>
+        <li>
             <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.opportunities.create', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_volunteering.org_dashboard.action_create') }}</a>
         </li>
         <li>

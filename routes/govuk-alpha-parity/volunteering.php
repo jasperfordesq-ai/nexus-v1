@@ -63,6 +63,9 @@ Route::post('/volunteering/opportunities/create', [AlphaController::class, 'volu
 Route::get('/volunteering/organisations/{id}/dashboard', [AlphaController::class, 'volunteeringOrgDashboard'])
     ->whereNumber('id')->name('volunteering.org.dashboard');
 
+Route::get('/volunteering/organisations/{id}/volunteers', [AlphaController::class, 'volunteeringOrgVolunteers'])
+    ->whereNumber('id')->name('volunteering.org.volunteers');
+
 Route::get('/volunteering/organisations/{id}/settings', [AlphaController::class, 'volunteeringOrgSettings'])
     ->whereNumber('id')->name('volunteering.org.settings');
 Route::post('/volunteering/organisations/{id}/settings', [AlphaController::class, 'volunteeringUpdateOrgSettings'])

@@ -5,6 +5,19 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    'org_volunteers' => [
+        'title' => 'Volunteers roster',
+        'description' => 'Approved volunteers who have joined your opportunities.',
+        'back_link' => 'Back to organisation dashboard',
+        'empty' => 'You have no approved volunteers yet.',
+        'empty_hint' => 'Volunteers appear here once you approve them for an opportunity.',
+        'table_name' => 'Name',
+        'table_email' => 'Email',
+        'table_hours' => 'Total hours',
+        'table_applications' => 'Roles',
+        'table_applied_date' => 'Joined',
+        'load_more' => 'Load more volunteers',
+    ],
     // Shared
     'shared' => [
         'back_to_volunteering' => 'Back to volunteering',

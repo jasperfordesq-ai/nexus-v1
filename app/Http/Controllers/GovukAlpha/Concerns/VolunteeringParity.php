@@ -202,6 +202,87 @@ trait VolunteeringParity
         ]);
     }
 
+    /**
+     * Read-only "Volunteers roster" for an organisation the member manages —
+     * approved volunteers with their total approved hours, role count and most
+     * recent application date. Mirrors VolunteerController::orgVolunteers exactly
+     * (same tenant + org scoping, approved-only, correlated hours subquery to
+     * avoid the logs×applications fan-out). The org gate restricts this to the
+     * org owner/admin, so one community's roster can never leak to another.
+     */
+    public function volunteeringOrgVolunteers(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $gate = $this->volunteeringOrgGate($tenantSlug, $id);
+        if ($gate instanceof RedirectResponse) {
+            return $gate;
+        }
+        [, $org] = $gate;
+
+        $tenantId = TenantContext::getId();
+        $limit = 20;
+        $cursor = (int) self::asStr($request->query('cursor'));
+
+        $params = [$id, $tenantId, $tenantId, $id, $tenantId];
+        $cursorClause = '';
+        if ($cursor > 0) {
+            $cursorClause = ' AND u.id < ?';
+            $params[] = $cursor;
+        }
+        $params[] = $limit + 1;
+
+        $volunteers = [];
+        $meta = ['has_more' => false, 'cursor' => null];
+        try {
+            $rows = DB::select("
+                SELECT u.id, u.name, u.avatar_url, u.email,
+                       MAX(va.created_at) as applied_at,
+                       COALESCE((SELECT SUM(vl.hours) FROM vol_logs vl
+                                 WHERE vl.user_id = u.id AND vl.organization_id = ?
+                                   AND vl.tenant_id = ? AND vl.status = 'approved'), 0) as total_hours,
+                       COUNT(DISTINCT va.id) as applications_count
+                FROM users u
+                INNER JOIN vol_applications va ON va.user_id = u.id AND va.tenant_id = u.tenant_id AND va.status = 'approved' AND va.tenant_id = ?
+                INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id AND vo.tenant_id = va.tenant_id AND vo.organization_id = ?
+                WHERE u.tenant_id = ?
+                {$cursorClause}
+                GROUP BY u.id, u.name, u.avatar_url, u.email
+                ORDER BY u.id DESC
+                LIMIT ?
+            ", $params);
+
+            $hasMore = count($rows) > $limit;
+            if ($hasMore) {
+                array_pop($rows);
+            }
+            $volunteers = array_map(static fn ($r) => [
+                'id' => (int) $r->id,
+                'name' => (string) ($r->name ?? ''),
+                'avatar_url' => $r->avatar_url,
+                'email' => (string) ($r->email ?? ''),
+                'total_hours' => (float) $r->total_hours,
+                'applications_count' => (int) $r->applications_count,
+                'applied_at' => $r->applied_at,
+            ], $rows);
+            $last = $volunteers !== [] ? end($volunteers) : null;
+            $meta = [
+                'has_more' => $hasMore,
+                'cursor' => $hasMore && $last ? (string) $last['id'] : null,
+            ];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::volunteering-org-volunteers', [
+            'title' => __('govuk_alpha_volunteering.org_volunteers.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'volunteering',
+            'orgId' => $id,
+            'orgName' => (string) ($org->name ?? ''),
+            'volunteers' => $volunteers,
+            'meta' => $meta,
+        ]);
+    }
+
     // =========================================================================
     // ORG SETTINGS — edit name/description/contact/website (React OrgSettingsTab)
     // =========================================================================
