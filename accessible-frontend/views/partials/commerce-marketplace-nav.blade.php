@@ -44,6 +44,12 @@
             'href' => route('govuk-alpha.marketplace.orders.seller', ['tenantSlug' => $tenantSlug]),
         ];
     }
+    if (\Illuminate\Support\Facades\Route::has('govuk-alpha.marketplace.slots')) {
+        $commerceTabs['slots'] = [
+            'label' => __('govuk_alpha_commerce.nav.slots'),
+            'href' => route('govuk-alpha.marketplace.slots', ['tenantSlug' => $tenantSlug]),
+        ];
+    }
     if (\Illuminate\Support\Facades\Route::has('govuk-alpha.marketplace.mine')) {
         $commerceTabs['mine'] = [
             'label' => __('govuk_alpha_commerce.nav.mine'),

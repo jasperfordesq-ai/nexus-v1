@@ -81,6 +81,8 @@ Route::post('/courses/instructor/{id}/publish', [AlphaController::class, 'commer
 Route::post('/courses/instructor/{id}/unpublish', [AlphaController::class, 'commerceUnpublishCourse'])->whereNumber('id')->middleware('throttle:10,1')->name('courses.instructor.unpublish');
 Route::post('/courses/instructor/{id}/delete', [AlphaController::class, 'commerceDeleteCourse'])->whereNumber('id')->middleware('throttle:10,1')->name('courses.instructor.delete');
 Route::get('/courses/instructor/{id}/analytics', [AlphaController::class, 'commerceCourseAnalytics'])->whereNumber('id')->name('courses.instructor.analytics');
+Route::get('/courses/instructor/{id}/grading', [AlphaController::class, 'commerceCourseGrading'])->whereNumber('id')->name('courses.instructor.grading');
+Route::post('/courses/instructor/{id}/grading/{attemptId}', [AlphaController::class, 'commerceGradeAttempt'])->whereNumber('id')->whereNumber('attemptId')->middleware('throttle:30,1')->name('courses.instructor.grading.grade');
 
 // ===== Courses — instructor section + lesson builder (no-JS CRUD) =====
 // All sub-paths of /courses/instructor/{id} so they never collide with the
@@ -100,6 +102,15 @@ Route::get('/marketplace/pickups', [AlphaController::class, 'commerceMyPickups']
 Route::get('/marketplace/onboarding', [AlphaController::class, 'commerceMerchantOnboarding'])->name('marketplace.onboarding');
 Route::post('/marketplace/onboarding', [AlphaController::class, 'commerceStoreMerchantOnboarding'])->middleware('throttle:10,1')->name('marketplace.onboarding.store');
 Route::get('/marketplace/category/{slug}', [AlphaController::class, 'commerceCategoryListings'])->where('slug', '[A-Za-z0-9_-]+')->name('marketplace.category');
+
+// ===== Seller — pickup-slot management (click-and-collect, no-JS CRUD) =====
+// `slots` is non-numeric so it never collides with the numeric /marketplace/{id}
+// route. Static sub-paths declared before the numeric {id} sub-paths.
+Route::get('/marketplace/slots', [AlphaController::class, 'commerceSellerPickupSlots'])->name('marketplace.slots');
+Route::post('/marketplace/slots', [AlphaController::class, 'commerceStorePickupSlot'])->middleware('throttle:30,1')->name('marketplace.slots.store');
+Route::get('/marketplace/slots/{id}/edit', [AlphaController::class, 'commerceEditPickupSlot'])->whereNumber('id')->name('marketplace.slots.edit');
+Route::post('/marketplace/slots/{id}/update', [AlphaController::class, 'commerceUpdatePickupSlot'])->whereNumber('id')->middleware('throttle:30,1')->name('marketplace.slots.update');
+Route::post('/marketplace/slots/{id}/delete', [AlphaController::class, 'commerceDeletePickupSlot'])->whereNumber('id')->middleware('throttle:30,1')->name('marketplace.slots.delete');
 
 // ===== Seller — merchant coupon management (create / edit / delete) =====
 Route::get('/marketplace/coupons', [AlphaController::class, 'commerceSellerCoupons'])->name('marketplace.coupons');

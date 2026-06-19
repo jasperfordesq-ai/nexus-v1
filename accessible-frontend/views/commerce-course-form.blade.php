@@ -354,6 +354,9 @@
         <div class="govuk-!-margin-top-2">
             <a class="govuk-link" href="{{ route('govuk-alpha.courses.instructor.analytics', ['tenantSlug' => $tenantSlug, 'id' => $courseId]) }}">{{ __('govuk_alpha_commerce.instructor.action_analytics') }}</a>
         </div>
+        <div class="govuk-!-margin-top-2">
+            <a class="govuk-link" href="{{ route('govuk-alpha.courses.instructor.grading', ['tenantSlug' => $tenantSlug, 'id' => $courseId]) }}">{{ __('govuk_alpha_commerce.instructor.action_grading') }}</a>
+        </div>
 
         <h2 class="govuk-heading-m govuk-!-margin-top-6">{{ __('govuk_alpha_commerce.instructor.delete_heading') }}</h2>
         <div class="govuk-warning-text">

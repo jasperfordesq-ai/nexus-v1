@@ -63,6 +63,8 @@ class VolunteeringParityTest extends TestCase
             '/volunteering/wellbeing',
             '/volunteering/donations',
             '/volunteering/opportunities/create',
+            '/volunteering/group-signups',
+            '/volunteering/expenses',
         ] as $path) {
             $response = $this->get("/{$this->testTenantSlug}/alpha{$path}");
             $response->assertRedirect();
@@ -479,6 +481,147 @@ class VolunteeringParityTest extends TestCase
     }
 
     // =====================================================================
+    // Group sign-ups
+    // =====================================================================
+
+    public function test_volunteering_group_signups_renders(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/group-signups");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_volunteering.group_signups.title'));
+    }
+
+    public function test_volunteering_group_signups_lists_a_led_reservation(): void
+    {
+        $user = $this->authenticatedUser();
+        $orgId = $this->createVolOrg((int) $user->id, 'Group Org', 'approved');
+        $this->createGroupReservation((int) $user->id, $orgId, 'Saturday Park Crew');
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/group-signups");
+
+        $response->assertOk();
+        $response->assertSee('Saturday Park Crew');
+        // The caller is the reserver → leader tag + add-member form show.
+        $response->assertSee(__('govuk_alpha_volunteering.group_signups.leader_tag'));
+    }
+
+    public function test_volunteering_group_signups_add_member_requires_an_id(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/group-signups/123/members", [
+            'user_id' => 0,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=member-id-required', $response->headers->get('Location') ?? '');
+    }
+
+    public function test_volunteering_group_signups_cancel_unknown_reservation_fails_gracefully(): void
+    {
+        $this->authenticatedUser();
+
+        // No such reservation → service returns false → cancel-failed flag.
+        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/group-signups/99999999/cancel");
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=reservation-cancel-failed', $response->headers->get('Location') ?? '');
+    }
+
+    // =====================================================================
+    // Expenses
+    // =====================================================================
+
+    public function test_volunteering_expenses_renders(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/expenses");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha_volunteering.expenses.title'));
+    }
+
+    public function test_volunteering_expenses_403_when_feature_disabled(): void
+    {
+        $this->authenticatedUser();
+
+        $row = DB::table('tenants')->where('id', $this->testTenantId)->value('features');
+        $current = $row ? (json_decode($row, true) ?: []) : [];
+        $current['volunteering'] = false;
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['features' => json_encode($current)]);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/expenses");
+
+        $response->assertForbidden();
+    }
+
+    public function test_volunteering_submit_expense_persists(): void
+    {
+        $user = $this->authenticatedUser();
+        $orgId = $this->createVolOrg((int) $user->id, 'Expense Org', 'approved');
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/expenses", [
+            'organization_id' => $orgId,
+            'expense_type' => 'travel',
+            'amount' => '12.50',
+            'description' => 'Bus fare to the food bank shift.',
+            'currency' => 'EUR',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=expense-submitted', $response->headers->get('Location') ?? '');
+        $this->assertDatabaseHas('vol_expenses', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => (int) $user->id,
+            'organization_id' => $orgId,
+            'expense_type' => 'travel',
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_volunteering_submit_expense_rejects_missing_organisation(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/expenses", [
+            'organization_id' => 0,
+            'expense_type' => 'travel',
+            'amount' => '10',
+            'description' => 'Something',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=expense-org-required', $response->headers->get('Location') ?? '');
+    }
+
+    public function test_volunteering_submit_expense_rejects_zero_amount(): void
+    {
+        $user = $this->authenticatedUser();
+        $orgId = $this->createVolOrg((int) $user->id, 'Zero Org', 'approved');
+
+        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/expenses", [
+            'organization_id' => $orgId,
+            'expense_type' => 'meals',
+            'amount' => '0',
+            'description' => 'Lunch',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertStringContainsString('status=expense-amount-invalid', $response->headers->get('Location') ?? '');
+        $this->assertDatabaseMissing('vol_expenses', [
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $orgId,
+            'expense_type' => 'meals',
+        ]);
+    }
+
+    // =====================================================================
     // Helpers
     // =====================================================================
 
@@ -520,5 +663,58 @@ class VolunteeringParityTest extends TestCase
         ]);
 
         return (int) DB::getPdo()->lastInsertId();
+    }
+
+    /**
+     * Build a minimal group reservation led by $reservedBy: an opportunity +
+     * a future shift + an active reservation row. Returns the reservation id.
+     * getUserReservations() joins opportunity (required) + organisation (left),
+     * so all three rows are written. A group row is also inserted so the
+     * service's Group::find() lookup resolves a name.
+     */
+    private function createGroupReservation(int $reservedBy, int $orgId, string $groupName): int
+    {
+        $groupId = (int) (DB::table('groups')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'name' => $groupName,
+            'owner_id' => $reservedBy,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]));
+
+        $oppId = (int) (DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $orgId,
+            'title' => 'Group Opportunity',
+            'description' => 'A group volunteering opportunity.',
+            'location' => 'Town Hall',
+            'is_active' => 1,
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]));
+
+        $shiftId = (int) (DB::table('vol_shifts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $oppId,
+            'start_time' => now()->addDays(3),
+            'end_time' => now()->addDays(3)->addHours(2),
+            'capacity' => 10,
+            'created_at' => now(),
+        ]));
+
+        $reservationId = (int) (DB::table('vol_shift_group_reservations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'shift_id' => $shiftId,
+            'group_id' => $groupId,
+            'reserved_slots' => 5,
+            'filled_slots' => 0,
+            'reserved_by' => $reservedBy,
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]));
+
+        return $reservationId;
     }
 }

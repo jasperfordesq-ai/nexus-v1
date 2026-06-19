@@ -1156,4 +1156,176 @@ trait IdeationParity
             return [];
         }
     }
+
+    // ================================================================
+    // DRAFT IDEAS (high) — /ideation/{id}/drafts
+    // ================================================================
+
+    /**
+     * The signed-in member's draft ideas for a challenge, with an inline edit
+     * + publish form per draft. Mirrors the "Your drafts" panel inside the
+     * React ChallengeDetailPage submit-idea modal (GET
+     * /v2/ideation-challenges/{id}/ideas/drafts). Cross-tenant / unknown
+     * challenge → 404.
+     *
+     * Note on parity scope: the React "save a NEW draft" button posts to
+     * POST /v2/ideation-challenges/{id}/ideas with is_draft=true, but the
+     * shared IdeationChallengeService::submitIdea() ignores is_draft and always
+     * persists status='submitted'. There is no service method that creates a
+     * status='draft' idea, so new-draft creation is intentionally NOT offered
+     * here (no working backend). Listing, editing and publishing existing
+     * drafts ARE fully backed (getUserDrafts + updateDraftIdea) and are built.
+     */
+    public function ideationDrafts(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $userId = $this->ideationGuard($tenantSlug);
+        if ($userId instanceof RedirectResponse) {
+            return $userId;
+        }
+
+        $svc = app(\App\Services\IdeationChallengeService::class);
+
+        $challenge = null;
+        try {
+            $challenge = $svc->getById($id);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($challenge === null, 404);
+
+        $drafts = [];
+        try {
+            $drafts = $svc->getUserDrafts($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::ideation-drafts', [
+            'title' => __('govuk_alpha_ideation.drafts.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'challenge' => $challenge,
+            'drafts' => is_array($drafts) ? $drafts : [],
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * Save or publish an existing draft idea (owner only). Mirrors
+     * PUT /v2/ideation-ideas/{ideaId}/draft. The service enforces owner +
+     * draft-status; a "publish" intent promotes the draft to a submitted idea.
+     */
+    public function ideationUpdateDraftIdea(Request $request, string $tenantSlug, int $id, int $ideaId): RedirectResponse
+    {
+        $userId = $this->ideationGuard($tenantSlug);
+        if ($userId instanceof RedirectResponse) {
+            return $userId;
+        }
+
+        $title = trim(self::asStr($request->input('draft_title')));
+        $description = trim(self::asStr($request->input('draft_description')));
+        $publish = self::asStr($request->input('draft_action')) === 'publish';
+
+        if ($title === '') {
+            return redirect()->route('govuk-alpha.ideation.drafts', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => 'draft-invalid',
+            ]);
+        }
+
+        $ok = false;
+        try {
+            $ok = app(\App\Services\IdeationChallengeService::class)->updateDraftIdea($ideaId, $userId, [
+                'title' => mb_substr($title, 0, 255),
+                'description' => mb_substr($description, 0, 5000),
+                'publish' => $publish,
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // A successful publish moves the idea out of the drafts list — send the
+        // member to the published idea instead of back to the (now shorter) list.
+        if ($ok && $publish) {
+            return redirect()->route('govuk-alpha.ideation.idea', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'ideaId' => $ideaId,
+                'status' => 'idea-submitted',
+            ]);
+        }
+
+        $statusKey = $ok ? 'draft-saved' : 'draft-failed';
+
+        return redirect()->route('govuk-alpha.ideation.drafts', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $statusKey,
+        ]);
+    }
+
+    // ================================================================
+    // POPULAR TAGS (med) — /ideation/tags
+    // ================================================================
+
+    /**
+     * Browse challenges by popular tag. Lists the most-used tags for the tenant
+     * (IdeationChallengeService::getAllTags, the same data behind React's
+     * GET /v2/ideation-tags/popular tag filter on IdeationPage) and, when a
+     * ?tag= is selected, the challenges carrying that tag. The shared getAll()
+     * does not accept a tag filter, so the selected-tag matching is done here
+     * against the decoded per-challenge tags array the service already returns.
+     */
+    public function ideationPopularTags(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $userId = $this->ideationGuard($tenantSlug);
+        if ($userId instanceof RedirectResponse) {
+            return $userId;
+        }
+
+        $svc = app(\App\Services\IdeationChallengeService::class);
+
+        $tags = [];
+        try {
+            $tags = $svc->getAllTags();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        $tags = is_array($tags) ? $tags : [];
+
+        $selectedTag = trim(self::asStr($request->query('tag')));
+        if (mb_strlen($selectedTag) > 100) {
+            $selectedTag = mb_substr($selectedTag, 0, 100);
+        }
+
+        $matches = [];
+        if ($selectedTag !== '') {
+            $needle = mb_strtolower($selectedTag);
+            try {
+                $items = $svc->getAll(['limit' => 100])['items'] ?? [];
+            } catch (\Throwable $e) {
+                report($e);
+                $items = [];
+            }
+            foreach (is_array($items) ? $items : [] as $item) {
+                $itemTags = is_array($item['tags'] ?? null) ? $item['tags'] : [];
+                foreach ($itemTags as $itemTag) {
+                    if (mb_strtolower(trim((string) $itemTag)) === $needle) {
+                        $matches[] = $item;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $this->view('accessible-frontend::ideation-tags', [
+            'title' => __('govuk_alpha_ideation.tags.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'tags' => $tags,
+            'selectedTag' => $selectedTag !== '' ? $selectedTag : null,
+            'matches' => $matches,
+        ]);
+    }
 }

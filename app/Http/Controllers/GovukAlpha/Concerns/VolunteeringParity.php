@@ -12,7 +12,9 @@ use App\Services\VolunteerEmergencyAlertService;
 use App\Services\VolunteerWellbeingService;
 use App\Services\VolunteerMatchingService;
 use App\Services\VolunteerDonationService;
+use App\Services\VolunteerExpenseService;
 use App\Services\VolOrgWalletService;
+use App\Services\ShiftGroupReservationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -1018,5 +1020,282 @@ trait VolunteeringParity
         }
 
         return $redirect('donate-recorded');
+    }
+
+    // =========================================================================
+    // GROUP SIGN-UPS — team shift reservations (React GroupSignUpTab)
+    //
+    // Lists every group reservation the caller leads or is a member of, calling
+    // the SAME ShiftGroupReservationService the React API (VolunteerCommunity-
+    // Controller::myGroupReservations) uses. Group leaders can add a member by
+    // user ID, remove a member, or cancel the whole reservation — all via plain
+    // no-JS POST forms. The React tab's debounced user-search autocomplete is a
+    // JS-only convenience; the HTML-first form takes the numeric user ID
+    // directly (the service validates leadership + capacity + membership). No
+    // reservation/slot/membership logic is reimplemented here.
+    // =========================================================================
+
+    public function volunteeringGroupSignups(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = TenantContext::getId();
+        $reservations = [];
+        try {
+            // Same read the React tab issues against /v2/volunteering/group-reservations.
+            $reservations = ShiftGroupReservationService::getUserReservations($userId, $tenantId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::volunteering-group-signups', [
+            'title' => __('govuk_alpha_volunteering.group_signups.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'volunteering',
+            'reservations' => $reservations,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function volunteeringAddGroupMember(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $memberUserId = (int) $request->input('user_id', 0);
+        if ($memberUserId <= 0) {
+            return redirect()->route('govuk-alpha.volunteering.group-signups', [
+                'tenantSlug' => $tenantSlug, 'status' => 'member-id-required',
+            ]);
+        }
+
+        $ok = false;
+        try {
+            // The service enforces leadership, capacity and the active-reservation
+            // check, running the slot increment inside a locked transaction.
+            $ok = ShiftGroupReservationService::addMember($id, $memberUserId, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.group-signups', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'member-added' : 'member-add-failed',
+        ]);
+    }
+
+    public function volunteeringRemoveGroupMember(Request $request, string $tenantSlug, int $id, int $userId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $leaderId = $this->currentUserId();
+        if ($leaderId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $ok = false;
+        try {
+            // Leadership-gated removal; decrements filled_slots in a transaction.
+            $ok = ShiftGroupReservationService::removeMember($id, $userId, $leaderId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.group-signups', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'member-removed' : 'member-remove-failed',
+        ]);
+    }
+
+    public function volunteeringCancelGroupReservation(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $ok = false;
+        try {
+            // Leadership-gated cancel; cancels the reservation + all member rows.
+            $ok = ShiftGroupReservationService::cancelReservation($id, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.group-signups', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'reservation-cancelled' : 'reservation-cancel-failed',
+        ]);
+    }
+
+    // =========================================================================
+    // EXPENSES — claim travel/meals/supplies costs back (React ExpensesTab)
+    //
+    // Lists the caller's own expense claims with totals, plus an HTML-first
+    // submit form. Calls the SAME VolunteerExpenseService the React API
+    // (VolunteerExpenseController::myExpenses / submitExpense) uses — all policy
+    // validation, org-relationship checks and tenant-scoping live in the service.
+    // The org dropdown is filled from VolunteerService::getMyOrganizations,
+    // exactly as the React tab does. Receipt file upload is omitted (the React
+    // member form does not upload a receipt either — it posts type/amount/
+    // description/currency only).
+    // =========================================================================
+
+    /** Expense types accepted by VolunteerExpenseService::submitExpense. */
+    private const VOL_EXPENSE_TYPES = ['travel', 'meals', 'supplies', 'equipment', 'parking', 'other'];
+
+    public function volunteeringExpenses(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // The caller's own claims (same filter the React member tab passes).
+        $expenses = [];
+        try {
+            $result = VolunteerExpenseService::getExpenses([
+                'user_id' => $userId,
+                'limit' => 50,
+            ]);
+            $expenses = $result['items'] ?? [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // Header totals — mirror the React tab's client-side reduction over the
+        // loaded claims (claimed / approved-or-paid / paid).
+        $totalClaimed = 0.0;
+        $totalApproved = 0.0;
+        $totalPaid = 0.0;
+        foreach ($expenses as $expense) {
+            $amount = (float) ($expense['amount'] ?? 0);
+            $statusValue = (string) ($expense['status'] ?? '');
+            $totalClaimed += $amount;
+            if ($statusValue === 'approved' || $statusValue === 'paid') {
+                $totalApproved += $amount;
+            }
+            if ($statusValue === 'paid') {
+                $totalPaid += $amount;
+            }
+        }
+
+        // Organisations the caller can claim against (the form's org dropdown).
+        $organizations = [];
+        try {
+            $orgs = VolunteerService::getMyOrganizations($userId, ['limit' => 50])['items'] ?? [];
+            foreach ($orgs as $o) {
+                $organizations[] = [
+                    'id' => (int) ($o['id'] ?? 0),
+                    'name' => (string) ($o['name'] ?? ''),
+                ];
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::volunteering-expenses', [
+            'title' => __('govuk_alpha_volunteering.expenses.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'volunteering',
+            'expenses' => $expenses,
+            'organizations' => $organizations,
+            'expenseTypes' => self::VOL_EXPENSE_TYPES,
+            'stats' => [
+                'total_claimed' => $totalClaimed,
+                'total_approved' => $totalApproved,
+                'total_paid' => $totalPaid,
+            ],
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    public function volunteeringSubmitExpense(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('volunteering'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $organizationId = (int) $request->input('organization_id', 0);
+        $expenseType = $this->allowed($request->input('expense_type'), self::VOL_EXPENSE_TYPES, 'travel');
+        $amount = (float) $request->input('amount', 0);
+        $description = trim(self::asStr($request->input('description')));
+        $currency = trim(self::asStr($request->input('currency')));
+
+        // Friendly inline validation; the service re-validates everything.
+        if ($organizationId <= 0) {
+            return redirect()->route('govuk-alpha.volunteering.expenses', [
+                'tenantSlug' => $tenantSlug, 'status' => 'expense-org-required',
+            ]);
+        }
+        if ($amount <= 0) {
+            return redirect()->route('govuk-alpha.volunteering.expenses', [
+                'tenantSlug' => $tenantSlug, 'status' => 'expense-amount-invalid',
+            ]);
+        }
+        if ($description === '') {
+            return redirect()->route('govuk-alpha.volunteering.expenses', [
+                'tenantSlug' => $tenantSlug, 'status' => 'expense-description-required',
+            ]);
+        }
+
+        $data = [
+            'organization_id' => $organizationId,
+            'expense_type' => $expenseType,
+            'amount' => $amount,
+            'description' => $description,
+        ];
+        if ($currency !== '') {
+            $data['currency'] = mb_substr($currency, 0, 10);
+        }
+
+        try {
+            // Same service the React submitExpense endpoint calls — it owns
+            // policy limits, org-relationship checks and the insert. It also
+            // throws on validation/forbidden/not-found, which we map to a flag.
+            VolunteerExpenseService::submitExpense($userId, $data);
+        } catch (\InvalidArgumentException $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.volunteering.expenses', [
+                'tenantSlug' => $tenantSlug, 'status' => 'expense-validation',
+            ]);
+        } catch (\RuntimeException $e) {
+            report($e);
+            $status = (int) $e->getCode() === 403 ? 'expense-forbidden' : 'expense-not-found';
+            return redirect()->route('govuk-alpha.volunteering.expenses', [
+                'tenantSlug' => $tenantSlug, 'status' => $status,
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.volunteering.expenses', [
+                'tenantSlug' => $tenantSlug, 'status' => 'expense-failed',
+            ]);
+        }
+
+        return redirect()->route('govuk-alpha.volunteering.expenses', [
+            'tenantSlug' => $tenantSlug, 'status' => 'expense-submitted',
+        ]);
     }
 }

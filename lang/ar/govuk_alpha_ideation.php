@@ -184,6 +184,39 @@ return [
         'unlink_aria' => 'Unlink challenge: :title',
     ],
 
+    'drafts' => [
+        'title' => 'Your draft ideas',
+        'caption' => ':challenge',
+        'intro' => 'Drafts are only visible to you. Finish a draft and publish it to share your idea with the challenge.',
+        'empty' => 'You have no draft ideas for this challenge.',
+        'back_to_challenge' => 'Back to challenge',
+        'edit_heading' => 'Edit draft',
+        'title_label' => 'Idea title',
+        'description_label' => 'Idea details',
+        'description_hint' => 'You can save a draft with just a title, but you will need details before you can publish.',
+        'save' => 'Save draft',
+        'publish' => 'Publish idea',
+        'publish_warning' => 'Publishing shares this idea with everyone and it can no longer be edited as a draft.',
+        'saved_on' => 'Saved :date',
+        'created_on' => 'Started :date',
+        'untitled' => 'Untitled draft',
+        'status' => 'Draft',
+    ],
+
+    'tags' => [
+        'title' => 'Browse by tag',
+        'caption' => ':community',
+        'intro' => 'Find challenges by their most popular tags.',
+        'empty' => 'No tags have been added to any challenges yet.',
+        'back_to_challenges' => 'Back to all challenges',
+        'popular_heading' => 'Popular tags',
+        'tag_count' => '{0} No challenges|{1} 1 challenge|[2,*] :count challenges',
+        'selected_heading' => 'Challenges tagged ":tag"',
+        'no_matches' => 'No challenges are tagged ":tag" right now.',
+        'clear' => 'Clear tag',
+        'view_challenge' => 'View challenge',
+    ],
+
     'outcomes' => [
         'title' => 'Outcomes',
         'caption' => ':community',
@@ -246,6 +279,10 @@ return [
         'challenge-unlinked' => 'The challenge has been unlinked from the campaign.',
         'outcome-saved' => 'The outcome has been saved.',
         'outcome-failed' => 'Sorry, the outcome could not be saved. Please try again.',
+        'draft-saved' => 'Your draft has been saved.',
+        'draft-invalid' => 'Enter a title for your draft.',
+        'draft-failed' => 'Sorry, your draft could not be saved. Please try again.',
+        'idea-submitted' => 'Your idea has been published.',
     ],
 
     'detail' => [

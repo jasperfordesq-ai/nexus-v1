@@ -339,6 +339,16 @@ class CampaignService
             return false;
         }
 
+        // Verify the campaign belongs to the current tenant before touching the
+        // junction table (campaign_challenges has no tenant_id column, so an
+        // unscoped delete by id would let a tenant admin unlink another tenant's
+        // campaign-challenge links). Campaign::find applies the HasTenantScope.
+        $campaign = Campaign::find($campaignId);
+        if (!$campaign) {
+            $this->addError('RESOURCE_NOT_FOUND', 'Campaign not found');
+            return false;
+        }
+
         try {
             DB::table('campaign_challenges')
                 ->where('campaign_id', $campaignId)

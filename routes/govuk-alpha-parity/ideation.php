@@ -34,6 +34,10 @@ Route::post('/ideation/campaigns/{id}/challenges/{challengeId}/unlink', [AlphaCo
 Route::get('/ideation/outcomes', [AlphaController::class, 'ideationOutcomes'])
     ->name('ideation.outcomes');
 
+// --- Browse by popular tag (static prefix before challenge {id}) ---
+Route::get('/ideation/tags', [AlphaController::class, 'ideationPopularTags'])
+    ->name('ideation.tags');
+
 // --- Challenge create (static segment before {id}) ---
 Route::get('/ideation/new', [AlphaController::class, 'ideationCreateChallenge'])
     ->name('ideation.create');
@@ -61,6 +65,12 @@ Route::get('/ideation/{id}/outcome', [AlphaController::class, 'ideationOutcomeEd
     ->whereNumber('id')->name('ideation.outcome');
 Route::post('/ideation/{id}/outcome', [AlphaController::class, 'ideationStoreOutcome'])
     ->whereNumber('id')->middleware('throttle:20,1')->name('ideation.outcome.store');
+
+// --- Draft ideas (list + save/publish an existing draft) ---
+Route::get('/ideation/{id}/drafts', [AlphaController::class, 'ideationDrafts'])
+    ->whereNumber('id')->name('ideation.drafts');
+Route::post('/ideation/{id}/drafts/{ideaId}', [AlphaController::class, 'ideationUpdateDraftIdea'])
+    ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:20,1')->name('ideation.drafts.update');
 
 // --- Idea detail + interactions (deepest path) ---
 Route::get('/ideation/{id}/ideas/{ideaId}', [AlphaController::class, 'ideationIdeaDetail'])

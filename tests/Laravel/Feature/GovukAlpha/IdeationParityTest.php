@@ -666,6 +666,209 @@ class IdeationParityTest extends GovukAlphaFrontendTest
     }
 
     // ================================================================
+    // Draft ideas
+    // ================================================================
+
+    private function ideationCreateDraft(int $challengeId, int $authorId, array $overrides = []): int
+    {
+        return $this->ideationCreateIdea($challengeId, $authorId, array_merge([
+            'title' => 'A half-finished idea',
+            'description' => '',
+            'status' => 'draft',
+        ], $overrides));
+    }
+
+    public function test_ideation_drafts_page_requires_login(): void
+    {
+        $this->ideationEnableFeature();
+        $author = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $challengeId = $this->ideationCreateChallenge($author->id);
+
+        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts");
+
+        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+    }
+
+    public function test_ideation_drafts_page_lists_only_own_drafts(): void
+    {
+        $this->ideationEnableFeature();
+        $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $member = $this->ideationUser();
+        $challengeId = $this->ideationCreateChallenge($member->id);
+        $this->ideationCreateDraft($challengeId, $member->id, ['title' => 'My own draft']);
+        $this->ideationCreateDraft($challengeId, $other->id, ['title' => 'Someone elses draft']);
+
+        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts");
+
+        $resp->assertOk();
+        $resp->assertSee('My own draft');
+        $resp->assertDontSee('Someone elses draft');
+    }
+
+    public function test_ideation_drafts_page_unknown_challenge_returns_404(): void
+    {
+        $this->ideationEnableFeature();
+        $this->ideationUser();
+
+        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/99999999/drafts");
+
+        $resp->assertNotFound();
+    }
+
+    public function test_ideation_draft_save_persists_title(): void
+    {
+        $this->ideationEnableFeature();
+        $member = $this->ideationUser();
+        $challengeId = $this->ideationCreateChallenge($member->id);
+        $draftId = $this->ideationCreateDraft($challengeId, $member->id);
+
+        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts/{$draftId}", [
+            'draft_title' => 'Now with a better title',
+            'draft_description' => 'Still working on the detail.',
+            'draft_action' => 'save',
+        ]);
+
+        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts?status=draft-saved");
+        $this->assertDatabaseHas('challenge_ideas', [
+            'id' => $draftId,
+            'title' => 'Now with a better title',
+            'status' => 'draft',
+        ]);
+    }
+
+    public function test_ideation_draft_publish_promotes_to_submitted(): void
+    {
+        $this->ideationEnableFeature();
+        $member = $this->ideationUser();
+        $challengeId = $this->ideationCreateChallenge($member->id);
+        $draftId = $this->ideationCreateDraft($challengeId, $member->id);
+
+        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts/{$draftId}", [
+            'draft_title' => 'Ready to share',
+            'draft_description' => 'A fully formed idea with detail.',
+            'draft_action' => 'publish',
+        ]);
+
+        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas/{$draftId}?status=idea-submitted");
+        $this->assertDatabaseHas('challenge_ideas', [
+            'id' => $draftId,
+            'title' => 'Ready to share',
+            'status' => 'submitted',
+        ]);
+    }
+
+    public function test_ideation_draft_save_rejects_empty_title(): void
+    {
+        $this->ideationEnableFeature();
+        $member = $this->ideationUser();
+        $challengeId = $this->ideationCreateChallenge($member->id);
+        $draftId = $this->ideationCreateDraft($challengeId, $member->id, ['title' => 'Original title']);
+
+        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts/{$draftId}", [
+            'draft_title' => '   ',
+            'draft_action' => 'save',
+        ]);
+
+        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts?status=draft-invalid");
+        $this->assertDatabaseHas('challenge_ideas', ['id' => $draftId, 'title' => 'Original title']);
+    }
+
+    public function test_ideation_draft_cannot_be_edited_by_non_owner(): void
+    {
+        $this->ideationEnableFeature();
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $challengeId = $this->ideationCreateChallenge($owner->id);
+        $draftId = $this->ideationCreateDraft($challengeId, $owner->id, ['title' => 'Owners draft']);
+
+        // A different member attempts to edit it — the service rejects (not owner),
+        // so the title must be unchanged and we land on draft-failed.
+        $this->ideationUser();
+        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts/{$draftId}", [
+            'draft_title' => 'Hijacked title',
+            'draft_action' => 'save',
+        ]);
+
+        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts?status=draft-failed");
+        $this->assertDatabaseHas('challenge_ideas', ['id' => $draftId, 'title' => 'Owners draft']);
+    }
+
+    // ================================================================
+    // Browse by popular tag
+    // ================================================================
+
+    public function test_ideation_tags_page_requires_login(): void
+    {
+        $this->ideationEnableFeature();
+
+        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/tags");
+
+        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+    }
+
+    public function test_ideation_tags_page_renders_popular_tags(): void
+    {
+        $this->ideationEnableFeature();
+        $member = $this->ideationUser();
+        $challengeId = $this->ideationCreateChallenge($member->id);
+
+        // Create a tag and link the challenge to it (mirrors getAllTags()).
+        $tagId = DB::table('challenge_tags')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Sustainability',
+            'slug' => 'sustainability',
+            'tag_type' => 'general',
+            'created_at' => now(),
+        ]);
+        DB::table('challenge_tag_links')->insert([
+            'challenge_id' => $challengeId,
+            'tag_id' => $tagId,
+        ]);
+
+        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/tags");
+
+        $resp->assertOk();
+        $resp->assertSee(__('govuk_alpha_ideation.tags.popular_heading'));
+        $resp->assertSee('Sustainability');
+    }
+
+    public function test_ideation_tags_page_filters_challenges_by_selected_tag(): void
+    {
+        $this->ideationEnableFeature();
+        $member = $this->ideationUser();
+        // One challenge tagged 'climate' (stored in the JSON tags column), one not.
+        $tagged = $this->ideationCreateChallenge($member->id, [
+            'title' => 'Tagged climate challenge',
+            'tags' => json_encode(['climate', 'design']),
+        ]);
+        $this->ideationCreateChallenge($member->id, [
+            'title' => 'Untagged challenge',
+            'tags' => json_encode([]),
+        ]);
+
+        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/tags?tag=climate");
+
+        $resp->assertOk();
+        $resp->assertSee('Tagged climate challenge');
+        $resp->assertDontSee('Untagged challenge');
+    }
+
+    public function test_ideation_tags_page_feature_gated_returns_403(): void
+    {
+        $row = DB::table('tenants')->where('id', $this->testTenantId)->value('features');
+        $current = $row ? (json_decode($row, true) ?: []) : [];
+        $current['ideation_challenges'] = false;
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['features' => json_encode($current)]);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        $this->ideationUser();
+
+        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/tags");
+
+        $resp->assertForbidden();
+    }
+
+    // ================================================================
     // Feature gate
     // ================================================================
 

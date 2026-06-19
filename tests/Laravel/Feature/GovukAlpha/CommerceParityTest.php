@@ -905,6 +905,236 @@ class CommerceParityTest extends TestCase
     }
 
     // ==================================================================
+    //  Marketplace — seller pickup-slot management
+    // ==================================================================
+
+    public function test_commerce_seller_pickup_slots_requires_auth(): void
+    {
+        $this->enableAlphaFeatures(['marketplace']);
+        $this->get("/{$this->testTenantSlug}/alpha/marketplace/slots")
+            ->assertRedirectContains('/alpha/login');
+    }
+
+    public function test_commerce_seller_pickup_slots_gated_off_by_default(): void
+    {
+        $this->authenticatedUser(['name' => 'Slot Gated']);
+        $this->get("/{$this->testTenantSlug}/alpha/marketplace/slots")->assertStatus(403);
+    }
+
+    public function test_commerce_seller_pickup_slots_lists(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Slot Seller']);
+        $this->enableAlphaFeatures(['marketplace']);
+        $profileId = $this->seedSellerProfile($user->id);
+        $this->seedPickupSlot($profileId);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/slots");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha_commerce.slots.title'));
+        $res->assertSee('name="capacity"', false);
+    }
+
+    public function test_commerce_store_pickup_slot_persists(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Slot Creator']);
+        $this->enableAlphaFeatures(['marketplace']);
+
+        $start = now()->addDay()->format('Y-m-d\TH:i');
+        $end = now()->addDay()->addHour()->format('Y-m-d\TH:i');
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/slots", [
+            'slot_start' => $start,
+            'slot_end' => $end,
+            'capacity' => '8',
+            'is_recurring' => '1',
+            'is_active' => '1',
+        ]);
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $profileId = (int) DB::table('marketplace_seller_profiles')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->value('id');
+        $this->assertDatabaseHas('marketplace_pickup_slots', [
+            'tenant_id' => $this->testTenantId,
+            'seller_id' => $profileId,
+            'capacity' => 8,
+            'is_recurring' => 1,
+        ]);
+    }
+
+    public function test_commerce_store_pickup_slot_validates_times(): void
+    {
+        $this->authenticatedUser(['name' => 'Bad Slot']);
+        $this->enableAlphaFeatures(['marketplace']);
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/slots", [
+            'slot_start' => '',
+            'slot_end' => '',
+            'capacity' => '5',
+        ]);
+        $res->assertRedirect();
+        $res->assertSessionHas('commercePickupSlotErrors');
+    }
+
+    public function test_commerce_edit_pickup_slot_renders_for_owner(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Slot Owner']);
+        $this->enableAlphaFeatures(['marketplace']);
+        $profileId = $this->seedSellerProfile($user->id);
+        $slotId = $this->seedPickupSlot($profileId);
+
+        $this->get("/{$this->testTenantSlug}/alpha/marketplace/slots/{$slotId}/edit")->assertOk();
+    }
+
+    public function test_commerce_edit_pickup_slot_cross_seller_404(): void
+    {
+        // The slot belongs to a DIFFERENT seller profile → the owning member
+        // resolves their own (empty) profile, so the slot id is not found → 404.
+        $foreignSellerUser = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $foreignProfileId = $this->seedSellerProfile($foreignSellerUser->id);
+        $foreignSlotId = $this->seedPickupSlot($foreignProfileId);
+
+        $this->authenticatedUser(['name' => 'Other Seller']);
+        $this->enableAlphaFeatures(['marketplace']);
+
+        $this->get("/{$this->testTenantSlug}/alpha/marketplace/slots/{$foreignSlotId}/edit")->assertStatus(404);
+    }
+
+    public function test_commerce_update_pickup_slot_persists_changes(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Slot Updater']);
+        $this->enableAlphaFeatures(['marketplace']);
+        $profileId = $this->seedSellerProfile($user->id);
+        $slotId = $this->seedPickupSlot($profileId);
+
+        $start = now()->addDays(2)->format('Y-m-d\TH:i');
+        $end = now()->addDays(2)->addHours(2)->format('Y-m-d\TH:i');
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/slots/{$slotId}/update", [
+            'slot_start' => $start,
+            'slot_end' => $end,
+            'capacity' => '12',
+            'is_active' => '1',
+        ]);
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseHas('marketplace_pickup_slots', [
+            'id' => $slotId,
+            'tenant_id' => $this->testTenantId,
+            'seller_id' => $profileId,
+            'capacity' => 12,
+        ]);
+    }
+
+    public function test_commerce_delete_pickup_slot_removes_it(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Slot Deleter']);
+        $this->enableAlphaFeatures(['marketplace']);
+        $profileId = $this->seedSellerProfile($user->id);
+        $slotId = $this->seedPickupSlot($profileId);
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/slots/{$slotId}/delete");
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseMissing('marketplace_pickup_slots', ['id' => $slotId]);
+    }
+
+    // ==================================================================
+    //  Courses — instructor grading queue
+    // ==================================================================
+
+    public function test_commerce_course_grading_requires_auth(): void
+    {
+        $this->enableAlphaFeatures(['courses']);
+        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/1/grading")
+            ->assertRedirectContains('/alpha/login');
+    }
+
+    public function test_commerce_course_grading_gated_off_by_default(): void
+    {
+        $this->authenticatedUser(['name' => 'Grading Gated']);
+        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/1/grading")->assertStatus(403);
+    }
+
+    public function test_commerce_course_grading_owner_only(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Grading Owner']);
+        $this->enableAlphaFeatures(['courses']);
+        $courseId = $this->seedCourse($owner->id, 'Gradable Course');
+
+        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$courseId}/grading")->assertOk();
+
+        $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        Sanctum::actingAs($other, ['*']);
+        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$courseId}/grading")->assertStatus(403);
+    }
+
+    public function test_commerce_course_grading_lists_pending(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Grading Lister']);
+        $this->enableAlphaFeatures(['courses']);
+        $courseId = $this->seedCourse($owner->id, 'Quiz Course');
+        $quizId = $this->seedQuiz($courseId);
+        $learner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Learner Smith']);
+        $this->seedQuizAttempt($quizId, $learner->id, 'pending_review');
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$courseId}/grading");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha_commerce.grading.title'));
+        $res->assertSee('Learner Smith');
+    }
+
+    public function test_commerce_grade_attempt_persists(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Grader']);
+        $this->enableAlphaFeatures(['courses']);
+        $courseId = $this->seedCourse($owner->id, 'Grade Me Course');
+        $quizId = $this->seedQuiz($courseId);
+        $learner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $attemptId = $this->seedQuizAttempt($quizId, $learner->id, 'pending_review');
+
+        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$courseId}/grading/{$attemptId}", [
+            'score_percent' => '85',
+            'passed' => '1',
+            'feedback' => 'Good work, minor improvements needed.',
+        ]);
+        $res->assertRedirect();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $this->assertDatabaseHas('course_quiz_attempts', [
+            'id' => $attemptId,
+            'grading_status' => 'graded',
+            'graded_by' => $owner->id,
+            'passed' => 1,
+        ]);
+    }
+
+    public function test_commerce_grade_attempt_wrong_course_404(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Grader Mismatch']);
+        $this->enableAlphaFeatures(['courses']);
+        $courseA = $this->seedCourse($owner->id, 'Course A');
+        $courseB = $this->seedCourse($owner->id, 'Course B');
+        $quizB = $this->seedQuiz($courseB);
+        $learner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $attemptB = $this->seedQuizAttempt($quizB, $learner->id, 'pending_review');
+
+        // Attempt belongs to Course B, but we grade it via Course A → 404.
+        $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$courseA}/grading/{$attemptB}", [
+            'score_percent' => '50',
+            'passed' => '0',
+        ])->assertStatus(404);
+    }
+
+    // ==================================================================
     //  Marketplace — merchant onboarding
     // ==================================================================
 
@@ -1225,6 +1455,52 @@ class CommerceParityTest extends TestCase
             'user_id' => $userId,
             'seller_type' => 'business',
             'joined_marketplace_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function seedPickupSlot(int $sellerProfileId): int
+    {
+        return (int) DB::table('marketplace_pickup_slots')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'seller_id' => $sellerProfileId,
+            'slot_start' => now()->addDay(),
+            'slot_end' => now()->addDay()->addHour(),
+            'capacity' => 5,
+            'booked_count' => 0,
+            'is_recurring' => 0,
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function seedQuiz(int $courseId): int
+    {
+        return (int) DB::table('course_quizzes')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'course_id' => $courseId,
+            'title' => 'Seeded Quiz',
+            'pass_mark_percent' => 70,
+            'max_attempts' => 0,
+            'shuffle_questions' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function seedQuizAttempt(int $quizId, int $userId, string $gradingStatus = 'pending_review'): int
+    {
+        return (int) DB::table('course_quiz_attempts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'quiz_id' => $quizId,
+            'user_id' => $userId,
+            'answers' => json_encode(['1' => 'A free-text answer from the learner.']),
+            'score_percent' => 0,
+            'passed' => 0,
+            'grading_status' => $gradingStatus,
+            'submitted_at' => now(),
             'created_at' => now(),
             'updated_at' => now(),
         ]);

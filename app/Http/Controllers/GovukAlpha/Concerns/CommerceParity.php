@@ -1671,6 +1671,242 @@ trait CommerceParity
     }
 
     // =================================================================
+    //  Marketplace — seller pickup-slot management (click-and-collect)
+    //  Mirrors MarketplacePickupSlotController slotsIndex/slotsStore/
+    //  slotsUpdate/slotsDestroy: marketplace feature + auth, then the SAME
+    //  MarketplacePickupSlotService the React seller page calls. Slots are
+    //  scoped to the member's own seller profile (cross-seller id → 404).
+    // =================================================================
+
+    /** List the seller's own pickup time slots, with a "new slot" form. */
+    public function commerceSellerPickupSlots(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $slots = [];
+        try {
+            $profile = MarketplaceSellerService::getOrCreateProfile($userId);
+            $slots = MarketplacePickupSlotService::listForSeller($profile->id);
+            $slots = is_array($slots) ? array_map(static fn ($s) => is_array($s) ? $s : (array) $s, $slots) : [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::commerce-pickup-slots', [
+            'title' => __('govuk_alpha_commerce.slots.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'slots' => $slots,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Create a new pickup slot for the member's seller profile. */
+    public function commerceStorePickupSlot(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        [$data, $errors] = $this->commercePickupSlotInput($request);
+        if (!empty($errors)) {
+            return redirect()->route('govuk-alpha.marketplace.slots', ['tenantSlug' => $tenantSlug])
+                ->withInput()->with('commercePickupSlotErrors', $errors);
+        }
+
+        $ok = false;
+        try {
+            $profile = MarketplaceSellerService::getOrCreateProfile($userId);
+            MarketplacePickupSlotService::create($profile->id, $data);
+            $ok = true;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.marketplace.slots', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'slot-created' : 'slot-create-failed',
+        ]);
+    }
+
+    /** Show the edit form for one of the seller's own pickup slots. */
+    public function commerceEditPickupSlot(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $slot = $this->commerceOwnedPickupSlotOr404($id, $userId);
+
+        return $this->view('accessible-frontend::commerce-pickup-slot-form', [
+            'title' => __('govuk_alpha_commerce.slots.title_edit'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'slot' => [
+                'id' => (int) $slot->id,
+                'slot_start' => $slot->slot_start?->format('Y-m-d\TH:i'),
+                'slot_end' => $slot->slot_end?->format('Y-m-d\TH:i'),
+                'capacity' => (int) $slot->capacity,
+                'booked_count' => (int) $slot->booked_count,
+                'is_recurring' => (bool) $slot->is_recurring,
+                'is_active' => (bool) $slot->is_active,
+            ],
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Persist edits to one of the seller's own pickup slots. */
+    public function commerceUpdatePickupSlot(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $slot = $this->commerceOwnedPickupSlotOr404($id, $userId);
+
+        [$data, $errors] = $this->commercePickupSlotInput($request);
+        if (!empty($errors)) {
+            return redirect()->route('govuk-alpha.marketplace.slots.edit', ['tenantSlug' => $tenantSlug, 'id' => $id])
+                ->withInput()->with('commercePickupSlotErrors', $errors);
+        }
+
+        $ok = false;
+        try {
+            MarketplacePickupSlotService::update($slot, $data);
+            $ok = true;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.marketplace.slots.edit', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'slot-saved' : 'slot-save-failed',
+        ]);
+    }
+
+    /** Delete one of the seller's own pickup slots. */
+    public function commerceDeletePickupSlot(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $slot = $this->commerceOwnedPickupSlotOr404($id, $userId);
+
+        $ok = false;
+        try {
+            MarketplacePickupSlotService::delete($slot);
+            $ok = true;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.marketplace.slots', [
+            'tenantSlug' => $tenantSlug,
+            'status' => $ok ? 'slot-deleted' : 'slot-delete-failed',
+        ]);
+    }
+
+    // =================================================================
+    //  Courses — instructor grading queue (manual review of quiz attempts)
+    //  Mirrors CourseQuizController gradingQueue/gradeAttempt: courses
+    //  feature + course ownership, then the SAME CourseQuizService
+    //  (pendingReviewForCourse / gradeAttempt). No-JS grading form.
+    // =================================================================
+
+    /** List the attempts awaiting manual review for one of the member's own courses. */
+    public function commerceCourseGrading(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $course = $this->commerceOwnedCourseOr404($id, $userId);
+
+        $attempts = [];
+        try {
+            $attempts = \App\Services\CourseQuizService::pendingReviewForCourse($id);
+            $attempts = is_array($attempts) ? array_map(static fn ($a) => is_array($a) ? $a : (array) $a, $attempts) : [];
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::commerce-course-grading', [
+            'title' => __('govuk_alpha_commerce.grading.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'courseId' => $id,
+            'courseTitle' => (string) $course->title,
+            'attempts' => $attempts,
+            'status' => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /** Apply a manual grade to a pending attempt belonging to the member's own course. */
+    public function commerceGradeAttempt(Request $request, string $tenantSlug, int $id, int $attemptId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Owner-gate the course (cross-tenant → 404, non-owner → 403).
+        $this->commerceOwnedCourseOr404($id, $userId);
+
+        // The attempt MUST belong to a quiz of THIS course, else 404.
+        $attemptCourseId = null;
+        try {
+            $attemptCourseId = \App\Services\CourseQuizService::courseIdForAttempt($attemptId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($attemptCourseId === null || (int) $attemptCourseId !== $id, 404);
+
+        $scoreRaw = self::asStr($request->input('score_percent'));
+        $score = is_numeric($scoreRaw) ? max(0.0, min(100.0, (float) $scoreRaw)) : 0.0;
+        $passed = filter_var($request->input('passed'), FILTER_VALIDATE_BOOLEAN);
+        $feedback = trim(self::asStr($request->input('feedback')));
+        $feedback = $feedback === '' ? null : mb_substr($feedback, 0, 5000);
+
+        $ok = false;
+        try {
+            $graded = \App\Services\CourseQuizService::gradeAttempt($attemptId, $score, $passed, $feedback, $userId);
+            $ok = $graded !== null;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.courses.instructor.grading', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'status' => $ok ? 'graded' : 'grade-failed',
+        ]);
+    }
+
+    // =================================================================
     //  Marketplace — merchant onboarding KYC wizard (single accessible page)
     //  Mirrors MerchantOnboardingController: marketplace feature + auth, then
     //  MerchantOnboardingService saveStep1/saveStep2/completeOnboarding.
@@ -2333,6 +2569,67 @@ trait CommerceParity
         }
         abort_if($profile === null, 403);
         return $profile;
+    }
+
+    /**
+     * Fetch one of the member's own pickup slots or abort. The slot is scoped by
+     * tenant + the member's seller-profile id, so a cross-tenant or cross-seller
+     * id resolves to 404 (same contract as MarketplacePickupSlotController).
+     */
+    private function commerceOwnedPickupSlotOr404(int $id, int $userId): \App\Models\MarketplacePickupSlot
+    {
+        $profile = MarketplaceSellerService::getOrCreateProfile($userId);
+        $slot = \App\Models\MarketplacePickupSlot::query()
+            ->where('id', $id)
+            ->where('tenant_id', TenantContext::getId())
+            ->where('seller_id', $profile->id)
+            ->first();
+        abort_if($slot === null, 404);
+        return $slot;
+    }
+
+    /**
+     * Parse + lightly validate the pickup-slot form input. Mirrors the React
+     * seller page: start/end datetime, capacity, recurring + active toggles.
+     * Recurring is a boolean only (no JSON pattern), so the json_valid CHECK on
+     * recurring_pattern is never tripped.
+     *
+     * @return array{0: array<string,mixed>, 1: array<int,string>} [data, errors]
+     */
+    private function commercePickupSlotInput(Request $request): array
+    {
+        $errors = [];
+        $start = trim(self::asStr($request->input('slot_start')));
+        $end = trim(self::asStr($request->input('slot_end')));
+
+        $startTs = $start !== '' ? strtotime($start) : false;
+        $endTs = $end !== '' ? strtotime($end) : false;
+
+        if ($startTs === false) {
+            $errors[] = __('govuk_alpha_commerce.slots.error_start');
+        }
+        if ($endTs === false) {
+            $errors[] = __('govuk_alpha_commerce.slots.error_end');
+        }
+        if ($startTs !== false && $endTs !== false && $endTs <= $startTs) {
+            $errors[] = __('govuk_alpha_commerce.slots.error_order');
+        }
+
+        $capacityRaw = self::asStr($request->input('capacity'));
+        $capacity = is_numeric($capacityRaw) ? (int) $capacityRaw : 1;
+        $capacity = max(1, min(1000, $capacity));
+
+        $data = [
+            'slot_start' => $startTs !== false ? date('Y-m-d H:i:s', $startTs) : null,
+            'slot_end' => $endTs !== false ? date('Y-m-d H:i:s', $endTs) : null,
+            'capacity' => $capacity,
+            'is_recurring' => filter_var($request->input('is_recurring'), FILTER_VALIDATE_BOOLEAN),
+            'is_active' => $request->has('is_active')
+                ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN)
+                : true,
+        ];
+
+        return [$data, $errors];
     }
 
     /**

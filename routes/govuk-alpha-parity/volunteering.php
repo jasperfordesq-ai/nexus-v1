@@ -74,3 +74,19 @@ Route::post('/volunteering/organisations/{id}/wallet/deposit', [AlphaController:
     ->whereNumber('id')->middleware('throttle:10,1')->name('volunteering.org.wallet.deposit');
 Route::post('/volunteering/organisations/{id}/wallet/auto-pay', [AlphaController::class, 'volunteeringOrgAutoPay'])
     ->whereNumber('id')->middleware('throttle:20,1')->name('volunteering.org.wallet.auto-pay');
+
+// ----- Group sign-ups (team shift reservations) -----
+Route::get('/volunteering/group-signups', [AlphaController::class, 'volunteeringGroupSignups'])
+    ->name('volunteering.group-signups');
+Route::post('/volunteering/group-signups/{id}/members', [AlphaController::class, 'volunteeringAddGroupMember'])
+    ->whereNumber('id')->middleware('throttle:20,1')->name('volunteering.group-signups.members.add');
+Route::post('/volunteering/group-signups/{id}/members/{userId}/remove', [AlphaController::class, 'volunteeringRemoveGroupMember'])
+    ->whereNumber('id')->whereNumber('userId')->middleware('throttle:20,1')->name('volunteering.group-signups.members.remove');
+Route::post('/volunteering/group-signups/{id}/cancel', [AlphaController::class, 'volunteeringCancelGroupReservation'])
+    ->whereNumber('id')->middleware('throttle:10,1')->name('volunteering.group-signups.cancel');
+
+// ----- Expenses (volunteer expense claims) -----
+Route::get('/volunteering/expenses', [AlphaController::class, 'volunteeringExpenses'])
+    ->name('volunteering.expenses');
+Route::post('/volunteering/expenses', [AlphaController::class, 'volunteeringSubmitExpense'])
+    ->middleware('throttle:10,1')->name('volunteering.expenses.submit');
