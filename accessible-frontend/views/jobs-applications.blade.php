@@ -87,6 +87,10 @@
                     @if ($appliedOn)
                         <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.jobs_t2.applied_on', ['date' => $appliedOn]) }}</p>
                     @endif
+                    @php $appId = (int) ($app['id'] ?? 0); @endphp
+                    @if ($appId > 0)
+                        <p class="govuk-body-s govuk-!-margin-bottom-1"><a class="govuk-link" href="{{ route('govuk-alpha.jobs.applications.history', ['tenantSlug' => $tenantSlug, 'applicationId' => $appId]) }}">{{ __('govuk_alpha_jobs.history.view_link') }}</a></p>
+                    @endif
                     @if ($canWithdraw)
                         <form method="post" action="{{ route('govuk-alpha.jobs.applications.withdraw', ['tenantSlug' => $tenantSlug, 'appId' => (int) ($app['id'] ?? 0)]) }}" class="govuk-!-margin-top-2">
                             @csrf

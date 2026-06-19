@@ -841,4 +841,56 @@ trait JobsParity
             (string) $filename
         );
     }
+
+    /**
+     * Application status-history timeline for one of the member's applications.
+     * Mirrors React MyApplicationsPage's timeline. JobVacancyService::
+     * getApplicationHistory enforces applicant/owner/admin access (null => not
+     * yours) and redacts notes + reviewer name for the applicant.
+     */
+    public function jobsApplicationHistory(Request $request, string $tenantSlug, int $applicationId): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(\App\Core\TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $svc = app(\App\Services\JobVacancyService::class);
+
+        $history = null;
+        try {
+            $history = $svc->getApplicationHistory($applicationId, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        // null => not found OR forbidden (service sets errors); a 404 keeps the
+        // accessible path from leaking which applications exist.
+        abort_if($history === null, 404);
+
+        // Vacancy title for the page heading (tenant + access already enforced
+        // by getApplicationHistory above).
+        $vacancyTitle = '';
+        try {
+            $row = \Illuminate\Support\Facades\DB::table('job_vacancy_applications as a')
+                ->join('job_vacancies as v', 'v.id', '=', 'a.vacancy_id')
+                ->where('a.id', $applicationId)
+                ->where('a.tenant_id', \App\Core\TenantContext::getId())
+                ->value('v.title');
+            $vacancyTitle = (string) ($row ?? '');
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::jobs-application-history', [
+            'title' => __('govuk_alpha_jobs.history.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav' => 'explore',
+            'jobsActiveTab' => 'applications',
+            'applicationId' => $applicationId,
+            'vacancyTitle' => $vacancyTitle,
+            'history' => is_array($history) ? $history : [],
+        ]);
+    }
 }

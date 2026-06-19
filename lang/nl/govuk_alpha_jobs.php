@@ -184,7 +184,18 @@ return [
     ],
 
     // Candidate responses inbox (interviews & offers)
+    'history' => [
+        'title' => 'Application timeline',
+        'view_link' => 'View application timeline',
+        'back_link' => 'Back to my applications',
+        'empty' => 'There are no status updates for this application yet.',
+        'from' => 'from :status',
+        'by' => 'by :name',
+        'status_unknown' => 'Updated',
+    ],
     'responses' => [
+        'add_to_calendar' => 'Add to Google Calendar',
+        'calendar_event_title' => 'Interview: :title',
         'title' => 'Interviews and offers',
         'caption' => 'Your responses from employers',
         'description' => 'Interviews and offers from employers appear here. Respond to invitations and decide on offers.',

@@ -87,6 +87,28 @@
                     @if ($ivLoc !== '')
                         <p class="govuk-body-s govuk-!-margin-bottom-2"><strong>{{ __('govuk_alpha_jobs.responses.location_label') }}:</strong> {{ $ivLoc }}</p>
                     @endif
+                    @if (!empty($iv['scheduled_at']))
+                        @php
+                            // Build a Google Calendar "add event" link (UTC, RFC-style
+                            // compact stamps). End = start + duration (default 30 min).
+                            try {
+                                $calStart = \Illuminate\Support\Carbon::parse($iv['scheduled_at'])->utc();
+                                $calEnd = $calStart->copy()->addMinutes((int) ($ivMins ?: 30));
+                                $calUrl = 'https://calendar.google.com/calendar/render?' . http_build_query([
+                                    'action' => 'TEMPLATE',
+                                    'text'   => __('govuk_alpha_jobs.responses.calendar_event_title', ['title' => $ivTitle]),
+                                    'dates'  => $calStart->format('Ymd\THis\Z') . '/' . $calEnd->format('Ymd\THis\Z'),
+                                    'details' => $ivType,
+                                    'location' => $ivLoc,
+                                ]);
+                            } catch (\Throwable $e) {
+                                $calUrl = '';
+                            }
+                        @endphp
+                        @if ($calUrl !== '')
+                            <p class="govuk-body-s govuk-!-margin-bottom-2"><a class="govuk-link" href="{{ $calUrl }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha_jobs.responses.add_to_calendar') }}</a></p>
+                        @endif
+                    @endif
                     @if ($ivVacId > 0)
                         <p class="govuk-body-s govuk-!-margin-bottom-2"><a class="govuk-link" href="{{ route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $ivVacId]) }}">{{ __('govuk_alpha_jobs.responses.view_opportunity') }}</a></p>
                     @endif
