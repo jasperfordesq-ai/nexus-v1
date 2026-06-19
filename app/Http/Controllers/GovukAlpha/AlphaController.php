@@ -8220,6 +8220,9 @@ class AlphaController extends Controller
                 'poll_type'   => in_array($request->input('poll_type'), ['standard', 'multiple'], true)
                     ? (string) $request->input('poll_type')
                     : 'standard',
+                // The view renders an is_anonymous checkbox (value=1); forward it so
+                // accessible-created polls honour the anonymity choice (was dropped).
+                'is_anonymous' => $request->boolean('is_anonymous'),
                 'options'     => $options,
             ]);
             $status = 'poll-created';
@@ -8836,6 +8839,9 @@ class AlphaController extends Controller
         }
 
         try {
+            // duration=0 → AudioUploader skips its max-duration gate (we cannot
+            // reliably probe clip length server-side without ffprobe). The 10 MB
+            // file-size ceiling in AudioUploader is the effective bound here.
             $audioResult = \App\Core\AudioUploader::upload([
                 'name'     => $file->getClientOriginalName(),
                 'type'     => $file->getMimeType(),

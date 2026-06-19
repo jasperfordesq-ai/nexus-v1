@@ -483,6 +483,7 @@ return [
         'scan_submit' => 'Afhaling bevestigen',
         'status_pickup_confirmed' => 'Afhaling bevestigd. De bestelling is gemarkeerd als afgehaald.',
         'status_pickup_scan_failed' => 'Die afhaalcode kon niet worden bevestigd. Controleer de code en probeer het opnieuw.',
+        'scan_order_ref' => 'Bestelreferentie: :id',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

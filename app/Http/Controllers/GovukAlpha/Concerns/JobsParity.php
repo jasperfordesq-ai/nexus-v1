@@ -648,14 +648,16 @@ trait JobsParity
             ->where('id', $userId)
             ->where('tenant_id', $tenantId)
             ->where('status', 'active')
-            ->first(['id', 'role', 'is_admin', 'is_super_admin', 'is_tenant_super_admin', 'is_god']);
+            ->first(['id', 'role', 'is_super_admin', 'is_tenant_super_admin']);
 
+        // EXACTLY mirrors BaseApiController::requireAdmin() — role allow-list OR the
+        // two super-admin flags. Do NOT add is_admin / is_god column checks: the API
+        // gate ignores them, and honouring them here would make this accessible route
+        // a WIDER door to hiring analytics than the React/API path.
         $isAdmin = $adminUser && (
             in_array((string) ($adminUser->role ?? ''), ['admin', 'tenant_admin', 'super_admin', 'god'], true)
-            || (bool) ($adminUser->is_admin ?? false)
             || (bool) ($adminUser->is_super_admin ?? false)
             || (bool) ($adminUser->is_tenant_super_admin ?? false)
-            || (bool) ($adminUser->is_god ?? false)
         );
 
         abort_unless($isAdmin, 403);

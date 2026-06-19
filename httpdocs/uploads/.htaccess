@@ -14,11 +14,12 @@ RewriteRule ^.*$ / [R=301,L]
 # back the in-app voice-message player — without them a fresh image-based
 # deploy would 403 voice files. (Production's uploads volume has no FilesMatch
 # restriction, so it already serves audio; this keeps the repo copy correct.)
-<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|pdf|doc|docx|mp4|mov|avi|apk|m4a|webm|ogg|wav|aac|mp3)$">
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|pdf|doc|docx|txt|csv|xls|xlsx|mp4|mov|avi|apk|m4a|webm|ogg|wav|aac|mp3)$">
     Require all granted
 </FilesMatch>
 
-# Force download for certain file types
-<FilesMatch "\.(pdf|doc|docx|apk)$">
+# Force download for certain file types (documents/spreadsheets — never render
+# inline; message attachments allow these via MessageAttachmentUploader).
+<FilesMatch "\.(pdf|doc|docx|txt|csv|xls|xlsx|apk)$">
     Header set Content-Disposition "attachment"
 </FilesMatch>

@@ -483,6 +483,7 @@ return [
         'scan_submit' => 'تأكيد الاستلام',
         'status_pickup_confirmed' => 'تم تأكيد الاستلام. تم وضع علامة على الطلب بأنه تم استلامه.',
         'status_pickup_scan_failed' => 'تعذّر تأكيد رمز الاستلام هذا. تحقق من الرمز وحاول مرة أخرى.',
+        'scan_order_ref' => 'مرجع الطلب: :id',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

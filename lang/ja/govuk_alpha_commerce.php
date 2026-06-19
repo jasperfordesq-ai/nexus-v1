@@ -483,6 +483,7 @@ return [
         'scan_submit' => '受け取りを確認する',
         'status_pickup_confirmed' => '受け取りを確認しました。注文は受け取り済みになりました。',
         'status_pickup_scan_failed' => 'その受け取りコードを確認できませんでした。コードを確認してもう一度お試しください。',
+        'scan_order_ref' => '注文番号：:id',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

@@ -483,6 +483,7 @@ return [
         'scan_submit' => 'Potwierdź odbiór',
         'status_pickup_confirmed' => 'Odbiór potwierdzony. Zamówienie zostało oznaczone jako odebrane.',
         'status_pickup_scan_failed' => 'Nie można potwierdzić tego kodu odbioru. Sprawdź kod i spróbuj ponownie.',
+        'scan_order_ref' => 'Numer zamówienia: :id',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

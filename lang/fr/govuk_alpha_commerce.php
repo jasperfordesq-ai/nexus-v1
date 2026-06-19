@@ -483,6 +483,7 @@ return [
         'scan_submit' => 'Confirmer le retrait',
         'status_pickup_confirmed' => 'Retrait confirmé. La commande est marquée comme retirée.',
         'status_pickup_scan_failed' => 'Ce code de retrait n\'a pas pu être confirmé. Vérifiez le code et réessayez.',
+        'scan_order_ref' => 'Référence de commande : :id',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

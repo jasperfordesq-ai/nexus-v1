@@ -483,6 +483,7 @@ return [
         'scan_submit' => 'Deimhnigh bailiú',
         'status_pickup_confirmed' => 'Bailiú deimhnithe. Tá an t-ordú marcáilte mar bhailithe.',
         'status_pickup_scan_failed' => 'Níorbh fhéidir an cód bailithe sin a dheimhniú. Seiceáil an cód agus bain triail eile as.',
+        'scan_order_ref' => 'Tagairt ordaithe: :id',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

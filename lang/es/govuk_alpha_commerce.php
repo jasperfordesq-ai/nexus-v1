@@ -483,6 +483,7 @@ return [
         'scan_submit' => 'Confirmar recogida',
         'status_pickup_confirmed' => 'Recogida confirmada. El pedido está marcado como recogido.',
         'status_pickup_scan_failed' => 'No se pudo confirmar ese código de recogida. Comprueba el código e inténtalo de nuevo.',
+        'scan_order_ref' => 'Referencia del pedido: :id',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

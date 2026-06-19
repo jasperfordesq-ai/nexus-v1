@@ -483,6 +483,7 @@ return [
         'scan_submit' => 'Conferma il ritiro',
         'status_pickup_confirmed' => 'Ritiro confermato. L\'ordine è contrassegnato come ritirato.',
         'status_pickup_scan_failed' => 'Impossibile confermare questo codice di ritiro. Controlla il codice e riprova.',
+        'scan_order_ref' => 'Riferimento ordine: :id',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

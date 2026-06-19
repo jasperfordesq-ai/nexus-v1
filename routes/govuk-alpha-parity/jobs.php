@@ -26,7 +26,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Bias audit — admin-only hiring-fairness analytics (static, before wildcards).
+// Throttled to match the API (AdminJobsController::biasAudit, 10/min) — caps
+// rapid re-querying that could harvest PII patterns from the aggregations.
 Route::get('/jobs/bias-audit', [AlphaController::class, 'jobsBiasAudit'])
+    ->middleware('throttle:10,1')
     ->name('jobs.bias-audit');
 
 // Talent search — employer-only candidate discovery (static, before wildcards).

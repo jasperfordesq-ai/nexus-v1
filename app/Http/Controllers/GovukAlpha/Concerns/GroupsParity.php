@@ -578,6 +578,15 @@ trait GroupsParity
             if ($code === 'FORBIDDEN') {
                 return $backList('ann-forbidden');
             }
+            // Field-level validation → highlight the offending field on the edit
+            // form (the edit view already renders these states; mirrors create).
+            $field = $errors[0]['field'] ?? '';
+            if ($field === 'title') {
+                return $backEdit('ann-title-required');
+            }
+            if ($field === 'content') {
+                return $backEdit('ann-content-required');
+            }
 
             return $backEdit('ann-update-failed');
         }

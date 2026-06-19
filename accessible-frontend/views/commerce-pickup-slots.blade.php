@@ -47,6 +47,9 @@
                 </div>
                 <div class="govuk-notification-banner__content">
                     <p class="govuk-notification-banner__heading">{{ $statusEntry['msg'] }}</p>
+                    @if ($status === 'pickup-confirmed' && (int) session('commercePickupScanOrderId') > 0)
+                        <p class="govuk-body govuk-!-margin-bottom-0">{{ __('govuk_alpha_commerce.slots.scan_order_ref', ['id' => (int) session('commercePickupScanOrderId')]) }}</p>
+                    @endif
                 </div>
             </div>
         @endif
