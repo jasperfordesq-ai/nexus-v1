@@ -39,6 +39,7 @@ Route::get('/marketplace/sales', [AlphaController::class, 'commerceSellerOrders'
 Route::post('/marketplace/orders/{id}/ship', [AlphaController::class, 'commerceShipOrder'])->whereNumber('id')->middleware('throttle:20,1')->name('marketplace.orders.ship');
 Route::post('/marketplace/orders/{id}/confirm', [AlphaController::class, 'commerceConfirmOrder'])->whereNumber('id')->middleware('throttle:20,1')->name('marketplace.orders.confirm');
 Route::post('/marketplace/orders/{id}/cancel', [AlphaController::class, 'commerceCancelOrder'])->whereNumber('id')->middleware('throttle:20,1')->name('marketplace.orders.cancel');
+Route::post('/marketplace/orders/{id}/pay', [AlphaController::class, 'commerceCheckoutCardPay'])->whereNumber('id')->middleware('throttle:10,1')->name('marketplace.orders.pay');
 Route::post('/marketplace/orders/{id}/rate', [AlphaController::class, 'commerceRateOrder'])->whereNumber('id')->middleware('throttle:10,1')->name('marketplace.orders.rate');
 
 // ===== Marketplace — advanced (faceted) search =====

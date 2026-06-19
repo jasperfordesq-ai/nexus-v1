@@ -312,6 +312,106 @@ class MarketplacePaymentService
     }
 
     /**
+     * Create a Stripe Checkout Session (hosted payment page) for a marketplace
+     * order. This is the NO-JS / accessible equivalent of createPaymentIntent:
+     * the buyer is redirected to Stripe's hosted page and pays there, so no
+     * Stripe.js / Elements is required. Same Connect destination charge —
+     * application fee to the platform, the rest transferred to the seller's
+     * connected account — and the SAME nexus_* metadata, so the
+     * checkout.session.completed webhook can reconcile the order and reuse
+     * confirmPayment(). Returns the Stripe-hosted Checkout URL to redirect to.
+     *
+     * @throws \RuntimeException when the seller has not completed onboarding or
+     *                          the Stripe API call fails.
+     */
+    public static function createCheckoutSession(MarketplaceOrder $order, string $successUrl, string $cancelUrl): string
+    {
+        if ($order->status !== 'pending_payment') {
+            throw new \InvalidArgumentException('Order must be in pending_payment status to start checkout.');
+        }
+
+        $tenantId = TenantContext::getId();
+
+        $sellerProfile = MarketplaceSellerProfile::where('user_id', $order->seller_id)->first();
+        if (!$sellerProfile || empty($sellerProfile->stripe_account_id)) {
+            throw new \RuntimeException('Seller has not completed Stripe onboarding.');
+        }
+        if (!$sellerProfile->stripe_onboarding_complete) {
+            throw new \RuntimeException('Seller Stripe account onboarding is not complete.');
+        }
+
+        $feePercent = (float) MarketplaceConfigurationService::get(
+            MarketplaceConfigurationService::CONFIG_PLATFORM_FEE_PERCENT,
+            5
+        );
+        $totalAmount = (float) $order->total_price;
+        $platformFee = round($totalAmount * ($feePercent / 100), 2);
+        $amountCents = (int) round($totalAmount * 100);
+        $feeCents = (int) round($platformFee * 100);
+        $currency = strtolower($order->currency ?? TenantContext::getCurrency());
+
+        $metadata = [
+            'nexus_tenant_id' => (string) $tenantId,
+            'nexus_order_id' => (string) $order->id,
+            'nexus_buyer_id' => (string) $order->buyer_id,
+            'nexus_seller_id' => (string) $order->seller_id,
+            'nexus_type' => 'marketplace',
+        ];
+
+        $client = StripeService::client();
+
+        try {
+            // Idempotency: a network retry of this create() returns the same
+            // session rather than charging twice. Scoped to order + tenant.
+            $idempotencyKey = "market-checkout-{$tenantId}-{$order->id}";
+            $session = $client->checkout->sessions->create([
+                'mode' => 'payment',
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => $currency,
+                        'product_data' => [
+                            'name' => "Marketplace order {$order->order_number}",
+                        ],
+                        'unit_amount' => $amountCents,
+                    ],
+                    'quantity' => 1,
+                ]],
+                'payment_intent_data' => [
+                    'application_fee_amount' => $feeCents,
+                    'transfer_data' => [
+                        'destination' => $sellerProfile->stripe_account_id,
+                    ],
+                    'metadata' => $metadata,
+                    'description' => "Marketplace order {$order->order_number}",
+                ],
+                // Session-level metadata too, so the webhook can read nexus_type
+                // / nexus_order_id straight off the checkout.session object.
+                'metadata' => $metadata,
+                'client_reference_id' => (string) $order->id,
+                'success_url' => $successUrl,
+                'cancel_url' => $cancelUrl,
+            ], ['idempotency_key' => $idempotencyKey]);
+        } catch (\Exception $e) {
+            Log::error('MarketplacePayment: failed to create Checkout Session', [
+                'order_id' => $order->id,
+                'tenant_id' => $tenantId,
+                'amount' => $totalAmount,
+                'error' => $e->getMessage(),
+            ]);
+            throw new \RuntimeException('Failed to start checkout: ' . $e->getMessage());
+        }
+
+        Log::info('MarketplacePayment: Checkout Session created', [
+            'order_id' => $order->id,
+            'session_id' => $session->id,
+            'amount' => $totalAmount,
+            'platform_fee' => $platformFee,
+        ]);
+
+        return (string) $session->url;
+    }
+
+    /**
      * Confirm a payment after frontend Stripe.js completes the PaymentIntent.
      *
      * Creates a MarketplacePayment record and transitions the order to 'paid'.
@@ -647,11 +747,86 @@ class MarketplacePaymentService
     public static function handleWebhookEvent(string $eventType, object $eventData): void
     {
         match ($eventType) {
+            'checkout.session.completed' => self::handleCheckoutSessionCompleted($eventData),
             'payment_intent.succeeded' => self::handlePaymentIntentSucceeded($eventData),
             'charge.refunded' => self::handleChargeRefunded($eventData),
             'account.updated' => self::handleAccountUpdated($eventData),
             default => null,
         };
+    }
+
+    /**
+     * Handle checkout.session.completed for a marketplace order — the no-JS
+     * Checkout flow's confirmation. Resolve the order from OUR DB (never trust
+     * the tenant from Stripe metadata; we read the order's own tenant_id),
+     * associate the resulting PaymentIntent, then reuse confirmPayment() which
+     * re-verifies the PI succeeded, records the payment, transitions the order to
+     * 'paid', holds escrow and sends notifications — all idempotently.
+     */
+    private static function handleCheckoutSessionCompleted(object $session): void
+    {
+        if (($session->metadata->nexus_type ?? null) !== 'marketplace') {
+            return; // not a marketplace checkout
+        }
+        // Stripe only fires this once the buyer has actually paid.
+        if (($session->payment_status ?? '') !== 'paid') {
+            return;
+        }
+
+        $orderId = (int) ($session->metadata->nexus_order_id ?? $session->client_reference_id ?? 0);
+        $piId = $session->payment_intent ?? null;
+        $piId = is_string($piId) ? $piId : ($piId->id ?? null);
+        if ($orderId <= 0 || !$piId) {
+            Log::warning('MarketplacePayment webhook: checkout.session.completed missing order/PI', [
+                'session_id' => $session->id ?? null,
+            ]);
+            return;
+        }
+
+        // Trust ONLY our own DB for the order + its tenant. Stripe signature
+        // verification already guarantees the event is genuine for a session we
+        // created, but resolving tenant from the order row (not metadata) keeps
+        // the same defence-in-depth posture as handlePaymentIntentSucceeded.
+        $orderRecord = MarketplaceOrder::withoutGlobalScopes()->find($orderId);
+        if (!$orderRecord) {
+            Log::warning('MarketplacePayment webhook: no local order for checkout session', [
+                'order_id' => $orderId,
+                'session_id' => $session->id ?? null,
+            ]);
+            return;
+        }
+
+        $tenantId = (int) $orderRecord->tenant_id;
+        if ($tenantId <= 0) {
+            return;
+        }
+
+        $previousTenantId = TenantContext::currentId();
+        try {
+            TenantContext::setById($tenantId);
+
+            // Associate the PaymentIntent so confirmPayment() can find the order.
+            $order = MarketplaceOrder::where('id', $orderId)->where('tenant_id', $tenantId)->first();
+            if ($order && empty($order->payment_intent_id)) {
+                $order->payment_intent_id = $piId;
+                $order->save();
+            }
+
+            self::confirmPayment($piId);
+        } catch (\Exception $e) {
+            Log::error('MarketplacePayment webhook: checkout confirmPayment failed', [
+                'order_id' => $orderId,
+                'session_id' => $session->id ?? null,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e; // let the controller mark the event failed so Stripe retries
+        } finally {
+            if ($previousTenantId !== null) {
+                TenantContext::setById($previousTenantId);
+            } else {
+                TenantContext::reset();
+            }
+        }
     }
 
     /**

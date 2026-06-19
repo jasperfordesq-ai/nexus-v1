@@ -229,6 +229,14 @@ class StripeWebhookController extends BaseApiController
 
     private function handleCheckoutCompleted(object $session): void
     {
+        // Marketplace card checkout (accessible no-JS flow) and subscription
+        // checkout share the checkout.session.completed event. Route by the
+        // nexus_type we stamp into the session metadata at creation time.
+        if (($session->metadata->nexus_type ?? null) === 'marketplace') {
+            MarketplacePaymentService::handleWebhookEvent('checkout.session.completed', $session);
+            return;
+        }
+
         StripeSubscriptionService::handleCheckoutCompleted($session);
     }
 

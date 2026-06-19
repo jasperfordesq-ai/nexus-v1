@@ -13,6 +13,12 @@
         $tabRoute = $isSeller ? 'govuk-alpha.marketplace.orders.seller' : 'govuk-alpha.marketplace.orders.buyer';
         $statusMessages = [
             'ordered' => __('govuk_alpha_commerce.orders.status_ordered'),
+            'payment-submitted' => __('govuk_alpha_commerce.orders.status_payment_submitted'),
+            'payment-cancelled' => __('govuk_alpha_commerce.orders.status_payment_cancelled'),
+            'pay-not-pending' => __('govuk_alpha_commerce.orders.status_pay_not_pending'),
+            'pay-not-required' => __('govuk_alpha_commerce.orders.status_pay_not_required'),
+            'pay-unavailable' => __('govuk_alpha_commerce.orders.status_pay_unavailable'),
+            'pay-failed' => __('govuk_alpha_commerce.orders.status_pay_failed'),
             'shipped' => __('govuk_alpha_commerce.orders.status_shipped_done'),
             'ship-failed' => __('govuk_alpha_commerce.orders.status_ship_failed'),
             'confirmed' => __('govuk_alpha_commerce.orders.status_confirmed'),
@@ -135,6 +141,15 @@
                         @csrf
                         <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_commerce.orders.action_confirm') }}</button>
                     </form>
+                @endif
+
+                {{-- Pay by card (buyer, pending money order) — Stripe hosted Checkout --}}
+                @if (!$isSeller && $oStatus === 'pending_payment' && (float) ($order['total_price'] ?? 0) > 0)
+                    <form method="post" action="{{ route('govuk-alpha.marketplace.orders.pay', ['tenantSlug' => $tenantSlug, 'id' => $orderId]) }}" class="govuk-!-margin-bottom-2">
+                        @csrf
+                        <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_commerce.orders.pay_by_card') }}</button>
+                    </form>
+                    <p class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha_commerce.orders.pay_by_card_hint') }}</p>
                 @endif
 
                 {{-- Cancel (both, before shipping) --}}

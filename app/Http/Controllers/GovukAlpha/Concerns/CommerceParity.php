@@ -494,6 +494,51 @@ trait CommerceParity
         return redirect()->route('govuk-alpha.marketplace.orders.buyer', ['tenantSlug' => $tenantSlug, 'status' => 'ordered']);
     }
 
+    /**
+     * Pay for a pending money order by card via Stripe's hosted Checkout page
+     * (the accessible no-JS path — no Stripe.js). Creates a Connect Checkout
+     * Session and 303-redirects the buyer to Stripe; the checkout.session
+     * .completed webhook marks the order paid. Only the order's buyer, only a
+     * pending_payment money order.
+     */
+    public function commerceCheckoutCardPay(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Buyer-only; cross-tenant / non-owner orders 404 inside the helper.
+        $order = $this->commerceOrderForRoleOr404($id, $userId, 'buyer');
+
+        if (($order->status ?? '') !== 'pending_payment') {
+            return redirect()->route('govuk-alpha.marketplace.orders.buyer', ['tenantSlug' => $tenantSlug, 'status' => 'pay-not-pending']);
+        }
+        // Card checkout is only for money orders (time-credit orders settle elsewhere).
+        if ((float) ($order->total_price ?? 0) <= 0) {
+            return redirect()->route('govuk-alpha.marketplace.orders.buyer', ['tenantSlug' => $tenantSlug, 'status' => 'pay-not-required']);
+        }
+
+        // Absolute URLs on the accessible host that Stripe returns the buyer to.
+        $successUrl = route('govuk-alpha.marketplace.orders.buyer', ['tenantSlug' => $tenantSlug, 'status' => 'payment-submitted']);
+        $cancelUrl = route('govuk-alpha.marketplace.orders.buyer', ['tenantSlug' => $tenantSlug, 'status' => 'payment-cancelled']);
+
+        try {
+            $checkoutUrl = \App\Services\MarketplacePaymentService::createCheckoutSession($order, $successUrl, $cancelUrl);
+        } catch (\RuntimeException $e) {
+            // Seller not onboarded / Stripe API failure — surface a friendly state.
+            return redirect()->route('govuk-alpha.marketplace.orders.buyer', ['tenantSlug' => $tenantSlug, 'status' => 'pay-unavailable']);
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('govuk-alpha.marketplace.orders.buyer', ['tenantSlug' => $tenantSlug, 'status' => 'pay-failed']);
+        }
+
+        // External redirect to Stripe's hosted Checkout (303 so the POST becomes a GET).
+        return redirect()->away($checkoutUrl, 303);
+    }
+
     /** Make-an-offer form (for negotiable listings). */
     public function commerceOfferForm(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
     {
