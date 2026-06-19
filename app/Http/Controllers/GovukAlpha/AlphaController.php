@@ -6721,8 +6721,10 @@ class AlphaController extends Controller
             \App\Models\Course::where('id', $id)
                 ->where('tenant_id', TenantContext::getId())
                 ->update([
-                    'rating_avg' => round((float) ($agg->avg_rating ?? 0), 2),
-                    'rating_count' => (int) ($agg->cnt ?? 0),
+                    // Aggregate-only first() returns a row over an empty set, but
+                    // ?-> hardens against any null defensively.
+                    'rating_avg' => round((float) ($agg?->avg_rating ?? 0), 2),
+                    'rating_count' => (int) ($agg?->cnt ?? 0),
                 ]);
         } catch (\Throwable $e) {
             report($e);
