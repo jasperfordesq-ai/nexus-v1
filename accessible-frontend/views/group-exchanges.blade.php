@@ -38,6 +38,23 @@
 
     <a class="govuk-button" href="{{ route('govuk-alpha.group-exchanges.create', ['tenantSlug' => $tenantSlug]) }}" role="button" draggable="false" data-module="govuk-button">{{ __('govuk_alpha.group_exchanges.create_button') }}</a>
 
+    {{-- ===== Status filter tabs (parity with React) ===== --}}
+    @php $currentState = $exchangeState ?? ''; @endphp
+    <nav class="govuk-!-margin-bottom-4" aria-label="{{ __('govuk_alpha.group_exchanges.filter_label') }}">
+        <ul class="govuk-list nexus-alpha-filter-tabs">
+            @foreach (['' => 'filter_all', 'draft' => 'statuses.draft', 'pending' => 'statuses.pending', 'active' => 'statuses.active', 'completed' => 'statuses.completed', 'cancelled' => 'statuses.cancelled'] as $val => $key)
+                @php
+                    $isActive = $currentState === $val;
+                    $href = $val === '' ? route('govuk-alpha.group-exchanges.index', ['tenantSlug' => $tenantSlug]) : route('govuk-alpha.group-exchanges.index', ['tenantSlug' => $tenantSlug, 'state' => $val]);
+                    $label = str_starts_with($key, 'statuses.') ? $statusLabel(substr($key, 9)) : __('govuk_alpha.group_exchanges.' . $key);
+                @endphp
+                <li class="govuk-!-display-inline-block govuk-!-margin-right-3">
+                    @if ($isActive)<strong>{{ $label }}</strong>@else<a class="govuk-link" href="{{ $href }}">{{ $label }}</a>@endif
+                </li>
+            @endforeach
+        </ul>
+    </nav>
+
     @if (empty($exchanges))
         <div class="govuk-inset-text">{{ __('govuk_alpha.group_exchanges.empty') }}</div>
     @else

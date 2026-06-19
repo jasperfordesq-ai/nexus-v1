@@ -1151,6 +1151,8 @@ return [
         'more_results_label' => 'Tuilleadh deiseanna',
     ],
     'wallet' => [
+        'pending_in_label' => 'Pending in',
+        'pending_in_badge' => 'Incoming',
         'title' => 'Sparán ama',
         'caption' => ':community',
         'description' => 'D\'iarmhéid creidmheasanna ama, stair idirbheart, agus bealach chun creidmheasanna a sheoladh chuig comhaltaí eile.',
@@ -1301,6 +1303,8 @@ return [
         'view_listing' => 'Féach ar liostú',
     ],
     'group_exchanges' => [
+        'filter_label' => 'Filter by status',
+        'filter_all' => 'All',
         'title' => 'Malartuithe grúpa',
         'caption' => ':community',
         'description' => 'Malartuithe ama idir roinnt comhaltaí ag an am céanna — mar shampla grúpa daoine ag roinnt nó ag comhthiomsú tascanna.',
@@ -1370,6 +1374,9 @@ return [
         ],
     ],
     'polls' => [
+        'category_label' => 'Category',
+        'all_categories' => 'All categories',
+        'my_polls_label' => 'Show only polls I created',
         'title' => 'Pobalbhreitheanna',
         'caption' => ':community',
         'description' => 'Cuir do thuairim in iúl ar cheisteanna a chuirtear faoin bpobal.',
@@ -1601,6 +1608,11 @@ return [
         'tag_group' => 'Grúpa',
     ],
     'groups' => [
+        'filter_label' => 'Show',
+        'filter_all' => 'All groups',
+        'filter_joined' => 'Groups I have joined',
+        'filter_public' => 'Public groups',
+        'filter_private' => 'Private groups',
         'title' => 'Grúpaí',
         'caption' => ':community',
         'description' => 'Grúpaí comhaltaí a bhfuil spéiseanna comhroinnte acu.',

@@ -27,6 +27,14 @@
             <div id="q-hint" class="govuk-hint">{{ __('govuk_alpha.groups.search_hint') }}</div>
             <input class="govuk-input govuk-!-width-two-thirds" id="q" name="q" type="search" value="{{ $groupsQuery ?? '' }}" aria-describedby="q-hint">
         </div>
+        <div class="govuk-form-group">
+            <label class="govuk-label" for="filter">{{ __('govuk_alpha.groups.filter_label') }}</label>
+            <select class="govuk-select" id="filter" name="filter">
+                @foreach (['all' => 'filter_all', 'joined' => 'filter_joined', 'public' => 'filter_public', 'private' => 'filter_private'] as $val => $key)
+                    <option value="{{ $val }}" @selected(($groupsFilter ?? 'all') === $val)>{{ __('govuk_alpha.groups.' . $key) }}</option>
+                @endforeach
+            </select>
+        </div>
         <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.actions.search') }}</button>
     </form>
 
@@ -63,7 +71,7 @@
             <nav class="govuk-pagination govuk-!-margin-top-6" role="navigation" aria-label="{{ __('govuk_alpha.groups.pagination_label') }}">
                 @if ($groupsPage > 1)
                     <div class="govuk-pagination__prev">
-                        <a class="govuk-link govuk-pagination__link" href="{{ route('govuk-alpha.groups.index', array_filter(['tenantSlug' => $tenantSlug, 'page' => $groupsPage - 1, 'q' => request('q')])) }}" rel="prev">
+                        <a class="govuk-link govuk-pagination__link" href="{{ route('govuk-alpha.groups.index', array_filter(['tenantSlug' => $tenantSlug, 'page' => $groupsPage - 1, 'q' => request('q'), 'filter' => request('filter')])) }}" rel="prev">
                             <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" focusable="false" aria-hidden="true" viewBox="0 0 15 13">
                                 <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"/>
                             </svg>
@@ -73,7 +81,7 @@
                 @endif
                 @if ($groupsPage < $groupsTotalPages)
                     <div class="govuk-pagination__next">
-                        <a class="govuk-link govuk-pagination__link" href="{{ route('govuk-alpha.groups.index', array_filter(['tenantSlug' => $tenantSlug, 'page' => $groupsPage + 1, 'q' => request('q')])) }}" rel="next">
+                        <a class="govuk-link govuk-pagination__link" href="{{ route('govuk-alpha.groups.index', array_filter(['tenantSlug' => $tenantSlug, 'page' => $groupsPage + 1, 'q' => request('q'), 'filter' => request('filter')])) }}" rel="next">
                             <span class="govuk-pagination__link-title">{{ __('govuk_alpha.polish_groups.pagination_next') }}</span>
                             <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" focusable="false" aria-hidden="true" viewBox="0 0 15 13">
                                 <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7246z"/>

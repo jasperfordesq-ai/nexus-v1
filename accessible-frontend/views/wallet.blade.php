@@ -9,6 +9,7 @@
         $balance = (float) ($wallet['balance'] ?? 0);
         $earned = (float) ($wallet['total_earned'] ?? 0);
         $spent = (float) ($wallet['total_spent'] ?? 0);
+        $pendingIn = (float) ($wallet['pending_in'] ?? ($wallet['pending_incoming'] ?? 0));
         $fmtHours = fn ($v): string => number_format((float) $v, 2);
         $txnDate = fn ($v): ?string => $v ? \Illuminate\Support\Carbon::parse($v)->translatedFormat('j F Y, g:ia') : null;
         $errorMessages = [
@@ -110,6 +111,14 @@
             <dt>{{ __('govuk_alpha.wallet.spent_label') }}</dt>
             <dd>{{ __('govuk_alpha.wallet.hours_value', ['value' => $fmtHours($spent)]) }}</dd>
         </div>
+        @if ($pendingIn > 0)
+            <div class="nexus-alpha-stat">
+                <dt>{{ __('govuk_alpha.wallet.pending_in_label') }}</dt>
+                <dd>{{ __('govuk_alpha.wallet.hours_value', ['value' => $fmtHours($pendingIn)]) }}
+                    <strong class="govuk-tag govuk-tag--yellow">{{ __('govuk_alpha.wallet.pending_in_badge') }}</strong>
+                </dd>
+            </div>
+        @endif
     </dl>
 
     {{-- WAVE T1-WALLET: community fund balance (read-only) --}}

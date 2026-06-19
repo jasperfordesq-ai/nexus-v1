@@ -1151,6 +1151,8 @@ return [
         'more_results_label' => 'Meer kansen',
     ],
     'wallet' => [
+        'pending_in_label' => 'Pending in',
+        'pending_in_badge' => 'Incoming',
         'title' => 'Tijdportemonnee',
         'caption' => ':community',
         'description' => 'Uw tijdkreditsaldo, transactiegeschiedenis en een manier om credits naar andere leden te sturen.',
@@ -1301,6 +1303,8 @@ return [
         'view_listing' => 'Advertentie bekijken',
     ],
     'group_exchanges' => [
+        'filter_label' => 'Filter by status',
+        'filter_all' => 'All',
         'title' => 'Groepsuitwisselingen',
         'caption' => ':community',
         'description' => 'Uitwisseling van tijd tussen meerdere leden tegelijk — bijvoorbeeld een groep mensen die een taak deelt of samenvoegt.',
@@ -1370,6 +1374,9 @@ return [
         ],
     ],
     'polls' => [
+        'category_label' => 'Category',
+        'all_categories' => 'All categories',
+        'my_polls_label' => 'Show only polls I created',
         'title' => 'Peilingen',
         'caption' => ':community',
         'description' => 'Geef uw mening over vragen die aan de gemeenschap worden gesteld.',
@@ -1601,6 +1608,11 @@ return [
         'tag_group' => 'Groep',
     ],
     'groups' => [
+        'filter_label' => 'Show',
+        'filter_all' => 'All groups',
+        'filter_joined' => 'Groups I have joined',
+        'filter_public' => 'Public groups',
+        'filter_private' => 'Private groups',
         'title' => 'Groepen',
         'caption' => ':community',
         'description' => 'Groepen van leden met gedeelde interesses.',

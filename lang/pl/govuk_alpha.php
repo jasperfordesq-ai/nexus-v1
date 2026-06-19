@@ -1151,6 +1151,8 @@ return [
         'more_results_label' => 'Więcej możliwości',
     ],
     'wallet' => [
+        'pending_in_label' => 'Pending in',
+        'pending_in_badge' => 'Incoming',
         'title' => 'Portfel czasowy',
         'caption' => ':community',
         'description' => 'Saldo kredytów czasowych, historia transakcji oraz możliwość wysyłania kredytów do innych członków.',
@@ -1301,6 +1303,8 @@ return [
         'view_listing' => 'Zobacz ogłoszenie',
     ],
     'group_exchanges' => [
+        'filter_label' => 'Filter by status',
+        'filter_all' => 'All',
         'title' => 'Wymiany grupowe',
         'caption' => ':community',
         'description' => 'Wymiana czasu między kilkoma członkami naraz — na przykład grupa osób dzieląca się zadaniem lub łącząca siły.',
@@ -1370,6 +1374,9 @@ return [
         ],
     ],
     'polls' => [
+        'category_label' => 'Category',
+        'all_categories' => 'All categories',
+        'my_polls_label' => 'Show only polls I created',
         'title' => 'Ankiety',
         'caption' => ':community',
         'description' => 'Wyraź swoją opinię w kwestiach poddanych pod głosowanie społeczności.',
@@ -1601,6 +1608,11 @@ return [
         'tag_group' => 'Grupa',
     ],
     'groups' => [
+        'filter_label' => 'Show',
+        'filter_all' => 'All groups',
+        'filter_joined' => 'Groups I have joined',
+        'filter_public' => 'Public groups',
+        'filter_private' => 'Private groups',
         'title' => 'Grupy',
         'caption' => ':community',
         'description' => 'Grupy członków o wspólnych zainteresowaniach.',

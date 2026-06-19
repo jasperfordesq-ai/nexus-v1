@@ -1151,6 +1151,8 @@ return [
         'more_results_label' => 'المزيد من الفرص',
     ],
     'wallet' => [
+        'pending_in_label' => 'Pending in',
+        'pending_in_badge' => 'Incoming',
         'title' => 'محفظة الوقت',
         'caption' => ':community',
         'description' => 'رصيد اعتمادات الوقت لديك، وسجل المعاملات، وطريقة لإرسال الاعتمادات إلى الأعضاء الآخرين.',
@@ -1301,6 +1303,8 @@ return [
         'view_listing' => 'عرض الإعلان',
     ],
     'group_exchanges' => [
+        'filter_label' => 'Filter by status',
+        'filter_all' => 'All',
         'title' => 'تبادلات المجموعة',
         'caption' => ':community',
         'description' => 'تبادلات الوقت بين عدة أعضاء في آنٍ واحد — على سبيل المثال مجموعة من الأشخاص يتشاركون مهمة أو يجمعون جهودهم.',
@@ -1370,6 +1374,9 @@ return [
         ],
     ],
     'polls' => [
+        'category_label' => 'Category',
+        'all_categories' => 'All categories',
+        'my_polls_label' => 'Show only polls I created',
         'title' => 'الاستطلاعات',
         'caption' => ':community',
         'description' => 'شارك برأيك في الأسئلة المطروحة على المجتمع.',
@@ -1601,6 +1608,11 @@ return [
         'tag_group' => 'مجموعة',
     ],
     'groups' => [
+        'filter_label' => 'Show',
+        'filter_all' => 'All groups',
+        'filter_joined' => 'Groups I have joined',
+        'filter_public' => 'Public groups',
+        'filter_private' => 'Private groups',
         'title' => 'المجموعات',
         'caption' => ':community',
         'description' => 'مجموعات من الأعضاء ذوي الاهتمامات المشتركة.',

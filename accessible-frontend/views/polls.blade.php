@@ -46,6 +46,33 @@
 
     <div class="govuk-inset-text">{{ __('govuk_alpha.polls.how_it_works') }}</div>
 
+    {{-- ===== Filter: my polls + category (parity with React tabs/category) ===== --}}
+    <form method="get" action="{{ route('govuk-alpha.polls.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-6">
+        @if (!empty($pollCategories))
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="category">{{ __('govuk_alpha.polls.category_label') }}</label>
+                <select class="govuk-select" id="category" name="category">
+                    <option value="">{{ __('govuk_alpha.polls.all_categories') }}</option>
+                    @foreach ($pollCategories as $cat)
+                        @php $catName = trim((string) $cat); @endphp
+                        @if ($catName !== '')
+                            <option value="{{ $catName }}" @selected(($pollsCategory ?? '') === $catName)>{{ $catName }}</option>
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+        @endif
+        <div class="govuk-form-group">
+            <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="mine" name="mine" type="checkbox" value="1" @checked(!empty($pollsMine))>
+                    <label class="govuk-label govuk-checkboxes__label" for="mine">{{ __('govuk_alpha.polls.my_polls_label') }}</label>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.actions.search') }}</button>
+    </form>
+
     {{-- ===== Page actions: advanced poll creation + management (parity links) ===== --}}
     <div class="govuk-button-group">
         @if (\Illuminate\Support\Facades\Route::has('govuk-alpha.gamification.poll.create'))

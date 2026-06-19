@@ -1151,6 +1151,8 @@ return [
         'more_results_label' => 'Plus d\'opportunités',
     ],
     'wallet' => [
+        'pending_in_label' => 'Pending in',
+        'pending_in_badge' => 'Incoming',
         'title' => 'Portefeuille de temps',
         'caption' => ':community',
         'description' => 'Votre solde de crédits-temps, l\'historique des transactions, et un moyen d\'envoyer des crédits à d\'autres membres.',
@@ -1301,6 +1303,8 @@ return [
         'view_listing' => 'Voir l\'annonce',
     ],
     'group_exchanges' => [
+        'filter_label' => 'Filter by status',
+        'filter_all' => 'All',
         'title' => 'Échanges de groupe',
         'caption' => ':community',
         'description' => 'Échanges de temps entre plusieurs membres simultanément — par exemple un groupe de personnes partageant ou mettant en commun une tâche.',
@@ -1370,6 +1374,9 @@ return [
         ],
     ],
     'polls' => [
+        'category_label' => 'Category',
+        'all_categories' => 'All categories',
+        'my_polls_label' => 'Show only polls I created',
         'title' => 'Sondages',
         'caption' => ':community',
         'description' => 'Donnez votre avis sur les questions soumises à la communauté.',
@@ -1601,6 +1608,11 @@ return [
         'tag_group' => 'Groupe',
     ],
     'groups' => [
+        'filter_label' => 'Show',
+        'filter_all' => 'All groups',
+        'filter_joined' => 'Groups I have joined',
+        'filter_public' => 'Public groups',
+        'filter_private' => 'Private groups',
         'title' => 'Groupes',
         'caption' => ':community',
         'description' => 'Groupes de membres partageant des intérêts communs.',

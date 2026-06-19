@@ -4365,6 +4365,17 @@ class AlphaController extends Controller
         if ($q !== '') {
             $filters['search'] = $q;
         }
+
+        // Visibility / membership filter (mirrors React: all | joined | public |
+        // private). GroupService::getAll honours `visibility` and `user_id`
+        // (joined). Only whitelisted values reach the query.
+        $groupsFilter = $this->allowed(self::asStr($request->query('filter')), ['all', 'joined', 'public', 'private'], 'all');
+        if ($groupsFilter === 'joined') {
+            $filters['user_id'] = $userId;
+        } elseif ($groupsFilter === 'public' || $groupsFilter === 'private') {
+            $filters['visibility'] = $groupsFilter;
+        }
+
         $items = [];
         $total = 0;
         try {
@@ -4381,6 +4392,7 @@ class AlphaController extends Controller
             'activeNav' => 'explore',
             'groups' => is_array($items) ? $items : [],
             'groupsQuery' => $q,
+            'groupsFilter' => $groupsFilter,
             'groupsTotal' => $total,
             'groupsPerPage' => $perPage,
             'status' => self::asStr($request->query('status')) ?: null,
@@ -8267,15 +8279,30 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
+        // "My polls" + category filters (mirror React Polls page). PollService
+        // ::getAll honours `user_id` (mine) + `category`.
+        $pollsMine = $request->query('mine') === '1';
+        $pollsCategory = trim(self::asStr($request->query('category')));
+
+        $listFilters = ['limit' => 30];
+        if ($pollsMine) {
+            $listFilters['user_id'] = $userId;
+        }
+        if ($pollsCategory !== '') {
+            $listFilters['category'] = $pollsCategory;
+        }
+
         $polls = [];
+        $pollCategories = [];
         try {
-            $list = \App\Services\PollService::getAll(['limit' => 30])['items'] ?? [];
+            $list = \App\Services\PollService::getAll($listFilters)['items'] ?? [];
             foreach ($list as $p) {
                 $full = \App\Services\PollService::getById((int) ($p['id'] ?? 0), $userId);
                 if ($full !== null) {
                     $polls[] = $full;
                 }
             }
+            $pollCategories = \App\Services\PollService::getCategories();
         } catch (\Throwable $e) {
             report($e);
         }
@@ -8285,6 +8312,9 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'explore',
             'polls' => $polls,
+            'pollsMine' => $pollsMine,
+            'pollsCategory' => $pollsCategory,
+            'pollCategories' => is_array($pollCategories) ? $pollCategories : [],
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -8370,9 +8400,17 @@ class AlphaController extends Controller
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
+        // Status-tab filter (mirrors React tabs). `state` keeps the flash `status`
+        // param free. GroupExchangeService::listForUser honours a `status` filter.
+        $exchangeState = $this->allowed(self::asStr($request->query('state')), ['draft', 'pending', 'active', 'completed', 'cancelled'], '');
+        $listFilters = ['limit' => 50];
+        if ($exchangeState !== '') {
+            $listFilters['status'] = $exchangeState;
+        }
+
         $items = [];
         try {
-            $items = app(\App\Services\GroupExchangeService::class)->listForUser($userId, ['limit' => 50])['items'] ?? [];
+            $items = app(\App\Services\GroupExchangeService::class)->listForUser($userId, $listFilters)['items'] ?? [];
         } catch (\Throwable $e) {
             report($e);
         }
@@ -8382,6 +8420,7 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'group_exchanges',
             'exchanges' => $items,
+            'exchangeState' => $exchangeState,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }

@@ -1151,6 +1151,8 @@ return [
         'more_results_label' => 'さらなるチャンス',
     ],
     'wallet' => [
+        'pending_in_label' => 'Pending in',
+        'pending_in_badge' => 'Incoming',
         'title' => 'タイムウォレット',
         'caption' => ':community',
         'description' => 'タイムクレジットの残高、取引履歴、および他のメンバーへのクレジット送付。',
@@ -1301,6 +1303,8 @@ return [
         'view_listing' => 'リスティングを見る',
     ],
     'group_exchanges' => [
+        'filter_label' => 'Filter by status',
+        'filter_all' => 'All',
         'title' => 'グループ交換',
         'caption' => ':community',
         'description' => '複数のメンバー間で一度に行う時間の交換です。例えば、グループでタスクを共有またはプールする場合などに使用します。',
@@ -1370,6 +1374,9 @@ return [
         ],
     ],
     'polls' => [
+        'category_label' => 'Category',
+        'all_categories' => 'All categories',
+        'my_polls_label' => 'Show only polls I created',
         'title' => '投票',
         'caption' => ':community',
         'description' => 'コミュニティへの質問に意見を表明してください。',
@@ -1601,6 +1608,11 @@ return [
         'tag_group' => 'グループ',
     ],
     'groups' => [
+        'filter_label' => 'Show',
+        'filter_all' => 'All groups',
+        'filter_joined' => 'Groups I have joined',
+        'filter_public' => 'Public groups',
+        'filter_private' => 'Private groups',
         'title' => 'グループ',
         'caption' => ':community',
         'description' => '共通の関心を持つメンバーのグループ。',

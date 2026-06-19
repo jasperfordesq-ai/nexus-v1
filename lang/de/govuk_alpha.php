@@ -1151,6 +1151,8 @@ return [
         'more_results_label' => 'Mehr Möglichkeiten',
     ],
     'wallet' => [
+        'pending_in_label' => 'Pending in',
+        'pending_in_badge' => 'Incoming',
         'title' => 'Zeitwallet',
         'caption' => ':community',
         'description' => 'Ihr Zeitguthabensaldo, Transaktionsverlauf und eine Möglichkeit, Guthaben an andere Mitglieder zu senden.',
@@ -1301,6 +1303,8 @@ return [
         'view_listing' => 'Inserat ansehen',
     ],
     'group_exchanges' => [
+        'filter_label' => 'Filter by status',
+        'filter_all' => 'All',
         'title' => 'Gruppentausche',
         'caption' => ':community',
         'description' => 'Zeitaustausch zwischen mehreren Mitgliedern gleichzeitig — zum Beispiel eine Gruppe von Personen, die eine Aufgabe teilt oder gemeinsam erledigt.',
@@ -1370,6 +1374,9 @@ return [
         ],
     ],
     'polls' => [
+        'category_label' => 'Category',
+        'all_categories' => 'All categories',
+        'my_polls_label' => 'Show only polls I created',
         'title' => 'Abstimmungen',
         'caption' => ':community',
         'description' => 'Äußern Sie Ihre Meinung zu Fragen, die der Gemeinschaft gestellt werden.',
@@ -1601,6 +1608,11 @@ return [
         'tag_group' => 'Gruppe',
     ],
     'groups' => [
+        'filter_label' => 'Show',
+        'filter_all' => 'All groups',
+        'filter_joined' => 'Groups I have joined',
+        'filter_public' => 'Public groups',
+        'filter_private' => 'Private groups',
         'title' => 'Gruppen',
         'caption' => ':community',
         'description' => 'Gruppen von Mitgliedern mit gemeinsamen Interessen.',
