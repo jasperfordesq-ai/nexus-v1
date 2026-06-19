@@ -56,6 +56,12 @@
                         'href' => route('govuk-alpha.settings.insurance', ['tenantSlug' => $tenantSlug]),
                     ];
                 }
+                if (\Illuminate\Support\Facades\Route::has('govuk-alpha.settings.availability')) {
+                    $settingsTabs[] = [
+                        'label' => __('govuk_alpha_settings.nav.availability'),
+                        'href' => route('govuk-alpha.settings.availability', ['tenantSlug' => $tenantSlug]),
+                    ];
+                }
             @endphp
             @if (!empty($settingsTabs))
                 <ul class="govuk-list govuk-!-margin-bottom-6">

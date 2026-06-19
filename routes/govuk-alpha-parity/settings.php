@@ -64,3 +64,10 @@ Route::get('/settings/insurance', [AlphaController::class, 'settingsInsurance'])
 Route::post('/settings/insurance', [AlphaController::class, 'settingsUploadInsurance'])
     ->middleware('throttle:10,1')
     ->name('settings.insurance.upload');
+
+// Weekly availability grid (recurring time slots).
+Route::get('/settings/availability', [AlphaController::class, 'settingsAvailability'])
+    ->name('settings.availability');
+Route::post('/settings/availability', [AlphaController::class, 'settingsUpdateAvailability'])
+    ->middleware('throttle:20,1')
+    ->name('settings.availability.update');

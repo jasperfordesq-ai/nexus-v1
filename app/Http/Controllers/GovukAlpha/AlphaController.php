@@ -72,6 +72,7 @@ class AlphaController extends Controller
     use Concerns\BlogReviewsParity;
     use Concerns\GoalsParity;
     use Concerns\SettingsAuthParity;
+    use Concerns\SettingsAvailabilityParity;
     use Concerns\AiChatParity;
 
     private const VALID_FEED_LIKE_TARGETS = [
