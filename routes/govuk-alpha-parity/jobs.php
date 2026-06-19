@@ -25,6 +25,10 @@ use Illuminate\Support\Facades\Route;
 | are distinct paths from the core /jobs/{id} route so there is no collision.
 */
 
+// Bias audit — admin-only hiring-fairness analytics (static, before wildcards).
+Route::get('/jobs/bias-audit', [AlphaController::class, 'jobsBiasAudit'])
+    ->name('jobs.bias-audit');
+
 // Talent search — employer-only candidate discovery (static, before wildcards).
 Route::get('/jobs/talent-search', [AlphaController::class, 'jobsTalentSearch'])
     ->name('jobs.talent');

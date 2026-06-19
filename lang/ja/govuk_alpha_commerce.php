@@ -477,6 +477,12 @@ return [
         'not_set' => 'Not set',
     ],
     'slots' => [
+        // Seller "confirm a collection" — no-JS QR-scan equivalent (added 2026-06-19)
+        'scan_heading' => '受け取りを確認',
+        'scan_hint' => '購入者が提示する受け取りコードを入力して、注文を受け取り済みにします。',
+        'scan_submit' => '受け取りを確認する',
+        'status_pickup_confirmed' => '受け取りを確認しました。注文は受け取り済みになりました。',
+        'status_pickup_scan_failed' => 'その受け取りコードを確認できませんでした。コードを確認してもう一度お試しください。',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

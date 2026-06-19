@@ -477,6 +477,12 @@ return [
         'not_set' => 'Not set',
     ],
     'slots' => [
+        // Seller "confirm a collection" — no-JS QR-scan equivalent (added 2026-06-19)
+        'scan_heading' => 'Deimhnigh bailiú',
+        'scan_hint' => 'Cuir isteach an cód bailithe a thaispeánann an ceannaitheoir duit chun a n-ordú a mharcáil mar bhailithe.',
+        'scan_submit' => 'Deimhnigh bailiú',
+        'status_pickup_confirmed' => 'Bailiú deimhnithe. Tá an t-ordú marcáilte mar bhailithe.',
+        'status_pickup_scan_failed' => 'Níorbh fhéidir an cód bailithe sin a dheimhniú. Seiceáil an cód agus bain triail eile as.',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

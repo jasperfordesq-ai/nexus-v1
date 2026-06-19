@@ -477,6 +477,12 @@ return [
         'not_set' => 'Not set',
     ],
     'slots' => [
+        // Seller "confirm a collection" — no-JS QR-scan equivalent (added 2026-06-19)
+        'scan_heading' => 'Confirmar uma recolha',
+        'scan_hint' => 'Introduza o código de recolha que o comprador lhe mostra para marcar a encomenda como recolhida.',
+        'scan_submit' => 'Confirmar recolha',
+        'status_pickup_confirmed' => 'Recolha confirmada. A encomenda está marcada como recolhida.',
+        'status_pickup_scan_failed' => 'Não foi possível confirmar esse código de recolha. Verifique o código e tente novamente.',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

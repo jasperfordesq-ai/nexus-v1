@@ -108,6 +108,8 @@ Route::get('/marketplace/category/{slug}', [AlphaController::class, 'commerceCat
 // route. Static sub-paths declared before the numeric {id} sub-paths.
 Route::get('/marketplace/slots', [AlphaController::class, 'commerceSellerPickupSlots'])->name('marketplace.slots');
 Route::post('/marketplace/slots', [AlphaController::class, 'commerceStorePickupSlot'])->middleware('throttle:30,1')->name('marketplace.slots.store');
+// Confirm a collection by code — no-JS equivalent of the React QR scanner.
+Route::post('/marketplace/slots/scan', [AlphaController::class, 'commerceScanPickup'])->middleware('throttle:60,1')->name('marketplace.slots.scan');
 Route::get('/marketplace/slots/{id}/edit', [AlphaController::class, 'commerceEditPickupSlot'])->whereNumber('id')->name('marketplace.slots.edit');
 Route::post('/marketplace/slots/{id}/update', [AlphaController::class, 'commerceUpdatePickupSlot'])->whereNumber('id')->middleware('throttle:30,1')->name('marketplace.slots.update');
 Route::post('/marketplace/slots/{id}/delete', [AlphaController::class, 'commerceDeletePickupSlot'])->whereNumber('id')->middleware('throttle:30,1')->name('marketplace.slots.delete');

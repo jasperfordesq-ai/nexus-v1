@@ -39,3 +39,17 @@ Route::get('/groups/{id}/image', [AlphaController::class, 'groupsImage'])
     ->whereNumber('id')->name('groups.image');
 Route::post('/groups/{id}/image', [AlphaController::class, 'groupsUpdateImage'])
     ->whereNumber('id')->middleware('throttle:15,1')->name('groups.image.update');
+
+// --- Announcements (list visible to members; create/edit/delete/pin admin-only) ---
+Route::get('/groups/{id}/announcements', [AlphaController::class, 'groupsAnnouncements'])
+    ->whereNumber('id')->name('groups.announcements');
+Route::post('/groups/{id}/announcements', [AlphaController::class, 'groupsCreateAnnouncement'])
+    ->whereNumber('id')->middleware('throttle:30,1')->name('groups.announcements.create');
+Route::get('/groups/{id}/announcements/{annId}/edit', [AlphaController::class, 'groupsEditAnnouncement'])
+    ->whereNumber('id')->whereNumber('annId')->name('groups.announcements.edit');
+Route::post('/groups/{id}/announcements/{annId}/edit', [AlphaController::class, 'groupsUpdateAnnouncement'])
+    ->whereNumber('id')->whereNumber('annId')->middleware('throttle:30,1')->name('groups.announcements.update');
+Route::post('/groups/{id}/announcements/{annId}/delete', [AlphaController::class, 'groupsDeleteAnnouncement'])
+    ->whereNumber('id')->whereNumber('annId')->middleware('throttle:30,1')->name('groups.announcements.delete');
+Route::post('/groups/{id}/announcements/{annId}/pin', [AlphaController::class, 'groupsPinAnnouncement'])
+    ->whereNumber('id')->whereNumber('annId')->middleware('throttle:30,1')->name('groups.announcements.pin');

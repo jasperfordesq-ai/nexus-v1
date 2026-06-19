@@ -477,6 +477,12 @@ return [
         'not_set' => 'Not set',
     ],
     'slots' => [
+        // Seller "confirm a collection" — no-JS QR-scan equivalent (added 2026-06-19)
+        'scan_heading' => 'Potwierdź odbiór',
+        'scan_hint' => 'Wprowadź kod odbioru, który pokazuje kupujący, aby oznaczyć jego zamówienie jako odebrane.',
+        'scan_submit' => 'Potwierdź odbiór',
+        'status_pickup_confirmed' => 'Odbiór potwierdzony. Zamówienie zostało oznaczone jako odebrane.',
+        'status_pickup_scan_failed' => 'Nie można potwierdzić tego kodu odbioru. Sprawdź kod i spróbuj ponownie.',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

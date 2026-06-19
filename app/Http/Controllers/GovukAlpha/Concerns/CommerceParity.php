@@ -1706,6 +1706,43 @@ trait CommerceParity
         ]);
     }
 
+    /**
+     * Confirm a click-and-collect collection by entering the buyer's collection
+     * code. This is the no-JS equivalent of the React seller "scan QR" page
+     * (SellerPickupScanPage) — both call MarketplacePickupSlotService::scanQr,
+     * which a camera scanner would ultimately hit too. The seller simply types
+     * the short code the buyer shows them on their device.
+     */
+    public function commerceScanPickup(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('marketplace'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $code = trim(self::asStr($request->input('qr_code')));
+        if ($code === '') {
+            return redirect()->route('govuk-alpha.marketplace.slots', ['tenantSlug' => $tenantSlug, 'status' => 'pickup-scan-failed']);
+        }
+
+        try {
+            $reservation = MarketplacePickupSlotService::scanQr($code, $userId);
+        } catch (\Throwable $e) {
+            // DomainException carries a buyer-facing reason (bad/used code, not
+            // this seller's order); only unexpected failures are worth a report.
+            if (!$e instanceof \DomainException) {
+                report($e);
+            }
+            return redirect()->route('govuk-alpha.marketplace.slots', ['tenantSlug' => $tenantSlug, 'status' => 'pickup-scan-failed']);
+        }
+
+        return redirect()
+            ->route('govuk-alpha.marketplace.slots', ['tenantSlug' => $tenantSlug, 'status' => 'pickup-confirmed'])
+            ->with('commercePickupScanOrderId', (int) ($reservation->order_id ?? 0));
+    }
+
     /** Create a new pickup slot for the member's seller profile. */
     public function commerceStorePickupSlot(Request $request, string $tenantSlug): RedirectResponse
     {

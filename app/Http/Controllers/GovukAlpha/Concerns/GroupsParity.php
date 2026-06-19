@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\GovukAlpha\Concerns;
 
 use App\Core\TenantContext;
+use App\Services\GroupAnnouncementService;
 use App\Services\GroupInviteService;
 use App\Services\GroupNotificationPreferenceService;
 use App\Services\GroupService;
@@ -381,5 +382,279 @@ trait GroupsParity
         }
 
         return $back($type === 'cover' ? 'cover-updated' : 'avatar-updated');
+    }
+
+    // -----------------------------------------------------------------
+    //  Group Announcements — list, create, edit, delete, pin/unpin
+    //  Mirrors GroupsController announcements methods + GroupAnnouncementService.
+    //  Permission rule: list visible to all active members; create/edit/delete/pin
+    //  restricted to group owners/admins (GroupService::canModify).
+    // -----------------------------------------------------------------
+
+    /**
+     * GET /{tenantSlug}/alpha/groups/{id}/announcements
+     * List announcements; also renders create form for admins.
+     */
+    public function groupsAnnouncements(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
+    {
+        $userId = $this->groupsParityGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $group = null;
+        try {
+            $group = GroupService::getById($id, $userId, true);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($group === null, 404);
+        abort_unless(
+            GroupService::isActiveMember($id, $userId) || GroupService::canModify($id, $userId),
+            403
+        );
+
+        $isAdmin = GroupService::canModify($id, $userId);
+
+        /** @var GroupAnnouncementService $service */
+        $service = app(GroupAnnouncementService::class);
+        $result = null;
+        try {
+            $result = $service->list($id, $userId, ['limit' => 50, 'include_expired' => true]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        $announcements = is_array($result) ? ($result['items'] ?? []) : [];
+
+        return $this->view('accessible-frontend::group-announcements', [
+            'title'         => __('govuk_alpha_groups.announcements.title'),
+            'tenantSlug'    => $tenantSlug,
+            'activeNav'     => 'explore',
+            'group'         => $group,
+            'announcements' => $announcements,
+            'isAdmin'       => $isAdmin,
+            'status'        => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * POST /{tenantSlug}/alpha/groups/{id}/announcements
+     * Create a new announcement (admin only).
+     */
+    public function groupsCreateAnnouncement(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $userId = $this->groupsParityGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $back = fn (string $status): RedirectResponse => redirect()->route(
+            'govuk-alpha.groups.announcements',
+            ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]
+        );
+
+        abort_unless(GroupService::canModify($id, $userId), 403);
+
+        $data = [
+            'title'      => self::asStr($request->input('title')),
+            'content'    => self::asStr($request->input('content')),
+            'is_pinned'  => $request->boolean('is_pinned'),
+            'expires_at' => self::asStr($request->input('expires_at')) ?: null,
+        ];
+
+        /** @var GroupAnnouncementService $service */
+        $service = app(GroupAnnouncementService::class);
+        $result = null;
+        try {
+            $result = $service->create($id, $userId, $data);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($result === null) {
+            $errors = $service->getErrors();
+            $code   = $errors[0]['code'] ?? '';
+            if ($code === 'FORBIDDEN') {
+                return $back('ann-forbidden');
+            }
+            $field = $errors[0]['field'] ?? '';
+            if ($field === 'title') {
+                return $back('ann-title-required');
+            }
+            if ($field === 'content') {
+                return $back('ann-content-required');
+            }
+
+            return $back('ann-create-failed');
+        }
+
+        return $back('ann-created');
+    }
+
+    /**
+     * GET /{tenantSlug}/alpha/groups/{id}/announcements/{annId}/edit
+     * Show edit form for a single announcement (admin only).
+     */
+    public function groupsEditAnnouncement(Request $request, string $tenantSlug, int $id, int $annId): Response|RedirectResponse
+    {
+        $userId = $this->groupsParityGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $group = null;
+        try {
+            $group = GroupService::getById($id, $userId, false);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($group === null, 404);
+        abort_unless(GroupService::canModify($id, $userId), 403);
+
+        /** @var GroupAnnouncementService $service */
+        $service = app(GroupAnnouncementService::class);
+        $announcement = null;
+        try {
+            $announcement = $service->getById($id, $annId, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($announcement === null, 404);
+
+        return $this->view('accessible-frontend::group-announcements-edit', [
+            'title'        => __('govuk_alpha_groups.announcements.edit_heading'),
+            'tenantSlug'   => $tenantSlug,
+            'activeNav'    => 'explore',
+            'group'        => $group,
+            'announcement' => $announcement,
+            'status'       => self::asStr($request->query('status')) ?: null,
+        ]);
+    }
+
+    /**
+     * POST /{tenantSlug}/alpha/groups/{id}/announcements/{annId}/edit
+     * Persist edits to an announcement (admin only, no-JS POST).
+     */
+    public function groupsUpdateAnnouncement(Request $request, string $tenantSlug, int $id, int $annId): RedirectResponse
+    {
+        $userId = $this->groupsParityGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $backList = fn (string $status): RedirectResponse => redirect()->route(
+            'govuk-alpha.groups.announcements',
+            ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]
+        );
+        $backEdit = fn (string $status): RedirectResponse => redirect()->route(
+            'govuk-alpha.groups.announcements.edit',
+            ['tenantSlug' => $tenantSlug, 'id' => $id, 'annId' => $annId, 'status' => $status]
+        );
+
+        abort_unless(GroupService::canModify($id, $userId), 403);
+
+        $data = [
+            'title'      => self::asStr($request->input('title')),
+            'content'    => self::asStr($request->input('content')),
+            'is_pinned'  => $request->boolean('is_pinned'),
+            'expires_at' => self::asStr($request->input('expires_at')) ?: null,
+        ];
+
+        /** @var GroupAnnouncementService $service */
+        $service = app(GroupAnnouncementService::class);
+        $result  = null;
+        try {
+            $result = $service->update($id, $annId, $userId, $data);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($result === null) {
+            $errors = $service->getErrors();
+            $code   = $errors[0]['code'] ?? '';
+            if ($code === 'NOT_FOUND') {
+                return $backList('ann-not-found');
+            }
+            if ($code === 'FORBIDDEN') {
+                return $backList('ann-forbidden');
+            }
+
+            return $backEdit('ann-update-failed');
+        }
+
+        return $backList('ann-updated');
+    }
+
+    /**
+     * POST /{tenantSlug}/alpha/groups/{id}/announcements/{annId}/delete
+     * Delete an announcement (admin only, no-JS POST).
+     */
+    public function groupsDeleteAnnouncement(Request $request, string $tenantSlug, int $id, int $annId): RedirectResponse
+    {
+        $userId = $this->groupsParityGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $back = fn (string $status): RedirectResponse => redirect()->route(
+            'govuk-alpha.groups.announcements',
+            ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]
+        );
+
+        abort_unless(GroupService::canModify($id, $userId), 403);
+
+        /** @var GroupAnnouncementService $service */
+        $service = app(GroupAnnouncementService::class);
+        $ok      = false;
+        try {
+            $ok = $service->delete($id, $annId, $userId);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $back($ok ? 'ann-deleted' : 'ann-delete-failed');
+    }
+
+    /**
+     * POST /{tenantSlug}/alpha/groups/{id}/announcements/{annId}/pin
+     * Toggle pin/unpin on an announcement (admin only, no-JS POST).
+     * Reads hidden input 'is_pinned' = '1' (pin) or '0' (unpin).
+     */
+    public function groupsPinAnnouncement(Request $request, string $tenantSlug, int $id, int $annId): RedirectResponse
+    {
+        $userId = $this->groupsParityGuard($tenantSlug);
+        if (is_object($userId)) {
+            return $userId;
+        }
+
+        $back = fn (string $status): RedirectResponse => redirect()->route(
+            'govuk-alpha.groups.announcements',
+            ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $status]
+        );
+
+        abort_unless(GroupService::canModify($id, $userId), 403);
+
+        $isPinned = (bool) $request->input('is_pinned', '0');
+
+        /** @var GroupAnnouncementService $service */
+        $service = app(GroupAnnouncementService::class);
+        $result  = null;
+        try {
+            $result = $service->update($id, $annId, $userId, ['is_pinned' => $isPinned]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        if ($result === null) {
+            $errors = $service->getErrors();
+            $code   = $errors[0]['code'] ?? '';
+            if ($code === 'NOT_FOUND') {
+                return $back('ann-not-found');
+            }
+
+            return $back('ann-pin-failed');
+        }
+
+        return $back($isPinned ? 'ann-pinned' : 'ann-unpinned');
     }
 }

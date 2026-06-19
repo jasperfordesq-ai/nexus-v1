@@ -615,6 +615,102 @@ trait JobsParity
             ->exists();
     }
 
+    // =========================================================================
+    // Bias Audit — admin-only hiring-fairness analytics (mirrors React BiasAuditPage)
+    // =========================================================================
+
+    /**
+     * Bias audit dashboard — admin-only hiring-process analytics.
+     *
+     * Mirrors React BiasAuditPage: application funnel, rejection rates by
+     * stage, average time-in-stage, skills-match correlation, and source
+     * effectiveness. Accepts optional `from`, `to` (Y-m-d) and `job_id`
+     * query params, defaulting to the last 12 months across all jobs.
+     *
+     * Calls JobBiasAuditService::generateReport directly (the same service
+     * AdminJobsController::biasAudit calls) — no HTTP round-trip.
+     * Auth mirrors AdminJobsController::requireAdminForJobs: feature gate +
+     * admin role check matching requireAdmin() roles.
+     */
+    public function jobsBiasAudit(Request $request, string $tenantSlug): Response|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(\App\Core\TenantContext::hasFeature('job_vacancies'), 403);
+
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        // Require admin role — mirrors BaseApiController::requireAdmin()
+        $tenantId = \App\Core\TenantContext::getId();
+        $adminUser = \Illuminate\Support\Facades\DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->first(['id', 'role', 'is_admin', 'is_super_admin', 'is_tenant_super_admin', 'is_god']);
+
+        $isAdmin = $adminUser && (
+            in_array((string) ($adminUser->role ?? ''), ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+            || (bool) ($adminUser->is_admin ?? false)
+            || (bool) ($adminUser->is_super_admin ?? false)
+            || (bool) ($adminUser->is_tenant_super_admin ?? false)
+            || (bool) ($adminUser->is_god ?? false)
+        );
+
+        abort_unless($isAdmin, 403);
+
+        // Sanitise and clamp filter inputs
+        $dateFrom = null;
+        $dateTo   = null;
+        $jobId    = null;
+
+        $rawFrom = trim((string) ($request->query('from') ?? ''));
+        $rawTo   = trim((string) ($request->query('to') ?? ''));
+        $rawJob  = trim((string) ($request->query('job_id') ?? ''));
+
+        if ($rawFrom !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $rawFrom)) {
+            $dateFrom = $rawFrom;
+        }
+        if ($rawTo !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $rawTo)) {
+            $dateTo = $rawTo;
+        }
+        if ($rawJob !== '' && ctype_digit($rawJob)) {
+            $jobId = (int) $rawJob;
+        }
+
+        $report = null;
+        try {
+            $report = app(\App\Services\JobBiasAuditService::class)
+                ->generateReport($tenantId, $jobId, $dateFrom, $dateTo);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        // Optionally build a list of jobs for the filter <select>
+        $jobs = [];
+        try {
+            $jobs = \Illuminate\Support\Facades\DB::table('job_vacancies')
+                ->where('tenant_id', $tenantId)
+                ->orderBy('title')
+                ->pluck('title', 'id')
+                ->toArray();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->view('accessible-frontend::jobs-bias-audit', [
+            'title'      => __('govuk_alpha_jobs.bias_audit.title'),
+            'tenantSlug' => $tenantSlug,
+            'activeNav'  => 'admin',
+            'report'     => $report,
+            'jobs'       => $jobs,
+            'filterFrom' => $dateFrom,
+            'filterTo'   => $dateTo,
+            'filterJob'  => $jobId,
+        ]);
+    }
+
     /**
      * Build the predictions block shown on the analytics page, mirroring
      * JobVacanciesController::predictions (same similar-jobs aggregation and

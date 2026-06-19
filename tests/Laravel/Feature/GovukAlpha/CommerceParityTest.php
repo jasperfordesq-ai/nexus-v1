@@ -1614,6 +1614,49 @@ class CommerceParityTest extends TestCase
         ]);
     }
 
+    // ==================================================================
+    //  Seller pickup "confirm a collection" — no-JS QR-scan equivalent
+    // ==================================================================
+
+    public function test_commerce_pickup_scan_form_renders_on_slots_page(): void
+    {
+        $this->authenticatedUser(['name' => 'Slot Seller']);
+        $this->enableAlphaFeatures(['marketplace']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/slots");
+        $res->assertOk();
+        $res->assertSee(__('govuk_alpha_commerce.slots.scan_heading'));
+        $res->assertSee(route('govuk-alpha.marketplace.slots.scan', ['tenantSlug' => $this->testTenantSlug]), false);
+        $res->assertSee('name="qr_code"', false);
+    }
+
+    public function test_commerce_pickup_scan_requires_auth(): void
+    {
+        $this->enableAlphaFeatures(['marketplace']);
+        $this->post("/{$this->testTenantSlug}/alpha/marketplace/slots/scan", ['qr_code' => 'ABC123'])
+            ->assertRedirectContains('/alpha/login');
+    }
+
+    public function test_commerce_pickup_scan_empty_code_redirects_with_failure(): void
+    {
+        $this->authenticatedUser();
+        $this->enableAlphaFeatures(['marketplace']);
+
+        $this->post("/{$this->testTenantSlug}/alpha/marketplace/slots/scan", ['qr_code' => '  '])
+            ->assertRedirect("/{$this->testTenantSlug}/alpha/marketplace/slots?status=pickup-scan-failed");
+    }
+
+    public function test_commerce_pickup_scan_invalid_code_redirects_with_failure(): void
+    {
+        $this->authenticatedUser();
+        $this->enableAlphaFeatures(['marketplace']);
+
+        // An unknown code is rejected by MarketplacePickupSlotService::scanQr
+        // (DomainException) and surfaced as the failure status, not a 500.
+        $this->post("/{$this->testTenantSlug}/alpha/marketplace/slots/scan", ['qr_code' => 'NOPE-NOT-A-REAL-CODE'])
+            ->assertRedirect("/{$this->testTenantSlug}/alpha/marketplace/slots?status=pickup-scan-failed");
+    }
+
     private function enableAlphaFeatures(array $features): void
     {
         $row = DB::table('tenants')->where('id', $this->testTenantId)->value('features');

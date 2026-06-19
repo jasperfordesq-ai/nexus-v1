@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Group announcements can now be managed on the accessible site.** Group owners and admins can post, edit, delete and pin announcements directly from the accessible group page — previously you could only *see* pinned announcements there, not manage them. Pinned items are clearly flagged and shown first.
+- **Job hiring "bias audit" is now available on the accessible site.** Admins get the same hiring-fairness report as the main site — application funnel, rejection rates by stage, time in each stage, outcome breakdown and where applicants came from — rendered as clear tables (no charts needed), with date-range and per-job filters.
+- **Sellers can confirm a click-and-collect handover on the accessible site.** A seller can type the short collection code the buyer shows them to mark an order as collected — the keyboard-friendly equivalent of scanning the buyer's QR code, no camera required.
 - **The accessible (simpler, screen-reader-first) version of the site now does almost everything the main site does.** Every community area — your wallet, messages, events, groups, volunteering, organisations, jobs, the marketplace, courses, podcasts, blog, reviews, ideas/challenges, goals, achievements and leaderboards, member profiles, search, saved items and collections, and federation — now works on the accessible site, with the same actions you'd expect: posting, applying, joining, transferring time credits, leaving reviews, managing your own listings/courses/events, and more. Links were added throughout so these pages are easy to find.
 
 ### Fixed

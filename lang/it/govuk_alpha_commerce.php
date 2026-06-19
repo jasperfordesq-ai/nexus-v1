@@ -477,6 +477,12 @@ return [
         'not_set' => 'Not set',
     ],
     'slots' => [
+        // Seller "confirm a collection" — no-JS QR-scan equivalent (added 2026-06-19)
+        'scan_heading' => 'Conferma un ritiro',
+        'scan_hint' => 'Inserisci il codice di ritiro che l\'acquirente ti mostra per contrassegnare il suo ordine come ritirato.',
+        'scan_submit' => 'Conferma il ritiro',
+        'status_pickup_confirmed' => 'Ritiro confermato. L\'ordine è contrassegnato come ritirato.',
+        'status_pickup_scan_failed' => 'Impossibile confermare questo codice di ritiro. Controlla il codice e riprova.',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

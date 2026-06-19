@@ -477,6 +477,12 @@ return [
         'not_set' => 'Not set',
     ],
     'slots' => [
+        // Seller "confirm a collection" — no-JS QR-scan equivalent (added 2026-06-19)
+        'scan_heading' => 'تأكيد الاستلام',
+        'scan_hint' => 'أدخل رمز الاستلام الذي يعرضه المشتري لوضع علامة على طلبه بأنه تم استلامه.',
+        'scan_submit' => 'تأكيد الاستلام',
+        'status_pickup_confirmed' => 'تم تأكيد الاستلام. تم وضع علامة على الطلب بأنه تم استلامه.',
+        'status_pickup_scan_failed' => 'تعذّر تأكيد رمز الاستلام هذا. تحقق من الرمز وحاول مرة أخرى.',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

@@ -499,6 +499,12 @@ return [
     ],
 
     'slots' => [
+        // Seller "confirm a collection" — no-JS QR-scan equivalent (added 2026-06-19)
+        'scan_heading' => 'Confirm a collection',
+        'scan_hint' => 'Enter the collection code the buyer shows you to mark their order as collected.',
+        'scan_submit' => 'Confirm collection',
+        'status_pickup_confirmed' => 'Collection confirmed. The order is marked as collected.',
+        'status_pickup_scan_failed' => 'That collection code could not be confirmed. Check the code and try again.',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

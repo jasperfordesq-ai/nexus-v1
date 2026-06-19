@@ -477,6 +477,12 @@ return [
         'not_set' => 'Not set',
     ],
     'slots' => [
+        // Seller "confirm a collection" — no-JS QR-scan equivalent (added 2026-06-19)
+        'scan_heading' => 'Een afhaling bevestigen',
+        'scan_hint' => 'Voer de afhaalcode in die de koper u toont om hun bestelling als afgehaald te markeren.',
+        'scan_submit' => 'Afhaling bevestigen',
+        'status_pickup_confirmed' => 'Afhaling bevestigd. De bestelling is gemarkeerd als afgehaald.',
+        'status_pickup_scan_failed' => 'Die afhaalcode kon niet worden bevestigd. Controleer de code en probeer het opnieuw.',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',

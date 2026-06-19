@@ -24,6 +24,8 @@
             'slot-deleted' => ['msg' => __('govuk_alpha_commerce.slots.status_slot_deleted'), 'error' => false],
             'slot-create-failed' => ['msg' => __('govuk_alpha_commerce.slots.status_slot_create_failed'), 'error' => true],
             'slot-delete-failed' => ['msg' => __('govuk_alpha_commerce.slots.status_slot_delete_failed'), 'error' => true],
+            'pickup-confirmed' => ['msg' => __('govuk_alpha_commerce.slots.status_pickup_confirmed'), 'error' => false],
+            'pickup-scan-failed' => ['msg' => __('govuk_alpha_commerce.slots.status_pickup_scan_failed'), 'error' => true],
         ];
         $statusEntry = $status !== null && isset($statusMessages[$status]) ? $statusMessages[$status] : null;
     @endphp
@@ -53,6 +55,19 @@
     <span class="govuk-caption-l">{{ __('govuk_alpha_commerce.slots.caption', ['community' => $communityName]) }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha_commerce.slots.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha_commerce.slots.description') }}</p>
+
+    {{-- Confirm a collection: the no-JS equivalent of scanning the buyer's QR
+         code. The seller types the short collection code the buyer shows them,
+         which marks their click-and-collect order as picked up. --}}
+    <form method="post" action="{{ route('govuk-alpha.marketplace.slots.scan', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-6">
+        @csrf
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-label--m" for="qr_code">{{ __('govuk_alpha_commerce.slots.scan_heading') }}</label>
+            <div id="qr_code-hint" class="govuk-hint">{{ __('govuk_alpha_commerce.slots.scan_hint') }}</div>
+            <input class="govuk-input govuk-input--width-20" id="qr_code" name="qr_code" type="text" inputmode="text" autocomplete="off" spellcheck="false" maxlength="64" aria-describedby="qr_code-hint">
+        </div>
+        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_commerce.slots.scan_submit') }}</button>
+    </form>
 
     <a class="govuk-button" href="#new-slot" data-module="govuk-button">{{ __('govuk_alpha_commerce.slots.new_button') }}</a>
 

@@ -477,6 +477,12 @@ return [
         'not_set' => 'Not set',
     ],
     'slots' => [
+        // Seller "confirm a collection" — no-JS QR-scan equivalent (added 2026-06-19)
+        'scan_heading' => 'Abholung bestätigen',
+        'scan_hint' => 'Geben Sie den Abholcode ein, den der Käufer Ihnen zeigt, um seine Bestellung als abgeholt zu markieren.',
+        'scan_submit' => 'Abholung bestätigen',
+        'status_pickup_confirmed' => 'Abholung bestätigt. Die Bestellung ist als abgeholt markiert.',
+        'status_pickup_scan_failed' => 'Dieser Abholcode konnte nicht bestätigt werden. Prüfen Sie den Code und versuchen Sie es erneut.',
         'title' => 'Pickup slots',
         'title_edit' => 'Edit pickup slot',
         'caption' => 'Click and collect at :community',
