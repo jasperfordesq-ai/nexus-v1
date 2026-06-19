@@ -1495,6 +1495,10 @@ return [
         'new_tag' => 'جديد',
         'view' => 'عرض',
         'mark_read' => 'تحديد كمقروء',
+        'mark_group_read' => 'Mark all as read',
+        'group_tag' => ':count grouped',
+        'actors_label' => 'From :names',
+        'actors_and_more' => 'From :names and :count others',
         'delete_all' => 'حذف الكل',
         'delete_all_warning' => 'سيؤدي هذا إلى إزالة جميع إشعاراتك نهائياً. لا يمكن التراجع عن هذا الإجراء.',
         'types' => [
@@ -1519,6 +1523,7 @@ return [
             'notification-deleted' => 'تم حذف الإشعار.',
             'notification-marked-read' => 'تم تحديد الإشعار كمقروء.',
             'all-notifications-deleted' => 'تم حذف جميع الإشعارات.',
+            'group-marked-read' => 'These notifications have been marked as read.',
         ],
     ],
     'activity' => [

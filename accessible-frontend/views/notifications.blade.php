@@ -112,7 +112,14 @@
             @php
                 $nId = (int) ($n['id'] ?? 0);
                 $nText = $resolveText((string) ($n['message'] ?? ($n['title'] ?? '')));
-                $nUnread = !($n['is_read'] ?? false);
+                $isGrouped = (bool) ($n['is_grouped'] ?? false);
+                $groupKey = (string) ($n['group_key'] ?? '');
+                $groupCount = (int) ($n['group_count'] ?? 1);
+                $actors = is_array($n['actors'] ?? null) ? $n['actors'] : [];
+                $actorNames = array_values(array_filter(array_map(fn ($a) => trim((string) ($a['name'] ?? '')), $actors)));
+                $remaining = (int) ($n['remaining_count'] ?? 0);
+                // Unread = the single's flag, or "not all read" for a group.
+                $nUnread = $isGrouped ? !($n['all_read'] ?? false) : !($n['is_read'] ?? false);
                 $nWhen = $dateFmt($n['created_at'] ?? null);
                 $nCat = $category((string) ($n['type'] ?? 'system'));
                 $nColour = $catColour[$nCat] ?? 'grey';
@@ -123,22 +130,40 @@
                 <div class="nexus-alpha-module-row">
                     <p class="govuk-body govuk-!-margin-bottom-1">
                         <strong class="govuk-tag govuk-tag--{{ $nColour }}">{{ __('govuk_alpha.notifications.types.' . $nCat) }}</strong>
+                        @if ($isGrouped)<strong class="govuk-tag govuk-tag--purple">{{ __('govuk_alpha.notifications.group_tag', ['count' => $groupCount]) }}</strong> @endif
                         @if ($nUnread)<strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha.notifications.new_tag') }}</strong> @endif
                         @if ($nHref)<a class="govuk-link govuk-link--no-visited-state" href="{{ $nHref }}">{{ $nText }}</a>@else{{ $nText }}@endif
                     </p>
                     <div class="nexus-alpha-actions">
-                        @if ($nUnread)
+                        @if ($isGrouped && $nUnread && $groupKey !== '')
+                            <form method="post" action="{{ route('govuk-alpha.notifications.group-read', ['tenantSlug' => $tenantSlug]) }}" class="nexus-alpha-linkform">
+                                @csrf
+                                <input type="hidden" name="group_key" value="{{ $groupKey }}">
+                                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.notifications.mark_group_read') }}</button>
+                            </form>
+                        @elseif (!$isGrouped && $nUnread)
                             <form method="post" action="{{ route('govuk-alpha.notifications.mark-read', ['tenantSlug' => $tenantSlug, 'id' => $nId]) }}" class="nexus-alpha-linkform">
                                 @csrf
                                 <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.notifications.mark_read') }}</button>
                             </form>
                         @endif
-                        <form method="post" action="{{ route('govuk-alpha.notifications.delete', ['tenantSlug' => $tenantSlug, 'id' => $nId]) }}" class="nexus-alpha-linkform">
-                            @csrf
-                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.notifications.delete') }}</button>
-                        </form>
+                        @unless ($isGrouped)
+                            <form method="post" action="{{ route('govuk-alpha.notifications.delete', ['tenantSlug' => $tenantSlug, 'id' => $nId]) }}" class="nexus-alpha-linkform">
+                                @csrf
+                                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.notifications.delete') }}</button>
+                            </form>
+                        @endunless
                     </div>
                 </div>
+                @if ($isGrouped && !empty($actorNames))
+                    <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">
+                        @if ($remaining > 0)
+                            {{ __('govuk_alpha.notifications.actors_and_more', ['names' => implode(', ', $actorNames), 'count' => $remaining]) }}
+                        @else
+                            {{ __('govuk_alpha.notifications.actors_label', ['names' => implode(', ', $actorNames)]) }}
+                        @endif
+                    </p>
+                @endif
                 @if ($nWhen)
                     <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-0">{{ $nWhen }}</p>
                 @endif

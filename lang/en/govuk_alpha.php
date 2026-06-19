@@ -1503,6 +1503,10 @@ return [
         'new_tag' => 'New',
         'view' => 'View',
         'mark_read' => 'Mark as read',
+        'mark_group_read' => 'Mark all as read',
+        'group_tag' => ':count grouped',
+        'actors_label' => 'From :names',
+        'actors_and_more' => 'From :names and :count others',
         'delete_all' => 'Delete all',
         'delete_all_warning' => 'This permanently removes all your notifications. You cannot undo this.',
         'types' => [
@@ -1527,6 +1531,7 @@ return [
             'notification-deleted' => 'Notification deleted.',
             'notification-marked-read' => 'Notification marked as read.',
             'all-notifications-deleted' => 'All notifications deleted.',
+            'group-marked-read' => 'These notifications have been marked as read.',
         ],
     ],
     'activity' => [

@@ -84,6 +84,137 @@ class NotificationService
     }
 
     /**
+     * Like getAll() but collapses notifications that share a type + link into a
+     * single "group" item (e.g. "Alice and 4 others liked your post"). Mirrors
+     * NotificationsController::grouped but returns STRUCTURAL data only — the
+     * grouped message is rendered by the caller from translatable strings, so it
+     * works in every locale. Singles keep is_grouped=false. Tenant scope is
+     * applied by the Notification model's global scope.
+     *
+     * @return array{items: array<int,array<string,mixed>>, cursor: ?string, has_more: bool}
+     */
+    public function getGroupedNotifications(int $userId, array $filters = []): array
+    {
+        $limit = min((int) ($filters['limit'] ?? 20), 100);
+        $cursor = $filters['cursor'] ?? null;
+
+        $query = $this->notification->newQuery()->where('user_id', $userId);
+        if (! empty($filters['unread_only'])) {
+            $query->unread();
+        }
+        if (! empty($filters['type']) && isset(self::TYPE_CATEGORIES[$filters['type']])) {
+            $query->whereIn('type', self::TYPE_CATEGORIES[$filters['type']]);
+        }
+        if ($cursor !== null) {
+            $cursorId = base64_decode((string) $cursor, true);
+            if ($cursorId !== false) {
+                $query->where('id', '<', (int) $cursorId);
+            }
+        }
+
+        // Pull a wider window so grouping has rows to collapse, then paginate the
+        // grouped result down to $limit.
+        $raw = $query->orderByDesc('id')->limit(200)->get();
+
+        $groups = [];
+        foreach ($raw as $n) {
+            $key = ($n->type ?? 'system') . ':' . ($n->link ?? 'none');
+            $groups[$key][] = $n;
+        }
+
+        $result = [];
+        foreach ($groups as $key => $rows) {
+            $latest = $rows[0]; // already id DESC
+            if (count($rows) === 1) {
+                $item = $latest->toArray();
+                $item['is_grouped'] = false;
+                $result[] = $item;
+                continue;
+            }
+
+            $actorIds = [];
+            $allRead = true;
+            foreach ($rows as $r) {
+                if (! $r->is_read) {
+                    $allRead = false;
+                }
+                $aid = $r->actor_id ?? null;
+                if ($aid && ! in_array((int) $aid, $actorIds, true)) {
+                    $actorIds[] = (int) $aid;
+                }
+            }
+
+            $actors = [];
+            if (! empty($actorIds)) {
+                $actorUsers = \Illuminate\Support\Facades\DB::table('users')
+                    ->where('tenant_id', \App\Core\TenantContext::getId())
+                    ->whereIn('id', array_slice($actorIds, 0, 3))
+                    ->get(['id', 'name', 'first_name', 'last_name', 'avatar_url']);
+                foreach ($actorUsers as $u) {
+                    $actors[] = [
+                        'id' => (int) $u->id,
+                        'name' => $u->name ?: trim(($u->first_name ?? '') . ' ' . ($u->last_name ?? '')),
+                        'avatar_url' => $u->avatar_url,
+                    ];
+                }
+            }
+
+            $count = count($rows);
+            $item = $latest->toArray();
+            $item['is_grouped'] = true;
+            $item['group_key'] = $key;
+            $item['group_count'] = $count;
+            $item['actors'] = $actors;
+            $item['remaining_count'] = max(0, $count - count($actors));
+            $item['all_read'] = $allRead;
+            $item['notification_ids'] = array_map(static fn ($r) => (int) $r->id, $rows);
+            $result[] = $item;
+        }
+
+        // Most-recent first by the latest id in each group.
+        usort($result, static fn ($a, $b) => ($b['id'] ?? 0) <=> ($a['id'] ?? 0));
+
+        $hasMore = count($result) > $limit;
+        $paginated = array_slice($result, 0, $limit);
+        $lastId = $paginated !== [] ? (int) ($paginated[count($paginated) - 1]['id'] ?? 0) : 0;
+
+        return [
+            'items'    => $paginated,
+            'cursor'   => $hasMore && $lastId > 0 ? base64_encode((string) $lastId) : null,
+            'has_more' => $hasMore,
+        ];
+    }
+
+    /**
+     * Mark every unread notification in a "type:link" group as read for this
+     * user. Mirrors NotificationsController::markGroupRead. Returns the number of
+     * rows updated. Tenant scope comes from the Notification model.
+     */
+    public function markGroupRead(int $userId, string $groupKey): int
+    {
+        $groupKey = trim(urldecode($groupKey));
+        if ($groupKey === '') {
+            return 0;
+        }
+
+        [$type, $linkPart] = array_pad(explode(':', $groupKey, 2), 2, '');
+        $link = ($linkPart === '' || $linkPart === 'none') ? null : $linkPart;
+
+        $query = $this->notification->newQuery()
+            ->where('user_id', $userId)
+            ->where('type', $type)
+            ->where('is_read', false);
+
+        if ($link !== null) {
+            $query->where('link', $link);
+        } else {
+            $query->whereNull('link');
+        }
+
+        return (int) $query->update(['is_read' => true]);
+    }
+
+    /**
      * Get unread counts grouped by type category.
      *
      * @return array{total: int, categories: array<string, int>}

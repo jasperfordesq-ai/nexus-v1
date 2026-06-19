@@ -1495,6 +1495,10 @@ return [
         'new_tag' => 'Neu',
         'view' => 'Ansehen',
         'mark_read' => 'Als gelesen markieren',
+        'mark_group_read' => 'Mark all as read',
+        'group_tag' => ':count grouped',
+        'actors_label' => 'From :names',
+        'actors_and_more' => 'From :names and :count others',
         'delete_all' => 'Alle löschen',
         'delete_all_warning' => 'Dadurch werden alle Ihre Benachrichtigungen dauerhaft entfernt. Dieser Vorgang kann nicht rückgängig gemacht werden.',
         'types' => [
@@ -1519,6 +1523,7 @@ return [
             'notification-deleted' => 'Benachrichtigung gelöscht.',
             'notification-marked-read' => 'Benachrichtigung als gelesen markiert.',
             'all-notifications-deleted' => 'Alle Benachrichtigungen gelöscht.',
+            'group-marked-read' => 'These notifications have been marked as read.',
         ],
     ],
     'activity' => [

@@ -1495,6 +1495,10 @@ return [
         'new_tag' => 'Nowe',
         'view' => 'Zobacz',
         'mark_read' => 'Oznacz jako przeczytane',
+        'mark_group_read' => 'Mark all as read',
+        'group_tag' => ':count grouped',
+        'actors_label' => 'From :names',
+        'actors_and_more' => 'From :names and :count others',
         'delete_all' => 'Usuń wszystkie',
         'delete_all_warning' => 'Spowoduje to trwałe usunięcie wszystkich Twoich powiadomień. Tej operacji nie można cofnąć.',
         'types' => [
@@ -1519,6 +1523,7 @@ return [
             'notification-deleted' => 'Powiadomienie zostało usunięte.',
             'notification-marked-read' => 'Powiadomienie oznaczono jako przeczytane.',
             'all-notifications-deleted' => 'Wszystkie powiadomienia zostały usunięte.',
+            'group-marked-read' => 'These notifications have been marked as read.',
         ],
     ],
     'activity' => [

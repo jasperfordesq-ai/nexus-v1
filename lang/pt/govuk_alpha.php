@@ -1495,6 +1495,10 @@ return [
         'new_tag' => 'Nova',
         'view' => 'Ver',
         'mark_read' => 'Marcar como lida',
+        'mark_group_read' => 'Mark all as read',
+        'group_tag' => ':count grouped',
+        'actors_label' => 'From :names',
+        'actors_and_more' => 'From :names and :count others',
         'delete_all' => 'Eliminar todas',
         'delete_all_warning' => 'Esta acção remove permanentemente todas as suas notificações. Não é possível desfazê-la.',
         'types' => [
@@ -1519,6 +1523,7 @@ return [
             'notification-deleted' => 'Notificação eliminada.',
             'notification-marked-read' => 'Notificação marcada como lida.',
             'all-notifications-deleted' => 'Todas as notificações eliminadas.',
+            'group-marked-read' => 'These notifications have been marked as read.',
         ],
     ],
     'activity' => [

@@ -1495,6 +1495,10 @@ return [
         'new_tag' => '新着',
         'view' => '表示',
         'mark_read' => '既読にする',
+        'mark_group_read' => 'Mark all as read',
+        'group_tag' => ':count grouped',
+        'actors_label' => 'From :names',
+        'actors_and_more' => 'From :names and :count others',
         'delete_all' => 'すべて削除',
         'delete_all_warning' => 'すべての通知が完全に削除されます。この操作は取り消せません。',
         'types' => [
@@ -1519,6 +1523,7 @@ return [
             'notification-deleted' => '通知を削除しました。',
             'notification-marked-read' => '通知を既読にしました。',
             'all-notifications-deleted' => 'すべての通知を削除しました。',
+            'group-marked-read' => 'These notifications have been marked as read.',
         ],
     ],
     'activity' => [

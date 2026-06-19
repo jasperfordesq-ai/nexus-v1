@@ -1495,6 +1495,10 @@ return [
         'new_tag' => 'Nuova',
         'view' => 'Visualizza',
         'mark_read' => 'Segna come letta',
+        'mark_group_read' => 'Mark all as read',
+        'group_tag' => ':count grouped',
+        'actors_label' => 'From :names',
+        'actors_and_more' => 'From :names and :count others',
         'delete_all' => 'Elimina tutte',
         'delete_all_warning' => 'Questa operazione rimuove definitivamente tutte le tue notifiche. Non è possibile annullare l\'azione.',
         'types' => [
@@ -1519,6 +1523,7 @@ return [
             'notification-deleted' => 'Notifica eliminata.',
             'notification-marked-read' => 'Notifica segnata come letta.',
             'all-notifications-deleted' => 'Tutte le notifiche eliminate.',
+            'group-marked-read' => 'These notifications have been marked as read.',
         ],
     ],
     'activity' => [

@@ -4196,7 +4196,8 @@ class AlphaController extends Controller
         $counts = ['total' => 0];
         try {
             $svc = app(\App\Services\NotificationService::class);
-            $data = $svc->getAll($userId, $filters);
+            // Collapse same-target notifications into groups (mirrors React).
+            $data = $svc->getGroupedNotifications($userId, $filters);
             $counts = $svc->getCounts($userId);
         } catch (\Throwable $e) {
             report($e);
@@ -4213,6 +4214,34 @@ class AlphaController extends Controller
             'notificationsUnreadOnly' => $unreadOnly,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
+    }
+
+    /**
+     * Mark every notification in a "type:link" group as read (mirrors React's
+     * mark-group-read). The group_key is posted in the body because it can
+     * contain slashes (the link). NotificationService::markGroupRead is
+     * user + tenant scoped.
+     */
+    public function markGroupNotificationsRead(Request $request, string $tenantSlug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $groupKey = self::asStr($request->input('group_key'));
+        if ($groupKey === '') {
+            return redirect()->route('govuk-alpha.notifications.index', ['tenantSlug' => $tenantSlug]);
+        }
+
+        try {
+            app(\App\Services\NotificationService::class)->markGroupRead($userId, $groupKey);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.notifications.index', ['tenantSlug' => $tenantSlug, 'status' => 'group-marked-read']);
     }
 
     public function markAllNotificationsRead(Request $request, string $tenantSlug): RedirectResponse

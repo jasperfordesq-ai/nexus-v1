@@ -1495,6 +1495,10 @@ return [
         'new_tag' => 'Nouveau',
         'view' => 'Voir',
         'mark_read' => 'Marquer comme lu',
+        'mark_group_read' => 'Mark all as read',
+        'group_tag' => ':count grouped',
+        'actors_label' => 'From :names',
+        'actors_and_more' => 'From :names and :count others',
         'delete_all' => 'Tout supprimer',
         'delete_all_warning' => 'Cela supprime définitivement toutes vos notifications. Vous ne pouvez pas annuler cette action.',
         'types' => [
@@ -1519,6 +1523,7 @@ return [
             'notification-deleted' => 'Notification supprimée.',
             'notification-marked-read' => 'Notification marquée comme lue.',
             'all-notifications-deleted' => 'Toutes les notifications ont été supprimées.',
+            'group-marked-read' => 'These notifications have been marked as read.',
         ],
     ],
     'activity' => [

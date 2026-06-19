@@ -1495,6 +1495,10 @@ return [
         'new_tag' => 'Nua',
         'view' => 'Féach',
         'mark_read' => 'Marcáil mar léite',
+        'mark_group_read' => 'Mark all as read',
+        'group_tag' => ':count grouped',
+        'actors_label' => 'From :names',
+        'actors_and_more' => 'From :names and :count others',
         'delete_all' => 'Scrios uile',
         'delete_all_warning' => 'Baineann sé seo do chuid fógraí go léir go buan. Ní féidir leat é seo a chealú.',
         'types' => [
@@ -1519,6 +1523,7 @@ return [
             'notification-deleted' => 'Scriosadh an fógra.',
             'notification-marked-read' => 'Marcáladh an fógra mar léite.',
             'all-notifications-deleted' => 'Scriosadh gach fógra.',
+            'group-marked-read' => 'These notifications have been marked as read.',
         ],
     ],
     'activity' => [

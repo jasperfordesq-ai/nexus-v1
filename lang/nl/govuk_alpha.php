@@ -1495,6 +1495,10 @@ return [
         'new_tag' => 'Nieuw',
         'view' => 'Bekijken',
         'mark_read' => 'Als gelezen markeren',
+        'mark_group_read' => 'Mark all as read',
+        'group_tag' => ':count grouped',
+        'actors_label' => 'From :names',
+        'actors_and_more' => 'From :names and :count others',
         'delete_all' => 'Alles verwijderen',
         'delete_all_warning' => 'Dit verwijdert al uw meldingen permanent. Dit kan niet ongedaan worden gemaakt.',
         'types' => [
@@ -1519,6 +1523,7 @@ return [
             'notification-deleted' => 'Melding verwijderd.',
             'notification-marked-read' => 'Melding als gelezen gemarkeerd.',
             'all-notifications-deleted' => 'Alle meldingen verwijderd.',
+            'group-marked-read' => 'These notifications have been marked as read.',
         ],
     ],
     'activity' => [
