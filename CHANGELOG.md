@@ -9,7 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **The accessible (simpler, screen-reader-first) version of the site now does almost everything the main site does.** Every community area — your wallet, messages, events, groups, volunteering, organisations, jobs, the marketplace, courses, podcasts, blog, reviews, ideas/challenges, goals, achievements and leaderboards, member profiles, search, saved items and collections, and federation — now works on the accessible site, with the same actions you'd expect: posting, applying, joining, transferring time credits, leaving reviews, managing your own listings/courses/events, and more. Links were added throughout so these pages are easy to find.
+
 ### Fixed
+
+- **A repeating event's "Expiry" and author details could disappear from its page.** A formatting issue could blank out part of an event/listing detail page after an update; this is fixed.
+- **Donating time credits to another member, group invitations by email, poll CSV exports, and group messaging** all had behind-the-scenes faults that could make them silently fail; all are fixed.
+
 
 - **Recurring events now show their cover image on every date, not just one.** When you create a repeating event with a photo, the photo now appears on all of its dates. Previously it only attached to a single date in the series (which showed up last in the list), leaving the rest with no image.
 
