@@ -3825,6 +3825,16 @@ return [
         'swap_cancel_failed' => 'تعذّر إلغاء طلب التبديل هذا.',
     ],
     'vol_org' => [
+        // Volunteering "organisation door" (two-hats gateway) — added 2026-06-19
+        'door_eyebrow' => 'للمنظمات',
+        'door_heading_one' => 'أنت تدير :name',
+        'door_heading_many' => 'أنت تدير :count منظمة',
+        'door_desc' => 'انشر الفرص وراجع الطلبات واعتمد الساعات التي يسجلها متطوعوك.',
+        'door_register_title' => 'هل تدير منظمة تطوعية؟',
+        'door_register_desc' => 'سجّل منظمتك لنشر الفرص ومراجعة الطلبات واعتماد ساعات التطوع. تتم مراجعة المنظمات الجديدة من قبل مسؤول المجتمع قبل تفعيلها.',
+        'door_guest_desc' => 'سجّل الدخول لتسجيل منظمتك ونشر الفرص وإدارة المتطوعين.',
+        'browse_link' => 'تصفّح المنظمات',
+        'tools_title' => 'أدوات التطوع الخاصة بك',
         'manage_link' => 'Manage your organisation',
         'manage_link_for' => 'for :name',
         'awaiting_approval' => 'Awaiting approval',

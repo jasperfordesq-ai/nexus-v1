@@ -3850,6 +3850,16 @@ return [
     ],
     // ===== WAVE V-ORG: organisation-admin dashboard (the "two hats" admin side) =====
     'vol_org' => [
+        // Volunteering "organisation door" (two-hats gateway) — added 2026-06-19
+        'door_eyebrow' => 'For organisations',
+        'door_heading_one' => 'You manage :name',
+        'door_heading_many' => 'You manage :count organisations',
+        'door_desc' => 'Post opportunities, review applications and approve the hours your volunteers log.',
+        'door_register_title' => 'Run a volunteer organisation?',
+        'door_register_desc' => 'Register your organisation to post opportunities, review applications and approve volunteer hours. New organisations are reviewed by a community administrator before they go live.',
+        'door_guest_desc' => 'Sign in to register your organisation, post opportunities and manage volunteers.',
+        'browse_link' => 'Browse organisations',
+        'tools_title' => 'Your volunteering tools',
         // Discoverability (shown on the volunteering "Organisations" tab)
         'manage_link' => 'Manage your organisation',
         'manage_link_for' => 'for :name',

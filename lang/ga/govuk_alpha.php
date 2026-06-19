@@ -3825,6 +3825,16 @@ return [
         'swap_cancel_failed' => 'Níorbh fhéidir an t-iarratas malartaithe seo a chealú.',
     ],
     'vol_org' => [
+        // Volunteering "organisation door" (two-hats gateway) — added 2026-06-19
+        'door_eyebrow' => 'Do eagraíochtaí',
+        'door_heading_one' => 'Bainistíonn tú :name',
+        'door_heading_many' => 'Bainistíonn tú :count eagraíocht',
+        'door_desc' => 'Foilsigh deiseanna, déan athbhreithniú ar iarratais agus faomh na huaireanta a logálann do chuid oibrithe deonacha.',
+        'door_register_title' => 'An bhfuil eagraíocht dheonach á reáchtáil agat?',
+        'door_register_desc' => 'Cláraigh d\'eagraíocht chun deiseanna a fhoilsiú, athbhreithniú a dhéanamh ar iarratais agus uaireanta deonacha a fhaomhadh. Déanann riarthóir pobail athbhreithniú ar eagraíochtaí nua sula dtéann siad beo.',
+        'door_guest_desc' => 'Sínigh isteach chun d\'eagraíocht a chlárú, deiseanna a fhoilsiú agus oibrithe deonacha a bhainistiú.',
+        'browse_link' => 'Brabhsáil eagraíochtaí',
+        'tools_title' => 'Do uirlisí oibre deonaí',
         'manage_link' => 'Manage your organisation',
         'manage_link_for' => 'for :name',
         'awaiting_approval' => 'Awaiting approval',

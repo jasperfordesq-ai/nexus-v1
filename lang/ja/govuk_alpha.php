@@ -3825,6 +3825,16 @@ return [
         'swap_cancel_failed' => 'このシフト交換リクエストをキャンセルできませんでした。',
     ],
     'vol_org' => [
+        // Volunteering "organisation door" (two-hats gateway) — added 2026-06-19
+        'door_eyebrow' => '団体向け',
+        'door_heading_one' => ':name を管理しています',
+        'door_heading_many' => ':count 件の団体を管理しています',
+        'door_desc' => '募集を掲載し、応募を確認し、ボランティアが記録した時間を承認します。',
+        'door_register_title' => 'ボランティア団体を運営していますか？',
+        'door_register_desc' => '団体を登録すると、募集の掲載、応募の確認、ボランティア時間の承認ができます。新しい団体は公開前にコミュニティ管理者が審査します。',
+        'door_guest_desc' => 'サインインして団体を登録し、募集を掲載し、ボランティアを管理しましょう。',
+        'browse_link' => '団体を見る',
+        'tools_title' => 'ボランティアツール',
         'manage_link' => 'Manage your organisation',
         'manage_link_for' => 'for :name',
         'awaiting_approval' => 'Awaiting approval',

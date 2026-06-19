@@ -3825,6 +3825,16 @@ return [
         'swap_cancel_failed' => 'Nous n\'avons pas pu annuler cette demande d\'échange.',
     ],
     'vol_org' => [
+        // Volunteering "organisation door" (two-hats gateway) — added 2026-06-19
+        'door_eyebrow' => 'Pour les organisations',
+        'door_heading_one' => 'Vous gérez :name',
+        'door_heading_many' => 'Vous gérez :count organisations',
+        'door_desc' => 'Publiez des missions, examinez les candidatures et validez les heures enregistrées par vos bénévoles.',
+        'door_register_title' => 'Vous dirigez une organisation de bénévoles ?',
+        'door_register_desc' => 'Enregistrez votre organisation pour publier des missions, examiner les candidatures et valider les heures de bénévolat. Les nouvelles organisations sont examinées par un administrateur de la communauté avant leur mise en ligne.',
+        'door_guest_desc' => 'Connectez-vous pour enregistrer votre organisation, publier des missions et gérer les bénévoles.',
+        'browse_link' => 'Parcourir les organisations',
+        'tools_title' => 'Vos outils de bénévolat',
         'manage_link' => 'Manage your organisation',
         'manage_link_for' => 'for :name',
         'awaiting_approval' => 'Awaiting approval',

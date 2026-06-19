@@ -1934,7 +1934,9 @@ class AlphaController extends Controller
         }
 
         $filters = $this->volunteeringFilters($request);
-        $selectedTab = $this->allowed($request->query('tab', 'opportunities'), ['opportunities', 'applications', 'organisations', 'recommended'], 'opportunities');
+        // The standalone "organisations" tab was replaced by the two-hats org
+        // door at the top of the gateway, so it's no longer an accepted tab value.
+        $selectedTab = $this->allowed($request->query('tab', 'opportunities'), ['opportunities', 'applications', 'recommended'], 'opportunities');
         $query = ['limit' => 12];
         foreach (['category_id', 'search', 'cursor', 'is_remote'] as $key) {
             if ($filters[$key] !== null && $filters[$key] !== '') {
@@ -10341,11 +10343,10 @@ class AlphaController extends Controller
             $items['volunteering'] = route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]);
         }
 
-        // Organisations sits beside Volunteering as its own landing page, but it
-        // is backed by the same volunteering services and feature gate.
-        if (TenantContext::hasFeature('volunteering')) {
-            $items['organisations'] = route('govuk-alpha.organisations.index', ['tenantSlug' => $tenantSlug]);
-        }
+        // Organisations is NOT on the flat service nav — it lives on the Explore
+        // page and is reachable from the Volunteering hero ("Browse organisations")
+        // and the org door. This keeps the GOV.UK service bar lean and matches the
+        // owner's IA decision that Organisations belongs under Explore, not the bar.
 
         // "Explore" is the gateway to discovery facilities (groups, goals, skills,
         // organisations, marketplace, jobs, courses, exchanges, polls, …) so the

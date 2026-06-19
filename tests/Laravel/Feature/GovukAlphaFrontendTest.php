@@ -2181,11 +2181,14 @@ class GovukAlphaFrontendTest extends TestCase
         $applications->assertSee(__('govuk_alpha.volunteering.status_values.pending'));
         $applications->assertSee(__('govuk_alpha.volunteering.applied_on'));
 
-        $organisations = $this->get("/{$this->testTenantSlug}/alpha/volunteering?tab=organisations");
-        $organisations->assertOk();
-        $organisations->assertSee(__('govuk_alpha.volunteering.organisations_title'));
-        $organisations->assertSee('Alpha Volunteer Organisation');
-        $organisations->assertSee(__('govuk_alpha.volunteering.roles.owner'));
+        // Organisations is now surfaced via the "two hats" org door on the
+        // gateway (the standalone Organisations tab was removed). The owner of an
+        // approved/active org sees the door naming it + the Post-opportunity CTA.
+        $gateway = $this->get("/{$this->testTenantSlug}/alpha/volunteering");
+        $gateway->assertOk();
+        $gateway->assertSee(__('govuk_alpha.vol_org.door_eyebrow'));
+        $gateway->assertSee(__('govuk_alpha.vol_org.door_heading_one', ['name' => 'Alpha Volunteer Organisation']));
+        $gateway->assertSee(route('govuk-alpha.volunteering.opportunities.create', ['tenantSlug' => $this->testTenantSlug]), false);
     }
 
     public function test_volunteering_recommended_tab_renders(): void
@@ -2702,7 +2705,7 @@ class GovukAlphaFrontendTest extends TestCase
         $res->assertStatus(404);
     }
 
-    public function test_volunteering_organisations_tab_shows_manage_link_for_owned_approved_org(): void
+    public function test_volunteering_gateway_door_shows_manage_link_for_owned_approved_org(): void
     {
         $owner = $this->authenticatedUser(['name' => 'Discover Owner']);
         $seed = $this->seedManagedVolunteerOrg($owner->id, [
@@ -2710,14 +2713,18 @@ class GovukAlphaFrontendTest extends TestCase
             'status' => 'approved',
         ]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering?tab=organisations");
+        // The two-hats org door replaced the standalone Organisations tab.
+        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering");
         $res->assertOk();
-        $res->assertSee('Discoverable Org');
+        $res->assertSee(__('govuk_alpha.vol_org.door_heading_one', ['name' => 'Discoverable Org']));
         $res->assertSee(__('govuk_alpha.vol_org.manage_link'));
-        $res->assertSee(route('govuk-alpha.volunteering.org.manage', ['tenantSlug' => $this->testTenantSlug, 'id' => $seed['org_id']]), false);
+        // Sole approved org → Manage points to its dashboard.
+        $res->assertSee(route('govuk-alpha.volunteering.org.dashboard', ['tenantSlug' => $this->testTenantSlug, 'id' => $seed['org_id']]), false);
+        // The Post-opportunity CTA is now discoverable straight from the gateway.
+        $res->assertSee(route('govuk-alpha.volunteering.opportunities.create', ['tenantSlug' => $this->testTenantSlug]), false);
     }
 
-    public function test_volunteering_organisations_tab_shows_awaiting_approval_for_pending_owned_org(): void
+    public function test_volunteering_gateway_door_shows_awaiting_approval_for_pending_owned_org(): void
     {
         $owner = $this->authenticatedUser(['name' => 'Pending Owner']);
         $this->seedManagedVolunteerOrg($owner->id, [
@@ -2725,12 +2732,12 @@ class GovukAlphaFrontendTest extends TestCase
             'status' => 'pending',
         ]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering?tab=organisations");
+        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering");
         $res->assertOk();
         $res->assertSee('Pending Org');
         $res->assertSee(__('govuk_alpha.vol_org.awaiting_approval'));
-        // No Manage link for a pending org.
-        $res->assertDontSee(__('govuk_alpha.vol_org.manage_link'));
+        // A pending org must NOT expose the Post-opportunity CTA yet.
+        $res->assertDontSee(route('govuk-alpha.volunteering.opportunities.create', ['tenantSlug' => $this->testTenantSlug]), false);
     }
 
     public function test_members_page_renders_directory_for_authenticated_user(): void

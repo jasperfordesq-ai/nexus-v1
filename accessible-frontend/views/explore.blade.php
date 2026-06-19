@@ -13,7 +13,10 @@
             ['govuk-alpha.groups.index', 'groups', 'groups'],
             ['govuk-alpha.goals.index', 'goals', 'goals'],
             ['govuk-alpha.skills.index', 'skills', null],
-            ['govuk-alpha.organisations.index', 'organisations', 'organisations'],
+            // Organisations is backed by the volunteering feature gate (the route
+            // 403s without it), so gate the Explore card on 'volunteering' to avoid
+            // surfacing a card that would 403. It moved here off the service nav.
+            ['govuk-alpha.organisations.index', 'organisations', 'volunteering'],
             ['govuk-alpha.blog.index', 'blog', 'blog'],
             ['govuk-alpha.resources.index', 'resources', 'resources'],
             ['govuk-alpha.marketplace.index', 'marketplace', 'marketplace'],

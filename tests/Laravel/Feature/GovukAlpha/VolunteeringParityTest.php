@@ -625,6 +625,63 @@ class VolunteeringParityTest extends TestCase
     // Helpers
     // =====================================================================
 
+    // =====================================================================
+    // Gateway "two hats" organisation door — the discoverable Post-opportunity
+    // path Jasper could not find. Replaces the old buried Organisations tab.
+    // =====================================================================
+
+    public function test_volunteering_gateway_shows_post_opportunity_door_for_approved_org_owner(): void
+    {
+        $user = $this->authenticatedUser();
+        $this->createVolOrg((int) $user->id, 'Door Owner Org', 'approved');
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.vol_org.door_eyebrow'));
+        // The "Post an opportunity" CTA must be present and link to create.
+        $response->assertSee(route('govuk-alpha.volunteering.opportunities.create', ['tenantSlug' => $this->testTenantSlug]), false);
+        // Sole approved org → the door names it directly.
+        $response->assertSee(__('govuk_alpha.vol_org.door_heading_one', ['name' => 'Door Owner Org']));
+    }
+
+    public function test_volunteering_gateway_shows_register_nudge_when_user_has_no_org(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.vol_org.door_register_title'));
+        $response->assertSee(route('govuk-alpha.organisations.register', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
+    public function test_volunteering_gateway_shows_awaiting_approval_for_pending_org_owner(): void
+    {
+        $user = $this->authenticatedUser();
+        $this->createVolOrg((int) $user->id, 'Pending Door Org', 'pending');
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.vol_org.awaiting_approval'));
+        // A pending org must NOT expose the post-opportunity CTA yet.
+        $response->assertDontSee(route('govuk-alpha.volunteering.opportunities.create', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
+    public function test_volunteering_gateway_no_longer_offers_the_organisations_tab(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering");
+
+        $response->assertOk();
+        // The redundant Organisations tab was removed in favour of the org door.
+        $response->assertDontSee(route('govuk-alpha.volunteering.index', ['tenantSlug' => $this->testTenantSlug, 'tab' => 'organisations']), false);
+        // Organisations is still reachable from the hero "Browse organisations" link.
+        $response->assertSee(route('govuk-alpha.organisations.index', ['tenantSlug' => $this->testTenantSlug]), false);
+    }
+
     private function enableVolunteeringFeature(): void
     {
         $row = DB::table('tenants')->where('id', $this->testTenantId)->value('features');

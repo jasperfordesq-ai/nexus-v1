@@ -3825,6 +3825,16 @@ return [
         'swap_cancel_failed' => 'No hemos podido cancelar esta solicitud de cambio de turno.',
     ],
     'vol_org' => [
+        // Volunteering "organisation door" (two-hats gateway) — added 2026-06-19
+        'door_eyebrow' => 'Para organizaciones',
+        'door_heading_one' => 'Gestionas :name',
+        'door_heading_many' => 'Gestionas :count organizaciones',
+        'door_desc' => 'Publica oportunidades, revisa las solicitudes y aprueba las horas que registran tus voluntarios.',
+        'door_register_title' => '¿Diriges una organización de voluntariado?',
+        'door_register_desc' => 'Registra tu organización para publicar oportunidades, revisar solicitudes y aprobar horas de voluntariado. Las nuevas organizaciones son revisadas por un administrador de la comunidad antes de activarse.',
+        'door_guest_desc' => 'Inicia sesión para registrar tu organización, publicar oportunidades y gestionar voluntarios.',
+        'browse_link' => 'Explorar organizaciones',
+        'tools_title' => 'Tus herramientas de voluntariado',
         'manage_link' => 'Manage your organisation',
         'manage_link_for' => 'for :name',
         'awaiting_approval' => 'Awaiting approval',

@@ -3825,6 +3825,16 @@ return [
         'swap_cancel_failed' => 'Diese Tauschbitte konnte nicht storniert werden.',
     ],
     'vol_org' => [
+        // Volunteering "organisation door" (two-hats gateway) — added 2026-06-19
+        'door_eyebrow' => 'Für Organisationen',
+        'door_heading_one' => 'Sie verwalten :name',
+        'door_heading_many' => 'Sie verwalten :count Organisationen',
+        'door_desc' => 'Veröffentlichen Sie Gelegenheiten, prüfen Sie Bewerbungen und bestätigen Sie die von Ihren Freiwilligen erfassten Stunden.',
+        'door_register_title' => 'Leiten Sie eine Freiwilligenorganisation?',
+        'door_register_desc' => 'Registrieren Sie Ihre Organisation, um Gelegenheiten zu veröffentlichen, Bewerbungen zu prüfen und Freiwilligenstunden zu bestätigen. Neue Organisationen werden vor der Freischaltung von einem Community-Administrator geprüft.',
+        'door_guest_desc' => 'Melden Sie sich an, um Ihre Organisation zu registrieren, Gelegenheiten zu veröffentlichen und Freiwillige zu verwalten.',
+        'browse_link' => 'Organisationen durchsuchen',
+        'tools_title' => 'Ihre Freiwilligen-Tools',
         'manage_link' => 'Manage your organisation',
         'manage_link_for' => 'for :name',
         'awaiting_approval' => 'Awaiting approval',

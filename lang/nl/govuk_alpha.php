@@ -3825,6 +3825,16 @@ return [
         'swap_cancel_failed' => 'We konden dit ruilverzoek niet annuleren.',
     ],
     'vol_org' => [
+        // Volunteering "organisation door" (two-hats gateway) — added 2026-06-19
+        'door_eyebrow' => 'Voor organisaties',
+        'door_heading_one' => 'U beheert :name',
+        'door_heading_many' => 'U beheert :count organisaties',
+        'door_desc' => 'Plaats vacatures, beoordeel aanmeldingen en keur de uren goed die uw vrijwilligers registreren.',
+        'door_register_title' => 'Leidt u een vrijwilligersorganisatie?',
+        'door_register_desc' => 'Registreer uw organisatie om vacatures te plaatsen, aanmeldingen te beoordelen en vrijwilligersuren goed te keuren. Nieuwe organisaties worden door een communitybeheerder beoordeeld voordat ze live gaan.',
+        'door_guest_desc' => 'Log in om uw organisatie te registreren, vacatures te plaatsen en vrijwilligers te beheren.',
+        'browse_link' => 'Organisaties bekijken',
+        'tools_title' => 'Uw vrijwilligershulpmiddelen',
         'manage_link' => 'Manage your organisation',
         'manage_link_for' => 'for :name',
         'awaiting_approval' => 'Awaiting approval',

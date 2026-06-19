@@ -20,6 +20,14 @@
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha.volunteering.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha.volunteering.description') }}</p>
 
+    {{-- Organisations no longer lives on the main service nav, so the volunteer
+         hero carries the link to browse community organisations. --}}
+    @unless ($moduleDisabled)
+        <p class="govuk-body govuk-!-margin-bottom-6">
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ route('govuk-alpha.organisations.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.vol_org.browse_link') }}</a>
+        </p>
+    @endunless
+
     {{-- Plain-language "how volunteering works" so a first-time volunteer isn't
          guessing what to do or how they earn time credits. Mirrors the React
          how_it_works copy, presented as a numbered list for clear, scannable steps. --}}
@@ -67,6 +75,79 @@
             </div>
         @endif
 
+        {{-- ───────── The "two hats" ORGANISATION door ─────────
+             Mirrors the React VolunteeringPage: a volunteer is one hat, running an
+             organisation is the other. Owners of an approved org get a prominent
+             "Post an opportunity" + "Manage organisation" door (this is the link
+             Jasper could not find); a pending org shows an awaiting-approval note;
+             a member with no org gets a quiet "register your organisation" nudge;
+             guests are invited to sign in. --}}
+        @php
+            $manageableOrgs = [];
+            $pendingOwnedOrgs = [];
+            foreach (($organizations ?? []) as $orgItem) {
+                $orgRole = (string) ($orgItem['member_role'] ?? 'member');
+                $orgStatus = (string) ($orgItem['status'] ?? 'pending');
+                if (in_array($orgRole, ['owner', 'admin'], true)) {
+                    if (in_array($orgStatus, ['approved', 'active'], true)) {
+                        $manageableOrgs[] = $orgItem;
+                    } else {
+                        $pendingOwnedOrgs[] = $orgItem;
+                    }
+                }
+            }
+            $soleManagedOrg = count($manageableOrgs) === 1 ? $manageableOrgs[0] : null;
+            $firstPendingOrg = $pendingOwnedOrgs[0] ?? null;
+            $manageOrgHref = $soleManagedOrg
+                ? route('govuk-alpha.volunteering.org.dashboard', ['tenantSlug' => $tenantSlug, 'id' => $soleManagedOrg['id']])
+                : route('govuk-alpha.volunteering.my-organisations', ['tenantSlug' => $tenantSlug]);
+        @endphp
+
+        @if ($requiresAuth)
+            <section class="nexus-alpha-card govuk-!-margin-bottom-6" aria-labelledby="vol-org-door-title">
+                <span class="govuk-caption-m">{{ __('govuk_alpha.vol_org.door_eyebrow') }}</span>
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-2" id="vol-org-door-title">{{ __('govuk_alpha.vol_org.door_register_title') }}</h2>
+                <p class="govuk-body">{{ __('govuk_alpha.vol_org.door_guest_desc') }}</p>
+                <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" role="button" draggable="false" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']) }}">{{ __('govuk_alpha.nav.login') }}</a>
+            </section>
+        @elseif (count($manageableOrgs) > 0)
+            <section class="nexus-alpha-card govuk-!-margin-bottom-6" aria-labelledby="vol-org-door-title">
+                <span class="govuk-caption-m">{{ __('govuk_alpha.vol_org.door_eyebrow') }}</span>
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-2" id="vol-org-door-title">
+                    @if ($soleManagedOrg)
+                        {{ __('govuk_alpha.vol_org.door_heading_one', ['name' => $soleManagedOrg['name'] ?? '']) }}
+                    @else
+                        {{ __('govuk_alpha.vol_org.door_heading_many', ['count' => count($manageableOrgs)]) }}
+                    @endif
+                </h2>
+                <p class="govuk-body">{{ __('govuk_alpha.vol_org.door_desc') }}</p>
+                <div class="govuk-button-group govuk-!-margin-bottom-0">
+                    <a class="govuk-button" data-module="govuk-button" role="button" draggable="false" href="{{ route('govuk-alpha.volunteering.opportunities.create', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_volunteering.create_opp.submit_button') }}</a>
+                    <a class="govuk-button govuk-button--secondary" data-module="govuk-button" role="button" draggable="false" href="{{ $manageOrgHref }}">{{ __('govuk_alpha.vol_org.manage_link') }}</a>
+                </div>
+            </section>
+        @elseif (count($pendingOwnedOrgs) > 0)
+            <div class="govuk-notification-banner govuk-!-margin-bottom-6" data-module="govuk-notification-banner" role="region" aria-labelledby="vol-org-pending-title">
+                <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title" id="vol-org-pending-title">{{ __('govuk_alpha.vol_org.door_eyebrow') }}</h2>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <p class="govuk-notification-banner__heading">{{ __('govuk_alpha.vol_org.awaiting_approval') }}</p>
+                    <p class="govuk-body">{{ __('govuk_alpha.vol_org.awaiting_approval_hint') }}</p>
+                    @if (!empty($firstPendingOrg['name']))
+                        <p class="govuk-body govuk-!-margin-bottom-0">{{ $firstPendingOrg['name'] }}</p>
+                    @endif
+                </div>
+            </div>
+        @else
+            <section class="nexus-alpha-card govuk-!-margin-bottom-6" aria-labelledby="vol-org-door-title">
+                <span class="govuk-caption-m">{{ __('govuk_alpha.vol_org.door_eyebrow') }}</span>
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-2" id="vol-org-door-title">{{ __('govuk_alpha.vol_org.door_register_title') }}</h2>
+                <p class="govuk-body">{{ __('govuk_alpha.vol_org.door_register_desc') }}</p>
+                <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" role="button" draggable="false" href="{{ route('govuk-alpha.organisations.register', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_volunteering.create_opp.register_link') }}</a>
+            </section>
+        @endif
+
         @if ($requiresAuth)
             <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="volunteering-auth-title">
                 <div class="govuk-notification-banner__header">
@@ -95,7 +176,10 @@
                     <dd>{{ number_format((float) ($summary['this_month_hours'] ?? 0), 1) }}</dd>
                 </div>
             </dl>
-            {{-- POLISH: govuk-list for semantic nav instead of <p> with middot separators --}}
+            {{-- Volunteer "tools" grouped under a clear heading so the page reads
+                 as: your hours → your tools → browse. POLISH: govuk-list for
+                 semantic nav instead of <p> with middot separators. --}}
+            <h2 class="govuk-heading-m govuk-!-margin-top-6 govuk-!-margin-bottom-2">{{ __('govuk_alpha.vol_org.tools_title') }}</h2>
             <ul class="govuk-list govuk-list--inline govuk-!-margin-bottom-4">
                 <li><a class="govuk-link" href="{{ route('govuk-alpha.volunteering.hours', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.log_hours_title') }}</a></li>
                 <li><a class="govuk-link" href="{{ route('govuk-alpha.volunteering.accessibility', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.accessibility_link') }}</a></li>
@@ -121,9 +205,6 @@
                     </li>
                     <li class="govuk-tabs__list-item">
                         <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.hours', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.tabs.hours') }}</a>
-                    </li>
-                    <li class="govuk-tabs__list-item{{ $selectedTab === 'organisations' ? ' govuk-tabs__list-item--selected' : '' }}">
-                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'organisations']) }}" @if ($selectedTab === 'organisations') aria-current="page" @endif>{{ __('govuk_alpha.volunteering.tabs.organisations') }}</a>
                     </li>
                 </ul>
             </div>
@@ -278,78 +359,6 @@
                                     <dd class="govuk-summary-list__value">{{ (int) ($shift['spots_remaining'] ?? 0) }}</dd>
                                 </div>
                             </dl>
-                        </article>
-                    @endforeach
-                </div>
-            @endif
-        @elseif (!$requiresAuth && $selectedTab === 'organisations')
-            <h2 class="govuk-heading-l">{{ __('govuk_alpha.volunteering.organisations_title') }}</h2>
-            @if (empty($organizations))
-                <div class="govuk-inset-text">{{ __('govuk_alpha.volunteering.empty_organisations') }}</div>
-            @else
-                <div class="nexus-alpha-card-list">
-                    @foreach ($organizations as $organization)
-                        @php
-                            $statusValue = (string) ($organization['status'] ?? 'pending');
-                            $roleValue = (string) ($organization['member_role'] ?? 'member');
-                            $website = (string) ($organization['website'] ?? '');
-                            $websiteScheme = $website !== '' ? parse_url($website, PHP_URL_SCHEME) : null;
-                            $websiteHref = in_array($websiteScheme, ['http', 'https'], true) ? $website : null;
-                            // The "two hats" admin entry point: owners/admins of an approved
-                            // org get a Manage link; a still-pending org shows an
-                            // awaiting-approval note instead (mirrors the React side).
-                            $canManageOrg = in_array($roleValue, ['owner', 'admin'], true);
-                            $orgIsApproved = in_array($statusValue, ['approved', 'active'], true);
-                        @endphp
-                        <article class="nexus-alpha-card">
-                            <h3 class="govuk-heading-m govuk-!-margin-bottom-2">
-                                @if (!empty($organization['id']))
-                                    <a class="govuk-link" href="{{ route('govuk-alpha.organisations.show', ['tenantSlug' => $tenantSlug, 'id' => $organization['id']]) }}">{{ $organization['name'] }}</a>
-                                @else
-                                    {{ $organization['name'] }}
-                                @endif
-                            </h3>
-                            <dl class="govuk-summary-list govuk-!-margin-bottom-0">
-                                <div class="govuk-summary-list__row">
-                                    <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.status') }}</dt>
-                                    <dd class="govuk-summary-list__value">{{ $label('volunteering.status_values', $statusValue) }}</dd>
-                                </div>
-                                <div class="govuk-summary-list__row">
-                                    <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.role_label') }}</dt>
-                                    <dd class="govuk-summary-list__value">{{ $label('volunteering.roles', $roleValue) }}</dd>
-                                </div>
-                                @if (!empty($organization['contact_email']))
-                                    <div class="govuk-summary-list__row">
-                                        <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.contact_email') }}</dt>
-                                        <dd class="govuk-summary-list__value">{{ $organization['contact_email'] }}</dd>
-                                    </div>
-                                @endif
-                                @if ($website !== '')
-                                    <div class="govuk-summary-list__row">
-                                        <dt class="govuk-summary-list__key">{{ __('govuk_alpha.volunteering.website') }}</dt>
-                                        <dd class="govuk-summary-list__value">
-                                            @if ($websiteHref)
-                                                <a class="govuk-link" href="{{ $websiteHref }}">{{ $website }}</a>
-                                            @else
-                                                {{ $website }}
-                                            @endif
-                                        </dd>
-                                    </div>
-                                @endif
-                            </dl>
-                            @if (!empty($organization['description']))
-                                <p class="govuk-body govuk-!-margin-top-3">{{ \Illuminate\Support\Str::limit(strip_tags((string) $organization['description']), 220) }}</p>
-                            @endif
-                            @if ($canManageOrg && $orgIsApproved && !empty($organization['id']))
-                                <a class="govuk-button govuk-button--secondary govuk-!-margin-top-2 govuk-!-margin-bottom-0" data-module="govuk-button" role="button" draggable="false" href="{{ route('govuk-alpha.volunteering.org.manage', ['tenantSlug' => $tenantSlug, 'id' => $organization['id']]) }}">
-                                    {{ __('govuk_alpha.vol_org.manage_link') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.vol_org.manage_link_for', ['name' => $organization['name'] ?? '']) }}</span>
-                                </a>
-                            @elseif ($canManageOrg && !$orgIsApproved)
-                                <p class="govuk-body govuk-!-margin-top-2 govuk-!-margin-bottom-0">
-                                    <strong class="govuk-tag govuk-tag--yellow">{{ __('govuk_alpha.vol_org.awaiting_approval') }}</strong>
-                                </p>
-                                <p class="govuk-hint govuk-!-margin-top-1 govuk-!-margin-bottom-0">{{ __('govuk_alpha.vol_org.awaiting_approval_hint') }}</p>
-                            @endif
                         </article>
                     @endforeach
                 </div>

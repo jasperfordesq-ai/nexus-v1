@@ -3825,6 +3825,16 @@ return [
         'swap_cancel_failed' => 'Não foi possível cancelar este pedido de troca.',
     ],
     'vol_org' => [
+        // Volunteering "organisation door" (two-hats gateway) — added 2026-06-19
+        'door_eyebrow' => 'Para organizações',
+        'door_heading_one' => 'Você gere :name',
+        'door_heading_many' => 'Você gere :count organizações',
+        'door_desc' => 'Publique oportunidades, analise candidaturas e aprove as horas registadas pelos seus voluntários.',
+        'door_register_title' => 'Dirige uma organização de voluntariado?',
+        'door_register_desc' => 'Registe a sua organização para publicar oportunidades, analisar candidaturas e aprovar horas de voluntariado. As novas organizações são analisadas por um administrador da comunidade antes de ficarem ativas.',
+        'door_guest_desc' => 'Inicie sessão para registar a sua organização, publicar oportunidades e gerir voluntários.',
+        'browse_link' => 'Explorar organizações',
+        'tools_title' => 'As suas ferramentas de voluntariado',
         'manage_link' => 'Manage your organisation',
         'manage_link_for' => 'for :name',
         'awaiting_approval' => 'Awaiting approval',
