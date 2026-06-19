@@ -72,12 +72,15 @@
             <div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="job-status">{{ __('govuk_alpha.states.success_title') }}</h2></div>
             <div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">{{ __('govuk_alpha.jobs_t3.states.' . $status) }}</p></div>
         </div>
-    @elseif ($status === 'apply-failed' || $status === 'save-failed' || $status === 'renew-failed')
+    @elseif (in_array($status, ['apply-failed', 'save-failed', 'renew-failed', 'cv-invalid', 'cv-too-large', 'cover-required'], true))
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert"><h2 class="govuk-error-summary__title">{{ __('govuk_alpha.states.error_title') }}</h2>
                 <div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list"><li>
                     @if ($status === 'save-failed'){{ __('govuk_alpha.jobs_t2.states.save-failed') }}
                     @elseif ($status === 'renew-failed'){{ __('govuk_alpha.jobs_t3.states.renew-failed') }}
+                    @elseif ($status === 'cv-invalid'){{ __('govuk_alpha.jobs.states.cv-invalid') }}
+                    @elseif ($status === 'cv-too-large'){{ __('govuk_alpha.jobs.states.cv-too-large') }}
+                    @elseif ($status === 'cover-required'){{ __('govuk_alpha.jobs.states.cover-required') }}
                     @else{{ __('govuk_alpha.jobs.states.apply-failed') }}@endif
                 </li></ul></div></div>
         </div>
@@ -195,12 +198,19 @@
         @if ($hasApplied)
             <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.jobs.already_applied') }}</p></div>
         @else
-            <form method="post" action="{{ route('govuk-alpha.jobs.apply', ['tenantSlug' => $tenantSlug, 'id' => $job['id']]) }}">
+            <form method="post" action="{{ route('govuk-alpha.jobs.apply', ['tenantSlug' => $tenantSlug, 'id' => $job['id']]) }}" enctype="multipart/form-data">
                 @csrf
                 <div class="govuk-form-group">
                     <label class="govuk-label" for="cover_letter">{{ __('govuk_alpha.jobs.cover_letter_label') }}</label>
                     <textarea class="govuk-textarea" id="cover_letter" name="cover_letter" rows="5" maxlength="5000"></textarea>
                 </div>
+                @if (!empty($cvUploadEnabled))
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="cv">{{ __('govuk_alpha.jobs.cv_label') }}</label>
+                        <div id="cv-hint" class="govuk-hint">{{ __('govuk_alpha.jobs.cv_hint') }}</div>
+                        <input class="govuk-file-upload" id="cv" name="cv" type="file" accept=".pdf,.doc,.docx" aria-describedby="cv-hint">
+                    </div>
+                @endif
                 <button type="submit" class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.jobs.apply_button') }}</button>
             </form>
         @endif

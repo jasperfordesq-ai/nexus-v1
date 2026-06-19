@@ -83,8 +83,10 @@
                                 @if ($appliedOn)
                                     <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha_jobs.pipeline.applied_on', ['date' => $appliedOn]) }}</p>
                                 @endif
-                                @if ($cvName !== '')
-                                    <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">{{ __('govuk_alpha_jobs.pipeline.download_cv') }}: {{ $cvName }}</p>
+                                @if ($cvName !== '' && $appId > 0)
+                                    <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">
+                                        <a class="govuk-link" href="{{ route('govuk-alpha.jobs.applications.cv', ['tenantSlug' => $tenantSlug, 'applicationId' => $appId]) }}">{{ __('govuk_alpha_jobs.pipeline.download_cv') }}</a>: {{ $cvName }}
+                                    </p>
                                 @endif
 
                                 <form method="post" action="{{ route('govuk-alpha.jobs.applicants.status', ['tenantSlug' => $tenantSlug, 'id' => $jobId, 'appId' => $appId]) }}" class="govuk-!-margin-top-2">

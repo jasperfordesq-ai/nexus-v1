@@ -793,4 +793,52 @@ trait JobsParity
             return null;
         }
     }
+
+    /**
+     * Download a job application's attached CV. Mirrors
+     * JobVacanciesController::downloadCv exactly — only the applicant, the job
+     * poster, or a tenant admin may fetch it, blind-hiring hides the CV from the
+     * poster, and the lookup is tenant-scoped so a cross-tenant application id
+     * 404s. Without this the accessible employer pipeline could show a CV
+     * filename but offer no way to open it.
+     */
+    public function jobsDownloadCv(Request $request, string $tenantSlug, int $applicationId): \Symfony\Component\HttpFoundation\BinaryFileResponse|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(\App\Core\TenantContext::hasFeature('job_vacancies'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $tenantId = \App\Core\TenantContext::getId();
+        $application = \App\Models\JobApplication::with(['vacancy'])->find($applicationId);
+
+        abort_if(
+            ! $application || ! $application->vacancy || (int) $application->vacancy->tenant_id !== $tenantId,
+            404
+        );
+
+        $isApplicant = (int) $application->user_id === $userId;
+        $isPoster = (int) $application->vacancy->user_id === $userId;
+        if (! $isApplicant && ! $isPoster) {
+            $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
+            $isAdmin = $user && in_array($user->role, ['admin', 'super_admin', 'tenant_admin'], true);
+            abort_unless($isAdmin, 403);
+        }
+
+        // Blind hiring: the poster (and admins) must not see the CV; only the
+        // applicant themselves can download their own.
+        abort_if(! $isApplicant && (bool) ($application->vacancy->blind_hiring ?? false), 403);
+
+        abort_if(empty($application->cv_path), 404);
+        abort_unless(\Illuminate\Support\Facades\Storage::disk('local')->exists($application->cv_path), 404);
+
+        $filename = preg_replace('/[^a-zA-Z0-9._\- ]/', '_', $application->cv_filename ?? basename($application->cv_path));
+
+        return response()->download(
+            \Illuminate\Support\Facades\Storage::disk('local')->path($application->cv_path),
+            (string) $filename
+        );
+    }
 }

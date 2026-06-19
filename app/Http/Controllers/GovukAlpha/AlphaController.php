@@ -5552,6 +5552,24 @@ class AlphaController extends Controller
         } catch (\Throwable $e) {
             report($e);
         }
+
+        // Category drill-in: ?category={id} shows the skills breakdown for that
+        // category (user / offering / requesting counts), mirroring the React
+        // page's expand-a-category behaviour without any JavaScript.
+        $categoryId = (int) $request->query('category', 0);
+        $selectedCategory = null;
+        $categorySkills = [];
+        if ($categoryId > 0) {
+            try {
+                $selectedCategory = $svc->getCategoryById($categoryId);
+                if ($selectedCategory !== null) {
+                    $categorySkills = $svc->getCategorySkills($categoryId);
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
         $skillQuery = trim(self::asStr($request->query('skill')));
         $skillMembers = [];
         if ($skillQuery !== '') {
@@ -5569,6 +5587,9 @@ class AlphaController extends Controller
             'skillTree' => is_array($tree) ? $tree : [],
             'skillQuery' => $skillQuery,
             'skillMembers' => is_array($skillMembers) ? $skillMembers : [],
+            'selectedCategoryId' => $categoryId > 0 ? $categoryId : null,
+            'selectedCategory' => is_array($selectedCategory) ? $selectedCategory : null,
+            'categorySkills' => is_array($categorySkills) ? $categorySkills : [],
         ]);
     }
 
@@ -5880,6 +5901,11 @@ class AlphaController extends Controller
             report($e);
         }
 
+        $cvUploadEnabled = filter_var(
+            \App\Services\JobConfigurationService::get(\App\Services\JobConfigurationService::CONFIG_ENABLE_CV_UPLOAD, true),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
         return $this->view('accessible-frontend::job-detail', [
             'title' => ($job['title'] ?? '') ?: __('govuk_alpha.jobs.title'),
             'tenantSlug' => $tenantSlug,
@@ -5888,6 +5914,7 @@ class AlphaController extends Controller
             'jobMatch' => is_array($match) ? $match : null,
             'similarJobs' => $similar,
             'isJobOwner' => (int) ($job['user_id'] ?? 0) === $userId,
+            'cvUploadEnabled' => $cvUploadEnabled,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -5902,11 +5929,81 @@ class AlphaController extends Controller
         }
 
         $cover = trim(self::asStr($request->input('cover_letter')));
+
+        // Mirror JobVacanciesController::apply config gates.
+        $requireCover = filter_var(
+            \App\Services\JobConfigurationService::get(\App\Services\JobConfigurationService::CONFIG_REQUIRE_COVER_MESSAGE, false),
+            FILTER_VALIDATE_BOOLEAN
+        );
+        if ($requireCover && $cover === '') {
+            return redirect()->route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'cover-required']);
+        }
+
+        // Optional CV upload (PDF/DOC/DOCX ≤5MB), validated exactly as the React
+        // API path: extension + MIME whitelist, sanitised filename, local disk.
+        $cvPath = null;
+        $cvFilename = null;
+        $cvSize = null;
+        if ($request->hasFile('cv')) {
+            $cvEnabled = filter_var(
+                \App\Services\JobConfigurationService::get(\App\Services\JobConfigurationService::CONFIG_ENABLE_CV_UPLOAD, true),
+                FILTER_VALIDATE_BOOLEAN
+            );
+            if (! $cvEnabled) {
+                return redirect()->route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'apply-failed']);
+            }
+
+            $file = $request->file('cv');
+            $allowed = ['pdf', 'doc', 'docx'];
+            $ext = strtolower((string) $file->getClientOriginalExtension());
+            if (! in_array($ext, $allowed, true)) {
+                return redirect()->route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'cv-invalid']);
+            }
+            if ($file->getSize() > 5 * 1024 * 1024) {
+                return redirect()->route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'cv-too-large']);
+            }
+            $allowedMimes = [
+                'pdf'  => ['application/pdf'],
+                'doc'  => ['application/msword', 'application/vnd.ms-office'],
+                'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip'],
+            ];
+            $detectedMime = $file->getMimeType();
+            if (! $detectedMime || ! in_array($detectedMime, $allowedMimes[$ext], true)) {
+                return redirect()->route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'cv-invalid']);
+            }
+            $rawName = basename((string) $file->getClientOriginalName());
+            $safeName = preg_replace('/[^A-Za-z0-9._-]/', '_', $rawName) ?: 'cv';
+            $safeName = substr($safeName, 0, 120);
+            try {
+                $cvPath = $file->store('job-applications/' . TenantContext::getId(), 'local');
+                $cvFilename = $safeName;
+                $cvSize = $file->getSize();
+            } catch (\Throwable $e) {
+                report($e);
+                return redirect()->route('govuk-alpha.jobs.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'apply-failed']);
+            }
+        }
+
         $ok = false;
         try {
-            $ok = app(\App\Services\JobVacancyService::class)->apply($id, $userId, ['cover_letter' => mb_substr($cover, 0, 5000)]) !== null;
+            $ok = app(\App\Services\JobVacancyService::class)->apply($id, $userId, [
+                'cover_letter' => mb_substr($cover, 0, 5000),
+                'cv_path' => $cvPath,
+                'cv_filename' => $cvFilename,
+                'cv_size' => $cvSize,
+            ]) !== null;
         } catch (\Throwable $e) {
             report($e);
+        }
+
+        // Clean up an orphaned CV upload when the application itself was rejected
+        // (already applied, vacancy closed, etc.) — mirrors the API controller.
+        if (! $ok && $cvPath !== null) {
+            try {
+                \Illuminate\Support\Facades\Storage::disk('local')->delete($cvPath);
+            } catch (\Throwable $e) {
+                // best-effort cleanup
+            }
         }
 
         // The service does not send the applicant/employer emails — the API

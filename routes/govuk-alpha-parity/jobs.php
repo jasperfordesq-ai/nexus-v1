@@ -66,6 +66,13 @@ Route::get('/jobs/{id}/qualified', [AlphaController::class, 'jobsQualification']
     ->whereNumber('id')
     ->name('jobs.qualified');
 
+// CV download for an application — applicant / poster / admin only, blind-hiring
+// aware (mirrors JobVacanciesController::downloadCv). Throttled like the API.
+Route::get('/jobs/applications/{applicationId}/cv', [AlphaController::class, 'jobsDownloadCv'])
+    ->whereNumber('applicationId')
+    ->middleware('throttle:20,1')
+    ->name('jobs.applications.cv');
+
 // Candidate responses — accept/decline an interview, accept/reject an offer.
 // Each service method carries its own owner + state checks; throttled POSTs.
 Route::post('/jobs/interviews/{interviewId}/accept', [AlphaController::class, 'jobsAcceptInterview'])
