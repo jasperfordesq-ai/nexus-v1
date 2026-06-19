@@ -341,11 +341,14 @@ class MessageService
                 if ($url === '') {
                     continue;
                 }
+                $mime = $att['mime'] ?? null;
                 $attachments[] = [
                     'url'  => $url,
+                    'path' => isset($att['path']) && (string) $att['path'] !== '' ? (string) $att['path'] : $url,
                     'name' => mb_substr((string) ($att['name'] ?? 'attachment'), 0, 255),
                     'size' => isset($att['size']) ? (int) $att['size'] : null,
-                    'mime' => $att['mime'] ?? null,
+                    'mime' => $mime,
+                    'type' => $att['type'] ?? (is_string($mime) && str_starts_with($mime, 'image/') ? 'image' : 'file'),
                 ];
             }
         }
@@ -392,7 +395,11 @@ class MessageService
                     \App\Models\MessageAttachment::create([
                         'message_id' => $message->id,
                         'file_url'   => $att['url'],
+                        // file_path is NOT NULL in the message_attachments table
+                        // (created by the 2026_02_07 legacy migration) — must be set.
+                        'file_path'  => $att['path'] ?? $att['url'],
                         'file_name'  => $att['name'],
+                        'file_type'  => $att['type'] ?? 'file',
                         'file_size'  => $att['size'],
                         'mime_type'  => $att['mime'],
                         'created_at' => now(),

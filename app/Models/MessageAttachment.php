@@ -26,7 +26,9 @@ class MessageAttachment extends Model
     protected $fillable = [
         'message_id',
         'file_url',
+        'file_path',
         'file_name',
+        'file_type',
         'file_size',
         'mime_type',
         'created_at',
@@ -63,9 +65,16 @@ class MessageAttachment extends Model
         return (int) ($this->attributes['file_size'] ?? 0);
     }
 
-    /** 'image' for image/* MIME types, otherwise 'file' (matches the React union). */
+    /**
+     * React's union 'image'|'file'. Prefer the stored file_type column (set on
+     * insert); fall back to deriving from the MIME type for older rows.
+     */
     public function getTypeAttribute(): string
     {
+        $stored = (string) ($this->attributes['file_type'] ?? '');
+        if ($stored === 'image' || $stored === 'file') {
+            return $stored;
+        }
         $mime = (string) ($this->attributes['mime_type'] ?? '');
         return str_starts_with($mime, 'image/') ? 'image' : 'file';
     }

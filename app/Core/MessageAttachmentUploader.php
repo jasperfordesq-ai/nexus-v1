@@ -106,9 +106,11 @@ class MessageAttachmentUploader
 
         return [
             'url'  => $publicPath,
+            'path' => $publicPath, // file_path column ("storage path") — same /uploads/ ref here
             'name' => $displayName,
             'size' => $size,
             'mime' => $detectedMime,
+            'type' => str_starts_with($detectedMime, 'image/') ? 'image' : 'file',
         ];
     }
 

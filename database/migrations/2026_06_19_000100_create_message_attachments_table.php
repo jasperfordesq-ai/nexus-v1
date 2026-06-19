@@ -9,12 +9,16 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Direct (1:1 sender→receiver) messages support voice already (messages.audio_url),
- * but file/image attachments sent by the React composer (FormData attachments[])
- * were silently dropped: MessageService::send never persisted them and there was
- * no column/table to hold them. This adds a dedicated message_attachments table so
- * a single message can carry multiple files, mirroring the React MessageBubble
- * file_url/file_name expectation. Additive + idempotent (safe for blue-green).
+ * The message_attachments table is created by the legacy SQL migration
+ * migrations/2026_02_07_message_attachments.sql and exists on production. This
+ * Laravel migration is GUARDED (hasTable) so it is a no-op wherever the table
+ * already exists; its only job is to recreate the SAME schema on a fresh
+ * environment that has neither the legacy SQL nor the schema dump applied.
+ *
+ * MessageService::send / MessageAttachmentUploader write file_path (NOT NULL)
+ * and file_type as well as file_url/file_name/mime_type/file_size, so this
+ * definition MUST match the legacy table exactly (file_path/file_type included)
+ * or attachment inserts would fail. Additive + idempotent (safe for blue-green).
  */
 return new class extends Migration
 {
@@ -24,25 +28,27 @@ return new class extends Migration
             return;
         }
 
+        // Mirror migrations/2026_02_07_message_attachments.sql exactly.
         Schema::create('message_attachments', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            // tenant_id mirrors the int(11) width used across the schema so the
-            // column type matches the tenants/messages tables (signed int).
-            $table->integer('tenant_id');
-            $table->integer('message_id');
-            $table->string('file_url', 1000);
+            $table->increments('id'); // int unsigned auto-increment
+            $table->unsignedInteger('message_id');
+            $table->unsignedInteger('tenant_id');
             $table->string('file_name', 255);
-            $table->unsignedBigInteger('file_size')->nullable();
-            $table->string('mime_type', 191)->nullable();
-            $table->timestamp('created_at')->nullable();
+            $table->string('file_path', 500);                 // storage path (NOT NULL)
+            $table->string('file_url', 500);                  // public URL (NOT NULL)
+            $table->string('file_type', 20)->default('file'); // 'image' | 'file'
+            $table->string('mime_type', 100)->nullable();
+            $table->unsignedInteger('file_size')->default(0);
+            $table->timestamp('created_at')->nullable()->useCurrent();
 
-            $table->index(['tenant_id', 'message_id'], 'idx_msg_attach_tenant_message');
-            $table->index('message_id', 'idx_msg_attach_message');
+            $table->index('message_id', 'idx_message_id');
+            $table->index('tenant_id', 'idx_tenant_id');
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('message_attachments');
+        // Intentionally NOT dropped: the table predates this migration (created by
+        // the 2026_02_07 legacy SQL), so a rollback here must not destroy it.
     }
 };
