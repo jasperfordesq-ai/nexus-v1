@@ -9,6 +9,11 @@ return [
     'nav' => [
         'view_analytics' => 'View listing analytics',
     ],
+    // Skill tags on the create/edit listing forms (no-JS CSV field).
+    'create' => [
+        'skill_tags_label' => 'Skills (optional)',
+        'skill_tags_hint' => 'List the skills involved, separated by commas — for example: gardening, cooking, tax advice. You can add up to 10.',
+    ],
     // Gap #12 — owner-only listing analytics panel.
     'analytics' => [
         'title' => 'Listing analytics',

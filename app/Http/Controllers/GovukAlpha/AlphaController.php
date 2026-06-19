@@ -3425,6 +3425,9 @@ class AlphaController extends Controller
             if ($request->hasFile('image')) {
                 $this->attachListingCoverImage($request, $listingId);
             }
+
+            // Optional skill tags (mirrors React's PUT /v2/listings/{id}/tags).
+            $this->persistListingSkillTags($request, $listingId);
         } catch (ValidationException $e) {
             // Conditional service-side rules (per-user cap, tenant requirements not
             // mirrored above) — surface them per field where we can.
@@ -3441,6 +3444,26 @@ class AlphaController extends Controller
         }
 
         return redirect()->route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $listingId, 'status' => 'listing-created']);
+    }
+
+    /**
+     * Parse the no-JS comma-separated skill_tags field and sync it onto a
+     * listing via ListingSkillTagService::setTags (which normalises, dedupes and
+     * caps at 10, tenant-scoped). Best-effort: a tag failure must never discard a
+     * listing the member already saved. An empty/absent field clears the tags.
+     */
+    private function persistListingSkillTags(Request $request, int $listingId): void
+    {
+        try {
+            $raw = self::asStr($request->input('skill_tags'));
+            $tags = array_values(array_filter(array_map(
+                static fn ($t) => trim((string) $t),
+                explode(',', $raw)
+            ), static fn ($t) => $t !== ''));
+            app(\App\Services\ListingSkillTagService::class)->setTags($listingId, $tags);
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     /** Resolve a listing the current user is allowed to manage, or abort. */
@@ -3470,6 +3493,15 @@ class AlphaController extends Controller
         $data['title'] = __('govuk_alpha.listings.edit.title');
         $data['listing'] = $listing;
 
+        // Pre-fill the skill-tags field from the source of truth.
+        $existingTags = [];
+        try {
+            $existingTags = app(\App\Services\ListingSkillTagService::class)->getTags($id);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        $data['existingSkillTags'] = implode(', ', $existingTags);
+
         return $this->view('accessible-frontend::listing-edit', $data);
     }
 
@@ -3497,6 +3529,8 @@ class AlphaController extends Controller
             if ($request->hasFile('image')) {
                 $this->attachListingCoverImage($request, $id);
             }
+            // Sync skill tags (mirrors React's PUT /v2/listings/{id}/tags).
+            $this->persistListingSkillTags($request, $id);
         } catch (ValidationException $e) {
             return redirect()
                 ->route('govuk-alpha.listings.edit', ['tenantSlug' => $tenantSlug, 'id' => $id])

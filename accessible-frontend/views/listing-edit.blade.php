@@ -175,6 +175,12 @@
             <input class="govuk-file-upload" id="image" name="image" type="file" accept="image/jpeg,image/png,image/gif,image/webp" aria-describedby="image-hint">
         </div>
 
+        <div class="govuk-form-group">
+            <label class="govuk-label" for="skill_tags">{{ __('govuk_alpha_listings.create.skill_tags_label') }}</label>
+            <div id="skill_tags-hint" class="govuk-hint">{{ __('govuk_alpha_listings.create.skill_tags_hint') }}</div>
+            <input class="govuk-input" id="skill_tags" name="skill_tags" type="text" maxlength="600" value="{{ old('skill_tags', $existingSkillTags ?? '') }}" aria-describedby="skill_tags-hint">
+        </div>
+
         <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.listings.edit.submit') }}</button>
     </form>
 
