@@ -203,6 +203,9 @@
                     <li class="govuk-tabs__list-item{{ $selectedTab === 'recommended' ? ' govuk-tabs__list-item--selected' : '' }}">
                         <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'recommended']) }}" @if ($selectedTab === 'recommended') aria-current="page" @endif>{{ __('govuk_alpha.volunteering.tabs.recommended') }}</a>
                     </li>
+                    <li class="govuk-tabs__list-item{{ $selectedTab === 'community_projects' ? ' govuk-tabs__list-item--selected' : '' }}">
+                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'community_projects']) }}" @if ($selectedTab === 'community_projects') aria-current="page" @endif>{{ __('govuk_alpha.volunteering.community_projects_tab') }}</a>
+                    </li>
                     <li class="govuk-tabs__list-item">
                         <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.hours', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.tabs.hours') }}</a>
                     </li>
@@ -359,6 +362,38 @@
                                     <dd class="govuk-summary-list__value">{{ (int) ($shift['spots_remaining'] ?? 0) }}</dd>
                                 </div>
                             </dl>
+                        </article>
+                    @endforeach
+                </div>
+            @endif
+        @elseif ($selectedTab === 'community_projects')
+            <h2 class="govuk-heading-l">{{ __('govuk_alpha.volunteering.community_projects_title') }}</h2>
+            <p class="govuk-body">{{ __('govuk_alpha.volunteering.community_projects_intro') }}</p>
+            @if (empty($communityProjects))
+                <div class="govuk-inset-text">{{ __('govuk_alpha.volunteering.empty_community_projects') }}</div>
+            @else
+                <div class="nexus-alpha-card-list">
+                    @foreach ($communityProjects as $project)
+                        @php
+                            $cpTitle = trim((string) ($project['title'] ?? '')) ?: __('govuk_alpha.volunteering.community_project_untitled');
+                            $cpStatus = trim((string) ($project['status'] ?? ''));
+                            $cpDesc = trim((string) ($project['description'] ?? ''));
+                            $cpProposer = trim((string) ($project['proposer_name'] ?? ($project['proposer_first_name'] ?? '') . ' ' . ($project['proposer_last_name'] ?? '')));
+                            $cpSupporters = (int) ($project['supporter_count'] ?? 0);
+                            $cpStatusTag = $cpStatus === 'completed' ? 'govuk-tag--green' : ($cpStatus === 'active' ? 'govuk-tag--turquoise' : 'govuk-tag--blue');
+                        @endphp
+                        <article class="nexus-alpha-card">
+                            <div class="nexus-alpha-module-row">
+                                <h3 class="govuk-heading-m govuk-!-margin-bottom-1">{{ $cpTitle }}</h3>
+                                @if ($cpStatus !== '')<strong class="govuk-tag {{ $cpStatusTag }}">{{ \Illuminate\Support\Str::headline($cpStatus) }}</strong>@endif
+                            </div>
+                            @if ($cpProposer !== '')
+                                <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.volunteering.community_project_proposed_by', ['name' => $cpProposer]) }}</p>
+                            @endif
+                            @if ($cpDesc !== '')
+                                <p class="govuk-body govuk-!-margin-bottom-1">{{ \Illuminate\Support\Str::limit(strip_tags($cpDesc), 200) }}</p>
+                            @endif
+                            <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-0">{{ __('govuk_alpha.volunteering.community_project_supporters', ['count' => $cpSupporters]) }}</p>
                         </article>
                     @endforeach
                 </div>
