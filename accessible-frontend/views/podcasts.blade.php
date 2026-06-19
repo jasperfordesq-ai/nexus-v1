@@ -21,14 +21,14 @@
 
     <form method="get" action="{{ route('govuk-alpha.podcasts.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-!-margin-bottom-6">
         <div class="govuk-grid-row">
-            <div class="govuk-grid-column-one-half">
+            <div class="govuk-grid-column-one-third">
                 <div class="govuk-form-group">
                     <label class="govuk-label" for="q">{{ __('govuk_alpha.polish_commerce.podcast_search_label') }}</label>
                     <div id="podcast-q-hint" class="govuk-hint">{{ __('govuk_alpha.polish_commerce.podcast_search_hint') }}</div>
                     <input class="govuk-input" id="q" name="q" type="search" value="{{ $podcastQuery }}" aria-describedby="podcast-q-hint">
                 </div>
             </div>
-            <div class="govuk-grid-column-one-half">
+            <div class="govuk-grid-column-one-third">
                 <div class="govuk-form-group">
                     <label class="govuk-label" for="sort">{{ __('govuk_alpha.polish_commerce.podcast_sort_label') }}</label>
                     <select class="govuk-select" id="sort" name="sort">
@@ -39,6 +39,19 @@
                     </select>
                 </div>
             </div>
+            @if (!empty($podcastCategories))
+                <div class="govuk-grid-column-one-third">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="category">{{ __('govuk_alpha.polish_commerce.podcast_category_label') }}</label>
+                        <select class="govuk-select" id="category" name="category">
+                            <option value="">{{ __('govuk_alpha.polish_commerce.podcast_category_all') }}</option>
+                            @foreach ($podcastCategories as $cat)
+                                <option value="{{ $cat }}" {{ ($podcastCategory ?? '') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            @endif
         </div>
         <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.polish_commerce.podcast_search_submit') }}</button>
     </form>

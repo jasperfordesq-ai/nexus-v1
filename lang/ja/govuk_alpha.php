@@ -2241,6 +2241,8 @@ return [
         'podcast_sort_episodes' => 'エピソード数が多い順',
         'podcast_sort_followers' => 'フォロワー数が多い順',
         'podcast_search_submit' => '検索',
+        'podcast_category_label' => 'Category',
+        'podcast_category_all' => 'All categories',
         'podcast_subscribe' => 'このポッドキャストを購読する',
         'podcast_unsubscribe' => 'このポッドキャストの購読を解除する',
         'podcast_subscribe_success' => 'このポッドキャストを購読しました。',

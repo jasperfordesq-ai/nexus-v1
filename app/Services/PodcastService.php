@@ -98,6 +98,26 @@ class PodcastService
     }
 
     /**
+     * Distinct non-empty podcast categories for the current tenant's published
+     * shows. Backs the accessible browse category filter (no-JS select). Tenant
+     * scope comes from PodcastShow's global scope; published() matches browse().
+     *
+     * @return array<int,string>
+     */
+    public static function getDistinctCategories(): array
+    {
+        return PodcastShow::query()
+            ->published()
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category')
+            ->map(static fn ($c) => (string) $c)
+            ->all();
+    }
+
+    /**
      * @return array<int,array<string,mixed>>
      */
     public static function authoredBy(int $userId): array

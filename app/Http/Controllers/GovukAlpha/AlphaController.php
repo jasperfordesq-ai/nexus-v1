@@ -6610,6 +6610,22 @@ class AlphaController extends Controller
             $browseFilters['search'] = $podcastQuery;
         }
 
+        // Category filter (mirrors React). Only a category present in the tenant's
+        // own distinct list reaches the query.
+        $podcastCategories = [];
+        try {
+            $podcastCategories = \App\Services\PodcastService::getDistinctCategories();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        $podcastCategory = trim(self::asStr($request->query('category')));
+        if ($podcastCategory !== '' && ! in_array($podcastCategory, $podcastCategories, true)) {
+            $podcastCategory = '';
+        }
+        if ($podcastCategory !== '') {
+            $browseFilters['category'] = $podcastCategory;
+        }
+
         $items = [];
         try {
             $items = \App\Services\PodcastService::browse($browseFilters)['items'] ?? [];
@@ -6625,6 +6641,8 @@ class AlphaController extends Controller
             'shows' => is_array($items) ? $items : [],
             'podcastQuery' => $podcastQuery,
             'podcastSort' => $podcastSort,
+            'podcastCategory' => $podcastCategory,
+            'podcastCategories' => is_array($podcastCategories) ? $podcastCategories : [],
         ]);
     }
 

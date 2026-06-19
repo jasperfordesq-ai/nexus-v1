@@ -2262,6 +2262,8 @@ return [
         'podcast_sort_episodes' => 'Most episodes',
         'podcast_sort_followers' => 'Most followers',
         'podcast_search_submit' => 'Search',
+        'podcast_category_label' => 'Category',
+        'podcast_category_all' => 'All categories',
         'podcast_subscribe' => 'Subscribe to this podcast',
         'podcast_unsubscribe' => 'Unsubscribe from this podcast',
         'podcast_subscribe_success' => 'You have subscribed to this podcast.',

@@ -2241,6 +2241,8 @@ return [
         'podcast_sort_episodes' => 'Meiste Folgen',
         'podcast_sort_followers' => 'Meiste Abonnenten',
         'podcast_search_submit' => 'Suchen',
+        'podcast_category_label' => 'Category',
+        'podcast_category_all' => 'All categories',
         'podcast_subscribe' => 'Diesen Podcast abonnieren',
         'podcast_unsubscribe' => 'Diesen Podcast abbestellen',
         'podcast_subscribe_success' => 'Sie haben diesen Podcast abonniert.',

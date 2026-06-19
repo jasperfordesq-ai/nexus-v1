@@ -2241,6 +2241,8 @@ return [
         'podcast_sort_episodes' => 'Meeste afleveringen',
         'podcast_sort_followers' => 'Meeste volgers',
         'podcast_search_submit' => 'Zoeken',
+        'podcast_category_label' => 'Category',
+        'podcast_category_all' => 'All categories',
         'podcast_subscribe' => 'Abonneer op deze podcast',
         'podcast_unsubscribe' => 'Afmelden voor deze podcast',
         'podcast_subscribe_success' => 'U bent geabonneerd op deze podcast.',

@@ -2241,6 +2241,8 @@ return [
         'podcast_sort_episodes' => 'الأكثر حلقات',
         'podcast_sort_followers' => 'الأكثر متابعين',
         'podcast_search_submit' => 'بحث',
+        'podcast_category_label' => 'Category',
+        'podcast_category_all' => 'All categories',
         'podcast_subscribe' => 'اشترك في هذا البودكاست',
         'podcast_unsubscribe' => 'إلغاء الاشتراك في هذا البودكاست',
         'podcast_subscribe_success' => 'لقد اشتركت في هذا البودكاست.',

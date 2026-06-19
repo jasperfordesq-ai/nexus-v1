@@ -2241,6 +2241,8 @@ return [
         'podcast_sort_episodes' => 'Mais episódios',
         'podcast_sort_followers' => 'Mais seguidores',
         'podcast_search_submit' => 'Pesquisar',
+        'podcast_category_label' => 'Category',
+        'podcast_category_all' => 'All categories',
         'podcast_subscribe' => 'Subscrever este podcast',
         'podcast_unsubscribe' => 'Cancelar subscrição deste podcast',
         'podcast_subscribe_success' => 'Subscreveu este podcast.',

@@ -2241,6 +2241,8 @@ return [
         'podcast_sort_episodes' => 'Na heipeagóid is mó',
         'podcast_sort_followers' => 'Na leanúnaithe is mó',
         'podcast_search_submit' => 'Cuardaigh',
+        'podcast_category_label' => 'Category',
+        'podcast_category_all' => 'All categories',
         'podcast_subscribe' => 'Liostáil leis an bpodchraoltán seo',
         'podcast_unsubscribe' => 'Dísliostáil ón bpodchraoltán seo',
         'podcast_subscribe_success' => 'Tá tú liostáilte leis an bpodchraoltán seo.',
