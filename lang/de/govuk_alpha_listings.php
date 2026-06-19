@@ -64,6 +64,9 @@ return [
 
     // ---- Listing detail extras (delete, comments link, author badges) ----
     'detail' => [
+        'like' => 'Like',
+        'unlike' => 'Liked',
+        'likes_count' => '{0} No likes yet|{1} :count like|[2,*] :count likes',
         'delete_heading' => 'Delete this listing',
         'delete_warning' => 'Deleting this listing cannot be undone. It will be removed for everyone.',
         'delete_button' => 'Delete listing',

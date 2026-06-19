@@ -3751,6 +3751,9 @@ return [
     ],
     'blog' => [
         'featured_image_generic' => 'Íomhá ghabhálach don alt seo',
+        'like' => 'Like',
+        'unlike' => 'Liked',
+        'likes_count' => '{0} No likes yet|{1} :count like|[2,*] :count likes',
         'caption' => ':community',
         'description' => 'Nuacht, scéalta agus nuashonruithe ón bpobal.',
         'comments_heading' => 'Tráchtanna',

@@ -51,6 +51,7 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/blog/feed.xml', [AlphaController::class, 'blogFeed'])->name('blog.feed');
         Route::get('/blog/{slug}', [AlphaController::class, 'blogPost'])->where('slug', '[a-zA-Z0-9_-]+')->name('blog.show');
         Route::post('/blog/{slug}/comments', [AlphaController::class, 'storeBlogComment'])->where('slug', '[a-zA-Z0-9_-]+')->middleware('throttle:20,1')->name('blog.comments.store');
+        Route::post('/blog/{slug}/like', [AlphaController::class, 'blogTogglePostLike'])->where('slug', '[a-zA-Z0-9_-]+')->middleware('throttle:60,1')->name('blog.like');
         Route::get('/login', [AlphaController::class, 'login'])->name('login');
         Route::post('/login', [AlphaController::class, 'storeLogin'])->middleware('throttle:30,1')->name('login.store');
         Route::post('/login/resend-verification', [AlphaController::class, 'resendVerification'])->middleware('throttle:5,5')->name('login.resend');
@@ -380,6 +381,7 @@ Route::prefix('{tenantSlug}/alpha')
         // ===== WAVE NIGHT-LISTINGS: save/unsave, renew, report, matches dismiss =====
         // Static segments (save, unsave, renew, report) declared before {id} wildcard
         // to prevent any routing collision. POSTs are rate-limited.
+        Route::post('/listings/{id}/like', [AlphaController::class, 'listingsToggleLike'])->whereNumber('id')->middleware('throttle:60,1')->name('listings.like');
         Route::post('/listings/{id}/save', [AlphaController::class, 'saveListing'])->whereNumber('id')->middleware('throttle:30,1')->name('listings.save');
         Route::post('/listings/{id}/unsave', [AlphaController::class, 'unsaveListing'])->whereNumber('id')->middleware('throttle:30,1')->name('listings.unsave');
         Route::post('/listings/{id}/renew', [AlphaController::class, 'renewListing'])->whereNumber('id')->middleware('throttle:10,1')->name('listings.renew');

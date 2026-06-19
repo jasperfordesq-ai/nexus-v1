@@ -1346,6 +1346,8 @@ class AlphaController extends Controller
             }
         }
 
+        $postId = (int) ($post['id'] ?? 0);
+
         return $this->view('accessible-frontend::blog-post', [
             'title' => (string) ($post['title'] ?? __('govuk_alpha.blog.title')),
             'tenantSlug' => $tenantSlug,
@@ -1354,8 +1356,35 @@ class AlphaController extends Controller
             'comments' => $comments,
             'commentsCount' => \App\Services\CommentService::countAll($comments),
             'isAuthenticated' => $userId !== null,
+            'likeCount' => $postId > 0 ? $this->alphaLikeCount('blog', $postId) : 0,
+            'hasLiked' => $userId !== null && $postId > 0 && $this->alphaUserLiked('blog', $postId, $userId),
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
+    }
+
+    /** Toggle a like on a blog post from the accessible blog post page. */
+    public function blogTogglePostLike(Request $request, string $tenantSlug, string $slug): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('blog'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $post = app(\App\Services\BlogService::class)->getBySlug($slug);
+        abort_if($post === null, 404);
+        $postId = (int) ($post['id'] ?? 0);
+
+        $action = 'like-failed';
+        try {
+            $action = $this->alphaToggleLike('blog', $postId, $userId) === 'liked' ? 'liked' : 'unliked';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.blog.show', ['tenantSlug' => $tenantSlug, 'slug' => $slug, 'status' => $action])
+            ->withFragment('reactions');
     }
 
     public function storeBlogComment(Request $request, string $tenantSlug, string $slug): RedirectResponse
@@ -3257,7 +3286,90 @@ class AlphaController extends Controller
             'status' => self::asStr(request()->query('status')) ?: null,
             'ogImage' => $this->absoluteAssetUrl($listing['image_url'] ?? null),
             'ogImageAlt' => $listing['image_url'] ? ($listing['title'] ?? null) : null,
+            'likeCount' => $this->alphaLikeCount('listing', $id),
+            'hasLiked' => $userId !== null && $this->alphaUserLiked('listing', $id, $userId),
         ]);
+    }
+
+    /**
+     * Total likes for a feed target (tenant-scoped). Mirrors the count the React
+     * SocialController returns; the accessible like button shows it inline.
+     */
+    private function alphaLikeCount(string $targetType, int $targetId): int
+    {
+        return (int) \Illuminate\Support\Facades\DB::table('likes')
+            ->where('target_type', $targetType)
+            ->where('target_id', $targetId)
+            ->where('tenant_id', TenantContext::getId())
+            ->count();
+    }
+
+    /** Whether the given user has liked a target (tenant-scoped). */
+    private function alphaUserLiked(string $targetType, int $targetId, int $userId): bool
+    {
+        return \Illuminate\Support\Facades\DB::table('likes')
+            ->where('user_id', $userId)
+            ->where('target_type', $targetType)
+            ->where('target_id', $targetId)
+            ->where('tenant_id', TenantContext::getId())
+            ->exists();
+    }
+
+    /**
+     * Toggle a like for a feed target, mirroring SocialController::likeV2's
+     * `likes`-table logic (INSERT IGNORE on like, delete on unlike, tenant-scoped,
+     * canView-gated). Returns 'liked' | 'unliked'. The accessible no-JS path posts
+     * a form here instead of calling the JSON endpoint.
+     */
+    private function alphaToggleLike(string $targetType, int $targetId, int $userId): string
+    {
+        $tenantId = TenantContext::getId();
+
+        if (! \App\Support\FeedItemTables::canView($targetType, $targetId, $userId)) {
+            abort(404);
+        }
+
+        $existing = \Illuminate\Support\Facades\DB::table('likes')
+            ->where('user_id', $userId)
+            ->where('target_type', $targetType)
+            ->where('target_id', $targetId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if ($existing) {
+            \Illuminate\Support\Facades\DB::table('likes')
+                ->where('id', $existing->id)
+                ->where('tenant_id', $tenantId)
+                ->delete();
+            return 'unliked';
+        }
+
+        \Illuminate\Support\Facades\DB::affectingStatement(
+            'INSERT IGNORE INTO likes (user_id, target_type, target_id, tenant_id, created_at) VALUES (?, ?, ?, ?, NOW())',
+            [$userId, $targetType, $targetId, $tenantId]
+        );
+        return 'liked';
+    }
+
+    /** Toggle a like on a listing from the accessible listing detail page. */
+    public function listingsToggleLike(Request $request, string $tenantSlug, int $id): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $action = 'like-failed';
+        try {
+            $action = $this->alphaToggleLike('listing', $id, $userId) === 'liked' ? 'liked' : 'unliked';
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('govuk-alpha.listings.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => $action])
+            ->withFragment('like');
     }
 
     public function createListing(Request $request, string $tenantSlug): Response|RedirectResponse

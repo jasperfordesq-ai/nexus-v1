@@ -69,6 +69,19 @@
                 {!! $post['content'] ?? '' !!}
             </div>
 
+            {{-- Post-level like (parity with the React social panel). --}}
+            <div id="reactions" class="govuk-!-margin-top-4 govuk-!-margin-bottom-2">
+                @if (!empty($isAuthenticated) && !empty($post['slug']))
+                    <form method="post" action="{{ route('govuk-alpha.blog.like', ['tenantSlug' => $tenantSlug, 'slug' => $post['slug']]) }}" class="govuk-!-display-inline-block">
+                        @csrf
+                        <button class="govuk-button {{ ($hasLiked ?? false) ? '' : 'govuk-button--secondary' }} govuk-!-margin-bottom-0" data-module="govuk-button">
+                            {{ ($hasLiked ?? false) ? __('govuk_alpha.blog.unlike') : __('govuk_alpha.blog.like') }}
+                        </button>
+                    </form>
+                @endif
+                <span class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha.blog.likes_count', ['count' => (int) ($likeCount ?? 0)]) }}</span>
+            </div>
+
             <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--l">
 
             <section id="comments">

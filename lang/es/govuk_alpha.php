@@ -3751,6 +3751,9 @@ return [
     ],
     'blog' => [
         'featured_image_generic' => 'Imagen destacada de este artículo',
+        'like' => 'Like',
+        'unlike' => 'Liked',
+        'likes_count' => '{0} No likes yet|{1} :count like|[2,*] :count likes',
         'caption' => ':community',
         'description' => 'Noticias, historias y novedades de la comunidad.',
         'comments_heading' => 'Comentarios',

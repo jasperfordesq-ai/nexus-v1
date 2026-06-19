@@ -281,6 +281,19 @@
         </div>
     @endif
 
+    {{-- Like / unlike action + count --}}
+    <div id="like" class="govuk-!-margin-top-4 govuk-!-margin-bottom-2">
+        @if ($isAuthenticated && !$isOwner)
+            <form method="post" action="{{ route('govuk-alpha.listings.like', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}" class="govuk-!-display-inline-block">
+                @csrf
+                <button class="govuk-button {{ ($hasLiked ?? false) ? '' : 'govuk-button--secondary' }} govuk-!-margin-bottom-0" data-module="govuk-button">
+                    {{ ($hasLiked ?? false) ? __('govuk_alpha_listings.detail.unlike') : __('govuk_alpha_listings.detail.like') }}
+                </button>
+            </form>
+        @endif
+        <span class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha_listings.detail.likes_count', ['count' => (int) ($likeCount ?? 0)]) }}</span>
+    </div>
+
     {{-- Save / unsave action + share URL + report link --}}
     <div class="govuk-button-group govuk-!-margin-top-4 govuk-!-margin-bottom-2">
         @if ($isAuthenticated && !$isOwner)
