@@ -13,6 +13,14 @@
             'lesson-completed' => __('govuk_alpha_commerce.learn.lesson_completed_status'),
             'course-completed' => __('govuk_alpha_commerce.learn.course_completed_status'),
         ];
+        // Quiz-attempt outcomes. success => green banner, error => error summary.
+        $quizStatusMessages = [
+            'quiz-passed' => ['success', __('govuk_alpha_commerce.learn.quiz_passed_status')],
+            'quiz-pending-review' => ['success', __('govuk_alpha_commerce.learn.quiz_pending_status')],
+            'quiz-failed' => ['error', __('govuk_alpha_commerce.learn.quiz_failed_status')],
+            'quiz-no-attempts' => ['error', __('govuk_alpha_commerce.learn.quiz_no_attempts_status')],
+            'quiz-error' => ['error', __('govuk_alpha_commerce.learn.quiz_error_status')],
+        ];
         $contentTypeLabels = [
             'video' => __('govuk_alpha_commerce.learn.content_type_video'),
             'text' => __('govuk_alpha_commerce.learn.content_type_text'),
@@ -37,6 +45,25 @@
                 <p class="govuk-notification-banner__heading">{{ $statusMessages[$status] }}</p>
             </div>
         </div>
+    @elseif (($status ?? null) !== null && isset($quizStatusMessages[$status]))
+        @php [$quizBannerKind, $quizBannerMsg] = $quizStatusMessages[$status]; @endphp
+        @if ($quizBannerKind === 'success')
+            <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="commerce-learn-status" data-module="govuk-notification-banner">
+                <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title" id="commerce-learn-status">{{ __('govuk_alpha_commerce.common.notice_title') }}</h2>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <p class="govuk-notification-banner__heading">{{ $quizBannerMsg }}</p>
+                </div>
+            </div>
+        @else
+            <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
+                <div role="alert">
+                    <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_commerce.common.error_title') }}</h2>
+                    <div class="govuk-error-summary__body"><p class="govuk-body">{{ $quizBannerMsg }}</p></div>
+                </div>
+            </div>
+        @endif
     @endif
 
     <p class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha_commerce.learn.progress_label', ['percent' => $percent]) }}</p>
@@ -110,6 +137,92 @@
 
                 @if ($attachment !== '')
                     <p class="govuk-body"><a class="govuk-link" href="{{ $attachment }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha_commerce.learn.download_attachment') }}</a></p>
+                @endif
+
+                @if ($ctype === 'quiz')
+                    @php $quiz = $current['quiz'] ?? null; @endphp
+                    @if ($quiz === null)
+                        <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha_commerce.learn.quiz_unavailable') }}</p></div>
+                    @else
+                        @php
+                            $quizQuestions = is_array($quiz['questions'] ?? null) ? $quiz['questions'] : [];
+                            $attemptsRemaining = $quiz['attempts_remaining'] ?? null; // null = unlimited
+                            $lastAttempt = $quiz['last_attempt'] ?? null;
+                            $passMark = (int) ($quiz['pass_mark_percent'] ?? 0);
+                        @endphp
+                        <h3 class="govuk-heading-m govuk-!-margin-top-4">{{ trim((string) ($quiz['title'] ?? '')) ?: __('govuk_alpha_commerce.learn.quiz_heading') }}</h3>
+                        @if (trim((string) ($quiz['description'] ?? '')) !== '')
+                            <p class="govuk-body">{{ $quiz['description'] }}</p>
+                        @endif
+                        <p class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha_commerce.learn.quiz_pass_mark', ['percent' => $passMark]) }}
+                            @if ($attemptsRemaining !== null) · {{ __('govuk_alpha_commerce.learn.quiz_attempts_remaining', ['count' => (int) $attemptsRemaining]) }}@endif
+                        </p>
+
+                        @if ($lastAttempt !== null)
+                            <div class="govuk-inset-text">
+                                @if (($lastAttempt['grading_status'] ?? '') === 'pending_review')
+                                    <p class="govuk-body">{{ __('govuk_alpha_commerce.learn.quiz_last_pending') }}</p>
+                                @else
+                                    <p class="govuk-body">{{ __('govuk_alpha_commerce.learn.quiz_last_score', ['score' => (int) round((float) ($lastAttempt['score_percent'] ?? 0))]) }}
+                                        @if (!empty($lastAttempt['passed']))<strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha_commerce.learn.quiz_passed_tag') }}</strong>@else<strong class="govuk-tag govuk-tag--red">{{ __('govuk_alpha_commerce.learn.quiz_failed_tag') }}</strong>@endif
+                                    </p>
+                                @endif
+                            </div>
+                        @endif
+
+                        @if ($attemptsRemaining !== null && (int) $attemptsRemaining <= 0)
+                            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha_commerce.learn.quiz_no_attempts_left') }}</p></div>
+                        @elseif (empty($quizQuestions))
+                            <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha_commerce.learn.quiz_no_questions') }}</p></div>
+                        @else
+                            <form method="post" action="{{ route('govuk-alpha.courses.quiz.submit', ['tenantSlug' => $tenantSlug, 'id' => $courseId, 'lessonId' => $current['id']]) }}" class="govuk-!-margin-top-2">
+                                @csrf
+                                @foreach ($quizQuestions as $q)
+                                    @php
+                                        $qid = (int) ($q['id'] ?? 0);
+                                        $qtype = (string) ($q['type'] ?? 'short');
+                                        $qprompt = trim((string) ($q['prompt'] ?? ''));
+                                        $qoptions = is_array($q['options'] ?? null) ? $q['options'] : [];
+                                    @endphp
+                                    @if ($qid > 0 && $qprompt !== '')
+                                        <div class="govuk-form-group">
+                                            <fieldset class="govuk-fieldset" aria-describedby="q-{{ $qid }}-hint">
+                                                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ $qprompt }}</legend>
+                                                @if ($qtype === 'multi' && !empty($qoptions))
+                                                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                                        @foreach ($qoptions as $opt)
+                                                            @php $oid = (string) (is_array($opt) ? ($opt['id'] ?? '') : $opt); $olabel = trim((string) (is_array($opt) ? ($opt['label'] ?? $oid) : $opt)); @endphp
+                                                            @if ($oid !== '')
+                                                                <div class="govuk-checkboxes__item">
+                                                                    <input class="govuk-checkboxes__input" id="q-{{ $qid }}-{{ $loop->index }}" name="answers[{{ $qid }}][]" type="checkbox" value="{{ $oid }}">
+                                                                    <label class="govuk-label govuk-checkboxes__label" for="q-{{ $qid }}-{{ $loop->index }}">{{ $olabel }}</label>
+                                                                </div>
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+                                                @elseif (($qtype === 'mcq' || $qtype === 'truefalse') && !empty($qoptions))
+                                                    <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                                                        @foreach ($qoptions as $opt)
+                                                            @php $oid = (string) (is_array($opt) ? ($opt['id'] ?? '') : $opt); $olabel = trim((string) (is_array($opt) ? ($opt['label'] ?? $oid) : $opt)); @endphp
+                                                            @if ($oid !== '')
+                                                                <div class="govuk-radios__item">
+                                                                    <input class="govuk-radios__input" id="q-{{ $qid }}-{{ $loop->index }}" name="answers[{{ $qid }}]" type="radio" value="{{ $oid }}">
+                                                                    <label class="govuk-label govuk-radios__label" for="q-{{ $qid }}-{{ $loop->index }}">{{ $olabel }}</label>
+                                                                </div>
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+                                                @else
+                                                    <textarea class="govuk-textarea" id="q-{{ $qid }}" name="answers[{{ $qid }}]" rows="{{ $qtype === 'essay' ? 5 : 2 }}"></textarea>
+                                                @endif
+                                            </fieldset>
+                                        </div>
+                                    @endif
+                                @endforeach
+                                <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha_commerce.learn.quiz_submit') }}</button>
+                            </form>
+                        @endif
+                    @endif
                 @endif
 
                 @if ($current['is_completed'] ?? false)

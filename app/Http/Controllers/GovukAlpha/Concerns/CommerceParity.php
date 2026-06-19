@@ -1003,6 +1003,16 @@ trait CommerceParity
             }
         }
 
+        // Quiz lessons carry an interactive quiz: load the learner-safe payload
+        // + the viewer's attempt state so the player can render the questions and
+        // their last result (mirrors React's quiz lesson type).
+        if (is_array($currentLesson) && ($currentLesson['content_type'] ?? '') === 'quiz') {
+            $lessonModel = \App\Models\CourseLesson::find((int) $currentLesson['id']);
+            if ($lessonModel !== null) {
+                $currentLesson['quiz'] = $this->commerceQuizPayload($lessonModel, $userId);
+            }
+        }
+
         return $this->view('accessible-frontend::commerce-course-learn', [
             'title' => (string) ($course->title ?? '') ?: __('govuk_alpha_commerce.learn.title'),
             'tenantSlug' => $tenantSlug,
@@ -1061,6 +1071,76 @@ trait CommerceParity
             'tenantSlug' => $tenantSlug,
             'id' => $id,
             'status' => $completed ? 'course-completed' : 'lesson-completed',
+        ]);
+    }
+
+    /**
+     * Submit a quiz attempt for a quiz lesson. Mirrors the React quiz submit:
+     * answers are posted as answers[questionId] (a scalar, or an array for
+     * multi-select), graded by CourseQuizService::submitAttempt (which enforces
+     * the max-attempts ceiling under a row lock). Tenant + enrollment + lesson↔
+     * quiz ownership are all verified so a cross-course/cross-tenant quiz id
+     * cannot be graded.
+     */
+    public function commerceCourseQuizSubmit(Request $request, string $tenantSlug, int $id, int $lessonId): RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('courses'), 403);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        $course = null;
+        try {
+            $course = CourseService::findById($id);
+            if ($course !== null && (int) $course->tenant_id !== TenantContext::getId()) {
+                $course = null;
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+        abort_if($course === null, 404);
+
+        $enrollment = CourseEnrollmentService::find($id, $userId);
+        if ($enrollment === null) {
+            return redirect()->route('govuk-alpha.courses.show', ['tenantSlug' => $tenantSlug, 'id' => $id, 'status' => 'enrol-required']);
+        }
+
+        // The lesson must belong to this course AND be a quiz lesson.
+        $lesson = \App\Models\CourseLesson::where('id', $lessonId)
+            ->where('course_id', $id)
+            ->first();
+        abort_if($lesson === null, 404);
+
+        $quiz = $lesson->quiz; // HasOne(CourseQuiz, lesson_id)
+        abort_if($quiz === null || (int) $quiz->course_id !== $id, 404);
+
+        $answers = $request->input('answers');
+        $answers = is_array($answers) ? $answers : [];
+
+        $status = 'quiz-failed';
+        try {
+            $result = \App\Services\CourseQuizService::submitAttempt((int) $quiz->id, $userId, $answers, (int) $enrollment->id);
+            if (! empty($result['needs_review'])) {
+                $status = 'quiz-pending-review';
+            } elseif (! empty($result['passed'])) {
+                $status = 'quiz-passed';
+            } else {
+                $status = 'quiz-failed';
+            }
+        } catch (\App\Exceptions\MaxAttemptsExceededException $e) {
+            $status = 'quiz-no-attempts';
+        } catch (\Throwable $e) {
+            report($e);
+            $status = 'quiz-error';
+        }
+
+        return redirect()->route('govuk-alpha.courses.learn', [
+            'tenantSlug' => $tenantSlug,
+            'id' => $id,
+            'lesson' => $lessonId,
+            'status' => $status,
         ]);
     }
 
@@ -3014,6 +3094,46 @@ trait CommerceParity
             'attachment_url' => is_string($attachment) ? $attachment : '',
             'is_completed' => (bool) ($entry['is_completed'] ?? false),
         ];
+    }
+
+    /**
+     * Build the learner-safe quiz payload for a quiz lesson, plus the viewer's
+     * attempt state (attempts used/remaining + their latest result). Returns null
+     * when the lesson has no quiz attached. Questions never include the correct
+     * answers — forLearner() strips them, mirroring the React CoursePlayerPage.
+     *
+     * @return array<string,mixed>|null
+     */
+    private function commerceQuizPayload(\App\Models\CourseLesson $lesson, int $userId): ?array
+    {
+        $quizModel = $lesson->quiz; // HasOne(CourseQuiz, lesson_id)
+        if ($quizModel === null) {
+            return null;
+        }
+
+        $data = \App\Services\CourseQuizService::forLearner((int) $quizModel->id);
+        if ($data === null) {
+            return null;
+        }
+
+        $attemptsUsed = \App\Services\CourseQuizService::attemptsUsed((int) $quizModel->id, $userId);
+        $maxAttempts = (int) ($data['max_attempts'] ?? 0);
+        $attemptsRemaining = $maxAttempts > 0 ? max(0, $maxAttempts - $attemptsUsed) : null; // null = unlimited
+
+        $last = \App\Models\CourseQuizAttempt::where('quiz_id', (int) $quizModel->id)
+            ->where('user_id', $userId)
+            ->orderByDesc('id')
+            ->first();
+
+        $data['attempts_used'] = $attemptsUsed;
+        $data['attempts_remaining'] = $attemptsRemaining;
+        $data['last_attempt'] = $last ? [
+            'score_percent' => (float) $last->score_percent,
+            'passed' => (bool) $last->passed,
+            'grading_status' => (string) $last->grading_status,
+        ] : null;
+
+        return $data;
     }
 
     /**

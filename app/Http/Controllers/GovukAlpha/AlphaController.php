@@ -6298,10 +6298,34 @@ class AlphaController extends Controller
         if ($q !== '') {
             $filters['search'] = $q;
         }
+
+        // Category + level filters mirror the React CoursesPage (CourseService
+        // ::browse supports category_id + level). Only whitelisted level values
+        // reach the query.
+        $categoryId = (int) $request->query('category', 0);
+        if ($categoryId > 0) {
+            $filters['category_id'] = $categoryId;
+        }
+        $level = strtolower(trim(self::asStr($request->query('level'))));
+        $allowedLevels = ['beginner', 'intermediate', 'advanced'];
+        if (! in_array($level, $allowedLevels, true)) {
+            $level = '';
+        }
+        if ($level !== '') {
+            $filters['level'] = $level;
+        }
+
         $items = [];
         try {
             $items = \App\Services\CourseService::browse($filters)['items'] ?? [];
             $items = array_map(static fn ($c) => is_array($c) ? $c : $c->toArray(), $items);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $categories = [];
+        try {
+            $categories = \App\Services\CourseCategoryService::all();
         } catch (\Throwable $e) {
             report($e);
         }
@@ -6312,6 +6336,9 @@ class AlphaController extends Controller
             'activeNav' => 'explore',
             'courses' => is_array($items) ? $items : [],
             'coursesQuery' => $q,
+            'courseCategories' => is_array($categories) ? $categories : [],
+            'courseCategoryId' => $categoryId > 0 ? $categoryId : null,
+            'courseLevel' => $level,
         ]);
     }
 

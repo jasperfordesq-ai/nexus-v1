@@ -27,6 +27,29 @@
             <div id="q-hint" class="govuk-hint">{{ __('govuk_alpha.courses.search_hint') }}</div>
             <input class="govuk-input govuk-!-width-two-thirds" id="q" name="q" type="search" value="{{ $coursesQuery ?? '' }}" aria-describedby="q-hint">
         </div>
+        @if (!empty($courseCategories))
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="category">{{ __('govuk_alpha.courses.category_label') }}</label>
+                <select class="govuk-select" id="category" name="category">
+                    <option value="">{{ __('govuk_alpha.courses.all_categories') }}</option>
+                    @foreach ($courseCategories as $cat)
+                        @php $catId = (int) ($cat['id'] ?? 0); $catName = trim((string) ($cat['name'] ?? '')); @endphp
+                        @if ($catId > 0 && $catName !== '')
+                            <option value="{{ $catId }}" @selected(($courseCategoryId ?? null) === $catId)>{{ $catName }}</option>
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+        @endif
+        <div class="govuk-form-group">
+            <label class="govuk-label" for="level">{{ __('govuk_alpha.courses.level_filter_label') }}</label>
+            <select class="govuk-select" id="level" name="level">
+                <option value="">{{ __('govuk_alpha.courses.all_levels') }}</option>
+                @foreach (['beginner', 'intermediate', 'advanced'] as $lvl)
+                    <option value="{{ $lvl }}" @selected(($courseLevel ?? '') === $lvl)>{{ __('govuk_alpha.courses.levels.' . $lvl) }}</option>
+                @endforeach
+            </select>
+        </div>
         <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha.actions.search') }}</button>
     </form>
 

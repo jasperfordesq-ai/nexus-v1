@@ -62,6 +62,7 @@ Route::post('/marketplace/{id}/report', [AlphaController::class, 'commerceStoreR
 Route::get('/courses/mine', [AlphaController::class, 'commerceMyLearning'])->name('courses.mine');
 Route::get('/courses/{id}/learn', [AlphaController::class, 'commerceCourseLearn'])->whereNumber('id')->name('courses.learn');
 Route::post('/courses/{id}/lessons/{lessonId}/complete', [AlphaController::class, 'commerceCompleteLesson'])->whereNumber('id')->whereNumber('lessonId')->middleware('throttle:30,1')->name('courses.lessons.complete');
+Route::post('/courses/{id}/lessons/{lessonId}/quiz', [AlphaController::class, 'commerceCourseQuizSubmit'])->whereNumber('id')->whereNumber('lessonId')->middleware('throttle:20,1')->name('courses.quiz.submit');
 
 // ===== Premium — subscription management =====
 Route::get('/premium/manage', [AlphaController::class, 'commercePremiumManage'])->name('premium.manage');
