@@ -105,6 +105,13 @@ class ExchangeService
             return 0;
         }
 
+        // Single source of truth: when the exchange workflow is disabled there is
+        // nothing actionable, so every caller (accessible banner + React endpoint)
+        // sees 0 — keeping the two dashboards in agreement.
+        if (! BrokerControlConfigService::isExchangeWorkflowEnabled()) {
+            return 0;
+        }
+
         return (int) $this->needingAttentionFilter(DB::table('exchange_requests as er'), $userId, $tenantId)->count();
     }
 
@@ -119,6 +126,11 @@ class ExchangeService
     {
         $tenantId = (int) (TenantContext::getId() ?? 0);
         if ($tenantId <= 0 || $userId <= 0) {
+            return [];
+        }
+
+        // Same workflow gate as countNeedingAttention() — keep callers consistent.
+        if (! BrokerControlConfigService::isExchangeWorkflowEnabled()) {
             return [];
         }
 

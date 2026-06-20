@@ -106,6 +106,20 @@ class AccessibleBugfixesParityTest extends TestCase
         $this->resetTenant();
     }
 
+    /**
+     * Turn the broker exchange-workflow config ON for the test tenant (it defaults
+     * OFF). The "needs attention" service gates on isExchangeWorkflowEnabled(), so
+     * without this the count is always 0 — mirroring the React endpoint's guard.
+     */
+    private function enableExchangeWorkflow(): void
+    {
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        \App\Services\BrokerControlConfigService::updateConfig(['exchange_workflow_enabled' => true]);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+    }
+
     private function seedCompletedPeerTransaction(int $reviewerId, int $counterpartyId): void
     {
         DB::table('transactions')->insert([
@@ -229,6 +243,9 @@ class AccessibleBugfixesParityTest extends TestCase
         $this->seedCompletedPeerTransaction($reviewer->id, $a->id);
         $this->seedCompletedPeerTransaction($reviewer->id, $b->id);
 
+        // Workflow ON so the silence is genuinely "no actionable exchange", not "workflow off".
+        $this->enableExchangeWorkflow();
+
         $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
         $response->assertOk();
 
@@ -245,6 +262,7 @@ class AccessibleBugfixesParityTest extends TestCase
 
         // An incoming request the provider must accept/decline → needs their action.
         $this->seedExchange($requester->id, $provider->id, 'pending_provider');
+        $this->enableExchangeWorkflow();
 
         $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
         $response->assertOk();
@@ -256,6 +274,21 @@ class AccessibleBugfixesParityTest extends TestCase
         $response->assertDontSee('#pending-heading', false);
     }
 
+    public function test_dashboard_banner_silent_when_exchange_workflow_disabled(): void
+    {
+        // Parity with React: the React endpoint returns {count:0} and the card hides
+        // when the broker exchange_workflow config is OFF (its DEFAULT). The accessible
+        // banner must do the same even with a genuinely actionable exchange present.
+        $provider = $this->authenticatedUser();
+        $requester = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $this->seedExchange($requester->id, $provider->id, 'pending_provider');
+        // NOTE: exchange workflow left at its default (disabled).
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
+        $response->assertOk();
+        $response->assertDontSee('dashboard-reviews-title', false);
+    }
+
     public function test_exchange_attention_count_excludes_transactions_and_others_requests(): void
     {
         TenantContext::reset();
@@ -265,10 +298,9 @@ class AccessibleBugfixesParityTest extends TestCase
         $requester = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
 
-        // User::factory()->forTenant()->create() clobbers TenantContext as a side
-        // effect; re-assert the test tenant before exercising the service.
-        TenantContext::reset();
-        TenantContext::setById($this->testTenantId);
+        // Enable the broker workflow (default OFF) + re-assert the test tenant
+        // (the factory creates above clobber TenantContext as a side effect).
+        $this->enableExchangeWorkflow();
 
         $svc = app(\App\Services\ExchangeService::class);
 
@@ -294,11 +326,9 @@ class AccessibleBugfixesParityTest extends TestCase
 
         $this->seedExchange($requester->id, $provider->id, 'pending_provider');
 
-        // User::factory()->forTenant()->create() clobbers TenantContext as a side
-        // effect; re-assert the test tenant before exercising the service (in a real
-        // request, middleware keeps the tenant stable).
-        TenantContext::reset();
-        TenantContext::setById($this->testTenantId);
+        // Enable the broker workflow (default OFF) + re-assert the test tenant (the
+        // factory creates clobber TenantContext; a real request keeps it stable).
+        $this->enableExchangeWorkflow();
 
         $svc = app(\App\Services\ExchangeService::class);
         $items = $svc->getNeedingAttention($provider->id, 5);

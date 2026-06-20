@@ -46,7 +46,11 @@
          to accept, a completion to confirm, or a completed exchange to review.
          NOT raw wallet transactions, so it stays silent unless a real exchange is
          waiting on the member. --}}
-    @if (($exchangeAttentionCount ?? 0) > 0 && \App\Core\TenantContext::hasModule('listings') && \Illuminate\Support\Facades\Route::has('govuk-alpha.exchanges.index'))
+    {{-- Parity with React's ExchangesAttentionCard gating: useFeature('exchange_workflow')
+         (feature flag) for the card render + the API's isExchangeWorkflowEnabled() (broker
+         config) guard, which ExchangeService::countNeedingAttention now enforces so the count
+         is already 0 when the workflow is off. --}}
+    @if (($exchangeAttentionCount ?? 0) > 0 && \App\Core\TenantContext::hasFeature('exchange_workflow') && \Illuminate\Support\Facades\Route::has('govuk-alpha.exchanges.index'))
         <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="dashboard-reviews-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="dashboard-reviews-title">{{ __('govuk_alpha.dashboard.pending_reviews_title') }}</h2>
