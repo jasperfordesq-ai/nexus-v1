@@ -100,12 +100,73 @@ class ExchangeService
      */
     public function countNeedingAttention(int $userId): int
     {
-        $tenantId = TenantContext::getId();
+        $tenantId = (int) (TenantContext::getId() ?? 0);
         if ($tenantId <= 0 || $userId <= 0) {
             return 0;
         }
 
-        return (int) DB::table('exchange_requests as er')
+        return (int) $this->needingAttentionFilter(DB::table('exchange_requests as er'), $userId, $tenantId)->count();
+    }
+
+    /**
+     * The exchanges needing the user's action, shaped for display (the dashboard
+     * "needs your attention" card). Same filter as countNeedingAttention(), plus
+     * the counterparty + listing + the specific action the user must take.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function getNeedingAttention(int $userId, int $limit = 5): array
+    {
+        $tenantId = (int) (TenantContext::getId() ?? 0);
+        if ($tenantId <= 0 || $userId <= 0) {
+            return [];
+        }
+
+        $query = DB::table('exchange_requests as er')
+            ->leftJoin('listings as l', 'er.listing_id', '=', 'l.id')
+            ->leftJoin('users as req', 'er.requester_id', '=', 'req.id')
+            ->leftJoin('users as prov', 'er.provider_id', '=', 'prov.id');
+
+        $rows = $this->needingAttentionFilter($query, $userId, $tenantId)
+            ->orderByDesc('er.id')
+            ->limit(max(1, min($limit, 20)))
+            ->get([
+                'er.id', 'er.status', 'er.requester_id', 'er.provider_id',
+                'l.title as listing_title',
+                'req.name as requester_name', 'req.avatar_url as requester_avatar',
+                'prov.name as provider_name', 'prov.avatar_url as provider_avatar',
+            ]);
+
+        return $rows->map(function ($r) use ($userId) {
+            $isRequester = (int) $r->requester_id === $userId;
+            $action = match ($r->status) {
+                self::STATUS_PENDING   => 'accept',
+                'pending_confirmation' => 'confirm',
+                self::STATUS_COMPLETED => 'review',
+                default                => 'view',
+            };
+
+            return [
+                'id'                  => (int) $r->id,
+                'status'              => (string) $r->status,
+                'action'              => $action,
+                'listing_title'       => $r->listing_title !== null ? (string) $r->listing_title : null,
+                'counterparty_name'   => $isRequester ? ($r->provider_name ?? '') : ($r->requester_name ?? ''),
+                'counterparty_avatar' => $isRequester ? ($r->provider_avatar ?? null) : ($r->requester_avatar ?? null),
+            ];
+        })->all();
+    }
+
+    /**
+     * Shared WHERE for "exchanges needing the user's action": (1) pending_provider
+     * where they are the provider, (2) pending_confirmation where their own
+     * confirmation is still missing, (3) completed and not yet reviewed by them.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query  Aliased `exchange_requests as er`.
+     */
+    private function needingAttentionFilter($query, int $userId, int $tenantId)
+    {
+        return $query
             ->where('er.tenant_id', $tenantId)
             ->where(fn ($q) => $q->where('er.requester_id', $userId)->orWhere('er.provider_id', $userId))
             ->where(function ($outer) use ($userId, $tenantId) {
@@ -133,8 +194,7 @@ class ExchangeService
                               ->where('r.reviewer_id', $userId);
                       });
                 });
-            })
-            ->count();
+            });
     }
 
     /**

@@ -42,7 +42,8 @@
     "upcoming_events": "Próximos Eventos",
     "your_progress": "O Seu Progresso",
     "pending_reviews": "Avaliações Pendentes",
-    "endorsements": "Recomendações"
+    "endorsements": "Recomendações",
+    "exchanges_attention": "Requer a sua atenção"
   },
   "view_all": "Ver tudo",
   "view_all_caps": "Ver Tudo",
@@ -120,7 +121,9 @@
     "view_achievements": "Ver conquistas",
     "browse_all_listings": "Explorar todos os anúncios",
     "view_all_endorsements": "Ver todas as recomendações",
-    "view_pending_reviews": "Ver todas as avaliações pendentes"
+    "view_pending_reviews": "Ver todas as avaliações pendentes",
+    "loading_exchanges_attention": "A carregar trocas que requerem atenção",
+    "view_exchanges_attention": "Ver todas as trocas"
   },
   "reviews": {
     "sent": "Enviou {{amount}}h",
@@ -132,5 +135,16 @@
     "view_all_pending": "Ver todos os pendentes"
   },
   "likes_count": "{{count}} likes",
-  "comments_count": "{{count}} comments"
+  "comments_count": "{{count}} comments",
+  "exchanges_attention": {
+    "none": "Está em dia",
+    "none_description": "As trocas que requerem a sua ação aparecerão aqui.",
+    "action": {
+      "accept": "Aceitar",
+      "confirm": "Confirmar",
+      "review": "Avaliar",
+      "view": "Ver"
+    },
+    "view_all": "Ver todas as trocas"
+  }
 }

@@ -42,7 +42,8 @@
     "upcoming_events": "Upcoming Events",
     "your_progress": "Your Progress",
     "pending_reviews": "Pending Reviews",
-    "endorsements": "Endorsements"
+    "endorsements": "Endorsements",
+    "exchanges_attention": "Needs your attention"
   },
   "view_all": "View all",
   "view_all_caps": "View All",
@@ -120,7 +121,9 @@
     "view_achievements": "View achievements",
     "browse_all_listings": "Browse all listings",
     "view_all_endorsements": "View all endorsements",
-    "view_pending_reviews": "View all pending reviews"
+    "view_pending_reviews": "View all pending reviews",
+    "loading_exchanges_attention": "Loading exchanges that need attention",
+    "view_exchanges_attention": "View all exchanges"
   },
   "reviews": {
     "sent": "Sent {{amount}}h",
@@ -132,5 +135,16 @@
     "view_all_pending": "View All Pending"
   },
   "likes_count": "{{count}} likes",
-  "comments_count": "{{count}} comments"
+  "comments_count": "{{count}} comments",
+  "exchanges_attention": {
+    "none": "You're all caught up",
+    "none_description": "Exchanges that need your action will appear here.",
+    "action": {
+      "accept": "Accept",
+      "confirm": "Confirm",
+      "review": "Review",
+      "view": "View"
+    },
+    "view_all": "View all exchanges"
+  }
 }

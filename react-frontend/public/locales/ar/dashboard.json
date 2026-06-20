@@ -42,7 +42,8 @@
     "upcoming_events": "الفعاليات القادمة",
     "your_progress": "تقدمك",
     "pending_reviews": "المراجعات المعلقة",
-    "endorsements": "التوصيات"
+    "endorsements": "التوصيات",
+    "exchanges_attention": "يتطلب انتباهك"
   },
   "view_all": "عرض الكل",
   "view_all_caps": "عرض الكل",
@@ -120,7 +121,9 @@
     "view_achievements": "عرض الإنجازات",
     "browse_all_listings": "تصفح جميع الإعلانات",
     "view_all_endorsements": "عرض جميع التزكيات",
-    "view_pending_reviews": "عرض جميع التقييمات المعلقة"
+    "view_pending_reviews": "عرض جميع التقييمات المعلقة",
+    "loading_exchanges_attention": "جارٍ تحميل التبادلات التي تتطلب الانتباه",
+    "view_exchanges_attention": "عرض جميع التبادلات"
   },
   "reviews": {
     "sent": "أرسل {{amount}} ساعة",
@@ -132,5 +135,16 @@
     "view_all_pending": "عرض جميع المعلقة"
   },
   "likes_count": "{{count}} likes",
-  "comments_count": "{{count}} comments"
+  "comments_count": "{{count}} comments",
+  "exchanges_attention": {
+    "none": "أنت على اطلاع بكل شيء",
+    "none_description": "ستظهر هنا التبادلات التي تتطلب إجراءً منك.",
+    "action": {
+      "accept": "قبول",
+      "confirm": "تأكيد",
+      "review": "تقييم",
+      "view": "عرض"
+    },
+    "view_all": "عرض جميع التبادلات"
+  }
 }

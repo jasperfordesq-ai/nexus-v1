@@ -35,7 +35,6 @@ import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import UserPlus from 'lucide-react/icons/user-plus';
 import Award from 'lucide-react/icons/award';
-import Star from 'lucide-react/icons/star';
 import ThumbsUp from 'lucide-react/icons/thumbs-up';
 import { GlassCard, Progress, Button, Chip, Avatar, Skeleton } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
@@ -82,7 +81,6 @@ interface DashboardStats {
   walletBalance: WalletBalance | null;
   recentListings: Listing[];
   activeListingsCount: number;
-  pendingTransactions: number;
   gamification: GamificationProfile | null;
   recentActivity: FeedActivityItem[];
   suggestedListings: Listing[];
@@ -182,13 +180,14 @@ export function DashboardPage() {
   const hasEvents = useFeature('events');
   const hasGroups = useFeature('groups');
   const hasConnections = useFeature('connections');
+  const hasExchangeWorkflow = useFeature('exchange_workflow');
   const hasCaringCommunity = useFeature(CARING_COMMUNITY_ROUTE.feature);
   const hasFeedModule = useModule('feed');
   const hasListingsModule = useModule('listings');
   const hasProfileModule = useModule('profile');
 
   const [stats, setStats] = useState<DashboardStats>({
-    walletBalance: null, recentListings: [], activeListingsCount: 0, pendingTransactions: 0,
+    walletBalance: null, recentListings: [], activeListingsCount: 0,
     gamification: null, recentActivity: [], suggestedListings: [], myGroups: [],
     upcomingEvents: [], myEndorsements: [],
   });
@@ -211,7 +210,6 @@ export function DashboardPage() {
       const coreRequests = [
         api.get<WalletBalance>('/v2/wallet/balance').catch(() => null),
         api.get<Listing[]>(`/v2/listings?user_id=${user?.id}&per_page=5`).catch(() => null),
-        api.get<{ count: number }>('/v2/wallet/pending-count').catch(() => null),
       ];
 
       const optionalRequests: Array<{ key: string; promise: Promise<unknown> }> = [];
@@ -227,10 +225,8 @@ export function DashboardPage() {
 
       const walletRes = results[0]?.status === 'fulfilled' ? results[0].value : null;
       const listingsRes = results[1]?.status === 'fulfilled' ? results[1].value : null;
-      const pendingRes = results[2]?.status === 'fulfilled' ? results[2].value : null;
       const walletData = walletRes as { success?: boolean; data?: WalletBalance } | null;
       const listingsData = listingsRes as { success?: boolean; data?: Listing[]; meta?: { total_items?: number } } | null;
-      const pendingData = pendingRes as { success?: boolean; data?: { count: number } } | null;
 
       const optionalResults: Record<string, unknown> = {};
       optionalRequests.forEach((req, index) => {
@@ -261,7 +257,6 @@ export function DashboardPage() {
         walletBalance: walletData?.success ? walletData.data ?? null : null,
         recentListings: listingsData?.success ? listingsData.data ?? [] : [],
         activeListingsCount: listingsCount,
-        pendingTransactions: pendingData?.success ? pendingData.data?.count ?? 0 : 0,
         gamification: gamificationData, recentActivity: activityData, suggestedListings: suggestedData,
         myGroups: groupsData, upcomingEvents: eventsData, myEndorsements: endorsementsData,
       });
@@ -364,11 +359,10 @@ export function DashboardPage() {
         )}
 
         {/* Stats Grid */}
-        <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+        <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
           <StatCard icon={<Wallet className="w-5 h-5" aria-hidden="true" />} label={t('stats.balance')} value={walletBalanceValue} color="indigo" href="/wallet" isLoading={isLoading} />
           <StatCard icon={<ListTodo className="w-5 h-5" aria-hidden="true" />} label={t('stats.active_listings')} value={stats.activeListingsCount.toString()} color="emerald" href="/listings" isLoading={isLoading} />
           <StatCard icon={<MessageSquare className="w-5 h-5" aria-hidden="true" />} label={t('stats.messages')} value={notificationCounts.messages.toString()} color="amber" href="/messages" isLoading={isLoading} />
-          <StatCard icon={<Clock className="w-5 h-5" aria-hidden="true" />} label={t('stats.pending')} value={stats.pendingTransactions.toString()} color="rose" href="/wallet" isLoading={isLoading} />
         </motion.div>
 
         {/* FLAT 2-COLUMN GRID — V2 layout (no sidebar) */}
@@ -650,10 +644,12 @@ export function DashboardPage() {
             </motion.div>
           )}
 
-          {/* Pending Reviews (span 1) */}
-          <motion.div variants={itemVariants} className="md:col-span-1">
-            <PendingReviewsCard />
-          </motion.div>
+          {/* Exchanges needing your attention (span 1) */}
+          {hasExchangeWorkflow && (
+            <motion.div variants={itemVariants} className="md:col-span-1">
+              <ExchangesAttentionCard />
+            </motion.div>
+          )}
 
           {/* Quick Actions (full width) */}
           <motion.div variants={itemVariants} className="md:col-span-2">
@@ -720,61 +716,70 @@ function QuickActionLink({ to, icon, label }: QuickActionLinkProps) {
   );
 }
 
-// Pending Reviews Card
+// Exchanges Needing Attention Card
+//
+// Driven by the exchange WORKFLOW (GET /v2/exchanges/needs-attention-count →
+// ExchangeService::countNeedingAttention), NOT raw wallet transactions: a request
+// to accept, a completion to confirm, or a completed exchange to review. Stays
+// empty unless a genuine exchange is waiting on the member.
 
-interface PendingReview {
-  exchange_id: number;
-  exchange_title?: string | null;
-  receiver_id: number;
-  receiver_name: string;
-  receiver_avatar?: string | null;
-  transaction_id?: number | null;
-  completed_at?: string | null;
+interface AttentionExchange {
+  id: number;
+  status: string;
+  action: 'accept' | 'confirm' | 'review' | 'view';
+  listing_title?: string | null;
+  counterparty_name: string;
+  counterparty_avatar?: string | null;
 }
 
-function PendingReviewsCard() {
+function ExchangesAttentionCard() {
   const { tenantPath } = useTenant();
   const { t } = useTranslation('dashboard');
-  const [pending, setPending] = useState<PendingReview[]>([]);
+  const [items, setItems] = useState<AttentionExchange[]>([]);
+  const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPending = async () => {
+    const fetchAttention = async () => {
       try {
-        const response = await api.get<PendingReview[]>('/v2/reviews/pending');
-        setPending(Array.isArray(response.data) ? response.data.slice(0, 3) : []);
+        const response = await api.get<{ count: number; items: AttentionExchange[] }>('/v2/exchanges/needs-attention-count');
+        const data = response.data;
+        setCount(typeof data?.count === 'number' ? data.count : 0);
+        setItems(Array.isArray(data?.items) ? data.items.slice(0, 3) : []);
       } catch (error) {
-        logError('Failed to fetch pending reviews', { error });
+        logError('Failed to fetch exchanges needing attention', { error });
       } finally { setLoading(false); }
     };
-    fetchPending();
+    fetchAttention();
   }, []);
+
+  const header = (
+    <div className="flex items-center gap-2.5 mb-4">
+      <SectionIcon color="amber"><Clock className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" /></SectionIcon>
+      <h2 className="text-lg font-semibold text-theme-primary">{t('sections.exchanges_attention')}</h2>
+      {count > 0 && <Chip size="sm" color="warning" variant="soft" className="ml-auto">{count}</Chip>}
+    </div>
+  );
 
   if (loading) {
     return (
       <GlassCard className="h-full p-5 sm:p-6">
-        <div className="flex items-center gap-2.5 mb-4">
-          <SectionIcon color="amber"><Star className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" /></SectionIcon>
-          <h2 className="text-lg font-semibold text-theme-primary">{t('sections.pending_reviews')}</h2>
-        </div>
-        <div aria-label={t('aria.loading_pending_reviews')} role="status" aria-busy="true" className="space-y-3">
+        {header}
+        <div aria-label={t('aria.loading_exchanges_attention')} role="status" aria-busy="true" className="space-y-3">
           {Array.from({ length: 2 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-16 rounded-lg bg-surface-tertiary" /></Skeleton>))}
         </div>
       </GlassCard>
     );
   }
 
-  if (pending.length === 0) {
+  if (count === 0) {
     return (
       <GlassCard className="h-full p-5 sm:p-6">
-        <div className="flex items-center gap-2.5 mb-4">
-          <SectionIcon color="amber"><Star className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" /></SectionIcon>
-          <h2 className="text-lg font-semibold text-theme-primary">{t('sections.pending_reviews')}</h2>
-        </div>
+        {header}
         <DashboardEmptyState
-          icon={<Star className="h-10 w-10" aria-hidden="true" />}
-          title={t('reviews.none_pending')}
-          description={t('reviews.none_pending_description')}
+          icon={<Clock className="h-10 w-10" aria-hidden="true" />}
+          title={t('exchanges_attention.none')}
+          description={t('exchanges_attention.none_description')}
         />
       </GlassCard>
     );
@@ -782,34 +787,23 @@ function PendingReviewsCard() {
 
   return (
     <GlassCard className="h-full p-5 sm:p-6">
-      <div className="flex items-center gap-2.5 mb-4">
-        <SectionIcon color="amber"><Star className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" /></SectionIcon>
-        <h2 className="text-lg font-semibold text-theme-primary">{t('sections.pending_reviews')}</h2>
-        <Chip size="sm" color="warning" variant="soft" className="ml-auto">{pending.length}</Chip>
-      </div>
+      {header}
       <div className="divide-y divide-[var(--glass-border)]">
-        {pending.map((review) => (
-          <Link key={review.exchange_id} to={tenantPath('/reviews')} className="block py-3 first:pt-0 last:pb-0 group">
-            <div className="flex items-center justify-between gap-2 mb-1">
-              <span className="text-sm font-medium text-theme-primary group-hover:text-[var(--color-primary)] transition-colors">{review.receiver_name}</span>
-              {review.completed_at && <span className="text-xs text-theme-subtle">{formatRelativeTime(review.completed_at)}</span>}
-            </div>
-            <div className="flex items-center gap-3 mt-2">
-              <Avatar src={resolveAvatarUrl(review.receiver_avatar) ?? undefined} name={review.receiver_name} size="sm" className="w-7 h-7 shrink-0" />
+        {items.map((item) => (
+          <Link key={item.id} to={tenantPath(`/exchanges/${item.id}`)} className="block py-3 first:pt-0 last:pb-0 group">
+            <div className="flex items-center gap-3 mt-1">
+              <Avatar src={resolveAvatarUrl(item.counterparty_avatar) ?? undefined} name={item.counterparty_name} size="sm" className="w-7 h-7 shrink-0" />
               <div className="min-w-0 flex-1">
-                {review.exchange_title ? (
-                  <p className="text-xs text-theme-subtle line-clamp-1">{review.exchange_title}</p>
-                ) : (
-                  <p className="text-xs text-theme-subtle">{t('reviews.pending_subtitle')}</p>
-                )}
+                <span className="block text-sm font-medium text-theme-primary group-hover:text-[var(--color-primary)] transition-colors line-clamp-1">{item.counterparty_name}</span>
+                {item.listing_title && <p className="text-xs text-theme-subtle line-clamp-1">{item.listing_title}</p>}
               </div>
-              <span className="text-xs text-amber-600 dark:text-amber-400 ml-auto flex items-center gap-1 shrink-0"><Star className="w-3 h-3" aria-hidden="true" />{t('reviews.review')}</span>
+              <Chip size="sm" color="warning" variant="soft" className="shrink-0">{t(`exchanges_attention.action.${item.action}`)}</Chip>
             </div>
           </Link>
         ))}
       </div>
-      <Link to={tenantPath('/reviews')} className="mt-4 block rounded-lg py-1 text-center text-sm text-[var(--color-primary)] transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]" aria-label={t('aria.view_pending_reviews')}>
-        {t('reviews.view_all_pending')} <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" aria-hidden="true" />
+      <Link to={tenantPath('/exchanges')} className="mt-4 block rounded-lg py-1 text-center text-sm text-[var(--color-primary)] transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]" aria-label={t('aria.view_exchanges_attention')}>
+        {t('exchanges_attention.view_all')} <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" aria-hidden="true" />
       </Link>
     </GlassCard>
   );

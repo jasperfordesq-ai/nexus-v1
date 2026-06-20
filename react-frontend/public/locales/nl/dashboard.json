@@ -42,7 +42,8 @@
     "upcoming_events": "Aankomende evenementen",
     "your_progress": "Jouw voortgang",
     "pending_reviews": "In afwachting van beoordelingen",
-    "endorsements": "Aanbevelingen"
+    "endorsements": "Aanbevelingen",
+    "exchanges_attention": "Vraagt om uw aandacht"
   },
   "view_all": "Bekijk alles",
   "view_all_caps": "Bekijk alles",
@@ -120,7 +121,9 @@
     "view_achievements": "Bekijk prestaties",
     "browse_all_listings": "Blader door alle advertenties",
     "view_all_endorsements": "Bekijk alle aanbevelingen",
-    "view_pending_reviews": "Bekijk alle openstaande beoordelingen"
+    "view_pending_reviews": "Bekijk alle openstaande beoordelingen",
+    "loading_exchanges_attention": "Uitwisselingen die aandacht vereisen worden geladen",
+    "view_exchanges_attention": "Alle uitwisselingen bekijken"
   },
   "reviews": {
     "sent": "Verzonden {{amount}}h",
@@ -132,5 +135,16 @@
     "view_all_pending": "Alle openstaande bekijken"
   },
   "likes_count": "{{count}} likes",
-  "comments_count": "{{count}} comments"
+  "comments_count": "{{count}} comments",
+  "exchanges_attention": {
+    "none": "U bent helemaal bij",
+    "none_description": "Uitwisselingen die uw actie vereisen verschijnen hier.",
+    "action": {
+      "accept": "Accepteren",
+      "confirm": "Bevestigen",
+      "review": "Beoordelen",
+      "view": "Bekijken"
+    },
+    "view_all": "Alle uitwisselingen bekijken"
+  }
 }

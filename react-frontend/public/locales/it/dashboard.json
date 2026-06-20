@@ -42,7 +42,8 @@
     "upcoming_events": "Prossimi Eventi",
     "your_progress": "Il Suo Progresso",
     "pending_reviews": "Recensioni in Attesa",
-    "endorsements": "Referenze"
+    "endorsements": "Referenze",
+    "exchanges_attention": "Richiede la tua attenzione"
   },
   "view_all": "Vedi tutto",
   "view_all_caps": "Vedi Tutto",
@@ -120,7 +121,9 @@
     "view_achievements": "Vedi i traguardi",
     "browse_all_listings": "Sfoglia tutti gli annunci",
     "view_all_endorsements": "Vedi tutte le segnalazioni",
-    "view_pending_reviews": "Vedi tutte le recensioni in attesa"
+    "view_pending_reviews": "Vedi tutte le recensioni in attesa",
+    "loading_exchanges_attention": "Caricamento degli scambi che richiedono attenzione",
+    "view_exchanges_attention": "Visualizza tutti gli scambi"
   },
   "reviews": {
     "sent": "Inviato {{amount}}h",
@@ -132,5 +135,16 @@
     "view_all_pending": "Vedi tutti i pendenti"
   },
   "likes_count": "{{count}} likes",
-  "comments_count": "{{count}} comments"
+  "comments_count": "{{count}} comments",
+  "exchanges_attention": {
+    "none": "Sei in pari",
+    "none_description": "Gli scambi che richiedono un'azione appariranno qui.",
+    "action": {
+      "accept": "Accetta",
+      "confirm": "Conferma",
+      "review": "Valuta",
+      "view": "Visualizza"
+    },
+    "view_all": "Visualizza tutti gli scambi"
+  }
 }

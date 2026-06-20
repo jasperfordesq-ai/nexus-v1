@@ -42,7 +42,8 @@
     "upcoming_events": "今後のイベント",
     "your_progress": "あなたの進捗",
     "pending_reviews": "保留中のレビュー",
-    "endorsements": "推薦"
+    "endorsements": "推薦",
+    "exchanges_attention": "対応が必要"
   },
   "view_all": "すべて表示",
   "view_all_caps": "すべて表示",
@@ -120,7 +121,9 @@
     "view_achievements": "達成項目を表示",
     "browse_all_listings": "すべてのリスティングを閲覧",
     "view_all_endorsements": "すべての推薦を表示",
-    "view_pending_reviews": "保留中のレビューをすべて表示"
+    "view_pending_reviews": "保留中のレビューをすべて表示",
+    "loading_exchanges_attention": "対応が必要な交換を読み込み中",
+    "view_exchanges_attention": "すべての交換を表示"
   },
   "reviews": {
     "sent": "{{amount}}hを送信しました",
@@ -132,5 +135,16 @@
     "view_all_pending": "保留中をすべて表示"
   },
   "likes_count": "{{count}} likes",
-  "comments_count": "{{count}} comments"
+  "comments_count": "{{count}} comments",
+  "exchanges_attention": {
+    "none": "すべて対応済みです",
+    "none_description": "対応が必要な交換はここに表示されます。",
+    "action": {
+      "accept": "承認",
+      "confirm": "確認",
+      "review": "レビュー",
+      "view": "表示"
+    },
+    "view_all": "すべての交換を表示"
+  }
 }

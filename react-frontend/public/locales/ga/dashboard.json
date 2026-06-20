@@ -42,7 +42,8 @@
     "upcoming_events": "Imeachtaí atá le Teacht",
     "your_progress": "Do Dhul Chun Cinn",
     "pending_reviews": "Léirmheasanna ar Feitheamh",
-    "endorsements": "Tacaíochtaí"
+    "endorsements": "Tacaíochtaí",
+    "exchanges_attention": "Ag teastáil d'aird"
   },
   "view_all": "Féach ar gach",
   "view_all_caps": "Féach ar Gach",
@@ -120,7 +121,9 @@
     "view_achievements": "Féach ar na héachtaí",
     "browse_all_listings": "Brabhsáil na liostaí go léir",
     "view_all_endorsements": "Féach ar na formhuinithe go léir",
-    "view_pending_reviews": "Féach ar na hathbhreithnithe ar feitheamh ar fad"
+    "view_pending_reviews": "Féach ar na hathbhreithnithe ar feitheamh ar fad",
+    "loading_exchanges_attention": "Ag lódáil malartuithe a dteastaíonn aird",
+    "view_exchanges_attention": "Féach ar gach malartú"
   },
   "reviews": {
     "sent": "Seolta {{amount}}u",
@@ -132,5 +135,16 @@
     "view_all_pending": "Féach ar Gach Ceann Ar Feitheamh"
   },
   "likes_count": "{{count}} likes",
-  "comments_count": "{{count}} comments"
+  "comments_count": "{{count}} comments",
+  "exchanges_attention": {
+    "none": "Tá tú suas chun dáta",
+    "none_description": "Taispeánfar anseo malartuithe a dteastaíonn gníomh uait.",
+    "action": {
+      "accept": "Glac",
+      "confirm": "Deimhnigh",
+      "review": "Léirmheas",
+      "view": "Féach"
+    },
+    "view_all": "Féach ar gach malartú"
+  }
 }

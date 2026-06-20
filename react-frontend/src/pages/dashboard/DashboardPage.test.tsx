@@ -128,19 +128,22 @@ function buildApiResponse(endpoint: string) {
       return { success: true, data: [] };
     case '/v2/members/1/endorsements':
       return { success: true, data: { endorsements: [] } };
-    case '/v2/reviews/pending':
+    case '/v2/exchanges/needs-attention-count':
       return {
         success: true,
-        data: [
-          {
-            exchange_id: 21,
-            exchange_title: 'Garden exchange',
-            receiver_id: 2,
-            receiver_name: 'Morgan',
-            receiver_avatar: null,
-            completed_at: '2026-04-20T09:00:00Z',
-          },
-        ],
+        data: {
+          count: 1,
+          items: [
+            {
+              id: 21,
+              status: 'pending_provider',
+              action: 'accept',
+              listing_title: 'Garden exchange',
+              counterparty_name: 'Morgan',
+              counterparty_avatar: null,
+            },
+          ],
+        },
       };
     default:
       return { success: true, data: [] };
@@ -203,7 +206,8 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Active Listings')).toBeInTheDocument();
     // "Messages" appears in both stat card and quick actions
     expect(screen.getAllByText('Messages').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Pending').length).toBeGreaterThanOrEqual(1);
+    // The dead always-zero "Pending" wallet stat was removed.
+    expect(screen.queryByText('Pending')).not.toBeInTheDocument();
   });
 
   it('renders Quick Actions section', () => {
@@ -244,12 +248,14 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Create Listing')).toBeInTheDocument();
   });
 
-  it('renders pending reviews from the direct array payload', async () => {
+  it('renders exchanges needing attention from the workflow endpoint', async () => {
     render(<DashboardPage />);
 
     expect(await screen.findByText('Morgan')).toBeInTheDocument();
     expect(screen.getByText('Garden exchange')).toBeInTheDocument();
-    expect(screen.getByText('View All Pending')).toBeInTheDocument();
+    // Action chip + footer link from the new exchange-workflow card.
+    expect(screen.getByText('Accept')).toBeInTheDocument();
+    expect(screen.getByText('View all exchanges')).toBeInTheDocument();
   });
 
   it('falls back to 0% when gamification progress is missing', async () => {

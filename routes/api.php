@@ -144,6 +144,7 @@ Route::get('/v2/explore/analytics', [\App\Http\Controllers\Api\ExploreController
 // ============================================
 Route::get('/v2/exchanges/config', [\App\Http\Controllers\Api\ExchangesController::class, 'config']);
 Route::get('/v2/exchanges/check', [\App\Http\Controllers\Api\ExchangesController::class, 'check']);
+Route::get('/v2/exchanges/needs-attention-count', [\App\Http\Controllers\Api\ExchangesController::class, 'needsAttentionCount']);
 Route::get('/v2/exchanges', [\App\Http\Controllers\Api\ExchangesController::class, 'index']);
 Route::post('/v2/exchanges', [\App\Http\Controllers\Api\ExchangesController::class, 'store']);
 Route::get('/v2/exchanges/{id}', [\App\Http\Controllers\Api\ExchangesController::class, 'show']);

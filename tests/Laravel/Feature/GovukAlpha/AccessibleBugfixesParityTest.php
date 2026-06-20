@@ -265,6 +265,11 @@ class AccessibleBugfixesParityTest extends TestCase
         $requester = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
 
+        // User::factory()->forTenant()->create() clobbers TenantContext as a side
+        // effect; re-assert the test tenant before exercising the service.
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
         $svc = app(\App\Services\ExchangeService::class);
 
         // A pending_provider request to $provider counts for the provider…
@@ -280,6 +285,32 @@ class AccessibleBugfixesParityTest extends TestCase
         // Wallet transactions never count.
         $this->seedCompletedPeerTransaction($provider->id, $requester->id);
         $this->assertSame(1, $svc->countNeedingAttention($provider->id));
+    }
+
+    public function test_exchange_get_needing_attention_shapes_items_for_the_card(): void
+    {
+        $provider = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Provider P']);
+        $requester = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Requester R']);
+
+        $this->seedExchange($requester->id, $provider->id, 'pending_provider');
+
+        // User::factory()->forTenant()->create() clobbers TenantContext as a side
+        // effect; re-assert the test tenant before exercising the service (in a real
+        // request, middleware keeps the tenant stable).
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        $svc = app(\App\Services\ExchangeService::class);
+        $items = $svc->getNeedingAttention($provider->id, 5);
+
+        $this->assertCount(1, $items);
+        $this->assertSame('accept', $items[0]['action']);            // provider must accept
+        $this->assertSame('pending_provider', $items[0]['status']);
+        $this->assertSame('Requester R', $items[0]['counterparty_name']); // the OTHER party
+        $this->assertSame('Attention test listing', $items[0]['listing_title']);
+
+        // The requester (not their move) gets nothing.
+        $this->assertSame([], $svc->getNeedingAttention($requester->id, 5));
     }
 
     public function test_account_hub_hides_gamification_links_when_feature_disabled(): void

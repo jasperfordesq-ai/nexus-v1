@@ -65,6 +65,26 @@ class ExchangesController extends BaseApiController
         ] : null);
     }
 
+    /**
+     * GET /api/v2/exchanges/needs-attention-count — exchanges genuinely waiting on
+     * the user to act (accept a request, confirm completion, or review a completed
+     * exchange). Drives the dashboard "needs your attention" card. Returns a count
+     * plus a short preview list. Never counts raw wallet transactions.
+     */
+    public function needsAttentionCount(): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        if (!$this->brokerControlConfigService->isExchangeWorkflowEnabled()) {
+            return $this->respondWithData(['count' => 0, 'items' => []]);
+        }
+
+        return $this->respondWithData([
+            'count' => $this->exchangeService->countNeedingAttention($userId),
+            'items' => $this->exchangeService->getNeedingAttention($userId, 5),
+        ]);
+    }
+
     /** GET /api/v2/exchanges — list user's exchanges */
     public function index(): JsonResponse
     {
