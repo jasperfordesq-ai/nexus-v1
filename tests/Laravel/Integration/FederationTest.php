@@ -283,18 +283,88 @@ class FederationTest extends TestCase
 
     public function test_federation_cross_tenant_messaging_gating(): void
     {
-        $this->markTestIncomplete(
-            'Cross-tenant messaging requires full federation setup with bidirectional whitelist, '
-            . 'message routing, and Pusher/FCM mocking — skipping for now.'
+        // Enable federation system-wide + whitelist tenant A so the gate reaches the
+        // per-tenant sub-feature branch, then disable the MESSAGING sub-feature only.
+        $this->setSystemFederationEnabled(true);
+        DB::table('federation_tenant_whitelist')->updateOrInsert(
+            ['tenant_id' => $this->tenantAId],
+            ['approved_at' => now(), 'approved_by' => 1]
         );
+        DB::table('federation_tenant_features')->updateOrInsert(
+            ['tenant_id' => $this->tenantAId, 'feature_key' => FederationFeatureService::TENANT_FEDERATION_ENABLED],
+            ['is_enabled' => 1, 'updated_at' => now()]
+        );
+        DB::table('federation_tenant_features')->updateOrInsert(
+            ['tenant_id' => $this->tenantAId, 'feature_key' => FederationFeatureService::TENANT_MESSAGING_ENABLED],
+            ['is_enabled' => 0, 'updated_at' => now()]
+        );
+        DB::table('federation_system_control')->where('id', 1)->update([
+            'cross_tenant_messaging_enabled' => 1,
+        ]);
+
+        $user = User::factory()->forTenant($this->tenantAId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($user, ['*']);
+        \App\Core\TenantContext::setById($this->tenantAId);
+        $this->app->make(FederationFeatureService::class)->clearCache();
+
+        $response = $this->apiPost('/v2/federation/messages', [
+            'receiver_id'        => 999,
+            'receiver_tenant_id' => $this->tenantBId,
+            'body'               => 'hello',
+        ]);
+
+        // Messaging sub-feature disabled → the gate must 403 before any routing/Pusher.
+        $this->assertSame(403, $response->getStatusCode(),
+            'Tenant messaging sub-feature gate must block with HTTP 403');
+        $this->assertStringContainsString('Federation feature disabled', (string) $response->getContent(),
+            'Response should carry the feature-disabled message');
     }
 
     public function test_federation_cross_tenant_transactions_gating(): void
     {
-        $this->markTestIncomplete(
-            'Cross-tenant transactions require exchange workflow + federation wallet bridging — '
-            . 'too complex for automated integration test without real federation infrastructure.'
+        // Enable federation system-wide + whitelist tenant A so the gate reaches the
+        // per-tenant sub-feature branch, then disable the TRANSACTIONS sub-feature only.
+        $this->setSystemFederationEnabled(true);
+        DB::table('federation_tenant_whitelist')->updateOrInsert(
+            ['tenant_id' => $this->tenantAId],
+            ['approved_at' => now(), 'approved_by' => 1]
         );
+        DB::table('federation_tenant_features')->updateOrInsert(
+            ['tenant_id' => $this->tenantAId, 'feature_key' => FederationFeatureService::TENANT_FEDERATION_ENABLED],
+            ['is_enabled' => 1, 'updated_at' => now()]
+        );
+        DB::table('federation_tenant_features')->updateOrInsert(
+            ['tenant_id' => $this->tenantAId, 'feature_key' => FederationFeatureService::TENANT_TRANSACTIONS_ENABLED],
+            ['is_enabled' => 0, 'updated_at' => now()]
+        );
+        DB::table('federation_system_control')->where('id', 1)->update([
+            'cross_tenant_transactions_enabled' => 1,
+        ]);
+
+        $user = User::factory()->forTenant($this->tenantAId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($user, ['*']);
+        \App\Core\TenantContext::setById($this->tenantAId);
+        $this->app->make(FederationFeatureService::class)->clearCache();
+
+        // Whole-hour amount; the gate fires before amount validation / wallet logic.
+        $response = $this->apiPost('/v2/federation/transactions', [
+            'receiver_id'        => 999,
+            'receiver_tenant_id' => $this->tenantBId,
+            'amount'             => 1,
+            'description'        => 'cross-tenant test transfer',
+        ]);
+
+        // Transactions sub-feature disabled → the gate must 403 before any wallet move.
+        $this->assertSame(403, $response->getStatusCode(),
+            'Tenant transactions sub-feature gate must block with HTTP 403');
+        $this->assertStringContainsString('Federation feature disabled', (string) $response->getContent(),
+            'Response should carry the feature-disabled message');
     }
 
     /**
