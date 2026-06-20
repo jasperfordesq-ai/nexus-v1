@@ -402,4 +402,47 @@ class ExchangeWorkflowTest extends TestCase
 
         $this->assertEquals(200, $response->getStatusCode());
     }
+
+    public function test_createRequest_returns_null_for_self_exchange(): void
+    {
+        // A user cannot create an exchange request against their own listing
+        // (would let them credit themselves). createRequest must return null.
+        $provider = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $listing = Listing::factory()->forTenant($this->testTenantId)->offer()->create([
+            'user_id' => $provider->id,
+        ]);
+
+        // Re-pin so the tenant-scoped Listing lookup finds the listing and the
+        // self-exchange guard (not a not-found) is what produces the null.
+        \App\Core\TenantContext::setById($this->testTenantId);
+
+        $this->assertNull(
+            ExchangeWorkflowService::createRequest((int) $provider->id, (int) $listing->id, ['proposed_hours' => 1.00]),
+            'createRequest must reject a self-exchange (requester == listing owner)'
+        );
+    }
+
+    public function test_cancelExchange_rejects_a_terminal_exchange(): void
+    {
+        // A completed exchange is terminal: cancelExchange must refuse it and never
+        // reverse a settled money movement.
+        $scenario = $this->createExchangeScenario([
+            'provider'  => ['status' => 'active', 'is_approved' => true],
+            'requester' => ['status' => 'active', 'is_approved' => true],
+            'exchange'  => ['status' => 'completed'],
+        ]);
+
+        \App\Core\TenantContext::setById($this->testTenantId);
+
+        $this->assertFalse(
+            ExchangeWorkflowService::cancelExchange((int) $scenario['exchange']->id, (int) $scenario['requester']->id),
+            'A completed (terminal) exchange cannot be cancelled'
+        );
+
+        $scenario['exchange']->refresh();
+        $this->assertSame('completed', $scenario['exchange']->status);
+    }
 }

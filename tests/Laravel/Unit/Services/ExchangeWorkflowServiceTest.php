@@ -27,20 +27,12 @@ class ExchangeWorkflowServiceTest extends TestCase
         $this->assertEquals('expired', ExchangeWorkflowService::STATUS_EXPIRED);
     }
 
-    public function test_createRequest_returns_null_for_self_exchange(): void
-    {
-        $this->markTestIncomplete('Requires Eloquent model mocking for Listing::find()');
-    }
-
-    public function test_acceptRequest_rejects_wrong_provider(): void
-    {
-        $this->markTestIncomplete('Requires Eloquent model mocking for ExchangeRequest::find()');
-    }
-
-    public function test_cancelExchange_rejects_terminal_status(): void
-    {
-        $this->markTestIncomplete('Requires Eloquent model mocking for ExchangeRequest::find()');
-    }
+    // The createRequest self-exchange guard, acceptRequest wrong-provider guard, and
+    // cancelExchange terminal-status guard need real Eloquent models, so they are
+    // covered against the real DB in tests/Laravel/Integration/ExchangeWorkflowTest.php
+    // (test_createRequest_returns_null_for_self_exchange,
+    //  test_only_provider_can_accept_exchange [API level],
+    //  test_cancelExchange_rejects_a_terminal_exchange) — not stubbed here.
 
     public function test_getExchange_returns_null_when_not_found(): void
     {
