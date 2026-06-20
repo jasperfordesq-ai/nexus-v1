@@ -101,44 +101,18 @@ class WalletApiControllerTest extends LegacyBridgeTestCase
     }
 
     // ===== Transfer Validation Tests =====
-
-    /**
-     * Test that transfer requires positive amount
-     */
-    public function testTransferRequiresPositiveAmount(): void
-    {
-        $amount = 0;
-        $this->assertLessThanOrEqual(0, $amount, 'Zero amount should fail validation');
-
-        $negativeAmount = -10;
-        $this->assertLessThan(0, $negativeAmount, 'Negative amount should fail validation');
-    }
-
-    /**
-     * Test that transfer fails with insufficient funds
-     */
-    public function testTransferFailsWithInsufficientFunds(): void
-    {
-        $sender = User::withoutGlobalScopes()->findOrFail($this->testSenderId);
-        $excessiveAmount = (float) $sender->balance + 100;
-
-        $this->assertGreaterThan(
-            $sender->balance,
-            $excessiveAmount,
-            'Amount exceeds balance - should fail validation'
-        );
-    }
-
-    /**
-     * Test that user cannot transfer to self
-     */
-    public function testCannotTransferToSelf(): void
-    {
-        $senderId = $this->testSenderId;
-        $receiverId = $this->testSenderId; // Same as sender
-
-        $this->assertEquals($senderId, $receiverId, 'Self-transfer should be detected and rejected');
-    }
+    //
+    // Validation of zero/negative amounts, insufficient funds, self-transfer, and
+    // cross-tenant transfers is covered with REAL assertions (exceptions + balance
+    // rollback) at the service layer by:
+    //   - Tests\Laravel\Feature\Services\WalletServiceTest
+    //   - Tests\Laravel\Feature\Services\WalletServiceEdgeCasesTest
+    //
+    // The three methods previously here (testTransferRequiresPositiveAmount,
+    // testTransferFailsWithInsufficientFunds, testCannotTransferToSelf) were
+    // arithmetic tautologies (e.g. assertLessThanOrEqual(0, 0)) that never called
+    // WalletService::transfer() and could not detect a regression. Removed to
+    // avoid false confidence.
 
     // ===== User Lookup Tests =====
 

@@ -132,7 +132,13 @@ class MarketplaceCardCheckoutParityTest extends TestCase
         ];
         // Must be a no-op (no exception, no Stripe call).
         MarketplacePaymentService::handleWebhookEvent('checkout.session.completed', $session);
-        $this->assertTrue(true);
+
+        // The handler returned early at the non-marketplace guard (nexus_type is
+        // 'subscription' and there is no nexus_order_id), so confirmPayment() was
+        // never reached — no marketplace_payments row was written.
+        $this->assertDatabaseMissing('marketplace_payments', [
+            'stripe_payment_intent_id' => 'pi_test_x',
+        ]);
     }
 
     public function test_webhook_noop_when_order_missing(): void
@@ -146,7 +152,15 @@ class MarketplaceCardCheckoutParityTest extends TestCase
         ];
         // No local order → logged + returns, never reaching confirmPayment/Stripe.
         MarketplacePaymentService::handleWebhookEvent('checkout.session.completed', $session);
-        $this->assertTrue(true);
+
+        // No MarketplaceOrder with id=99999999 exists, so confirmPayment() was never
+        // called: no payment row written and no phantom order created.
+        $this->assertDatabaseMissing('marketplace_payments', [
+            'stripe_payment_intent_id' => 'pi_test_y',
+        ]);
+        $this->assertDatabaseMissing('marketplace_orders', [
+            'id' => 99999999,
+        ]);
     }
 
     public function test_webhook_noop_when_unpaid(): void
@@ -158,7 +172,12 @@ class MarketplaceCardCheckoutParityTest extends TestCase
             'metadata' => (object) ['nexus_type' => 'marketplace', 'nexus_order_id' => '1'],
         ];
         MarketplacePaymentService::handleWebhookEvent('checkout.session.completed', $session);
-        $this->assertTrue(true);
+
+        // The handler returned early at the payment_status !== 'paid' guard, so
+        // confirmPayment() was never reached — no marketplace_payments row exists.
+        $this->assertDatabaseMissing('marketplace_payments', [
+            'stripe_payment_intent_id' => 'pi_test_z',
+        ]);
     }
 
     public function test_webhook_throws_to_retry_when_paid_but_pi_not_linked(): void
@@ -187,6 +206,15 @@ class MarketplaceCardCheckoutParityTest extends TestCase
             'metadata' => (object) ['nexus_order_id' => '88888888'],
         ];
         MarketplacePaymentService::handleWebhookEvent('checkout.session.completed', $session);
-        $this->assertTrue(true);
+
+        // nexus_order_id present but no nexus_type → treated as marketplace
+        // (defence-in-depth); order 88888888 does not exist, so the handler
+        // returned early after find() returned null — nothing recorded.
+        $this->assertDatabaseMissing('marketplace_payments', [
+            'stripe_payment_intent_id' => 'pi_test_v',
+        ]);
+        $this->assertDatabaseMissing('marketplace_orders', [
+            'id' => 88888888,
+        ]);
     }
 }
