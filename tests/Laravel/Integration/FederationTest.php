@@ -63,8 +63,13 @@ class FederationTest extends TestCase
 
         $response = $this->apiGet('/v2/federation/status');
 
-        // Should return 200 with federation status, or 403/404 if feature is disabled
-        $this->assertContains($response->getStatusCode(), [200, 403, 404]);
+        // status() is auth-gated only (no feature gate) -> always 200 with the hub payload.
+        $this->assertSame(200, $response->getStatusCode());
+        $data = $response->json('data');
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('enabled', $data);
+        $this->assertArrayHasKey('tenant_federation_enabled', $data);
+        $this->assertIsBool($data['enabled']);
     }
 
     public function test_federation_requires_system_level_enable(): void
@@ -76,18 +81,11 @@ class FederationTest extends TestCase
 
         $response = $this->apiGet('/v2/federation/partners');
 
-        // With federation disabled system-wide, partners should return empty or error
-        $this->assertContains($response->getStatusCode(), [200, 403, 404]);
-
-        if ($response->getStatusCode() === 200) {
-            $data = $response->json('data') ?? $response->json();
-            $partners = $data['data'] ?? $data;
-            // Should be empty or indicate federation is off
-            $this->assertTrue(
-                empty($partners) || isset($data['federation_enabled']),
-                'With federation disabled, partners should be empty or status should indicate off'
-            );
-        }
+        // partners() lists active federation_partnerships (none are seeded), so it returns
+        // 200 with an empty list — no partner communities exist for this tenant.
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertIsArray($response->json('data'));
+        $this->assertEmpty($response->json('data'), 'No active partnerships -> empty partner list');
     }
 
     // =========================================================================
@@ -134,40 +132,36 @@ class FederationTest extends TestCase
         // Try to discover federated partners
         $response = $this->apiGet('/v2/federation/partners');
 
-        if ($response->getStatusCode() === 403 || $response->getStatusCode() === 404) {
-            $this->markTestIncomplete(
-                'Federation endpoints not accessible — feature may need additional setup'
-            );
-        }
-
-        $this->assertEquals(200, $response->getStatusCode());
+        // The endpoint is reachable (auth-gated only) and returns a well-formed list.
+        // Discovery reads active federation_partnerships rows (the whitelist controls
+        // eligibility, not membership), and none are seeded here, so the list is empty
+        // but the contract holds — no markTestIncomplete masking a 403/404.
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertIsArray($response->json('data'));
     }
 
     public function test_cross_tenant_members_requires_whitelist(): void
     {
-        // Enable federation system-wide
+        // Enable federation system-wide AND turn ON whitelist mode (nexus_test ships with
+        // whitelist_mode_enabled = 0, which auto-approves every tenant). With whitelist
+        // mode on and tenant A NOT whitelisted, the profiles gate must deny.
         $this->setSystemFederationEnabled(true);
+        DB::table('federation_system_control')->where('id', 1)->update([
+            'whitelist_mode_enabled' => 1,
+        ]);
+        DB::table('federation_tenant_whitelist')->where('tenant_id', $this->tenantAId)->delete();
 
-        // Do NOT whitelist tenant B — discovery should return empty
         $user = $this->actAsMember();
+        \App\Core\TenantContext::setById($this->tenantAId);
+        $this->app->make(FederationFeatureService::class)->clearCache();
 
         $response = $this->apiGet("/v2/federation/members?tenant_id={$this->tenantBId}");
 
-        if ($response->getStatusCode() === 403 || $response->getStatusCode() === 404) {
-            $this->markTestIncomplete(
-                'Federation members endpoint not accessible — feature may need additional setup'
-            );
-        }
-
-        $this->assertEquals(200, $response->getStatusCode());
-
-        $data = $response->json('data') ?? $response->json();
-        $members = $data['data'] ?? $data;
-
-        // Without whitelist, should return no members from tenant B
-        if (is_array($members)) {
-            $this->assertEmpty($members, 'Should not expose members from non-whitelisted tenant');
-        }
+        // members() begins with requireFederationOperation('profiles'); tenant A is NOT
+        // whitelisted, so isOperationAllowed('profiles') is false and the gate returns 403
+        // BEFORE any cross-tenant member data is read. A non-whitelisted tenant cannot
+        // enumerate another tenant's members — assert that hard, not "200-then-maybe-empty".
+        $this->assertSame(403, $response->getStatusCode());
     }
 
     // =========================================================================
@@ -192,34 +186,72 @@ class FederationTest extends TestCase
 
         $response = $this->apiGet('/v2/federation/status');
 
-        if ($response->getStatusCode() === 200) {
-            $data = $response->json('data') ?? $response->json();
-            $status = $data['data'] ?? $data;
-
-            // Federation should be indicated as disabled for this tenant
-            if (isset($status['federation_enabled'])) {
-                $this->assertFalse(
-                    (bool) $status['federation_enabled'],
-                    'Federation should be disabled for tenant A'
-                );
-            }
-        }
-
-        // Also acceptable: 403 (forbidden because federation is off)
-        $this->assertContains($response->getStatusCode(), [200, 403, 404]);
+        // status() always returns 200; with the tenant feature disabled (and the tenant
+        // not whitelisted) tenant_federation_enabled must be false for tenant A.
+        $this->assertSame(200, $response->getStatusCode());
+        $data = $response->json('data');
+        $this->assertFalse(
+            (bool) $data['tenant_federation_enabled'],
+            'Federation must be reported disabled for tenant A'
+        );
+        $this->assertFalse((bool) $data['enabled'], 'enabled implies tenant federation on');
     }
 
-    public function test_federation_opt_in_flow(): void
+    public function test_federation_opt_in_requires_tenant_federation_available(): void
     {
-        // Enable federation system-wide
+        // System enabled, but the tenant federation feature is explicitly OFF for tenant A
+        // (nexus_test auto-whitelists tenants, so we make it unavailable via the feature
+        // flag, not the whitelist). optIn() must reject with 403 before writing settings.
         $this->setSystemFederationEnabled(true);
+        DB::table('federation_tenant_features')->updateOrInsert(
+            ['tenant_id' => $this->tenantAId, 'feature_key' => FederationFeatureService::TENANT_FEDERATION_ENABLED],
+            ['is_enabled' => 0, 'updated_at' => now()]
+        );
 
         $user = $this->actAsMember();
+        \App\Core\TenantContext::setById($this->tenantAId);
+        $this->app->make(FederationFeatureService::class)->clearCache();
 
         $response = $this->apiPost('/v2/federation/opt-in');
 
-        // Opt-in may succeed or fail depending on tenant config
-        $this->assertContains($response->getStatusCode(), [200, 201, 400, 403, 404]);
+        $this->assertSame(403, $response->getStatusCode(),
+            'Opt-in must be blocked when tenant federation is not available');
+        // And no opt-in row should have been written for this user.
+        $this->assertDatabaseMissing('federation_user_settings', [
+            'user_id'          => $user->id,
+            'federation_optin' => 1,
+        ]);
+    }
+
+    public function test_federation_opt_in_succeeds_when_available(): void
+    {
+        // Full enablement: system on + tenant A whitelisted + tenant feature on.
+        $this->setSystemFederationEnabled(true);
+        DB::table('federation_tenant_whitelist')->updateOrInsert(
+            ['tenant_id' => $this->tenantAId],
+            ['approved_at' => now(), 'approved_by' => 1]
+        );
+        DB::table('federation_tenant_features')->updateOrInsert(
+            ['tenant_id' => $this->tenantAId, 'feature_key' => FederationFeatureService::TENANT_FEDERATION_ENABLED],
+            ['is_enabled' => 1, 'updated_at' => now()]
+        );
+
+        $user = User::factory()->forTenant($this->tenantAId)->create([
+            'status' => 'active', 'is_approved' => true,
+        ]);
+        Sanctum::actingAs($user, ['*']);
+        \App\Core\TenantContext::setById($this->tenantAId);
+        $this->app->make(FederationFeatureService::class)->clearCache();
+
+        $response = $this->apiPost('/v2/federation/opt-in');
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertTrue((bool) $response->json('data.success'), 'Opt-in should report success');
+        // The opt-in must actually persist.
+        $this->assertDatabaseHas('federation_user_settings', [
+            'user_id'          => $user->id,
+            'federation_optin' => 1,
+        ]);
     }
 
     public function test_federation_opt_out_flow(): void
@@ -228,8 +260,14 @@ class FederationTest extends TestCase
 
         $response = $this->apiPost('/v2/federation/opt-out');
 
-        // Opt-out may succeed or fail depending on current state
-        $this->assertContains($response->getStatusCode(), [200, 400, 403, 404]);
+        // opt-out has no feature gate; for a member of the current tenant it always
+        // succeeds and writes federation_optin = 0.
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertTrue((bool) $response->json('data.success'));
+        $this->assertDatabaseHas('federation_user_settings', [
+            'user_id'          => $user->id,
+            'federation_optin' => 0,
+        ]);
     }
 
     // =========================================================================
@@ -262,23 +300,26 @@ class FederationTest extends TestCase
 
     public function test_federation_emergency_lockdown(): void
     {
-        // Enable system lockdown
+        // Emergency lockdown forces FederationFeatureService::isGloballyEnabled() to false
+        // and isOperationAllowed() to deny every operation. Assert it against the
+        // operation-gated members endpoint (the partners list is not operation-gated, so
+        // it was the wrong probe before).
         $this->setEmergencyLockdown(true);
 
         $user = $this->actAsMember();
+        \App\Core\TenantContext::setById($this->tenantAId);
+        $this->app->make(FederationFeatureService::class)->clearCache();
 
-        $response = $this->apiGet('/v2/federation/partners');
+        // members() runs requireFederationOperation('profiles') -> denied under lockdown -> 403.
+        $members = $this->apiGet('/v2/federation/members');
+        $this->assertSame(403, $members->getStatusCode(),
+            'Member discovery must be blocked during emergency lockdown');
 
-        // Under lockdown, federation should be fully disabled
-        $this->assertContains($response->getStatusCode(), [200, 403, 404, 503]);
-
-        if ($response->getStatusCode() === 200) {
-            $data = $response->json('data') ?? $response->json();
-            $partners = $data['data'] ?? $data;
-            if (is_array($partners)) {
-                $this->assertEmpty($partners, 'No partners should be visible during lockdown');
-            }
-        }
+        // status() still answers but must report federation disabled.
+        $status = $this->apiGet('/v2/federation/status');
+        $this->assertSame(200, $status->getStatusCode());
+        $this->assertFalse((bool) $status->json('data.tenant_federation_enabled'),
+            'tenant federation must read disabled during emergency lockdown');
     }
 
     public function test_federation_cross_tenant_messaging_gating(): void
