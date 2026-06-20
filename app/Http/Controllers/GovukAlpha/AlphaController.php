@@ -735,18 +735,6 @@ class AlphaController extends Controller
             ->where('tenant_id', TenantContext::getId())
             ->value('onboarding_completed');
 
-        $pendingReviewCount = 0;
-        try {
-            // getPendingReviews' meta.total is count($items), bounded by the limit — so
-            // use the SAME limit (20) the Reviews "Pending" destination loads, so the
-            // banner count matches what the user will actually see (and trans_choice
-            // picks the correct singular/plural form) instead of always reporting 1.
-            $pendingReviewCount = (int) (app(\App\Services\ReviewService::class)
-                ->getPendingReviews($userId, ['limit' => 20])['meta']['total'] ?? 0);
-        } catch (\Throwable $e) {
-            report($e);
-        }
-
         $endorsements = [];
         try {
             $endorsements = \App\Services\EndorsementService::getEndorsementsForUser($userId);
@@ -770,7 +758,6 @@ class AlphaController extends Controller
             'badges' => $badges,
             'upcomingEvents' => $upcomingEvents,
             'onboardingCompleted' => $onboardingCompleted,
-            'pendingReviewCount' => $pendingReviewCount,
             'endorsements' => $endorsements,
             'firstName' => $firstName,
             'status' => self::asStr($request->query('status')) ?: null,

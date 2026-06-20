@@ -41,22 +41,13 @@
         </div>
     @endif
 
-    @if (($pendingReviewCount ?? 0) > 0 && \App\Core\TenantContext::hasFeature('reviews') && \Illuminate\Support\Facades\Route::has('govuk-alpha.reviews.index'))
-        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="dashboard-reviews-title">
-            <div class="govuk-notification-banner__header">
-                <h2 class="govuk-notification-banner__title" id="dashboard-reviews-title">{{ __('govuk_alpha.dashboard.pending_reviews_title') }}</h2>
-            </div>
-            <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading">{{ trans_choice('govuk_alpha.dashboard.pending_reviews_body', $pendingReviewCount, ['count' => $pendingReviewCount]) }}</p>
-                <p class="govuk-body">
-                    {{-- Pending reviews live on the Reviews page (transactions awaiting a
-                         review), NOT the Exchanges list (exchange_requests by status) — the
-                         count and destination are the same source now (ReviewService::getPendingReviews). --}}
-                    <a class="govuk-notification-banner__link" href="{{ route('govuk-alpha.reviews.index', ['tenantSlug' => $tenantSlug]) }}#pending-heading">{{ __('govuk_alpha.dashboard.pending_reviews_link') }}</a>
-                </p>
-            </div>
-        </div>
-    @endif
+    {{-- The "exchanges to review" prompt was removed: it was driven by
+         ReviewService::getPendingReviews(), which counts every completed wallet
+         TRANSACTION (time-credit transfer) the member hasn't reviewed — not the
+         exchange workflow. For an active timebank member that surfaced dozens of
+         transfers as phantom "completed exchanges to review", which is noise. If a
+         genuine "review your completed exchanges" prompt is wanted, it must count
+         completed exchange_requests awaiting review, not raw transactions. --}}
 
     @if (\App\Core\TenantContext::hasModule('listings'))
         <div class="govuk-button-group govuk-!-margin-bottom-6">

@@ -184,47 +184,33 @@ class AccessibleBugfixesParityTest extends TestCase
         $this->get("/{$this->testTenantSlug}/alpha/dashboard")->assertStatus(403);
     }
 
-    // ── Bug 3: pending-reviews banner points at Reviews, not Exchanges ───────
+    // ── Bug 3: the misleading "exchanges to review" banner is REMOVED ────────
+    //
+    // The banner was driven by ReviewService::getPendingReviews(), which counts
+    // every completed wallet TRANSACTION (time-credit transfer) the member hasn't
+    // reviewed — NOT the exchange workflow. For an active timebank member that
+    // surfaced dozens of transfers as phantom "completed exchanges to review".
+    // The banner must NOT render even when such transactions exist.
 
-    public function test_dashboard_pending_review_banner_links_to_reviews_not_exchanges(): void
-    {
-        $reviewer = $this->authenticatedUser();
-        $counterparty = User::factory()->forTenant($this->testTenantId)->create([
-            'status' => 'active',
-            'is_approved' => true,
-        ]);
-
-        // A completed peer transaction the reviewer has not yet reviewed → exactly
-        // what ReviewService::getPendingReviews() (and the banner count) reports.
-        $this->seedCompletedPeerTransaction($reviewer->id, $counterparty->id);
-
-        $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
-        $response->assertOk();
-
-        // Banner links to the Reviews page Pending section (same data source as the count)…
-        $reviewsHref = route('govuk-alpha.reviews.index', ['tenantSlug' => $this->testTenantSlug]) . '#pending-heading';
-        $response->assertSee($reviewsHref, false);
-        // …and NOT the old, wrong Exchanges "completed" tab (different table).
-        $response->assertDontSee('status_filter=completed', false);
-    }
-
-    public function test_dashboard_pending_review_count_is_accurate_not_capped_at_one(): void
+    public function test_dashboard_does_not_show_pending_reviews_banner_for_transactions(): void
     {
         $reviewer = $this->authenticatedUser();
         $a = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $b = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
 
-        // Two distinct completed peer transactions awaiting review.
+        // Completed peer transactions that getPendingReviews() WOULD have counted.
         $this->seedCompletedPeerTransaction($reviewer->id, $a->id);
         $this->seedCompletedPeerTransaction($reviewer->id, $b->id);
 
         $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
         $response->assertOk();
 
-        // The count must reflect BOTH (was previously hard-capped at 1 by limit=1),
-        // and trans_choice must pick the plural form — matching the view's render.
-        $response->assertSee(trans_choice('govuk_alpha.dashboard.pending_reviews_body', 2, ['count' => 2]));
-        $response->assertDontSee(trans_choice('govuk_alpha.dashboard.pending_reviews_body', 1, ['count' => 1]));
+        // No "exchanges to review" banner, no link to the reviews pending section,
+        // and no stale link to the exchanges "completed" tab.
+        $response->assertDontSee(__('govuk_alpha.dashboard.pending_reviews_title'));
+        $response->assertDontSee('dashboard-reviews-title', false);
+        $response->assertDontSee('#pending-heading', false);
+        $response->assertDontSee('status_filter=completed', false);
     }
 
     public function test_account_hub_hides_gamification_links_when_feature_disabled(): void
