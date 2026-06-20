@@ -289,58 +289,61 @@ class AccessibleBugfixesParityTest extends TestCase
         $response->assertDontSee('dashboard-reviews-title', false);
     }
 
-    public function test_exchange_attention_count_excludes_transactions_and_others_requests(): void
+    public function test_exchange_attention_counts_active_exchanges_for_both_roles(): void
     {
-        TenantContext::reset();
-        TenantContext::setById($this->testTenantId);
-
         $provider = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $requester = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
 
-        // Enable the broker workflow (default OFF) + re-assert the test tenant
-        // (the factory creates above clobber TenantContext as a side effect).
         $this->enableExchangeWorkflow();
-
         $svc = app(\App\Services\ExchangeService::class);
 
-        // A pending_provider request to $provider counts for the provider…
+        // A pending request is an ACTIVE exchange for BOTH parties — the provider
+        // must respond, the requester is awaiting the reply and tracking it.
         $this->seedExchange($requester->id, $provider->id, 'pending_provider');
-        // …but NOT for the requester (it's the provider's move).
         $this->assertSame(1, $svc->countNeedingAttention($provider->id));
-        $this->assertSame(0, $svc->countNeedingAttention($requester->id));
+        $this->assertSame(1, $svc->countNeedingAttention($requester->id));
 
-        // An in-progress exchange is in flight → counts for nobody.
+        // An in-progress exchange counts for its participants (this was the bug:
+        // an in_progress exchange the member is part of must be visible).
         $this->seedExchange($requester->id, $other->id, 'in_progress');
-        $this->assertSame(0, $svc->countNeedingAttention($other->id));
+        $this->assertSame(1, $svc->countNeedingAttention($other->id));
+        $this->assertSame(2, $svc->countNeedingAttention($requester->id)); // pending + in_progress
+
+        // Terminal states never count.
+        $this->seedExchange($requester->id, $other->id, 'cancelled');
+        $this->seedExchange($requester->id, $other->id, 'expired');
+        $this->assertSame(1, $svc->countNeedingAttention($other->id)); // still just the in_progress
 
         // Wallet transactions never count.
         $this->seedCompletedPeerTransaction($provider->id, $requester->id);
         $this->assertSame(1, $svc->countNeedingAttention($provider->id));
     }
 
-    public function test_exchange_get_needing_attention_shapes_items_for_the_card(): void
+    public function test_exchange_get_needing_attention_shapes_items_for_both_roles(): void
     {
         $provider = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Provider P']);
         $requester = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Requester R']);
 
         $this->seedExchange($requester->id, $provider->id, 'pending_provider');
-
-        // Enable the broker workflow (default OFF) + re-assert the test tenant (the
-        // factory creates clobber TenantContext; a real request keeps it stable).
         $this->enableExchangeWorkflow();
 
         $svc = app(\App\Services\ExchangeService::class);
-        $items = $svc->getNeedingAttention($provider->id, 5);
 
-        $this->assertCount(1, $items);
-        $this->assertSame('accept', $items[0]['action']);            // provider must accept
-        $this->assertSame('pending_provider', $items[0]['status']);
-        $this->assertSame('Requester R', $items[0]['counterparty_name']); // the OTHER party
-        $this->assertSame('Attention test listing', $items[0]['listing_title']);
+        // Provider: it's their turn to respond → 'accept' chip, counterparty = requester.
+        $forProvider = $svc->getNeedingAttention($provider->id, 5);
+        $this->assertCount(1, $forProvider);
+        $this->assertSame('accept', $forProvider[0]['action']);
+        $this->assertSame('pending_provider', $forProvider[0]['status']);
+        $this->assertSame('Requester R', $forProvider[0]['counterparty_name']);
+        $this->assertSame('Attention test listing', $forProvider[0]['listing_title']);
 
-        // The requester (not their move) gets nothing.
-        $this->assertSame([], $svc->getNeedingAttention($requester->id, 5));
+        // Requester: the SAME active exchange, but they're awaiting the reply →
+        // neutral 'active' chip, counterparty = provider.
+        $forRequester = $svc->getNeedingAttention($requester->id, 5);
+        $this->assertCount(1, $forRequester);
+        $this->assertSame('active', $forRequester[0]['action']);
+        $this->assertSame('Provider P', $forRequester[0]['counterparty_name']);
     }
 
     public function test_account_hub_hides_gamification_links_when_feature_disabled(): void

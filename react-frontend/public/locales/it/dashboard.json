@@ -143,7 +143,8 @@
       "accept": "Accetta",
       "confirm": "Conferma",
       "review": "Valuta",
-      "view": "Visualizza"
+      "view": "Visualizza",
+      "active": "Attivo"
     },
     "view_all": "Visualizza tutti gli scambi"
   }

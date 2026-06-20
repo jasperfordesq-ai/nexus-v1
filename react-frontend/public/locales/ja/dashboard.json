@@ -143,7 +143,8 @@
       "accept": "承認",
       "confirm": "確認",
       "review": "レビュー",
-      "view": "表示"
+      "view": "表示",
+      "active": "進行中"
     },
     "view_all": "すべての交換を表示"
   }

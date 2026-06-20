@@ -143,7 +143,8 @@
       "accept": "Annehmen",
       "confirm": "Bestätigen",
       "review": "Bewerten",
-      "view": "Ansehen"
+      "view": "Ansehen",
+      "active": "Aktiv"
     },
     "view_all": "Alle Austausche ansehen"
   }

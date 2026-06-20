@@ -143,7 +143,8 @@
       "accept": "Aceptar",
       "confirm": "Confirmar",
       "review": "Valorar",
-      "view": "Ver"
+      "view": "Ver",
+      "active": "Activo"
     },
     "view_all": "Ver todos los intercambios"
   }

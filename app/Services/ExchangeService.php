@@ -144,6 +144,7 @@ class ExchangeService
             ->limit(max(1, min($limit, 20)))
             ->get([
                 'er.id', 'er.status', 'er.requester_id', 'er.provider_id',
+                'er.requester_confirmed_at', 'er.provider_confirmed_at',
                 'l.title as listing_title',
                 'req.name as requester_name', 'req.avatar_url as requester_avatar',
                 'prov.name as provider_name', 'prov.avatar_url as provider_avatar',
@@ -151,11 +152,17 @@ class ExchangeService
 
         return $rows->map(function ($r) use ($userId) {
             $isRequester = (int) $r->requester_id === $userId;
-            $action = match ($r->status) {
-                self::STATUS_PENDING   => 'accept',
-                'pending_confirmation' => 'confirm',
-                self::STATUS_COMPLETED => 'review',
-                default                => 'view',
+            $isProvider  = (int) $r->provider_id === $userId;
+
+            // The chip cue: a verb when it's the member's turn to act, otherwise a
+            // neutral "active" state they're tracking in flight.
+            $myConfirmMissing = ($isRequester && $r->requester_confirmed_at === null)
+                || ($isProvider && $r->provider_confirmed_at === null);
+            $action = match (true) {
+                $r->status === self::STATUS_PENDING && $isProvider          => 'accept',  // your turn to respond
+                $r->status === 'pending_confirmation' && $myConfirmMissing   => 'confirm', // your turn to confirm hours
+                $r->status === self::STATUS_COMPLETED                        => 'review',  // your turn to review
+                default                                                      => 'active',  // in flight / awaiting the other party
             };
 
             return [
@@ -182,19 +189,21 @@ class ExchangeService
             ->where('er.tenant_id', $tenantId)
             ->where(fn ($q) => $q->where('er.requester_id', $userId)->orWhere('er.provider_id', $userId))
             ->where(function ($outer) use ($userId, $tenantId) {
-                // 1. Incoming request you (the provider) must accept or decline.
-                $outer->where(function ($s) use ($userId) {
-                    $s->where('er.status', self::STATUS_PENDING)->where('er.provider_id', $userId);
-                })
-                // 2. Completion awaiting YOUR confirmation (your timestamp is null).
-                ->orWhere(function ($s) use ($userId) {
-                    $s->where('er.status', 'pending_confirmation')
-                      ->where(function ($c) use ($userId) {
-                          $c->where(fn ($r) => $r->where('er.requester_id', $userId)->whereNull('er.requester_confirmed_at'))
-                            ->orWhere(fn ($p) => $p->where('er.provider_id', $userId)->whereNull('er.provider_confirmed_at'));
-                      });
-                })
-                // 3. Completed exchange you have not reviewed yet.
+                // ANY active (non-terminal) exchange the member is part of — as
+                // requester OR provider, whether it is their turn to act now or they
+                // are tracking it in flight (a sent request awaiting a reply, work in
+                // progress, hours to confirm, a dispute). Excludes only terminal
+                // states (cancelled/expired/declined) and already-reviewed completions.
+                $outer->whereIn('er.status', [
+                    self::STATUS_PENDING,   // pending_provider
+                    'pending_broker',
+                    self::STATUS_ACCEPTED,  // accepted
+                    'scheduled',
+                    'in_progress',
+                    'pending_confirmation',
+                    'disputed',
+                ])
+                // PLUS a completed exchange the member has not reviewed yet.
                 ->orWhere(function ($s) use ($userId, $tenantId) {
                     $s->where('er.status', self::STATUS_COMPLETED)
                       ->whereNotNull('er.transaction_id')

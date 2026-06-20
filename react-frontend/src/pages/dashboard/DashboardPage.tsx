@@ -726,7 +726,7 @@ function QuickActionLink({ to, icon, label }: QuickActionLinkProps) {
 interface AttentionExchange {
   id: number;
   status: string;
-  action: 'accept' | 'confirm' | 'review' | 'view';
+  action: 'accept' | 'confirm' | 'review' | 'active' | 'view';
   listing_title?: string | null;
   counterparty_name: string;
   counterparty_avatar?: string | null;

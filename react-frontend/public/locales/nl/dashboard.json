@@ -143,7 +143,8 @@
       "accept": "Accepteren",
       "confirm": "Bevestigen",
       "review": "Beoordelen",
-      "view": "Bekijken"
+      "view": "Bekijken",
+      "active": "Actief"
     },
     "view_all": "Alle uitwisselingen bekijken"
   }
