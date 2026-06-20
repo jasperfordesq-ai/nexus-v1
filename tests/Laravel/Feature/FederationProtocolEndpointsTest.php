@@ -130,10 +130,12 @@ class FederationProtocolEndpointsTest extends TestCase
             'X-Tenant-ID' => (string) $this->testTenantId,
         ]);
 
-        $this->assertContains(
+        // No Authorization header -> FederationApiMiddleware returns 401 (MISSING_API_KEY /
+        // INVALID_AUTH_HEADER); 403 is reserved for inactive/permission-denied, not missing auth.
+        $this->assertSame(
+            401,
             $response->getStatusCode(),
-            [401, 403],
-            "Unauthenticated {$method} {$path} must be rejected — got {$response->getStatusCode()}"
+            "Unauthenticated {$method} {$path} must be rejected with 401 — got {$response->getStatusCode()}"
         );
     }
 
@@ -145,21 +147,19 @@ class FederationProtocolEndpointsTest extends TestCase
     {
         $response = $this->json('DELETE', '/api/v2/federation/komunitin/HOURS/currency', [], $this->authHeaders());
 
-        // 204 on success OR 403 if tenant_settings unavailable — just require non-error on auth path
-        $this->assertContains($response->getStatusCode(), [204, 500]);
+        // Authenticated DELETE must succeed with 204 No Content — not crash with 500.
+        $this->assertSame(204, $response->getStatusCode());
 
-        if ($response->getStatusCode() === 204) {
-            $inactive = DB::table('tenant_settings')
-                ->where('tenant_id', $this->testTenantId)
-                ->where('setting_key', 'federation.komunitin.currency_inactive')
-                ->value('setting_value');
-            $this->assertNotEmpty($inactive, 'currency_inactive flag should be set after DELETE');
+        $inactive = DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('setting_key', 'federation.komunitin.currency_inactive')
+            ->value('setting_value');
+        $this->assertNotEmpty($inactive, 'currency_inactive flag should be set after DELETE');
 
-            // Subsequent GET should report status=inactive
-            $get = $this->json('GET', '/api/v2/federation/komunitin/HOURS/currency', [], $this->authHeaders());
-            $get->assertStatus(200);
-            $this->assertSame('inactive', $get->json('data.attributes.status'));
-        }
+        // Subsequent GET should report status=inactive
+        $get = $this->json('GET', '/api/v2/federation/komunitin/HOURS/currency', [], $this->authHeaders());
+        $get->assertStatus(200);
+        $this->assertSame('inactive', $get->json('data.attributes.status'));
     }
 
     // ==========================================
@@ -302,15 +302,13 @@ class FederationProtocolEndpointsTest extends TestCase
             [], $this->authHeaders()
         );
 
-        $this->assertContains($response->getStatusCode(), [200, 500]);
-
-        if ($response->getStatusCode() === 200) {
-            $this->assertSame('C', $response->json('data.state'));
-            $state = DB::table('federation_cc_entries')
-                ->where('transaction_uuid', $uuid)
-                ->value('state');
-            $this->assertSame('C', $state);
-        }
+        // Committing a validated (V) entry must transition it to C — not 500.
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('C', $response->json('data.state'));
+        $state = DB::table('federation_cc_entries')
+            ->where('transaction_uuid', $uuid)
+            ->value('state');
+        $this->assertSame('C', $state);
     }
 
     public function test_cc_validate_rejects_invalid_transition(): void

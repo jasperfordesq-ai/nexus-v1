@@ -8,17 +8,28 @@ declare(strict_types=1);
 
 namespace Tests\Laravel\Feature\Federation;
 
+use App\Core\TenantContext;
+use App\Services\CreditCommonsNodeService;
 use App\Services\Protocols\CreditCommonsAdapter;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\Laravel\Concerns\FederationIntegrationHarness;
 use Tests\Laravel\TestCase;
 
 /**
- * CreditCommonsProtocolTest — propose → validate → commit lifecycle +
- * hashchain validation expectations.
+ * CreditCommonsProtocolTest — adapter shape/normalization + the security-critical
+ * hashchain replay/forgery guard.
+ *
+ * The propose → validate → commit HTTP lifecycle is covered end-to-end (real DB
+ * state transitions P→V→C) by
+ * tests/Laravel/Feature/FederationProtocolEndpointsTest.php — see
+ * test_cc_propose_creates_pending_entry / test_cc_validate_transitions_P_to_V /
+ * test_cc_commit_transitions_V_to_C. The former reflection-only lifecycle stub
+ * here (class_exists + method_exists) is removed as redundant theatre.
  */
 final class CreditCommonsProtocolTest extends TestCase
 {
     use FederationIntegrationHarness;
+    use DatabaseTransactions;
 
     private CreditCommonsAdapter $adapter;
 
@@ -61,31 +72,59 @@ final class CreditCommonsProtocolTest extends TestCase
         $this->assertNotEmpty($normalized);
     }
 
-    public function test_propose_validate_commit_lifecycle(): void
+    public function test_hashchain_validation_enforces_the_chain_once_established(): void
     {
-        // End-to-end lifecycle over HTTP requires FederationCreditCommonsController
-        // to expose propose/validate/commit endpoints. Verify the controller is
-        // present, otherwise mark incomplete.
-        if (!class_exists(\App\Http\Controllers\Api\FederationCreditCommonsController::class)) {
-            $this->markTestIncomplete('FederationCreditCommonsController not present.');
-        }
+        // Establish a hashchain for the test tenant with a known last hash.
+        TenantContext::setById($this->testTenantId);
+        CreditCommonsNodeService::getNodeConfig($this->testTenantId); // ensure a config row exists
+        $knownHash = hash('sha256', 'genesis-' . $this->testTenantId);
+        CreditCommonsNodeService::recordHash($this->testTenantId, $knownHash);
 
-        $controller = new \App\Http\Controllers\Api\FederationCreditCommonsController();
+        TenantContext::setById($this->testTenantId);
+
+        // A matching Last-hash validates.
         $this->assertTrue(
-            method_exists($controller, 'propose')
-            || method_exists($controller, 'proposeTransaction')
-            || method_exists($controller, 'validate')
-            || method_exists($controller, 'commit'),
-            'CC controller is missing propose/validate/commit methods — lifecycle cannot be exercised.'
+            CreditCommonsAdapter::validateHashchain($knownHash, $this->testTenantId),
+            'A relay presenting the correct Last-hash must validate against the established chain'
+        );
+
+        // A forged / mismatched hash must be rejected — this is the replay/forgery guard.
+        $this->assertFalse(
+            CreditCommonsAdapter::validateHashchain('forged-' . str_repeat('0', 56), $this->testTenantId),
+            'A relay presenting a wrong Last-hash must be rejected'
+        );
+
+        // A missing Last-hash must FAIL CLOSED once a chain exists (omitting the header
+        // previously bypassed the chain entirely).
+        $this->assertFalse(
+            CreditCommonsAdapter::validateHashchain(null, $this->testTenantId),
+            'A missing Last-hash must not bypass an established chain'
         );
     }
 
-    public function test_hashchain_validation_is_available(): void
+    public function test_hashchain_validation_adopts_root_on_first_interaction(): void
     {
-        // Hashchain validation is optional. If the adapter exposes it, call it.
-        if (!method_exists($this->adapter, 'validateHashchain')) {
-            $this->markTestIncomplete('CC hashchain validation not yet implemented on adapter.');
-        }
-        $this->assertTrue(true);
+        // With no local chain yet, the first authenticated peer hash is adopted as the
+        // chain root and validation returns true (genuine first interaction).
+        TenantContext::setById($this->testTenantId);
+        $config = CreditCommonsNodeService::getNodeConfig($this->testTenantId);
+        // Force a clean (null) chain root for this tenant.
+        \Illuminate\Support\Facades\DB::table('federation_cc_node_config')
+            ->where('tenant_id', $this->testTenantId)
+            ->update(['last_hash' => null]);
+
+        TenantContext::setById($this->testTenantId);
+        $peerHash = hash('sha256', 'peer-root');
+        $this->assertTrue(
+            CreditCommonsAdapter::validateHashchain($peerHash, $this->testTenantId),
+            'First interaction with no local chain must adopt the peer hash and validate'
+        );
+
+        // The adopted hash is now the chain root, so a different hash is rejected.
+        TenantContext::setById($this->testTenantId);
+        $this->assertFalse(
+            CreditCommonsAdapter::validateHashchain('different-' . str_repeat('0', 53), $this->testTenantId),
+            'After adopting the root, a mismatching hash must be rejected'
+        );
     }
 }
