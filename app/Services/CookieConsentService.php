@@ -65,7 +65,7 @@ class CookieConsentService
         $record = [
             'user_id'         => $userId,
             'tenant_id'       => $tenantId,
-            'session_id'      => session_id() ?: null,
+            'session_id'      => session()->getId() ?: ('anon-' . bin2hex(random_bytes(8))),
             'essential'       => true,
             'functional'      => $preferences['functional'] ?? false,
             'analytics'       => $preferences['analytics'] ?? false,
@@ -116,7 +116,7 @@ class CookieConsentService
         DB::table('cookie_consents')->insert([
             'user_id'         => $userId,
             'tenant_id'       => $tenantId,
-            'session_id'      => session_id() ?: null,
+            'session_id'      => session()->getId() ?: ('anon-' . bin2hex(random_bytes(8))),
             'essential'       => true,
             'functional'      => $categories['functional'] ?? false,
             'analytics'       => $categories['analytics'] ?? false,

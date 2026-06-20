@@ -74,6 +74,7 @@ class AlphaController extends Controller
     use Concerns\SettingsAuthParity;
     use Concerns\SettingsAvailabilityParity;
     use Concerns\AiChatParity;
+    use Concerns\CookieSupportParity;
 
     private const VALID_FEED_LIKE_TARGETS = [
         'post', 'listing', 'event', 'poll', 'goal',
@@ -792,6 +793,13 @@ class AlphaController extends Controller
                 ->first();
         }
 
+        // When a signed-out visitor uses "Report a problem with this page", they are
+        // routed here with the page they were on so the contact form is pre-filled.
+        $problemUrl = self::asStr($request->query('problem_url'));
+        $problemUrl = ($problemUrl !== '' && str_starts_with($problemUrl, '/') && ! str_starts_with($problemUrl, '//'))
+            ? $problemUrl
+            : null;
+
         return $this->view('accessible-frontend::contact', [
             'title' => __('govuk_alpha.contact.title'),
             'tenantSlug' => $tenantSlug,
@@ -799,6 +807,7 @@ class AlphaController extends Controller
             'status' => self::asStr($request->query('status')) ?: null,
             'contactUser' => $user ? (array) $user : null,
             'turnstileSiteKey' => (string) env('TURNSTILE_SITE_KEY', ''),
+            'problemUrl' => $problemUrl,
         ]);
     }
 

@@ -27,6 +27,13 @@ Route::prefix('{tenantSlug}/alpha')
         Route::get('/contact', [AlphaController::class, 'contact'])->name('contact');
         Route::post('/contact', [AlphaController::class, 'storeContact'])->middleware('throttle:5,1')->name('contact.store');
 
+        // GOV.UK cookie banner + settings (no auth — anonymous visitors can consent).
+        Route::post('/cookie-consent', [AlphaController::class, 'storeCookieConsent'])->middleware('throttle:30,1')->name('cookies.store');
+        Route::get('/cookies', [AlphaController::class, 'cookieSettings'])->name('cookies');
+        // GOV.UK "Report a problem with this page" — routes by login (handler decides).
+        Route::get('/report-a-problem', [AlphaController::class, 'reportProblem'])->name('report-problem');
+        Route::post('/report-a-problem', [AlphaController::class, 'storeReportProblem'])->middleware('throttle:10,1')->name('report-problem.store');
+
         // Content & legal pages (footer destinations). Legal documents reuse the
         // tenant-scoped LegalDocumentService with a GOV.UK static fallback; the
         // shared legalDocument() method reads the document type from route defaults.

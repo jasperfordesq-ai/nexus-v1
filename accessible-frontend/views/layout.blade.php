@@ -76,6 +76,8 @@
 <body class="govuk-template__body">
     {{-- GOV.UK progressive enhancement: only claim JS support when JS actually runs --}}
     <script>document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
+    {{-- GOV.UK cookie banner — first thing in the body, before the skip link (no-JS). --}}
+    @include('accessible-frontend::partials.cookie-banner')
     <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">{{ __('govuk_alpha.skip_to_content') }}</a>
 
     <header class="nexus-alpha-header" role="banner">
@@ -223,6 +225,18 @@
             <div class="govuk-footer__meta">
                 <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
                     <h2 class="govuk-visually-hidden">{{ __('govuk_alpha.footer.meta_label') }}</h2>
+                    @if (!empty($tenantSlug))
+                        {{-- GOV.UK footer utility links: report a problem with the current
+                             page + change cookie settings, on every tenant page. --}}
+                        <ul class="govuk-footer__inline-list">
+                            <li class="govuk-footer__inline-list-item">
+                                <a class="govuk-footer__link" href="{{ route('govuk-alpha.report-problem', ['tenantSlug' => $tenantSlug, 'return' => request()->getRequestUri()]) }}">{{ __('govuk_alpha.report_problem.footer_link') }}</a>
+                            </li>
+                            <li class="govuk-footer__inline-list-item">
+                                <a class="govuk-footer__link" href="{{ route('govuk-alpha.cookies', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.cookie_settings.title') }}</a>
+                            </li>
+                        </ul>
+                    @endif
                     @if (!empty($alphaSignOutUrl))
                         <ul class="govuk-footer__inline-list">
                             <li class="govuk-footer__inline-list-item">

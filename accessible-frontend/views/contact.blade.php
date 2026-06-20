@@ -13,10 +13,13 @@
         if ($defaultName === '') {
             $defaultName = trim(((string) ($contactUser['first_name'] ?? '')) . ' ' . ((string) ($contactUser['last_name'] ?? '')));
         }
+        // When routed here from "Report a problem with this page" while signed out,
+        // pre-fill the message with the page they were on so we keep that context.
+        $problemUrl = $problemUrl ?? null;
         $nameValue = old('name', $defaultName);
         $emailValue = old('email', $contactUser['email'] ?? '');
-        $subjectValue = old('subject', '');
-        $messageValue = old('message', '');
+        $subjectValue = old('subject', $problemUrl ? 'technical' : '');
+        $messageValue = old('message', $problemUrl ? __('govuk_alpha.report_problem.contact_prefill', ['url' => $problemUrl]) . "\n\n" : '');
         $validationFallback = ($status ?? '') === 'contact-validation' && ! $errorBag->any();
         $fieldErrors = [
             'name' => $errorBag->first('name') ?: ($validationFallback ? __('govuk_alpha.contact.errors.name_required') : ''),
