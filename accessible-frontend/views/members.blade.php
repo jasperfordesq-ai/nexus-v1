@@ -151,7 +151,7 @@
                                     <h3 class="govuk-heading-m govuk-!-margin-bottom-2">
                                         <a class="govuk-link" href="{{ $profileUrl($member) }}">{{ $displayName }}</a>
                                     </h3>
-                                    @if (!empty($member['is_verified']))
+                                    @if (!empty($member['identity_verified']))
                                         <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.members.verified') }}</strong>
                                     @endif
                                     @if (!empty($member['level']) && (int) $member['level'] > 0)

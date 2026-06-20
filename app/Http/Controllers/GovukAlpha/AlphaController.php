@@ -665,6 +665,9 @@ class AlphaController extends Controller
     public function dashboard(Request $request, string $tenantSlug): Response|RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        // Parity with React, which wraps /dashboard in <FeatureGate module="dashboard">
+        // (App.tsx) — when an admin switches the module off, the page is unreachable.
+        abort_unless(TenantContext::hasModule('dashboard'), 403);
         $userId = $this->currentUserId();
 
         if ($userId === null) {
@@ -734,8 +737,12 @@ class AlphaController extends Controller
 
         $pendingReviewCount = 0;
         try {
+            // getPendingReviews' meta.total is count($items), bounded by the limit — so
+            // use the SAME limit (20) the Reviews "Pending" destination loads, so the
+            // banner count matches what the user will actually see (and trans_choice
+            // picks the correct singular/plural form) instead of always reporting 1.
             $pendingReviewCount = (int) (app(\App\Services\ReviewService::class)
-                ->getPendingReviews($userId, ['limit' => 1])['meta']['total'] ?? 0);
+                ->getPendingReviews($userId, ['limit' => 20])['meta']['total'] ?? 0);
         } catch (\Throwable $e) {
             report($e);
         }
@@ -3266,6 +3273,11 @@ class AlphaController extends Controller
         $ownerId = (int) ($listing['user_id'] ?? $listing['author_id'] ?? $listing['user']['id'] ?? 0);
         $isOwner = $userId !== null && $ownerId === $userId;
 
+        // The author "Verified" trust tag must reflect ID verification (id_verified
+        // badge), NOT email verification (is_verified). ListingService::getById()
+        // populates author_verified from is_verified, so override it here.
+        $listing['author_verified'] = $this->alphaIdentityVerified($ownerId);
+
         // Resolve the cover image to a same-origin URL and attach the multi-image
         // gallery (the ListingImage rows are not returned by ListingService::getById,
         // so we load them here exactly as the React ListingsController::show() does).
@@ -3303,6 +3315,76 @@ class AlphaController extends Controller
             'likeCount' => $this->alphaLikeCount('listing', $id),
             'hasLiked' => $userId !== null && $this->alphaUserLiked('listing', $id, $userId),
         ]);
+    }
+
+    /**
+     * True iff the member holds an active `id_verified` verification badge — the
+     * genuine identity-verification trust signal.
+     *
+     * CRITICAL: `users.is_verified` means EMAIL-verified, NOT identity-verified, so
+     * it must never drive the green "Verified" trust tag (that falsely marked every
+     * email-confirmed member as identity-verified). This mirrors React's
+     * VerificationBadgeRow, which keys the trust badge on the id_verified badge.
+     */
+    private function alphaIdentityVerified(int $userId): bool
+    {
+        if ($userId <= 0) {
+            return false;
+        }
+        try {
+            foreach (app(\App\Services\MemberVerificationBadgeService::class)->getUserBadges($userId) as $badge) {
+                if ((($badge['badge_type'] ?? $badge['type'] ?? '')) === 'id_verified') {
+                    return true;
+                }
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return false;
+    }
+
+    /**
+     * Attach an `identity_verified` flag to each member-card row via ONE batched
+     * badge query (avoids N+1 across a directory page). Keyed on each row's `id`.
+     *
+     * @param  list<array<string, mixed>>  $members
+     * @return list<array<string, mixed>>
+     */
+    private function alphaAttachIdentityVerified(array $members): array
+    {
+        $ids = [];
+        foreach ($members as $m) {
+            $id = (int) ($m['id'] ?? 0);
+            if ($id > 0) {
+                $ids[] = $id;
+            }
+        }
+
+        $verified = [];
+        if ($ids !== []) {
+            try {
+                $batch = app(\App\Services\MemberVerificationBadgeService::class)
+                    ->getBatchUserBadges(array_values(array_unique($ids)));
+                foreach ($batch as $uid => $badges) {
+                    foreach ($badges as $badge) {
+                        if ((($badge['type'] ?? $badge['badge_type'] ?? '')) === 'id_verified') {
+                            $verified[(int) $uid] = true;
+                            break;
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
+        foreach ($members as &$m) {
+            $m['identity_verified'] = ! empty($verified[(int) ($m['id'] ?? 0)]);
+        }
+        unset($m);
+
+        return $members;
     }
 
     /**
@@ -4173,11 +4255,14 @@ class AlphaController extends Controller
         ]);
     }
 
-    // === Notifications inbox (auth-only; notifications are always-on) ===
+    // === Notifications inbox (auth + notifications module) ===
 
     public function notifications(Request $request, string $tenantSlug): Response|RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        // Parity with React, which wraps /notifications in <FeatureGate module="notifications">
+        // (App.tsx) — when an admin switches the module off, the page is unreachable.
+        abort_unless(TenantContext::hasModule('notifications'), 403);
         $userId = $this->currentUserId();
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
@@ -4226,6 +4311,7 @@ class AlphaController extends Controller
     public function markGroupNotificationsRead(Request $request, string $tenantSlug): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('notifications'), 403);
         $userId = $this->currentUserId();
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
@@ -4248,6 +4334,7 @@ class AlphaController extends Controller
     public function markAllNotificationsRead(Request $request, string $tenantSlug): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('notifications'), 403);
         $userId = $this->currentUserId();
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
@@ -4264,6 +4351,7 @@ class AlphaController extends Controller
     public function deleteNotification(Request $request, string $tenantSlug, int $id): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('notifications'), 403);
         $userId = $this->currentUserId();
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
@@ -4280,6 +4368,7 @@ class AlphaController extends Controller
     public function markNotificationRead(Request $request, string $tenantSlug, int $id): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('notifications'), 403);
         $userId = $this->currentUserId();
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
@@ -4301,6 +4390,7 @@ class AlphaController extends Controller
     public function deleteAllNotifications(Request $request, string $tenantSlug): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('notifications'), 403);
         $userId = $this->currentUserId();
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
@@ -9534,6 +9624,9 @@ class AlphaController extends Controller
             'profile' => $profile,
             'displayName' => $displayName,
             'isOwnProfile' => $id === $viewerId,
+            // Identity-verified trust tag keys on the id_verified badge, NOT the
+            // email-verified `is_verified` column (mirrors React VerificationBadgeRow).
+            'identityVerified' => $this->alphaIdentityVerified($id),
             'status' => self::asStr($request->query('status')) ?: null,
             'profileStats' => $this->profileStats($profile),
             'profileListings' => $this->profileListings($id),
@@ -10940,7 +11033,11 @@ class AlphaController extends Controller
             // hub, not the service nav — which is reserved for community +
             // discovery facilities to keep the flat GOV.UK bar uncrowded. See
             // account() + the header in layout.blade.php.
-            $items['dashboard'] = route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]);
+            // Gate the dashboard link on the dashboard module (parity with React's
+            // Navbar hasModule('dashboard') check) so a disabled module hides it.
+            if (TenantContext::hasModule('dashboard')) {
+                $items['dashboard'] = route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]);
+            }
         }
 
         if (TenantContext::hasModule('feed')) {
@@ -11851,7 +11948,7 @@ class AlphaController extends Controller
         return [
             // Attach the viewer's connection state per card (≤ per_page lookups) so
             // the directory shows "Connected"/"Request sent" at a glance.
-            'items' => array_map(function (object $row) use ($viewerId): array {
+            'items' => $this->alphaAttachIdentityVerified(array_map(function (object $row) use ($viewerId): array {
                 $member = (array) $row;
                 try {
                     $member['connection_state'] = ConnectionService::getStatus($viewerId, (int) $member['id'])['status'] ?? 'none';
@@ -11860,7 +11957,7 @@ class AlphaController extends Controller
                 }
 
                 return $member;
-            }, $items),
+            }, $items)),
             'meta' => [
                 'total_items' => $total,
                 'offset' => $filters['offset'],

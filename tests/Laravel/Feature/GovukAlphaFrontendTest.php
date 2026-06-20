@@ -2743,7 +2743,7 @@ class GovukAlphaFrontendTest extends TestCase
     public function test_members_page_renders_directory_for_authenticated_user(): void
     {
         $viewer = $this->authenticatedUser(['name' => 'Viewer Member']);
-        User::factory()->forTenant($this->testTenantId)->create([
+        $directoryMember = User::factory()->forTenant($this->testTenantId)->create([
             'name' => 'Alpha Directory Member',
             'first_name' => 'Alpha',
             'last_name' => 'Member',
@@ -2756,6 +2756,16 @@ class GovukAlphaFrontendTest extends TestCase
             'is_verified' => true,
             'privacy_search' => true,
             'created_at' => now()->addYear(),
+        ]);
+        // The green "Verified" trust tag keys on the id_verified badge (real identity
+        // verification), NOT the email-verified is_verified column — grant one so the
+        // tag legitimately renders.
+        \Illuminate\Support\Facades\DB::table('member_verification_badges')->insert([
+            'user_id' => $directoryMember->id,
+            'tenant_id' => $this->testTenantId,
+            'badge_type' => 'id_verified',
+            'verified_by' => $directoryMember->id,
+            'granted_at' => now(),
         ]);
         User::factory()->forTenant(999)->create([
             'name' => 'Other Tenant Member',

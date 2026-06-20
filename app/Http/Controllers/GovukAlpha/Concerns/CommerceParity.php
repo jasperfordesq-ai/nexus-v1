@@ -426,7 +426,9 @@ trait CommerceParity
             'activeNav' => 'explore',
             'sellerName' => $name,
             'sellerAvatar' => self::asStr($seller->avatar_url ?? ''),
-            'sellerVerified' => (bool) ($seller->is_verified ?? false),
+            // Identity-verified trust tag keys on the id_verified badge, NOT the
+            // email-verified `is_verified` column (mirrors React VerificationBadgeRow).
+            'sellerVerified' => $this->alphaIdentityVerified((int) $seller->id),
             'sellerSince' => isset($seller->created_at) ? (string) $seller->created_at : '',
             'sellerRating' => is_array($rating) ? $rating : null,
             'listings' => $items,

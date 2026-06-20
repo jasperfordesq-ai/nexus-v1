@@ -41,7 +41,7 @@
         </div>
     @endif
 
-    @if (($pendingReviewCount ?? 0) > 0 && \App\Core\TenantContext::hasModule('listings'))
+    @if (($pendingReviewCount ?? 0) > 0 && \App\Core\TenantContext::hasFeature('reviews') && \Illuminate\Support\Facades\Route::has('govuk-alpha.reviews.index'))
         <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="dashboard-reviews-title">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="dashboard-reviews-title">{{ __('govuk_alpha.dashboard.pending_reviews_title') }}</h2>
@@ -49,7 +49,10 @@
             <div class="govuk-notification-banner__content">
                 <p class="govuk-notification-banner__heading">{{ trans_choice('govuk_alpha.dashboard.pending_reviews_body', $pendingReviewCount, ['count' => $pendingReviewCount]) }}</p>
                 <p class="govuk-body">
-                    <a class="govuk-notification-banner__link" href="{{ route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug, 'status_filter' => 'completed']) }}">{{ __('govuk_alpha.dashboard.pending_reviews_link') }}</a>
+                    {{-- Pending reviews live on the Reviews page (transactions awaiting a
+                         review), NOT the Exchanges list (exchange_requests by status) — the
+                         count and destination are the same source now (ReviewService::getPendingReviews). --}}
+                    <a class="govuk-notification-banner__link" href="{{ route('govuk-alpha.reviews.index', ['tenantSlug' => $tenantSlug]) }}#pending-heading">{{ __('govuk_alpha.dashboard.pending_reviews_link') }}</a>
                 </p>
             </div>
         </div>

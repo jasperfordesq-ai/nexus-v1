@@ -37,7 +37,7 @@
             ];
         }
 
-        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.notifications.index')) {
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.notifications.index') && \App\Core\TenantContext::hasModule('notifications')) {
             $accountLinks[] = [
                 'title' => __('govuk_alpha.notifications.title'),
                 'description' => __('govuk_alpha.notifications.description'),
@@ -93,22 +93,24 @@
             ];
         }
 
-        // Gamification — each appears automatically once its route exists.
-        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.achievements')) {
+        // Gamification — gated on the gamification feature (parity with React, which
+        // wraps achievements/leaderboard/nexus-score in <FeatureGate feature="gamification">
+        // and filters the same links out of its account/personal menus).
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.achievements') && \App\Core\TenantContext::hasFeature('gamification')) {
             $accountLinks[] = [
                 'title' => __('govuk_alpha.achievements.title'),
                 'description' => __('govuk_alpha.achievements.description'),
                 'href' => route('govuk-alpha.achievements', ['tenantSlug' => $tenantSlug]),
             ];
         }
-        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.leaderboard')) {
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.leaderboard') && \App\Core\TenantContext::hasFeature('gamification')) {
             $accountLinks[] = [
                 'title' => __('govuk_alpha.leaderboard.title'),
                 'description' => __('govuk_alpha.leaderboard.description'),
                 'href' => route('govuk-alpha.leaderboard', ['tenantSlug' => $tenantSlug]),
             ];
         }
-        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.nexus-score')) {
+        if (\Illuminate\Support\Facades\Route::has('govuk-alpha.nexus-score') && \App\Core\TenantContext::hasFeature('gamification')) {
             $accountLinks[] = [
                 'title' => __('govuk_alpha.nexus_score.title'),
                 'description' => __('govuk_alpha.nexus_score.description'),

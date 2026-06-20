@@ -353,7 +353,7 @@ trait MembersParity
         $params = array_merge([$tenantId, $tenantId, $tenantId, $tenantId], $orderedIds, $orderedIds);
         $rows = \Illuminate\Support\Facades\DB::select($sql, $params);
 
-        return array_map(function (object $row) use ($viewerId, $scoreByUserId): array {
+        return $this->alphaAttachIdentityVerified(array_map(function (object $row) use ($viewerId, $scoreByUserId): array {
             $member = (array) $row;
             $member['avatar'] = $this->resolveAsset(self::asStr($member['avatar'] ?? null) ?: null);
             $member['community_rank_score'] = $scoreByUserId[(int) $member['id']] ?? null;
@@ -364,7 +364,7 @@ trait MembersParity
             }
 
             return $member;
-        }, $rows);
+        }, $rows));
     }
 
     /**
@@ -391,6 +391,6 @@ trait MembersParity
             $out[] = $row;
         }
 
-        return $out;
+        return $this->alphaAttachIdentityVerified($out);
     }
 }

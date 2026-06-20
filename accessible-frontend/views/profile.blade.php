@@ -97,7 +97,7 @@
             </span>
             <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ $displayName }}</h1>
             <div class="nexus-alpha-inline-flex-tags govuk-!-margin-bottom-2" style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
-                @if (!empty($profile['is_verified']))
+                @if ($identityVerified ?? false)
                     <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.profile.verified') }}</strong>
                 @endif
                 <strong class="govuk-tag govuk-tag--grey">{{ __('govuk_alpha.profile.profile_type_' . $profileType) }}</strong>
