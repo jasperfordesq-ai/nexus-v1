@@ -85,6 +85,59 @@ class ExchangeService
     }
 
     /**
+     * Count the user's exchanges that are genuinely waiting on THEM to act —
+     * the signal behind the dashboard "exchanges need your attention" banner.
+     *
+     * Member-actionable states only (never raw wallet transactions):
+     *   1. pending_provider where the user is the provider → accept/decline.
+     *   2. pending_confirmation where the user's own confirmation is still
+     *      missing → confirm the hours.
+     *   3. completed where the user hasn't reviewed the linked transaction → review.
+     *
+     * Deliberately excludes pending_broker (broker's job), accepted/scheduled/
+     * in_progress (in flight, no blocking click), disputed (resolved by a broker/
+     * admin), and terminal states. Returns 0 when nothing needs the user.
+     */
+    public function countNeedingAttention(int $userId): int
+    {
+        $tenantId = TenantContext::getId();
+        if ($tenantId <= 0 || $userId <= 0) {
+            return 0;
+        }
+
+        return (int) DB::table('exchange_requests as er')
+            ->where('er.tenant_id', $tenantId)
+            ->where(fn ($q) => $q->where('er.requester_id', $userId)->orWhere('er.provider_id', $userId))
+            ->where(function ($outer) use ($userId, $tenantId) {
+                // 1. Incoming request you (the provider) must accept or decline.
+                $outer->where(function ($s) use ($userId) {
+                    $s->where('er.status', self::STATUS_PENDING)->where('er.provider_id', $userId);
+                })
+                // 2. Completion awaiting YOUR confirmation (your timestamp is null).
+                ->orWhere(function ($s) use ($userId) {
+                    $s->where('er.status', 'pending_confirmation')
+                      ->where(function ($c) use ($userId) {
+                          $c->where(fn ($r) => $r->where('er.requester_id', $userId)->whereNull('er.requester_confirmed_at'))
+                            ->orWhere(fn ($p) => $p->where('er.provider_id', $userId)->whereNull('er.provider_confirmed_at'));
+                      });
+                })
+                // 3. Completed exchange you have not reviewed yet.
+                ->orWhere(function ($s) use ($userId, $tenantId) {
+                    $s->where('er.status', self::STATUS_COMPLETED)
+                      ->whereNotNull('er.transaction_id')
+                      ->whereNotExists(function ($sub) use ($userId, $tenantId) {
+                          $sub->selectRaw('1')
+                              ->from('reviews as r')
+                              ->whereColumn('r.transaction_id', 'er.transaction_id')
+                              ->where('r.tenant_id', $tenantId)
+                              ->where('r.reviewer_id', $userId);
+                      });
+                });
+            })
+            ->count();
+    }
+
+    /**
      * Get a single exchange by ID.
      */
     public function getById(int $id): ?array

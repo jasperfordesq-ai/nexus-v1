@@ -735,6 +735,19 @@ class AlphaController extends Controller
             ->where('tenant_id', TenantContext::getId())
             ->value('onboarding_completed');
 
+        // Exchanges genuinely waiting on this member to act (accept a request,
+        // confirm completion, or review a completed exchange) — drives the
+        // dashboard banner. Driven by the exchange workflow (exchange_requests),
+        // NOT raw wallet transactions, so it stays silent when nothing is pending.
+        $exchangeAttentionCount = 0;
+        if (TenantContext::hasModule('listings')) {
+            try {
+                $exchangeAttentionCount = app(ExchangeService::class)->countNeedingAttention($userId);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
         $endorsements = [];
         try {
             $endorsements = \App\Services\EndorsementService::getEndorsementsForUser($userId);
@@ -758,6 +771,7 @@ class AlphaController extends Controller
             'badges' => $badges,
             'upcomingEvents' => $upcomingEvents,
             'onboardingCompleted' => $onboardingCompleted,
+            'exchangeAttentionCount' => $exchangeAttentionCount,
             'endorsements' => $endorsements,
             'firstName' => $firstName,
             'status' => self::asStr($request->query('status')) ?: null,

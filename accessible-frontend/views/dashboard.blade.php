@@ -41,13 +41,24 @@
         </div>
     @endif
 
-    {{-- The "exchanges to review" prompt was removed: it was driven by
-         ReviewService::getPendingReviews(), which counts every completed wallet
-         TRANSACTION (time-credit transfer) the member hasn't reviewed — not the
-         exchange workflow. For an active timebank member that surfaced dozens of
-         transfers as phantom "completed exchanges to review", which is noise. If a
-         genuine "review your completed exchanges" prompt is wanted, it must count
-         completed exchange_requests awaiting review, not raw transactions. --}}
+    {{-- "Exchanges need your attention" — driven by the exchange workflow
+         (exchange_requests via ExchangeService::countNeedingAttention): a request
+         to accept, a completion to confirm, or a completed exchange to review.
+         NOT raw wallet transactions, so it stays silent unless a real exchange is
+         waiting on the member. --}}
+    @if (($exchangeAttentionCount ?? 0) > 0 && \App\Core\TenantContext::hasModule('listings') && \Illuminate\Support\Facades\Route::has('govuk-alpha.exchanges.index'))
+        <div class="govuk-notification-banner" data-module="govuk-notification-banner" role="region" aria-labelledby="dashboard-reviews-title">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="dashboard-reviews-title">{{ __('govuk_alpha.dashboard.pending_reviews_title') }}</h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">{{ trans_choice('govuk_alpha.dashboard.pending_reviews_body', $exchangeAttentionCount, ['count' => $exchangeAttentionCount]) }}</p>
+                <p class="govuk-body">
+                    <a class="govuk-notification-banner__link" href="{{ route('govuk-alpha.exchanges.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.dashboard.pending_reviews_link') }}</a>
+                </p>
+            </div>
+        </div>
+    @endif
 
     @if (\App\Core\TenantContext::hasModule('listings'))
         <div class="govuk-button-group govuk-!-margin-bottom-6">

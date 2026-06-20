@@ -123,6 +123,34 @@ class AccessibleBugfixesParityTest extends TestCase
         ]);
     }
 
+    private function seedListing(int $ownerId): int
+    {
+        return (int) DB::table('listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $ownerId,
+            'title' => 'Attention test listing',
+            'type' => 'offer',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function seedExchange(int $requesterId, int $providerId, string $status, array $extra = []): int
+    {
+        $listingId = $this->seedListing($providerId);
+
+        return (int) DB::table('exchange_requests')->insertGetId(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'listing_id' => $listingId,
+            'requester_id' => $requesterId,
+            'provider_id' => $providerId,
+            'proposed_hours' => 1.00,
+            'status' => $status,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $extra));
+    }
+
     // ── Bug 1: identity verification ─────────────────────────────────────────
 
     public function test_profile_hides_verified_tag_for_email_only_member(): void
@@ -184,33 +212,74 @@ class AccessibleBugfixesParityTest extends TestCase
         $this->get("/{$this->testTenantSlug}/alpha/dashboard")->assertStatus(403);
     }
 
-    // ── Bug 3: the misleading "exchanges to review" banner is REMOVED ────────
+    // ── Bug 3: "exchanges need your attention" banner = exchange workflow ────
     //
-    // The banner was driven by ReviewService::getPendingReviews(), which counts
-    // every completed wallet TRANSACTION (time-credit transfer) the member hasn't
-    // reviewed — NOT the exchange workflow. For an active timebank member that
-    // surfaced dozens of transfers as phantom "completed exchanges to review".
-    // The banner must NOT render even when such transactions exist.
+    // The banner must be driven by exchange_requests that genuinely need the
+    // member to act (ExchangeService::countNeedingAttention) — NOT raw wallet
+    // transactions. Completed time-credit transfers must NOT trigger it; a real
+    // pending exchange MUST, and it links to the Exchanges list (not /reviews).
 
-    public function test_dashboard_does_not_show_pending_reviews_banner_for_transactions(): void
+    public function test_dashboard_banner_silent_for_wallet_transactions_only(): void
     {
         $reviewer = $this->authenticatedUser();
         $a = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $b = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
 
-        // Completed peer transactions that getPendingReviews() WOULD have counted.
+        // Completed wallet transfers (no exchange_request) — the old phantom source.
         $this->seedCompletedPeerTransaction($reviewer->id, $a->id);
         $this->seedCompletedPeerTransaction($reviewer->id, $b->id);
 
         $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
         $response->assertOk();
 
-        // No "exchanges to review" banner, no link to the reviews pending section,
-        // and no stale link to the exchanges "completed" tab.
-        $response->assertDontSee(__('govuk_alpha.dashboard.pending_reviews_title'));
+        // No banner, and never a link to /reviews or the old exchanges completed tab.
         $response->assertDontSee('dashboard-reviews-title', false);
         $response->assertDontSee('#pending-heading', false);
         $response->assertDontSee('status_filter=completed', false);
+    }
+
+    public function test_dashboard_banner_shows_for_pending_exchange_and_links_to_exchanges(): void
+    {
+        $provider = $this->authenticatedUser();
+        $requester = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+
+        // An incoming request the provider must accept/decline → needs their action.
+        $this->seedExchange($requester->id, $provider->id, 'pending_provider');
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
+        $response->assertOk();
+
+        $response->assertSee('dashboard-reviews-title', false);
+        $response->assertSee(__('govuk_alpha.dashboard.pending_reviews_title'));
+        // Links to the Exchanges list — never /reviews.
+        $response->assertSee(route('govuk-alpha.exchanges.index', ['tenantSlug' => $this->testTenantSlug]), false);
+        $response->assertDontSee('#pending-heading', false);
+    }
+
+    public function test_exchange_attention_count_excludes_transactions_and_others_requests(): void
+    {
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        $provider = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $requester = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
+
+        $svc = app(\App\Services\ExchangeService::class);
+
+        // A pending_provider request to $provider counts for the provider…
+        $this->seedExchange($requester->id, $provider->id, 'pending_provider');
+        // …but NOT for the requester (it's the provider's move).
+        $this->assertSame(1, $svc->countNeedingAttention($provider->id));
+        $this->assertSame(0, $svc->countNeedingAttention($requester->id));
+
+        // An in-progress exchange is in flight → counts for nobody.
+        $this->seedExchange($requester->id, $other->id, 'in_progress');
+        $this->assertSame(0, $svc->countNeedingAttention($other->id));
+
+        // Wallet transactions never count.
+        $this->seedCompletedPeerTransaction($provider->id, $requester->id);
+        $this->assertSame(1, $svc->countNeedingAttention($provider->id));
     }
 
     public function test_account_hub_hides_gamification_links_when_feature_disabled(): void
