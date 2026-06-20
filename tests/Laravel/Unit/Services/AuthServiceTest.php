@@ -54,10 +54,10 @@ class AuthServiceTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function test_login_returns_user_and_token_on_success(): void
-    {
-        $this->markTestIncomplete('Requires integration test — User model method calls (only, password check) need real model');
-    }
+    // The login() success path (token issuance) is covered against a real DB by
+    // tests/Laravel/Feature/Services/AuthServiceTest::test_login_returns_user_and_token_on_valid_credentials
+    // and at the live controller layer by AuthControllerTest::test_login_returns_token_and_user_on_valid_credentials.
+    // The previous markTestIncomplete stub here asserted nothing and is removed as redundant theatre.
 
     public function test_logout_returns_true_when_token_deleted(): void
     {

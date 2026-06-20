@@ -39,21 +39,39 @@ class AuthServiceTest extends TestCase
 
     public function test_login_returns_user_and_token_on_valid_credentials(): void
     {
+        // NOTE: AuthService::login() checks the `password` column and Hash::check against
+        // it (the live login path is AuthController::login, which uses password_hash + JWT;
+        // AuthService::login is a legacy service method — see docs/MORNING-REPORT.md). To
+        // exercise its success branch we must populate the column it actually reads.
         $email = 'authsvc_' . uniqid() . '@example.com';
-        User::factory()->forTenant($this->testTenantId)->create([
-            'email' => $email,
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'email'         => $email,
             'password_hash' => Hash::make('correct-password'),
-            'status' => 'active',
+            'status'        => 'active',
+            'is_approved'   => true,
         ]);
+        // `password` is not mass-assignable; set the column AuthService::login reads directly.
+        \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)
+            ->update(['password' => Hash::make('correct-password')]);
 
-        $result = $this->service->login($email, 'correct-password');
+        // Re-pin: factory create drifts TenantContext, and login() runs a tenant-scoped
+        // User query — it must resolve against the tenant the user was created in.
+        \App\Core\TenantContext::setById($this->testTenantId);
 
-        // Login may return null if AuthService uses a different auth mechanism
-        if ($result !== null) {
-            $this->assertIsArray($result);
-        } else {
-            $this->markTestIncomplete('AuthService::login() returned null — may use different auth mechanism');
+        try {
+            $result = $this->service->login($email, 'correct-password');
+        } catch (\Illuminate\Database\QueryException $e) {
+            // On success login issues a token via createApiToken() -> INSERT INTO api_tokens,
+            // which is absent from the lean local nexus_test but present in full CI.
+            $this->markTestSkipped('api_tokens table absent — token issuance cannot run in this DB');
         }
+
+        // Valid credentials -> a real session payload carrying the user and an issued token.
+        $this->assertIsArray($result, 'Valid credentials must return a session array, not null');
+        $this->assertArrayHasKey('user', $result);
+        $this->assertArrayHasKey('token', $result);
+        $this->assertSame($email, $result['user']['email']);
+        $this->assertNotEmpty($result['token']);
     }
 
     // ------------------------------------------------------------------
