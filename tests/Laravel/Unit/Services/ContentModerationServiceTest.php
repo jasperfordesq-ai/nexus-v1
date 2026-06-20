@@ -6,14 +6,57 @@
 
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
-use App\Services\ContentModerationService;
+use App\Core\TenantContext;
 use App\Models\ContentModerationQueue;
+use App\Models\User;
+use App\Services\ContentModerationService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
-use Mockery;
+use Tests\Laravel\TestCase;
 
+/**
+ * Real-DB tests for ContentModerationService.
+ *
+ * Previously most methods were markTestIncomplete ("Eloquent models cannot use
+ * shouldReceive()") or stubbed with DB::shouldReceive(). They now run against
+ * the real nexus_test database inside a rolled-back transaction.
+ *
+ * Tenant gotcha: ContentModerationQueue is tenant-scoped via HasTenantScope, so
+ * every query reads TenantContext::getId(). User::factory() / model creation can
+ * drift TenantContext, so we re-pin `TenantContext::setById($this->testTenantId)`
+ * immediately before each tenant-scoped service call.
+ *
+ * Real FK ids: author_id / reviewer_id are FKs to users — we create real users
+ * via User::factory()->forTenant() and pass their ids, never literals.
+ *
+ * The factory's default content_type can be an out-of-enum value (it includes
+ * 'feed_post'/'message'); the table enum is post|listing|event|comment|group, so
+ * we always pass an explicit valid content_type and status on create.
+ */
 class ContentModerationServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
+    /**
+     * Create a pending moderation-queue row owned by the test tenant.
+     */
+    private function makePendingItem(int $authorId, string $contentType = 'post', int $contentId = 12345): ContentModerationQueue
+    {
+        TenantContext::setById($this->testTenantId);
+
+        return ContentModerationQueue::factory()->forTenant($this->testTenantId)->create([
+            'content_type'  => $contentType,
+            'content_id'    => $contentId,
+            'author_id'     => $authorId,
+            'status'        => 'pending',
+            'auto_flagged'  => 0,
+            'reviewer_id'   => null,
+            'reviewed_at'   => null,
+        ]);
+    }
+
+    // --- Pure constant / static-data assertions (no DB) ---
+
     public function test_constants_defined(): void
     {
         $this->assertContains('post', ContentModerationService::CONTENT_TYPES);
@@ -24,20 +67,77 @@ class ContentModerationServiceTest extends TestCase
         $this->assertSame('flagged', ContentModerationService::STATUS_FLAGGED);
     }
 
+    // --- detectSpam: pure regex, no DB ---
+
+    public function test_detectSpam_flags_known_spam_phrases(): void
+    {
+        $this->assertTrue(ContentModerationService::detectSpam('Hey, buy now and click here for a limited offer!'));
+        $this->assertTrue(ContentModerationService::detectSpam('FREE MONEY ACT NOW'));
+    }
+
+    public function test_detectSpam_passes_clean_content(): void
+    {
+        $this->assertFalse(ContentModerationService::detectSpam('Just sharing an update about my day at the community garden.'));
+    }
+
+    // --- approve() ---
+
     public function test_approve_returns_true_on_success(): void
     {
-        $this->markTestIncomplete('Requires integration test — Eloquent models cannot use shouldReceive()');
+        $author = User::factory()->forTenant($this->testTenantId)->create();
+        $admin  = User::factory()->forTenant($this->testTenantId)->create();
+        $item   = $this->makePendingItem((int) $author->id, 'comment', 10);
+
+        TenantContext::setById($this->testTenantId);
+        $this->assertTrue(
+            ContentModerationService::approve((int) $item->id, $this->testTenantId, (int) $admin->id)
+        );
+
+        $fresh = ContentModerationQueue::withoutGlobalScopes()->find($item->id);
+        $this->assertSame('approved', $fresh->status);
+        $this->assertSame((int) $admin->id, (int) $fresh->reviewer_id);
+        $this->assertNotNull($fresh->reviewed_at);
     }
 
     public function test_approve_returns_false_when_not_pending(): void
     {
-        $this->markTestIncomplete('Requires integration test — Eloquent models cannot use shouldReceive()');
+        $author = User::factory()->forTenant($this->testTenantId)->create();
+        $admin  = User::factory()->forTenant($this->testTenantId)->create();
+        $item   = $this->makePendingItem((int) $author->id, 'comment', 11);
+
+        // First approval transitions away from pending.
+        TenantContext::setById($this->testTenantId);
+        $this->assertTrue(
+            ContentModerationService::approve((int) $item->id, $this->testTenantId, (int) $admin->id)
+        );
+
+        // A second call must be a no-op (already non-pending).
+        TenantContext::setById($this->testTenantId);
+        $this->assertFalse(
+            ContentModerationService::approve((int) $item->id, $this->testTenantId, (int) $admin->id)
+        );
     }
+
+    // --- reject() ---
 
     public function test_reject_returns_true_on_success(): void
     {
-        $this->markTestIncomplete('Requires integration test — Eloquent models cannot use shouldReceive()');
+        $author = User::factory()->forTenant($this->testTenantId)->create();
+        $admin  = User::factory()->forTenant($this->testTenantId)->create();
+        $item   = $this->makePendingItem((int) $author->id, 'listing', 20);
+
+        TenantContext::setById($this->testTenantId);
+        $this->assertTrue(
+            ContentModerationService::reject((int) $item->id, $this->testTenantId, (int) $admin->id, 'spam')
+        );
+
+        $fresh = ContentModerationQueue::withoutGlobalScopes()->find($item->id);
+        $this->assertSame('rejected', $fresh->status);
+        $this->assertSame((int) $admin->id, (int) $fresh->reviewer_id);
+        $this->assertSame('spam', $fresh->rejection_reason);
     }
+
+    // --- review() — pure validation guard (no DB) ---
 
     public function test_review_returns_error_for_invalid_decision(): void
     {
@@ -46,32 +146,192 @@ class ContentModerationServiceTest extends TestCase
         $this->assertStringContainsString('Invalid decision', $result['message']);
     }
 
+    // --- review() — real-DB guards ---
+
     public function test_review_returns_error_when_item_not_found(): void
     {
-        $this->markTestIncomplete('Requires integration test — Eloquent models cannot use shouldReceive()');
+        $admin = User::factory()->forTenant($this->testTenantId)->create();
+
+        TenantContext::setById($this->testTenantId);
+        $result = ContentModerationService::review(99999999, $this->testTenantId, (int) $admin->id, 'approved');
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('Moderation queue item not found.', $result['message']);
     }
 
     public function test_review_returns_error_when_already_reviewed(): void
     {
-        $this->markTestIncomplete('Requires integration test — Eloquent models cannot use shouldReceive()');
+        $author = User::factory()->forTenant($this->testTenantId)->create();
+        $admin  = User::factory()->forTenant($this->testTenantId)->create();
+        $item   = $this->makePendingItem((int) $author->id, 'comment', 30);
+
+        // First review approves it.
+        TenantContext::setById($this->testTenantId);
+        $first = ContentModerationService::review((int) $item->id, $this->testTenantId, (int) $admin->id, 'approved');
+        $this->assertTrue($first['success']);
+
+        // Second review must be rejected as already-reviewed.
+        TenantContext::setById($this->testTenantId);
+        $second = ContentModerationService::review((int) $item->id, $this->testTenantId, (int) $admin->id, 'approved');
+        $this->assertFalse($second['success']);
+        $this->assertSame('This item has already been reviewed.', $second['message']);
     }
 
     public function test_review_requires_rejection_reason(): void
     {
-        $this->markTestIncomplete('Requires integration test — Eloquent models cannot use shouldReceive()');
+        $author = User::factory()->forTenant($this->testTenantId)->create();
+        $admin  = User::factory()->forTenant($this->testTenantId)->create();
+        $item   = $this->makePendingItem((int) $author->id, 'post', 40);
+
+        TenantContext::setById($this->testTenantId);
+        $result = ContentModerationService::review((int) $item->id, $this->testTenantId, (int) $admin->id, 'rejected');
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('Rejection reason is required.', $result['message']);
+
+        // Item must remain pending — a rejected-without-reason call changes nothing.
+        $fresh = ContentModerationQueue::withoutGlobalScopes()->find($item->id);
+        $this->assertSame('pending', $fresh->status);
     }
+
+    public function test_review_approve_succeeds_and_persists_decision(): void
+    {
+        $author = User::factory()->forTenant($this->testTenantId)->create();
+        $admin  = User::factory()->forTenant($this->testTenantId)->create();
+        $item   = $this->makePendingItem((int) $author->id, 'post', 50);
+
+        TenantContext::setById($this->testTenantId);
+        $result = ContentModerationService::review((int) $item->id, $this->testTenantId, (int) $admin->id, 'approved');
+
+        $this->assertTrue($result['success']);
+        $this->assertSame('post', $result['content_type']);
+        $this->assertSame(50, $result['content_id']);
+
+        $fresh = ContentModerationQueue::withoutGlobalScopes()->find($item->id);
+        $this->assertSame('approved', $fresh->status);
+        $this->assertSame((int) $admin->id, (int) $fresh->reviewer_id);
+        $this->assertNotNull($fresh->reviewed_at);
+    }
+
+    // --- getStats() ---
 
     public function test_getStats_returns_expected_keys(): void
     {
-        $this->markTestIncomplete('Requires integration test — Eloquent models cannot use shouldReceive()');
+        TenantContext::setById($this->testTenantId);
+        $stats = ContentModerationService::getStats($this->testTenantId);
+
+        foreach (['pending', 'approved', 'rejected', 'flagged', 'total'] as $key) {
+            $this->assertArrayHasKey($key, $stats);
+            $this->assertIsInt($stats[$key]);
+        }
     }
 
-    public function test_updateSettings_returns_true_on_success(): void
+    public function test_getStats_counts_a_new_pending_item(): void
     {
-        DB::shouldReceive('table')->with('tenant_settings')->andReturnSelf();
-        DB::shouldReceive('updateOrInsert')->andReturn(true);
+        $author = User::factory()->forTenant($this->testTenantId)->create();
 
-        $result = ContentModerationService::updateSettings(2, ['enabled' => true, 'auto_filter' => true]);
+        TenantContext::setById($this->testTenantId);
+        $before = ContentModerationService::getStats($this->testTenantId);
+
+        $this->makePendingItem((int) $author->id, 'post', 60);
+
+        TenantContext::setById($this->testTenantId);
+        $after = ContentModerationService::getStats($this->testTenantId);
+
+        $this->assertSame($before['pending'] + 1, $after['pending']);
+        $this->assertSame($before['total'] + 1, $after['total']);
+    }
+
+    // --- getReports() ---
+
+    public function test_getReports_returns_items_and_total(): void
+    {
+        $author = User::factory()->forTenant($this->testTenantId)->create();
+        $item   = $this->makePendingItem((int) $author->id, 'post', 70);
+
+        TenantContext::setById($this->testTenantId);
+        $reports = ContentModerationService::getReports($this->testTenantId, ['status' => 'pending', 'limit' => 50]);
+
+        $this->assertArrayHasKey('items', $reports);
+        $this->assertArrayHasKey('total', $reports);
+        $this->assertIsArray($reports['items']);
+        $this->assertIsInt($reports['total']);
+        $this->assertGreaterThanOrEqual(1, $reports['total']);
+
+        $ids = array_column($reports['items'], 'id');
+        $this->assertContains($item->id, $ids);
+    }
+
+    // --- getQueue() ---
+
+    public function test_getQueue_returns_shaped_items(): void
+    {
+        $author = User::factory()->forTenant($this->testTenantId)->create();
+        $item   = $this->makePendingItem((int) $author->id, 'post', 80);
+
+        TenantContext::setById($this->testTenantId);
+        $queue = ContentModerationService::getQueue($this->testTenantId, ['status' => 'pending'], 50, 0);
+
+        $this->assertArrayHasKey('items', $queue);
+        $this->assertArrayHasKey('total', $queue);
+        $this->assertIsArray($queue['items']);
+        $this->assertGreaterThanOrEqual(1, $queue['total']);
+
+        $row = null;
+        foreach ($queue['items'] as $candidate) {
+            if ((int) $candidate['id'] === (int) $item->id) {
+                $row = $candidate;
+                break;
+            }
+        }
+        $this->assertNotNull($row, 'Inserted pending item should appear in the queue');
+
+        foreach (['id', 'content_type', 'content_id', 'title', 'status', 'author', 'auto_flagged', 'flag_reason', 'reviewer', 'reviewed_at', 'rejection_reason', 'created_at', 'updated_at'] as $key) {
+            $this->assertArrayHasKey($key, $row);
+        }
+        $this->assertSame('post', $row['content_type']);
+        $this->assertSame(80, $row['content_id']);
+        $this->assertSame((int) $author->id, $row['author']['id']);
+    }
+
+    // --- getModerationSettings() / updateSettings() round-trip ---
+
+    public function test_getModerationSettings_returns_all_boolean_keys(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $settings = ContentModerationService::getModerationSettings($this->testTenantId);
+
+        foreach (['enabled', 'require_post', 'require_listing', 'require_event', 'require_comment', 'auto_filter'] as $key) {
+            $this->assertArrayHasKey($key, $settings);
+            $this->assertIsBool($settings[$key]);
+        }
+    }
+
+    public function test_updateSettings_persists_and_is_readable(): void
+    {
+        // Start from a known-clean state for this tenant's moderation settings.
+        DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('setting_key', 'LIKE', 'moderation.%')
+            ->delete();
+
+        $result = ContentModerationService::updateSettings($this->testTenantId, [
+            'enabled'     => true,
+            'auto_filter' => true,
+        ]);
         $this->assertTrue($result);
+
+        // Real round-trip: the written values come back from the DB, not a mock.
+        $settings = ContentModerationService::getModerationSettings($this->testTenantId);
+        $this->assertTrue($settings['enabled']);
+        $this->assertTrue($settings['auto_filter']);
+        // Keys that were not set stay at their default (false).
+        $this->assertFalse($settings['require_post']);
+
+        // Direct row check confirms updateOrInsert wrote a real row.
+        $this->assertSame('1', (string) DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('setting_key', 'moderation.enabled')
+            ->value('setting_value'));
     }
 }
