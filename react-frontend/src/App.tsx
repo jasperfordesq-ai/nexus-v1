@@ -1205,8 +1205,16 @@ function AppRoutes() {
               <BlockedUsersPage />
             </FeatureErrorBoundary>
           } />
-          <Route path="verify-identity-optional" element={<VerifyIdentityOptionalPage />} />
-          <Route path="verify-identity/callback" element={<VerifyIdentityOptionalPage />} />
+          <Route path="verify-identity-optional" element={
+            <FeatureGate feature="identity_verification" redirect="/dashboard">
+              <VerifyIdentityOptionalPage />
+            </FeatureGate>
+          } />
+          <Route path="verify-identity/callback" element={
+            <FeatureGate feature="identity_verification" redirect="/dashboard">
+              <VerifyIdentityOptionalPage />
+            </FeatureGate>
+          } />
           <Route path="search" element={
             <FeatureGate feature="search" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Search">

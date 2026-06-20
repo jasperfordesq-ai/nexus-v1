@@ -405,7 +405,9 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* Identity Verification Status */}
               <VerificationBadgeRow userId={user.id} size="sm" />
-              <IdentityVerificationCTA userId={user.id} tenantPath={tenantPath} onClose={onClose} />
+              {hasFeature('identity_verification') && (
+                <IdentityVerificationCTA userId={user.id} tenantPath={tenantPath} onClose={onClose} />
+              )}
 
               {/* Quick Stats */}
               <div className="grid grid-cols-3 gap-2 mt-3 min-w-0">

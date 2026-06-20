@@ -46,6 +46,10 @@ class TenantFeatureConfig
         'local_advertising' => false,
         'regional_analytics' => false,
         'newsletter' => true,
+        // Identity verification (Stripe Identity "ID Verified" badge). Default ON
+        // so the member-facing "Verify Identity" affordance keeps showing where it
+        // already does; admins can turn it off per tenant in Module Configuration.
+        'identity_verification' => true,
         // Maps default OFF platform-wide: the map system has had display issues
         // (Google AdvancedMarkers need a Map ID, etc.), so maps are opt-in per
         // tenant via the admin "Maps & location" kill switch rather than on by

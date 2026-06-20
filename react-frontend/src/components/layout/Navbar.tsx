@@ -121,9 +121,16 @@ export function getVisibleCommunityItems(
   return items.filter(item => !item.feature || hasFeature(item.feature));
 }
 
-const utilityBarActionClass = 'utility-bar-action inline-flex items-center justify-center rounded-[8px] !bg-transparent hover:!bg-transparent data-[hovered=true]:!bg-transparent data-[pressed=true]:!bg-transparent !shadow-none border-0 outline-solid outline-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2 text-theme-muted hover:text-theme-primary h-8 min-w-0 px-2.5 gap-1.5 text-xs shrink-0 transition-colors';
+// Base styling shared by every utility-bar item, WITHOUT a text colour so each
+// variant can own its own colour cleanly.
+const utilityBarActionBase = 'utility-bar-action inline-flex items-center justify-center rounded-[8px] !bg-transparent hover:!bg-transparent data-[hovered=true]:!bg-transparent data-[pressed=true]:!bg-transparent !shadow-none border-0 outline-solid outline-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2 h-8 min-w-0 px-2.5 gap-1.5 text-xs shrink-0 transition-colors';
+const utilityBarActionClass = `${utilityBarActionBase} text-theme-muted hover:text-theme-primary`;
 const utilityBarIconActionClass = `${utilityBarActionClass} w-8 min-w-8 px-0`;
-const utilityBarSuccessActionClass = `${utilityBarActionClass} text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold`;
+// Verified / "Verify Identity" affordance — green. Built from the colourless base
+// (not utilityBarActionClass) so it never inherits text-theme-muted, and the emerald
+// utilities use the important modifier because the `.text-theme-*` helpers in
+// index.css are unlayered and would otherwise win over Tailwind's layered colours.
+const utilityBarSuccessActionClass = `${utilityBarActionBase} !text-emerald-600 hover:!text-emerald-700 dark:!text-emerald-400 dark:hover:!text-emerald-300 font-semibold`;
 const utilityBarDividerClass = 'text-[var(--border-default)] text-xs select-none shrink-0 opacity-70';
 
 export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChange, isMobileMenuOpen }: NavbarProps) {
@@ -214,11 +221,13 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     requestInstall(installState);
   }, [closeAllDropdowns, installState]);
 
-  // Identity verification status — shows "Verify Identity" or "Identity Verified" in utility bar
+  // Identity verification status — shows "Verify Identity" or "Identity Verified" in
+  // utility bar. Gated by the per-tenant `identity_verification` feature flag.
+  const identityVerificationEnabled = hasFeature('identity_verification');
   const [isIdVerified, setIsIdVerified] = useState<boolean>(false);
   const [idVerifiedLoaded, setIdVerifiedLoaded] = useState(false);
   useEffect(() => {
-    if (!isAuthenticated || !user?.id) return;
+    if (!isAuthenticated || !user?.id || !identityVerificationEnabled) return;
     let cancelled = false;
     import('@/lib/api').then(({ api }) => {
       api.get<IdentityStatusResponse>('/v2/identity/status').then((res) => {
@@ -233,7 +242,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       if (!cancelled) { setIsIdVerified(false); setIdVerifiedLoaded(true); }
     });
     return () => { cancelled = true; };
-  }, [isAuthenticated, user?.id]);
+  }, [isAuthenticated, user?.id, identityVerificationEnabled]);
 
   const dropdownNavigate = useCallback((path: string) => {
     closeAllDropdowns();
@@ -504,8 +513,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         >
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-end gap-2 h-9 flex-nowrap overflow-x-auto">
-              {/* Identity verification status */}
-              {isAuthenticated && idVerifiedLoaded && (
+              {/* Identity verification status — only when the feature is enabled */}
+              {isAuthenticated && identityVerificationEnabled && idVerifiedLoaded && (
                 <>
                   <span className={utilityBarDividerClass}>|</span>
                   {isIdVerified ? (

@@ -106,6 +106,9 @@ const defaultFeatures: TenantFeatures = {
   marketplace: false,
   message_translation: true,
   member_premium: false,
+  // Identity verification (Stripe Identity "ID Verified" badge). Default ON so the
+  // "Verify Identity" affordance keeps showing; admins can disable it per tenant.
+  identity_verification: true,
   partner_api: false,
   ai_agents: false,
   fadp_compliance: false,

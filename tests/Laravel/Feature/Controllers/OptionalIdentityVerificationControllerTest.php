@@ -6,8 +6,10 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Core\TenantContext;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -51,5 +53,53 @@ class OptionalIdentityVerificationControllerTest extends TestCase
         // Identity SDK isn't configured in the test environment.
         $this->assertNotEquals(401, $response->status());
         $this->assertNotEquals(403, $response->status());
+    }
+
+    /** Toggle the per-tenant identity_verification feature flag. */
+    private function setIdentityVerificationFeature(bool $enabled): void
+    {
+        $row = DB::table('tenants')->where('id', $this->testTenantId)->first();
+        $features = [];
+        if ($row && !empty($row->features)) {
+            $decoded = is_string($row->features) ? json_decode($row->features, true) : $row->features;
+            if (is_array($decoded)) {
+                $features = $decoded;
+            }
+        }
+        $features['identity_verification'] = $enabled;
+        DB::table('tenants')->where('id', $this->testTenantId)->update([
+            'features' => json_encode($features),
+        ]);
+        TenantContext::setById($this->testTenantId);
+    }
+
+    public function test_start_verification_returns_403_when_feature_disabled(): void
+    {
+        $this->setIdentityVerificationFeature(false);
+        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]));
+        $this->apiPost('/v2/identity/start', [])->assertStatus(403);
+    }
+
+    public function test_save_dob_returns_403_when_feature_disabled(): void
+    {
+        $this->setIdentityVerificationFeature(false);
+        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]));
+        $this->apiPost('/v2/identity/save-dob', ['date_of_birth' => '1990-01-01'])->assertStatus(403);
+    }
+
+    public function test_create_payment_returns_403_when_feature_disabled(): void
+    {
+        $this->setIdentityVerificationFeature(false);
+        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]));
+        $this->apiPost('/v2/identity/create-payment', [])->assertStatus(403);
     }
 }

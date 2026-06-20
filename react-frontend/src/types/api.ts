@@ -1149,6 +1149,8 @@ export interface TenantFeatures {
   marketplace: boolean;
   message_translation: boolean;
   member_premium: boolean;
+  /** Identity verification (Stripe Identity "ID Verified" badge) — default ON. */
+  identity_verification: boolean;
   partner_api: boolean;
   ai_agents: boolean;
   fadp_compliance: boolean;

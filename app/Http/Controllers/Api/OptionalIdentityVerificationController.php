@@ -33,6 +33,22 @@ class OptionalIdentityVerificationController extends BaseApiController
     ) {}
 
     /**
+     * Optional identity verification is gated by the per-tenant
+     * `identity_verification` feature flag (admin Module Configuration). When an
+     * admin turns it off, members can no longer start or progress a new
+     * verification. Read-only status (getStatus) stays available so existing
+     * "ID Verified" badges keep rendering. Returns a 403 response when disabled,
+     * or null when the feature is enabled.
+     */
+    private function guardFeatureEnabled(): ?JsonResponse
+    {
+        if (!TenantContext::hasFeature('identity_verification')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+        return null;
+    }
+
+    /**
      * GET /api/v2/identity/status
      *
      * Returns verification status, badge state, DOB status, and fee info.
@@ -178,6 +194,10 @@ class OptionalIdentityVerificationController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
 
+        if ($disabled = $this->guardFeatureEnabled()) {
+            return $disabled;
+        }
+
         // If already verified, DOB is locked
         $badges = $this->badgeService->getUserBadges($userId);
         $hasIdBadge = collect($badges)->contains(fn($b) => $b['badge_type'] === 'id_verified');
@@ -229,6 +249,10 @@ class OptionalIdentityVerificationController extends BaseApiController
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
 
+        if ($disabled = $this->guardFeatureEnabled()) {
+            return $disabled;
+        }
+
         $feeCents = IdentityVerificationPaymentService::getFeeCents($tenantId);
 
         if ($feeCents <= 0) {
@@ -275,6 +299,10 @@ class OptionalIdentityVerificationController extends BaseApiController
     {
         $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
+
+        if ($disabled = $this->guardFeatureEnabled()) {
+            return $disabled;
+        }
 
         $this->rateLimit("optional_verify_{$userId}", 20, 3600);
 
