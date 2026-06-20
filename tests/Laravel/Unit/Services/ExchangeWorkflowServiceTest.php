@@ -6,11 +6,18 @@
 
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
+use App\Core\TenantContext;
+use App\Models\Listing;
+use App\Models\User;
 use App\Services\ExchangeWorkflowService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
+use Tests\Laravel\TestCase;
 
 class ExchangeWorkflowServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     // ExchangeWorkflowService uses Eloquent models (ExchangeRequest, Listing, ExchangeHistory)
     // with complex state machine transitions. Best tested as integration tests.
 
@@ -36,31 +43,72 @@ class ExchangeWorkflowServiceTest extends TestCase
 
     public function test_getExchange_returns_null_when_not_found(): void
     {
-        \Illuminate\Support\Facades\DB::shouldReceive('table->join->join->join->leftJoin->leftJoin->where->where->select->first')
-            ->andReturn(null);
-
-        $result = ExchangeWorkflowService::getExchange(999);
-        $this->assertNull($result);
+        // Real query against nexus_test: an id that does not exist must resolve to null
+        // (exercises the actual tenant-scoped join, not a mocked chain).
+        TenantContext::setById($this->testTenantId);
+        $this->assertNull(ExchangeWorkflowService::getExchange(999999999));
     }
 
     public function test_getStatistics_returns_expected_structure(): void
     {
-        \Illuminate\Support\Facades\DB::shouldReceive('table->where->where->count')->andReturn(0);
-
+        // Real call: runs the five tenant-scoped count queries against nexus_test.
+        TenantContext::setById($this->testTenantId);
         $result = ExchangeWorkflowService::getStatistics(30);
-        $this->assertArrayHasKey('total', $result);
-        $this->assertArrayHasKey('completed', $result);
-        $this->assertArrayHasKey('pending_broker', $result);
-        $this->assertArrayHasKey('cancelled', $result);
-        $this->assertArrayHasKey('disputed', $result);
-        $this->assertArrayHasKey('days', $result);
+
+        foreach (['total', 'completed', 'pending_broker', 'cancelled', 'disputed', 'days'] as $key) {
+            $this->assertArrayHasKey($key, $result);
+        }
+        $this->assertIsInt($result['total']);
+        $this->assertGreaterThanOrEqual(0, $result['total']);
+        $this->assertSame(30, $result['days']);
+        // total must be >= each sub-count (they are subsets of all exchanges in the window).
+        $this->assertGreaterThanOrEqual($result['completed'], $result['total']);
     }
 
     public function test_checkComplianceRequirements_returns_empty_for_no_risk_tags(): void
     {
-        \Illuminate\Support\Facades\DB::shouldReceive('table->where->where->first')->andReturn(null);
+        TenantContext::setById($this->testTenantId);
 
-        $result = ExchangeWorkflowService::checkComplianceRequirements(1, 1);
-        $this->assertEquals([], $result);
+        $owner = User::factory()->forTenant($this->testTenantId)->create();
+        $listing = Listing::factory()->forTenant($this->testTenantId)->offer()->create([
+            'user_id' => $owner->id,
+        ]);
+
+        // No listing_risk_tags row exists for this listing -> no compliance requirements.
+        TenantContext::setById($this->testTenantId);
+        $this->assertSame(
+            [],
+            ExchangeWorkflowService::checkComplianceRequirements((int) $listing->id, (int) $owner->id)
+        );
+    }
+
+    public function test_checkComplianceRequirements_flags_missing_dbs_vetting(): void
+    {
+        // A risk tag requiring DBS, against a provider with no verified vetting record,
+        // must surface a compliance violation — the real safety guard on the exchange path.
+        TenantContext::setById($this->testTenantId);
+
+        $owner = User::factory()->forTenant($this->testTenantId)->create();
+        $provider = User::factory()->forTenant($this->testTenantId)->create();
+        $listing = Listing::factory()->forTenant($this->testTenantId)->offer()->create([
+            'user_id' => $owner->id,
+        ]);
+
+        DB::table('listing_risk_tags')->insert([
+            'tenant_id'    => $this->testTenantId,
+            'listing_id'   => (int) $listing->id,
+            'risk_level'   => 'high',
+            'dbs_required' => 1,
+            'created_at'   => now(),
+            'updated_at'   => now(),
+        ]);
+
+        // Re-pin: the factory creates above drift TenantContext, and the service reads
+        // listing_risk_tags scoped to TenantContext::getId() — it must match the row's tenant.
+        TenantContext::setById($this->testTenantId);
+        $violations = ExchangeWorkflowService::checkComplianceRequirements((int) $listing->id, (int) $provider->id);
+
+        $this->assertCount(1, $violations, 'A DBS-required listing with an unvetted provider must flag exactly one violation');
+        $this->assertStringContainsString('DBS', $violations[0]);
     }
 }

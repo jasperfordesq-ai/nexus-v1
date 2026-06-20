@@ -77,121 +77,15 @@ class ExchangeWorkflowTest extends TestCase
     // Full Lifecycle Tests
     // =========================================================================
 
-    public function test_full_exchange_lifecycle_via_api(): void
-    {
-        // Step 1: Provider creates a listing (offer)
-        Sanctum::actingAs($this->provider, ['*']);
-
-        $listingResponse = $this->apiPost('/v2/listings', [
-            'title'       => 'Garden Help',
-            'description' => 'I can help with your garden and outdoor spaces.',
-            'type'        => 'offer',
-            'category_id' => $this->listingCategoryId,
-            'hours_estimate' => 2.00,
-            'service_type'   => 'physical_only',
-        ]);
-
-        // Listing creation should succeed (201 or 200)
-        $this->assertContains($listingResponse->getStatusCode(), [200, 201]);
-        $listingData = $listingResponse->json('data') ?? $listingResponse->json();
-        $listingId = $listingData['id'] ?? $listingData['data']['id'] ?? null;
-
-        if (!$listingId) {
-            // If the API doesn't return the listing in expected format, create directly
-            $listing = Listing::factory()->forTenant($this->testTenantId)->offer()->create([
-                'user_id' => $this->provider->id,
-                'title'   => 'Garden Help',
-                'price'   => 2.00,
-            ]);
-            $listingId = $listing->id;
-        }
-
-        // Step 2: Requester creates an exchange request
-        Sanctum::actingAs($this->requester, ['*']);
-
-        $exchangeResponse = $this->apiPost('/v2/exchanges', [
-            'listing_id'     => $listingId,
-            'proposed_hours' => 2.00,
-            'message'        => 'I would like help with my garden please',
-        ]);
-
-        // Exchange creation may fail if compliance checks or broker config block it
-        if ($exchangeResponse->getStatusCode() === 400 || $exchangeResponse->getStatusCode() === 403) {
-            $this->markTestIncomplete(
-                'Exchange creation blocked by compliance/broker config: '
-                . $exchangeResponse->getContent()
-            );
-        }
-
-        $this->assertContains($exchangeResponse->getStatusCode(), [200, 201]);
-        $exchangeData = $exchangeResponse->json('data') ?? $exchangeResponse->json();
-        $exchangeId = $exchangeData['id'] ?? $exchangeData['data']['id'] ?? null;
-        $this->assertNotNull($exchangeId, 'Exchange ID should be returned');
-
-        // Verify exchange is in an initial pending status. A freshly created
-        // exchange starts at 'pending_provider' (or 'pending_broker' when broker
-        // approval is enabled for the tenant) — there is no bare 'pending' state.
-        $exchange = ExchangeRequest::find($exchangeId);
-        $this->assertNotNull($exchange);
-        $this->assertContains($exchange->status, ['pending_provider', 'pending_broker']);
-
-        // Step 3: Provider accepts the exchange
-        Sanctum::actingAs($this->provider, ['*']);
-
-        $acceptResponse = $this->apiPost("/v2/exchanges/{$exchangeId}/accept");
-        $this->assertContains($acceptResponse->getStatusCode(), [200, 201]);
-
-        $exchange->refresh();
-        $this->assertEquals('accepted', $exchange->status);
-
-        // Step 4: Provider starts the exchange
-        $startResponse = $this->apiPost("/v2/exchanges/{$exchangeId}/start");
-        $this->assertContains($startResponse->getStatusCode(), [200, 201]);
-
-        $exchange->refresh();
-        $this->assertEquals('in_progress', $exchange->status);
-
-        // Step 5: Provider marks as complete (ready for confirmation)
-        $completeResponse = $this->apiPost("/v2/exchanges/{$exchangeId}/complete");
-        $this->assertContains($completeResponse->getStatusCode(), [200, 201]);
-
-        // Step 6: Both parties confirm hours
-        // Provider confirms
-        $providerConfirmResponse = $this->apiPost("/v2/exchanges/{$exchangeId}/confirm", [
-            'hours' => 2.00,
-        ]);
-        $this->assertContains($providerConfirmResponse->getStatusCode(), [200, 201]);
-
-        // Requester confirms
-        Sanctum::actingAs($this->requester, ['*']);
-
-        $requesterConfirmResponse = $this->apiPost("/v2/exchanges/{$exchangeId}/confirm", [
-            'hours' => 2.00,
-        ]);
-        $this->assertContains($requesterConfirmResponse->getStatusCode(), [200, 201]);
-
-        // Step 7: Verify final state
-        $exchange->refresh();
-        $this->assertContains($exchange->status, ['completed', 'awaiting_confirmation']);
-
-        // If completed, verify wallet balances were updated
-        if ($exchange->status === 'completed') {
-            $this->provider->refresh();
-            $this->requester->refresh();
-
-            // Provider should have earned credits (balance increased)
-            $this->assertGreaterThanOrEqual(10.00, (float) $this->provider->balance);
-
-            // A transaction record should exist
-            $transaction = Transaction::where('tenant_id', $this->testTenantId)
-                ->where(function ($q) {
-                    $q->where('sender_id', $this->requester->id)
-                      ->orWhere('receiver_id', $this->provider->id);
-                })
-                ->first();
-            $this->assertNotNull($transaction, 'A transaction should be created on completion');
-        }
-    }
+    // NOTE: the previous `test_full_exchange_lifecycle_via_api` was removed as
+    // green theatre — it wrapped every step in `assertContains([200,201])`, fell
+    // back to `markTestIncomplete` on a 400/403, and only asserted balances inside
+    // an `if ($status === 'completed')` guard, so a broken money path could pass it.
+    // The deterministic money path is now fully covered below by
+    // `test_completing_an_exchange_credits_exact_hours_and_conserves_money`
+    // (exact credit math + conservation + single-transaction shape), and the API
+    // state transitions are asserted individually by the per-action tests further
+    // down. See docs/TEST-DEBT.md.
 
     /**
      * Deterministic money-path regression test for the #1 critical journey
@@ -274,33 +168,46 @@ class ExchangeWorkflowTest extends TestCase
 
     public function test_exchange_status_transitions_are_enforced(): void
     {
+        // Use the canonical initial status 'pending_provider' (not a bare 'pending',
+        // which is not a real workflow state) so getExchange resolves the row and the
+        // status guard — not a not-found — is what rejects the call.
         $scenario = $this->createExchangeScenario([
             'provider'  => ['balance' => 10.00, 'status' => 'active', 'is_approved' => true],
             'requester' => ['balance' => 10.00, 'status' => 'active', 'is_approved' => true],
-            'exchange'  => ['status' => 'pending'],
+            'exchange'  => ['status' => 'pending_provider'],
         ]);
 
-        // Requester cannot start a pending exchange (only provider can accept first)
+        // Requester cannot start a not-yet-accepted exchange (only provider can accept first)
         Sanctum::actingAs($scenario['requester'], ['*']);
 
         $startResponse = $this->apiPost("/v2/exchanges/{$scenario['exchange']->id}/start");
-        // Should fail because exchange is not yet accepted
-        $this->assertContains($startResponse->getStatusCode(), [400, 403, 404, 422]);
+        // The requester IS a participant, so start() passes the not-found/ownership
+        // guard and fails deterministically at the status guard (startProgress only
+        // acts on an 'accepted' exchange) -> 400 EXCHANGE_ERROR. Not a vague range.
+        $this->assertSame(400, $startResponse->getStatusCode());
     }
 
     public function test_only_provider_can_accept_exchange(): void
     {
+        // Canonical initial status so getExchange resolves the row and the
+        // provider-only ownership check is what rejects the requester.
         $scenario = $this->createExchangeScenario([
             'provider'  => ['status' => 'active', 'is_approved' => true],
             'requester' => ['status' => 'active', 'is_approved' => true],
-            'exchange'  => ['status' => 'pending'],
+            'exchange'  => ['status' => 'pending_provider'],
         ]);
 
         // Requester tries to accept (should be forbidden)
         Sanctum::actingAs($scenario['requester'], ['*']);
 
         $response = $this->apiPost("/v2/exchanges/{$scenario['exchange']->id}/accept");
-        $this->assertContains($response->getStatusCode(), [403, 404]);
+        // The requester is a same-tenant participant, so accept() loads the exchange
+        // and rejects on the provider-only ownership check -> 403 FORBIDDEN. The state
+        // assertion makes this a real guarantee, not just a status check.
+        $this->assertSame(403, $response->getStatusCode());
+        $scenario['exchange']->refresh();
+        $this->assertNotSame('accepted', $scenario['exchange']->status,
+            'a non-provider must never be able to accept an exchange');
     }
 
     public function test_exchange_not_visible_to_third_party(): void
@@ -344,7 +251,7 @@ class ExchangeWorkflowTest extends TestCase
         $scenario['exchange']->refresh();
         // Declining transitions the exchange to 'cancelled' (the workflow has no
         // separate 'declined' terminal state — decline maps to cancelled).
-        $this->assertContains($scenario['exchange']->status, ['declined', 'cancelled']);
+        $this->assertSame('cancelled', $scenario['exchange']->status);
     }
 
     public function test_exchange_can_be_cancelled(): void
@@ -395,12 +302,10 @@ class ExchangeWorkflowTest extends TestCase
 
         $response = $this->apiGet('/v2/exchanges');
 
-        // May return 400 if exchange workflow not enabled; otherwise 200
-        if ($response->getStatusCode() === 400) {
-            $this->markTestIncomplete('Exchange workflow not enabled for test tenant');
-        }
-
-        $this->assertEquals(200, $response->getStatusCode());
+        // setUp() enables the exchange workflow for the test tenant, so the index
+        // must return 200 with a data payload — not a feature-disabled 400.
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertIsArray($response->json('data'));
     }
 
     public function test_createRequest_returns_null_for_self_exchange(): void
