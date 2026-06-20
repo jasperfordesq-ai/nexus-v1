@@ -21,7 +21,7 @@ import { CourseCard } from '@/components/courses/CourseCard';
 export default function CoursesPage() {
   const { t } = useTranslation('courses');
   usePageTitle(t('title'));
-  const { tenantPath } = useTenant();
+  const { tenant, isLoading: tenantLoading, tenantPath } = useTenant();
   const { isAuthenticated } = useAuth();
 
   const [courses, setCourses] = useState<Course[]>([]);
@@ -34,12 +34,26 @@ export default function CoursesPage() {
   const [hasMore, setHasMore] = useState(false);
 
   useEffect(() => {
+    if (tenantLoading || !tenant?.id) return;
+
     coursesApi.categories().then((res) => {
       if (res.success && res.data) setCategories(res.data);
     });
-  }, []);
+  }, [tenant?.id, tenantLoading]);
 
   useEffect(() => {
+    if (tenantLoading) {
+      setLoading(true);
+      return;
+    }
+
+    if (!tenant?.id) {
+      setCourses([]);
+      setHasMore(false);
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
     setLoading(true);
     coursesApi
@@ -65,11 +79,11 @@ export default function CoursesPage() {
     return () => {
       cancelled = true;
     };
-  }, [search, categoryId, level, page]);
+  }, [tenant?.id, tenantLoading, search, categoryId, level, page]);
 
   useEffect(() => {
     setPage(1);
-  }, [search, categoryId, level]);
+  }, [tenant?.id, search, categoryId, level]);
 
   const levelOptions = useMemo(
     () => [

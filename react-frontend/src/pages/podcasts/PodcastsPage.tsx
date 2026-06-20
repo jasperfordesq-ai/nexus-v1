@@ -25,7 +25,7 @@ function showArtwork(show: PodcastShow): string | undefined {
 export default function PodcastsPage() {
   const { t } = useTranslation('podcasts');
   usePageTitle(t('title'));
-  const { tenantPath } = useTenant();
+  const { tenant, isLoading: tenantLoading, tenantPath } = useTenant();
   const { isAuthenticated } = useAuth();
 
   const [shows, setShows] = useState<PodcastShow[]>([]);
@@ -39,6 +39,19 @@ export default function PodcastsPage() {
   const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
 
   useEffect(() => {
+    if (tenantLoading) {
+      setLoading(true);
+      return;
+    }
+
+    if (!tenant?.id) {
+      setShows([]);
+      setHasMore(false);
+      setLoading(false);
+      setLoadingMore(false);
+      return;
+    }
+
     let cancelled = false;
     const isFirstPage = page === 1;
     if (isFirstPage) setLoading(true);
@@ -87,11 +100,11 @@ export default function PodcastsPage() {
     return () => {
       cancelled = true;
     };
-  }, [category, searchTerm, sort, page]);
+  }, [tenant?.id, tenantLoading, category, searchTerm, sort, page]);
 
   useEffect(() => {
     setPage(1);
-  }, [category, searchTerm, sort]);
+  }, [tenant?.id, category, searchTerm, sort]);
 
   const activeFilterCount = useMemo(
     () => [searchTerm.trim(), category].filter(Boolean).length,
