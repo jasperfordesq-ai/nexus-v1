@@ -55,7 +55,7 @@
             @else
                 <ul class="govuk-list govuk-list--spaced">
                     @foreach ($conversations as $conv)
-                        @php($convId = (int) ($conv['id'] ?? 0))
+                        @php $convId = (int) ($conv['id'] ?? 0); @endphp
                         <li>
                             @if ($convId === $selectedId)
                                 <strong>{{ \Illuminate\Support\Str::limit((string) ($conv['title'] ?? __('govuk_alpha_aichat.thread_title')), 60) }}</strong>

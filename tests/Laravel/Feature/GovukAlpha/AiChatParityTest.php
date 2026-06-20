@@ -58,6 +58,39 @@ class AiChatParityTest extends TestCase
         $res->assertSee('name="message"', false);
     }
 
+    /**
+     * Regression: the message-thread render branch (?c=<id>) must compile and
+     * render. The empty-thread test above never enters the @foreach ($messages)
+     * block, so it could not catch the Blade mis-compilation that left $tagClass
+     * undefined and 500'd any conversation that actually had messages.
+     */
+    public function test_ai_chat_renders_existing_thread_with_messages(): void
+    {
+        $user = $this->authedUser();
+        $this->setAiChat(true);
+
+        $conversationId = DB::table('ai_conversations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Finding a gardener',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('ai_messages')->insert([
+            ['conversation_id' => $conversationId, 'role' => 'user', 'content' => 'How do I find a gardener?', 'created_at' => now()],
+            ['conversation_id' => $conversationId, 'role' => 'assistant', 'content' => 'Try the Listings page.', 'created_at' => now()],
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/chat?c={$conversationId}");
+        $res->assertOk();
+        $res->assertSee('How do I find a gardener?');
+        $res->assertSee('Try the Listings page.');
+        // The role tag classes are emitted from the @php block that previously
+        // failed to compile — assert they are present.
+        $res->assertSee('govuk-tag--blue', false);
+        $res->assertSee('govuk-tag--green', false);
+    }
+
     public function test_ai_chat_send_empty_message_redirects(): void
     {
         $this->authedUser();
