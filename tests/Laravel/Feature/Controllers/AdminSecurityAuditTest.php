@@ -114,10 +114,17 @@ class AdminSecurityAuditTest extends TestCase
         ]);
 
         // Should either reject the key or only allow whitelisted keys
-        // NOTE: SEC-003 finding — the settings endpoint currently accepts maintenance_mode
-        // without restriction. This is a known issue tracked for remediation.
+        // SEC-003 (CONFIRMED OPEN — needs a product decision, NOT proven secure):
+        // PUT /v2/admin/settings -> AdminConfigController::updateSettings treats
+        // 'maintenance_mode' as a recognised GENERAL_SETTING_KEY. Verified 2026-06-20:
+        // a regular (non-super) tenant admin CAN set it — the response returns
+        // data.updated === true and the key is NOT rejected. This is either a privilege
+        // bug (maintenance_mode should require super-admin) OR an intended tenant-admin
+        // feature (a tenant putting ITSELF into maintenance). Decide, then assert the
+        // chosen behaviour (403 vs 200+updated). Kept as a status-only smoke check so CI
+        // is not blocked on the open decision.
         $this->assertContains($response->getStatusCode(), [200, 400, 403, 422],
-            'SEC-003: Settings endpoint returned unexpected status code.');
+            'SEC-003: settings endpoint returned an unexpected status (open finding — see note).');
     }
 
     // ================================================================
@@ -174,11 +181,11 @@ class AdminSecurityAuditTest extends TestCase
 
         $response = $this->apiPost('/v2/admin/users/' . $targetUser->id . '/impersonate');
 
-        // Impersonation is a very sensitive operation.
-        // A regular admin being able to impersonate is a privilege escalation risk.
-        // Non-200 means endpoint properly restricts access.
-        $this->assertContains($response->getStatusCode(), [401, 403, 404, 405, 500],
-            'SEC-005: Regular admin should NOT be able to impersonate users.');
+        // The /v2/admin/users/{id}/impersonate route sits behind the super-admin
+        // middleware (EnsureIsSuperAdmin), which rejects a regular/tenant admin with
+        // 403 before the controller runs — not a vague "any non-200".
+        $this->assertSame(403, $response->getStatusCode(),
+            'SEC-005: a regular admin must receive 403 (impersonation is super-admin only).');
     }
 
     // ================================================================
@@ -234,17 +241,14 @@ class AdminSecurityAuditTest extends TestCase
             'role' => 'super_admin',
         ]);
 
-        // A non-super-admin should NOT be able to grant super_admin role
-        if ($response->getStatusCode() === 200) {
-            $targetUser->refresh();
-            $this->assertNotEquals('super_admin', $targetUser->role,
-                'SEC-007: Regular admin escalated user to super_admin role. ' .
-                'Role changes to super_admin/god should require super admin privileges.');
-        } else {
-            // Non-200 response means the endpoint rejected the request, which is acceptable
-            $this->assertContains($response->getStatusCode(), [400, 403, 404, 422],
-                'SEC-007: Unexpected status code when non-super-admin attempts role escalation.');
-        }
+        // AdminUsersController::update() requires super-admin to set 'super_admin'/'god';
+        // a regular admin is rejected with 403 and the target role is unchanged — assert
+        // both the status AND the security property rather than accepting any non-200.
+        $this->assertSame(403, $response->getStatusCode(),
+            'SEC-007: a non-super-admin setting super_admin role must receive 403.');
+        $targetUser->refresh();
+        $this->assertNotEquals('super_admin', $targetUser->role,
+            'SEC-007: target role must not have been escalated to super_admin.');
     }
 
     // ================================================================
