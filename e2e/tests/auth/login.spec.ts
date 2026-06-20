@@ -7,6 +7,12 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../page-objects';
 import { tenantUrl, dismissDevNoticeModal } from '../../helpers/test-utils';
 
+// The first navigation in a run pays the cold Vite-compile tax; the login →
+// redirect → reload flows need room beyond the 30s default.
+test.beforeEach(({}, testInfo) => {
+  testInfo.setTimeout(90_000);
+});
+
 /**
  * Helper to handle cookie consent banner if present
  */
@@ -100,43 +106,39 @@ test.describe('Authentication - Login', () => {
       expect(emailType).toBe('email');
     });
 
-    test.skip('should redirect to dashboard on successful login', async ({ page }) => {
-      // Skip if no valid test credentials configured
+    test('should authenticate and redirect away from login on valid credentials', async ({ page }) => {
       const email = process.env.E2E_USER_EMAIL;
       const password = process.env.E2E_USER_PASSWORD;
-
-      if (!email || !password) {
-        test.skip();
-        return;
-      }
+      test.skip(!email || !password, 'No E2E user credentials configured');
 
       const loginPage = new LoginPage(page);
       await loginPage.navigate();
 
-      await loginPage.login(email, password);
+      await loginPage.login(email!, password!);
 
-      // Should be redirected to dashboard or home
-      expect(page.url()).toMatch(/\/(dashboard|home|feed|\/)/);
+      // The app redirects to the post-login landing (default /feed) and persists a JWT.
+      expect(page.url()).toMatch(/\/(dashboard|home|feed)(\/|$|\?)/);
+      expect(page.url()).not.toContain('/login');
       expect(await loginPage.isLoggedIn()).toBeTruthy();
     });
 
-    test.skip('should maintain session after page refresh', async ({ page }) => {
-      // Skip if no valid test credentials configured
+    test('should maintain session after page refresh', async ({ page }) => {
       const email = process.env.E2E_USER_EMAIL;
       const password = process.env.E2E_USER_PASSWORD;
-
-      if (!email || !password) {
-        test.skip();
-        return;
-      }
+      test.skip(!email || !password, 'No E2E user credentials configured');
 
       const loginPage = new LoginPage(page);
       await loginPage.navigate();
 
-      await loginPage.login(email, password);
-      await page.reload();
-
+      await loginPage.login(email!, password!);
       expect(await loginPage.isLoggedIn()).toBeTruthy();
+
+      await page.reload();
+      await page.waitForLoadState('domcontentloaded');
+
+      // Session survives a hard reload (token persists, not bounced to login).
+      expect(await loginPage.isLoggedIn()).toBeTruthy();
+      expect(page.url()).not.toContain('/login');
     });
 
     test('should have remember me option if available', async ({ page }) => {
@@ -258,57 +260,45 @@ test.describe('Authentication - Login', () => {
 });
 
 test.describe('Authentication - Logout', () => {
-  test.skip('should successfully logout', async ({ page }) => {
-    // Skip if no valid test credentials configured
+  test('should successfully logout', async ({ page }) => {
     const email = process.env.E2E_USER_EMAIL;
     const password = process.env.E2E_USER_PASSWORD;
-
-    if (!email || !password) {
-      test.skip();
-      return;
-    }
+    test.skip(!email || !password, 'No E2E user credentials configured');
 
     const loginPage = new LoginPage(page);
     await loginPage.navigate();
 
-    await loginPage.login(email, password);
+    await loginPage.login(email!, password!);
     expect(await loginPage.isLoggedIn()).toBeTruthy();
 
-    // Click logout
-    const logoutLink = page.locator('a[href*="logout"]');
-    await logoutLink.click();
-    await page.waitForLoadState('domcontentloaded');
+    // Log out via the navbar user menu (React Dropdown, not an <a href>).
+    await loginPage.logout();
 
-    // Should be redirected to login or home
-    expect(page.url()).toMatch(/\/(login|\/)/);
+    // Token is cleared — the session is gone.
     expect(await loginPage.isLoggedIn()).toBeFalsy();
   });
 
-  test.skip('should not access protected pages after logout', async ({ page }) => {
-    // Skip if no valid test credentials configured
+  test('should not access protected pages after logout', async ({ page }) => {
     const email = process.env.E2E_USER_EMAIL;
     const password = process.env.E2E_USER_PASSWORD;
-
-    if (!email || !password) {
-      test.skip();
-      return;
-    }
+    test.skip(!email || !password, 'No E2E user credentials configured');
 
     const loginPage = new LoginPage(page);
     await loginPage.navigate();
 
-    await loginPage.login(email, password);
+    await loginPage.login(email!, password!);
+    await loginPage.logout();
 
-    // Logout
-    const logoutLink = page.locator('a[href*="logout"]');
-    await logoutLink.click();
-    await page.waitForLoadState('domcontentloaded');
+    // Logout clears auth state and the SPA bounces away from protected content;
+    // let that client-side redirect settle before navigating again (avoids a
+    // race between logout's redirect and our goto).
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
 
-    // Try to access dashboard
-    await page.goto(tenantUrl('dashboard'));
+    // Visiting a protected route while logged out must redirect to login.
+    await page.goto(tenantUrl('dashboard'), { waitUntil: 'domcontentloaded' }).catch(() => {});
     await dismissDevNoticeModal(page);
+    await page.waitForURL(/\/login/, { timeout: 30000 }).catch(() => {});
 
-    // Should redirect to login
     expect(page.url()).toContain('login');
   });
 });

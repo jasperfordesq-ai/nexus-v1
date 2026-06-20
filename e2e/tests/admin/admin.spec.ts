@@ -11,6 +11,15 @@ import {
   AdminSettingsPage,
   AdminTimebankingPage,
 } from '../../page-objects';
+import { tenantUrl } from '../../helpers/test-utils';
+
+const USER_STORAGE = 'e2e/fixtures/.auth/user.json';
+
+// Admin pages are heavy and the first navigation in a run pays the cold
+// Vite-compile tax — raise the per-test timeout beyond the 30s default.
+test.beforeEach(({}, testInfo) => {
+  testInfo.setTimeout(90_000);
+});
 
 /**
  * Admin tests for React Admin Panel
@@ -279,19 +288,38 @@ test.describe('Admin - Navigation', () => {
 });
 
 test.describe('Admin - Access Control', () => {
-  test('should redirect non-admins to login', async ({ browser }) => {
-    // Create fresh context without auth
-    const context = await browser.newContext();
+  test('should redirect unauthenticated users from admin to login', async ({ browser }) => {
+    // Fresh context with EXPLICITLY empty auth state. (The 'admin' project sets
+    // a default storageState, so an argument-less newContext() would inherit the
+    // admin session — force a clean, genuinely-unauthenticated browser here.)
+    const context = await browser.newContext({ storageState: { cookies: [], origins: [] } });
     const page = await context.newPage();
 
-    await page.goto('/admin');
-    await page.waitForLoadState('domcontentloaded');
+    await page.goto(tenantUrl('admin'));
+    // AdminRoute redirects an unauthenticated visitor to the tenant login page
+    // once the SPA finishes bootstrapping. A cold fresh-context load can be slow,
+    // so allow a generous window for the redirect to settle.
+    await page.waitForURL(/\/login(\/|$|\?)/, { timeout: 60000 }).catch(() => {});
 
-    // Should redirect to login or show 403
-    const url = page.url();
-    const requiresAuth = url.includes('login') || url.includes('auth') || url.includes('403');
+    // They must never reach the admin panel, and they land on the login gate.
+    expect(page.url()).not.toMatch(/\/admin(\/|$)/);
+    expect(page.url()).toContain('/login');
 
-    expect(requiresAuth || true).toBeTruthy();
+    await context.close();
+  });
+
+  test('should redirect authenticated non-admins from admin to dashboard', async ({ browser }) => {
+    // Authenticated as the seeded NON-admin member (user.json storage state).
+    const context = await browser.newContext({ storageState: USER_STORAGE });
+    const page = await context.newPage();
+
+    await page.goto(tenantUrl('admin'));
+    // AdminRoute redirects a member without panel access to the dashboard
+    // (there is no 403 page — see react-frontend/src/admin/AdminRoute.tsx).
+    await page.waitForURL(/\/dashboard/, { timeout: 30000 }).catch(() => {});
+
+    expect(page.url()).toContain('/dashboard');
+    expect(page.url()).not.toMatch(/\/admin(\/|$)/);
 
     await context.close();
   });

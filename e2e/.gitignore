@@ -9,6 +9,12 @@ test-results.json
 # Environment
 .env.e2e
 
+# Auth storage states + generated seed data — contain live JWTs / generated
+# fixtures, must never be committed (this repo is public).
+fixtures/.auth/
+fixtures/.seed/
+scripts/debug-*.mjs
+
 # Playwright browsers
 .cache/
 

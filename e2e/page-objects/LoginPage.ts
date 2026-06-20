@@ -22,10 +22,10 @@ export class LoginPage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    // Use specific IDs from the login form (login.php uses #login-email, #login-password)
-    this.emailInput = page.locator('#login-email, input[name="email"]').first();
-    this.passwordInput = page.locator('#login-password, input[name="password"]').first();
-    this.submitButton = page.locator('.auth-card button[type="submit"], form button[type="submit"]').first();
+    // React login form: HeroUI <Input> with no id/name — match by type/autocomplete.
+    this.emailInput = page.locator('input[type="email"]').first();
+    this.passwordInput = page.locator('input[autocomplete="current-password"], input[type="password"]').first();
+    this.submitButton = page.locator('form button[type="submit"]').first();
     // Link text is "Forgot?" or may contain "forgot" in href
     this.forgotPasswordLink = page.locator('a[href*="password/forgot"], a:has-text("Forgot")').first();
     this.registerLink = page.locator('a[href*="register"], a:has-text("Join Now")').first();
@@ -120,5 +120,19 @@ export class LoginPage extends BasePage {
    */
   async hasSocialLogin(): Promise<boolean> {
     return await this.socialLoginButtons.count() > 0;
+  }
+
+  /**
+   * Log out via the navbar user menu (React SPA: a Dropdown menu item, not an
+   * <a href="/logout">). Opens "User menu for {name}" then clicks "Log Out".
+   */
+  async logout(): Promise<void> {
+    const userMenu = this.page.getByRole('button', { name: /user menu for/i }).first();
+    await userMenu.click();
+    await this.page.getByRole('menuitem', { name: /log ?out/i }).first().click();
+    // Logout clears tokens and redirects; wait for the token to be cleared.
+    await this.page
+      .waitForFunction(() => !localStorage.getItem('nexus_access_token'), { timeout: 10000 })
+      .catch(() => {});
   }
 }

@@ -64,8 +64,8 @@ export class WalletPage extends BasePage {
     this.balanceCard = page.locator('[class*="glass"]').filter({ hasText: 'Available Balance' }).or(
       page.locator('[class*="glass"]').filter({ hasText: 'Current Balance' })
     );
-    this.balance = page.locator('text=/\\d+(\\.\\d+)?\\s*hours?/').first();
-    this.balanceLabel = page.locator('text=Available Balance, text=Current Balance').first();
+    this.balance = page.getByTestId('wallet-balance');
+    this.balanceLabel = page.getByText('Your Balance').first();
 
     // Stats cards
     this.totalEarnedStat = page.locator('text=Total Earned').locator('..').locator('p, span').filter({ hasText: /\d+/ });
@@ -75,36 +75,36 @@ export class WalletPage extends BasePage {
     // Transfer button (gradient button)
     this.transferButton = page.locator('button:has-text("Send Credits"), button:has-text("Transfer")').first();
 
-    // Transaction list
-    this.transactionsList = page.locator('[class*="glass"]').filter({ hasText: 'Transaction History' }).or(
-      page.locator('[class*="glass"]').filter({ hasText: 'Recent Transactions' })
-    );
-    this.transactionItems = page.locator('[class*="glass"]').filter({ hasText: 'Transaction History' })
-      .locator('> div').filter({ has: page.locator('text=/\\d+(\\.\\d+)?\\s*hours?/') });
-    this.noTransactionsMessage = page.locator('text=No transactions yet, text=No transactions found');
+    // Transaction list (GlassCard with the "Transaction History" heading)
+    this.transactionsList = page.getByRole('heading', { name: 'Transaction History' });
+    this.transactionItems = page.getByTestId('wallet-transaction');
+    // EmptyState title is "No transactions" (all filter) / "No matching transactions".
+    this.noTransactionsMessage = page.getByText('No transactions', { exact: false }).first();
 
-    // Filter chips (All, Earned, Spent, Pending)
-    this.filterChips = page.locator('button:has-text("All"), button:has-text("Earned"), button:has-text("Spent"), button:has-text("Pending")');
-    this.allFilterChip = page.locator('button:has-text("All")').first();
-    this.earnedFilterChip = page.locator('button:has-text("Earned")').first();
-    this.spentFilterChip = page.locator('button:has-text("Spent")').first();
-    this.pendingFilterChip = page.locator('button:has-text("Pending")').first();
+    // Filter controls are HeroUI Tabs (role="tab"), not buttons.
+    this.filterChips = page.getByRole('tab');
+    this.allFilterChip = page.getByRole('tab', { name: 'All' });
+    this.earnedFilterChip = page.getByRole('tab', { name: 'Earned' });
+    this.spentFilterChip = page.getByRole('tab', { name: 'Spent' });
+    this.pendingFilterChip = page.getByRole('tab', { name: 'Pending' });
 
     // Load more button
-    this.loadMoreButton = page.locator('button:has-text("Load More")');
+    this.loadMoreButton = page.getByRole('button', { name: 'Load More' });
 
-    // Transfer Modal (overlay, NOT a route)
-    this.transferModal = page.locator('[role="dialog"][aria-modal="true"]:has-text("Send Credits")');
-    this.modalTitle = this.transferModal.locator('#transfer-modal-title, h2:has-text("Send Credits")');
-    this.recipientSearchInput = this.transferModal.locator('input[placeholder*="Search"]');
-    this.recipientResults = page.locator('[role="listbox"][aria-label="Search results"]');
-    this.selectedRecipient = this.transferModal.locator('.bg-theme-elevated:has(img[alt])').first();
-    this.amountInput = this.transferModal.locator('input[type="number"], input[name="amount"]');
-    this.descriptionInput = this.transferModal.locator('textarea[placeholder*="description" i], textarea[name="description"]');
-    this.modalSubmitButton = this.transferModal.locator('button[type="submit"]:has-text("Send")');
-    this.modalCancelButton = this.transferModal.locator('button:has-text("Cancel")');
-    this.modalCloseButton = this.transferModal.locator('button[aria-label="Close modal"]');
-    this.availableBalanceDisplay = this.transferModal.locator('text=Available Balance').locator('..').locator('span').filter({ hasText: /\d+/ });
+    // Transfer Modal (overlay, NOT a route). HeroUI Modal renders role="dialog";
+    // "Send Credits" appears in both the header and the submit button.
+    this.transferModal = page.locator('[role="dialog"]').filter({ hasText: 'Send Credits' }).first();
+    this.modalTitle = this.transferModal.getByText('Send Credits').first();
+    // The only text input in the modal is the recipient search (amount is number, description is textarea).
+    this.recipientSearchInput = this.transferModal.locator('input[type="text"]').first();
+    this.recipientResults = page.locator('[role="listbox"]');
+    this.selectedRecipient = this.transferModal.locator('.bg-theme-elevated:has(button[aria-label])').first();
+    this.amountInput = this.transferModal.locator('input[type="number"]');
+    this.descriptionInput = this.transferModal.locator('textarea');
+    this.modalSubmitButton = this.transferModal.getByRole('button', { name: 'Send Credits' });
+    this.modalCancelButton = this.transferModal.getByRole('button', { name: 'Cancel' });
+    this.modalCloseButton = this.transferModal.locator('button[aria-label*="Close" i], button[aria-label*="Dismiss" i]').first();
+    this.availableBalanceDisplay = this.transferModal.getByText('Available Balance');
   }
 
   /**
@@ -119,11 +119,15 @@ export class WalletPage extends BasePage {
    */
   async waitForLoad(): Promise<void> {
     await this.page.waitForLoadState('domcontentloaded');
-    // Wait for balance or empty state to appear
-    await this.page.locator('[class*="glass"], text=No transactions yet').first().waitFor({
-      state: 'visible',
-      timeout: 15000
-    }).catch(() => {});
+    // Wait for the balance value or the "unable to load" error state to render.
+    // Generous timeout: the first navigation in a run pays the cold Vite-compile tax.
+    await this.page
+      .getByTestId('wallet-balance')
+      .or(this.page.getByText('Your Balance'))
+      .or(this.page.getByRole('button', { name: /try again/i }))
+      .first()
+      .waitFor({ state: 'visible', timeout: 30000 })
+      .catch(() => {});
   }
 
   /**
@@ -147,10 +151,7 @@ export class WalletPage extends BasePage {
    * Get number of visible transactions
    */
   async getTransactionCount(): Promise<number> {
-    // Count transaction items within the transaction list
-    const items = this.page.locator('[class*="glass"]').filter({ hasText: 'Transaction History' })
-      .locator('> div > div').filter({ has: this.page.locator('text=/\\d+(\\.\\d+)?\\s*hours?/') });
-    return await items.count();
+    return await this.transactionItems.count();
   }
 
   /**
@@ -177,7 +178,7 @@ export class WalletPage extends BasePage {
   async clickTransfer(): Promise<void> {
     await this.transferButton.click();
     // Wait for modal to appear
-    await this.transferModal.waitFor({ state: 'visible', timeout: 3000 });
+    await this.transferModal.waitFor({ state: 'visible', timeout: 8000 });
   }
 
   /**
@@ -212,14 +213,12 @@ export class WalletPage extends BasePage {
     date: string;
     type: 'sent' | 'received' | 'pending';
   }> {
-    const items = this.page.locator('[class*="glass"]').filter({ hasText: 'Transaction History' })
-      .locator('> div > div').filter({ has: this.page.locator('text=/\\d+(\\.\\d+)?\\s*hours?/') });
+    const transaction = this.transactionItems.nth(index);
 
-    const transaction = items.nth(index);
-
-    const amount = await transaction.locator('text=/[+-]?\\d+(\\.\\d+)?\\s*hours?/').first().textContent() || '';
-    const description = await transaction.locator('p, span').filter({ hasText: /\w+/ }).first().textContent() || '';
-    const date = await transaction.locator('time, .text-xs').first().textContent() || '';
+    const amount = await transaction.locator('text=/[+-]?\\d+(\\.\\d+)?\\s*(hours?|h)\\b/i').first().textContent()
+      || (await transaction.getAttribute('aria-label')) || '';
+    const description = await transaction.locator('h4').first().textContent() || '';
+    const date = await transaction.locator('time, .text-xs, .text-theme-subtle').first().textContent() || '';
 
     let type: 'sent' | 'received' | 'pending' = 'received';
     const amountText = amount.toLowerCase();
@@ -257,19 +256,19 @@ export class TransferPage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.modal = page.locator('[role="dialog"][aria-modal="true"]:has-text("Send Credits")');
-    this.recipientInput = this.modal.locator('input[placeholder*="Search"]');
-    this.recipientSuggestions = page.locator('[role="listbox"][aria-label="Search results"]');
-    this.selectedRecipientDisplay = this.modal.locator('.bg-theme-elevated:has(img[alt])').first();
-    this.removeRecipientButton = this.selectedRecipientDisplay.locator('button[aria-label*="Remove"]');
-    this.amountInput = this.modal.locator('input[type="number"], input[name="amount"]');
-    this.descriptionInput = this.modal.locator('textarea[placeholder*="description" i]');
-    this.availableBalance = this.modal.locator('text=Available Balance').locator('..').locator('span').filter({ hasText: /\d+/ });
-    this.submitButton = this.modal.locator('button[type="submit"]:has-text("Send")');
-    this.cancelButton = this.modal.locator('button:has-text("Cancel")');
-    this.closeButton = this.modal.locator('button[aria-label="Close modal"]');
-    this.errorMessage = page.locator('[role="alert"], .error, text=Error').filter({ hasText: /error|failed/i });
-    this.successMessage = page.locator('[role="alert"], text=successful, text=sent').filter({ hasText: /success|sent/i });
+    this.modal = page.locator('[role="dialog"]').filter({ hasText: 'Send Credits' }).first();
+    this.recipientInput = this.modal.locator('input[type="text"]').first();
+    this.recipientSuggestions = page.locator('[role="listbox"]');
+    this.selectedRecipientDisplay = this.modal.locator('.bg-theme-elevated:has(button[aria-label])').first();
+    this.removeRecipientButton = this.modal.locator('button[aria-label*="Remove" i]');
+    this.amountInput = this.modal.locator('input[type="number"]');
+    this.descriptionInput = this.modal.locator('textarea');
+    this.availableBalance = this.modal.getByText('Available Balance');
+    this.submitButton = this.modal.getByRole('button', { name: 'Send Credits' });
+    this.cancelButton = this.modal.getByRole('button', { name: 'Cancel' });
+    this.closeButton = this.modal.locator('button[aria-label*="Close" i], button[aria-label*="Dismiss" i]').first();
+    this.errorMessage = page.locator('[role="alert"]').filter({ hasText: /error|failed|exceed/i });
+    this.successMessage = page.locator('[role="alert"], [role="status"]').filter({ hasText: /success|sent/i });
   }
 
   /**
@@ -307,7 +306,9 @@ export class TransferPage extends BasePage {
    * Select recipient from search results
    */
   async selectRecipient(index: number = 0): Promise<void> {
-    const results = this.recipientSuggestions.locator('button[role="option"]');
+    // HeroUI Button does not forward role="option" to the DOM, so the result
+    // rows are plain <button>s inside the listbox.
+    const results = this.recipientSuggestions.locator('button');
     await results.nth(index).click();
     await this.page.waitForTimeout(300);
   }
@@ -317,7 +318,7 @@ export class TransferPage extends BasePage {
    */
   async getResultsCount(): Promise<number> {
     if (await this.recipientSuggestions.isVisible()) {
-      return await this.recipientSuggestions.locator('button[role="option"]').count();
+      return await this.recipientSuggestions.locator('button').count();
     }
     return 0;
   }

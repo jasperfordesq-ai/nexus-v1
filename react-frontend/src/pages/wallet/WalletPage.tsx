@@ -288,7 +288,7 @@ export function WalletPage() {
                 </div>
               ) : (
                 <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1" aria-live="polite">
-                  <span className="text-5xl font-bold leading-none text-theme-primary sm:text-6xl">
+                  <span data-testid="wallet-balance" className="text-5xl font-bold leading-none text-theme-primary sm:text-6xl">
                     {balance?.balance ?? 0}
                   </span>
                   <span className="text-xl font-semibold text-theme-muted">{t('hours')}</span>
@@ -538,6 +538,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
 
   return (
     <article
+      data-testid="wallet-transaction"
       className="rounded-xl border border-theme-default bg-theme-elevated p-4 transition-colors hover:bg-theme-hover"
       aria-label={t('aria.transaction_detail', { direction: isCredit ? t('csv.received') : t('csv.sent'), amount: transaction.amount, name: otherPartyName || '' })}
     >

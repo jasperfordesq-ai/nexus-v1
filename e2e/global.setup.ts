@@ -8,6 +8,7 @@ import { chromium } from 'playwright';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
+import { seedTwoActors } from './helpers/seed';
 
 // Load environment variables from .env.test
 dotenv.config({ path: path.join(__dirname, '.env.test') });
@@ -346,6 +347,23 @@ async function globalSetup(config: FullConfig) {
         }
 
         await authContext.close();
+      }
+
+      // Seed the deterministic two-actor fixture (balance floor, second actor,
+      // listing, exchange) so money/auth specs can assert real outcomes. Best-effort:
+      // a seeding failure must not block the suite.
+      if (HAS_USER_CREDENTIALS && HAS_ADMIN_CREDENTIALS) {
+        console.log('🌱 Seeding two-actor fixture...');
+        try {
+          await seedTwoActors({
+            userA: { email: TEST_USERS.user.email, password: TEST_USERS.user.password },
+            admin: { email: TEST_USERS.admin.email, password: TEST_USERS.admin.password },
+          });
+          console.log('✅ Seed fixture written.\n');
+        } catch (error) {
+          console.warn(`⚠️  Two-actor seeding failed: ${error}`);
+          console.warn('   Money/exchange specs that require the seed may be skipped.\n');
+        }
       }
     }
 

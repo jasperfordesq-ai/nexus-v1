@@ -144,6 +144,11 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         // No storage state - fresh browser
       },
+      // Depends on setup so the seed (incl. legal-document acceptance for the
+      // test user) is in place — otherwise the "Updated legal documents" gate
+      // blocks post-login interactions like logout. Storage state is still
+      // empty, so these tests start as a genuinely fresh/unauthenticated browser.
+      dependencies: ['setup'],
       testMatch: '**/auth/**/*.spec.ts',
     },
   ],

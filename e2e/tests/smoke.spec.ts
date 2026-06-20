@@ -342,14 +342,9 @@ test.describe('Smoke Tests @smoke', () => {
       const content = page.locator('main, [role="main"], .content');
       await expect(content.first()).toBeVisible({ timeout: 30000 });
 
-      // Should have some balance-related content (number, "Balance", "Credits", etc.)
-      const balanceIndicator = page.locator(
-        'text=Balance, text=Credits, text=Hours, text=Wallet'
-      ).first();
-      const hasBalance = await balanceIndicator.isVisible({ timeout: 5000 }).catch(() => false);
-
-      // Balance display is expected but not strictly required (module might be disabled)
-      expect(hasBalance || true).toBeTruthy();
+      // The wallet balance value must render for an authenticated member.
+      await expect(page.getByTestId('wallet-balance')).toBeVisible({ timeout: 30000 });
+      await expect(page.getByText('Your Balance')).toBeVisible();
 
       expect(consoleErrors).toHaveLength(0);
     });
@@ -408,17 +403,13 @@ test.describe('Smoke Tests @smoke', () => {
       // Should either show admin content or redirect to login (if not admin)
       await page.waitForLoadState('domcontentloaded');
 
-      const isOnAdmin = page.url().includes('/admin');
-      const isOnLogin = page.url().includes('/login');
+      // The seeded admin has panel access — it must land on /admin, not be
+      // redirected away to login or the member dashboard.
+      expect(page.url()).toContain('/admin');
+      expect(page.url()).not.toContain('/login');
 
-      // Either we got to admin or were correctly redirected to login
-      expect(isOnAdmin || isOnLogin).toBeTruthy();
-
-      if (isOnAdmin && !isOnLogin) {
-        // Admin content should be visible
-        const content = page.locator('main, .content, [role="main"]');
-        await expect(content.first()).toBeVisible({ timeout: 30000 });
-      }
+      const content = page.locator('main, .content, [role="main"]');
+      await expect(content.first()).toBeVisible({ timeout: 30000 });
 
       expect(consoleErrors).toHaveLength(0);
     });

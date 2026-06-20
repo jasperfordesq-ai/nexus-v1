@@ -72,11 +72,12 @@ export class BasePage {
   }
 
   /**
-   * Check if user is logged in
+   * Check if user is logged in.
+   * The React SPA is JWT-based — authentication state is the presence of the
+   * access token in localStorage (there is no `<a href="/logout">`).
    */
   async isLoggedIn(): Promise<boolean> {
-    const logoutLink = this.page.locator('a[href*="/logout"]');
-    return await logoutLink.count() > 0;
+    return await this.page.evaluate(() => !!localStorage.getItem('nexus_access_token')).catch(() => false);
   }
 
   /**

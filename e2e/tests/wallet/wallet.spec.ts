@@ -6,6 +6,13 @@
 import { test, expect } from '@playwright/test';
 import { WalletPage, TransferPage, InsightsPage } from '../../page-objects';
 import { generateTestData } from '../../helpers/test-utils';
+import { loadSeed } from '../../helpers/seed';
+
+// The first navigation in a run pays the cold Vite-compile tax, and the transfer
+// flow navigates twice — give these browser tests room beyond the 30s default.
+test.beforeEach(({}, testInfo) => {
+  testInfo.setTimeout(90_000);
+});
 
 /**
  * Wallet E2E Tests (React Frontend)
@@ -77,12 +84,10 @@ test.describe('Wallet - Overview', () => {
     await walletPage.navigate();
     await walletPage.waitForLoad();
 
-    // Stats may be visible - check if they exist
-    const hasEarned = await walletPage.totalEarnedStat.count() > 0;
-    const hasSpent = await walletPage.totalSpentStat.count() > 0;
-
-    // At least one stat should be visible
-    expect(hasEarned || hasSpent || true).toBeTruthy();
+    // The Earned / Spent / Pending stat cards must all render.
+    await expect(page.getByText('Earned', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Spent', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Pending', { exact: true }).first()).toBeVisible();
   });
 
   test('should show filter chips', async ({ page }) => {
@@ -222,8 +227,46 @@ test.describe('Wallet - Transfer Modal', () => {
     await expect(transferModal.modal).toBeHidden({ timeout: 3000 });
   });
 
-  test.skip('should complete a transfer', async ({ page }) => {
-    // Skip to avoid creating real transfers
+  test('should complete a transfer to another member', async ({ page }) => {
+    const seed = loadSeed();
+    test.skip(!seed, 'Seed fixture not available — run global setup against a live stack.');
+
+    const walletPage = new WalletPage(page);
+    await walletPage.navigate();
+    await walletPage.waitForLoad();
+
+    // The seeded balance floor guarantees a positive (transferable) balance.
+    const balanceBefore = await walletPage.getBalance();
+    expect(balanceBefore).toBeGreaterThan(0);
+
+    await walletPage.clickTransfer();
+    const transfer = new TransferPage(page);
+    await expect(transfer.modal).toBeVisible();
+
+    // Resolve the seeded second actor via the recipient autocomplete.
+    const query = (seed!.userB.name || '').split(' ')[0] || seed!.userB.username || 'a';
+    await transfer.searchRecipient(query);
+    await expect(transfer.recipientSuggestions).toBeVisible({ timeout: 6000 });
+    await transfer.selectRecipient(0);
+
+    // Transfer exactly 1 hour.
+    await transfer.amountInput.fill('1');
+    await transfer.descriptionInput.fill('E2E harness transfer');
+
+    await expect(transfer.submitButton).toBeEnabled();
+    await transfer.submitButton.click();
+
+    // A success toast (only shown on a 2xx transfer) and the modal closing prove
+    // the transfer was accepted by the API.
+    await expect(page.getByText(/transfer successful/i).first()).toBeVisible({ timeout: 10000 });
+    await expect(transfer.modal).toBeHidden({ timeout: 10000 });
+
+    // Reload the wallet and assert the sender's balance dropped by the amount sent
+    // (money conservation from the sender side).
+    await walletPage.navigate();
+    await walletPage.waitForLoad();
+    const balanceAfter = await walletPage.getBalance();
+    expect(balanceAfter).toBeCloseTo(balanceBefore - 1, 1);
   });
 });
 
@@ -260,8 +303,8 @@ test.describe('Wallet - Filtering', () => {
     await walletPage.filterTransactions('spent');
     await page.waitForTimeout(300);
 
-    // Should complete without errors
-    expect(true).toBeTruthy();
+    // The Spent tab is now the selected one (HeroUI sets aria-selected on tabs).
+    await expect(walletPage.spentFilterChip).toHaveAttribute('aria-selected', 'true');
   });
 
   test('should show all filter as default', async ({ page }) => {
@@ -269,13 +312,9 @@ test.describe('Wallet - Filtering', () => {
     await walletPage.navigate();
     await walletPage.waitForLoad();
 
-    // All chip should have active styling (gradient background)
-    const allChip = walletPage.allFilterChip;
-    const classes = await allChip.getAttribute('class');
-
-    // Solid/active variant has gradient or indigo color
-    const isActive = classes?.includes('gradient') || classes?.includes('indigo');
-    expect(isActive || true).toBeTruthy();
+    // On load, the "All" filter tab is the default-selected one.
+    await expect(walletPage.allFilterChip).toBeVisible();
+    await expect(walletPage.allFilterChip).toHaveAttribute('aria-selected', 'true');
   });
 });
 
@@ -287,18 +326,17 @@ test.describe('Wallet - Pagination', () => {
 
     const initialCount = await walletPage.getTransactionCount();
 
-    if (initialCount > 0) {
-      // Load More button is optional (only shows if there are more transactions)
-      const hasLoadMore = await walletPage.loadMoreButton.count() > 0;
-      expect(hasLoadMore || true).toBeTruthy();
-
-      if (hasLoadMore) {
-        await walletPage.loadMore();
-        await page.waitForTimeout(1000);
-
-        const newCount = await walletPage.getTransactionCount();
-        expect(newCount).toBeGreaterThanOrEqual(initialCount);
-      }
+    // The "Load More" button only appears when more transactions exist. When it
+    // does, clicking it must add rows (never remove them).
+    const hasLoadMore = await walletPage.loadMoreButton.count() > 0;
+    if (hasLoadMore) {
+      await walletPage.loadMore();
+      await page.waitForTimeout(1000);
+      const newCount = await walletPage.getTransactionCount();
+      expect(newCount).toBeGreaterThan(initialCount);
+    } else {
+      // No pagination control ⇒ all transactions already fit on the page.
+      expect(initialCount).toBe(await walletPage.getTransactionCount());
     }
   });
 });
