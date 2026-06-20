@@ -7,6 +7,29 @@ import { test, expect } from '@playwright/test';
 import { loginAsUser, logout } from '../helpers/auth';
 import { testUsers, testTenant, selectors } from '../helpers/fixtures';
 
+/**
+ * Exchange Workflow E2E.
+ *
+ * HONESTY NOTE (see PRODUCTION-READINESS.md §3, journey J1):
+ * The money-mutating steps below (request / accept / complete / review / decline)
+ * were previously written as `if (await button.isVisible()) { ... }` with no
+ * `else` branch. On an empty or unseeded database those branches never execute,
+ * so the tests passed having asserted NOTHING — "green theatre". A broken
+ * credit-minting path was invisible to CI.
+ *
+ * Those steps are now marked `test.fixme` so a green run no longer implies the
+ * money path works. They require a deterministic, seeded TWO-actor harness
+ * (a provider AND a requester, with known balances) that does not yet exist at
+ * the browser layer — promote them back to `test(...)` once it does, and assert
+ * real outcomes (status transitions + wallet balance deltas), not just toasts.
+ *
+ * Until then, the exchange money path IS guarded by a real, deterministic,
+ * blocking-gate test at the service layer:
+ *   tests/Laravel/Integration/ExchangeWorkflowTest.php
+ *     ::test_completing_an_exchange_credits_exact_hours_and_conserves_money
+ * which asserts the exact credit math, money conservation, and the single
+ * transaction row. That is the right layer for a money-conservation assertion.
+ */
 test.describe('Exchange Workflow', () => {
   test.beforeEach(async ({ page }) => {
     // Login as primary user
@@ -24,7 +47,10 @@ test.describe('Exchange Workflow', () => {
     expect(listingCount).toBeGreaterThan(0);
   });
 
-  test('should request exchange on a listing @critical', async ({ page }) => {
+  // FIXME(J1): asserts nothing real — the request control is only clicked "if visible".
+  // Needs a seeded listing owned by a *different* user the primary user can request.
+  // Money path is covered by ExchangeWorkflowTest::test_completing_an_exchange_credits_exact_hours_and_conserves_money.
+  test.fixme('should request exchange on a listing @critical', async ({ page }) => {
     // Navigate to listings
     await page.goto(`/${testTenant.slug}/listings`);
 
@@ -64,14 +90,14 @@ test.describe('Exchange Workflow', () => {
     // Wait for page to load
     await expect(page.locator('h1, h2').filter({ hasText: /exchange/i })).toBeVisible();
 
-    // Check if exchanges list is visible
-    const exchangesList = page.locator('[data-testid="exchanges-list"], .exchange-card, .exchange-item');
-
-    // List should be present (may be empty)
+    // List should be present (may be empty) — asserts the page rendered a real
+    // pending/active/empty state rather than an error page.
     await expect(page.locator('text=/pending|active|no exchanges/i')).toBeVisible({ timeout: 5000 });
   });
 
-  test('should accept exchange as listing owner @critical', async ({ page }) => {
+  // FIXME(J1): "Accept" is only clicked if it happens to be visible — passes on empty data.
+  // Needs a seeded pending exchange where the logged-in user is the provider.
+  test.fixme('should accept exchange as listing owner @critical', async ({ page }) => {
     // This test requires a pending exchange to exist
     // Navigate to exchanges page
     await page.goto(`/${testTenant.slug}/exchanges`);
@@ -93,7 +119,10 @@ test.describe('Exchange Workflow', () => {
     }
   });
 
-  test('should mark exchange as complete @critical', async ({ page }) => {
+  // FIXME(J1): the critical money step — but it only checks a toast, never that a
+  // wallet balance changed. Needs a seeded in-progress exchange + balance assertions.
+  // Covered deterministically by ExchangeWorkflowTest (service layer).
+  test.fixme('should mark exchange as complete @critical', async ({ page }) => {
     // Navigate to exchanges page
     await page.goto(`/${testTenant.slug}/exchanges`);
 
@@ -114,7 +143,8 @@ test.describe('Exchange Workflow', () => {
     }
   });
 
-  test('should leave review after exchange @critical', async ({ page }) => {
+  // FIXME(J1): review controls only exercised "if visible" — passes with zero completed exchanges.
+  test.fixme('should leave review after exchange @critical', async ({ page }) => {
     // Navigate to a completed exchange (this requires setup)
     await page.goto(`/${testTenant.slug}/exchanges`);
 
@@ -147,7 +177,8 @@ test.describe('Exchange Workflow', () => {
     }
   });
 
-  test('should decline exchange request @regression', async ({ page }) => {
+  // FIXME(J1): decline only exercised "if visible" — passes with no pending exchange.
+  test.fixme('should decline exchange request @regression', async ({ page }) => {
     // Navigate to exchanges page
     await page.goto(`/${testTenant.slug}/exchanges`);
 
@@ -168,7 +199,8 @@ test.describe('Exchange Workflow', () => {
     }
   });
 
-  test('should view exchange history @regression', async ({ page }) => {
+  // FIXME(J1): history tab only clicked "if visible" — passes whether or not history renders.
+  test.fixme('should view exchange history @regression', async ({ page }) => {
     await page.goto(`/${testTenant.slug}/exchanges`);
 
     // Look for "History" or "Completed" tab/filter

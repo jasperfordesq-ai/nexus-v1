@@ -193,6 +193,85 @@ class ExchangeWorkflowTest extends TestCase
         }
     }
 
+    /**
+     * Deterministic money-path regression test for the #1 critical journey
+     * (exchange lifecycle). Unlike test_full_exchange_lifecycle_via_api above —
+     * which skips the balance check entirely when completion does not fire and
+     * otherwise only asserts the provider balance "did not decrease" — this
+     * drives the service to a guaranteed 'completed' state and asserts the
+     * EXACT credit math, money conservation, and the single transaction row.
+     *
+     * A bug that credits zero, the wrong amount, double-mints, or fails to
+     * debit the requester would pass the old test and fail this one.
+     *
+     * Whole-hour amounts only: the nexus_test schema stores balance/amount as
+     * INT, so fractional values round and would break exact assertions (prod
+     * uses decimal(10,2)).
+     */
+    public function test_completing_an_exchange_credits_exact_hours_and_conserves_money(): void
+    {
+        $scenario = $this->createExchangeScenario([
+            'provider'  => ['balance' => 10, 'status' => 'active', 'is_approved' => true],
+            'requester' => ['balance' => 10, 'status' => 'active', 'is_approved' => true],
+            'listing'   => ['title' => 'Garden Help'],
+            'exchange'  => ['status' => 'in_progress', 'proposed_hours' => 2.00],
+        ]);
+
+        $provider  = $scenario['provider'];
+        $requester = $scenario['requester'];
+        $exchange  = $scenario['exchange'];
+
+        $totalBefore = (float) $provider->balance + (float) $requester->balance;
+
+        // Both parties confirm matching hours -> exchange completes and credits move.
+        $this->assertTrue(
+            ExchangeWorkflowService::confirmCompletion($exchange->id, (int) $provider->id, 2.00),
+            'Provider confirmation should succeed'
+        );
+        $this->assertTrue(
+            ExchangeWorkflowService::confirmCompletion($exchange->id, (int) $requester->id, 2.00),
+            'Requester confirmation should complete the exchange'
+        );
+
+        // The exchange must reach the terminal completed state — not silently
+        // stall in awaiting/pending confirmation (the gap in the lifecycle test).
+        $exchange->refresh();
+        $this->assertSame(
+            ExchangeWorkflowService::STATUS_COMPLETED,
+            $exchange->status,
+            'Exchange should be completed after both parties confirm matching hours'
+        );
+
+        // EXACT credit math: the requester pays 2 credits, the provider earns 2.
+        $provider->refresh();
+        $requester->refresh();
+        $this->assertEqualsWithDelta(12.0, (float) $provider->balance, 0.001, 'Provider should be credited exactly 2 hours (10 + 2)');
+        $this->assertEqualsWithDelta(8.0, (float) $requester->balance, 0.001, 'Requester should be debited exactly 2 hours (10 - 2)');
+
+        // Conservation: a same-tenant transfer must neither create nor destroy credits.
+        $this->assertEqualsWithDelta(
+            $totalBefore,
+            (float) $provider->balance + (float) $requester->balance,
+            0.001,
+            'Total credits in the tenant must be conserved across an exchange'
+        );
+
+        // Exactly ONE exchange transaction, with the correct shape (guards against
+        // double-mint and wrong-amount regressions).
+        $transactions = Transaction::where('tenant_id', $this->testTenantId)
+            ->where('sender_id', (int) $requester->id)
+            ->where('receiver_id', (int) $provider->id)
+            ->where('transaction_type', 'exchange')
+            ->get();
+
+        $this->assertCount(1, $transactions, 'Completion should create exactly one exchange transaction');
+
+        $transaction = $transactions->first();
+        $this->assertEqualsWithDelta(2.0, (float) $transaction->amount, 0.001, 'Transaction amount must equal the confirmed hours');
+        $this->assertSame('completed', $transaction->status);
+        $this->assertEquals((int) $exchange->transaction_id, (int) $transaction->id, 'Exchange should link the transaction it created');
+    }
+
     public function test_exchange_status_transitions_are_enforced(): void
     {
         $scenario = $this->createExchangeScenario([

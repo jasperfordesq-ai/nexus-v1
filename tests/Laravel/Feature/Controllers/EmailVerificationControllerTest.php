@@ -145,6 +145,107 @@ class EmailVerificationControllerTest extends TestCase
         $this->assertNotNull(DB::table('users')->where('id', $user->id)->value('email_verified_at'));
     }
 
+    public function test_verify_email_rejects_a_token_from_another_tenant(): void
+    {
+        // Security: a verification token issued for tenant A must NOT verify a
+        // user when the request resolves under tenant B. The lookup is tenant-
+        // scoped (WHERE tenant_id = ? AND token = ?), so a foreign token is
+        // invalid here and must never flip the foreign user to verified.
+        $this->ensureEmailVerificationTokenTable();
+
+        $otherTenantId = 999; // seeded active in TestCase::setUpTenantContext
+
+        $foreignUser = User::factory()->forTenant($otherTenantId)->create([
+            'email_verified_at' => null,
+            'is_verified' => false,
+            'is_approved' => true,
+            'status' => 'pending',
+        ]);
+
+        $plaintext = bin2hex(random_bytes(32));
+        DB::table('email_verification_tokens')->insert([
+            'user_id' => $foreignUser->id,
+            'tenant_id' => $otherTenantId,
+            'token' => hash('sha256', $plaintext),
+            'expires_at' => now()->addDay(),
+        ]);
+
+        // Request resolves under the default test tenant (2), not 999.
+        TenantContext::setById($this->testTenantId);
+        $response = $this->apiPost('/auth/verify-email', ['token' => $plaintext]);
+
+        $this->assertContains($response->getStatusCode(), [400, 404]);
+
+        // The foreign user must remain unverified.
+        $this->assertNull(DB::table('users')->where('id', $foreignUser->id)->value('email_verified_at'));
+    }
+
+    public function test_verify_email_does_not_activate_an_unapproved_user(): void
+    {
+        // Approval gate (UPDATE ... status = CASE WHEN status='pending' AND is_approved=1
+        // THEN 'active' ELSE status END): on tenants that require admin approval,
+        // confirming the email must NOT bypass approval. The account stays pending.
+        $this->ensureEmailVerificationTokenTable();
+
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'email_verified_at' => null,
+            'is_verified' => false,
+            'is_approved' => false, // NOT approved yet
+            'status' => 'pending',
+        ]);
+
+        $plaintext = bin2hex(random_bytes(32));
+        DB::table('email_verification_tokens')->insert([
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'token' => hash('sha256', $plaintext),
+            'expires_at' => now()->addDay(),
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+        $response = $this->apiPost('/auth/verify-email', ['token' => $plaintext]);
+
+        $response->assertOk();
+
+        $row = DB::table('users')->where('id', $user->id)->first();
+        // Email is confirmed...
+        $this->assertNotNull($row->email_verified_at);
+        $this->assertEquals(1, (int) $row->is_verified);
+        // ...but the account stays pending because it is not approved.
+        $this->assertSame('pending', $row->status);
+    }
+
+    public function test_verify_email_activates_an_already_approved_pending_user(): void
+    {
+        // The positive side of the gate: an approved, email-pending user becomes
+        // active the moment they confirm their email.
+        $this->ensureEmailVerificationTokenTable();
+
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'email_verified_at' => null,
+            'is_verified' => false,
+            'is_approved' => true, // already approved
+            'status' => 'pending',
+        ]);
+
+        $plaintext = bin2hex(random_bytes(32));
+        DB::table('email_verification_tokens')->insert([
+            'user_id' => $user->id,
+            'tenant_id' => $this->testTenantId,
+            'token' => hash('sha256', $plaintext),
+            'expires_at' => now()->addDay(),
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+        $response = $this->apiPost('/auth/verify-email', ['token' => $plaintext]);
+
+        $response->assertOk();
+
+        $row = DB::table('users')->where('id', $user->id)->first();
+        $this->assertNotNull($row->email_verified_at);
+        $this->assertSame('active', $row->status);
+    }
+
     // ------------------------------------------------------------------
     //  POST /auth/resend-verification (public, rate-limited)
     // ------------------------------------------------------------------
