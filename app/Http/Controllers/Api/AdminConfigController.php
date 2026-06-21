@@ -86,6 +86,16 @@ class AdminConfigController extends BaseApiController
     ];
 
     /**
+     * Settings that require a super-admin — a regular (delegated) tenant admin may NOT
+     * change them. maintenance_mode takes the whole tenant offline, so it is gated above
+     * generic admin: a tenant-super-admin (the community's own top admin) or a platform
+     * super-admin may set it; a regular admin is rejected with 403. (SEC-003, 2026-06-21.)
+     */
+    private const SUPER_ADMIN_ONLY_KEYS = [
+        'maintenance_mode',
+    ];
+
+    /**
      * Settings whose stored value contains a credential and should be
      * returned masked from getSettings (e.g. "AIza••••••••YJ4") so the
      * admin UI can show whether a key is configured without leaking it.
@@ -1134,6 +1144,14 @@ class AdminConfigController extends BaseApiController
                     403
                 );
             }
+        }
+
+        // Super-admin-only keys (e.g. maintenance_mode takes the whole tenant offline) —
+        // a regular delegated admin is rejected with 403; tenant-super-admins and above
+        // may set them. requireSuperAdmin() throws a 403 (api.super_admin_required) here.
+        $superOnlyKeys = array_intersect(array_keys($kvUpdates), self::SUPER_ADMIN_ONLY_KEYS);
+        if (!empty($superOnlyKeys)) {
+            $this->requireSuperAdmin();
         }
 
         if (!empty($directUpdates)) {

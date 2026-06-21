@@ -103,28 +103,44 @@ class AdminSecurityAuditTest extends TestCase
     // an allowlist.
     // ================================================================
 
-    public function test_settings_update_rejects_dangerous_keys(): void
+    // SEC-003 (RESOLVED 2026-06-21): maintenance_mode now requires a super-admin.
+    // Decision: only super-admins may take a community offline. A regular delegated
+    // tenant admin is rejected with 403; the community's own super-admin (or a platform
+    // super-admin) is allowed. Enforced via SUPER_ADMIN_ONLY_KEYS + requireSuperAdmin()
+    // in AdminConfigController::updateSettings.
+
+    public function test_settings_update_maintenance_mode_rejects_regular_admin(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create([
+            'is_super_admin' => false,
+            'is_tenant_super_admin' => false,
+            'is_god' => false,
+        ]);
         Sanctum::actingAs($admin);
 
-        // Try to set maintenance_mode via settings endpoint
         $response = $this->apiPut('/v2/admin/settings', [
             'maintenance_mode' => '1',
         ]);
 
-        // Should either reject the key or only allow whitelisted keys
-        // SEC-003 (CONFIRMED OPEN — needs a product decision, NOT proven secure):
-        // PUT /v2/admin/settings -> AdminConfigController::updateSettings treats
-        // 'maintenance_mode' as a recognised GENERAL_SETTING_KEY. Verified 2026-06-20:
-        // a regular (non-super) tenant admin CAN set it — the response returns
-        // data.updated === true and the key is NOT rejected. This is either a privilege
-        // bug (maintenance_mode should require super-admin) OR an intended tenant-admin
-        // feature (a tenant putting ITSELF into maintenance). Decide, then assert the
-        // chosen behaviour (403 vs 200+updated). Kept as a status-only smoke check so CI
-        // is not blocked on the open decision.
-        $this->assertContains($response->getStatusCode(), [200, 400, 403, 422],
-            'SEC-003: settings endpoint returned an unexpected status (open finding — see note).');
+        $this->assertSame(403, $response->getStatusCode(),
+            'SEC-003: a regular (non-super) admin must receive 403 when setting maintenance_mode.');
+    }
+
+    public function test_settings_update_maintenance_mode_allows_tenant_super_admin(): void
+    {
+        $superAdmin = User::factory()->forTenant($this->testTenantId)->admin()->create([
+            'is_super_admin' => false,
+            'is_tenant_super_admin' => true,
+            'is_god' => false,
+        ]);
+        Sanctum::actingAs($superAdmin);
+
+        $response = $this->apiPut('/v2/admin/settings', [
+            'maintenance_mode' => '1',
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode(),
+            'SEC-003: a tenant super-admin must be allowed to set maintenance_mode for their community.');
     }
 
     // ================================================================
@@ -134,31 +150,22 @@ class AdminSecurityAuditTest extends TestCase
     // system to a regular admin.
     // ================================================================
 
-    public function test_federation_timebanks_does_not_leak_all_tenants(): void
+    // SEC-004 (RESOLVED 2026-06-21): the unscoped AdminFederationController::timebanks()
+    // method — which ran `SELECT id,name,slug,domain FROM tenants WHERE is_active=1` with
+    // no tenant scope, gated only by requireAdmin() — was deleted. It was unrouted dead
+    // code that would have leaked the full tenant directory had a route ever been wired.
+    // The live federation directory (GET /v1/federation/timebanks) is partnership-scoped
+    // + fedAuth-gated.
+
+    public function test_federation_timebanks_admin_endpoint_does_not_exist(): void
     {
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
         Sanctum::actingAs($admin);
 
         $response = $this->apiGet('/v2/admin/federation/timebanks');
 
-        // Endpoint may return 200 with tenant list or a non-200 error
-        // Either way, we assert the response was received (documenting the finding)
-        $this->assertContains($response->getStatusCode(), [200, 401, 403, 404, 500],
-            'SEC-004: Federation timebanks endpoint returned unexpected status code.');
-        if ($response->getStatusCode() === 200) {
-            $data = $response->json('data');
-            // Verify the response only contains tenants visible to this admin's tenant,
-            // not internal/system tenants that should be hidden
-            $this->assertIsArray($data,
-                'SEC-004: Federation timebanks endpoint should return an array of tenants.');
-            foreach ($data as $tenant) {
-                // Each returned tenant should not expose sensitive internal fields
-                $this->assertArrayNotHasKey('db_password', (array) $tenant,
-                    'SEC-004: Federation timebanks endpoint leaks sensitive database credentials.');
-                $this->assertArrayNotHasKey('api_secret', (array) $tenant,
-                    'SEC-004: Federation timebanks endpoint leaks API secrets.');
-            }
-        }
+        $this->assertSame(404, $response->getStatusCode(),
+            'SEC-004: the unscoped admin timebanks endpoint must not exist (dead code removed).');
     }
 
     // ================================================================

@@ -106,13 +106,12 @@ class AdminFederationController extends BaseApiController
         return $this->respondWithData(['features' => $features, 'whitelist' => $whitelist]);
     }
 
-    /** GET /api/v2/admin/federation/timebanks */
-    public function timebanks(): JsonResponse
-    {
-        $this->requireAdmin();
-        $timebanks = DB::select('SELECT id, name, slug, domain FROM tenants WHERE is_active = 1 ORDER BY name');
-        return $this->respondWithData($timebanks);
-    }
+    // SEC-004 (removed 2026-06-21): the unrouted timebanks() method ran an UNSCOPED
+    // `SELECT id,name,slug,domain FROM tenants WHERE is_active = 1` gated only by
+    // requireAdmin(), which would have leaked the full tenant directory to any tenant
+    // admin had a route ever been wired to it. It was dead code (no route, no callers);
+    // deleted to remove the latent leak. The live, partnership-scoped directory is
+    // GET /v1/federation/timebanks -> FederationController::timebanks (fedAuth-gated).
 
     /** GET /api/v2/admin/federation/controls */
     public function controls(): JsonResponse
