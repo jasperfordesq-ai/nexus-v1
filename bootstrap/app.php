@@ -60,6 +60,15 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->onOneServer()
             ->name('slo-check');
 
+        // Stuck-Stripe-webhook pager (B3): a webhook event left in 'failed'
+        // status means a payment/refund Stripe gave up retrying (~3 days) — silent
+        // money-state drift. Alert (log → Sentry → Slack) + non-zero exit daily.
+        $schedule->command('stripe:check-stuck-webhooks')
+            ->dailyAt('07:45')
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->name('stripe-check-stuck-webhooks');
+
         // Tenant data retention disposal (IT-Data-03) — off-peak nightly pass
         $schedule->command('retention:enforce')
             ->dailyAt('03:30')

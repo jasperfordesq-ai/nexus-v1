@@ -76,11 +76,24 @@ class ReconcileFederationPendingTxJob implements ShouldQueue
             return;
         }
 
+        $sampleIds = $stale->take(10)->pluck('id')->all();
+
         Log::critical('ReconcileFederationPendingTxJob: stale federated transactions detected', [
             'count' => $stale->count(),
             'cutoff' => $cutoff->toIso8601String(),
-            'sample_ids' => $stale->take(10)->pluck('id')->all(),
+            'sample_ids' => $sampleIds,
         ]);
+
+        // Page a human. A Log::critical only reaches Sentry if LOG_STACK includes
+        // the `sentry` channel, which prod cannot be assumed to set; report() goes
+        // through the Sentry integration directly. Stuck federated money is a
+        // money-state-drift signal that MUST be visible, not just logged.
+        report(new \RuntimeException(sprintf(
+            'Federation reconcile: %d federated transaction(s) stuck pending > %d min (sample ids: %s)',
+            $stale->count(),
+            self::STALE_AFTER_MINUTES,
+            implode(',', array_map('strval', $sampleIds))
+        )));
 
         foreach ($stale as $tx) {
             try {
@@ -110,5 +123,9 @@ class ReconcileFederationPendingTxJob implements ShouldQueue
         Log::error('ReconcileFederationPendingTxJob failed permanently', [
             'error' => $e->getMessage(),
         ]);
+
+        // The reconcile job is itself a safety-net; if IT dies permanently,
+        // stuck federated money goes unwatched. Surface it to Sentry.
+        report($e);
     }
 }

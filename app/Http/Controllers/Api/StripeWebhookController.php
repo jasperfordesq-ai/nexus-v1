@@ -180,6 +180,13 @@ class StripeWebhookController extends BaseApiController
                 'event_id' => $eventId,
                 'error' => $e->getMessage(),
             ]);
+
+            // A failed Stripe webhook is a money-state-drift risk: Stripe abandons
+            // retries after ~3 days, so a silent handler crash can leave a payment
+            // un-applied forever. report() ensures it reaches Sentry regardless of
+            // LOG_STACK; the row stays status='failed' for stripe:check-stuck-webhooks.
+            report($e);
+
             return $this->respondWithError(
                 'HANDLER_ERROR',
                 __('api.webhook_handler_error'),
