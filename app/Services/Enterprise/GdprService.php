@@ -41,6 +41,11 @@ class GdprService
     {
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
+        // Default to associative rows. The raw Laravel PDO uses PDO::FETCH_BOTH,
+        // which duplicates every column under a numeric key — that bloats the
+        // GDPR JSON export and makes generateHtmlExport() choke on int keys.
+        // Callers that pass an explicit mode (e.g. FETCH_COLUMN) still override.
+        $stmt->setFetchMode(\PDO::FETCH_ASSOC);
         return $stmt;
     }
 
@@ -271,6 +276,11 @@ class GdprService
 
     /**
      * Collect all user data
+     *
+     * Each section runs in isolation via safeSection(): a drifted/absent table
+     * or column in ONE section yields a partial export (that section empty)
+     * rather than aborting the entire export. The retention copy is best-effort
+     * — one bad table must not lose every other section of the subject's data.
      */
     private function collectUserData(int $userId): array
     {
@@ -282,29 +292,57 @@ class GdprService
                 'format_version' => '1.0',
                 'tenant_id' => $this->tenantId,
             ],
-            'profile' => $this->getProfileData($userId),
-            'listings' => $this->getListingsData($userId),
-            'messages' => $this->getMessagesData($userId),
-            'transactions' => $this->getTransactionsData($userId),
-            'events' => $this->getEventsData($userId),
-            'groups' => $this->getGroupsData($userId),
-            'volunteering' => $this->getVolunteeringData($userId),
-            'volunteer_detailed' => $this->exportVolunteerData($userId),
-            'gamification' => $this->getGamificationData($userId),
-            'activity_log' => $this->getActivityLogData($userId),
-            'consents' => $this->getConsentsData($userId),
-            'notifications' => $this->getNotificationsData($userId),
-            'connections' => self::getConnectionsData($userId),
-            'login_history' => self::getLoginHistoryData($userId),
-            'messaging_restrictions' => $this->getMessagingRestrictionsData($userId),
-            'ai_chat_history' => $this->getAiChatData($userId),
-            'reviews' => $this->getReviewsData($userId),
-            'exchanges' => $this->getExchangeData($userId),
-            'vetting_records' => $this->getVettingRecordsData($userId),
-            'insurance_certificates' => $this->getInsuranceCertificatesData($userId),
-            'identity_verification' => $this->getIdentityVerificationData($userId),
-            'safeguarding_preferences' => $this->getSafeguardingPreferencesData($userId),
+            'profile' => $this->safeSection('profile', fn () => $this->getProfileData($userId), null),
+            'listings' => $this->safeSection('listings', fn () => $this->getListingsData($userId), []),
+            'messages' => $this->safeSection('messages', fn () => $this->getMessagesData($userId), []),
+            'transactions' => $this->safeSection('transactions', fn () => $this->getTransactionsData($userId), []),
+            'events' => $this->safeSection('events', fn () => $this->getEventsData($userId), []),
+            'groups' => $this->safeSection('groups', fn () => $this->getGroupsData($userId), []),
+            'volunteering' => $this->safeSection('volunteering', fn () => $this->getVolunteeringData($userId), []),
+            'volunteer_detailed' => $this->safeSection('volunteer_detailed', fn () => $this->exportVolunteerData($userId), []),
+            'gamification' => $this->safeSection('gamification', fn () => $this->getGamificationData($userId), []),
+            'activity_log' => $this->safeSection('activity_log', fn () => $this->getActivityLogData($userId), []),
+            'consents' => $this->safeSection('consents', fn () => $this->getConsentsData($userId), []),
+            'notifications' => $this->safeSection('notifications', fn () => $this->getNotificationsData($userId), []),
+            'connections' => $this->safeSection('connections', fn () => $this->getConnectionsData($userId), []),
+            'login_history' => $this->safeSection('login_history', fn () => $this->getLoginHistoryData($userId), []),
+            'messaging_restrictions' => $this->safeSection('messaging_restrictions', fn () => $this->getMessagingRestrictionsData($userId), null),
+            'ai_chat_history' => $this->safeSection('ai_chat_history', fn () => $this->getAiChatData($userId), []),
+            'reviews' => $this->safeSection('reviews', fn () => $this->getReviewsData($userId), []),
+            'exchanges' => $this->safeSection('exchanges', fn () => $this->getExchangeData($userId), []),
+            'vetting_records' => $this->safeSection('vetting_records', fn () => $this->getVettingRecordsData($userId), []),
+            'insurance_certificates' => $this->safeSection('insurance_certificates', fn () => $this->getInsuranceCertificatesData($userId), []),
+            'identity_verification' => $this->safeSection('identity_verification', fn () => $this->getIdentityVerificationData($userId), []),
+            'safeguarding_preferences' => $this->safeSection('safeguarding_preferences', fn () => $this->getSafeguardingPreferencesData($userId), []),
         ];
+    }
+
+    /**
+     * Run a single export section in isolation.
+     *
+     * A producer that throws (drifted column, absent table, etc.) is caught
+     * and logged as a breadcrumb; the section's $default is substituted so the
+     * overall export still completes. This is the fault-isolation boundary that
+     * keeps one schema-drifted table from aborting the whole retention export.
+     *
+     * @template T
+     * @param string        $section Section key, for the log breadcrumb
+     * @param callable():T  $fn      Producer for the section payload
+     * @param T             $default Value substituted when the producer throws
+     * @return T
+     */
+    private function safeSection(string $section, callable $fn, $default)
+    {
+        try {
+            return $fn();
+        } catch (\Throwable $e) {
+            $this->logger->warning('GDPR export section skipped', [
+                'section'   => $section,
+                'tenant_id' => $this->tenantId,
+                'error'     => $e->getMessage(),
+            ]);
+            return $default;
+        }
     }
 
     private function getProfileData(int $userId): ?array
@@ -321,10 +359,13 @@ class GdprService
 
     private function getListingsData(int $userId): array
     {
+        // `time_credits`/`views_count` do not exist in the real `listings`
+        // schema — the time value lives in `hours_estimate` and the view tally
+        // in `view_count`.
         return $this->query(
             "SELECT id, title, description, type, category_id, subcategory_id,
-                    time_credits, location, latitude, longitude, status,
-                    views_count, created_at, updated_at
+                    hours_estimate, location, latitude, longitude, status,
+                    view_count, created_at, updated_at
              FROM listings WHERE user_id = ? AND tenant_id = ?",
             [$userId, $this->tenantId]
         )->fetchAll();
@@ -332,8 +373,9 @@ class GdprService
 
     private function getMessagesData(int $userId): array
     {
+        // The message body column is `body`, not `content`.
         return $this->query(
-            "SELECT m.id, m.content, m.created_at, m.read_at,
+            "SELECT m.id, m.body AS content, m.created_at, m.read_at,
                     CASE WHEN m.sender_id = ? THEN 'sent' ELSE 'received' END as direction,
                     CASE WHEN m.sender_id = ? THEN m.receiver_id ELSE m.sender_id END as other_user_id
              FROM messages m
@@ -346,12 +388,14 @@ class GdprService
 
     private function getTransactionsData(int $userId): array
     {
+        // The transactions table keys parties as `sender_id`/`receiver_id`,
+        // not `from_user_id`/`to_user_id`.
         return $this->query(
             "SELECT t.id, t.amount, t.description, t.transaction_type,
                     t.status, t.created_at,
-                    CASE WHEN t.from_user_id = ? THEN 'outgoing' ELSE 'incoming' END as direction
+                    CASE WHEN t.sender_id = ? THEN 'outgoing' ELSE 'incoming' END as direction
              FROM transactions t
-             WHERE (t.from_user_id = ? OR t.to_user_id = ?) AND t.tenant_id = ?
+             WHERE (t.sender_id = ? OR t.receiver_id = ?) AND t.tenant_id = ?
              ORDER BY t.created_at DESC",
             [$userId, $userId, $userId, $this->tenantId]
         )->fetchAll();
@@ -359,8 +403,10 @@ class GdprService
 
     private function getEventsData(int $userId): array
     {
+        // `events` has no `end_date`; the real timing columns are `start_date`
+        // (date) plus `start_time`/`end_time` (datetimes).
         return $this->query(
-            "SELECT e.id, e.title, e.description, e.start_date, e.end_date,
+            "SELECT e.id, e.title, e.description, e.start_date, e.start_time, e.end_time,
                     e.location, er.status as rsvp_status, er.created_at as rsvp_date
              FROM event_rsvps er
              JOIN events e ON er.event_id = e.id
@@ -408,9 +454,11 @@ class GdprService
         $t = $this->tenantId;
 
         // vol_applications
+        // vol_applications has no reviewed_by/reviewed_at; the org-side note is
+        // stored in `org_note`.
         $applications = $this->query(
             "SELECT va.id, va.opportunity_id, va.shift_id, va.status, va.message,
-                    va.reviewed_by, va.reviewed_at, va.created_at, va.updated_at,
+                    va.org_note, va.created_at, va.updated_at,
                     opp.title as opportunity_title
              FROM vol_applications va
              LEFT JOIN vol_opportunities opp ON va.opportunity_id = opp.id
@@ -420,9 +468,11 @@ class GdprService
         )->fetchAll();
 
         // vol_logs (hour logs)
+        // vol_logs has no verified_by/verified_at columns (approval is captured
+        // by `status`).
         $logs = $this->query(
             "SELECT vl.id, vl.organization_id, vl.opportunity_id, vl.hours, vl.description,
-                    vl.date_logged, vl.status, vl.verified_by, vl.verified_at, vl.created_at,
+                    vl.date_logged, vl.status, vl.created_at,
                     opp.title as opportunity_title
              FROM vol_logs vl
              LEFT JOIN vol_opportunities opp ON vl.opportunity_id = opp.id
@@ -493,10 +543,11 @@ class GdprService
         )->fetchAll();
 
         // vol_expenses
+        // vol_expenses has no created_at column; submission time is submitted_at.
         $expenses = $this->query(
             "SELECT id, organization_id, opportunity_id, expense_type, amount, currency,
                     description, receipt_path, receipt_filename, status,
-                    reviewed_by, review_notes, reviewed_at, paid_at, payment_reference, submitted_at, created_at
+                    reviewed_by, review_notes, reviewed_at, paid_at, payment_reference, submitted_at
              FROM vol_expenses
              WHERE user_id = ? AND tenant_id = ?
              ORDER BY submitted_at DESC",
@@ -789,8 +840,10 @@ class GdprService
     private function getReviewsData(int $userId): array
     {
         try {
+            // `reviews` links to a transaction, not a listing — there is no
+            // `listing_id` column.
             return $this->query(
-                "SELECT id, reviewer_id, receiver_id, listing_id, rating, comment, created_at,
+                "SELECT id, reviewer_id, receiver_id, transaction_id, rating, comment, created_at,
                         CASE WHEN reviewer_id = ? THEN 'given' ELSE 'received' END as direction
                  FROM reviews
                  WHERE (reviewer_id = ? OR receiver_id = ?) AND tenant_id = ?
