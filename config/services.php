@@ -96,6 +96,10 @@ return [
         // logs only (safe no-op) — email is deliberately NOT used as the alert
         // channel because email problems are exactly what it watches for.
         'email_alerts_webhook' => env('SLACK_EMAIL_ALERTS_WEBHOOK'),
+        // Incoming-webhook URL used by `slo:check` to page the operator when an
+        // SLO (exchange-completion success rate) is breached. When empty the
+        // command logs/Sentry-captures only (safe no-op).
+        'slo_alerts_webhook' => env('SLACK_SLO_ALERTS_WEBHOOK'),
         // Base URL of the React app, used to deep-link Slack alerts to the
         // /admin/email-deliverability dashboard.
         'dashboard_url' => env('ADMIN_DASHBOARD_URL', 'https://app.project-nexus.ie'),

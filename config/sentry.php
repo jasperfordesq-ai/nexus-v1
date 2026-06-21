@@ -14,7 +14,12 @@ return [
     // DSN preference: SENTRY_DSN_PHP (canonical for this project) → SENTRY_LARAVEL_DSN → SENTRY_DSN
     'dsn' => env('SENTRY_DSN_PHP', env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN'))),
 
-    'release' => env('SENTRY_RELEASE'),
+    // Prefer an explicit SENTRY_RELEASE; otherwise derive it from the same
+    // BUILD_COMMIT the deploy script injects (and that SecurityHeaders uses for
+    // the X-Build header), so backend events are attributable to a specific
+    // deploy — mirroring the React side's `nexus-react@<commit>` convention.
+    // Falls back to null (current behaviour) when neither is set.
+    'release' => env('SENTRY_RELEASE') ?: (env('BUILD_COMMIT') ? 'nexus-php@' . env('BUILD_COMMIT') : null),
 
     'environment' => env('SENTRY_ENVIRONMENT'),
 

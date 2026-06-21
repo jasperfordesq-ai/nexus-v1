@@ -51,6 +51,15 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('safeguarding-clear-expired-monitoring');
 
+        // SLO watch (docs/SLO.md): evaluate the exchange-completion success rate
+        // daily and alert (log → Sentry → Slack) + exit non-zero when breached,
+        // so a money-path regression is VISIBLE before users complain.
+        $schedule->command('slo:check')
+            ->dailyAt('07:30')
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->name('slo-check');
+
         // Tenant data retention disposal (IT-Data-03) — off-peak nightly pass
         $schedule->command('retention:enforce')
             ->dailyAt('03:30')
