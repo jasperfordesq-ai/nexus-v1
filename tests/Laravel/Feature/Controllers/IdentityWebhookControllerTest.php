@@ -6,8 +6,15 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
-use Tests\Laravel\TestCase;
+use App\Core\TenantContext;
+use App\Models\User;
+use App\Services\Identity\IdentityProviderRegistry;
+use App\Services\Identity\IdentityVerificationProviderInterface;
+use App\Services\Identity\IdentityVerificationSessionService;
+use App\Services\MemberVerificationBadgeService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
+use Tests\Laravel\TestCase;
 
 /**
  * Feature tests for IdentityWebhookController — identity verification provider webhooks (public).
@@ -15,6 +22,14 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class IdentityWebhookControllerTest extends TestCase
 {
     use DatabaseTransactions;
+
+    protected function tearDown(): void
+    {
+        // The mismatch tests register a throwaway provider into the static
+        // registry; reset so it doesn't leak into other tests in the suite.
+        IdentityProviderRegistry::reset();
+        parent::tearDown();
+    }
 
     // ------------------------------------------------------------------
     //  POST /v2/webhooks/identity/{provider_slug} (PUBLIC — no auth)
@@ -38,5 +53,110 @@ class IdentityWebhookControllerTest extends TestCase
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 400, 404, 422]);
+    }
+
+    // ------------------------------------------------------------------
+    //  H4 — a "passed" webhook must NOT grant the badge when the verified
+    //  name/DOB does not match the user's profile.
+    // ------------------------------------------------------------------
+
+    public function test_verified_webhook_with_name_dob_mismatch_does_not_grant_id_verified_badge(): void
+    {
+        TenantContext::setById($this->testTenantId);
+
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name'    => 'Alice',
+            'last_name'     => 'Smith',
+            'date_of_birth' => '1990-05-15',
+        ]);
+        TenantContext::setById($this->testTenantId);
+
+        $slug = 'test_mismatch_idp';
+        IdentityProviderRegistry::register($this->makeFakeProvider($slug, [
+            'status'              => 'passed',
+            'verified_first_name' => 'Mallory',           // mismatch
+            'verified_last_name'  => 'Imposter',          // mismatch
+            'verified_dob'        => ['year' => 1971, 'month' => 2, 'day' => 3],
+        ]));
+
+        $sessionId = IdentityVerificationSessionService::create(
+            $this->testTenantId, (int) $user->id, $slug, 'document_only', ['provider_session_id' => 'sess_mismatch']
+        );
+
+        $response = $this->apiPost("/v2/webhooks/identity/{$slug}", [
+            'session_id' => 'sess_mismatch',
+            'result'     => 'passed',
+        ]);
+
+        $response->assertOk();
+
+        // The trust badge must NOT have been granted.
+        $badges = app(MemberVerificationBadgeService::class)->getUserBadges((int) $user->id);
+        $hasIdBadge = collect($badges)->contains(fn ($b) => ($b['badge_type'] ?? null) === 'id_verified');
+        $this->assertFalse($hasIdBadge, 'A name/DOB mismatch must NOT grant the id_verified badge');
+
+        // The session is recorded as failed, consistent with the poll/cron paths.
+        $status = DB::table('identity_verification_sessions')->where('id', $sessionId)->value('status');
+        $this->assertSame('failed', $status, 'A mismatched pass must be downgraded to failed');
+    }
+
+    public function test_verified_webhook_with_matching_name_dob_grants_id_verified_badge(): void
+    {
+        TenantContext::setById($this->testTenantId);
+
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name'    => 'Alice',
+            'last_name'     => 'Smith',
+            'date_of_birth' => '1990-05-15',
+        ]);
+        TenantContext::setById($this->testTenantId);
+
+        $slug = 'test_match_idp';
+        IdentityProviderRegistry::register($this->makeFakeProvider($slug, [
+            'status'              => 'passed',
+            'verified_first_name' => 'Alice',
+            'verified_last_name'  => 'Smith',
+            'verified_dob'        => ['year' => 1990, 'month' => 5, 'day' => 15],
+        ]));
+
+        $sessionId = IdentityVerificationSessionService::create(
+            $this->testTenantId, (int) $user->id, $slug, 'document_only', ['provider_session_id' => 'sess_match']
+        );
+
+        $response = $this->apiPost("/v2/webhooks/identity/{$slug}", [
+            'session_id' => 'sess_match',
+            'result'     => 'passed',
+        ]);
+
+        $response->assertOk();
+
+        $badges = app(MemberVerificationBadgeService::class)->getUserBadges((int) $user->id);
+        $hasIdBadge = collect($badges)->contains(fn ($b) => ($b['badge_type'] ?? null) === 'id_verified');
+        $this->assertTrue($hasIdBadge, 'A matching name/DOB must grant the id_verified badge');
+    }
+
+    private function makeFakeProvider(string $slug, array $verifiedOutputs): IdentityVerificationProviderInterface
+    {
+        return new class($slug, $verifiedOutputs) implements IdentityVerificationProviderInterface {
+            public function __construct(private string $slug, private array $verifiedOutputs) {}
+            public function getSlug(): string { return $this->slug; }
+            public function getName(): string { return 'Test IDP'; }
+            public function getSupportedLevels(): array { return ['document_only']; }
+            public function createSession(int $userId, int $tenantId, string $level, array $metadata = []): array
+            {
+                return ['provider_session_id' => 'sess_' . $this->slug];
+            }
+            public function getSessionStatus(string $providerSessionId): array { return $this->verifiedOutputs; }
+            public function handleWebhook(array $payload, array $headers): array
+            {
+                return [
+                    'provider_session_id' => $payload['session_id'] ?? ('sess_' . $this->slug),
+                    'status'              => $payload['result'] ?? 'passed',
+                ];
+            }
+            public function verifyWebhookSignature(string $rawBody, array $headers): bool { return true; }
+            public function cancelSession(string $providerSessionId): bool { return true; }
+            public function isAvailable(int $tenantId): bool { return true; }
+        };
     }
 }

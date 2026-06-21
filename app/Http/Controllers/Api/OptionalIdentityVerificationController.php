@@ -433,8 +433,12 @@ class OptionalIdentityVerificationController extends BaseApiController
     /**
      * Compare Stripe's verified_outputs (name/DOB from document) against the user's profile.
      * Returns a mismatch reason string, or null if everything matches.
+     *
+     * Public + the single source of truth for the name/DOB gate so the webhook,
+     * poll, and cron verification paths can't drift (H4) — a passed document must
+     * never grant the ID-Verified badge if the identity doesn't match the profile.
      */
-    private static function checkNameDobMismatch(int $userId, int $tenantId, array $stripeStatus): ?string
+    public static function checkNameDobMismatch(int $userId, int $tenantId, array $stripeStatus): ?string
     {
         $user = DB::table('users')
             ->where('id', $userId)

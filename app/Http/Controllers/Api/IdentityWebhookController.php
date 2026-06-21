@@ -129,13 +129,40 @@ class IdentityWebhookController extends BaseApiController
             TenantContext::setById($sessionTenantId);
         }
 
+        // H4: a "passed" document is not enough — the verified name/DOB must match
+        // the user's profile, exactly as the poll + cron paths already enforce.
+        // Fetch the verified outputs and downgrade a mismatched pass to 'failed'
+        // BEFORE recording the result, so a mismatch never grants the trust badge
+        // (and the user/admins get a single, consistent "failed" notification).
+        if ($status === 'passed') {
+            try {
+                $verifiedOutputs = $provider->getSessionStatus($providerSessionId);
+            } catch (\Throwable $e) {
+                // Couldn't fetch verified outputs — fall back to the webhook result
+                // (carries no name/DOB, so the check is a no-op, matching old behaviour).
+                $verifiedOutputs = $result;
+            }
+
+            $mismatch = OptionalIdentityVerificationController::checkNameDobMismatch(
+                $sessionUserId,
+                $sessionTenantId,
+                is_array($verifiedOutputs) ? $verifiedOutputs : []
+            );
+
+            if ($mismatch !== null) {
+                $status = 'failed';
+                $result['failure_reason'] = $mismatch;
+            }
+        }
+
         $this->orchestrationService->handleVerificationResult(
             (int) $session['id'],
             $status,
             $result
         );
 
-        // Auto-grant ID Verified badge when verification passes
+        // Auto-grant the ID Verified badge ONLY when verification passed AND the
+        // name/DOB matched (a mismatch was already downgraded to 'failed' above).
         if ($status === 'passed') {
             try {
                 OptionalIdentityVerificationController::grantIdVerifiedBadge(
@@ -146,10 +173,6 @@ class IdentityWebhookController extends BaseApiController
                 // Non-critical — log but don't fail the webhook
                 \Illuminate\Support\Facades\Log::warning("[IdentityWebhook] Failed to grant id_verified badge: " . $e->getMessage());
             }
-
-        } elseif ($status === 'failed') {
-            // Verification result notifications are dispatched by
-            // RegistrationOrchestrationService::applyPostVerificationAction().
         }
 
         // Always return 200 to the webhook provider
