@@ -15,6 +15,7 @@ use App\Services\FederationFeatureService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\Concerns\FederationIntegrationHarness;
 use Tests\Laravel\TestCase;
@@ -91,6 +92,11 @@ class FederationV2InternalTransferTest extends TestCase
         // controller re-reads the rows we just seeded (DatabaseTransactions rolls them
         // back between tests).
         $this->app->make(FederationFeatureService::class)->clearCache();
+
+        // The H6 idempotency guard claims keys in the cache; flush so the array
+        // cache cannot leak a claim between tests (DatabaseTransactions rolls back
+        // the DB but not the cache).
+        Cache::flush();
 
         TenantContext::setById(self::SOURCE_TENANT_ID);
     }
@@ -205,6 +211,31 @@ class FederationV2InternalTransferTest extends TestCase
             ->where('sender_id', $sender)
             ->where('is_federated', 1)
             ->count());
+    }
+
+    public function test_double_submit_does_not_double_debit(): void
+    {
+        $sender   = $this->makeFederatedUser(self::SOURCE_TENANT_ID, 25);
+        $receiver = $this->makeFederatedUser($this->destinationTenantId, 0);
+
+        $r1 = $this->callSendTransaction($sender, $receiver, $this->destinationTenantId, 10, 'Helped move a sofa');
+        $this->assertSame(201, $r1->getStatusCode(), (string) $r1->getContent());
+
+        // Immediate resubmit of the identical request (double-click / network retry).
+        $r2 = $this->callSendTransaction($sender, $receiver, $this->destinationTenantId, 10, 'Helped move a sofa');
+
+        // Idempotent: the replay returns the SAME committed transaction, not a new debit.
+        $this->assertSame(201, $r2->getStatusCode(), (string) $r2->getContent());
+
+        // Money moved exactly once.
+        $this->assertEqualsWithDelta(15, $this->balanceOf($sender), 0.001, 'Sender must be debited exactly once');
+        $this->assertEqualsWithDelta(10, $this->balanceOf($receiver), 0.001, 'Receiver must be credited exactly once');
+
+        // Exactly one federated ledger row, despite two submits.
+        $this->assertSame(1, (int) DB::table('transactions')
+            ->where('sender_id', $sender)
+            ->where('is_federated', 1)
+            ->count(), 'A double-submit must create exactly one federated transaction');
     }
 
     // ------------------------------------------------------------------

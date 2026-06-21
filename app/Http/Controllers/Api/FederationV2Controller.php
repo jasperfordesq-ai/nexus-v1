@@ -2583,6 +2583,8 @@ class FederationV2Controller extends BaseApiController
         }
 
         // ── Internal transaction ──
+        $idemCacheKey = null;
+        $idemTtl = 0;
         try {
             $receiverTenantIdInt = (int) $receiverTenantId;
             $receiverIdInt = (int) $receiverId;
@@ -2611,10 +2613,45 @@ class FederationV2Controller extends BaseApiController
                 return $this->respondWithError('TRANSACTIONS_NOT_ALLOWED', __('api.fed_partnership_no_transactions'), null, 403);
             }
 
+            // Idempotency / anti-double-submit guard (H6): a client double-submit
+            // (or network retry) would otherwise create TWO real debits. Prefer an
+            // explicit Idempotency-Key; otherwise fall back to a short-window
+            // content fingerprint so an accidental double-click is still caught
+            // without a client key. Fail OPEN on a cache hiccup — never block a
+            // legitimate transfer on infrastructure flakiness.
+            $explicitKey = trim((string) (request()->header('Idempotency-Key') ?? ($input['idempotency_key'] ?? '')));
+            $hasExplicitKey = $explicitKey !== '';
+            $fingerprint = $hasExplicitKey
+                ? sha1('key:' . $explicitKey)
+                : sha1('content:' . $receiverIdInt . '|' . $receiverTenantIdInt . '|' . $amount . '|' . $description);
+            $idemCacheKey = "fedtx:idem:{$tenantId}:{$userId}:{$fingerprint}";
+            $idemTtl = $hasExplicitKey ? 86400 : 120;
+
+            $claimed = true;
+            try {
+                $claimed = \Illuminate\Support\Facades\Cache::add($idemCacheKey, ['status' => 'pending'], $idemTtl);
+            } catch (\Throwable $cacheEx) {
+                $claimed = true;        // cache unavailable → do not block the transfer
+                $idemCacheKey = null;   // and don't try to forget/store later
+            }
+            if (! $claimed) {
+                $prior = null;
+                try { $prior = \Illuminate\Support\Facades\Cache::get($idemCacheKey); } catch (\Throwable $e) {}
+                if (is_array($prior) && isset($prior['transaction_id'])) {
+                    // Idempotent replay — return the original committed result, no second debit.
+                    return $this->respondWithData($prior, null, 201);
+                }
+                // A concurrent in-flight duplicate inside the window.
+                return $this->respondWithError('DUPLICATE_TRANSACTION', __('api.fed_transaction_failed'), null, 409);
+            }
+
             DB::beginTransaction();
             $deducted = DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?", [$amount, $userId, $tenantId, $amount]);
             if ($deducted === 0) {
                 DB::rollBack();
+                if ($idemCacheKey !== null) {
+                    try { \Illuminate\Support\Facades\Cache::forget($idemCacheKey); } catch (\Throwable $e) {}
+                }
                 return $this->respondWithError('INSUFFICIENT_BALANCE', __('api.fed_insufficient_balance'), null, 400);
             }
 
@@ -2627,6 +2664,18 @@ class FederationV2Controller extends BaseApiController
             );
             $txId = (int) DB::getPdo()->lastInsertId();
             DB::commit();
+
+            // Record the committed result against the idempotency key so a replay
+            // returns the SAME transaction instead of debiting again.
+            if ($idemCacheKey !== null) {
+                try {
+                    \Illuminate\Support\Facades\Cache::put(
+                        $idemCacheKey,
+                        ['transaction_id' => $txId, 'status' => 'completed', 'amount' => $amount],
+                        $idemTtl
+                    );
+                } catch (\Throwable $e) { /* best-effort */ }
+            }
 
             $this->federationAuditService->log('federation_transaction', $tenantId, $receiverTenantIdInt, $userId,
                 ['transaction_id' => $txId, 'amount' => $amount, 'receiver_id' => $receiverIdInt]);
@@ -2712,6 +2761,11 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithData(['transaction_id' => $txId, 'status' => 'completed', 'amount' => $amount], null, 201);
         } catch (\Throwable $e) {
             DB::rollBack();
+            // Release the idempotency claim so a legitimate retry of a transfer
+            // that failed mid-flight is not wrongly treated as a duplicate.
+            if (! empty($idemCacheKey)) {
+                try { \Illuminate\Support\Facades\Cache::forget($idemCacheKey); } catch (\Throwable $ex) {}
+            }
             \Illuminate\Support\Facades\Log::warning("FederationV2::sendTransaction internal error: " . $e->getMessage());
             return $this->respondWithError('TRANSACTION_FAILED', __('api.fed_transaction_failed'), null, 500);
         }
