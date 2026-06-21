@@ -80,6 +80,17 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->onOneServer()
             ->name('gdpr-check-overdue-requests');
 
+        // Alarm delivery heartbeat (watcher-of-the-watcher): the three breach
+        // alarms above only fire when something is wrong, so a silently-broken
+        // Sentry/Slack delivery path would go unnoticed. This fires a benign
+        // weekly heartbeat through the SAME legs (log → Sentry → Slack); if it
+        // ever stops arriving, alarm delivery itself is broken. Always exits 0.
+        $schedule->command('monitoring:alarm-selftest')
+            ->weeklyOn(1, '07:55')
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->name('monitoring-alarm-selftest');
+
         // Tenant data retention disposal (IT-Data-03) — off-peak nightly pass
         $schedule->command('retention:enforce')
             ->dailyAt('03:30')
