@@ -7,10 +7,12 @@
 namespace Tests\Laravel\Feature\Services;
 
 use App\Core\TenantContext;
+use App\Events\TransactionCompleted;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Services\WalletService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Event;
 use Tests\Laravel\TestCase;
 
 /**
@@ -276,5 +278,51 @@ class WalletServiceEdgeCasesTest extends TestCase
             })
             ->count();
         $this->assertSame($txnCountBefore, $txnCountAfter, 'A failed transfer must not create a transaction row');
+    }
+
+    /**
+     * J1 seam (PRODUCTION-READINESS §3): the post-commit notification / event
+     * dispatch runs OUTSIDE the DB::transaction() that moves the money. That is
+     * deliberate and safe — money is committed first, side-effects are
+     * best-effort. This locks the property: a failure in the post-commit path
+     * (here a throwing TransactionCompleted listener) must NOT roll back or
+     * corrupt the already-committed transfer. It would fail if a future refactor
+     * moved event() inside the transaction or dropped the surrounding try/catch.
+     */
+    public function test_post_commit_notification_failure_does_not_roll_back_the_transfer(): void
+    {
+        $sender   = User::factory()->forTenant($this->testTenantId)->create(['balance' => 10]);
+        $receiver = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
+
+        TenantContext::setById($this->testTenantId);
+
+        // Force the post-commit notification/event path to blow up.
+        Event::listen(TransactionCompleted::class, function (): void {
+            throw new \RuntimeException('post-commit listener boom — must not roll back committed money');
+        });
+
+        // Must NOT throw — the wallet swallows post-commit side-effect failures.
+        $result = $this->service->transfer($sender->id, [
+            'recipient'   => $receiver->id,
+            'amount'      => 4.0,
+            'description' => 'post-commit failure isolation',
+        ]);
+
+        $sender->refresh();
+        $receiver->refresh();
+
+        // Money moved and was recorded despite the throwing listener.
+        $this->assertEqualsWithDelta(6.0, (float) $sender->balance, 0.001, 'Sender must still be debited');
+        $this->assertEqualsWithDelta(4.0, (float) $receiver->balance, 0.001, 'Receiver must still be credited');
+        $this->assertNotEmpty($result, 'Transfer must return a completed result');
+
+        // Re-pin: the post-commit event dispatch drifts TenantContext, which the
+        // Transaction model's global tenant scope would otherwise resolve against.
+        TenantContext::setById($this->testTenantId);
+        $this->assertSame(1, Transaction::where('tenant_id', $this->testTenantId)
+            ->where('sender_id', $sender->id)
+            ->where('receiver_id', $receiver->id)
+            ->where('status', 'completed')
+            ->count(), 'The committed transaction row must persist');
     }
 }
