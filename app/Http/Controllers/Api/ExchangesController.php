@@ -311,7 +311,18 @@ class ExchangesController extends BaseApiController
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.exchange_hours_gt_zero'), 'hours', 400);
         }
 
-        $success = $this->exchangeWorkflowService->confirmCompletion($id, $userId, $hours);
+        try {
+            $success = $this->exchangeWorkflowService->confirmCompletion($id, $userId, $hours);
+        } catch (\RuntimeException $e) {
+            // The final confirmation triggers the credit transfer; if the requester
+            // can't cover it the transfer rolls back cleanly (no credits move) — but
+            // that previously surfaced as an opaque 500. Return a typed 4xx so the
+            // counterparty sees a clear, actionable reason.
+            if (str_contains($e->getMessage(), 'INSUFFICIENT_BALANCE')) {
+                return $this->respondWithError('INSUFFICIENT_BALANCE', __('api.insufficient_balance'), null, 422);
+            }
+            throw $e;
+        }
         if (!$success) {
             return $this->respondWithError('EXCHANGE_ERROR', __('api.exchange_confirm_failed'), null, 400);
         }

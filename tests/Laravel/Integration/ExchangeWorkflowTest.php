@@ -73,6 +73,52 @@ class ExchangeWorkflowTest extends TestCase
         ]);
     }
 
+    /**
+     * Tier-3: when the requester can't cover the confirmed hours, the FINAL
+     * confirmation (which triggers the credit transfer) must fail with a typed
+     * INSUFFICIENT_BALANCE signal — not a generic crash — and move no money. The
+     * controller maps this to a 422 instead of the previous opaque 500.
+     */
+    public function test_final_confirmation_with_insufficient_requester_balance_throws_typed_and_moves_no_money(): void
+    {
+        $scenario = $this->createExchangeScenario([
+            'provider'  => ['balance' => 5, 'status' => 'active', 'is_approved' => true],
+            'requester' => ['balance' => 1, 'status' => 'active', 'is_approved' => true], // cannot cover 2h
+            'listing'   => ['title' => 'Garden Help'],
+            'exchange'  => ['status' => 'in_progress', 'proposed_hours' => 2.00],
+        ]);
+
+        $provider  = $scenario['provider'];
+        $requester = $scenario['requester'];
+        $exchange  = $scenario['exchange'];
+
+        // First confirmation only records; the second triggers the transfer.
+        $this->assertTrue(
+            ExchangeWorkflowService::confirmCompletion($exchange->id, (int) $provider->id, 2.00),
+            'Provider confirmation should record'
+        );
+
+        try {
+            ExchangeWorkflowService::confirmCompletion($exchange->id, (int) $requester->id, 2.00);
+            $this->fail('Expected an INSUFFICIENT_BALANCE failure on the final confirmation');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('INSUFFICIENT_BALANCE', $e->getMessage());
+        }
+
+        // Clean rollback — no credits moved, no transaction row, not completed.
+        \App\Core\TenantContext::setById($this->testTenantId);
+        $provider->refresh();
+        $requester->refresh();
+        $this->assertEqualsWithDelta(5, (float) $provider->balance, 0.001, 'provider balance unchanged');
+        $this->assertEqualsWithDelta(1, (float) $requester->balance, 0.001, 'requester balance unchanged');
+        $this->assertSame(0, Transaction::where('tenant_id', $this->testTenantId)
+            ->where('sender_id', $requester->id)
+            ->where('transaction_type', 'exchange')
+            ->count(), 'no exchange transaction row on a failed confirmation');
+        $exchange->refresh();
+        $this->assertNotSame(ExchangeWorkflowService::STATUS_COMPLETED, $exchange->status, 'exchange must not be marked completed');
+    }
+
     // =========================================================================
     // Full Lifecycle Tests
     // =========================================================================

@@ -1039,7 +1039,10 @@ class ExchangeWorkflowService
 
             if (!$sender || (float) $sender->balance < $hours) {
                 Log::warning("Exchange #{$exchangeId}: requester #{$requesterId} has insufficient balance (" . ($sender->balance ?? 0) . " < {$hours})");
-                return null;
+                // Typed signal so the confirm endpoint returns a clear 4xx instead
+                // of a generic 500. The surrounding DB::transaction rolls back, so
+                // no credits move and the counterparty's confirmation is preserved.
+                throw new \RuntimeException('INSUFFICIENT_BALANCE');
             }
 
             // Lock receiver row too for consistency
@@ -1068,6 +1071,12 @@ class ExchangeWorkflowService
 
             return $transactionId;
         } catch (\Exception $e) {
+            // Let the typed insufficient-balance signal propagate (so the confirm
+            // endpoint can return a 4xx); only generic/unexpected failures degrade
+            // to a null return.
+            if ($e instanceof \RuntimeException && $e->getMessage() === 'INSUFFICIENT_BALANCE') {
+                throw $e;
+            }
             Log::error("Failed to create transaction for exchange $exchangeId: " . $e->getMessage());
             return null;
         }
