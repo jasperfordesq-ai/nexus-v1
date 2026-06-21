@@ -30,9 +30,52 @@ env:
   E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
   E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
 
+# ─────────────────────────────────────────────────────────────────────────────
+# A green check on this workflow must MEAN something. Previously, when no E2E
+# environment was configured, the test jobs exited 0 (GREEN) having run ZERO
+# tests — a false sense of safety. That is fixed here:
+#
+#   * No E2E environment configured  -> jobs are SKIPPED (neutral grey), NOT a
+#     passing green check. A skipped job does not assert success. This also keeps
+#     `main` green (skipped != failed) and works for fork PRs (no secrets).
+#   * E2E environment IS configured  -> the job runs for real. If it executes
+#     ZERO tests, or required credentials are missing, it FAILS loudly. We never
+#     pass `--pass-with-no-tests`, so Playwright exits non-zero when nothing ran.
+#
+# The blocking PR environment gate remains the self-contained local Docker smoke
+# job (see e2e-smoke). This workflow is the *remote-environment* suite.
+#
+# NOTE: if you want unauthenticated-only E2E against a remote environment, set
+# only `E2E_BASE_URL` and trim the matrices below to `[unauthenticated]`. Leaving
+# a credentialed project in the matrix without its credentials is treated as a
+# real misconfiguration and fails — by design, so partial setups are visible.
+# ─────────────────────────────────────────────────────────────────────────────
+
 jobs:
+  # Secrets cannot be referenced in a job-level `if:`, so resolve "is an E2E
+  # environment configured?" here and expose it as a job output the test jobs gate on.
+  e2e-preflight:
+    name: E2E Preflight (environment check)
+    runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
+    steps:
+      - id: check
+        name: Determine whether an E2E target is configured
+        run: |
+          if [ -n "$E2E_BASE_URL" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "E2E_BASE_URL is configured — remote E2E jobs will run."
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=E2E skipped::No E2E_BASE_URL configured. The remote E2E jobs are SKIPPED (reported as skipped/neutral, NOT as a passing green check). The blocking PR gate is the self-contained local Docker smoke job."
+            { echo "### ⏭️ Remote E2E skipped"; echo "No \`E2E_BASE_URL\` configured — the remote E2E jobs were **skipped** (not run, not a green pass). A green pass on this workflow only ever means tests actually ran."; } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
   e2e-tests:
     name: E2E Tests
+    needs: e2e-preflight
+    if: needs.e2e-preflight.outputs.configured == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -63,34 +106,19 @@ jobs:
           if [ "${{ github.event.inputs.project }}" != "" ] && [ "${{ github.event.inputs.project }}" != "all" ]; then
             PROJECT="${{ github.event.inputs.project }}"
           fi
-          # PR checks must not depend on live production tenant state. Run this
-          # workflow only when a target E2E environment is configured explicitly;
-          # the local Docker smoke job remains the blocking PR environment gate.
-          # IMPORTANT: when a target environment / credentials are not configured
-          # this job exits 0 (green) WITHOUT running any tests. To avoid a false
-          # sense of safety, that state is surfaced as a loud ::warning:: and a job
-          # summary — a green check here does NOT mean the E2E suite passed unless
-          # the summary confirms tests actually ran. (Stays non-blocking by design;
-          # the real gate is a self-contained run — see the E2E coverage notes.)
-          if [ -z "$E2E_BASE_URL" ]; then
-            echo "::warning::E2E NOT RUN (${PROJECT}) — E2E_BASE_URL is not configured. This check is GREEN but executed ZERO tests and is NOT a safety gate."
-            { echo "### ⚠️ E2E tests did NOT run (${PROJECT})"; echo "No \`E2E_BASE_URL\` configured — this green check executed **zero** tests and is **not** a real gate."; } >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          # Skip credential-dependent projects when secrets are not configured.
-          # Without credentials, authenticated suites time out on login and
-          # exhaust the 30-minute job timeout. Public unauthenticated checks
-          # can still run without secrets.
+          # We are inside a CONFIGURED run (E2E_BASE_URL is set). Missing credentials
+          # for a credentialed project is a real misconfiguration -> FAIL loudly
+          # rather than silently exit green having run nothing.
           if [ "$PROJECT" != "unauthenticated" ] && [ "$PROJECT" != "admin" ] && [ -z "$E2E_USER_EMAIL" ]; then
-            echo "::warning::E2E NOT RUN (${PROJECT}) — E2E_USER_EMAIL not configured. Green but executed ZERO authenticated tests; not a gate."
-            { echo "### ⚠️ Authenticated E2E did NOT run (${PROJECT})"; echo "No \`E2E_USER_EMAIL\` configured — zero authenticated tests ran."; } >> "$GITHUB_STEP_SUMMARY"
-            exit 0
+            echo "::error title=E2E misconfigured::E2E_BASE_URL is set but E2E_USER_EMAIL is missing — authenticated project '$PROJECT' cannot run. Configure the credentials or scope the matrix to [unauthenticated]."
+            exit 1
           fi
           if [ "$PROJECT" = "admin" ] && [ -z "$E2E_ADMIN_EMAIL" ]; then
-            echo "::warning::E2E NOT RUN (admin) — E2E_ADMIN_EMAIL not configured. Green but executed ZERO admin tests; not a gate."
-            { echo "### ⚠️ Admin E2E did NOT run"; echo "No \`E2E_ADMIN_EMAIL\` configured — zero admin tests ran."; } >> "$GITHUB_STEP_SUMMARY"
-            exit 0
+            echo "::error title=E2E misconfigured::E2E_BASE_URL is set but E2E_ADMIN_EMAIL is missing — admin project cannot run."
+            exit 1
           fi
+          # Do NOT add --pass-with-no-tests: Playwright exits non-zero ("no tests
+          # found") so a run that matches ZERO tests FAILS instead of green-passing.
           npx playwright test --project=$PROJECT
 
       - name: Upload test results
@@ -112,9 +140,10 @@ jobs:
 
   e2e-cross-browser:
     name: Cross-Browser E2E Tests
+    needs: e2e-preflight
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.e2e-preflight.outputs.configured == 'true'
 
     strategy:
       fail-fast: false
@@ -139,16 +168,13 @@ jobs:
 
       - name: Run E2E tests
         run: |
-          if [ -z "$E2E_BASE_URL" ]; then
-            echo "::warning::E2E NOT RUN (${{ matrix.project }}) — E2E_BASE_URL not configured. Green but executed ZERO tests; not a gate."
-            { echo "### ⚠️ Cross-browser E2E did NOT run (${{ matrix.project }})"; echo "No \`E2E_BASE_URL\` configured — zero tests ran."; } >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
+          # Inside a CONFIGURED run. Cross-browser projects exercise authenticated
+          # flows; missing credentials is a real misconfiguration -> FAIL loudly.
           if [ -z "$E2E_USER_EMAIL" ]; then
-            echo "::warning::E2E NOT RUN (${{ matrix.project }}) — E2E_USER_EMAIL not configured. Green but executed ZERO tests; not a gate."
-            { echo "### ⚠️ Cross-browser E2E did NOT run (${{ matrix.project }})"; echo "No \`E2E_USER_EMAIL\` configured — zero tests ran."; } >> "$GITHUB_STEP_SUMMARY"
-            exit 0
+            echo "::error title=E2E misconfigured::E2E_BASE_URL is set but E2E_USER_EMAIL is missing — cross-browser project ${{ matrix.project }} cannot run."
+            exit 1
           fi
+          # No --pass-with-no-tests: a zero-test run FAILS instead of green-passing.
           npx playwright test --project=${{ matrix.project }}
 
       - name: Upload test results
