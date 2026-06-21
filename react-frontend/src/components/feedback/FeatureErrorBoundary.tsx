@@ -14,6 +14,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';import i18n from 'i18next';
 import { GlassCard, Button } from '@/components/ui';
 import { logError } from '@/lib/logger';
+import { captureSentryException } from '@/lib/sentry';
 
 interface FeatureErrorBoundaryProps {
   children: ReactNode;
@@ -44,7 +45,24 @@ export class FeatureErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    logError(`Feature error in ${this.props.featureName}`, { error, errorInfo });
+    // Dev console only — logError now forwards to Sentry in production, so
+    // calling it here in prod too would double-report alongside the explicit
+    // captureSentryException below.
+    if (import.meta.env.DEV) {
+      logError(`Feature error in ${this.props.featureName}`, { error, errorInfo });
+    }
+
+    // Production crash visibility (consent-gated — captureSentryException no-ops
+    // unless the user granted analytics consent). Mirrors ErrorBoundary.tsx so a
+    // render crash in an authenticated feature route (Wallet, Listings, Events,
+    // Groups, Messages — the ~169 <FeatureErrorBoundary> wraps) surfaces in
+    // Sentry instead of vanishing. The feature tag makes crashes filterable per
+    // module.
+    captureSentryException(error, {
+      feature: this.props.featureName,
+      componentStack: errorInfo.componentStack ?? undefined,
+      source: 'FeatureErrorBoundary',
+    });
   }
 
   handleRetry = () => {

@@ -50,8 +50,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     this.setState({ errorInfo });
     this.props.onError?.(error, errorInfo);
 
-    // Log to console in development
-    logError('Error Boundary caught an error', { error, errorInfo });
+    // Log to console in development only — logError now forwards to Sentry in
+    // production, so guarding this prevents a duplicate of the explicit
+    // captureSentryException report below.
+    if (import.meta.env.DEV) {
+      logError('Error Boundary caught an error', { error, errorInfo });
+    }
 
     // Report to Sentry in production
     captureSentryException(error, {

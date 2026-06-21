@@ -6,6 +6,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@/test/test-utils';
 import { FeatureErrorBoundary } from './FeatureErrorBoundary';
+import { captureSentryException } from '@/lib/sentry';
 
 vi.mock('@/lib/motion', () => {
   const handler = {
@@ -26,6 +27,10 @@ vi.mock('@/lib/logger', () => ({
   logError: vi.fn(),
 }));
 
+vi.mock('@/lib/sentry', () => ({
+  captureSentryException: vi.fn(),
+}));
+
 function ThrowingComponent() {
   throw new Error('Feature error');
 }
@@ -34,6 +39,7 @@ const originalConsoleError = console.error;
 
 describe('FeatureErrorBoundary', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     console.error = vi.fn();
   });
 
@@ -76,5 +82,31 @@ describe('FeatureErrorBoundary', () => {
       </FeatureErrorBoundary>
     );
     expect(screen.getByText('Try Again')).toBeInTheDocument();
+  });
+
+  it('reports the crash to Sentry tagged with the feature name', () => {
+    render(
+      <FeatureErrorBoundary featureName="Wallet">
+        <ThrowingComponent />
+      </FeatureErrorBoundary>
+    );
+
+    expect(captureSentryException).toHaveBeenCalledTimes(1);
+    const [reportedError, context] = vi.mocked(captureSentryException).mock.calls[0];
+    expect(reportedError).toBeInstanceOf(Error);
+    expect(reportedError.message).toBe('Feature error');
+    expect(context).toMatchObject({
+      feature: 'Wallet',
+      source: 'FeatureErrorBoundary',
+    });
+  });
+
+  it('does not report to Sentry when children render successfully', () => {
+    render(
+      <FeatureErrorBoundary featureName="Dashboard">
+        <div>All good</div>
+      </FeatureErrorBoundary>
+    );
+    expect(captureSentryException).not.toHaveBeenCalled();
   });
 });
