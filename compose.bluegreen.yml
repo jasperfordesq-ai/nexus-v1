@@ -118,7 +118,6 @@ services:
     volumes:
       - nexus-php-logs:/var/log
       - nexus-php-storage:/var/www/html/storage
-      - nexus-php-bootstrap-cache:/var/www/html/bootstrap/cache
     env_file:
       - ${NEXUS_ENV_FILE:-.env}
     environment:
@@ -157,7 +156,6 @@ services:
     volumes:
       - nexus-php-logs:/var/log
       - nexus-php-storage:/var/www/html/storage
-      - nexus-php-bootstrap-cache:/var/www/html/bootstrap/cache
     env_file:
       - ${NEXUS_ENV_FILE:-.env}
     environment:
@@ -191,5 +189,10 @@ volumes:
     external: true
   nexus-php-prerendered:
     external: true
-  nexus-php-bootstrap-cache:
-    external: true
+  # NOTE: bootstrap/cache is intentionally NOT a shared volume. Each container
+  # uses its own image-baked cache (the Dockerfile bakes packages.php; the
+  # queue/scheduler rebuild config/route/event cache at startup via `optimize`).
+  # A shared, cross-color external volume caused a TOCTOU: a crash-looping
+  # queue's `artisan optimize` deleted routes-v7.php / events.php out from under
+  # the scheduler's booting artisan children, producing 2,000+ "Failed to open
+  # stream" fatals (Sentry NEXUS-PHP-10) + failed scheduled commands. Do not re-add.
