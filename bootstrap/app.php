@@ -91,6 +91,18 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->onOneServer()
             ->name('monitoring-alarm-selftest');
 
+        // Backup dead-man's switch: the nightly backup script only writes a
+        // local log, so a stopped cron / unreachable DB / full disk would let
+        // backups silently lapse until a restore is needed and there's nothing
+        // to restore. This alarms (log -> Sentry -> Slack + non-zero exit) if the
+        // newest nexus_db_*.sql.gz is missing, zero-byte, or > ~26h old. Runs
+        // mid-morning, well after the 02:00 nightly backup window + retries.
+        $schedule->command('backup:verify')
+            ->dailyAt('09:30')
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->name('backup-verify');
+
         // Tenant data retention disposal (IT-Data-03) — off-peak nightly pass
         $schedule->command('retention:enforce')
             ->dailyAt('03:30')
