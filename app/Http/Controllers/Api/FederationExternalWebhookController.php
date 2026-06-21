@@ -883,6 +883,21 @@ class FederationExternalWebhookController extends BaseApiController
 
     private function handleMembersList(array $data, object $partner): array
     {
+        // Respect the partner's member-search permission (mirrors handleListingsList).
+        if (empty($partner->allow_member_search)) {
+            return ['members' => [], 'count' => 0];
+        }
+
+        // Wallet balance is financial data and must NOT leak to a federation
+        // partner by default (H7). Only include it when the partner is explicitly
+        // permitted richer member sync; the member directory is for discoverability.
+        $includeBalance = ! empty($partner->allow_member_sync);
+
+        $columns = ['u.id', 'u.first_name', 'u.last_name'];
+        if ($includeBalance) {
+            $columns[] = 'u.balance';
+        }
+
         $users = DB::table('users as u')
             ->join('federation_user_settings as fus', function ($join) {
                 $join->on('fus.user_id', '=', 'u.id')
@@ -893,16 +908,19 @@ class FederationExternalWebhookController extends BaseApiController
             ->where('u.tenant_id', TenantContext::getId())
             ->where('u.status', 'active')
             ->limit(100)
-            ->get(['u.id', 'u.first_name', 'u.last_name', 'u.balance']);
+            ->get($columns);
 
         $members = [];
         foreach ($users as $user) {
-            $members[] = [
+            $member = [
                 'id' => $user->id,
                 'username' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
-                'balance' => ($user->balance ?? 0) * 3600,
                 'tags' => '',
             ];
+            if ($includeBalance) {
+                $member['balance'] = ($user->balance ?? 0) * 3600;
+            }
+            $members[] = $member;
         }
 
         return ['members' => $members, 'count' => count($members)];
