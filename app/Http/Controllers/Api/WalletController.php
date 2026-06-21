@@ -142,8 +142,17 @@ class WalletController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('wallet_transfer', 10, 60);
 
+        // Anti-double-submit: forward a client Idempotency-Key (header or body)
+        // into the service so a double-click / network retry collapses to ONE
+        // debit (WalletService::transfer replays the original transaction).
+        $input = $this->getAllInput();
+        $idemKey = request()->header('Idempotency-Key');
+        if (is_string($idemKey) && $idemKey !== '' && empty($input['idempotency_key'])) {
+            $input['idempotency_key'] = $idemKey;
+        }
+
         try {
-            $result = $this->walletService->transfer($userId, $this->getAllInput());
+            $result = $this->walletService->transfer($userId, $input);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 400);
         } catch (\RuntimeException $e) {
@@ -160,6 +169,11 @@ class WalletController extends BaseApiController
             } elseif (str_contains($msg, 'yourself')) {
                 $code = 'VALIDATION_ERROR';
                 $status = 400;
+            } elseif (str_contains($msg, 'Duplicate')) {
+                // A concurrent in-flight duplicate of this transfer (the original
+                // hasn't committed yet). 409 so the client can stop retrying.
+                $code = 'DUPLICATE_TRANSACTION';
+                $status = 409;
             }
 
             return $this->respondWithError($code, $msg, null, $status);

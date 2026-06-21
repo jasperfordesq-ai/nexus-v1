@@ -228,6 +228,7 @@
                             <form method="post" action="{{ route('govuk-alpha.profile.transfer', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
                                 @csrf
                                 <input type="hidden" name="recipient_id" value="{{ $memberId }}">
+                                <input type="hidden" name="idempotency_key" value="{{ \Illuminate\Support\Str::uuid() }}">
                                 <div class="govuk-form-group govuk-!-margin-bottom-3">
                                     <label class="govuk-label govuk-label--s" for="profile-transfer-amount-{{ $memberId }}">{{ __('govuk_alpha.polish_members.send_credits_amount_label') }}</label>
                                     <div id="profile-transfer-amount-hint-{{ $memberId }}" class="govuk-hint">{{ __('govuk_alpha.polish_members.send_credits_amount_hint') }}</div>

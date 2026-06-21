@@ -220,6 +220,7 @@
                         <form method="post" action="{{ route('govuk-alpha.wallet.transfer', ['tenantSlug' => $tenantSlug]) }}">
                             @csrf
                             <input type="hidden" name="recipient_id" value="{{ $recipient['id'] }}">
+                            <input type="hidden" name="idempotency_key" value="{{ \Illuminate\Support\Str::uuid() }}">
                             <div class="govuk-form-group govuk-!-margin-bottom-3">
                                 <label class="govuk-label" for="amount-{{ $recipient['id'] }}">{{ __('govuk_alpha.wallet.amount_label') }}</label>
                                 <div id="amount-hint-{{ $recipient['id'] }}" class="govuk-hint">{{ __('govuk_alpha.wallet.amount_hint') }}</div>

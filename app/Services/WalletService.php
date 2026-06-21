@@ -11,6 +11,7 @@ use App\Events\TransactionCompleted;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -352,35 +353,110 @@ class WalletService
             throw new \RuntimeException('Recipient account is not active');
         }
 
-        $txn = DB::transaction(function () use ($senderId, $receiver, $amount, $description) {
-            // Lock both user rows in consistent ID order to prevent deadlocks
-            // when two users transfer to each other simultaneously
-            $minId = min($senderId, $receiver->id);
-            $maxId = max($senderId, $receiver->id);
-            $this->user->newQuery()->lockForUpdate()->findOrFail($minId);
-            $this->user->newQuery()->lockForUpdate()->findOrFail($maxId);
+        // ── Idempotency / anti-double-submit guard ──
+        // Re-implements the federation H6 pattern (see
+        // FederationV2Controller::sendTransaction). The lockForUpdate below
+        // prevents over-spend below zero, NOT duplicate INTENT: a double-click or
+        // network retry of a sufficient-balance amount would otherwise create two
+        // real, legitimate-looking debits. Claim a short-lived fingerprint; on a
+        // duplicate, replay the ORIGINAL transaction instead of debiting again.
+        // Prefer an explicit client Idempotency-Key (24h window); otherwise fall
+        // back to a 120s content fingerprint so an accidental double-click is
+        // caught even without a client key. Fail OPEN on any cache hiccup — never
+        // block a legitimate transfer on cache flakiness.
+        $tenantId = TenantContext::getId();
+        $explicitKey = trim((string) ($data['idempotency_key'] ?? ''));
+        $hasExplicitKey = $explicitKey !== '';
+        $fingerprint = $hasExplicitKey
+            ? sha1('key:' . $explicitKey)
+            : sha1('content:' . $receiver->id . '|' . $amount . '|' . $description);
+        $idemCacheKey = "wallettx:idem:{$tenantId}:{$senderId}:{$fingerprint}";
+        $idemTtl = $hasExplicitKey ? 86400 : 120;
 
-            /** @var User $sender */
-            $sender = $this->user->newQuery()->find($senderId);
-
-            if ((float) $sender->balance < $amount) {
-                throw new \RuntimeException('Insufficient balance');
+        $claimed = true;
+        try {
+            $claimed = Cache::add($idemCacheKey, ['status' => 'pending'], $idemTtl);
+        } catch (\Throwable $cacheEx) {
+            $claimed = true;       // cache unavailable → do not block the transfer
+            $idemCacheKey = null;  // and don't try to forget/store later
+        }
+        if (! $claimed) {
+            // Duplicate within the window. If the original already committed,
+            // replay it (no second debit); otherwise it's a concurrent in-flight
+            // twin we must reject rather than risk a double-debit.
+            $prior = null;
+            try {
+                $prior = Cache::get($idemCacheKey);
+            } catch (\Throwable $e) {
+                $prior = null;
             }
+            if (is_array($prior) && isset($prior['transaction_id'])) {
+                $original = $this->transaction->newQuery()
+                    ->with(['sender', 'receiver'])
+                    ->find((int) $prior['transaction_id']);
+                if ($original) {
+                    return $this->formatTransaction($original, $senderId);
+                }
+            }
+            throw new \RuntimeException('Duplicate transfer ignored');
+        }
 
-            $txn = $this->transaction->newInstance([
-                'sender_id'   => $senderId,
-                'receiver_id' => $receiver->id,
-                'amount'      => $amount,
-                'description' => $description,
-                'status'      => 'completed',
-            ]);
-            $txn->save();
+        try {
+            $txn = DB::transaction(function () use ($senderId, $receiver, $amount, $description) {
+                // Lock both user rows in consistent ID order to prevent deadlocks
+                // when two users transfer to each other simultaneously
+                $minId = min($senderId, $receiver->id);
+                $maxId = max($senderId, $receiver->id);
+                $this->user->newQuery()->lockForUpdate()->findOrFail($minId);
+                $this->user->newQuery()->lockForUpdate()->findOrFail($maxId);
 
-            $sender->decrement('balance', $amount);
-            $receiver->increment('balance', $amount);
+                /** @var User $sender */
+                $sender = $this->user->newQuery()->find($senderId);
 
-            return $txn->fresh(['sender', 'receiver']);
-        });
+                if ((float) $sender->balance < $amount) {
+                    throw new \RuntimeException('Insufficient balance');
+                }
+
+                $txn = $this->transaction->newInstance([
+                    'sender_id'   => $senderId,
+                    'receiver_id' => $receiver->id,
+                    'amount'      => $amount,
+                    'description' => $description,
+                    'status'      => 'completed',
+                ]);
+                $txn->save();
+
+                $sender->decrement('balance', $amount);
+                $receiver->increment('balance', $amount);
+
+                return $txn->fresh(['sender', 'receiver']);
+            });
+        } catch (\Throwable $e) {
+            // Release the idempotency claim so a legitimate retry of a FAILED
+            // transfer (e.g. a transient error) is not blocked by a stale claim.
+            if ($idemCacheKey !== null) {
+                try {
+                    Cache::forget($idemCacheKey);
+                } catch (\Throwable $ignore) {
+                    // best-effort
+                }
+            }
+            throw $e;
+        }
+
+        // Record the committed result against the idempotency key so a replay
+        // returns the SAME transaction instead of debiting a second time.
+        if ($idemCacheKey !== null) {
+            try {
+                Cache::put($idemCacheKey, [
+                    'transaction_id' => $txn->id,
+                    'status'         => 'completed',
+                    'amount'         => $amount,
+                ], $idemTtl);
+            } catch (\Throwable $e) {
+                // best-effort — a failed cache write only weakens replay-dedup
+            }
+        }
 
         // Fire low-balance / empty-balance alert after transaction completes
         try {

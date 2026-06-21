@@ -238,13 +238,26 @@ export function TransferModal({
     setIsSubmitting(true);
     setError(null);
 
+    // Idempotency key for this submit: a double-click or network retry of the
+    // same transfer collapses to ONE debit server-side (WalletService::transfer
+    // replays the original transaction). The api layer reuses these headers on
+    // its internal retries, so the key stays stable for this logical transfer.
+    const idempotencyKey =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `tx-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
     try {
-      const response = await api.post<Transaction>('/v2/wallet/transfer', {
-        recipient: formData.recipient!.id,
-        amount: parseFloat(formData.amount),
-        description: formData.description.trim() || undefined,
-        category_id: formData.category_id || undefined,
-      });
+      const response = await api.post<Transaction>(
+        '/v2/wallet/transfer',
+        {
+          recipient: formData.recipient!.id,
+          amount: parseFloat(formData.amount),
+          description: formData.description.trim() || undefined,
+          category_id: formData.category_id || undefined,
+        },
+        { headers: { 'Idempotency-Key': idempotencyKey } }
+      );
 
       if (response.success && response.data) {
         onTransferComplete(response.data);

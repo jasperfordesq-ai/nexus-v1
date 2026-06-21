@@ -9267,9 +9267,12 @@ class AlphaController extends Controller
 
         try {
             app(\App\Services\WalletService::class)->transfer($userId, [
-                'recipient'   => $recipientId,
-                'amount'      => $amount,
-                'description' => mb_substr($note, 0, 255),
+                'recipient'      => $recipientId,
+                'amount'         => $amount,
+                'description'    => mb_substr($note, 0, 255),
+                // Anti-double-submit: the form carries a per-render idempotency
+                // token so a double-click collapses to one debit server-side.
+                'idempotency_key' => self::asStr($request->input('idempotency_key')),
             ]);
         } catch (\Throwable $e) {
             $msg = $e->getMessage();
@@ -15043,9 +15046,12 @@ class AlphaController extends Controller
 
         try {
             app(\App\Services\WalletService::class)->transfer($userId, [
-                'recipient'   => $id,
-                'amount'      => $amount,
-                'description' => mb_substr($note, 0, 255),
+                'recipient'      => $id,
+                'amount'         => $amount,
+                'description'    => mb_substr($note, 0, 255),
+                // Anti-double-submit: the form carries a per-render idempotency
+                // token so a double-click collapses to one debit server-side.
+                'idempotency_key' => self::asStr($request->input('idempotency_key')),
             ]);
         } catch (\Throwable $e) {
             $msg = $e->getMessage();
