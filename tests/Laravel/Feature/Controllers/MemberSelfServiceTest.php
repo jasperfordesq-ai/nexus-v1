@@ -35,6 +35,15 @@ class MemberSelfServiceTest extends TestCase
 {
     use DatabaseTransactions;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Re-pin the tenant before each test: factory create() + the GDPR erasure
+        // flow drift TenantContext, and a prior test's drift would otherwise make
+        // a later test's tenant-scoped DELETE (e.g. the notifications purge) miss.
+        \App\Core\TenantContext::setById($this->testTenantId);
+    }
+
     private function makeMember(string $password = 'OldPassword123!'): User
     {
         $user = User::factory()->forTenant($this->testTenantId)->create([
@@ -147,6 +156,21 @@ class MemberSelfServiceTest extends TestCase
 
     // --------------------------------------------------------------- delete acct
 
+    public function test_delete_account_rejects_a_missing_password(): void
+    {
+        // H1: the primary React UI must send the re-auth password (SettingsPage
+        // sends { body: { password } }); a passwordless request must be refused
+        // with a 400 BEFORE any erasure, and the account must be left intact.
+        $user = $this->makeMember('OldPassword123!');
+
+        $response = $this->apiDelete('/v2/users/me', []);
+
+        $this->assertSame(400, $response->getStatusCode());
+        $row = DB::table('users')->where('id', $user->id)->first();
+        $this->assertSame('active', $row->status, 'account must remain active when no password is supplied');
+        $this->assertSame($user->email, $row->email, 'account must not be anonymized without re-auth');
+    }
+
     public function test_delete_account_rejects_a_wrong_password(): void
     {
         $user = $this->makeMember('OldPassword123!');
@@ -174,5 +198,46 @@ class MemberSelfServiceTest extends TestCase
         $this->assertNotNull($row->anonymized_at, 'anonymized_at must be stamped');
         $this->assertStringStartsWith('deleted_', (string) $row->email, 'email must be anonymized');
         $this->assertNotSame($user->email, $row->email);
+    }
+
+    /**
+     * H2 regression: DELETE /v2/users/me must run the full GDPR Article 17
+     * erasure (GdprService::executeAccountDeletion), not the shallow PII-column
+     * anonymize. The shallow path left related personal records and the
+     * password hash behind; full erasure purges them.
+     */
+    public function test_delete_account_with_correct_password_purges_related_records(): void
+    {
+        $user = $this->makeMember('OldPassword123!');
+
+        // A personal record the full erasure must DELETE (the shallow path left
+        // these behind — that was the H2 bug).
+        DB::table('notifications')->insert([
+            'user_id'    => $user->id,
+            'tenant_id'  => $this->testTenantId,
+            'message'    => 'You have a new message',
+            'type'       => 'system',
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiDelete('/v2/users/me', ['password' => 'OldPassword123!']);
+
+        $this->assertSame(200, $response->getStatusCode());
+
+        // Related personal data is purged, not merely anonymized.
+        $this->assertSame(
+            0,
+            DB::table('notifications')->where('user_id', $user->id)->count(),
+            'full GDPR erasure must delete the user\'s notifications'
+        );
+
+        // Credentials are destroyed by the full purge (the shallow path left
+        // password_hash intact); the account is anonymized + deactivated, with
+        // the GdprService-style @anonymized.local address.
+        $row = DB::table('users')->where('id', $user->id)->first();
+        $this->assertSame('', (string) $row->password_hash, 'password_hash must be wiped by full erasure');
+        $this->assertSame('inactive', $row->status);
+        $this->assertNotNull($row->anonymized_at);
+        $this->assertStringEndsWith('@anonymized.local', (string) $row->email);
     }
 }
