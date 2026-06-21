@@ -75,16 +75,21 @@ class ResendStuckVerificationEmails extends Command
             ->where('created_at', '>=', $since)
             ->whereIn('status', ['pending', 'active'])
             // The command exists for users who NEVER received an activation
-            // email. Anyone with a successful verification send on record is
-            // out of scope — and without this exclusion, repeat runs re-mailed
-            // the same oldest `--limit` users on every invocation and never
-            // progressed past them.
+            // email. Anyone with a successful activation send on record is out of
+            // scope. We exclude BOTH the initial welcome/activation email
+            // (SendWelcomeNotification logs category 'activation') AND a prior
+            // verification resend (category 'email_verification'): a user who got
+            // their activation email but simply hasn't clicked verify yet is NOT
+            // "stuck" and must not be re-mailed. Excluding both categories is also
+            // what makes this command safe to run on a schedule — in a healthy
+            // system every signup has an 'activation' log, so nothing matches and
+            // it sends zero; it only fires when the queue worker failed to send.
             ->whereNotExists(function ($sub) {
                 $sub->select(DB::raw(1))
                     ->from('email_log')
                     ->whereColumn('email_log.recipient_email', 'users.email')
                     ->whereColumn('email_log.tenant_id', 'users.tenant_id')
-                    ->where('email_log.category', 'email_verification')
+                    ->whereIn('email_log.category', ['activation', 'email_verification'])
                     ->whereIn('email_log.status', ['sent', 'delivered']);
             })
             ->orderBy('created_at', 'asc')

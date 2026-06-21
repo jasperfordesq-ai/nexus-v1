@@ -120,6 +120,18 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->onOneServer()
             ->name('email-health-alert');
 
+        // Self-healing safety net for the activation/welcome email (H5): if the
+        // queue worker is dead or a send fails, new signups never get their
+        // verification link and are silently locked out. This re-sends ONLY to
+        // recent users with NO activation email on record (the command excludes
+        // anyone who already received an 'activation' or 'email_verification'
+        // email), so a healthy system sends nothing here.
+        $schedule->command('emails:resend-stuck-activations --since=7days --limit=100')
+            ->hourly()
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->name('emails-resend-stuck-activations');
+
         $schedule->command('safeguarding:purge-message-copies')
             ->weekly()
             ->withoutOverlapping()
