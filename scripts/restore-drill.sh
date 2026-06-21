@@ -19,6 +19,20 @@
 #   0 4 1 * * bash /opt/nexus-php/scripts/restore-drill.sh \
 #               >> /opt/nexus-php/logs/restore-drill.log 2>&1
 #
+# Local dev drill (proves restorability on the dev machine, no prod access):
+#   Every path/container is overridable, so you can drill the local Docker DB.
+#   1. Dump the local DB the same way the nightly backup does:
+#        DB_PASS=$(grep -E '^DB_(PASSWORD|PASS)=' .env | head -1 | cut -d= -f2 | tr -d '"')
+#        mkdir -p /tmp/drill/backups
+#        docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db \
+#          mariadb-dump -u nexus nexus | gzip > /tmp/drill/backups/nexus_db_$(date +%F).sql.gz
+#   2. Run the drill against the local source container + that backup:
+#        BACKUP_DIR=/tmp/drill/backups SOURCE_DB_CONTAINER=nexus-php-db \
+#        ENV_FILE="$(pwd)/.env" DRILL_CONTAINER=nexus-restore-drill-local DRILL_PORT=33307 \
+#          bash scripts/restore-drill.sh
+#   Last proven locally: 2026-06-21 — restored nexus into a throwaway container and
+#   matched live row counts (tenants/users/laravel_migrations). PASS.
+#
 # Exit codes:
 #   0 — drill passed, backups are restorable
 #   1 — drill failed, alert immediately
