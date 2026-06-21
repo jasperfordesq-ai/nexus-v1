@@ -1431,6 +1431,7 @@ return [
     'user_new_password_required'           => 'New password is required',
     'user_password_required'               => 'Password is required',
     'user_invalid_password'                => 'Invalid password',
+    'user_delete_failed'                   => 'Failed to delete account',
     'user_no_valid_prefs'                  => 'No valid preferences provided',
     'user_prefs_update_failed'             => 'Failed to update preferences',
     'user_consent_slug_required'           => 'Missing consent slug',

@@ -22,6 +22,12 @@ vi.mock('@/components/security/BiometricSettings', () => ({
   BiometricSettings: () => <div data-testid="biometric-settings" />,
 }));
 
+// Use the shared lightweight UI mock so modal content (which only renders when
+// the overlay is open) is queryable in jsdom and labeled inputs resolve via
+// getByLabelText. The overlay stub returns null when isOpen is false, matching
+// the real "closed modal renders nothing" behaviour the other tests rely on.
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+
 const defaultProps = {
   // 2FA
   twoFactorEnabled: false,
@@ -44,6 +50,7 @@ const defaultProps = {
   isChangingPassword: false,
   // Delete
   deleteConfirmation: '',
+  deletePassword: '',
   isDeleting: false,
   // Modals
   passwordModalOpen: false,
@@ -68,6 +75,7 @@ const defaultProps = {
   onShowNewPasswordToggle: vi.fn(),
   onChangePassword: vi.fn(),
   onDeleteConfirmationChange: vi.fn(),
+  onDeletePasswordChange: vi.fn(),
   onDeleteAccount: vi.fn(),
   onLogout: vi.fn(),
   onSetup2FA: vi.fn(),
@@ -177,5 +185,38 @@ describe('SecurityTab', () => {
   it('renders BiometricSettings component', () => {
     render(<SecurityTab {...defaultProps} />);
     expect(screen.getByTestId('biometric-settings')).toBeDefined();
+  });
+
+  // ─── Delete account password re-authentication (H1 regression) ───────────────
+
+  it('renders a password field in the delete account modal', () => {
+    render(<SecurityTab {...defaultProps} deleteModalOpen={true} />);
+    const passwordField = screen.getByLabelText('password.current');
+    expect(passwordField).toBeInTheDocument();
+    expect(passwordField).toHaveAttribute('type', 'password');
+  });
+
+  it('forwards delete-modal password input to onDeletePasswordChange', async () => {
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+    const onDeletePasswordChange = vi.fn();
+    render(
+      <SecurityTab {...defaultProps} deleteModalOpen={true} onDeletePasswordChange={onDeletePasswordChange} />
+    );
+    await user.type(screen.getByLabelText('password.current'), 'a');
+    expect(onDeletePasswordChange).toHaveBeenCalled();
+  });
+
+  it('keeps delete submit disabled until DELETE is typed AND a password is entered', () => {
+    const { rerender } = render(
+      <SecurityTab {...defaultProps} deleteModalOpen={true} deleteConfirmation="DELETE" deletePassword="" />
+    );
+    // DELETE typed but no password yet → still blocked (backend requires re-auth).
+    expect(screen.getByText('delete_modal.submit').closest('button')).toBeDisabled();
+
+    rerender(
+      <SecurityTab {...defaultProps} deleteModalOpen={true} deleteConfirmation="DELETE" deletePassword="hunter2-pw" />
+    );
+    expect(screen.getByText('delete_modal.submit').closest('button')).not.toBeDisabled();
   });
 });

@@ -312,9 +312,8 @@ class GdprService
         return $this->query(
             "SELECT id, email, first_name, last_name, phone, bio,
                     skills, interests, location, latitude, longitude,
-                    profile_picture, cover_image, website, social_links,
-                    timezone, locale, created_at, updated_at, last_login,
-                    is_verified
+                    avatar_url, tagline, timezone, preferred_language,
+                    created_at, updated_at, last_login, is_verified
              FROM users WHERE id = ? AND tenant_id = ?",
             [$userId, $this->tenantId]
         )->fetch() ?: null;
@@ -689,7 +688,7 @@ class GdprService
         )->fetchAll();
 
         $stats = $this->query(
-            "SELECT xp_points, level, login_streak
+            "SELECT xp AS xp_points, level, login_streak
              FROM users WHERE id = ? AND tenant_id = ?",
             [$userId, $this->tenantId]
         )->fetch();
@@ -837,11 +836,29 @@ class GdprService
     {
         $this->logger->info("Starting account deletion", ['user_id' => $userId]);
 
-        $this->db->beginTransaction();
+        // Only manage our own transaction if the caller hasn't already opened
+        // one. PHPUnit's DatabaseTransactions trait wraps each test in a
+        // transaction on this same PDO, and a raw nested beginTransaction()
+        // would throw "There is already an active transaction".
+        $ownsTransaction = !$this->db->inTransaction();
+        if ($ownsTransaction) {
+            $this->db->beginTransaction();
+        }
 
         try {
-            // 1. Generate final data export for legal retention
-            $exportPath = $this->generateDataExport($userId);
+            // 1. Generate final data export for legal retention. Best-effort:
+            // a failure here must NOT block the Article 17 erasure (the legal
+            // duty outweighs the retention copy), so log and continue rather
+            // than aborting the whole deletion.
+            try {
+                $exportPath = $this->generateDataExport($userId);
+            } catch (\Throwable $e) {
+                $exportPath = null;
+                $this->logger->warning('GDPR pre-deletion export failed; continuing with erasure', [
+                    'user_id' => $userId,
+                    'error'   => $e->getMessage(),
+                ]);
+            }
 
             // 1b. Capture original email BEFORE anonymisation so we can purge
             // email_suppression (platform-wide cache keyed on email address).
@@ -869,13 +886,12 @@ class GdprService
                     location = NULL,
                     latitude = NULL,
                     longitude = NULL,
-                    profile_picture = NULL,
-                    cover_image = NULL,
-                    website = NULL,
-                    social_links = NULL,
+                    avatar_url = NULL,
+                    tagline = NULL,
                     password_hash = '',
                     password = '',
                     remember_token = NULL,
+                    status = 'inactive',
                     deleted_at = NOW(),
                     anonymized_at = NOW()
                  WHERE id = ? AND tenant_id = ?",
@@ -1326,7 +1342,9 @@ class GdprService
                 );
             }
 
-            $this->db->commit();
+            if ($ownsTransaction) {
+                $this->db->commit();
+            }
 
             // 9. GDPR: retract federated profile from all partner networks (queued, non-blocking)
             try {
@@ -1385,7 +1403,9 @@ class GdprService
 
             $this->logger->info("Account deletion completed", ['user_id' => $userId]);
         } catch (\Exception $e) {
-            $this->db->rollBack();
+            if ($ownsTransaction && $this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
             $this->logger->error("Account deletion failed", [
                 'user_id' => $userId,
                 'error' => $e->getMessage(),

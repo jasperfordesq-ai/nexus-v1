@@ -130,6 +130,7 @@ export function SettingsPage() {
 
   // Delete confirmation
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Error state for notification settings
@@ -639,9 +640,11 @@ export function SettingsPage() {
 
     try {
       setIsDeleting(true);
-      const response = await api.delete('/v2/users/me');
+      // Backend requires password re-authentication before erasure.
+      const response = await api.delete('/v2/users/me', { body: { password: deletePassword } });
 
       if (response.success) {
+        setDeletePassword('');
         toast.success(t('toasts.account_deleted'), t('toasts.account_deleted_desc'));
         await logout();
         navigate(tenantPath('/'));
@@ -1127,6 +1130,7 @@ export function SettingsPage() {
             showNewPassword={showNewPassword}
             isChangingPassword={isChangingPassword}
             deleteConfirmation={deleteConfirmation}
+            deletePassword={deletePassword}
             isDeleting={isDeleting}
             passwordModalOpen={passwordModal.isOpen}
             passwordModalOnClose={passwordModal.onClose}
@@ -1149,6 +1153,7 @@ export function SettingsPage() {
             onShowNewPasswordToggle={() => setShowNewPassword(!showNewPassword)}
             onChangePassword={handleChangePassword}
             onDeleteConfirmationChange={setDeleteConfirmation}
+            onDeletePasswordChange={setDeletePassword}
             onDeleteAccount={handleDeleteAccount}
             onLogout={handleLogout}
             onSetup2FA={handleSetup2FA}

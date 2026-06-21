@@ -63,6 +63,7 @@ interface SecurityTabProps {
   isChangingPassword: boolean;
   // Delete
   deleteConfirmation: string;
+  deletePassword: string;
   isDeleting: boolean;
   // Modal disclosure objects
   passwordModalOpen: boolean;
@@ -87,6 +88,7 @@ interface SecurityTabProps {
   onShowNewPasswordToggle: () => void;
   onChangePassword: () => void;
   onDeleteConfirmationChange: (value: string) => void;
+  onDeletePasswordChange: (value: string) => void;
   onDeleteAccount: () => void;
   onLogout: () => void;
   onSetup2FA: () => void;
@@ -136,6 +138,7 @@ export function SecurityTab({
   showNewPassword,
   isChangingPassword,
   deleteConfirmation,
+  deletePassword,
   isDeleting,
   passwordModalOpen,
   passwordModalOnClose,
@@ -158,6 +161,7 @@ export function SecurityTab({
   onShowNewPasswordToggle,
   onChangePassword,
   onDeleteConfirmationChange,
+  onDeletePasswordChange,
   onDeleteAccount,
   onLogout,
   onSetup2FA,
@@ -459,6 +463,16 @@ export function SecurityTab({
                   }}
                 />
               </div>
+              {/* Password re-authentication — required by the backend before erasure. */}
+              <Input
+                type="password"
+                label={t('password.current')}
+                value={deletePassword}
+                onChange={(e) => onDeletePasswordChange(e.target.value)}
+                isRequired
+                autoComplete="current-password"
+                classNames={inputClassNames}
+              />
             </div>
           </ModalBody>
           <ModalFooter>
@@ -469,7 +483,7 @@ export function SecurityTab({
               variant="danger"
               onPress={onDeleteAccount}
               isLoading={isDeleting}
-              isDisabled={deleteConfirmation !== 'DELETE'}
+              isDisabled={deleteConfirmation !== 'DELETE' || !deletePassword}
             >
               {t('delete_modal.submit')}
             </Button>

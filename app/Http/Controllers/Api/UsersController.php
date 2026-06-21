@@ -610,11 +610,24 @@ class UsersController extends BaseApiController
         $userEmail  = $userRow->email;
         $userLocale = $userRow->preferred_language ?? null;
 
-        $success = $this->userService->deleteAccount($userId);
-
-        if (!$success) {
-            $errors = $this->userService->getErrors();
-            return $this->respondWithErrors($errors, 400);
+        // Full GDPR Article 17 erasure — purges messages, tokens, passkeys,
+        // listings, AI chat, uploaded files and the Meilisearch index (and
+        // anonymizes + deactivates the users row), not the shallow PII-column
+        // wipe the previous UserService path performed.
+        //
+        // Build a tenant-scoped instance explicitly: GdprService captures its
+        // tenant at construction, and the container-injected $this->gdprService
+        // is resolved before the request tenant is guaranteed to be set, which
+        // could otherwise scope the erasure to the wrong tenant (a 0-row, silent
+        // no-op). $tenantId was already resolved above for the user lookup.
+        try {
+            (new GdprService($tenantId))->executeAccountDeletion($userId);
+        } catch (\Throwable $e) {
+            Log::error('[UsersController] deleteAccount GDPR erasure failed', [
+                'user_id' => $userId,
+                'error'   => $e->getMessage(),
+            ]);
+            return $this->respondWithError('DELETE_FAILED', __('api.user_delete_failed'), null, 500);
         }
 
         // Send farewell confirmation to the now-anonymized account's original email
