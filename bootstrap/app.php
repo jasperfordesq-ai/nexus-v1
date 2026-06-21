@@ -69,6 +69,17 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->onOneServer()
             ->name('stripe-check-stuck-webhooks');
 
+        // Overdue-GDPR-request pager: data-subject requests are created as
+        // pending rows actioned MANUALLY by an admin (no automated processor),
+        // so a request nobody opens silently breaches the GDPR Art.12(3) one-
+        // month deadline. Alert (log → Sentry → Slack) + non-zero exit daily,
+        // warning a few days before the 30-day deadline. Does not process them.
+        $schedule->command('gdpr:check-overdue-requests')
+            ->dailyAt('07:50')
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->name('gdpr-check-overdue-requests');
+
         // Tenant data retention disposal (IT-Data-03) — off-peak nightly pass
         $schedule->command('retention:enforce')
             ->dailyAt('03:30')
