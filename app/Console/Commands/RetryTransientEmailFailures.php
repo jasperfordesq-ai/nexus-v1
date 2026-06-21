@@ -49,6 +49,24 @@ class RetryTransientEmailFailures extends Command
             return self::SUCCESS;
         }
 
+        // Reconciliation is best-effort housekeeping. A transient DB hiccup,
+        // a SendGrid outage, or a broken stdout/log pipe in the scheduler
+        // container must NOT escalate this 15-minute job into a paging
+        // "Scheduled command [...] failed with exit code [1]" Sentry error —
+        // the next run reconciles the same window anyway. Log and exit clean.
+        try {
+            $this->reconcile($apiKey);
+        } catch (\Throwable $e) {
+            Log::warning('emails:reconcile-transient-failures aborted early', [
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return self::SUCCESS;
+    }
+
+    private function reconcile(string $apiKey): void
+    {
         $minutes = max(5, (int) $this->option('minutes'));
         $limit   = max(1, (int) $this->option('limit'));
         $dryRun  = (bool) $this->option('dry-run');
@@ -69,7 +87,7 @@ class RetryTransientEmailFailures extends Command
 
         if ($rows->isEmpty()) {
             $this->info('No failed rows in the window — nothing to do.');
-            return self::SUCCESS;
+            return;
         }
 
         $reconciled = 0;
@@ -109,8 +127,6 @@ class RetryTransientEmailFailures extends Command
             $limit,
             $dryRun ? ', dry-run' : ''
         ));
-
-        return self::SUCCESS;
     }
 
     /**

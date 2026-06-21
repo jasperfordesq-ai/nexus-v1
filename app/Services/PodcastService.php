@@ -555,7 +555,22 @@ class PodcastService
                 return $base . '?expires=' . $expires . '&signature=' . self::mediaSignature($tenantId, $episode->id, $expires);
             }
 
-            return self::cloudMediaUrl((string) $episode->audio_storage_path);
+            // A misconfigured / uninstalled cloud disk driver (e.g. the `s3`
+            // disk without league/flysystem-aws-s3-v3 installed) makes
+            // Storage::disk(...)->url() throw a fatal "Class not found". An
+            // unresolvable media URL must never 500 the request — fall back to
+            // the in-app media proxy, which always works regardless of disk.
+            try {
+                return self::cloudMediaUrl((string) $episode->audio_storage_path);
+            } catch (\Throwable $e) {
+                Log::warning('Podcast cloud media URL resolution failed; using media proxy fallback', [
+                    'episode_id' => (int) $episode->id,
+                    'disk'       => $episode->audio_storage_disk ?? null,
+                    'error'      => $e->getMessage(),
+                ]);
+
+                return $base;
+            }
         }
         if (!$signed) {
             return $base;
