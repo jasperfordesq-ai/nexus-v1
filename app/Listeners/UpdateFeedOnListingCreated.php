@@ -43,17 +43,33 @@ class UpdateFeedOnListingCreated implements ShouldQueue
                 return;
             }
 
-            FeedActivity::create([
-                'tenant_id'   => $event->tenantId,
-                'source_type' => 'listing',
-                'source_id'   => $event->listing->id,
-                'user_id'     => $event->user->id,
-                'title'       => $event->listing->title ?? 'New Listing',
-                'content'     => Str::limit($event->listing->description ?? '', 500),
-                'image_url'   => $event->listing->image_url ?? null,
-                'is_visible'  => true,
-                'created_at'  => now(),
-            ]);
+            // Idempotent on the (tenant_id, source_type, source_id) unique key
+            // `uq_tenant_source`. A re-fired/retried ListingCreated event (this
+            // listener is ShouldQueue, so retries happen) used to hit a raw
+            // insert and throw 1062 Duplicate entry — which aborted handle()
+            // BEFORE the search re-index below ever ran. firstOrCreate makes the
+            // duplicate a no-op so indexing still proceeds.
+            // Idempotent on the (tenant_id, source_type, source_id) unique key
+            // `uq_tenant_source`. A re-fired/retried ListingCreated event (this
+            // listener is ShouldQueue, so retries happen) used to hit a raw
+            // insert and throw 1062 Duplicate entry — which aborted handle()
+            // BEFORE the search re-index below ever ran. firstOrCreate makes the
+            // duplicate a no-op so indexing still proceeds.
+            FeedActivity::firstOrCreate(
+                [
+                    'tenant_id'   => $event->tenantId,
+                    'source_type' => 'listing',
+                    'source_id'   => $event->listing->id,
+                ],
+                [
+                    'user_id'     => $event->user->id,
+                    'title'       => $event->listing->title ?? 'New Listing',
+                    'content'     => Str::limit($event->listing->description ?? '', 500),
+                    'image_url'   => $event->listing->image_url ?? null,
+                    'is_visible'  => true,
+                    'created_at'  => now(),
+                ]
+            );
 
             SearchService::indexListing($event->listing);
         } catch (\Throwable $e) {
