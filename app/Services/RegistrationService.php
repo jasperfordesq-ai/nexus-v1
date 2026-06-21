@@ -537,8 +537,14 @@ class RegistrationService
         $requiresAdminApproval = $this->tenantSettings
             ->requiresAdminApproval((int) $user->tenant_id);
 
+        // B2 — self-serve activation lockout: when admin approval is OFF the
+        // account becomes active AND approved, so login's is_approved gate
+        // doesn't strand a verified self-serve user as 'active' but unapproved.
+        // When approval is required, leave is_approved untouched (an admin
+        // promotes the account later).
         $user->update([
             'status'             => $requiresAdminApproval ? 'pending' : 'active',
+            'is_approved'        => $requiresAdminApproval ? $user->is_approved : 1,
             'verification_token' => null,
             'email_verified_at'  => now(),
         ]);

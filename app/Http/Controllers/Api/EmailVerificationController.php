@@ -27,6 +27,7 @@ class EmailVerificationController extends BaseApiController
 
     public function __construct(
         private readonly RateLimitService $rateLimitService,
+        private readonly \App\Services\TenantSettingsService $tenantSettings,
     ) {}
 
     /** Token expiry in seconds (24 hours) */
@@ -95,13 +96,25 @@ class EmailVerificationController extends BaseApiController
             ]);
         }
 
-        // Mark user as verified. Only activate already-approved users; tenants
-        // that require admin approval must not become status-active from email
-        // verification alone.
-        DB::update(
-            "UPDATE users SET email_verified_at = NOW(), is_verified = 1, status = CASE WHEN status = 'pending' AND is_approved = 1 THEN 'active' ELSE status END WHERE id = ? AND tenant_id = ?",
-            [$userId, $tenantId]
-        );
+        // Mark the email as verified. The activation rule depends on the
+        // tenant's admin_approval toggle (B2 — self-serve activation lockout):
+        //   - Approval REQUIRED: only an already-approved (is_approved=1) user
+        //     goes active; everyone else stays 'pending' for an admin to promote.
+        //   - Approval OFF (self-serve): verifying the email both APPROVES and
+        //     ACTIVATES the account. Self-serve registration never sets
+        //     is_approved, so without this a verified user is stuck 'pending'
+        //     forever and login's approval gate blocks them permanently.
+        if ($this->tenantSettings->requiresAdminApproval($tenantId)) {
+            DB::update(
+                "UPDATE users SET email_verified_at = NOW(), is_verified = 1, status = CASE WHEN status = 'pending' AND is_approved = 1 THEN 'active' ELSE status END WHERE id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
+            );
+        } else {
+            DB::update(
+                "UPDATE users SET email_verified_at = NOW(), is_verified = 1, is_approved = 1, status = CASE WHEN status = 'pending' THEN 'active' ELSE status END WHERE id = ? AND tenant_id = ?",
+                [$userId, $tenantId]
+            );
+        }
 
         // Delete all verification tokens for this user in this tenant
         $this->cleanupVerificationTokens($userId, $tenantId);

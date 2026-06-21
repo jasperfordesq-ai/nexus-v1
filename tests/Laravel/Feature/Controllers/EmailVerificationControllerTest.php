@@ -182,10 +182,13 @@ class EmailVerificationControllerTest extends TestCase
 
     public function test_verify_email_does_not_activate_an_unapproved_user(): void
     {
-        // Approval gate (UPDATE ... status = CASE WHEN status='pending' AND is_approved=1
-        // THEN 'active' ELSE status END): on tenants that require admin approval,
-        // confirming the email must NOT bypass approval. The account stays pending.
+        // Approval gate: on tenants that require admin approval, confirming the
+        // email must NOT bypass approval. The account stays pending.
         $this->ensureEmailVerificationTokenTable();
+
+        // Make the tenant policy explicit (B2 fix keys activation off this flag).
+        app(\App\Services\TenantSettingsService::class)
+            ->set($this->testTenantId, 'admin_approval', 'true', 'boolean');
 
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'email_verified_at' => null,
