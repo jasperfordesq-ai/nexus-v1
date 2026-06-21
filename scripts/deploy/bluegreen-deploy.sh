@@ -1152,6 +1152,16 @@ cmd_deploy() {
             log_warn "Prerender cron install had errors — jobs may not drain"
     fi
 
+    # Install/refresh the host cron for the nightly DB backup. Self-healing: a
+    # fresh host (or one where the cron was lost) can't silently ship without
+    # backups. Complements the scheduled backup:verify alarm, which DETECTS a
+    # lapsed backup; this PREVENTS the lapse.
+    if [ -f "$SELF_DIR/phases/install-backup-cron.sh" ]; then
+        phase "Install Backup Cron" "${CURRENT_ACTIVE:-}" "${CURRENT_TARGET:-}" "${CURRENT_COMMIT:-}"
+        bash "$SELF_DIR/phases/install-backup-cron.sh" || \
+            log_warn "Backup cron install had errors — nightly backups may not run"
+    fi
+
     # Rotate the bot-only access log so it doesn't grow unbounded (busy sites
     # see MB/day of crawler hits). Idempotent.
     if [ -f "$SELF_DIR/phases/install-prerender-logrotate.sh" ]; then

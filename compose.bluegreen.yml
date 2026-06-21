@@ -156,6 +156,13 @@ services:
     volumes:
       - nexus-php-logs:/var/log
       - nexus-php-storage:/var/www/html/storage
+      # Phase D backup:verify runs in THIS scheduler container (scheduled daily)
+      # and must read the host nightly-backup dir to detect a missing/stale dump.
+      # server-nightly-backup.sh writes nexus_db_*.sql.gz to ${DEPLOY_DIR}/backups
+      # on the host; mount it read-only (mirrors the host-logs bind on the app
+      # service). Without this, backup:verify would false-alarm "no backup"
+      # because the container's base_path('backups') is not the host dir.
+      - ${DEPLOY_DIR:-/opt/nexus-php}/backups:/var/www/html/storage/backups:ro
     env_file:
       - ${NEXUS_ENV_FILE:-.env}
     environment:
@@ -167,6 +174,8 @@ services:
       - REDIS_HOST=nexus-php-redis
       - REDIS_PORT=6379
       - QUEUE_CONNECTION=redis
+      # Point backup:verify at the read-only host-backups mount above.
+      - BACKUP_VERIFY_DIR=/var/www/html/storage/backups
     networks:
       - nexus-php-internal
     healthcheck:
