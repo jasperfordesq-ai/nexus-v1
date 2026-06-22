@@ -1,0 +1,68 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@/test/test-utils';
+import { createMockContexts } from '@/test/mock-contexts';
+import userEvent from '@testing-library/user-event';
+
+vi.mock('@/contexts', () => createMockContexts());
+
+// The AdminHelpDrawer is a complex portal component; stub it so the test stays focused.
+vi.mock('./AdminHelpDrawer', () => ({
+  AdminHelpDrawer: ({ isOpen, article }: { isOpen: boolean; article: { title: string } }) =>
+    isOpen ? <div data-testid="help-drawer">{article.title}</div> : null,
+}));
+
+// Stub helpContent so we control when a help article exists.
+vi.mock('../data/helpContent', () => ({
+  HELP_CONTENT: {
+    '/admin/dashboard': {
+      title: 'Dashboard Help',
+      summary: 'Help for dashboard',
+    },
+  },
+}));
+
+import { PageHeader } from './PageHeader';
+
+describe('PageHeader', () => {
+  it('renders the page title', () => {
+    render(<PageHeader title="My Page" />);
+    expect(screen.getByRole('heading', { name: 'My Page' })).toBeInTheDocument();
+  });
+
+  it('renders description when provided', () => {
+    render(<PageHeader title="Settings" description="Configure your settings here." />);
+    expect(screen.getByText('Configure your settings here.')).toBeInTheDocument();
+  });
+
+  it('renders subtitle when description is absent', () => {
+    render(<PageHeader title="Events" subtitle="Manage events for your community." />);
+    expect(screen.getByText('Manage events for your community.')).toBeInTheDocument();
+  });
+
+  it('prefers description over subtitle', () => {
+    render(<PageHeader title="X" description="Desc text" subtitle="Sub text" />);
+    expect(screen.getByText('Desc text')).toBeInTheDocument();
+    expect(screen.queryByText('Sub text')).not.toBeInTheDocument();
+  });
+
+  it('renders icon when provided', () => {
+    render(<PageHeader title="Stats" icon={<span data-testid="test-icon" />} />);
+    expect(screen.getByTestId('test-icon')).toBeInTheDocument();
+  });
+
+  it('renders actions slot when provided', () => {
+    render(<PageHeader title="Members" actions={<button>Export</button>} />);
+    expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument();
+  });
+
+  it('does NOT render a help button when the route has no help article', () => {
+    // Default MemoryRouter path is '/' which has no entry in HELP_CONTENT
+    render(<PageHeader title="No Help Page" />);
+    expect(screen.queryByRole('button', { name: /help/i })).not.toBeInTheDocument();
+  });
+});
