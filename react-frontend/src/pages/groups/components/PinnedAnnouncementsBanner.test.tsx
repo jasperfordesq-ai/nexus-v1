@@ -1,0 +1,221 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@/test/test-utils';
+import { createMockContexts } from '@/test/mock-contexts';
+import React from 'react';
+
+// ─── Mock api ────────────────────────────────────────────────────────────────
+const { mockApi } = vi.hoisted(() => ({
+  mockApi: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    patch: vi.fn(),
+    delete: vi.fn(),
+    download: vi.fn(),
+    upload: vi.fn(),
+  },
+}));
+
+vi.mock('@/lib/api', () => ({ api: mockApi, default: mockApi }));
+
+// ─── Contexts ─────────────────────────────────────────────────────────────────
+const mockToast = {
+  success: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+  warning: vi.fn(),
+  showToast: vi.fn(),
+};
+
+vi.mock('@/contexts', () =>
+  createMockContexts({
+    useAuth: () => ({
+      user: { id: 1, name: 'Member' },
+      isAuthenticated: true,
+      login: vi.fn(),
+      logout: vi.fn(),
+      register: vi.fn(),
+      updateUser: vi.fn(),
+      refreshUser: vi.fn(),
+      status: 'idle' as const,
+      error: null,
+    }),
+    useToast: () => mockToast,
+    useTenant: () => ({
+      tenant: { id: 2, name: 'Test', slug: 'test' },
+      tenantPath: (p: string) => `/test${p}`,
+      hasFeature: vi.fn(() => true),
+      hasModule: vi.fn(() => true),
+    }),
+  })
+);
+
+// Stub SafeHtml to avoid DOMPurify in jsdom
+vi.mock('@/components/ui/SafeHtml', () => ({
+  SafeHtml: ({ content, className }: { content: string; className?: string }) => (
+    <p className={className} data-testid="safe-html">{content}</p>
+  ),
+}));
+
+// ─── Fixtures ────────────────────────────────────────────────────────────────
+const makeAnnouncement = (overrides = {}) => ({
+  id: 1,
+  title: 'Important update',
+  content: 'Please read this announcement.',
+  author: { name: 'Admin User' },
+  created_at: '2025-01-01T10:00:00Z',
+  is_pinned: true,
+  ...overrides,
+});
+
+// ─── Tests ───────────────────────────────────────────────────────────────────
+describe('PinnedAnnouncementsBanner', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mockApi.get.mockResolvedValue({ success: true, data: [] });
+  });
+
+  it('renders nothing when no pinned announcements', async () => {
+    mockApi.get.mockResolvedValue({ success: true, data: [] });
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    const { container } = render(<PinnedAnnouncementsBanner groupId={5} />);
+    await waitFor(() => {
+      // Should return null → no announcement content
+      expect(container.querySelector('[data-testid="safe-html"]')).toBeNull();
+    });
+  });
+
+  it('renders nothing when isMember is false', async () => {
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    const { container } = render(<PinnedAnnouncementsBanner groupId={5} isMember={false} />);
+    // Should not call API and render nothing
+    await waitFor(() => {
+      expect(mockApi.get).not.toHaveBeenCalled();
+      expect(container.querySelector('[data-testid="safe-html"]')).toBeNull();
+    });
+  });
+
+  it('fetches announcements from correct group endpoint', async () => {
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    render(<PinnedAnnouncementsBanner groupId={42} />);
+    await waitFor(() => {
+      expect(mockApi.get).toHaveBeenCalledWith('/v2/groups/42/announcements?pinned=1');
+    });
+  });
+
+  it('renders announcement title when pinned items are returned', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: [makeAnnouncement({ title: 'Community event next week' })],
+    });
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    render(<PinnedAnnouncementsBanner groupId={5} />);
+    await waitFor(() => {
+      expect(screen.getByText('Community event next week')).toBeInTheDocument();
+    });
+  });
+
+  it('renders announcement content via SafeHtml', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: [makeAnnouncement({ content: 'Check the noticeboard.' })],
+    });
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    render(<PinnedAnnouncementsBanner groupId={5} />);
+    await waitFor(() => {
+      expect(screen.getByTestId('safe-html')).toHaveTextContent('Check the noticeboard.');
+    });
+  });
+
+  it('renders a Pinned chip label', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: [makeAnnouncement()],
+    });
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    render(<PinnedAnnouncementsBanner groupId={5} />);
+    // i18n key groups:announcements.pinned → "Pinned" in English
+    await waitFor(() => {
+      expect(screen.getByText(/pinned/i)).toBeInTheDocument();
+    });
+  });
+
+  it('renders multiple pinned announcements', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: [
+        makeAnnouncement({ id: 1, title: 'First notice' }),
+        makeAnnouncement({ id: 2, title: 'Second notice' }),
+      ],
+    });
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    render(<PinnedAnnouncementsBanner groupId={5} />);
+    await waitFor(() => {
+      expect(screen.getByText('First notice')).toBeInTheDocument();
+      expect(screen.getByText('Second notice')).toBeInTheDocument();
+    });
+  });
+
+  it('handles items returned under announcements key', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: { announcements: [makeAnnouncement({ title: 'Nested key item' })] },
+    });
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    render(<PinnedAnnouncementsBanner groupId={5} />);
+    await waitFor(() => {
+      expect(screen.getByText('Nested key item')).toBeInTheDocument();
+    });
+  });
+
+  it('handles items returned under items key', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: { items: [makeAnnouncement({ title: 'Items key result' })] },
+    });
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    render(<PinnedAnnouncementsBanner groupId={5} />);
+    await waitFor(() => {
+      expect(screen.getByText('Items key result')).toBeInTheDocument();
+    });
+  });
+
+  it('filters out announcements with is_pinned=false', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: [
+        makeAnnouncement({ id: 1, title: 'Pinned one', is_pinned: true }),
+        makeAnnouncement({ id: 2, title: 'Not pinned', is_pinned: false }),
+      ],
+    });
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    render(<PinnedAnnouncementsBanner groupId={5} />);
+    await waitFor(() => {
+      expect(screen.getByText('Pinned one')).toBeInTheDocument();
+      expect(screen.queryByText('Not pinned')).not.toBeInTheDocument();
+    });
+  });
+
+  it('silently fails (renders nothing) when API throws', async () => {
+    mockApi.get.mockRejectedValue(new Error('Network error'));
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    const { container } = render(<PinnedAnnouncementsBanner groupId={5} />);
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="safe-html"]')).toBeNull();
+    });
+  });
+
+  it('renders nothing when API returns success=false', async () => {
+    mockApi.get.mockResolvedValue({ success: false, data: null });
+    const { PinnedAnnouncementsBanner } = await import('./PinnedAnnouncementsBanner');
+    const { container } = render(<PinnedAnnouncementsBanner groupId={5} />);
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="safe-html"]')).toBeNull();
+    });
+  });
+});
