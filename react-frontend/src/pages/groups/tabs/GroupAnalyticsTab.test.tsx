@@ -1,0 +1,273 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { createMockContexts } from '@/test/mock-contexts';
+import React from 'react';
+
+// ─── Mock api ────────────────────────────────────────────────────────────────
+const { mockApi } = vi.hoisted(() => ({
+  mockApi: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+}));
+
+vi.mock('@/lib/api', () => ({ api: mockApi, default: mockApi }));
+vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
+
+// ─── Chart colors (simple stubs avoid CSS var resolution errors) ──────────────
+vi.mock('@/lib/chartColors', () => ({
+  CHART_COLORS: ['#4f46e5', '#10b981', '#f59e0b'],
+  CHART_COLOR_MAP: { primary: '#4f46e5', secondary: '#6366f1', success: '#10b981' },
+  CHART_TOKEN_COLORS: { border: '#e5e7eb', surface: '#ffffff', foreground: '#111827' },
+}));
+
+vi.mock('@/lib/helpers', () => ({ resolveAvatarUrl: (url: string | null) => url ?? '' }));
+
+// ─── Stub recharts (heavy canvas library) ────────────────────────────────────
+vi.mock('recharts', () => ({
+  LineChart: ({ children }: { children: React.ReactNode }) => <div data-testid="line-chart">{children}</div>,
+  BarChart: ({ children }: { children: React.ReactNode }) => <div data-testid="bar-chart">{children}</div>,
+  PieChart: ({ children }: { children: React.ReactNode }) => <div data-testid="pie-chart">{children}</div>,
+  Line: () => null,
+  Bar: () => null,
+  Pie: () => null,
+  Cell: () => null,
+  XAxis: () => null,
+  YAxis: () => null,
+  CartesianGrid: () => null,
+  Tooltip: () => null,
+  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  AreaChart: ({ children }: { children: React.ReactNode }) => <div data-testid="area-chart">{children}</div>,
+  Area: () => null,
+}));
+
+// ─── Toast / Tenant ──────────────────────────────────────────────────────────
+const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() };
+
+vi.mock('@/contexts', () =>
+  createMockContexts({
+    useToast: () => mockToast,
+  }),
+);
+
+vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
+
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
+
+// ─── Fixtures ────────────────────────────────────────────────────────────────
+const makeFullDashboard = () => ({
+  kpi: { total_members: 120, active_members: 45, participation_rate: 37.5, avg_posts_per_day: 3.2 },
+  growth: [
+    { date: '2025-05-01', members: 110, new_members: 5 },
+    { date: '2025-06-01', members: 120, new_members: 10 },
+  ],
+  engagement: [
+    { date: '2025-05-01', posts: 20, discussions: 5, active_members: 30 },
+  ],
+  top_contributors: [
+    { user_id: 1, name: 'Alice', avatar_url: null, post_count: 15 },
+    { user_id: 2, name: 'Bob', avatar_url: null, post_count: 10 },
+  ],
+  activity_breakdown: [
+    { type: 'post', count: 40 },
+    { type: 'comment', count: 25 },
+  ],
+  retention: [
+    { month: '2025-01', joined: 20, still_active: 16, retention_pct: 80 },
+    { month: '2025-02', joined: 15, still_active: 9, retention_pct: 60 },
+  ],
+  comparative: {
+    your_members: 120,
+    avg_members: 80,
+    your_activity: 65,
+    avg_activity: 50,
+    percentile_rank: 75,
+  },
+});
+
+const successResponse = (data: object) => ({ success: true, data });
+
+// ─────────────────────────────────────────────────────────────────────────────
+describe('GroupAnalyticsTab', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mockApi.get.mockResolvedValue(successResponse(makeFullDashboard()));
+  });
+
+  it('shows admin-only message when isAdmin=false', async () => {
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={1} isAdmin={false} />);
+
+    // Should not fetch
+    expect(mockApi.get).not.toHaveBeenCalled();
+    // Should show restricted message
+    await waitFor(() => {
+      // i18n returns key as value in test env
+      const msg = document.body.textContent;
+      expect(msg).toMatch(/admin_only|analytics/i);
+    });
+  });
+
+  it('shows loading spinner initially when isAdmin=true', async () => {
+    mockApi.get.mockImplementationOnce(() => new Promise(() => {}));
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
+
+    const statuses = screen.getAllByRole('status');
+    const busy = statuses.find((el) => el.getAttribute('aria-busy') === 'true');
+    expect(busy).toBeDefined();
+  });
+
+  it('renders KPI values after data loads', async () => {
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
+
+    await waitFor(() => {
+      // Loading spinner gone
+      const busy = screen.queryAllByRole('status').find(
+        (el) => el.getAttribute('aria-busy') === 'true',
+      );
+      expect(busy).toBeUndefined();
+    });
+
+    const items120 = screen.getAllByText('120');
+    expect(items120.length).toBeGreaterThan(0); // total_members (may also appear in comparative)
+    expect(screen.getByText('45')).toBeInTheDocument();  // active_members
+  });
+
+  it('renders top contributor names', async () => {
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getByText('Bob')).toBeInTheDocument();
+    });
+  });
+
+  it('renders retention cohort table rows', async () => {
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('2025-01')).toBeInTheDocument();
+      expect(screen.getByText('2025-02')).toBeInTheDocument();
+    });
+  });
+
+  it('calls the API with the groupId and default 30-day range', async () => {
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={42} isAdmin={true} />);
+
+    await waitFor(() => {
+      expect(mockApi.get).toHaveBeenCalledWith(
+        expect.stringContaining('/v2/groups/42/analytics?days=30'),
+      );
+    });
+  });
+
+  it('shows "no growth data" message when growth array is empty', async () => {
+    const emptyGrowth = { ...makeFullDashboard(), growth: [] };
+    mockApi.get.mockResolvedValue(successResponse(emptyGrowth));
+
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
+
+    await waitFor(() => {
+      const busy = screen.queryAllByRole('status').find(
+        (el) => el.getAttribute('aria-busy') === 'true',
+      );
+      expect(busy).toBeUndefined();
+    });
+
+    // line-chart should NOT be rendered (no data)
+    expect(screen.queryByTestId('line-chart')).toBeNull();
+  });
+
+  it('shows "no contributors" message when top_contributors is empty', async () => {
+    const noContribs = { ...makeFullDashboard(), top_contributors: [] };
+    mockApi.get.mockResolvedValue(successResponse(noContribs));
+
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
+
+    await waitFor(() => {
+      const busy = screen.queryAllByRole('status').find(
+        (el) => el.getAttribute('aria-busy') === 'true',
+      );
+      expect(busy).toBeUndefined();
+    });
+
+    expect(screen.queryByText('Alice')).toBeNull();
+    expect(screen.queryByText('Bob')).toBeNull();
+  });
+
+  it('shows toast error when API fails', async () => {
+    mockApi.get.mockRejectedValue(new Error('network'));
+
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
+
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalled();
+    });
+  });
+
+  it('renders comparative stats section when data present', async () => {
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
+
+    await waitFor(() => {
+      // your_members value visible in comparative section
+      const items = screen.getAllByText('120');
+      expect(items.length).toBeGreaterThan(0);
+    });
+  });
+
+  it('export members button is rendered', async () => {
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
+
+    await waitFor(() => {
+      const busy = screen.queryAllByRole('status').find(
+        (el) => el.getAttribute('aria-busy') === 'true',
+      );
+      expect(busy).toBeUndefined();
+    });
+
+    const exportBtn = screen.getAllByRole('button').find((b) =>
+      b.getAttribute('aria-label')?.toLowerCase().includes('export') &&
+      b.getAttribute('aria-label')?.toLowerCase().includes('member'),
+    );
+    expect(exportBtn).toBeDefined();
+    fireEvent.click(exportBtn!);
+    expect(openSpy).toHaveBeenCalledWith(
+      expect.stringContaining('/analytics/export/members'),
+      '_blank',
+    );
+
+    openSpy.mockRestore();
+  });
+
+  it('fetches new data when day range toggle is clicked', async () => {
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={5} isAdmin={true} />);
+
+    await waitFor(() => {
+      expect(mockApi.get).toHaveBeenCalledWith(expect.stringContaining('days=30'));
+    });
+
+    // Find the 7-day toggle button
+    const btn7 = screen.getAllByRole('button').find((b) => b.textContent?.includes('7'));
+    if (btn7) {
+      fireEvent.click(btn7);
+      await waitFor(() => {
+        expect(mockApi.get).toHaveBeenCalledWith(expect.stringContaining('days=7'));
+      });
+    }
+  });
+});

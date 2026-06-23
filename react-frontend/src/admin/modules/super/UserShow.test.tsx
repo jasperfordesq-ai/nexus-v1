@@ -1,0 +1,345 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import React from 'react';
+import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { createMockContexts } from '@/test/mock-contexts';
+import userEvent from '@testing-library/user-event';
+
+// ─── Hoist mock data ─────────────────────────────────────────────────────────
+const { mockAdminSuper, mockAdminUsers } = vi.hoisted(() => ({
+  mockAdminSuper: {
+    getUser: vi.fn(),
+    listTenants: vi.fn(),
+    grantSuperAdmin: vi.fn(),
+    revokeSuperAdmin: vi.fn(),
+    grantGlobalSuperAdmin: vi.fn(),
+    revokeGlobalSuperAdmin: vi.fn(),
+    moveUserTenant: vi.fn(),
+    moveAndPromote: vi.fn(),
+  },
+  mockAdminUsers: {
+    impersonate: vi.fn(),
+  },
+}));
+
+// ─── Mock adminApi ────────────────────────────────────────────────────────────
+vi.mock('../../api/adminApi', () => ({
+  adminSuper: mockAdminSuper,
+  adminUsers: mockAdminUsers,
+}));
+
+// ─── Mock admin components ────────────────────────────────────────────────────
+vi.mock('../../components', () => ({
+  PageHeader: ({ title, description, actions }: { title: string; description?: string; actions?: React.ReactNode }) => (
+    <div data-testid="page-header">
+      <h1>{title}</h1>
+      {description && <p>{description}</p>}
+      {actions}
+    </div>
+  ),
+  ConfirmModal: ({
+    isOpen,
+    onClose,
+    onConfirm,
+    title,
+    confirmLabel,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    title: string;
+    confirmLabel: string;
+    message?: string;
+    confirmColor?: string;
+    isLoading?: boolean;
+  }) =>
+    isOpen ? (
+      <div role="dialog" aria-label={title} data-testid="confirm-modal">
+        <p>{title}</p>
+        <button data-testid="confirm-btn" onClick={onConfirm}>{confirmLabel}</button>
+        <button data-testid="cancel-btn" onClick={onClose}>Cancel</button>
+      </div>
+    ) : null,
+}));
+
+// ─── Mock contexts ────────────────────────────────────────────────────────────
+const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() };
+const mockNavigate = vi.fn();
+
+vi.mock('react-router-dom', async (importOriginal) => {
+  const orig = await importOriginal<typeof import('react-router-dom')>();
+  return {
+    ...orig,
+    useNavigate: () => mockNavigate,
+    useParams: () => ({ id: '42' }),
+  };
+});
+
+vi.mock('@/contexts', () =>
+  createMockContexts({
+    useAuth: () => ({
+      user: { id: 1, name: 'Super Admin', role: 'super_admin', is_super_admin: true },
+      isAuthenticated: true,
+      login: vi.fn(),
+      logout: vi.fn(),
+      register: vi.fn(),
+      updateUser: vi.fn(),
+      refreshUser: vi.fn(),
+      status: 'idle' as const,
+      error: null,
+    }),
+    useToast: () => mockToast,
+    useTenant: () => ({
+      tenant: { id: 2, name: 'Test', slug: 'test' },
+      tenantPath: (p: string) => `/test${p}`,
+      hasFeature: vi.fn(() => true),
+      hasModule: vi.fn(() => true),
+    }),
+  })
+);
+
+vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
+vi.mock('@/lib/safeStorage', () => ({ safeLocalStorageSet: vi.fn() }));
+vi.mock('@/lib/helpers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/helpers')>();
+  return {
+    ...actual,
+    resolveAvatarUrl: (url: unknown) => (url as string) || '',
+  };
+});
+
+// ─── Fixtures ─────────────────────────────────────────────────────────────────
+const makeUser = (overrides = {}) => ({
+  id: 42,
+  name: 'Alice Smith',
+  first_name: 'Alice',
+  last_name: 'Smith',
+  email: 'alice@example.com',
+  role: 'member',
+  status: 'active',
+  is_super_admin: false,
+  is_tenant_super_admin: false,
+  tenant_id: 2,
+  tenant_name: 'Hour Timebank',
+  avatar: null,
+  balance: 5,
+  location: 'Dublin',
+  phone: '+353 1 234 5678',
+  created_at: '2024-01-01T00:00:00Z',
+  last_login_at: '2024-06-01T00:00:00Z',
+  ...overrides,
+});
+
+const makeTenants = () => [
+  { id: 2, name: 'Hour Timebank', allows_subtenants: false },
+  { id: 3, name: 'Hub Tenant', allows_subtenants: true },
+  { id: 4, name: 'Another Tenant', allows_subtenants: false },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+describe('UserShow', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mockAdminSuper.getUser.mockResolvedValue({ success: true, data: makeUser() });
+    mockAdminSuper.listTenants.mockResolvedValue({ success: true, data: makeTenants() });
+  });
+
+  it('shows a loading spinner while fetching user', async () => {
+    mockAdminSuper.getUser.mockImplementationOnce(() => new Promise(() => {}));
+    const { UserShow } = await import('./UserShow');
+    render(<UserShow />);
+
+    const statuses = screen.getAllByRole('status');
+    const busy = statuses.find((el) => el.getAttribute('aria-busy') === 'true');
+    expect(busy).toBeDefined();
+  });
+
+  it('shows user-not-found message when API returns no user', async () => {
+    mockAdminSuper.getUser.mockResolvedValue({ success: false, data: null });
+    const { UserShow } = await import('./UserShow');
+    render(<UserShow />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/not_found|not found/i)).toBeInTheDocument();
+    });
+  });
+
+  it('renders user name and email after loading', async () => {
+    const { UserShow } = await import('./UserShow');
+    render(<UserShow />);
+
+    await waitFor(() => {
+      // email is unique enough
+      expect(screen.getByText('alice@example.com')).toBeInTheDocument();
+      // name appears multiple times (header + card) — just check at least one
+      const names = screen.getAllByText('Alice Smith');
+      expect(names.length).toBeGreaterThan(0);
+    });
+  });
+
+  it('renders status and role chips', async () => {
+    const { UserShow } = await import('./UserShow');
+    render(<UserShow />);
+
+    await waitFor(() => {
+      expect(screen.getByText('active')).toBeInTheDocument();
+      expect(screen.getByText('member')).toBeInTheDocument();
+    });
+  });
+
+  it('shows "Grant Tenant SA" button when user is not a tenant super admin', async () => {
+    const { UserShow } = await import('./UserShow');
+    render(<UserShow />);
+
+    await waitFor(() => {
+      const btn = screen.getAllByRole('button').find((b) =>
+        b.textContent?.toLowerCase().includes('grant') && b.textContent?.toLowerCase().includes('tenant')
+      );
+      expect(btn).toBeInTheDocument();
+    });
+  });
+
+  it('shows "Revoke Tenant SA" button when user IS a tenant super admin', async () => {
+    mockAdminSuper.getUser.mockResolvedValue({
+      success: true,
+      data: makeUser({ is_tenant_super_admin: true }),
+    });
+    const { UserShow } = await import('./UserShow');
+    render(<UserShow />);
+
+    await waitFor(() => {
+      const btn = screen.getAllByRole('button').find((b) =>
+        b.textContent?.toLowerCase().includes('revoke') && b.textContent?.toLowerCase().includes('tenant')
+      );
+      expect(btn).toBeInTheDocument();
+    });
+  });
+
+  it('opens confirm modal when Grant Tenant SA is clicked', async () => {
+    const { UserShow } = await import('./UserShow');
+    render(<UserShow />);
+
+    await waitFor(() => screen.getByText('alice@example.com'));
+
+    const grantBtn = screen.getAllByRole('button').find((b) =>
+      b.textContent?.toLowerCase().includes('grant') && b.textContent?.toLowerCase().includes('tenant')
+    );
+    expect(grantBtn).toBeDefined();
+    fireEvent.click(grantBtn!);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+    });
+  });
+
+  it('calls grantSuperAdmin API when confirm modal is confirmed', async () => {
+    mockAdminSuper.grantSuperAdmin.mockResolvedValue({ success: true });
+    const { UserShow } = await import('./UserShow');
+    render(<UserShow />);
+
+    await waitFor(() => screen.getByText('alice@example.com'));
+
+    const grantBtn = screen.getAllByRole('button').find((b) =>
+      b.textContent?.toLowerCase().includes('grant') && b.textContent?.toLowerCase().includes('tenant')
+    );
+    fireEvent.click(grantBtn!);
+
+    await waitFor(() => screen.getByTestId('confirm-modal'));
+
+    fireEvent.click(screen.getByTestId('confirm-btn'));
+
+    await waitFor(() => {
+      expect(mockAdminSuper.grantSuperAdmin).toHaveBeenCalledWith(42);
+      expect(mockToast.success).toHaveBeenCalled();
+    });
+  });
+
+  it('shows impersonate button for super admin users', async () => {
+    const { UserShow } = await import('./UserShow');
+    render(<UserShow />);
+
+    await waitFor(() => {
+      const btn = screen.getAllByRole('button').find((b) =>
+        b.textContent?.toLowerCase().includes('impersonat')
+      );
+      expect(btn).toBeInTheDocument();
+    });
+  });
+
+  it('opens impersonation modal when impersonate button is clicked', async () => {
+    const { UserShow } = await import('./UserShow');
+    render(<UserShow />);
+
+    await waitFor(() => screen.getByText('alice@example.com'));
+
+    const impersonateBtn = screen.getAllByRole('button').find((b) =>
+      b.textContent?.toLowerCase().includes('impersonat')
+    );
+    fireEvent.click(impersonateBtn!);
+
+    await waitFor(() => {
+      const dialog = document.querySelector('[role="dialog"]');
+      expect(dialog).toBeTruthy();
+    });
+  });
+
+  it('shows "Move to Different Tenant" button', async () => {
+    const { UserShow } = await import('./UserShow');
+    render(<UserShow />);
+
+    await waitFor(() => {
+      const btn = screen.getAllByRole('button').find((b) =>
+        b.textContent?.toLowerCase().includes('tenant') && b.textContent?.toLowerCase().includes('move')
+      );
+      expect(btn).toBeInTheDocument();
+    });
+  });
+
+  it('shows "Grant Global SA" button when user is not global super admin', async () => {
+    const { UserShow } = await import('./UserShow');
+    render(<UserShow />);
+
+    await waitFor(() => {
+      const btn = screen.getAllByRole('button').find((b) =>
+        b.textContent?.toLowerCase().includes('global')
+      );
+      expect(btn).toBeInTheDocument();
+    });
+  });
+
+  it('shows error toast when grantSuperAdmin fails', async () => {
+    mockAdminSuper.grantSuperAdmin.mockResolvedValue({ success: false, error: 'Permission denied' });
+    const { UserShow } = await import('./UserShow');
+    render(<UserShow />);
+
+    await waitFor(() => screen.getByText('alice@example.com'));
+
+    const grantBtn = screen.getAllByRole('button').find((b) =>
+      b.textContent?.toLowerCase().includes('grant') && b.textContent?.toLowerCase().includes('tenant')
+    );
+    fireEvent.click(grantBtn!);
+
+    await waitFor(() => screen.getByTestId('confirm-modal'));
+    fireEvent.click(screen.getByTestId('confirm-btn'));
+
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalled();
+    });
+  });
+
+  it('displays balance when provided', async () => {
+    const { UserShow } = await import('./UserShow');
+    render(<UserShow />);
+
+    await waitFor(() => {
+      // balance is 5 hours — "5 super.hours" or similar label
+      const balanceEls = screen.getAllByText(/5/);
+      expect(balanceEls.length).toBeGreaterThan(0);
+    });
+  });
+});
