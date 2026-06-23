@@ -7,6 +7,9 @@
 [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4.svg?logo=php&logoColor=white)](composer.json)
 [![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20.svg?logo=laravel&logoColor=white)](composer.json)
 [![React](https://img.shields.io/badge/React-19-61DAFB.svg?logo=react&logoColor=black)](react-frontend/package.json)
+[![Docs](https://img.shields.io/badge/docs-online-4051B5.svg?logo=materialformkdocs&logoColor=white)](https://jasperfordesq-ai.github.io/nexus-v1/)
+
+> 📖 **Documentation** — browse the full, searchable documentation site at **<https://jasperfordesq-ai.github.io/nexus-v1/>** (module guides, architecture, and an interactive API reference). The Markdown sources live in [docs/](docs/README.md).
 
 > 🌐 **Live demo** — see the platform running in production: the [React frontend](https://app.project-nexus.ie) (primary UI) and the [accessible HTML-first frontend](https://accessible.project-nexus.ie). The PHP API is served from `https://api.project-nexus.ie`.
 
