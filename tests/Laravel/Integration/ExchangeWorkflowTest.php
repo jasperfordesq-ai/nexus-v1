@@ -131,7 +131,7 @@ class ExchangeWorkflowTest extends TestCase
     // `test_completing_an_exchange_credits_exact_hours_and_conserves_money`
     // (exact credit math + conservation + single-transaction shape), and the API
     // state transitions are asserted individually by the per-action tests further
-    // down. See docs/TEST-DEBT.md.
+    // down. See docs/TESTING.md.
 
     /**
      * Deterministic money-path regression test for the #1 critical journey

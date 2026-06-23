@@ -12,6 +12,8 @@ Use these files for publishing, outreach, and high-level technical orientation. 
 | [OPEN_SOURCE_ANNOUNCEMENT_EMAIL.html](OPEN_SOURCE_ANNOUNCEMENT_EMAIL.html) | HTML version of the open-source announcement. |
 | [FEDERATION_INTEGRATION_SPECIFICATION.md](FEDERATION_INTEGRATION_SPECIFICATION.md) | Current pointer to maintained federation integration docs. |
 | [observability/prerender-runbook.md](observability/prerender-runbook.md) | Public-safe prerender observability runbook. |
+| [observability/prerender-alerts.yml](observability/prerender-alerts.yml) | Public-safe alert rule example for prerender monitoring. |
+| [observability/prerender-grafana-dashboard.json](observability/prerender-grafana-dashboard.json) | Public-safe Grafana dashboard JSON for prerender monitoring. |
 
 ## Dated Engine Snapshots
 

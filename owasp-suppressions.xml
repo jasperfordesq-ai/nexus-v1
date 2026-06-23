@@ -333,7 +333,7 @@
     appear in any production dependency tree). They run only during local
     development, the production build, or CI performance audits — they are NOT
     part of the deployed bundle served to users, so their advisories are not a
-    production attack surface. See SECURITY-POSTURE.md for the full triage.
+    production attack surface. See docs/SECURITY-SCANNING.md for the full triage.
       - vite        → the dev server (the advisories concern the local dev
                       server on Windows; production serves static built assets,
                       no Vite process runs).

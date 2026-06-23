@@ -14,20 +14,14 @@ Route::pattern('id', '[0-9]+');
 | Laravel API Routes
 |--------------------------------------------------------------------------
 |
-| Routes registered here are served by Laravel's router.
-| Any route NOT matched here falls through to the legacy Router::dispatch().
-|
-| Migration progress: routes are being migrated incrementally from
-| httpdocs/routes/*.php to this file.
+| Routes registered here are served by Laravel's router. Laravel 12 is the sole
+| HTTP handler for the API; keep new routes here or in explicit route partials.
 |
 */
 
 // ==========================================================================
-// Phase 5 wiring: Delegation controllers (App\Http\Controllers\Api\*)
-// replace legacy Nexus controllers where method signatures match exactly.
-// Each delegation controller wraps the legacy controller via ob_start(),
-// so responses are identical. Routes NOT yet swapped have a mismatch in
-// method names between the delegation controller and the route definition.
+// Laravel API controllers live under App\Http\Controllers\Api.
+// Keep controllers thin and move business rules into app/Services.
 // ==========================================================================
 
 // Health check -- confirms Laravel routing is operational
@@ -188,15 +182,9 @@ Route::post('/v2/events/{id}/image', [\App\Http\Controllers\Api\EventsController
 // Source: httpdocs/routes/listings.php
 // NOTE: Categories endpoint moved to public routes (above auth:sanctum group)
 // ============================================
-// FUTURE: When ready to use new Laravel controllers, replace:
-//   [\Nexus\Controllers\Api\ListingsApiController::class, 'index']
-// with:
-//   [App\Http\Controllers\Api\ListingsController::class, 'index']
-//
-// The new ListingsController uses constructor DI (App\Services\ListingService),
-// returns JsonResponse from every method, and handles validation via
-// Laravel's ValidationException. See ListingsController.php for the
-// reference implementation pattern to follow for all other controllers.
+// ListingsController uses constructor DI (App\Services\ListingService),
+// returns JsonResponse from every method, and handles validation via Laravel's
+// ValidationException. Use it as the reference implementation pattern.
 Route::middleware('module:listings')->group(function () {
     Route::get('/v2/listings', [\App\Http\Controllers\Api\ListingsController::class, 'index'])->withoutMiddleware('auth:sanctum');
     Route::get('/v2/listings/nearby', [\App\Http\Controllers\Api\ListingsController::class, 'nearby'])->withoutMiddleware('auth:sanctum');

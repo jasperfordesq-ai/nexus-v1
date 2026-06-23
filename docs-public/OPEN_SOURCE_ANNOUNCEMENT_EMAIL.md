@@ -121,7 +121,7 @@ Here's the full breakdown:
 - 🏢 **Enterprise RBAC** — role-based access control across 13+ modules with a full permission matrix
 - ♿ **WCAG 2.1 AA accessibility compliance** — enforced in the React frontend and the GOV.UK accessible interface
 - 🌍 **Multi-language support** — **11 languages**: English, Irish, German, French, Italian, Portuguese, Spanish, Dutch, Polish, Japanese, and **Arabic with full right-to-left layout**
-- 🔎 **SEO at build time** — 19+ public pages fully self-hosted pre-rendered with Playwright, structured data (organization type, geo meta tags, lat/lng schema), sitemaps, and nginx-served HTML for bots and users alike — no third-party prerender dependency
+- 🔎 **SEO at build time** — 19+ public pages fully self-hosted pre-rendered with Playwright, structured data (organization type, geo meta tags, lat/lng schema), sitemaps, and Apache-served HTML for bots and users alike — no third-party prerender dependency
 - 🚀 **Guided onboarding wizard** for new members
 - 📊 **Comprehensive admin panel** with algorithm controls, diagnostics, cron job monitoring, and email deliverability monitoring
 - 🏗️ **Tenant hierarchy with domain inheritance** — parent-child tenant relationships with feature toggling and sub-tenant URLs at the parent domain

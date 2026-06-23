@@ -56,6 +56,6 @@ e2e/
 
 ## Current Status
 
-The E2E suite is being moved from broad smoke coverage toward real journey assertions. CI no longer treats a configured zero-test run as green, but some lower-priority browser specs still contain defensive presence checks and `|| true` fallbacks. See [../E2E-COVERAGE.md](../E2E-COVERAGE.md) before treating E2E as release evidence.
+The E2E suite is being moved from broad smoke coverage toward real journey assertions. CI no longer treats a configured zero-test run as green, but some lower-priority browser specs still contain defensive presence checks and `|| true` fallbacks. See [../docs/TESTING.md](../docs/TESTING.md) before treating E2E as release evidence.
 
 When converting an E2E test, run it against a live local stack and assert real outcomes such as persisted state, changed balances, visible messages, route protection, or form validation. Do not replace a stale selector with another unverified fallback.

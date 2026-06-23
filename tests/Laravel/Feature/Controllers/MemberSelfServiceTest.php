@@ -21,7 +21,7 @@ use Tests\Laravel\TestCase;
  * This is security/privacy-sensitive (password change requires the current
  * password; account deletion requires re-auth and must actually anonymize PII).
  * It was the real-coverage gap left when the reflection-only Migrated
- * UsersApiControllerTest was deleted (commit ffa90d82a) — see docs/TEST-DEBT.md.
+ * UsersApiControllerTest was deleted (commit ffa90d82a). See docs/TESTING.md.
  *
  * Routes exercised (routes/api.php):
  *   GET    /v2/users/me                  -> UsersController::me

@@ -74,7 +74,7 @@ class IntegrationShowcaseService
                 ['label' => 'List subscriptions',  'path' => '/api/partner/v1/webhooks/subscriptions',        'method' => 'GET'],
                 ['label' => 'Create subscription', 'path' => '/api/partner/v1/webhooks/subscriptions',        'method' => 'POST'],
             ],
-            'docs_link' => 'https://github.com/jasperfordesq-ai/nexus-v1/blob/main/docs/API_REFERENCE.md',
+            'docs_link' => 'https://github.com/jasperfordesq-ai/nexus-v1/blob/main/docs/API.md',
         ];
     }
 
@@ -124,7 +124,7 @@ class IntegrationShowcaseService
             'items' => [
                 ['label' => 'Tenant aggregate', 'path' => '/api/v2/federation/aggregates', 'method' => 'GET'],
             ],
-            'docs_link' => 'https://github.com/jasperfordesq-ai/nexus-v1/blob/main/docs/FEDERATION.md',
+            'docs_link' => 'https://github.com/jasperfordesq-ai/nexus-v1/blob/main/docs/FEDERATION_API_MANUAL.md',
         ];
     }
 

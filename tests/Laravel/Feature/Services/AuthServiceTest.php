@@ -41,7 +41,7 @@ class AuthServiceTest extends TestCase
     {
         // NOTE: AuthService::login() checks the `password` column and Hash::check against
         // it (the live login path is AuthController::login, which uses password_hash + JWT;
-        // AuthService::login is a legacy service method — see docs/MORNING-REPORT.md). To
+        // AuthService::login is a legacy service method; see docs/TESTING.md. To
         // exercise its success branch we must populate the column it actually reads.
         $email = 'authsvc_' . uniqid() . '@example.com';
         $user = User::factory()->forTenant($this->testTenantId)->create([

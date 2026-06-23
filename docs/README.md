@@ -13,15 +13,19 @@ Historical prompts, one-off audits, dated handoff notes, generated reports, PDF 
 | [MONITORING.md](MONITORING.md) | External uptime checks, alert channels, and response notes. |
 | [SLO.md](SLO.md) | Initial service-level objectives and wired alerting commands. |
 | [SENTRY.md](SENTRY.md) | Backend and frontend Sentry configuration. |
+| [SECURITY-SCANNING.md](SECURITY-SCANNING.md) | Public-safe scanner interpretation and suppression policy. |
 
 ## Platform Features
 
 | Document | Purpose |
 | --- | --- |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Maintained platform architecture map, runtime boundaries, and documentation sufficiency note. |
+| [API.md](API.md) | API documentation source-of-truth, OpenAPI contract guidance, and generated-reference policy. |
 | [CUSTOM-DOMAINS.md](CUSTOM-DOMAINS.md) | Tenant custom-domain setup for the React and accessible frontends. |
 | [FEDERATION_API_MANUAL.md](FEDERATION_API_MANUAL.md) | Plain-English and technical federation API guide. |
 | [FEDERATION_COVERAGE.md](FEDERATION_COVERAGE.md) | Dated federation test coverage snapshot. |
+| [MODULES.md](MODULES.md) | Module guide map and priorities for deeper module documentation. |
+| [TESTING.md](TESTING.md) | Test-layer meanings, E2E status, and generated-report policy. |
 | [govuk-alpha/RESEARCH.md](govuk-alpha/RESEARCH.md) | Accessible frontend architecture and GOV.UK Frontend constraints. |
 | [govuk-alpha/ATTRIBUTION.md](govuk-alpha/ATTRIBUTION.md) | GOV.UK-related attribution notes. |
 
@@ -29,6 +33,7 @@ Historical prompts, one-off audits, dated handoff notes, generated reports, PDF 
 
 | Document | Purpose |
 | --- | --- |
+| [DOCUMENTATION.md](DOCUMENTATION.md) | Documentation architecture, standards, inventory classes, and maintenance workflow. |
 | [CONTRIBUTOR_TERMS_ENFORCEMENT.md](CONTRIBUTOR_TERMS_ENFORCEMENT.md) | How PR gates enforce contributor terms and ownership acknowledgements. |
 
 ## Related Public Collateral
@@ -51,4 +56,4 @@ Before adding a document here:
 - run `npm run check:docs` before committing documentation changes.
 - run `npm run check:version` after changing release/version labels or public collateral.
 
-The docs hygiene check fails on task-output filenames, oversized docs, non-Markdown files, missing index links, broken local links, stale retired-doc references, old namespace/path references, and obvious secret patterns.
+The docs hygiene check fails on task-output filenames, oversized docs, non-Markdown files, missing index links, broken local links, stale retired-doc references, old namespace/path references, stale platform-version phrases, generated artifacts in public doc paths, and obvious secret patterns.

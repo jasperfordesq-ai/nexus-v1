@@ -1,0 +1,39 @@
+# Testing
+
+Last reviewed: 2026-06-23
+
+This page explains what each test layer proves and where the remaining test-documentation risk sits.
+
+## Test Layers
+
+| Layer | Command | Proves |
+| --- | --- | --- |
+| Laravel PHPUnit | `vendor/bin/phpunit --testsuite=Laravel,LaravelMigrated --colors=always` | Backend routes, controllers, services, tenant boundaries, auth, money paths, and migrations. |
+| PHPStan / Larastan | `vendor/bin/phpstan analyse --no-progress --memory-limit=512M --error-format=github` | Static-analysis regressions beyond the configured baseline. |
+| React type check | `cd react-frontend && npx tsc --noEmit` | TypeScript correctness for the primary frontend. |
+| React build | `cd react-frontend && npm run build` | Production build viability. |
+| Vitest | `cd react-frontend && npm test` | Component, hook, and frontend behavior tests. |
+| Playwright E2E | `npm run test:e2e` | Browser behavior against the React frontend and Laravel API. |
+| Accessible frontend | `npm run build:accessible-frontend`, `npm run test:accessible-frontend:php`, `npm run test:accessible-frontend:a11y` | HTML-first frontend build, PHP route behavior, and accessibility smoke coverage. |
+
+## E2E Status
+
+The Playwright suite is being moved from broad smoke coverage toward real journey assertions. CI no longer treats a configured zero-test run as green, but some lower-priority specs still contain defensive presence checks and `|| true` fallbacks.
+
+Before treating E2E as release evidence, prefer tests that assert real outcomes:
+
+- account state changed;
+- balances or ledgers changed correctly;
+- a message, notification, listing, event, or review persists after reload;
+- route protection works for signed-out and cross-tenant users;
+- validation errors are visible and keyboard reachable.
+
+## Generated Reports
+
+Playwright reports under `e2e/reports/`, coverage reports, raw PHPStan output, and temporary static-analysis dumps are generated artifacts. Do not commit them as maintained docs. If a one-off report must be retained locally, put it under `.local-docs-archive/`.
+
+## Test Documentation Rules
+
+- Keep test instructions near the test harness they describe (`tests/README.md`, `e2e/README.md`, `mobile/README.md`).
+- Put platform-wide testing policy here.
+- Update this page when a test layer changes meaningfully, especially if a green check no longer proves what this page says it proves.

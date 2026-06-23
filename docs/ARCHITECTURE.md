@@ -66,7 +66,7 @@ New schema changes should use Laravel migrations in `database/migrations/`. The 
 | Tenant isolation | Middleware, tenant context, scoped queries, and feature gates. |
 | Open-source attribution | AGPL Section 7(b) footer/about attribution and `NOTICE` terms. |
 | Version consistency | `VERSION` plus `npm run check:version`. |
-| Documentation hygiene | `docs/README.md` plus `npm run check:docs`. |
+| Documentation hygiene | `docs/README.md`, [DOCUMENTATION.md](DOCUMENTATION.md), plus `npm run check:docs`. |
 | Changelog discipline | `CHANGELOG.md` under `[Unreleased]`, then `npm --prefix react-frontend run copy-changelog`. |
 
 ## Operations and Deployment
@@ -77,6 +77,6 @@ Routine Windows development uses native Laragon Apache/PHP and native Vite, with
 
 ## Documentation Sufficiency
 
-The documentation is now adequate as a maintained baseline for the current platform if the hygiene checks keep passing. It covers setup, topology, deployment, incident response, monitoring, SLOs, Sentry, federation, custom domains, accessible frontend constraints, contributor terms, versioning, and changelog discipline.
+The documentation is now adequate as a maintained baseline for the current platform if the hygiene checks keep passing. It covers setup, topology, deployment, incident response, monitoring, SLOs, Sentry, API reference policy, testing, security scanning, federation, custom domains, accessible frontend constraints, module-guide priorities, contributor terms, versioning, and changelog discipline.
 
-The remaining documentation risk is depth, not tidiness: large modules such as wallet/exchange lifecycle, notifications, search, federation operations, and mobile packaging may still need curated module guides when they next receive material changes. Add those as small maintained pages only when they become useful to future maintenance.
+The remaining documentation risk is depth, not tidiness: large modules such as wallet/exchange lifecycle, notifications, search, federation operations, and mobile packaging still need curated module guides when they next receive material changes. Use [MODULES.md](MODULES.md) to decide where the next deeper guide belongs.

@@ -8,7 +8,7 @@ Project NEXUS now runs as a Laravel 12.54 application on PHP 8.2+.
 
 - Laravel is the sole HTTP handler.
 - PHP source lives under `app/` with PSR-4 namespace `App\`.
-- `composer.json` no longer autoloads a `Nexus\` namespace.
+- `composer.json` no longer autoloads the former legacy PHP namespace.
 - The top-level legacy `src/` directory has been removed.
 - API routes are in `routes/api.php`; accessible frontend routes are in `routes/govuk-alpha.php` and `routes/govuk-alpha-parity/`.
 - The React 19 frontend remains the primary UI; the accessible frontend is the approved HTML-first exception.
@@ -50,7 +50,7 @@ Commit both the Laravel migration and the refreshed schema dump. The legacy SQL 
 - Put new PHP code in `app/`.
 - Follow existing Laravel services, controllers, models, and tests.
 - Scope tenant data through the current tenant-aware models/services.
-- Never add a new `Nexus\` namespace or top-level `src/` code.
+- Never add a new legacy PHP namespace or top-level `src/` code.
 - Do not create PHP views for product UI. Use the React frontend or the approved accessible frontend.
 - Verify backend changes with the relevant PHPUnit suite and PHPStan/Larastan.
 
@@ -63,4 +63,4 @@ The migration was performed in phases:
 3. The bridge/fallback layer was removed.
 4. Legacy controllers, models, service delegates, and the top-level `src/` tree were deleted.
 
-Older versions of this document contained a phase-by-phase worklist with references to remaining `src/` files, `Nexus\` classes, stub services, and legacy admin panels. Those references are intentionally removed because they no longer describe the current codebase.
+Older versions of this document contained a phase-by-phase worklist with references to remaining top-level legacy PHP files, legacy classes, stub services, and legacy admin panels. Those references are intentionally removed because they no longer describe the current codebase.

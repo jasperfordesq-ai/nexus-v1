@@ -282,7 +282,7 @@ VolunteerService::getHoursSummary(userId) → {
    ```
    VolunteerCheckInService::generateToken(shiftId, volunteerId) → string (64 hex chars)
    ```
-   Token = `bin2hex(random_bytes(32))`
+   Token value: a 64-character hex string generated from cryptographically secure random bytes.
 
 2. **Check-In:** Shift coordinator scans QR code:
    ```

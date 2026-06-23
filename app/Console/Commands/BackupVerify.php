@@ -34,7 +34,7 @@ use Illuminate\Support\Facades\Log;
  * base_path('backups'). On production the nightly script writes to
  * /opt/nexus-php/backups — the scheduler container must be able to read that
  * path (volume mount) or BACKUP_VERIFY_DIR must point at the mounted location.
- * See the owner-action checklist in docs/UNATTENDED-OPERATION-TRUST-REPORT.md.
+ * See docs/RUNBOOK-INCIDENTS.md for backup incident handling.
  */
 class BackupVerify extends Command
 {

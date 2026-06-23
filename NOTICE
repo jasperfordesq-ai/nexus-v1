@@ -202,7 +202,7 @@ RELATED PROJECTS
 ================================================================================
 
 Project NEXUS is actively developed across related codebases. This repository
-is the V1 PHP 8.2+ / React 18 / MariaDB implementation:
+is the V1 PHP 8.2+ / React 19 / MariaDB implementation:
 
   https://github.com/jasperfordesq-ai/nexus-v1
 
