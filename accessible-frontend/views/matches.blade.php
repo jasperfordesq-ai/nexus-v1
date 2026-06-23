@@ -30,9 +30,9 @@
         ];
     @endphp
 
-    @if (!empty($allMatchItems))
-        {{-- Stats summary --}}
-        <dl class="govuk-summary-list govuk-!-margin-bottom-6">
+    {{-- Stats summary + source filter — always rendered so the counts and
+         filter navigation are present even when the member has zero matches. --}}
+    <dl class="govuk-summary-list govuk-!-margin-bottom-6">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">{{ __('govuk_alpha.polish_listings.matches_total_label') }}</dt>
                 <dd class="govuk-summary-list__value">{{ $totalMatches }}</dd>
@@ -55,7 +55,6 @@
                 @endforeach
             </ul>
         </nav>
-    @endif
 
     @if (empty($allMatchItems))
         <div class="govuk-inset-text">{{ __('govuk_alpha.matches.empty') }}</div>
