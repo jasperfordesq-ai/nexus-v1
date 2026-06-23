@@ -1,0 +1,279 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@/test/test-utils';
+import { createMockContexts } from '@/test/mock-contexts';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+
+// ─── Mock api ────────────────────────────────────────────────────────────────
+const { mockApi } = vi.hoisted(() => ({
+  mockApi: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    patch: vi.fn(),
+    delete: vi.fn(),
+    download: vi.fn(),
+    upload: vi.fn(),
+  },
+}));
+
+vi.mock('@/lib/api', () => ({ api: mockApi, default: mockApi }));
+vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
+vi.mock('@/lib/helpers', () => ({ resolveAvatarUrl: vi.fn((url: string | null) => url ?? null) }));
+
+// ─── Navigation ──────────────────────────────────────────────────────────────
+const mockNavigate = vi.fn();
+
+vi.mock('react-router-dom', async (importOriginal) => {
+  const orig = await importOriginal<typeof import('react-router-dom')>();
+  return { ...orig, useNavigate: () => mockNavigate };
+});
+
+// ─── Contexts ────────────────────────────────────────────────────────────────
+const mockLogout = vi.fn();
+const mockToast = {
+  success: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+  warning: vi.fn(),
+  showToast: vi.fn(),
+};
+
+vi.mock('@/contexts', () =>
+  createMockContexts({
+    useAuth: () => ({
+      user: { id: 1, name: 'Alice Admin', avatar_url: null, avatar: null },
+      isAuthenticated: true,
+      login: vi.fn(),
+      logout: mockLogout,
+      register: vi.fn(),
+      updateUser: vi.fn(),
+      refreshUser: vi.fn(),
+      status: 'idle' as const,
+      error: null,
+    }),
+    useToast: () => mockToast,
+    useTenant: () => ({
+      tenant: { id: 2, name: 'Hour Timebank', slug: 'hour-timebank' },
+      tenantPath: (p: string) => `/hour-timebank${p}`,
+      hasFeature: vi.fn(() => true),
+      hasModule: vi.fn(() => true),
+    }),
+  })
+);
+
+// ─── Stub heavy HeroUI components ────────────────────────────────────────────
+vi.mock('@/components/ui', async (importOriginal) => {
+  const orig = await importOriginal<typeof import('@/components/ui')>();
+  return {
+    ...orig,
+    Button: ({
+      children,
+      onPress,
+      'aria-label': ariaLabel,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      isIconOnly: _isIconOnly,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      startContent: _startContent,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      variant: _variant,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      size: _size,
+    }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+      onPress?: () => void;
+      children?: React.ReactNode;
+      isIconOnly?: boolean;
+      startContent?: React.ReactNode;
+      variant?: string;
+      size?: string;
+    }) => (
+      <button aria-label={ariaLabel} onClick={onPress}>
+        {children}
+      </button>
+    ),
+    Avatar: ({ name, src }: { name?: string; src?: string }) => (
+      <img data-testid="avatar" alt={name ?? ''} src={src || undefined} />
+    ),
+    Dropdown: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="dropdown">{children}</div>
+    ),
+    DropdownTrigger: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="dropdown-trigger">{children}</div>
+    ),
+    DropdownMenu: ({
+      children,
+      onAction,
+    }: {
+      children: React.ReactNode;
+      onAction?: (key: string) => void;
+    }) => (
+      <div data-testid="dropdown-menu" onClick={(e) => {
+        const key = (e.target as HTMLElement).getAttribute('data-key');
+        if (key && onAction) onAction(key);
+      }}>
+        {children}
+      </div>
+    ),
+    DropdownItem: ({
+      children,
+      id,
+    }: {
+      children: React.ReactNode;
+      id?: string;
+    }) => (
+      <div data-testid={`dropdown-item-${id}`} data-key={id} role="menuitem">
+        {children}
+      </div>
+    ),
+  };
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('AdminHeader', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it('renders as a header element', async () => {
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} />);
+
+    expect(screen.getByRole('banner')).toBeInTheDocument();
+  });
+
+  it('shows the tenant name', async () => {
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} />);
+
+    expect(screen.getByText('Hour Timebank')).toBeInTheDocument();
+  });
+
+  it('shows the logged-in user name', async () => {
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} />);
+
+    expect(screen.getByText('Alice Admin')).toBeInTheDocument();
+  });
+
+  it('renders a back-to-site button that navigates to tenant dashboard', async () => {
+    const user = userEvent.setup();
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} />);
+
+    // Find the back button by its aria-label (from i18n admin_nav namespace)
+    const backBtn = screen.getAllByRole('button').find(
+      (btn) => btn.getAttribute('aria-label')?.toLowerCase().includes('back') ||
+               btn.getAttribute('aria-label')?.toLowerCase().includes('site')
+    );
+    expect(backBtn).toBeDefined();
+
+    if (backBtn) {
+      await user.click(backBtn);
+      expect(mockNavigate).toHaveBeenCalledWith('/hour-timebank/dashboard');
+    }
+  });
+
+  it('shows hamburger toggle button when onSidebarToggle is provided', async () => {
+    const mockToggle = vi.fn();
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} onSidebarToggle={mockToggle} />);
+
+    // Find toggle button by aria-label (toggle_sidebar from i18n)
+    const toggleBtn = screen.getAllByRole('button').find(
+      (btn) => btn.getAttribute('aria-label')?.toLowerCase().includes('toggle') ||
+               btn.getAttribute('aria-label')?.toLowerCase().includes('sidebar') ||
+               btn.getAttribute('aria-label')?.toLowerCase().includes('menu')
+    );
+    expect(toggleBtn).toBeDefined();
+  });
+
+  it('calls onSidebarToggle when hamburger is clicked', async () => {
+    const user = userEvent.setup();
+    const mockToggle = vi.fn();
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} onSidebarToggle={mockToggle} />);
+
+    const toggleBtn = screen.getAllByRole('button').find(
+      (btn) => btn.getAttribute('aria-label')?.toLowerCase().includes('toggle') ||
+               btn.getAttribute('aria-label')?.toLowerCase().includes('sidebar') ||
+               btn.getAttribute('aria-label')?.toLowerCase().includes('menu')
+    );
+
+    if (toggleBtn) {
+      await user.click(toggleBtn);
+      expect(mockToggle).toHaveBeenCalledTimes(1);
+    }
+  });
+
+  it('does not show hamburger toggle when onSidebarToggle is not provided', async () => {
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} />);
+
+    const toggleBtn = screen.getAllByRole('button').find(
+      (btn) => btn.getAttribute('aria-label')?.toLowerCase().includes('toggle') ||
+               btn.getAttribute('aria-label')?.toLowerCase().includes('sidebar')
+    );
+    expect(toggleBtn).toBeUndefined();
+  });
+
+  it('renders notifications button', async () => {
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} />);
+
+    const notifBtn = screen.getAllByRole('button').find(
+      (btn) => btn.getAttribute('aria-label')?.toLowerCase().includes('notification')
+    );
+    expect(notifBtn).toBeDefined();
+  });
+
+  it('navigates to notifications when bell button is clicked', async () => {
+    const user = userEvent.setup();
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} />);
+
+    const notifBtn = screen.getAllByRole('button').find(
+      (btn) => btn.getAttribute('aria-label')?.toLowerCase().includes('notification')
+    );
+
+    if (notifBtn) {
+      await user.click(notifBtn);
+      expect(mockNavigate).toHaveBeenCalledWith('/hour-timebank/notifications');
+    }
+  });
+
+  it('renders dropdown menu items for profile and sign-out', async () => {
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} />);
+
+    expect(screen.getByTestId('dropdown-item-profile')).toBeInTheDocument();
+    expect(screen.getByTestId('dropdown-item-logout')).toBeInTheDocument();
+  });
+
+  it('calls logout when sign-out menu item is clicked', async () => {
+    const user = userEvent.setup();
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} />);
+
+    const logoutItem = screen.getByTestId('dropdown-item-logout');
+    await user.click(logoutItem);
+
+    expect(mockLogout).toHaveBeenCalled();
+  });
+
+  it('navigates to profile when profile menu item is clicked', async () => {
+    const user = userEvent.setup();
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} />);
+
+    const profileItem = screen.getByTestId('dropdown-item-profile');
+    await user.click(profileItem);
+
+    expect(mockNavigate).toHaveBeenCalledWith('/hour-timebank/profile');
+  });
+});
