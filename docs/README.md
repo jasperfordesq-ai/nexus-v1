@@ -4,6 +4,12 @@ This directory contains the public, maintained documentation for Project NEXUS.
 
 Historical prompts, one-off audits, dated handoff notes, generated reports, PDF exports, and stale planning documents were moved out of `docs/` during the 2026-06-23 cleanup. They remain available locally under `.local-docs-archive/2026-06-23-docs-cleanup/`, which is intentionally ignored by git.
 
+## Getting Started
+
+| Document | Purpose |
+| --- | --- |
+| [TUTORIAL.md](TUTORIAL.md) | Hands-on tutorial: clone, run, make a visible change, verify, and open a pull request. |
+
 ## Operations
 
 | Document | Purpose |
@@ -30,6 +36,13 @@ Historical prompts, one-off audits, dated handoff notes, generated reports, PDF 
 | [modules/wallet-exchanges.md](modules/wallet-exchanges.md) | Wallet and exchanges module: time-credit ledger, transfer flow, exchange lifecycle, and invariants. |
 | [modules/admin.md](modules/admin.md) | Admin module: permission model, tenant vs platform super-admin, audit surfaces, feature/module configuration, and security invariants. |
 | [modules/members-and-gdpr.md](modules/members-and-gdpr.md) | Member directory plus the GDPR surface: Article 17 deletion, DSAR export, consent records, and the overdue-request alarm. |
+| [modules/goals-and-impact.md](modules/goals-and-impact.md) | Goals and impact module: goal CRUD, check-ins, milestones, templates, buddies, community impact metrics, and SROI calculation (with the corrected transaction-type exclusions). |
+| [modules/listings.md](modules/listings.md) | Listings module: offer/request model, lifecycle (create/moderate/expire/renew), categories, skill tags, search indexing, featured listings, exchange workflow entry point, and failure modes. |
+| [modules/events.md](modules/events.md) | Events module: create/edit/cancel/delete, RSVP and waitlists, recurring series, polls, cover images, online events, organiser check-in, reminders, and failure modes. |
+| [modules/jobs.md](modules/jobs.md) | Jobs / hiring module: posting vacancies, the application and hiring pipeline, interviews and offers, job alerts, syndication feeds, the bias/fairness audit, applicant-data GDPR handling, and CSV exports. |
+| [modules/groups.md](modules/groups.md) | Groups module: public vs private groups, join/approval workflow, roles and permissions, discussions, announcements, file sharing, chatrooms, group events, moderation, and security invariants. |
+| [modules/messaging.md](modules/messaging.md) | Messaging module: conversations, sending/editing/deleting, voice and file attachments, Pusher real-time delivery, broker safeguarding visibility, federation cross-community messaging, and failure modes. |
+| [modules/gamification.md](modules/gamification.md) | Gamification module: XP and levels, badges and achievements, leaderboards, challenges, the NEXUS score, and the XP-award idempotency / anti-abuse mechanism. |
 | [TESTING.md](TESTING.md) | Test-layer meanings, E2E status, and generated-report policy. |
 | [govuk-alpha/RESEARCH.md](govuk-alpha/RESEARCH.md) | Accessible frontend architecture and GOV.UK Frontend constraints. |
 | [govuk-alpha/ATTRIBUTION.md](govuk-alpha/ATTRIBUTION.md) | GOV.UK-related attribution notes. |

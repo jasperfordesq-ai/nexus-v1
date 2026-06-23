@@ -243,9 +243,11 @@ function checkTrackedRootArtifacts(tracked) {
     'CONTRIBUTING.md',
     'CONTRIBUTORS.md',
     'CONTRIBUTOR_TERMS.md',
+    'GOVERNANCE.md',
     'LARAVEL_MIGRATION_PLAN.md',
     'README.md',
     'SECURITY.md',
+    'SUPPORT.md',
   ]);
 
   for (const relativePath of tracked) {
