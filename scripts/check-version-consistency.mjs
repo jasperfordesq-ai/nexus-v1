@@ -84,6 +84,61 @@ assertContains('CHANGELOG.md', new RegExp(`^## \\[${versionEscaped}\\] - `, 'm')
 assertContains('CHANGELOG.md', `[Unreleased]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v${version}...HEAD`, 'Unreleased compare link');
 assertContains('react-frontend/src/config/releaseStatus.ts', `Generally Available (v${version})`, 'release status label');
 
+// --- Extended enforcement (added 2026-06-23) ---
+// A partial version bump must FAIL here rather than ship a stale reference.
+// These cover every remaining place the version is surfaced, including the
+// user-visible footer/changelog label (the one that has gone stale before).
+assertContains('README.md', `version-${version}-`, 'README version badge');
+assertContains('react-frontend/src/config/releaseStatus.test.ts', `v${version}`, 'releaseStatus test version assertion');
+assertContains('SECURITY.md', new RegExp(`v${versionEscaped}\\b`), 'SECURITY.md supported-version row');
+assertContains('docs/ARCHITECTURE.md', `Platform version: ${version}`, 'ARCHITECTURE platform version');
+assertContains('app/Services/Enterprise/LoggerService.php', `'${version}'`, 'LoggerService version fallback');
+assertContains('app/Services/Enterprise/MetricsService.php', `'${version}'`, 'MetricsService version fallback');
+assertContains('.github/ISSUE_TEMPLATE/bug_report.yml', `placeholder: "${version}"`, 'bug-report version placeholder');
+
+// The visible footer + changelog-chip label is driven by the per-language
+// `release_stage` translation key — enforce all installed locale files.
+const localesRoot = path.join(root, 'react-frontend/public/locales');
+if (fs.existsSync(localesRoot)) {
+  for (const lang of fs.readdirSync(localesRoot).sort()) {
+    for (const ns of ['common.json', 'public.json']) {
+      const rel = toPosix(path.join('react-frontend/public/locales', lang, ns));
+      if (!fs.existsSync(path.join(root, rel))) continue;
+      let data;
+      try {
+        data = JSON.parse(read(rel));
+      } catch {
+        addIssue(`${rel}: invalid JSON`);
+        continue;
+      }
+      const label = data.release_stage;
+      if (typeof label !== 'string') {
+        addIssue(`${rel}: missing release_stage label`);
+      } else if (!label.includes(version)) {
+        addIssue(`${rel}: release_stage "${label}" does not contain version ${version}`);
+      }
+    }
+  }
+}
+
+// resources.d.ts mirrors the en locale; every release_stage value must carry the version.
+{
+  const rel = 'react-frontend/src/resources.d.ts';
+  if (fs.existsSync(path.join(root, rel))) {
+    const text = read(rel);
+    const re = /"release_stage":\s*"([^"]*)"/g;
+    let match;
+    let found = false;
+    while ((match = re.exec(text)) !== null) {
+      found = true;
+      if (!match[1].includes(version)) {
+        addIssue(`${rel}: release_stage "${match[1]}" does not contain version ${version}`);
+      }
+    }
+    if (!found) addIssue(`${rel}: no release_stage entries found`);
+  }
+}
+
 const changelog = read('CHANGELOG.md');
 const bundledChangelogPath = path.join(root, 'react-frontend/public/changelog.md');
 if (fs.existsSync(bundledChangelogPath)) {
