@@ -109,6 +109,15 @@ CVE-2026-34601
 CVE-2026-1526
 CVE-2026-1528
 CVE-2026-2229
+# undici DoS via WebSocket memory growth (CVE-2026-12151, fix 6.27.0) and ws DoS
+# (CVE-2026-48779, fix 6.2.4/7.5.11). Both arrive only through the Expo/Metro/
+# React-Native DEV bundler toolchain (metro, @expo/metro, @react-native/dev-
+# middleware, react-devtools-core) — none of which ship in the compiled APK/IPA
+# or run on any server. The DoS is reachable only on the localhost dev server
+# during development. Bumping is deferred to a mobile-only change that can build
+# and validate the Expo tree. (added 2026-06-24)
+CVE-2026-12151
+CVE-2026-48779
 
 # ── urllib3 CVE-2026-44431 (HIGH) — vendor/mockery/mockery/docs/requirements.txt ──
 # Newly-disclosed urllib3 CVE in the same Python requirements.txt inside the
