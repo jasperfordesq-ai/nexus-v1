@@ -40,6 +40,8 @@ All contributors are expected to behave respectfully and professionally. We do n
 
 All contributions are subject to the [Project NEXUS Contributor Terms](CONTRIBUTOR_TERMS.md). These terms give Jasper Ford, and any entity he designates to steward Project NEXUS, the right to use contributions under AGPL-3.0-or-later and under commercial or proprietary licence terms.
 
+These terms are intentionally broad so the Project Steward can keep Project NEXUS open source while also offering private licensing, hosted services, support, and other commercial arrangements. Do not submit a contribution unless you can grant the copyright, patent, sublicensing, and relicensing rights described in `CONTRIBUTOR_TERMS.md`.
+
 Do not submit a contribution unless you have the right to make that grant. Contributions must not include secrets, confidential material, incompatible third-party code, or undisclosed AI-generated material.
 
 Pull requests are checked automatically. A PR cannot pass the Project NEXUS PR quality checks unless the contributor-terms acknowledgement is checked and the AI and third-party-material disclosure fields are completed.
@@ -65,39 +67,50 @@ Pull requests are checked automatically. A PR cannot pass the Project NEXUS PR q
 
 ## Development Environment Setup
 
-**Docker is the only supported development environment.** No local PHP or Node.js installation is required.
+Project NEXUS supports two local development paths:
+
+- **Public Docker path:** use Docker for the PHP app, database, Redis, Meilisearch, and optional frontend container.
+- **Maintainer Windows path:** use Laragon/Apache/PHP natively plus native Vite, with Docker used for data services. This is the fastest path on the maintainer workstation and is documented in `AGENTS.md`.
 
 ### Prerequisites
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/macOS) or Docker Engine + Compose (Linux)
+- Node.js 22+ and npm 10+ for the React/Vite frontend when running it natively
 - Git
 
 ### Start the platform
 
 ```bash
+# Start database, Redis, and Meilisearch
 docker compose up -d
+
+# Start the Docker PHP app if you are not using a native PHP/Apache stack
+docker compose --profile docker-php up -d app
+
+# Start the React frontend with native Vite
+npm run dev:frontend
 ```
 
-This starts all services. The first run will pull and build images, which may take several minutes.
+The first Docker run will pull and build images, which may take several minutes. On Windows maintainer machines, routine PHP/API work uses native Apache at `127.0.0.1:8088`; the Docker PHP app remains available on `localhost:8090` for container-specific checks.
 
 ### Service URLs
 
 | Service | URL |
 |---------|-----|
 | React Frontend | http://localhost:5173 |
-| PHP API | http://localhost:8090 |
+| PHP API (Docker profile) | http://localhost:8090 |
+| PHP API (maintainer native stack) | http://127.0.0.1:8088 |
 | Sales Site | http://localhost:3001 |
 | React Admin | http://localhost:5173/admin |
-| PHP Admin (Legacy) | http://localhost:8090/admin-legacy/ |
 | phpMyAdmin | http://localhost:8091 (start with `--profile tools`) |
 
 ### Environment variables
 
 Copy `.env.example` to `.env` and fill in the required values. **Never commit `.env`** — the repository is public.
 
-### Full setup guide
+### Additional setup notes
 
-See [docs/LOCAL_DEV_SETUP.md](docs/LOCAL_DEV_SETUP.md) for detailed instructions, including database seeding, first-time configuration, and troubleshooting.
+The retired `docs/LOCAL_DEV_SETUP.md` file is no longer part of the public documentation. Current local-development commands are maintained in `README.md`, `AGENTS.md`, `compose.yml`, and `package.json`.
 
 ---
 
@@ -105,7 +118,7 @@ See [docs/LOCAL_DEV_SETUP.md](docs/LOCAL_DEV_SETUP.md) for detailed instructions
 
 ```text
 nexus-v1/
-├── react-frontend/               # React 18 + HeroUI + Tailwind CSS 4 SPA (PRIMARY UI)
+├── react-frontend/               # React 19 + HeroUI v3 + Tailwind CSS 4 SPA (PRIMARY UI)
 │   ├── src/
 │   │   ├── components/           # Shared UI components
 │   │   ├── contexts/             # React context providers
@@ -120,13 +133,8 @@ nexus-v1/
 │   ├── Models/                   # Eloquent models
 │   ├── Services/                 # Business logic services
 │   └── Listeners/                # Event listeners
-├── src/                          # Legacy PHP (PSR-4: Nexus\) — admin views only
-│   ├── Controllers/Api/          # V2 API controllers
-│   ├── Models/                   # Legacy data models
-│   └── Services/                 # Legacy services
+├── accessible-frontend/          # HTML-first accessible frontend served by Laravel
 ├── mobile/                       # Capacitor + Expo mobile app
-├── sales-site/                   # Static Next.js marketing site
-│   └── CLAUDE.md                 # Sales site conventions
 ├── database/
 │   └── migrations/               # Laravel migrations (use these for new schema changes)
 ├── migrations/                   # Legacy SQL migrations (historical)
@@ -137,7 +145,7 @@ nexus-v1/
 └── compose.prod.yml              # Docker Compose (production)
 ```
 
-**The React frontend (`react-frontend/`) is the primary UI.** All user-facing pages belong there. PHP admin views at `views/admin/` and `views/modern/admin/` are maintained only for legacy admin panels at `/admin-legacy/` and `/super-admin/`.
+**The React frontend (`react-frontend/`) is the primary UI.** All maintained user-facing and admin UI work belongs in React, except for the approved accessible frontend under `accessible-frontend/`. Legacy PHP views are retired; do not create new PHP views.
 
 ---
 
@@ -183,11 +191,11 @@ The React frontend lives in `react-frontend/`. See [react-frontend/CLAUDE.md](re
 
 | Tool | Version |
 |------|---------|
-| React | 18 |
+| React | 19 |
 | TypeScript | 5 (strict mode) |
-| HeroUI | `@heroui/react` (latest) |
+| HeroUI | v3 via `@heroui/react` |
 | Tailwind CSS | 4 |
-| Framer Motion | latest |
+| Animation | Local `@/lib/motion` CSS-transition shim; do not add `framer-motion` |
 | Icons | Lucide React (`lucide-react`) only |
 | Testing | Vitest |
 
@@ -210,14 +218,16 @@ The React frontend lives in `react-frontend/`. See [react-frontend/CLAUDE.md](re
 ### Running the frontend dev server
 
 ```bash
-# Inside Docker (recommended)
-docker compose up -d
-# Then visit http://localhost:5173
-
-# Or outside Docker (requires Node 20+)
+# Native Vite (recommended on Windows maintainer machines)
 cd react-frontend
 npm install
 npm run dev
+
+# Or from the repository root
+npm run dev:frontend
+
+# Docker Vite is available only when deliberately testing the frontend container
+docker compose --profile docker-frontend up -d frontend
 ```
 
 ### Frontend tests
@@ -233,16 +243,15 @@ npm run build     # Production build check
 
 ## Backend Contribution Workflow
 
-The backend is Laravel 12 + PHP 8.2+. See [docs/PHP_CONVENTIONS.md](docs/PHP_CONVENTIONS.md) for full patterns.
+The backend is Laravel 12 + PHP 8.2+. Follow existing patterns in `app/Services/`, `app/Http/Controllers/Api/`, Eloquent models, and `routes/api.php`; the old `docs/PHP_CONVENTIONS.md` file has been retired.
 
 ### Namespace conventions
 
 | Code | Namespace | Location |
 |------|-----------|----------|
 | New Laravel code | `App\` | `app/` |
-| Legacy code (admin only) | `Nexus\` | `src/` |
 
-All new PHP code goes in `app/`. Do not add new files under `src/` unless they are strictly required by the legacy admin panel.
+All new PHP code goes in `app/`. The legacy top-level `src/` namespace has been removed.
 
 ### Multi-tenant scoping (CRITICAL)
 
@@ -280,8 +289,8 @@ php artisan make:migration create_my_table
 ### Running the backend
 
 ```bash
-docker compose up -d
-# PHP API is available at http://localhost:8090
+docker compose --profile docker-php up -d app
+# Docker PHP API is available at http://localhost:8090
 ```
 
 ### Backend tests
@@ -373,13 +382,7 @@ Project NEXUS serves timebanks worldwide. **Never add Ireland-specific or any ot
 
 ### Dead legacy themes — never touch
 
-The following PHP theme directories are dead legacy code and must never be modified, fixed, or referenced:
-
-- `views/civicone/`
-- `views/modern/` (non-admin subdirectories)
-- `views/starter/`
-
-The only maintained PHP views are `views/admin/` and `views/modern/admin/`.
+PHP-rendered themes under `views/` are retired legacy code. Do not modify, fix, refactor, or add PHP views for product UI. The maintained UIs are the React app and the approved accessible frontend.
 
 ### General rules
 
@@ -478,7 +481,7 @@ npx expo test
 docker exec nexus-php-app vendor/bin/phpstan analyse --no-progress --memory-limit=512M
 ```
 
-PHPStan runs at level 3 targeting `src/`. It is currently warning-only (non-blocking). Fix pre-existing errors before promoting to blocking.
+PHPStan/Larastan targets the Laravel `app/` codebase with the repository baseline in `phpstan-baseline.neon`. Keep new findings out of touched code and run the configured command before risky backend changes.
 
 ---
 

@@ -40,7 +40,7 @@ Time banking is a community-based system where members exchange services using t
 | **Search** | Meilisearch |
 | **CDN** | Cloudflare |
 | **Real-Time** | Pusher (WebSockets) + Firebase Cloud Messaging |
-| **Dev Environment** | Docker Compose |
+| **Dev Environment** | Docker data services + native Vite/PHP on Windows; Docker PHP profile available |
 | **Icons** | Lucide React |
 | **Animations** | CSS transitions via a local motion shim (no framer-motion) |
 | **Charts** | Recharts |
@@ -55,8 +55,9 @@ Time banking is a community-based system where members exchange services using t
 | `accessible-frontend/` | Accessibility-first, HTML-first frontend served by Laravel at `accessible.project-nexus.ie` and `/{tenantSlug}/alpha/...` |
 | `views/` | Live email templates (`views/emails/match_*.php`) and the module-404 page; everything else under `views/` is retired legacy code |
 | `httpdocs/` | Apache web root, public health endpoints, and compatibility entrypoints |
-| `database/`, `migrations/`, `schema.sql` | Laravel migrations, legacy SQL history, and schema reference artifacts |
+| `database/`, `migrations/` | Laravel migrations, schema dump, and legacy SQL history |
 | `tests/`, `e2e/`, `playwright.config.ts` | PHPUnit, integration, and browser test coverage |
+| `docs/` | Maintained public operations, platform, and governance documentation |
 | `.github/` | CI, security, contributor, release, and dependency automation |
 | `scripts/` | Build, migration, deployment, maintenance, and audit tooling |
 
@@ -72,10 +73,13 @@ cd nexus-v1
 # Copy the example environment file and fill in your values
 cp .env.docker.example .env.docker
 
-# Start backend/database/services with Docker
+# Start database, Redis, and Meilisearch
 docker compose up -d
 
-# Start the React frontend with native Vite on Windows
+# Start Docker PHP if you are using the containerized backend
+docker compose --profile docker-php up -d app
+
+# Start the React frontend with native Vite
 npm run dev:frontend
 
 # Run Laravel migrations to set up the database schema
@@ -83,7 +87,7 @@ docker exec nexus-php-app php artisan migrate
 
 # Access the application
 # React Frontend: http://localhost:5173
-# PHP API:        http://localhost:8090
+# PHP API:        http://localhost:8090 (Docker) or http://127.0.0.1:8088 (maintainer native)
 # Sales Site:     http://localhost:3001
 # Accessible UI:  http://localhost:8090/hour-timebank/alpha
 
@@ -98,7 +102,7 @@ Run Laravel migrations after starting Docker to create the schema:
 docker exec nexus-php-app php artisan migrate
 ```
 
-A legacy schema dump is also available at [schema.sql](schema.sql) if needed for reference. Zero-downtime deployments use a blue/green container switch (see `scripts/deploy/bluegreen-deploy.sh`).
+The full current schema dump is committed at [database/schema/mysql-schema.sql](database/schema/mysql-schema.sql). Zero-downtime deployments use a blue/green container switch (see `scripts/deploy/bluegreen-deploy.sh`).
 
 ## Project Status
 
@@ -118,6 +122,7 @@ We welcome contributors who are comfortable working with a modern Laravel + Reac
 
 - Security reports use the private process in [SECURITY.md](SECURITY.md).
 - Contributor behaviour expectations are documented in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- Maintained project documentation starts at [docs/README.md](docs/README.md).
 - Dependency updates are managed by Dependabot for Composer, npm, Docker, and GitHub Actions.
 - Pull requests run dependency review, CI, security scanning, i18n drift checks, SPDX checks, E2E smoke tests, and accessibility checks.
 - GitHub Releases are created from version tags; see [.github/RELEASE_PROCESS.md](.github/RELEASE_PROCESS.md).

@@ -17,8 +17,8 @@ composer.phar
 .cloudflare-api-token
 .build-version
 
-# ─── Documentation (private — not for public repo) ───────────────────────────
-/docs/
+# ─── Local documentation archive (private cleanup history) ───────────────────
+/.local-docs-archive/
 
 # ─── AI Assistant Config (contains sensitive project context) ─────────────────
 CLAUDE.md

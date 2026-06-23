@@ -1,249 +1,68 @@
-# API Testing Suite - Quick Reference
+# Project NEXUS Test Suite
 
-## Quick Start
+This directory contains the PHP test harness for the Laravel 12 backend. The older `tests/run-api-tests.php` runner still exists for legacy API smoke checks, but the canonical backend test entrypoint is PHPUnit via `phpunit.xml`.
+
+## Canonical Commands
 
 ```bash
-# Run all API tests
-php tests/run-api-tests.php
+# Main Laravel suites
+vendor/bin/phpunit --testsuite=Laravel,LaravelMigrated --colors=always
 
-# Run specific suite
-php tests/run-api-tests.php --suite=auth
+# Integration-focused tests
+vendor/bin/phpunit --testsuite=Integration --colors=always
 
-# Run with verbose output
-php tests/run-api-tests.php --verbose
-
-# Generate coverage report
-php tests/run-api-tests.php --coverage
+# Static analysis gate
+vendor/bin/phpstan analyse --no-progress --memory-limit=512M --error-format=github
 ```
 
-## What's Included
+On the Docker PHP profile, prefix the PHP commands with `docker exec nexus-php-app`.
 
-### ✅ Implemented Tests (84 tests, 8 controllers)
+## Suite Layout
 
-1. **AuthController** (8 tests) - Login, logout, session management
-2. **CoreApiController** (13 tests) - Members, listings, messages, notifications
-3. **SocialApiController** (13 tests) - Likes, comments, feed posts
-4. **WalletApiController** (6 tests) - Balance, transfers, transactions
-5. **GamificationApiController** (13 tests) - Rewards, challenges, badges
-6. **AiApiController** (15 tests) - AI chat, content generation
-7. **PushApiController** (8 tests) - Push notifications, subscriptions
-8. **WebAuthnApiController** (8 tests) - Passwordless authentication
-
-### Test Structure
-
-```
+```text
 tests/
-├── Controllers/
-│   └── Api/
-│       ├── ApiTestCase.php              # Base test class with helpers
-│       ├── AuthControllerTest.php       # ✅ 8 tests
-│       ├── CoreApiControllerTest.php    # ✅ 13 tests
-│       ├── SocialApiControllerTest.php  # ✅ 13 tests
-│       ├── WalletApiControllerTest.php  # ✅ 6 tests (existing)
-│       ├── GamificationApiControllerTest.php  # ✅ 13 tests
-│       ├── AiApiControllerTest.php      # ✅ 15 tests
-│       ├── PushApiControllerTest.php    # ✅ 8 tests
-│       └── WebAuthnApiControllerTest.php # ✅ 8 tests
-├── run-api-tests.php                    # Test runner script
-├── bootstrap.php                        # Test bootstrap
-├── TestCase.php                         # Base utilities
-└── DatabaseTestCase.php                 # Database utilities
+├── Laravel/
+│   ├── Feature/       # HTTP, controller, console, and integration-style feature tests
+│   ├── Integration/   # Cross-service and journey-level backend tests
+│   ├── Migrated/      # Tests for migrated Laravel API/controller behavior
+│   └── Unit/          # Unit and service-level tests
+├── Core/              # Legacy/core helper tests retained where still relevant
+├── Ai/                # AI-related tests
+├── Helpers/           # Shared helpers
+├── bootstrap.php      # PHPUnit bootstrap
+└── run-api-tests.php  # Legacy API smoke runner, not the canonical coverage source
 ```
 
-## Available Test Suites
+## Test Environment
 
-| Suite | Coverage | Endpoints |
-|-------|----------|-----------|
-| `auth` | 100% | 8 |
-| `core` | 100% | 13 |
-| `social` | 100% | 13 |
-| `wallet` | 100% | 6 |
-| `gamification` | 100% | 13 |
-| `ai` | 100% | 15 |
-| `push` | 100% | 8 |
-| `webauthn` | 100% | 8 |
-| **TOTAL** | **49%** | **84/173** |
+`phpunit.xml` forces safe testing defaults:
 
-## Running Tests
+- `APP_ENV=testing`
+- `DB_NAME=nexus_test`
+- `DB_DATABASE=nexus_test`
+- array cache/session/mail drivers
+- sync queue
+- null broadcaster
 
-### Basic Commands
-
-```bash
-# All API tests
-php tests/run-api-tests.php
-
-# Specific suite
-php tests/run-api-tests.php --suite=wallet
-
-# With filter
-php tests/run-api-tests.php --filter=testTransfer
-
-# Stop on failure
-php tests/run-api-tests.php --stop-on-failure
-```
-
-### Using PHPUnit Directly
-
-```bash
-# Run all API tests
-vendor/bin/phpunit tests/Controllers/Api/
-
-# Run specific test class
-vendor/bin/phpunit tests/Controllers/Api/AuthControllerTest.php
-
-# Run with coverage
-vendor/bin/phpunit --coverage-html coverage/html tests/Controllers/Api/
-```
+Do not point tests at production or a real tenant database. If a test needs schema state, use the Laravel test helpers and migrations/schema dump rather than ad hoc writes to shared data.
 
 ## Writing Tests
 
-### Basic Test Structure
+- Prefer Laravel feature/integration tests for API behavior and tenant boundaries.
+- Assert real outcomes: response status, database state, balance changes, emitted jobs/events, or translated output.
+- Avoid `assertTrue(true)`, broad `assertContains([200, 403, 500])`, unconditional skips, or tests that only check `class_exists`.
+- Tenant-scoped behavior must include a tenant-isolation assertion when the route or service crosses tenant data.
+- Money, auth, federation, wallet, messaging, and GDPR paths should include regression tests for both success and failure cases.
 
-```php
-<?php
+## Frontend And E2E
 
-namespace Tests\Controllers\Api;
+React/Vitest tests live under `react-frontend/src/**/*.test.*`.
 
-class MyApiTest extends ApiTestCase
-{
-    public function testGetEndpoint(): void
-    {
-        $response = $this->get('/api/endpoint', ['param' => 'value']);
-
-        $this->assertEquals('GET', $response['method']);
-        $this->assertArrayHasKey('param', $response['data']);
-    }
-
-    public function testPostEndpoint(): void
-    {
-        $response = $this->post('/api/endpoint', [
-            'field' => 'value'
-        ]);
-
-        $this->assertEquals('POST', $response['method']);
-        $this->assertArrayHasKey('field', $response['data']);
-    }
-}
-```
-
-### Available Helper Methods
-
-```php
-// HTTP requests
-$this->get('/api/endpoint', $params);
-$this->post('/api/endpoint', $data);
-$this->put('/api/endpoint', $data);
-$this->delete('/api/endpoint', $data);
-
-// Assertions
-$this->assertSuccess($response);
-$this->assertError($response);
-$this->assertJsonStructure(['id', 'name'], $data);
-$this->assertArrayHasKeys(['key1', 'key2'], $array);
-
-// Test data
-$user = $this->createUser(['balance' => 100]);
-$this->cleanupUser($user['id']);
-```
-
-## Test Data
-
-- **Test Tenant ID:** `self::$testTenantId`
-- **Test User ID:** `self::$testUserId`
-- **Test User Email:** `self::$testUserEmail`
-- **Test Auth Token:** `self::$testAuthToken`
-
-All requests are automatically authenticated with test credentials.
-
-## Configuration
-
-### Environment
-
-Tests use `.env.testing` configuration:
-- Database: `nexus_test`
-- Environment: `testing`
-- Cache/Session: `array` driver
-
-### PHPUnit Configuration
-
-See [phpunit.xml](../phpunit.xml) for detailed configuration:
-- Bootstrap: `tests/bootstrap.php`
-- Test suites: Unit, Integration, Feature, Models, Services, Controllers
-- Coverage output: `coverage/html/`
-
-## Documentation
-
-- **[API Testing Guide](../docs/API_TESTING_GUIDE.md)** - Complete testing guide
-- **[API Test Matrix](../docs/API_TEST_MATRIX.md)** - Endpoint coverage matrix
-- **[PHPUnit Docs](https://phpunit.de/)** - PHPUnit documentation
-
-## Coverage Report
-
-Generate and view coverage:
+Playwright E2E tests live under `e2e/` and are run from the repository root:
 
 ```bash
-# Generate coverage
-php tests/run-api-tests.php --coverage
-
-# View HTML report
-open coverage/html/index.html
+npm run test:e2e
+npx playwright test e2e/tests/smoke.spec.ts --grep '@smoke' --project=chromium-modern
 ```
 
-## Troubleshooting
-
-### Database Issues
-
-```bash
-# Check database
-mysql -e "SHOW DATABASES LIKE 'nexus_test';"
-
-# Create test database
-mysql -e "CREATE DATABASE IF NOT EXISTS nexus_test;"
-```
-
-### Permission Issues
-
-```bash
-# Fix permissions
-chmod -R 755 tests/
-chmod -R 755 coverage/
-```
-
-### Clean Cache
-
-```bash
-# Clear PHPUnit cache
-rm -rf .phpunit.cache/
-
-# Clear test data
-php tests/debug/clear-cache.php
-```
-
-## Next Steps
-
-### Phase 2 - Additional Controllers (Coming Soon)
-
-- Feed Management (3 endpoints)
-- Events & Volunteering (3 endpoints)
-- Leaderboard & Achievements (5 endpoints)
-- Recommendations (4 endpoints)
-- Menu Management (5 endpoints)
-- Polls & Goals (5 endpoints)
-
-### Phase 3 - Admin & Advanced (Planned)
-
-- Layout Builder (10 endpoints)
-- GDPR & Privacy (3 endpoints)
-- Admin API (25 endpoints)
-
-## Support
-
-For help:
-1. Check [API_TESTING_GUIDE.md](../docs/API_TESTING_GUIDE.md)
-2. Review existing test examples
-3. Contact development team
-
----
-
-**Last Updated:** January 12, 2026
-**Version:** 1.0.0
+See [../e2e/README.md](../e2e/README.md), [../E2E-COVERAGE.md](../E2E-COVERAGE.md), and [../docs/TEST-DEBT.md](../docs/TEST-DEBT.md) for browser-test status and remaining debt.
