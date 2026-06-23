@@ -1,0 +1,161 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@/test/test-utils';
+import { createMockContexts } from '@/test/mock-contexts';
+
+// ─── Mutable auth / tenant state ─────────────────────────────────────────────
+const { mockAuth, mockTenant } = vi.hoisted(() => ({
+  mockAuth: {
+    user: null as Record<string, unknown> | null,
+    isLoading: false,
+    status: 'idle' as string,
+    isAuthenticated: false,
+    login: vi.fn(),
+    logout: vi.fn(),
+    register: vi.fn(),
+    updateUser: vi.fn(),
+    refreshUser: vi.fn(),
+    error: null,
+  },
+  mockTenant: {
+    tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
+    tenantPath: (p: string) => `/test${p}`,
+    hasFeature: vi.fn(() => true),
+    hasModule: vi.fn(() => true),
+  },
+}));
+
+vi.mock('@/contexts', () =>
+  createMockContexts({
+    useAuth: () => ({ ...mockAuth }),
+    useTenant: () => ({ ...mockTenant }),
+  })
+);
+
+// ─── Stub Navigate + Outlet ───────────────────────────────────────────────────
+vi.mock('react-router-dom', async (importOriginal) => {
+  const orig = await importOriginal<typeof import('react-router-dom')>();
+  return {
+    ...orig,
+    Navigate: ({ to }: { to: string }) => (
+      <div data-testid="redirect" data-to={to} />
+    ),
+    Outlet: () => <div data-testid="outlet">children</div>,
+  };
+});
+
+// ─── Stub LoadingScreen ───────────────────────────────────────────────────────
+vi.mock('@/components/feedback', () => ({
+  LoadingScreen: ({ message }: { message?: string }) => (
+    <div data-testid="loading-screen" aria-busy="true">{message}</div>
+  ),
+}));
+
+// ─────────────────────────────────────────────────────────────────────────────
+describe('SuperAdminRoute', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mockAuth.user = null;
+    mockAuth.isAuthenticated = false;
+    mockAuth.isLoading = false;
+    mockAuth.status = 'idle';
+    mockTenant.tenantPath = (p: string) => `/test${p}`;
+  });
+
+  it('shows loading screen while isLoading is true', async () => {
+    mockAuth.isLoading = true;
+    const { SuperAdminRoute } = await import('./SuperAdminRoute');
+    render(<SuperAdminRoute />);
+    expect(screen.getByTestId('loading-screen')).toBeInTheDocument();
+    expect(screen.queryByTestId('outlet')).not.toBeInTheDocument();
+  });
+
+  it('shows loading screen when status is "loading"', async () => {
+    mockAuth.isLoading = false;
+    mockAuth.status = 'loading';
+    const { SuperAdminRoute } = await import('./SuperAdminRoute');
+    render(<SuperAdminRoute />);
+    expect(screen.getByTestId('loading-screen')).toBeInTheDocument();
+  });
+
+  it('redirects null user (unauthenticated) to /admin', async () => {
+    mockAuth.user = null;
+    const { SuperAdminRoute } = await import('./SuperAdminRoute');
+    render(<SuperAdminRoute />);
+    const redirect = screen.getByTestId('redirect');
+    expect(redirect.getAttribute('data-to')).toBe('/test/admin');
+  });
+
+  it('redirects ordinary member to /admin', async () => {
+    mockAuth.user = { id: 1, role: 'member' };
+    const { SuperAdminRoute } = await import('./SuperAdminRoute');
+    render(<SuperAdminRoute />);
+    const redirect = screen.getByTestId('redirect');
+    expect(redirect.getAttribute('data-to')).toBe('/test/admin');
+  });
+
+  it('redirects regular admin (not super_admin) to /admin', async () => {
+    mockAuth.user = { id: 2, role: 'admin' };
+    const { SuperAdminRoute } = await import('./SuperAdminRoute');
+    render(<SuperAdminRoute />);
+    expect(screen.getByTestId('redirect')).toBeInTheDocument();
+    expect(screen.queryByTestId('outlet')).not.toBeInTheDocument();
+  });
+
+  it('redirects broker to /admin', async () => {
+    mockAuth.user = { id: 3, role: 'broker' };
+    const { SuperAdminRoute } = await import('./SuperAdminRoute');
+    render(<SuperAdminRoute />);
+    expect(screen.getByTestId('redirect')).toBeInTheDocument();
+  });
+
+  it('renders Outlet for user with role "super_admin"', async () => {
+    mockAuth.user = { id: 4, role: 'super_admin' };
+    const { SuperAdminRoute } = await import('./SuperAdminRoute');
+    render(<SuperAdminRoute />);
+    expect(screen.getByTestId('outlet')).toBeInTheDocument();
+    expect(screen.queryByTestId('redirect')).not.toBeInTheDocument();
+  });
+
+  it('renders Outlet for user with is_super_admin flag', async () => {
+    mockAuth.user = { id: 5, role: 'member', is_super_admin: true };
+    const { SuperAdminRoute } = await import('./SuperAdminRoute');
+    render(<SuperAdminRoute />);
+    expect(screen.getByTestId('outlet')).toBeInTheDocument();
+  });
+
+  it('renders Outlet for user with is_tenant_super_admin flag', async () => {
+    mockAuth.user = { id: 6, role: 'member', is_tenant_super_admin: true };
+    const { SuperAdminRoute } = await import('./SuperAdminRoute');
+    render(<SuperAdminRoute />);
+    expect(screen.getByTestId('outlet')).toBeInTheDocument();
+  });
+
+  it('renders Outlet for user with is_god flag', async () => {
+    mockAuth.user = { id: 7, role: 'member', is_god: true };
+    const { SuperAdminRoute } = await import('./SuperAdminRoute');
+    render(<SuperAdminRoute />);
+    expect(screen.getByTestId('outlet')).toBeInTheDocument();
+  });
+
+  it('redirect destination uses tenantPath(/admin)', async () => {
+    mockAuth.user = { id: 8, role: 'member' };
+    mockTenant.tenantPath = (p: string) => `/hour-timebank${p}`;
+    const { SuperAdminRoute } = await import('./SuperAdminRoute');
+    render(<SuperAdminRoute />);
+    const redirect = screen.getByTestId('redirect');
+    expect(redirect.getAttribute('data-to')).toBe('/hour-timebank/admin');
+  });
+
+  it('does not render Outlet when is_super_admin is false (not true)', async () => {
+    mockAuth.user = { id: 9, role: 'member', is_super_admin: false };
+    const { SuperAdminRoute } = await import('./SuperAdminRoute');
+    render(<SuperAdminRoute />);
+    expect(screen.queryByTestId('outlet')).not.toBeInTheDocument();
+    expect(screen.getByTestId('redirect')).toBeInTheDocument();
+  });
+});
