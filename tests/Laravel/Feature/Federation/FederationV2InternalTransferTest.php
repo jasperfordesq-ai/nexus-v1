@@ -27,8 +27,8 @@ use Tests\Laravel\TestCase;
  * This is the live successor to the removed App\Services\FederatedTransactionService,
  * whose old suite (tests/Laravel/Unit/Services/FederatedTransactionServiceTest.php)
  * was fully markTestSkipped AND referenced the deleted class — green theatre that
- * asserted nothing. It guards critical journey J6 in PRODUCTION-READINESS.md
- * ("Federation cross-tenant hour transfer — money, weakest atomicity").
+ * asserted nothing. It guards the historical critical journey J6:
+ * federation cross-tenant hour transfer money atomicity.
  *
  * The internal transfer debits the sender and credits a member of a *partnered*
  * tenant inside a single DB transaction: an atomic conditional debit

@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Documentation, version, and changelog governance is now enforced.** A root `VERSION` file records the platform version, `npm run check:version` keeps Composer, React package metadata, Laravel config, README, release status, changelog links, and current public collateral in sync, and `npm run check:changelog` catches release-relevant work that forgets to update `CHANGELOG.md`.
+- **A maintained architecture map now anchors the docs.** `docs/ARCHITECTURE.md` gives future maintainers a compact view of the runtime boundaries, tenant/feature model, UI surfaces, backend organization, operations references, and remaining documentation depth risks.
 - **More of the accessible site now matches the main site**, from a fresh module-by-module review: group **file sharing** (upload, list, download, delete) on the accessible group page; a volunteering **safeguarding** area to log training records and report concerns; a **goal progress history** timeline; **likes and comments on individual resources**; and a **delete button for your own polls** on the polls page.
 - **The AI assistant is now on the accessible site.** Ask the community assistant a question from the Explore page and it replies on the same page; your previous conversations are listed so you can pick one back up. It's a simpler, no-JavaScript version of the main site's chat — you send a message and the reply appears when the page reloads, rather than streaming live.
 - **Voice messages on the accessible site.** You can send a voice message by uploading a short audio clip — on a phone, the file picker opens the recorder directly. Voice messages play with the browser's built-in audio player and, where a transcription is available, include a "Show transcript" panel so they're accessible to everyone.
@@ -32,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Public documentation is tidier and version-consistent.** The README, public module engine reports, and open-source announcement collateral now identify Project NEXUS as v1.5.2; the stale federation integration report has been replaced with a concise pointer to the maintained federation manual and coverage documents; `docs-public/README.md` now separates current collateral from dated engine snapshots; accessible frontend docs now distinguish the public Beta track from legacy `alpha` route/code names and record `govuk-frontend` 6.3.0 as the latest verified stable; retired documentation links in tests/workflows now point to maintained guidance; docs hygiene rules now keep prompts, scratch plans, generated reports, PDFs, and private notes out of `docs/`.
 - **The Events page now shows one card per repeating series instead of every single date.** A repeating event now appears once — as its next upcoming date — with a "Repeats weekly · N dates" label, so the page no longer fills up with the same event over and over. Open the event to see the full list of its upcoming dates.
 - **Clearer limit when choosing how many times an event repeats.** The "number of occurrences" field now states the allowed range (2–52). Entering a number outside it shows a clear error, flags the field in red and jumps you straight to it, instead of the form silently doing nothing.
 
@@ -1104,7 +1107,7 @@ For the people behind the project, see [CONTRIBUTORS.md](CONTRIBUTORS.md) — th
 
 - **Issues**: https://github.com/jasperfordesq-ai/nexus-v1/issues
 - **Documentation**: `/docs` directory
-- **Email**: jasper@hour-timebank.ie
+- **Security reports**: see [SECURITY.md](SECURITY.md)
 
 ---
 

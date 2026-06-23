@@ -7,8 +7,9 @@
 /**
  * Deployment Version - Cache Busting
  *
- * Auto-updated by claude-deploy.sh
- * All CSS/JS files use this version to force browser cache refresh.
+ * This is a deployment build/cache-busting identifier, not the platform
+ * semantic version in VERSION/composer.json/react-frontend/package.json.
+ * Deployment scripts update build metadata separately from release versioning.
  */
 
 return [

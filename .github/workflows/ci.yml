@@ -584,7 +584,46 @@ jobs:
 
 
   # ─────────────────────────────────────────────────────────────────
-  # Stage 6b: SPDX/AGPL License Compliance Check
+  # Stage 6b: Documentation, Version, and Changelog Hygiene
+  # ─────────────────────────────────────────────────────────────────
+  docs-hygiene:
+    name: Documentation, Version, and Changelog Hygiene
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: "BLOCKING: Keep docs/ curated and public-safe"
+        run: npm run check:docs
+
+      - name: "BLOCKING: Keep platform version references unified"
+        run: npm run check:version
+
+      - name: "BLOCKING: Require changelog for release-relevant changes"
+        shell: bash
+        run: |
+          BASE_REF=""
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_REF="${{ github.event.pull_request.base.sha }}"
+          elif [ -n "${{ github.event.before }}" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            BASE_REF="${{ github.event.before }}"
+          fi
+
+          if [ -n "$BASE_REF" ]; then
+            node scripts/check-changelog-updated.mjs --base "$BASE_REF" --allow-missing-base
+          else
+            node scripts/check-changelog-updated.mjs --allow-missing-base
+          fi
+
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 6c: SPDX/AGPL License Compliance Check
   # ─────────────────────────────────────────────────────────────────
   spdx-compliance:
     name: SPDX License Compliance

@@ -1,6 +1,6 @@
 # Project NEXUS
 
-> **Version 1.5 — Generally Available** — Project NEXUS V1.5 is generally available and in active production use. The platform runs on Laravel 12 + PHP 8.2+ with a React 19 frontend. It is currently in use by communities in **Ireland** and being evaluated by communities in the **United Kingdom**, **Spain**, **Switzerland**, and the **United States**. Newer modules may still ship with their own per-module maturity label (Beta / Preview). Contributions and feedback are welcome.
+> **Version 1.5.2 — Generally Available** — Project NEXUS V1.5.2 is generally available and in active production use. The platform runs on Laravel 12 + PHP 8.2+ with a React 19 frontend. It is currently in use by communities in **Ireland** and being evaluated by communities in the **United Kingdom**, **Spain**, **Switzerland**, and the **United States**. Newer modules may still ship with their own per-module maturity label (Beta / Preview). Contributions and feedback are welcome.
 
 A modern, multi-tenant community time banking platform built with Laravel 12 + PHP 8.2+, React 19, and MariaDB.
 
@@ -106,7 +106,7 @@ The full current schema dump is committed at [database/schema/mysql-schema.sql](
 
 ## Project Status
 
-This is **version 1.5 — generally available**, in active production use. Per-module maturity (GA / Beta / Preview) is published on the in-app `/features` page and the public Changelog:
+This is **version 1.5.2 — generally available**, in active production use. Per-module maturity (GA / Beta / Preview) is published on the in-app `/features` page and the public Changelog:
 
 - The **React frontend** (`react-frontend/`) is the primary UI for user-facing pages and current admin workflows
 - The **Accessible frontend** (`accessible-frontend/`) is an approved HTML-first UI track for core tenant pages, served by Laravel and planned for `accessible.project-nexus.ie`
@@ -123,6 +123,9 @@ We welcome contributors who are comfortable working with a modern Laravel + Reac
 - Security reports use the private process in [SECURITY.md](SECURITY.md).
 - Contributor behaviour expectations are documented in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 - Maintained project documentation starts at [docs/README.md](docs/README.md).
+- Public documentation changes are checked with `npm run check:docs`.
+- Platform version references are checked with `npm run check:version`; update `VERSION`, Composer, React package metadata, the README, release status, and current public collateral together.
+- Release-relevant changes must update [CHANGELOG.md](CHANGELOG.md) under `[Unreleased]`, then refresh the bundled app copy with `npm --prefix react-frontend run copy-changelog`.
 - Dependency updates are managed by Dependabot for Composer, npm, Docker, and GitHub Actions.
 - Pull requests run dependency review, CI, security scanning, i18n drift checks, SPDX checks, E2E smoke tests, and accessibility checks.
 - GitHub Releases are created from version tags; see [.github/RELEASE_PROCESS.md](.github/RELEASE_PROCESS.md).

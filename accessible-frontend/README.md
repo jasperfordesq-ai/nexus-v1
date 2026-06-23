@@ -19,7 +19,7 @@ Deployment target: the Laravel/PHP blue-green app container, not the React front
 - `views/`: Blade page templates loaded through Laravel's `accessible-frontend::` view namespace.
 - Built assets are emitted to `httpdocs/build/accessible-frontend/`.
 
-The Laravel route namespace currently remains `/{tenantSlug}/alpha/...` while this track is in alpha.
+The public-facing accessible frontend is now Beta. The Laravel route namespace currently remains `/{tenantSlug}/alpha/...` for compatibility until a deliberate route migration is done.
 
 The generic root path `/` renders a tenant chooser for shared hosts such as local development and `accessible.project-nexus.ie`. Tenant-scoped pages continue under `/{tenantSlug}/alpha/...`.
 
@@ -37,7 +37,7 @@ Commit the generated files under `httpdocs/build/accessible-frontend/` with the 
 
 ## Official Stack
 
-- Component library: `govuk-frontend@6.1.0`.
+- Component library: installed `govuk-frontend@6.1.0`; latest stable verified from npm on 2026-06-23 was `6.3.0`.
 - Source repository: https://github.com/alphagov/govuk-frontend
 - Design System source: https://github.com/alphagov/govuk-design-system
 - Technical frontend docs: https://github.com/alphagov/govuk-frontend-docs

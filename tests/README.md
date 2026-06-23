@@ -65,4 +65,4 @@ npm run test:e2e
 npx playwright test e2e/tests/smoke.spec.ts --grep '@smoke' --project=chromium-modern
 ```
 
-See [../e2e/README.md](../e2e/README.md), [../E2E-COVERAGE.md](../E2E-COVERAGE.md), and [../docs/TEST-DEBT.md](../docs/TEST-DEBT.md) for browser-test status and remaining debt.
+See [../e2e/README.md](../e2e/README.md) and [../E2E-COVERAGE.md](../E2E-COVERAGE.md) for browser-test status and remaining debt.

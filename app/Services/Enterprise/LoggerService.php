@@ -55,7 +55,7 @@ class LoggerService
         $this->context = [
             'env' => getenv('APP_ENV') ?: 'production',
             'service' => getenv('DD_SERVICE') ?: 'nexus-app',
-            'version' => getenv('APP_VERSION') ?: '1.0.0',
+            'version' => self::platformVersion(),
         ];
     }
 
@@ -73,6 +73,19 @@ class LoggerService
     public static function channel(string $channel): self
     {
         return new self($channel);
+    }
+
+    private static function platformVersion(): string
+    {
+        if (function_exists('config')) {
+            $configuredVersion = config('app.version');
+            if (is_string($configuredVersion) && $configuredVersion !== '') {
+                return $configuredVersion;
+            }
+        }
+
+        $envVersion = getenv('APP_VERSION');
+        return is_string($envVersion) && $envVersion !== '' ? $envVersion : '1.5.2';
     }
 
     /**
@@ -398,7 +411,7 @@ class LoggerService
         $this->context = [
             'env' => getenv('APP_ENV') ?: 'production',
             'service' => getenv('DD_SERVICE') ?: 'nexus-app',
-            'version' => getenv('APP_VERSION') ?: '1.0.0',
+            'version' => self::platformVersion(),
         ];
         return $this;
     }

@@ -281,7 +281,7 @@ class WalletServiceEdgeCasesTest extends TestCase
     }
 
     /**
-     * J1 seam (PRODUCTION-READINESS §3): the post-commit notification / event
+     * Historical journey J1: the post-commit notification / event
      * dispatch runs OUTSIDE the DB::transaction() that moves the money. That is
      * deliberate and safe — money is committed first, side-effects are
      * best-effort. This locks the property: a failure in the post-commit path

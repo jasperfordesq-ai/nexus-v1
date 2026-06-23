@@ -1,18 +1,18 @@
-# Project NEXUS V1.5.1 — Open Source Announcement Email
+# Project NEXUS V1.5.2 — Open Source Announcement Email
 
 **Date:** 2026-05-25 (updated)
 **Status:** Ready to send
-**Purpose:** Public announcement of Project NEXUS V1.5.1 open source release — refreshed with Spring 2026 feature work (Marketplace, Donations, Identity Verification, four-protocol Federation layer including Credit Commons / CEN, 11 languages, self-hosted SEO pre-rendering, hierarchical domain inheritance, proximity search, accessible GOV.UK Alpha frontend, email deliverability suite with SendGrid webhook processing, mobile push from every notification path, RFC-compliant one-click unsubscribe, SEO structured data enhancements, registration fraud prevention, and a hardened security/payments layer).
+**Purpose:** Public announcement of Project NEXUS V1.5.2 open source release — refreshed with Spring 2026 feature work (Marketplace, Donations, Identity Verification, four-protocol Federation layer including Credit Commons / CEN, 11 languages, self-hosted SEO pre-rendering, hierarchical domain inheritance, proximity search, accessible GOV.UK Alpha frontend, email deliverability suite with SendGrid webhook processing, mobile push from every notification path, RFC-compliant one-click unsubscribe, SEO structured data enhancements, registration fraud prevention, and a hardened security/payments layer).
 
 ---
 
-**Subject: Project NEXUS V1.5.1 is Now Open Source — Building the Future of Community Exchange Together**
+**Subject: Project NEXUS V1.5.2 is Now Open Source — Building the Future of Community Exchange Together**
 
 Dear Community Builders, Developers, and Changemakers,
 
 Today marks a pivotal moment in our mission to reimagine how communities connect, exchange, and thrive.
 
-**We're releasing Project NEXUS V1.5.1 to the world — fully open source, built for everyone.**
+**We're releasing Project NEXUS V1.5.2 to the world — fully open source, built for everyone.**
 
 ---
 
@@ -24,7 +24,7 @@ But NEXUS goes far beyond timebanking. It's a complete ecosystem for building co
 
 ---
 
-## What's Inside V1.5.1?
+## What's Inside V1.5.2?
 
 At a glance: **timebanking engine, real-time messaging, AI-powered matching, multi-tenant architecture, a four-protocol federation layer (Nexus, Komunitin, Credit Commons, TimeOverflow), a Stripe payments layer (subscriptions, donations, marketplace payouts, identity verification), gamification, registration fraud prevention, and a full social platform in 11 languages** — all production-ready and fully Dockerized.
 
@@ -135,11 +135,11 @@ Here's the full breakdown:
 
 This is where it gets exciting.
 
-**V1.5.1 ships with native adapters for four federation protocols** — Nexus (our own), the complete [Komunitin specification](https://github.com/komunitin/komunitin-spec) (all 15 endpoints), the [Credit Commons Protocol](https://creditcommons.org/) (11 endpoints, CEN-compatible mutual credit with P→V→C→E→X transaction lifecycle), and TimeOverflow. Two-way sync across 9 entity types (members, listings, events, groups, connections, volunteering, reviews, transfers, messages), event-driven push, reputation portability, and end-to-end integration test coverage. The vision is simple but ambitious: **a global time bank where external federation partners can discover each other, exchange services, and trade time credits across platforms and across borders.**
+**V1.5.2 ships with native adapters for four federation protocols** — Nexus (our own), the complete [Komunitin specification](https://github.com/komunitin/komunitin-spec) (all 15 endpoints), the [Credit Commons Protocol](https://creditcommons.org/) (11 endpoints, CEN-compatible mutual credit with P→V→C→E→X transaction lifecycle), and TimeOverflow. Two-way sync across 9 entity types (members, listings, events, groups, connections, volunteering, reviews, transfers, messages), event-driven push, reputation portability, and end-to-end integration test coverage. The vision is simple but ambitious: **a global time bank where external federation partners can discover each other, exchange services, and trade time credits across platforms and across borders.**
 
 Imagine a member in Dublin helping someone in São Paulo with web design, while a member in Tokyo teaches Irish students origami — all through interconnected timebanking platforms, all valuing every hour equally.
 
-The Federation API — available in V1.5.1 right now — enables:
+The Federation API — available in V1.5.2 right now — enables:
 - 🌍 **Cross-platform discovery** — Find members and services on partner timebanking platforms globally
 - 🔄 **Interoperable time credit exchange** — Trade time credits between different timebanking systems seamlessly
 - 🏘️ **Federation Neighborhoods** — Geographically grouped clusters of federated communities for regional coordination
@@ -284,7 +284,7 @@ Welcome to Project NEXUS. Welcome home.
 
 ---
 
-*Project NEXUS V1.5.1 — Built by Jasper Ford — Licensed under AGPL-3.0-or-later*
+*Project NEXUS V1.5.2 — Built by Jasper Ford — Licensed under AGPL-3.0-or-later*
 
 **"Every hour is equal. Every contribution matters. Every community deserves better. Everywhere."**
 

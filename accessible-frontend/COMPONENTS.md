@@ -9,11 +9,11 @@ See NOTICE file for attribution and acknowledgements.
 
 The complete shared component library for this frontend is the official `govuk-frontend` npm package.
 
-Verified baseline on 2026-05-06:
+Verified baseline on 2026-06-23:
 
 - Installed package: `govuk-frontend@6.1.0`
-- Latest stable on npm: `6.1.0`
-- Newer prerelease seen on npm/GitHub: `6.2.0-beta.0`
+- Latest stable on npm: `6.3.0`
+- Upgrade status: pending a compatibility pass; do not upgrade by documentation edit alone.
 - Package licence: MIT
 
 Canonical repositories for future work:

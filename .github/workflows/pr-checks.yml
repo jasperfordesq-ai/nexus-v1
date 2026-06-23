@@ -132,7 +132,7 @@ jobs:
                 ...errors.map((error) => `- ${error}`),
                 '',
                 'Please edit the PR description to include these sections.',
-                'See `docs/REGRESSION_PREVENTION.md` for guidance.',
+                'See `CONTRIBUTING.md` for pull request guidance.',
               ].join('\n');
 
               core.setFailed(message);

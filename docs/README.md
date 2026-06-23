@@ -18,6 +18,7 @@ Historical prompts, one-off audits, dated handoff notes, generated reports, PDF 
 
 | Document | Purpose |
 | --- | --- |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Maintained platform architecture map, runtime boundaries, and documentation sufficiency note. |
 | [CUSTOM-DOMAINS.md](CUSTOM-DOMAINS.md) | Tenant custom-domain setup for the React and accessible frontends. |
 | [FEDERATION_API_MANUAL.md](FEDERATION_API_MANUAL.md) | Plain-English and technical federation API guide. |
 | [FEDERATION_COVERAGE.md](FEDERATION_COVERAGE.md) | Dated federation test coverage snapshot. |
@@ -30,6 +31,12 @@ Historical prompts, one-off audits, dated handoff notes, generated reports, PDF 
 | --- | --- |
 | [CONTRIBUTOR_TERMS_ENFORCEMENT.md](CONTRIBUTOR_TERMS_ENFORCEMENT.md) | How PR gates enforce contributor terms and ownership acknowledgements. |
 
+## Related Public Collateral
+
+| Location | Purpose |
+| --- | --- |
+| [../docs-public/README.md](../docs-public/README.md) | Public announcements, outreach collateral, and dated engine-report snapshots. |
+
 ## Publication Standards
 
 Before adding a document here:
@@ -39,4 +46,9 @@ Before adding a document here:
 - avoid publishing raw prompts, handoffs, scratch plans, generated audit dumps, and exported PDFs;
 - mark dated verification records clearly with the date and command used;
 - prefer current code paths such as `app/`, `database/migrations/`, `routes/api.php`, and `react-frontend/`;
-- move local-only material to `.local-docs-archive/` instead of committing it.
+- list every public document in this index;
+- move local-only material to `.local-docs-archive/` instead of committing it;
+- run `npm run check:docs` before committing documentation changes.
+- run `npm run check:version` after changing release/version labels or public collateral.
+
+The docs hygiene check fails on task-output filenames, oversized docs, non-Markdown files, missing index links, broken local links, stale retired-doc references, old namespace/path references, and obvious secret patterns.

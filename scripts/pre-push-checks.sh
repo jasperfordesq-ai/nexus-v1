@@ -24,9 +24,45 @@ FAIL=0
 
 echo "=== Pre-push validation ==="
 
-# 1. Required env vars documented in .env.example match config/ usage
+# 1. Public docs stay curated and free of task-output junk
 echo ""
-echo "[1/2] Env var documentation check"
+echo "[1/5] Documentation hygiene check"
+if node scripts/check-docs-hygiene.mjs; then
+    echo "  docs hygiene OK"
+else
+    echo "  docs hygiene failed"
+    FAIL=$((FAIL + 1))
+fi
+
+# 2. Platform version references stay in sync
+echo ""
+echo "[2/5] Version consistency check"
+if node scripts/check-version-consistency.mjs; then
+    echo "  version consistency OK"
+else
+    echo "  version consistency failed"
+    FAIL=$((FAIL + 1))
+fi
+
+# 3. Release-relevant work updates CHANGELOG.md
+echo ""
+echo "[3/5] Changelog guard"
+CHANGELOG_ARGS=()
+UPSTREAM_REF="$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || true)"
+if [ -n "$UPSTREAM_REF" ]; then
+    CHANGELOG_ARGS=(--base "$UPSTREAM_REF" --allow-missing-base)
+fi
+
+if node scripts/check-changelog-updated.mjs "${CHANGELOG_ARGS[@]}"; then
+    echo "  changelog guard OK"
+else
+    echo "  changelog guard failed"
+    FAIL=$((FAIL + 1))
+fi
+
+# 4. Required env vars documented in .env.example match config/ usage
+echo ""
+echo "[4/5] Env var documentation check"
 if php scripts/validate-env.php --file=.env.example; then
     echo "  ✓ env vars OK"
 else
@@ -34,10 +70,10 @@ else
     FAIL=$((FAIL + 1))
 fi
 
-# 2. Artisan cache fail-fast (requires running dev container)
+# 5. Artisan cache fail-fast (requires running dev container)
 if [ "${SKIP_ARTISAN:-0}" != "1" ]; then
     echo ""
-    echo "[2/2] Artisan cache fail-fast test"
+    echo "[5/5] Artisan cache fail-fast test"
     if bash scripts/test-artisan-cache.sh; then
         echo "  ✓ artisan cache OK"
     else
@@ -51,7 +87,7 @@ if [ "${SKIP_ARTISAN:-0}" != "1" ]; then
     fi
 else
     echo ""
-    echo "[2/2] Artisan cache test skipped (SKIP_ARTISAN=1)"
+    echo "[5/5] Artisan cache test skipped (SKIP_ARTISAN=1)"
 fi
 
 echo ""

@@ -70,12 +70,39 @@ project-nexus/
 |----------|---------|
 | [react-frontend/CLAUDE.md](react-frontend/CLAUDE.md) | React frontend stack conventions, contexts, hooks, pages |
 | [docs/README.md](docs/README.md) | Public documentation index and publication standards |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Maintained platform architecture map and major runtime boundaries |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deployment guide (public-safe; secrets stay in local env files) |
-| [docs/govuk-alpha/RESEARCH.md](docs/govuk-alpha/RESEARCH.md) | GOV.UK Alpha frontend architecture, official repos, licensing, and branding limits |
+| [docs/govuk-alpha/RESEARCH.md](docs/govuk-alpha/RESEARCH.md) | GOV.UK-based accessible frontend architecture, official repos, licensing, and branding limits |
 | [LARAVEL_MIGRATION_PLAN.md](LARAVEL_MIGRATION_PLAN.md) | Historical Laravel migration record and current backend migration guidance |
-| `BACKUP.md` (private, dev machine only) | Full backup system — private repo for machine transfers (gitignored from public) |
+| `BACKUP.md` (local-only, gitignored) | Full backup system and private backup-remote workflow for machine transfers |
 
 > Note: `docs/` is public documentation. Local prompts, scratch reports, handoffs, and stale generated artifacts belong in `.local-docs-archive/`, which is gitignored. PHP_CONVENTIONS / API_REFERENCE / REGRESSION_PREVENTION / QA_AUDIT_AND_TEST_PLAN / LOCAL_DEV_SETUP have been retired — follow existing code patterns in `app/Services/` and `routes/api.php` instead.
+
+### Documentation Hygiene
+
+`docs/` must stay small, public-safe, and maintained. Do not write routine prompts, plans, handoffs, audit dumps, generated reports, exported PDFs, screenshots, or scratch notes into `docs/`, including `docs/superpowers/plans/`. Put local task output in `.local-docs-archive/` instead.
+
+Every public doc must be Markdown, linked from [docs/README.md](docs/README.md), and pass:
+
+```bash
+npm run check:docs
+```
+
+### Version and Changelog Hygiene
+
+`VERSION` is the canonical platform semantic version. Keep it in sync with `composer.json`, `react-frontend/package.json`, `config/app.php`, `README.md`, `CHANGELOG.md`, `react-frontend/src/config/releaseStatus.ts`, and current public collateral. Verify with:
+
+```bash
+npm run check:version
+```
+
+For every release-relevant change (code, config, scripts, CI, public docs, user-visible behaviour, or release/version metadata), update [CHANGELOG.md](CHANGELOG.md) under `[Unreleased]` before finishing. Then refresh the in-app bundled copy:
+
+```bash
+npm --prefix react-frontend run copy-changelog
+```
+
+If a change genuinely needs no release note, state that explicitly in the final response. Do not silently skip the changelog.
 
 ---
 
@@ -122,7 +149,7 @@ docker compose --profile docker-frontend up -d frontend
 - Check status: `(Get-Service WbioSrvc).Status`
 
 **If "This Windows device" never appears in Chrome's passkey dialog:**
-The NGC folder (`C:\Users\{user}\AppData\Local\Microsoft\Ngc`) must exist — this is where Windows Hello credentials are stored. If it doesn't exist, Windows Hello is NOT enrolled and Chrome has no platform authenticator to offer.
+The NGC folder (`%LOCALAPPDATA%\Microsoft\Ngc`) must exist — this is where Windows Hello credentials are stored. If it doesn't exist, Windows Hello is NOT enrolled and Chrome has no platform authenticator to offer.
 - Diagnostic: `Test-Path "$env:LOCALAPPDATA\Microsoft\Ngc"` — must be `True`
 - Fix: Open Settings > Accounts > Sign-in options > PIN (Windows Hello) and set it up. A regular Windows sign-in PIN is NOT the same as Windows Hello PIN and does NOT support WebAuthn.
 - WbioSrvc stops immediately when no biometric hardware and no NGC credentials exist — this is a symptom of the above, not the cause.
@@ -267,19 +294,19 @@ This project is **publicly released** under AGPL-3.0-or-later at <https://github
 
 See [react-frontend/CLAUDE.md](react-frontend/CLAUDE.md) for full styling rules, contexts, hooks, and component reference.
 
-### Accessible Frontend GOV.UK Alpha
+### Accessible Frontend (GOV.UK-Based)
 
-The accessible frontend is an explicitly approved new UI track that complements, but does not replace, `react-frontend/`. It is the only maintained exception to the React-primary UI rule and is intended for users who benefit from a highly accessible, HTML-first experience.
+The accessible frontend is an explicitly approved UI track that complements, but does not replace, `react-frontend/`. It is the only maintained exception to the React-primary UI rule and is intended for users who benefit from a highly accessible, HTML-first experience. The public-facing track is now Beta; the `GovukAlpha`, `govuk_alpha`, and `/alpha/...` names remain as compatibility code-path names until a deliberate route/namespace migration is done.
 
 - Keep it isolated under root-level `accessible-frontend/`, `app/Http/Controllers/GovukAlpha/`, and `/{tenantSlug}/alpha/...` routes.
 - Preferred public subdomain: `accessible.project-nexus.ie`.
 - Deploy it through the Laravel/PHP blue-green app container, not the React container. Run `npm run build:accessible-frontend`, `npm run test:accessible-frontend:php`, and `npm run test:accessible-frontend:a11y` before deployment.
-- Use official `govuk-frontend` first, currently `govuk-frontend@6.1.0` unless a newer stable version is verified from npm/GitHub.
+- Use official `govuk-frontend` first. The project currently installs `govuk-frontend@6.1.0`; npm latest stable was verified as `6.3.0` on 2026-06-23 and should be upgraded only after a compatibility pass.
 - Use official GOV.UK Frontend markup/classes/Sass/JS with HTML-first progressive enhancement; do not use unofficial React GOV.UK libraries as the foundation.
 - Do not use the GOV.UK crown, GOV.UK logotype, GOV.UK header identity, GDS Transport, or wording that implies this is an official UK government service.
 - Do not use deprecated GOV.UK repos/packages: `govuk_template`, `govuk_elements`, or `govuk_frontend_toolkit`.
 - All user-facing strings must use `lang/en/govuk_alpha.php`.
-- Preserve tenant context, module gates, and AGPL Section 7(b) attribution on every alpha page.
+- Preserve tenant context, module gates, and AGPL Section 7(b) attribution on every accessible frontend page.
 
 See [docs/govuk-alpha/RESEARCH.md](docs/govuk-alpha/RESEARCH.md) for the architecture decision and source list.
 
@@ -297,7 +324,7 @@ No agent may initiate SSH, run `bluegreen-deploy.sh` / `safe-deploy.sh`, or trig
 
 **NEVER push to the `backup` remote (`nexus-v1-backup`) unless the user explicitly tells you to.** The backup repo is private and contains credentials, secrets, and all gitignored files.
 
-See `BACKUP.md` (private, dev machine only) for the full backup system documentation.
+See local-only `BACKUP.md` for the full backup system documentation.
 
 ---
 
@@ -582,19 +609,7 @@ ssh -i "$PROD_SSH_KEY" -o RequestTTY=force "$PROD_SSH_USER@$PROD_SSH_HOST" \
 ```
 
 **Legacy SQL migrations (if needed):**
-```bash
-# Step 1 — SCP the file to the server (from local machine)
-source .secrets.local/deploy.env
-scp -i "$PROD_SSH_KEY" migrations/your_file.sql \
-    "$PROD_SSH_USER@$PROD_SSH_HOST":/opt/nexus-php/migrations/
-
-# Step 2 — Run it (from local machine, one-liner)
-# Reads DB password from .env on the server — never inline credentials
-ssh -i "$PROD_SSH_KEY" -o RequestTTY=force "$PROD_SSH_USER@$PROD_SSH_HOST" \
-    "DB_PASS=\$(sudo grep ^DB_PASS= /opt/nexus-php/.env | cut -d= -f2); \
-     sudo docker exec -i -e MYSQL_PWD=\"\$DB_PASS\" nexus-php-db mariadb -u nexus nexus \
-     < /opt/nexus-php/migrations/your_file.sql; echo EXIT:\$?"
-```
+Use the checked-in wrappers below. Do not publish production hostnames, database credentials, or copied one-off shell snippets in documentation.
 
 **Why `-o RequestTTY=force`?** Sudoers has `use_pty` — sudo refuses without a terminal. `-t` and `-tt` fail when stdin isn't a TTY. `-o RequestTTY=force` is the only flag that works.
 

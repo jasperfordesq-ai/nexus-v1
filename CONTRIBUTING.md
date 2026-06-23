@@ -110,7 +110,33 @@ Copy `.env.example` to `.env` and fill in the required values. **Never commit `.
 
 ### Additional setup notes
 
-The retired `docs/LOCAL_DEV_SETUP.md` file is no longer part of the public documentation. Current local-development commands are maintained in `README.md`, `AGENTS.md`, `compose.yml`, and `package.json`.
+Current local-development commands are maintained in `README.md`, `AGENTS.md`, `compose.yml`, and `package.json`.
+
+### Documentation hygiene
+
+The public `docs/` directory is for maintained reference material only. Do not add raw prompts, handoffs, scratch plans, generated audits, exported PDFs, or one-off reports there. Put local task output in `.local-docs-archive/` instead.
+
+Every new public doc must be linked from `docs/README.md` and pass:
+
+```bash
+npm run check:docs
+```
+
+### Version and changelog hygiene
+
+Project NEXUS keeps the current platform version in `VERSION`. When preparing a release, update `VERSION`, `composer.json`, `react-frontend/package.json`, `config/app.php`, `README.md`, `CHANGELOG.md`, `react-frontend/src/config/releaseStatus.ts`, and current public collateral together, then run:
+
+```bash
+npm run check:version
+```
+
+Every release-relevant contribution should update `CHANGELOG.md` under `[Unreleased]`. After editing the root changelog, refresh the copy served by the React app:
+
+```bash
+npm --prefix react-frontend run copy-changelog
+```
+
+For internal-only changes with no release note, say so in the PR or commit notes.
 
 ---
 
@@ -243,7 +269,7 @@ npm run build     # Production build check
 
 ## Backend Contribution Workflow
 
-The backend is Laravel 12 + PHP 8.2+. Follow existing patterns in `app/Services/`, `app/Http/Controllers/Api/`, Eloquent models, and `routes/api.php`; the old `docs/PHP_CONVENTIONS.md` file has been retired.
+The backend is Laravel 12 + PHP 8.2+. Follow existing patterns in `app/Services/`, `app/Http/Controllers/Api/`, Eloquent models, and `routes/api.php`; old standalone PHP conventions notes have been retired.
 
 ### Namespace conventions
 

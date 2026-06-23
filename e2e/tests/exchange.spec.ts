@@ -10,7 +10,7 @@ import { testUsers, testTenant, selectors } from '../helpers/fixtures';
 /**
  * Exchange Workflow E2E.
  *
- * HONESTY NOTE (see PRODUCTION-READINESS.md §3, journey J1):
+ * HONESTY NOTE (historical production-readiness journey J1):
  * The money-mutating steps below (request / accept / complete / review / decline)
  * were previously written as `if (await button.isVisible()) { ... }` with no
  * `else` branch. On an empty or unseeded database those branches never execute,

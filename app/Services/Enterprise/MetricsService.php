@@ -38,7 +38,7 @@ class MetricsService
         $this->globalTags = [
             'env' => getenv('APP_ENV') ?: 'production',
             'service' => getenv('DD_SERVICE') ?: 'nexus-app',
-            'version' => getenv('APP_VERSION') ?: '1.0.0',
+            'version' => self::platformVersion(),
         ];
 
         if (getenv('DD_TENANT_ID')) {
@@ -56,6 +56,19 @@ class MetricsService
             self::$instance = new self();
         }
         return self::$instance;
+    }
+
+    private static function platformVersion(): string
+    {
+        if (function_exists('config')) {
+            $configuredVersion = config('app.version');
+            if (is_string($configuredVersion) && $configuredVersion !== '') {
+                return $configuredVersion;
+            }
+        }
+
+        $envVersion = getenv('APP_VERSION');
+        return is_string($envVersion) && $envVersion !== '' ? $envVersion : '1.5.2';
     }
 
     /**
