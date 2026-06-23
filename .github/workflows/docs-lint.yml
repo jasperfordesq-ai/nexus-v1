@@ -1,0 +1,67 @@
+name: Docs Lint
+
+# Quality gates for documentation: Markdown structure (markdownlint), the
+# OpenAPI contract (Redocly), and that the MkDocs site still builds.
+# All three are verified to pass on the current tree.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - '*.md'
+      - 'openapi.json'
+      - 'mkdocs.yml'
+      - '.markdownlint-cli2.jsonc'
+      - 'redocly.yaml'
+      - '.github/workflows/docs-lint.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '*.md'
+      - 'openapi.json'
+      - 'mkdocs.yml'
+      - '.markdownlint-cli2.jsonc'
+      - 'redocly.yaml'
+      - '.github/workflows/docs-lint.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  markdownlint:
+    name: Markdown structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: markdownlint-cli2
+        run: npx --yes markdownlint-cli2
+
+  openapi-lint:
+    name: OpenAPI contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Redocly lint (minimal ruleset — fails on spec-validity errors)
+        run: npx --yes @redocly/cli@latest lint openapi.json
+
+  docs-build:
+    name: MkDocs site builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install MkDocs Material
+        run: pip install "mkdocs-material>=9.5" "pymdown-extensions>=10"
+      - name: Stage the OpenAPI contract for the API reference page
+        run: cp openapi.json docs/openapi.json
+      - name: Build site
+        run: mkdocs build

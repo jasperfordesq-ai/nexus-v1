@@ -45,6 +45,7 @@ All tables carry `tenant_id` for row-level tenant isolation. There are no databa
 | `podcast_episode_reports` | Member content reports; `reason`, `details`, `status` (`open`/`resolved`/`dismissed`/`escalated`), `reviewed_by`, `reviewed_at` |
 
 Migrations (in order):
+
 - `database/migrations/2026_06_03_000001_create_podcast_module_tables.php` — core tables
 - `database/migrations/2026_06_03_000002_add_distribution_metadata_to_podcasts.php` — RSS/iTunes metadata columns
 - `database/migrations/2026_06_03_000003_harden_podcast_media_and_moderation.php` — media pipeline columns, subscriptions, reports
@@ -134,6 +135,7 @@ Episodes support two audio storage modes, set at upload time:
 **Media pipeline** (async): when a file is uploaded with `podcasts.enable_media_processing` or `podcasts.enable_media_scanning` enabled, the `ProcessPodcastEpisodeMedia` queue job fires (`app/Jobs/ProcessPodcastEpisodeMedia.php`). It retries up to three times with a 30-second backoff. The current implementation is a provision hook — it marks unscanned media as `scan_unavailable` rather than `clean`, preventing unreviewed audio from being labelled safe. Real scanner and transcoder integrations can be dropped in here. If all retries are exhausted, `media_processing_status` is set to `failed` and a warning is logged.
 
 **Audio delivery** (`GET /v2/podcasts/media/{tenantId}/{episodeId}/audio`):
+
 - Local disk: served as a `BinaryFileResponse` with `Accept-Ranges: bytes` for Range support (seekable in browsers).
 - Cloud disk: redirected to a 10-minute temporary URL via `Storage::disk(...)->temporaryUrl()`. If the driver package is missing (e.g. `league/flysystem-aws-s3-v3` not installed), the route falls back to the in-app proxy rather than 500-ing. This fallback is regression-tested in `tests/Laravel/Feature/Services/PodcastEpisodeAudioUrlFallbackTest.php`.
 - Members-only or private episodes require either an active session or a valid HMAC signature (`?expires=<ts>&signature=<hex>`). Public episodes served through RSS get unsigned URLs so aggregators can fetch without signing.
@@ -150,6 +152,7 @@ Feed URL: `GET /v2/podcasts/{showSlug}/feed.xml`
 Aggregator-stable URL: `GET /v2/podcasts/feed/{tenantId}/{showSlug}.xml`
 
 The feed includes:
+
 - iTunes channel metadata: `<itunes:author>`, `<itunes:owner>`, `<itunes:category>`, `<itunes:image>`, `<itunes:explicit>`, `<copyright>`.
 - `<podcast:funding>` when `funding_url` is set.
 - Per-episode `<enclosure>` (with `length` and `type`), `<itunes:duration>` (HH:MM:SS), `<itunes:episodeType>` (`full`/`trailer`/`bonus`), `<itunes:season>`, `<itunes:episode>`.
@@ -194,6 +197,7 @@ When `podcasts.enable_listen_analytics` is `true` (the default), `POST /v2/podca
 Stored fields are privacy-preserving: IP, user-agent, and session ID are stored only as SHA-256 hashes. No raw PII is retained.
 
 The admin dashboard (`GET /v2/admin/podcasts`) returns aggregate stats:
+
 - Total and completed listen counts, completion rate, unique listener count.
 - Client-family breakdown (browser/app family extracted from user-agent).
 - Retention bucket breakdown (what proportion of episodes listeners completed: 0–25%, 25–50%, 50–75%, 75–100%, 100%+).

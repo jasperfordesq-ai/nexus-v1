@@ -3,9 +3,13 @@
   // Run: npx markdownlint-cli2
   // Style/length rules are relaxed; structural rules (trailing spaces, hard
   // tabs, heading/list spacing, file-end newline) are kept.
+  // Honour .gitignore so local-only files (PRODUCTION-READINESS.md,
+  // SECURITY-POSTURE.md, the archive) are never linted.
+  "gitignore": true,
   "config": {
     "default": true,
     "MD013": false, // line length — prose wraps freely
+    "MD028": false, // blank line between adjacent blockquotes is intentional
     "MD033": false, // inline HTML — used for Mermaid fences, badges, details
     "MD041": false, // first line need not be a top-level heading (notes/frontmatter)
     "MD024": { "siblings_only": true }, // duplicate headings allowed if not siblings
@@ -16,6 +20,8 @@
     "MD036": false, // emphasis used as a pseudo-heading
     "MD040": false, // fenced code language hint optional (ascii/text blocks)
     "MD046": false, // allow both indented and fenced code
+    "MD049": false, // emphasis style (asterisk vs underscore) — not enforced
+    "MD060": false, // table cell padding style — cosmetic
     "MD001": false  // heading levels may skip where it reads better
   },
   "globs": [

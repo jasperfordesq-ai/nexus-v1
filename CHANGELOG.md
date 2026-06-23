@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Greptile code review configuration now lives in the repository.** Automated reviews are guided by the Project NEXUS tenant-isolation, localization, frontend, accessible frontend, security, deployment-boundary and AGPL licensing rules, with tracked context files for lower-noise review comments.
 - **Documentation now covers every module and follows the Diátaxis framework.** Added maintained, code-verified guides for all remaining modules (marketplace, courses, podcasts, blog & resources, social feed, AI chat, ideation & challenges, organisations, monetization, connections & reviews, identity verification) — 24 module guides in total — plus explanation docs for internationalisation ([docs/I18N.md](docs/I18N.md)), the database and migrations ([docs/DATABASE.md](docs/DATABASE.md)), and the CI pipeline ([docs/CI.md](docs/CI.md)), a [RELEASES.md](RELEASES.md) versioning policy, a "How the documentation is organised" Diátaxis index, and a markdownlint configuration.
+- **A hosted documentation site and documentation CI gates.** The docs now build into a searchable MkDocs Material site with an interactive Redoc API reference (deployed to GitHub Pages), and CI gained documentation quality gates: markdownlint (Markdown structure), Redocly (OpenAPI contract validity), and a MkDocs build check.
 
 ## [1.5.3] - 2026-06-23
 

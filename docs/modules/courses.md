@@ -165,6 +165,7 @@ When `credit_cost > 0`, calling `POST /v2/courses/{id}/enroll` triggers `CourseE
 4. If the charge fails (insufficient credits, inactive author, etc.) a `RuntimeException` is thrown, the transaction rolls back (no enrollment row is created), and the controller returns `INSUFFICIENT_CREDITS` (HTTP 422).
 
 Special cases:
+
 - **Zero cost:** `credit_cost = 0` is treated as free — no transfer is made.
 - **Author self-enrolment:** a user enrolling in their own course is never charged regardless of `credit_cost`.
 - **Re-enrolment after dropping:** a dropped learner has already paid once. `enrollWithPayment()` detects the `dropped` row and calls the free `enroll()` path, preserving the "charge exactly once" contract.

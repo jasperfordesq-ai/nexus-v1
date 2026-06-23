@@ -52,15 +52,19 @@ Pull requests are checked automatically. A PR cannot pass the Project NEXUS PR q
 
 1. **Fork** the repository on GitHub: https://github.com/jasperfordesq-ai/nexus-v1
 2. **Clone** your fork:
+
    ```bash
    git clone https://github.com/YOUR_USERNAME/nexus-v1.git
    cd nexus-v1
    ```
+
 3. **Set up the development environment** (see below).
 4. **Create a branch** for your work:
+
    ```bash
    git checkout -b feat/your-feature-name
    ```
+
 5. Make your changes, write tests, and submit a pull request.
 
 ---
@@ -180,6 +184,7 @@ nexus-v1/
 ### Reporting bugs
 
 Open an issue on GitHub with:
+
 - A clear, descriptive title
 - Steps to reproduce
 - Expected vs. actual behaviour

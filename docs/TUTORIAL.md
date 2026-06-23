@@ -251,6 +251,7 @@ git commit -m "docs(features): clarify Beta chip label in public features page"
 ```
 
 Commit message rules:
+
 - Use a prefix: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, or `chore`
 - Keep the subject under 72 characters
 - Use the imperative mood ("Add", "Fix", "Update") — not past tense
@@ -324,6 +325,7 @@ You have completed your first contribution. Here are the best places to go deepe
 | [CONTRIBUTING.md](../CONTRIBUTING.md) | Full contributor guide: workflows, coding standards, tests, AGPL compliance |
 
 Good places to find first issues:
+
 - GitHub Issues labelled `good first issue` or `docs`
 - Translation gaps: run `npm run check:i18n:gaps` to see which strings are missing from non-English locales
 - Test coverage: check for components without a matching `.test.tsx` file and add one

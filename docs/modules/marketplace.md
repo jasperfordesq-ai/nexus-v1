@@ -159,7 +159,7 @@ Three distinct settlement paths exist; be precise about which one applies:
 | **Two buyers race the same item** | Direct purchase locks the listing row and re-checks `status = active` / inventory inside the transaction; the loser gets "no longer available". |
 | **Buyer-confirm races auto-release cron** | Atomic status-predicated completion / escrow release: exactly one caller wins; the loser is a no-op (stats untouched, no second payout). |
 | **Concurrent escrow hold** | `UNIQUE(order_id)` plus an exists-check; a concurrent `holdFunds()` returns the existing escrow. |
-| **Refund vs release race** | `refundEscrow()` claims `held|disputed` atomically; if the escrow already `released`, the refund throws rather than overwriting (prevents paying seller AND refunding buyer). |
+| **Refund vs release race** | `refundEscrow()` claims `held\|disputed` atomically; if the escrow already `released`, the refund throws rather than overwriting (prevents paying seller AND refunding buyer). |
 | **Open dispute at auto-release time** | `processAutoReleases()` marks the escrow `disputed` (conditional on still being `held`) and skips payout. |
 | **Stripe webhook / payment confirm** | `confirmPayment` is idempotent on `stripe_payment_intent_id` (UNIQUE); escrow hold is supplementary — a failed hold is logged but does not unwind a succeeded payment. |
 | **Duplicate pickup reservation / full slot / past slot** | `reserve()` throws typed `DomainException` (`DUPLICATE_RESERVATION`, `SLOT_FULL`, `SLOT_PAST`, `SLOT_INACTIVE`). |
@@ -206,5 +206,3 @@ React: `react-frontend/src/pages/marketplace/*.test.tsx` (e.g. `npm test -- Buye
 - [modules/search.md](search.md) — the `marketplace_listings` Meilisearch index and SQL fallback.
 - [`routes/api.php`](../../routes/api.php) — authoritative endpoint list (do not duplicate here).
 - [ARCHITECTURE.md](../ARCHITECTURE.md) — runtime boundaries.
-</content>
-</invoke>

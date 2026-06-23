@@ -263,6 +263,7 @@ A DB-level unique index on `(user_id, target_type, target_id)` in the `reactions
 `POST /v2/feed/posts/{id}/share` (and the polymorphic `POST /v2/feed/share`) inserts a row into `post_shares`. One share per `(user_id, original_type, original_post_id, tenant_id)`.
 
 `share_count` on feed items comes from two sources:
+
 - For `type = 'post'`: the denormalised `feed_posts.share_count` column (updated by `ShareService`).
 - For all other types: computed on demand by `ShareService::batchShareCount`.
 

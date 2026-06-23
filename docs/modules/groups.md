@@ -145,6 +145,7 @@ Discussions are ordered with pinned ones first, then by descending ID. Listing a
 Only group admins and owners may create, edit, or delete announcements. Members can read them.
 
 Announcements support:
+
 - `is_pinned` — pinned announcements sort to the top.
 - `priority` — integer; higher values appear above lower ones within the same pin bucket.
 - `expires_at` — expired announcements are excluded from the default list response but visible when `include_expired=true`.
@@ -154,6 +155,7 @@ Announcements support:
 Any active member may upload. Admins and the uploader may delete.
 
 Constraints enforced by `GroupFileService`:
+
 - Maximum file size: **25 MB**
 - Allowed MIME types: common images (JPEG, PNG, GIF, WebP), PDF, Word, Excel, PowerPoint, plain text, CSV, Markdown, ZIP, RAR, MP4, WebM, MP3, WAV, OGG
 - SVG is explicitly excluded because inline `<script>` tags in SVG constitute XSS when served inline.

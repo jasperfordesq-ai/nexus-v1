@@ -247,6 +247,7 @@ npm test -- --testPathPattern=ideation
 ```
 
 Key coverage:
+
 - `IdeationChallengesControllerTest` — HTTP-level feature tests for challenge CRUD, idea submission, voting, and auth guards using `DatabaseTransactions`.
 - `IdeationChallengeServiceTest` — unit tests with mocked DB; covers pagination shape, vote toggle, and draft publish path.
 - `ChallengeOutcomeServiceTest` — outcome upsert and dashboard aggregation.

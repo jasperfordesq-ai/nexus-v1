@@ -168,6 +168,7 @@ Typing indicators use a separate path: `POST /api/v2/messages/typing` triggers `
 Pusher channel authorization is handled by `PusherController::auth()` at `/pusher/auth`. The React client fetches Pusher connection credentials from `GET /api/v2/pusher/config`.
 
 The `NotifyMessageReceived` listener runs asynchronously on the queue and sends:
+
 1. An in-app bell notification (`Notification::createNotification`).
 2. An optional HTML email (suppressed if the recipient's `email_messages` notification preference is false).
 3. A push notification via `NotificationDispatcher::fanOutPush()`.
@@ -240,6 +241,7 @@ Federation messaging uses a separate table (`federation_messages`) and service (
 `FederatedMessageService::storeExternalMessage()` is idempotent: if the partner re-delivers a message with the same `external_message_id`, it repairs any missing notification or email side effects without inserting a duplicate row.
 
 Inbound federation messages trigger:
+
 - An in-app bell notification via `Notification::createNotification()`, rendered in the recipient's `preferred_language`.
 - A push notification via `NotificationDispatcher::fanOutPush()`.
 - An email via `FederationEmailService::sendExternalMessageNotification()`.

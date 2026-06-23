@@ -141,10 +141,12 @@ The blog integrates with the shared social layer:
 ### Frontend entry points
 
 React:
+
 - `/blog` → `react-frontend/src/pages/blog/BlogPage.tsx` — category filter tabs, search, cursor-paginated grid.
 - `/blog/:slug` → `react-frontend/src/pages/blog/BlogPostPage.tsx` — full post with comment thread, reactions.
 
 Accessible (GOV.UK) frontend under `/{tenantSlug}/alpha/`:
+
 - `GET /blog` — index (govuk-alpha.blog.index)
 - `GET /blog/feed.xml` — RSS feed (govuk-alpha.blog.feed)
 - `GET /blog/{slug}` — post detail (govuk-alpha.blog.show)
@@ -271,9 +273,11 @@ Resources support the same social layer as blog posts:
 ### Frontend entry points
 
 React:
+
 - `/resources` → `react-frontend/src/pages/resources/ResourcesPage.tsx` — category tree sidebar, search, cursor-paginated list, upload modal (authenticated), download button.
 
 Accessible (GOV.UK) frontend under `/{tenantSlug}/alpha/`:
+
 - `GET /resources` — simple browse (govuk-alpha.resources.index)
 - `GET /resources/library` — full library with category tree, filters, pagination, reorder
 - `GET /resources/upload` / `POST /resources/upload` — upload form (throttled 20/min)
@@ -296,6 +300,7 @@ Routes defined in `routes/govuk-alpha.php` (simple browse) and `routes/govuk-alp
 ## Security invariants
 
 **Blog:**
+
 - All public read endpoints require no auth but are still tenant-scoped via `TenantContext`.
 - Admin write endpoints call `$this->requireAdmin()` before any DB operation.
 - All user-supplied HTML content passes through `HtmlSanitizer::sanitizeCms()` on both write and read of the detail view.
@@ -303,6 +308,7 @@ Routes defined in `routes/govuk-alpha.php` (simple browse) and `routes/govuk-alp
 - Every delete and update confirms `tenant_id` in the `WHERE` clause.
 
 **Resources:**
+
 - Extension + MIME allowlist enforcement prevents disguised executable uploads. SVG is intentionally excluded.
 - All file-system paths are resolved with `realpath()` and verified to be inside the `httpdocs/uploads` directory before read or delete operations.
 - Cryptographically random filenames prevent enumeration of uploaded files.
