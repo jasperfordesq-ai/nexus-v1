@@ -4,46 +4,85 @@ This directory contains the public, maintained documentation for Project NEXUS.
 
 Historical prompts, one-off audits, dated handoff notes, generated reports, PDF exports, and stale planning documents were moved out of `docs/` during the 2026-06-23 cleanup. They remain available locally under `.local-docs-archive/2026-06-23-docs-cleanup/`, which is intentionally ignored by git.
 
+## How the documentation is organised
+
+This documentation follows the [Diátaxis](https://diataxis.fr/) framework — four kinds of documentation, each with a different job:
+
+| Kind | What it's for | Where it lives |
+| --- | --- | --- |
+| **Tutorial** (learning) | A guided, hands-on first experience. | [TUTORIAL.md](TUTORIAL.md) |
+| **How-to guides** (tasks) | Step-by-step recipes for a specific job. | Operations docs below; task sections inside each module guide. |
+| **Reference** (information) | Precise, look-it-up facts. | The [module guides](#module-guides), the [API](API.md) + `openapi.json`, and the architecture/platform docs. |
+| **Explanation** (understanding) | The "why" behind the design. | [ARCHITECTURE.md](ARCHITECTURE.md), [I18N.md](I18N.md), [DATABASE.md](DATABASE.md), [CI.md](CI.md), [GOVERNANCE.md](../GOVERNANCE.md), [DOCUMENTATION.md](DOCUMENTATION.md). |
+
+New to the project? Start with the [tutorial](TUTORIAL.md), then skim [ARCHITECTURE.md](ARCHITECTURE.md), then dive into the [module guide](#module-guides) for whatever you're changing.
+
 ## Getting Started
 
 | Document | Purpose |
 | --- | --- |
 | [TUTORIAL.md](TUTORIAL.md) | Hands-on tutorial: clone, run, make a visible change, verify, and open a pull request. |
 
+## Architecture & Platform
+
+| Document | Purpose |
+| --- | --- |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Maintained platform architecture map, runtime boundaries, and the tenant/feature model. |
+| [API.md](API.md) | API getting-started + the `openapi.json` contract as source of truth. |
+| [I18N.md](I18N.md) | Internationalisation: 11 languages, the recipient-locale rule, and the i18n quality gates. |
+| [DATABASE.md](DATABASE.md) | Database, the two migration systems, the schema dump, and tenant scoping. |
+| [CI.md](CI.md) | The CI pipeline, which checks are blocking, PR gates, and how to run them locally. |
+| [TESTING.md](TESTING.md) | Test-layer meanings, E2E status, and generated-report policy. |
+| [CUSTOM-DOMAINS.md](CUSTOM-DOMAINS.md) | Tenant custom-domain setup for the React and accessible frontends. |
+| [FEDERATION_API_MANUAL.md](FEDERATION_API_MANUAL.md) | Plain-English and technical federation API guide. |
+| [MODULES.md](MODULES.md) | The module map: every module → its code paths and guide. |
+
+## Module Guides
+
+Curated, code-verified reference guides for every live module (`docs/modules/`):
+
+| Guide | Module |
+| --- | --- |
+| [admin](modules/admin.md) | Admin permissions, tenant vs platform super-admin, audit surfaces. |
+| [ai-chat](modules/ai-chat.md) | AI assistant: provider abstraction, tools, privacy boundary with external providers. |
+| [blog-and-resources](modules/blog-and-resources.md) | Blog (posts, comments, RSS/SEO) and the resource library. |
+| [connections-and-reviews](modules/connections-and-reviews.md) | Member connections, member reviews, and skill endorsements. |
+| [courses](modules/courses.md) | Course catalogue, free + time-credit-paid enrolment, lessons, quizzes, certificates. |
+| [events](modules/events.md) | Events, RSVP/waitlists, recurring series, polls, organiser actions. |
+| [gamification](modules/gamification.md) | XP/levels, badges, leaderboards, challenges, NEXUS score, anti-abuse. |
+| [goals-and-impact](modules/goals-and-impact.md) | Goals, check-ins, milestones, community impact metrics, and SROI. |
+| [groups](modules/groups.md) | Public/private groups, roles/permissions, discussions, files, moderation. |
+| [identity-verification](modules/identity-verification.md) | Document/selfie ID verification, the "ID Verified" badge, fee, and privacy. |
+| [ideation-challenges](modules/ideation-challenges.md) | Community challenges, idea submission, voting, and outcomes. |
+| [jobs](modules/jobs.md) | Vacancies, hiring pipeline, alerts, the bias/fairness audit, applicant GDPR. |
+| [listings](modules/listings.md) | Timebanking offers/requests, lifecycle, categories, search indexing. |
+| [marketplace](modules/marketplace.md) | Standalone marketplace with Stripe Connect payments, escrow, and click-and-collect. |
+| [members-and-gdpr](modules/members-and-gdpr.md) | Member directory + GDPR (Article 17 deletion, DSAR export, consent, overdue alarm). |
+| [messaging](modules/messaging.md) | Conversations, attachments/voice, Pusher real-time, broker safeguarding, federation. |
+| [monetization](modules/monetization.md) | Premium subscriptions, merchant coupons, and local advertising. |
+| [notifications](modules/notifications.md) | In-app/email/push channels, the recipient-locale rule, dispatcher flow. |
+| [organisations](modules/organisations.md) | Organisation directory, registration/approval, opportunities, reviews, stats. |
+| [podcasts](modules/podcasts.md) | Shows/episodes, audio hosting, RSS/iTunes feed, scheduled publishing. |
+| [search](modules/search.md) | Meilisearch architecture, indexes, tenant scoping, sync script, fallback. |
+| [social-feed](modules/social-feed.md) | Activity stream, posts, polls (hidden-totals), stories, reactions, ranking. |
+| [volunteering](modules/volunteering.md) | Hour logging, auto-mint approval, certificates, organisation roles, safeguarding. |
+| [wallet-exchanges](modules/wallet-exchanges.md) | Time-credit ledger, transfers, the exchange lifecycle, and money invariants. |
+
 ## Operations
 
 | Document | Purpose |
 | --- | --- |
 | [DEPLOYMENT.md](DEPLOYMENT.md) | Production deployment workflow and blue/green commands. |
-| [RUNBOOK-INCIDENTS.md](RUNBOOK-INCIDENTS.md) | First-response runbook for production incidents. |
+| [RUNBOOK-INCIDENTS.md](RUNBOOK-INCIDENTS.md) | First-response runbook for production incidents, with a post-mortem template. |
 | [MONITORING.md](MONITORING.md) | External uptime checks, alert channels, and response notes. |
-| [SLO.md](SLO.md) | Initial service-level objectives and wired alerting commands. |
+| [SLO.md](SLO.md) | Service-level objectives and wired alerting commands. |
 | [SENTRY.md](SENTRY.md) | Backend and frontend Sentry configuration. |
 | [SECURITY-SCANNING.md](SECURITY-SCANNING.md) | Public-safe scanner interpretation and suppression policy. |
 
-## Platform Features
+## Accessible Frontend
 
 | Document | Purpose |
 | --- | --- |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Maintained platform architecture map, runtime boundaries, and documentation sufficiency note. |
-| [API.md](API.md) | API documentation source-of-truth, OpenAPI contract guidance, and generated-reference policy. |
-| [CUSTOM-DOMAINS.md](CUSTOM-DOMAINS.md) | Tenant custom-domain setup for the React and accessible frontends. |
-| [FEDERATION_API_MANUAL.md](FEDERATION_API_MANUAL.md) | Plain-English and technical federation API guide. |
-| [MODULES.md](MODULES.md) | Module guide map and priorities for deeper module documentation. |
-| [modules/search.md](modules/search.md) | Search module: Meilisearch architecture, indexes, tenant scoping, sync script, and failure modes. |
-| [modules/volunteering.md](modules/volunteering.md) | Volunteering module: hour logging, approval flow, certificates, organisation roles, and failure modes. |
-| [modules/notifications.md](modules/notifications.md) | Notifications and email module: channels, recipient-locale rule, dispatcher flow, push, and failure modes. |
-| [modules/wallet-exchanges.md](modules/wallet-exchanges.md) | Wallet and exchanges module: time-credit ledger, transfer flow, exchange lifecycle, and invariants. |
-| [modules/admin.md](modules/admin.md) | Admin module: permission model, tenant vs platform super-admin, audit surfaces, feature/module configuration, and security invariants. |
-| [modules/members-and-gdpr.md](modules/members-and-gdpr.md) | Member directory plus the GDPR surface: Article 17 deletion, DSAR export, consent records, and the overdue-request alarm. |
-| [modules/goals-and-impact.md](modules/goals-and-impact.md) | Goals and impact module: goal CRUD, check-ins, milestones, templates, buddies, community impact metrics, and SROI calculation (with the corrected transaction-type exclusions). |
-| [modules/listings.md](modules/listings.md) | Listings module: offer/request model, lifecycle (create/moderate/expire/renew), categories, skill tags, search indexing, featured listings, exchange workflow entry point, and failure modes. |
-| [modules/events.md](modules/events.md) | Events module: create/edit/cancel/delete, RSVP and waitlists, recurring series, polls, cover images, online events, organiser check-in, reminders, and failure modes. |
-| [modules/jobs.md](modules/jobs.md) | Jobs / hiring module: posting vacancies, the application and hiring pipeline, interviews and offers, job alerts, syndication feeds, the bias/fairness audit, applicant-data GDPR handling, and CSV exports. |
-| [modules/groups.md](modules/groups.md) | Groups module: public vs private groups, join/approval workflow, roles and permissions, discussions, announcements, file sharing, chatrooms, group events, moderation, and security invariants. |
-| [modules/messaging.md](modules/messaging.md) | Messaging module: conversations, sending/editing/deleting, voice and file attachments, Pusher real-time delivery, broker safeguarding visibility, federation cross-community messaging, and failure modes. |
-| [modules/gamification.md](modules/gamification.md) | Gamification module: XP and levels, badges and achievements, leaderboards, challenges, the NEXUS score, and the XP-award idempotency / anti-abuse mechanism. |
-| [TESTING.md](TESTING.md) | Test-layer meanings, E2E status, and generated-report policy. |
 | [govuk-alpha/RESEARCH.md](govuk-alpha/RESEARCH.md) | Accessible frontend architecture and GOV.UK Frontend constraints. |
 | [govuk-alpha/ATTRIBUTION.md](govuk-alpha/ATTRIBUTION.md) | GOV.UK-related attribution notes. |
 
@@ -54,11 +93,13 @@ Historical prompts, one-off audits, dated handoff notes, generated reports, PDF 
 | [DOCUMENTATION.md](DOCUMENTATION.md) | Documentation architecture, standards, inventory classes, and maintenance workflow. |
 | [CONTRIBUTOR_TERMS_ENFORCEMENT.md](CONTRIBUTOR_TERMS_ENFORCEMENT.md) | How PR gates enforce contributor terms and ownership acknowledgements. |
 
+> Project-level governance, release, and community-health documents live at the repository root: [GOVERNANCE.md](../GOVERNANCE.md), [RELEASES.md](../RELEASES.md), [CONTRIBUTING.md](../CONTRIBUTING.md), [SUPPORT.md](../SUPPORT.md), [SECURITY.md](../SECURITY.md), [CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md).
+
 ## Related Public Collateral
 
 | Location | Purpose |
 | --- | --- |
-| [../docs-public/README.md](../docs-public/README.md) | Public announcements, outreach collateral, and dated engine-report snapshots. |
+| [../docs-public/README.md](../docs-public/README.md) | Public collateral and the prerender observability runbook. |
 
 ## Publication Standards
 

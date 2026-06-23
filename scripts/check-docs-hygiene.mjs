@@ -246,6 +246,7 @@ function checkTrackedRootArtifacts(tracked) {
     'GOVERNANCE.md',
     'LARAVEL_MIGRATION_PLAN.md',
     'README.md',
+    'RELEASES.md',
     'SECURITY.md',
     'SUPPORT.md',
   ]);

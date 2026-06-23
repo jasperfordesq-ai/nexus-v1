@@ -36,6 +36,7 @@ CLAUDE.md
 !SECURITY.md
 !GOVERNANCE.md
 !SUPPORT.md
+!RELEASES.md
 
 # ─── Scripts & Migrations (internal, contain credentials/emails) ──────────────
 /scripts/*

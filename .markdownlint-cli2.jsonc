@@ -1,0 +1,39 @@
+{
+  // Markdown structure linting for maintained documentation.
+  // Run: npx markdownlint-cli2
+  // Style/length rules are relaxed; structural rules (trailing spaces, hard
+  // tabs, heading/list spacing, file-end newline) are kept.
+  "config": {
+    "default": true,
+    "MD013": false, // line length — prose wraps freely
+    "MD033": false, // inline HTML — used for Mermaid fences, badges, details
+    "MD041": false, // first line need not be a top-level heading (notes/frontmatter)
+    "MD024": { "siblings_only": true }, // duplicate headings allowed if not siblings
+    "MD025": false, // allow more than one H1 where intentional
+    "MD026": false, // trailing punctuation in headings
+    "MD029": false, // ordered list numbering style
+    "MD034": false, // bare URLs are sometimes intentional
+    "MD036": false, // emphasis used as a pseudo-heading
+    "MD040": false, // fenced code language hint optional (ascii/text blocks)
+    "MD046": false, // allow both indented and fenced code
+    "MD001": false  // heading levels may skip where it reads better
+  },
+  "globs": [
+    "*.md",
+    "docs/**/*.md",
+    "docs-public/**/*.md"
+  ],
+  "ignores": [
+    "node_modules/**",
+    "**/node_modules/**",
+    "vendor/**",
+    ".local-docs-archive/**",
+    ".heroui-docs/**",
+    "react-frontend/**",
+    "accessible-frontend/**",
+    "mobile/**",
+    "e2e/**",
+    "tests/**",
+    "CHANGELOG.md"
+  ]
+}
