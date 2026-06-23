@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.3] - 2026-06-23
+
 ### Added
 
 - **Documentation, version, and changelog governance is now enforced.** A root `VERSION` file records the platform version, `npm run check:version` keeps Composer, React package metadata, Laravel config, README, release status, changelog links, and current public collateral in sync, and `npm run check:changelog` catches release-relevant work that forgets to update `CHANGELOG.md`.
@@ -1107,7 +1109,8 @@ For the people behind the project, see [CONTRIBUTORS.md](CONTRIBUTORS.md) — th
 
 ---
 
-[Unreleased]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.2...HEAD
+[Unreleased]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.3...HEAD
+[1.5.3]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.0-rc.1...v1.5.0
