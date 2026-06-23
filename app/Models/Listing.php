@@ -66,6 +66,7 @@ class Listing extends Model
         'direct_messaging_disabled' => 'boolean',
         'exchange_workflow_required' => 'boolean',
         'is_featured' => 'boolean',
+        'expires_at' => 'datetime',
         'renewed_at' => 'datetime',
         'featured_until' => 'datetime',
         'reviewed_at' => 'datetime',
