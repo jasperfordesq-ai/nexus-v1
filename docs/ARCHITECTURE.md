@@ -9,23 +9,31 @@ This document is the maintained architecture map for Project NEXUS. It is intent
 
 Project NEXUS is a multi-tenant community platform for timebanking and adjacent community-exchange workflows. The production system is a Laravel 12 API/backend, a React 19 primary frontend, an HTML-first accessible frontend, MariaDB, Redis, Meilisearch, Pusher, Firebase Cloud Messaging, and supporting deployment/observability tooling.
 
-```text
-Users and admins
-  |
-  +-- React SPA at app.project-nexus.ie
-  |     |
-  |     +-- Laravel API routes in routes/api.php
-  |
-  +-- Accessible HTML frontend at accessible.project-nexus.ie
-        |
-        +-- Laravel controllers under app/Http/Controllers/GovukAlpha/
+```mermaid
+flowchart TD
+    subgraph Clients
+        U[Members & admins]
+        M[Mobile PWA / native wrapper]
+    end
+    U -->|app.project-nexus.ie| RC[React 19 SPA<br/>react-frontend/]
+    U -->|accessible.project-nexus.ie| AC[Accessible HTML frontend<br/>accessible-frontend/]
+    M --> RC
 
-Laravel 12 application
-  |
-  +-- Eloquent models and services under app/
-  +-- Tenant context, middleware, auth, feature gates
-  +-- MariaDB 10.11, Redis 7, Meilisearch, Pusher, FCM
-  +-- Blue/green deployment on Apache/Plesk/Azure
+    RC -->|JSON / Bearer + CSRF| API[Laravel 12 API<br/>routes/api.php]
+    AC --> GC[GovukAlpha controllers<br/>app/Http/Controllers/GovukAlpha]
+    GC --> API
+
+    API --> SVC[Domain services<br/>app/Services]
+    SVC --> DB[(MariaDB 10.11)]
+    SVC --> RED[(Redis 7)]
+    SVC --> MEI[(Meilisearch)]
+    SVC --> PUSH[Pusher WebSockets]
+    SVC --> FCM[Firebase Cloud Messaging]
+
+    subgraph Deployment
+        BG[Blue/green switch<br/>scripts/deploy]
+    end
+    BG -.atomic Apache route swap.-> API
 ```
 
 ## Runtime Boundaries

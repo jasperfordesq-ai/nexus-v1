@@ -31,7 +31,7 @@ This software is informed by and builds upon a social impact study commissioned 
 
 ## Machine-Readable Format
 
-For programmatic access, see [contributors.json](contributors.json).
+For programmatic access, see [`react-frontend/src/data/contributors.json`](react-frontend/src/data/contributors.json) — the canonical source the About page renders from (mirrored at the repository root as `contributors.json`).
 
 ## Attribution Requirements
 

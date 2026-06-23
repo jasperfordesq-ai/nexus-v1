@@ -1,0 +1,14 @@
+# Project NEXUS funding configuration.
+# GitHub renders a "Sponsor" button from this file. Fill in the channels you use.
+#
+# To enable GitHub Sponsors, uncomment and set your username:
+# github: [jasperfordesq-ai]
+#
+# Other supported platforms (uncomment as needed):
+# open_collective: project-nexus
+# ko_fi: your-handle
+# liberapay: your-handle
+
+# Custom funding links (the originating community CLG):
+custom:
+  - "https://hour-timebank.ie"

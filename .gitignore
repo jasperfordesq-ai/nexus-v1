@@ -22,6 +22,7 @@ composer.phar
 
 # ─── AI Assistant Config (contains sensitive project context) ─────────────────
 CLAUDE.md
+!accessible-frontend/CLAUDE.md
 .agent/
 .claude/
 
@@ -33,7 +34,8 @@ CLAUDE.md
 !CHANGELOG.md
 !CODE_OF_CONDUCT.md
 !SECURITY.md
-!OPEN_SOURCE_ANNOUNCEMENT_EMAIL.md
+!GOVERNANCE.md
+!SUPPORT.md
 
 # ─── Scripts & Migrations (internal, contain credentials/emails) ──────────────
 /scripts/*

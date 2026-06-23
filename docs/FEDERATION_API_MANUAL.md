@@ -179,15 +179,24 @@ Returns a 1-hour JWT. `sub` = partner_id, verified against `federation_api_keys`
 
 ### Webhooks (outbound — NEXUS notifying partners)
 
-Triggered by domain events. Queued via `ShouldQueue` listeners:
+Triggered by domain events. Queued via `ShouldQueue` listeners. The authoritative event→listener wiring lives in `app/Providers/EventServiceProvider.php`:
 
-| Event | Listener |
-|-------|----------|
-| `ExchangeRated` | `PushFederatedReviewToPartners` |
-| `TransactionCompleted` | `PushFederatedTransactionToPartners` |
-| `MessageSent` | `PushFederatedMessageToPartners` |
-| `ListingPublished` | `SyncListingToFederationPartners` |
-| `UserVerified` | `BroadcastVerifiedUserToPartners` |
+| Event | Outbound listener |
+|-------|-------------------|
+| `ListingCreated`, `ListingUpdated` | `PushListingToFederatedPartners` |
+| `TransactionCompleted` | `PushTransactionToFederatedPartner` |
+| `MessageSent` | `PushMessageToFederatedPartner` |
+| `ReviewCreated` | `PushReviewToFederatedPartner` |
+| `ConnectionAccepted` | `PushConnectionAcceptedToFederatedPartner` |
+| `CommunityEventCreated`, `CommunityEventUpdated` | `PushCommunityEventToFederatedPartners` |
+| `GroupCreated`, `GroupUpdated` | `PushGroupToFederatedPartners` |
+| `GroupMemberJoined` | `PushGroupMembershipToFederatedPartners` |
+| `GroupDeleted`, `GroupMemberLeft` | `PushGroupRetractionToFederatedPartners` |
+| `VolunteerOpportunityCreated`, `VolunteerOpportunityUpdated` | `PushVolunteerOpportunityToFederatedPartners` |
+| `MemberProfileUpdated` | `PushMemberProfileUpdateToFederatedPartners` |
+| `UserFederatedOptOut` | `PushFederationDataRetraction` (retracts previously shared data) |
+
+Inbound federation events are handled by the matching `HandleFederated*` / `IngestFederated*` listeners (e.g. `FederatedReviewReceived` → `HandleFederatedReviewReceived`, `FederatedListingReceived` → `HandleFederatedListingReceived`).
 
 Outbound webhook request:
 
@@ -250,11 +259,12 @@ Federated ratings written to `exchange_ratings.is_federated = 1` with `receiver_
 
 ### Related documentation
 
-- [FEDERATION_COVERAGE.md](FEDERATION_COVERAGE.md) - dated feature matrix by protocol.
+- `app/Providers/EventServiceProvider.php` - authoritative event→listener wiring (source of truth for the webhook table above).
 - `routes/api.php` - registered federation routes.
 - `app/Services/FederationExternalApiClient.php` - outbound federation client.
+- `app/Core/FederationApiMiddleware.php` - inbound authentication (API key / HMAC / JWT) and `generateSigningSecret()`.
 - `tests/Laravel/Feature/Federation*Test.php` - per-protocol integration tests.
 
 ---
 
-Document version: 1.0. Last reviewed: 2026-04-13.
+Document version: 1.1. Last reviewed: 2026-06-23.

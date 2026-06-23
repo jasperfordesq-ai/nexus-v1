@@ -177,6 +177,18 @@ These routes existed in the legacy PHP frontend but **no longer exist** in React
 | `/dashboard/notifications` | `/dashboard` (single page, no sub-routes) |
 | `/wallet/transfer` | `/wallet` (modal on same page) |
 
+## Legacy → React selector patterns
+
+When porting an older spec that still targets legacy PHP markup, translate the selectors to the React + HeroUI equivalents (prefer semantic/role/aria selectors over CSS classes):
+
+| Legacy PHP | React + HeroUI |
+|------------|----------------|
+| `.stat-card` | `[data-testid="stat-card"]` or `.grid > div` |
+| `.sidebar` | `nav[aria-label="Admin"]` or `aside` |
+| `.btn-primary` | `button[color="primary"]` or HeroUI Button classes |
+| `.form-control` | `input`, `textarea`, or HeroUI Input classes |
+| `.alert-success` | `[role="alert"]`, `.toast`, or HeroUI Alert |
+
 ## Testing Notes
 
 1. **Always use `tenantUrl()` helper** for navigation in tests

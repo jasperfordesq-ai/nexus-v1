@@ -1,8 +1,36 @@
 # Project NEXUS
 
+[![CI](https://img.shields.io/github/actions/workflow/status/jasperfordesq-ai/nexus-v1/ci.yml?branch=main&label=CI&logo=github)](https://github.com/jasperfordesq-ai/nexus-v1/actions/workflows/ci.yml)
+[![Security scan](https://img.shields.io/github/actions/workflow/status/jasperfordesq-ai/nexus-v1/security-scan.yml?branch=main&label=security%20scan&logo=github)](https://github.com/jasperfordesq-ai/nexus-v1/actions/workflows/security-scan.yml)
+[![License: AGPL v3](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-1.5.2-success.svg)](CHANGELOG.md)
+[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4.svg?logo=php&logoColor=white)](composer.json)
+[![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20.svg?logo=laravel&logoColor=white)](composer.json)
+[![React](https://img.shields.io/badge/React-19-61DAFB.svg?logo=react&logoColor=black)](react-frontend/package.json)
+
+> 🌐 **Live demo** — see the platform running in production: the [React frontend](https://app.project-nexus.ie) (primary UI) and the [accessible HTML-first frontend](https://accessible.project-nexus.ie). The PHP API is served from `https://api.project-nexus.ie`.
+
 > **Version 1.5.2 — Generally Available** — Project NEXUS V1.5.2 is generally available and in active production use. The platform runs on Laravel 12 + PHP 8.2+ with a React 19 frontend. It is currently in use by communities in **Ireland** and being evaluated by communities in the **United Kingdom**, **Spain**, **Switzerland**, and the **United States**. Newer modules may still ship with their own per-module maturity label (Beta / Preview). Contributions and feedback are welcome.
 
 A modern, multi-tenant community time banking platform built with Laravel 12 + PHP 8.2+, React 19, and MariaDB.
+
+## Contents
+
+- [What is Time Banking?](#what-is-time-banking)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Repository Topology](#repository-topology)
+- [Quick Start](#quick-start)
+- [Database Setup](#database-setup)
+- [Project Status](#project-status)
+- [Quality, Security, and Releases](#quality-security-and-releases)
+- [Documentation](#documentation)
+- [Contributing & Support](#contributing--support)
+- [Credits and Origins](#credits-and-origins)
+- [License](#license)
+- [UI Attribution Requirement](#ui-attribution-requirement)
+- [Related Projects](#related-projects)
 
 ## What is Time Banking?
 
@@ -45,6 +73,39 @@ Time banking is a community-based system where members exchange services using t
 | **Animations** | CSS transitions via a local motion shim (no framer-motion) |
 | **Charts** | Recharts |
 | **Rich Text** | Lexical |
+
+## Architecture
+
+Project NEXUS is a multi-tenant Laravel 12 API with two frontends (a React 19 SPA and an HTML-first accessible frontend), backed by MariaDB, Redis, and Meilisearch, and deployed with a zero-downtime blue/green container switch.
+
+```mermaid
+flowchart TD
+    subgraph Clients
+        U[Members & admins]
+        M[Mobile PWA / native wrapper]
+    end
+    U -->|app.project-nexus.ie| RC[React 19 SPA]
+    U -->|accessible.project-nexus.ie| AC[Accessible HTML frontend]
+    M --> RC
+
+    RC -->|JSON / Bearer + CSRF| API[Laravel 12 API<br/>routes/api.php]
+    AC --> GC[GovukAlpha controllers<br/>app/Http/Controllers/GovukAlpha]
+    GC --> API
+
+    API --> SVC[Domain services<br/>app/Services]
+    SVC --> DB[(MariaDB 10.11)]
+    SVC --> RED[(Redis 7)]
+    SVC --> MEI[(Meilisearch)]
+    SVC --> PUSH[Pusher WebSockets]
+    SVC --> FCM[Firebase Cloud Messaging]
+
+    subgraph Deployment
+        BG[Blue/green switch<br/>scripts/deploy]
+    end
+    BG -.atomic Apache route swap.-> API
+```
+
+The full architecture map — runtime boundaries, tenant/feature model, and cross-cutting requirements — is in **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
 
 ## Repository Topology
 
@@ -129,6 +190,27 @@ We welcome contributors who are comfortable working with a modern Laravel + Reac
 - Dependency updates are managed by Dependabot for Composer, npm, Docker, and GitHub Actions.
 - Pull requests run dependency review, CI, security scanning, i18n drift checks, SPDX checks, E2E smoke tests, and accessibility checks.
 - GitHub Releases are created from version tags; see [.github/RELEASE_PROCESS.md](.github/RELEASE_PROCESS.md).
+
+## Documentation
+
+Maintained documentation starts at **[docs/README.md](docs/README.md)** and follows the standards in [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) (Diátaxis, Google/GitLab style, OpenAPI-first).
+
+| Area | Start here |
+|------|-----------|
+| **Architecture** | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
+| **API** | [docs/API.md](docs/API.md) (contract: [`openapi.json`](openapi.json)) |
+| **Deployment & operations** | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/RUNBOOK-INCIDENTS.md](docs/RUNBOOK-INCIDENTS.md) |
+| **Module guides** | [docs/MODULES.md](docs/MODULES.md) |
+| **Frontend conventions** | [react-frontend/CLAUDE.md](react-frontend/CLAUDE.md) |
+| **Accessible frontend** | [docs/govuk-alpha/RESEARCH.md](docs/govuk-alpha/RESEARCH.md) |
+
+## Contributing & Support
+
+- **Contributing** — start with [CONTRIBUTING.md](CONTRIBUTING.md) (environment setup, workflow, coding standards, SPDX headers) and the [CONTRIBUTOR_TERMS.md](CONTRIBUTOR_TERMS.md).
+- **Project governance** — how the project is maintained and decisions are made: [GOVERNANCE.md](GOVERNANCE.md).
+- **Code of conduct** — [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- **Getting help** — [SUPPORT.md](SUPPORT.md) explains where to ask questions, report bugs, and request features.
+- **Security** — report vulnerabilities privately via [SECURITY.md](SECURITY.md).
 
 ## Credits and Origins
 

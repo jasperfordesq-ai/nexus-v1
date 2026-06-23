@@ -128,7 +128,7 @@ Prefer the shared wrappers in `components/ui` for app screens:
 - Direct `heroui-native` primitives for dense compound layouts where the wrapper would fight the native component anatomy
 - Native React Native primitives for layout, lists, media, maps, gesture surfaces, and platform APIs
 
-See `docs/HEROUI_NATIVE_PARITY_AUDIT.md` and `docs/HEROUI_NATIVE_MIGRATION_NOTES.md` for the current parity matrix, intentional native-touch exceptions, and verification log.
+See `docs/WRAPPER_POLICY.md` for the wrapper-vs-primitive policy and locale guide, and `docs/HEROUI_NATIVE_PARITY_AUDIT.md` for the current parity matrix.
 
 ### Auth Flow
 

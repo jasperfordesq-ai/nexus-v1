@@ -468,7 +468,9 @@ Husky hooks run automatically:
 - **Pre-commit** (`lint-staged`): ESLint + `tsc --noEmit` on staged `.ts`/`.tsx` files.
 - **Pre-push**: Full `tsc --noEmit` + production build check.
 
-Do not skip hooks with `--no-verify` unless you have a specific, documented reason.
+As a contributor, do not bypass these hooks with `--no-verify`. Your pull request is re-checked by CI regardless, so a local bypass only delays the failure rather than avoiding it.
+
+The one documented exception is when a commit is blocked **solely by a pre-existing** lint or type error in files your change does not touch. In that case you may bypass the hook for that commit and explain why in the pull-request description. If you can fix the pre-existing failure cleanly in its own commit, prefer that. (Project maintainers follow the same documented-exception rule when clearing pre-existing failures on `main`.)
 
 ---
 

@@ -168,7 +168,7 @@ All pages use `usePageTitle()` and are feature/module gated in `App.tsx`:
 |------|-------|------|
 | Dashboard | `/dashboard` | Module: `dashboard` |
 | Listings | `/listings`, `/listings/:id` | Module: `listings` |
-| Create Listing | `/listings/new`, `/listings/:id/edit` | Module: `listings` |
+| Create Listing | `/listings/create`, `/listings/edit/:id` | Module: `listings` |
 | Messages | `/messages`, `/messages/:id` | Module: `messages` |
 | Wallet | `/wallet` | Module: `wallet` |
 | Feed | `/feed` | Module: `feed` |

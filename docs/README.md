@@ -23,8 +23,13 @@ Historical prompts, one-off audits, dated handoff notes, generated reports, PDF 
 | [API.md](API.md) | API documentation source-of-truth, OpenAPI contract guidance, and generated-reference policy. |
 | [CUSTOM-DOMAINS.md](CUSTOM-DOMAINS.md) | Tenant custom-domain setup for the React and accessible frontends. |
 | [FEDERATION_API_MANUAL.md](FEDERATION_API_MANUAL.md) | Plain-English and technical federation API guide. |
-| [FEDERATION_COVERAGE.md](FEDERATION_COVERAGE.md) | Dated federation test coverage snapshot. |
 | [MODULES.md](MODULES.md) | Module guide map and priorities for deeper module documentation. |
+| [modules/search.md](modules/search.md) | Search module: Meilisearch architecture, indexes, tenant scoping, sync script, and failure modes. |
+| [modules/volunteering.md](modules/volunteering.md) | Volunteering module: hour logging, approval flow, certificates, organisation roles, and failure modes. |
+| [modules/notifications.md](modules/notifications.md) | Notifications and email module: channels, recipient-locale rule, dispatcher flow, push, and failure modes. |
+| [modules/wallet-exchanges.md](modules/wallet-exchanges.md) | Wallet and exchanges module: time-credit ledger, transfer flow, exchange lifecycle, and invariants. |
+| [modules/admin.md](modules/admin.md) | Admin module: permission model, tenant vs platform super-admin, audit surfaces, feature/module configuration, and security invariants. |
+| [modules/members-and-gdpr.md](modules/members-and-gdpr.md) | Member directory plus the GDPR surface: Article 17 deletion, DSAR export, consent records, and the overdue-request alarm. |
 | [TESTING.md](TESTING.md) | Test-layer meanings, E2E status, and generated-report policy. |
 | [govuk-alpha/RESEARCH.md](govuk-alpha/RESEARCH.md) | Accessible frontend architecture and GOV.UK Frontend constraints. |
 | [govuk-alpha/ATTRIBUTION.md](govuk-alpha/ATTRIBUTION.md) | GOV.UK-related attribution notes. |

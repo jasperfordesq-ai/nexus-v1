@@ -47,3 +47,15 @@ Use these states mentally when reviewing locale work:
 
 - Admin namespaces (`admin.json`, `admin_nav.json`, `admin_dashboard.json`, `super_admin.json`) are included in translation like all other namespaces.
 - Irish (`ga`) uses the OpenAI path when `OPENAI_API_KEY` is available because DeepL does not support Irish.
+
+## Acceptable residual English
+
+When a gap report flags an admin-namespace value that is identical to English, do not treat it as a missing translation if it falls into one of these categories — they are expected, review-safe residues, not blockers:
+
+- **Format placeholders and units** — e.g. `{{value}} ms`, `{{count}}h`, `{{value}}/min`, `#{{id}}`.
+- **Sample data** — example emails, phone numbers, postal codes, placeholder domains.
+- **Punctuation and symbols** — em dashes, `#`, infinity signs, suffix punctuation.
+- **Proper nouns and technical identifiers** — Project NEXUS, OpenAI, Redis, Docker, cPanel, OAuth, GDPR, FADP, JSON/API labels, social-network names, currency labels, protocol names, and civic terms such as Age-Stiftung, Spitex, Vereine, Kanton, Gemeinden.
+- **Accepted same-spelling or loanword terms** in the target language (especially German, French, Dutch, Polish) — e.g. Status, Blog, Admin, Partner, Dashboard, Action, Date, Agent, Module, Contact, Plan, Type, Marketing, Webhook, Cache.
+
+Only treat an exact-English match as a blocker when it is user-facing prose or a label not covered above.
