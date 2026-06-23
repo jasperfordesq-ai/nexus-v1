@@ -113,7 +113,8 @@ class SkillTaxonomyServiceTest extends TestCase
 
     public function test_removeSkill_returns_false_when_not_found(): void
     {
-        DB::shouldReceive('table->where->where->delete')->andReturn(0);
+        // removeSkill scopes by id, user_id AND tenant_id → three where() calls.
+        DB::shouldReceive('table->where->where->where->delete')->andReturn(0);
 
         $result = $this->service->removeSkill(1, 999);
         $this->assertFalse($result);

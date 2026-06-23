@@ -56,16 +56,22 @@ class UpdateFeedOnListingCreatedTest extends TestCase
         $event = new ListingCreated($listing, $user, 2);
 
         $feedMock = $this->feedMock;
-        $feedMock->shouldReceive('create')
+        // The listener calls FeedActivity::firstOrCreate($keys, $values) for
+        // idempotency on the (tenant_id, source_type, source_id) unique key.
+        $feedMock->shouldReceive('firstOrCreate')
             ->once()
-            ->with(Mockery::on(function ($data) {
-                return $data['tenant_id'] === 2
-                    && $data['source_type'] === 'listing'
-                    && $data['source_id'] === 100
-                    && $data['user_id'] === 42
-                    && $data['title'] === 'Guitar Lessons'
-                    && $data['is_visible'] === true;
-            }));
+            ->with(
+                Mockery::on(function ($keys) {
+                    return $keys['tenant_id'] === 2
+                        && $keys['source_type'] === 'listing'
+                        && $keys['source_id'] === 100;
+                }),
+                Mockery::on(function ($values) {
+                    return $values['user_id'] === 42
+                        && $values['title'] === 'Guitar Lessons'
+                        && $values['is_visible'] === true;
+                })
+            );
 
         $listener = new UpdateFeedOnListingCreated();
         $listener->handle($event);
@@ -84,11 +90,14 @@ class UpdateFeedOnListingCreatedTest extends TestCase
         $event = new ListingCreated($listing, $user, 2);
 
         $feedMock = $this->feedMock;
-        $feedMock->shouldReceive('create')
+        $feedMock->shouldReceive('firstOrCreate')
             ->once()
-            ->with(Mockery::on(function ($data) {
-                return $data['title'] === 'New Listing';
-            }));
+            ->with(
+                Mockery::type('array'),
+                Mockery::on(function ($values) {
+                    return $values['title'] === 'New Listing';
+                })
+            );
 
         $listener = new UpdateFeedOnListingCreated();
         $listener->handle($event);
@@ -105,7 +114,7 @@ class UpdateFeedOnListingCreatedTest extends TestCase
         $event = new ListingCreated($listing, $user, 2);
 
         $feedMock = $this->feedMock;
-        $feedMock->shouldReceive('create')
+        $feedMock->shouldReceive('firstOrCreate')
             ->andThrow(new \RuntimeException('DB error'));
 
         Log::shouldReceive('error')

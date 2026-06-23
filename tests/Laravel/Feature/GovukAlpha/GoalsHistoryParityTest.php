@@ -12,6 +12,7 @@ use App\Services\GoalCheckinService;
 use App\Services\GoalService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -219,39 +220,31 @@ class GoalsHistoryParityTest extends TestCase
 
     public function test_goals_history_404_for_cross_tenant_goal(): void
     {
-        // Create a goal under a different tenant ID so the tenant-scoped
-        // GoalService::getById() returns null — same 404 as missing goal.
+        // Insert a goal owned by a DIFFERENT tenant directly, with an explicit
+        // tenant_id, so the row is guaranteed to carry the foreign tenant
+        // regardless of TenantContext juggling inside the test harness. The
+        // accessible goals-history route is tenant-scoped (GoalService::getById
+        // applies the tenant global scope), so it must 404 — it must never leak
+        // another tenant's goal.
         $otherTenantId = $this->testTenantId === 2 ? 1 : 2;
 
-        TenantContext::reset();
-        TenantContext::setById($otherTenantId);
-
-        $otherOwner = User::factory()->forTenant($otherTenantId)->create([
-            'status'      => 'active',
-            'is_approved' => true,
+        $crossGoalId = DB::table('goals')->insertGetId([
+            'tenant_id'     => $otherTenantId,
+            'user_id'       => 999000 + $otherTenantId,
+            'title'         => 'Cross-tenant Goal',
+            'is_public'     => 1,
+            'status'        => 'active',
+            'current_value' => 0,
+            'target_value'  => 10,
+            'created_at'    => now(),
+            'updated_at'    => now(),
         ]);
 
-        $crossGoal = null;
-        try {
-            $crossGoal = app(GoalService::class)->create($otherOwner->id, [
-                'title'        => 'Cross-tenant Goal',
-                'target_value' => 10,
-            ]);
-        } catch (\Throwable $e) {
-            // If tenant 1 doesn't exist in test DB, skip gracefully
-        }
-
-        // Switch back to the test tenant and authenticate normally
         TenantContext::reset();
         TenantContext::setById($this->testTenantId);
         $this->authenticatedUser(['name' => 'Cross Tenant Viewer']);
 
-        if ($crossGoal !== null) {
-            $this->get("/{$this->testTenantSlug}/alpha/goals/{$crossGoal->id}/history")
-                ->assertStatus(404);
-        } else {
-            $this->get("/{$this->testTenantSlug}/alpha/goals/99999802/history")
-                ->assertStatus(404);
-        }
+        $this->get("/{$this->testTenantSlug}/alpha/goals/{$crossGoalId}/history")
+            ->assertStatus(404);
     }
 }
