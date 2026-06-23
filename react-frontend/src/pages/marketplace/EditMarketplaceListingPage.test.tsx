@@ -1,0 +1,358 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { createMockContexts } from '@/test/mock-contexts';
+import React from 'react';
+
+// ─── Mock api ────────────────────────────────────────────────────────────────
+const { mockApi, stableTenantPath, stableT } = vi.hoisted(() => ({
+  mockApi: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    patch: vi.fn(),
+    delete: vi.fn(),
+    download: vi.fn(),
+    upload: vi.fn(),
+  },
+  // Stable function references — prevents effect re-runs from identity changes
+  stableTenantPath: (p: string) => `/test${p}`,
+  stableT: (key: string) => key,
+}));
+
+vi.mock('@/lib/api', () => ({
+  api: mockApi,
+  default: mockApi,
+}));
+
+vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
+
+// ─── Stable i18n — prevents t() reference churn in useEffect deps ────────────
+vi.mock('react-i18next', async (importOriginal) => {
+  const orig = await importOriginal<typeof import('react-i18next')>();
+  return {
+    ...orig,
+    useTranslation: () => ({
+      t: stableT,
+      i18n: { changeLanguage: vi.fn(), language: 'en' },
+    }),
+    Trans: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  };
+});
+
+// ─── Toast / Auth / Tenant ───────────────────────────────────────────────────
+const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn(), showToast: vi.fn() };
+const mockNavigate = vi.fn();
+
+vi.mock('react-router-dom', async (importOriginal) => {
+  const orig = await importOriginal<typeof import('react-router-dom')>();
+  return {
+    ...orig,
+    useNavigate: () => mockNavigate,
+    useParams: () => ({ id: '77' }),
+  };
+});
+
+vi.mock('@/contexts', () =>
+  createMockContexts({
+    useAuth: () => ({
+      user: { id: 10, name: 'Alice Owner' },
+      isAuthenticated: true,
+      login: vi.fn(),
+      logout: vi.fn(),
+      register: vi.fn(),
+      updateUser: vi.fn(),
+      refreshUser: vi.fn(),
+      status: 'idle' as const,
+      error: null,
+    }),
+    useToast: () => mockToast,
+    useTenant: () => ({
+      tenant: { id: 2, name: 'Test', slug: 'test' },
+      tenantPath: stableTenantPath,
+      hasFeature: vi.fn(() => true),
+      hasModule: vi.fn(() => true),
+      branding: { name: 'Test Platform' },
+    }),
+  })
+);
+
+vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
+vi.mock('@/hooks/usePageTitle', () => ({ usePageTitle: vi.fn() }));
+
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
+
+vi.mock('@/components/feedback', () => ({
+  EmptyState: ({ title, description }: { title: string; description?: string }) => (
+    <div data-testid="empty-state">{title}{description && <p>{description}</p>}</div>
+  ),
+}));
+
+// Stub heavy location/map components
+vi.mock('@/components/location', () => ({
+  PlaceAutocompleteInput: ({ label, value, onChange }: { label?: string; value?: string; onChange?: (v: string) => void }) => (
+    <input
+      aria-label={label ?? 'location'}
+      value={value ?? ''}
+      onChange={(e) => onChange?.(e.target.value)}
+    />
+  ),
+}));
+
+// Stub HeroUI components that can infinite-loop
+vi.mock('@/components/ui', async (importOriginal) => {
+  const orig = await importOriginal<typeof import('@/components/ui')>();
+  return {
+    ...orig,
+    Select: ({ children, label, onSelectionChange, selectedKeys }: {
+      children?: React.ReactNode;
+      label?: string;
+      onSelectionChange?: (keys: Set<string>) => void;
+      selectedKeys?: string[];
+    }) => (
+      <select
+        aria-label={label ?? 'select'}
+        value={selectedKeys?.[0] ?? ''}
+        onChange={(e) => onSelectionChange?.(new Set([e.target.value]))}
+      >
+        {children}
+      </select>
+    ),
+    SelectItem: ({ children, id }: { children?: React.ReactNode; id?: string }) => (
+      <option value={id ?? ''}>{children}</option>
+    ),
+    Switch: ({ children, isSelected, onValueChange }: {
+      children?: React.ReactNode;
+      isSelected?: boolean;
+      onValueChange?: (v: boolean) => void;
+    }) => (
+      <label>
+        <input
+          type="checkbox"
+          checked={isSelected ?? false}
+          onChange={(e) => onValueChange?.(e.target.checked)}
+        />
+        {children}
+      </label>
+    ),
+    RadioGroup: ({ children, label }: { children?: React.ReactNode; label?: string }) => (
+      <fieldset aria-label={label ?? 'radio group'}>{children}</fieldset>
+    ),
+    Radio: ({ children, value }: { children?: React.ReactNode; value?: string }) => (
+      <label><input type="radio" value={value ?? ''} readOnly />{children}</label>
+    ),
+  };
+});
+
+// ─── Fixtures ────────────────────────────────────────────────────────────────
+const { makeListing, makeCategories } = vi.hoisted(() => ({
+  makeListing: (overrides = {}) => ({
+    id: 77,
+    title: 'Vintage Lamp',
+    description: 'A beautiful vintage lamp in great condition.',
+    price: 25,
+    price_currency: 'EUR',
+    price_type: 'fixed',
+    condition: 'good',
+    quantity: 1,
+    category: { id: 3, name: 'Home & Garden', slug: 'home-garden' },
+    location: 'Dublin',
+    latitude: 53.3498,
+    longitude: -6.2603,
+    delivery_method: 'pickup',
+    images: [{ id: 1, url: 'https://example.com/lamp.jpg', is_primary: true }],
+    template_data: null,
+    is_own: true,
+    user: { id: 10, name: 'Alice Owner' },
+    status: 'active',
+    views_count: 5,
+    saves_count: 1,
+    is_saved: false,
+    is_promoted: false,
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-02T00:00:00Z',
+    ...overrides,
+  }),
+  makeCategories: () => [
+    { id: 3, name: 'Home & Garden', slug: 'home-garden' },
+    { id: 4, name: 'Electronics', slug: 'electronics' },
+  ],
+}));
+
+function setupMocks(listingOverrides = {}) {
+  mockApi.get.mockImplementation((url: string) => {
+    if (url.includes('/marketplace/listings/77')) {
+      return Promise.resolve({ success: true, data: makeListing(listingOverrides) });
+    }
+    if (url.includes('/marketplace/categories') && !url.includes('/template')) {
+      return Promise.resolve({ success: true, data: makeCategories() });
+    }
+    if (url.includes('/template')) {
+      return Promise.resolve({ success: true, data: { fields: [] } });
+    }
+    return Promise.resolve({ success: true, data: null });
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+describe('EditMarketplaceListingPage', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    setupMocks();
+  });
+
+  it('shows a loading spinner initially', async () => {
+    mockApi.get.mockImplementation(() => new Promise(() => {}));
+    const { EditMarketplaceListingPage } = await import('./EditMarketplaceListingPage');
+    render(<EditMarketplaceListingPage />);
+
+    const spinners = screen.getAllByRole('status');
+    const busy = spinners.find((el) => el.getAttribute('aria-busy') === 'true');
+    expect(busy).toBeDefined();
+  });
+
+  it('renders listing title pre-populated after load', async () => {
+    const { EditMarketplaceListingPage } = await import('./EditMarketplaceListingPage');
+    render(<EditMarketplaceListingPage />);
+
+    await waitFor(() => {
+      const titleInput = screen.getAllByRole('textbox').find(
+        (el) => (el as HTMLInputElement).value === 'Vintage Lamp'
+      );
+      expect(titleInput).toBeDefined();
+    });
+  });
+
+  it('renders description pre-populated after load', async () => {
+    const { EditMarketplaceListingPage } = await import('./EditMarketplaceListingPage');
+    render(<EditMarketplaceListingPage />);
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('A beautiful vintage lamp in great condition.')).toBeInTheDocument();
+    });
+  });
+
+  it('shows error EmptyState when listing fails to load', async () => {
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/marketplace/listings/77')) {
+        return Promise.resolve({ success: false, error: 'Not found' });
+      }
+      if (url.includes('/marketplace/categories')) {
+        return Promise.resolve({ success: true, data: makeCategories() });
+      }
+      return Promise.resolve({ success: true, data: null });
+    });
+
+    const { EditMarketplaceListingPage } = await import('./EditMarketplaceListingPage');
+    render(<EditMarketplaceListingPage />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+    });
+  });
+
+  it('redirects non-owners away from edit page', async () => {
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('/marketplace/listings/77')) {
+        return Promise.resolve({
+          success: true,
+          data: makeListing({ is_own: false, user: { id: 99, name: 'Someone Else' } }),
+        });
+      }
+      if (url.includes('/marketplace/categories')) {
+        return Promise.resolve({ success: true, data: makeCategories() });
+      }
+      return Promise.resolve({ success: true, data: null });
+    });
+
+    const { EditMarketplaceListingPage } = await import('./EditMarketplaceListingPage');
+    render(<EditMarketplaceListingPage />);
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith(
+        expect.stringContaining('/marketplace/77'),
+        expect.objectContaining({ replace: true })
+      );
+    });
+  });
+
+  it('renders the Save Changes button', async () => {
+    const { EditMarketplaceListingPage } = await import('./EditMarketplaceListingPage');
+    render(<EditMarketplaceListingPage />);
+
+    await waitFor(() => {
+      const saveBtn = screen.getAllByRole('button').find(
+        (b) => b.textContent?.toLowerCase().includes('save')
+      );
+      expect(saveBtn).toBeDefined();
+    });
+  });
+
+  it('calls PUT /v2/marketplace/listings/77 on save submit', async () => {
+    mockApi.put.mockResolvedValue({ success: true });
+    const { EditMarketplaceListingPage } = await import('./EditMarketplaceListingPage');
+    render(<EditMarketplaceListingPage />);
+
+    await waitFor(() => screen.getByDisplayValue('Vintage Lamp'));
+
+    // Find and click Save Changes
+    const saveBtn = screen.getAllByRole('button').find(
+      (b) => b.textContent?.toLowerCase().includes('save')
+    );
+    if (saveBtn) {
+      fireEvent.click(saveBtn);
+      await waitFor(() => {
+        expect(mockApi.put).toHaveBeenCalledWith(
+          '/v2/marketplace/listings/77',
+          expect.objectContaining({ title: 'Vintage Lamp' })
+        );
+      });
+    }
+  });
+
+  it('shows error toast when save fails', async () => {
+    mockApi.put.mockResolvedValue({ success: false, error: 'Save failed' });
+    const { EditMarketplaceListingPage } = await import('./EditMarketplaceListingPage');
+    render(<EditMarketplaceListingPage />);
+
+    await waitFor(() => screen.getByDisplayValue('Vintage Lamp'));
+
+    const saveBtn = screen.getAllByRole('button').find(
+      (b) => b.textContent?.toLowerCase().includes('save')
+    );
+    if (saveBtn) {
+      fireEvent.click(saveBtn);
+      await waitFor(() => {
+        expect(mockToast.error).toHaveBeenCalled();
+      });
+    }
+  });
+
+  it('shows price field for fixed-price listing', async () => {
+    const { EditMarketplaceListingPage } = await import('./EditMarketplaceListingPage');
+    render(<EditMarketplaceListingPage />);
+
+    await waitFor(() => {
+      const priceInput = screen.getAllByRole('spinbutton').find(
+        (el) => (el as HTMLInputElement).value === '25'
+      );
+      expect(priceInput).toBeDefined();
+    });
+  });
+
+  it('renders Generate with AI button after load', async () => {
+    const { EditMarketplaceListingPage } = await import('./EditMarketplaceListingPage');
+    render(<EditMarketplaceListingPage />);
+
+    await waitFor(() => {
+      const aiBtn = screen.getAllByRole('button').find(
+        (b) => b.textContent?.toLowerCase().includes('ai') || b.textContent?.toLowerCase().includes('generat')
+      );
+      expect(aiBtn).toBeDefined();
+    });
+  });
+});
