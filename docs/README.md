@@ -29,6 +29,7 @@ New to the project? Start with the [tutorial](TUTORIAL.md), then skim [ARCHITECT
 | --- | --- |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Maintained platform architecture map, runtime boundaries, and the tenant/feature model. |
 | [API.md](API.md) | API getting-started + the `openapi.json` contract as source of truth. |
+| [api-reference.md](api-reference.md) | Interactive, browsable API reference (Redoc) — rendered on the documentation site. |
 | [I18N.md](I18N.md) | Internationalisation: 11 languages, the recipient-locale rule, and the i18n quality gates. |
 | [DATABASE.md](DATABASE.md) | Database, the two migration systems, the schema dump, and tenant scoping. |
 | [CI.md](CI.md) | The CI pipeline, which checks are blocking, PR gates, and how to run them locally. |

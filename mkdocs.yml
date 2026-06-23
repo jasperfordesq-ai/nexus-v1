@@ -1,0 +1,125 @@
+site_name: Project NEXUS Documentation
+site_description: Documentation for Project NEXUS — an open-source multi-tenant community timebanking platform (Laravel 12 + React 19).
+site_url: https://jasperfordesq-ai.github.io/nexus-v1/
+repo_url: https://github.com/jasperfordesq-ai/nexus-v1
+repo_name: jasperfordesq-ai/nexus-v1
+edit_uri: edit/main/docs/
+docs_dir: docs
+copyright: Copyright &copy; 2024–2026 Jasper Ford — AGPL-3.0-or-later
+
+theme:
+  name: material
+  language: en
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+# Cross-links from docs/ to repo-root files (../README.md etc.) resolve on
+# GitHub but point above the site root here — warn instead of failing the build.
+validation:
+  omitted_files: ignore
+  nav:
+    omitted_files: ignore
+    not_found: warn
+  links:
+    not_found: warn
+    absolute_links: ignore
+    unrecognized_links: ignore
+
+nav:
+  - Home: README.md
+  - Getting started:
+      - Tutorial — your first contribution: TUTORIAL.md
+  - Architecture & platform:
+      - Architecture: ARCHITECTURE.md
+      - API: API.md
+      - API reference (OpenAPI): api-reference.md
+      - Internationalisation: I18N.md
+      - Database & migrations: DATABASE.md
+      - CI & quality gates: CI.md
+      - Testing: TESTING.md
+      - Custom domains: CUSTOM-DOMAINS.md
+      - Federation API manual: FEDERATION_API_MANUAL.md
+      - Module map: MODULES.md
+  - Module guides:
+      - Wallet & exchanges: modules/wallet-exchanges.md
+      - Listings: modules/listings.md
+      - Marketplace: modules/marketplace.md
+      - Messaging: modules/messaging.md
+      - Social feed: modules/social-feed.md
+      - Events: modules/events.md
+      - Groups: modules/groups.md
+      - Members & GDPR: modules/members-and-gdpr.md
+      - Connections & reviews: modules/connections-and-reviews.md
+      - Organisations: modules/organisations.md
+      - Volunteering: modules/volunteering.md
+      - Jobs: modules/jobs.md
+      - Gamification: modules/gamification.md
+      - Goals & impact: modules/goals-and-impact.md
+      - Ideation & challenges: modules/ideation-challenges.md
+      - Courses: modules/courses.md
+      - Podcasts: modules/podcasts.md
+      - Blog & resources: modules/blog-and-resources.md
+      - Search: modules/search.md
+      - Notifications: modules/notifications.md
+      - AI chat: modules/ai-chat.md
+      - Identity verification: modules/identity-verification.md
+      - Monetization: modules/monetization.md
+      - Admin: modules/admin.md
+  - Operations:
+      - Deployment: DEPLOYMENT.md
+      - Incident runbook: RUNBOOK-INCIDENTS.md
+      - Monitoring: MONITORING.md
+      - SLOs: SLO.md
+      - Sentry: SENTRY.md
+      - Security scanning: SECURITY-SCANNING.md
+  - Accessible frontend:
+      - Research & constraints: govuk-alpha/RESEARCH.md
+      - Attribution: govuk-alpha/ATTRIBUTION.md
+  - Governance:
+      - Documentation standards: DOCUMENTATION.md
+      - Contributor terms enforcement: CONTRIBUTOR_TERMS_ENFORCEMENT.md

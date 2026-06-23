@@ -20,6 +20,10 @@ composer.phar
 # ─── Local documentation archive (private cleanup history) ───────────────────
 /.local-docs-archive/
 
+# ─── Docs site (MkDocs) build artifacts ──────────────────────────────────────
+/site/
+/docs/openapi.json
+
 # ─── AI Assistant Config (contains sensitive project context) ─────────────────
 CLAUDE.md
 !accessible-frontend/CLAUDE.md
