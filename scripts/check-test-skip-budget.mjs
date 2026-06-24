@@ -46,10 +46,13 @@ const TESTS_DIR = join(PROJECT_ROOT, 'tests');
 // so they actually run and pass — only ~52 of the counted skips fire at runtime;
 // the static scan over-reports the rest. The pre-commit gate
 // (scripts/git-hooks/pre-commit) now runs this check on the tracked+staged tree,
-// so the number is FROZEN at 288 and cannot creep further.
+// so the number cannot creep further.
+// 2026-06-24: lowered 288 -> 286 to lock in the current tracked-tree count
+// (later coverage batches stripped two dead guards). Tightening the ratchet
+// converts that headroom into protection so the slack can't silently refill.
 // Right direction is still DOWN: lower this as dead guards are stripped or the
 // schema dump is refreshed. Do not raise it further without a matching reason.
-const BASELINE = 288;
+const BASELINE = 286;
 const BUDGET = Number.parseInt(process.env.TEST_SKIP_BUDGET ?? '', 10) || BASELINE;
 
 const REPORT_ONLY = process.argv.includes('--report');
