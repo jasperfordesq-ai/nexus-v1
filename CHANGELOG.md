@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Three Regional Analytics dashboard sections that always showed "data unavailable" now work.** The Demographics (age groups), Volunteer breakdown (top organisations), and Help-request analysis sections each queried a column that doesn't exist, so every request errored out. They now read the correct columns (`users.date_of_birth`, `vol_logs.organization_id`) and group help requests by contact preference, counting a request as resolved once its status reaches `closed`.
+
 ### Added
 
 - **Greptile code review configuration now lives in the repository.** Automated reviews are guided by the Project NEXUS tenant-isolation, localization, frontend, accessible frontend, security, deployment-boundary and AGPL licensing rules, with tracked context files for lower-noise review comments.
