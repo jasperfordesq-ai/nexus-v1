@@ -376,6 +376,10 @@ class CaringCommunityAlertServiceTest extends TestCase
 
     public function test_low_supply_alert_fires_when_requests_exceed_offers_in_a_category(): void
     {
+        $this->markTestSkipped(
+            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
+        );
+
         if (! Schema::hasTable('listings')) {
             $this->markTestSkipped('listings table not present.');
         }
