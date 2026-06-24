@@ -401,4 +401,77 @@ class AgentExecutorTest extends TestCase
         // The idempotency check in dispatchAction should prevent a duplicate row
         $this->assertSame($countBefore, $countAfter);
     }
+
+    // =========================================================================
+    // dispatchAction: route_help_request side-effect
+    // =========================================================================
+
+    public function test_approve_route_help_request_transitions_status_to_matched(): void
+    {
+        $runId       = $this->seedRun();
+        $coordinator = $this->insertUser('coordinator');
+        $reviewerId  = $this->insertUser('admin');
+        $requesterId = $this->insertUser('member');
+
+        $requestId = DB::table('caring_help_requests')->insertGetId([
+            'tenant_id'          => self::TENANT_ID,
+            'user_id'            => $requesterId,
+            'what'               => 'Need a lift to the clinic',
+            'when_needed'        => 'Tuesday morning',
+            'contact_preference' => 'either',
+            'status'             => 'pending',
+            'created_at'         => now(),
+            'updated_at'         => now(),
+        ]);
+
+        $propId = $this->seedProposal($runId, 'route_help_request', [
+            'request_id'     => $requestId,
+            'coordinator_id' => $coordinator,
+        ]);
+
+        AgentExecutor::approve($propId, self::TENANT_ID, $reviewerId);
+
+        // The original bug wrote a non-existent `assigned_to` column, so the
+        // request was never updated. The dispatch must now transition the help
+        // request out of `pending` into `matched`.
+        $status = DB::table('caring_help_requests')
+            ->where('id', $requestId)
+            ->where('tenant_id', self::TENANT_ID)
+            ->value('status');
+        $this->assertSame('matched', $status);
+
+        $proposal = DB::table('agent_proposals')->where('id', $propId)->first();
+        $this->assertSame('approved', $proposal->status);
+    }
+
+    public function test_approve_route_help_request_does_not_touch_already_closed_request(): void
+    {
+        $runId       = $this->seedRun();
+        $coordinator = $this->insertUser('coordinator');
+        $reviewerId  = $this->insertUser('admin');
+        $requesterId = $this->insertUser('member');
+
+        // A request that is already closed must not be reopened/altered by the
+        // `status = 'pending'` guarded update.
+        $requestId = DB::table('caring_help_requests')->insertGetId([
+            'tenant_id'          => self::TENANT_ID,
+            'user_id'            => $requesterId,
+            'what'               => 'Already handled',
+            'when_needed'        => 'Last week',
+            'contact_preference' => 'either',
+            'status'             => 'closed',
+            'created_at'         => now(),
+            'updated_at'         => now(),
+        ]);
+
+        $propId = $this->seedProposal($runId, 'route_help_request', [
+            'request_id'     => $requestId,
+            'coordinator_id' => $coordinator,
+        ]);
+
+        AgentExecutor::approve($propId, self::TENANT_ID, $reviewerId);
+
+        $status = DB::table('caring_help_requests')->where('id', $requestId)->value('status');
+        $this->assertSame('closed', $status);
+    }
 }
