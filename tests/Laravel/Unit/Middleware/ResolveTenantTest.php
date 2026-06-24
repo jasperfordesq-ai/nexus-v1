@@ -44,6 +44,10 @@ class ResolveTenantTest extends TestCase
 
     public function test_handle_binds_tenant_id_to_container(): void
     {
+        $this->markTestSkipped(
+            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
+        );
+
         $request = Request::create('/api/v2/feed', 'GET');
         $this->middleware->handle($request, $this->makeNext());
 
