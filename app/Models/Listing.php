@@ -49,6 +49,9 @@ class Listing extends Model
         'save_count',
         'is_featured',
         'featured_until',
+        'rejection_reason',
+        'reviewed_by',
+        'reviewed_at',
     ];
 
     /**
@@ -66,6 +69,7 @@ class Listing extends Model
         'direct_messaging_disabled' => 'boolean',
         'exchange_workflow_required' => 'boolean',
         'is_featured' => 'boolean',
+        'expires_at' => 'datetime',
         'renewed_at' => 'datetime',
         'featured_until' => 'datetime',
         'reviewed_at' => 'datetime',
