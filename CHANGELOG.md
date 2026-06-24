@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Bulk club-member (Verein) CSV import no longer aborts the whole batch when a row is already a member.** A CSV that included someone who was already an active member of the club was being flagged as a hard validation error, so the entire import failed with "CSV contains invalid rows" and none of the valid rows were imported. Existing members are now treated as a skippable info state: they are reported as already-members in the preview, quietly skipped (and counted as "skipped") on import, and the remaining valid rows are imported as expected. Genuinely bad rows (invalid email, duplicate within the file) still block the import as before.
 - **Three Regional Analytics dashboard sections that always showed "data unavailable" now work.** The Demographics (age groups), Volunteer breakdown (top organisations), and Help-request analysis sections each queried a column that doesn't exist, so every request errored out. They now read the correct columns (`users.date_of_birth`, `vol_logs.organization_id`) and group help requests by contact preference, counting a request as resolved once its status reaches `closed`.
 
 ### Added
