@@ -65,6 +65,8 @@ CLAUDE.md
 !/scripts/prerender-events-check.sh
 !/scripts/test/
 !/scripts/test/**
+!/scripts/git-hooks/
+!/scripts/git-hooks/**
 !/scripts/migrate-production.sh
 !/scripts/backup-production-db.sh
 !/scripts/server-nightly-backup.sh
