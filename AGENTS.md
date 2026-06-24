@@ -359,6 +359,12 @@ When committing code, always use `--no-verify` flag if pre-commit hooks fail due
 
 Pre-commit hooks (husky/eslint) have known pre-existing failures. When commits are blocked by pre-existing lint or test errors unrelated to current changes, use `--no-verify` to bypass rather than attempting to fix all pre-existing issues.
 
+#### 🔴 EXCEPTION — never `--no-verify` past the test verify-gate
+
+The `pre-commit` hook (`scripts/git-hooks/pre-commit`, installed via `bash scripts/git-hooks/install-hooks.sh`) runs **only the PHP test files staged in the current commit**. A failure there is, by definition, in a file *you are committing right now* — it is never "pre-existing" or "unrelated". If this gate fails, **fix the test or drop the file. Do NOT `--no-verify` past it.** This exists because automated coverage/test batches repeatedly landed broken tests on `main` and turned CI red. The `--no-verify` allowance above applies ONLY to pre-existing lint/build failures in files you did not change.
+
+Any automated loop that generates and commits test batches MUST let this gate run (no `--no-verify`); if it commits a failing test, it has broken `main` for everyone.
+
 ### Git Commit Convention
 
 ```

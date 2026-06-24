@@ -373,10 +373,23 @@ class KiAgentService
                         ->where('recipient_id', $recipientId)
                         ->exists();
                     if (!$existing) {
+                        // `caring_support_relationships` requires NOT NULL `title`
+                        // and `start_date` (neither has a DB default). Omitting them
+                        // either rejected the row (strict mode) or wrote an empty
+                        // title and a zero start_date (non-strict mode) — never a
+                        // usable tandem. Populate them like CaringSupportRelationshipService.
+                        $supporterName = trim((string) ($data['supporter_name'] ?? ''));
+                        $recipientName = trim((string) ($data['recipient_name'] ?? ''));
+                        $title = ($supporterName !== '' && $recipientName !== '')
+                            ? $supporterName . ' & ' . $recipientName
+                            : (string) __('api.caring_support_relationship_default_title');
+
                         DB::table('caring_support_relationships')->insertGetId([
                             'tenant_id'    => $tenantId,
                             'supporter_id' => $supporterId,
                             'recipient_id' => $recipientId,
+                            'title'        => mb_substr($title, 0, 255),
+                            'start_date'   => now()->toDateString(),
                             'status'       => 'active',
                             'created_at'   => now(),
                             'updated_at'   => now(),
@@ -412,12 +425,17 @@ class KiAgentService
                 $requestId    = (int) ($data['request_id'] ?? 0);
                 $assignedToId = (int) ($proposal['target_user_id'] ?? 0);
                 if ($requestId && $assignedToId) {
+                    // `caring_help_requests` has no `assigned_to` column, so the
+                    // original UPDATE raised an "Unknown column" error and routing
+                    // silently failed. The coordinator is recorded on the proposal
+                    // (target_user_id); the real transition is `pending` -> `matched`.
                     DB::table('caring_help_requests')
                         ->where('id', $requestId)
                         ->where('tenant_id', $tenantId)
+                        ->where('status', 'pending')
                         ->update([
-                            'assigned_to' => $assignedToId,
-                            'updated_at'  => now(),
+                            'status'     => 'matched',
+                            'updated_at' => now(),
                         ]);
                 }
                 break;
