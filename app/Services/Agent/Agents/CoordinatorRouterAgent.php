@@ -41,21 +41,27 @@ final class CoordinatorRouterAgent extends BaseAgent
             return $this->emptyResult('no coordinators available');
         }
 
-        // Compute open-load per coordinator
+        // Compute each coordinator's current open-task load. `caring_help_requests`
+        // has no assignee column; the real per-coordinator workload lives in
+        // `coordinator_tasks` (assigned_to + status pending|in_progress).
+        $hasCoordinatorTasks = Schema::hasTable('coordinator_tasks');
         $loads = [];
         foreach ($coordinators as $c) {
-            $loads[$c->id] = (int) DB::table('caring_help_requests')
-                ->where('tenant_id', $this->tenantId)
-                ->where('assigned_to', $c->id)
-                ->whereIn('status', ['pending', 'in_progress', 'open'])
-                ->count();
+            $loads[$c->id] = $hasCoordinatorTasks
+                ? (int) DB::table('coordinator_tasks')
+                    ->where('tenant_id', $this->tenantId)
+                    ->where('assigned_to', $c->id)
+                    ->whereIn('status', ['pending', 'in_progress'])
+                    ->count()
+                : 0;
         }
 
-        // Find unassigned help requests
+        // Find unassigned help requests. The status enum is pending|matched|closed,
+        // so `pending` is the unhandled state (no coordinator has picked it up yet).
         $requests = DB::table('caring_help_requests')
             ->where('tenant_id', $this->tenantId)
-            ->whereNull('assigned_to')
-            ->whereIn('status', ['pending', 'open'])
+            ->where('status', 'pending')
+            ->whereNull('deleted_at')
             ->orderBy('created_at')
             ->limit($maxProposals)
             ->get();
@@ -77,7 +83,7 @@ final class CoordinatorRouterAgent extends BaseAgent
                     'request_id'           => (int) $req->id,
                     'coordinator_id'       => $assignedId,
                     'coordinator_name'     => $coordName,
-                    'request_summary'      => mb_substr((string) ($req->description ?? $req->title ?? ''), 0, 200),
+                    'request_summary'      => mb_substr((string) ($req->what ?? ''), 0, 200),
                 ],
                 reasoning: sprintf(
                     'Coordinator %s has the lightest open load (%d). Routing this help request to them for fastest response.',

@@ -55,9 +55,13 @@ class SearchJobsTool extends AbstractTool
         $isRemote = $arguments['is_remote'] ?? null;
         $limit = $this->intArg($arguments, 'limit', 5, 1, 8);
 
+        // A publicly-visible vacancy is status='open' (the enum is
+        // open/closed/filled/draft — there is no 'active'), not under a
+        // moderation hold, and not past its expiry. Mirrors the public_only
+        // scope in JobVacancyService::getAll().
         $q = DB::table('job_vacancies')
             ->where('tenant_id', $tenantId)
-            ->where('status', 'active')
+            ->where('status', 'open')
             ->where(function ($q) {
                 $q->whereNull('moderation_status')->orWhere('moderation_status', 'approved');
             })

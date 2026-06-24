@@ -18,15 +18,15 @@ use Tests\Laravel\TestCase;
 /**
  * Tests for CoordinatorRouterAgent (AG61 coordinator router).
  *
- * NOTE: The caring_help_requests schema does NOT have assigned_to, description,
- * or title columns (it has what/when_needed/status as 'pending'|'matched'|'closed').
- * The agent queries for status IN ('pending','in_progress','open') and
- * whereNull('assigned_to') / where('assigned_to', …) — these columns do not exist
- * in the live schema and will cause a DB error. Tests that exercise the proposal-
- * creation path are therefore skipped with an explanation below (source bug noted).
+ * The agent finds unhandled help requests (caring_help_requests.status = 'pending';
+ * the enum is pending|matched|closed and there is no assignee column) and computes
+ * each coordinator's open-task load from coordinator_tasks (assigned_to + status
+ * pending|in_progress). It then routes each request to the lightest-loaded
+ * coordinator via a route_help_request proposal.
  *
  * Tests cover: identity/metadata, empty-result cases (no coordinators, missing
- * tables), and the load-balancing selector logic via a mocked result path.
+ * tables), the load-balancing selector logic, and proposal creation for pending
+ * help requests.
  */
 class CoordinatorRouterAgentTest extends TestCase
 {
@@ -149,25 +149,89 @@ class CoordinatorRouterAgentTest extends TestCase
         // Insert a coordinator so we reach the requests query.
         $this->insertUser('coordinator');
 
-        $agent = $this->makeAgent();
+        $agent  = $this->makeAgent();
+        $result = $agent->run();
 
-        // caring_help_requests.assigned_to column does not exist in the current schema
-        // (only what/when_needed/status exist). Running the agent triggers a DB error
-        // on the WHERE NULL `assigned_to` query. We catch the exception and note the bug.
-        try {
-            $result = $agent->run();
-            // If somehow the schema was updated and the query succeeds, verify structure.
-            $this->assertIsInt($result['proposals_created']);
-            $this->assertIsString($result['summary']);
-        } catch (\Illuminate\Database\QueryException $e) {
-            // NOTE: This confirms the source bug: CoordinatorRouterAgent references
-            // caring_help_requests.assigned_to which does not exist in the schema.
-            // The column must be added before this agent can produce proposals.
-            $this->markTestSkipped(
-                'SOURCE BUG: caring_help_requests.assigned_to column missing from schema. ' .
-                'Error: ' . $e->getMessage()
-            );
-        }
+        // The regression guard here is that the agent runs cleanly against the
+        // real schema (the original bug threw "Unknown column" on assigned_to).
+        // We don't hard-assert exactly 0 — the shared test DB could one day hold
+        // committed pending requests for tenant 2 that DatabaseTransactions would
+        // not roll back — only that the result is a well-formed, non-negative count.
+        $this->assertIsInt($result['proposals_created']);
+        $this->assertGreaterThanOrEqual(0, $result['proposals_created']);
+        $this->assertIsString($result['summary']);
+        $this->assertNotEmpty($result['summary']);
+    }
+
+    // -------------------------------------------------------------------------
+    // Proposal creation — pending help request gets routed
+    // -------------------------------------------------------------------------
+
+    public function test_creates_route_proposal_for_pending_help_request(): void
+    {
+        // Insert a coordinator so there is at least one routing candidate, and a
+        // single pending help request. The shared test DB may already have other
+        // coordinators in tenant 2, so we do NOT assume the request is routed to
+        // *this* coordinator — only that it is routed to a valid one. We scope the
+        // proposal lookup to this run, and the request lookup to our own request id.
+        $this->insertUser('coordinator');
+        $requesterId = $this->insertUser('member');
+
+        $requestId = DB::table('caring_help_requests')->insertGetId([
+            'tenant_id'          => self::TENANT_ID,
+            'user_id'            => $requesterId,
+            'what'               => 'Need help with weekly shopping',
+            'when_needed'        => 'Saturday mornings',
+            'contact_preference' => 'either',
+            'status'             => 'pending',
+            'created_at'         => now(),
+            'updated_at'         => now(),
+        ]);
+
+        $runId = DB::table('agent_runs')->insertGetId([
+            'tenant_id'           => self::TENANT_ID,
+            'agent_type'          => 'help_routing',
+            'status'              => 'running',
+            'triggered_by'        => 'schedule',
+            'proposals_generated' => 0,
+            'proposals_applied'   => 0,
+            'created_at'          => now(),
+            'updated_at'          => now(),
+        ]);
+
+        $agent  = new CoordinatorRouterAgent(self::TENANT_ID, $runId, 0, []);
+        $result = $agent->run();
+
+        // At least our request is routed. We do NOT hard-assert the tenant-wide
+        // count (the shared test DB could one day contain other committed pending
+        // requests for tenant 2 that DatabaseTransactions would not roll back);
+        // instead we scope the assertion to exactly one proposal for *our* request.
+        $this->assertGreaterThanOrEqual(1, $result['proposals_created']);
+
+        $ourProposals = DB::table('agent_proposals')
+            ->where('tenant_id', self::TENANT_ID)
+            ->where('run_id', $runId)
+            ->where('proposal_type', 'route_help_request')
+            ->get()
+            ->filter(static fn ($p): bool => (int) (json_decode((string) $p->proposal_data, true)['request_id'] ?? 0) === $requestId)
+            ->values();
+
+        $this->assertCount(1, $ourProposals, 'exactly one route_help_request proposal for this request');
+        $proposal = $ourProposals->first();
+
+        $data = json_decode((string) $proposal->proposal_data, true);
+        $this->assertSame($requestId, (int) $data['request_id']);
+        $this->assertSame('Need help with weekly shopping', $data['request_summary']);
+
+        // The request must be routed to a real, active coordinator in this tenant.
+        $this->assertNotNull($proposal->target_user_id);
+        $this->assertSame((int) $proposal->target_user_id, (int) $data['coordinator_id']);
+        $routedRole = DB::table('users')
+            ->where('id', (int) $proposal->target_user_id)
+            ->where('tenant_id', self::TENANT_ID)
+            ->where('status', 'active')
+            ->value('role');
+        $this->assertContains($routedRole, ['admin', 'coordinator', 'broker']);
     }
 
     // -------------------------------------------------------------------------
@@ -206,19 +270,11 @@ class CoordinatorRouterAgentTest extends TestCase
         // Insert a broker-role user for our tenant.
         $this->insertUser('broker');
 
-        $agent = $this->makeAgent();
+        $agent  = $this->makeAgent();
+        $result = $agent->run();
 
-        // The query proceeds to the requests scan. If the schema bug is present,
-        // the DB throws; we handle it and skip.
-        try {
-            $result = $agent->run();
-            // No requests → 0 proposals, but coordinator was found.
-            $this->assertSame(0, $result['proposals_created']);
-        } catch (\Illuminate\Database\QueryException $e) {
-            $this->markTestSkipped(
-                'SOURCE BUG (caring_help_requests.assigned_to missing): ' . $e->getMessage()
-            );
-        }
+        // Broker is accepted as a coordinator; with no pending requests, 0 proposals.
+        $this->assertSame(0, $result['proposals_created']);
     }
 
     // -------------------------------------------------------------------------
