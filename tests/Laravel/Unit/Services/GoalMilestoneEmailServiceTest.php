@@ -154,14 +154,26 @@ class GoalMilestoneEmailServiceTest extends TestCase
         $goalId = 9999002;
 
         $this->forgetCacheKey($userId, $goalId, 25);
+        // Force a deterministic send failure by suppressing the recipient, so the
+        // dedup assertion does not depend on ambient SMTP/transport state (other
+        // tests in the full suite can leave the mailer able to "succeed"). The
+        // suppression row is rolled back by DatabaseTransactions.
+        $email = (string) DB::table('users')->where('id', $userId)->value('email');
+        DB::table('email_suppression')->insert([
+            'email'         => $email,
+            'reason'        => 'bounce',
+            'suppressed_at' => now(),
+            'created_at'    => now(),
+            'updated_at'    => now(),
+        ]);
 
         // checkAndSendMilestone returns void — just assert no exception
         GoalMilestoneEmailService::checkAndSendMilestone(
             self::TENANT_ID, $userId, $goalId, 'Quarter Goal', 0.0, 25.0
         );
 
-        // Because SMTP fails in tests, the cache key should NOT be set
-        // (the service only sets it on confirmed send)
+        // The send is refused (recipient suppressed) → the cache key must NOT be
+        // set (the service only sets it on a confirmed send).
         $this->assertFalse(Cache::has($this->cacheKey($userId, $goalId, 25)));
     }
 

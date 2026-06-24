@@ -269,12 +269,23 @@ class OnboardingNurtureServiceTest extends TestCase
         // key is never written — confirming the service only deduplicates
         // genuinely-sent emails.
         [$userId, $email] = $this->insertUserAtDay(2, ['onboarding_completed' => 0]);
+        // Force a deterministic send failure by suppressing the recipient, so the
+        // dedup assertion does not depend on ambient SMTP/transport state (other
+        // tests in the full suite can leave the mailer able to "succeed"). The
+        // suppression row is rolled back by DatabaseTransactions.
+        DB::table('email_suppression')->insert([
+            'email'         => $email,
+            'reason'        => 'bounce',
+            'suppressed_at' => now(),
+            'created_at'    => now(),
+            'updated_at'    => now(),
+        ]);
 
         OnboardingNurtureService::sendDueNurtureEmails();
 
         $this->assertFalse(
             Cache::has($this->dedupKey($userId, 2)),
-            'Dedup key must NOT be set when the mailer returns false (SMTP unavailable in test env)'
+            'Dedup key must NOT be set when the send is refused (recipient suppressed)'
         );
     }
 

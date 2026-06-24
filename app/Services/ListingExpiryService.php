@@ -210,12 +210,13 @@ class ListingExpiryService
 
         $newExpiresAt = $baseDate->copy()->addDays(self::RENEWAL_DAYS)->format('Y-m-d H:i:s');
 
-        $listing->update([
-            'status' => 'active',
-            'expires_at' => $newExpiresAt,
-            'renewed_at' => now(),
-            'renewal_count' => DB::raw('renewal_count + 1'),
-        ]);
+        // Set + save instead of DB::raw('renewal_count + 1'): the raw expression
+        // conflicts with the 'renewal_count' => 'integer' cast in Listing::$casts.
+        $listing->status = 'active';
+        $listing->expires_at = $newExpiresAt;
+        $listing->renewed_at = now();
+        $listing->renewal_count = $currentCount + 1;
+        $listing->save();
 
         // Log activity
         try {
