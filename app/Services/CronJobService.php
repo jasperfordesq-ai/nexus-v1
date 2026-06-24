@@ -48,7 +48,10 @@ class CronJobService
             Log::error("CronJobService: {$jobName} failed", ['error' => $errorMsg]);
         }
 
-        $duration = now()->diffInSeconds($startedAt);
+        // Carbon v3 `diffInSeconds` is signed: measure $startedAt -> now (older ->
+        // newer) so the run duration is a non-negative whole number of seconds.
+        // `now()->diffInSeconds($startedAt)` would return a negative float here.
+        $duration = max(0, (int) round($startedAt->diffInSeconds(now())));
 
         DB::table('cron_job_runs')->insert([
             'job_name'   => $jobName,

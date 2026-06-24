@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **Three Regional Analytics dashboard sections that always showed "data unavailable" now work.** The Demographics (age groups), Volunteer breakdown (top organisations), and Help-request analysis sections each queried a column that doesn't exist, so every request errored out. They now read the correct columns (`users.date_of_birth`, `vol_logs.organization_id`) and group help requests by contact preference, counting a request as resolved once its status reaches `closed`.
+- **The Caring Community help-request SLA breach dashboard no longer crashes and now reports accurate turnaround.** An updated date library returned signed, fractional time differences where the dashboard expected whole positive numbers. As a result it threw an error the moment any help request was pending or in progress — taking the whole SLA dashboard down — and every recently-closed request reported a turnaround of zero, so they all looked "within SLA". The dashboard now loads reliably, ages requests correctly into on-track / at-risk / breached buckets against the tenant's SLA policy, and measures real resolution turnaround. The same signed-time-difference issue was also corrected in cron run-duration logging, the job "days posted" metric (admin and accessible frontends), and the social-feed "scheduled more than a year ahead" guard.
 
 ### Added
 
