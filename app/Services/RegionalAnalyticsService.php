@@ -288,18 +288,18 @@ class RegionalAnalyticsService
                 return ['error' => 'data_unavailable'];
             }
 
-            // Age groups from birthdate
+            // Age groups from date_of_birth
             $ageRows = DB::table('users')
                 ->where('tenant_id', $tenantId)
                 ->where('status', 'active')
                 ->selectRaw(
                     "CASE
-                        WHEN birthdate IS NULL THEN 'unknown'
-                        WHEN TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) < 25 THEN 'under_25'
-                        WHEN TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) < 35 THEN '25_34'
-                        WHEN TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) < 45 THEN '35_44'
-                        WHEN TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) < 55 THEN '45_54'
-                        WHEN TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) < 65 THEN '55_64'
+                        WHEN date_of_birth IS NULL THEN 'unknown'
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) < 25 THEN 'under_25'
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) < 35 THEN '25_34'
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) < 45 THEN '35_44'
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) < 55 THEN '45_54'
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) < 65 THEN '55_64'
                         ELSE '65_plus'
                     END as age_group,
                     COUNT(*) as count"
@@ -562,18 +562,18 @@ class RegionalAnalyticsService
 
             if ($orgTable !== null) {
                 $topOrgs = (clone $query)
-                    ->whereNotNull('vol_logs.org_id')
+                    ->whereNotNull('vol_logs.organization_id')
                     ->join('vol_organizations as o', function ($join) use ($tenantId) {
-                        $join->on('vol_logs.org_id', '=', 'o.id')
+                        $join->on('vol_logs.organization_id', '=', 'o.id')
                              ->where('o.tenant_id', '=', $tenantId);
                     })
                     ->select(
-                        'vol_logs.org_id',
+                        'vol_logs.organization_id as org_id',
                         'o.name as org_name',
                         DB::raw('SUM(vol_logs.hours) as total_hours'),
                         DB::raw('COUNT(DISTINCT vol_logs.user_id) as volunteers')
                     )
-                    ->groupBy('vol_logs.org_id', 'o.name')
+                    ->groupBy('vol_logs.organization_id', 'o.name')
                     ->orderByDesc('total_hours')
                     ->limit(10)
                     ->get()
@@ -586,16 +586,16 @@ class RegionalAnalyticsService
                     ->values()
                     ->all();
             } else {
-                // Fall back to org_id only
+                // Fall back to organization_id only
                 $topOrgs = (clone $query)
-                    ->whereNotNull('vol_logs.org_id')
+                    ->whereNotNull('vol_logs.organization_id')
                     ->select(
-                        'vol_logs.org_id',
-                        DB::raw('CONCAT("Org #", vol_logs.org_id) as org_name'),
+                        'vol_logs.organization_id as org_id',
+                        DB::raw('CONCAT("Org #", vol_logs.organization_id) as org_name'),
                         DB::raw('SUM(vol_logs.hours) as total_hours'),
                         DB::raw('COUNT(DISTINCT vol_logs.user_id) as volunteers')
                     )
-                    ->groupBy('vol_logs.org_id')
+                    ->groupBy('vol_logs.organization_id')
                     ->orderByDesc('total_hours')
                     ->limit(10)
                     ->get()
@@ -653,16 +653,22 @@ class RegionalAnalyticsService
                 $query->where('created_at', '>=', $cutoff);
             }
 
-            // By category
+            // Breakdown dimension: caring_help_requests has no `category` column, so we
+            // group by `contact_preference` (the only categorical enum on the table) and
+            // surface it under the `category` key the API/frontend contract expects.
+            // Resolution semantics follow HelpRequestSlaService: a request is "resolved"
+            // once its status reaches `closed` (the terminal state in the
+            // pending|matched|closed enum). updated_at - created_at is the resolution-time
+            // proxy, consistent with the rest of the caring-community analytics.
             $byCategory = (clone $query)
-                ->select('category')
+                ->select('contact_preference as category')
                 ->selectRaw('COUNT(*) as total')
-                ->selectRaw("SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved_count")
+                ->selectRaw("SUM(CASE WHEN status = 'closed' THEN 1 ELSE 0 END) as resolved_count")
                 ->selectRaw(
-                    "AVG(CASE WHEN status = 'resolved' AND updated_at IS NOT NULL
+                    "AVG(CASE WHEN status = 'closed' AND updated_at IS NOT NULL
                         THEN TIMESTAMPDIFF(DAY, created_at, updated_at) END) as avg_resolution_days"
                 )
-                ->groupBy('category')
+                ->groupBy('contact_preference')
                 ->orderByDesc('total')
                 ->get()
                 ->map(fn ($r) => [
@@ -685,7 +691,7 @@ class RegionalAnalyticsService
                 ->where('created_at', '>=', now()->subMonths(6))
                 ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month")
                 ->selectRaw('COUNT(*) as total')
-                ->selectRaw("SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved")
+                ->selectRaw("SUM(CASE WHEN status = 'closed' THEN 1 ELSE 0 END) as resolved")
                 ->groupBy('month')
                 ->orderBy('month')
                 ->get()

@@ -22,18 +22,17 @@ use Illuminate\Support\Facades\DB;
  * guaranteed to have zero pre-existing data, so counts/sums are fully
  * deterministic. All rows are rolled back by DatabaseTransactions.
  *
- * Known source bugs documented inline with // NOTE: comments:
- *   - vol_logs.org_id column does not exist (real column = organization_id)
- *     → getVolunteerBreakdown() throws SQLSTATE[42S22] from the org query
- *       (NOT inside a try/catch), so the outer catch returns ['error' => 'data_unavailable'].
- *   - caring_help_requests has no `category` column
- *     → getHelpRequestAnalysis() throws SQLSTATE[42S22] on by_category groupBy,
- *       so the method returns ['error' => 'data_unavailable'].
- *   - caring_help_requests.status enum is 'pending|matched|closed', not 'resolved'
- *     → resolved_count will always be 0 if the method were to work.
- *   - users table has no `birthdate` column
- *     → getDemographics() throws SQLSTATE[42S22] on the age_group CASE expression,
- *       so the method returns ['error' => 'data_unavailable'].
+ * Previously-broken report sections (now fixed in RegionalAnalyticsService) and
+ * the real columns/enum values they were corrected to use:
+ *   - getDemographics(): age_group CASE now reads users.date_of_birth (was the
+ *     non-existent `birthdate`).
+ *   - getVolunteerBreakdown(): top-orgs query now joins on vol_logs.organization_id
+ *     (was the non-existent `org_id`).
+ *   - getHelpRequestAnalysis(): caring_help_requests has no `category` column, so the
+ *     breakdown now groups by `contact_preference` (surfaced under the `category` key
+ *     for the API/frontend contract). Resolution is counted via the real `closed`
+ *     status (the enum is pending|matched|closed; there is no `resolved`), matching
+ *     the convention in HelpRequestSlaService.
  */
 class RegionalAnalyticsServiceTest extends TestCase
 {
@@ -87,16 +86,46 @@ class RegionalAnalyticsServiceTest extends TestCase
     }
 
     /** Insert a vol_log row and return the ID. */
-    private function insertVolLog(int $userId, float $hours, string $status = 'approved', ?string $createdAt = null): int
+    private function insertVolLog(int $userId, float $hours, string $status = 'approved', ?string $createdAt = null, ?int $organizationId = null): int
     {
         return DB::table('vol_logs')->insertGetId([
-            'tenant_id'    => self::TENANT_ID,
-            'user_id'      => $userId,
-            'date_logged'  => now()->toDateString(),
-            'hours'        => $hours,
-            'status'       => $status,
-            'created_at'   => $createdAt ?? now(),
-            'updated_at'   => now(),
+            'tenant_id'       => self::TENANT_ID,
+            'user_id'         => $userId,
+            'organization_id' => $organizationId,
+            'date_logged'     => now()->toDateString(),
+            'hours'           => $hours,
+            'status'          => $status,
+            'created_at'      => $createdAt ?? now(),
+            'updated_at'      => now(),
+        ]);
+    }
+
+    /** Insert a vol_organizations row and return the ID. */
+    private function insertVolOrganization(string $name): int
+    {
+        return DB::table('vol_organizations')->insertGetId([
+            'tenant_id'  => self::TENANT_ID,
+            'user_id'    => $this->insertUser(),
+            'name'       => $name,
+            'slug'       => 'org-' . uniqid(),
+            'status'     => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    /** Insert a caring_help_requests row and return the ID. */
+    private function insertHelpRequest(int $userId, string $contactPreference = 'either', string $status = 'pending', ?string $createdAt = null): int
+    {
+        return DB::table('caring_help_requests')->insertGetId([
+            'tenant_id'          => self::TENANT_ID,
+            'user_id'            => $userId,
+            'what'               => 'Need help ' . uniqid(),
+            'when_needed'        => 'ASAP',
+            'contact_preference' => $contactPreference,
+            'status'             => $status,
+            'created_at'         => $createdAt ?? now(),
+            'updated_at'         => now(),
         ]);
     }
 
@@ -292,49 +321,92 @@ class RegionalAnalyticsServiceTest extends TestCase
     // 4. getDemographics
     // ──────────────────────────────────────────────────────────────────────────
 
-    // NOTE: getDemographics() has a source bug: users table has no `birthdate`
-    // column (the age_group CASE uses `birthdate` which doesn't exist), so
-    // the service always returns ['error' => 'data_unavailable']. Tests below
-    // document actual behaviour. Fix: rename `birthdate` → `date_of_birth`.
-    public function test_getDemographics_returns_error_due_to_source_bug_birthdate_column_missing(): void
+    // getDemographics() now reads users.date_of_birth (the real column) for the
+    // age_group CASE expression, so it returns aggregated demographics rather than
+    // an error response.
+    public function test_getDemographics_returns_age_groups_languages_and_growth(): void
     {
-        $this->insertUser();
+        // 25_34 bracket, 65_plus bracket, and one with no DOB → 'unknown'.
+        $this->insertUser(['date_of_birth' => now()->subYears(30)->toDateString()]);
+        $this->insertUser(['date_of_birth' => now()->subYears(70)->toDateString()]);
+        $this->insertUser(); // date_of_birth NULL → 'unknown'
 
         $result = RegionalAnalyticsService::getDemographics(self::TENANT_ID);
 
-        // NOTE: Source bug — users table has no `birthdate` column (real column is date_of_birth).
-        // The CASE WHEN birthdate IS NULL … throws SQLSTATE[42S22] which the outer catch
-        // converts to ['error' => 'data_unavailable']. Asserting actual behaviour.
         $this->assertIsArray($result);
-        $this->assertArrayHasKey('error', $result);
-        $this->assertSame('data_unavailable', $result['error']);
+        $this->assertArrayNotHasKey('error', $result);
+        foreach (['age_groups', 'languages', 'monthly_growth'] as $key) {
+            $this->assertArrayHasKey($key, $result, "Key '{$key}' missing from demographics");
+        }
+
+        $this->assertSame(1, $result['age_groups']['25_34'] ?? 0);
+        $this->assertSame(1, $result['age_groups']['65_plus'] ?? 0);
+        $this->assertSame(1, $result['age_groups']['unknown'] ?? 0);
     }
 
-    // NOTE: These three tests would verify getDemographics aggregation math,
-    // but are skipped because the service always errors due to the `birthdate`
-    // column bug above. Remove the skip once the source is fixed.
-    public function test_getDemographics_language_breakdown_counts_correctly_skipped_due_to_source_bug(): void
+    public function test_getDemographics_language_breakdown_counts_correctly(): void
     {
-        $this->markTestSkipped(
-            'getDemographics() throws SQLSTATE on birthdate column (does not exist). ' .
-            'Fix source: rename birthdate → date_of_birth in age_group CASE expression.'
-        );
+        $this->insertUser(['preferred_language' => 'en']);
+        $this->insertUser(['preferred_language' => 'en']);
+        $this->insertUser(['preferred_language' => 'fr']);
+
+        $result = RegionalAnalyticsService::getDemographics(self::TENANT_ID);
+
+        $this->assertArrayNotHasKey('error', $result);
+
+        $languages = collect($result['languages']);
+        $en = $languages->firstWhere('language', 'en');
+        $fr = $languages->firstWhere('language', 'fr');
+
+        $this->assertNotNull($en, 'English language bucket missing');
+        $this->assertSame(2, $en['count']);
+        $this->assertNotNull($fr, 'French language bucket missing');
+        $this->assertSame(1, $fr['count']);
+
+        // Ordered by count desc → most common language first.
+        $this->assertSame('en', $result['languages'][0]['language']);
     }
 
-    public function test_getDemographics_monthly_growth_is_chronologically_ordered_skipped_due_to_source_bug(): void
+    public function test_getDemographics_monthly_growth_is_chronologically_ordered(): void
     {
-        $this->markTestSkipped(
-            'getDemographics() throws SQLSTATE on birthdate column (does not exist). ' .
-            'Fix source: rename birthdate → date_of_birth in age_group CASE expression.'
-        );
+        $this->insertUser(['created_at' => now()->subMonths(2)->startOfMonth()->addDay()->toDateTimeString()]);
+        $this->insertUser(['created_at' => now()->subMonths(1)->startOfMonth()->addDay()->toDateTimeString()]);
+        $this->insertUser(['created_at' => now()->startOfMonth()->addDay()->toDateTimeString()]);
+
+        $result = RegionalAnalyticsService::getDemographics(self::TENANT_ID);
+
+        $this->assertArrayNotHasKey('error', $result);
+        $this->assertNotEmpty($result['monthly_growth']);
+
+        $months = array_column($result['monthly_growth'], 'month');
+        $sorted = $months;
+        sort($sorted);
+        $this->assertSame($sorted, $months, 'monthly_growth must be chronologically ordered by month');
     }
 
-    public function test_getDemographics_monthly_growth_cumulative_is_monotonically_non_decreasing_skipped_due_to_source_bug(): void
+    public function test_getDemographics_monthly_growth_cumulative_is_monotonically_non_decreasing(): void
     {
-        $this->markTestSkipped(
-            'getDemographics() throws SQLSTATE on birthdate column (does not exist). ' .
-            'Fix source: rename birthdate → date_of_birth in age_group CASE expression.'
-        );
+        $this->insertUser(['created_at' => now()->subMonths(2)->startOfMonth()->addDay()->toDateTimeString()]);
+        $this->insertUser(['created_at' => now()->subMonths(1)->startOfMonth()->addDay()->toDateTimeString()]);
+        $this->insertUser(['created_at' => now()->subMonths(1)->startOfMonth()->addDays(2)->toDateTimeString()]);
+        $this->insertUser(['created_at' => now()->startOfMonth()->addDay()->toDateTimeString()]);
+
+        $result = RegionalAnalyticsService::getDemographics(self::TENANT_ID);
+
+        $this->assertArrayNotHasKey('error', $result);
+
+        $prev = -1;
+        foreach ($result['monthly_growth'] as $row) {
+            $this->assertArrayHasKey('cumulative', $row);
+            $this->assertGreaterThanOrEqual($prev, $row['cumulative'],
+                'cumulative member count must never decrease month over month');
+            $prev = $row['cumulative'];
+        }
+
+        // Tenant is isolated with no members older than 12 months, so the final
+        // cumulative equals the total inserted.
+        $last = end($result['monthly_growth']);
+        $this->assertSame(4, $last['cumulative']);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -401,122 +473,151 @@ class RegionalAnalyticsServiceTest extends TestCase
     // 6. getVolunteerBreakdown
     // ──────────────────────────────────────────────────────────────────────────
 
-    // NOTE: getVolunteerBreakdown() has a source bug: vol_logs.org_id does not
-    // exist (real column is organization_id). The org query is OUTSIDE the inner
-    // try/catch, so SQLSTATE[42S22] propagates to the outer catch which returns
-    // ['error' => 'data_unavailable']. Tests document actual behaviour.
-    // Fix: rename vol_logs.org_id → vol_logs.organization_id in the service.
-    public function test_getVolunteerBreakdown_returns_error_due_to_source_bug_org_id_column_missing(): void
-    {
-        $result = RegionalAnalyticsService::getVolunteerBreakdown(self::TENANT_ID, 'all_time');
-
-        // NOTE: Source bug — vol_logs.org_id column does not exist (real column = organization_id).
-        // The org select query outside the inner try/catch throws SQLSTATE[42S22], caught
-        // by the outer \Throwable handler which returns ['error' => 'data_unavailable'].
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('error', $result);
-        $this->assertSame('data_unavailable', $result['error']);
-    }
-
-    public function test_getVolunteerBreakdown_returns_correct_total_hours_skipped_due_to_source_bug(): void
-    {
-        $this->markTestSkipped(
-            'getVolunteerBreakdown() throws SQLSTATE on vol_logs.org_id (real column = organization_id). ' .
-            'Fix source: replace org_id with organization_id throughout getVolunteerBreakdown().'
-        );
-    }
-
-    public function test_getVolunteerBreakdown_avg_hours_per_volunteer_is_computed_correctly_skipped_due_to_source_bug(): void
-    {
-        $this->markTestSkipped(
-            'getVolunteerBreakdown() throws SQLSTATE on vol_logs.org_id (real column = organization_id). ' .
-            'Fix source: replace org_id with organization_id throughout getVolunteerBreakdown().'
-        );
-    }
-
+    // getVolunteerBreakdown() now joins on vol_logs.organization_id (the real column),
+    // so it returns the breakdown structure rather than ['error' => 'data_unavailable'].
     public function test_getVolunteerBreakdown_returns_required_keys(): void
     {
         $result = RegionalAnalyticsService::getVolunteerBreakdown(self::TENANT_ID, 'all_time');
 
-        // NOTE: Due to source bug (vol_logs.org_id does not exist) the method returns
-        // an error array, not the breakdown structure. Asserting actual error key presence.
         $this->assertIsArray($result);
-        $this->assertArrayHasKey('error', $result);
+        $this->assertArrayNotHasKey('error', $result);
+        foreach (['top_orgs', 'avg_hours_per_volunteer', 'total_hours', 'reciprocity_ratio'] as $key) {
+            $this->assertArrayHasKey($key, $result, "Key '{$key}' missing from volunteer breakdown");
+        }
     }
 
-    public function test_getVolunteerBreakdown_empty_when_no_vol_logs(): void
+    public function test_getVolunteerBreakdown_returns_zeroed_structure_when_no_vol_logs(): void
     {
         $result = RegionalAnalyticsService::getVolunteerBreakdown(self::TENANT_ID, 'all_time');
 
-        // NOTE: Source bug causes error response; asserting it is always an array.
-        $this->assertIsArray($result);
-        $this->assertNotEmpty($result);
+        $this->assertArrayNotHasKey('error', $result);
+        $this->assertSame([], $result['top_orgs']);
+        $this->assertSame(0.0, $result['total_hours']);
+        $this->assertSame(0.0, $result['avg_hours_per_volunteer']);
+        $this->assertSame(0.0, $result['reciprocity_ratio']);
     }
 
-    // NOTE: getVolunteerBreakdown() org query uses vol_logs.org_id (non-existent column).
-    // The SQLSTATE exception propagates out of the org block (not inside inner try/catch)
-    // and is caught by the outer \Throwable handler → ['error' => 'data_unavailable'].
-    public function test_getVolunteerBreakdown_top_orgs_unavailable_due_to_source_bug_wrong_column_name(): void
+    public function test_getVolunteerBreakdown_returns_correct_total_hours(): void
     {
-        $userId = $this->insertUser();
-        $this->insertVolLog($userId, 5.0, 'approved');
+        $user1 = $this->insertUser();
+        $user2 = $this->insertUser();
+
+        // Approved: 2.0 + 3.0 + 4.0 = 9.0 across 2 distinct volunteers.
+        $this->insertVolLog($user1, 2.0, 'approved');
+        $this->insertVolLog($user1, 3.0, 'approved');
+        $this->insertVolLog($user2, 4.0, 'approved');
+        // Pending must NOT be counted.
+        $this->insertVolLog($user2, 100.0, 'pending');
 
         $result = RegionalAnalyticsService::getVolunteerBreakdown(self::TENANT_ID, 'all_time');
 
-        // NOTE: Source bug — vol_logs.org_id does not exist (should be organization_id).
-        // SQLSTATE propagates to outer catch → error response, not breakdown structure.
-        $this->assertSame('data_unavailable', $result['error'] ?? null);
+        $this->assertArrayNotHasKey('error', $result);
+        $this->assertEqualsWithDelta(9.0, $result['total_hours'], 0.05,
+            'Only approved vol_logs hours should be summed');
+    }
+
+    public function test_getVolunteerBreakdown_avg_hours_per_volunteer_is_computed_correctly(): void
+    {
+        $user1 = $this->insertUser();
+        $user2 = $this->insertUser();
+
+        // Total 10.0 hours across 2 distinct volunteers → avg 5.0.
+        $this->insertVolLog($user1, 6.0, 'approved');
+        $this->insertVolLog($user2, 4.0, 'approved');
+
+        $result = RegionalAnalyticsService::getVolunteerBreakdown(self::TENANT_ID, 'all_time');
+
+        $this->assertArrayNotHasKey('error', $result);
+        $this->assertEqualsWithDelta(10.0, $result['total_hours'], 0.05);
+        $this->assertEqualsWithDelta(5.0, $result['avg_hours_per_volunteer'], 0.01);
+    }
+
+    public function test_getVolunteerBreakdown_top_orgs_aggregates_hours_by_organization(): void
+    {
+        $orgId = $this->insertVolOrganization('Helping Hands');
+        $user1 = $this->insertUser();
+        $user2 = $this->insertUser();
+
+        // 5.0 + 2.5 = 7.5 hours for the org across 2 distinct volunteers.
+        $this->insertVolLog($user1, 5.0, 'approved', null, $orgId);
+        $this->insertVolLog($user2, 2.5, 'approved', null, $orgId);
+
+        $result = RegionalAnalyticsService::getVolunteerBreakdown(self::TENANT_ID, 'all_time');
+
+        $this->assertArrayNotHasKey('error', $result);
+        $this->assertNotEmpty($result['top_orgs'], 'top_orgs should be populated after the organization_id fix');
+
+        $org = collect($result['top_orgs'])->firstWhere('org_id', $orgId);
+        $this->assertNotNull($org, 'Organization row not found in top_orgs');
+        $this->assertSame('Helping Hands', $org['org_name']);
+        $this->assertEqualsWithDelta(7.5, $org['total_hours'], 0.05);
+        $this->assertSame(2, $org['volunteers']);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
     // 7. getHelpRequestAnalysis
     // ──────────────────────────────────────────────────────────────────────────
 
-    // NOTE: getHelpRequestAnalysis() has a source bug: caring_help_requests has no
-    // `category` column. The by_category query does ->select('category') which
-    // throws SQLSTATE[42S22], caught by the outer \Throwable handler returning
-    // ['error' => 'data_unavailable']. Tests document actual behaviour.
-    // Fix: add a `category` column to caring_help_requests or change the groupBy.
-    public function test_getHelpRequestAnalysis_returns_error_due_to_source_bug_category_column_missing(): void
+    // getHelpRequestAnalysis() now groups by the real `contact_preference` column
+    // (caring_help_requests has no `category` column) and counts resolution via the
+    // real `closed` status, so it returns aggregated stats rather than an error.
+    public function test_getHelpRequestAnalysis_groups_by_contact_preference_with_resolution_stats(): void
     {
         $userId = $this->insertUser();
-        DB::table('caring_help_requests')->insert([
-            'tenant_id'          => self::TENANT_ID,
-            'user_id'            => $userId,
-            'what'               => 'Need help with shopping',
-            'when_needed'        => 'ASAP',
-            'contact_preference' => 'either',
-            'status'             => 'pending',
-            'created_at'         => now(),
-            'updated_at'         => now(),
-        ]);
+
+        // 2 'phone' requests: one closed (resolved), one pending.
+        $this->insertHelpRequest($userId, 'phone', 'closed');
+        $this->insertHelpRequest($userId, 'phone', 'pending');
+        // 1 'message' request, matched — NOT resolved under `closed` semantics.
+        $this->insertHelpRequest($userId, 'message', 'matched');
 
         $result = RegionalAnalyticsService::getHelpRequestAnalysis(self::TENANT_ID, 'all_time');
 
-        // NOTE: Source bug — caring_help_requests has no `category` column.
-        // SQLSTATE[42S22] propagates to outer catch → ['error' => 'data_unavailable'].
         $this->assertIsArray($result);
-        $this->assertArrayHasKey('error', $result);
-        $this->assertSame('data_unavailable', $result['error']);
+        $this->assertArrayNotHasKey('error', $result);
+        $this->assertArrayHasKey('by_category', $result);
+        $this->assertArrayHasKey('resolution_trend', $result);
+
+        $phone = collect($result['by_category'])->firstWhere('category', 'phone');
+        $this->assertNotNull($phone, 'phone contact-preference bucket missing');
+        $this->assertSame(2, $phone['total']);
+        $this->assertSame(1, $phone['resolved_count'], 'only the closed request counts as resolved');
+        $this->assertEqualsWithDelta(50.0, $phone['resolution_rate'], 0.05);
+
+        $message = collect($result['by_category'])->firstWhere('category', 'message');
+        $this->assertNotNull($message, 'message contact-preference bucket missing');
+        $this->assertSame(1, $message['total']);
+        $this->assertSame(0, $message['resolved_count'], 'matched is not closed → not resolved');
     }
 
-    public function test_getHelpRequestAnalysis_resolution_trend_entries_have_required_keys_skipped_due_to_source_bug(): void
+    public function test_getHelpRequestAnalysis_resolution_trend_entries_have_required_keys(): void
     {
-        $this->markTestSkipped(
-            'getHelpRequestAnalysis() throws SQLSTATE on caring_help_requests.category column (does not exist). ' .
-            'Fix source: add category column to caring_help_requests or remove the groupBy(category).'
-        );
+        $userId = $this->insertUser();
+        $this->insertHelpRequest($userId, 'either', 'closed');
+
+        $result = RegionalAnalyticsService::getHelpRequestAnalysis(self::TENANT_ID, 'all_time');
+
+        $this->assertArrayNotHasKey('error', $result);
+        $this->assertNotEmpty($result['resolution_trend']);
+        foreach (['month', 'total', 'resolved', 'resolution_rate'] as $key) {
+            $this->assertArrayHasKey($key, $result['resolution_trend'][0],
+                "Key '{$key}' missing from resolution_trend entry");
+        }
+
+        // The single closed request resolves to a 100% rate for its month.
+        $this->assertEqualsWithDelta(100.0, $result['resolution_trend'][0]['resolution_rate'], 0.05);
     }
 
-    public function test_getHelpRequestAnalysis_returns_data_unavailable_when_no_table(): void
+    public function test_getHelpRequestAnalysis_returns_empty_structure_when_no_requests(): void
     {
-        // caring_help_requests exists in this DB, but category column does not.
-        // Either way, asserting the method returns a well-formed array.
         $result = RegionalAnalyticsService::getHelpRequestAnalysis(self::TENANT_ID, 'all_time');
 
         $this->assertIsArray($result);
-        // Source bug means this always returns error in current DB schema.
-        $this->assertNotEmpty($result);
+        $this->assertArrayNotHasKey('error', $result);
+        $this->assertArrayHasKey('by_category', $result);
+        $this->assertArrayHasKey('resolution_trend', $result);
+        $this->assertSame([], $result['by_category']);
+        $this->assertSame([], $result['resolution_trend']);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
