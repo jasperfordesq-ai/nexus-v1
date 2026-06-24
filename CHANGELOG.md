@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Federation initial-sync after a partnership is approved could never run.** The background job that records the bilateral start-of-sync audit entries when two communities become federation partners crashed the instant it was created, so the audit trail and snapshot counts were silently never written. The job declared its queue with a typed property that clashes with Laravel's queue trait under PHP 8.2+, fataling at class-load time before any work could start; it now sets the queue in its constructor (matching the sibling reconciliation job) so it dispatches and runs correctly.
 - **Three Regional Analytics dashboard sections that always showed "data unavailable" now work.** The Demographics (age groups), Volunteer breakdown (top organisations), and Help-request analysis sections each queried a column that doesn't exist, so every request errored out. They now read the correct columns (`users.date_of_birth`, `vol_logs.organization_id`) and group help requests by contact preference, counting a request as resolved once its status reaches `closed`.
 
 ### Added
