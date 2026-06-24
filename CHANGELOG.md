@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Refreshing a caring-community success story's live "municipal ROI" figure no longer errors.** The live-metric refresh counted distinct care recipients against a column that doesn't exist (`recipient_user_id`), so every municipal-ROI story crashed with a database error the moment its figure was refreshed — regardless of which metric was requested. It now reads the correct `recipient_id` column, so the hourly-rate, formal-care-offset, prevention-value, hours, and recipients-supported figures all refresh correctly.
 - **Three Regional Analytics dashboard sections that always showed "data unavailable" now work.** The Demographics (age groups), Volunteer breakdown (top organisations), and Help-request analysis sections each queried a column that doesn't exist, so every request errored out. They now read the correct columns (`users.date_of_birth`, `vol_logs.organization_id`) and group help requests by contact preference, counting a request as resolved once its status reaches `closed`.
 
 ### Added

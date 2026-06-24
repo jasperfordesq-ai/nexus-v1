@@ -367,39 +367,39 @@ class SuccessStoryServiceTest extends TestCase
         $this->assertSame('manual_metric', $result['error']);
     }
 
-    public function test_refresh_live_metrics_municipal_roi_throws_due_to_wrong_column_name(): void
+    public function test_refresh_live_metrics_municipal_roi_returns_hourly_rate(): void
     {
         if (! Schema::hasTable('vol_logs')) {
             $this->markTestSkipped('vol_logs table not present.');
         }
 
-        // NOTE: SOURCE BUG in SuccessStoryService::fetchMunicipalRoiMetric() (line ~355-356).
-        // The query uses `distinct('recipient_user_id')` / `count('recipient_user_id')`, but the
-        // actual column in `caring_support_relationships` is `recipient_id` (confirmed in
-        // database/schema/mysql-schema.sql). This causes an SQLSTATE[42S22] Column not found error
-        // for ANY municipal_roi metric key, because the caring_support_relationships sub-query
-        // is always executed before the match() return, regardless of which key is requested.
-        //
-        // Fix: change `recipient_user_id` → `recipient_id` in SuccessStoryService::fetchMunicipalRoiMetric().
+        // Regression: fetchMunicipalRoiMetric() previously queried the non-existent
+        // `recipient_user_id` column on `caring_support_relationships` (the real column
+        // is `recipient_id`), which raised SQLSTATE[42S22] for ANY municipal_roi metric
+        // key because that distinct-count sub-query runs before the match() return. With
+        // the column fixed, the `hourly_rate_chf` key resolves to the flat 35.0 CHF rate.
         $svc = $this->service();
         $id = $svc->createStory($this->tenantId, $this->validPayload([
             'metric_source' => 'municipal_roi',
             'metric_key'    => 'hourly_rate_chf',
         ]))['story']['id'];
 
-        $this->expectException(\Illuminate\Database\QueryException::class);
-        $svc->refreshLiveMetrics($this->tenantId, $id);
+        $result = $svc->refreshLiveMetrics($this->tenantId, $id);
+
+        $this->assertArrayHasKey('story', $result);
+        $this->assertSame(35.0, $result['story']['after_value']);
     }
 
-    public function test_refresh_live_metrics_municipal_roi_formal_care_offset_throws_due_to_wrong_column_name(): void
+    public function test_refresh_live_metrics_municipal_roi_computes_formal_care_offset(): void
     {
         if (! Schema::hasTable('vol_logs')) {
             $this->markTestSkipped('vol_logs table not present.');
         }
 
-        // NOTE: SOURCE BUG — same as test above. Both tests document that the `social_isolation_prevented`
-        // metric key path crashes because `recipient_user_id` does not exist; the column is `recipient_id`.
-        // Also: vol_logs requires a real user_id FK, so a real user must be created before inserting rows.
+        // Regression: same root cause as the test above — the `recipient_id` column fix
+        // lets the caring_support_relationships distinct-count run, so the formal-care
+        // offset can be computed from approved volunteer hours.
+        // vol_logs requires a real user_id FK, so a real user must be created before inserting rows.
         $uid = uniqid('sss_u_', true);
         $userId = (int) DB::table('users')->insertGetId([
             'tenant_id'  => $this->tenantId,
@@ -427,10 +427,10 @@ class SuccessStoryServiceTest extends TestCase
             'metric_key'    => 'formal_care_offset_chf',
         ]))['story']['id'];
 
-        // This will throw because fetchMunicipalRoiMetric() references the non-existent
-        // `recipient_user_id` column. Once the source bug is fixed the assertion should
-        // become: $this->assertSame(350.0, $result['story']['after_value']);
-        $this->expectException(\Illuminate\Database\QueryException::class);
-        $svc->refreshLiveMetrics($this->tenantId, $id);
+        // 10 approved hours × 35.0 CHF/hr = 350.0; the 5 pending hours are excluded.
+        $result = $svc->refreshLiveMetrics($this->tenantId, $id);
+
+        $this->assertArrayHasKey('story', $result);
+        $this->assertSame(350.0, $result['story']['after_value']);
     }
 }
