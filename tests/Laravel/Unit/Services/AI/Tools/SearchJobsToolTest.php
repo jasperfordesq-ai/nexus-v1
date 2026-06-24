@@ -19,14 +19,9 @@ use Illuminate\Support\Facades\Queue;
  * filter, remote filter, limit, moderation gating, expired-at exclusion,
  * salary formatting, and tenant scoping.
  *
- * NOTE: The job_vacancies table schema defines status as
- * enum('open','closed','filled','draft') — 'active' is NOT a valid value.
- * SearchJobsTool::execute() queries WHERE status = 'active', which can
- * never match any real row.  Tests that exercise the happy path seed rows
- * with status = 'open' but the tool will NOT return them because of this
- * mismatch.  Each such test documents the source bug and asserts the ACTUAL
- * (broken) behaviour so we detect the regression when the bug is fixed.
- * See NOTE comments inline.
+ * A publicly-visible vacancy is status='open' (the job_vacancies.status enum
+ * is open/closed/filled/draft), with no active moderation hold and not past
+ * its expiry — mirroring the public_only scope in JobVacancyService::getAll().
  */
 class SearchJobsToolTest extends \Tests\Laravel\TestCase
 {
@@ -63,9 +58,9 @@ class SearchJobsToolTest extends \Tests\Laravel\TestCase
     // ── helpers ───────────────────────────────────────────────────────────────
 
     /**
-     * Insert a job vacancy with the given status (schema enum: open/closed/filled/draft).
-     * NOTE: SearchJobsTool queries WHERE status='active'. Rows inserted here with
-     * status='open' will NOT be returned until the source bug is fixed.
+     * Insert a job vacancy. Defaults to status='open' (the schema enum is
+     * open/closed/filled/draft), which is the publicly-visible state the tool
+     * surfaces.
      */
     private function insertJob(array $overrides = []): int
     {
@@ -80,7 +75,7 @@ class SearchJobsToolTest extends \Tests\Laravel\TestCase
             'is_remote'         => 0,
             'type'              => 'paid',
             'commitment'        => 'flexible',
-            'status'            => 'active', // NOTE: 'active' is NOT in the enum; MariaDB strict mode will reject this
+            'status'            => 'open',
             'moderation_status' => null,
             'expired_at'        => null,
             'is_featured'       => 0,
@@ -90,9 +85,7 @@ class SearchJobsToolTest extends \Tests\Laravel\TestCase
     }
 
     /**
-     * Insert a job vacancy with the CORRECT enum status value ('open').
-     * These rows will NOT be returned by SearchJobsTool::execute() because
-     * it queries WHERE status='active'. This is the documented source bug.
+     * Insert a publicly-visible job vacancy (status='open').
      */
     private function insertOpenJob(array $overrides = []): int
     {
@@ -165,31 +158,51 @@ class SearchJobsToolTest extends \Tests\Laravel\TestCase
     }
 
     /**
-     * NOTE (SOURCE BUG): SearchJobsTool queries WHERE status='active', but
-     * job_vacancies.status enum is ('open','closed','filled','draft').
-     * 'active' is not a valid value. MariaDB in non-strict mode silently
-     * stores '' (empty string) for an invalid enum value; strict mode raises
-     * a data exception. Either way, no rows match WHERE status='active', so
-     * the tool always returns an empty result set regardless of seeded data.
-     *
-     * This test asserts the ACTUAL (broken) behaviour. When the bug is fixed
-     * (change the query to WHERE status='open', or alter the enum), this
-     * test should be updated to assert count >= 1.
+     * The tool surfaces publicly-visible (status='open') vacancies. Seed an
+     * open vacancy and confirm a keyword search returns it with the expected
+     * card shape. Guards against regressing to a status value that no longer
+     * matches the job_vacancies.status enum (open/closed/filled/draft).
      */
-    public function test_execute_returns_empty_due_to_status_active_bug_not_matching_enum(): void
+    public function test_execute_returns_open_vacancy_matching_query(): void
     {
         $keyword = 'developer' . uniqid();
-        // Insert with valid enum status 'open'
-        $this->insertOpenJob(['title' => "Senior {$keyword} role"]);
+        $jobId = $this->insertOpenJob([
+            'title'       => "Senior {$keyword} role",
+            'description' => 'Build great things with the team.',
+            'location'    => 'Dublin',
+        ]);
 
-        // NOTE: BUG — tool queries WHERE status='active'; enum has no 'active' value.
-        // Expected correct behaviour after fix: count >= 1. Actual: 0.
         $result = $this->tool->execute(['query' => $keyword], 1);
 
         $this->assertTrue($result['ok']);
-        // Asserting ACTUAL broken behaviour — update when source bug is fixed:
-        $this->assertSame(0, count($result['results']),
-            'NOTE: SearchJobsTool uses WHERE status=\'active\' but enum only has open/closed/filled/draft — fix the tool query to WHERE status=\'open\'');
+        $this->assertSame('job', $result['card_type']);
+        $this->assertNull($result['error']);
+        $this->assertGreaterThanOrEqual(1, count($result['results']));
+
+        $ids = array_column($result['results'], 'id');
+        $this->assertContains($jobId, $ids, 'Open vacancy matching the query should be returned.');
+
+        $row = $result['results'][array_search($jobId, $ids, true)];
+        $this->assertSame("Senior {$keyword} role", $row['title']);
+        $this->assertSame('Dublin', $row['location']);
+        $this->assertStringContainsString('/jobs/' . $jobId, $row['url']);
+    }
+
+    /**
+     * Non-open statuses (closed/filled/draft) are not publicly visible and
+     * must be excluded.
+     */
+    public function test_execute_excludes_non_open_statuses(): void
+    {
+        $keyword = 'archivist' . uniqid();
+        $this->insertJob(['title' => "{$keyword} closed", 'status' => 'closed']);
+        $this->insertJob(['title' => "{$keyword} filled", 'status' => 'filled']);
+        $this->insertJob(['title' => "{$keyword} draft", 'status' => 'draft']);
+
+        $result = $this->tool->execute(['query' => $keyword], 1);
+
+        $this->assertTrue($result['ok']);
+        $this->assertSame([], $result['results']);
     }
 
     // ── execute: empty/no-query (browse all) ─────────────────────────────────
@@ -215,9 +228,8 @@ class SearchJobsToolTest extends \Tests\Laravel\TestCase
 
     public function test_limit_intarg_clamps_to_max_8(): void
     {
-        // We test the intArg clamping indirectly — result count cannot exceed 8
-        // (Since status bug means 0 results, we just verify no exception is thrown
-        // and result count does not exceed 8.)
+        // intArg clamps limit to a max of 8, so the result count can never
+        // exceed 8 regardless of the requested value.
         $result = $this->tool->execute(['query' => '', 'limit' => 100], 1);
 
         $this->assertTrue($result['ok']);
@@ -235,10 +247,8 @@ class SearchJobsToolTest extends \Tests\Laravel\TestCase
     // ── execute: result structure when rows exist ─────────────────────────────
 
     /**
-     * To actually test result structure we need status='active' to match.
-     * We work around the source bug by directly inserting with status='active'
-     * (stored as '' by MariaDB non-strict) and accepting it might not match.
-     * Instead we verify the tool NEVER crashes on empty results.
+     * The result envelope always exposes the same keys, even when no rows
+     * match.
      */
     public function test_execute_result_structure_has_ok_summary_results_card_type_error(): void
     {
@@ -286,7 +296,7 @@ class SearchJobsToolTest extends \Tests\Laravel\TestCase
     public function test_execute_does_not_include_rejected_moderation(): void
     {
         $keyword = 'accountant' . uniqid();
-        // Even if status bug is fixed, rejected moderation should still exclude
+        // An open vacancy with rejected moderation must still be excluded.
         DB::table('job_vacancies')->insert([
             'tenant_id'         => self::TENANT_ID,
             'user_id'           => $this->ownerUserId,
@@ -302,7 +312,7 @@ class SearchJobsToolTest extends \Tests\Laravel\TestCase
         $result = $this->tool->execute(['query' => $keyword], 1);
 
         $this->assertTrue($result['ok']);
-        // Should be empty: 'open' ≠ 'active' bug + rejected moderation both exclude
+        // Rejected moderation excludes the row even though status is 'open'.
         $this->assertSame([], $result['results']);
     }
 
@@ -333,15 +343,18 @@ class SearchJobsToolTest extends \Tests\Laravel\TestCase
     public function test_execute_does_not_return_jobs_from_another_tenant(): void
     {
         $keyword = 'plumber' . uniqid();
+        // Open + approved in another tenant — only tenant scoping should
+        // keep it out of the current tenant's results.
         DB::table('job_vacancies')->insert([
-            'tenant_id'   => 999,
-            'user_id'     => $this->ownerUserId,
-            'title'       => "{$keyword} needed",
-            'description' => 'Should not appear',
-            'type'        => 'paid',
-            'commitment'  => 'flexible',
-            'status'      => 'active',
-            'created_at'  => now(),
+            'tenant_id'         => 999,
+            'user_id'           => $this->ownerUserId,
+            'title'             => "{$keyword} needed",
+            'description'       => 'Should not appear',
+            'type'              => 'paid',
+            'commitment'        => 'flexible',
+            'status'            => 'open',
+            'moderation_status' => null,
+            'created_at'        => now(),
         ]);
 
         TenantContext::setById(self::TENANT_ID);
