@@ -82,11 +82,8 @@ class ListingModerationServiceTest extends TestCase
 
         $row = DB::table('listings')->where('id', $listingId)->first();
         $this->assertSame('pending_review', $row->moderation_status);
-        // NOTE: suspected source bug — `rejection_reason` is absent from Listing::$fillable,
-        // so $listing->update(['rejection_reason' => ...]) is silently discarded by Eloquent
-        // mass-assignment protection. The reason is never persisted. Fix: add 'rejection_reason'
-        // (and 'reviewed_by', 'reviewed_at') to Listing::$fillable in app/Models/Listing.php.
-        $this->assertNull($row->rejection_reason);
+        // `rejection_reason` is now in Listing::$fillable, so the flagged reason persists.
+        $this->assertSame('Suspicious content', $row->rejection_reason);
     }
 
     /**
@@ -99,10 +96,8 @@ class ListingModerationServiceTest extends TestCase
         $this->service->flag($this->tenantId, $listingId, $this->userId, '  Too vague   ');
 
         $row = DB::table('listings')->where('id', $listingId)->first();
-        // NOTE: suspected source bug — `rejection_reason` is not in Listing::$fillable, so the
-        // trimmed value is never written. Asserts actual current behaviour (null). See note in
-        // test_flag_sets_pending_review_and_reason for the full explanation.
-        $this->assertNull($row->rejection_reason);
+        // The reason is trimmed before being persisted to the now-fillable column.
+        $this->assertSame('Too vague', $row->rejection_reason);
     }
 
     /**
@@ -143,12 +138,10 @@ class ListingModerationServiceTest extends TestCase
         $row = DB::table('listings')->where('id', $listingId)->first();
         $this->assertSame('active', $row->status);
         $this->assertSame('approved', $row->moderation_status);
-        // NOTE: suspected source bug — `reviewed_by` and `reviewed_at` are absent from
-        // Listing::$fillable, so the approve() call to $listing->update([...]) silently
-        // discards those fields. Fix: add 'reviewed_by', 'reviewed_at', and 'rejection_reason'
-        // to Listing::$fillable in app/Models/Listing.php.
-        $this->assertNull($row->reviewed_by);
-        $this->assertNull($row->reviewed_at);
+        // `reviewed_by` / `reviewed_at` are now fillable, so the moderation audit trail persists.
+        $this->assertSame($this->adminId, (int) $row->reviewed_by);
+        $this->assertNotNull($row->reviewed_at);
+        // approve() explicitly clears any prior rejection reason.
         $this->assertNull($row->rejection_reason);
     }
 
@@ -206,12 +199,10 @@ class ListingModerationServiceTest extends TestCase
         $row = DB::table('listings')->where('id', $listingId)->first();
         $this->assertSame('rejected', $row->status);
         $this->assertSame('rejected', $row->moderation_status);
-        // NOTE: suspected source bug — `rejection_reason`, `reviewed_by`, and `reviewed_at` are
-        // absent from Listing::$fillable, so $listing->update([...]) in reject() silently discards
-        // all three fields. Fix: add them to Listing::$fillable in app/Models/Listing.php.
-        $this->assertNull($row->rejection_reason);
-        $this->assertNull($row->reviewed_by);
-        $this->assertNull($row->reviewed_at);
+        // All three moderation fields are now fillable, so the audit trail persists.
+        $this->assertSame('Violates community standards', $row->rejection_reason);
+        $this->assertSame($this->adminId, (int) $row->reviewed_by);
+        $this->assertNotNull($row->reviewed_at);
     }
 
     /**
