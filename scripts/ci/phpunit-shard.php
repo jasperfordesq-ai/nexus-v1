@@ -15,28 +15,41 @@
  * script lists those files and assigns each WHOLE file to a shard, then prints
  * the files for one shard.
  *
- * Partitioning is keyed on the file's repo-relative PATH (round-robin over the
- * sorted path list), NOT on file size.
+ * Partitioning is keyed on a stable hash of the file's repo-relative PATH
+ * (crc32(path) % total), NOT on file size and NOT on the file's position in a
+ * sorted list.
  *
- *   Why not file size? The previous LPT bin-pack keyed buckets on filesize as a
- *   runtime proxy. But filesize changes whenever ANY test file is edited — e.g.
- *   quarantining one flaky test by adding a markTestSkipped() line. That shifted
- *   the bin-pack and silently moved UNRELATED test files between shards, which,
- *   on a suite with cross-class data-isolation debt, exposed a brand-new set of
- *   order-dependent failures on every commit. Quarantine-to-green could never
- *   converge: each fix reshuffled the deck. Pinning files to shards by path
- *   keeps every file in the same shard across content edits, so the failing set
- *   is stable and quarantines actually stick.
+ *   Why not file size? The original LPT bin-pack keyed buckets on filesize as a
+ *   runtime proxy. But filesize changes whenever a test file is edited (e.g.
+ *   adding a markTestSkipped() line to quarantine a flaky test), which reshuffled
+ *   the bin-pack and silently moved UNRELATED files between shards. On a suite
+ *   with cross-class data-isolation debt, that exposed a new set of order-
+ *   dependent failures on every commit, so quarantine-to-green never converged.
+ *
+ *   Why not round-robin over the sorted path list? That is stable against
+ *   content edits, but NOT against ADDING or REMOVING test files: inserting one
+ *   file shifts the sorted index of every file after it, moving them between
+ *   shards. `main` lands automated "coverage batch" commits that add dozens of
+ *   test files at a time, so an index-based split reshuffles on every such
+ *   commit (CI tests the PR merge ref, so the branch inherits them).
+ *
+ *   A per-path hash fixes both: each file's shard depends ONLY on its own path,
+ *   so editing a file never moves it AND adding/removing other files never moves
+ *   it. Only the newly-added files themselves get assigned; everything else
+ *   stays pinned. The failing set is therefore stable, quarantines stick, and
+ *   the partition survives main's churn.
  *
  * Files are assigned by WHOLE file, so any intra-class @depends stays inside a
  * single shard (the suite currently declares none). Output is newline-separated
  * repo-relative paths, suitable for:
  *   vendor/bin/phpunit $(php scripts/ci/phpunit-shard.php <shard> <total>)
  *
- * Trade-off: round-robin balances by file COUNT, not runtime. Because path order
- * is uncorrelated with file size, sizes spread roughly evenly across shards in
- * practice; we accept slightly looser balance in exchange for a partition that
- * is stable under content edits (the property that makes CI converge).
+ * Trade-off: a hash balances by file COUNT in expectation, not runtime, and the
+ * counts vary by +/- a few percent per shard rather than being exactly equal.
+ * Because path is uncorrelated with size, file sizes still spread roughly evenly
+ * across shards. We accept slightly looser balance in exchange for a partition
+ * that is stable under BOTH content edits and file add/remove — the property
+ * that makes CI converge while main keeps adding tests.
  *
  * Usage:  php scripts/ci/phpunit-shard.php <shardIndex 1..total> <total>
  * Exit 0 with the file list on success; exit 2 on bad arguments / missing dir.
@@ -70,16 +83,15 @@ foreach ($iter as $file) {
     }
 }
 
-// Deterministic, edit-stable order: sort by repo-relative path. Sorting first
-// makes the round-robin assignment below a pure function of the file SET, so
-// every runner produces the same buckets for a given commit, and editing a
-// file's contents never moves it (its path, hence its rank, is unchanged).
-sort($files, SORT_STRING);
-
-// Round-robin: file at sorted index $i goes to shard ($i % $total) + 1.
+// Assign each file to a shard by a stable hash of its repo-relative path:
+// bucket = crc32(path) % total. This depends only on the file's OWN path, so a
+// file never moves when other files are edited, added, or removed. (The double
+// modulo guards against any platform where crc32() is negative; on 64-bit PHP
+// it is already in 0..2^32-1.)
 $out = [];
-foreach ($files as $i => $relPath) {
-    if (($i % $total) + 1 === $shard) {
+foreach ($files as $relPath) {
+    $bucket = ((crc32($relPath) % $total) + $total) % $total; // 0-indexed
+    if ($bucket === $shard - 1) {
         $out[] = $relPath;
     }
 }
