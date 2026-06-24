@@ -47,7 +47,7 @@ class BackupVerify extends Command
 
     public function handle(): int
     {
-        $dir = (string) ($this->option('dir') ?: env('BACKUP_VERIFY_DIR') ?: base_path('backups'));
+        $dir = (string) ($this->option('dir') ?: config('app.backup_verify_dir') ?: base_path('backups'));
         $dir = rtrim($dir, '/\\');
         $maxAgeHours = max(1, (int) $this->option('max-age-hours'));
         $pattern = (string) $this->option('glob');

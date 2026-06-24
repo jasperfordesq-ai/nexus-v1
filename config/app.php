@@ -11,6 +11,13 @@ return [
     'debug' => (bool) env('APP_DEBUG', false),
     'url' => env('APP_URL', 'http://localhost'),
     'frontend_url' => env('FRONTEND_URL', env('APP_FRONTEND_URL', env('APP_URL', 'http://localhost'))),
+    // Deploy-injected build commit (set by bluegreen-deploy.sh). Read via
+    // config('app.build_commit') so it survives config:cache — env() returns
+    // null once the config cache is built.
+    'build_commit' => env('BUILD_COMMIT'),
+    // Optional override directory for backup:verify. Read via
+    // config('app.backup_verify_dir') for the same config-cache safety.
+    'backup_verify_dir' => env('BACKUP_VERIFY_DIR'),
     'timezone' => 'UTC',
     'locale' => 'en',
     'fallback_locale' => 'en',

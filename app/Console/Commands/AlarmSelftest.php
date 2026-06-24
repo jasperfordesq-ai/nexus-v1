@@ -46,7 +46,7 @@ class AlarmSelftest extends Command
     public function handle(): int
     {
         $stamp = Carbon::now()->toIso8601String();
-        $release = (string) (env('BUILD_COMMIT') ?: 'unknown');
+        $release = (string) (config('app.build_commit') ?: 'unknown');
         $host = (string) (gethostname() ?: 'unknown');
 
         $message = sprintf(
