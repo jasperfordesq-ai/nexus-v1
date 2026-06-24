@@ -2,53 +2,64 @@
 #
 # Pre-commit verify-gate (test batches)
 # -------------------------------------
-# Auto-generated/coverage test batches kept landing on `main` broken, turning CI
-# red. This gate runs any *staged* PHP test files before the commit is created,
-# so a test that fails in isolation can't be committed.
+# Auto-generated/coverage test batches kept landing on `main` broken (failing
+# tests) or inflating schema-skip debt, turning CI red. This gate runs two
+# checks whenever PHP test files are staged:
 #
-# It is deliberately conservative — it SKIPS (never blocks) when php/phpunit or
-# the test DB aren't available, so it can't block unrelated work or fire on a
-# machine without the test stack. It blocks ONLY when a staged test actually runs
-# and fails.
+#   1. Schema-skip budget ratchet (scripts/check-test-skip-budget.mjs) — static,
+#      git-aware (counts tracked+staged only). Blocks if a staged test pushes the
+#      schema-driven markTestSkipped count over the committed budget.
+#   2. The staged test files themselves (phpunit) — blocks if any fail in
+#      isolation. Skips gracefully when php/phpunit or the test DB are absent.
 #
-# NOTE: order-dependent failures that only appear in the full 12k-test suite are
-# NOT caught here (a staged file run in isolation can pass yet flake in CI). CI
-# remains the backstop for those.
+# Order-dependent failures that only appear in the full suite are NOT caught
+# here; CI remains the backstop for those.
 #
-# Bypass is for PRE-EXISTING lint/build issues only. A failure from THIS gate is
-# always in a file you are committing — fix or drop the test; do not --no-verify.
+# A failure from THIS gate is always in a file you are committing — fix or drop
+# it. Do NOT --no-verify past it (see AGENTS.md).
 #
 
 STAGED_TESTS=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^tests/.*\.php$' || true)
 [ -z "$STAGED_TESTS" ] && exit 0
 
+# (1) Schema-skip budget — static, needs only node.
+if command -v node >/dev/null 2>&1 && [ -f scripts/check-test-skip-budget.mjs ]; then
+  BUDGET_OUT=$(node scripts/check-test-skip-budget.mjs 2>&1)
+  if [ $? -ne 0 ]; then
+    echo "$BUDGET_OUT" | tail -7 >&2
+    echo "" >&2
+    echo "pre-commit: schema-skip budget exceeded — commit BLOCKED." >&2
+    echo " A staged test adds a markTestSkipped() guard for a missing table/column." >&2
+    echo " The table likely exists — make it a real test or drop the guard." >&2
+    echo " Do NOT --no-verify past this." >&2
+    exit 1
+  fi
+fi
+
+# (2) Run the staged test files — needs php + phpunit + the test DB.
 if ! command -v php >/dev/null 2>&1 || [ ! -f vendor/bin/phpunit ]; then
-  echo "pre-commit: php/phpunit unavailable — skipping test verify-gate." >&2
+  echo "pre-commit: php/phpunit unavailable — skipping staged-test run (budget OK)." >&2
   exit 0
 fi
-
-# Skip (don't block) if the test DB isn't reachable on 127.0.0.1:3307.
 if ! php -r '$c=@fsockopen("127.0.0.1",3307,$e,$s,2); exit($c?0:1);' >/dev/null 2>&1; then
-  echo "pre-commit: test DB 127.0.0.1:3307 not reachable — skipping test verify-gate." >&2
+  echo "pre-commit: test DB 127.0.0.1:3307 not reachable — skipping staged-test run (budget OK)." >&2
   exit 0
 fi
 
-echo "pre-commit: verifying staged test file(s) before commit..."
+echo "pre-commit: verifying staged test file(s)..."
 echo "$STAGED_TESTS" | sed 's/^/  - /'
-
 MEILISEARCH_HOST="${MEILISEARCH_HOST:-http://127.0.0.1:7700}" \
   php vendor/bin/phpunit --no-coverage --stop-on-failure $STAGED_TESTS
 STATUS=$?
-
 if [ "$STATUS" -ne 0 ]; then
   echo "" >&2
   echo "==============================================================" >&2
   echo " Staged test file(s) FAILED — commit BLOCKED." >&2
-  echo " These tests are part of THIS commit, so the failure is yours" >&2
-  echo " to fix or drop — do NOT bypass with --no-verify." >&2
+  echo " These tests are part of THIS commit — fix or drop them." >&2
+  echo " Do NOT bypass with --no-verify." >&2
   echo "==============================================================" >&2
   exit 1
 fi
 
-echo "pre-commit: staged test file(s) pass — proceeding."
+echo "pre-commit: staged tests pass + schema-skip budget OK — proceeding."
 exit 0
