@@ -45,6 +45,13 @@ class CaringCommunityAlertServiceTest extends TestCase
     {
         parent::setUp();
 
+        // The array cache survives across tests in the shared process; an earlier
+        // test can leave tenant settings/feature state cached for tenant 2, which
+        // suppresses the low-supply alert here. Flush so the alert logic reads
+        // fresh state — this test passes in isolation but flaked in the full suite
+        // without it. (DatabaseTransactions already isolates DB rows.)
+        \Illuminate\Support\Facades\Cache::flush();
+
         Queue::fake();
 
         TenantContext::setById(self::TENANT_ID);
