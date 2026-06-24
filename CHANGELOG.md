@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation now covers every module and follows the Diátaxis framework.** Added maintained, code-verified guides for all remaining modules (marketplace, courses, podcasts, blog & resources, social feed, AI chat, ideation & challenges, organisations, monetization, connections & reviews, identity verification) — 24 module guides in total — plus explanation docs for internationalisation ([docs/I18N.md](docs/I18N.md)), the database and migrations ([docs/DATABASE.md](docs/DATABASE.md)), and the CI pipeline ([docs/CI.md](docs/CI.md)), a [RELEASES.md](RELEASES.md) versioning policy, a "How the documentation is organised" Diátaxis index, and a markdownlint configuration.
 - **A hosted documentation site and documentation CI gates.** The docs now build into a searchable MkDocs Material site with an interactive Redoc API reference (deployed to GitHub Pages), and CI gained documentation quality gates: markdownlint (Markdown structure), Redocly (OpenAPI contract validity), and a MkDocs build check.
 
+### Fixed
+
+- **Approving an AI assistant suggestion to pair two members or route a help request now actually does it.** Two caring-community AI agent actions silently failed: approving a "create a support tandem" suggestion marked it approved but never created the relationship, and approving a "route this help request to a coordinator" suggestion never updated the request. Both wrote to database columns that don't exist, so the change was discarded without an error. They now create the support relationship (with the required title and start date) and move the help request into its "matched" state as intended.
+
 ## [1.5.3] - 2026-06-23
 
 ### Added

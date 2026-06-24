@@ -328,27 +328,31 @@ class AgentExecutorTest extends TestCase
         $reviewerId = $this->insertUser('admin');
 
         $propId = $this->seedProposal($runId, 'create_tandem', [
-            'supporter_id' => $supporter,
-            'recipient_id' => $recipient,
+            'supporter_id'   => $supporter,
+            'recipient_id'   => $recipient,
+            'supporter_name' => 'Supporter Sam',
+            'recipient_name' => 'Recipient Rae',
         ]);
 
         AgentExecutor::approve($propId, self::TENANT_ID, $reviewerId);
 
-        // The action must have inserted a caring_support_relationships row
-        // (only if the table exists — it does in the test DB).
-        $exists = DB::table('caring_support_relationships')
+        // The action must insert a caring_support_relationships row with the
+        // required NOT NULL columns (title, start_date) populated — otherwise the
+        // INSERT throws and is swallowed, leaving the tandem uncreated.
+        $row = DB::table('caring_support_relationships')
             ->where('tenant_id', self::TENANT_ID)
             ->where('supporter_id', $supporter)
             ->where('recipient_id', $recipient)
-            ->exists();
+            ->first();
 
-        // NOTE: caring_support_relationships has NOT NULL columns (title, start_date)
-        // that AgentExecutor::dispatchAction does not populate — if the INSERT fails
-        // the dispatchAction silently returns (no exception). We assert that the
-        // proposal itself was approved regardless.
-        // The relationship row creation is best-effort; we verify the proposal status.
-        $row = DB::table('agent_proposals')->where('id', $propId)->first();
-        $this->assertSame('approved', $row->status);
+        $this->assertNotNull($row, 'create_tandem must persist a caring_support_relationships row');
+        $this->assertSame('active', $row->status);
+        $this->assertNotEmpty($row->title, 'title (NOT NULL) must be populated');
+        $this->assertNotNull($row->start_date, 'start_date (NOT NULL) must be populated');
+        $this->assertSame('Supporter Sam & Recipient Rae', $row->title);
+
+        $proposal = DB::table('agent_proposals')->where('id', $propId)->first();
+        $this->assertSame('approved', $proposal->status);
     }
 
     // =========================================================================

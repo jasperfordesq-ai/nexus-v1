@@ -169,10 +169,26 @@ final class AgentExecutor
                     ->where('recipient_id', $recipientId)
                     ->exists();
                 if (!$exists) {
+                    // `caring_support_relationships` requires NOT NULL `title` and
+                    // `start_date` (neither has a DB default). The original insert
+                    // omitted both, so the row was either rejected (strict mode) or
+                    // written with an empty title and a zero `0000-00-00` start_date
+                    // (the connection's non-strict mode) — never a usable tandem.
+                    // Populate them the way CaringSupportRelationshipService::create()
+                    // does; `frequency`, `expected_hours` and `status` keep their
+                    // schema defaults.
+                    $supporterName = trim((string) ($payload['supporter_name'] ?? ''));
+                    $recipientName = trim((string) ($payload['recipient_name'] ?? ''));
+                    $title = ($supporterName !== '' && $recipientName !== '')
+                        ? $supporterName . ' & ' . $recipientName
+                        : (string) __('api.caring_support_relationship_default_title');
+
                     DB::table('caring_support_relationships')->insertGetId([
                         'tenant_id'    => $tenantId,
                         'supporter_id' => $supporterId,
                         'recipient_id' => $recipientId,
+                        'title'        => mb_substr($title, 0, 255),
+                        'start_date'   => now()->toDateString(),
                         'status'       => 'active',
                         'created_at'   => now(),
                         'updated_at'   => now(),
@@ -198,17 +214,23 @@ final class AgentExecutor
                 if (!Schema::hasTable('caring_help_requests')) {
                     return;
                 }
-                $requestId = (int) ($payload['request_id'] ?? 0);
-                $assignedTo = (int) ($payload['coordinator_id'] ?? ($proposal['target_user_id'] ?? 0));
-                if (!$requestId || !$assignedTo) {
+                $requestId   = (int) ($payload['request_id'] ?? 0);
+                $coordinator = (int) ($payload['coordinator_id'] ?? ($proposal['target_user_id'] ?? 0));
+                if (!$requestId || !$coordinator) {
                     return;
                 }
+                // `caring_help_requests` has no `assigned_to` column, so the
+                // original UPDATE raised an "Unknown column" error and the routing
+                // silently failed. The routed coordinator is recorded on the
+                // proposal (target_user_id); the real status transition is
+                // `pending` -> `matched`, i.e. the request is now being handled.
                 DB::table('caring_help_requests')
                     ->where('id', $requestId)
                     ->where('tenant_id', $tenantId)
+                    ->where('status', 'pending')
                     ->update([
-                        'assigned_to' => $assignedTo,
-                        'updated_at'  => now(),
+                        'status'     => 'matched',
+                        'updated_at' => now(),
                     ]);
                 break;
 
