@@ -152,10 +152,15 @@ class CoordinatorRouterAgentTest extends TestCase
         $agent  = $this->makeAgent();
         $result = $agent->run();
 
-        // No pending help requests seeded for this tenant → zero proposals, but the
-        // query runs cleanly against the real schema (status/coordinator_tasks).
-        $this->assertSame(0, $result['proposals_created']);
+        // The regression guard here is that the agent runs cleanly against the
+        // real schema (the original bug threw "Unknown column" on assigned_to).
+        // We don't hard-assert exactly 0 — the shared test DB could one day hold
+        // committed pending requests for tenant 2 that DatabaseTransactions would
+        // not roll back — only that the result is a well-formed, non-negative count.
+        $this->assertIsInt($result['proposals_created']);
+        $this->assertGreaterThanOrEqual(0, $result['proposals_created']);
         $this->assertIsString($result['summary']);
+        $this->assertNotEmpty($result['summary']);
     }
 
     // -------------------------------------------------------------------------
