@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+# Pre-commit verify-gate (test batches)
+# -------------------------------------
+# Auto-generated/coverage test batches kept landing on `main` broken, turning CI
+# red. This gate runs any *staged* PHP test files before the commit is created,
+# so a test that fails in isolation can't be committed.
+#
+# It is deliberately conservative — it SKIPS (never blocks) when php/phpunit or
+# the test DB aren't available, so it can't block unrelated work or fire on a
+# machine without the test stack. It blocks ONLY when a staged test actually runs
+# and fails.
+#
+# NOTE: order-dependent failures that only appear in the full 12k-test suite are
+# NOT caught here (a staged file run in isolation can pass yet flake in CI). CI
+# remains the backstop for those.
+#
+# Bypass is for PRE-EXISTING lint/build issues only. A failure from THIS gate is
+# always in a file you are committing — fix or drop the test; do not --no-verify.
+#
+
+STAGED_TESTS=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^tests/.*\.php$' || true)
+[ -z "$STAGED_TESTS" ] && exit 0
+
+if ! command -v php >/dev/null 2>&1 || [ ! -f vendor/bin/phpunit ]; then
+  echo "pre-commit: php/phpunit unavailable — skipping test verify-gate." >&2
+  exit 0
+fi
+
+# Skip (don't block) if the test DB isn't reachable on 127.0.0.1:3307.
+if ! php -r '$c=@fsockopen("127.0.0.1",3307,$e,$s,2); exit($c?0:1);' >/dev/null 2>&1; then
+  echo "pre-commit: test DB 127.0.0.1:3307 not reachable — skipping test verify-gate." >&2
+  exit 0
+fi
+
+echo "pre-commit: verifying staged test file(s) before commit..."
+echo "$STAGED_TESTS" | sed 's/^/  - /'
+
+MEILISEARCH_HOST="${MEILISEARCH_HOST:-http://127.0.0.1:7700}" \
+  php vendor/bin/phpunit --no-coverage --stop-on-failure $STAGED_TESTS
+STATUS=$?
+
+if [ "$STATUS" -ne 0 ]; then
+  echo "" >&2
+  echo "==============================================================" >&2
+  echo " Staged test file(s) FAILED — commit BLOCKED." >&2
+  echo " These tests are part of THIS commit, so the failure is yours" >&2
+  echo " to fix or drop — do NOT bypass with --no-verify." >&2
+  echo "==============================================================" >&2
+  exit 1
+fi
+
+echo "pre-commit: staged test file(s) pass — proceeding."
+exit 0
