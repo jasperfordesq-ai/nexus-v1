@@ -20,11 +20,28 @@ env:
 
 jobs:
   # ─────────────────────────────────────────────────────────────────
-  # Stage 1: PHP Checks (syntax + unit tests + service tests)
+  # Stage 1a: PHP Tests — PHPUnit, sharded across parallel runners.
+  #
+  # The ~12.5k-test Laravel suite ran single-threaded and took ~2h, making it
+  # the long pole every PR waited on. It is now split into SHARD_TOTAL balanced
+  # buckets by scripts/ci/phpunit-shard.php and run as a matrix, cutting the
+  # wall-clock to roughly 1/N. Each shard gets its OWN MariaDB + Redis service,
+  # so there is no cross-worker DB contention — every shard is the same
+  # isolated, single-threaded environment the suite was written for, just
+  # smaller. (Keep the matrix list length in sync with SHARD_TOTAL.)
   # ─────────────────────────────────────────────────────────────────
-  php-checks:
-    name: PHP Checks
+  php-tests:
+    name: PHP Tests (shard ${{ matrix.shard }})
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      SHARD_TOTAL: '6'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6]
 
     services:
       mariadb:
@@ -60,8 +77,8 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           extensions: pdo_mysql, mbstring, xml, zip, redis, gd, intl, bcmath, opcache, curl, fileinfo, gmp
-          # php-checks does not consume coverage output, but xdebug instrumented
-          # all 8303 tests and made the blocking suite take 20+ min. Disable it.
+          # coverage disabled: xdebug instrumented every test and made the suite
+          # take 20+ min. php-tests does not consume coverage output.
           coverage: none
 
       - name: Cache Composer Dependencies
@@ -115,30 +132,29 @@ jobs:
           SESSION_DRIVER: array
           QUEUE_CONNECTION: sync
           LOG_CHANNEL: "null"
-          # Without this, booting artisan resolves the default 'pusher'
-          # broadcaster with a null PUSHER_KEY and throws at boot (same
-          # reason phpunit.xml pins it). Migrations don't broadcast, so
-          # the null driver is correct here.
           BROADCAST_CONNECTION: "null"
           BROADCAST_DRIVER: "null"
 
-      - name: PHP Syntax Check
+      # --display-warnings/--display-deprecations: phpunit.xml sets
+      # failOnWarning/failOnRisky=true, so a single warning fails this gate
+      # with a bare "OK, but there were issues!" and no detail. The display
+      # flags itemise the offending tests so the red is actionable.
+      #
+      # The test files for this shard come from phpunit-shard.php; passing
+      # explicit paths still honours phpunit.xml (bootstrap, <php> env, and the
+      # slow/external <groups> excludes), so behaviour matches the full run.
+      - name: "BLOCKING: PHPUnit Laravel suite (shard ${{ matrix.shard }}/${{ env.SHARD_TOTAL }})"
+        shell: bash
         run: |
-          echo "Checking PHP syntax in app/ ..."
-          ERRORS=$(find app -name "*.php" -print0 | xargs -0 -n1 php -l 2>&1 | grep -c "Parse error" || true)
-          if [ "$ERRORS" -gt 0 ]; then
-            echo "::error::Found $ERRORS PHP syntax error(s):"
-            find app -name "*.php" -print0 | xargs -0 -n1 php -l 2>&1 | grep "Parse error"
+          mapfile -t FILES < <(php scripts/ci/phpunit-shard.php "${{ matrix.shard }}" "$SHARD_TOTAL")
+          echo "Shard ${{ matrix.shard }}/$SHARD_TOTAL → ${#FILES[@]} test files"
+          if [ "${#FILES[@]}" -eq 0 ]; then
+            echo "::error::No test files assigned to shard ${{ matrix.shard }}/$SHARD_TOTAL"
             exit 1
           fi
-          echo "All PHP files passed syntax check."
-
-      - name: "BLOCKING: PHPUnit Laravel suite"
-        # --display-warnings/--display-deprecations: phpunit.xml sets
-        # failOnWarning/failOnRisky=true, so a single warning fails this gate
-        # with a bare "OK, but there were issues!" and no detail. The display
-        # flags itemise the offending tests so the red is actionable.
-        run: vendor/bin/phpunit --testsuite=Laravel,LaravelMigrated --colors=always --no-coverage --display-warnings --display-deprecations --display-incomplete --display-skipped
+          vendor/bin/phpunit --colors=always --no-coverage \
+            --display-warnings --display-deprecations --display-incomplete --display-skipped \
+            "${FILES[@]}"
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
@@ -154,11 +170,111 @@ jobs:
           QUEUE_CONNECTION: sync
           LOG_CHANNEL: null
 
-      # Schema-driven test-skip ratchet. ~172 PHPUnit tests skip when the test DB
-      # (built from database/schema/mysql-schema.sql) lacks a table/column, so they
-      # provide no protection. This freezes that count so new schema-skip debt can't
-      # be added; refresh the schema dump and convert skips to real tests to lower it.
-      # (node is preinstalled on the runner; the script uses only built-in modules.)
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 1b: PHP Static Analysis & guards — syntax, schema-skip budget,
+  # PHPStan, env-var doc check, and the artisan cache fail-fast test. These
+  # are independent of the test run, so they execute in parallel with the
+  # shards instead of waiting behind a 2h suite (as they did before).
+  # ─────────────────────────────────────────────────────────────────
+  php-analysis:
+    name: PHP Static Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MYSQL_ROOT_PASSWORD: testing
+          MYSQL_DATABASE: nexus_test
+          MYSQL_USER: nexus
+          MYSQL_PASSWORD: nexus_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo_mysql, mbstring, xml, zip, redis, gd, intl, bcmath, opcache, curl, fileinfo, gmp
+          coverage: none
+
+      - name: Cache Composer Dependencies
+        uses: actions/cache@v5
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Prepare Laravel Runtime Directories
+        run: |
+          mkdir -p bootstrap/cache storage/framework/{cache,sessions,views} storage/logs
+          chmod -R ug+rw bootstrap/cache storage
+
+      - name: Setup Test Database Schema
+        run: |
+          echo "Loading schema into nexus_test database..."
+          mysql -h 127.0.0.1 -u root -ptesting nexus_test < database/schema/mysql-schema.sql
+          mysql -h 127.0.0.1 -u root -ptesting -e "CREATE DATABASE IF NOT EXISTS nexus;"
+          mysql -h 127.0.0.1 -u root -ptesting -e "GRANT ALL PRIVILEGES ON nexus.* TO 'nexus'@'%';"
+          mysql -h 127.0.0.1 -u root -ptesting -e "FLUSH PRIVILEGES;"
+          mysql -h 127.0.0.1 -u root -ptesting nexus < database/schema/mysql-schema.sql
+
+      - name: Run pending migrations on test databases
+        run: |
+          php artisan migrate --force
+          DB_DATABASE=nexus php artisan migrate --force
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: nexus_test
+          DB_USER: root
+          DB_PASS: testing
+          APP_ENV: testing
+          APP_KEY: base64:HfQEDtbtr90JIXhsaAhSFWnzIo1f31VZ2e5qLqKKnls=
+          CACHE_DRIVER: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
+          LOG_CHANNEL: "null"
+          BROADCAST_CONNECTION: "null"
+          BROADCAST_DRIVER: "null"
+
+      - name: PHP Syntax Check
+        run: |
+          echo "Checking PHP syntax in app/ ..."
+          ERRORS=$(find app -name "*.php" -print0 | xargs -0 -n1 php -l 2>&1 | grep -c "Parse error" || true)
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "::error::Found $ERRORS PHP syntax error(s):"
+            find app -name "*.php" -print0 | xargs -0 -n1 php -l 2>&1 | grep "Parse error"
+            exit 1
+          fi
+          echo "All PHP files passed syntax check."
+
+      # Schema-driven test-skip ratchet. Counts PHPUnit tests that skip when the
+      # test DB lacks a table/column (they protect nothing) and fails if the
+      # count rises above the committed baseline; refresh the schema dump and
+      # convert skips to real tests to lower it.
       - name: "BLOCKING: Schema-driven test-skip budget"
         run: node scripts/check-test-skip-budget.mjs
 
@@ -167,25 +283,16 @@ jobs:
       - name: "BLOCKING: PHPStan static analysis (level 1, larastan + baseline)"
         run: vendor/bin/phpstan analyse --no-progress --memory-limit=2G --error-format=github
         env:
-          # larastan boots the full Laravel app; routes/channels.php resolves
-          # the default broadcaster at route load, and the 'pusher' driver
-          # throws on a null PUSHER_KEY (no secrets in CI). Same null-driver
-          # pin as the migration and PHPUnit steps. This step had been
-          # unreachable for weeks (PHPUnit failed first), so the gap only
-          # surfaced once the suite went green.
+          # larastan boots the full Laravel app; routes/channels.php resolves the
+          # default broadcaster at route load, and the 'pusher' driver throws on
+          # a null PUSHER_KEY (no secrets in CI). Null-driver pin matches the
+          # migration step.
           BROADCAST_CONNECTION: "null"
           BROADCAST_DRIVER: "null"
 
       # TD15: Validate that all required env vars referenced in config/ are
-      # documented in .env.example. Catches the class of bug where a new
-      # config/foo.php references env('NEW_KEY') but the example wasn't updated,
-      # which would crash-loop `php artisan config:cache` at container start.
-      #
-      # WARNING-ONLY: Laravel's framework config files (session.php, broadcasting.php,
-      # queue.php, filesystems.php, mail.php) use env() without fallback as a
-      # documented pattern — these keys are only read when the driver is selected.
-      # Promoting to BLOCKING would require an allowlist or a smarter scanner.
-      # Tracked as a follow-up; for now this surfaces new gaps without blocking CI.
+      # documented in .env.example. WARNING-ONLY (see history); surfaces new
+      # gaps without blocking.
       - name: "WARNING: Validate required env vars are documented"
         run: |
           cp .env.example .env.ci
@@ -195,21 +302,14 @@ jobs:
 
       # TD15: Exercise artisan cache commands — these are fail-fast at container
       # start in Dockerfile.prod. Any failure here would crash-loop production.
-      # We copy .env.example → .env and generate an APP_KEY so cache:build has
-      # a valid encryption key; without this, config:cache fails immediately on
-      # a fresh checkout.
       - name: "BLOCKING: Artisan cache fail-fast test"
         run: |
-          # Seed .env from example so env() calls resolve
           [ -f .env ] || cp .env.example .env
-          # Ensure bootstrap/cache exists (gitignored — absent in fresh CI clone)
           mkdir -p bootstrap/cache
-          # Ensure APP_KEY is set (required by config:cache)
           php artisan key:generate --force --ansi
           php artisan config:cache
           php artisan route:cache
           php artisan event:cache
-          # Clean up so subsequent steps don't inherit cached config
           php artisan config:clear
           php artisan route:clear
           php artisan event:clear
@@ -220,6 +320,29 @@ jobs:
           DB_PASS: nexus_test
           REDIS_HOST: 127.0.0.1
           APP_ENV: testing
+
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 1: PHP Checks — aggregate gate. Kept under this exact name so the
+  # existing required status check and docker-verify's `needs: php-checks`
+  # stay valid. Green only when every test shard AND the static analysis job
+  # succeed; reports a clear failure otherwise.
+  # ─────────────────────────────────────────────────────────────────
+  php-checks:
+    name: PHP Checks
+    runs-on: ubuntu-latest
+    needs: [php-tests, php-analysis]
+    if: always()
+
+    steps:
+      - name: Verify PHP tests and analysis passed
+        run: |
+          echo "php-tests   = ${{ needs.php-tests.result }}"
+          echo "php-analysis = ${{ needs.php-analysis.result }}"
+          if [ "${{ needs.php-tests.result }}" != "success" ] || [ "${{ needs.php-analysis.result }}" != "success" ]; then
+            echo "::error::PHP checks failed (tests=${{ needs.php-tests.result }}, analysis=${{ needs.php-analysis.result }})"
+            exit 1
+          fi
+          echo "All PHP test shards and static analysis passed."
 
   # ─────────────────────────────────────────────────────────────────
   # Stage 2: React Frontend (TypeScript + Vitest + Build)
