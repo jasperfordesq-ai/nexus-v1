@@ -22,13 +22,12 @@ use Tests\Laravel\TestCase;
  * PrerenderService is mocked for broadcastJob calls.
  * All DB writes are rolled back per test via DatabaseTransactions.
  *
- * NOTE: PrerenderReapStale::handle() sets `'updated_at' => $now` in its UPDATE
- * statements (lines 104 & 110 of PrerenderReapStale.php), but the
- * prerender_jobs table does not have an updated_at column in the current schema.
- * This causes a SQLSTATE[42S22] when the command actually executes an UPDATE.
- * Tests that exercise the UPDATE path are wrapped with a try/expectException so
- * they still record a real assertion and flag the bug rather than silently
- * swallowing it. Dry-run tests are unaffected as they never reach the UPDATE.
+ * The prerender_jobs table has no updated_at column, so handle() must NOT set
+ * one in its UPDATE payloads — it writes only the columns that exist
+ * (status / claimed_at / claimed_by / started_at / finished_at / error_message).
+ * The reap-path tests below assert the stuck rows are actually transitioned
+ * (failed by default, queued under --requeue); the dry-run tests assert no
+ * mutation occurs.
  */
 class PrerenderReapStaleTest extends TestCase
 {
@@ -170,57 +169,44 @@ class PrerenderReapStaleTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // Stale claimed row IS detected (row enters the reap loop).
-    // NOTE: the UPDATE itself fails with "Unknown column updated_at" due to a
-    // source bug in PrerenderReapStale::handle(). The command propagates the
-    // DB exception which exits non-zero. We assert the row was targeted by
-    // verifying it still has status=claimed (not changed to anything else)
-    // and the exception came from the DB, proving detection worked.
+    // Stale claimed row IS reaped: status -> failed, finished_at + error_message
+    // set, and the job change is broadcast.
     // -------------------------------------------------------------------------
 
-    public function test_stale_claimed_row_is_detected_by_reaper(): void
+    public function test_stale_claimed_row_is_reaped_to_failed(): void
     {
         // 15-minute-old claimed row — well past the default 10-minute threshold.
         $id = $this->insertJob('claimed', now()->subMinutes(15));
 
-        // NOTE: source bug — PrerenderReapStale sets `updated_at` on a column
-        // that does not exist in prerender_jobs, causing a DB exception on UPDATE.
-        // broadcastJob is after the UPDATE so it won't be called either.
-        $this->service->shouldNotReceive('broadcastJob');
+        // Failed-reap path broadcasts the job change exactly once.
+        $this->service->shouldReceive('broadcastJob')->once()->with($id);
 
-        try {
-            $this->artisan('prerender:reap-stale');
-        } catch (\Illuminate\Database\QueryException $e) {
-            // Expected: the DB rejects the `updated_at` column that doesn't exist.
-            $this->assertStringContainsString('updated_at', $e->getMessage());
-            return;
-        }
+        $this->artisan('prerender:reap-stale')
+            ->assertExitCode(0);
 
-        // If no exception was thrown, the UPDATE silently succeeded (schema changed).
-        // Either way, assert the row was acted upon.
-        $status = DB::table('prerender_jobs')->where('id', $id)->value('status');
-        $this->assertContains($status, ['failed', 'queued']);
+        $row = DB::table('prerender_jobs')->where('id', $id)->first();
+        $this->assertSame('failed', $row->status);
+        $this->assertNotNull($row->finished_at);
+        $this->assertSame('reaped: worker did not finalise within timeout', $row->error_message);
     }
 
     // -------------------------------------------------------------------------
-    // Stale running row IS detected (similar to above).
+    // Stale running row IS reaped to failed (similar to above).
     // -------------------------------------------------------------------------
 
-    public function test_stale_running_row_is_detected_by_reaper(): void
+    public function test_stale_running_row_is_reaped_to_failed(): void
     {
         $id = $this->insertJob('running', now()->subMinutes(60));
 
-        $this->service->shouldNotReceive('broadcastJob');
+        $this->service->shouldReceive('broadcastJob')->once()->with($id);
 
-        try {
-            $this->artisan('prerender:reap-stale');
-        } catch (\Illuminate\Database\QueryException $e) {
-            $this->assertStringContainsString('updated_at', $e->getMessage());
-            return;
-        }
+        $this->artisan('prerender:reap-stale')
+            ->assertExitCode(0);
 
-        $status = DB::table('prerender_jobs')->where('id', $id)->value('status');
-        $this->assertContains($status, ['failed', 'queued']);
+        $row = DB::table('prerender_jobs')->where('id', $id)->first();
+        $this->assertSame('failed', $row->status);
+        $this->assertNotNull($row->finished_at);
+        $this->assertSame('reaped: worker did not finalise within timeout', $row->error_message);
     }
 
     // -------------------------------------------------------------------------
@@ -249,19 +235,15 @@ class PrerenderReapStaleTest extends TestCase
         // 3 min old; --claimed-minutes=2 → stale.
         $id = $this->insertJob('claimed', now()->subMinutes(3));
 
-        // NOTE: same source bug — UPDATE will fail; catch and assert detection.
-        $this->service->shouldNotReceive('broadcastJob');
+        $this->service->shouldReceive('broadcastJob')->once()->with($id);
 
-        try {
-            $this->artisan('prerender:reap-stale', ['--claimed-minutes' => '2']);
-        } catch (\Illuminate\Database\QueryException $e) {
-            $this->assertStringContainsString('updated_at', $e->getMessage());
-            return;
-        }
+        $this->artisan('prerender:reap-stale', ['--claimed-minutes' => '2'])
+            ->assertExitCode(0);
 
-        // If bug is fixed, assert the row was reaped.
-        $status = DB::table('prerender_jobs')->where('id', $id)->value('status');
-        $this->assertContains($status, ['failed', 'queued']);
+        $row = DB::table('prerender_jobs')->where('id', $id)->first();
+        $this->assertSame('failed', $row->status);
+        $this->assertNotNull($row->finished_at);
+        $this->assertSame('reaped: worker did not finalise within timeout', $row->error_message);
     }
 
     // -------------------------------------------------------------------------
@@ -297,6 +279,48 @@ class PrerenderReapStaleTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertSame('claimed', DB::table('prerender_jobs')->where('id', $id)->value('status'));
+    }
+
+    // -------------------------------------------------------------------------
+    // --requeue (real run): a never-requeued stuck row is reset to queued and
+    // its claim fields cleared. The requeue path does not broadcast.
+    // -------------------------------------------------------------------------
+
+    public function test_requeue_resets_stale_claimed_row_to_queued(): void
+    {
+        $id = $this->insertJob('claimed', now()->subMinutes(20), null);
+
+        $this->service->shouldNotReceive('broadcastJob');
+
+        $this->artisan('prerender:reap-stale', ['--requeue' => true])
+            ->assertExitCode(0);
+
+        $row = DB::table('prerender_jobs')->where('id', $id)->first();
+        $this->assertSame('queued', $row->status);
+        $this->assertNull($row->claimed_at);
+        $this->assertNull($row->claimed_by);
+        $this->assertNull($row->started_at);
+        $this->assertSame('reaped: requeued once after stuck', $row->error_message);
+    }
+
+    // -------------------------------------------------------------------------
+    // --requeue but the row was already requeued once (non-empty error_message)
+    // → falls through to the failed path instead of looping forever.
+    // -------------------------------------------------------------------------
+
+    public function test_requeue_falls_back_to_failed_when_already_requeued(): void
+    {
+        $id = $this->insertJob('claimed', now()->subMinutes(20), 'reaped: requeued once after stuck');
+
+        $this->service->shouldReceive('broadcastJob')->once()->with($id);
+
+        $this->artisan('prerender:reap-stale', ['--requeue' => true])
+            ->assertExitCode(0);
+
+        $row = DB::table('prerender_jobs')->where('id', $id)->first();
+        $this->assertSame('failed', $row->status);
+        $this->assertNotNull($row->finished_at);
+        $this->assertSame('reaped: worker did not finalise within timeout', $row->error_message);
     }
 
     // -------------------------------------------------------------------------

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Stale prerender jobs are reaped again instead of getting stuck forever.** The `prerender:reap-stale` maintenance command tried to write an `updated_at` column that the `prerender_jobs` table doesn't have, so every real reap threw a SQL "unknown column" error — only the dry-run preview worked. Prerender jobs whose worker died mid-render (host reboot, OOM-kill, deploy SIGTERM) therefore stayed `claimed`/`running` indefinitely, distorting queue dashboards. The command now updates only columns that exist, so stuck jobs are correctly failed (or requeued once with `--requeue`).
 - **Three Regional Analytics dashboard sections that always showed "data unavailable" now work.** The Demographics (age groups), Volunteer breakdown (top organisations), and Help-request analysis sections each queried a column that doesn't exist, so every request errored out. They now read the correct columns (`users.date_of_birth`, `vol_logs.organization_id`) and group help requests by contact preference, counting a request as resolved once its status reaches `closed`.
 
 ### Added
