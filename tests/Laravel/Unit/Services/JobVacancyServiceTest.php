@@ -654,30 +654,29 @@ class JobVacancyServiceTest extends TestCase
         $this->assertIsInt($alertId);
         $this->assertGreaterThan(0, $alertId);
 
-        // NOTE: source bug — subscribeAlert() omits tenant_id from JobAlert::create(),
-        // so the row is saved with tenant_id=0 (DB default), not the current tenant.
-        // We query the raw table (bypassing HasTenantScope) to confirm the row exists.
+        // subscribeAlert() now sets tenant_id explicitly, so the row is scoped to the
+        // active tenant and is reachable by every other HasTenantScope-scoped query.
         $row = DB::table('job_alerts')->where('id', $alertId)->first();
         $this->assertNotNull($row);
         $this->assertSame((string) $userId, (string) $row->user_id);
         $this->assertSame(1, (int) $row->is_active);
-        // Confirm the tenant_id bug:
-        $this->assertSame(0, (int) $row->tenant_id, 'NOTE: subscribeAlert() bug — tenant_id=0 instead of '.self::TENANT_ID);
+        $this->assertSame(self::TENANT_ID, (int) $row->tenant_id);
+        $this->assertSame('PHP Laravel', $row->keywords);
     }
 
     public function test_getAlerts_returns_alerts_for_user(): void
     {
-        // NOTE: because subscribeAlert() stores tenant_id=0, and getAlerts() uses
-        // JobAlert::where('user_id', ...) which applies HasTenantScope (tenant=2),
-        // the newly-created alert is invisible to getAlerts(). We instead verify
-        // the call returns an array (the model-level behaviour is consistent).
-        $userId = $this->insertUser();
-        $this->svc->subscribeAlert($userId, ['keywords' => 'testing']);
+        $userId  = $this->insertUser();
+        $alertId = $this->svc->subscribeAlert($userId, ['keywords' => 'testing']);
 
         $alerts = $this->svc->getAlerts($userId);
 
         $this->assertIsArray($alerts);
-        // Alert NOT present because of tenant_id=0 mismatch (source bug confirmed above)
+        $this->assertCount(1, $alerts);
+        $this->assertSame($alertId, $alerts[0]['id']);
+        $this->assertSame($userId, $alerts[0]['user_id']);
+        $this->assertTrue($alerts[0]['is_active']);
+        $this->assertSame('testing', $alerts[0]['keywords']);
     }
 
     public function test_unsubscribeAlert_deactivates_alert(): void
@@ -685,15 +684,11 @@ class JobVacancyServiceTest extends TestCase
         $userId  = $this->insertUser();
         $alertId = $this->svc->subscribeAlert($userId, ['keywords' => 'nurse']);
 
-        // NOTE: unsubscribeAlert() uses JobAlert::where('id', ...)->where('user_id', ...)
-        // which applies HasTenantScope (tenant_id=2). The row has tenant_id=0 (source bug
-        // in subscribeAlert — see test_subscribeAlert_creates_alert_and_returns_id).
-        // The update silently matches 0 rows; the row remains is_active=1.
         $this->svc->unsubscribeAlert($alertId, $userId);
 
         $row = DB::table('job_alerts')->where('id', $alertId)->first();
-        // Row is NOT deactivated because HasTenantScope filters it out (tenant_id mismatch).
-        $this->assertSame(1, (int) $row->is_active, 'NOTE: unsubscribeAlert() cannot reach rows saved with wrong tenant_id');
+        $this->assertNotNull($row);
+        $this->assertSame(0, (int) $row->is_active);
     }
 
     public function test_resubscribeAlert_reactivates_alert(): void
@@ -701,13 +696,13 @@ class JobVacancyServiceTest extends TestCase
         $userId  = $this->insertUser();
         $alertId = $this->svc->subscribeAlert($userId, ['keywords' => 'teacher']);
 
-        // NOTE: same tenant_id=0 bug applies here. unsubscribeAlert() does nothing,
-        // so the row remains is_active=1 before and after resubscribeAlert() too.
-        $this->svc->unsubscribeAlert($alertId, $userId); // no-op due to bug
-        $this->svc->resubscribeAlert($alertId, $userId); // no-op due to bug
+        $this->svc->unsubscribeAlert($alertId, $userId);
+        $this->assertSame(0, (int) DB::table('job_alerts')->where('id', $alertId)->value('is_active'));
+
+        $this->svc->resubscribeAlert($alertId, $userId);
 
         $row = DB::table('job_alerts')->where('id', $alertId)->first();
-        $this->assertSame(1, (int) $row->is_active, 'NOTE: both (un)subscribe calls are no-ops due to tenant_id mismatch');
+        $this->assertSame(1, (int) $row->is_active);
     }
 
     public function test_deleteAlert_removes_alert_row(): void
@@ -715,19 +710,10 @@ class JobVacancyServiceTest extends TestCase
         $userId  = $this->insertUser();
         $alertId = $this->svc->subscribeAlert($userId, ['keywords' => 'delete me']);
 
-        // deleteAlert uses JobAlert::where('id',...)->where('user_id',...)->delete().
-        // JobAlert has HasTenantScope, so the global scope adds tenant_id=2 — but the
-        // row has tenant_id=0 (source bug). The delete silently matches 0 rows, and
-        // the alert row persists.
-        // NOTE: This confirms the source bug: deleteAlert() cannot delete alerts it
-        // created because the tenant_id mismatch prevents the scope from matching.
         $this->svc->deleteAlert($alertId, $userId);
 
         $row = DB::table('job_alerts')->where('id', $alertId)->first();
-        // Row still exists due to HasTenantScope filtering on wrong tenant_id.
-        // When the bug in subscribeAlert() is fixed (add tenant_id to create call),
-        // this assertion should be changed to assertNull($row).
-        $this->assertNotNull($row, 'NOTE: Alert row persists due to tenant_id=0 bug in subscribeAlert()');
+        $this->assertNull($row);
     }
 
     // =========================================================================

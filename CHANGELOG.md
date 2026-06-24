@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation now covers every module and follows the Diátaxis framework.** Added maintained, code-verified guides for all remaining modules (marketplace, courses, podcasts, blog & resources, social feed, AI chat, ideation & challenges, organisations, monetization, connections & reviews, identity verification) — 24 module guides in total — plus explanation docs for internationalisation ([docs/I18N.md](docs/I18N.md)), the database and migrations ([docs/DATABASE.md](docs/DATABASE.md)), and the CI pipeline ([docs/CI.md](docs/CI.md)), a [RELEASES.md](RELEASES.md) versioning policy, a "How the documentation is organised" Diátaxis index, and a markdownlint configuration.
 - **A hosted documentation site and documentation CI gates.** The docs now build into a searchable MkDocs Material site with an interactive Redoc API reference (deployed to GitHub Pages), and CI gained documentation quality gates: markdownlint (Markdown structure), Redocly (OpenAPI contract validity), and a MkDocs build check.
 
+### Fixed
+
+- **Job alert subscriptions could become invisible and unmanageable.** Creating a job-alert subscription did not stamp it with the member's community, so the alert could be saved against the wrong tenant — after which it never appeared in the member's alert list and could not be paused, resumed, or deleted. Alerts are now always tagged with the correct community on creation.
+
 ## [1.5.3] - 2026-06-23
 
 ### Added

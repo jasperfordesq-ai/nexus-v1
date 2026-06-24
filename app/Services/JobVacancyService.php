@@ -1493,6 +1493,7 @@ class JobVacancyService
 
         try {
             $alert = JobAlert::create([
+                'tenant_id' => TenantContext::getId(),
                 'user_id' => $userId,
                 'keywords' => isset($data['keywords']) ? (mb_substr(trim($data['keywords']), 0, 500) ?: null) : null,
                 'categories' => isset($data['categories']) ? (mb_substr(trim($data['categories']), 0, 500) ?: null) : null,
