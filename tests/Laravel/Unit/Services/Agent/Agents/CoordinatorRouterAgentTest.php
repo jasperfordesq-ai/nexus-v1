@@ -164,8 +164,13 @@ class CoordinatorRouterAgentTest extends TestCase
 
     public function test_creates_route_proposal_for_pending_help_request(): void
     {
-        $coordinatorId = $this->insertUser('coordinator');
-        $requesterId   = $this->insertUser('member');
+        // Insert a coordinator so there is at least one routing candidate, and a
+        // single pending help request. The shared test DB may already have other
+        // coordinators in tenant 2, so we do NOT assume the request is routed to
+        // *this* coordinator — only that it is routed to a valid one. We scope the
+        // proposal lookup to this run, and the request lookup to our own request id.
+        $this->insertUser('coordinator');
+        $requesterId = $this->insertUser('member');
 
         $requestId = DB::table('caring_help_requests')->insertGetId([
             'tenant_id'          => self::TENANT_ID,
@@ -178,23 +183,45 @@ class CoordinatorRouterAgentTest extends TestCase
             'updated_at'         => now(),
         ]);
 
-        $agent  = $this->makeAgent();
+        $runId = DB::table('agent_runs')->insertGetId([
+            'tenant_id'           => self::TENANT_ID,
+            'agent_type'          => 'help_routing',
+            'status'              => 'running',
+            'triggered_by'        => 'schedule',
+            'proposals_generated' => 0,
+            'proposals_applied'   => 0,
+            'created_at'          => now(),
+            'updated_at'          => now(),
+        ]);
+
+        $agent  = new CoordinatorRouterAgent(self::TENANT_ID, $runId, 0, []);
         $result = $agent->run();
 
+        // Only one pending help request exists for this tenant, so exactly one
+        // routing proposal is produced for this run.
         $this->assertSame(1, $result['proposals_created']);
 
         $proposal = DB::table('agent_proposals')
             ->where('tenant_id', self::TENANT_ID)
+            ->where('run_id', $runId)
             ->where('proposal_type', 'route_help_request')
-            ->where('target_user_id', $coordinatorId)
             ->first();
 
         $this->assertNotNull($proposal, 'a route_help_request proposal must be created');
 
         $data = json_decode((string) $proposal->proposal_data, true);
         $this->assertSame($requestId, (int) $data['request_id']);
-        $this->assertSame($coordinatorId, (int) $data['coordinator_id']);
         $this->assertSame('Need help with weekly shopping', $data['request_summary']);
+
+        // The request must be routed to a real, active coordinator in this tenant.
+        $this->assertNotNull($proposal->target_user_id);
+        $this->assertSame((int) $proposal->target_user_id, (int) $data['coordinator_id']);
+        $routedRole = DB::table('users')
+            ->where('id', (int) $proposal->target_user_id)
+            ->where('tenant_id', self::TENANT_ID)
+            ->where('status', 'active')
+            ->value('role');
+        $this->assertContains($routedRole, ['admin', 'coordinator', 'broker']);
     }
 
     // -------------------------------------------------------------------------
