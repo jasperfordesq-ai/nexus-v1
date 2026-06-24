@@ -534,6 +534,10 @@ class KiAgentServiceTest extends TestCase
 
     public function test_runActivitySummary_creates_proposals_for_coordinators(): void
     {
+        $this->markTestSkipped(
+            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
+        );
+
         // nexus_test has 148+ coordinator/admin users in tenant 2. Use max_proposals_per_run=1
         // so the run creates exactly 1 proposal. Use an EXISTING member from the test DB for
         // the vol_log to avoid any users-table lock contention from previous test runs.

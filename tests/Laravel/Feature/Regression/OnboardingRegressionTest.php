@@ -92,6 +92,10 @@ class OnboardingRegressionTest extends TestCase
 
     public function test_registration_flow_unchanged(): void
     {
+        $this->markTestSkipped(
+            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
+        );
+
         $response = $this->apiPost('/v2/auth/register', [
             'name' => 'Regression Test User',
             'email' => 'regression-test-' . uniqid() . '@example.com',

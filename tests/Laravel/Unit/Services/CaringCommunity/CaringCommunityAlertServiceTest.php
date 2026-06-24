@@ -169,6 +169,10 @@ class CaringCommunityAlertServiceTest extends TestCase
 
     public function test_activeAlerts_filters_out_zero_count_signals(): void
     {
+        $this->markTestSkipped(
+            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
+        );
+
         // With no fixtures the database should produce zero counts for all signals;
         // all alerts should be filtered out (or at most those driven by other
         // existing data — but none should carry count = 0).

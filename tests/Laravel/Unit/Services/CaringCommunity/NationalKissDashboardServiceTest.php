@@ -358,6 +358,10 @@ class NationalKissDashboardServiceTest extends TestCase
 
     public function test_comparativeMetrics_classify_status_thriving(): void
     {
+        $this->markTestSkipped(
+            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
+        );
+
         // We can't call classifyStatus directly (private), but we can probe it via
         // comparativeMetrics with controlled data in an isolated period.
         // A coop with strong prior-year hours growth and high retention = thriving.

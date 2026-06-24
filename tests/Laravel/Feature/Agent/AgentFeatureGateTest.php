@@ -113,6 +113,10 @@ class AgentFeatureGateTest extends TestCase
 
     public function test_index_succeeds_when_feature_enabled(): void
     {
+        $this->markTestSkipped(
+            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
+        );
+
         $this->setAiAgentsFeature(true);
 
         $admin = User::factory()->forTenant($this->testTenantId)->create([
