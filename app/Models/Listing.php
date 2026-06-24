@@ -49,6 +49,9 @@ class Listing extends Model
         'save_count',
         'is_featured',
         'featured_until',
+        'rejection_reason',
+        'reviewed_by',
+        'reviewed_at',
     ];
 
     /**
