@@ -194,32 +194,73 @@ class ListingExpiryServiceTest extends TestCase
         $this->assertSame(0, $result['errors']);
     }
 
-    // ── renewListing: successful path (service has two known bugs — documented) ─
+    // ── renewListing: successful path — extends expiry, increments renewal_count ─
 
     /**
-     * @see ListingExpiryService::renewListing() line 206: $listing->expires_at is a
-     *      raw string (not in Listing::$casts as datetime), so ->copy() on line 211
-     *      throws "Call to a member function copy() on string" for active listings
-     *      with a future expires_at.
+     * Active listing with a future expires_at: renewal extends expiry by RENEWAL_DAYS
+     * from the existing expires_at and bumps renewal_count by one.
      *
-     *      Additionally, DB::raw('renewal_count + 1') on line 217 conflicts with the
-     *      'renewal_count' => 'integer' cast in Listing::$casts, throwing
-     *      "Object of class Query\Expression could not be converted to int" on every
-     *      renewal path that reaches the update() call.
-     *
-     *      Both bugs exist in app/ source which cannot be modified by this test suite.
-     *      The two successful-renewal tests are skipped until the service is fixed:
-     *      (a) add 'expires_at' => 'datetime' to Listing::$casts, and
-     *      (b) use $listing->increment('renewal_count') instead of DB::raw().
+     * This is the path that previously threw at runtime:
+     *  (a) expires_at was not cast to datetime, so $baseDate->copy() hit a string;
+     *  (b) DB::raw('renewal_count + 1') conflicted with the 'renewal_count' => 'integer'
+     *      cast. Both are now fixed (see Listing::$casts + ListingExpiryService).
      */
-    public function test_renew_listing_success_path_skipped_pending_service_bug_fix(): void
+    public function test_renew_listing_success_extends_expiry_and_increments_count(): void
     {
-        $this->markTestSkipped(
-            'renewListing() has two service-layer bugs: ' .
-            '(1) expires_at is not cast to datetime so ->copy() throws on string; ' .
-            '(2) DB::raw(renewal_count+1) conflicts with integer cast in Listing::$casts. ' .
-            'Fix app/Services/ListingExpiryService.php and app/Models/Listing.php before enabling.'
+        $baseExpiry = Carbon::now()->addDays(5)->startOfSecond();
+        $listingId  = $this->insertListing([
+            'status'        => 'active',
+            'expires_at'    => $baseExpiry->toDateTimeString(),
+            'renewal_count' => 2,
+        ]);
+
+        $result = $this->service->renewListing($listingId, $this->userId);
+
+        $this->assertTrue($result['success'], 'Renewal of an active future-expiry listing should succeed');
+        $this->assertNull($result['error']);
+        $this->assertNotNull($result['new_expires_at']);
+
+        // New expiry must be exactly RENEWAL_DAYS (30) past the original future expiry.
+        $expectedExpiry = $baseExpiry->copy()->addDays(30);
+        $this->assertSame($expectedExpiry->format('Y-m-d H:i:s'), $result['new_expires_at']);
+
+        $row = DB::table('listings')->where('id', $listingId)->first();
+        $this->assertSame('active', $row->status);
+        $this->assertTrue(
+            Carbon::parse($row->expires_at)->isSameMinute($expectedExpiry),
+            'Stored expires_at should be extended by 30 days from the original future expiry'
         );
+        $this->assertSame(3, (int) $row->renewal_count, 'renewal_count must increment from 2 to 3');
+    }
+
+    // ── renewListing: expired listing renews from now() ──────────────────────────
+
+    /**
+     * A listing that is past its expiry (or not 'active') renews from now(), not from
+     * the stale past expires_at — confirms the now() base-date branch also works.
+     */
+    public function test_renew_listing_expired_listing_renews_from_now(): void
+    {
+        $listingId = $this->insertListing([
+            'status'        => 'expired',
+            'expires_at'    => Carbon::now()->subDays(3)->toDateTimeString(),
+            'renewal_count' => 0,
+        ]);
+
+        $before = Carbon::now();
+        $result = $this->service->renewListing($listingId, $this->userId);
+        $after  = Carbon::now();
+
+        $this->assertTrue($result['success']);
+
+        // New expiry should be ~30 days from now (between before+30d and after+30d).
+        $newExpiry = Carbon::parse($result['new_expires_at']);
+        $this->assertTrue($newExpiry->greaterThanOrEqualTo($before->copy()->addDays(30)->subSecond()));
+        $this->assertTrue($newExpiry->lessThanOrEqualTo($after->copy()->addDays(30)->addSecond()));
+
+        $row = DB::table('listings')->where('id', $listingId)->first();
+        $this->assertSame('active', $row->status, 'Renewing reactivates an expired listing');
+        $this->assertSame(1, (int) $row->renewal_count);
     }
 
     // ── renewListing: non-owner gets forbidden ────────────────────────────────
