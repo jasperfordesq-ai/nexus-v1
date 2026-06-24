@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Three Regional Analytics dashboard sections that always showed "data unavailable" now work.** The Demographics (age groups), Volunteer breakdown (top organisations), and Help-request analysis sections each queried a column that doesn't exist, so every request errored out. They now read the correct columns (`users.date_of_birth`, `vol_logs.organization_id`) and group help requests by contact preference, counting a request as resolved once its status reaches `closed`.
+
 ### Added
 
 - **Greptile code review configuration now lives in the repository.** Automated reviews are guided by the Project NEXUS tenant-isolation, localization, frontend, accessible frontend, security, deployment-boundary and AGPL licensing rules, with tracked context files for lower-noise review comments.
@@ -17,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Job alert subscriptions could become invisible and unmanageable.** Creating a job-alert subscription did not stamp it with the member's community, so the alert could be saved against the wrong tenant — after which it never appeared in the member's alert list and could not be paused, resumed, or deleted. Alerts are now always tagged with the correct community on creation.
 - **Approving an AI assistant suggestion to pair two members or route a help request now actually does it.** Two caring-community AI agent actions silently failed: approving a "create a support tandem" suggestion marked it approved but never created the relationship, and approving a "route this help request to a coordinator" suggestion never updated the request. Both wrote to database columns that don't exist, so the change was discarded without an error. They now create the support relationship (with the required title and start date) and move the help request into its "matched" state as intended.
 - **Renewing a listing that was about to expire no longer errors.** One-click renewal of an active listing with a future expiry date was failing with a runtime error instead of extending it; renewal now correctly extends the expiry by 30 days and increments the renewal counter.
 - **Marketplace moderation decisions now keep their audit trail.** When an admin flagged, approved, or rejected a listing, the rejection reason, the reviewing admin, and the review timestamp were being silently dropped instead of saved — so the record of *who* reviewed a listing, *when*, and *why* it was rejected was lost. Those moderation details are now persisted correctly.
