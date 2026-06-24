@@ -197,17 +197,22 @@ class CoordinatorRouterAgentTest extends TestCase
         $agent  = new CoordinatorRouterAgent(self::TENANT_ID, $runId, 0, []);
         $result = $agent->run();
 
-        // Only one pending help request exists for this tenant, so exactly one
-        // routing proposal is produced for this run.
-        $this->assertSame(1, $result['proposals_created']);
+        // At least our request is routed. We do NOT hard-assert the tenant-wide
+        // count (the shared test DB could one day contain other committed pending
+        // requests for tenant 2 that DatabaseTransactions would not roll back);
+        // instead we scope the assertion to exactly one proposal for *our* request.
+        $this->assertGreaterThanOrEqual(1, $result['proposals_created']);
 
-        $proposal = DB::table('agent_proposals')
+        $ourProposals = DB::table('agent_proposals')
             ->where('tenant_id', self::TENANT_ID)
             ->where('run_id', $runId)
             ->where('proposal_type', 'route_help_request')
-            ->first();
+            ->get()
+            ->filter(static fn ($p): bool => (int) (json_decode((string) $p->proposal_data, true)['request_id'] ?? 0) === $requestId)
+            ->values();
 
-        $this->assertNotNull($proposal, 'a route_help_request proposal must be created');
+        $this->assertCount(1, $ourProposals, 'exactly one route_help_request proposal for this request');
+        $proposal = $ourProposals->first();
 
         $data = json_decode((string) $proposal->proposal_data, true);
         $this->assertSame($requestId, (int) $data['request_id']);
