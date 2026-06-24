@@ -201,51 +201,27 @@ class HelpRequestSlaDashboardTest extends TestCase
             'Fresh request',
         );
 
-        // ⚠ Bug discovered while writing this test (Carbon 3.x):
-        // HelpRequestSlaService::collect() at line 124 calls
-        //   $now->diffInSeconds($created)
-        // expecting the (positive) age in seconds, but Carbon 3 returns a
-        // FLOAT and reverses the sign convention from Carbon 2:
-        //   $past->diffInSeconds($now) = +N seconds
-        //   $now->diffInSeconds($past) = -N seconds (the service's call shape)
-        // Without `max(0, …)` the negative float is then handed to
-        // bucket(int $ageSec) and trips a TypeError. With it, every age would
-        // clamp to 0 and the breached/at_risk buckets would never trigger.
-        // Both bugs are pre-existing, so the test exercises the dashboard
-        // shape via expectException to verify the failure mode without
-        // silently green-lighting broken arithmetic.
+        // Carbon v3 regression guard: before the fix this call threw a TypeError
+        // (a float age was handed to bucket(int)) and inverted the age sign. The
+        // dashboard now ages requests correctly against the 24h first-response SLA.
         $service = app(HelpRequestSlaService::class);
+        $dashboard = $service->dashboard($this->testTenantId);
 
-        try {
-            $dashboard = $service->dashboard($this->testTenantId);
-            // If the upstream service is ever fixed (cast to int + abs), the
-            // dashboard call returns and we then assert the expected shape.
-            $this->assertSame(2, $dashboard['summary']['pending']);
-            $this->assertSame(1, $dashboard['summary']['first_response_breached']);
-            $this->assertSame(0, $dashboard['summary']['first_response_at_risk']);
+        $this->assertSame(2, $dashboard['summary']['pending']);
+        $this->assertSame(1, $dashboard['summary']['first_response_breached']);
+        $this->assertSame(0, $dashboard['summary']['first_response_at_risk']);
 
-            $this->assertCount(2, $dashboard['open_requests']);
+        $this->assertCount(2, $dashboard['open_requests']);
 
-            $first = $dashboard['open_requests'][0];
-            $this->assertSame($breachedId, (int) $first['id']);
-            $this->assertSame('breached', $first['bucket']);
-            $this->assertSame('first_response', $first['sla_dimension']);
-            $this->assertSame(24, (int) $first['sla_target_hours']);
+        $first = $dashboard['open_requests'][0];
+        $this->assertSame($breachedId, (int) $first['id']);
+        $this->assertSame('breached', $first['bucket']);
+        $this->assertSame('first_response', $first['sla_dimension']);
+        $this->assertSame(24, (int) $first['sla_target_hours']);
 
-            $second = $dashboard['open_requests'][1];
-            $this->assertSame($onTrackId, (int) $second['id']);
-            $this->assertSame('on_track', $second['bucket']);
-        } catch (\TypeError $e) {
-            // Pre-existing bug — Carbon 3 returns float from diffInSeconds and
-            // the service's $ageSec is fed to bucket(int).
-            $this->markTestSkipped(
-                'Pre-existing bug in HelpRequestSlaService: Carbon 3 diffInSeconds '
-                . 'returns a NEGATIVE FLOAT for $now->diffInSeconds($pastDate), which '
-                . 'breaks bucket(int $ageSec) (TypeError) and inverts age signs. '
-                . 'Service must be fixed to: $ageSec = (int) abs($now->diffInSeconds($created)). '
-                . "TypeError: {$e->getMessage()}"
-            );
-        }
+        $second = $dashboard['open_requests'][1];
+        $this->assertSame($onTrackId, (int) $second['id']);
+        $this->assertSame('on_track', $second['bucket']);
     }
 
     public function test_recently_resolved_shows_within_resolution_sla(): void
@@ -284,22 +260,18 @@ class HelpRequestSlaDashboardTest extends TestCase
         $this->assertSame($closedId, (int) $row['id']);
         $this->assertSame('closed', $row['status']);
 
-        // ⚠ Same Carbon 3 sign-flip bug as above — line 161:
-        //   $turnaroundSec = max(0, $updated->diffInSeconds($created));
-        // returns max(0, NEGATIVE) = 0, so turnaround is always reported as 0
-        // hours and within_resolution_sla is always true. We assert what the
-        // service actually produces today (turnaround = 0, within_sla = true)
-        // so the test passes deterministically while still exercising the
-        // recently_resolved code path.
+        // Turnaround = updated(-12h) − created(-36h) = 24h, within the 72h
+        // platform-default resolution SLA. (Regression guard for the Carbon v3
+        // signed-diff fix: the service now measures created → updated, so this
+        // reports the real 24h rather than the old, always-zero value.)
         $this->assertTrue(
             (bool) $row['within_resolution_sla'],
-            'Closed turnaround is reported within the 72h SLA window'
+            'Closed turnaround (24h) is within the 72h resolution SLA window'
         );
         $this->assertSame(
-            0.0,
+            24.0,
             (float) $row['turnaround_hours'],
-            'Pre-existing bug: Carbon 3 diffInSeconds reverses sign vs Carbon 2; '
-            . 'service clamps to 0 with max(0, …). When fixed, this should be ~24.0.'
+            'Turnaround must be the real 24h (updated −12h minus created −36h)'
         );
     }
 
