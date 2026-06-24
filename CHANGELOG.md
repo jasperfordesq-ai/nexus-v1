@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **Renewing a listing that was about to expire no longer errors.** One-click renewal of an active listing with a future expiry date was failing with a runtime error instead of extending it; renewal now correctly extends the expiry by 30 days and increments the renewal counter.
+- **Marketplace moderation decisions now keep their audit trail.** When an admin flagged, approved, or rejected a listing, the rejection reason, the reviewing admin, and the review timestamp were being silently dropped instead of saved — so the record of *who* reviewed a listing, *when*, and *why* it was rejected was lost. Those moderation details are now persisted correctly.
 
 ## [1.5.3] - 2026-06-23
 

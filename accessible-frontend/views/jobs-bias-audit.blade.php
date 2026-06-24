@@ -77,11 +77,15 @@
         <div class="govuk-inset-text">
             {{ __('govuk_alpha_jobs.bias_audit.error_loading') }}
         </div>
-    @elseif ($noData)
-        <div class="govuk-inset-text">
-            {{ __('govuk_alpha_jobs.bias_audit.no_data') }}
-        </div>
     @else
+        {{-- Report loaded successfully. Render the full audit structure (section
+             headings + per-section empty states) even with zero applications so
+             the page is consistent; a notice flags that there is no data yet. --}}
+        @if ($total === 0)
+            <div class="govuk-inset-text">
+                {{ __('govuk_alpha_jobs.bias_audit.no_data') }}
+            </div>
+        @endif
 
         {{-- Summary metric --}}
         <dl class="govuk-summary-list govuk-!-margin-bottom-6">

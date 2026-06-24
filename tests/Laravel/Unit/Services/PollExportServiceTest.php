@@ -45,8 +45,8 @@ class PollExportServiceTest extends TestCase
         DB::shouldReceive('table->where->where->first')->once()->andReturn($poll);
 
         $options = collect([
-            (object) ['id' => 10, 'option_text' => 'Option A'],
-            (object) ['id' => 11, 'option_text' => 'Option B'],
+            (object) ['id' => 10, 'label' => 'Option A'],
+            (object) ['id' => 11, 'label' => 'Option B'],
         ]);
         DB::shouldReceive('table->where->get')->once()->andReturn($options);
         DB::shouldReceive('table->where->count')->twice()->andReturn(3, 2);

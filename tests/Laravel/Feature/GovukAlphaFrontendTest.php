@@ -6066,15 +6066,22 @@ class GovukAlphaFrontendTest extends TestCase
 
     private function ensureListingCategory(): void
     {
-        DB::table('categories')->insertOrIgnore([
-            'id' => 1,
-            'tenant_id' => $this->testTenantId,
-            'name' => 'General',
-            'slug' => 'general',
-            'type' => 'listing',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        // The CI bootstrap pre-seeds category id=1 for tenant 1, so a plain
+        // insertOrIgnore here is a no-op (PK collision) and leaves category 1
+        // owned by the wrong tenant — listing validation (Rule::exists scoped to
+        // the current tenant_id) then rejects it as "invalid category". Force the
+        // category onto the test tenant; DatabaseTransactions rolls this back.
+        DB::table('categories')->updateOrInsert(
+            ['id' => 1],
+            [
+                'tenant_id' => $this->testTenantId,
+                'name' => 'General',
+                'slug' => 'general',
+                'type' => 'listing',
+                'updated_at' => now(),
+                'created_at' => now(),
+            ]
+        );
     }
 
     private function enableExchangeWorkflow(): void

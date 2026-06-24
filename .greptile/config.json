@@ -1,0 +1,93 @@
+{
+  "strictness": 2,
+  "commentTypes": ["logic", "syntax"],
+  "triggerOnUpdates": true,
+  "shouldUpdateDescription": false,
+  "updateExistingSummaryComment": true,
+  "statusCheck": true,
+  "statusCommentsEnabled": true,
+  "fixWithAI": true,
+  "ignorePatterns": "node_modules/**\nvendor/**\nreact-frontend/dist/**\nhttpdocs/build/**\ncoverage/**\n**/coverage/**\nplaywright-report/**\ntest-results/**\nstorage/**\nuploads/**\nlogs/**\nbackups/**\nexports/**\n.local-docs-archive/**\n.secrets.local/**\n*.log\n*.tsbuildinfo",
+  "summarySection": {
+    "included": true,
+    "collapsible": true,
+    "defaultOpen": false
+  },
+  "issuesTableSection": {
+    "included": true,
+    "collapsible": true,
+    "defaultOpen": true
+  },
+  "confidenceScoreSection": {
+    "included": true,
+    "collapsible": true,
+    "defaultOpen": false
+  },
+  "sequenceDiagramSection": {
+    "included": false
+  },
+  "instructions": "Project NEXUS is a public AGPL-3.0-or-later multi-tenant timebanking platform. Prioritize actionable bugs, security risks, tenant-boundary regressions, translation/localization regressions, accessibility regressions, and violations of the repository rules in AGENTS.md. Avoid style-only comments unless they expose a maintainability or correctness risk. Never suggest production deployment as part of a review.",
+  "rules": [
+    {
+      "id": "tenant-scope-backend-data",
+      "rule": "Backend data access for tenant-owned records must be tenant-scoped through TenantContext, Eloquent tenant scopes, route/middleware tenant context, or an explicit and justified cross-tenant admin path. Flag unscoped reads/writes of users, listings, events, groups, messages, wallets, notifications, files, or tenant settings.",
+      "scope": ["app/**/*.php", "routes/**/*.php", "database/migrations/**/*.php", "migrations/**/*.sql", "tests/**/*.php"],
+      "severity": "high"
+    },
+    {
+      "id": "parameterized-sql-only",
+      "rule": "SQL that includes user-controlled values must use parameterized queries. Do not interpolate values into SQL strings. For IN clauses, expand placeholders with implode(',', array_fill(...)) and pass scalar values, not arrays, as query parameters.",
+      "scope": ["app/**/*.php", "tests/**/*.php", "scripts/**/*.php"],
+      "severity": "high"
+    },
+    {
+      "id": "recipient-locale-notifications",
+      "rule": "Every user-facing email or notification render must use translation keys and render inside App\\I18n\\LocaleContext::withLocale for the recipient, including subject lines and per-recipient fanout loops. Queries feeding notifications must include preferred_language when needed.",
+      "scope": ["app/**/*.php", "tests/**/*.php", "lang/**/*.php", "lang/**/*.json", "views/emails/*.php"],
+      "severity": "high"
+    },
+    {
+      "id": "no-hardcoded-end-user-strings",
+      "rule": "End-user React, Blade, PHP email, and notification output must not add hardcoded English strings. Use t(...) in React and __(...) with the appropriate lang files in PHP/Blade.",
+      "scope": ["react-frontend/src/**/*.ts", "react-frontend/src/**/*.tsx", "accessible-frontend/views/**/*.blade.php", "app/**/*.php", "lang/**/*.php", "lang/**/*.json", "views/emails/*.php"],
+      "severity": "high"
+    },
+    {
+      "id": "react-heroui-tailwind-patterns",
+      "rule": "React UI changes must prefer HeroUI v3 components from @heroui/react, Tailwind CSS utilities, Lucide icons, tenantPath for internal links, usePageTitle on pages, and CSS tokens for theme colors. Do not add framer-motion, inline styles, or per-component CSS files.",
+      "scope": ["react-frontend/src/**/*.ts", "react-frontend/src/**/*.tsx", "react-frontend/package.json", "react-frontend/package-lock.json"],
+      "severity": "medium"
+    },
+    {
+      "id": "accessible-frontend-boundaries",
+      "rule": "Accessible frontend changes must stay HTML-first with Laravel Blade and official govuk-frontend classes, preserve tenant assertions and feature gates, use lang/en/govuk_alpha*.php translation keys, and avoid GOV.UK crown/logotype/identity wording.",
+      "scope": ["accessible-frontend/**", "app/Http/Controllers/GovukAlpha/**/*.php", "routes/govuk-alpha*.php", "routes/govuk-alpha-parity/**/*.php", "lang/**/govuk_alpha*.php"],
+      "severity": "high"
+    },
+    {
+      "id": "legacy-views-do-not-touch",
+      "rule": "Legacy PHP views under views/ are dead and should not be modified, audited, or improved. Only views/emails/match_hot.php, views/emails/match_mutual.php, views/emails/match_digest.php, and views/errors/404.php are live exceptions; changes there must preserve current behavior until migrated deliberately.",
+      "scope": ["views/**"],
+      "severity": "high"
+    },
+    {
+      "id": "agpl-spdx-new-source",
+      "rule": "New PHP, TypeScript, TSX, and Blade source files must include the Project NEXUS AGPL-3.0-or-later SPDX header and must preserve AGPL Section 7(b) attribution on rendered pages.",
+      "scope": ["**/*.php", "**/*.ts", "**/*.tsx", "**/*.blade.php"],
+      "severity": "high"
+    },
+    {
+      "id": "global-platform-no-irish-only-validation",
+      "rule": "Do not add Irish-only phone, address, map, or location validation. Use international formats and neutral global defaults unless a tenant-specific feature explicitly requires narrower behavior.",
+      "scope": ["app/**/*.php", "react-frontend/src/**/*.ts", "react-frontend/src/**/*.tsx", "accessible-frontend/**", "lang/**/*.php", "lang/**/*.json"],
+      "severity": "high"
+    },
+    {
+      "id": "no-secrets-or-private-deploy-assumptions",
+      "rule": "Do not commit secrets, tokens, private backup material, production credentials, local .env values, or generated private notes. Do not introduce automation that deploys to production or pushes to the backup remote unless explicitly requested by the human operator.",
+      "scope": ["**/*"],
+      "severity": "high"
+    }
+  ],
+  "disabledRules": []
+}

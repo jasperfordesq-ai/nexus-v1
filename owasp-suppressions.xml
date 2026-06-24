@@ -367,5 +367,27 @@
     <packageUrl regex="true">^pkg:npm/tar@.*$</packageUrl>
     <vulnerabilityName>GHSA-vmf3-w455-68vh</vulnerabilityName>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+      FALSE POSITIVE: form-data GHSA-hmw2-7cc7-3qxx (unsafe random boundary) is
+      fixed in form-data 4.0.4. The installed version is 4.0.5 — already patched.
+      OWASP DC's version-range match over-reports here. Present transitively in
+      react-frontend and mobile lockfiles. (added 2026-06-24)
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/form-data@4\.0\.[4-9].*$</packageUrl>
+    <vulnerabilityName>GHSA-hmw2-7cc7-3qxx</vulnerabilityName>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      MOBILE-ONLY: undici GHSA-vxpw-j846-p89q in mobile/package-lock.json. undici
+      arrives only through the Expo/Metro React-Native dev bundler toolchain in
+      the Capacitor mobile app — it is not in the compiled APK/IPA or on any
+      server. The prior undici@6.2[0-3] rule predates the 6.26.0 bump; this rule
+      covers the whole undici 6.x mobile dev line so it does not go stale on the
+      next patch bump. (added 2026-06-24)
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/undici@6\..*$</packageUrl>
+    <vulnerabilityName>GHSA-vxpw-j846-p89q</vulnerabilityName>
+  </suppress>
 
 </suppressions>

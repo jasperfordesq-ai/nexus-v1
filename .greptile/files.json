@@ -1,0 +1,45 @@
+{
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "description": "Project-wide source of truth for architecture, mandatory rules, workflows, release hygiene, deployment constraints, and coding conventions."
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "description": "Contribution workflow, public repository expectations, and contributor terms context."
+    },
+    {
+      "path": "SECURITY.md",
+      "description": "Security policy and vulnerability reporting expectations."
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "description": "Maintained platform architecture map and runtime boundaries."
+    },
+    {
+      "path": "docs/DEPLOYMENT.md",
+      "description": "Deployment model and operational boundaries; include when reviewing deployment, Docker, script, or infrastructure changes.",
+      "scope": ["scripts/**", "docker/**", "compose*.yml", "Dockerfile*", ".github/workflows/**", "docs/DEPLOYMENT.md"]
+    },
+    {
+      "path": "docs/govuk-alpha/RESEARCH.md",
+      "description": "Accessible frontend architecture decision, approved GOV.UK Frontend usage, licensing, and branding limits.",
+      "scope": ["accessible-frontend/**", "app/Http/Controllers/GovukAlpha/**", "routes/govuk-alpha*.php", "routes/govuk-alpha-parity/**", "lang/**/govuk_alpha*.php"]
+    },
+    {
+      "path": "react-frontend/CLAUDE.md",
+      "description": "Tracked React frontend conventions for HeroUI v3, Tailwind CSS 4, routing, contexts, hooks, and UI rules.",
+      "scope": ["react-frontend/**"]
+    },
+    {
+      "path": "accessible-frontend/CLAUDE.md",
+      "description": "Tracked accessible frontend conventions for Laravel Blade, govuk-frontend, translations, tenant assertions, and progressive enhancement.",
+      "scope": ["accessible-frontend/**", "app/Http/Controllers/GovukAlpha/**", "routes/govuk-alpha*.php", "routes/govuk-alpha-parity/**", "lang/**/govuk_alpha*.php"]
+    },
+    {
+      "path": "openapi.json",
+      "description": "Public API shape for API controller and route changes.",
+      "scope": ["app/Http/Controllers/Api/**", "routes/api.php", "openapi.json"]
+    }
+  ]
+}

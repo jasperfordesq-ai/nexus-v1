@@ -1424,13 +1424,17 @@ trait VolunteeringParity
         $status = self::asStr($request->query('status')) ?: null;
 
         return $this->view('accessible-frontend::volunteering-safeguarding', [
+            'tenantSlug' => $tenantSlug,
             'trainings' => $trainings,
             'incidents' => $incidents,
             'status'    => $status,
+            // Both /volunteering/training and /volunteering/incidents resolve to
+            // this method, so the default tab must come from the URL path; an
+            // explicit ?tab= query still overrides it.
             'subView'   => $this->allowed(
                 self::asStr($request->query('tab')),
                 ['training', 'incidents'],
-                'training'
+                $request->is('*/volunteering/incidents') ? 'incidents' : 'training'
             ),
         ]);
     }

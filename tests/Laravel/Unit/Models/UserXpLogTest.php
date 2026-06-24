@@ -33,7 +33,7 @@ class UserXpLogTest extends TestCase
 
     public function test_fillable_contains_expected_fields(): void
     {
-        $expected = ['tenant_id', 'user_id', 'xp_amount', 'action', 'description'];
+        $expected = ['tenant_id', 'user_id', 'xp_amount', 'action', 'description', 'source_reference'];
         $this->assertEquals($expected, $this->model->getFillable());
     }
 
