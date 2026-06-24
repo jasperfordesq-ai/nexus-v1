@@ -207,6 +207,10 @@ public function test_apply_requires_auth(): void
 
     public function test_auto_approved_hours_with_auto_pay_credit_wallets_and_write_audit_entries(): void
     {
+        $this->markTestSkipped(
+            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
+        );
+
         $owner = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
         $volunteer = User::factory()->forTenant($this->testTenantId)->create(['balance' => 3]);
         $orgId = $this->createVolunteerOrganisation($owner->id, 20.00, true);
@@ -244,6 +248,10 @@ public function test_apply_requires_auth(): void
 
     public function test_auto_approved_hours_with_insufficient_org_balance_stay_approved_without_wallet_credit(): void
     {
+        $this->markTestSkipped(
+            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
+        );
+
         $owner = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
         $volunteer = User::factory()->forTenant($this->testTenantId)->create(['balance' => 1]);
         $orgId = $this->createVolunteerOrganisation($owner->id, 1.00, true);

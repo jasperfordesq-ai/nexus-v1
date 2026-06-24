@@ -99,6 +99,38 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUpTenantContext(): void
     {
+        // Reset ALL leaked tenant state before re-establishing it. The PHPUnit
+        // process is shared across every test in a shard (effectively a
+        // persistent worker), so state from an earlier test survives into later
+        // ones. Two distinct leaks both bite once test order changes (e.g. under
+        // sharding):
+        //
+        //   1. Static state: setById() below only sets $tenant/$cachedId — it
+        //      does NOT clear $headerTenantId / $tokenTenantId / $parentDomain.
+        //      A prior test that ran TenantContext::initialize() with an
+        //      X-Tenant-ID header leaves $headerTenantId set, so e.g.
+        //      TenantContextTest::test_getHeaderTenantId_returns_null_by_default
+        //      sees the leaked id instead of null. reset() was built for exactly
+        //      this persistent-worker case.
+        //
+        //   2. Superglobals: ResolveTenant middleware writes
+        //      $_SERVER['HTTP_X_TENANT_ID'] / ['HTTP_X_TENANT_SLUG'] on every API
+        //      request and never clears them. If a later test nulls the tenant
+        //      (e.g. a listener calling restoreAfterScopedListener() in CLI mode)
+        //      and then touches a tenant-scoped model, TenantContext::resolve()
+        //      re-reads the STALE header — and a leaked invalid id throws
+        //      INVALID_TENANT (see WalletApiControllerTest / AwardXpOnVolLog*).
+        //      reset() does not touch $_SERVER, so clear it explicitly here.
+        //      HTTP_AUTHORIZATION is cleared too: ResolveTenant also syncs it and
+        //      TenantContext derives a token tenant id from the Bearer token, so a
+        //      leaked Authorization header is a third resolution-poisoning vector.
+        unset(
+            $_SERVER['HTTP_X_TENANT_ID'],
+            $_SERVER['HTTP_X_TENANT_SLUG'],
+            $_SERVER['HTTP_AUTHORIZATION']
+        );
+        TenantContext::reset();
+
         // Seed the test tenant. Use updateOrInsert (NOT insertOrIgnore) keyed on id:
         // CI pre-seeds tenant id=2 with slug 'test-tenant-2', so insertOrIgnore was a
         // no-op and the slug never became the expected 'hour-timebank' — every test

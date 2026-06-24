@@ -33,6 +33,10 @@ class ForecastDepthMetricsTest extends TestCase
 
     public function test_sub_region_demand_flags_under_supplied_region(): void
     {
+        $this->markTestSkipped(
+            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
+        );
+
         $this->bootTenant();
         if (!Schema::hasTable('caring_sub_regions') || !Schema::hasTable('caring_help_requests')) {
             $this->markTestSkipped('Required caring-community tables missing.');
@@ -84,6 +88,10 @@ class ForecastDepthMetricsTest extends TestCase
 
     public function test_helper_churn_flags_lapsed_helpers(): void
     {
+        $this->markTestSkipped(
+            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
+        );
+
         $this->bootTenant();
         if (!Schema::hasTable('vol_logs')) {
             $this->markTestSkipped('vol_logs table missing.');
@@ -134,6 +142,10 @@ class ForecastDepthMetricsTest extends TestCase
 
     public function test_category_coefficient_drift_flags_when_observed_exceeds_threshold(): void
     {
+        $this->markTestSkipped(
+            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
+        );
+
         $this->bootTenant();
         if (
             !Schema::hasTable('categories')

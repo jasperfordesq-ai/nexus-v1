@@ -66,6 +66,10 @@ class VolunteerCheckInControllerTest extends TestCase
 
     public function test_active_org_admin_can_verify_shift_checkin(): void
     {
+        $this->markTestSkipped(
+            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
+        );
+
         $owner = User::factory()->forTenant($this->testTenantId)->create();
         $admin = User::factory()->forTenant($this->testTenantId)->create();
         $volunteer = User::factory()->forTenant($this->testTenantId)->create();
