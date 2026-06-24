@@ -1,0 +1,561 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+declare(strict_types=1);
+
+namespace Tests\Laravel\Unit\Console;
+
+use App\Services\PrerenderService;
+use App\Services\SitemapService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
+use Mockery;
+use Tests\Laravel\TestCase;
+
+/**
+ * Tests for the prerender:detect-drift Artisan command.
+ *
+ * The command:
+ *   1. Calls PrerenderService::loadTenantTargets() to get active tenants.
+ *   2. Calls PrerenderService::inventory() for mtime data.
+ *   3. Fetches sitemap XML via SitemapService::generateForTenant().
+ *   4. Does a raw DB::table('prerender_jobs') query to check for active jobs.
+ *   5. For stale/missing routes calls PrerenderService::enqueueJob().
+ *
+ * Because `prerender_jobs` may not exist in the nexus_test schema, we create
+ * it inline in setUp() and drop it in tearDown().
+ *
+ * We bind mocks for PrerenderService and SitemapService to avoid any
+ * filesystem / HTTP / headless-renderer calls.
+ */
+class PrerenderDetectDriftTest extends TestCase
+{
+    use \Illuminate\Foundation\Testing\DatabaseTransactions;
+
+    /** Unique tenant id scoped to this test file. */
+    private const TENANT_ID = 99715;
+    private const TENANT_SLUG = 'test-drift-99715';
+    private const TENANT_HOST = 'drift-99715.project-nexus.ie';
+
+    private \Mockery\MockInterface $prerenderMock;
+    private \Mockery\MockInterface $sitemapMock;
+
+    /** Whether we created prerender_jobs ourselves (so we can drop it). */
+    private bool $createdPrerenderJobsTable = false;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Queue::fake();
+
+        // Create prerender_jobs if it doesn't exist in nexus_test.
+        $tableExists = (bool) DB::select("SHOW TABLES LIKE 'prerender_jobs'");
+        if (!$tableExists) {
+            Schema::create('prerender_jobs', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('requested_by')->nullable();
+                $table->unsignedInteger('tenant_id')->nullable();
+                $table->string('routes', 2048)->nullable();
+                $table->boolean('force_render')->default(false);
+                $table->boolean('dry_run')->default(false);
+                $table->unsignedTinyInteger('priority')->default(5);
+                $table->enum('status', ['queued', 'claimed', 'running', 'succeeded', 'failed', 'partial', 'cancelled'])->default('queued');
+                $table->string('claimed_by', 128)->nullable();
+                $table->unsignedInteger('planned_count')->nullable();
+                $table->unsignedInteger('rendered_count')->nullable();
+                $table->unsignedInteger('invalid_count')->nullable();
+                $table->unsignedInteger('duration_s')->nullable();
+                $table->integer('exit_code')->nullable();
+                $table->mediumText('log_excerpt')->nullable();
+                $table->string('error_message', 1024)->nullable();
+                $table->timestamp('queued_at')->useCurrent();
+                $table->timestamp('claimed_at')->nullable();
+                $table->timestamp('started_at')->nullable();
+                $table->timestamp('finished_at')->nullable();
+            });
+            $this->createdPrerenderJobsTable = true;
+        }
+
+        // Ensure our unique test tenant exists and is active.
+        DB::table('tenants')->updateOrInsert(
+            ['id' => self::TENANT_ID],
+            [
+                'name'       => 'Drift Test Tenant 99715',
+                'slug'       => self::TENANT_SLUG,
+                'domain'     => null,
+                'is_active'  => 1,
+                'depth'      => 0,
+                'allows_subtenants' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+        \App\Core\TenantContext::setById(self::TENANT_ID);
+
+        // Bind mocks into the container so the command's constructor injection
+        // picks them up automatically.
+        $this->prerenderMock = Mockery::mock(PrerenderService::class);
+        $this->sitemapMock   = Mockery::mock(SitemapService::class);
+
+        $this->app->instance(PrerenderService::class, $this->prerenderMock);
+        $this->app->instance(SitemapService::class,   $this->sitemapMock);
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown(); // rolls back DatabaseTransactions first
+
+        // Drop the table only if we created it (so we don't drop a real table).
+        if ($this->createdPrerenderJobsTable) {
+            Schema::dropIfExists('prerender_jobs');
+            $this->createdPrerenderJobsTable = false;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Helper: build minimal sitemap XML for the test tenant.
+    // -------------------------------------------------------------------------
+
+    private function sitemapXml(array $entries): string
+    {
+        $urls = '';
+        foreach ($entries as $path => $lastmod) {
+            $loc = 'https://' . self::TENANT_HOST . '/' . self::TENANT_SLUG . $path;
+            $urls .= "<url><loc>{$loc}</loc><lastmod>{$lastmod}</lastmod></url>\n";
+        }
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset>{$urls}</urlset>";
+    }
+
+    private function makeTenantTarget(): array
+    {
+        return [
+            'tenant_id' => self::TENANT_ID,
+            'slug'      => self::TENANT_SLUG,
+            'host'      => self::TENANT_HOST,
+            'prefix'    => '/' . self::TENANT_SLUG,
+        ];
+    }
+
+    // =========================================================================
+    // No active tenants → early-exit with "No active tenants." message.
+    // =========================================================================
+
+    public function test_exits_success_when_no_active_tenants(): void
+    {
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([]);
+
+        // inventory() and enqueueJob() must never be called.
+        $this->prerenderMock->shouldNotReceive('inventory');
+        $this->prerenderMock->shouldNotReceive('enqueueJob');
+
+        $this->artisan('prerender:detect-drift')
+            ->expectsOutputToContain('No active tenants')
+            ->assertExitCode(0);
+    }
+
+    // =========================================================================
+    // No stale / missing routes → enqueueJob never called.
+    // =========================================================================
+
+    public function test_no_enqueue_when_all_snapshots_are_fresh(): void
+    {
+        $now = time();
+        // Snapshot mtime = now; sitemap lastmod = 5 minutes ago → NOT stale.
+        $snapMtime  = $now;
+        $lastmodTs  = $now - 300;
+        $lastmodStr = date('Y-m-d', $lastmodTs);
+
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([
+                [
+                    'host'  => self::TENANT_HOST,
+                    'route' => '/about',
+                    'mtime' => $snapMtime,
+                ],
+            ]);
+
+        $this->sitemapMock
+            ->shouldReceive('generateForTenant')
+            ->once()
+            ->with(self::TENANT_ID, Mockery::type('string'))
+            ->andReturn($this->sitemapXml(['/about' => $lastmodStr]));
+
+        $this->prerenderMock->shouldNotReceive('enqueueJob');
+
+        $this->artisan('prerender:detect-drift')
+            ->assertExitCode(0);
+    }
+
+    // =========================================================================
+    // Stale snapshot → enqueueJob called with the stale route.
+    // =========================================================================
+
+    public function test_enqueues_job_when_snapshot_is_stale(): void
+    {
+        $now = time();
+        // Snapshot mtime = 2 h ago; sitemap lastmod = 1 h ago → stale (gap > 60s).
+        $snapMtime  = $now - 7200;
+        $lastmodTs  = $now - 3600;
+        $lastmodStr = gmdate('Y-m-d\TH:i:s\Z', $lastmodTs);
+
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([
+                [
+                    'host'  => self::TENANT_HOST,
+                    'route' => '/about',
+                    'mtime' => $snapMtime,
+                ],
+            ]);
+
+        $this->sitemapMock
+            ->shouldReceive('generateForTenant')
+            ->once()
+            ->with(self::TENANT_ID, Mockery::type('string'))
+            ->andReturn($this->sitemapXml(['/about' => $lastmodStr]));
+
+        $this->prerenderMock
+            ->shouldReceive('enqueueJob')
+            ->once()
+            ->with(
+                self::TENANT_ID,
+                Mockery::on(fn ($r) => is_string($r) && str_contains($r, '/about')),
+                false,
+                false,
+                null,
+                PrerenderService::PRIORITY_HIGH
+            )
+            ->andReturn(1001);
+
+        $this->artisan('prerender:detect-drift')
+            ->assertExitCode(0);
+    }
+
+    // =========================================================================
+    // Missing snapshot (include-missing=1 default) → enqueueJob called.
+    // =========================================================================
+
+    public function test_enqueues_job_for_missing_snapshot_by_default(): void
+    {
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+
+        // Inventory is empty — no snapshot exists for /events.
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([]);
+
+        $this->sitemapMock
+            ->shouldReceive('generateForTenant')
+            ->once()
+            ->andReturn($this->sitemapXml(['/events' => date('Y-m-d')]));
+
+        $this->prerenderMock
+            ->shouldReceive('enqueueJob')
+            ->once()
+            ->with(
+                self::TENANT_ID,
+                Mockery::on(fn ($r) => is_string($r) && str_contains($r, '/events')),
+                false,
+                false,
+                null,
+                Mockery::type('int')
+            )
+            ->andReturn(1002);
+
+        $this->artisan('prerender:detect-drift')
+            ->assertExitCode(0);
+    }
+
+    // =========================================================================
+    // --include-missing=0 → missing snapshots are NOT enqueued.
+    // =========================================================================
+
+    public function test_does_not_enqueue_missing_when_include_missing_off(): void
+    {
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([]);
+
+        $this->sitemapMock
+            ->shouldReceive('generateForTenant')
+            ->once()
+            ->andReturn($this->sitemapXml(['/events' => date('Y-m-d')]));
+
+        // With include-missing=0 and no stale rows, enqueueJob must not be called.
+        $this->prerenderMock->shouldNotReceive('enqueueJob');
+
+        $this->artisan('prerender:detect-drift', ['--include-missing' => '0'])
+            ->assertExitCode(0);
+    }
+
+    // =========================================================================
+    // --dry-run → enqueueJob never called; output contains dry_run:true.
+    // =========================================================================
+
+    public function test_dry_run_does_not_call_enqueue_job(): void
+    {
+        $now        = time();
+        $snapMtime  = $now - 7200;
+        $lastmodStr = gmdate('Y-m-d\TH:i:s\Z', $now - 3600);
+
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([
+                ['host' => self::TENANT_HOST, 'route' => '/about', 'mtime' => $snapMtime],
+            ]);
+
+        $this->sitemapMock
+            ->shouldReceive('generateForTenant')
+            ->once()
+            ->andReturn($this->sitemapXml(['/about' => $lastmodStr]));
+
+        $this->prerenderMock->shouldNotReceive('enqueueJob');
+
+        $this->artisan('prerender:detect-drift', ['--dry-run' => true])
+            ->expectsOutputToContain('"dry_run": true')
+            ->assertExitCode(0);
+    }
+
+    // =========================================================================
+    // Sitemap error → tenant is skipped; no enqueueJob.
+    // =========================================================================
+
+    public function test_skips_tenant_when_sitemap_throws(): void
+    {
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([]);
+
+        $this->sitemapMock
+            ->shouldReceive('generateForTenant')
+            ->once()
+            ->andThrow(new \RuntimeException('sitemap generation failed'));
+
+        $this->prerenderMock->shouldNotReceive('enqueueJob');
+
+        $this->artisan('prerender:detect-drift')
+            ->assertExitCode(0);
+    }
+
+    // =========================================================================
+    // Tenant with an active job (row in prerender_jobs) is skipped.
+    // =========================================================================
+
+    public function test_skips_tenant_with_active_job_in_db(): void
+    {
+        // Insert a live 'queued' job for our tenant. DatabaseTransactions rolls this back.
+        DB::table('prerender_jobs')->insert([
+            'tenant_id'  => self::TENANT_ID,
+            'status'     => 'queued',
+            'priority'   => PrerenderService::PRIORITY_HIGH,
+            'queued_at'  => now(),
+        ]);
+
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([]);
+
+        // Sitemap / enqueueJob should not be called because the tenant is skipped.
+        $this->sitemapMock->shouldNotReceive('generateForTenant');
+        $this->prerenderMock->shouldNotReceive('enqueueJob');
+
+        $this->artisan('prerender:detect-drift')
+            ->assertExitCode(0);
+    }
+
+    // =========================================================================
+    // --max-tenants=0 → no tenants processed, no enqueueJob.
+    // =========================================================================
+
+    public function test_tenant_cap_zero_processes_no_tenants(): void
+    {
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([]);
+
+        $this->sitemapMock->shouldNotReceive('generateForTenant');
+        $this->prerenderMock->shouldNotReceive('enqueueJob');
+
+        $this->artisan('prerender:detect-drift', ['--max-tenants' => '0'])
+            ->assertExitCode(0);
+    }
+
+    // =========================================================================
+    // Output JSON always contains the snapshot_count key (when at least one
+    // tenant is active so the JSON block is reached).
+    // =========================================================================
+
+    public function test_output_contains_snapshot_count(): void
+    {
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([]);
+
+        $this->sitemapMock
+            ->shouldReceive('generateForTenant')
+            ->once()
+            ->andReturn($this->sitemapXml([]));
+
+        $this->artisan('prerender:detect-drift')
+            ->expectsOutputToContain('snapshot_count')
+            ->assertExitCode(0);
+    }
+
+    // =========================================================================
+    // Custom --priority propagated to enqueueJob.
+    // =========================================================================
+
+    public function test_custom_priority_is_passed_to_enqueue_job(): void
+    {
+        $now        = time();
+        $snapMtime  = $now - 7200;
+        $lastmodStr = gmdate('Y-m-d\TH:i:s\Z', $now - 3600);
+
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([
+                ['host' => self::TENANT_HOST, 'route' => '/about', 'mtime' => $snapMtime],
+            ]);
+
+        $this->sitemapMock
+            ->shouldReceive('generateForTenant')
+            ->once()
+            ->andReturn($this->sitemapXml(['/about' => $lastmodStr]));
+
+        $this->prerenderMock
+            ->shouldReceive('enqueueJob')
+            ->once()
+            ->withArgs(function (int $tenantId, ?string $routes, bool $force, bool $dryRun, $requestedBy, int $priority): bool {
+                // Priority 7 = LOW, passed via --priority=7.
+                return $priority === 7;
+            })
+            ->andReturn(1003);
+
+        $this->artisan('prerender:detect-drift', ['--priority' => '7'])
+            ->assertExitCode(0);
+    }
+
+    // =========================================================================
+    // Multiple stale + missing routes combined into one enqueueJob call.
+    // =========================================================================
+
+    public function test_stale_and_missing_routes_merged_into_single_job(): void
+    {
+        $now        = time();
+        $snapMtime  = $now - 7200;
+        $lastmodStr = gmdate('Y-m-d\TH:i:s\Z', $now - 3600);
+
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([
+                // /about is stale.
+                ['host' => self::TENANT_HOST, 'route' => '/about', 'mtime' => $snapMtime],
+            ]);
+
+        // Sitemap has /about (stale) and /jobs (missing).
+        $this->sitemapMock
+            ->shouldReceive('generateForTenant')
+            ->once()
+            ->andReturn($this->sitemapXml([
+                '/about' => $lastmodStr,
+                '/jobs'  => date('Y-m-d'),
+            ]));
+
+        $this->prerenderMock
+            ->shouldReceive('enqueueJob')
+            ->once()
+            ->withArgs(function (int $tenantId, ?string $routes, bool $force, bool $dryRun, $requestedBy, int $priority): bool {
+                // Both routes must appear in the comma-separated routes string.
+                $parts = explode(',', $routes ?? '');
+                return in_array('/about', $parts, true) && in_array('/jobs', $parts, true);
+            })
+            ->andReturn(1004);
+
+        $this->artisan('prerender:detect-drift')
+            ->assertExitCode(0);
+    }
+}
