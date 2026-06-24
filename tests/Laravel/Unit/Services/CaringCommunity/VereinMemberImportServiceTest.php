@@ -1,0 +1,344 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+declare(strict_types=1);
+
+namespace Tests\Laravel\Unit\Services\CaringCommunity;
+
+use App\Core\TenantContext;
+use App\Services\CaringCommunity\VereinMemberImportService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Schema;
+use InvalidArgumentException;
+use Tests\Laravel\TestCase;
+
+class VereinMemberImportServiceTest extends TestCase
+{
+    use DatabaseTransactions;
+
+    private int $orgId = 0;
+    private int $actorId = 0;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (!Schema::hasTable('vol_organizations') || !Schema::hasTable('org_members')) {
+            $this->markTestSkipped('vol_organizations / org_members tables not present.');
+        }
+
+        Queue::fake();
+        TenantContext::setById($this->testTenantId);
+
+        // Create an actor user (the importer).
+        $this->actorId = (int) DB::table('users')->insertGetId([
+            'tenant_id'  => $this->testTenantId,
+            'name'       => 'Import Actor',
+            'email'      => 'actor.' . uniqid() . '@example.test',
+            'role'       => 'admin',
+            'status'     => 'active',
+            'is_approved' => 1,
+            'created_at' => now(),
+        ]);
+
+        // Create a club-type organisation in our tenant.
+        $this->orgId = (int) DB::table('vol_organizations')->insertGetId([
+            'tenant_id'  => $this->testTenantId,
+            'user_id'    => $this->actorId,
+            'name'       => 'Test Verein ' . uniqid(),
+            'org_type'   => 'club',
+            'status'     => 'active',
+            'created_at' => now(),
+        ]);
+    }
+
+    private function service(): VereinMemberImportService
+    {
+        return app(VereinMemberImportService::class);
+    }
+
+    /** Build a minimal valid CSV with one row. */
+    private function csv(array $rows, array $headers = ['email', 'first_name', 'last_name', 'role']): string
+    {
+        $lines = [implode(',', $headers)];
+        foreach ($rows as $row) {
+            $lines[] = implode(',', $row);
+        }
+        return implode("\n", $lines);
+    }
+
+    // -------------------------------------------------------------------------
+    // parseCsv / validation
+    // -------------------------------------------------------------------------
+
+    public function test_preview_throws_on_empty_csv(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->service()->preview($this->testTenantId, $this->orgId, '');
+    }
+
+    public function test_preview_throws_when_email_header_missing(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $csv = "first_name,last_name\nJane,Doe\n";
+        $this->service()->preview($this->testTenantId, $this->orgId, $csv);
+    }
+
+    public function test_preview_throws_for_non_club_organisation(): void
+    {
+        // Create a non-club org (default org_type is 'organisation').
+        $nonClubOrgId = (int) DB::table('vol_organizations')->insertGetId([
+            'tenant_id'  => $this->testTenantId,
+            'user_id'    => $this->actorId,
+            'name'       => 'Non Club Org ' . uniqid(),
+            'org_type'   => 'organisation',
+            'status'     => 'active',
+            'created_at' => now(),
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $csv = $this->csv([['jane@example.test', 'Jane', 'Doe', 'member']]);
+        $this->service()->preview($this->testTenantId, $nonClubOrgId, $csv);
+    }
+
+    public function test_preview_throws_for_cross_tenant_organisation(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        // Pass a tenant that doesn't own the org.
+        $csv = $this->csv([['jane@example.test', 'Jane', 'Doe', 'member']]);
+        $this->service()->preview(999, $this->orgId, $csv);
+    }
+
+    // -------------------------------------------------------------------------
+    // preview() — action classification
+    // -------------------------------------------------------------------------
+
+    public function test_preview_marks_new_email_as_create(): void
+    {
+        $email = 'new.' . uniqid() . '@example.test';
+        $csv   = $this->csv([[$email, 'Jane', 'Doe', 'member']]);
+
+        $result = $this->service()->preview($this->testTenantId, $this->orgId, $csv);
+
+        $this->assertCount(1, $result['items']);
+        $this->assertSame('create', $result['items'][0]['action']);
+        $this->assertSame(1, $result['summary']['ready_to_create']);
+        $this->assertSame(0, $result['summary']['ready_to_link']);
+        $this->assertSame(0, $result['summary']['invalid']);
+    }
+
+    public function test_preview_marks_existing_non_member_email_as_link_existing(): void
+    {
+        $email = 'existing.' . uniqid() . '@example.test';
+        DB::table('users')->insertGetId([
+            'tenant_id'  => $this->testTenantId,
+            'name'       => 'Existing User',
+            'email'      => $email,
+            'role'       => 'member',
+            'status'     => 'active',
+            'is_approved' => 1,
+            'created_at' => now(),
+        ]);
+
+        $csv    = $this->csv([[$email, 'Existing', 'User', 'member']]);
+        $result = $this->service()->preview($this->testTenantId, $this->orgId, $csv);
+
+        $this->assertSame('link_existing', $result['items'][0]['action']);
+        $this->assertSame(1, $result['summary']['ready_to_link']);
+        $this->assertSame(0, $result['summary']['ready_to_create']);
+    }
+
+    public function test_preview_marks_invalid_email_format_as_invalid(): void
+    {
+        $csv    = $this->csv([['not-an-email', 'Bad', 'Email', 'member']]);
+        $result = $this->service()->preview($this->testTenantId, $this->orgId, $csv);
+
+        $this->assertSame('invalid', $result['items'][0]['action']);
+        $this->assertNotEmpty($result['items'][0]['errors']);
+        $this->assertSame(1, $result['summary']['invalid']);
+    }
+
+    public function test_preview_marks_in_file_duplicate_as_invalid(): void
+    {
+        $email = 'dup.' . uniqid() . '@example.test';
+        $csv   = $this->csv([
+            [$email, 'First', 'Entry', 'member'],
+            [$email, 'Second', 'Entry', 'member'],
+        ]);
+
+        $result = $this->service()->preview($this->testTenantId, $this->orgId, $csv);
+
+        // First occurrence is 'create', second is 'invalid' (duplicate).
+        $this->assertSame('create', $result['items'][0]['action']);
+        $this->assertSame('invalid', $result['items'][1]['action']);
+        $this->assertSame(2, $result['summary']['total_rows']);
+    }
+
+    public function test_preview_normalises_unknown_role_to_member(): void
+    {
+        $email  = 'roletest.' . uniqid() . '@example.test';
+        $csv    = $this->csv([[$email, 'Role', 'Test', 'captain']]);
+        $result = $this->service()->preview($this->testTenantId, $this->orgId, $csv);
+
+        $this->assertSame('member', $result['items'][0]['role']);
+    }
+
+    public function test_preview_returns_organisation_details(): void
+    {
+        $email  = 'org.' . uniqid() . '@example.test';
+        $csv    = $this->csv([[$email, 'O', 'R', 'member']]);
+        $result = $this->service()->preview($this->testTenantId, $this->orgId, $csv);
+
+        $this->assertSame($this->orgId, $result['organization']['id']);
+        $this->assertSame('club', $result['organization']['org_type']);
+        $this->assertArrayHasKey('name', $result['organization']);
+    }
+
+    // -------------------------------------------------------------------------
+    // import()
+    // -------------------------------------------------------------------------
+
+    public function test_import_throws_when_csv_has_invalid_rows(): void
+    {
+        $csv = $this->csv([['not-an-email', 'Bad', 'Email', 'member']]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->service()->import($this->testTenantId, $this->orgId, $this->actorId, $csv);
+    }
+
+    public function test_import_creates_new_user_and_org_member_row(): void
+    {
+        $email  = 'newimport.' . uniqid() . '@example.test';
+        $csv    = $this->csv([[$email, 'First', 'Last', 'member']]);
+        $result = $this->service()->import($this->testTenantId, $this->orgId, $this->actorId, $csv);
+
+        $this->assertSame(1, $result['created']);
+        $this->assertSame(0, $result['linked']);
+        $this->assertSame(0, $result['skipped']);
+
+        // User row must exist in DB.
+        $user = DB::table('users')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('email', $email)
+            ->first();
+        $this->assertNotNull($user, 'User row should have been created.');
+        $this->assertSame('active', $user->status);
+        $this->assertSame(1, (int) $user->is_approved);
+
+        // org_members row must exist.
+        $member = DB::table('org_members')
+            ->where('organization_id', $this->orgId)
+            ->where('user_id', $user->id)
+            ->first();
+        $this->assertNotNull($member, 'org_members row should have been created.');
+        $this->assertSame('active', $member->status);
+
+        // Returned members array should carry temporary_password.
+        $this->assertCount(1, $result['members']);
+        $this->assertNotNull($result['members'][0]['temporary_password']);
+        $this->assertTrue($result['members'][0]['created']);
+    }
+
+    public function test_import_links_existing_user_without_creating_new_row(): void
+    {
+        $email  = 'link.' . uniqid() . '@example.test';
+        $userId = (int) DB::table('users')->insertGetId([
+            'tenant_id'  => $this->testTenantId,
+            'name'       => 'Pre Existing',
+            'email'      => $email,
+            'role'       => 'member',
+            'status'     => 'active',
+            'is_approved' => 1,
+            'created_at' => now(),
+        ]);
+
+        $csv    = $this->csv([[$email, 'Pre', 'Existing', 'member']]);
+        $result = $this->service()->import($this->testTenantId, $this->orgId, $this->actorId, $csv);
+
+        $this->assertSame(0, $result['created']);
+        $this->assertSame(1, $result['linked']);
+
+        // org_members row should reference the pre-existing user.
+        $member = DB::table('org_members')
+            ->where('organization_id', $this->orgId)
+            ->where('user_id', $userId)
+            ->first();
+        $this->assertNotNull($member);
+        $this->assertFalse($result['members'][0]['created']);
+        $this->assertNull($result['members'][0]['temporary_password']);
+    }
+
+    public function test_preview_marks_existing_org_member_as_invalid_with_error(): void
+    {
+        // NOTE: Source bug in VereinMemberImportService::preview() — when a user
+        // is already an active org member the code sets $action = 'already_member'
+        // then immediately adds an error and overwrites $action to 'invalid' (lines
+        // 57-63).  As a result import() always throws InvalidArgumentException for
+        // existing-member rows.  The import() skipped-counter logic at line 118
+        // checks for 'already_member' action but preview() never emits it.
+        // This test asserts the ACTUAL (buggy) behaviour so we detect if the bug
+        // is later fixed without a test update.
+        $email  = 'alreadymember.' . uniqid() . '@example.test';
+        $userId = (int) DB::table('users')->insertGetId([
+            'tenant_id'  => $this->testTenantId,
+            'name'       => 'Already Member',
+            'email'      => $email,
+            'role'       => 'member',
+            'status'     => 'active',
+            'is_approved' => 1,
+            'created_at' => now(),
+        ]);
+
+        DB::table('org_members')->insertOrIgnore([
+            'tenant_id'       => $this->testTenantId,
+            'organization_id' => $this->orgId,
+            'org_type'        => 'volunteer',
+            'user_id'         => $userId,
+            'role'            => 'member',
+            'status'          => 'active',
+            'created_at'      => now(),
+        ]);
+
+        $csv    = $this->csv([[$email, 'Already', 'Member', 'member']]);
+        $result = $this->service()->preview($this->testTenantId, $this->orgId, $csv);
+
+        // The action is overwritten to 'invalid' (not 'already_member') because
+        // the error-check at line 62-63 fires first — see NOTE above.
+        $this->assertSame('invalid', $result['items'][0]['action']);
+        $this->assertNotEmpty($result['items'][0]['errors']);
+    }
+
+    public function test_import_mixed_batch_returns_correct_counts(): void
+    {
+        $newEmail  = 'mixednew.' . uniqid() . '@example.test';
+        $linkEmail = 'mixedlink.' . uniqid() . '@example.test';
+
+        // Pre-create the existing user.
+        DB::table('users')->insertGetId([
+            'tenant_id'  => $this->testTenantId,
+            'name'       => 'Link Me',
+            'email'      => $linkEmail,
+            'role'       => 'member',
+            'status'     => 'active',
+            'is_approved' => 1,
+            'created_at' => now(),
+        ]);
+
+        $csv = $this->csv([
+            [$newEmail,  'New',  'User', 'member'],
+            [$linkEmail, 'Link', 'Me',   'admin'],
+        ]);
+
+        $result = $this->service()->import($this->testTenantId, $this->orgId, $this->actorId, $csv);
+
+        $this->assertSame(1, $result['created']);
+        $this->assertSame(1, $result['linked']);
+        $this->assertSame(0, $result['skipped']);
+        $this->assertSame($this->actorId, $result['imported_by']);
+    }
+}
