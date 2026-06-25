@@ -2,6 +2,7 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/jasperfordesq-ai/nexus-v1/ci.yml?branch=main&label=CI&logo=github)](https://github.com/jasperfordesq-ai/nexus-v1/actions/workflows/ci.yml)
 [![Security scan](https://img.shields.io/github/actions/workflow/status/jasperfordesq-ai/nexus-v1/security-scan.yml?branch=main&label=security%20scan&logo=github)](https://github.com/jasperfordesq-ai/nexus-v1/actions/workflows/security-scan.yml)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13344/badge)](https://www.bestpractices.dev/projects/13344)
 [![License: AGPL v3](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.5.3-success.svg)](CHANGELOG.md)
 [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4.svg?logo=php&logoColor=white)](composer.json)
