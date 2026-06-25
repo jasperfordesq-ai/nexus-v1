@@ -50,6 +50,48 @@ const COLOR_OPTIONS = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Actions menu
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface CategoryActionsMenuProps {
+  category: AdminCategory;
+  t: (key: string, options?: Record<string, unknown>) => string;
+  openEditModal: (category: AdminCategory) => void;
+  setDeleteTarget: React.Dispatch<React.SetStateAction<AdminCategory | null>>;
+}
+
+function CategoryActionsMenu({ category, t, openEditModal, setDeleteTarget }: CategoryActionsMenuProps) {
+  type ActionKey = 'edit' | 'delete';
+
+  const handleMenuAction = (key: React.Key) => {
+    const action = key as ActionKey;
+    if (action === 'edit') {
+      openEditModal(category);
+    } else if (action === 'delete') {
+      setDeleteTarget(category);
+    }
+  };
+
+  return (
+    <Dropdown>
+      <DropdownTrigger>
+        <Button isIconOnly size="sm" variant="tertiary" aria-label={t('categories.label_category_actions')}>
+          <MoreVertical size={16} />
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu aria-label={t('categories.label_category_actions')} onAction={handleMenuAction}>
+        <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
+          {t('common.edit')}
+        </DropdownItem>
+        <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">
+          {t('common.delete')}
+        </DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -207,39 +249,6 @@ export function CategoriesAdmin() {
     setDeleting(false);
   };
 
-  // ─── Actions menu ───
-
-  function CategoryActionsMenu({ category }: { category: AdminCategory }) {
-    type ActionKey = 'edit' | 'delete';
-
-    const handleMenuAction = (key: React.Key) => {
-      const action = key as ActionKey;
-      if (action === 'edit') {
-        openEditModal(category);
-      } else if (action === 'delete') {
-        setDeleteTarget(category);
-      }
-    };
-
-    return (
-      <Dropdown>
-        <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="tertiary" aria-label={t('categories.label_category_actions')}>
-            <MoreVertical size={16} />
-          </Button>
-        </DropdownTrigger>
-        <DropdownMenu aria-label={t('categories.label_category_actions')} onAction={handleMenuAction}>
-          <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
-            {t('common.edit')}
-          </DropdownItem>
-          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">
-            {t('common.delete')}
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
-    );
-  }
-
   // ─── Table columns ───
 
   const columns: Column<AdminCategory>[] = [
@@ -297,7 +306,14 @@ export function CategoriesAdmin() {
     {
       key: 'actions',
       label: t('common.actions'),
-      render: (cat) => <CategoryActionsMenu category={cat} />,
+      render: (cat) => (
+        <CategoryActionsMenu
+          category={cat}
+          t={t}
+          openEditModal={openEditModal}
+          setDeleteTarget={setDeleteTarget}
+        />
+      ),
     },
   ];
 

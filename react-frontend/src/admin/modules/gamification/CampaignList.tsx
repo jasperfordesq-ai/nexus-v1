@@ -33,6 +33,80 @@ import type { Campaign } from '../../api/types';
 
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
+// Actions menu per row
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface CampaignActionsProps {
+  campaign: Campaign;
+  t: (key: string, options?: Record<string, unknown>) => string;
+  navigate: (path: string) => void;
+  tenantPath: (path: string) => string;
+  handleStatusChange: (campaign: Campaign, newStatus: Campaign['status']) => Promise<void>;
+  setDeleteTarget: React.Dispatch<React.SetStateAction<Campaign | null>>;
+}
+
+function CampaignActions({ campaign, t, navigate, tenantPath, handleStatusChange, setDeleteTarget }: CampaignActionsProps) {
+  type ActionKey = 'edit' | 'activate' | 'pause' | 'resume' | 'delete';
+
+  const handleAction = (key: React.Key) => {
+    const action = key as ActionKey;
+    if (action === 'edit') {
+      navigate(tenantPath(`/admin/gamification/campaigns/edit/${campaign.id}`));
+    } else if (action === 'activate') {
+      handleStatusChange(campaign, 'active');
+    } else if (action === 'pause') {
+      handleStatusChange(campaign, 'paused');
+    } else if (action === 'resume') {
+      handleStatusChange(campaign, 'active');
+    } else if (action === 'delete') {
+      setDeleteTarget(campaign);
+    }
+  };
+
+  return (
+    <Dropdown>
+      <DropdownTrigger>
+        <Button isIconOnly size="sm" variant="tertiary" aria-label={t('gamification.label_campaign_actions')}>
+          <MoreVertical size={16} />
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu aria-label={t('gamification.label_campaign_actions')} onAction={handleAction}>
+        <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
+          {t('gamification.edit')}
+        </DropdownItem>
+        <DropdownItem
+          key="activate" id="activate"
+          startContent={<Play size={14} />}
+          color="success"
+          className={campaign.status === 'draft' ? 'text-success' : 'hidden'}
+        >
+          {t('gamification.activate')}
+        </DropdownItem>
+        <DropdownItem
+          key="pause" id="pause"
+          startContent={<Pause size={14} />}
+          color="warning"
+          className={campaign.status === 'active' ? 'text-warning' : 'hidden'}
+        >
+          {t('gamification.pause')}
+        </DropdownItem>
+        <DropdownItem
+          key="resume" id="resume"
+          startContent={<RotateCcw size={14} />}
+          color="success"
+          className={campaign.status === 'paused' ? 'text-success' : 'hidden'}
+        >
+          {t('gamification.resume')}
+        </DropdownItem>
+        <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">
+          {t('gamification.delete')}
+        </DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -93,68 +167,6 @@ export function CampaignList() {
     }
   };
 
-  // Actions menu per row
-  function CampaignActions({ campaign }: { campaign: Campaign }) {
-    type ActionKey = 'edit' | 'activate' | 'pause' | 'resume' | 'delete';
-
-    const handleAction = (key: React.Key) => {
-      const action = key as ActionKey;
-      if (action === 'edit') {
-        navigate(tenantPath(`/admin/gamification/campaigns/edit/${campaign.id}`));
-      } else if (action === 'activate') {
-        handleStatusChange(campaign, 'active');
-      } else if (action === 'pause') {
-        handleStatusChange(campaign, 'paused');
-      } else if (action === 'resume') {
-        handleStatusChange(campaign, 'active');
-      } else if (action === 'delete') {
-        setDeleteTarget(campaign);
-      }
-    };
-
-    return (
-      <Dropdown>
-        <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="tertiary" aria-label={t('gamification.label_campaign_actions')}>
-            <MoreVertical size={16} />
-          </Button>
-        </DropdownTrigger>
-        <DropdownMenu aria-label={t('gamification.label_campaign_actions')} onAction={handleAction}>
-          <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
-            {t('gamification.edit')}
-          </DropdownItem>
-          <DropdownItem
-            key="activate" id="activate"
-            startContent={<Play size={14} />}
-            color="success"
-            className={campaign.status === 'draft' ? 'text-success' : 'hidden'}
-          >
-            {t('gamification.activate')}
-          </DropdownItem>
-          <DropdownItem
-            key="pause" id="pause"
-            startContent={<Pause size={14} />}
-            color="warning"
-            className={campaign.status === 'active' ? 'text-warning' : 'hidden'}
-          >
-            {t('gamification.pause')}
-          </DropdownItem>
-          <DropdownItem
-            key="resume" id="resume"
-            startContent={<RotateCcw size={14} />}
-            color="success"
-            className={campaign.status === 'paused' ? 'text-success' : 'hidden'}
-          >
-            {t('gamification.resume')}
-          </DropdownItem>
-          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">
-            {t('gamification.delete')}
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
-    );
-  }
-
   const columns: Column<Campaign>[] = [
     {
       key: 'name',
@@ -207,7 +219,16 @@ export function CampaignList() {
     {
       key: 'actions',
       label: t('gamification.col_actions'),
-      render: (c) => <CampaignActions campaign={c} />,
+      render: (c) => (
+        <CampaignActions
+          campaign={c}
+          t={t}
+          navigate={navigate}
+          tenantPath={tenantPath}
+          handleStatusChange={handleStatusChange}
+          setDeleteTarget={setDeleteTarget}
+        />
+      ),
     },
   ];
 

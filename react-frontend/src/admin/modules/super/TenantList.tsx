@@ -32,6 +32,68 @@ import { DataTable,
 import type { SuperAdminTenant } from '../../api/types';
 
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Tabs, Tab } from '@/components/ui';
+
+type TenantConfirmAction = {
+  type: 'delete' | 'deactivate' | 'reactivate' | 'toggle-hub';
+  tenant: SuperAdminTenant;
+};
+
+interface TenantActionsMenuProps {
+  tenant: SuperAdminTenant;
+  t: (key: string, options?: Record<string, unknown>) => string;
+  navigate: (path: string) => void;
+  tenantPath: (path: string) => string;
+  setConfirmAction: React.Dispatch<React.SetStateAction<TenantConfirmAction | null>>;
+}
+
+function TenantActionsMenu({ tenant, t, navigate, tenantPath, setConfirmAction }: TenantActionsMenuProps) {
+  type ActionKey = 'view' | 'edit' | 'toggle-hub' | 'deactivate' | 'reactivate' | 'delete';
+
+  const handleMenuAction = (key: React.Key) => {
+    const action = key as ActionKey;
+    if (action === 'view') {
+      navigate(tenantPath(`/super-admin/tenants/${tenant.id}`));
+    } else if (action === 'edit') {
+      navigate(tenantPath(`/super-admin/tenants/${tenant.id}/edit`));
+    } else {
+      setConfirmAction({ type: action as 'delete' | 'deactivate' | 'reactivate' | 'toggle-hub', tenant });
+    }
+  };
+
+  return (
+    <Dropdown>
+      <DropdownTrigger>
+        <Button isIconOnly size="sm" variant="tertiary" aria-label={t('super.tenant_actions')}>
+          <MoreVertical size={16} />
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu aria-label={t('super.tenant_actions')} onAction={handleMenuAction}>
+        <DropdownItem key="view" id="view" startContent={<Eye aria-hidden="true" size={14} />}>
+          {t('super.action_view')}
+        </DropdownItem>
+        <DropdownItem key="edit" id="edit" startContent={<Edit aria-hidden="true" size={14} />}>
+          {t('common.edit')}
+        </DropdownItem>
+        <DropdownItem key="toggle-hub" id="toggle-hub" startContent={tenant.allows_subtenants ? <ToggleLeft aria-hidden="true" size={14} /> : <ToggleRight aria-hidden="true" size={14} />}>
+          {tenant.allows_subtenants ? t('super.disable_hub') : t('super.enable_hub')}
+        </DropdownItem>
+        {tenant.is_active ? (
+          <DropdownItem key="deactivate" id="deactivate" startContent={<Shield aria-hidden="true" size={14} />} className="text-warning" color="warning">
+            {t('super.deactivate')}
+          </DropdownItem>
+        ) : (
+          <DropdownItem key="reactivate" id="reactivate" startContent={<Shield aria-hidden="true" size={14} />} className="text-success" color="success">
+            {t('super.reactivate')}
+          </DropdownItem>
+        )}
+        <DropdownItem key="delete" id="delete" startContent={<Trash2 aria-hidden="true" size={14} />} className="text-danger" variant="danger">
+          {t('common.delete')}
+        </DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
+  );
+}
+
 export function TenantList() {
   const { t } = useTranslation('admin');
   usePageTitle(t('super.page_title'));
@@ -135,54 +197,6 @@ export function TenantList() {
     },
   };
 
-  function TenantActionsMenu({ tenant }: { tenant: SuperAdminTenant }) {
-    type ActionKey = 'view' | 'edit' | 'toggle-hub' | 'deactivate' | 'reactivate' | 'delete';
-
-    const handleMenuAction = (key: React.Key) => {
-      const action = key as ActionKey;
-      if (action === 'view') {
-        navigate(tenantPath(`/super-admin/tenants/${tenant.id}`));
-      } else if (action === 'edit') {
-        navigate(tenantPath(`/super-admin/tenants/${tenant.id}/edit`));
-      } else {
-        setConfirmAction({ type: action as 'delete' | 'deactivate' | 'reactivate' | 'toggle-hub', tenant });
-      }
-    };
-
-    return (
-      <Dropdown>
-        <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="tertiary" aria-label={t('super.tenant_actions')}>
-            <MoreVertical size={16} />
-          </Button>
-        </DropdownTrigger>
-        <DropdownMenu aria-label={t('super.tenant_actions')} onAction={handleMenuAction}>
-          <DropdownItem key="view" id="view" startContent={<Eye aria-hidden="true" size={14} />}>
-            {t('super.action_view')}
-          </DropdownItem>
-          <DropdownItem key="edit" id="edit" startContent={<Edit aria-hidden="true" size={14} />}>
-            {t('common.edit')}
-          </DropdownItem>
-          <DropdownItem key="toggle-hub" id="toggle-hub" startContent={tenant.allows_subtenants ? <ToggleLeft aria-hidden="true" size={14} /> : <ToggleRight aria-hidden="true" size={14} />}>
-            {tenant.allows_subtenants ? t('super.disable_hub') : t('super.enable_hub')}
-          </DropdownItem>
-          {tenant.is_active ? (
-            <DropdownItem key="deactivate" id="deactivate" startContent={<Shield aria-hidden="true" size={14} />} className="text-warning" color="warning">
-              {t('super.deactivate')}
-            </DropdownItem>
-          ) : (
-            <DropdownItem key="reactivate" id="reactivate" startContent={<Shield aria-hidden="true" size={14} />} className="text-success" color="success">
-              {t('super.reactivate')}
-            </DropdownItem>
-          )}
-          <DropdownItem key="delete" id="delete" startContent={<Trash2 aria-hidden="true" size={14} />} className="text-danger" variant="danger">
-            {t('common.delete')}
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
-    );
-  }
-
   const columns: Column<SuperAdminTenant>[] = [
     {
       key: 'name',
@@ -255,7 +269,15 @@ export function TenantList() {
     {
       key: 'actions',
       label: t('common.actions'),
-      render: (tenant) => <TenantActionsMenu tenant={tenant} />,
+      render: (tenant) => (
+        <TenantActionsMenu
+          tenant={tenant}
+          t={t}
+          navigate={navigate}
+          tenantPath={tenantPath}
+          setConfirmAction={setConfirmAction}
+        />
+      ),
     },
   ];
 

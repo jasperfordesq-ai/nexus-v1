@@ -60,6 +60,43 @@ const EMPTY_FORM: FaqFormData = {
   is_published: true,
 };
 
+// ─── Actions menu ───
+
+interface FaqActionsMenuProps {
+  faq: AdminHelpFaq;
+  t: (key: string, options?: Record<string, unknown>) => string;
+  openEditModal: (faq: AdminHelpFaq) => void;
+  setDeleteTarget: React.Dispatch<React.SetStateAction<AdminHelpFaq | null>>;
+}
+
+function FaqActionsMenu({ faq, t, openEditModal, setDeleteTarget }: FaqActionsMenuProps) {
+  const handleMenuAction = (key: React.Key) => {
+    if (key === 'edit') {
+      openEditModal(faq);
+    } else if (key === 'delete') {
+      setDeleteTarget(faq);
+    }
+  };
+
+  return (
+    <Dropdown>
+      <DropdownTrigger>
+        <Button isIconOnly size="sm" variant="tertiary" aria-label={t('help_faqs.actions_aria')}>
+          <MoreVertical size={16} />
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu aria-label={t('help_faqs.actions_aria')} onAction={handleMenuAction}>
+        <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
+          {t('common.edit')}
+        </DropdownItem>
+        <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">
+          {t('common.delete')}
+        </DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
+  );
+}
+
 export function HelpFaqsAdmin() {
   const { t } = useTranslation('admin');
   usePageTitle(t('help_faqs.page_title'));
@@ -202,36 +239,6 @@ export function HelpFaqsAdmin() {
     setDeleting(false);
   };
 
-  // ─── Actions menu ───
-
-  function FaqActionsMenu({ faq }: { faq: AdminHelpFaq }) {
-    const handleMenuAction = (key: React.Key) => {
-      if (key === 'edit') {
-        openEditModal(faq);
-      } else if (key === 'delete') {
-        setDeleteTarget(faq);
-      }
-    };
-
-    return (
-      <Dropdown>
-        <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="tertiary" aria-label={t('help_faqs.actions_aria')}>
-            <MoreVertical size={16} />
-          </Button>
-        </DropdownTrigger>
-        <DropdownMenu aria-label={t('help_faqs.actions_aria')} onAction={handleMenuAction}>
-          <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
-            {t('common.edit')}
-          </DropdownItem>
-          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">
-            {t('common.delete')}
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
-    );
-  }
-
   // ─── Table columns ───
 
   const columns: Column<AdminHelpFaq>[] = [
@@ -292,7 +299,14 @@ export function HelpFaqsAdmin() {
     {
       key: 'actions',
       label: t('common.actions'),
-      render: (faq) => <FaqActionsMenu faq={faq} />,
+      render: (faq) => (
+        <FaqActionsMenu
+          faq={faq}
+          t={t}
+          openEditModal={openEditModal}
+          setDeleteTarget={setDeleteTarget}
+        />
+      ),
     },
   ];
 

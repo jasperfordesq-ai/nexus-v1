@@ -181,6 +181,89 @@ function parseUserSearch(value: string): ParsedUserSearch {
   };
 }
 
+type UserConfirmAction = {
+  type: 'approve' | 'suspend' | 'ban' | 'reactivate' | 'delete' | 'reset2fa' | 'impersonate';
+  user: AdminUser;
+};
+
+interface UserActionsMenuProps {
+  user: AdminUser;
+  t: (key: string, options?: Record<string, unknown>) => string;
+  isSuperAdmin: boolean;
+  currentUser: { id?: number } | null;
+  navigate: (path: string) => void;
+  tenantPath: (path: string) => string;
+  setConfirmAction: React.Dispatch<React.SetStateAction<UserConfirmAction | null>>;
+}
+
+function UserActionsMenu({ user, t, isSuperAdmin, currentUser, navigate, tenantPath, setConfirmAction }: UserActionsMenuProps) {
+  type ActionKey = 'edit' | 'approve' | 'suspend' | 'ban' | 'reactivate' | 'reset2fa' | 'permissions' | 'impersonate' | 'delete';
+
+  const items: { key: ActionKey; label: string; icon: React.ReactNode; color?: 'success' | 'warning' | 'danger'; className?: string }[] = [
+    { key: 'edit', label: t('users.action_edit'), icon: <Edit size={14} aria-hidden="true" /> },
+  ];
+
+  if (user.status === 'pending') {
+    items.push({ key: 'approve', label: t('users.action_approve'), icon: <UserCheck size={14} aria-hidden="true" />, color: 'success', className: 'text-success' });
+  }
+  if (user.status === 'active') {
+    items.push({ key: 'suspend', label: t('users.action_suspend'), icon: <UserX size={14} aria-hidden="true" />, color: 'warning', className: 'text-warning' });
+  }
+  if (user.status !== 'banned') {
+    items.push({ key: 'ban', label: t('users.action_ban'), icon: <Ban size={14} aria-hidden="true" />, color: 'danger', className: 'text-danger' });
+  }
+  if (user.status === 'suspended' || user.status === 'banned') {
+    items.push({ key: 'reactivate', label: t('users.action_reactivate'), icon: <RotateCcw size={14} aria-hidden="true" />, color: 'success', className: 'text-success' });
+  }
+  if (user.has_2fa_enabled) {
+    items.push({ key: 'reset2fa', label: t('users.action_reset_2fa'), icon: <KeyRound size={14} aria-hidden="true" /> });
+  }
+  items.push({ key: 'permissions', label: t('users.action_permissions'), icon: <Shield size={14} aria-hidden="true" /> });
+  // Super admins can impersonate other users (but not other super admins)
+  if (isSuperAdmin && !user.is_super_admin && user.id !== currentUser?.id) {
+    items.push({ key: 'impersonate', label: t('users.action_impersonate'), icon: <LogIn size={14} aria-hidden="true" /> });
+  }
+  // Delete (only if not current user)
+  if (user.id !== currentUser?.id) {
+    items.push({ key: 'delete', label: t('users.action_delete'), icon: <Trash2 size={14} aria-hidden="true" />, color: 'danger', className: 'text-danger' });
+  }
+
+  const handleMenuAction = (key: React.Key) => {
+    const action = key as ActionKey;
+    if (action === 'edit') {
+      navigate(tenantPath(`/admin/users/${user.id}/edit`));
+    } else if (action === 'permissions') {
+      navigate(tenantPath(`/admin/users/${user.id}/permissions`));
+    } else if (action === 'impersonate') {
+      setConfirmAction({ type: 'impersonate', user });
+    } else {
+      setConfirmAction({ type: action, user });
+    }
+  };
+
+  return (
+    <Dropdown>
+      <DropdownTrigger>
+        <Button isIconOnly size="sm" variant="tertiary" aria-label={t('users.actions_menu')} className="bg-surface-secondary/70">
+          <MoreVertical size={16} aria-hidden="true" />
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu aria-label={t('users.actions_menu')} onAction={handleMenuAction}>
+        {items.map((item) => (
+          <DropdownItem
+            key={item.key} id={item.key}
+            startContent={item.icon}
+            className={item.className}
+            color={item.color}
+          >
+            {item.label}
+          </DropdownItem>
+        ))}
+      </DropdownMenu>
+    </Dropdown>
+  );
+}
+
 export function UserList() {
   const { t } = useTranslation('admin');
   useAdminPageMeta({ title: t('users.title') });
@@ -437,74 +520,6 @@ export function UserList() {
     impersonate: { title: t('users.confirm_impersonate_title'), message: t('users.confirm_impersonate_message'), label: t('users.action_impersonate') },
   };
 
-  function UserActionsMenu({ user }: { user: AdminUser }) {
-    type ActionKey = 'edit' | 'approve' | 'suspend' | 'ban' | 'reactivate' | 'reset2fa' | 'permissions' | 'impersonate' | 'delete';
-
-    const items: { key: ActionKey; label: string; icon: React.ReactNode; color?: 'success' | 'warning' | 'danger'; className?: string }[] = [
-      { key: 'edit', label: t('users.action_edit'), icon: <Edit size={14} aria-hidden="true" /> },
-    ];
-
-    if (user.status === 'pending') {
-      items.push({ key: 'approve', label: t('users.action_approve'), icon: <UserCheck size={14} aria-hidden="true" />, color: 'success', className: 'text-success' });
-    }
-    if (user.status === 'active') {
-      items.push({ key: 'suspend', label: t('users.action_suspend'), icon: <UserX size={14} aria-hidden="true" />, color: 'warning', className: 'text-warning' });
-    }
-    if (user.status !== 'banned') {
-      items.push({ key: 'ban', label: t('users.action_ban'), icon: <Ban size={14} aria-hidden="true" />, color: 'danger', className: 'text-danger' });
-    }
-    if (user.status === 'suspended' || user.status === 'banned') {
-      items.push({ key: 'reactivate', label: t('users.action_reactivate'), icon: <RotateCcw size={14} aria-hidden="true" />, color: 'success', className: 'text-success' });
-    }
-    if (user.has_2fa_enabled) {
-      items.push({ key: 'reset2fa', label: t('users.action_reset_2fa'), icon: <KeyRound size={14} aria-hidden="true" /> });
-    }
-    items.push({ key: 'permissions', label: t('users.action_permissions'), icon: <Shield size={14} aria-hidden="true" /> });
-    // Super admins can impersonate other users (but not other super admins)
-    if (isSuperAdmin && !user.is_super_admin && user.id !== currentUser?.id) {
-      items.push({ key: 'impersonate', label: t('users.action_impersonate'), icon: <LogIn size={14} aria-hidden="true" /> });
-    }
-    // Delete (only if not current user)
-    if (user.id !== currentUser?.id) {
-      items.push({ key: 'delete', label: t('users.action_delete'), icon: <Trash2 size={14} aria-hidden="true" />, color: 'danger', className: 'text-danger' });
-    }
-
-    const handleMenuAction = (key: React.Key) => {
-      const action = key as ActionKey;
-      if (action === 'edit') {
-        navigate(tenantPath(`/admin/users/${user.id}/edit`));
-      } else if (action === 'permissions') {
-        navigate(tenantPath(`/admin/users/${user.id}/permissions`));
-      } else if (action === 'impersonate') {
-        setConfirmAction({ type: 'impersonate', user });
-      } else {
-        setConfirmAction({ type: action, user });
-      }
-    };
-
-    return (
-      <Dropdown>
-        <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="tertiary" aria-label={t('users.actions_menu')} className="bg-surface-secondary/70">
-            <MoreVertical size={16} aria-hidden="true" />
-          </Button>
-        </DropdownTrigger>
-        <DropdownMenu aria-label={t('users.actions_menu')} onAction={handleMenuAction}>
-          {items.map((item) => (
-            <DropdownItem
-              key={item.key} id={item.key}
-              startContent={item.icon}
-              className={item.className}
-              color={item.color}
-            >
-              {item.label}
-            </DropdownItem>
-          ))}
-        </DropdownMenu>
-      </Dropdown>
-    );
-  }
-
   const columns: Column<AdminUser>[] = [
     {
       key: 'name',
@@ -576,7 +591,17 @@ export function UserList() {
     {
       key: 'actions',
       label: t('users.col_actions'),
-      render: (user) => <UserActionsMenu user={user} />,
+      render: (user) => (
+        <UserActionsMenu
+          user={user}
+          t={t}
+          isSuperAdmin={isSuperAdmin}
+          currentUser={currentUser}
+          navigate={navigate}
+          tenantPath={tenantPath}
+          setConfirmAction={setConfirmAction}
+        />
+      ),
     },
   ];
 

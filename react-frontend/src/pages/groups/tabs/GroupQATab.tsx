@@ -73,6 +73,74 @@ interface GroupQATabProps {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Vote button sub-component
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface VoteControlsProps {
+  type: 'question' | 'answer';
+  targetId: number;
+  voteCount: number;
+  userVote: 1 | -1 | 0;
+  votingIds: Set<string>;
+  handleVote: (type: 'question' | 'answer', targetId: number, vote: 1 | -1) => Promise<void>;
+  isMember: boolean;
+  t: (key: string, options?: Record<string, unknown>) => string;
+}
+
+function VoteControls({
+  type,
+  targetId,
+  voteCount,
+  userVote,
+  votingIds,
+  handleVote,
+  isMember,
+  t,
+}: VoteControlsProps) {
+  const isVoting = votingIds.has(`${type}-${targetId}`);
+
+  return (
+    <div className="flex flex-col items-center gap-0.5">
+      <Button
+        isIconOnly
+        variant="light"
+        size="sm"
+        className={userVote === 1 ? 'text-success' : 'text-muted'}
+        onPress={() => handleVote(type, targetId, 1)}
+        isDisabled={isVoting || !isMember}
+        aria-label={t('qa.upvote_aria')}
+      >
+        <ArrowUp className="w-4 h-4" aria-hidden="true" />
+      </Button>
+      <span
+        role="img"
+        className={`text-sm font-semibold ${
+          voteCount > 0
+            ? 'text-success'
+            : voteCount < 0
+              ? 'text-danger'
+              : 'text-muted'
+        }`}
+        aria-label={t('qa.vote_count_aria', { count: voteCount })}
+      >
+        {voteCount}
+      </span>
+      <Button
+        isIconOnly
+        variant="light"
+        size="sm"
+        className={userVote === -1 ? 'text-danger' : 'text-muted'}
+        onPress={() => handleVote(type, targetId, -1)}
+        isDisabled={isVoting || !isMember}
+        aria-label={t('qa.downvote_aria')}
+      >
+        <ArrowDown className="w-4 h-4" aria-hidden="true" />
+      </Button>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -357,64 +425,6 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
   ];
 
   // ─────────────────────────────────────────────────────────────────────
-  // Vote button sub-component
-  // ─────────────────────────────────────────────────────────────────────
-
-  const VoteControls = ({
-    type,
-    targetId,
-    voteCount,
-    userVote,
-  }: {
-    type: 'question' | 'answer';
-    targetId: number;
-    voteCount: number;
-    userVote: 1 | -1 | 0;
-  }) => {
-    const isVoting = votingIds.has(`${type}-${targetId}`);
-
-    return (
-      <div className="flex flex-col items-center gap-0.5">
-        <Button
-          isIconOnly
-          variant="light"
-          size="sm"
-          className={userVote === 1 ? 'text-success' : 'text-muted'}
-          onPress={() => handleVote(type, targetId, 1)}
-          isDisabled={isVoting || !isMember}
-          aria-label={t('qa.upvote_aria')}
-        >
-          <ArrowUp className="w-4 h-4" aria-hidden="true" />
-        </Button>
-        <span
-          role="img"
-          className={`text-sm font-semibold ${
-            voteCount > 0
-              ? 'text-success'
-              : voteCount < 0
-                ? 'text-danger'
-                : 'text-muted'
-          }`}
-          aria-label={t('qa.vote_count_aria', { count: voteCount })}
-        >
-          {voteCount}
-        </span>
-        <Button
-          isIconOnly
-          variant="light"
-          size="sm"
-          className={userVote === -1 ? 'text-danger' : 'text-muted'}
-          onPress={() => handleVote(type, targetId, -1)}
-          isDisabled={isVoting || !isMember}
-          aria-label={t('qa.downvote_aria')}
-        >
-          <ArrowDown className="w-4 h-4" aria-hidden="true" />
-        </Button>
-      </div>
-    );
-  };
-
-  // ─────────────────────────────────────────────────────────────────────
   // Render
   // ─────────────────────────────────────────────────────────────────────
 
@@ -512,6 +522,10 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                       targetId={question.id}
                       voteCount={question.vote_count}
                       userVote={question.user_vote}
+                      votingIds={votingIds}
+                      handleVote={handleVote}
+                      isMember={isMember}
+                      t={t}
                     />
                   </div>
 
@@ -590,6 +604,10 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                                 targetId={answer.id}
                                 voteCount={answer.vote_count}
                                 userVote={answer.user_vote}
+                                votingIds={votingIds}
+                                handleVote={handleVote}
+                                isMember={isMember}
+                                t={t}
                               />
 
                               {/* Answer content */}

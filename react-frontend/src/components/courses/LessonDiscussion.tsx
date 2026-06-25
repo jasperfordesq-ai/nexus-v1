@@ -19,6 +19,40 @@ interface LessonDiscussionProps {
   lessonId: number;
 }
 
+interface CommentProps {
+  c: CourseDiscussion;
+  isReply?: boolean;
+  t: (key: string, options?: Record<string, unknown>) => string;
+  user: { id?: number | string } | null;
+  remove: (id: number) => void | Promise<void>;
+  setReplyTo: React.Dispatch<React.SetStateAction<number | null>>;
+}
+
+function Comment({ c, isReply = false, t, user, remove, setReplyTo }: CommentProps) {
+  return (
+    <div className={`flex gap-3 ${isReply ? 'ml-10 mt-3' : 'mt-4'}`}>
+      <Avatar size="sm" src={c.user?.avatar_url ?? undefined} name={c.user?.name ?? '?'} />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold">{c.user?.name ?? `#${c.user_id}`}</span>
+          {user && Number(user.id) === c.user_id ? (
+            <Button isIconOnly size="sm" variant="tertiary" aria-label={t('discussion.delete')} onPress={() => remove(c.id)}>
+              <Trash2 size={12} />
+            </Button>
+          ) : null}
+        </div>
+        <p className="text-sm whitespace-pre-wrap">{c.body}</p>
+        {!isReply ? (
+          <button type="button" className="text-xs text-accent mt-1" onClick={() => setReplyTo(c.id)}>
+            {t('discussion.reply')}
+          </button>
+        ) : null}
+        {(c.replies ?? []).map((r) => <Comment key={r.id} c={r} isReply t={t} user={user} remove={remove} setReplyTo={setReplyTo} />)}
+      </div>
+    </div>
+  );
+}
+
 export function LessonDiscussion({ courseId, lessonId }: LessonDiscussionProps) {
   const { t } = useTranslation('courses');
   const { user } = useAuth();
@@ -55,29 +89,6 @@ export function LessonDiscussion({ courseId, lessonId }: LessonDiscussionProps) 
     load();
   };
 
-  const Comment = ({ c, isReply = false }: { c: CourseDiscussion; isReply?: boolean }) => (
-    <div className={`flex gap-3 ${isReply ? 'ml-10 mt-3' : 'mt-4'}`}>
-      <Avatar size="sm" src={c.user?.avatar_url ?? undefined} name={c.user?.name ?? '?'} />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold">{c.user?.name ?? `#${c.user_id}`}</span>
-          {user && Number(user.id) === c.user_id ? (
-            <Button isIconOnly size="sm" variant="tertiary" aria-label={t('discussion.delete')} onPress={() => remove(c.id)}>
-              <Trash2 size={12} />
-            </Button>
-          ) : null}
-        </div>
-        <p className="text-sm whitespace-pre-wrap">{c.body}</p>
-        {!isReply ? (
-          <button type="button" className="text-xs text-accent mt-1" onClick={() => setReplyTo(c.id)}>
-            {t('discussion.reply')}
-          </button>
-        ) : null}
-        {(c.replies ?? []).map((r) => <Comment key={r.id} c={r} isReply />)}
-      </div>
-    </div>
-  );
-
   return (
     <div className="mt-8">
       <h2 className="text-lg font-semibold mb-2">{t('discussion.title')}</h2>
@@ -106,7 +117,7 @@ export function LessonDiscussion({ courseId, lessonId }: LessonDiscussionProps) 
       ) : comments.length === 0 ? (
         <p className="text-sm text-muted">{t('discussion.empty')}</p>
       ) : (
-        <div>{comments.map((c) => <Comment key={c.id} c={c} />)}</div>
+        <div>{comments.map((c) => <Comment key={c.id} c={c} t={t} user={user} remove={remove} setReplyTo={setReplyTo} />)}</div>
       )}
     </div>
   );

@@ -101,6 +101,110 @@ function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) 
   );
 }
 
+interface ApplicationsPanelProps {
+  t: (key: string, options?: Record<string, unknown>) => string;
+  items: Job[];
+  loading: boolean;
+  selectedJob: Job | null;
+  handleSelectJob: (job: Job) => void;
+  appsLoading: boolean;
+  appsError: string | null;
+  applications: Application[];
+  loadApplications: (job: Job) => Promise<void>;
+  handleStatusUpdate: (appId: number, status: string, notes: string) => Promise<void>;
+}
+
+function ApplicationsPanel({
+  t,
+  items,
+  loading,
+  selectedJob,
+  handleSelectJob,
+  appsLoading,
+  appsError,
+  applications,
+  loadApplications,
+  handleStatusUpdate,
+}: ApplicationsPanelProps) {
+  return (
+    <div className='flex gap-4 min-h-[480px]'>
+      <div className='w-64 shrink-0 flex flex-col gap-1 border-r border-divider pr-4'>
+        <p className='text-xs font-semibold text-muted uppercase tracking-wide mb-2 px-1'>{t('jobs.jobs_count', { count: items.length })}</p>
+        {loading ? (
+          <div role="status" aria-busy="true" aria-label={t('common.loading')} className='flex justify-center pt-8'><Spinner size='sm' /></div>
+        ) : items.length === 0 ? (
+          <p className='text-sm text-muted/80 px-1'>{t('jobs.no_jobs_in_list')}</p>
+        ) : (
+          <div className='flex flex-col gap-1 overflow-y-auto max-h-[600px] pr-1'>
+            {items.map((job) => {
+              const isSelected = selectedJob?.id === job.id;
+              return (
+                <Button key={job.id} onPress={() => handleSelectJob(job)}
+                  variant="ghost"
+                  className={['min-h-14 w-full justify-start rounded-lg px-3 py-2.5 text-left',
+                    isSelected ? 'bg-accent-soft border border-accent dark:bg-accent-soft dark:border-accent' : 'border border-transparent',
+                  ].join(' ')} aria-pressed={isSelected}>
+                  <div className="text-left w-full">
+                    <p className={['text-sm font-medium leading-snug truncate',
+                      isSelected ? 'text-accent dark:text-accent' : 'text-foreground'].join(' ')}>{job.title}</p>
+                    <div className='flex items-center gap-1.5 mt-1'>
+                      <Users aria-hidden="true" size={11} className='text-muted shrink-0' />
+                      <span className='text-xs text-muted'>{t(job.applications_count === 1 ? 'jobs.application_count_one' : 'jobs.application_count_other', { count: job.applications_count })}</span>
+                    </div>
+                    {(job.organization_name || job.poster_name) && <p className='text-xs text-muted/80 truncate mt-0.5'>{job.organization_name || job.poster_name}</p>}
+                  </div>
+                </Button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <div className='flex-1 min-w-0'>
+        {!selectedJob ? (
+          <div className='flex flex-col items-center justify-center h-64 text-center gap-3'>
+            <div className='w-14 h-14 rounded-full bg-surface-secondary flex items-center justify-center'><ClipboardList aria-hidden="true" size={24} className='text-muted' /></div>
+            <div>
+              <p className='text-sm font-medium text-foreground/80'>{t('jobs.select_job')}</p>
+              <p className='text-xs text-muted/80 mt-1'>{t('jobs.select_job_hint')}</p>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <div className='flex items-start justify-between gap-3 mb-4'>
+              <div className='min-w-0'>
+                <h3 className='font-semibold text-foreground truncate'>{selectedJob.title}</h3>
+                <p className='text-sm text-muted mt-0.5'>{selectedJob.organization_name || selectedJob.poster_name || t('jobs.no_organization')}{' '}&middot;{' '}<span className='capitalize'>{t(`jobs.status_${selectedJob.status}`)}</span></p>
+              </div>
+              <Button size='sm' variant='tertiary' startContent={<RefreshCw aria-hidden="true" size={13} />} onPress={() => loadApplications(selectedJob)} isDisabled={appsLoading}>{t('jobs.refresh')}</Button>
+            </div>
+            {appsLoading && <div role="status" aria-busy="true" aria-label={t('common.loading')} className='flex justify-center py-12'><Spinner label={t('jobs.loading_applications')} /></div>}
+            {!appsLoading && appsError && (
+              <div className='flex flex-col items-center gap-3 py-12 text-center'>
+                <p className='text-sm text-danger'>{appsError}</p>
+                <Button size='sm' variant='danger-soft' onPress={() => loadApplications(selectedJob)}>{t('jobs.try_again')}</Button>
+              </div>
+            )}
+            {!appsLoading && !appsError && applications.length === 0 && (
+              <div className='flex flex-col items-center justify-center py-12 text-center gap-3'>
+                <div className='w-12 h-12 rounded-full bg-surface-secondary flex items-center justify-center'><CheckCircle2 aria-hidden="true" size={20} className='text-muted' /></div>
+                <div><p className='text-sm font-medium text-foreground/80'>{t('jobs.no_applications_yet')}</p><p className='text-xs text-muted/80 mt-1'>{t('jobs.no_applications_hint')}</p></div>
+              </div>
+            )}
+            {!appsLoading && !appsError && applications.length > 0 && (
+              <div>
+                <p className='text-xs text-muted mb-3'>{t(applications.length === 1 ? 'jobs.application_count_one' : 'jobs.application_count_other', { count: applications.length })}</p>
+                <div className='overflow-y-auto max-h-[520px] pr-1'>
+                  {applications.map((appl) => <ApplicationCard key={appl.id} application={appl} onStatusUpdate={handleStatusUpdate} />)}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function JobsAdmin() {
   const { t } = useTranslation('admin');
   usePageTitle(t('jobs.page_title'));
@@ -235,86 +339,6 @@ export function JobsAdmin() {
     },
   ];
 
-  function ApplicationsPanel() {
-    return (
-      <div className='flex gap-4 min-h-[480px]'>
-        <div className='w-64 shrink-0 flex flex-col gap-1 border-r border-divider pr-4'>
-          <p className='text-xs font-semibold text-muted uppercase tracking-wide mb-2 px-1'>{t('jobs.jobs_count', { count: items.length })}</p>
-          {loading ? (
-            <div role="status" aria-busy="true" aria-label={t('common.loading')} className='flex justify-center pt-8'><Spinner size='sm' /></div>
-          ) : items.length === 0 ? (
-            <p className='text-sm text-muted/80 px-1'>{t('jobs.no_jobs_in_list')}</p>
-          ) : (
-            <div className='flex flex-col gap-1 overflow-y-auto max-h-[600px] pr-1'>
-              {items.map((job) => {
-                const isSelected = selectedJob?.id === job.id;
-                return (
-                  <Button key={job.id} onPress={() => handleSelectJob(job)}
-                    variant="ghost"
-                    className={['min-h-14 w-full justify-start rounded-lg px-3 py-2.5 text-left',
-                      isSelected ? 'bg-accent-soft border border-accent dark:bg-accent-soft dark:border-accent' : 'border border-transparent',
-                    ].join(' ')} aria-pressed={isSelected}>
-                    <div className="text-left w-full">
-                      <p className={['text-sm font-medium leading-snug truncate',
-                        isSelected ? 'text-accent dark:text-accent' : 'text-foreground'].join(' ')}>{job.title}</p>
-                      <div className='flex items-center gap-1.5 mt-1'>
-                        <Users aria-hidden="true" size={11} className='text-muted shrink-0' />
-                        <span className='text-xs text-muted'>{t(job.applications_count === 1 ? 'jobs.application_count_one' : 'jobs.application_count_other', { count: job.applications_count })}</span>
-                      </div>
-                      {(job.organization_name || job.poster_name) && <p className='text-xs text-muted/80 truncate mt-0.5'>{job.organization_name || job.poster_name}</p>}
-                    </div>
-                  </Button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-        <div className='flex-1 min-w-0'>
-          {!selectedJob ? (
-            <div className='flex flex-col items-center justify-center h-64 text-center gap-3'>
-              <div className='w-14 h-14 rounded-full bg-surface-secondary flex items-center justify-center'><ClipboardList aria-hidden="true" size={24} className='text-muted' /></div>
-              <div>
-                <p className='text-sm font-medium text-foreground/80'>{t('jobs.select_job')}</p>
-                <p className='text-xs text-muted/80 mt-1'>{t('jobs.select_job_hint')}</p>
-              </div>
-            </div>
-          ) : (
-            <div>
-              <div className='flex items-start justify-between gap-3 mb-4'>
-                <div className='min-w-0'>
-                  <h3 className='font-semibold text-foreground truncate'>{selectedJob.title}</h3>
-                  <p className='text-sm text-muted mt-0.5'>{selectedJob.organization_name || selectedJob.poster_name || t('jobs.no_organization')}{' '}&middot;{' '}<span className='capitalize'>{t(`jobs.status_${selectedJob.status}`)}</span></p>
-                </div>
-                <Button size='sm' variant='tertiary' startContent={<RefreshCw aria-hidden="true" size={13} />} onPress={() => loadApplications(selectedJob)} isDisabled={appsLoading}>{t('jobs.refresh')}</Button>
-              </div>
-              {appsLoading && <div role="status" aria-busy="true" aria-label={t('common.loading')} className='flex justify-center py-12'><Spinner label={t('jobs.loading_applications')} /></div>}
-              {!appsLoading && appsError && (
-                <div className='flex flex-col items-center gap-3 py-12 text-center'>
-                  <p className='text-sm text-danger'>{appsError}</p>
-                  <Button size='sm' variant='danger-soft' onPress={() => loadApplications(selectedJob)}>{t('jobs.try_again')}</Button>
-                </div>
-              )}
-              {!appsLoading && !appsError && applications.length === 0 && (
-                <div className='flex flex-col items-center justify-center py-12 text-center gap-3'>
-                  <div className='w-12 h-12 rounded-full bg-surface-secondary flex items-center justify-center'><CheckCircle2 aria-hidden="true" size={20} className='text-muted' /></div>
-                  <div><p className='text-sm font-medium text-foreground/80'>{t('jobs.no_applications_yet')}</p><p className='text-xs text-muted/80 mt-1'>{t('jobs.no_applications_hint')}</p></div>
-                </div>
-              )}
-              {!appsLoading && !appsError && applications.length > 0 && (
-                <div>
-                  <p className='text-xs text-muted mb-3'>{t(applications.length === 1 ? 'jobs.application_count_one' : 'jobs.application_count_other', { count: applications.length })}</p>
-                  <div className='overflow-y-auto max-h-[520px] pr-1'>
-                    {applications.map((appl) => <ApplicationCard key={appl.id} application={appl} onStatusUpdate={handleStatusUpdate} />)}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div>
       <PageHeader title={t('jobs.page_title')} description={t('jobs.page_description')}
@@ -349,7 +373,20 @@ export function JobsAdmin() {
           />
         </>
       )}
-      {panelTab === 'applications' && <ApplicationsPanel />}
+      {panelTab === 'applications' && (
+        <ApplicationsPanel
+          t={t}
+          items={items}
+          loading={loading}
+          selectedJob={selectedJob}
+          handleSelectJob={handleSelectJob}
+          appsLoading={appsLoading}
+          appsError={appsError}
+          applications={applications}
+          loadApplications={loadApplications}
+          handleStatusUpdate={handleStatusUpdate}
+        />
+      )}
       {confirmDelete && (
         <ConfirmModal isOpen={!!confirmDelete} onClose={() => setConfirmDelete(null)} onConfirm={handleDelete}
           title={t('jobs.delete_job_title')} message={t('jobs.delete_job_message')}

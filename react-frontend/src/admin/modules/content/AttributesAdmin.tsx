@@ -45,6 +45,48 @@ const ATTRIBUTE_TYPES = [
 ] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Actions menu
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface AttributeActionsMenuProps {
+  item: AdminAttribute;
+  t: (key: string, options?: Record<string, unknown>) => string;
+  openEditModal: (item: AdminAttribute) => void;
+  setDeleteTarget: React.Dispatch<React.SetStateAction<AdminAttribute | null>>;
+}
+
+function AttributeActionsMenu({ item, t, openEditModal, setDeleteTarget }: AttributeActionsMenuProps) {
+  type ActionKey = 'edit' | 'delete';
+
+  const handleMenuAction = (key: React.Key) => {
+    const action = key as ActionKey;
+    if (action === 'edit') {
+      openEditModal(item);
+    } else if (action === 'delete') {
+      setDeleteTarget(item);
+    }
+  };
+
+  return (
+    <Dropdown>
+      <DropdownTrigger>
+        <Button isIconOnly size="sm" variant="tertiary" aria-label={t('content.label_attribute_actions')}>
+          <MoreVertical size={16} />
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu aria-label={t('content.label_attribute_actions')} onAction={handleMenuAction}>
+        <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
+          {t('content.label_edit_item')}
+        </DropdownItem>
+        <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">
+          {t('content.label_delete_item')}
+        </DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -197,39 +239,6 @@ export function AttributesAdmin() {
     setDeleting(false);
   };
 
-  // ─── Actions menu ───
-
-  function AttributeActionsMenu({ item }: { item: AdminAttribute }) {
-    type ActionKey = 'edit' | 'delete';
-
-    const handleMenuAction = (key: React.Key) => {
-      const action = key as ActionKey;
-      if (action === 'edit') {
-        openEditModal(item);
-      } else if (action === 'delete') {
-        setDeleteTarget(item);
-      }
-    };
-
-    return (
-      <Dropdown>
-        <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="tertiary" aria-label={t('content.label_attribute_actions')}>
-            <MoreVertical size={16} />
-          </Button>
-        </DropdownTrigger>
-        <DropdownMenu aria-label={t('content.label_attribute_actions')} onAction={handleMenuAction}>
-          <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
-            {t('content.label_edit_item')}
-          </DropdownItem>
-          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">
-            {t('content.label_delete_item')}
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
-    );
-  }
-
   // ─── Table columns ───
 
   const columns: Column<AdminAttribute>[] = [
@@ -270,7 +279,14 @@ export function AttributesAdmin() {
     {
       key: 'actions',
       label: t('content.label_actions'),
-      render: (item) => <AttributeActionsMenu item={item} />,
+      render: (item) => (
+        <AttributeActionsMenu
+          item={item}
+          t={t}
+          openEditModal={openEditModal}
+          setDeleteTarget={setDeleteTarget}
+        />
+      ),
     },
   ];
 

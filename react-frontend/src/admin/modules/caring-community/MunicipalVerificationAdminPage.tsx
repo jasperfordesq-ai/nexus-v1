@@ -54,6 +54,33 @@ interface VerificationResponse {
   items: VerificationItem[];
 }
 
+interface StatusChipProps {
+  status: string;
+  t: (key: string, options?: Record<string, unknown>) => string;
+}
+
+function StatusChip({ status, t }: StatusChipProps) {
+  if (status === 'verified') {
+    return (
+      <Chip color="success" variant="soft" size="sm" startContent={<ShieldCheck className="w-3.5 h-3.5" />}>
+        {t('municipal_verification.status.verified')}
+      </Chip>
+    );
+  }
+  if (status === 'pending') {
+    return (
+      <Chip color="warning" variant="soft" size="sm">
+        {t('municipal_verification.status.pending_dns')}
+      </Chip>
+    );
+  }
+  return (
+    <Chip color="default" variant="soft" size="sm" startContent={<ShieldAlert className="w-3.5 h-3.5" />}>
+      {status}
+    </Chip>
+  );
+}
+
 export default function MunicipalVerificationAdminPage() {
   const { t } = useTranslation('admin');
   const toast = useToast();
@@ -187,28 +214,6 @@ export default function MunicipalVerificationAdminPage() {
   const items = data.items ?? [];
   const active = data.active;
 
-  const StatusChip = ({ status }: { status: string }) => {
-    if (status === 'verified') {
-      return (
-        <Chip color="success" variant="soft" size="sm" startContent={<ShieldCheck className="w-3.5 h-3.5" />}>
-          {t('municipal_verification.status.verified')}
-        </Chip>
-      );
-    }
-    if (status === 'pending') {
-      return (
-        <Chip color="warning" variant="soft" size="sm">
-          {t('municipal_verification.status.pending_dns')}
-        </Chip>
-      );
-    }
-    return (
-      <Chip color="default" variant="soft" size="sm" startContent={<ShieldAlert className="w-3.5 h-3.5" />}>
-        {status}
-      </Chip>
-    );
-  };
-
   return (
     <div className="space-y-6">
       <PageHeader
@@ -262,7 +267,7 @@ export default function MunicipalVerificationAdminPage() {
           {data.verified && active ? (
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <StatusChip status="verified" />
+                <StatusChip status="verified" t={t} />
                 <span className="text-sm text-foreground">{active.domain}</span>
               </div>
               {active.verified_at && (
@@ -369,7 +374,7 @@ export default function MunicipalVerificationAdminPage() {
                   <div className="flex items-start justify-between gap-3 flex-wrap">
                     <div>
                       <div className="flex items-center gap-2">
-                        <StatusChip status={item.status} />
+                        <StatusChip status={item.status} t={t} />
                         <span className="font-medium">{item.domain}</span>
                         <span className="text-xs text-muted">{t('municipal_verification.history.via_method', { method: item.method })}</span>
                       </div>
