@@ -22,7 +22,10 @@ import ListChecks from 'lucide-react/icons/list-checks';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
-import { DataTable, PageHeader, StatCard, EmptyState, type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { StatCard } from '../../components/StatCard';
+import { EmptyState } from '../../components/EmptyState';
 import { useTranslation } from 'react-i18next';
 
 // ── Types ──────────────────────────────────────────────────────────────────────

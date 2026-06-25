@@ -34,7 +34,7 @@ import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminKb } from '../../api/adminApi';
 import { api, API_BASE } from '@/lib/api';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
 
 interface KBAttachment {

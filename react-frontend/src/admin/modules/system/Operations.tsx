@@ -22,7 +22,7 @@ import Play from 'lucide-react/icons/play';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminConfig } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import type { CacheStats, BackgroundJob } from '../../api/types';
 
 export default function Operations() {

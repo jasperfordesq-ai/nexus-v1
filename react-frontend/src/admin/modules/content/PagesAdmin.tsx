@@ -17,7 +17,10 @@ import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminPages } from '../../api/adminApi';
-import { PageHeader, DataTable, StatusBadge, EmptyState, ConfirmModal, type Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
+import { EmptyState } from '../../components/EmptyState';
+import { ConfirmModal } from '../../components/ConfirmModal';
 
 import { useTranslation } from 'react-i18next';
 import { Button, Chip, Spinner } from '@/components/ui';

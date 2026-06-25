@@ -54,7 +54,8 @@ import {
   type TrendingSearch,
   type ZeroResultSearch,
 } from '../../api/adminApi';
-import { StatCard, PageHeader } from '../../components';
+import { StatCard } from '../../components/StatCard';
+import { PageHeader } from '../../components/PageHeader';
 
 const PERIOD_OPTIONS = [7, 14, 30, 60, 90] as const;
 

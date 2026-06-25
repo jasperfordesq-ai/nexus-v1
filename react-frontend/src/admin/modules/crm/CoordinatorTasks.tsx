@@ -27,9 +27,8 @@ import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant,
   useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
-import { PageHeader,
-  MemberSearchPicker,
-  type MemberSearchMember } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { MemberSearchPicker, type MemberSearchMember } from '../../components/MemberSearchPicker';
 
 import { useTranslation } from 'react-i18next';
 interface Task {

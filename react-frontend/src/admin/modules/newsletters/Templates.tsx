@@ -25,13 +25,10 @@ import { usePageTitle } from '@/hooks';
 import { useTenant,
   useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
-import {
-  DataTable,
-  PageHeader,
-  EmptyState,
-  ConfirmModal,
-  type Column,
-  } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { EmptyState } from '../../components/EmptyState';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { TemplatePreview } from './TemplatePreview';
 
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Tabs, Tab } from '@/components/ui';

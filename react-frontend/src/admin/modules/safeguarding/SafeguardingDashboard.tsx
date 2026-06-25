@@ -25,8 +25,8 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
-import { PageHeader } from '../../components';
-import { StatCard } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { StatCard } from '../../components/StatCard';
 import { SafeguardingHelp } from './SafeguardingHelp';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

@@ -11,7 +11,7 @@ import Shield from 'lucide-react/icons/shield';
 import Star from 'lucide-react/icons/star';
 import User from 'lucide-react/icons/user';
 import XCircle from 'lucide-react/icons/x-circle';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { usePageTitle } from '@/hooks';
 import api from '@/lib/api';
 // Copyright © 2024–2026 Jasper Ford

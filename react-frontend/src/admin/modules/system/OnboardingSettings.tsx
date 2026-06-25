@@ -19,7 +19,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford

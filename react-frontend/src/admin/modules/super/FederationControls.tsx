@@ -25,7 +25,9 @@ import { usePageTitle } from '@/hooks';
 import { useToast,
   useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
-import { PageHeader, ConfirmModal, StatCard } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { StatCard } from '../../components/StatCard';
 import type { FederationSystemControls as FederationSystemControlsType, FederationWhitelistEntry, FederationPartnership } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford

@@ -39,7 +39,7 @@ import {
   Tabs,
   Tooltip,
 } from '@/components/ui';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 
 type ModerationFilter = 'all' | PodcastModerationStatus;
 type ModerationAction = 'approve' | 'reject' | 'flag';

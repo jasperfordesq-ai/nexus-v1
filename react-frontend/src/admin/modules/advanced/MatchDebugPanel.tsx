@@ -10,7 +10,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { adminUsers } from '../../api/adminApi';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford

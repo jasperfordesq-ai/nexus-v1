@@ -41,7 +41,7 @@ import {
   TableCell,
   Textarea,
 } from '@/components/ui';
-import { ConfirmModal } from '../../components';
+import { ConfirmModal } from '../../components/ConfirmModal';
 
 type StatusFilter = 'pending' | 'approved' | 'rejected' | 'all';
 

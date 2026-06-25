@@ -25,7 +25,7 @@ import {
   type MemberPremiumTier,
   type TierUpsertPayload,
 } from '../../api/memberPremiumApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 
 interface FormState {
   id: number | null;

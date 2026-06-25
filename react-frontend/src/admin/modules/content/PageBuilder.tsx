@@ -10,7 +10,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast, useAuth } from '@/contexts';
 import { adminPages } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

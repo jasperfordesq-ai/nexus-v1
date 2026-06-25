@@ -24,7 +24,7 @@ import Search from 'lucide-react/icons/search';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBlog, adminCategories } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import type { AdminBlogPost, AdminCategory } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 

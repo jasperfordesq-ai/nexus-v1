@@ -25,7 +25,8 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { Abbr, PageHeader } from '../../components';
+import { Abbr } from '../../components/Abbr';
+import { PageHeader } from '../../components/PageHeader';
 
 // ---------------------------------------------------------------------------
 // Types

@@ -20,7 +20,9 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
-import { PageHeader, ConfirmModal, EmptyState } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { EmptyState } from '../../components/EmptyState';
 import type { BadgeDefinition } from '../../api/types';
 
 // ─────────────────────────────────────────────────────────────────────────────

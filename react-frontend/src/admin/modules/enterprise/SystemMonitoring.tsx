@@ -26,7 +26,7 @@ import ToggleLeft from 'lucide-react/icons/toggle-left';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import type { SystemHealth } from '../../api/types';
 
 /**

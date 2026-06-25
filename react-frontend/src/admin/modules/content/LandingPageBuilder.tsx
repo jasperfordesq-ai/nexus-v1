@@ -22,7 +22,7 @@ import type { LucideIcon } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminLandingPage } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import type {
   LandingPageConfig,
   LandingSection,

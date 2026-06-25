@@ -20,7 +20,10 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable, type Column } from '../../components/DataTable';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { EmptyState } from '../../components/EmptyState';
 import { useTranslation } from 'react-i18next';
 import { Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 

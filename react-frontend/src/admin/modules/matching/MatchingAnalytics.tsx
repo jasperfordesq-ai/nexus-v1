@@ -17,7 +17,9 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
-import { StatCard, PageHeader, EmptyState } from '../../components';
+import { StatCard } from '../../components/StatCard';
+import { PageHeader } from '../../components/PageHeader';
+import { EmptyState } from '../../components/EmptyState';
 import type { MatchingStatsResponse } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford

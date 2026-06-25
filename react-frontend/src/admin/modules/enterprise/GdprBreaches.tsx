@@ -18,8 +18,9 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { PageHeader, DataTable, StatusBadge } from '../../components';
-import type { Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable, StatusBadge } from '../../components/DataTable';
+import type { Column } from '../../components/DataTable';
 import type { GdprBreach } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';

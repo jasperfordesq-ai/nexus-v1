@@ -10,7 +10,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 // Copyright © 2024–2026 Jasper Ford

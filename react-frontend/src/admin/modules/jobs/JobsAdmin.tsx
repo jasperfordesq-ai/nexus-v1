@@ -33,7 +33,11 @@ import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { PageHeader, DataTable, ConfirmModal, EmptyState, StatCard, type Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable, type Column } from '../../components/DataTable';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { EmptyState } from '../../components/EmptyState';
+import { StatCard } from '../../components/StatCard';
 
 interface Job { id: number; title: string; organization_name?: string; poster_name?: string; type?: string; applications_count: number; views_count: number; is_featured: boolean; status: string; deadline?: string; created_at: string; }
 interface JobsMeta { page: number; per_page: number; total: number; total_pages: number; }

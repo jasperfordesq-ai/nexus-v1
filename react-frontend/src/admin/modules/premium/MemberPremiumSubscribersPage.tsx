@@ -18,7 +18,7 @@ import {
   memberPremiumAdminApi,
   type MemberSubscriberRow,
 } from '../../api/memberPremiumApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 
 const STATUS_OPTIONS = ['', 'active', 'past_due', 'canceled', 'trialing', 'incomplete'];
 

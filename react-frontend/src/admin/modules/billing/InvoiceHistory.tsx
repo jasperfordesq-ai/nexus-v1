@@ -15,7 +15,9 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { billingApi, type Invoice } from '../../api/billingApi';
-import { PageHeader, DataTable, EmptyState, type Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable, type Column } from '../../components/DataTable';
+import { EmptyState } from '../../components/EmptyState';
 import { Button, Chip, Spinner } from '@/components/ui';
 
 function invoiceStatusColor(status: string): 'success' | 'warning' | 'danger' | 'default' {

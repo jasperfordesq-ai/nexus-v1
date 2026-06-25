@@ -18,7 +18,8 @@ import Shield from 'lucide-react/icons/shield';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
-import { PageHeader, StatusBadge } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { StatusBadge } from '../../components/DataTable';
 import type { MatchApprovalDetail } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford

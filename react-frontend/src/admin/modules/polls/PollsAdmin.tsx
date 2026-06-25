@@ -15,7 +15,9 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { DataTable, PageHeader, ConfirmModal, type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { Button, Chip } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────

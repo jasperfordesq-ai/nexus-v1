@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { billingApi, type Plan, type SubscriptionDetails } from '../../api/billingApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 
 export function PlanSelector() {
   const { t } = useTranslation('admin');

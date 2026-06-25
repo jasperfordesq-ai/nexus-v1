@@ -35,7 +35,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import type { SuperAdminTenant, SuperAdminTenantDetail, CreateTenantPayload } from '../../api/types';
 
 const FEATURE_META: { key: string; labelKey: string; descKey: string; icon: typeof Calendar }[] = [

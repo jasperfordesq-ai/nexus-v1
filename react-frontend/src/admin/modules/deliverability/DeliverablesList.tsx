@@ -21,7 +21,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { adminDeliverability } from '../../api/adminApi';
-import { PageHeader, DataTable, StatusBadge, EmptyState, ConfirmModal, type Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
+import { EmptyState } from '../../components/EmptyState';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 
 interface DeliverableItem {

@@ -15,7 +15,7 @@ import Code from 'lucide-react/icons/code';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import type { SystemRequirements as SystemRequirementsType } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

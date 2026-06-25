@@ -18,7 +18,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 
 type IntegrationStatus =
   | 'proposed'

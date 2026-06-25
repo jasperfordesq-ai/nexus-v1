@@ -37,13 +37,10 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { adminUsers,
   type BulkActionResult } from '../../api/adminApi';
-import { DataTable,
-  StatusBadge,
-  PageHeader,
-  ConfirmModal,
-  BulkActionToolbar,
-  type BulkAction,
-  type Column } from '../../components';
+import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { BulkActionToolbar, type BulkAction } from '../../components/BulkActionToolbar';
 import type { AdminUser,
   UserListParams } from '../../api/types';
 

@@ -16,8 +16,10 @@ import FileText from 'lucide-react/icons/file-text';
 import GitBranch from 'lucide-react/icons/git-branch';
 import { useTenant, useToast } from '@/contexts';
 import { adminLegalDocs } from '../../api/adminApi';
-import { PageHeader, DataTable, ConfirmModal, StatusBadge } from '../../components';
-import type { Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable, StatusBadge } from '../../components/DataTable';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import type { Column } from '../../components/DataTable';
 import type { LegalDocument } from '../../api/types';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 

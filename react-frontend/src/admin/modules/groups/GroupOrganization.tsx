@@ -57,7 +57,7 @@ import {
   TableRow,
   TableCell,
 } from '@/components/ui';
-import { ConfirmModal } from '../../components';
+import { ConfirmModal } from '../../components/ConfirmModal';
 
 const RULE_TYPES: GroupAutoAssignRuleType[] = ['location', 'interest', 'role', 'attribute'];
 

@@ -31,7 +31,11 @@ import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { adminDonations, type AdminDonation } from '../../api/adminApi';
-import { DataTable, PageHeader, ConfirmModal, EmptyState, StatCard, type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { EmptyState } from '../../components/EmptyState';
+import { StatCard } from '../../components/StatCard';
 
 const STATUS_FILTERS = ['all', 'completed', 'pending', 'refunded', 'failed'] as const;
 type StatusFilter = (typeof STATUS_FILTERS)[number];

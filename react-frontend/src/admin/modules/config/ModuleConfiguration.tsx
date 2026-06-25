@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminConfig } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import type { TenantConfig } from '../../api/types';
 import ModuleCard from './ModuleCard';
 import ModuleConfigModal from './ModuleConfigModal';

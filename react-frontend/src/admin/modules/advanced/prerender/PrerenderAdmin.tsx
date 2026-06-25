@@ -22,7 +22,8 @@ import Zap from 'lucide-react/icons/zap';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useAuth, usePusherOptional } from '@/contexts';
-import { PageHeader, ConfirmModal } from '../../../components';
+import { PageHeader } from '../../../components/PageHeader';
+import { ConfirmModal } from '../../../components/ConfirmModal';
 import {
   adminPrerender,
   type PrerenderSummary,

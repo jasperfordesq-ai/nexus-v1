@@ -22,13 +22,9 @@ import BarChart3 from 'lucide-react/icons/chart-column';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
-import {
-  DataTable,
-  PageHeader,
-  StatCard,
-  StatusBadge,
-  type Column,
-} from '../../components';
+import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { StatCard } from '../../components/StatCard';
 import type { MatchApproval, MatchApprovalStats } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';

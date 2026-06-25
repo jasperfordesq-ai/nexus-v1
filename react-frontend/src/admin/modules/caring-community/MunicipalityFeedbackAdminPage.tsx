@@ -19,7 +19,8 @@ import { usePageTitle } from '@/hooks';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { canManageCaring } from '@/caring/access';
-import { EmptyState, PageHeader } from '../../components';
+import { EmptyState } from '../../components/EmptyState';
+import { PageHeader } from '../../components/PageHeader';
 
 // ---------------------------------------------------------------------------
 // Types

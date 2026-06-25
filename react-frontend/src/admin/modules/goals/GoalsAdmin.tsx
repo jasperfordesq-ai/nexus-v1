@@ -22,7 +22,8 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader, ConfirmModal } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
 
 // ---------------------------------------------------------------------------
 // Types

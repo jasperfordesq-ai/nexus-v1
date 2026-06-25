@@ -21,7 +21,8 @@ import { useAuth, useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { api } from '@/lib/api';
 import { adminUsers, adminTimebanking, adminVetting, adminInsurance } from '../../api/adminApi';
-import { PageHeader, ConfirmModal } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import type { AdminUserDetail, AdminBadge, UpdateUserPayload, UserConsent, VettingRecord, InsuranceCertificate } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

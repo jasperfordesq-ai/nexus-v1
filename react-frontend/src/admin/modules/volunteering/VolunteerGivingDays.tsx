@@ -18,7 +18,10 @@ import {
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
-import { DataTable, PageHeader, StatCard, EmptyState, type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { StatCard } from '../../components/StatCard';
+import { EmptyState } from '../../components/EmptyState';
 import { useTranslation } from 'react-i18next';
 import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
 // Copyright © 2024–2026 Jasper Ford

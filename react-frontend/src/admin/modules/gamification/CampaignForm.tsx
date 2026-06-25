@@ -6,7 +6,7 @@ import Save from 'lucide-react/icons/save';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
 import type { Campaign, BadgeDefinition } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford

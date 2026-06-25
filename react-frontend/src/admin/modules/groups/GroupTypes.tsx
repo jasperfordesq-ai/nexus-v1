@@ -15,7 +15,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { GroupType } from '@/admin/api/types';
-import { ConfirmModal } from '../../components';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import GroupPolicies from './GroupPolicies';
 
 export default function GroupTypes() {

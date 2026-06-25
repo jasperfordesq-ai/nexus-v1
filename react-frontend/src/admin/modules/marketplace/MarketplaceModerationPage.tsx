@@ -21,7 +21,11 @@ import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { adminMarketplace, type BulkActionResult } from '../../api/adminApi';
-import { PageHeader, DataTable, ConfirmModal, EmptyState, BulkActionToolbar, type BulkAction, type Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable, type Column } from '../../components/DataTable';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { EmptyState } from '../../components/EmptyState';
+import { BulkActionToolbar, type BulkAction } from '../../components/BulkActionToolbar';
 import { Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────

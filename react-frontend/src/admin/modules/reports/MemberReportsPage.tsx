@@ -24,7 +24,8 @@ import { usePageTitle } from '@/hooks';
 import { api, tokenManager } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { CHART_COLOR_MAP } from '@/lib/chartColors';
-import { StatCard, PageHeader } from '../../components';
+import { StatCard } from '../../components/StatCard';
+import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts/ToastContext';
 // Copyright © 2024–2026 Jasper Ford

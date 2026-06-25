@@ -21,7 +21,10 @@ import Users from 'lucide-react/icons/users';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable, type Column } from '../../components/DataTable';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { EmptyState } from '../../components/EmptyState';
 import { Button, Chip, Tabs, Tab } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -23,12 +23,10 @@ import { usePageTitle } from '@/hooks';
 import { useToast,
   useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
-import { DataTable,
-  PageHeader,
-  ConfirmModal,
-  StatusBadge,
-  EmptyState,
-  type Column } from '../../components';
+import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { EmptyState } from '../../components/EmptyState';
 import type { Campaign } from '../../api/types';
 
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@/components/ui';

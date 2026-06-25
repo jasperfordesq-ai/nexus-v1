@@ -17,7 +17,8 @@ import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
-import { PageHeader, StatCard } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { StatCard } from '../../components/StatCard';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 // Copyright © 2024–2026 Jasper Ford

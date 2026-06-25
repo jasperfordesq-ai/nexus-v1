@@ -13,7 +13,8 @@ import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant } from '@/contexts';
 import { adminTimebanking } from '../../api/adminApi';
-import { StatCard, PageHeader } from '../../components';
+import { StatCard } from '../../components/StatCard';
+import { PageHeader } from '../../components/PageHeader';
 import type { TimebankingStats } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford

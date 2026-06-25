@@ -17,8 +17,10 @@ import Shield from 'lucide-react/icons/shield';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
-import { PageHeader, DataTable, ConfirmModal } from '../../components';
-import type { Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable } from '../../components/DataTable';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import type { Column } from '../../components/DataTable';
 import type { Role } from '../../api/types';
 import { Button, Chip } from '@/components/ui';
 

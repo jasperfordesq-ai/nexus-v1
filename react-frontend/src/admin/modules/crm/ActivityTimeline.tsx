@@ -26,7 +26,8 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
-import { PageHeader, MemberSearchPicker, type MemberSearchMember } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { MemberSearchPicker, type MemberSearchMember } from '../../components/MemberSearchPicker';
 
 import { useTranslation } from 'react-i18next';
 interface TimelineEntry {

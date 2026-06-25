@@ -29,7 +29,10 @@ import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { Accordion, AccordionItem, Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Textarea, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { adminVolunteering } from '../../api/adminApi';
-import { DataTable, EmptyState, PageHeader, StatCard, type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { EmptyState } from '../../components/EmptyState';
+import { PageHeader } from '../../components/PageHeader';
+import { StatCard } from '../../components/StatCard';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 

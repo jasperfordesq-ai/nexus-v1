@@ -12,7 +12,8 @@ import XCircle from 'lucide-react/icons/circle-x';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
-import { PageHeader, ConfirmModal } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import type { SuperAdminTenant, SuperAdminUser, BulkOperationResult } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

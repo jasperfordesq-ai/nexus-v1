@@ -6,7 +6,7 @@ import Play from 'lucide-react/icons/play';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { adminTools } from '../../api/adminApi';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford

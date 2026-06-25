@@ -33,7 +33,8 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts/ToastContext';
 import { api, tokenManager } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { StatCard, PageHeader } from '../../components';
+import { StatCard } from '../../components/StatCard';
+import { PageHeader } from '../../components/PageHeader';
 
 import { useTranslation } from 'react-i18next';
 // ---------------------------------------------------------------------------

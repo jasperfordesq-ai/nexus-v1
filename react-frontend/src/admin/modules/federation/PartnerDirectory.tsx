@@ -18,7 +18,8 @@ import ExternalLink from 'lucide-react/icons/external-link';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
-import { PageHeader, EmptyState } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { EmptyState } from '../../components/EmptyState';
 import { useTranslation } from 'react-i18next';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 // Copyright Â© 2024â€“2026 Jasper Ford

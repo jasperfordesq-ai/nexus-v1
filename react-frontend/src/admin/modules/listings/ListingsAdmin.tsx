@@ -24,7 +24,9 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { adminListings } from '../../api/adminApi';
-import { DataTable, StatusBadge, PageHeader, ConfirmModal, type Column } from '../../components';
+import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import type { AdminListing, FeaturedListing } from '../../api/types';
 
 const typeColors: Record<string, 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'default'> = {

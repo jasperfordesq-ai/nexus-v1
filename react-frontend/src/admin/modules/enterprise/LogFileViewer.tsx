@@ -19,7 +19,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import type { LogFileContent } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';

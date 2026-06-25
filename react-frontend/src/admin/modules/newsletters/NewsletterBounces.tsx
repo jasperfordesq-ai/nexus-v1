@@ -15,7 +15,8 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import { CHART_COLOR_MAP } from '@/lib/chartColors';
-import { PageHeader, ConfirmModal } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import type { NewsletterBounce, SuppressionListEntry, BounceTrendsData, BounceReasonSummary } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

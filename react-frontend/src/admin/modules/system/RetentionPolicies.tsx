@@ -20,7 +20,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Switch } from '@/components/ui';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 
 interface RetentionPolicy {
   data_type: string;

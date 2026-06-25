@@ -6,7 +6,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { adminTools } from '../../api/adminApi';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

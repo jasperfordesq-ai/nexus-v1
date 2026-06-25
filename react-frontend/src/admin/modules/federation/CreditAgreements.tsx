@@ -23,7 +23,9 @@ import { api } from '@/lib/api';
 import { adminFederation } from '../../api/adminApi';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
-import { PageHeader, StatCard, ConfirmModal } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { StatCard } from '../../components/StatCard';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 // Copyright © 2024–2026 Jasper Ford

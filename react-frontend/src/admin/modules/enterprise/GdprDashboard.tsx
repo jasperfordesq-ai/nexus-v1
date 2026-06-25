@@ -25,7 +25,8 @@ import { useTenant } from '@/contexts';
 import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { adminEnterprise } from '../../api/adminApi';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { StatCard, PageHeader } from '../../components';
+import { StatCard } from '../../components/StatCard';
+import { PageHeader } from '../../components/PageHeader';
 import type { GdprDashboardStats, GdprStatistics, GdprTrendData } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 

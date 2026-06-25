@@ -14,7 +14,9 @@ import { usePageTitle } from '@/hooks';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
-import { PageHeader, DataTable, StatusBadge, EmptyState, type Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
+import { EmptyState } from '../../components/EmptyState';
 import type { MatchApproval } from '../../api/types';
 import { Chip, Spinner } from '@/components/ui';
 

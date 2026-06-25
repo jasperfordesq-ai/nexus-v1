@@ -17,7 +17,9 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { PageHeader, StatCard, EmptyState } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { StatCard } from '../../components/StatCard';
+import { EmptyState } from '../../components/EmptyState';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford

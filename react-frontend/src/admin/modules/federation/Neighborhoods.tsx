@@ -16,8 +16,9 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { PageHeader, ConfirmModal } from '../../components';
-import { StatCard } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { StatCard } from '../../components/StatCard';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

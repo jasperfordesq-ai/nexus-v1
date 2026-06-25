@@ -30,7 +30,7 @@ import Download from 'lucide-react/icons/download';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

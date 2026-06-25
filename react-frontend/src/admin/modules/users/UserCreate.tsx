@@ -19,7 +19,7 @@ import Save from 'lucide-react/icons/save';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminUsers } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import type { CreateUserPayload } from '../../api/types';
 
 export function UserCreate() {

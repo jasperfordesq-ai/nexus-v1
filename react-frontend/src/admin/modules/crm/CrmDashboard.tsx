@@ -17,7 +17,8 @@ import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
 import { adminCrm } from '../../api/adminApi';
-import { StatCard, PageHeader } from '../../components';
+import { StatCard } from '../../components/StatCard';
+import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

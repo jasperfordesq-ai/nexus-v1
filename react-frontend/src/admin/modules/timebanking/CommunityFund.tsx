@@ -14,7 +14,9 @@ import { useTranslation } from 'react-i18next';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { adminTimebanking, adminUsers } from '../../api/adminApi';
 import type { AdminUser, CommunityFundBalance, CommunityFundTransaction } from '../../api/types';
-import { DataTable, PageHeader, StatCard, type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { StatCard } from '../../components/StatCard';
 import { useTenant, useToast } from '@/contexts';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

@@ -39,7 +39,7 @@ import {
   useDisclosure,
 } from '@/components/ui';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 
 interface AdminSsoProvider {
   id: number;

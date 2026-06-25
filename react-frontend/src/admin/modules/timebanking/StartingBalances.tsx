@@ -8,7 +8,8 @@ import Users from 'lucide-react/icons/users';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useToast } from '@/contexts';
 import { adminUsers, adminTimebanking } from '../../api/adminApi';
-import { DataTable, PageHeader, type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
 import type { AdminUser, WalletGrant } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford

@@ -22,7 +22,10 @@ import PlusCircle from 'lucide-react/icons/circle-plus';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
-import { DataTable, PageHeader, StatCard, EmptyState, type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { StatCard } from '../../components/StatCard';
+import { EmptyState } from '../../components/EmptyState';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 

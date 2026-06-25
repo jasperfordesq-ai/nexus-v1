@@ -29,7 +29,8 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api, tokenManager } from '@/lib/api';
 import { CHART_COLORS, CHART_COLOR_MAP, CHART_TOKEN_COLORS } from '@/lib/chartColors';
-import { StatCard, PageHeader } from '../../components';
+import { StatCard } from '../../components/StatCard';
+import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

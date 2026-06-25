@@ -27,10 +27,9 @@ import { useTenant,
   useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';
 import { api } from '@/lib/api';
-import { DataTable,
-  PageHeader,
-  ConfirmModal,
-  type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import type { AdminGroup } from '../../api/types';
 
 import { resolveAssetUrl } from '@/lib/helpers';

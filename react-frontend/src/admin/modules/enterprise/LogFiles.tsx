@@ -24,7 +24,7 @@ import Files from 'lucide-react/icons/files';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import type { LogFile } from '../../api/types';
 
 type FilterType = 'all' | 'errors' | 'application' | 'cron';

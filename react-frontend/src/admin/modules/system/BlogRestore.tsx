@@ -7,7 +7,9 @@ import Download from 'lucide-react/icons/download';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
-import { PageHeader, EmptyState, ConfirmModal } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { EmptyState } from '../../components/EmptyState';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { adminTools } from '../../api/adminApi';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

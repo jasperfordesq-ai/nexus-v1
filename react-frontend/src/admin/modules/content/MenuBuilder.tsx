@@ -37,7 +37,10 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMenus, adminPages } from '../../api/adminApi';
-import { PageHeader, IconPicker, VisibilityRulesEditor, ConfirmModal } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { IconPicker } from '../../components/IconPicker';
+import { VisibilityRulesEditor } from '../../components/VisibilityRulesEditor';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import type { MenuItemType, MenuLocation, VisibilityRules } from '@/types/menu';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

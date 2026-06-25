@@ -30,7 +30,8 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
-import { PageHeader, ConfirmModal } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import type { SuperAdminTenantDetail } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

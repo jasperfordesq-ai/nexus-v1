@@ -20,7 +20,8 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTenant, useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { PageHeader, StatusBadge } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { StatusBadge } from '../../components/DataTable';
 import type { GdprRequestDetail as GdprRequestDetailType, GdprTimelineEntry } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford

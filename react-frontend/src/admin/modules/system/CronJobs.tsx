@@ -28,7 +28,8 @@ import { usePageTitle } from '@/hooks';
 import { Button, Card, CardBody, CardFooter, CardHeader, Chip, Spinner } from '@/components/ui';
 import { adminCron, adminSystem } from '../../api/adminApi';
 import type { CronHealthMetrics, CronJob } from '../../api/types';
-import { PageHeader, StatusBadge } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { StatusBadge } from '../../components/DataTable';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Extended type to include extra fields from the API

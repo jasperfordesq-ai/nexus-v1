@@ -17,7 +17,7 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
 import { useTenant, useToast } from '@/contexts';
 import { adminLegalDocs } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 
 

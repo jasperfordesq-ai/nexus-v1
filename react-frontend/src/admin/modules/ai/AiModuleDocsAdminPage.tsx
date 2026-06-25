@@ -16,7 +16,7 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { ConfirmModal } from '../../components';
+import { ConfirmModal } from '../../components/ConfirmModal';
 
 interface ModuleDoc {
   id: number;

@@ -30,7 +30,8 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { formatRelativeTime } from '@/lib/helpers';
 import { adminFederation } from '../../api/adminApi';
-import { PageHeader, StatCard } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { StatCard } from '../../components/StatCard';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -25,11 +25,9 @@ import { usePageTitle } from '@/hooks';
 import { useTenant,
   useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
-import { DataTable,
-  PageHeader,
-  StatusBadge,
-  ConfirmModal,
-  type Column } from '../../components';
+import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { NewsletterResend } from './NewsletterResend';
 
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip } from '@/components/ui';

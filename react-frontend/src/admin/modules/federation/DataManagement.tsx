@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 
 interface ImportSummary {

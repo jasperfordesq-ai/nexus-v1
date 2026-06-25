@@ -15,7 +15,9 @@ import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { canManageCaring } from '@/caring/access';
-import { MemberSearchPicker, PageHeader, StatCard, type MemberSearchMember } from '../../components';
+import { MemberSearchPicker, type MemberSearchMember } from '../../components/MemberSearchPicker';
+import { PageHeader } from '../../components/PageHeader';
+import { StatCard } from '../../components/StatCard';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford

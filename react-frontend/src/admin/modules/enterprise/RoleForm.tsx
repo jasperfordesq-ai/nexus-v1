@@ -18,7 +18,7 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 
 function permissionLabel(value: string): string {
   return value

@@ -16,7 +16,8 @@ import type { TFunction } from 'i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import api from '@/lib/api';
-import { EmptyState, PageHeader } from '../../components';
+import { EmptyState } from '../../components/EmptyState';
+import { PageHeader } from '../../components/PageHeader';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford

@@ -19,7 +19,9 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader, EmptyState, DataTable, type Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { EmptyState } from '../../components/EmptyState';
+import { DataTable, type Column } from '../../components/DataTable';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

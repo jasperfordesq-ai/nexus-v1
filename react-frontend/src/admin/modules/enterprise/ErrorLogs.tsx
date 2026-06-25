@@ -13,8 +13,9 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
-import { PageHeader, DataTable } from '../../components';
-import type { Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable } from '../../components/DataTable';
+import type { Column } from '../../components/DataTable';
 import type { ErrorLogEntry } from '../../api/types';
 import { Button, Chip } from '@/components/ui';
 

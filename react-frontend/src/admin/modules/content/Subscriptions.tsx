@@ -13,7 +13,9 @@ import { useState, useEffect, useCallback } from 'react';import CreditCard from 
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminPlans } from '../../api/adminApi';
-import { PageHeader, DataTable, StatusBadge, EmptyState, type Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
+import { EmptyState } from '../../components/EmptyState';
 
 import { useTranslation } from 'react-i18next';
 import { Spinner } from '@/components/ui';

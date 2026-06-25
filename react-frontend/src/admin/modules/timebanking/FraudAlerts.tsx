@@ -19,9 +19,8 @@ import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant,
   useToast } from '@/contexts';
 import { adminTimebanking } from '../../api/adminApi';
-import { DataTable,
-  PageHeader,
-  type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
 import type { FraudAlert } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';

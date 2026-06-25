@@ -20,7 +20,7 @@ import { adminGroups } from '@/admin/api/adminApi';
 import type { AdminGroup, GroupMember as GroupMemberType } from '@/admin/api/types';
 interface AdminGroupDetail extends AdminGroup {  stats?: { total_exchanges: number; total_hours: number; active_members: number; posts_count: number; events_count: number; activity_score: number };  latitude?: number;  longitude?: number;}
 import type { GroupMember } from '@/admin/api/types';
-import { ConfirmModal } from '../../components';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { Button, Chip, Input, Textarea, Card, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 
 export default function GroupDetail() {

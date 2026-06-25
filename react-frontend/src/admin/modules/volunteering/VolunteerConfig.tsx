@@ -33,7 +33,10 @@ import Clock from 'lucide-react/icons/clock';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
-import { DataTable, PageHeader, EmptyState, ConfirmModal, type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { EmptyState } from '../../components/EmptyState';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 
 function apiErrorMessage(res: { error?: string; message?: string } | null | undefined): string | undefined {

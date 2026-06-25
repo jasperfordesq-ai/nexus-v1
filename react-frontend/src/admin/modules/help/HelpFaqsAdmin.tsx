@@ -42,7 +42,10 @@ import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { adminHelpFaqs, type AdminHelpFaq } from '../../api/adminApi';
-import { DataTable, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { EmptyState } from '../../components/EmptyState';
 
 interface FaqFormData {
   category: string;

@@ -34,7 +34,8 @@ import api from '@/lib/api';
 import { LocationMap } from '@/components/location';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { useTenant } from '@/contexts';
-import { StatCard, PageHeader } from '../../components';
+import { StatCard } from '../../components/StatCard';
+import { PageHeader } from '../../components/PageHeader';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

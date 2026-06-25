@@ -30,7 +30,8 @@ import { Snippet, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisc
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
-import { PageHeader, ConfirmModal } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 

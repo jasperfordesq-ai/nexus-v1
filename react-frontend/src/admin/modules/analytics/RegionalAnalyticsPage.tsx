@@ -12,7 +12,8 @@ import Activity from 'lucide-react/icons/activity';
 import Heart from 'lucide-react/icons/heart';
 import { usePageTitle } from '@/hooks';
 import api from '@/lib/api';
-import { StatCard, PageHeader } from '../../components';
+import { StatCard } from '../../components/StatCard';
+import { PageHeader } from '../../components/PageHeader';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

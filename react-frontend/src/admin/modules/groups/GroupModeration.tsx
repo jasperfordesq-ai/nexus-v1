@@ -14,7 +14,9 @@ import Flag from 'lucide-react/icons/flag';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';
-import { DataTable, PageHeader, EmptyState, StatusBadge, type Column } from '../../components';
+import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { EmptyState } from '../../components/EmptyState';
 import type { GroupModerationItem } from '../../api/types';
 import { Chip, Spinner } from '@/components/ui';
 

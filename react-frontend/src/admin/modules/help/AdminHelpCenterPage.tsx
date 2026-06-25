@@ -7,7 +7,7 @@ import { usePageTitle } from '@/hooks';
 import BookOpen from 'lucide-react/icons/book-open';
 import SearchIcon from 'lucide-react/icons/search';
 import HelpCircle from 'lucide-react/icons/help-circle';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { HELP_CONTENT, type HelpArticle } from '../../data/helpContent';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

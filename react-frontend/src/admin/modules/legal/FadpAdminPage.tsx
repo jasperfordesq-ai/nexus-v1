@@ -13,7 +13,7 @@ import FileText from 'lucide-react/icons/file-text';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import api from '@/lib/api';
-import { ConfirmModal } from '../../components';
+import { ConfirmModal } from '../../components/ConfirmModal';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford

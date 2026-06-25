@@ -23,7 +23,8 @@ import { useTenant, useToast } from '@/contexts';
 import { useOnboardingConfig } from '@/hooks/useOnboardingConfig';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { adminDashboard } from '../../api/adminApi';
-import { StatCard, PageHeader } from '../../components';
+import { StatCard } from '../../components/StatCard';
+import { PageHeader } from '../../components/PageHeader';
 import type { AdminDashboardStats, ActivityLogEntry, MonthlyTrend } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

@@ -17,7 +17,8 @@ import X from 'lucide-react/icons/x';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
-import { DataTable, PageHeader, StatusBadge, type Column } from '../../components';
+import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
 import type { SuperAuditEntry } from '../../api/types';
 
 const PAGE_SIZE = 25;

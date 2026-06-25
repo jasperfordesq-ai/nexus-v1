@@ -22,11 +22,10 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useToast } from '@/contexts';
 import { adminCategories } from '../../api/adminApi';
-import { DataTable,
-  PageHeader,
-  ConfirmModal,
-  EmptyState,
-  type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { EmptyState } from '../../components/EmptyState';
 import type { AdminCategory } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';

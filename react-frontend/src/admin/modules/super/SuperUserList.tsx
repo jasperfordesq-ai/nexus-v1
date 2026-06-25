@@ -19,11 +19,9 @@ import { usePageTitle } from '@/hooks';
 import { useTenant,
   useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
-import { DataTable,
-  PageHeader,
-  StatusBadge,
-  ConfirmModal,
-  type Column } from '../../components';
+import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import type { SuperAdminUser } from '../../api/types';
 
 export function SuperUserList() {

@@ -36,14 +36,10 @@ import { usePageTitle } from '@/hooks';
 import { logError } from '@/lib/logger';
 import { Button, Card, CardBody, CardHeader, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Textarea, useDisclosure, Switch, Tab, Tabs } from '@/components/ui';
 import { adminFederation } from '../../api/adminApi';
-import {
-  ConfirmModal,
-  DataTable,
-  EmptyState,
-  PageHeader,
-  StatusBadge,
-  type Column,
-} from '../../components';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
+import { EmptyState } from '../../components/EmptyState';
+import { PageHeader } from '../../components/PageHeader';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 
 // ─────────────────────────────────────────────────────────────────────────────

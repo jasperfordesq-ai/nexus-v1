@@ -7,7 +7,7 @@ import Smartphone from 'lucide-react/icons/smartphone';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { adminSettings } from '../../api/adminApi';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

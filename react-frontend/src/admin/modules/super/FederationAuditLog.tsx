@@ -18,7 +18,9 @@ import Handshake from 'lucide-react/icons/handshake';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
 import { adminSuper } from '../../api/adminApi';
-import { DataTable, PageHeader, StatCard, type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { StatCard } from '../../components/StatCard';
 import type { SuperAuditEntry } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';

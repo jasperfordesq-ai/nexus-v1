@@ -24,7 +24,8 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
-import { StatCard, PageHeader } from '../../components';
+import { StatCard } from '../../components/StatCard';
+import { PageHeader } from '../../components/PageHeader';
 import type { EnterpriseDashboardStats } from '../../api/types';
 
 export function EnterpriseDashboard() {

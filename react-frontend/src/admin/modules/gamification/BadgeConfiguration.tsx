@@ -20,7 +20,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { useTranslation } from 'react-i18next';
 import { adminGamification } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import type { BadgeConfigEntry } from '../../api/types';
 
 // TIER_LABELS removed — tier display names now come from i18n (gamification.badge_tiers.*)

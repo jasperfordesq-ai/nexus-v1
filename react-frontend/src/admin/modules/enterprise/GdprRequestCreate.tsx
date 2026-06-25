@@ -26,7 +26,7 @@ import type { LucideIcon } from 'lucide-react';
 import { useTenant, useToast } from '@/contexts';
 import { adminEnterprise, adminUsers } from '../../api/adminApi';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import type { AdminUser } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';

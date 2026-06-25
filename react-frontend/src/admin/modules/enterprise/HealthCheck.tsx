@@ -10,7 +10,7 @@ import HeartPulse from 'lucide-react/icons/heart-pulse';
 import History from 'lucide-react/icons/history';
 import { usePageTitle } from '@/hooks';
 import { adminEnterprise } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import type { HealthCheckResult, HealthCheckHistoryEntry } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

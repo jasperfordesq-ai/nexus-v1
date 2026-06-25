@@ -15,7 +15,10 @@ import UserPlus from 'lucide-react/icons/user-plus';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';
-import { DataTable, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { EmptyState } from '../../components/EmptyState';
 import type { GroupApproval } from '../../api/types';
 import { Button, Chip, Spinner } from '@/components/ui';
 

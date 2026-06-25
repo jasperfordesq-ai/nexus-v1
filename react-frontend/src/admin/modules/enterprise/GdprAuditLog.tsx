@@ -18,8 +18,9 @@ import Eye from 'lucide-react/icons/eye';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { PageHeader, DataTable } from '../../components';
-import type { Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable } from '../../components/DataTable';
+import type { Column } from '../../components/DataTable';
 import type { GdprAuditEntry } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 

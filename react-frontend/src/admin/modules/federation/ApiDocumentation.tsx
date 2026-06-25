@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 
 import { usePageTitle } from '@/hooks';
 import { Accordion, AccordionItem, Card, CardBody, CardHeader, Chip, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -13,7 +13,10 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
-import { PageHeader, EmptyState, DataTable, ConfirmModal, type Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { EmptyState } from '../../components/EmptyState';
+import { DataTable, type Column } from '../../components/DataTable';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { adminTools } from '../../api/adminApi';
 import { Button, Spinner } from '@/components/ui';
 

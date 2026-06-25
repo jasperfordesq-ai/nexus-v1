@@ -25,10 +25,9 @@ import { usePageTitle } from '@/hooks';
 import { useTenant,
   useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
-import { DataTable,
-  PageHeader,
-  ConfirmModal,
-  type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import type { SuperAdminTenant } from '../../api/types';
 
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Tabs, Tab } from '@/components/ui';

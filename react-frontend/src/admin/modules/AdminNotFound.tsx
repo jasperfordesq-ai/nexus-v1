@@ -17,7 +17,7 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
-import { PageHeader } from '../components';
+import { PageHeader } from '../components/PageHeader';
 
 export function AdminNotFound() {
   const { t } = useTranslation('admin');

@@ -15,7 +15,10 @@ import CalendarRange from 'lucide-react/icons/calendar-range';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
-import { PageHeader, StatCard, DataTable, EmptyState, type Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { StatCard } from '../../components/StatCard';
+import { DataTable, type Column } from '../../components/DataTable';
+import { EmptyState } from '../../components/EmptyState';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

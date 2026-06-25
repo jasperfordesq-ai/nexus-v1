@@ -19,7 +19,7 @@ import { useTenant, useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';
 import { api } from '@/lib/api';
 import { resolveAssetUrl } from '@/lib/helpers';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import type { AdminGroup, GroupType } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

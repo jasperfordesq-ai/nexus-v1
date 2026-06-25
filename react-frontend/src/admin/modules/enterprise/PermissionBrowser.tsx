@@ -16,7 +16,7 @@ import Lock from 'lucide-react/icons/lock';
 import { usePageTitle } from '@/hooks';
 import { useTranslation } from 'react-i18next';
 import { adminEnterprise } from '../../api/adminApi';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 
 export function PermissionBrowser() {
   usePageTitle("Enterprise");

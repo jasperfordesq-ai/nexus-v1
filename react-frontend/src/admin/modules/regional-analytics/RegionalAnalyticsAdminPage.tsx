@@ -25,7 +25,7 @@ import Plus from 'lucide-react/icons/plus';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 

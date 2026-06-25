@@ -17,7 +17,7 @@ import MapPin from 'lucide-react/icons/map-pin';
 import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 
 export function GroupGeocode() {
   const { t } = useTranslation('admin');

@@ -24,7 +24,9 @@ import Plus from 'lucide-react/icons/plus';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
-import { DataTable, PageHeader, EmptyState, type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { EmptyState } from '../../components/EmptyState';
 import { useTranslation } from 'react-i18next';
 
 interface VolOrg {

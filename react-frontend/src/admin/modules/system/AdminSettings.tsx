@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useToast, useTenant, useAuth } from '@/contexts';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { adminSettings } from '../../api/adminApi';
 import { resolveAssetUrl } from '@/lib/helpers';
 import type { AdminSettingsResponse } from '../../api/types';

@@ -23,7 +23,10 @@ import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast, useAuth } from '@/contexts';
 import { adminPlans, type PlanListItem } from '../../api/adminApi';
-import { PageHeader, DataTable, EmptyState, ConfirmModal, type Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable, type Column } from '../../components/DataTable';
+import { EmptyState } from '../../components/EmptyState';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 import { Button, Chip, Spinner, Tooltip } from '@/components/ui';
 

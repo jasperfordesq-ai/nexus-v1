@@ -20,7 +20,10 @@ import Send from 'lucide-react/icons/send';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBlog, type BulkActionResult } from '../../api/adminApi';
-import { DataTable, PageHeader, ConfirmModal, BulkActionToolbar, type BulkAction, type Column } from '../../components';
+import { DataTable, type Column } from '../../components/DataTable';
+import { PageHeader } from '../../components/PageHeader';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { BulkActionToolbar, type BulkAction } from '../../components/BulkActionToolbar';
 import type { AdminBlogPost } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';

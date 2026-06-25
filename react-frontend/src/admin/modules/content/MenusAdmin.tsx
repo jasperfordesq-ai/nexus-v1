@@ -19,7 +19,10 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMenus } from '../../api/adminApi';
-import { PageHeader, DataTable, EmptyState, ConfirmModal, type Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable, type Column } from '../../components/DataTable';
+import { EmptyState } from '../../components/EmptyState';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { Button, Chip, Spinner } from '@/components/ui';
 
 interface MenuItem {

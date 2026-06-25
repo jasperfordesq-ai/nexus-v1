@@ -28,7 +28,7 @@ import Key from 'lucide-react/icons/key';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
 import { PartnerTimebankGuidance } from '../federation/PartnerTimebankGuidance';
 
 // ─── Types ────────────────────────────────────────────────────────────────

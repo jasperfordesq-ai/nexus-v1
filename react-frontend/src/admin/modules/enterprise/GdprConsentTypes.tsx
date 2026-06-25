@@ -23,8 +23,10 @@ import ExternalLink from 'lucide-react/icons/external-link';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { PageHeader, DataTable, ConfirmModal } from '../../components';
-import type { Column } from '../../components';
+import { PageHeader } from '../../components/PageHeader';
+import { DataTable } from '../../components/DataTable';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import type { Column } from '../../components/DataTable';
 import type { ConsentType, ConsentTypeUser } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 

@@ -26,7 +26,8 @@ import ListChecks from 'lucide-react/icons/list-checks';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
-import { StatCard, PageHeader } from '../../components';
+import { StatCard } from '../../components/StatCard';
+import { PageHeader } from '../../components/PageHeader';
 import type { SuperAdminDashboardStats, SuperAdminTenant } from '../../api/types';
 
 export function SuperDashboard() {
