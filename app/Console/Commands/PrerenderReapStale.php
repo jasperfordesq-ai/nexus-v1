@@ -101,7 +101,6 @@ class PrerenderReapStale extends Command
                             'claimed_by'    => null,
                             'started_at'    => null,
                             'error_message' => 'reaped: requeued once after stuck',
-                            'updated_at'    => $now,
                         ]);
                         $reapedCount++;
                         continue;
@@ -111,7 +110,6 @@ class PrerenderReapStale extends Command
                     'status'        => 'failed',
                     'finished_at'   => $now,
                     'error_message' => 'reaped: worker did not finalise within timeout',
-                    'updated_at'    => $now,
                 ]);
                 $reapedCount++;
                 $this->service->broadcastJob((int) $row->id);
