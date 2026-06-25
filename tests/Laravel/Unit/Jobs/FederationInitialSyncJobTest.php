@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Tests\Laravel\Unit\Jobs;
 
+use App\Jobs\FederationInitialSyncJob;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -16,126 +18,100 @@ use Tests\Laravel\TestCase;
 /**
  * FederationInitialSyncJobTest
  *
- * SOURCE BUG: FederationInitialSyncJob (app/Jobs/FederationInitialSyncJob.php,
- * line 40) declares `public string $queue = 'federation';` with an explicit type
- * annotation. PHP 8.2 trait composition rules require type-compatible property
- * declarations; Illuminate\Bus\Queueable declares `public $queue;` (untyped),
- * making the override incompatible. This causes a PHP fatal error at class-load time:
+ * FIXED BUG (regression guard): FederationInitialSyncJob previously declared
+ * `public string $queue = 'federation';` with an explicit type annotation. PHP
+ * 8.2+ trait composition rules require type-compatible property declarations;
+ * Illuminate\Bus\Queueable declares `public $queue;` (untyped), so the override
+ * was incompatible and produced a fatal error at class-load time:
  *
  *   "App\Jobs\FederationInitialSyncJob and Illuminate\Bus\Queueable define the same
  *    property ($queue) in the composition of App\Jobs\FederationInitialSyncJob.
  *    However, the definition differs and is considered incompatible."
  *
- * Because the fatal fires during PHP compilation of the class (before any test
- * method runs), the class CANNOT be referenced anywhere in the test file — not
- * even in a `use` statement, string-class argument, or `new` expression — without
- * crashing the entire PHPUnit process.
- *
- * FIX REQUIRED in app/Jobs/FederationInitialSyncJob.php:
- *   Remove:  public string $queue = 'federation';    // line 40
- *   Add to constructor body: $this->queue = 'federation';
- *   (See ReconcileFederationPendingTxJob for the exact pattern.)
- *
- * Until that fix lands, this test suite verifies job behaviour via:
- *  (a) Source-file text analysis (no autoloading).
- *  (b) Direct DB/cache assertions that replicate what handle() would do,
- *      via FederationAuditService::log() called inline.
- *
- * Once the fix is applied, replace the source-text assertions with proper
- * instantiation tests (see comments marked "POST-FIX").
+ * Because the fatal fired during PHP compilation of the class, the job could not
+ * be dispatched at all in production. The fix assigns `$this->queue = 'federation';`
+ * inside the constructor instead of re-declaring the property (mirroring
+ * ReconcileFederationPendingTxJob). These tests now instantiate the real class
+ * to guard against the regression returning, and verify the queue/tries/timeout
+ * configuration and the bilateral audit pattern handle() relies on.
  */
 class FederationInitialSyncJobTest extends TestCase
 {
     use DatabaseTransactions;
 
-    private string $jobSourcePath;
+    // ── instantiation tests (proves the class loads & is configured) ──────────
 
-    protected function setUp(): void
+    /** The class loads and instantiates without the trait-composition fatal. */
+    public function test_job_can_be_instantiated(): void
     {
-        parent::setUp();
-        $this->jobSourcePath = base_path('app/Jobs/FederationInitialSyncJob.php');
+        $job = new FederationInitialSyncJob(2, 3, 1);
+
+        $this->assertInstanceOf(FederationInitialSyncJob::class, $job);
+        $this->assertInstanceOf(ShouldQueue::class, $job);
     }
 
-    // ── source-text structural tests (no autoloading) ─────────────────────────
-
-    /** Job source file exists at the expected path. */
-    public function test_job_source_file_exists(): void
-    {
-        $this->assertFileExists($this->jobSourcePath);
-    }
-
-    /** Job implements ShouldQueue (visible in source text). */
-    public function test_job_implements_should_queue(): void
-    {
-        $source = file_get_contents($this->jobSourcePath);
-        $this->assertStringContainsString(
-            'implements ShouldQueue',
-            $source,
-            'Job must implement ShouldQueue'
-        );
-    }
-
-    /**
-     * Job targets the 'federation' queue.
-     * NOTE: the current declaration `public string $queue` is the source bug.
-     * The fix is to move this to the constructor as `$this->queue = 'federation';`.
-     */
+    /** Job targets the 'federation' queue (set in the constructor, not as a typed property). */
     public function test_job_targets_federation_queue(): void
     {
-        $source = file_get_contents($this->jobSourcePath);
-        $this->assertStringContainsString(
-            "'federation'",
-            $source,
-            "Job must target the 'federation' queue"
-        );
+        $job = new FederationInitialSyncJob(2, 3, 1);
+
+        $this->assertSame('federation', $job->queue);
     }
 
     /** Job declares tries = 1 (idempotency by design — fire once). */
     public function test_job_declares_one_try(): void
     {
-        $source = file_get_contents($this->jobSourcePath);
-        $this->assertStringContainsString('$tries = 1', $source);
+        $job = new FederationInitialSyncJob(2, 3, 1);
+
+        $this->assertSame(1, $job->tries);
     }
 
     /** Job declares a 300-second timeout (large tenant tables may be scanned). */
     public function test_job_declares_300_second_timeout(): void
     {
-        $source = file_get_contents($this->jobSourcePath);
-        $this->assertStringContainsString('$timeout = 300', $source);
+        $job = new FederationInitialSyncJob(2, 3, 1);
+
+        $this->assertSame(300, $job->timeout);
+    }
+
+    /** Constructor stores tenantId, partnerTenantId and partnershipId. */
+    public function test_constructor_stores_required_params(): void
+    {
+        $job = new FederationInitialSyncJob(2, 3, 7);
+
+        $this->assertSame(2, $job->tenantId);
+        $this->assertSame(3, $job->partnerTenantId);
+        $this->assertSame(7, $job->partnershipId);
     }
 
     /**
-     * Source bug is documented: the typed $queue declaration conflicts with
-     * Queueable's untyped $queue. This test pins the existence of the bug so
-     * CI catches when it is fixed — at which point the POST-FIX tests below
-     * should be enabled.
+     * Regression guard: the `$queue` property must NOT be re-declared with a type
+     * in the class body. A typed re-declaration reintroduces the PHP trait-
+     * composition fatal that made this job undispatchable. The value must be set
+     * via the constructor instead.
      */
-    public function test_source_bug_typed_queue_property_exists(): void
+    public function test_queue_property_is_not_typed_redeclaration(): void
     {
-        $source = file_get_contents($this->jobSourcePath);
-        $this->assertStringContainsString(
+        $source = file_get_contents(base_path('app/Jobs/FederationInitialSyncJob.php'));
+
+        $this->assertStringNotContainsString(
             'public string $queue',
             $source,
-            'SOURCE BUG: `public string $queue` conflicts with Queueable trait. ' .
-            'Fix: remove this line and assign $this->queue in the constructor.'
+            'Regression: `public string $queue` re-declaration conflicts with the ' .
+            'Queueable trait and fatals at class load. Set $this->queue in the constructor instead.'
         );
-    }
-
-    /** Job constructor accepts tenantId, partnerTenantId, partnershipId. */
-    public function test_constructor_accepts_required_params(): void
-    {
-        $source = file_get_contents($this->jobSourcePath);
-        $this->assertStringContainsString('int $tenantId', $source);
-        $this->assertStringContainsString('int $partnerTenantId', $source);
-        $this->assertStringContainsString('int $partnershipId', $source);
+        $this->assertStringContainsString(
+            "\$this->queue = 'federation';",
+            $source,
+            'The federation queue must be assigned in the constructor.'
+        );
     }
 
     // ── FederationAuditService integration: verify bilateral audit pattern ────
     //
     // These tests replicate what handle() does (call FederationAuditService::log
     // twice with source_tenant_id swapped) and assert the DB outcome, so the
-    // infrastructure (audit table columns, bilateral insert logic) is covered
-    // independently of the broken job class.
+    // infrastructure (audit table columns, bilateral insert logic) is covered.
 
     /** FederationAuditService::log writes a row with the correct columns. */
     public function test_audit_service_writes_row_with_correct_columns(): void

@@ -37,7 +37,11 @@ class FederationInitialSyncJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public string $queue = 'federation';
+    // PHP 8.2+ strict trait composition rejects ANY property re-declaration
+    // when the trait's signature differs (Queueable declares `public $queue;`
+    // with implicit null default; we need to assign 'federation'). Setting
+    // $this->queue inside the constructor sidesteps the trait conflict
+    // entirely while preserving the queue routing.
 
     /**
      * Fail fast rather than letting redis re-deliver mid-flight. The queue's
@@ -54,7 +58,9 @@ class FederationInitialSyncJob implements ShouldQueue
         public readonly int $tenantId,
         public readonly int $partnerTenantId,
         public readonly int $partnershipId,
-    ) {}
+    ) {
+        $this->queue = 'federation';
+    }
 
     public function handle(): void
     {
