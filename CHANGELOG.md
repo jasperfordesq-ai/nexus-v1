@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Federation write requests from approved partner communities are no longer always blocked.** The CORS guard that authorizes cross-community writes (Komunitin and Credit Commons endpoints) checked the wrong table using columns that don't exist, so the lookup always errored and every federation write — even from a registered, active partner — was denied with `403 Origin not in federation whitelist`. It now matches the request origin against the active remote partners registered in `federation_external_partners`, so writes from approved partners are allowed while unknown or non-active origins stay blocked.
 - **Three Regional Analytics dashboard sections that always showed "data unavailable" now work.** The Demographics (age groups), Volunteer breakdown (top organisations), and Help-request analysis sections each queried a column that doesn't exist, so every request errored out. They now read the correct columns (`users.date_of_birth`, `vol_logs.organization_id`) and group help requests by contact preference, counting a request as resolved once its status reaches `closed`.
 
 ### Added

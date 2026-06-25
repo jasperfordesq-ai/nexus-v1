@@ -129,23 +129,53 @@ class EnsureCorsHeadersTest extends TestCase
     }
 
     /**
-     * Federation write from any origin → 403 because the whitelist query fails.
+     * Federation write from a registered, ACTIVE remote partner origin → allowed,
+     * with ACAO reflecting the specific origin.
      *
-     * NOTE: EnsureCorsHeaders::isFederationOriginWhitelisted() queries
-     * federation_tenant_whitelist.remote_url and .is_active, but the actual
-     * schema (confirmed via DESCRIBE) has only: tenant_id, approved_at,
-     * approved_by, notes. Those columns don't exist, so every call throws a
-     * QueryException, the catch block returns false, and ALL federation writes
-     * are blocked with 403. This test asserts the ACTUAL runtime behavior.
-     * The source middleware has a schema mismatch that should be fixed in a
-     * follow-up migration.
+     * The whitelist source is federation_external_partners (base_url + status),
+     * NOT federation_tenant_whitelist (which is the local-tenant approval list,
+     * keyed by tenant_id, and holds no remote URLs). A partner row whose base_url
+     * matches the request Origin and whose status is 'active' authorizes the write.
      */
-    public function test_federation_write_always_returns_403_due_to_whitelist_schema_mismatch(): void
+    public function test_federation_write_from_whitelisted_active_partner_origin_is_allowed(): void
     {
-        // NOTE: Even a "trusted" origin gets 403 because the whitelist query
-        // throws (missing columns) and the catch block denies by default.
+        $origin = 'https://trusted-partner.example.org';
+        $tenantId = (int) DB::table('tenants')->min('id');
+
+        DB::table('federation_external_partners')->insert([
+            'tenant_id' => $tenantId,
+            'name'      => 'Trusted Partner',
+            'base_url'  => $origin,
+            'status'    => 'active',
+        ]);
+
         $request = Request::create('/v2/federation/komunitin/transfers', 'POST');
-        $request->headers->set('Origin', 'https://trusted-partner.example.org');
+        $request->headers->set('Origin', $origin);
+
+        $response = $this->middleware->handle($request, $this->makeNext());
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals($origin, $response->headers->get('Access-Control-Allow-Origin'));
+    }
+
+    /**
+     * Federation write from a registered partner that is NOT active (e.g. pending
+     * or suspended) → 403. Only status='active' partners may mutate.
+     */
+    public function test_federation_write_from_non_active_partner_origin_returns_403(): void
+    {
+        $origin = 'https://pending-partner.example.org';
+        $tenantId = (int) DB::table('tenants')->min('id');
+
+        DB::table('federation_external_partners')->insert([
+            'tenant_id' => $tenantId,
+            'name'      => 'Pending Partner',
+            'base_url'  => $origin,
+            'status'    => 'pending',
+        ]);
+
+        $request = Request::create('/v2/federation/komunitin/transfers', 'POST');
+        $request->headers->set('Origin', $origin);
 
         $response = $this->middleware->handle($request, $this->makeNext());
 
