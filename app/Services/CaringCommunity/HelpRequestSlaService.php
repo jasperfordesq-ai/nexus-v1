@@ -118,10 +118,11 @@ class HelpRequestSlaService
                 continue;
             }
 
-            $ageSec = max(0, $now->diffInSeconds($created, false));
-            // `diffInSeconds` returns a negative value when the second arg is
-            // before the first; we always want a positive age.
-            $ageSec = $created->lessThanOrEqualTo($now) ? $now->diffInSeconds($created) : 0;
+            // Carbon v3 `diffInSeconds` is SIGNED and returns a float. Measure
+            // older -> now so the elapsed age is positive, and clamp to
+            // non-negative so a future-dated row reads as age 0 rather than a
+            // negative age. (`$created->diffInSeconds($now)` > 0 when now > created.)
+            $ageSec = max(0.0, $created->diffInSeconds($now));
 
             $rowView = [
                 'id'             => (int) $row->id,
@@ -158,7 +159,11 @@ class HelpRequestSlaService
             // unless it's closed.
             if ($status === 'closed') {
                 if ($updated && $updated->greaterThanOrEqualTo($resolvedWindow)) {
-                    $turnaroundSec = max(0, $updated->diffInSeconds($created));
+                    // Carbon v3 `diffInSeconds` is SIGNED: measure created -> updated
+                    // (older -> newer) so the turnaround is positive. The previous
+                    // `$updated->diffInSeconds($created)` returned a negative value,
+                    // so `max(0, …)` collapsed every turnaround to 0.
+                    $turnaroundSec = max(0.0, $created->diffInSeconds($updated));
                     $rowView['turnaround_hours'] = round($turnaroundSec / 3600, 1);
                     $rowView['within_resolution_sla'] = $turnaroundSec <= $resolutionSec;
                     $recentlyResolved[] = $rowView;
@@ -208,7 +213,7 @@ class HelpRequestSlaService
         return [$summary, $openRequests, $recentlyResolved];
     }
 
-    private function bucket(int $ageSec, int $targetSec): string
+    private function bucket(float|int $ageSec, int $targetSec): string
     {
         if ($ageSec >= $targetSec) {
             return 'breached';

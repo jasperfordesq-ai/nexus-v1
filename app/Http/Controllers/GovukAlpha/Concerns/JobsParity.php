@@ -749,7 +749,9 @@ trait JobsParity
 
             $currentApps = (int) ($vacancy->applications_count ?? 0);
             $currentViews = (int) ($vacancy->views_count ?? 0);
-            $daysPosted = $vacancy->created_at ? (int) now()->diffInDays($vacancy->created_at) : 0;
+            // Carbon v3 `diffInDays` is signed; measure created_at -> now (older ->
+            // newer) so days-posted is positive. The reversed form returned negative.
+            $daysPosted = $vacancy->created_at ? (int) $vacancy->created_at->diffInDays(now()) : 0;
 
             $currentConversion = $currentViews > 0 ? round(($currentApps / $currentViews) * 100, 1) : 0.0;
             $avgConversion = $avgViews > 0 ? round(($avgApplications / $avgViews) * 100, 1) : 0.0;

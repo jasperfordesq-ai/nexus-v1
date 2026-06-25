@@ -273,16 +273,11 @@ class VereinMemberImportServiceTest extends TestCase
         $this->assertNull($result['members'][0]['temporary_password']);
     }
 
-    public function test_preview_marks_existing_org_member_as_invalid_with_error(): void
+    public function test_preview_marks_existing_org_member_as_already_member_without_blocking_error(): void
     {
-        // NOTE: Source bug in VereinMemberImportService::preview() — when a user
-        // is already an active org member the code sets $action = 'already_member'
-        // then immediately adds an error and overwrites $action to 'invalid' (lines
-        // 57-63).  As a result import() always throws InvalidArgumentException for
-        // existing-member rows.  The import() skipped-counter logic at line 118
-        // checks for 'already_member' action but preview() never emits it.
-        // This test asserts the ACTUAL (buggy) behaviour so we detect if the bug
-        // is later fixed without a test update.
+        // An already-active org member is a skippable info state, not a hard error:
+        // preview() must classify the row as 'already_member' and must NOT push it
+        // into the blocking $errors array (otherwise import() aborts the batch).
         $email  = 'alreadymember.' . uniqid() . '@example.test';
         $userId = (int) DB::table('users')->insertGetId([
             'tenant_id'  => $this->testTenantId,
@@ -307,10 +302,66 @@ class VereinMemberImportServiceTest extends TestCase
         $csv    = $this->csv([[$email, 'Already', 'Member', 'member']]);
         $result = $this->service()->preview($this->testTenantId, $this->orgId, $csv);
 
-        // The action is overwritten to 'invalid' (not 'already_member') because
-        // the error-check at line 62-63 fires first — see NOTE above.
-        $this->assertSame('invalid', $result['items'][0]['action']);
-        $this->assertNotEmpty($result['items'][0]['errors']);
+        $this->assertSame('already_member', $result['items'][0]['action']);
+        $this->assertSame([], $result['items'][0]['errors']);
+        // It is an info/skip state, not a hard validation failure.
+        $this->assertSame(0, $result['summary']['invalid']);
+    }
+
+    public function test_import_skips_already_member_and_imports_valid_rows(): void
+    {
+        // Regression: a CSV that mixes an already-member row with valid rows must
+        // skip the already-member (skipped +1) and still import the rest, instead
+        // of throwing InvalidArgumentException and aborting the whole import.
+        $memberEmail = 'present.' . uniqid() . '@example.test';
+        $memberId    = (int) DB::table('users')->insertGetId([
+            'tenant_id'  => $this->testTenantId,
+            'name'       => 'Present Member',
+            'email'      => $memberEmail,
+            'role'       => 'member',
+            'status'     => 'active',
+            'is_approved' => 1,
+            'created_at' => now(),
+        ]);
+        DB::table('org_members')->insertOrIgnore([
+            'tenant_id'       => $this->testTenantId,
+            'organization_id' => $this->orgId,
+            'org_type'        => 'volunteer',
+            'user_id'         => $memberId,
+            'role'            => 'member',
+            'status'          => 'active',
+            'created_at'      => now(),
+        ]);
+
+        $newEmail = 'fresh.' . uniqid() . '@example.test';
+        $csv = $this->csv([
+            [$memberEmail, 'Present', 'Member', 'member'],
+            [$newEmail,    'Fresh',   'Recruit', 'member'],
+        ]);
+
+        $result = $this->service()->import($this->testTenantId, $this->orgId, $this->actorId, $csv);
+
+        // The already-member row is skipped, the new row is created.
+        $this->assertSame(1, $result['skipped']);
+        $this->assertSame(1, $result['created']);
+        $this->assertSame(0, $result['linked']);
+
+        // The valid row really landed in the database.
+        $createdUser = DB::table('users')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('email', $newEmail)
+            ->first();
+        $this->assertNotNull($createdUser, 'Valid row should have been imported despite the already-member row.');
+        $this->assertDatabaseHas('org_members', [
+            'tenant_id'       => $this->testTenantId,
+            'organization_id' => $this->orgId,
+            'user_id'         => $createdUser->id,
+            'status'          => 'active',
+        ]);
+
+        // Only the freshly created user is returned in members; the skipped row is not.
+        $this->assertCount(1, $result['members']);
+        $this->assertSame($newEmail, $result['members'][0]['email']);
     }
 
     public function test_import_mixed_batch_returns_correct_counts(): void
