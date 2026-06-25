@@ -2979,7 +2979,9 @@ class JobVacanciesController extends BaseApiController
         // Current job metrics
         $currentApps = $vacancy->applications_count ?? 0;
         $currentViews = $vacancy->views_count ?? 0;
-        $daysPosted = $vacancy->created_at ? now()->diffInDays($vacancy->created_at) : 0;
+        // Carbon v3 `diffInDays` is signed; measure created_at -> now (older ->
+        // newer) so days-posted is positive. The reversed form returned negative.
+        $daysPosted = $vacancy->created_at ? (int) $vacancy->created_at->diffInDays(now()) : 0;
 
         // Conversion rate (applications/views) for this job vs average
         $currentConversion = $currentViews > 0 ? round(($currentApps / $currentViews) * 100, 1) : 0;

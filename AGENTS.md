@@ -481,6 +481,19 @@ npm run build                               # Production build
 
 Test environment: `APP_ENV=testing`, `DB_DATABASE=nexus_test`, `CACHE_DRIVER=array`.
 
+> **🔴 NOTE — running PHP tests via `docker exec` that use `Crypt`/encryption:** You MUST pass the test `APP_KEY` explicitly on the `docker exec` line. The container's `.env` ships a dev placeholder (`APP_KEY=nexus-dev-app-key-change-in-production`) that is **not** a valid base64 32-byte key. Laravel loads that value into config during app bootstrap, and phpunit.xml's `<env name="APP_KEY" force="true">` does **not** reliably override it for the `Encrypter` singleton inside the container — so any test that touches `Crypt` (e.g. the federation listener tests in `tests/Laravel/Unit/Listeners/`: `PushGroupToFederatedPartnersTest`, `PushGroupMembershipToFederatedPartnersTest`, `PushGroupRetractionToFederatedPartnersTest`, `PushMemberProfileUpdateToFederatedPartnersTest`) fails with `RuntimeException: Unsupported cipher or incorrect key length` from `Encrypter.php`.
+>
+> **Fix:** add `-e APP_KEY="base64:HfQEDtbtr90JIXhsaAhSFWnzIo1f31VZ2e5qLqKKnls="` (the same fixed, non-secret test key already in `phpunit.xml`) to the `docker exec` command:
+>
+> ```bash
+> docker exec \
+>   -e MAIL_MAILER=array \
+>   -e APP_KEY="base64:HfQEDtbtr90JIXhsaAhSFWnzIo1f31VZ2e5qLqKKnls=" \
+>   nexus-php-app php vendor/bin/phpunit tests/Laravel/Unit/Listeners/...
+> ```
+>
+> This applies to CI and any local `docker exec` run. The `-e APP_KEY=...` flag is not needed when running phpunit outside the container (e.g. native PHP), where phpunit.xml's `<env>` is authoritative.
+
 ---
 
 ## Deployment

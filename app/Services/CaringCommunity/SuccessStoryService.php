@@ -352,8 +352,8 @@ class SuccessStoryService
         if (Schema::hasTable('caring_support_relationships')) {
             $recipientCount = (int) DB::table('caring_support_relationships')
                 ->where('tenant_id', $tenantId)
-                ->distinct('recipient_user_id')
-                ->count('recipient_user_id');
+                ->distinct('recipient_id')
+                ->count('recipient_id');
         }
 
         return match ($key) {
