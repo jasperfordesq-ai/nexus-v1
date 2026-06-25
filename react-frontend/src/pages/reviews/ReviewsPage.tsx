@@ -13,7 +13,7 @@
  *   DELETE /api/v2/reviews/{id}             — delete own review
  */
 
-import { useState, useCallback, useEffect, useRef, type JSX } from 'react';
+import { useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 
@@ -72,7 +72,7 @@ interface PendingReview {
 
 // ─── Star display component ───────────────────────────────────────────────────
 
-function StarRating({ rating }: { rating: number }): JSX.Element {
+function StarRating({ rating }: { rating: number }): ReactNode {
   const { t } = useTranslation('reviews');
   return (
     <div className="flex items-center gap-0.5" aria-label={t('rating_aria', { n: rating })}>
@@ -97,7 +97,7 @@ function ReviewCard({
   review: Review;
   onDelete?: (id: number) => void;
   canDelete?: boolean;
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation(['reviews', 'common']);
   const [deleting, setDeleting] = useState(false);
   const toast = useToast();
@@ -185,7 +185,7 @@ function GivenReviewCard({
 }: {
   review: GivenReview;
   onDelete: (id: number) => void;
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation(['reviews', 'common']);
   const { tenantPath } = useTenant();
   const [deleting, setDeleting] = useState(false);
@@ -263,7 +263,7 @@ function GivenReviewCard({
 
 // ─── Empty state ──────────────────────────────────────────────────────────────
 
-function EmptyState({ message, subtitle }: { message: string; subtitle: string }): JSX.Element {
+function EmptyState({ message, subtitle }: { message: string; subtitle: string }): ReactNode {
   return (
     <div className="text-center py-12 text-[var(--color-text-muted)]">
       <Star className="w-12 h-12 mx-auto mb-3 opacity-30" aria-hidden="true" />
@@ -275,7 +275,7 @@ function EmptyState({ message, subtitle }: { message: string; subtitle: string }
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-export default function ReviewsPage(): JSX.Element {
+export default function ReviewsPage(): ReactNode {
   const { t } = useTranslation('reviews');
   const { user } = useAuth();
   const toast = useToast();

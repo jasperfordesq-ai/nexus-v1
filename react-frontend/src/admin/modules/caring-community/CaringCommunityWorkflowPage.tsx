@@ -1,5 +1,5 @@
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
-import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type JSX } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
 
 import { Separator } from '@/components/ui';
 import { Link } from 'react-router-dom';
@@ -461,7 +461,7 @@ function trendChip(series: ForecastSeries, t: AdminT): { label: string; color: '
   return { label: t('caring_workflow.predictive.trend_stable'), color: 'default', icon: Minus };
 }
 
-function ForecastMiniChart({ title, series, valueSuffix, t }: { title: string; series: ForecastSeries; valueSuffix: string; t: AdminT }): JSX.Element {
+function ForecastMiniChart({ title, series, valueSuffix, t }: { title: string; series: ForecastSeries; valueSuffix: string; t: AdminT }): ReactNode {
   const data = buildChartData(series);
   const chip = trendChip(series, t);
   const ChipIcon = chip.icon;
@@ -552,7 +552,7 @@ function alertSeverityLabel(severity: ForecastAlert['severity'], t: AdminT): str
   return t('caring_workflow.predictive.severity.info');
 }
 
-function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: PredictiveInsightsCardProps): JSX.Element {
+function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: PredictiveInsightsCardProps): ReactNode {
   const isInitialLoading = loading && !forecast;
   const hasAnyHistory = forecast
     ? [forecast.hours, forecast.members, forecast.recipients].some(

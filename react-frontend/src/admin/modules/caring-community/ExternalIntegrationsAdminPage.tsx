@@ -4,7 +4,7 @@ import { CardBody, Card, Select, SelectItem, useDisclosure, Button, Chip, Spinne
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useState, type JSX } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Separator } from '@/components/ui';
@@ -147,7 +147,7 @@ function fromIntegration(item: Integration): FormState {
   };
 }
 
-export default function ExternalIntegrationsAdminPage(): JSX.Element {
+export default function ExternalIntegrationsAdminPage(): ReactNode {
   const { t } = useTranslation('admin');
   usePageTitle(t('external_integrations.meta.title'));
   const { showToast } = useToast();

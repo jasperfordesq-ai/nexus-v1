@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState, type JSX } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, Navigate } from 'react-router-dom';import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import { useTranslation } from 'react-i18next';
@@ -41,7 +41,7 @@ const STATUS_COLOR: Record<MyReport['status'], 'default' | 'primary' | 'warning'
   dismissed: 'default',
 };
 
-export default function MySafeguardingReportsPage(): JSX.Element {
+export default function MySafeguardingReportsPage(): ReactNode {
   const { t } = useTranslation('common');
   const { hasFeature, tenantPath } = useTenant();
   usePageTitle(t('safeguarding_reports.my_reports.meta.title'));

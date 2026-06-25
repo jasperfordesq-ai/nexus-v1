@@ -4,7 +4,7 @@ import { Select, SelectItem, GlassCard, Button, Input, Textarea } from '@/compon
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useMemo, useState, type JSX } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
@@ -32,7 +32,7 @@ const SEVERITY_SLA_HOURS: Record<Severity, number> = {
   low: 168,
 };
 
-export default function SafeguardingReportPage(): JSX.Element {
+export default function SafeguardingReportPage(): ReactNode {
   const { t } = useTranslation('common');
   const { hasFeature, tenantPath } = useTenant();
   const navigate = useNavigate();

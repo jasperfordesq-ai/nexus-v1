@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useState, type JSX } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';
 
@@ -53,7 +53,7 @@ function formatDate(value: string | null): string {
   }
 }
 
-export function DataExportPage(): JSX.Element {
+export function DataExportPage(): ReactNode {
   const { t } = useTranslation('common');
   usePageTitle(t('data_export.meta.title'));
   const toast = useToast();

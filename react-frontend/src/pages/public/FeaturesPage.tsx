@@ -498,14 +498,14 @@ export function FeaturesPage() {
       {/* Feature groups */}
       {GROUPS.map((group, index) => {
         const icons = [
-          <Sparkles className="w-5 h-5 text-accent" aria-hidden="true" />,
-          <Globe className="w-5 h-5 text-accent" aria-hidden="true" />,
-          <CheckCircle className="w-5 h-5 text-success" aria-hidden="true" />,
-          <CheckCircle className="w-5 h-5 text-success" aria-hidden="true" />,
-          <Shield className="w-5 h-5 text-warning" aria-hidden="true" />,
-          <Sparkles className="w-5 h-5 text-accent" aria-hidden="true" />,
-          <Sparkles className="w-5 h-5 text-accent" aria-hidden="true" />,
-          <Shield className="w-5 h-5 text-accent" aria-hidden="true" />,
+          <Sparkles key="feature-icon-0" className="w-5 h-5 text-accent" aria-hidden="true" />,
+          <Globe key="feature-icon-1" className="w-5 h-5 text-accent" aria-hidden="true" />,
+          <CheckCircle key="feature-icon-2" className="w-5 h-5 text-success" aria-hidden="true" />,
+          <CheckCircle key="feature-icon-3" className="w-5 h-5 text-success" aria-hidden="true" />,
+          <Shield key="feature-icon-4" className="w-5 h-5 text-warning" aria-hidden="true" />,
+          <Sparkles key="feature-icon-5" className="w-5 h-5 text-accent" aria-hidden="true" />,
+          <Sparkles key="feature-icon-6" className="w-5 h-5 text-accent" aria-hidden="true" />,
+          <Shield key="feature-icon-7" className="w-5 h-5 text-accent" aria-hidden="true" />,
         ];
         return <FeatureSection key={group.key} group={group} icon={icons[index]} />;
       })}

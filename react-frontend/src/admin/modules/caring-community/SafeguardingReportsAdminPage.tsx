@@ -1,5 +1,5 @@
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
-import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Separator } from '@/components/ui';
@@ -73,7 +73,7 @@ const STATUS_COLOR: Record<Status, 'default' | 'primary' | 'warning' | 'success'
 const ALL_STATUSES: Status[] = ['submitted', 'triaged', 'investigating', 'resolved', 'dismissed'];
 const ALL_SEVERITIES: Severity[] = ['critical', 'high', 'medium', 'low'];
 
-export default function SafeguardingReportsAdminPage(): JSX.Element {
+export default function SafeguardingReportsAdminPage(): ReactNode {
   const { t } = useTranslation('caring_community');
   usePageTitle(t('admin.safeguarding_reports.meta_title'));
   useAdminPageMeta({

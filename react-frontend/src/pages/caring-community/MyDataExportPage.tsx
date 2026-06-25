@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, type JSX } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Link, Navigate } from 'react-router-dom';import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Download from 'lucide-react/icons/download';
 import ShieldCheck from 'lucide-react/icons/shield-check';
@@ -23,7 +23,7 @@ import { api } from '@/lib/api';
  * help requests, hour gifts, hour transfers, loyalty redemptions, regional
  * points, safeguarding reports they filed, and civic-digest preferences.
  */
-export default function MyDataExportPage(): JSX.Element {
+export default function MyDataExportPage(): ReactNode {
   const { t } = useTranslation('caring_community');
   const { hasFeature, tenantPath } = useTenant();
   const { showToast } = useToast();

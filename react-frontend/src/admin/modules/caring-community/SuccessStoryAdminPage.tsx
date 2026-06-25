@@ -4,7 +4,7 @@ import { CardBody, Card, Select, SelectItem, useDisclosure, Button, Chip, Spinne
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useState, type JSX } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Separator } from '@/components/ui';
@@ -142,7 +142,7 @@ function toPayload(form: FormState): Record<string, unknown> {
 // Component
 // ---------------------------------------------------------------------------
 
-export default function SuccessStoryAdminPage(): JSX.Element {
+export default function SuccessStoryAdminPage(): ReactNode {
   const { t } = useTranslation('admin');
   usePageTitle(t('success_stories_admin.meta.title'));
   const { showToast } = useToast();
