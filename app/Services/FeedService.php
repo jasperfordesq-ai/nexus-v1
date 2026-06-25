@@ -1214,7 +1214,10 @@ class FeedService
                 $publishStatus = 'published';
                 $scheduledAt = null;
             }
-            if ($scheduledTime->diffInDays(now()) > 365) {
+            // Carbon v3 `diffInDays` is signed; for a future scheduled time measure
+            // now -> scheduledTime so the "more than a year ahead" guard is positive.
+            // The reversed form returned negative, so this check never fired.
+            if (now()->diffInDays($scheduledTime) > 365) {
                 throw new \InvalidArgumentException(__('api.feed_schedule_too_far'));
             }
         }

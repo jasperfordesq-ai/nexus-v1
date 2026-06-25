@@ -54,9 +54,13 @@ class VereinMemberImportService
                 : false;
 
             $action = $existingUser ? 'link_existing' : 'create';
+            // Being an existing active org member is a skippable info state, NOT a
+            // blocking error: import() silently skips these rows (counting them as
+            // "skipped") instead of aborting the whole batch. Do not push it into
+            // $errors. Genuine problems (bad email / in-file duplicate) still flip
+            // the row to 'invalid' in the check below and take precedence.
             if ($alreadyMember) {
                 $action = 'already_member';
-                $errors[] = __('api.verein_import_already_member');
             }
             if ($errors !== []) {
                 $action = 'invalid';
@@ -99,9 +103,11 @@ class VereinMemberImportService
     public function import(int $tenantId, int $organizationId, int $actorId, string $csv): array
     {
         $preview = $this->preview($tenantId, $organizationId, $csv);
+        // Only genuinely invalid rows (bad email / in-file duplicate) abort the
+        // import. 'already_member' rows are skipped gracefully in the loop below.
         $invalid = array_values(array_filter(
             $preview['items'],
-            fn (array $item): bool => $item['errors'] !== []
+            fn (array $item): bool => $item['action'] === 'invalid'
         ));
 
         if ($invalid !== []) {
