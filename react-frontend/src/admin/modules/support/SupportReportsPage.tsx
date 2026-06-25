@@ -101,7 +101,7 @@ export function buildSupportReportHandoff(report: AdminSupportReport): string {
 export default function SupportReportsPage() {
   const { t } = useTranslation('admin');
   const toast = useToast();
-  const location = useLocation();
+  const { search: locationSearch } = useLocation();
 
   usePageTitle(t('support_reports.meta_title'));
   useAdminPageMeta({
@@ -188,7 +188,7 @@ export default function SupportReportsPage() {
   }, [t, toast]);
 
   useEffect(() => {
-    const reportId = new URLSearchParams(location.search).get('report');
+    const reportId = new URLSearchParams(locationSearch).get('report');
     if (!reportId || openedFromQueryRef.current === reportId) {
       return;
     }
@@ -200,7 +200,7 @@ export default function SupportReportsPage() {
 
     openedFromQueryRef.current = reportId;
     openReport(numericReportId);
-  }, [location.search, openReport]);
+  }, [locationSearch, openReport]);
 
   const refreshAll = async () => {
     await Promise.all([loadReports(), loadStats()]);

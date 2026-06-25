@@ -135,7 +135,7 @@ const utilityBarDividerClass = 'text-[var(--border-default)] text-xs select-none
 
 export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChange, isMobileMenuOpen }: NavbarProps) {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { pathname } = useLocation();
   const { t } = useTranslation(['common', 'broker']);
   const { user, isAuthenticated, logout } = useAuth();
   const { tenant, hasFeature, hasModule, tenantPath } = useTenant();
@@ -260,7 +260,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   // Close all dropdowns when route changes
   useEffect(() => {
     closeAllDropdowns();
-  }, [location.pathname, closeAllDropdowns]);
+  }, [pathname, closeAllDropdowns]);
 
   // Keyboard shortcut: Ctrl/Cmd+K opens search
   useEffect(() => {
@@ -276,7 +276,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
   // Check if current path matches any in a group
   const isActiveGroup = (paths: string[]) => {
-    return paths.some(path => location.pathname.startsWith(path));
+    return paths.some(path => pathname.startsWith(path));
   };
 
   // ─── Memoized nav item arrays ──────────────────────────────────────────────
@@ -693,7 +693,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                         key={item.href} id={item.href}
                         description={item.desc}
                         startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
-                        className={location.pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
+                        className={pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
                       >
                         {item.label}
                       </DropdownItem>

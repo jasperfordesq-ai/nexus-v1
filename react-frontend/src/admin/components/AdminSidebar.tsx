@@ -586,7 +586,7 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: AdminSidebarProps) {
   const { t } = useTranslation('admin_nav');
-  const location = useLocation();
+  const { pathname, search } = useLocation();
   const { tenantPath } = useTenant();
   const [searchQuery, setSearchQuery] = useState('');
   const [recentPages, setRecentPages] = useState<RecentPage[]>(() => readRecentPages());
@@ -610,13 +610,13 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
       const fullPath = tenantPath(path);
       const isDashboard = path === '/admin';
 
-      if (isDashboard && location.pathname !== fullPath) continue;
-      if (!isDashboard && !(location.pathname === fullPath || location.pathname.startsWith(`${fullPath}/`))) continue;
+      if (isDashboard && pathname !== fullPath) continue;
+      if (!isDashboard && !(pathname === fullPath || pathname.startsWith(`${fullPath}/`))) continue;
 
       let score = path.length;
       if (rawQuery) {
         const required = new URLSearchParams(rawQuery);
-        const current = new URLSearchParams(location.search);
+        const current = new URLSearchParams(search);
         let queryMatches = true;
         for (const [key, value] of required.entries()) {
           if (current.get(key) !== value) {
@@ -626,7 +626,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
         }
         if (!queryMatches) continue;
         score += 1000;
-      } else if (new URLSearchParams(location.search).get('filter')) {
+      } else if (new URLSearchParams(search).get('filter')) {
         score -= 100;
       }
 
@@ -637,7 +637,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
     }
 
     return bestHref;
-  }, [allItems, location.pathname, location.search, tenantPath]);
+  }, [allItems, pathname, search, tenantPath]);
 
   const activeSectionKey = useMemo(() => {
     if (!activeHref) return null;
