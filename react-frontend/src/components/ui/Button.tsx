@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { forwardRef, type ElementType, type MouseEvent, type ReactNode } from 'react';
+import { type ElementType, type MouseEvent, type ReactNode, type Ref } from 'react';
 import type { ButtonHTMLAttributes } from 'react';
 import {
   Button as HeroUIButton,
@@ -138,35 +138,34 @@ function combineClasses(...classes: Array<string | false | undefined>): string |
   return className || undefined;
 }
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      as: Component,
-      children,
-      className,
-      classNames,
-      color,
-      disableAnimation: _disableAnimation,
-      disableRipple: _disableRipple,
-      endContent,
-      fullWidth,
-      isDisabled,
-      isIconOnly,
-      isLoading,
-      isPending,
-      onPress,
-      radius,
-      size,
-      spinner,
-      spinnerPlacement = 'start',
-      startContent,
-      type,
-      variant,
-      disabled,
-      ...props
-    },
+export function Button(
+  {
+    as: Component,
+    children,
+    className,
+    classNames,
+    color,
+    disableAnimation: _disableAnimation,
+    disableRipple: _disableRipple,
+    endContent,
+    fullWidth,
+    isDisabled,
+    isIconOnly,
+    isLoading,
+    isPending,
+    onPress,
+    radius,
+    size,
+    spinner,
+    spinnerPlacement = 'start',
+    startContent,
+    type,
+    variant,
+    disabled,
     ref,
-  ) => {
+    ...props
+  }: ButtonProps & { ref?: Ref<HTMLButtonElement> },
+) {
     const pending = isPending ?? isLoading ?? false;
     const disabledState = isDisabled ?? disabled ?? false;
     const mappedVariant = mapVariant(color, variant);
@@ -255,7 +254,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {content}
       </HeroUIButton>
     );
-  },
-);
+}
 
 Button.displayName = 'Button';

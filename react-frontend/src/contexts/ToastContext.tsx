@@ -8,7 +8,7 @@
  * Provides global toast notifications for API errors and user feedback
  */
 
-import { createContext, useContext, useState, useCallback, useMemo, useRef, forwardRef, type ReactNode } from 'react';
+import { createContext, use, useState, useCallback, useMemo, useRef, type ReactNode, type Ref } from 'react';
 import { motion, AnimatePresence } from '@/lib/motion';import X from 'lucide-react/icons/x';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import AlertCircle from 'lucide-react/icons/circle-alert';
@@ -113,7 +113,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function useToast(): ToastContextType {
-  const context = useContext(ToastContext);
+  const context = use(ToastContext);
   if (!context) {
     throw new Error('useToast must be used within a ToastProvider');
   }
@@ -236,7 +236,7 @@ const config = {
   },
 };
 
-const ToastItem = forwardRef<HTMLDivElement, ToastItemProps>(function ToastItem({ toast, onRemove }, ref) {
+function ToastItem({ toast, onRemove, ref }: ToastItemProps & { ref?: Ref<HTMLDivElement> }) {
   const { t } = useTranslation('common');
 
   const { icon: Icon, bgColor, borderColor, iconColor } = config[toast.type];
@@ -274,6 +274,6 @@ const ToastItem = forwardRef<HTMLDivElement, ToastItemProps>(function ToastItem(
       </div>
     </motion.div>
   );
-});
+}
 
 export default ToastProvider;

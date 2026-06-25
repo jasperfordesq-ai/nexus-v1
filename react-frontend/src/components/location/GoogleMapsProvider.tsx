@@ -11,7 +11,7 @@
  * map/autocomplete components, so ordinary page views do not load Google Maps.
  */
 
-import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, type ReactNode, use, useEffect, useState } from 'react';
 import { APIProvider } from '@vis.gl/react-google-maps';
 
 declare global {
@@ -119,7 +119,7 @@ interface GoogleMapsProviderProps {
 }
 
 export function useGoogleMapsConfig() {
-  return useContext(GoogleMapsConfigContext);
+  return use(GoogleMapsConfigContext);
 }
 
 export function GoogleMapsProvider({ children, fallback = null }: GoogleMapsProviderProps) {

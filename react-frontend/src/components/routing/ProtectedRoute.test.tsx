@@ -19,9 +19,8 @@ vi.mock('react-router-dom', () => ({
 vi.mock('@/lib/motion', () => ({
   motion: new Proxy({}, {
     get: (_target: Record<string, unknown>, tag: string) => {
-      return React.forwardRef(({ children, ...rest }: Record<string, unknown>, ref: React.Ref<HTMLElement>) =>
-        React.createElement(typeof tag === 'string' ? tag : 'div', { ...rest, ref }, children as React.ReactNode)
-      );
+      return ({ children, ref, ...rest }: Record<string, unknown> & { ref?: React.Ref<HTMLElement> }) =>
+        React.createElement(typeof tag === 'string' ? tag : 'div', { ...rest, ref }, children as React.ReactNode);
     },
   }),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => children,

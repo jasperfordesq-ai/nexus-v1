@@ -7,7 +7,7 @@ import {
   cloneElement,
   createContext,
   isValidElement,
-  useContext,
+  use,
   type ComponentPropsWithoutRef,
   type ReactNode,
 } from 'react';
@@ -120,7 +120,7 @@ export function Popover({
 }
 
 export function PopoverTrigger({ children, className, ...props }: PopoverTriggerProps) {
-  const { classNames } = useContext(PopoverContext);
+  const { classNames } = use(PopoverContext);
   const triggerClassName = combineClasses(classNames?.trigger, className);
 
   if (isValidElement<{ className?: string }>(children)) {
@@ -152,7 +152,7 @@ export function PopoverContent({
   showArrow,
   ...props
 }: PopoverContentProps) {
-  const context = useContext(PopoverContext);
+  const context = use(PopoverContext);
   const shouldRenderArrow = showArrow ?? context.showArrow;
 
   return (

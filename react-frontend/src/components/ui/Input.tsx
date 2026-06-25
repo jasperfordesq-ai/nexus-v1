@@ -6,9 +6,9 @@
 import {
   type ChangeEvent,
   type CSSProperties,
-  forwardRef,
   type InputHTMLAttributes,
   type ReactNode,
+  type Ref,
 } from 'react';
 import {
   CloseButton as HeroUICloseButton,
@@ -120,7 +120,7 @@ function decoratedWrapperClass(
   );
 }
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
+export function Input({
   className,
   classNames,
   color: _color,
@@ -144,8 +144,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
   style,
   validate,
   variant,
+  ref,
   ...props
-}: InputProps, ref) {
+}: InputProps & { ref?: Ref<HTMLInputElement> }) {
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange?.(event);
     onValueChange?.(event.target.value);
@@ -283,4 +284,4 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
       ) : null}
     </TextField>
   );
-});
+}

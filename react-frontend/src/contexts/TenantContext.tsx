@@ -20,7 +20,7 @@
 
 import {
   createContext,
-  useContext,
+  use,
   useState,
   useEffect,
   useMemo,
@@ -666,7 +666,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function useTenant(): TenantContextValue {
-  const context = useContext(TenantContext);
+  const context = use(TenantContext);
 
   if (!context) {
     throw new Error('useTenant must be used within a TenantProvider');

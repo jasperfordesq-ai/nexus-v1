@@ -10,7 +10,7 @@
  * Scoped to the ComposeHub subtree only (not a global provider).
  */
 
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, use, useState } from 'react';
 import type { ComposeSubmitRegistration } from './types';
 
 interface ComposeSubmitContextValue {
@@ -41,7 +41,7 @@ export function ComposeSubmitProvider({ children }: { children: React.ReactNode 
 
 /** Hook for tabs to register their submit state, and for mobile header to read it. */
 export function useComposeSubmit(): ComposeSubmitContextValue {
-  const ctx = useContext(ComposeSubmitCtx);
+  const ctx = use(ComposeSubmitCtx);
   if (!ctx) {
     // Outside provider — return no-op stubs so tabs work in isolation (e.g., tests)
     return {

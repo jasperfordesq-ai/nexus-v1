@@ -4,9 +4,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import {
-  forwardRef,
   type ComponentPropsWithoutRef,
   type ReactNode,
+  type Ref,
 } from 'react';
 import {
   Description,
@@ -62,7 +62,7 @@ function colorClass(color?: SwitchColor) {
   }
 }
 
-export const Switch = forwardRef<HTMLLabelElement, SwitchProps>(function Switch({
+export function Switch({
   children,
   className,
   classNames,
@@ -74,8 +74,9 @@ export const Switch = forwardRef<HTMLLabelElement, SwitchProps>(function Switch(
   onValueChange,
   startContent,
   thumbIcon,
+  ref,
   ...props
-}, ref) {
+}: SwitchProps & { ref?: Ref<HTMLLabelElement> }) {
   if (typeof children === 'function') {
     return (
       <HeroUISwitch
@@ -115,6 +116,6 @@ export const Switch = forwardRef<HTMLLabelElement, SwitchProps>(function Switch(
       ) : null}
     </HeroUISwitch>
   );
-});
+}
 
 Switch.displayName = 'Switch';

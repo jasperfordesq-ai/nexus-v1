@@ -15,7 +15,7 @@
 
 import {
   createContext,
-  useContext,
+  use,
   useState,
   useEffect,
   useCallback,
@@ -440,7 +440,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function useNotifications(): NotificationsContextValue {
-  const context = useContext(NotificationsContext);
+  const context = use(NotificationsContext);
 
   if (!context) {
     throw new Error('useNotifications must be used within a NotificationsProvider');

@@ -14,14 +14,14 @@ import React from "react";
 vi.mock('@/lib/motion', () => ({
   motion: new Proxy({}, {
     get: (_: object, prop: string | symbol) => {
-      return React.forwardRef(({ children, ...props }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
+      return ({ children, ref, ...props }: Record<string, unknown> & { ref?: React.Ref<HTMLElement> }) => {
         const motionProps = ['variants','initial','animate','exit','transition','whileHover','whileTap','layout','layoutId','viewport'];
         const clean: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(props)) {
           if (!motionProps.includes(k)) clean[k] = v;
         }
         return React.createElement(typeof prop === 'string' ? prop : 'div', { ...clean, ref }, children);
-      });
+      };
     },
   }),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => children,

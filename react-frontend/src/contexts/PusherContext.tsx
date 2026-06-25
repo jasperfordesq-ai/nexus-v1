@@ -15,7 +15,7 @@
  * Automatically subscribes to user-specific and conversation channels.
  */
 
-import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef, type ReactNode } from 'react';
+import { createContext, use, useEffect, useState, useCallback, useMemo, useRef, type ReactNode } from 'react';
 import Pusher, { type Channel } from 'pusher-js';
 import { useAuth } from './AuthContext';
 import { api, tokenManager } from '@/lib/api';
@@ -434,7 +434,7 @@ export function PusherProvider({ children }: PusherProviderProps) {
  * Hook to access Pusher context
  */
 export function usePusher(): PusherContextValue {
-  const context = useContext(PusherContext);
+  const context = use(PusherContext);
   if (!context) {
     throw new Error('usePusher must be used within a PusherProvider');
   }
@@ -445,5 +445,5 @@ export function usePusher(): PusherContextValue {
  * Hook to optionally access Pusher context (returns null if not available)
  */
 export function usePusherOptional(): PusherContextValue | null {
-  return useContext(PusherContext);
+  return use(PusherContext);
 }

@@ -5,7 +5,7 @@
 
 import {
   createContext,
-  useContext,
+  use,
   useEffect,
   useMemo,
   useState,
@@ -59,7 +59,7 @@ export function AdminMetaProvider({
 }
 
 export function useAdminPageMeta(meta: AdminPageMeta) {
-  const context = useContext(AdminMetaContext);
+  const context = use(AdminMetaContext);
   const setPageMeta = context?.setPageMeta;
   const stableMeta = useMemo(() => ({
     description: meta.description,
@@ -87,7 +87,7 @@ export function useAdminPageMeta(meta: AdminPageMeta) {
 }
 
 export function useResolvedAdminMeta() {
-  const context = useContext(AdminMetaContext);
+  const context = use(AdminMetaContext);
   if (!context) {
     throw new Error('useResolvedAdminMeta must be used within AdminMetaProvider');
   }

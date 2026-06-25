@@ -46,13 +46,13 @@ vi.mock('@/lib/motion', async () => {
   const { default: React } = await import('react');
   return {
     motion: {
-      div: React.forwardRef(
-        (props: Record<string, unknown> & { children?: React.ReactNode }, ref: React.Ref<HTMLDivElement>) => {
-          // Strip non-DOM props before forwarding
-          const { drag: _d, dragConstraints: _dc, dragElastic: _de, onDragEnd: _ode, custom: _c, variants: _v, initial: _i, animate: _a, exit: _e, transition: _t, children, ...domProps } = props;
-          return React.createElement('div', { ...domProps, ref }, children as React.ReactNode);
-        }
-      ),
+      div: (
+        { ref, ...props }: Record<string, unknown> & { children?: React.ReactNode; ref?: React.Ref<HTMLDivElement> }
+      ) => {
+        // Strip non-DOM props before forwarding
+        const { drag: _d, dragConstraints: _dc, dragElastic: _de, onDragEnd: _ode, custom: _c, variants: _v, initial: _i, animate: _a, exit: _e, transition: _t, children, ...domProps } = props;
+        return React.createElement('div', { ...domProps, ref }, children as React.ReactNode);
+      },
     },
     AnimatePresence: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
   };

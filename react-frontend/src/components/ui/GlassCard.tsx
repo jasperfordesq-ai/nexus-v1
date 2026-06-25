@@ -4,7 +4,7 @@ import { Card } from '@/components/ui';
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { forwardRef, type ReactNode, type HTMLAttributes, type MouseEvent } from 'react';
+import { type ReactNode, type HTMLAttributes, type MouseEvent, type Ref } from 'react';
 
 import { motion, type Variants } from '@/lib/motion';
 
@@ -31,20 +31,19 @@ const cardVariants: Variants = {
  *
  * Uses centralized CSS utilities from styles/glass.css
  */
-export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
-  (
-    {
-      children,
-      hoverable = false,
-      glow = 'none',
-      animated = false,
-      className = '',
-      onClick,
-      onKeyDown,
-      ...rest
-    },
-    ref
-  ) => {
+export function GlassCard(
+  {
+    children,
+    hoverable = false,
+    glow = 'none',
+    animated = false,
+    className = '',
+    onClick,
+    onKeyDown,
+    ref,
+    ...rest
+  }: GlassCardProps & { ref?: Ref<HTMLDivElement> },
+) {
     const baseClass = hoverable ? 'glass-card-hover' : 'glass-card';
     const glowClass = glow !== 'none' ? `glow-${glow}` : '';
     const combinedClassName = ['backdrop-blur-lg', baseClass, glowClass, className].filter(Boolean).join(' ');
@@ -96,8 +95,7 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
         {children}
       </Card>
     );
-  }
-);
+}
 
 GlassCard.displayName = 'GlassCard';
 

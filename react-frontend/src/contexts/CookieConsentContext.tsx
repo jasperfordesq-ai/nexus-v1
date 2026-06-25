@@ -19,7 +19,7 @@
  * - On mount (if auth token exists) → fetch server consent, prefer most recent
  */
 
-import { createContext, useContext, useState, useCallback, useMemo, useEffect, useRef, type ReactNode } from 'react';
+import { createContext, use, useState, useCallback, useMemo, useEffect, useRef, type ReactNode } from 'react';
 import { api, tokenManager } from '@/lib/api';
 import { safeLocalStorageGet, safeLocalStorageRemove, safeLocalStorageSetJSON } from '@/lib/safeStorage';
 
@@ -246,7 +246,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
 }
 
 export function useCookieConsent(): CookieConsentContextValue {
-  const ctx = useContext(CookieConsentContext);
+  const ctx = use(CookieConsentContext);
   if (!ctx) {
     throw new Error('useCookieConsent must be used within CookieConsentProvider');
   }

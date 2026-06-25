@@ -10,7 +10,7 @@
  * Supports keyboard navigation, loading states, and empty states.
  */
 
-import { forwardRef } from 'react';
+import { type Ref } from 'react';
 import { motion, AnimatePresence } from '@/lib/motion';
 
 import UserCheck from 'lucide-react/icons/user-check';
@@ -73,11 +73,9 @@ function HighlightText({ text, query }: { text: string; query: string }) {
 
 /* ─── Component ─────────────────────────────────────────────── */
 
-export const MentionAutocomplete = forwardRef<HTMLDivElement, MentionAutocompleteProps>(
-  function MentionAutocomplete(
-    { isOpen, suggestions, selectedIndex, isLoading, query, onSelect, onHover, style, className = '' },
-    ref,
-  ) {
+export function MentionAutocomplete(
+  { isOpen, suggestions, selectedIndex, isLoading, query, onSelect, onHover, style, className = '', ref }: MentionAutocompleteProps & { ref?: Ref<HTMLDivElement> },
+) {
     const { t } = useTranslation('social');
     if (!isOpen) return null;
 
@@ -159,7 +157,6 @@ export const MentionAutocomplete = forwardRef<HTMLDivElement, MentionAutocomplet
         </motion.div>
       </AnimatePresence>
     );
-  },
-);
+}
 
 export default MentionAutocomplete;

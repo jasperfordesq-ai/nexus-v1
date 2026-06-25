@@ -6,12 +6,11 @@
 import {
   createContext,
   type ComponentType,
-  forwardRef,
   type HTMLAttributes,
   type ReactNode,
   type Ref,
   useCallback,
-  useContext,
+  use,
   useMemo,
 } from 'react';
 import { Modal as HeroUIModal, ModalHeading as HeroUIModalHeading } from '@heroui/react';
@@ -170,9 +169,8 @@ export function Modal({
   );
 }
 
-export const ModalContent = forwardRef(function ModalContent(
-  { children, className, ...props }: ModalContentProps,
-  ref: Ref<HTMLDivElement>,
+export function ModalContent(
+  { children, className, ref, ...props }: ModalContentProps & { ref?: Ref<HTMLDivElement> },
 ) {
   const {
     backdrop,
@@ -188,7 +186,7 @@ export const ModalContent = forwardRef(function ModalContent(
     portalContainer,
     scrollBehavior,
     size,
-  } = useContext(ModalContext);
+  } = use(ModalContext);
 
   const handleOpenChange = useCallback((nextOpen: boolean) => {
     onOpenChange?.(nextOpen);
@@ -235,13 +233,12 @@ export const ModalContent = forwardRef(function ModalContent(
       </HeroUIModal.Container>
     </HeroUIModal.Backdrop>
   );
-});
+}
 
-export const ModalHeader = forwardRef(function ModalHeader(
-  { children, className, ...props }: ModalSectionProps,
-  ref: Ref<HTMLHeadingElement>,
+export function ModalHeader(
+  { children, className, ref, ...props }: ModalSectionProps & { ref?: Ref<HTMLHeadingElement> },
 ) {
-  const { classNames } = useContext(ModalContext);
+  const { classNames } = use(ModalContext);
 
   return (
     <HeroUIModalHeading
@@ -252,13 +249,12 @@ export const ModalHeader = forwardRef(function ModalHeader(
       {children}
     </HeroUIModalHeading>
   );
-});
+}
 
-export const ModalBody = forwardRef(function ModalBody(
-  { className, ...props }: ModalSectionProps,
-  ref: Ref<HTMLDivElement>,
+export function ModalBody(
+  { className, ref, ...props }: ModalSectionProps & { ref?: Ref<HTMLDivElement> },
 ) {
-  const { classNames } = useContext(ModalContext);
+  const { classNames } = use(ModalContext);
 
   return (
     <HeroUIModal.Body
@@ -267,13 +263,12 @@ export const ModalBody = forwardRef(function ModalBody(
       {...props}
     />
   );
-});
+}
 
-export const ModalFooter = forwardRef(function ModalFooter(
-  { className, ...props }: ModalSectionProps,
-  ref: Ref<HTMLDivElement>,
+export function ModalFooter(
+  { className, ref, ...props }: ModalSectionProps & { ref?: Ref<HTMLDivElement> },
 ) {
-  const { classNames } = useContext(ModalContext);
+  const { classNames } = use(ModalContext);
 
   return (
     <HeroUIModal.Footer
@@ -282,4 +277,4 @@ export const ModalFooter = forwardRef(function ModalFooter(
       {...props}
     />
   );
-});
+}

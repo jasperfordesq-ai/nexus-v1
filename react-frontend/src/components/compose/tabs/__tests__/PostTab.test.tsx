@@ -71,11 +71,11 @@ vi.mock('@/components/compose/ComposeSubmitContext', () => ({
   })),
 }));
 
-// Mock the lazy-loaded ComposeEditor with forwardRef to suppress ref warning
-import { forwardRef } from 'react';
-const MockEditor = forwardRef<unknown, { placeholder?: string }>(({ placeholder }, _ref) => (
+// Mock the lazy-loaded ComposeEditor (ref as a normal prop) to suppress ref warning
+import type { Ref } from 'react';
+const MockEditor = ({ placeholder, ref: _ref }: { placeholder?: string; ref?: Ref<unknown> }) => (
   <div data-testid="compose-editor">{placeholder || 'Editor'}</div>
-));
+);
 MockEditor.displayName = 'MockComposeEditor';
 
 vi.mock('@/components/compose/shared/ComposeEditor', () => ({

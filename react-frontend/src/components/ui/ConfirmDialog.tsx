@@ -29,7 +29,7 @@
 import {
   createContext,
   useCallback,
-  useContext,
+  use,
   useState,
   type ReactNode,
 } from 'react';
@@ -114,7 +114,7 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
 }
 
 export function useConfirm(): ConfirmFn {
-  const ctx = useContext(ConfirmContext);
+  const ctx = use(ConfirmContext);
   if (!ctx) {
     throw new Error('useConfirm must be used within <ConfirmDialogProvider>');
   }

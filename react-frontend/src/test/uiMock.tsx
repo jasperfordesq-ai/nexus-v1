@@ -74,7 +74,7 @@ function makeStub(name: string): unknown {
   // Overlay roots (not their compound sub-parts) honor an explicit closed state.
   const isOverlayRoot = /^(modal|drawer|alertdialog|dialog)$/.test(leaf);
 
-  const Stub = React.forwardRef<HTMLElement, AnyProps>((props, ref) => {
+  const Stub = ({ ref, ...props }: AnyProps & { ref?: React.Ref<HTMLElement> }) => {
     const { onPress, onChange, onValueChange, onClick, onKeyDown } = props as Record<string, unknown>;
     const children = resolveChildren(props.children);
     const label = props.label as ReactNode;
@@ -155,7 +155,7 @@ function makeStub(name: string): unknown {
     }
 
     return React.createElement('div', extra, ...textBits({ ...props, children }));
-  });
+  };
   Stub.displayName = `UiMock(${name})`;
   // Wrap so compound sub-components (Card.Content, Chip.Label, NumberField.Group,
   // Breadcrumbs.Item, SearchField.Input, …) resolve to nested stubs instead of

@@ -276,8 +276,8 @@ function createMotionComponent(tag: string) {
         ...rest
       } = props as MotionProps & Record<string, any>;
 
-      const presence = React.useContext(PresenceContext);
-      const parentVariants = React.useContext(VariantContext);
+      const presence = React.use(PresenceContext);
+      const parentVariants = React.use(VariantContext);
       const reduced = useReducedMotion();
 
       const localRef = React.useRef<HTMLElement | null>(null);

@@ -4,11 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React, {
-  forwardRef,
   type ElementType,
   type HTMLAttributes,
   type MouseEvent,
   type ReactNode,
+  type Ref,
 } from 'react';
 import { Card as HeroUICard, type CardProps as HeroUICardProps } from '@heroui/react';
 
@@ -101,30 +101,29 @@ function shadowClass(shadow?: V2CardShadow): string | undefined {
   }
 }
 
-const CardRoot = forwardRef<HTMLElement, CardProps>(
-  (
-    {
-      as: Component,
-      children,
-      className,
-      classNames,
-      disableAnimation: _disableAnimation,
-      disableRipple: _disableRipple,
-      fullWidth,
-      isBlurred,
-      isDisabled,
-      isFooterBlurred,
-      isHoverable,
-      isPressable,
-      onClick,
-      onPress,
-      radius,
-      shadow,
-      variant,
-      ...props
-    },
+function CardRoot(
+  {
+    as: Component,
+    children,
+    className,
+    classNames,
+    disableAnimation: _disableAnimation,
+    disableRipple: _disableRipple,
+    fullWidth,
+    isBlurred,
+    isDisabled,
+    isFooterBlurred,
+    isHoverable,
+    isPressable,
+    onClick,
+    onPress,
+    radius,
+    shadow,
+    variant,
     ref,
-  ) => {
+    ...props
+  }: CardProps & { ref?: Ref<HTMLElement> },
+) {
     const rootClassName = combineClasses(
       classNames?.base,
       fullWidth && 'w-full',
@@ -173,8 +172,7 @@ const CardRoot = forwardRef<HTMLElement, CardProps>(
         {children}
       </HeroUICard>
     );
-  },
-);
+}
 
 CardRoot.displayName = 'Card';
 

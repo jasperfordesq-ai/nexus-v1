@@ -23,14 +23,14 @@ const { toastMock } = vi.hoisted(() => ({
 
 vi.mock('@/lib/motion', () => ({
   motion: new Proxy({}, {
-    get: () => React.forwardRef(({ children, ...props }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
+    get: () => ({ children, ref, ...props }: Record<string, unknown> & { ref?: React.Ref<HTMLElement> }) => {
       const motionProps = ['variants', 'initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap', 'layout', 'layoutId', 'viewport'];
       const clean: Record<string, unknown> = {};
       for (const [k, v] of Object.entries(props)) {
         if (!motionProps.includes(k)) clean[k] = v;
       }
       return React.createElement('div', { ...clean, ref }, children as React.ReactNode);
-    }),
+    },
   }),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
 }));

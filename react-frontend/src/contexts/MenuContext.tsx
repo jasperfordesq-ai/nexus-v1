@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, use, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 import { useTenant } from './TenantContext';
 import { useMenus } from '@/hooks/useMenus';
@@ -68,7 +68,7 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function useMenuContext(): MenuContextValue {
-  const context = useContext(MenuContext);
+  const context = use(MenuContext);
   if (!context) {
     throw new Error('useMenuContext must be used within a MenuProvider');
   }

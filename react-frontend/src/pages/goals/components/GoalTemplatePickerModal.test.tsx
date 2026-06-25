@@ -63,8 +63,8 @@ vi.mock('@/lib/motion', async () => {
   const { default: React } = await import('react');
   return {
     motion: {
-      div: React.forwardRef(
-        (props: Record<string, unknown> & { children?: React.ReactNode }, ref: React.Ref<HTMLDivElement>) => {
+      div: (
+        ({ ref, ...props }: Record<string, unknown> & { children?: React.ReactNode } & { ref?: React.Ref<HTMLDivElement> }) => {
           const { initial: _i, animate: _a, exit: _e, custom: _c, variants: _v, transition: _t, children, ...domProps } = props;
           return React.createElement('div', { ...domProps, ref }, children as React.ReactNode);
         }

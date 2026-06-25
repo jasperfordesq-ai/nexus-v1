@@ -16,7 +16,7 @@
 
 import {
   createContext,
-  useContext,
+  use,
   useState,
   useEffect,
   useCallback,
@@ -726,7 +726,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function useAuth(): AuthContextValue {
-  const context = useContext(AuthContext);
+  const context = use(AuthContext);
 
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');

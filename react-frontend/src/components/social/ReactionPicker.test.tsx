@@ -29,8 +29,8 @@ vi.mock('@/lib/motion', () => ({
     get: (_target, prop) => {
       // Return a real HTML element factory so motion.div/motion.button etc. work
       const tag = String(prop);
-      return React.forwardRef(
-        (props: React.HTMLAttributes<HTMLElement> & { [key: string]: unknown }, ref: React.Ref<HTMLElement>) => {
+      return (
+        ({ ref, ...props }: React.HTMLAttributes<HTMLElement> & { [key: string]: unknown } & { ref?: React.Ref<HTMLElement> }) => {
           // Strip motion-specific props before passing to DOM element
           const { initial, animate, exit, transition, whileHover, whileTap, ...rest } = props as Record<string, unknown>;
           return React.createElement(tag as string, { ...rest, ref });

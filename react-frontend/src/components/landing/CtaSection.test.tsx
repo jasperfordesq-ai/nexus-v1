@@ -12,35 +12,35 @@ import React from 'react';
 vi.mock('@/lib/motion', () => {
   const React = require('react');
 
-  const MotionDiv = React.forwardRef(
-    ({ children, ...rest }: React.HTMLAttributes<HTMLDivElement>, ref: React.Ref<HTMLDivElement>) => {
-      const {
-        initial: _i, animate: _a, exit: _e, transition: _t, variants: _v,
-        whileHover: _wh, whileTap: _wt, whileFocus: _wf, whileInView: _wiv,
-        viewport: _vp, layout: _l, layoutId: _lid, custom: _c,
-        drag: _d, dragConstraints: _dc, dragElastic: _de,
-        onDragStart: _ods, onDragEnd: _ode,
-        ...domProps
-      } = rest as Record<string, unknown>;
-      return React.createElement('div', { ...domProps, ref }, children);
-    }
-  );
+  const MotionDiv = (
+    { children, ref, ...rest }: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }
+  ) => {
+    const {
+      initial: _i, animate: _a, exit: _e, transition: _t, variants: _v,
+      whileHover: _wh, whileTap: _wt, whileFocus: _wf, whileInView: _wiv,
+      viewport: _vp, layout: _l, layoutId: _lid, custom: _c,
+      drag: _d, dragConstraints: _dc, dragElastic: _de,
+      onDragStart: _ods, onDragEnd: _ode,
+      ...domProps
+    } = rest as Record<string, unknown>;
+    return React.createElement('div', { ...domProps, ref }, children);
+  };
 
   const motion = new Proxy({} as Record<string, typeof MotionDiv>, {
     get(_target, prop: string) {
-      return React.forwardRef(
-        ({ children, ...rest }: React.HTMLAttributes<HTMLElement>, ref: React.Ref<HTMLElement>) => {
-          const {
-            initial: _i, animate: _a, exit: _e, transition: _t, variants: _v,
-            whileHover: _wh, whileTap: _wt, whileFocus: _wf, whileInView: _wiv,
-            viewport: _vp, layout: _l, layoutId: _lid, custom: _c,
-            drag: _d, dragConstraints: _dc, dragElastic: _de,
-            onDragStart: _ods, onDragEnd: _ode,
-            ...domProps
-          } = rest as Record<string, unknown>;
-          return React.createElement(prop, { ...domProps, ref }, children);
-        }
-      );
+      return (
+        { children, ref, ...rest }: React.HTMLAttributes<HTMLElement> & { ref?: React.Ref<HTMLElement> }
+      ) => {
+        const {
+          initial: _i, animate: _a, exit: _e, transition: _t, variants: _v,
+          whileHover: _wh, whileTap: _wt, whileFocus: _wf, whileInView: _wiv,
+          viewport: _vp, layout: _l, layoutId: _lid, custom: _c,
+          drag: _d, dragConstraints: _dc, dragElastic: _de,
+          onDragStart: _ods, onDragEnd: _ode,
+          ...domProps
+        } = rest as Record<string, unknown>;
+        return React.createElement(prop, { ...domProps, ref }, children);
+      };
     },
   });
 

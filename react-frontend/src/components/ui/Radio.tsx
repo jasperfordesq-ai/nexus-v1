@@ -4,9 +4,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import {
-  forwardRef,
   type ComponentPropsWithoutRef,
   type ReactNode,
+  type Ref,
 } from 'react';
 import {
   Description,
@@ -90,7 +90,7 @@ function sizeClass(size?: RadioSize) {
   }
 }
 
-export const Radio = forwardRef<HTMLLabelElement, RadioProps>(function Radio({
+export function Radio({
   children,
   className,
   classNames,
@@ -98,8 +98,9 @@ export const Radio = forwardRef<HTMLLabelElement, RadioProps>(function Radio({
   description,
   disableAnimation: _disableAnimation,
   size,
+  ref,
   ...props
-}, ref) {
+}: RadioProps & { ref?: Ref<HTMLLabelElement> }) {
   if (typeof children === 'function') {
     return (
       <HeroUIRadio
@@ -129,11 +130,11 @@ export const Radio = forwardRef<HTMLLabelElement, RadioProps>(function Radio({
       ) : null}
     </HeroUIRadio>
   );
-});
+}
 
 Radio.displayName = 'Radio';
 
-export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(function RadioGroup({
+export function RadioGroup({
   children,
   className,
   classNames,
@@ -143,8 +144,9 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(function R
   onChange,
   onValueChange,
   size: _size,
+  ref,
   ...props
-}, ref) {
+}: RadioGroupProps & { ref?: Ref<HTMLDivElement> }) {
   if (typeof children === 'function') {
     return (
       <HeroUIRadioGroup
@@ -171,6 +173,6 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(function R
       {errorMessage ? <FieldError className={classNames?.errorMessage}>{errorMessage}</FieldError> : null}
     </HeroUIRadioGroup>
   );
-});
+}
 
 RadioGroup.displayName = 'RadioGroup';

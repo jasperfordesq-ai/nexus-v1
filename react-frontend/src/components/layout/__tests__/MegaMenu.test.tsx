@@ -60,7 +60,7 @@ vi.mock('@/lib/motion', async () => {
 });
 
 // Stub icon component
-const StubIcon: LucideIcon = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<SVGSVGElement>) =>
+const StubIcon: LucideIcon = (({ ref, ...props }: Record<string, unknown> & { ref?: React.Ref<SVGSVGElement> }) =>
   React.createElement('svg', { ...props, ref, 'data-testid': 'icon' })
 ) as unknown as LucideIcon;
 (StubIcon as { displayName: string }).displayName = 'StubIcon';

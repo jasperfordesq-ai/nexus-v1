@@ -5,13 +5,13 @@
 
 import {
   Children,
-  forwardRef,
   isValidElement,
   type ComponentPropsWithoutRef,
   type ElementType,
   type HTMLAttributes,
   type ImgHTMLAttributes,
   type ReactNode,
+  type Ref,
 } from 'react';
 import { Avatar as HeroUIAvatar } from '@heroui/react';
 
@@ -119,7 +119,7 @@ function radiusClass(radius?: AvatarRadius) {
   }
 }
 
-export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar({
+export function Avatar({
   alt,
   as: _as,
   children,
@@ -138,8 +138,9 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar({
   showFallback: _showFallback,
   size,
   src,
+  ref,
   ...props
-}, ref) {
+}: AvatarProps & { ref?: Ref<HTMLDivElement> }) {
   const fallbackContent = fallback ?? icon ?? (getInitials && name ? getInitials(name) : initialsFromName(name));
 
   return (
@@ -171,7 +172,7 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar({
       {children}
     </HeroUIAvatar>
   );
-});
+}
 
 Avatar.displayName = 'Avatar';
 

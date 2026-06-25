@@ -22,14 +22,14 @@ const motionProps = [
 export const framerMotionMock = {
   motion: new Proxy({}, {
     get: (_target: object, prop: string | symbol) => {
-      return React.forwardRef(({ children, ...props }: any, ref: any) => {
+      return ({ children, ref, ...props }: any) => {
         const clean: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(props)) {
           if (!motionProps.includes(k)) clean[k] = v;
         }
         const Tag = typeof prop === 'string' ? prop : 'div';
         return React.createElement(Tag, { ...clean, ref }, children);
-      });
+      };
     },
   }),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),

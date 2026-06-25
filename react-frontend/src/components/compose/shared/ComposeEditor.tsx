@@ -14,7 +14,7 @@
  */
 
 import {
-  forwardRef,
+  type Ref,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -406,18 +406,17 @@ function ComposeEditorErrorBoundary({ children }: { children: React.ReactNode })
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
-export const ComposeEditor = forwardRef<ComposeEditorHandle, ComposeEditorProps>(
-  function ComposeEditor(
-    {
-      value,
-      onChange,
-      onPlainTextChange,
-      placeholder = 'What would you like to share?',
-      maxLength,
-      isDisabled = false,
-    },
+export function ComposeEditor(
+  {
+    value,
+    onChange,
+    onPlainTextChange,
+    placeholder = 'What would you like to share?',
+    maxLength,
+    isDisabled = false,
     ref,
-  ) {
+  }: ComposeEditorProps & { ref?: Ref<ComposeEditorHandle> },
+) {
     const { t } = useTranslation('common');
     const editorRef = useRef<LexicalEditor | null>(null);
 
@@ -527,8 +526,7 @@ export const ComposeEditor = forwardRef<ComposeEditorHandle, ComposeEditorProps>
         )}
       </div>
     );
-  },
-);
+}
 
 /* ───────────────────────── Max Length Indicator ───────────────────────── */
 

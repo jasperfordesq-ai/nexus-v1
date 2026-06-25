@@ -8,7 +8,7 @@ import {
   createContext,
   Fragment,
   isValidElement,
-  useContext,
+  use,
   type ComponentProps,
   type ReactNode,
 } from 'react';
@@ -104,7 +104,7 @@ export function DropdownMenu<T extends object = object>({
   variant: _variant,
   ...props
 }: DropdownMenuProps<T>) {
-  const { placement, shouldBlockScroll } = useContext(DropdownContext);
+  const { placement, shouldBlockScroll } = use(DropdownContext);
   const popoverProps = shouldBlockScroll === undefined
     ? {}
     : ({ shouldBlockScroll } as Partial<HeroDropdownPopoverProps>);
@@ -155,7 +155,7 @@ export function DropdownItem({
 }: DropdownItemProps) {
   const danger = color === 'danger' || variant === 'danger';
   const resolvedTextValue = textValue ?? inferTextValue(children);
-  const selectionMode = useContext(DropdownSelectionContext);
+  const selectionMode = use(DropdownSelectionContext);
   const isSelectable = selectionMode === 'single' || selectionMode === 'multiple';
 
   return (

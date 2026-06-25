@@ -49,13 +49,13 @@ vi.mock('@/components/legal/CustomLegalDocument', () => ({
 vi.mock('@/lib/motion', () => {
   const proxy = new Proxy({}, {
     get: (_t: object, prop: string | symbol) => {
-      return React.forwardRef(({ children, ...p }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
+      return ({ children, ref, ...p }: Record<string, unknown> & { ref?: React.Ref<HTMLElement> }) => {
         const c: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(p)) {
           if (!['variants','initial','animate','exit','transition','whileHover','whileTap','whileInView','layout','viewport'].includes(k)) c[k] = v;
         }
         return React.createElement(typeof prop === 'string' ? prop : 'div', { ...c, ref }, children);
-      });
+      };
     },
   });
   return { motion: proxy, AnimatePresence: ({ children }: { children: React.ReactNode }) => children };

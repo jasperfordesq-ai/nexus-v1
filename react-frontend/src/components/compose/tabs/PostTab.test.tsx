@@ -86,15 +86,15 @@ vi.mock('@/hooks/useMediaQuery', () => ({
 
 // ─── Stub heavy compose sub-components ───────────────────────────────────────
 vi.mock('../shared/ComposeEditor', () => ({
-  ComposeEditor: React.forwardRef(function ComposeEditor(
-    { placeholder, onChange, onPlainTextChange }: {
+  ComposeEditor: function ComposeEditor(
+    { placeholder, onChange, onPlainTextChange, ref: _ref }: {
       placeholder?: string;
       onChange?: (html: string) => void;
       onPlainTextChange?: (text: string) => void;
       value?: string;
       maxLength?: number;
-    },
-    _ref: React.ForwardedRef<unknown>
+      ref?: React.ForwardedRef<unknown>;
+    }
   ) {
     return (
       <textarea
@@ -106,7 +106,7 @@ vi.mock('../shared/ComposeEditor', () => ({
         }}
       />
     );
-  }),
+  },
 }));
 
 vi.mock('../MediaUploader', () => ({

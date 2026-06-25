@@ -6,8 +6,8 @@
 import {
   type ChangeEvent,
   type CSSProperties,
-  forwardRef,
   type ReactNode,
+  type Ref,
   type TextareaHTMLAttributes,
 } from 'react';
 import {
@@ -98,7 +98,7 @@ function combineClasses(...classes: Array<string | false | undefined>): string |
   return className || undefined;
 }
 
-export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea({
+export function Textarea({
   className,
   classNames,
   color: _color,
@@ -123,8 +123,9 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   style,
   validate,
   variant,
+  ref,
   ...props
-}: TextareaProps, ref) {
+}: TextareaProps & { ref?: Ref<HTMLTextAreaElement> }) {
   const handleTextareaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     onChange?.(event);
     onValueChange?.(event.target.value);
@@ -224,4 +225,4 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
       ) : null}
     </TextField>
   );
-});
+}

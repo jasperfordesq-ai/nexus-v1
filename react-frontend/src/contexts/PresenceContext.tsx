@@ -17,7 +17,7 @@
 
 import {
   createContext,
-  useContext,
+  use,
   useEffect,
   useState,
   useCallback,
@@ -340,7 +340,7 @@ export function PresenceProvider({ children }: PresenceProviderProps) {
  * Hook to access presence context (required).
  */
 export function usePresence(): PresenceContextValue {
-  const context = useContext(PresenceContext);
+  const context = use(PresenceContext);
   if (!context) {
     throw new Error('usePresence must be used within a PresenceProvider');
   }
@@ -351,5 +351,5 @@ export function usePresence(): PresenceContextValue {
  * Hook to optionally access presence context (returns null if not available).
  */
 export function usePresenceOptional(): PresenceContextValue | null {
-  return useContext(PresenceContext);
+  return use(PresenceContext);
 }

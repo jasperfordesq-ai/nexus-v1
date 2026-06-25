@@ -28,17 +28,17 @@ import { render, screen, waitFor } from '@/test/test-utils';
 vi.mock('@/lib/motion', () => {
   const motionProxy = new Proxy({}, {
     get: (_target, prop) => {
-      return React.forwardRef(
-        ({ children, ...props }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
-          const clean = { ...props };
-          delete clean.variants; delete clean.initial; delete clean.animate;
-          delete clean.exit; delete clean.transition; delete clean.whileHover;
-          delete clean.whileTap; delete clean.whileInView; delete clean.layout;
-          delete clean.viewport;
-          const Tag = typeof prop === 'string' ? prop : 'div';
-          return React.createElement(Tag, { ...clean, ref }, children as React.ReactNode);
-        },
-      );
+      return (
+        { children, ref, ...props }: Record<string, unknown> & { ref?: React.Ref<HTMLElement> }
+      ) => {
+        const clean = { ...props };
+        delete clean.variants; delete clean.initial; delete clean.animate;
+        delete clean.exit; delete clean.transition; delete clean.whileHover;
+        delete clean.whileTap; delete clean.whileInView; delete clean.layout;
+        delete clean.viewport;
+        const Tag = typeof prop === 'string' ? prop : 'div';
+        return React.createElement(Tag, { ...clean, ref }, children as React.ReactNode);
+      };
     },
   });
   return {

@@ -4,10 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import {
-  forwardRef,
   useId,
   type ComponentPropsWithoutRef,
   type ReactNode,
+  type Ref,
 } from 'react';
 import {
   Checkbox as HeroUICheckbox,
@@ -108,7 +108,7 @@ function radiusClass(radius?: CheckboxRadius) {
   }
 }
 
-export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(function Checkbox({
+export function Checkbox({
   children,
   className,
   classNames,
@@ -128,8 +128,9 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(function Che
   // required. Valid slot names are 'selection'." Callers can still pass an
   // explicit slot when they genuinely want the collection's selection slot.
   slot = null,
+  ref,
   ...props
-}, ref) {
+}: CheckboxProps & { ref?: Ref<HTMLLabelElement> }) {
   const generatedId = useId();
   const checkboxId = id ?? generatedId;
 
@@ -176,11 +177,11 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(function Che
       ) : null}
     </HeroUICheckbox>
   );
-});
+}
 
 Checkbox.displayName = 'Checkbox';
 
-export const CheckboxGroup = forwardRef<HTMLDivElement, CheckboxGroupProps>(function CheckboxGroup({
+export function CheckboxGroup({
   children,
   className,
   classNames,
@@ -190,8 +191,9 @@ export const CheckboxGroup = forwardRef<HTMLDivElement, CheckboxGroupProps>(func
   onValueChange,
   orientation,
   size: _size,
+  ref,
   ...props
-}, ref) {
+}: CheckboxGroupProps & { ref?: Ref<HTMLDivElement> }) {
   if (typeof children === 'function') {
     return (
       <HeroUICheckboxGroup
@@ -227,6 +229,6 @@ export const CheckboxGroup = forwardRef<HTMLDivElement, CheckboxGroupProps>(func
       {children}
     </HeroUICheckboxGroup>
   );
-});
+}
 
 CheckboxGroup.displayName = 'CheckboxGroup';

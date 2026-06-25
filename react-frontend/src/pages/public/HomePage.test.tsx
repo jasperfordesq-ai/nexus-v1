@@ -53,7 +53,7 @@ vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
 vi.mock('@/lib/motion', () => {
   const motionProxy = new Proxy({}, {
     get: (_target, prop) => {
-      return React.forwardRef(({ children, ...props }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
+      return ({ children, ref, ...props }: Record<string, unknown> & { ref?: React.Ref<HTMLElement> }) => {
         const clean = { ...props };
         delete clean.variants; delete clean.initial; delete clean.animate;
         delete clean.exit; delete clean.transition; delete clean.whileHover;
@@ -61,7 +61,7 @@ vi.mock('@/lib/motion', () => {
         delete clean.viewport;
         const Tag = typeof prop === 'string' ? prop : 'div';
         return React.createElement(Tag, { ...clean, ref }, children);
-      });
+      };
     },
   });
   return {

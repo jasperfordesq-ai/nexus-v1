@@ -14,7 +14,7 @@ import React from "react";
 vi.mock("@/lib/motion", () => ({
   motion: new Proxy({}, {
     get: (_target: object, prop: string | symbol) => {
-      return React.forwardRef(({ children, ...props }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
+      return ({ children, ref, ...props }: Record<string, unknown> & { ref?: React.Ref<HTMLElement> }) => {
         const motionPropNames = ["variants","initial","animate","exit","transition","whileHover","whileTap","whileInView","layout","layoutId","viewport"];
         const clean: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(props)) {
@@ -22,7 +22,7 @@ vi.mock("@/lib/motion", () => ({
         }
         const tag = typeof prop === "string" ? prop : "div";
         return React.createElement(tag, { ...clean, ref }, children);
-      });
+      };
     },
   }),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => children,

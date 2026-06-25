@@ -5,7 +5,6 @@
 
 import {
   createContext,
-  forwardRef,
   type ComponentProps,
   type ComponentType,
   type CSSProperties,
@@ -13,7 +12,7 @@ import {
   type ReactNode,
   type Ref,
   useCallback,
-  useContext,
+  use,
   useMemo,
 } from 'react';
 import { Drawer as HeroUIDrawer } from '@heroui/react';
@@ -148,9 +147,8 @@ export function Drawer({
   );
 }
 
-export const DrawerContent = forwardRef(function DrawerContent(
-  { children, className, ...props }: DrawerContentProps,
-  ref: Ref<HTMLDivElement>,
+export function DrawerContent(
+  { children, className, ref, ...props }: DrawerContentProps & { ref?: Ref<HTMLDivElement> },
 ) {
   const {
     backdrop,
@@ -164,7 +162,7 @@ export const DrawerContent = forwardRef(function DrawerContent(
     placement,
     portalContainer,
     size,
-  } = useContext(DrawerContext);
+  } = use(DrawerContext);
 
   const handleOpenChange = useCallback((nextOpen: boolean) => {
     onOpenChange?.(nextOpen);
@@ -206,13 +204,12 @@ export const DrawerContent = forwardRef(function DrawerContent(
       </HeroUIDrawer.Content>
     </HeroUIDrawer.Backdrop>
   );
-});
+}
 
-export const DrawerHeader = forwardRef(function DrawerHeader(
-  { children, className, ...props }: DrawerSectionProps,
-  ref: Ref<HTMLDivElement>,
+export function DrawerHeader(
+  { children, className, ref, ...props }: DrawerSectionProps & { ref?: Ref<HTMLDivElement> },
 ) {
-  const { classNames } = useContext(DrawerContext);
+  const { classNames } = use(DrawerContext);
 
   return (
     <HeroUIDrawer.Header
@@ -223,13 +220,12 @@ export const DrawerHeader = forwardRef(function DrawerHeader(
       {children}
     </HeroUIDrawer.Header>
   );
-});
+}
 
-export const DrawerBody = forwardRef(function DrawerBody(
-  { className, ...props }: DrawerSectionProps,
-  ref: Ref<HTMLDivElement>,
+export function DrawerBody(
+  { className, ref, ...props }: DrawerSectionProps & { ref?: Ref<HTMLDivElement> },
 ) {
-  const { classNames } = useContext(DrawerContext);
+  const { classNames } = use(DrawerContext);
 
   return (
     <HeroUIDrawer.Body
@@ -238,13 +234,12 @@ export const DrawerBody = forwardRef(function DrawerBody(
       {...props}
     />
   );
-});
+}
 
-export const DrawerFooter = forwardRef(function DrawerFooter(
-  { className, ...props }: DrawerSectionProps,
-  ref: Ref<HTMLDivElement>,
+export function DrawerFooter(
+  { className, ref, ...props }: DrawerSectionProps & { ref?: Ref<HTMLDivElement> },
 ) {
-  const { classNames } = useContext(DrawerContext);
+  const { classNames } = use(DrawerContext);
 
   return (
     <HeroUIDrawer.Footer
@@ -253,4 +248,4 @@ export const DrawerFooter = forwardRef(function DrawerFooter(
       {...props}
     />
   );
-});
+}
