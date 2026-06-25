@@ -557,6 +557,7 @@ export function EditMarketplaceListingPage() {
               onChange={(e) => handleImageSelect(e.target.files)}
               className="hidden"
               aria-hidden="true"
+              tabIndex={-1}
             />
           </div>
 

@@ -344,6 +344,7 @@ export function MediaUploader({
         multiple
         className="hidden"
         aria-hidden="true"
+        tabIndex={-1}
         onChange={handleFileChange}
       />
 

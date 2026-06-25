@@ -162,6 +162,7 @@ export function DataManagement() {
               accept="application/json,.json"
               className="hidden"
               aria-hidden="true"
+              tabIndex={-1}
               onChange={handleFileChange}
             />
 

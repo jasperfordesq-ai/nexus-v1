@@ -294,6 +294,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
           className="hidden"
           onChange={handleFileSelect}
           aria-hidden="true"
+          tabIndex={-1}
         />
       </div>
 

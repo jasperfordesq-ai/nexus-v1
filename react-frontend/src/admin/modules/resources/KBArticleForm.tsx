@@ -552,6 +552,7 @@ export function KBArticleForm() {
                   onChange={handleFileSelect}
                   className="hidden"
                   aria-hidden="true"
+                  tabIndex={-1}
                 />
               </div>
             )}

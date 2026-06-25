@@ -501,6 +501,7 @@ export function AdminSettings() {
                 className="hidden"
                 onChange={handlePartnerLogoUpload}
                 aria-hidden="true"
+                tabIndex={-1}
               />
               <div className="flex gap-2 flex-wrap">
                 <Button
@@ -562,6 +563,7 @@ export function AdminSettings() {
                 className="hidden"
                 onChange={(e) => handleHeaderLogoUpload('light', e)}
                 aria-hidden="true"
+                tabIndex={-1}
               />
               <div className="flex gap-2 flex-wrap">
                 <Button
@@ -603,6 +605,7 @@ export function AdminSettings() {
                 className="hidden"
                 onChange={(e) => handleHeaderLogoUpload('dark', e)}
                 aria-hidden="true"
+                tabIndex={-1}
               />
               <div className="flex gap-2 flex-wrap">
                 <Button
@@ -770,6 +773,7 @@ export function AdminSettings() {
                   className="hidden"
                   onChange={(e) => handlePoweredByUpload('light', e)}
                   aria-hidden="true"
+                  tabIndex={-1}
                 />
                 <Button
                   variant="secondary" size="sm"
@@ -812,6 +816,7 @@ export function AdminSettings() {
                   className="hidden"
                   onChange={(e) => handlePoweredByUpload('dark', e)}
                   aria-hidden="true"
+                  tabIndex={-1}
                 />
                 <Button
                   variant="secondary" size="sm"

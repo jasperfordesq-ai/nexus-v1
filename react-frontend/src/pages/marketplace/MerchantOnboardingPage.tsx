@@ -681,6 +681,7 @@ export function MerchantOnboardingPage() {
                 accept="image/*"
                 className="hidden"
                 aria-hidden="true"
+                tabIndex={-1}
                 onChange={e => {
                   const file = e.target.files?.[0];
                   if (file) handleAvatarFile(file);
@@ -725,6 +726,7 @@ export function MerchantOnboardingPage() {
                 accept="image/*"
                 className="hidden"
                 aria-hidden="true"
+                tabIndex={-1}
                 onChange={e => {
                   const file = e.target.files?.[0];
                   if (file) handleCoverFile(file);

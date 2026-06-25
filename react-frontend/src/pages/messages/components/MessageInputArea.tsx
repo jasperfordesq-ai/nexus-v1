@@ -227,6 +227,7 @@ export function MessageInputArea({
             className="hidden"
             onChange={onFileSelect}
             aria-hidden="true"
+            tabIndex={-1}
           />
           {/* Attachment button */}
           <Button

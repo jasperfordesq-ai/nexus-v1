@@ -240,6 +240,7 @@ export function GroupEdit() {
                   className="hidden"
                   onChange={(e) => handleImageUpload(e, 'avatar')}
                   aria-hidden="true"
+                  tabIndex={-1}
                 />
               </div>
 
@@ -270,6 +271,7 @@ export function GroupEdit() {
                   className="hidden"
                   onChange={(e) => handleImageUpload(e, 'cover')}
                   aria-hidden="true"
+                  tabIndex={-1}
                 />
               </div>
             </div>

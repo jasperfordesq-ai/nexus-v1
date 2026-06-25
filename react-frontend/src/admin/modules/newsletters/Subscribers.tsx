@@ -688,6 +688,7 @@ export function Subscribers() {
                 className="hidden"
                 onChange={handleFileSelect}
                 aria-hidden="true"
+                tabIndex={-1}
               />
 
               {importRows.length > 0 && (

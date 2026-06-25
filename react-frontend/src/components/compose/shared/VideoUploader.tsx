@@ -77,6 +77,7 @@ export function VideoUploader({ onVideoSelect, onVideoRemove, selectedVideo }: V
         className="hidden"
         onChange={handleChange}
         aria-hidden="true"
+        tabIndex={-1}
       />
 
       {!selectedVideo && (

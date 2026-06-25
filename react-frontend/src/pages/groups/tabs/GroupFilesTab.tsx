@@ -278,6 +278,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
           className="hidden"
           onChange={handleFileSelect}
           aria-hidden="true"
+          tabIndex={-1}
         />
       </div>
 

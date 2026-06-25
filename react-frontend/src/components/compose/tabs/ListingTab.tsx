@@ -291,6 +291,7 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
           className="hidden"
           onChange={handleImageSelect}
           aria-hidden="true"
+          tabIndex={-1}
         />
         {imagePreview ? (
           <div className="relative inline-block rounded-xl overflow-hidden border border-[var(--border-default)]">

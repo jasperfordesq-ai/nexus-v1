@@ -462,6 +462,7 @@ export function CreateMarketplaceListingPage() {
               ref={fileInputRef}
               type="file"
               aria-hidden="true"
+              tabIndex={-1}
               accept="image/*"
               multiple
               onChange={(e) => handleImageSelect(e.target.files)}
@@ -561,6 +562,7 @@ export function CreateMarketplaceListingPage() {
                 ref={videoInputRef}
                 type="file"
                 aria-hidden="true"
+                tabIndex={-1}
                 accept="video/mp4,video/webm,video/quicktime"
                 onChange={(e) => handleVideoSelect(e.target.files)}
                 className="hidden"

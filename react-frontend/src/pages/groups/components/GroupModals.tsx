@@ -290,6 +290,7 @@ export function GroupSettingsModal({
                       accept="image/*"
                       className="hidden"
                       aria-hidden="true"
+                      tabIndex={-1}
                       disabled={uploadingImage}
                       onChange={(e) => onImageUpload(e, 'avatar')}
                     />
@@ -318,6 +319,7 @@ export function GroupSettingsModal({
                       accept="image/*"
                       className="hidden"
                       aria-hidden="true"
+                      tabIndex={-1}
                       disabled={uploadingImage}
                       onChange={(e) => onImageUpload(e, 'cover')}
                     />

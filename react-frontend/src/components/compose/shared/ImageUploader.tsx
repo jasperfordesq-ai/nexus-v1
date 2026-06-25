@@ -65,6 +65,7 @@ export function ImageUploader({
         className="hidden"
         onChange={handleChange}
         aria-hidden="true"
+        tabIndex={-1}
       />
 
       {preview && (
