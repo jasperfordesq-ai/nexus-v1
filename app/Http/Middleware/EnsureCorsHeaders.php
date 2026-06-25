@@ -59,8 +59,9 @@ class EnsureCorsHeaders
         // Federation endpoints (Komunitin + Credit Commons) are queried by external
         // partner instances from unknown origins.
         // GET (read-only) requests keep the permissive wildcard policy.
-        // Write operations (POST, PUT, PATCH, DELETE) require the Origin to be in
-        // the federation_tenant_whitelist table to prevent unauthorized mutations.
+        // Write operations (POST, PUT, PATCH, DELETE) require the Origin to match a
+        // registered, active remote partner in federation_external_partners to prevent
+        // unauthorized mutations.
         if ($this->isFederationPath($path)) {
             $method = strtoupper($request->method());
             $isWriteMethod = in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'], true);
@@ -99,21 +100,66 @@ class EnsureCorsHeaders
     }
 
     /**
-     * Check whether the given origin is registered in the federation whitelist.
-     * Matches on the base URL (scheme + host) stored in federation_tenant_whitelist.
+     * Check whether the given origin belongs to a registered, active remote
+     * federation partner.
+     *
+     * Remote partner servers are stored in federation_external_partners, keyed by
+     * the partner's base URL (scheme + host, e.g. https://partner.example.com) with
+     * a status of pending/active/suspended/failed. A federation write is only
+     * permitted from a partner whose base_url matches the request Origin and whose
+     * status is 'active'. (federation_tenant_whitelist is a separate concept — it is
+     * the local-tenant approval list keyed by tenant_id and holds no remote URLs.)
      */
     private function isFederationOriginWhitelisted(string $origin): bool
     {
-        try {
-            $count = \Illuminate\Support\Facades\DB::table('federation_tenant_whitelist')
-                ->where('remote_url', 'like', rtrim($origin, '/') . '%')
-                ->where('is_active', true)
-                ->count();
-            return $count > 0;
-        } catch (\Throwable) {
-            // If the table doesn't exist or query fails, deny by default
+        // The Origin header is fully attacker-controlled on these server-to-server
+        // federation calls, so it must NEVER be interpolated into a SQL LIKE
+        // pattern: a crafted "https://%" (or "_" wildcards) would match every
+        // active partner and bypass the whitelist entirely. Normalise both sides
+        // to a scheme://host[:port] origin and require an exact, case-insensitive
+        // match — no pattern semantics, no prefix matching.
+        $needle = $this->normaliseOrigin($origin);
+        if ($needle === null) {
             return false;
         }
+
+        try {
+            $baseUrls = \Illuminate\Support\Facades\DB::table('federation_external_partners')
+                ->where('status', 'active')
+                ->pluck('base_url');
+        } catch (\Throwable) {
+            // If the table doesn't exist or the query fails, deny by default.
+            return false;
+        }
+
+        foreach ($baseUrls as $baseUrl) {
+            if ($this->normaliseOrigin((string) $baseUrl) === $needle) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Reduce a URL to its case-insensitive origin (scheme://host[:port]), or null
+     * if it has no scheme/host. Used to compare a request Origin against partner
+     * base URLs by exact value, never as a SQL/LIKE pattern. Tolerates partner
+     * base URLs that carry a trailing slash, path, or port.
+     */
+    private function normaliseOrigin(string $url): ?string
+    {
+        $parts = parse_url(trim($url));
+        if ($parts === false || empty($parts['scheme']) || empty($parts['host'])) {
+            return null;
+        }
+
+        $origin = strtolower($parts['scheme']) . '://' . strtolower($parts['host']);
+        if (isset($parts['port'])) {
+            $origin .= ':' . $parts['port'];
+        }
+
+        return $origin;
     }
 
     private function renderException(Request $request, \Throwable $e): Response

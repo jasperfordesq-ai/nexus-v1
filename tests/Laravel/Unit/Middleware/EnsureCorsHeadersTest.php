@@ -129,29 +129,142 @@ class EnsureCorsHeadersTest extends TestCase
     }
 
     /**
-     * Federation write from any origin → 403 because the whitelist query fails.
+     * Federation write from a registered, ACTIVE remote partner origin → allowed,
+     * with ACAO reflecting the specific origin.
      *
-     * NOTE: EnsureCorsHeaders::isFederationOriginWhitelisted() queries
-     * federation_tenant_whitelist.remote_url and .is_active, but the actual
-     * schema (confirmed via DESCRIBE) has only: tenant_id, approved_at,
-     * approved_by, notes. Those columns don't exist, so every call throws a
-     * QueryException, the catch block returns false, and ALL federation writes
-     * are blocked with 403. This test asserts the ACTUAL runtime behavior.
-     * The source middleware has a schema mismatch that should be fixed in a
-     * follow-up migration.
+     * The whitelist source is federation_external_partners (base_url + status),
+     * NOT federation_tenant_whitelist (which is the local-tenant approval list,
+     * keyed by tenant_id, and holds no remote URLs). A partner row whose base_url
+     * matches the request Origin and whose status is 'active' authorizes the write.
      */
-    public function test_federation_write_always_returns_403_due_to_whitelist_schema_mismatch(): void
+    public function test_federation_write_from_whitelisted_active_partner_origin_is_allowed(): void
     {
-        // NOTE: Even a "trusted" origin gets 403 because the whitelist query
-        // throws (missing columns) and the catch block denies by default.
+        $origin = 'https://trusted-partner.example.org';
+        $tenantId = (int) DB::table('tenants')->min('id');
+
+        DB::table('federation_external_partners')->insert([
+            'tenant_id' => $tenantId,
+            'name'      => 'Trusted Partner',
+            'base_url'  => $origin,
+            'status'    => 'active',
+        ]);
+
         $request = Request::create('/v2/federation/komunitin/transfers', 'POST');
-        $request->headers->set('Origin', 'https://trusted-partner.example.org');
+        $request->headers->set('Origin', $origin);
+
+        $response = $this->middleware->handle($request, $this->makeNext());
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals($origin, $response->headers->get('Access-Control-Allow-Origin'));
+    }
+
+    /**
+     * Federation write from a registered partner that is NOT active (e.g. pending
+     * or suspended) → 403. Only status='active' partners may mutate.
+     */
+    public function test_federation_write_from_non_active_partner_origin_returns_403(): void
+    {
+        $origin = 'https://pending-partner.example.org';
+        $tenantId = (int) DB::table('tenants')->min('id');
+
+        DB::table('federation_external_partners')->insert([
+            'tenant_id' => $tenantId,
+            'name'      => 'Pending Partner',
+            'base_url'  => $origin,
+            'status'    => 'pending',
+        ]);
+
+        $request = Request::create('/v2/federation/komunitin/transfers', 'POST');
+        $request->headers->set('Origin', $origin);
 
         $response = $this->middleware->handle($request, $this->makeNext());
 
         $this->assertEquals(403, $response->getStatusCode());
         $data = json_decode($response->getContent(), true);
         $this->assertStringContainsString('federation whitelist', $data['message']);
+    }
+
+    /**
+     * Security regression: the Origin header is attacker-controlled on these
+     * server-to-server calls, so SQL LIKE wildcards in it must NOT bypass the
+     * whitelist. With an active partner present, crafted wildcard origins must
+     * still be rejected — they must not match every (or any non-equal) active
+     * partner. (Previously the origin was used as a LIKE prefix pattern, so
+     * "https://%" matched all active partners.)
+     */
+    public function test_federation_write_with_like_wildcard_origin_does_not_bypass_whitelist(): void
+    {
+        $tenantId = (int) DB::table('tenants')->min('id');
+        DB::table('federation_external_partners')->insert([
+            'tenant_id' => $tenantId,
+            'name'      => 'Active Partner',
+            'base_url'  => 'https://real-partner.example.org',
+            'status'    => 'active',
+        ]);
+
+        foreach (['https://%', 'https://_____', 'https://real-partner.example.%'] as $craftedOrigin) {
+            $request = Request::create('/v2/federation/cc/transfers', 'POST');
+            $request->headers->set('Origin', $craftedOrigin);
+
+            $response = $this->middleware->handle($request, $this->makeNext());
+
+            $this->assertEquals(
+                403,
+                $response->getStatusCode(),
+                "Crafted origin {$craftedOrigin} must not bypass the federation whitelist"
+            );
+        }
+    }
+
+    /**
+     * Security regression: a short prefix of a real partner's origin must NOT
+     * authorize a write. With an active partner "https://trusted-partner.example.org",
+     * an Origin of "https://trusted-partner" must be rejected (the old LIKE prefix
+     * match would have allowed it).
+     */
+    public function test_federation_write_with_prefix_origin_does_not_match_partner(): void
+    {
+        $tenantId = (int) DB::table('tenants')->min('id');
+        DB::table('federation_external_partners')->insert([
+            'tenant_id' => $tenantId,
+            'name'      => 'Active Partner',
+            'base_url'  => 'https://trusted-partner.example.org',
+            'status'    => 'active',
+        ]);
+
+        $request = Request::create('/v2/federation/komunitin/transfers', 'POST');
+        $request->headers->set('Origin', 'https://trusted-partner');
+
+        $response = $this->middleware->handle($request, $this->makeNext());
+
+        $this->assertEquals(403, $response->getStatusCode());
+    }
+
+    /**
+     * A partner base_url stored with a path (or trailing slash) still authorizes a
+     * write from the matching scheme://host origin: both sides are normalised to
+     * their origin before the exact comparison.
+     */
+    public function test_federation_write_matches_partner_base_url_with_path(): void
+    {
+        $tenantId = (int) DB::table('tenants')->min('id');
+        DB::table('federation_external_partners')->insert([
+            'tenant_id' => $tenantId,
+            'name'      => 'Pathful Partner',
+            'base_url'  => 'https://pathful-partner.example.org/api/v1/federation',
+            'status'    => 'active',
+        ]);
+
+        $request = Request::create('/v2/federation/komunitin/transfers', 'POST');
+        $request->headers->set('Origin', 'https://pathful-partner.example.org');
+
+        $response = $this->middleware->handle($request, $this->makeNext());
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(
+            'https://pathful-partner.example.org',
+            $response->headers->get('Access-Control-Allow-Origin')
+        );
     }
 
     /** If inner layer already set ACAO header, this middleware must not override it */

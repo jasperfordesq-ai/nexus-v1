@@ -13,6 +13,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -73,10 +74,22 @@ class RegistrationOnboardingTest extends TestCase
         // the tenant's settings cache to force a clean reload from the test DB.
         app(\App\Services\TenantSettingsService::class)->clearCacheForTenant($this->testTenantId);
 
-        // Seed some categories for onboarding interest selection
-        Category::factory()->forTenant($this->testTenantId)->count(3)->create([
-            'type' => 'listing',
-        ]);
+        // Seed some categories for onboarding interest selection.
+        //
+        // Use explicit, guaranteed-unique names/slugs instead of the factory's
+        // faker->unique()->words(2) default. Faker's uniqueness is in-memory
+        // only and does not account for category rows already committed by other
+        // tests in the same shard, so the short two-word names intermittently
+        // collided with the `unique_name_tenant` constraint (e.g. duplicate
+        // "Et et"), failing this test non-deterministically under sharded CI.
+        foreach (range(1, 3) as $i) {
+            $suffix = Str::lower(Str::random(8));
+            Category::factory()->forTenant($this->testTenantId)->create([
+                'type' => 'listing',
+                'name' => "Onboarding Interest {$i} {$suffix}",
+                'slug' => "onboarding-interest-{$i}-{$suffix}",
+            ]);
+        }
     }
 
     // =========================================================================
