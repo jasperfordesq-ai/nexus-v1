@@ -413,7 +413,7 @@ export function IdeaDetailPage() {
             '@type': 'CreativeWork',
             name: idea?.title,
             ...(idea?.description ? { description: idea.description.substring(0, 300) } : {}),
-          })}
+          }).replace(/</g, '\\u003c')}
         </script>
       </Helmet>
       {/* Back link */}

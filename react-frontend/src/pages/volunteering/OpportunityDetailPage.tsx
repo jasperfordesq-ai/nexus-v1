@@ -807,7 +807,7 @@ export function OpportunityDetailPage() {
             ...(opp.organization ? { agent: { '@type': 'Organization', name: opp.organization.name } } : {}),
             ...(opp.start_date ? { startTime: opp.start_date } : {}),
             ...(opp.end_date ? { endTime: opp.end_date } : {}),
-          })}
+          }).replace(/</g, '\\u003c')}
         </script>
       </Helmet>
 

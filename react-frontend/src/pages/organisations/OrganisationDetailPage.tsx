@@ -302,7 +302,7 @@ export function OrganisationDetailPage() {
             ...(organisation?.logo_url ? { logo: organisation.logo_url } : {}),
             ...(organisation?.website ? { url: organisation.website } : {}),
             ...(organisation?.email ? { email: organisation.email } : {}),
-          })}
+          }).replace(/</g, '\\u003c')}
         </script>
       </Helmet>
       {/* Breadcrumbs */}

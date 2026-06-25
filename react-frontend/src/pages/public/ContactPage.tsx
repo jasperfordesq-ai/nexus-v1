@@ -107,7 +107,7 @@ export function ContactPage() {
       {contactPointSchema && (
         <Helmet>
           <script type="application/ld+json">
-            {JSON.stringify(contactPointSchema)}
+            {JSON.stringify(contactPointSchema).replace(/</g, '\\u003c')}
           </script>
         </Helmet>
       )}

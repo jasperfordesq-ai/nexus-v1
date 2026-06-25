@@ -261,7 +261,7 @@ export function BlogPostPage() {
       {/* Article JSON-LD structured data */}
       <Helmet>
         <script type="application/ld+json">
-          {JSON.stringify(articleStructuredData)}
+          {JSON.stringify(articleStructuredData).replace(/</g, '\\u003c')}
         </script>
       </Helmet>
 

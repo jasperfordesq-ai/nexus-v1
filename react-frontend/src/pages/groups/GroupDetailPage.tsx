@@ -1086,7 +1086,7 @@ export function GroupDetailPage() {
               ...(group?.description ? { description: group.description.substring(0, 300) } : {}),
               ...(group?.image_url || group?.cover_image_url ? { image: group.image_url || group.cover_image_url } : {}),
               ...(group?.member_count ? { numberOfEmployees: { '@type': 'QuantitativeValue', value: group.member_count } } : {}),
-            })}
+            }).replace(/</g, '\\u003c')}
           </script>
         </Helmet>
       )}

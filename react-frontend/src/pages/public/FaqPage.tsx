@@ -374,7 +374,7 @@ export function FaqPage() {
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <PageMeta title={t('faq.page_title')} description={t('faq.meta_description')} />
       <Helmet>
-        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
+        <script type="application/ld+json">{JSON.stringify(faqSchema).replace(/</g, '\\u003c')}</script>
       </Helmet>
       <motion.div
         variants={containerVariants}

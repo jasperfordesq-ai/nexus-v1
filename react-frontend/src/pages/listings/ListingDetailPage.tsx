@@ -426,7 +426,7 @@ export function ListingDetailPage() {
       />
       <Helmet>
         <script type="application/ld+json">
-          {JSON.stringify(listingStructuredData)}
+          {JSON.stringify(listingStructuredData).replace(/</g, '\\u003c')}
         </script>
       </Helmet>
       {/* Breadcrumbs */}

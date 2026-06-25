@@ -805,7 +805,7 @@ export function ChallengeDetailPage() {
             name: challenge?.title,
             ...(challenge?.description ? { description: challenge.description.substring(0, 300) } : {}),
             ...(challenge?.cover_image ? { image: resolveAssetUrl(challenge.cover_image) } : {}),
-          })}
+          }).replace(/</g, '\\u003c')}
         </script>
       </Helmet>
       {/* Back link */}

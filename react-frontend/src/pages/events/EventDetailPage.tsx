@@ -589,7 +589,7 @@ export function EventDetailPage() {
               '@type': 'Person',
               name: organizerName,
             },
-          })}
+          }).replace(/</g, '\\u003c')}
         </script>
       </Helmet>
 

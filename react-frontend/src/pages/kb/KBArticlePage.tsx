@@ -256,7 +256,7 @@ export function KBArticlePage() {
             ...(article?.excerpt ? { description: article.excerpt } : {}),
             ...(article?.updated_at ? { dateModified: article.updated_at } : {}),
             ...(article?.created_at ? { datePublished: article.created_at } : {}),
-          })}
+          }).replace(/</g, '\\u003c')}
         </script>
       </Helmet>
       {/* Breadcrumb */}

@@ -171,13 +171,13 @@ export function SeoHead() {
           Contains address, contact, sameAs links — used by Google Knowledge
           Graph, Bing, and AI assistants to identify and describe the org. */}
       <script type="application/ld+json">
-        {JSON.stringify(orgSchema)}
+        {JSON.stringify(orgSchema).replace(/</g, '\\u003c')}
       </script>
 
       {/* WebSite JSON-LD with SearchAction — enables sitelinks searchbox
           in Google results. */}
       <script type="application/ld+json">
-        {JSON.stringify(webSiteSchema)}
+        {JSON.stringify(webSiteSchema).replace(/</g, '\\u003c')}
       </script>
 
       {/* Geo meta tags — help Google and Bing assign geographic context to
@@ -196,7 +196,7 @@ export function SeoHead() {
       {/* BreadcrumbList JSON-LD (only on non-homepage routes) */}
       {pathSegments.length > 0 && (
         <script type="application/ld+json">
-          {JSON.stringify(breadcrumbSchema)}
+          {JSON.stringify(breadcrumbSchema).replace(/</g, '\\u003c')}
         </script>
       )}
     </Helmet>
