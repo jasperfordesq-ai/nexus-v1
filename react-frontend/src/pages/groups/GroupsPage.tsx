@@ -38,6 +38,19 @@ const ITEMS_PER_PAGE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 const MAX_VISIBLE_TAGS = 3;
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function GroupsPage() {
   const { t } = useTranslation('groups');
   usePageTitle(t('title'));
@@ -192,19 +205,6 @@ export function GroupsPage() {
         return t('filter_all');
     }
   }
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   return (
     <div className="space-y-6">

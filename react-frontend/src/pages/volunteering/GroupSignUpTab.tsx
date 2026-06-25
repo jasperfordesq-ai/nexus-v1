@@ -64,6 +64,16 @@ interface GroupReservation {
   created_at: string;
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 /* ───────────────────────── Component ───────────────────────── */
 
 export function GroupSignUpTab() {
@@ -234,16 +244,6 @@ export function GroupSignUpTab() {
       case 'declined': return <XCircle className="w-3 h-3 text-[var(--color-error)]" />;
       default: return <Hourglass className="w-3 h-3 text-[var(--color-warning)]" />;
     }
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   return (

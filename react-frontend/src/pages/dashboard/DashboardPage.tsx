@@ -170,6 +170,9 @@ function DashboardEmptyState({ icon, title, description, actionTo, actionLabel }
   );
 }
 
+const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08 } } };
+const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 15 } } };
+
 export function DashboardPage() {
   const { t } = useTranslation('dashboard');
   usePageTitle(t('meta.title'));
@@ -271,8 +274,6 @@ export function DashboardPage() {
 
   useEffect(() => { loadDashboardData(); }, [loadDashboardData]);
 
-  const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08 } } };
-  const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 15 } } };
   const levelProgress = normalizePercent(stats.gamification?.level_progress);
   const walletBalanceValue = stats.walletBalance ? t('stats.hours_value', { value: stats.walletBalance.balance }) : '\u2014';
 
@@ -679,15 +680,16 @@ interface StatCardProps {
   color: 'indigo' | 'emerald' | 'amber' | 'rose'; href: string; isLoading?: boolean;
 }
 
+const colorClasses = {
+  indigo: 'bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300',
+  emerald: 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300',
+  amber: 'bg-amber-500/10 text-amber-600 dark:bg-amber-500/15 dark:text-amber-300',
+  rose: 'bg-rose-500/10 text-rose-600 dark:bg-rose-500/15 dark:text-rose-300',
+};
+
 function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps) {
   const { tenantPath } = useTenant();
   const { t } = useTranslation('dashboard');
-  const colorClasses = {
-    indigo: 'bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300',
-    emerald: 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300',
-    amber: 'bg-amber-500/10 text-amber-600 dark:bg-amber-500/15 dark:text-amber-300',
-    rose: 'bg-rose-500/10 text-rose-600 dark:bg-rose-500/15 dark:text-rose-300',
-  };
   return (
     <Link to={tenantPath(href)} aria-label={`${label}: ${isLoading ? t('common.loading') : value}`} className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-base)]">
       <GlassCard hoverable className="min-h-[124px] p-4 focus-within:ring-2 focus-within:ring-accent/40">

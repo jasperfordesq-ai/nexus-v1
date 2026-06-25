@@ -51,6 +51,16 @@ interface EmergencyAlert {
   created_at: string;
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function EmergencyAlertsTab() {
   const { t } = useTranslation('volunteering');
   const toast = useToast();
@@ -126,16 +136,6 @@ export function EmergencyAlertsTab() {
     critical: { color: 'danger' as const, label: t('emergency.priority_critical'), bgClass: 'border-red-500/30 bg-red-500/5' },
     urgent: { color: 'warning' as const, label: t('emergency.priority_urgent'), bgClass: 'border-amber-500/30 bg-amber-500/5' },
     normal: { color: 'primary' as const, label: t('emergency.priority_normal'), bgClass: '' },
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   return (

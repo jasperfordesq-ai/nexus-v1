@@ -34,6 +34,14 @@ interface MenuItem {
   item_count: number;
 }
 
+const LOCATIONS: string[] = [
+  'header-main',
+  'header-secondary',
+  'footer',
+  'sidebar',
+  'mobile',
+];
+
 export function MenusAdmin() {
   const { t } = useTranslation('admin');
   usePageTitle(t('content.page_title'));
@@ -46,14 +54,6 @@ export function MenusAdmin() {
   const [confirmDelete, setConfirmDelete] = useState<MenuItem | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [locationFilter, setLocationFilter] = useState<string | null>(null);
-
-  const LOCATIONS: string[] = [
-    'header-main',
-    'header-secondary',
-    'footer',
-    'sidebar',
-    'mobile',
-  ];
 
   const LOCATION_LABELS: Record<string, string> = {
     'header-main': t('content.location_header_main'),

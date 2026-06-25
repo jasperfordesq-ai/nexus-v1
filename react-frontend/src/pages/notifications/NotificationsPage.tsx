@@ -43,6 +43,19 @@ import type { Notification } from '@/types/api';
 
 type NotificationFilter = 'all' | 'unread';
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: { opacity: 1, x: 0 },
+};
+
 export function NotificationsPage() {
   const { t } = useTranslation('notifications');
   usePageTitle(t('page_title'));
@@ -293,19 +306,6 @@ export function NotificationsPage() {
 
   const unreadCount = notifications.filter((n) => !n.read_at).length;
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0 },
-  };
-
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <PageMeta title={t('page_meta.title')} noIndex />
@@ -474,6 +474,32 @@ interface NotificationCardProps {
   onDelete: () => void;
 }
 
+const iconMap: Record<string, { icon: React.ReactNode; color: string }> = {
+  message: { icon: <MessageSquare className="w-5 h-5" aria-hidden="true" />, color: 'indigo' },
+  listing: { icon: <ListTodo className="w-5 h-5" aria-hidden="true" />, color: 'emerald' },
+  transaction: { icon: <Wallet className="w-5 h-5" aria-hidden="true" />, color: 'amber' },
+  connection: { icon: <User className="w-5 h-5" aria-hidden="true" />, color: 'purple' },
+  event: { icon: <Calendar className="w-5 h-5" aria-hidden="true" />, color: 'rose' },
+  group: { icon: <Users className="w-5 h-5" aria-hidden="true" />, color: 'teal' },
+  achievement: { icon: <Award className="w-5 h-5" aria-hidden="true" />, color: 'orange' },
+  safeguarding_flag: { icon: <ShieldAlert className="w-5 h-5" aria-hidden="true" />, color: 'red' },
+  safeguarding_assignment: { icon: <Shield className="w-5 h-5" aria-hidden="true" />, color: 'blue' },
+  broker_review: { icon: <Eye className="w-5 h-5" aria-hidden="true" />, color: 'amber' },
+};
+
+const colorClasses: Record<string, string> = {
+  indigo: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400',
+  emerald: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
+  amber: 'bg-amber-500/20 text-amber-600 dark:text-amber-400',
+  purple: 'bg-purple-500/20 text-purple-600 dark:text-purple-400',
+  rose: 'bg-rose-500/20 text-rose-600 dark:text-rose-400',
+  teal: 'bg-teal-500/20 text-teal-600 dark:text-teal-400',
+  orange: 'bg-orange-500/20 text-orange-600 dark:text-orange-400',
+  red: 'bg-red-500/20 text-red-600 dark:text-red-400',
+  blue: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',
+  gray: 'bg-theme-elevated text-theme-muted',
+};
+
 const NotificationCard = memo(function NotificationCard({ notification, onMarkRead, onDelete }: NotificationCardProps) {
   const { t } = useTranslation('notifications');
   const navigate = useNavigate();
@@ -491,33 +517,7 @@ const NotificationCard = memo(function NotificationCard({ notification, onMarkRe
     navigate(tenantPath(notification.link));
   }
 
-  const iconMap: Record<string, { icon: React.ReactNode; color: string }> = {
-    message: { icon: <MessageSquare className="w-5 h-5" aria-hidden="true" />, color: 'indigo' },
-    listing: { icon: <ListTodo className="w-5 h-5" aria-hidden="true" />, color: 'emerald' },
-    transaction: { icon: <Wallet className="w-5 h-5" aria-hidden="true" />, color: 'amber' },
-    connection: { icon: <User className="w-5 h-5" aria-hidden="true" />, color: 'purple' },
-    event: { icon: <Calendar className="w-5 h-5" aria-hidden="true" />, color: 'rose' },
-    group: { icon: <Users className="w-5 h-5" aria-hidden="true" />, color: 'teal' },
-    achievement: { icon: <Award className="w-5 h-5" aria-hidden="true" />, color: 'orange' },
-    safeguarding_flag: { icon: <ShieldAlert className="w-5 h-5" aria-hidden="true" />, color: 'red' },
-    safeguarding_assignment: { icon: <Shield className="w-5 h-5" aria-hidden="true" />, color: 'blue' },
-    broker_review: { icon: <Eye className="w-5 h-5" aria-hidden="true" />, color: 'amber' },
-  };
-
   const { icon, color } = iconMap[notification.type] || { icon: <Bell className="w-5 h-5" aria-hidden="true" />, color: 'gray' };
-
-  const colorClasses: Record<string, string> = {
-    indigo: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400',
-    emerald: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
-    amber: 'bg-amber-500/20 text-amber-600 dark:text-amber-400',
-    purple: 'bg-purple-500/20 text-purple-600 dark:text-purple-400',
-    rose: 'bg-rose-500/20 text-rose-600 dark:text-rose-400',
-    teal: 'bg-teal-500/20 text-teal-600 dark:text-teal-400',
-    orange: 'bg-orange-500/20 text-orange-600 dark:text-orange-400',
-    red: 'bg-red-500/20 text-red-600 dark:text-red-400',
-    blue: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',
-    gray: 'bg-theme-elevated text-theme-muted',
-  };
 
   return (
     <GlassCard className={`p-4 ${isUnread ? 'ring-1 ring-indigo-500/30' : ''} ${hasLink ? 'hover:bg-theme-hover/50 transition-colors' : ''}`}>

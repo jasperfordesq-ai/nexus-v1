@@ -66,6 +66,18 @@ const TYPE_COLOR: Record<WalletTransaction['type'], 'success' | 'warning' | 'dan
   admin_adjustment: 'primary',
 };
 
+/* ───────────────────────── Animation variants ───────────────────────── */
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 /* ───────────────────────── Component ───────────────────────── */
 
 export function OrgWalletTab({ orgId, balance, onBalanceChange }: OrgWalletTabProps) {
@@ -219,18 +231,6 @@ export function OrgWalletTab({ orgId, balance, onBalanceChange }: OrgWalletTabPr
 
   const getAmountColor = (amount: number) => {
     return amount >= 0 ? 'text-emerald-500' : 'text-[var(--color-error)]';
-  };
-
-  /* ───────────────────────── Animation variants ───────────────────────── */
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   return (

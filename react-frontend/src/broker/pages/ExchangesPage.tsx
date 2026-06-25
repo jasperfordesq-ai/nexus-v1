@@ -27,17 +27,18 @@ import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFoo
 
 type ActionType = 'approve' | 'reject';
 
+// Status filter is mirrored to `?status=` so stat-card deep-links and
+// browser back/forward work as expected.
+const EXCHANGE_STATUSES = [
+  'all', 'pending_broker', 'accepted', 'in_progress', 'completed', 'cancelled', 'disputed',
+] as const;
+
 export function ExchangeManagement() {
   const { t } = useTranslation('broker');
   usePageTitle(t('exchanges.title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
 
-  // Status filter is mirrored to `?status=` so stat-card deep-links and
-  // browser back/forward work as expected.
-  const EXCHANGE_STATUSES = [
-    'all', 'pending_broker', 'accepted', 'in_progress', 'completed', 'cancelled', 'disputed',
-  ] as const;
   type ExchangeStatus = (typeof EXCHANGE_STATUSES)[number];
   const [searchParams, setSearchParams] = useSearchParams();
   const urlStatus = searchParams.get('status') as ExchangeStatus | null;

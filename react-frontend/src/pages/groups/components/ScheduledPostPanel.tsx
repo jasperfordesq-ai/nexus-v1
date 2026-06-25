@@ -51,6 +51,11 @@ const getRecurrencePatternKey = (pattern: string) => {
   return 'scheduled.pattern_unknown';
 };
 
+const typeColorMap: Record<string, 'primary' | 'warning'> = {
+  discussion: 'primary',
+  announcement: 'warning',
+};
+
 export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps) {
   const { t } = useTranslation('groups');
   const toast = useToast();
@@ -143,11 +148,6 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
     } catch {
       toast.error(t('scheduled.cancel_failed'));
     }
-  };
-
-  const typeColorMap: Record<string, 'primary' | 'warning'> = {
-    discussion: 'primary',
-    announcement: 'warning',
   };
 
   if (!isAdmin) return null;

@@ -103,6 +103,17 @@ function StatCard({ icon: Icon, label, value }: { icon: React.ElementType; label
 // Main Component
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ── Animation variants ───────────────────────────────────────────────────
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.04 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function SkillsBrowsePage() {
   const { t } = useTranslation('common');
   usePageTitle(t('skills.browse_title'));
@@ -232,17 +243,6 @@ export function SkillsBrowsePage() {
       (cat.children?.reduce((s, c) => s + (c.skills_count || 0), 0) || 0),
     0
   );
-
-  // ── Animation variants ───────────────────────────────────────────────────
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.04 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 16 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">

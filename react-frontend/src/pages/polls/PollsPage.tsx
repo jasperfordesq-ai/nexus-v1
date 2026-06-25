@@ -347,6 +347,21 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
   );
 });
 
+/* ───────────────────────── Animation variants ───────────────────────── */
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function PollsPage() {
@@ -768,20 +783,6 @@ export function PollsPage() {
   /* ── Tab change handler ── */
   const handleTabChange = (key: React.Key) => {
     setTab(key as PollTab);
-  };
-
-  /* ── Animation variants ── */
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   /* ── Empty state description by tab ── */

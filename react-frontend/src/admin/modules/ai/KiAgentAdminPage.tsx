@@ -137,6 +137,8 @@ function identifierLabel(value: string): string {
   return value.replace(/_/g, ' ');
 }
 
+const proposalFilters = ['pending_review', 'approved', 'auto_applied', 'rejected', 'expired', ''] as const;
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -345,7 +347,6 @@ export default function KiAgentAdminPage() {
   const agentTypeText = (value: string) => translatedIdentifier(`ai.ki_agents.agent_types.${value}`, value);
   const statusText = (value: string) => translatedIdentifier(`ai.ki_agents.status.${value}`, value);
   const triggeredByText = (value: string) => translatedIdentifier(`ai.ki_agents.triggered_by.${value}`, value);
-  const proposalFilters = ['pending_review', 'approved', 'auto_applied', 'rejected', 'expired', ''] as const;
 
   return (
     <div className="space-y-6 p-6">

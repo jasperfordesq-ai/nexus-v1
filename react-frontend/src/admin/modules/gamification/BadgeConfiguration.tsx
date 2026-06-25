@@ -46,6 +46,8 @@ const CLASS_ICONS: Record<string, typeof Award> = {
   verification: Shield,
 };
 
+const tierOrder = ['core', 'template', 'custom'];
+
 type FilterTab = 'all' | 'core' | 'template' | 'custom' | 'quality';
 
 export function BadgeConfiguration() {
@@ -113,8 +115,6 @@ export function BadgeConfiguration() {
     acc[tier].push(b);
     return acc;
   }, {});
-
-  const tierOrder = ['core', 'template', 'custom'];
 
   if (loading) {
     return (

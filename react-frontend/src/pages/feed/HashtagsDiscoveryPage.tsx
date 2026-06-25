@@ -33,6 +33,16 @@ interface HashtagItem {
   trend_direction?: 'up' | 'down' | 'stable';
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.03 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1 },
+};
+
 export function HashtagsDiscoveryPage() {
   const { t } = useTranslation('feed');
   usePageTitle(t('hashtags.title'));
@@ -96,16 +106,6 @@ export function HashtagsDiscoveryPage() {
   }, []);
 
   const displayHashtags = searchQuery.length >= 2 ? searchResults : hashtags;
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.03 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1 },
-  };
 
   return (
     <>

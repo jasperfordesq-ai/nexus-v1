@@ -95,6 +95,18 @@ function getRiskColor(risk: string): 'success' | 'warning' | 'danger' {
   }
 }
 
+/* ───────────────────────── Animation variants ───────────────────────── */
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function WellbeingTab() {
@@ -178,16 +190,6 @@ export function WellbeingTab() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   return (

@@ -167,6 +167,13 @@ const MEDIA_ICON_MAP: Record<string, typeof Image> = {
   link: ExternalLink,
 };
 
+const IMPLEMENTATION_STATUS_COLORS: Record<string, 'default' | 'warning' | 'success' | 'danger'> = {
+  not_started: 'default',
+  in_progress: 'warning',
+  implemented: 'success',
+  abandoned: 'danger',
+};
+
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function ChallengeDetailPage() {
@@ -771,13 +778,6 @@ export function ChallengeDetailPage() {
       onPress: onDeleteOpen,
     },
   ];
-
-  const IMPLEMENTATION_STATUS_COLORS: Record<string, 'default' | 'warning' | 'success' | 'danger'> = {
-    not_started: 'default',
-    in_progress: 'warning',
-    implemented: 'success',
-    abandoned: 'danger',
-  };
 
   // Feature gate — checked before loading/error to avoid useless rendering
   if (!hasFeature('ideation_challenges')) {

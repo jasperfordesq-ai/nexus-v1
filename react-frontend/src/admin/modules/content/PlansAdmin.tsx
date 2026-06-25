@@ -30,6 +30,13 @@ import { ConfirmModal } from '../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 import { Button, Chip, Spinner, Tooltip } from '@/components/ui';
 
+const TIER_COLORS: Record<number, 'default' | 'primary' | 'secondary' | 'success' | 'warning'> = {
+  0: 'default',
+  1: 'primary',
+  2: 'secondary',
+  3: 'warning',
+};
+
 export function PlansAdmin() {
   const { t } = useTranslation('admin');
   usePageTitle(t('content.plans_admin_title'));
@@ -106,13 +113,6 @@ export function PlansAdmin() {
   const formatPrice = (price: number) => {
     if (!price) return t('content.free');
     return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' }).format(Number(price));
-  };
-
-  const TIER_COLORS: Record<number, 'default' | 'primary' | 'secondary' | 'success' | 'warning'> = {
-    0: 'default',
-    1: 'primary',
-    2: 'secondary',
-    3: 'warning',
   };
 
   const columns: Column<PlanListItem>[] = [

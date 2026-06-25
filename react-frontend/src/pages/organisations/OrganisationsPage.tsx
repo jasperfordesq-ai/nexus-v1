@@ -56,6 +56,16 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function OrganisationsPage() {
   const { t } = useTranslation('community');
   usePageTitle(t('organisations.page_title'));
@@ -154,16 +164,6 @@ export function OrganisationsPage() {
     setCursor(undefined);
     loadOrganisations();
   }, [debouncedQuery]); // eslint-disable-line react-hooks/exhaustive-deps -- reset on search change; loadOrganisations excluded to avoid loop
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   return (
     <div className="space-y-6">

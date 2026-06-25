@@ -31,6 +31,12 @@ interface TopEndorsedMember {
   top_skills?: string[] | null;
 }
 
+const rankIcons = [
+  <Medal key="gold" className="w-5 h-5 text-amber-500" aria-hidden="true" />,
+  <Medal key="silver" className="w-5 h-5 text-gray-400" aria-hidden="true" />,
+  <Medal key="bronze" className="w-5 h-5 text-amber-700" aria-hidden="true" />,
+];
+
 export function TopEndorsedWidget({ limit = 5 }: { limit?: number }) {
   const { tenantPath } = useTenant();
   const { t } = useTranslation('endorsements');
@@ -65,12 +71,6 @@ export function TopEndorsedWidget({ limit = 5 }: { limit?: number }) {
   }
 
   if (members.length === 0) return null;
-
-  const rankIcons = [
-    <Medal key="gold" className="w-5 h-5 text-amber-500" aria-hidden="true" />,
-    <Medal key="silver" className="w-5 h-5 text-gray-400" aria-hidden="true" />,
-    <Medal key="bronze" className="w-5 h-5 text-amber-700" aria-hidden="true" />,
-  ];
 
   return (
     <GlassCard className="p-4">

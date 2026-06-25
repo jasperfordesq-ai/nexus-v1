@@ -67,6 +67,17 @@ const STATUS_COLOR_MAP: Record<string, 'warning' | 'success' | 'danger' | 'accen
 
 const SEARCH_DEBOUNCE_MS = 300;
 
+// Status filter is mirrored to `?status=` so stat-card deep-links and
+// browser back/forward work correctly.
+// 'pending_review' is the union of literal-pending + submitted — both
+// are pre-verification states the broker still owns. Mirrors the
+// Vetting page's filter shape so the UX is consistent across the
+// two compliance modules.
+const INSURANCE_STATUSES = [
+  'all', 'pending_review', 'pending', 'submitted', 'verified', 'expired', 'expiring_soon', 'rejected',
+] as const;
+type InsuranceStatus = (typeof INSURANCE_STATUSES)[number];
+
 interface UserSearchResult {
   id: number;
   first_name: string;
@@ -87,16 +98,6 @@ export function InsuranceCertificates() {
   };
 
   // List state
-  // Status filter is mirrored to `?status=` so stat-card deep-links and
-  // browser back/forward work correctly.
-  // 'pending_review' is the union of literal-pending + submitted — both
-  // are pre-verification states the broker still owns. Mirrors the
-  // Vetting page's filter shape so the UX is consistent across the
-  // two compliance modules.
-  const INSURANCE_STATUSES = [
-    'all', 'pending_review', 'pending', 'submitted', 'verified', 'expired', 'expiring_soon', 'rejected',
-  ] as const;
-  type InsuranceStatus = (typeof INSURANCE_STATUSES)[number];
   const [searchParams, setSearchParams] = useSearchParams();
   const urlStatus = searchParams.get('status') as InsuranceStatus | null;
   const statusFilter: InsuranceStatus =

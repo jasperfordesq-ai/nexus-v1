@@ -94,6 +94,22 @@ interface CategoryTreeNode {
 const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'csv', 'jpg', 'png', 'gif', 'svg'];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
+const categoryColorMap: Record<string, string> = {
+  blue: 'bg-blue-500/10 text-[var(--color-info)]',
+  gray: 'bg-gray-500/10 text-gray-500',
+  fuchsia: 'bg-fuchsia-500/10 text-fuchsia-500',
+  purple: 'bg-purple-500/10 text-purple-500',
+  green: 'bg-emerald-500/10 text-emerald-500',
+  red: 'bg-rose-500/10 text-rose-500',
+  yellow: 'bg-amber-500/10 text-[var(--color-warning)]',
+};
+
+const inputClassNames = {
+  input: 'bg-transparent text-theme-primary',
+  inputWrapper: 'bg-theme-elevated border-theme-default',
+  label: 'text-theme-muted',
+};
+
 /* ───────────────────────── Helpers ───────────────────────── */
 
 function getFileIcon(path: string) {
@@ -508,22 +524,6 @@ export function ResourcesPage() {
       toast.error(t('resources.download_failed'));
     }
   }
-
-  const categoryColorMap: Record<string, string> = {
-    blue: 'bg-blue-500/10 text-[var(--color-info)]',
-    gray: 'bg-gray-500/10 text-gray-500',
-    fuchsia: 'bg-fuchsia-500/10 text-fuchsia-500',
-    purple: 'bg-purple-500/10 text-purple-500',
-    green: 'bg-emerald-500/10 text-emerald-500',
-    red: 'bg-rose-500/10 text-rose-500',
-    yellow: 'bg-amber-500/10 text-[var(--color-warning)]',
-  };
-
-  const inputClassNames = {
-    input: 'bg-transparent text-theme-primary',
-    inputWrapper: 'bg-theme-elevated border-theme-default',
-    label: 'text-theme-muted',
-  };
 
   return (
     <div className="space-y-6">

@@ -72,6 +72,32 @@ const DEFAULT_SETTINGS: SettingsFormData = {
   travel_radius_km: 0,
 };
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
+// HeroUI input classNames
+const inputClassNames = {
+  input: 'bg-transparent text-theme-primary',
+  inputWrapper: 'bg-theme-elevated border-theme-default',
+  label: 'text-theme-muted',
+};
+
+const selectClassNames = {
+  trigger: 'bg-theme-elevated border-theme-default',
+  value: 'text-theme-primary',
+  label: 'text-theme-muted',
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -203,36 +229,6 @@ export function FederationSettingsPage() {
   const updateSetting = useCallback(<K extends keyof SettingsFormData>(key: K, value: SettingsFormData[K]) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   }, []);
-
-  // ───────────────────────────────────────────────────────────────────────────
-  // Animation Variants
-  // ───────────────────────────────────────────────────────────────────────────
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.08 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
-
-  // HeroUI input classNames
-  const inputClassNames = {
-    input: 'bg-transparent text-theme-primary',
-    inputWrapper: 'bg-theme-elevated border-theme-default',
-    label: 'text-theme-muted',
-  };
-
-  const selectClassNames = {
-    trigger: 'bg-theme-elevated border-theme-default',
-    value: 'text-theme-primary',
-    label: 'text-theme-muted',
-  };
 
   // ───────────────────────────────────────────────────────────────────────────
   // Loading / Error States

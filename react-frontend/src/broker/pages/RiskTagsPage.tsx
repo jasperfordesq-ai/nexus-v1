@@ -48,6 +48,9 @@ const RISK_CATEGORY_KEYS = [
   'other',
 ] as const;
 
+// Risk level filter is mirrored to `?level=` so stat-card deep-links work.
+const RISK_LEVELS = ['all', 'critical', 'high', 'medium', 'low'] as const;
+
 interface RiskTagForm {
   listing_id: string;
   risk_level: 'low' | 'medium' | 'high' | 'critical';
@@ -82,8 +85,6 @@ export function RiskTagsPage() {
   const { tenantPath } = useTenant();
   const toast = useToast();
 
-  // Risk level filter is mirrored to `?level=` so stat-card deep-links work.
-  const RISK_LEVELS = ['all', 'critical', 'high', 'medium', 'low'] as const;
   type RiskLevel = (typeof RISK_LEVELS)[number];
   const [searchParams, setSearchParams] = useSearchParams();
   const urlLevel = searchParams.get('level') as RiskLevel | null;

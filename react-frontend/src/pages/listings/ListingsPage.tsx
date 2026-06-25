@@ -58,6 +58,11 @@ type ListingType = 'all' | 'offer' | 'request';
 type ViewMode = 'grid' | 'list' | 'map';
 type SortMode = 'recommended' | 'newest';
 
+const validTypes: ListingType[] = ['all', 'offer', 'request'];
+const validHours = ['any', 'quick', 'short', 'half_day', 'full_day'];
+const validService = ['any', 'remote', 'in_person'];
+const validPosted = ['any', '1', '7', '30'];
+
 export function ListingsPage() {
   const { t } = useTranslation('listings');
   usePageTitle(t('title'));
@@ -74,10 +79,6 @@ export function ListingsPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState(searchParams.get('q') || '');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
-  const validTypes: ListingType[] = ['all', 'offer', 'request'];
-  const validHours = ['any', 'quick', 'short', 'half_day', 'full_day'];
-  const validService = ['any', 'remote', 'in_person'];
-  const validPosted = ['any', '1', '7', '30'];
 
   const [selectedType, setSelectedType] = useState<ListingType>(() => {
     const v = searchParams.get('type');

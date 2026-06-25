@@ -9,6 +9,8 @@ import { Badge as HeroUIBadge } from '@heroui/react';
 type HeroUIBadgeProps = ComponentProps<typeof HeroUIBadge>;
 type HeroUIBadgeAnchorProps = ComponentProps<typeof HeroUIBadge.Anchor>;
 
+const anchorProps: Partial<HeroUIBadgeAnchorProps> = {};
+
 type BadgeClassNames = {
   base?: string;
   badge?: string;
@@ -78,7 +80,6 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const badgeContent = isDot ? undefined : content;
-  const anchorProps: Partial<HeroUIBadgeAnchorProps> = {};
 
   return (
     <HeroUIBadge.Anchor className={classNames?.base} {...anchorProps}>

@@ -72,6 +72,16 @@ function getContentTypeIcon(type: string) {
 
 /* ───────────────────────── Component ───────────────────────── */
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.04 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function KnowledgeBasePage() {
   const { t } = useTranslation('kb');
   usePageTitle(t('title'));
@@ -182,16 +192,6 @@ export function KnowledgeBasePage() {
     }
     return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
   }, [displayArticles, t]);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.04 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 12 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">

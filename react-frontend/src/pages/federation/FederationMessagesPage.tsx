@@ -153,6 +153,12 @@ const bubbleVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+const LANG_NAMES: Record<string, string> = {
+  en: 'English', fr: 'French', de: 'German', es: 'Spanish',
+  it: 'Italian', pt: 'Portuguese', ga: 'Irish', nl: 'Dutch',
+  pl: 'Polish', ja: 'Japanese', ar: 'Arabic',
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Main Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -207,11 +213,6 @@ export function FederationMessagesPage() {
   const autoTranslatingRef = useRef(false);
   const translatedIdsRef = useRef<Set<number>>(new Set());
 
-  const LANG_NAMES: Record<string, string> = {
-    en: 'English', fr: 'French', de: 'German', es: 'Spanish',
-    it: 'Italian', pt: 'Portuguese', ga: 'Irish', nl: 'Dutch',
-    pl: 'Polish', ja: 'Japanese', ar: 'Arabic',
-  };
   const userLangBase = (i18n.language || 'en').split('-')[0] ?? 'en';
   const userLangName = LANG_NAMES[userLangBase] ?? userLangBase;
 

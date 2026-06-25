@@ -117,6 +117,23 @@ interface CurrentSeasonResponse {
   total_participants: number;
 }
 
+const typeIcons: Record<LeaderboardType, React.ReactNode> = {
+  xp: <Zap className="w-4 h-4 text-theme-subtle" aria-hidden="true" />,
+  volunteer_hours: <Clock className="w-4 h-4 text-theme-subtle" aria-hidden="true" />,
+  credits_earned: <Coins className="w-4 h-4 text-theme-subtle" aria-hidden="true" />,
+  nexus_score: <Trophy className="w-4 h-4 text-indigo-400" aria-hidden="true" />,
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.03 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: { opacity: 1, x: 0 },
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Season Card Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -517,23 +534,6 @@ export function LeaderboardPage() {
     volunteer_hours: t('leaderboard.type.volunteer_hours'),
     credits_earned: t('leaderboard.type.credits_earned'),
     nexus_score: t('leaderboard.type.nexus_score'),
-  };
-
-  const typeIcons: Record<LeaderboardType, React.ReactNode> = {
-    xp: <Zap className="w-4 h-4 text-theme-subtle" aria-hidden="true" />,
-    volunteer_hours: <Clock className="w-4 h-4 text-theme-subtle" aria-hidden="true" />,
-    credits_earned: <Coins className="w-4 h-4 text-theme-subtle" aria-hidden="true" />,
-    nexus_score: <Trophy className="w-4 h-4 text-indigo-400" aria-hidden="true" />,
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.03 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0 },
   };
 
   const periodLabels: Record<LeaderboardPeriod, string> = {

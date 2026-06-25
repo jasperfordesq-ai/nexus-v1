@@ -59,6 +59,12 @@ function makeCaptcha(): { a: number; b: number } {
   return { a: 3 + Math.floor(Math.random() * 7), b: 2 + Math.floor(Math.random() * 7) };
 }
 
+const inputClasses = {
+  inputWrapper: 'bg-theme-elevated border-theme-default',
+  label: 'text-theme-muted',
+  input: 'text-theme-primary placeholder:text-theme-subtle',
+};
+
 export function PilotApplyPage() {
   const { t } = useTranslation('common');
   const { tenantPath } = useTenant();
@@ -176,12 +182,6 @@ export function PilotApplyPage() {
       setSubmitting(false);
     }
   }
-
-  const inputClasses = {
-    inputWrapper: 'bg-theme-elevated border-theme-default',
-    label: 'text-theme-muted',
-    input: 'text-theme-primary placeholder:text-theme-subtle',
-  };
 
   if (submitted) {
     return (

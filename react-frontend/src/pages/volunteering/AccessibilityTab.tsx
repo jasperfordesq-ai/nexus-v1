@@ -60,6 +60,16 @@ function emptyNeed(): AccessibilityNeed {
   };
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 /* ---------- Main Component ---------- */
 
 export function AccessibilityTab() {
@@ -129,16 +139,6 @@ export function AccessibilityTab() {
 
   const removeNeed = (index: number) => {
     setNeeds((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   return (

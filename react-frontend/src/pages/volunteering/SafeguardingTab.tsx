@@ -31,6 +31,9 @@ function trainingStatusColor(s: Training['status']): 'warning'|'success'|'danger
 function severityColor(s: Incident['severity']): 'default'|'warning'|'danger' { if (s==='low') return 'default'; if (s==='medium') return 'warning'; return 'danger'; }
 function incidentStatusColor(s: Incident['status']): 'warning'|'success'|'danger'|'primary'|'default' { if (s==='open') return 'warning'; if (s==='investigating') return 'primary'; if (s==='resolved') return 'success'; if (s==='escalated') return 'danger'; return 'default'; }
 
+const cV = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.05 } } };
+const iV = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
+
 export function SafeguardingTab() {
   const { t } = useTranslation('volunteering');
   const toast = useToast();
@@ -109,9 +112,6 @@ export function SafeguardingTab() {
     } catch (err) { logError('Failed to report incident', err); toastRef.current.error(tRef.current('safeguarding.incident_failed')); }
     finally { setIsSubmittingIncident(false); }
   };
-
-  const cV = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.05 } } };
-  const iV = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
 
   return (
     <div className="space-y-4">

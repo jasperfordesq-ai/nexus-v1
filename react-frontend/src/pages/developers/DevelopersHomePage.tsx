@@ -23,22 +23,22 @@ import Gauge from 'lucide-react/icons/gauge';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import { PageMeta } from '@/components/seo';
 
+const features = [
+  { icon: Key, titleKey: 'developers.feature_oauth_title', bodyKey: 'developers.feature_oauth_body' },
+  { icon: Code, titleKey: 'developers.feature_curated_title', bodyKey: 'developers.feature_curated_body' },
+  { icon: Webhook, titleKey: 'developers.feature_webhooks_title', bodyKey: 'developers.feature_webhooks_body' },
+  { icon: Gauge, titleKey: 'developers.feature_rate_limit_title', bodyKey: 'developers.feature_rate_limit_body' },
+];
+
+const navLinks = [
+  { to: '/developers/auth', icon: Key, key: 'developers.nav.auth' },
+  { to: '/developers/endpoints', icon: BookOpen, key: 'developers.nav.endpoints' },
+  { to: '/developers/webhooks', icon: Webhook, key: 'developers.nav.webhooks' },
+];
+
 export default function DevelopersHomePage() {
   const { t } = useTranslation('common');
   usePageTitle(t('developers.page_title'));
-
-  const features = [
-    { icon: Key, titleKey: 'developers.feature_oauth_title', bodyKey: 'developers.feature_oauth_body' },
-    { icon: Code, titleKey: 'developers.feature_curated_title', bodyKey: 'developers.feature_curated_body' },
-    { icon: Webhook, titleKey: 'developers.feature_webhooks_title', bodyKey: 'developers.feature_webhooks_body' },
-    { icon: Gauge, titleKey: 'developers.feature_rate_limit_title', bodyKey: 'developers.feature_rate_limit_body' },
-  ];
-
-  const navLinks = [
-    { to: '/developers/auth', icon: Key, key: 'developers.nav.auth' },
-    { to: '/developers/endpoints', icon: BookOpen, key: 'developers.nav.endpoints' },
-    { to: '/developers/webhooks', icon: Webhook, key: 'developers.nav.webhooks' },
-  ];
 
   return (
     <>

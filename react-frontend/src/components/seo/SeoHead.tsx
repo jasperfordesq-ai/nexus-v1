@@ -26,6 +26,16 @@ import { useTenant } from '@/contexts';
  * The `<html lang>` attribute is synced dynamically by i18n.ts via
  * `i18n.on('languageChanged')` — no Helmet intervention needed.
  */
+
+// areaServed — only emitted for LocalBusiness; maps service_area scope to Schema @type.
+// Combines location_name (e.g. "Cork") with country_code (e.g. "IE") for Google disambiguation.
+const areaServedTypeMap: Record<string, string> = {
+  local: 'City',
+  regional: 'AdministrativeArea',
+  national: 'Country',
+  international: 'Place',
+};
+
 export function SeoHead() {
   const { branding, tenant } = useTenant();
   const location = useLocation();
@@ -83,14 +93,6 @@ export function SeoHead() {
       }
     : undefined;
 
-  // areaServed — only emitted for LocalBusiness; maps service_area scope to Schema @type.
-  // Combines location_name (e.g. "Cork") with country_code (e.g. "IE") for Google disambiguation.
-  const areaServedTypeMap: Record<string, string> = {
-    local: 'City',
-    regional: 'AdministrativeArea',
-    national: 'Country',
-    international: 'Place',
-  };
   const areaServedSchemaType = areaServedTypeMap[contact?.service_area ?? ''];
   const areaServed = orgType === 'LocalBusiness' && (contact?.location || contact?.country_code)
     ? {

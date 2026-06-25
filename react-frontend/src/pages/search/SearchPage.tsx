@@ -99,6 +99,19 @@ function groupSearchItems(items: RawSearchItem[]): SearchResults {
 
 type SearchTab = 'all' | 'listings' | 'users' | 'events' | 'groups';
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function SearchPage() {
   const { t } = useTranslation('search_page');
   usePageTitle(t('page_title'));
@@ -216,19 +229,6 @@ export function SearchPage() {
     results.users.length +
     results.events.length +
     results.groups.length;
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">

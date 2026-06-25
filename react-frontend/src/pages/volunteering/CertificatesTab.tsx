@@ -39,6 +39,16 @@ interface Certificate {
   downloaded_at: string | null;
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function CertificatesTab() {
   const { t } = useTranslation('volunteering');
   const [certificates, setCertificates] = useState<Certificate[]>([]);
@@ -122,16 +132,6 @@ export function CertificatesTab() {
 
   const handleDownload = (code: string) => {
     window.open(`${API_BASE}/v2/volunteering/certificates/${code}/html`, '_blank');
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   return (

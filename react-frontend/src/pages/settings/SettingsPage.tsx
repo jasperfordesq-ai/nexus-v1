@@ -77,6 +77,23 @@ function isSettingsTabKey(value: string | null): value is SettingsTabKey {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Animation Variants
+// ─────────────────────────────────────────────────────────────────────────────
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -876,23 +893,6 @@ export function SettingsPage() {
       toast.error(t('toasts.copy_failed'), t('toasts.copy_failed_desc'));
     }
   }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Animation Variants
-  // ─────────────────────────────────────────────────────────────────────────
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   // ─────────────────────────────────────────────────────────────────────────
   // Render

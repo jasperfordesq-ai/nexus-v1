@@ -116,6 +116,8 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
   );
 }
 
+const authPaths = ['login', 'register', 'password/forgot', 'password/reset', 'verify-email'];
+
 /**
  * Inner guard that checks if tenant resolution failed with a notFoundSlug.
  * Must be inside TenantProvider to access useTenant().
@@ -176,7 +178,6 @@ function TenantGuard({
                        (lowerPrefix ? (lowerPath === `/${lowerPrefix}/admin` ||
                                        lowerPath.startsWith(`/${lowerPrefix}/admin/`)) : false);
 
-  const authPaths = ['login', 'register', 'password/forgot', 'password/reset', 'verify-email'];
   const isAuthRoute = authPaths.some((p) =>
     lowerPath === `/${p}` ||
     (lowerPrefix && lowerPath === `/${lowerPrefix}/${p}`)

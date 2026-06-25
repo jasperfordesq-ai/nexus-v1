@@ -50,6 +50,11 @@ function severityColor(severity?: string): { color: SeverityChipColor; variant: 
   }
 }
 
+// The active tab is driven by the URL so deep-links from the broker
+// dashboard stat cards land on the right filter.
+const ALLOWED_FILTERS = ['unreviewed', 'flagged', 'reviewed', 'all'] as const;
+type MessageFilter = (typeof ALLOWED_FILTERS)[number];
+
 export function MessageReview() {
   const { t } = useTranslation('broker');
   usePageTitle(t('messages.title'));
@@ -58,10 +63,6 @@ export function MessageReview() {
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // The active tab is driven by the URL so deep-links from the broker
-  // dashboard stat cards land on the right filter.
-  const ALLOWED_FILTERS = ['unreviewed', 'flagged', 'reviewed', 'all'] as const;
-  type MessageFilter = (typeof ALLOWED_FILTERS)[number];
   const urlStatus = searchParams.get('status') as MessageFilter | null;
   const filter: MessageFilter =
     urlStatus && ALLOWED_FILTERS.includes(urlStatus) ? urlStatus : 'unreviewed';

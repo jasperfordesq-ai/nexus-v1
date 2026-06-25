@@ -53,15 +53,15 @@ async function listUsers(accessToken) {
   return res.json();
 }`;
 
+const steps = [
+  { titleKey: 'developers.auth_step1_title', bodyKey: 'developers.auth_step1_body' },
+  { titleKey: 'developers.auth_step2_title', bodyKey: 'developers.auth_step2_body' },
+  { titleKey: 'developers.auth_step3_title', bodyKey: 'developers.auth_step3_body' },
+];
+
 export default function DevelopersAuthPage() {
   const { t } = useTranslation('common');
   usePageTitle(t('developers.auth_meta_title'));
-
-  const steps = [
-    { titleKey: 'developers.auth_step1_title', bodyKey: 'developers.auth_step1_body' },
-    { titleKey: 'developers.auth_step2_title', bodyKey: 'developers.auth_step2_body' },
-    { titleKey: 'developers.auth_step3_title', bodyKey: 'developers.auth_step3_body' },
-  ];
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">

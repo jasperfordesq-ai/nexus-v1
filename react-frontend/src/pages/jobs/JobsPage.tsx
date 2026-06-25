@@ -116,6 +116,19 @@ const COMMITMENT_FILTERS = [
   { id: 'one_off' },
 ] as const;
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function JobsPage() {
   const { t } = useTranslation('jobs');
   usePageTitle(t('title'));
@@ -308,19 +321,6 @@ export function JobsPage() {
       </div>
     );
   }
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   return (
     <div className="space-y-6">

@@ -127,6 +127,16 @@ interface DailyRewardStatus {
   next_claim_at: string | null;
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: { opacity: 1, y: 0 },
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Daily Reward Widget
 // ─────────────────────────────────────────────────────────────────────────────
@@ -395,16 +405,6 @@ function ChallengesTab() {
     } finally {
       setClaimingId(null);
     }
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 15 },
-    visible: { opacity: 1, y: 0 },
   };
 
   if (isLoading) {

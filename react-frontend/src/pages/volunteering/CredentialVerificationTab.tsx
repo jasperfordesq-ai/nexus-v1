@@ -92,6 +92,16 @@ function getStatusLabel(status: string, t: (key: string) => string): string {
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function CredentialVerificationTab() {
   const { t } = useTranslation('volunteering');
   const [credentials, setCredentials] = useState<Credential[]>([]);
@@ -218,16 +228,6 @@ export function CredentialVerificationTab() {
   const handleModalClose = () => {
     onClose();
     resetUploadForm();
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   // Separate credentials by status for summary

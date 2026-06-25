@@ -40,6 +40,13 @@ import { useTranslation } from 'react-i18next';
  * Super-admin hub for federation management: system status, feature toggles, * whitelist, partnerships, and quick links to sub-pages.
  */
 
+const colorClasses: Record<string, { bg: string; text: string }> = {
+  accent: { bg: 'bg-accent/10', text: 'text-accent' },
+  success: { bg: 'bg-success/10', text: 'text-success' },
+  default: { bg: 'bg-surface-tertiary', text: 'text-muted' },
+  warning: { bg: 'bg-warning/10', text: 'text-warning' },
+  danger: { bg: 'bg-danger/10', text: 'text-danger' },
+};
 
 export function FederationControls() {
   const { t } = useTranslation('admin');
@@ -189,13 +196,6 @@ export function FederationControls() {
   ];
 
   const activePartnerships = partnerships.filter(p => p.status === 'active').length;
-  const colorClasses: Record<string, { bg: string; text: string }> = {
-    accent: { bg: 'bg-accent/10', text: 'text-accent' },
-    success: { bg: 'bg-success/10', text: 'text-success' },
-    default: { bg: 'bg-surface-tertiary', text: 'text-muted' },
-    warning: { bg: 'bg-warning/10', text: 'text-warning' },
-    danger: { bg: 'bg-danger/10', text: 'text-danger' },
-  };
 
   const partnershipStatusLabel = (status: string) => {
     switch (status) {

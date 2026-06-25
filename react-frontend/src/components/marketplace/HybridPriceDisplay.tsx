@@ -48,6 +48,12 @@ function formatCurrency(price: number, currency: string): string {
   }
 }
 
+const sizeClasses = {
+  sm: { price: 'text-base', tc: 'text-sm', icon: 'w-3.5 h-3.5', chip: 'text-xs' },
+  md: { price: 'text-xl', tc: 'text-base', icon: 'w-4 h-4', chip: 'text-sm' },
+  lg: { price: 'text-2xl', tc: 'text-lg', icon: 'w-5 h-5', chip: 'text-base' },
+};
+
 export function HybridPriceDisplay({
   price,
   currency,
@@ -57,12 +63,6 @@ export function HybridPriceDisplay({
 }: HybridPriceDisplayProps) {
   const { t } = useTranslation('marketplace');
   const { tenantPath } = useTenant();
-
-  const sizeClasses = {
-    sm: { price: 'text-base', tc: 'text-sm', icon: 'w-3.5 h-3.5', chip: 'text-xs' },
-    md: { price: 'text-xl', tc: 'text-base', icon: 'w-4 h-4', chip: 'text-sm' },
-    lg: { price: 'text-2xl', tc: 'text-lg', icon: 'w-5 h-5', chip: 'text-base' },
-  };
 
   const classes = sizeClasses[size];
 

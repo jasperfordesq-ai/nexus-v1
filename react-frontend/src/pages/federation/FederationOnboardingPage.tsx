@@ -82,6 +82,19 @@ const DEFAULT_SETTINGS: OnboardingSettings = {
 
 const TOTAL_STEPS = 4;
 
+// HeroUI shared classNames
+const selectClassNames = {
+  trigger: 'bg-theme-elevated border-theme-default',
+  value: 'text-theme-primary',
+  label: 'text-theme-muted',
+};
+
+const inputClassNames = {
+  input: 'bg-transparent text-theme-primary',
+  inputWrapper: 'bg-theme-elevated border-theme-default',
+  label: 'text-theme-muted',
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -223,19 +236,6 @@ export function FederationOnboardingPage() {
     setSlideDirection(-1);
     goBack();
   }, [goBack]);
-
-  // HeroUI shared classNames
-  const selectClassNames = {
-    trigger: 'bg-theme-elevated border-theme-default',
-    value: 'text-theme-primary',
-    label: 'text-theme-muted',
-  };
-
-  const inputClassNames = {
-    input: 'bg-transparent text-theme-primary',
-    inputWrapper: 'bg-theme-elevated border-theme-default',
-    label: 'text-theme-muted',
-  };
 
   // ───────────────────────────────────────────────────────────────────────────
   // Render

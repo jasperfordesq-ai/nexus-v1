@@ -62,6 +62,19 @@ function getOtherUser(conv: Conversation) {
   };
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: { opacity: 1, x: 0 },
+};
+
 export function MessagesPage() {
   const { t } = useTranslation('messages');
   usePageTitle(t('title'));
@@ -401,19 +414,6 @@ export function MessagesPage() {
     [conversations]
   );
   const hasSearchQuery = searchQuery.trim().length > 0;
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0 },
-  };
 
   return (
     <div className="mx-auto max-w-4xl space-y-5 sm:space-y-6">

@@ -209,34 +209,35 @@ interface ToastItemProps {
   onRemove: (id: string) => void;
 }
 
+const config = {
+  success: {
+    icon: CheckCircle,
+    bgColor: 'bg-emerald-500/20',
+    borderColor: 'border-emerald-500/40',
+    iconColor: 'text-emerald-400',
+  },
+  error: {
+    icon: AlertCircle,
+    bgColor: 'bg-red-500/20',
+    borderColor: 'border-red-500/40',
+    iconColor: 'text-red-400',
+  },
+  warning: {
+    icon: AlertTriangle,
+    bgColor: 'bg-amber-500/20',
+    borderColor: 'border-amber-500/40',
+    iconColor: 'text-amber-400',
+  },
+  info: {
+    icon: Info,
+    bgColor: 'bg-blue-500/20',
+    borderColor: 'border-blue-500/40',
+    iconColor: 'text-blue-400',
+  },
+};
+
 const ToastItem = forwardRef<HTMLDivElement, ToastItemProps>(function ToastItem({ toast, onRemove }, ref) {
   const { t } = useTranslation('common');
-  const config = {
-    success: {
-      icon: CheckCircle,
-      bgColor: 'bg-emerald-500/20',
-      borderColor: 'border-emerald-500/40',
-      iconColor: 'text-emerald-400',
-    },
-    error: {
-      icon: AlertCircle,
-      bgColor: 'bg-red-500/20',
-      borderColor: 'border-red-500/40',
-      iconColor: 'text-red-400',
-    },
-    warning: {
-      icon: AlertTriangle,
-      bgColor: 'bg-amber-500/20',
-      borderColor: 'border-amber-500/40',
-      iconColor: 'text-amber-400',
-    },
-    info: {
-      icon: Info,
-      bgColor: 'bg-blue-500/20',
-      borderColor: 'border-blue-500/40',
-      iconColor: 'text-blue-400',
-    },
-  };
 
   const { icon: Icon, bgColor, borderColor, iconColor } = config[toast.type];
 

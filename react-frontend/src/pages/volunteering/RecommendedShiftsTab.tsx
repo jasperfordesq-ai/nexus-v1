@@ -112,6 +112,16 @@ function normalizeRecommendedShift(item: RecommendedShiftPayload): RecommendedSh
   };
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function RecommendedShiftsTab() {
   const { t } = useTranslation('volunteering');
   const navigate = useNavigate();
@@ -169,16 +179,6 @@ export function RecommendedShiftsTab() {
     if (score >= 50) return 'primary';
     if (score >= 30) return 'warning';
     return 'default';
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   return (

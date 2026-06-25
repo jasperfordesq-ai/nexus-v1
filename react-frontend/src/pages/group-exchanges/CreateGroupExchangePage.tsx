@@ -83,6 +83,13 @@ const SPLIT_TYPE_CARDS: { value: SplitType; icon: React.ReactNode }[] = [
   },
 ];
 
+// Shared classNames
+const inputClassNames = {
+  input: 'bg-transparent text-theme-primary',
+  inputWrapper: 'bg-theme-elevated border-theme-default',
+  label: 'text-theme-muted',
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -343,16 +350,6 @@ export function CreateGroupExchangePage() {
       x: direction < 0 ? 80 : -80,
       opacity: 0,
     }),
-  };
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Shared classNames
-  // ─────────────────────────────────────────────────────────────────────────
-
-  const inputClassNames = {
-    input: 'bg-transparent text-theme-primary',
-    inputWrapper: 'bg-theme-elevated border-theme-default',
-    label: 'text-theme-muted',
   };
 
   const stepLabels = [

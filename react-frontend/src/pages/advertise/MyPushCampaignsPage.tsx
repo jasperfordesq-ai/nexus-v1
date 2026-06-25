@@ -81,6 +81,15 @@ function formatDateTime(value: string): string {
   }).format(new Date(value));
 }
 
+const defaultForm: CreatePushCampaignForm = {
+  name: '',
+  title: '',
+  body: '',
+  schedule_at: '',
+  audience_radius_km: '',
+  audience_min_trust_tier: 'any',
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -101,14 +110,6 @@ export function MyPushCampaignsPage() {
   const [audienceEstimate, setAudienceEstimate] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const defaultForm: CreatePushCampaignForm = {
-    name: '',
-    title: '',
-    body: '',
-    schedule_at: '',
-    audience_radius_km: '',
-    audience_min_trust_tier: 'any',
-  };
   const [form, setForm] = useState<CreatePushCampaignForm>(defaultForm);
 
   const fetchCampaigns = useCallback(async () => {

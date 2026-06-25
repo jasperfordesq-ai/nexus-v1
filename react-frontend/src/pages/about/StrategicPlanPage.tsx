@@ -662,42 +662,42 @@ interface SwotCardProps {
   items: string[];
 }
 
-function SwotCard({ title, accent, icon: Icon, items }: SwotCardProps) {
-  const colorMap = {
-    emerald: {
-      gradient: 'from-emerald-500/10 to-teal-500/10',
-      border: 'border-emerald-500/20',
-      iconBg: 'bg-emerald-500/15',
-      iconColor: 'text-emerald-500 dark:text-emerald-400',
-      titleColor: 'text-emerald-600 dark:text-emerald-400',
-      bullet: 'text-emerald-500 dark:text-emerald-400',
-    },
-    rose: {
-      gradient: 'from-rose-500/10 to-pink-500/10',
-      border: 'border-rose-500/20',
-      iconBg: 'bg-rose-500/15',
-      iconColor: 'text-rose-500 dark:text-rose-400',
-      titleColor: 'text-rose-600 dark:text-rose-400',
-      bullet: 'text-rose-500 dark:text-rose-400',
-    },
-    indigo: {
-      gradient: 'from-indigo-500/10 to-blue-500/10',
-      border: 'border-indigo-500/20',
-      iconBg: 'bg-indigo-500/15',
-      iconColor: 'text-indigo-500 dark:text-indigo-400',
-      titleColor: 'text-indigo-600 dark:text-indigo-400',
-      bullet: 'text-indigo-500 dark:text-indigo-400',
-    },
-    amber: {
-      gradient: 'from-amber-500/10 to-orange-500/10',
-      border: 'border-amber-500/20',
-      iconBg: 'bg-amber-500/15',
-      iconColor: 'text-[var(--color-warning)]',
-      titleColor: 'text-amber-600 dark:text-amber-400',
-      bullet: 'text-[var(--color-warning)]',
-    },
-  };
+const colorMap = {
+  emerald: {
+    gradient: 'from-emerald-500/10 to-teal-500/10',
+    border: 'border-emerald-500/20',
+    iconBg: 'bg-emerald-500/15',
+    iconColor: 'text-emerald-500 dark:text-emerald-400',
+    titleColor: 'text-emerald-600 dark:text-emerald-400',
+    bullet: 'text-emerald-500 dark:text-emerald-400',
+  },
+  rose: {
+    gradient: 'from-rose-500/10 to-pink-500/10',
+    border: 'border-rose-500/20',
+    iconBg: 'bg-rose-500/15',
+    iconColor: 'text-rose-500 dark:text-rose-400',
+    titleColor: 'text-rose-600 dark:text-rose-400',
+    bullet: 'text-rose-500 dark:text-rose-400',
+  },
+  indigo: {
+    gradient: 'from-indigo-500/10 to-blue-500/10',
+    border: 'border-indigo-500/20',
+    iconBg: 'bg-indigo-500/15',
+    iconColor: 'text-indigo-500 dark:text-indigo-400',
+    titleColor: 'text-indigo-600 dark:text-indigo-400',
+    bullet: 'text-indigo-500 dark:text-indigo-400',
+  },
+  amber: {
+    gradient: 'from-amber-500/10 to-orange-500/10',
+    border: 'border-amber-500/20',
+    iconBg: 'bg-amber-500/15',
+    iconColor: 'text-[var(--color-warning)]',
+    titleColor: 'text-amber-600 dark:text-amber-400',
+    bullet: 'text-[var(--color-warning)]',
+  },
+};
 
+function SwotCard({ title, accent, icon: Icon, items }: SwotCardProps) {
   const colors = colorMap[accent];
 
   return (
@@ -727,15 +727,15 @@ interface RoadmapBadgeProps {
   type: 'submit' | 'secure' | 'launch' | 'ongoing' | 'pitch';
 }
 
-function RoadmapBadge({ label, type }: RoadmapBadgeProps) {
-  const styles = {
-    submit: 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400',
-    secure: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
-    launch: 'bg-purple-500/15 text-purple-600 dark:text-purple-400',
-    ongoing: 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400',
-    pitch: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
-  };
+const styles = {
+  submit: 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400',
+  secure: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+  launch: 'bg-purple-500/15 text-purple-600 dark:text-purple-400',
+  ongoing: 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400',
+  pitch: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
+};
 
+function RoadmapBadge({ label, type }: RoadmapBadgeProps) {
   return (
     <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${styles[type]}`}>
       {label}

@@ -36,6 +36,12 @@ const INSURANCE_TYPE_KEYS = [
 
 const INSURANCE_STATUS_KEYS = ['verified', 'pending', 'submitted', 'rejected'] as const;
 
+const selectClassNames = {
+  trigger: 'bg-theme-elevated border-theme-default',
+  value: 'text-theme-primary',
+  label: 'text-theme-muted',
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -140,12 +146,6 @@ export function PrivacyTab({
       ? t(`insurance.status_${status}`)
       : t('insurance.status_unknown')
   );
-
-  const selectClassNames = {
-    trigger: 'bg-theme-elevated border-theme-default',
-    value: 'text-theme-primary',
-    label: 'text-theme-muted',
-  };
 
   return (
     <div className="space-y-6">

@@ -192,6 +192,16 @@ function SimpleBarChart({ data, givenLabel, receivedLabel }: { data: MonthlyEntr
 // Main Component
 // ─────────────────────────────────────────────────────────────────────────────
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function ActivityDashboardPage() {
   const { t } = useTranslation('activity');
   usePageTitle(t('page_title'));
@@ -233,16 +243,6 @@ export function ActivityDashboardPage() {
   useEffect(() => {
     void loadDashboard();
   }, [loadDashboard]);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   if (isLoading) {
     return (

@@ -84,6 +84,12 @@ const INITIAL_STATE: WizardState = {
   createdJobId: null,
 };
 
+const stepVariants = {
+  enter: { opacity: 0, x: 40 },
+  center: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -40 },
+};
+
 export function EmployerOnboardingPage() {
   const { t } = useTranslation('jobs');
   usePageTitle(t('onboarding.title'));
@@ -177,12 +183,6 @@ export function EmployerOnboardingPage() {
   };
 
   const progressPercentage = ((state.step + 1) / TOTAL_STEPS) * 100;
-
-  const stepVariants = {
-    enter: { opacity: 0, x: 40 },
-    center: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -40 },
-  };
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">

@@ -89,6 +89,19 @@ const PERMISSION_META: Record<string, { icon: typeof Globe }> = {
 // Page Component
 // ─────────────────────────────────────────────────────────────────────────────
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function FederationPartnersPage() {
   const { t } = useTranslation('federation');
   usePageTitle(t('partners.page_title'));
@@ -147,19 +160,6 @@ export function FederationPartnersPage() {
     setIsDetailOpen(false);
     setSelectedPartner(null);
   }
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.08 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   return (
     <div className="space-y-6">

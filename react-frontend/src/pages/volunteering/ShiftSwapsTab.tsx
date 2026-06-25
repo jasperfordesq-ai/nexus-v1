@@ -59,6 +59,16 @@ interface ShiftSwap {
 
 /* ───────────────────────── Component ───────────────────────── */
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function ShiftSwapsTab() {
   const { t } = useTranslation('volunteering');
   const toast = useToast();
@@ -209,16 +219,6 @@ export function ShiftSwapsTab() {
 
   const sentCount = swaps.filter((s) => s.direction === 'sent').length;
   const receivedCount = swaps.filter((s) => s.direction === 'received').length;
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   const formatShiftTime = (shift: SwapShift) => {
     const start = new Date(shift.start_time);

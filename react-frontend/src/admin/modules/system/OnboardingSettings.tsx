@@ -102,6 +102,23 @@ const STEP_ICONS: Record<string, typeof Sparkles> = {
   confirm: CheckCircle,
 };
 
+const LISTING_MODES = [
+  { key: 'disabled', labelKey: 'system.onboarding.listing_mode_disabled', descriptionKey: 'system.onboarding.listing_mode_disabled_desc' },
+  { key: 'suggestions_only', labelKey: 'system.onboarding.listing_mode_suggestions', descriptionKey: 'system.onboarding.listing_mode_suggestions_desc' },
+  { key: 'draft', labelKey: 'system.onboarding.listing_mode_draft', descriptionKey: 'system.onboarding.listing_mode_draft_desc' },
+  { key: 'pending_review', labelKey: 'system.onboarding.listing_mode_pending', descriptionKey: 'system.onboarding.listing_mode_pending_desc' },
+  { key: 'active', labelKey: 'system.onboarding.listing_mode_active', descriptionKey: 'system.onboarding.listing_mode_active_desc' },
+];
+
+const STEPS_CONFIG = [
+  { key: 'welcome', labelKey: 'system.onboarding.step_welcome', descriptionKey: 'system.onboarding.step_welcome_desc' },
+  { key: 'profile', labelKey: 'system.onboarding.step_profile', descriptionKey: 'system.onboarding.step_profile_desc' },
+  { key: 'interests', labelKey: 'system.onboarding.step_interests', descriptionKey: 'system.onboarding.step_interests_desc' },
+  { key: 'skills', labelKey: 'system.onboarding.step_skills', descriptionKey: 'system.onboarding.step_skills_desc' },
+  { key: 'safeguarding', labelKey: 'system.onboarding.step_safeguarding', descriptionKey: 'system.onboarding.step_safeguarding_desc' },
+  { key: 'confirm', labelKey: 'system.onboarding.step_confirm', descriptionKey: 'system.onboarding.step_confirm_desc' },
+];
+
 // ── Component ────────────────────────────────────────────────────────────────
 
 export function OnboardingSettings() {
@@ -120,23 +137,6 @@ export function OnboardingSettings() {
   const [applyingPreset, setApplyingPreset] = useState(false);
 
   const presetModal = useDisclosure();
-
-  const LISTING_MODES = [
-    { key: 'disabled', labelKey: 'system.onboarding.listing_mode_disabled', descriptionKey: 'system.onboarding.listing_mode_disabled_desc' },
-    { key: 'suggestions_only', labelKey: 'system.onboarding.listing_mode_suggestions', descriptionKey: 'system.onboarding.listing_mode_suggestions_desc' },
-    { key: 'draft', labelKey: 'system.onboarding.listing_mode_draft', descriptionKey: 'system.onboarding.listing_mode_draft_desc' },
-    { key: 'pending_review', labelKey: 'system.onboarding.listing_mode_pending', descriptionKey: 'system.onboarding.listing_mode_pending_desc' },
-    { key: 'active', labelKey: 'system.onboarding.listing_mode_active', descriptionKey: 'system.onboarding.listing_mode_active_desc' },
-  ];
-
-  const STEPS_CONFIG = [
-    { key: 'welcome', labelKey: 'system.onboarding.step_welcome', descriptionKey: 'system.onboarding.step_welcome_desc' },
-    { key: 'profile', labelKey: 'system.onboarding.step_profile', descriptionKey: 'system.onboarding.step_profile_desc' },
-    { key: 'interests', labelKey: 'system.onboarding.step_interests', descriptionKey: 'system.onboarding.step_interests_desc' },
-    { key: 'skills', labelKey: 'system.onboarding.step_skills', descriptionKey: 'system.onboarding.step_skills_desc' },
-    { key: 'safeguarding', labelKey: 'system.onboarding.step_safeguarding', descriptionKey: 'system.onboarding.step_safeguarding_desc' },
-    { key: 'confirm', labelKey: 'system.onboarding.step_confirm', descriptionKey: 'system.onboarding.step_confirm_desc' },
-  ];
 
   // ── Fetch config on mount ────────────────────────────────────────────────
 

@@ -65,6 +65,26 @@ interface BlogCategory {
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const categoryColorMap: Record<string, string> = {
+  blue: 'bg-blue-500/10 text-[var(--color-info)]',
+  gray: 'bg-gray-500/10 text-gray-500',
+  fuchsia: 'bg-fuchsia-500/10 text-fuchsia-500',
+  purple: 'bg-purple-500/10 text-purple-500',
+  green: 'bg-emerald-500/10 text-emerald-500',
+  red: 'bg-rose-500/10 text-rose-500',
+  yellow: 'bg-amber-500/10 text-[var(--color-warning)]',
+};
+
 export function BlogPage() {
   const { t } = useTranslation('blog');
   usePageTitle(t('page_title'));
@@ -158,26 +178,6 @@ export function BlogPage() {
     cursorRef.current = undefined;
     loadPosts();
   }, [searchQuery, selectedCategory, loadPosts]);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
-
-  const categoryColorMap: Record<string, string> = {
-    blue: 'bg-blue-500/10 text-[var(--color-info)]',
-    gray: 'bg-gray-500/10 text-gray-500',
-    fuchsia: 'bg-fuchsia-500/10 text-fuchsia-500',
-    purple: 'bg-purple-500/10 text-purple-500',
-    green: 'bg-emerald-500/10 text-emerald-500',
-    red: 'bg-rose-500/10 text-rose-500',
-    yellow: 'bg-amber-500/10 text-[var(--color-warning)]',
-  };
 
   return (
     <div className="space-y-6">

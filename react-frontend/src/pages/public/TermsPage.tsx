@@ -97,17 +97,17 @@ function scrollToSection(id: string) {
   }
 }
 
+const prohibitedKeys = [
+  'terms.prohibited_harassment',
+  'terms.prohibited_fraud',
+  'terms.prohibited_illegal',
+  'terms.prohibited_spam',
+  'terms.prohibited_impersonation',
+  'terms.prohibited_sharing_private',
+] as const;
+
 function DefaultTermsContent({ branding, tenantPath }: { branding: { name: string }; tenantPath: (path: string) => string }) {
   const { t } = useTranslation('legal');
-
-  const prohibitedKeys = [
-    'terms.prohibited_harassment',
-    'terms.prohibited_fraud',
-    'terms.prohibited_illegal',
-    'terms.prohibited_spam',
-    'terms.prohibited_impersonation',
-    'terms.prohibited_sharing_private',
-  ] as const;
 
   return (
     <motion.div

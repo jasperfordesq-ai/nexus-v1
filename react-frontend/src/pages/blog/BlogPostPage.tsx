@@ -113,6 +113,16 @@ function buildArticleStructuredData(post: BlogPostDetail, options: ArticleStruct
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
+const categoryColorMap: Record<string, string> = {
+  blue: 'bg-blue-500/10 text-[var(--color-info)]',
+  gray: 'bg-gray-500/10 text-gray-500',
+  fuchsia: 'bg-fuchsia-500/10 text-fuchsia-500',
+  purple: 'bg-purple-500/10 text-purple-500',
+  green: 'bg-emerald-500/10 text-emerald-500',
+  red: 'bg-rose-500/10 text-rose-500',
+  yellow: 'bg-amber-500/10 text-[var(--color-warning)]',
+};
+
 export function BlogPostPage() {
   const { t } = useTranslation('blog');
   const { slug } = useParams<{ slug: string }>();
@@ -161,16 +171,6 @@ export function BlogPostPage() {
   useEffect(() => {
     loadPost();
   }, [loadPost]);
-
-  const categoryColorMap: Record<string, string> = {
-    blue: 'bg-blue-500/10 text-[var(--color-info)]',
-    gray: 'bg-gray-500/10 text-gray-500',
-    fuchsia: 'bg-fuchsia-500/10 text-fuchsia-500',
-    purple: 'bg-purple-500/10 text-purple-500',
-    green: 'bg-emerald-500/10 text-emerald-500',
-    red: 'bg-rose-500/10 text-rose-500',
-    yellow: 'bg-amber-500/10 text-[var(--color-warning)]',
-  };
 
   // Loading state
   if (isLoading) {

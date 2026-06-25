@@ -112,15 +112,15 @@ interface StatCardProps {
   icon?: React.ReactNode;
 }
 
-function StatCard({ label, value, color = 'default', icon }: StatCardProps) {
-  const colorClass: Record<string, string> = {
-    primary: 'text-accent',
-    success: 'text-success',
-    warning: 'text-warning',
-    danger: 'text-danger',
-    default: 'text-foreground',
-  };
+const colorClass: Record<string, string> = {
+  primary: 'text-accent',
+  success: 'text-success',
+  warning: 'text-warning',
+  danger: 'text-danger',
+  default: 'text-foreground',
+};
 
+function StatCard({ label, value, color = 'default', icon }: StatCardProps) {
   return (
     <Card className="p-1">
       <CardBody className="gap-2">

@@ -61,6 +61,18 @@ const STATUS_COLOR_MAP: Record<string, 'warning' | 'success' | 'danger' | 'accen
 
 const SEARCH_DEBOUNCE_MS = 300;
 
+// Status filter is mirrored to the `?status=` URL param so the broker
+// dashboard stat cards can deep-link straight into a filtered view and
+// the browser back button round-trips correctly.
+// 'pending_review' is the union of literal-pending + submitted — both
+// are pre-verification states the broker still owns. This is what the
+// broker dashboard's "Vetting Pending" tile counts and what the
+// "Pending Review" stat card on this page surfaces. The narrower
+// 'pending' / 'submitted' filters are still available for drill-down.
+const VETTING_STATUSES = [
+  'all', 'pending_review', 'pending', 'submitted', 'verified', 'expired', 'expiring_soon', 'rejected',
+] as const;
+
 interface UserSearchResult {
   id: number;
   first_name: string;
@@ -79,17 +91,6 @@ export function VettingRecords() {
     return tKey ? t(`vetting.${tKey}`) : key;
   };
 
-  // Status filter is mirrored to the `?status=` URL param so the broker
-  // dashboard stat cards can deep-link straight into a filtered view and
-  // the browser back button round-trips correctly.
-  // 'pending_review' is the union of literal-pending + submitted — both
-  // are pre-verification states the broker still owns. This is what the
-  // broker dashboard's "Vetting Pending" tile counts and what the
-  // "Pending Review" stat card on this page surfaces. The narrower
-  // 'pending' / 'submitted' filters are still available for drill-down.
-  const VETTING_STATUSES = [
-    'all', 'pending_review', 'pending', 'submitted', 'verified', 'expired', 'expiring_soon', 'rejected',
-  ] as const;
   type VettingStatus = (typeof VETTING_STATUSES)[number];
   const [searchParams, setSearchParams] = useSearchParams();
   const urlStatus = searchParams.get('status') as VettingStatus | null;

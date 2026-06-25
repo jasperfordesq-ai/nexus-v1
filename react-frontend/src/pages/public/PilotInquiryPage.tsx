@@ -120,6 +120,14 @@ function StepTitle({ step }: { step: number }) {
   );
 }
 
+// ─── Input class helper ────────────────────────────────────────────────────
+
+const inputClasses = {
+  inputWrapper: 'bg-theme-elevated border-theme-default',
+  label: 'text-theme-muted',
+  input: 'text-theme-primary placeholder:text-theme-subtle',
+};
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export function PilotInquiryPage() {
@@ -211,14 +219,6 @@ export function PilotInquiryPage() {
     if (score >= 40) return { label: t('success_good'),      color: 'text-amber-500' };
     return              { label: t('success_interested'),    color: 'text-indigo-500' };
   }
-
-  // ── Input class helper ────────────────────────────────────────────────────
-
-  const inputClasses = {
-    inputWrapper: 'bg-theme-elevated border-theme-default',
-    label: 'text-theme-muted',
-    input: 'text-theme-primary placeholder:text-theme-subtle',
-  };
 
   // ─── Success state ────────────────────────────────────────────────────────
 

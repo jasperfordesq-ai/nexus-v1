@@ -76,16 +76,16 @@ const INITIAL_FORM: EmailSettingsForm = {
   _smtp_password_set: false,
 };
 
+const PROVIDERS = [
+  { key: 'platform_default', labelKey: 'provider_platform_default' },
+  { key: 'sendgrid', labelKey: 'provider_sendgrid' },
+  { key: 'gmail_api', labelKey: 'provider_gmail_api' },
+  { key: 'smtp', labelKey: 'provider_smtp' },
+];
+
 export function EmailSettings() {
   const { t } = useTranslation('admin', { keyPrefix: 'advanced' });
   const { t: tNav } = useTranslation('admin_nav');
-  const PROVIDERS = [
-    { key: 'platform_default', labelKey: 'provider_platform_default' },
-    { key: 'sendgrid', labelKey: 'provider_sendgrid' },
-    { key: 'gmail_api', labelKey: 'provider_gmail_api' },
-    { key: 'smtp', labelKey: 'provider_smtp' },
-  ];
-
   usePageTitle(tNav('advanced'));
   const toast = useToast();
   const [loading, setLoading] = useState(true);

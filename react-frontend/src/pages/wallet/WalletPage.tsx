@@ -504,13 +504,13 @@ interface StatCardProps {
   isLoading?: boolean;
 }
 
-function StatCard({ icon, label, value, color, isLoading }: StatCardProps) {
-  const colorClasses = {
-    emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300',
-    rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-300',
-    amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-300',
-  };
+const colorClasses = {
+  emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300',
+  rose: 'bg-rose-500/10 text-rose-600 dark:text-rose-300',
+  amber: 'bg-amber-500/10 text-amber-600 dark:text-amber-300',
+};
 
+function StatCard({ icon, label, value, color, isLoading }: StatCardProps) {
   return (
     <GlassCard className="min-h-28 p-4">
       <div className={`mb-3 inline-flex rounded-lg p-2 ${colorClasses[color]}`}>

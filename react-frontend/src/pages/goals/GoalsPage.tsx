@@ -98,6 +98,28 @@ type GoalTab = 'my' | 'buddying' | 'discover';
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const modalClasses = {
+  backdrop: 'z-[9998]',
+  wrapper: 'z-[9999] items-start px-3 py-4 pt-28 sm:px-4 sm:pt-32',
+  base: 'z-[10000] bg-overlay border border-theme-default my-0 max-h-[calc(100dvh_-_8rem)] sm:max-h-[calc(100dvh_-_9rem)]',
+  body: 'overflow-y-auto',
+};
+
+const inputClasses = {
+  input: 'bg-transparent text-theme-primary',
+  inputWrapper: 'bg-theme-elevated border-theme-default',
+};
+
 export function GoalsPage() {
   const { t } = useTranslation(['gamification', 'goals']);
   usePageTitle(t('goals.page_title'));
@@ -425,28 +447,6 @@ export function GoalsPage() {
     } catch (err) {
       logError('Failed to load goal details', err);
     }
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
-
-  const modalClasses = {
-    backdrop: 'z-[9998]',
-    wrapper: 'z-[9999] items-start px-3 py-4 pt-28 sm:px-4 sm:pt-32',
-    base: 'z-[10000] bg-overlay border border-theme-default my-0 max-h-[calc(100dvh_-_8rem)] sm:max-h-[calc(100dvh_-_9rem)]',
-    body: 'overflow-y-auto',
-  };
-
-  const inputClasses = {
-    input: 'bg-transparent text-theme-primary',
-    inputWrapper: 'bg-theme-elevated border-theme-default',
   };
 
   return (

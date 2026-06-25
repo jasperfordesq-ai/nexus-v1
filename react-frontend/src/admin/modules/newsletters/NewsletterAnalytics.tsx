@@ -545,12 +545,13 @@ function EngagementStat({
   );
 }
 
+const colors: Record<number, string> = {
+  1: 'bg-warning text-warning-foreground',
+  2: 'bg-surface-secondary text-muted',
+  3: 'bg-orange-300 text-orange-900',
+};
+
 function RankBadge({ rank }: { rank: number }) {
-  const colors: Record<number, string> = {
-    1: 'bg-warning text-warning-foreground',
-    2: 'bg-surface-secondary text-muted',
-    3: 'bg-orange-300 text-orange-900',
-  };
   return (
     <span
       className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold ${colors[rank] ?? ''}`}

@@ -85,13 +85,14 @@ interface MemberPreference {
 // Severity Chip Helper
 // ─────────────────────────────────────────────────────────────────────────────
 
+const colorMap: Record<string, 'default' | 'warning' | 'danger'> = {
+  low: 'default',
+  medium: 'warning',
+  high: 'danger',
+  critical: 'danger',
+};
+
 function SeverityChip({ severity, t }: { severity: string; t: TFunction }) {
-  const colorMap: Record<string, 'default' | 'warning' | 'danger'> = {
-    low: 'default',
-    medium: 'warning',
-    high: 'danger',
-    critical: 'danger',
-  };
   const color = colorMap[severity] || 'default';
   const variant = severity === 'critical' ? 'primary' : 'tertiary';
   // Reuse the existing broker.status namespace which already has
@@ -107,6 +108,11 @@ function SeverityChip({ severity, t }: { severity: string; t: TFunction }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
+
+// The active tab and severity filter are mirrored to the `?tab=` and
+// `?filter=` URL params so dashboard tiles can deep-link directly into a
+// pre-filtered view AND browser back/forward round-trips correctly.
+const ALLOWED_TABS = ['flagged', 'guardians', 'preferences'] as const;
 
 export default function SafeguardingPage() {
   const { t } = useTranslation('broker');
@@ -142,10 +148,6 @@ export default function SafeguardingPage() {
   const [reviewLoading, setReviewLoading] = useState(false);
 
   // ── Active tab + severity filter (URL-driven) ────────────────────────────
-  // The active tab and severity filter are mirrored to the `?tab=` and
-  // `?filter=` URL params so dashboard tiles can deep-link directly into a
-  // pre-filtered view AND browser back/forward round-trips correctly.
-  const ALLOWED_TABS = ['flagged', 'guardians', 'preferences'] as const;
   type TabKey = (typeof ALLOWED_TABS)[number];
   const urlTab = searchParams.get('tab') as TabKey | null;
   const activeTab: TabKey = urlTab && ALLOWED_TABS.includes(urlTab) ? urlTab : 'flagged';

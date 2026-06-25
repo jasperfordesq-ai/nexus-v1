@@ -114,6 +114,19 @@ interface GamificationBadgeResponse {
   earned_at?: string | null;
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function ProfilePage() {
   const { t } = useTranslation('profile');
   const { id } = useParams<{ id: string }>();
@@ -541,19 +554,6 @@ export function ProfilePage() {
       />
     );
   }
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   const profileName = profile.name || profile.first_name || t('member_fallback');
   const profileAvatar = profile.avatar_url || profile.avatar;
@@ -1417,15 +1417,15 @@ interface ProfileStatCardProps {
   color: 'emerald' | 'indigo' | 'purple' | 'amber' | 'rose';
 }
 
-function ProfileStatCard({ icon, label, value, color }: ProfileStatCardProps) {
-  const colorClasses: Record<string, string> = {
-    emerald: 'from-emerald-500/20 to-teal-500/20 text-emerald-500',
-    indigo: 'from-indigo-500/20 to-blue-500/20 text-indigo-500',
-    purple: 'from-purple-500/20 to-fuchsia-500/20 text-purple-500',
-    amber: 'from-amber-500/20 to-orange-500/20 text-[var(--color-warning)]',
-    rose: 'from-rose-500/20 to-pink-500/20 text-rose-500',
-  };
+const colorClasses: Record<string, string> = {
+  emerald: 'from-emerald-500/20 to-teal-500/20 text-emerald-500',
+  indigo: 'from-indigo-500/20 to-blue-500/20 text-indigo-500',
+  purple: 'from-purple-500/20 to-fuchsia-500/20 text-purple-500',
+  amber: 'from-amber-500/20 to-orange-500/20 text-[var(--color-warning)]',
+  rose: 'from-rose-500/20 to-pink-500/20 text-rose-500',
+};
 
+function ProfileStatCard({ icon, label, value, color }: ProfileStatCardProps) {
   return (
     <GlassCard className="p-4 text-center hover:bg-theme-hover transition-colors">
       <div className={`inline-flex p-2 rounded-lg bg-gradient-to-br ${colorClasses[color]} mb-2`}>

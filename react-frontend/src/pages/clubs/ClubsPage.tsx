@@ -46,6 +46,16 @@ interface Club {
 const ITEMS_PER_PAGE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function ClubsPage() {
@@ -122,16 +132,6 @@ export function ClubsPage() {
     const nextPage = page + 1;
     setPage(nextPage);
     loadClubs(nextPage, true);
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   return (

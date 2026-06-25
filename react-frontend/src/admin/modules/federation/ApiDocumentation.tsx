@@ -990,15 +990,15 @@ print(data['message_id'])  # 1234`,
 
 type ExampleLang = 'curl' | 'js' | 'python';
 
+const langLabels: Record<ExampleLang, string> = {
+  curl: 'cURL',
+  js: 'JavaScript',
+  python: 'Python',
+};
+
 function ExamplesTab() {
   const { t } = useTranslation('admin');
   const [lang, setLang] = useState<ExampleLang>('curl');
-
-  const langLabels: Record<ExampleLang, string> = {
-    curl: 'cURL',
-    js: 'JavaScript',
-    python: 'Python',
-  };
 
   return (
     <div className="space-y-6">

@@ -707,29 +707,29 @@ interface CaseStudyCardProps {
   accent: 'emerald' | 'indigo' | 'amber';
 }
 
+const colorMap = {
+  emerald: {
+    bg: 'bg-emerald-500/5',
+    border: 'border-emerald-500/20',
+    icon: 'text-emerald-500/60',
+    badge: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+  },
+  indigo: {
+    bg: 'bg-indigo-500/5',
+    border: 'border-indigo-500/20',
+    icon: 'text-indigo-500/60',
+    badge: 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400',
+  },
+  amber: {
+    bg: 'bg-amber-500/5',
+    border: 'border-amber-500/20',
+    icon: 'text-[var(--color-warning)]/60',
+    badge: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
+  },
+};
+
 function CaseStudyCard({ name, quote, accent }: CaseStudyCardProps) {
   const { t } = useTranslation('about');
-  const colorMap = {
-    emerald: {
-      bg: 'bg-emerald-500/5',
-      border: 'border-emerald-500/20',
-      icon: 'text-emerald-500/60',
-      badge: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
-    },
-    indigo: {
-      bg: 'bg-indigo-500/5',
-      border: 'border-indigo-500/20',
-      icon: 'text-indigo-500/60',
-      badge: 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400',
-    },
-    amber: {
-      bg: 'bg-amber-500/5',
-      border: 'border-amber-500/20',
-      icon: 'text-[var(--color-warning)]/60',
-      badge: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
-    },
-  };
-
   const colors = colorMap[accent];
 
   return (

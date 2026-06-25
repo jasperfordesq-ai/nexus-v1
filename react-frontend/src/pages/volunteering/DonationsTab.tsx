@@ -84,6 +84,16 @@ const STATUS_COLOR: Record<string, 'success' | 'warning' | 'danger' | 'default'>
   refunded: 'default',
 };
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 /* ───────────────────────── Component ───────────────────────── */
 
 export function DonationsTab() {
@@ -218,16 +228,6 @@ export function DonationsTab() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   return (
