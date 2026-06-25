@@ -33,13 +33,15 @@ export function AdminLayout() {
 function AdminLayoutShell() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const location = useLocation();
+  const { pathname } = useLocation();
   const drawerRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
 
-  useEffect(() => {
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setMobileDrawerOpen(false);
-  }, [location.pathname]);
+  }
 
   const { t } = useTranslation('admin_nav');
 

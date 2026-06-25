@@ -142,7 +142,7 @@ interface MobileDrawerProps {
 
 export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProps) {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { pathname } = useLocation();
   const { t } = useTranslation('common');
   const { user, isAuthenticated, logout } = useAuth();
   const { tenant, hasFeature, hasModule, tenantPath } = useTenant();
@@ -252,14 +252,14 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   ];
 
   // Track previous pathname to only close on actual navigation
-  const prevPathRef = useRef(location.pathname);
+  const prevPathRef = useRef(pathname);
 
   useEffect(() => {
-    if (prevPathRef.current !== location.pathname) {
+    if (prevPathRef.current !== pathname) {
       onClose();
-      prevPathRef.current = location.pathname;
+      prevPathRef.current = pathname;
     }
-  }, [location.pathname, onClose]);
+  }, [pathname, onClose]);
 
   const handleLogout = async () => {
     await logout();
@@ -281,7 +281,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
     const Icon = item.icon;
     const resolvedHref = tenantPath(item.href);
-    const isActive = location.pathname === resolvedHref || location.pathname.startsWith(resolvedHref + '/');
+    const isActive = pathname === resolvedHref || pathname.startsWith(resolvedHref + '/');
 
     return (
       <Button

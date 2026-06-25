@@ -16,7 +16,7 @@ export function CaringLayout() {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement | null>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
-  const location = useLocation();
+  const { pathname } = useLocation();
   const { t } = useTranslation('caring_community');
 
   const closeMobileDrawer = () => {
@@ -34,9 +34,11 @@ export function CaringLayout() {
     });
   };
 
-  useEffect(() => {
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setMobileDrawerOpen(false);
-  }, [location.pathname]);
+  }
 
   useEffect(() => {
     if (!mobileDrawerOpen) {
