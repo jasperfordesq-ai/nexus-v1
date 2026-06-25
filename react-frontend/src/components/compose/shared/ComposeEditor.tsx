@@ -345,10 +345,10 @@ function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
  */
 function HtmlImportPlugin({ html }: { html: string }) {
   const [editor] = useLexicalComposerContext();
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const hasLoadedRef = useRef(false);
 
   useEffect(() => {
-    if (hasLoaded || !html) return;
+    if (hasLoadedRef.current || !html) return;
 
     editor.update(() => {
       const parser = new DOMParser();
@@ -359,8 +359,8 @@ function HtmlImportPlugin({ html }: { html: string }) {
       nodes.forEach((node) => root.append(node));
     });
 
-    setHasLoaded(true);
-  }, [editor, html, hasLoaded]);
+    hasLoadedRef.current = true;
+  }, [editor, html]);
 
   return null;
 }

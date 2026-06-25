@@ -9,7 +9,7 @@
  * Uses HeroUI Button components for the toolbar and Tailwind CSS for styling.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
@@ -447,10 +447,10 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
  */
 function HtmlImportPlugin({ html }: { html: string }) {
   const [editor] = useLexicalComposerContext();
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const hasLoadedRef = useRef(false);
 
   useEffect(() => {
-    if (hasLoaded || !html) return;
+    if (hasLoadedRef.current || !html) return;
 
     editor.update(() => {
       const parser = new DOMParser();
@@ -461,8 +461,8 @@ function HtmlImportPlugin({ html }: { html: string }) {
       nodes.forEach((node) => root.append(node));
     });
 
-    setHasLoaded(true);
-  }, [editor, html, hasLoaded]);
+    hasLoadedRef.current = true;
+  }, [editor, html]);
 
   return null;
 }
