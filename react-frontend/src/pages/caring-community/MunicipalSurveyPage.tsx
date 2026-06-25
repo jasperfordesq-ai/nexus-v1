@@ -10,7 +10,7 @@
  * All user-facing text is translated via t('municipality_survey.*').
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CheckCircle from 'lucide-react/icons/check-circle';
@@ -392,14 +392,20 @@ export default function MunicipalSurveyPage() {
     void fetchSurveys();
   };
 
+  const surveyDateFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(i18n.language || 'en', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      }),
+    [i18n.language]
+  );
+
   const formatSurveyDate = (iso: string): string => {
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) return iso;
-    return new Intl.DateTimeFormat(i18n.language || 'en', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    }).format(date);
+    return surveyDateFormatter.format(date);
   };
 
   // ── Success state ──────────────────────────────────────────────────────────

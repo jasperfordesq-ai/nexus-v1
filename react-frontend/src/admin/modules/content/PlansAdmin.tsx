@@ -37,6 +37,8 @@ const TIER_COLORS: Record<number, 'default' | 'primary' | 'secondary' | 'success
   3: 'warning',
 };
 
+const planPriceFormatter = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' });
+
 export function PlansAdmin() {
   const { t } = useTranslation('admin');
   usePageTitle(t('content.plans_admin_title'));
@@ -112,7 +114,7 @@ export function PlansAdmin() {
 
   const formatPrice = (price: number) => {
     if (!price) return t('content.free');
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' }).format(Number(price));
+    return planPriceFormatter.format(Number(price));
   };
 
   const columns: Column<PlanListItem>[] = [

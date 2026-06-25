@@ -52,13 +52,15 @@ interface RevenueDashboardData {
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
+const currencyFormatter = new Intl.NumberFormat('en-IE', {
+  style: 'currency',
+  currency: 'EUR',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-IE', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
+  return currencyFormatter.format(amount);
 }
 
 function actionChipColor(

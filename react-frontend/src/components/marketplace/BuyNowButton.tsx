@@ -16,7 +16,7 @@ import { Select, SelectItem, useDisclosure, Button, Input } from '@/components/u
  * telling the buyer to contact the seller to arrange payment.
  */
 
-import { useState, useCallback, useEffect } from 'react';import CreditCard from 'lucide-react/icons/credit-card';
+import { useState, useCallback, useEffect, useMemo } from 'react';import CreditCard from 'lucide-react/icons/credit-card';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -175,12 +175,17 @@ export function BuyNowButton({
   }, [listingId, isOwnListing, user, toast, onSuccess, checkoutModal, t, couponApplied, couponCode, selectedSlotId])
 
   // Format price for button label
-  const priceLabel = new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: currency || 'EUR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(price);
+  const priceFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: currency || 'EUR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      }),
+    [currency]
+  );
+  const priceLabel = priceFormatter.format(price);
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) return;

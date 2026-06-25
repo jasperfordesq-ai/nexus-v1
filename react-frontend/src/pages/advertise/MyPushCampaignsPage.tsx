@@ -71,14 +71,16 @@ const STATUS_COLOR: Record<CampaignStatus, 'default' | 'primary' | 'success' | '
   failed: 'danger',
 };
 
+const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  month: 'short',
+  year: 'numeric',
+});
+
 function formatDateTime(value: string): string {
-  return new Intl.DateTimeFormat(undefined, {
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(value));
+  return dateTimeFormatter.format(new Date(value));
 }
 
 const defaultForm: CreatePushCampaignForm = {

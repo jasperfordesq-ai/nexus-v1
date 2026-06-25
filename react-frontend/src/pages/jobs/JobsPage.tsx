@@ -24,7 +24,7 @@ import { Chip as HeroChip, ToggleButton, ToggleButtonGroup } from '@/components/
  * - Featured jobs visual distinction (ring + gradient bg)
  */
 
-import { useState, useEffect, useCallback, useRef, memo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
@@ -736,18 +736,24 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
   const isPastDeadline = deadlineDate ? deadlineDate < new Date() : false;
 
   // J9: Format salary with Intl.NumberFormat
-  const formatCurrency = (value: number) => {
-    const currency = vacancy.salary_currency || 'EUR';
+  const currency = vacancy.salary_currency || 'EUR';
+  const currencyFormatter = useMemo(() => {
     try {
       return new Intl.NumberFormat(undefined, {
         style: 'currency',
         currency,
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
-      }).format(value);
+      });
     } catch {
+      return null;
+    }
+  }, [currency]);
+  const formatCurrency = (value: number) => {
+    if (!currencyFormatter) {
       return `${currency} ${value.toLocaleString()}`;
     }
+    return currencyFormatter.format(value);
   };
 
   const salaryDisplay = (() => {

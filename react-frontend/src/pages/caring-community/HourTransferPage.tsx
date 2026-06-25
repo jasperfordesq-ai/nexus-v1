@@ -59,12 +59,14 @@ const STATUS_COLOR: Record<TransferStatus, 'default' | 'primary' | 'success' | '
   rejected: 'danger',
 };
 
+const dateFormatter = new Intl.DateTimeFormat(undefined, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+
 function formatDate(value: string): string {
-  return new Intl.DateTimeFormat(undefined, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(value));
+  return dateFormatter.format(new Date(value));
 }
 
 export function HourTransferPage() {

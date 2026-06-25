@@ -23,12 +23,14 @@ import { PageHeader } from '../../components/PageHeader';
 const isFreePlan = (plan: Plan) =>
   plan.price_monthly === 0 && plan.price_yearly === 0;
 
+const priceFormatter = new Intl.NumberFormat(undefined, {
+  style: 'currency',
+  currency: 'EUR',
+  minimumFractionDigits: 2,
+});
+
 const formatPrice = (amount: number) => {
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 2,
-  }).format(amount);
+  return priceFormatter.format(amount);
 };
 
 export function PlanSelector() {

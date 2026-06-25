@@ -107,12 +107,14 @@ function buildChartData(recent: NudgeRecent[]) {
   return Object.values(days);
 }
 
+const adminDateFormatter = new Intl.DateTimeFormat(undefined, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+
 function formatAdminDate(value: string): string {
-  return new Intl.DateTimeFormat(undefined, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(value));
+  return adminDateFormatter.format(new Date(value));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -81,6 +81,12 @@ function getStatusKey(status: string) {
   return `jobs.pipeline_status_${status.toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
 }
 
+const salaryFormatter = new Intl.NumberFormat(undefined, {
+  style: 'currency',
+  currency: 'EUR',
+  maximumFractionDigits: 0,
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Filter options
 // ─────────────────────────────────────────────────────────────────────────────
@@ -291,11 +297,7 @@ export function JobPipelineOverview() {
         sortable: true,
         render: (item) =>
           item.salary_offered != null
-            ? new Intl.NumberFormat(undefined, {
-                style: 'currency',
-                currency: 'EUR',
-                maximumFractionDigits: 0,
-              }).format(item.salary_offered)
+            ? salaryFormatter.format(item.salary_offered)
             : '—',
       },
       {

@@ -10,7 +10,7 @@
  * Payment is one-time per tenant. Retries after failure skip DOB and payment steps.
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';import ShieldCheck from 'lucide-react/icons/shield-check';
@@ -78,6 +78,15 @@ export function VerifyIdentityOptionalPage() {
   const [isCreatingPayment, setIsCreatingPayment] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const userStartedRef = useRef(false);
+
+  const feeFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: feeCurrency,
+      }),
+    [feeCurrency]
+  );
 
   const stopPolling = useCallback(() => {
     if (pollRef.current) {
@@ -375,10 +384,7 @@ export function VerifyIdentityOptionalPage() {
   // ─── Payment Required ──────────────────────────────────────────────
 
   if (pageState === 'payment_required') {
-    const feeDisplay = new Intl.NumberFormat(undefined, {
-      style: 'currency',
-      currency: feeCurrency,
-    }).format(feeCents / 100);
+    const feeDisplay = feeFormatter.format(feeCents / 100);
 
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">

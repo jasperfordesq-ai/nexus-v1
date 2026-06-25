@@ -53,12 +53,14 @@ function formatHoursShort(
   return t('hours_short', { count: hours.toFixed(2) });
 }
 
+const dateFormatter = new Intl.DateTimeFormat(undefined, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+
 function formatDate(value: string): string {
-  return new Intl.DateTimeFormat(undefined, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(value));
+  return dateFormatter.format(new Date(value));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

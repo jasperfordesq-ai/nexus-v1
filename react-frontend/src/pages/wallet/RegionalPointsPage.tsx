@@ -70,12 +70,14 @@ interface HistoryResponse {
   items: PointTransaction[];
 }
 
+const activityDateFormatter = new Intl.DateTimeFormat(undefined, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+
 function formatActivityDate(value: string): string {
-  return new Intl.DateTimeFormat(undefined, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(value));
+  return activityDateFormatter.format(new Date(value));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

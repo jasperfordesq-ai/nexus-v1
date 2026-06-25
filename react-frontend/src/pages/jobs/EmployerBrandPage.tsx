@@ -8,7 +8,7 @@
  * Route: /jobs/employers/:userId
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 import { Chip } from '@/components/ui';
@@ -159,6 +159,8 @@ export function EmployerBrandPage() {
   const [jobs, setJobs] = useState<EmployerJob[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const reviewDateFormatter = useMemo(() => new Intl.DateTimeFormat(i18n.language), [i18n.language]);
 
   // Reviews state
   const [reviews, setReviews] = useState<EmployerReview[]>([]);
@@ -627,7 +629,7 @@ export function EmployerBrandPage() {
                         </span>
                         <StarRating rating={review.rating} size={13} />
                         <span className="text-xs text-theme-muted">
-                          {review.created_at ? new Intl.DateTimeFormat(i18n.language).format(new Date(review.created_at)) : ''}
+                          {review.created_at ? reviewDateFormatter.format(new Date(review.created_at)) : ''}
                         </span>
                       </div>
                       {review.comment && (

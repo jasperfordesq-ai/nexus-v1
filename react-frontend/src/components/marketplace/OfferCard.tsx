@@ -53,12 +53,14 @@ function formatCurrency(amount: number, currency: string): string {
   }
 }
 
+const timestampFormatter = new Intl.DateTimeFormat(undefined, {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+});
+
 function formatTimestamp(dateStr: string): string {
   try {
-    return new Intl.DateTimeFormat(undefined, {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    }).format(new Date(dateStr));
+    return timestampFormatter.format(new Date(dateStr));
   } catch {
     return dateStr;
   }
