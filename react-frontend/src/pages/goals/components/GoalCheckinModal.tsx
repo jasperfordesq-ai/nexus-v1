@@ -108,15 +108,20 @@ export function GoalCheckinModal({
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [showHistory, setShowHistory] = useState(false);
 
-  // Reset form when opening
-  useEffect(() => {
+  // Reset form when opening. Done during render with a prev-prop comparison
+  // (not useEffect) so users never see a stale frame. Mirrors the original
+  // effect deps [isOpen, currentProgress]: re-applies when either changes while
+  // the modal is open.
+  const [prevTrigger, setPrevTrigger] = useState({ isOpen, currentProgress });
+  if (isOpen !== prevTrigger.isOpen || currentProgress !== prevTrigger.currentProgress) {
+    setPrevTrigger({ isOpen, currentProgress });
     if (isOpen) {
       setProgressValue(currentProgress);
       setNote('');
       setSelectedMood(null);
       setShowHistory(false);
     }
-  }, [isOpen, currentProgress]);
+  }
 
   // Load check-in history
   const loadCheckins = useCallback(async () => {

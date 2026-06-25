@@ -50,13 +50,25 @@ export function PodcastAudioPlayer({ episode, onCompleted }: PodcastAudioPlayerP
   const sliderMax = Math.max(1, duration);
   const sliderValue = Math.min(Math.max(scrubValue ?? currentTime, 0), sliderMax);
 
-  useEffect(() => {
+  // Reset player state when the episode changes. Done during render with a
+  // prev-prop comparison (not useEffect) so users never see a stale frame.
+  const [prevEpisode, setPrevEpisode] = useState({
+    id: episode.id,
+    durationSeconds: episode.duration_seconds,
+  });
+  if (episode.id !== prevEpisode.id || episode.duration_seconds !== prevEpisode.durationSeconds) {
+    setPrevEpisode({ id: episode.id, durationSeconds: episode.duration_seconds });
     completedRef.current = false;
     setCurrentTime(0);
     setDuration(normalizeDuration(episode.duration_seconds));
     setPlaybackRate(1);
     setScrubValue(null);
     setHasError(false);
+  }
+
+  // Imperatively reset the audio element to match the new episode. Stays in an
+  // effect because it touches the DOM (not safe during render).
+  useEffect(() => {
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
       audioRef.current.playbackRate = 1;

@@ -82,16 +82,24 @@ export function TransferModal({
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  // Reset form when modal opens/closes
-  useEffect(() => {
-    let cancelled = false;
-
+  // Reset form when the modal transitions open. Done during render with a
+  // prev-prop comparison (not useEffect) so users never see a stale frame.
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setFormData({ recipient: null, amount: '', description: '', category_id: null });
       setSearchQuery('');
       setSearchResults([]);
       setError(null);
+    }
+  }
 
+  // Async side-effects when the modal opens (config + recipient prefetch).
+  useEffect(() => {
+    let cancelled = false;
+
+    if (isOpen) {
       // Fetch max transfer limit from wallet config; fall back silently to current state value
       api.get<{ max_transfer?: number }>('/v2/wallet/config')
         .then((res) => {

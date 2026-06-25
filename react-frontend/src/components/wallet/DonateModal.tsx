@@ -48,8 +48,11 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  // Reset form when modal opens
-  useEffect(() => {
+  // Reset form when the modal transitions open. Done during render with a
+  // prev-prop comparison (not useEffect) so users never see a stale frame.
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setRecipientType('community_fund');
       setSelectedRecipient(null);
@@ -59,10 +62,14 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
       setAmount('');
       setMessage('');
     }
+  }
+
+  // Clear the pending search debounce on unmount.
+  useEffect(() => {
     return () => {
       if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     };
-  }, [isOpen]);
+  }, []);
 
   const searchUsers = useCallback(async (query: string) => {
     if (query.length < 2) {

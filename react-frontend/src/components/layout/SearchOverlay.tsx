@@ -100,27 +100,39 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   }, [isOpen]);
 
   // ─── Load recent searches on open ──────────────────────────────────────
-  useEffect(() => {
-    if (!isOpen) return;
-    const stored = safeLocalStorageGetJSON<string[]>(RECENT_SEARCHES_KEY, []);
-    if (stored.length > 0) setRecentSearches(stored);
-  }, [isOpen]);
+  // Done during render with a prev-prop comparison (not useEffect) so users
+  // never see a stale frame. Reading localStorage is a pure read, safe here.
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
+    if (isOpen) {
+      const stored = safeLocalStorageGetJSON<string[]>(RECENT_SEARCHES_KEY, []);
+      if (stored.length > 0) setRecentSearches(stored);
+    }
+  }
+
+  // ─── Clear stale suggestions when the query is too short ────────────────
+  // Synchronous reset reacting to query/isOpen — moved out of the debounced
+  // search effect to render-time so the cleared frame is never stale.
+  const trimmedQuery = query.trim();
+  const queryIsSearchable = isOpen && trimmedQuery.length >= 2 && !trimmedQuery.startsWith('>');
+  const [prevQueryWasSearchable, setPrevQueryWasSearchable] = useState(queryIsSearchable);
+  if (queryIsSearchable !== prevQueryWasSearchable) {
+    setPrevQueryWasSearchable(queryIsSearchable);
+    if (!queryIsSearchable) {
+      setSuggestions([]);
+    }
+  }
 
   // ─── Debounced search ──────────────────────────────────────────────────
   useEffect(() => {
-    if (!isOpen) return;
-
-    const trimmed = query.trim();
-    if (trimmed.length < 2 || trimmed.startsWith('>')) {
-      setSuggestions([]);
-      return;
-    }
+    if (!queryIsSearchable) return;
 
     setIsLoading(true);
     const timer = setTimeout(async () => {
       try {
         const response = await api.get<Record<string, SearchSuggestion[]>>(
-          `/v2/search/suggestions?q=${encodeURIComponent(trimmed)}&limit=5`
+          `/v2/search/suggestions?q=${encodeURIComponent(trimmedQuery)}&limit=5`
         );
         if (response.success && response.data) {
           const all: SearchSuggestion[] = [];
@@ -139,7 +151,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     }, 250);
 
     return () => clearTimeout(timer);
-  }, [query, isOpen]);
+  }, [queryIsSearchable, trimmedQuery]);
 
   // Reset selection when suggestions change
   useEffect(() => {

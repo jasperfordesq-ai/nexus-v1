@@ -98,15 +98,18 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  // Reset state when modal opens
-  useEffect(() => {
+  // Reset state when the modal transitions open. Done during render with a
+  // prev-prop comparison (not useEffect) so users never see a stale frame.
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setQuery('');
       setUsers([]);
       setSelectedUser(null);
       setSentTo(new Set());
     }
-  }, [isOpen]);
+  }
 
   const handleSend = async (user: UserResult) => {
     try {

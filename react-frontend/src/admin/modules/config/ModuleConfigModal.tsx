@@ -211,7 +211,13 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     }
   }, [toast, t])
 
-  useEffect(() => {
+  // Reset all config state when the modal closes or the module changes. Done
+  // during render with a prev-prop comparison (not useEffect) so users never
+  // see a stale frame of the previous module's config. Mirrors the original
+  // effect deps [isOpen, module].
+  const [prevTrigger, setPrevTrigger] = useState<{ isOpen: boolean; module: ModuleDefinition | null }>({ isOpen, module });
+  if (isOpen !== prevTrigger.isOpen || module !== prevTrigger.module) {
+    setPrevTrigger({ isOpen, module });
     if (!isOpen || !module) {
       setHasChanges(false);
       setBrokerConfig(null);
@@ -221,6 +227,12 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
       setJobConfig(null);
       setPodcastConfig(null);
       setIdentityConfig(null);
+    }
+  }
+
+  // Load the appropriate config when the modal is open for a module.
+  useEffect(() => {
+    if (!isOpen || !module) {
       return;
     }
     if (module.configSource === 'broker_config') {
