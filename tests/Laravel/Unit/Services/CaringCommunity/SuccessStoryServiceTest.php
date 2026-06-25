@@ -415,6 +415,16 @@ class SuccessStoryServiceTest extends TestCase
             'updated_at' => now(),
         ]);
 
+        // fetchMunicipalRoiMetric() sums ALL approved vol_logs for the tenant, and
+        // DatabaseTransactions only rolls back THIS test's writes — not seed rows already
+        // in the DB. So capture the tenant's existing approved hours and assert relative to
+        // that baseline; a hardcoded 350.0 would yield a false failure on any database that
+        // already has approved hours for this tenant.
+        $baselineHours = (float) DB::table('vol_logs')
+            ->where('tenant_id', $this->tenantId)
+            ->where('status', 'approved')
+            ->sum('hours');
+
         // Insert 10 approved hours and 5 pending (pending should be ignored per intent).
         DB::table('vol_logs')->insert([
             ['tenant_id' => $this->tenantId, 'user_id' => $userId, 'date_logged' => '2026-01-01', 'hours' => 10.00, 'status' => 'approved', 'created_at' => now()],
@@ -427,10 +437,12 @@ class SuccessStoryServiceTest extends TestCase
             'metric_key'    => 'formal_care_offset_chf',
         ]))['story']['id'];
 
-        // 10 approved hours × 35.0 CHF/hr = 350.0; the 5 pending hours are excluded.
+        // Our 10 approved hours add 10 × 35.0 = 350.0 CHF on top of the baseline; the 5
+        // pending hours are excluded. Mirrors fetchMunicipalRoiMetric()'s round(hours × 35, 2).
+        $expectedOffset = round(($baselineHours + 10.0) * 35.0, 2);
         $result = $svc->refreshLiveMetrics($this->tenantId, $id);
 
         $this->assertArrayHasKey('story', $result);
-        $this->assertSame(350.0, $result['story']['after_value']);
+        $this->assertSame($expectedOffset, $result['story']['after_value']);
     }
 }
