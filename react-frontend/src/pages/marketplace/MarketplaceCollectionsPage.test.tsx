@@ -31,7 +31,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
     Modal: ({ isOpen, children }: { isOpen?: boolean; children?: React.ReactNode }) =>
       isOpen ? <div data-testid="modal-root">{children}</div> : null,
     ModalContent: ({ children }: { children?: React.ReactNode | ((onClose: () => void) => React.ReactNode) }) => (
-      <div role="dialog" aria-modal="true">
+      <div role="dialog" aria-label="Dialog" aria-modal="true">
         {typeof children === 'function' ? children(() => {}) : children}
       </div>
     ),

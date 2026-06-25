@@ -88,7 +88,7 @@ vi.mock('../../components', async (importOriginal) => {
       isLoading?: boolean;
     }) =>
       isOpen ? (
-        <div role="dialog" data-testid="confirm-modal">
+        <div role="dialog" aria-label="Dialog" data-testid="confirm-modal">
           <p>{modalTitle}</p>
           <button onClick={onConfirm} data-testid="confirm-btn">Confirm</button>
           <button onClick={onClose} data-testid="cancel-btn">Cancel</button>

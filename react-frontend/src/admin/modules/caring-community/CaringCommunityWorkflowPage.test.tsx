@@ -112,7 +112,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
       <option value={id}>{children}</option>
     ),
     Modal: ({ children, isOpen }: { children: React.ReactNode; isOpen?: boolean }) =>
-      isOpen ? <div role="dialog">{children}</div> : null,
+      isOpen ? <div role="dialog" aria-label="Dialog">{children}</div> : null,
     ModalContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     ModalHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     ModalBody: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,

@@ -113,7 +113,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
       children?: React.ReactNode;
       size?: string;
       scrollBehavior?: string;
-    }) => isOpen ? <div role="dialog" data-testid="icon-modal">{children}</div> : null,
+    }) => isOpen ? <div role="dialog" aria-label="Dialog" data-testid="icon-modal">{children}</div> : null,
     // ModalContent: render-prop pattern (ModalContent can have function children)
     ModalContent: ({ children }: { children: React.ReactNode | ((onClose: () => void) => React.ReactNode) }) => (
       <div>{typeof children === 'function' ? children(() => {}) : children}</div>

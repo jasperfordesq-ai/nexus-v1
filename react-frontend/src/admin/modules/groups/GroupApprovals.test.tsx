@@ -74,7 +74,7 @@ vi.mock('@/admin/components', async (importOriginal) => {
       confirmLabel?: string;
     }) =>
       isOpen ? (
-        <div role="dialog" aria-modal="true">
+        <div role="dialog" aria-label="Dialog" aria-modal="true">
           <p>{title}</p>
           <button onClick={onClose}>Cancel</button>
           <button data-testid="confirm-btn" onClick={onConfirm}>{confirmLabel ?? 'Confirm'}</button>

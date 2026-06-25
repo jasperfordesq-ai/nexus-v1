@@ -54,7 +54,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
     CardBody: ({ children }: { children: React.ReactNode }) => <div data-testid="card-body">{children}</div>,
     CardHeader: ({ children, className }: { children: React.ReactNode; className?: string }) => <div className={className} data-testid="card-header">{children}</div>,
     Modal: ({ isOpen, children }: { isOpen: boolean; children: React.ReactNode; onClose?: () => void; size?: string; scrollBehavior?: string }) =>
-      isOpen ? <div role="dialog" data-testid="option-modal">{children}</div> : null,
+      isOpen ? <div role="dialog" aria-label="Dialog" data-testid="option-modal">{children}</div> : null,
     ModalContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     ModalHeader: ({ children }: { children: React.ReactNode }) => <div data-testid="modal-header">{children}</div>,
     ModalBody: ({ children, className }: { children: React.ReactNode; className?: string }) => <div className={className} data-testid="modal-body">{children}</div>,

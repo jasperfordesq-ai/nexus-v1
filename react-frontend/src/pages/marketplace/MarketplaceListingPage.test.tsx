@@ -138,7 +138,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
       children?: React.ReactNode;
       onOpenChange?: (open: boolean) => void;
     }) =>
-      isOpen ? <div role="dialog">{typeof children === 'function' ? (children as (close: () => void) => React.ReactNode)(() => onOpenChange?.(false)) : children}</div> : null,
+      isOpen ? <div role="dialog" aria-label="Dialog">{typeof children === 'function' ? (children as (close: () => void) => React.ReactNode)(() => onOpenChange?.(false)) : children}</div> : null,
     ModalContent: ({ children }: { children?: React.ReactNode | ((onClose: () => void) => React.ReactNode) }) => (
       <div>{typeof children === 'function' ? (children as (onClose: () => void) => React.ReactNode)(() => {}) : children}</div>
     ),

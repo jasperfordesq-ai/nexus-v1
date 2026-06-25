@@ -110,7 +110,7 @@ vi.mock('../../components', () => ({
   ),
   ConfirmModal: ({ isOpen, onConfirm, onClose, title }: { isOpen: boolean; onConfirm: () => void; onClose: () => void; title: string; message?: string; confirmLabel?: string; confirmColor?: string; isLoading?: boolean }) =>
     isOpen ? (
-      <div role="dialog" data-testid="confirm-modal">
+      <div role="dialog" aria-label="Dialog" data-testid="confirm-modal">
         <p>{title}</p>
         <button onClick={onClose}>Cancel</button>
         <button onClick={onConfirm} data-testid="confirm-btn">Confirm</button>
@@ -127,7 +127,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
   return {
     ...actual,
     Modal: ({ isOpen, children, onClose }: { isOpen: boolean; children: React.ReactNode; onClose?: () => void; size?: string }) =>
-      isOpen ? <div role="dialog" data-testid="reject-modal">{children}</div> : null,
+      isOpen ? <div role="dialog" aria-label="Dialog" data-testid="reject-modal">{children}</div> : null,
     ModalContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     ModalHeader: ({ children, className }: { children: React.ReactNode; className?: string }) => <div className={className} data-testid="modal-header">{children}</div>,
     ModalBody: ({ children }: { children: React.ReactNode }) => <div data-testid="modal-body">{children}</div>,

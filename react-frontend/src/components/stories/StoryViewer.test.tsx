@@ -50,7 +50,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
   return {
     ...actual,
     Modal: ({ isOpen, children }: { isOpen: boolean; children: React.ReactNode }) =>
-      isOpen ? <div role="dialog">{children}</div> : null,
+      isOpen ? <div role="dialog" aria-label="Dialog">{children}</div> : null,
     ModalContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     ModalBody: ({ children, ...rest }: { children: React.ReactNode; [key: string]: unknown }) => (
       <div aria-label={(rest as Record<string, string>)['aria-label']}>{children}</div>

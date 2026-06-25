@@ -54,7 +54,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
     useConfirm: () => mockConfirm,
     // Modal stub — always closed unless tested directly
     Modal: ({ children, isOpen }: { children?: React.ReactNode; isOpen?: boolean }) =>
-      isOpen ? <div role="dialog">{children as React.ReactNode}</div> : null,
+      isOpen ? <div role="dialog" aria-label="Dialog">{children as React.ReactNode}</div> : null,
     ModalContent: ({ children }: { children?: React.ReactNode }) => <>{children as React.ReactNode}</>,
     ModalBody: ({ children }: { children?: React.ReactNode }) => <div>{children as React.ReactNode}</div>,
     // ToggleButtonGroup stub

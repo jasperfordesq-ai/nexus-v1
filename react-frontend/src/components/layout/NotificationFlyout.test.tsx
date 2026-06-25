@@ -111,7 +111,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
       isOpen: boolean; children?: React.ReactNode; onClose?: () => void;
       placement?: string; hideCloseButton?: boolean; classNames?: unknown
     }) =>
-      isOpen ? <div role="dialog" data-testid="drawer">{children}</div> : null,
+      isOpen ? <div role="dialog" aria-label="Dialog" data-testid="drawer">{children}</div> : null,
     DrawerContent: ({ children, 'aria-label': ariaLabel }: { children: React.ReactNode; 'aria-label'?: string }) => <div aria-label={ariaLabel}>{children}</div>,
     DrawerHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     DrawerBody: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,

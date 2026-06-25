@@ -32,7 +32,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
       backdrop?: string;
     }) =>
       isOpen ? (
-        <div role="dialog" aria-modal="true" data-testid="modal">
+        <div role="dialog" aria-label="Dialog" aria-modal="true" data-testid="modal">
           {children}
         </div>
       ) : null,

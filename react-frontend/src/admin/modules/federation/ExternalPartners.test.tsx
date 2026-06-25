@@ -59,7 +59,7 @@ vi.mock('../../components', () => ({
     confirmColor?: string; isLoading?: boolean;
   }) =>
     isOpen ? (
-      <div role="dialog" data-testid="confirm-modal">
+      <div role="dialog" aria-label="Dialog" data-testid="confirm-modal">
         <span>{modalTitle}</span>
         <button onClick={onClose} disabled={isLoading}>Cancel</button>
         <button onClick={onConfirm} disabled={isLoading} data-testid="confirm-btn">Confirm</button>
