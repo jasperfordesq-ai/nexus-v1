@@ -105,6 +105,8 @@ vi.mock('@/components/ui', async (importOriginal) => {
         <button
           role="combobox"
           aria-haspopup="listbox"
+          aria-expanded={false}
+          aria-controls="mock-combobox-options"
           data-testid="select-trigger"
           onClick={() => {
             // Emit the first selected key on click for testing
@@ -114,7 +116,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
         >
           {selectedKeys?.[0] ?? ''}
         </button>
-        <div style={{ display: 'none' }}>{children}</div>
+        <div id="mock-combobox-options" style={{ display: 'none' }}>{children}</div>
       </div>
     ),
     SelectItem: ({ children }: { children?: React.ReactNode }) => <>{children}</>,

@@ -72,6 +72,8 @@ vi.mock('@/components/ui', async (importOriginal) => {
         <input
           role="combobox"
           aria-label={props['aria-label'] as string | undefined}
+          aria-expanded={false}
+          aria-controls="mock-listbox"
           data-testid="combobox-input"
           onChange={(e) => {
             const fn = props['onInputChange'] as ((v: string) => void) | undefined;

@@ -24,7 +24,7 @@
  * />
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';import MapPin from 'lucide-react/icons/map-pin';
+import { useState, useEffect, useRef, useCallback, useId } from 'react';import MapPin from 'lucide-react/icons/map-pin';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
@@ -93,6 +93,7 @@ function PlaceAutocompleteWithGoogle(props: PlaceAutocompleteInputProps) {
 
   const [suggestions, setSuggestions] = useState<google.maps.places.AutocompleteSuggestion[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const listboxId = useId();
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -269,6 +270,7 @@ function PlaceAutocompleteWithGoogle(props: PlaceAutocompleteInputProps) {
         autoComplete="off"
         role="combobox"
         aria-expanded={isOpen}
+        aria-controls={listboxId}
         aria-haspopup="listbox"
         aria-autocomplete="list"
         startContent={
@@ -296,6 +298,7 @@ function PlaceAutocompleteWithGoogle(props: PlaceAutocompleteInputProps) {
       {/* Suggestions dropdown */}
       {isOpen && suggestions.length > 0 && (
         <ul
+          id={listboxId}
           role="listbox"
           className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-xl
                      border border-glass-border bg-[var(--surface-dropdown)]

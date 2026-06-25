@@ -387,6 +387,7 @@ export function TransferModal({
                               key={user.id}
                               type="button"
                               role="option"
+                              aria-selected={false}
                               variant="ghost"
                               onPress={() => handleSelectRecipient(user)}
                               className="w-full min-h-[64px] flex items-center justify-start gap-3 rounded-none p-3 text-left transition-colors hover:bg-theme-hover"

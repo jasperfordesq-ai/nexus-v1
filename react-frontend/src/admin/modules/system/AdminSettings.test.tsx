@@ -114,6 +114,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
         type="checkbox"
         role="switch"
         aria-label={ariaLabel}
+        aria-checked={Boolean(isSelected)}
         checked={isSelected ?? false}
         disabled={isDisabled ?? false}
         onChange={(e) => onValueChange?.(e.target.checked)}

@@ -95,7 +95,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/components/ui')>();
   return {
     ...actual,
-    ModalHeader: ({ children }: { children: React.ReactNode }) => <div role="heading">{children}</div>,
+    ModalHeader: ({ children }: { children: React.ReactNode }) => <div role="heading" aria-level={2}>{children}</div>,
     ModalBody: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     ModalFooter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   };

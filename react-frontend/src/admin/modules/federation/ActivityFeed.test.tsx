@@ -66,6 +66,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
         <input
           type="checkbox"
           role="checkbox"
+          aria-checked={Boolean(isSelected)}
           checked={isSelected ?? false}
           onChange={(e) => onValueChange?.(e.target.checked)}
           data-size={size}
