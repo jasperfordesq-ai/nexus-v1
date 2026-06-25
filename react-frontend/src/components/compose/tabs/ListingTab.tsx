@@ -229,6 +229,7 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
 
       <div role="radiogroup" aria-label={t('compose.listing_type_label')} className="flex gap-2">
         <button
+          type="button"
           role="radio"
           aria-checked={draft.type === 'offer'}
           onClick={() => setType('offer')}
@@ -241,6 +242,7 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
           {t('compose.listing_offering')}
         </button>
         <button
+          type="button"
           role="radio"
           aria-checked={draft.type === 'request'}
           onClick={() => setType('request')}

@@ -176,6 +176,7 @@ function ErrorFallback() {
         {i18n.t('common:error_boundary.description')}
       </p>
       <button
+        type="button"
         onClick={() => window.location.reload()}
         style={{
           padding: '0.75rem 1.5rem',

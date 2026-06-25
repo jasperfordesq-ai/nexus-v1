@@ -397,7 +397,7 @@ export function MarketplaceMapSearchPage() {
         {/* Main layout */}
         <div className="flex gap-6">
           {/* Desktop: filter sidebar (compact) */}
-          <aside className="hidden lg:block w-80 shrink-0" role="complementary" aria-label={t('aria.filter_panel')}>
+          <aside className="hidden lg:block w-80 shrink-0" aria-label={t('aria.filter_panel')}>
             <div className="space-y-4 sticky top-24">
               {/* List view of results */}
               {isLoading ? (

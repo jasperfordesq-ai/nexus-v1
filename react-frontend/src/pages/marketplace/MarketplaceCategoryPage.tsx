@@ -545,7 +545,7 @@ export function MarketplaceCategoryPage() {
         {/* Main layout */}
         <div className="flex gap-6">
           {/* Desktop filter sidebar */}
-          <aside className="hidden lg:block w-64 shrink-0" role="complementary" aria-label={t('aria.filter_panel')}>
+          <aside className="hidden lg:block w-64 shrink-0" aria-label={t('aria.filter_panel')}>
             <GlassCard className="p-5 sticky top-24">
               <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-accent" />

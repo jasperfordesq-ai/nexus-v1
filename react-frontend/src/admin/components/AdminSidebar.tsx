@@ -895,6 +895,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
             endContent={
               searchQuery ? (
                 <button
+                  type="button"
                   onClick={() => setSearchQuery('')}
                   className="text-muted hover:text-foreground"
                   aria-label={t('clear_search')}
