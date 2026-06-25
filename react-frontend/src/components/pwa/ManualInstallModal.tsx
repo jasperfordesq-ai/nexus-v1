@@ -39,7 +39,7 @@ export function ManualInstallModal({ isOpen, onClose, browser }: ManualInstallMo
           <p className="text-sm text-theme-muted">{intro}</p>
           <ol className="space-y-3 mt-2">
             {steps.map((step, i) => (
-              <li key={i} className="flex items-start gap-3">
+              <li key={step.text} className="flex items-start gap-3">
                 <span className="shrink-0 w-6 h-6 rounded-full bg-accent/15 text-accent text-xs font-semibold inline-flex items-center justify-center">
                   {i + 1}
                 </span>

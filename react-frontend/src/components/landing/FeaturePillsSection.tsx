@@ -62,7 +62,7 @@ export function FeaturePillsSection({ content }: FeaturePillsSectionProps) {
     >
       {pills.map((pill, index) => (
         <motion.div
-          key={`pill-${index}`}
+          key={pill.title}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

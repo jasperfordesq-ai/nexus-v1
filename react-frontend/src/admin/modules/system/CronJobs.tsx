@@ -288,8 +288,8 @@ export function CronJobs() {
               </CardHeader>
               <CardBody className="p-0">
                 <div className="divide-y divide-divider">
-                  {healthMetrics.recent_failures.slice(0, 5).map((failure, idx) => (
-                    <div key={idx} className="px-4 py-3">
+                  {healthMetrics.recent_failures.slice(0, 5).map((failure) => (
+                    <div key={`${failure.job_name}-${failure.failed_at}`} className="px-4 py-3">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium truncate">{failure.job_name}</p>
@@ -317,8 +317,8 @@ export function CronJobs() {
               </CardHeader>
               <CardBody className="p-0">
                 <div className="divide-y divide-divider">
-                  {healthMetrics.jobs_overdue.map((job, idx) => (
-                    <div key={idx} className="px-4 py-3">
+                  {healthMetrics.jobs_overdue.map((job) => (
+                    <div key={job.job_id} className="px-4 py-3">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium truncate">{job.job_name}</p>

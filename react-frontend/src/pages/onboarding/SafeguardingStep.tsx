@@ -395,8 +395,8 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
                 </h3>
               </div>
               <ul className="space-y-2">
-                {activations.map((activation, idx) => (
-                  <li key={idx} className="flex items-start gap-2 pl-1">
+                {activations.map((activation) => (
+                  <li key={activation} className="flex items-start gap-2 pl-1">
                     <span className="text-[var(--color-warning)] mt-1">•</span>
                     <span className="text-sm text-theme-secondary">{activation}</span>
                   </li>

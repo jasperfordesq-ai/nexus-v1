@@ -406,9 +406,9 @@ export default function CareProviderAdminPage() {
             </p>
           ) : (
             <div className="space-y-2">
-              {duplicates?.pairs.map((pair, idx) => (
+              {duplicates?.pairs.map((pair) => (
                 <div
-                  key={`${pair.provider_a.id}-${pair.provider_b.id}-${idx}`}
+                  key={`${pair.provider_a.id}-${pair.provider_b.id}`}
                   className="rounded-lg border border-border bg-surface p-3"
                 >
                   <div className="flex items-start justify-between gap-3 flex-wrap">

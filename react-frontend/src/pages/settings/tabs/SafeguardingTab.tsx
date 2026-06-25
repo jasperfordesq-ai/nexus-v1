@@ -189,8 +189,8 @@ export function SafeguardingTab() {
                       {/* Never show activation chips for the declination option */}
                       {!isDeclination && activationChips.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
-                          {activationChips.map((label, idx) => (
-                            <Chip key={idx} size="sm" variant="soft" color="warning">
+                          {activationChips.map((label) => (
+                            <Chip key={label} size="sm" variant="soft" color="warning">
                               {label}
                             </Chip>
                           ))}

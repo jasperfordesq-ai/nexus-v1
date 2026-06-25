@@ -49,8 +49,8 @@ vi.mock('@/admin/components', async (importOriginal) => {
     ...actual,
     DataTable: ({ data, columns }: { data: unknown[]; columns: Array<{ key: string; render?: (item: unknown) => React.ReactNode }> }) => (
       <ul data-testid="data-table">
-        {(data as Array<Record<string, unknown>>).map((item, i) => (
-          <li key={i} data-testid="data-table-row">
+        {(data as Array<Record<string, unknown>>).map((item) => (
+          <li key={String(item['id'])} data-testid="data-table-row">
             {columns.map((col) => (
               <span key={col.key} data-col={col.key}>
                 {col.render ? col.render(item) : String(item[col.key] ?? '')}

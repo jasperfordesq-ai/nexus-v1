@@ -226,8 +226,8 @@ export function CertificatesTab() {
 
                     {cert.organizations.length > 0 && (
                       <div className="flex flex-wrap gap-2">
-                        {cert.organizations.map((org, i) => (
-                          <Chip key={i} size="sm" variant="soft" startContent={<Building2 className="w-3 h-3" />}>
+                        {cert.organizations.map((org) => (
+                          <Chip key={org.name} size="sm" variant="soft" startContent={<Building2 className="w-3 h-3" />}>
                             {t('certificates.organization_hours', { name: org.name, hours: org.hours })}
                           </Chip>
                         ))}

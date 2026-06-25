@@ -43,6 +43,7 @@ import { RelatedPages } from './RelatedPages';
 
 const impactCards = [
   {
+    key: 'cost-savings',
     icon: TrendingUp,
     color: 'from-emerald-500 to-teal-500',
     bgAccent: 'bg-emerald-500/10',
@@ -50,6 +51,7 @@ const impactCards = [
     borderAccent: 'border-emerald-500/30',
   },
   {
+    key: 'wellbeing',
     icon: ShieldCheck,
     color: 'from-blue-500 to-indigo-500',
     bgAccent: 'bg-blue-500/10',
@@ -57,6 +59,7 @@ const impactCards = [
     borderAccent: 'border-blue-500/30',
   },
   {
+    key: 'scalability',
     icon: Rocket,
     color: 'from-purple-500 to-pink-500',
     bgAccent: 'bg-purple-500/10',
@@ -67,15 +70,19 @@ const impactCards = [
 
 const partnershipTypes = [
   {
+    key: 'funder',
     icon: Building2,
   },
   {
+    key: 'community',
     icon: HeartHandshake,
   },
   {
+    key: 'technology',
     icon: Laptop,
   },
   {
+    key: 'academic',
     icon: GraduationCap,
   },
 ];
@@ -311,7 +318,7 @@ export function PartnerPage() {
             className="grid sm:grid-cols-3 gap-6"
           >
             {impactCards.map((card, index) => (
-              <motion.div key={`impact-card-${index}`} variants={fadeInUp}>
+              <motion.div key={card.key} variants={fadeInUp}>
                 <GlassCard className="p-6 h-full text-center relative overflow-hidden group hover:scale-[1.02] transition-transform">
                   {/* Gradient top bar */}
                   <div
@@ -378,7 +385,7 @@ export function PartnerPage() {
           <div className="grid sm:grid-cols-2 gap-6">
             {partnershipTypes.map((type, index) => (
               <motion.div
-                key={`partnership-type-${index}`}
+                key={type.key}
                 initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}

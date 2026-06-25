@@ -241,9 +241,9 @@ export function VolunteeringOverview() {
       {/* Alert Banners */}
       {!loading && alerts.length > 0 && (
         <div className="flex flex-col gap-2">
-          {alerts.map((alert, idx) => (
+          {alerts.map((alert) => (
             <div
-              key={idx}
+              key={alert.message}
               className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-3 cursor-pointer hover:bg-amber-500/15 transition-colors"
               onClick={() => alert.path && navigate(alert.path)}
               role="button"

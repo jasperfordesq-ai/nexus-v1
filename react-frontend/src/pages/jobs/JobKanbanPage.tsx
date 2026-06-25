@@ -1073,7 +1073,7 @@ export function JobKanbanPage() {
           <ModalBody className="space-y-4">
             <p className="text-sm font-medium text-theme-primary">{t('scorecard.criteria')}</p>
             {scorecardCriteria.map((criterion, idx) => (
-              <div key={idx} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+              <div key={criterion.label} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                 <span className="text-sm text-theme-secondary sm:w-36 sm:flex-shrink-0">{criterion.label}</span>
                 <NumberField
                   aria-label={criterion.label}

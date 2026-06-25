@@ -416,9 +416,9 @@ export function TalentSearchPage() {
                   {/* Skills */}
                   {candidate.skills.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-3">
-                      {candidate.skills.slice(0, 5).map((skill, idx) => (
+                      {candidate.skills.slice(0, 5).map((skill) => (
                         <Chip
-                          key={idx}
+                          key={skill}
                           size="sm"
                           variant="tertiary"
                           color="accent"

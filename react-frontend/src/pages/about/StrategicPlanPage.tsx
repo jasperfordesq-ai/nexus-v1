@@ -427,48 +427,56 @@ export function StrategicPlanPage() {
                   <TableBody>
                     {[
                       {
+                        key: 'roadmap-funding',
                         q1: 'submit' as const,
                         q2: 'secure' as const,
                         q3: null,
                         q4: null,
                       },
                       {
+                        key: 'roadmap-platform',
                         q1: 'pitch' as const,
                         q2: 'launch' as const,
                         q3: 'launch' as const,
                         q4: 'launch' as const,
                       },
                       {
+                        key: 'roadmap-onboarding',
                         q1: null,
                         q2: 'pitch' as const,
                         q3: 'ongoing' as const,
                         q4: 'ongoing' as const,
                       },
                       {
+                        key: 'roadmap-partnerships',
                         q1: null,
                         q2: 'launch' as const,
                         q3: 'ongoing' as const,
                         q4: 'ongoing' as const,
                       },
                       {
+                        key: 'roadmap-measurement',
                         q1: 'pitch' as const,
                         q2: 'pitch' as const,
                         q3: 'secure' as const,
                         q4: null,
                       },
                       {
+                        key: 'roadmap-operations',
                         q1: 'ongoing' as const,
                         q2: 'ongoing' as const,
                         q3: 'ongoing' as const,
                         q4: 'ongoing' as const,
                       },
                       {
+                        key: 'roadmap-expansion',
                         q1: 'submit' as const,
                         q2: 'secure' as const,
                         q3: null,
                         q4: null,
                       },
                       {
+                        key: 'roadmap-evaluation',
                         q1: null,
                         q2: null,
                         q3: null,
@@ -483,7 +491,7 @@ export function StrategicPlanPage() {
                         </TableCell>
                       );
                       return (
-                        <TableRow key={idx}>
+                        <TableRow key={row.key}>
                           <TableCell className="text-theme-muted font-medium">{t(`strategic_plan.roadmap_activity_${idx}`)}</TableCell>
                           {qCell(row.q1, 'q1')}
                           {qCell(row.q2, 'q2')}
@@ -531,13 +539,13 @@ export function StrategicPlanPage() {
                   </TableHeader>
                   <TableBody>
                     {[
-                      { likelihood: 'High' as const, impact: 'Critical' as const },
-                      { likelihood: 'Medium' as const, impact: 'High' as const },
-                      { likelihood: 'Medium' as const, impact: 'Medium' as const },
-                      { likelihood: 'Low' as const, impact: 'Medium' as const },
-                      { likelihood: 'Medium' as const, impact: 'High' as const },
+                      { key: 'risk-funding', likelihood: 'High' as const, impact: 'Critical' as const },
+                      { key: 'risk-adoption', likelihood: 'Medium' as const, impact: 'High' as const },
+                      { key: 'risk-capacity', likelihood: 'Medium' as const, impact: 'Medium' as const },
+                      { key: 'risk-technical', likelihood: 'Low' as const, impact: 'Medium' as const },
+                      { key: 'risk-retention', likelihood: 'Medium' as const, impact: 'High' as const },
                     ].map((row, idx) => (
-                      <TableRow key={idx}>
+                      <TableRow key={row.key}>
                         <TableCell className="text-theme-muted font-medium">{t(`strategic_plan.risk_${idx}_name`)}</TableCell>
                         <TableCell className="text-center">
                           <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${

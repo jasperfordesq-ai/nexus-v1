@@ -954,9 +954,9 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <div>
                   <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">{t('creator.templates_label')}</p>
                   <div className="flex gap-2 overflow-x-auto pb-1">
-                    {STORY_TEMPLATES.map((tpl, idx) => (
+                    {STORY_TEMPLATES.map((tpl) => (
                       <Button
-                        key={idx}
+                        key={tpl.labelKey}
                         variant="secondary"
                         onPress={() => {
                           setTextContent(tpl.text);
@@ -994,7 +994,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <div className="flex gap-2 flex-wrap">
                   {GRADIENT_PRESETS.map((g, idx) => (
                     <Button
-                      key={idx}
+                      key={g.labelKey}
                       isIconOnly
                       variant="secondary"
                       onPress={() => setSelectedGradient(idx)}
@@ -1015,7 +1015,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <div className="flex gap-2">
                   {FONT_STYLES.map((f, idx) => (
                     <Button
-                      key={idx}
+                      key={f.labelKey}
                       variant="secondary"
                       onPress={() => setSelectedFont(idx)}
                       className={`min-h-[34px] rounded-full px-4 py-1.5 text-sm transition-all ${
@@ -1125,7 +1125,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <div className="flex gap-2 flex-wrap">
                   {GRADIENT_PRESETS.map((g, idx) => (
                     <Button
-                      key={idx}
+                      key={g.labelKey}
                       isIconOnly
                       variant="secondary"
                       onPress={() => setPollGradient(idx)}

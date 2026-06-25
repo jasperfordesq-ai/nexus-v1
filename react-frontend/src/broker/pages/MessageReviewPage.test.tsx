@@ -72,8 +72,8 @@ vi.mock('@/admin/components', () => ({
       {isLoading && <div role="status" aria-busy="true" aria-label="loading">Loading…</div>}
       {!isLoading && data.length === 0 && <div data-testid="empty-table">No items</div>}
       {!isLoading &&
-        data.map((row, i) => (
-          <div key={i} data-testid="table-row">
+        data.map((row) => (
+          <div key={String((row as Record<string, unknown>).id)} data-testid="table-row">
             {columns.map((col) => (
               <div key={col.key}>
                 {col.render ? col.render(row) : null}

@@ -269,7 +269,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
       {/* Dot indicators — collapses to max 7 visible dots for 8+ images */}
       {total > 1 && (
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
-          {media.map((_, idx) => {
+          {media.map((item, idx) => {
             // For 8+ images, only show dots near the current index (Instagram-style)
             if (total > 7) {
               const distance = Math.abs(idx - currentIndex);
@@ -277,7 +277,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
               const scale = distance <= 1 ? '' : distance === 2 ? 'scale-75' : 'scale-50 opacity-50';
               return (
                 <Button
-                  key={idx}
+                  key={item.id}
                   isIconOnly
                   variant="light"
                   size="sm"
@@ -295,7 +295,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
             }
             return (
               <Button
-                key={idx}
+                key={item.id}
                 isIconOnly
                 variant="light"
                 size="sm"

@@ -430,8 +430,8 @@ export function ActivityDashboardPage() {
             <GlassCard className="p-5">
               <h3 className="font-semibold text-theme-primary mb-3 text-sm">{t('my_skills')}</h3>
               <div className="space-y-2">
-                {skills_breakdown.skills.slice(0, 6).map((skill, idx) => (
-                  <div key={idx} className="flex items-center justify-between">
+                {skills_breakdown.skills.slice(0, 6).map((skill) => (
+                  <div key={skill.skill_name} className="flex items-center justify-between">
                     <span className="text-sm text-theme-muted truncate">{skill.skill_name}</span>
                     <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
                       {skill.is_offering && (

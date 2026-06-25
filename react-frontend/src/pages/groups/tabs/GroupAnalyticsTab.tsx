@@ -522,9 +522,9 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                     }
                     labelLine={{ strokeWidth: 1 }}
                   >
-                    {data.activity_breakdown.map((_, index) => (
+                    {data.activity_breakdown.map((entry, index) => (
                       <Cell
-                        key={`cell-${index}`}
+                        key={`cell-${entry.type}`}
                         fill={CHART_COLORS[index % CHART_COLORS.length]}
                         fillOpacity={0.85}
                       />

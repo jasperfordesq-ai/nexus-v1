@@ -622,8 +622,8 @@ export function SeoOverview() {
           <CardBody>
             {serverAudit?.checks && serverAudit.checks.length > 0 ? (
               <div className="space-y-2">
-                {serverAudit.checks.map((check, idx) => (
-                  <div key={idx} className="flex items-start gap-3 py-1">
+                {serverAudit.checks.map((check) => (
+                  <div key={check.name} className="flex items-start gap-3 py-1">
                     {check.status === 'pass' && <CheckCircle size={18} className="text-success mt-0.5 shrink-0" />}
                     {check.status === 'warning' && <AlertTriangle size={18} className="text-warning mt-0.5 shrink-0" />}
                     {check.status === 'fail' && <XCircle size={18} className="text-danger mt-0.5 shrink-0" />}

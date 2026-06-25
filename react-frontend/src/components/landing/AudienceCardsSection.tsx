@@ -90,7 +90,7 @@ export function AudienceCardsSection({ content }: AudienceCardsSectionProps) {
               'group flex flex-col h-full p-5 sm:p-6 rounded-2xl border border-theme-default bg-theme-elevated transition-colors hover:border-theme-accent hover:bg-theme-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]';
             return (
               <motion.div
-                key={`audience-card-${index}`}
+                key={card._key ?? card.target_url}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

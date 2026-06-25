@@ -110,7 +110,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
                 </h3>
                 <ol className="space-y-3">
                   {article.steps.map((step, idx) => (
-                    <li key={idx} className="flex gap-3">
+                    <li key={step.label} className="flex gap-3">
                       <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-bold text-accent">
                         {idx + 1}
                       </span>
@@ -140,9 +140,9 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
                   {t('help_drawer.tips')}
                 </h3>
                 <ul className="space-y-2">
-                  {article.tips.map((tip, idx) => (
+                  {article.tips.map((tip) => (
                     <li
-                      key={idx}
+                      key={tip}
                       className="flex gap-2.5 rounded-lg bg-surface px-3 py-2.5 text-xs text-muted leading-relaxed"
                     >
                       <LightbulbIcon

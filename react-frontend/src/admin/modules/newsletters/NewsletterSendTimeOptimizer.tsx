@@ -136,7 +136,7 @@ export function NewsletterSendTimeOptimizer() {
               <div className="grid gap-3 md:grid-cols-3">
                 {data.recommendations.map((rec, idx) => (
                   <div
-                    key={idx}
+                    key={`${rec.day_of_week}-${rec.hour}`}
                     className="rounded-xl border border-success-200/70 bg-success-50/80 p-4 shadow-sm dark:border-success-400/20 dark:bg-success-50/10"
                   >
                     <div className="space-y-2">

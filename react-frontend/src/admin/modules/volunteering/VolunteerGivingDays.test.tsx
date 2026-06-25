@@ -59,8 +59,8 @@ vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 vi.mock('../../components', () => ({
   DataTable: ({ data, isLoading }: { data: object[]; isLoading: boolean }) => (
     <div data-testid="data-table" data-loading={String(isLoading)}>
-      {data.map((row: Record<string, unknown>, i: number) => (
-        <div key={i} data-testid="table-row">{String(row['name'])}</div>
+      {data.map((row: Record<string, unknown>) => (
+        <div key={String(row['id'])} data-testid="table-row">{String(row['name'])}</div>
       ))}
     </div>
   ),

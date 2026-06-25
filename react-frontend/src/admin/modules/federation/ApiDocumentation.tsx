@@ -764,9 +764,9 @@ function EndpointsTab() {
   const { t } = useTranslation('admin');
   return (
     <Accordion variant="surface" selectionMode="multiple">
-      {ENDPOINTS.map((ep, idx) => (
+      {ENDPOINTS.map((ep) => (
         <AccordionItem
-          key={idx} id={idx}
+          key={`${ep.method}-${ep.path}`} id={`${ep.method}-${ep.path}`}
           aria-label={`${ep.method} ${ep.path}`}
           title={
             <div className="flex items-center gap-3">

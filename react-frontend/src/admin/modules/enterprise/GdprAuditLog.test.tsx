@@ -59,8 +59,8 @@ vi.mock('@/admin/components', async () => {
       return (
         <table>
           <tbody>
-            {(data as Record<string, unknown>[]).map((row, i) => (
-              <tr key={i}>
+            {(data as Record<string, unknown>[]).map((row) => (
+              <tr key={String(row['id'])}>
                 <td>{String(row['action'] ?? '')}</td>
                 <td>{String(row['entity_type'] ?? '')}</td>
                 <td>{String(row['user_name'] ?? '')}</td>

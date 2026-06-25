@@ -54,8 +54,8 @@ vi.mock('@/admin/components', () => ({
     return (
       <table>
         <tbody>
-          {data.map((row: Record<string, unknown>, i) => (
-            <tr key={i}>
+          {data.map((row: Record<string, unknown>) => (
+            <tr key={String(row.id)}>
               {columns.map((col) => (
                 <td key={col.key}>{col.render(row)}</td>
               ))}

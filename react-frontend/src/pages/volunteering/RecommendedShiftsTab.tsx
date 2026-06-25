@@ -288,8 +288,8 @@ export function RecommendedShiftsTab() {
 
                     {item.shift.required_skills.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
-                        {item.shift.required_skills.map((skill, i) => (
-                          <Chip key={i} size="sm" variant="soft" color="accent" className="text-xs">
+                        {item.shift.required_skills.map((skill) => (
+                          <Chip key={skill} size="sm" variant="soft" color="accent" className="text-xs">
                             {skill}
                           </Chip>
                         ))}

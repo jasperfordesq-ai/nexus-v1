@@ -561,9 +561,9 @@ export function SegmentForm() {
               </p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {suggestions.map((suggestion, idx) => (
+                {suggestions.map((suggestion) => (
                   <Button
-                    key={idx}
+                    key={suggestion.name}
                     onPress={() => applySuggestion(suggestion)}
                     variant="outline"
                     className="min-h-28 justify-start rounded-lg border-border p-4 text-left hover:border-accent hover:bg-accent-soft"

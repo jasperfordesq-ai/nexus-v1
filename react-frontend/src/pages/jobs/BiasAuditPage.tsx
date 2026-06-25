@@ -365,8 +365,8 @@ export function BiasAuditPage() {
                     }}
                   />
                   <Bar dataKey="count" radius={[0, 4, 4, 0]}>
-                    {report.funnel.map((_entry, index) => (
-                      <Cell key={index} fill={FUNNEL_COLORS[index % FUNNEL_COLORS.length]} />
+                    {report.funnel.map((entry, index) => (
+                      <Cell key={entry.stage} fill={FUNNEL_COLORS[index % FUNNEL_COLORS.length]} />
                     ))}
                   </Bar>
                 </BarChart>

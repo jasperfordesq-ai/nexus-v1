@@ -774,8 +774,8 @@ export function CreateGroupExchangePage() {
                     <TableColumn className="text-right">{t('detail.col_hours')}</TableColumn>
                   </TableHeader>
                   <TableBody emptyContent={<div className="text-center py-6 text-theme-muted">{t('create.unable_to_calculate')}</div>}>
-                    {splitPreview.map((split, idx) => (
-                      <TableRow key={idx}>
+                    {splitPreview.map((split) => (
+                      <TableRow key={`${split.providerId}-${split.receiverId}`}>
                         <TableCell className="text-emerald-700 dark:text-emerald-400">{split.providerName}</TableCell>
                         <TableCell className="text-center text-theme-subtle">
                           <ArrowRight className="w-4 h-4 inline" aria-label={t('detail.gives_to')} />

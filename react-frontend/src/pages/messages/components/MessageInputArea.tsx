@@ -186,7 +186,7 @@ export function MessageInputArea({
       {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && attachmentPreviews.length > 0 && (
         <div className="flex gap-2 mb-3 flex-wrap">
           {attachmentPreviews.map((item, index) => (
-            <div key={`${item.file.name}-${index}`} className="relative group">
+            <div key={item.preview} className="relative group">
               {item.type === 'image' ? (
                 <img
                   src={item.preview}

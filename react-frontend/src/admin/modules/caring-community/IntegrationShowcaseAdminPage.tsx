@@ -166,9 +166,9 @@ export default function IntegrationShowcaseAdminPage() {
 
                   {section.items && section.items.length > 0 && (
                     <div className="space-y-2">
-                      {section.items.map((item, i) => (
+                      {section.items.map((item) => (
                         <div
-                          key={`${section.id}-item-${i}`}
+                          key={`${section.id}-${item.method}-${item.path}`}
                           className="flex items-center gap-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
                         >
                           <Chip

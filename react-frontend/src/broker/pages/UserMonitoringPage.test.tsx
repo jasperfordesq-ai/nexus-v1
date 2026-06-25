@@ -47,8 +47,8 @@ vi.mock('@/contexts', () =>
 vi.mock('@/admin/components', () => ({
   DataTable: ({ data, isLoading }: { data: object[]; isLoading: boolean }) => (
     <div data-testid="data-table" data-loading={String(isLoading)}>
-      {data.map((item, i) => (
-        <div key={i} data-testid="data-table-row">
+      {data.map((item) => (
+        <div key={String((item as { user_id: number }).user_id)} data-testid="data-table-row">
           {(item as { user_name: string }).user_name}
         </div>
       ))}

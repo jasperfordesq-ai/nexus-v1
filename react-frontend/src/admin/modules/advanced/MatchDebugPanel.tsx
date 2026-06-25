@@ -473,8 +473,8 @@ export function MatchDebugPanel() {
                   <div>
                     <p className="text-xs font-medium text-muted mb-2">{t('match_reasons')}</p>
                     <div className="flex flex-wrap gap-1.5">
-                      {match.reasons.map((reason, i) => (
-                        <Chip key={i} size="sm" variant="soft" className="text-xs">
+                      {match.reasons.map((reason) => (
+                        <Chip key={reason} size="sm" variant="soft" className="text-xs">
                           {reason}
                         </Chip>
                       ))}

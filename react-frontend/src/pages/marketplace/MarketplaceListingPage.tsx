@@ -269,9 +269,9 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
               <ChevronRight className="w-5 h-5" aria-hidden="true" />
             </Button>
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-              {images.map((_, idx) => (
+              {images.map((image, idx) => (
                 <Button
-                  key={idx}
+                  key={image.id}
                   isIconOnly
                   variant="tertiary"
                   size="sm"

@@ -282,23 +282,27 @@ export function ImpactReportPage() {
                 <div className="grid sm:grid-cols-2 gap-4 mt-4">
                   {[
                     {
+                      key: 'wellbeing',
                       color: 'text-indigo-500 dark:text-indigo-400',
                       bg: 'bg-indigo-500/10',
                     },
                     {
+                      key: 'isolation',
                       color: 'text-rose-500 dark:text-rose-400',
                       bg: 'bg-rose-500/10',
                     },
                     {
+                      key: 'economic',
                       color: 'text-[var(--color-warning)]',
                       bg: 'bg-amber-500/10',
                     },
                     {
+                      key: 'social-capital',
                       color: 'text-emerald-500 dark:text-emerald-400',
                       bg: 'bg-emerald-500/10',
                     },
                   ].map((item, index) => (
-                    <div key={index} className={`p-4 rounded-xl ${item.bg}`}>
+                    <div key={item.key} className={`p-4 rounded-xl ${item.bg}`}>
                       <h4 className={`text-sm font-semibold ${item.color} mb-1`}>{t(`impact_report.lit_review_${index}_title`)}</h4>
                       <p className="text-xs text-theme-muted leading-relaxed">{t(`impact_report.lit_review_${index}_description`)}</p>
                     </div>
@@ -574,14 +578,14 @@ export function ImpactReportPage() {
                   </TableHeader>
                   <TableBody>
                     {[
-                      { priority: 'Critical' },
-                      { priority: 'High' },
-                      { priority: 'High' },
-                      { priority: 'Medium' },
-                      { priority: 'Medium' },
-                      { priority: 'Medium' },
+                      { key: 'rec-funding', priority: 'Critical' },
+                      { key: 'rec-staffing', priority: 'High' },
+                      { key: 'rec-measurement', priority: 'High' },
+                      { key: 'rec-partnerships', priority: 'Medium' },
+                      { key: 'rec-technology', priority: 'Medium' },
+                      { key: 'rec-outreach', priority: 'Medium' },
                     ].map((row, idx) => (
-                      <TableRow key={idx}>
+                      <TableRow key={row.key}>
                         <TableCell className="text-theme-subtle font-medium">{idx + 1}</TableCell>
                         <TableCell className="text-theme-muted">{t(`impact_report.rec_${idx}`)}</TableCell>
                         <TableCell>

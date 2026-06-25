@@ -369,15 +369,16 @@ export function GroupExchangeDetailPage() {
   // Build split rows
   // ─────────────────────────────────────────────────────────────────────────
 
-  function buildSplitRows(): { providerName: string; receiverName: string; amount: number }[] {
+  function buildSplitRows(): { key: string; providerName: string; receiverName: string; amount: number }[] {
     if (!exchange?.calculated_split) return [];
 
-    const rows: { providerName: string; receiverName: string; amount: number }[] = [];
+    const rows: { key: string; providerName: string; receiverName: string; amount: number }[] = [];
     const participantMap = new Map(exchange.participants.map((p) => [String(p.user_id), p.user_name]));
 
     for (const [providerId, receivers] of Object.entries(exchange.calculated_split)) {
       for (const [receiverId, amount] of Object.entries(receivers)) {
         rows.push({
+          key: `${providerId}-${receiverId}`,
           providerName: participantMap.get(providerId) || `User #${providerId}`,
           receiverName: participantMap.get(receiverId) || `User #${receiverId}`,
           amount: amount as number,
@@ -707,8 +708,8 @@ export function GroupExchangeDetailPage() {
               <TableColumn className="text-right">{t('detail.col_hours')}</TableColumn>
             </TableHeader>
             <TableBody>
-              {splitRows.map((row, idx) => (
-                <TableRow key={idx}>
+              {splitRows.map((row) => (
+                <TableRow key={row.key}>
                   <TableCell className="text-emerald-700 dark:text-emerald-400">{row.providerName}</TableCell>
                   <TableCell className="text-center text-theme-subtle">
                     <ArrowRight className="w-4 h-4 inline" aria-label={t('detail.gives_to')} />

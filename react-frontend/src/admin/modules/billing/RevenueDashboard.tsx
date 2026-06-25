@@ -313,8 +313,8 @@ export function RevenueDashboard() {
                   <TableColumn>{t('billing.expiry_date')}</TableColumn>
                 </TableHeader>
                 <TableBody emptyContent="-">
-                  {data.recent_changes.slice(0, 10).map((change, idx) => (
-                    <TableRow key={idx}>
+                  {data.recent_changes.slice(0, 10).map((change) => (
+                    <TableRow key={`${change.created_at}-${change.tenant_name}-${change.action}`}>
                       <TableCell className="font-medium">{change.tenant_name}</TableCell>
                       <TableCell>
                         <Chip

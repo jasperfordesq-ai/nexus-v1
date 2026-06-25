@@ -80,8 +80,8 @@ vi.mock('@/components/feedback', () => ({
 vi.mock('@/components/navigation', () => ({
   Breadcrumbs: ({ items }: { items: Array<{ label: string; href?: string }> }) => (
     <nav data-testid="breadcrumbs">
-      {items.map((item, i) => (
-        <span key={i}>{item.label}</span>
+      {items.map((item) => (
+        <span key={item.label}>{item.label}</span>
       ))}
     </nav>
   ),

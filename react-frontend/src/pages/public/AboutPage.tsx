@@ -222,7 +222,7 @@ export function AboutPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {steps.map((step, index) => (
                 <motion.div
-                  key={`about-step-${index}`}
+                  key={step.color}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -267,7 +267,7 @@ export function AboutPage() {
             <div className="grid sm:grid-cols-2 gap-6">
               {values.map((value, index) => (
                 <motion.div
-                  key={`about-value-${index}`}
+                  key={value.bg}
                   initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}

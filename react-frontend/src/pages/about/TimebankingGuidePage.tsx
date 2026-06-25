@@ -63,14 +63,17 @@ const impactStats = [
 
 const steps = [
   {
+    key: 'offer',
     icon: Handshake,
     color: 'from-indigo-500 to-purple-500',
   },
   {
+    key: 'earn',
     icon: Clock,
     color: 'from-emerald-500 to-teal-500',
   },
   {
+    key: 'spend',
     icon: Users,
     color: 'from-amber-500 to-orange-500',
   },
@@ -78,21 +81,25 @@ const steps = [
 
 const values = [
   {
+    key: 'equality',
     icon: Gem,
     color: 'text-indigo-500 dark:text-indigo-400',
     bg: 'bg-indigo-500/15',
   },
   {
+    key: 'reciprocity',
     icon: RefreshCw,
     color: 'text-emerald-500 dark:text-emerald-400',
     bg: 'bg-emerald-500/15',
   },
   {
+    key: 'recognition',
     icon: Sparkles,
     color: 'text-[var(--color-warning)]',
     bg: 'bg-amber-500/15',
   },
   {
+    key: 'community',
     icon: Network,
     color: 'text-rose-500 dark:text-rose-400',
     bg: 'bg-rose-500/15',
@@ -235,7 +242,7 @@ export function TimebankingGuidePage() {
           <div className="grid sm:grid-cols-3 gap-8">
             {steps.map((step, index) => (
               <motion.div
-                key={`step-${index}`}
+                key={step.key}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -282,7 +289,7 @@ export function TimebankingGuidePage() {
           <div className="grid sm:grid-cols-2 gap-6">
             {values.map((value, index) => (
               <motion.div
-                key={`value-${index}`}
+                key={value.key}
                 initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}

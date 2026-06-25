@@ -300,8 +300,8 @@ export function BiometricSettings() {
             {instructions.title} - {t('passkey_setup_subtitle')}
           </p>
           <ol className="text-sm text-theme-subtle space-y-1 list-decimal list-inside">
-            {instructions.steps.map((step, i) => (
-              <li key={i}>{step}</li>
+            {instructions.steps.map((step) => (
+              <li key={step}>{step}</li>
             ))}
           </ol>
           <div className="pt-2 border-t border-indigo-500/10">

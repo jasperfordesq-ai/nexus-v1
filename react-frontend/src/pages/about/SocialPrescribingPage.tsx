@@ -65,24 +65,28 @@ const outcomeStats = [
 
 const referralSteps = [
   {
+    key: 'referral',
     icon: ClipboardList,
     color: 'from-blue-500 to-indigo-500',
     bgAccent: 'bg-blue-500/10',
     textAccent: 'text-blue-600 dark:text-blue-400',
   },
   {
+    key: 'welcome',
     icon: UserPlus,
     color: 'from-emerald-500 to-teal-500',
     bgAccent: 'bg-emerald-500/10',
     textAccent: 'text-emerald-600 dark:text-emerald-400',
   },
   {
+    key: 'connect',
     icon: Link2,
     color: 'from-purple-500 to-pink-500',
     bgAccent: 'bg-purple-500/10',
     textAccent: 'text-purple-600 dark:text-purple-400',
   },
   {
+    key: 'attend',
     icon: CalendarCheck,
     color: 'from-amber-500 to-orange-500',
     bgAccent: 'bg-amber-500/10',
@@ -222,10 +226,10 @@ export function SocialPrescribingPage() {
                 </h3>
               </div>
               <ul className="space-y-3 ml-1">
-                {strategicFitPoints.map((index) => (
-                  <li key={index} className="flex items-start gap-3">
+                {strategicFitPoints.map((point) => (
+                  <li key={`strategic-fit-${point}`} className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                    <span className="text-theme-muted text-sm leading-relaxed">{t(`social_prescribing.strategic_fit_${index}`)}</span>
+                    <span className="text-theme-muted text-sm leading-relaxed">{t(`social_prescribing.strategic_fit_${point}`)}</span>
                   </li>
                 ))}
               </ul>
@@ -294,7 +298,7 @@ export function SocialPrescribingPage() {
           <div className="grid sm:grid-cols-2 gap-6">
             {referralSteps.map((step, index) => (
               <motion.div
-                key={`referral-step-${index}`}
+                key={step.key}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

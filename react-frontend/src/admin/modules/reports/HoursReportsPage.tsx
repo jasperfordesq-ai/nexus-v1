@@ -309,8 +309,8 @@ export function HoursReportsPage() {
                     >
                       {categories
                         .filter((c) => c.total_hours > 0)
-                        .map((_, index) => (
-                          <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} fillOpacity={0.85} />
+                        .map((entry, index) => (
+                          <Cell key={`cell-${entry.category}`} fill={PIE_COLORS[index % PIE_COLORS.length]} fillOpacity={0.85} />
                         ))}
                     </Pie>
                     <Tooltip

@@ -98,7 +98,7 @@ export function HowItWorksSection({ content }: HowItWorksSectionProps) {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {steps.map((step, index) => (
             <motion.div
-              key={`step-${index}`}
+              key={step.title}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

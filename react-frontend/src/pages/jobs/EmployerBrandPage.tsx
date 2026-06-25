@@ -398,8 +398,8 @@ export function EmployerBrandPage() {
                       </div>
                       {job.benefits && job.benefits.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
-                          {job.benefits.slice(0, 4).map((b, i) => (
-                            <Chip key={i} size="sm" variant="soft" color="success">
+                          {job.benefits.slice(0, 4).map((b) => (
+                            <Chip key={b} size="sm" variant="soft" color="success">
                               <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
                               <Chip.Label>{b}</Chip.Label>
                             </Chip>

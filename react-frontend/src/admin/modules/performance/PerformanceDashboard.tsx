@@ -173,8 +173,8 @@ export default function PerformanceDashboard() {
                 </div>
                 {request.warnings && request.warnings.length > 0 && (
                   <div className="flex gap-2 mt-2">
-                    {request.warnings.map((warning, i) => (
-                      <Chip key={i} size="sm" color="warning" variant="soft">
+                    {request.warnings.map((warning) => (
+                      <Chip key={warning} size="sm" color="warning" variant="soft">
                         {warning.replace(/_/g, ' ')}
                       </Chip>
                     ))}

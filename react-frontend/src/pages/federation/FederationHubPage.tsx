@@ -83,14 +83,17 @@ interface FederationDashboardData {
 
 const howItWorksCards = [
   {
+    key: 'discover',
     icon: Search,
     gradient: 'from-indigo-500 to-blue-500',
   },
   {
+    key: 'connect',
     icon: Users,
     gradient: 'from-purple-500 to-pink-500',
   },
   {
+    key: 'exchange',
     icon: ArrowRightLeft,
     gradient: 'from-cyan-500 to-teal-500',
   },
@@ -219,7 +222,7 @@ function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOpting
           {howItWorksCards.map((card, index) => {
             const Icon = card.icon;
             return (
-              <motion.div key={index} variants={itemVariants}>
+              <motion.div key={card.key} variants={itemVariants}>
                 <GlassCard className="p-6 h-full text-center">
                   <div className="relative mx-auto mb-4">
                     <div

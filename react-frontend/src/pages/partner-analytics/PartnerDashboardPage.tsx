@@ -497,8 +497,8 @@ function DemographicsTab({ data, t }: { data: DashboardPayload; t: T }) {
             <ResponsiveContainer width="100%" height={260}>
               <PieChart>
                 <Pie data={ageData} dataKey="value" nameKey="name" outerRadius={90} label>
-                  {ageData.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  {ageData.map((entry, i) => (
+                    <Cell key={entry.name} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip />

@@ -63,8 +63,8 @@ vi.mock('../../components', async (importOriginal) => {
       if (!data || data.length === 0) return <div data-testid="data-table-empty">No data</div>;
       return (
         <div data-testid="data-table">
-          {(data as Array<Record<string, unknown>>).map((row, i) => (
-            <div key={i} data-testid={`row-${i}`}>
+          {(data as Array<Record<string, unknown>>).map((row) => (
+            <div key={String(row.id)} data-testid={`row-${String(row.id)}`}>
               {columns.map((col) => (
                 <div key={col.key}>
                   {col.render

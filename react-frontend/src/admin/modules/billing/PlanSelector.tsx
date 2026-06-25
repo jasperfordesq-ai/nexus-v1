@@ -197,8 +197,8 @@ export function PlanSelector() {
                     <Separator />
 
                     <ul className="space-y-2">
-                      {(Array.isArray(plan.features) ? plan.features : []).map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
+                      {(Array.isArray(plan.features) ? plan.features : []).map((feature) => (
+                        <li key={feature} className="flex items-start gap-2 text-sm">
                           <Check className="w-4 h-4 text-success mt-0.5 shrink-0" />
                           <span>{feature}</span>
                         </li>

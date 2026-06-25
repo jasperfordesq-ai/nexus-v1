@@ -444,9 +444,9 @@ export function FaqPage() {
                       indicator: 'text-theme-subtle',
                     }}
                   >
-                    {cat.items.map((item, idx) => (
+                    {cat.items.map((item) => (
                       <AccordionItem
-                        key={`${cat.title}-${idx}`} id={`${cat.title}-${idx}`}
+                        key={`${cat.title}-${item.question}`} id={`${cat.title}-${item.question}`}
                         aria-label={item.question}
                         title={item.question}
                       >

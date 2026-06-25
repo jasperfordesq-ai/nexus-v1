@@ -119,8 +119,8 @@ vi.mock('../../components', () => ({
         </tr>
       </thead>
       <tbody>
-        {(data as Record<string, unknown>[]).map((row, i) => (
-          <tr key={i}>
+        {(data as Record<string, unknown>[]).map((row) => (
+          <tr key={String(row['id'])}>
             {columns.map((col) => (
               <td key={col.key}>
                 {col.render ? col.render(row) : String(row[col.key] ?? '')}

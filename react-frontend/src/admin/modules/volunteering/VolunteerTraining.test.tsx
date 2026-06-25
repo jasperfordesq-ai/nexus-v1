@@ -71,14 +71,14 @@ vi.mock('../../components', () => ({
   }) => (
     <div data-testid="data-table">
       {isLoading && <div role="status" aria-busy="true" />}
-      {data.map((item, i) => (
-        <div key={i} data-testid={`row-${i}`}>
+      {data.map((item) => (
+        <div key={String(item.id)} data-testid={`row-${String(item.id)}`}>
           <span>{String(item.volunteer_name ?? '')}</span>
           <span>{String(item.training_type ?? '')}</span>
           <span>{String(item.status ?? '')}</span>
           {columns.map((col) =>
             col.render ? (
-              <div key={col.key} data-testid={`col-${col.key}-${i}`}>
+              <div key={col.key} data-testid={`col-${col.key}-${String(item.id)}`}>
                 {col.render(item)}
               </div>
             ) : null

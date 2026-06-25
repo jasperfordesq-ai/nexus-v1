@@ -97,7 +97,7 @@ export function StatsSection({ content }: StatsSectionProps) {
       aria-label={isLoading ? t('loading', { ns: 'common' }) : undefined}
     >
       {stats.map((stat, index) => (
-        <div key={`stat-${index}`} className="text-center">
+        <div key={stat.label} className="text-center">
           <motion.p
             initial={{ opacity: 0, scale: 0.5 }}
             whileInView={{ opacity: 1, scale: 1 }}

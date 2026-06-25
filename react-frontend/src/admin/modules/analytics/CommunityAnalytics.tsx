@@ -447,9 +447,9 @@ export function CommunityAnalytics() {
                   >
                     {data.category_demand
                       .filter((c) => c.listing_count > 0)
-                      .map((_, index) => (
+                      .map((cat, index) => (
                         <Cell
-                          key={`cell-${index}`}
+                          key={cat.name}
                           fill={PIE_COLORS[index % PIE_COLORS.length]}
                           fillOpacity={0.85}
                         />

@@ -79,7 +79,7 @@ vi.mock('@/admin/components', async (importOriginal) => {
         <table>
           <tbody>
             {data.map((row, i) => (
-              <tr key={i}>
+              <tr key={String(row.id)}>
                 {selectable && (
                   <td>
                     <input

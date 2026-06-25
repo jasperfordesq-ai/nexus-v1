@@ -56,8 +56,8 @@ vi.mock('../../components', () => ({
       )}
       {!isLoading && (
         <ul>
-          {data.map((row, i) => (
-            <li key={i}>
+          {data.map((row) => (
+            <li key={String(row.id)}>
               {columns.map((col: any) => (
                 <span key={col.key}>{col.render ? col.render(row) : row[col.key]}</span>
               ))}

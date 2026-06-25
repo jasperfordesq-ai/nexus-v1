@@ -1615,8 +1615,8 @@ function AnalyticsTab() {
               <TableColumn>{t('columns.hits')}</TableColumn>
             </TableHeader>
             <TableBody emptyContent={t('empty_bot_traffic')}>
-              {data.top_uris.map((u, i) => (
-                <TableRow key={i}>
+              {data.top_uris.map((u) => (
+                <TableRow key={u.url}>
                   <TableCell className="text-xs font-mono">{u.url}</TableCell>
                   <TableCell className="text-xs">{u.hits}</TableCell>
                 </TableRow>

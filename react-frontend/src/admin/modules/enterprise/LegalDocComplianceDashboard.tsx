@@ -370,8 +370,8 @@ export default function LegalDocComplianceDashboard() {
                       <TableColumn>{t('enterprise.col_ip_address')}</TableColumn>
                     </TableHeader>
                     <TableBody>
-                      {acceptances.map((acceptance, idx) => (
-                        <TableRow key={idx}>
+                      {acceptances.map((acceptance) => (
+                        <TableRow key={`${acceptance.user_id}-${acceptance.version_id}`}>
                           <TableCell>{acceptance.user_name}</TableCell>
                           <TableCell>{acceptance.user_email}</TableCell>
                           <TableCell>{acceptance.version_number}</TableCell>
