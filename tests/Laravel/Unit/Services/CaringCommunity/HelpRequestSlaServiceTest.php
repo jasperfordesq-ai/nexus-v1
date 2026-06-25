@@ -17,23 +17,26 @@ use Illuminate\Support\Facades\Schema;
 use Tests\Laravel\TestCase;
 
 /**
- * NOTE (source bug A): Carbon::diffInSeconds() returns float in Carbon v3 / PHP 8.2,
- * but HelpRequestSlaService::bucket() declares its first parameter as `int`. Any
- * call to dashboard() that processes pending or matched rows will throw:
- *   TypeError: bucket(): Argument #1 ($ageSec) must be of type int, float given
- * (HelpRequestSlaService.php:211, called from lines 140 and 176)
- * Fix: change `private function bucket(int $ageSec, ...)` to `float|int $ageSec`.
+ * Carbon-v3 SLA regression coverage for HelpRequestSlaService. Both source bugs
+ * below are now FIXED; these tests assert the CORRECT behaviour and act as
+ * regression guards against the signed/float Carbon-v3 diff semantics.
  *
- * NOTE (source bug B): In collect(), line 161:
- *   $turnaroundSec = max(0, $updated->diffInSeconds($created));
- * Carbon's diffInSeconds() is SIGNED; $updated->diffInSeconds($created) returns
- * a NEGATIVE float when $updated is AFTER $created (the normal case), so max(0, …)
- * always gives 0. This means:
- *   - $within_resolution_sla is always TRUE (0 ≤ any SLA window)
- *   - $resolved_within_window_24h increments for EVERY recently-closed row regardless of actual turnaround
- * Fix: use $created->diffInSeconds($updated) (reversed operands) or abs(…).
+ * FIXED bug A — Carbon::diffInSeconds() returns a SIGNED float in Carbon v3.
+ *   The age line `$now->diffInSeconds($created)` produced a NEGATIVE float, which
+ *   both threw `TypeError: bucket(): Argument #1 ($ageSec) must be of type int,
+ *   float given` and (once the type was widened) yielded a negative age that
+ *   mis-bucketed every breached request as on_track. Fixed by measuring
+ *   `max(0.0, $created->diffInSeconds($now))` (older → now, clamped) and widening
+ *   bucket()'s first parameter to `float|int`.
  *
- * Tests document ACTUAL behaviour for bug B. Tests that hit bug A are skipped.
+ * FIXED bug B — collect()'s turnaround line was
+ *   `$turnaroundSec = max(0, $updated->diffInSeconds($created));`
+ *   Carbon's diffInSeconds() is SIGNED, so `$updated->diffInSeconds($created)`
+ *   returned a NEGATIVE float when $updated is AFTER $created (the normal case),
+ *   collapsing every turnaround to max(0, negative) = 0. That made
+ *   within_resolution_sla always TRUE and resolved_within_window_24h increment for
+ *   every recently-closed row. Fixed by reversing the operands to
+ *   `max(0.0, $created->diffInSeconds($updated))` (older → newer).
  */
 class HelpRequestSlaServiceTest extends TestCase
 {
@@ -208,86 +211,147 @@ class HelpRequestSlaServiceTest extends TestCase
     }
 
     // ──────────────────────────────────────────────────────────────────────
-    // Source bug A demonstration — skipped tests (pending/matched → bucket() TypeError)
+    // Bucketing + age (FIXED bug A) — pending/matched rows now bucket correctly.
     //
-    // NOTE (source bug A): Carbon::diffInSeconds() → float passed to bucket(int $ageSec).
-    // Fix: `private function bucket(float|int $ageSec, int $targetSec)` in
-    //      app/Services/CaringCommunity/HelpRequestSlaService.php line 211.
+    // Default policy: first_response SLA = 24h, resolution SLA = 72h.
+    // RISK_RATIO_AT_RISK = 0.75 → at_risk threshold is 75% of the target window
+    // (18h for first response, 54h for resolution).
     // ──────────────────────────────────────────────────────────────────────
 
-    /** @group bug-float-ageSec */
     public function test_pending_request_well_within_sla_is_on_track(): void
     {
-        $this->markTestSkipped(
-            'SOURCE BUG A: bucket(int $ageSec) receives float from Carbon::diffInSeconds() — ' .
-            'TypeError at HelpRequestSlaService.php:211. Fix: widen type hint to float|int.'
-        );
+        // Age ≈ 1h, well under the 18h at_risk threshold.
+        $this->insertHelpRequest([
+            'status'     => 'pending',
+            'created_at' => now()->subHour(),
+        ]);
+
+        $result = $this->service()->dashboard($this->testTenantId);
+
+        $this->assertSame(1, $result['summary']['pending']);
+        $this->assertSame(0, $result['summary']['first_response_breached']);
+        $this->assertSame(0, $result['summary']['first_response_at_risk']);
+        $this->assertCount(1, $result['open_requests']);
+
+        $row = $result['open_requests'][0];
+        $this->assertSame('on_track', $row['bucket']);
+        $this->assertSame('first_response', $row['sla_dimension']);
+        $this->assertSame(24, $row['sla_target_hours']);
     }
 
-    /** @group bug-float-ageSec */
     public function test_pending_request_at_risk_above_75_percent_of_sla(): void
     {
-        $this->markTestSkipped(
-            'SOURCE BUG A: bucket(int $ageSec) receives float from Carbon::diffInSeconds() — ' .
-            'TypeError at HelpRequestSlaService.php:211. Fix: widen type hint to float|int.'
-        );
+        // Age ≈ 20h: ≥ 18h (75% of 24h) but < 24h → at_risk.
+        $this->insertHelpRequest([
+            'status'     => 'pending',
+            'created_at' => now()->subHours(20),
+        ]);
+
+        $result = $this->service()->dashboard($this->testTenantId);
+
+        $this->assertSame(1, $result['summary']['first_response_at_risk']);
+        $this->assertSame(0, $result['summary']['first_response_breached']);
+        $this->assertSame('at_risk', $result['open_requests'][0]['bucket']);
     }
 
-    /** @group bug-float-ageSec */
     public function test_pending_request_breached_when_older_than_sla(): void
     {
-        $this->markTestSkipped(
-            'SOURCE BUG A: bucket(int $ageSec) receives float from Carbon::diffInSeconds() — ' .
-            'TypeError at HelpRequestSlaService.php:211. Fix: widen type hint to float|int.'
-        );
+        // Age ≈ 30h ≥ 24h first-response SLA → breached.
+        $this->insertHelpRequest([
+            'status'     => 'pending',
+            'created_at' => now()->subHours(30),
+        ]);
+
+        $result = $this->service()->dashboard($this->testTenantId);
+
+        $this->assertSame(1, $result['summary']['first_response_breached']);
+        $this->assertSame(0, $result['summary']['first_response_at_risk']);
+
+        $row = $result['open_requests'][0];
+        $this->assertSame('breached', $row['bucket']);
+        $this->assertGreaterThanOrEqual(6.0, $row['sla_overage_hours']); // ≈ 30h - 24h
     }
 
-    /** @group bug-float-ageSec */
     public function test_matched_request_well_within_resolution_sla_is_on_track(): void
     {
-        $this->markTestSkipped(
-            'SOURCE BUG A: bucket(int $ageSec) receives float from Carbon::diffInSeconds() — ' .
-            'TypeError at HelpRequestSlaService.php:211. Fix: widen type hint to float|int.'
-        );
+        // Matched (in-progress) measured against the 72h resolution SLA.
+        // Age ≈ 10h, well under the 54h at_risk threshold.
+        $this->insertHelpRequest([
+            'status'     => 'matched',
+            'created_at' => now()->subHours(10),
+        ]);
+
+        $result = $this->service()->dashboard($this->testTenantId);
+
+        $this->assertSame(1, $result['summary']['in_progress']);
+        $this->assertSame(0, $result['summary']['resolution_breached']);
+        $this->assertSame(0, $result['summary']['resolution_at_risk']);
+
+        $row = $result['open_requests'][0];
+        $this->assertSame('on_track', $row['bucket']);
+        $this->assertSame('resolution', $row['sla_dimension']);
+        $this->assertSame(72, $row['sla_target_hours']);
     }
 
-    /** @group bug-float-ageSec */
     public function test_matched_request_breached_when_older_than_resolution_sla(): void
     {
-        $this->markTestSkipped(
-            'SOURCE BUG A: bucket(int $ageSec) receives float from Carbon::diffInSeconds() — ' .
-            'TypeError at HelpRequestSlaService.php:211. Fix: widen type hint to float|int.'
-        );
+        // Age ≈ 80h ≥ 72h resolution SLA → breached.
+        $this->insertHelpRequest([
+            'status'     => 'matched',
+            'created_at' => now()->subHours(80),
+        ]);
+
+        $result = $this->service()->dashboard($this->testTenantId);
+
+        $this->assertSame(1, $result['summary']['in_progress']);
+        $this->assertSame(1, $result['summary']['resolution_breached']);
+        $this->assertSame('breached', $result['open_requests'][0]['bucket']);
     }
 
-    /** @group bug-float-ageSec */
     public function test_open_requests_sorted_breached_before_at_risk_before_on_track(): void
     {
-        $this->markTestSkipped(
-            'SOURCE BUG A: bucket(int $ageSec) receives float from Carbon::diffInSeconds() — ' .
-            'TypeError at HelpRequestSlaService.php:211. Fix: widen type hint to float|int.'
-        );
+        $this->insertHelpRequest(['status' => 'pending', 'created_at' => now()->subHour()]);    // on_track
+        $this->insertHelpRequest(['status' => 'pending', 'created_at' => now()->subHours(20)]); // at_risk
+        $this->insertHelpRequest(['status' => 'pending', 'created_at' => now()->subHours(30)]); // breached
+
+        $result = $this->service()->dashboard($this->testTenantId);
+
+        $this->assertCount(3, $result['open_requests']);
+        $buckets = array_column($result['open_requests'], 'bucket');
+        $this->assertSame(['breached', 'at_risk', 'on_track'], $buckets);
     }
 
-    /** @group bug-float-ageSec */
     public function test_sla_breach_uses_tenant_policy_sla_not_platform_defaults(): void
     {
-        $this->markTestSkipped(
-            'SOURCE BUG A: bucket(int $ageSec) receives float from Carbon::diffInSeconds() — ' .
-            'TypeError at HelpRequestSlaService.php:211. Fix: widen type hint to float|int.'
-        );
+        // Tighten the first-response SLA to 2h via tenant policy.
+        app(OperatingPolicyService::class)->update($this->testTenantId, [
+            'sla_first_response_hours' => 2,
+            'sla_help_request_hours'   => 72,
+        ]);
+
+        // Age ≈ 3h: on_track under the 24h default, but breached under the 2h policy.
+        $this->insertHelpRequest([
+            'status'     => 'pending',
+            'created_at' => now()->subHours(3),
+        ]);
+
+        $result = $this->service()->dashboard($this->testTenantId);
+
+        $this->assertSame(2, $result['policy']['first_response_hours']);
+        $this->assertSame('tenant_policy', $result['policy']['source']);
+        $this->assertSame(1, $result['summary']['first_response_breached']);
+
+        $row = $result['open_requests'][0];
+        $this->assertSame('breached', $row['bucket']);
+        $this->assertSame(2, $row['sla_target_hours']);
     }
 
     // ──────────────────────────────────────────────────────────────────────
-    // Recently resolved — closed rows bypass bucket(), these tests run.
+    // Recently resolved — turnaround / within-SLA (FIXED bug B).
     //
-    // NOTE (source bug B): $updated->diffInSeconds($created) is SIGNED. When $updated
-    // is after $created (the normal case), it returns a NEGATIVE float. The code then
-    // does max(0, negative) = 0, so $turnaroundSec is ALWAYS 0. Consequence:
-    //   - within_resolution_sla is ALWAYS true (0 ≤ any SLA)
-    //   - resolved_within_window_24h increments for EVERY recently-closed row
-    // The tests below assert the ACTUAL (buggy) behaviour and are annotated.
-    // Fix: reverse operands to $created->diffInSeconds($updated), or use abs().
+    // With the signed-diff fix, $turnaroundSec is now the real elapsed
+    // created → updated time, so within_resolution_sla and
+    // resolved_within_window_24h reflect actual turnaround.
     // ──────────────────────────────────────────────────────────────────────
 
     public function test_closed_request_within_72h_appears_in_recently_resolved(): void
@@ -307,6 +371,11 @@ class HelpRequestSlaServiceTest extends TestCase
         $this->assertArrayHasKey('turnaround_hours', $row);
         $this->assertArrayHasKey('within_resolution_sla', $row);
         $this->assertSame('closed', $row['status']);
+
+        // Regression guard for bug B: created 48h ago, updated 1h ago → real
+        // turnaround ≈ 47h. The old signed-diff bug collapsed this to 0.0.
+        $this->assertEqualsWithDelta(47.0, $row['turnaround_hours'], 0.2);
+        $this->assertTrue($row['within_resolution_sla']); // 47h ≤ 72h SLA
     }
 
     public function test_closed_request_older_than_72h_does_not_appear_in_recently_resolved(): void
@@ -323,12 +392,8 @@ class HelpRequestSlaServiceTest extends TestCase
     }
 
     /**
-     * NOTE (source bug B): Due to the signed diffInSeconds bug, $turnaroundSec is
-     * always 0 (max(0, negative) = 0), so resolved_within_window_24h increments
-     * for EVERY recently-closed row, not just those with actual turnaround ≤ 24h.
-     * This test asserts the ACTUAL (buggy) behaviour: the counter IS incremented.
-     * Expected CORRECT behaviour (after fix): should also be 1 here (turnaround ≈ 2h ≤ 24h),
-     * so the bug does not change the assertion for this specific case.
+     * Turnaround ≈ 2h (created 3h ago, updated 1h ago) is ≤ 24h, so
+     * resolved_within_window_24h is incremented.
      */
     public function test_closed_within_24h_turnaround_increments_resolved_within_window_24h(): void
     {
@@ -340,21 +405,18 @@ class HelpRequestSlaServiceTest extends TestCase
 
         $result = $this->service()->dashboard($this->testTenantId);
 
-        // ACTUAL behaviour: increments because bug makes turnaroundSec=0 ≤ 86400.
-        // Correct behaviour would also be 1 here (2h ≤ 24h), so assertion is bug-safe.
         $this->assertSame(1, $result['summary']['resolved_within_window_24h']);
+        $this->assertEqualsWithDelta(2.0, $result['recently_resolved'][0]['turnaround_hours'], 0.2);
     }
 
     /**
-     * NOTE (source bug B): Due to the signed diffInSeconds bug, $turnaroundSec is
-     * always 0, so resolved_within_window_24h is ALWAYS incremented for recently-closed
-     * rows (within 72h window). This test asserts ACTUAL behaviour: counter = 1.
-     * Expected CORRECT behaviour after fix: counter = 0 (turnaround ≈ 48h > 24h).
+     * Regression guard for bug B: turnaround ≈ 48h (created 49h ago, updated 1h
+     * ago) is > 24h, so resolved_within_window_24h must NOT be incremented even
+     * though the row is still within the 72h recently-resolved window. Under the
+     * old signed-diff bug this wrongly counted as 1 (turnaround collapsed to 0).
      */
-    public function test_closed_turnaround_beyond_24h_does_not_increment_resolved_within_window_24h_bug_b(): void
+    public function test_closed_turnaround_beyond_24h_does_not_increment_resolved_within_window_24h(): void
     {
-        // Turnaround ≈ 48h > 24h, but updated recently (within 72h window).
-        // NOTE (source bug B): Actual result is 1 (not 0) due to max(0, negative)=0 bug.
         $this->insertHelpRequest([
             'status'     => 'closed',
             'created_at' => now()->subHours(49),
@@ -363,22 +425,20 @@ class HelpRequestSlaServiceTest extends TestCase
 
         $result = $this->service()->dashboard($this->testTenantId);
 
-        // ACTUAL (buggy) behaviour: 1 because turnaroundSec wrongly computes as 0.
-        $this->assertSame(1, $result['summary']['resolved_within_window_24h']);
+        // Real turnaround ≈ 48h > 24h → counter stays 0.
+        $this->assertSame(0, $result['summary']['resolved_within_window_24h']);
 
         // Row still appears in recently_resolved (correct — updated within 72h).
         $this->assertCount(1, $result['recently_resolved']);
+        $this->assertEqualsWithDelta(48.0, $result['recently_resolved'][0]['turnaround_hours'], 0.2);
     }
 
     /**
-     * NOTE (source bug B): within_resolution_sla is ALWAYS true because turnaroundSec=0
-     * (from max(0, negative signed diff)). Test asserts actual behaviour.
-     * Expected CORRECT behaviour after fix: true (24h turnaround ≤ 72h SLA).
-     * Both agree here, so this test is bug-safe.
+     * Default resolution SLA = 72h. Turnaround ≈ 24h (created 25h ago, updated 1h
+     * ago) is within SLA → within_resolution_sla is true.
      */
     public function test_closed_request_within_resolution_sla_sets_within_resolution_sla_true(): void
     {
-        // Default resolution SLA = 72h. Turnaround ≈ 24h → within SLA.
         $this->insertHelpRequest([
             'status'     => 'closed',
             'created_at' => now()->subHours(25),
@@ -388,19 +448,18 @@ class HelpRequestSlaServiceTest extends TestCase
         $result = $this->service()->dashboard($this->testTenantId);
 
         $this->assertCount(1, $result['recently_resolved']);
-        // ACTUAL and CORRECT behaviour agree: true (both buggy 0h and real 24h are ≤ 72h SLA).
+        $this->assertEqualsWithDelta(24.0, $result['recently_resolved'][0]['turnaround_hours'], 0.2);
         $this->assertTrue($result['recently_resolved'][0]['within_resolution_sla']);
     }
 
     /**
-     * NOTE (source bug B): within_resolution_sla should be FALSE for a 73h turnaround
-     * exceeding the 72h SLA, but due to the signed diffInSeconds bug, turnaroundSec=0
-     * so within_resolution_sla is always TRUE. Test asserts ACTUAL (buggy) behaviour.
-     * Expected CORRECT behaviour after fix: false.
+     * Regression guard for bug B: turnaround ≈ 73h (created 74h ago, updated 1h
+     * ago) exceeds the 72h resolution SLA, so within_resolution_sla must be FALSE.
+     * Under the old signed-diff bug turnaround collapsed to 0 and this wrongly
+     * read true.
      */
-    public function test_closed_request_outside_resolution_sla_within_resolution_sla_is_bugged_true(): void
+    public function test_closed_request_outside_resolution_sla_sets_within_resolution_sla_false(): void
     {
-        // Turnaround ≈ 73h > 72h default SLA → should be false, but bug makes it true.
         $this->insertHelpRequest([
             'status'     => 'closed',
             'created_at' => now()->subHours(74),
@@ -410,11 +469,8 @@ class HelpRequestSlaServiceTest extends TestCase
         $result = $this->service()->dashboard($this->testTenantId);
 
         $this->assertCount(1, $result['recently_resolved']);
-
-        // NOTE (source bug B): within_resolution_sla is TRUE instead of FALSE because
-        // $turnaroundSec = max(0, $updated->diffInSeconds($created)) = max(0, negative) = 0.
-        // Fix: use $created->diffInSeconds($updated) (reversed) or abs().
-        $this->assertTrue($result['recently_resolved'][0]['within_resolution_sla']);
+        $this->assertEqualsWithDelta(73.0, $result['recently_resolved'][0]['turnaround_hours'], 0.2);
+        $this->assertFalse($result['recently_resolved'][0]['within_resolution_sla']);
     }
 
     // ──────────────────────────────────────────────────────────────────────
