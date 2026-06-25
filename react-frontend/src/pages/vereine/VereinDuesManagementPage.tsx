@@ -105,7 +105,7 @@ export function VereinDuesManagementPage() {
 
   // Members table
   const [rows, setRows] = useState<DuesRow[]>([]);
-  const [year, setYear] = useState<number>(new Date().getFullYear());
+  const [year, setYear] = useState<number>(() => new Date().getFullYear());
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [overdueCount, setOverdueCount] = useState<number>(0);

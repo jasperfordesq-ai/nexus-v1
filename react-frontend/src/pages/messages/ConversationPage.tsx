@@ -94,7 +94,7 @@ function scrollToMessage(messageId: number) {
 
 export function ConversationPage() {
   const { t, i18n } = useTranslation('messages');
-  const [pageTitle, setPageTitle] = useState(t('title'));
+  const [pageTitle, setPageTitle] = useState(() => t('title'));
   usePageTitle(pageTitle);
   const { id, userId } = useParams<{ id?: string; userId?: string }>();
   const [searchParams] = useSearchParams();

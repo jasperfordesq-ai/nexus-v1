@@ -111,8 +111,8 @@ export default function MunicipalRoiAdminPage() {
   const [loading, setLoading] = useState(true);
 
   // Filters
-  const [from, setFrom] = useState<string>(startOfYearISO());
-  const [to, setTo] = useState<string>(todayISO());
+  const [from, setFrom] = useState<string>(() => startOfYearISO());
+  const [to, setTo] = useState<string>(() => todayISO());
   const [subRegionId, setSubRegionId] = useState<string>('');
 
   // Sub-regions

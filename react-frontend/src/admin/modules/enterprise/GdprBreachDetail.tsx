@@ -78,7 +78,7 @@ export function GdprBreachDetail() {
   const [preventionMeasures, setPreventionMeasures] = useState('');
 
   // Live countdown timer for DPA 72-hour deadline
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
 
   const breachId = useMemo(() => (id ? parseInt(id, 10) : 0), [id]);
 

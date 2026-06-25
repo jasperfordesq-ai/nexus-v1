@@ -63,7 +63,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
   // components render anywhere for this tenant; address autocomplete still
   // works via the geocoding provider below. Backed by the same toggle endpoint
   // every other feature uses (PUT /v2/admin/config/features).
-  const [mapsEnabled, setMapsEnabled] = useState<boolean>(hasFeature('maps'));
+  const [mapsEnabled, setMapsEnabled] = useState<boolean>(() => hasFeature('maps'));
   const [savingMaps, setSavingMaps] = useState(false);
 
   // Provider state

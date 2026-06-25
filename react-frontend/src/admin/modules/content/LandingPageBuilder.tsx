@@ -1042,7 +1042,7 @@ export function LandingPageBuilder() {
   const toast = useToast();
 
   // State
-  const [config, setConfig] = useState<LandingPageConfig>(
+  const [config, setConfig] = useState<LandingPageConfig>(() =>
     cloneConfig(DEFAULT_LANDING_PAGE_CONFIG),
   );
   const [savedConfig, setSavedConfig] = useState<LandingPageConfig | null>(null);
