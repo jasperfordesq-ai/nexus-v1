@@ -58,6 +58,19 @@ const IMPL_STATUS_COLORS: Record<string, 'default' | 'warning' | 'success' | 'da
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
+const formatDate = (dateStr: string | null) => {
+  if (!dateStr) return null;
+  try {
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+};
+
 export function OutcomesDashboardPage() {
   const { t } = useTranslation('ideation');
   usePageTitle(t('outcomes.page_title'));
@@ -100,18 +113,6 @@ export function OutcomesDashboardPage() {
     fetchDashboard();
   }, [fetchDashboard]);
 
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return null;
-    try {
-      return new Date(dateStr).toLocaleDateString(undefined, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-    } catch {
-      return dateStr;
-    }
-  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">

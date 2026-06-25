@@ -45,6 +45,17 @@ interface TagSummary {
 
 type ViewMode = 'summary' | 'members';
 
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
 export function MemberTags() {
   const { t: tNav } = useTranslation('admin_nav');
   const { t } = useTranslation('admin');
@@ -215,19 +226,6 @@ export function MemberTags() {
       toast.error(t('crm.failed_to_remove_tag'));
     }
     setDeleting(false);
-  };
-
-  // ----- Formatting -----
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
   };
 
   // ----- Filtered data -----

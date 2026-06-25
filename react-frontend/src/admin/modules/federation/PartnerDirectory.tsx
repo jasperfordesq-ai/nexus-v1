@@ -90,6 +90,17 @@ const partnershipStatusConfig: Record<string, { color: 'success' | 'warning' | '
   suspended: { color: 'danger', icon: XCircle, label: 'federation.status_suspended' },
 };
 
+const enabledFeatures = (community: Community): string[] => {
+  const features: string[] = [];
+  if (community.profiles_enabled) features.push('federation.feature_profiles');
+  if (community.listings_enabled) features.push('federation.feature_listings');
+  if (community.messaging_enabled) features.push('federation.feature_messages');
+  if (community.transactions_enabled) features.push('federation.feature_transactions');
+  if (community.events_enabled) features.push('federation.feature_events');
+  if (community.groups_enabled) features.push('federation.feature_groups');
+  return features;
+};
+
 export function PartnerDirectory() {
   const { t } = useTranslation('admin');
   usePageTitle(t('federation.page_title'));
@@ -168,17 +179,6 @@ export function PartnerDirectory() {
     } finally {
       setRequestLoading(false);
     }
-  };
-
-  const enabledFeatures = (community: Community): string[] => {
-    const features: string[] = [];
-    if (community.profiles_enabled) features.push('federation.feature_profiles');
-    if (community.listings_enabled) features.push('federation.feature_listings');
-    if (community.messaging_enabled) features.push('federation.feature_messages');
-    if (community.transactions_enabled) features.push('federation.feature_transactions');
-    if (community.events_enabled) features.push('federation.feature_events');
-    if (community.groups_enabled) features.push('federation.feature_groups');
-    return features;
   };
 
   const activeFilters = useMemo(() => {

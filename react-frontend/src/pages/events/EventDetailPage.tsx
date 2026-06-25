@@ -78,6 +78,15 @@ interface AttendeeWithCheckIn extends User {
   rsvp_status?: string;
 }
 
+/** Map backend rsvp_status to our 3-option model */
+function normalizeRsvpStatus(status: string | null | undefined): RsvpOption | null {
+  if (!status) return null;
+  if (status === 'going' || status === 'attending') return 'going';
+  if (status === 'interested' || status === 'maybe') return 'interested';
+  if (status === 'not_going' || status === 'not_attending') return 'not_going';
+  return null;
+}
+
 export function EventDetailPage() {
   const { t } = useTranslation('events');
   const { id } = useParams<{ id: string }>();
@@ -118,15 +127,6 @@ export function EventDetailPage() {
   tRef.current = t;
   const toastRef = useRef(toast);
   toastRef.current = toast;
-
-  /** Map backend rsvp_status to our 3-option model */
-  function normalizeRsvpStatus(status: string | null | undefined): RsvpOption | null {
-    if (!status) return null;
-    if (status === 'going' || status === 'attending') return 'going';
-    if (status === 'interested' || status === 'maybe') return 'interested';
-    if (status === 'not_going' || status === 'not_attending') return 'not_going';
-    return null;
-  }
 
   const loadEvent = useCallback(async () => {
     if (!id) return;

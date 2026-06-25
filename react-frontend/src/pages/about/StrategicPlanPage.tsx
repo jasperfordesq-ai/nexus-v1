@@ -61,18 +61,18 @@ const tocSections = [
 
 /* ───────────────────────── Component ───────────────────────── */
 
+const scrollTo = (id: string) => {
+  const el = document.getElementById(id);
+  if (el) {
+    const top = el.getBoundingClientRect().top + window.scrollY - 100;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+};
+
 export function StrategicPlanPage() {
   const { t } = useTranslation('about');
   const { tenantPath } = useTenant();
   usePageTitle(t('strategic_plan.page_title'));
-
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      const top = el.getBoundingClientRect().top + window.scrollY - 100;
-      window.scrollTo({ top, behavior: 'smooth' });
-    }
-  };
 
   return (
     <>

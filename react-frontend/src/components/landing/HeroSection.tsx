@@ -28,6 +28,10 @@ interface HeroSectionProps {
   content?: HeroContent;
 }
 
+const scrollToSection = () => {
+  document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+};
+
 export function HeroSection({ content }: HeroSectionProps) {
   const { t } = useTranslation('public');
   const { branding, tenantPath } = useTenant();
@@ -42,10 +46,6 @@ export function HeroSection({ content }: HeroSectionProps) {
   const ctaSecondaryText = content?.cta_secondary_text || t('home.cta_learn_more');
   const ctaSecondaryLink = content?.cta_secondary_link || '/about';
   const ctaFeedText = t('home.cta_feed');
-
-  const scrollToSection = () => {
-    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   return (
     <section aria-labelledby="hero-heading" className="relative py-20 sm:py-32 px-4 sm:px-6 lg:px-8">

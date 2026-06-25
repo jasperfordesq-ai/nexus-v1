@@ -52,6 +52,26 @@ interface PendingHoursResponse {
   has_more: boolean;
 }
 
+const formatDate = (dateStr: string) => {
+  try {
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+};
+
+const statusColor = (status: HourLogEntry['status']): 'success' | 'danger' | 'warning' => {
+  switch (status) {
+    case 'approved': return 'success';
+    case 'declined': return 'danger';
+    default: return 'warning';
+  }
+};
+
 export function HoursReviewTab() {
   const toast = useToast();
   const { t } = useTranslation('volunteering');
@@ -161,26 +181,6 @@ export function HoursReviewTab() {
         next.delete(entryId);
         return next;
       });
-    }
-  };
-
-  const formatDate = (dateStr: string) => {
-    try {
-      return new Date(dateStr).toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
-    } catch {
-      return dateStr;
-    }
-  };
-
-  const statusColor = (status: HourLogEntry['status']): 'success' | 'danger' | 'warning' => {
-    switch (status) {
-      case 'approved': return 'success';
-      case 'declined': return 'danger';
-      default: return 'warning';
     }
   };
 

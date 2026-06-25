@@ -58,6 +58,15 @@ interface SubscriberStats {
 
 type StatusFilter = '' | 'active' | 'pending' | 'unsubscribed';
 
+const statusColor = (status: string): 'success' | 'warning' | 'danger' | 'default' => {
+  switch (status) {
+    case 'active': return 'success';
+    case 'pending': return 'warning';
+    case 'unsubscribed': return 'danger';
+    default: return 'default';
+  }
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -349,15 +358,6 @@ export function Subscribers() {
     navigator.clipboard.writeText(subscribeUrl);
     toast.success(t('newsletters.subscribe_link_copied_to_clipboard'));
   }, [subscribeUrl, t, toast])
-
-  const statusColor = (status: string): 'success' | 'warning' | 'danger' | 'default' => {
-    switch (status) {
-      case 'active': return 'success';
-      case 'pending': return 'warning';
-      case 'unsubscribed': return 'danger';
-      default: return 'default';
-    }
-  };
 
   const sourceLabel = (source: string | null) => {
     switch (source) {

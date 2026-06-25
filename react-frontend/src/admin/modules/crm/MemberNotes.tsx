@@ -74,6 +74,17 @@ const CATEGORY_COLORS: Record<string, 'default' | 'primary' | 'warning' | 'succe
 
 const ITEMS_PER_PAGE = 20;
 
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
 export function MemberNotes() {
   const { t: tNav } = useTranslation('admin_nav');
   const { t } = useTranslation('admin');
@@ -248,17 +259,6 @@ export function MemberNotes() {
   };
 
   // ----- Formatting -----
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
 
   const getCategoryLabel = (key: string) => {
     const cat = CATEGORIES.find(c => c.key === key);

@@ -157,6 +157,22 @@ const PRIMARY_VOLUNTEER_TABS: VolunteerTab[] = ['opportunities', 'applications',
 const VOL_GRADIENT_BASE = 'bg-linear-to-r from-rose-500 to-pink-600';
 const VOL_GRADIENT = `${VOL_GRADIENT_BASE} text-white`;
 
+const statusColor = (status: string) => {
+  switch (status) {
+    case 'approved': return 'success';
+    case 'declined': return 'danger';
+    default: return 'warning';
+  }
+};
+
+const statusIcon = (status: string) => {
+  switch (status) {
+    case 'approved': return <CheckCircle className="w-3 h-3" aria-hidden="true" />;
+    case 'declined': return <XCircle className="w-3 h-3" aria-hidden="true" />;
+    default: return <Hourglass className="w-3 h-3" aria-hidden="true" />;
+  }
+};
+
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function VolunteeringPage() {
@@ -999,22 +1015,6 @@ function ApplicationsTab() {
     } catch (err) {
       logError('Failed to withdraw application', err);
       toast.error(t('withdraw_failed'));
-    }
-  };
-
-  const statusColor = (status: string) => {
-    switch (status) {
-      case 'approved': return 'success';
-      case 'declined': return 'danger';
-      default: return 'warning';
-    }
-  };
-
-  const statusIcon = (status: string) => {
-    switch (status) {
-      case 'approved': return <CheckCircle className="w-3 h-3" aria-hidden="true" />;
-      case 'declined': return <XCircle className="w-3 h-3" aria-hidden="true" />;
-      default: return <Hourglass className="w-3 h-3" aria-hidden="true" />;
     }
   };
 

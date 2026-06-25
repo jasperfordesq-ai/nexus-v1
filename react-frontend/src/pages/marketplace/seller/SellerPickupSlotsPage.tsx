@@ -31,6 +31,16 @@ interface PickupSlot {
   is_active: boolean;
 }
 
+const formatRange = (s: string, e: string) => {
+  try {
+    const a = new Date(s);
+    const b = new Date(e);
+    return `${a.toLocaleString()} → ${b.toLocaleTimeString()}`;
+  } catch {
+    return `${s} → ${e}`;
+  }
+};
+
 export function SellerPickupSlotsPage() {
   const { t } = useTranslation('common');
   const confirm = useConfirm();
@@ -114,16 +124,6 @@ export function SellerPickupSlotsPage() {
       }
     } catch (err) {
       logError('SellerPickupSlotsPage: delete failed', err);
-    }
-  };
-
-  const formatRange = (s: string, e: string) => {
-    try {
-      const a = new Date(s);
-      const b = new Date(e);
-      return `${a.toLocaleString()} → ${b.toLocaleTimeString()}`;
-    } catch {
-      return `${s} → ${e}`;
     }
   };
 

@@ -44,6 +44,18 @@ interface Campaign {
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
+const formatDate = (dateStr: string) => {
+  try {
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+};
+
 export function CampaignsPage() {
   const { t } = useTranslation('ideation');
   usePageTitle(t('campaigns.page_title'));
@@ -131,18 +143,6 @@ export function CampaignsPage() {
       toastRef.current.error(tRef.current('toast.error_generic'));
     } finally {
       setIsCreating(false);
-    }
-  };
-
-  const formatDate = (dateStr: string) => {
-    try {
-      return new Date(dateStr).toLocaleDateString(undefined, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-    } catch {
-      return dateStr;
     }
   };
 

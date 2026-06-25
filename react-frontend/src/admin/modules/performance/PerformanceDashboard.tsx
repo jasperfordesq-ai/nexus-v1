@@ -49,6 +49,21 @@ interface PerformanceSummary {
   total_slow_queries: number;
 }
 
+const formatDuration = (ms: number) => {
+  if (ms < 1000) return `${Math.round(ms)}ms`;
+  return `${(ms / 1000).toFixed(2)}s`;
+};
+
+const getDurationColor = (ms: number) => {
+  if (ms < 100) return 'success';
+  if (ms < 500) return 'warning';
+  return 'danger';
+};
+
+const formatTimestamp = (timestamp: string) => {
+  return new Date(timestamp).toLocaleString();
+};
+
 export default function PerformanceDashboard() {
   const { t } = useTranslation('admin');
   usePageTitle(t('performance.page_title'));
@@ -75,21 +90,6 @@ export default function PerformanceDashboard() {
   useEffect(() => {
     loadSummary();
   }, [hours, loadSummary]);
-
-  const formatDuration = (ms: number) => {
-    if (ms < 1000) return `${Math.round(ms)}ms`;
-    return `${(ms / 1000).toFixed(2)}s`;
-  };
-
-  const getDurationColor = (ms: number) => {
-    if (ms < 100) return 'success';
-    if (ms < 500) return 'warning';
-    return 'danger';
-  };
-
-  const formatTimestamp = (timestamp: string) => {
-    return new Date(timestamp).toLocaleString();
-  };
 
   const renderStats = () => {
     if (!summary) return null;

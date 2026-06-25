@@ -98,6 +98,38 @@ function featureLabelKey(feature: string): string {
   }
 }
 
+const getLevelColor = (level: number) => {
+  switch (level) {
+    case 1: return 'primary';
+    case 2: return 'success';
+    case 3: return 'secondary';
+    case 4: return 'warning';
+    default: return 'default';
+  }
+};
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'active': return 'success';
+    case 'pending': return 'warning';
+    case 'suspended': return 'danger';
+    case 'terminated': return 'default';
+    default: return 'default';
+  }
+};
+
+const getFeatureIcon = (feature: string) => {
+  switch (feature) {
+    case 'profiles': return <Users className="w-4 h-4 text-accent" />;
+    case 'messaging': return <MessageSquare className="w-4 h-4 text-success" />;
+    case 'transactions': return <DollarSign className="w-4 h-4 text-accent" />;
+    case 'listings': return <FileText className="w-4 h-4 text-warning" />;
+    case 'events': return <Calendar className="w-4 h-4 text-pink-500" />;
+    case 'groups': return <UsersRound className="w-4 h-4 text-cyan-500" />;
+    default: return null;
+  }
+};
+
 export default function Partnerships() {
   const { t } = useTranslation('admin');
   usePageTitle(t('super.page_title'));
@@ -148,38 +180,6 @@ export default function Partnerships() {
       toast.success(t('super.partnership_terminated'));
     } else {
       toast.error(res.error || t('super.failed_to_terminate_partnership'));
-    }
-  };
-
-  const getLevelColor = (level: number) => {
-    switch (level) {
-      case 1: return 'primary';
-      case 2: return 'success';
-      case 3: return 'secondary';
-      case 4: return 'warning';
-      default: return 'default';
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'success';
-      case 'pending': return 'warning';
-      case 'suspended': return 'danger';
-      case 'terminated': return 'default';
-      default: return 'default';
-    }
-  };
-
-  const getFeatureIcon = (feature: string) => {
-    switch (feature) {
-      case 'profiles': return <Users className="w-4 h-4 text-accent" />;
-      case 'messaging': return <MessageSquare className="w-4 h-4 text-success" />;
-      case 'transactions': return <DollarSign className="w-4 h-4 text-accent" />;
-      case 'listings': return <FileText className="w-4 h-4 text-warning" />;
-      case 'events': return <Calendar className="w-4 h-4 text-pink-500" />;
-      case 'groups': return <UsersRound className="w-4 h-4 text-cyan-500" />;
-      default: return null;
     }
   };
 

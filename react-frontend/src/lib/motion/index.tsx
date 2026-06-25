@@ -229,11 +229,12 @@ const VariantContext = React.createContext<VariantCtx | null>(null);
 
 /* --------------------------------------------------------- reduced motion */
 
+const get = () =>
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 export function useReducedMotion(): boolean {
-  const get = () =>
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const [reduced, setReduced] = React.useState<boolean>(get);
   React.useEffect(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;

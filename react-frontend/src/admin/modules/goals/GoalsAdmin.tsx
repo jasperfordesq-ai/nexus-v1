@@ -106,6 +106,14 @@ function normalizeGoal(item: RawGoal): Goal {
   };
 }
 
+const progressPercent = (goal: Goal): number => {
+  if (!goal.target_value || goal.target_value <= 0) return 0;
+  return Math.min(Math.round((goal.current_value / goal.target_value) * 100), 100);
+};
+
+const formatDate = (iso: string): string =>
+  new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -196,18 +204,6 @@ export function GoalsAdmin() {
       setConfirmDelete(null);
     }
   };
-
-  // -----------------------------------------------------------------------
-  // Helpers
-  // -----------------------------------------------------------------------
-
-  const progressPercent = (goal: Goal): number => {
-    if (!goal.target_value || goal.target_value <= 0) return 0;
-    return Math.min(Math.round((goal.current_value / goal.target_value) * 100), 100);
-  };
-
-  const formatDate = (iso: string): string =>
-    new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 
   // -----------------------------------------------------------------------
   // Render

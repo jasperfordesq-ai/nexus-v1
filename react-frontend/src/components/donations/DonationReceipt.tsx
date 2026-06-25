@@ -41,6 +41,10 @@ interface DonationReceiptProps {
 
 /* ───────────────────────── Component ───────────────────────── */
 
+const handlePrint = () => {
+  window.print();
+};
+
 export function DonationReceipt({ donationId }: DonationReceiptProps) {
   const { t } = useTranslation('volunteering');
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
@@ -70,10 +74,6 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
 
     fetchReceipt();
   }, [donationId, t]);
-
-  const handlePrint = () => {
-    window.print();
-  };
 
   if (isLoading) {
     return (

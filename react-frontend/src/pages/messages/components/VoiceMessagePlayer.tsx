@@ -17,6 +17,12 @@ export interface VoiceMessagePlayerProps {
   transcriptLanguage?: string;
 }
 
+function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
 /**
  * Voice message player component
  */
@@ -71,12 +77,6 @@ export function VoiceMessagePlayer({ audioUrl, audioBlob, transcript }: VoiceMes
       audio.play();
       setIsPlaying(true);
     }
-  }
-
-  function formatTime(seconds: number): string {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;

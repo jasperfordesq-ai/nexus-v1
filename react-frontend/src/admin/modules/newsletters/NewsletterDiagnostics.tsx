@@ -29,6 +29,31 @@ import type { NewsletterDiagnostics as DiagnosticsData } from '../../api/types';
  * Email health dashboard - queue status, bounce rate, configuration checks
  */
 
+const getHealthColor = (status: string) => {
+  switch (status) {
+    case 'healthy': return 'success';
+    case 'warning': return 'warning';
+    case 'critical': return 'danger';
+    default: return 'default';
+  }
+};
+
+const getHealthIcon = (status: string) => {
+  switch (status) {
+    case 'healthy': return <CheckCircle size={24} className="text-success" />;
+    case 'warning': return <AlertCircle size={24} className="text-warning" />;
+    case 'critical': return <XCircle size={24} className="text-danger" />;
+    default: return <Activity size={24} className="text-muted" />;
+  }
+};
+
+const getConfigIcon = (enabled: boolean) => {
+  return enabled ? (
+    <CheckCircle size={16} className="text-success" />
+  ) : (
+    <XCircle size={16} className="text-danger" />
+  );
+};
 
 export function NewsletterDiagnostics() {
   const { t } = useTranslation('admin');
@@ -59,32 +84,6 @@ export function NewsletterDiagnostics() {
   }, [navigate, tenantPath]);
 
   useEffect(() => { loadData(); }, [loadData]);
-
-  const getHealthColor = (status: string) => {
-    switch (status) {
-      case 'healthy': return 'success';
-      case 'warning': return 'warning';
-      case 'critical': return 'danger';
-      default: return 'default';
-    }
-  };
-
-  const getHealthIcon = (status: string) => {
-    switch (status) {
-      case 'healthy': return <CheckCircle size={24} className="text-success" />;
-      case 'warning': return <AlertCircle size={24} className="text-warning" />;
-      case 'critical': return <XCircle size={24} className="text-danger" />;
-      default: return <Activity size={24} className="text-muted" />;
-    }
-  };
-
-  const getConfigIcon = (enabled: boolean) => {
-    return enabled ? (
-      <CheckCircle size={16} className="text-success" />
-    ) : (
-      <XCircle size={16} className="text-danger" />
-    );
-  };
 
   const queueTotal = data?.queue_status?.total || 0;
   const queuePending = data?.queue_status?.pending || 0;

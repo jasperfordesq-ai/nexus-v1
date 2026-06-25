@@ -76,6 +76,19 @@ const STATUS_COLOR_MAP: Record<string, 'default' | 'success' | 'warning' | 'dang
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
+const formatDate = (dateStr: string | null) => {
+  if (!dateStr) return null;
+  try {
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+};
+
 export function CampaignDetailPage() {
   const { t } = useTranslation('ideation');
   const { id } = useParams<{ id: string }>();
@@ -186,19 +199,6 @@ export function CampaignDetailPage() {
       logError('Failed to unlink challenge', err);
       toastRef.current.error(tRef.current('toast.error_generic'));
       setUnlinkTargetId(null);
-    }
-  };
-
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return null;
-    try {
-      return new Date(dateStr).toLocaleDateString(undefined, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-    } catch {
-      return dateStr;
     }
   };
 

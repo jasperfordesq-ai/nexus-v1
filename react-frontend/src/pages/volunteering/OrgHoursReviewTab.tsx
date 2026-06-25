@@ -41,6 +41,18 @@ interface PendingHoursResponse {
   has_more: boolean;
 }
 
+const formatDate = (dateStr: string) => {
+  try {
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+};
+
 function OrgHoursReviewTab({ orgId, balance, onBalanceChange }: OrgHoursReviewTabProps) {
   const toast = useToast();
   const { t } = useTranslation('volunteering');
@@ -166,18 +178,6 @@ function OrgHoursReviewTab({ orgId, balance, onBalanceChange }: OrgHoursReviewTa
         next.delete(entryId);
         return next;
       });
-    }
-  };
-
-  const formatDate = (dateStr: string) => {
-    try {
-      return new Date(dateStr).toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
-    } catch {
-      return dateStr;
     }
   };
 

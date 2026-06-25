@@ -76,6 +76,22 @@ const itemVariants = {
 
 /* ───────────────────────── Component ───────────────────────── */
 
+const statusColor = (status: string) => {
+  switch (status) {
+    case 'confirmed': return 'success';
+    case 'cancelled': return 'danger';
+    default: return 'warning';
+  }
+};
+
+const memberStatusIcon = (status: string) => {
+  switch (status) {
+    case 'confirmed': return <CheckCircle className="w-3 h-3 text-emerald-500" />;
+    case 'declined': return <XCircle className="w-3 h-3 text-[var(--color-error)]" />;
+    default: return <Hourglass className="w-3 h-3 text-[var(--color-warning)]" />;
+  }
+};
+
 export function GroupSignUpTab() {
   const { t } = useTranslation('volunteering');
   const toast = useToast();
@@ -227,22 +243,6 @@ export function GroupSignUpTab() {
       setAddError(tRef.current('group_signup.add_member_error_generic'));
     } finally {
       setIsAdding(false);
-    }
-  };
-
-  const statusColor = (status: string) => {
-    switch (status) {
-      case 'confirmed': return 'success';
-      case 'cancelled': return 'danger';
-      default: return 'warning';
-    }
-  };
-
-  const memberStatusIcon = (status: string) => {
-    switch (status) {
-      case 'confirmed': return <CheckCircle className="w-3 h-3 text-emerald-500" />;
-      case 'declined': return <XCircle className="w-3 h-3 text-[var(--color-error)]" />;
-      default: return <Hourglass className="w-3 h-3 text-[var(--color-warning)]" />;
     }
   };
 

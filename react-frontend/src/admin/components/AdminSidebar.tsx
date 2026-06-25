@@ -584,6 +584,12 @@ interface AdminSidebarProps {
   onToggle?: () => void;
 }
 
+const renderBadge = (item: NavItem) => {
+  if (!item.badge) return null;
+  const tone = item.attention === 'danger' ? 'bg-danger text-danger-foreground' : 'bg-accent text-accent-foreground';
+  return <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${tone}`}>{item.badge}</span>;
+};
+
 export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: AdminSidebarProps) {
   const { t } = useTranslation('admin_nav');
   const { pathname, search } = useLocation();
@@ -717,12 +723,6 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
   };
 
   const isActive = (href: string) => href === activeHref;
-
-  const renderBadge = (item: NavItem) => {
-    if (!item.badge) return null;
-    const tone = item.attention === 'danger' ? 'bg-danger text-danger-foreground' : 'bg-accent text-accent-foreground';
-    return <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${tone}`}>{item.badge}</span>;
-  };
 
   const renderNavLink = (item: NavItem, compact = false) => {
     const ItemIcon = item.icon;

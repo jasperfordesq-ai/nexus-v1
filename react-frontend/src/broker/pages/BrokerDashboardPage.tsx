@@ -65,6 +65,11 @@ const quickLinkTextClass: Record<string, string> = {
   default: 'text-muted',
 };
 
+// A dash for null (load failed) and a dash for missing data both render
+// identically — but the partial-load banner makes the difference visible.
+const renderMetric = (value: number | null | undefined): number | string =>
+  typeof value === 'number' ? value : '—';
+
 export function BrokerDashboard() {
   const { t } = useTranslation('broker');
   usePageTitle(t('dashboard.title'));
@@ -106,11 +111,6 @@ export function BrokerDashboard() {
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
-
-  // A dash for null (load failed) and a dash for missing data both render
-  // identically — but the partial-load banner makes the difference visible.
-  const renderMetric = (value: number | null | undefined): number | string =>
-    typeof value === 'number' ? value : '—';
 
   return (
     <div>

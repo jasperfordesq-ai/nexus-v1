@@ -366,6 +366,35 @@ function EmptyState({ icon: Icon, message, cta, onAction }: {
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Format a date to a short readable format
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+};
+
+const formatDateTime = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+};
+
+const getChallengeProgress = (startDate: string, endDate: string) => {
+  const start = new Date(startDate).getTime();
+  const end = new Date(endDate).getTime();
+  const now = Date.now();
+
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) {
+    return 100;
+  }
+
+  const elapsedRatio = ((now - start) / (end - start)) * 100;
+  return Math.min(100, Math.max(5, elapsedRatio));
+};
+
 export default function ExplorePage() {
   const { t } = useTranslation('explore');
   usePageTitle(t('page_title'));
@@ -498,35 +527,6 @@ export default function ExplorePage() {
   }, []);
 
   const stats = data?.community_stats;
-
-  // Format a date to a short readable format
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-  };
-
-  const formatDateTime = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  };
-
-  const getChallengeProgress = (startDate: string, endDate: string) => {
-    const start = new Date(startDate).getTime();
-    const end = new Date(endDate).getTime();
-    const now = Date.now();
-
-    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) {
-      return 100;
-    }
-
-    const elapsedRatio = ((now - start) / (end - start)) * 100;
-    return Math.min(100, Math.max(5, elapsedRatio));
-  };
 
   // Memoize time-ago for trending posts
   const timeAgo = useCallback((dateStr: string) => {

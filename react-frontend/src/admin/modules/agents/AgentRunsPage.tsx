@@ -33,6 +33,13 @@ interface AgentRun {
   completed_at: string | null;
 }
 
+const statusColor = (s: string): 'success' | 'warning' | 'danger' | 'default' => {
+  if (s === 'completed') return 'success';
+  if (s === 'running') return 'warning';
+  if (s === 'failed') return 'danger';
+  return 'default';
+};
+
 export default function AgentRunsPage() {
   const { t } = useTranslation('admin');
   usePageTitle(t('agents.runs.meta.title'));
@@ -63,13 +70,6 @@ export default function AgentRunsPage() {
   useEffect(() => {
     void fetchItems();
   }, [fetchItems]);
-
-  const statusColor = (s: string): 'success' | 'warning' | 'danger' | 'default' => {
-    if (s === 'completed') return 'success';
-    if (s === 'running') return 'warning';
-    if (s === 'failed') return 'danger';
-    return 'default';
-  };
 
   return (
     <div className="p-6 space-y-6">

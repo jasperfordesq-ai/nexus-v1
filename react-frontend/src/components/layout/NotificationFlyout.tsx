@@ -44,6 +44,11 @@ const TYPE_ICONS: Record<string, typeof Bell> = {
   system: Info,
 };
 
+const getIcon = (type: string) => {
+  const Icon = TYPE_ICONS[type] || Bell;
+  return <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />;
+};
+
 export function NotificationFlyout() {
   const { t } = useTranslation('notifications');
   const navigate = useNavigate();
@@ -116,11 +121,6 @@ export function NotificationFlyout() {
     setIsOpen(false);
     navigate(tenantPath('/notifications'));
   }, [navigate, tenantPath]);
-
-  const getIcon = (type: string) => {
-    const Icon = TYPE_ICONS[type] || Bell;
-    return <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />;
-  };
 
   /* ── Shared notification list content ────────────────────── */
   const notificationHeader = (

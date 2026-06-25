@@ -92,6 +92,9 @@ function generateId(): string {
   return Math.random().toString(36).substring(2, 9);
 }
 
+const getFieldConfig = (fieldKey: string): RuleFieldConfig | undefined =>
+  RULE_FIELDS.find(f => f.key === fieldKey);
+
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Component
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -277,9 +280,6 @@ export function SegmentForm() {
   }, []);
 
   // â”€â”€ Render helpers â”€â”€
-
-  const getFieldConfig = (fieldKey: string): RuleFieldConfig | undefined =>
-    RULE_FIELDS.find(f => f.key === fieldKey);
 
   const renderValueInput = (rule: SegmentRule) => {
     const fieldConfig = getFieldConfig(rule.field);

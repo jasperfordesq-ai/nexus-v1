@@ -22,6 +22,17 @@ import type { AdminUserDetail } from '../../api/types';
  */
 
 
+const roleColorFor = (role?: string): 'primary' | 'secondary' | 'success' | 'warning' | 'default' => {
+  switch (role) {
+    case 'super_admin': return 'secondary';
+    case 'tenant_admin':
+    case 'admin': return 'primary';
+    case 'moderator': return 'warning';
+    case 'member': return 'success';
+    default: return 'default';
+  }
+};
+
 export function UserPermissions() {
   const { t } = useTranslation('admin');
   usePageTitle(t('users.permissions_title'));
@@ -53,17 +64,6 @@ export function UserPermissions() {
     return () => { cancelled = true; };
   }, [id, t, toast]);
 
-
-  const roleColorFor = (role?: string): 'primary' | 'secondary' | 'success' | 'warning' | 'default' => {
-    switch (role) {
-      case 'super_admin': return 'secondary';
-      case 'tenant_admin':
-      case 'admin': return 'primary';
-      case 'moderator': return 'warning';
-      case 'member': return 'success';
-      default: return 'default';
-    }
-  };
 
   return (
     <div>

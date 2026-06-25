@@ -63,6 +63,8 @@ const RULE_TYPES: GroupAutoAssignRuleType[] = ['location', 'interest', 'role', '
 
 const EMPTY_COLLECTION_FORM = { name: '', description: '', image_url: '', sort_order: '0', is_active: true };
 
+const formatDate = (value?: string | null) => (value ? new Date(value).toLocaleDateString() : '—');
+
 export default function GroupOrganization() {
   const { t } = useTranslation('admin');
   usePageTitle(t('group_organization.page_title'));
@@ -388,8 +390,6 @@ export default function GroupOrganization() {
       setDeleteRuleLoading(false);
     }
   };
-
-  const formatDate = (value?: string | null) => (value ? new Date(value).toLocaleDateString() : '—');
 
   return (
     <div className="p-6 space-y-6">

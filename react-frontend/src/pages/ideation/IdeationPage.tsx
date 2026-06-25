@@ -96,6 +96,24 @@ const STATUS_COLOR_MAP: Record<string, 'default' | 'success' | 'warning' | 'dang
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
+const truncate = (text: string, maxLength: number) => {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength).trimEnd() + '...';
+};
+
+const formatDate = (dateStr: string | null) => {
+  if (!dateStr) return null;
+  try {
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+};
+
 export function IdeationPage() {
   const { t } = useTranslation('ideation');
   usePageTitle(t('page_title'));
@@ -290,24 +308,6 @@ export function IdeationPage() {
         next.delete(challengeId);
         return next;
       });
-    }
-  };
-
-  const truncate = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text;
-    return text.slice(0, maxLength).trimEnd() + '...';
-  };
-
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return null;
-    try {
-      return new Date(dateStr).toLocaleDateString(undefined, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-    } catch {
-      return dateStr;
     }
   };
 

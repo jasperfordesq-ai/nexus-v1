@@ -107,6 +107,11 @@ const EMPTY_FORM: WebhookFormData = {
   events: [],
 };
 
+const truncateUrl = (url: string, max = 45) => {
+  if (url.length <= max) return url;
+  return url.substring(0, max) + '...';
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -365,12 +370,6 @@ export function Webhooks() {
     }
     setRetryingLogId(null);
   }, [toast, t, webhooks]);
-
-  // ─── Truncate URL for display ───
-  const truncateUrl = (url: string, max = 45) => {
-    if (url.length <= max) return url;
-    return url.substring(0, max) + '...';
-  };
 
   // ─── Render ───
   if (loading) {

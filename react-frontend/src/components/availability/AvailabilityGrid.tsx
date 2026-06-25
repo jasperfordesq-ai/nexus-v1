@@ -48,6 +48,13 @@ const TIME_SLOTS = [
   '18:00', '19:00', '20:00', '21:00',
 ];
 
+// Build key for slot map (day = grid index: 0=Mon, 6=Sun)
+const slotKey = (day: number, time: string) => `${day}-${time}`;
+
+// Backend uses 0=Sunday, 6=Saturday; grid uses 0=Monday, 6=Sunday
+const backendDayToGrid = (d: number) => (d + 6) % 7;
+const gridDayToBackend = (d: number) => (d + 1) % 7;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // AvailabilityGrid Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -93,13 +100,6 @@ export function AvailabilityGrid({
     tAvail('full_days.mon'), tAvail('full_days.tue'), tAvail('full_days.wed'), tAvail('full_days.thu'),
     tAvail('full_days.fri'), tAvail('full_days.sat'), tAvail('full_days.sun'),
   ];
-
-  // Build key for slot map (day = grid index: 0=Mon, 6=Sun)
-  const slotKey = (day: number, time: string) => `${day}-${time}`;
-
-  // Backend uses 0=Sunday, 6=Saturday; grid uses 0=Monday, 6=Sunday
-  const backendDayToGrid = (d: number) => (d + 6) % 7;
-  const gridDayToBackend = (d: number) => (d + 1) % 7;
 
   // Load availability
   const loadAvailability = useCallback(async () => {

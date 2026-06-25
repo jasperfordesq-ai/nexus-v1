@@ -44,6 +44,11 @@ const emptyFormData = {
   is_active: true,
 };
 
+const handleExportUsers = (slug: string) => {
+  const url = adminEnterprise.exportConsentTypeUsers(slug);
+  window.open(url, '_blank');
+};
+
 export function GdprConsentTypes() {
   const { t } = useTranslation('admin');
   useAdminPageMeta({ title: t('enterprise.gdpr_consent_types_title') });
@@ -193,11 +198,6 @@ export function GdprConsentTypes() {
     } finally {
       setDeleteLoading(false);
     }
-  };
-
-  const handleExportUsers = (slug: string) => {
-    const url = adminEnterprise.exportConsentTypeUsers(slug);
-    window.open(url, '_blank');
   };
 
   const userColumns: Column<ConsentTypeUser>[] = [

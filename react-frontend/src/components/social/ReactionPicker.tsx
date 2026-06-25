@@ -68,6 +68,31 @@ export interface ReactionPickerProps {
 
 /* ───────────────────────── Component ───────────────────────── */
 
+// Color based on reaction type
+const getReactionColor = (type: ReactionType | null): string => {
+  if (!type) return 'text-[var(--text-muted)] hover:text-rose-500';
+  switch (type) {
+    case 'love':
+      return 'text-rose-500 font-medium';
+    case 'like':
+      return 'text-[var(--color-info)] font-medium';
+    case 'laugh':
+      return 'text-[var(--color-warning)] font-medium';
+    case 'wow':
+      return 'text-[var(--color-warning)] font-medium';
+    case 'sad':
+      return 'text-blue-700 dark:text-blue-400 font-medium';
+    case 'celebrate':
+      return 'text-emerald-500 font-medium';
+    case 'clap':
+      return 'text-orange-500 font-medium';
+    case 'time_credit':
+      return 'text-purple-500 font-medium';
+    default:
+      return 'text-[var(--text-muted)]';
+  }
+};
+
 export function ReactionPicker({
   userReaction,
   onReact,
@@ -248,31 +273,6 @@ export function ReactionPicker({
 
   const buttonLabel = currentConfig ? t(currentConfig.label) : t('card.like_action');
   const buttonEmoji = currentConfig ? currentConfig.emoji : null;
-
-  // Color based on reaction type
-  const getReactionColor = (type: ReactionType | null): string => {
-    if (!type) return 'text-[var(--text-muted)] hover:text-rose-500';
-    switch (type) {
-      case 'love':
-        return 'text-rose-500 font-medium';
-      case 'like':
-        return 'text-[var(--color-info)] font-medium';
-      case 'laugh':
-        return 'text-[var(--color-warning)] font-medium';
-      case 'wow':
-        return 'text-[var(--color-warning)] font-medium';
-      case 'sad':
-        return 'text-blue-700 dark:text-blue-400 font-medium';
-      case 'celebrate':
-        return 'text-emerald-500 font-medium';
-      case 'clap':
-        return 'text-orange-500 font-medium';
-      case 'time_credit':
-        return 'text-purple-500 font-medium';
-      default:
-        return 'text-[var(--text-muted)]';
-    }
-  };
 
   return (
     <div

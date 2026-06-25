@@ -71,6 +71,9 @@ const STATUS_COLOR: Record<ExpenseStatus, 'warning' | 'success' | 'danger' | 'pr
 
 /* ───────────────────────── Component ───────────────────────── */
 
+const fmt = (val: number) =>
+  val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 export function ExpensesTab() {
   const { t } = useTranslation('volunteering');
   const toast = useToast();
@@ -190,9 +193,6 @@ export function ExpensesTab() {
       setIsSubmitting(false);
     }
   };
-
-  const fmt = (val: number) =>
-    val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
     <div className="space-y-4">

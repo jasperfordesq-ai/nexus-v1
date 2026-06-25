@@ -69,6 +69,14 @@ const tocSections = [
 
 /* ───────────────────────── Component ───────────────────────── */
 
+const scrollTo = (id: string) => {
+  const el = document.getElementById(id);
+  if (el) {
+    const top = el.getBoundingClientRect().top + window.scrollY - 100;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+};
+
 export function ImpactReportPage() {
   const { t } = useTranslation('about');
   const { tenantPath } = useTenant();
@@ -96,14 +104,6 @@ export function ImpactReportPage() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
-
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      const top = el.getBoundingClientRect().top + window.scrollY - 100;
-      window.scrollTo({ top, behavior: 'smooth' });
-    }
-  };
 
   return (
     <>

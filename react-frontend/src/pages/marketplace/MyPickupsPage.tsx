@@ -30,6 +30,15 @@ interface Reservation {
   slot: { slot_start: string | null; slot_end: string | null } | null;
 }
 
+const formatTime = (s: string | null) => (s ? new Date(s).toLocaleString() : '—');
+
+const statusColor = (s: string): 'primary' | 'success' | 'warning' | 'danger' => {
+  if (s === 'picked_up') return 'success';
+  if (s === 'cancelled') return 'danger';
+  if (s === 'no_show') return 'warning';
+  return 'primary';
+};
+
 export function MyPickupsPage() {
   const { t } = useTranslation('marketplace');
   usePageTitle(t('pickup.my_pickups_title'));
@@ -55,15 +64,6 @@ export function MyPickupsPage() {
       cancelled = true;
     };
   }, [isAuthenticated]);
-
-  const formatTime = (s: string | null) => (s ? new Date(s).toLocaleString() : '—');
-
-  const statusColor = (s: string): 'primary' | 'success' | 'warning' | 'danger' => {
-    if (s === 'picked_up') return 'success';
-    if (s === 'cancelled') return 'danger';
-    if (s === 'no_show') return 'warning';
-    return 'primary';
-  };
 
   return (
     <>

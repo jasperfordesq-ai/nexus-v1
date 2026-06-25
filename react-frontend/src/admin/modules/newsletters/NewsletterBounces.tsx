@@ -28,6 +28,20 @@ import type { NewsletterBounce, SuppressionListEntry, BounceTrendsData, BounceRe
  * Bounce tracking and suppression list management
  */
 
+const escapeCsvField = (field: string): string => {
+  let s = (field ?? '').replace(/"/g, '""');
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+  return `"${s}"`;
+};
+
+const getBadgeColor = (type: string) => {
+  switch (type) {
+    case 'hard': return 'danger';
+    case 'soft': return 'warning';
+    case 'complaint': return 'danger';
+    default: return 'default';
+  }
+};
 
 export function NewsletterBounces() {
   const { t } = useTranslation('admin');
@@ -146,12 +160,6 @@ export function NewsletterBounces() {
     setProcessing(false);
   };
 
-  const escapeCsvField = (field: string): string => {
-    let s = (field ?? '').replace(/"/g, '""');
-    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
-    return `"${s}"`;
-  };
-
   const exportBounces = () => {
     const csv = [
       [
@@ -182,15 +190,6 @@ export function NewsletterBounces() {
   const filteredSuppression = suppressionList.filter(s =>
     searchQuery === '' || s.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const getBadgeColor = (type: string) => {
-    switch (type) {
-      case 'hard': return 'danger';
-      case 'soft': return 'warning';
-      case 'complaint': return 'danger';
-      default: return 'default';
-    }
-  };
 
   return (
     <div>

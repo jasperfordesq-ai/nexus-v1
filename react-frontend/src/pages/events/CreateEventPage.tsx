@@ -143,6 +143,10 @@ function buildRecurrenceRule(data: FormData): string | null {
   return `RRULE:${parts.join(';')}`;
 }
 
+function handleDragOver(e: React.DragEvent) {
+  e.preventDefault();
+}
+
 export function CreateEventPage() {
   const { t } = useTranslation('events');
   const { id } = useParams<{ id: string }>();
@@ -324,10 +328,6 @@ export function CreateEventPage() {
     };
     reader.readAsDataURL(file);
     setExistingImage(null);
-  }
-
-  function handleDragOver(e: React.DragEvent) {
-    e.preventDefault();
   }
 
   function validateForm(): boolean {

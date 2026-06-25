@@ -46,6 +46,24 @@ const STATUS_COLORS: Record<string, 'default' | 'primary' | 'warning' | 'success
   cancelled: 'default',
 };
 
+const formatDate = (dateStr: string): string => {
+  return new Date(dateStr).toLocaleString();
+};
+
+const formatProvider = (slug: string): string => {
+  return slug
+    .split('_')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+};
+
+const formatLevel = (level: string): string => {
+  return level
+    .split('_')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+};
+
 export function VerificationReviewQueue() {
   const { t } = useTranslation('admin');
   const toast = useToast();
@@ -110,24 +128,6 @@ export function VerificationReviewQueue() {
 
   const getUserName = (session: PendingSession): string => {
     return [session.first_name, session.last_name].filter(Boolean).join(' ') || t('verification.user_with_id', { id: session.user_id });
-  };
-
-  const formatDate = (dateStr: string): string => {
-    return new Date(dateStr).toLocaleString();
-  };
-
-  const formatProvider = (slug: string): string => {
-    return slug
-      .split('_')
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(' ');
-  };
-
-  const formatLevel = (level: string): string => {
-    return level
-      .split('_')
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(' ');
   };
 
   return (

@@ -390,6 +390,13 @@ function SeasonCard() {
 
 const LEADERBOARD_PAGE_SIZE = 50;
 
+const getRankIcon = (position: number) => {
+  if (position === 1) return <Crown className="w-5 h-5 text-yellow-400" aria-hidden="true" />;
+  if (position === 2) return <Medal className="w-5 h-5 text-gray-300" aria-hidden="true" />;
+  if (position === 3) return <Medal className="w-5 h-5 text-amber-600" aria-hidden="true" />;
+  return <span className="text-theme-subtle font-mono text-sm w-5 text-center">{position}</span>;
+};
+
 export function LeaderboardPage() {
   const { t } = useTranslation('gamification');
   usePageTitle(t('leaderboard.page_title'));
@@ -481,13 +488,6 @@ export function LeaderboardPage() {
   useEffect(() => {
     loadLeaderboard();
   }, [loadLeaderboard]);
-
-  const getRankIcon = (position: number) => {
-    if (position === 1) return <Crown className="w-5 h-5 text-yellow-400" aria-hidden="true" />;
-    if (position === 2) return <Medal className="w-5 h-5 text-gray-300" aria-hidden="true" />;
-    if (position === 3) return <Medal className="w-5 h-5 text-amber-600" aria-hidden="true" />;
-    return <span className="text-theme-subtle font-mono text-sm w-5 text-center">{position}</span>;
-  };
 
   /**
    * Format a score value based on the current leaderboard type

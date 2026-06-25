@@ -77,6 +77,21 @@ interface PaginationState {
   hasNewerMessages: boolean;
 }
 
+/**
+ * Scroll to a specific message by ID
+ */
+function scrollToMessage(messageId: number) {
+  const element = document.getElementById(`message-${messageId}`);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Add highlight effect
+    element.classList.add('ring-2', 'ring-yellow-400/50');
+    setTimeout(() => {
+      element.classList.remove('ring-2', 'ring-yellow-400/50');
+    }, 2000);
+  }
+}
+
 export function ConversationPage() {
   const { t, i18n } = useTranslation('messages');
   const [pageTitle, setPageTitle] = useState(t('title'));
@@ -1246,21 +1261,6 @@ export function ConversationPage() {
       toast.error(t('error_title'), t('send_error'));
     } finally {
       setIsSending(false);
-    }
-  }
-
-  /**
-   * Scroll to a specific message by ID
-   */
-  function scrollToMessage(messageId: number) {
-    const element = document.getElementById(`message-${messageId}`);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Add highlight effect
-      element.classList.add('ring-2', 'ring-yellow-400/50');
-      setTimeout(() => {
-        element.classList.remove('ring-2', 'ring-yellow-400/50');
-      }, 2000);
     }
   }
 

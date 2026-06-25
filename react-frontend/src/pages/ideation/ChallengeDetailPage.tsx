@@ -176,6 +176,19 @@ const IMPLEMENTATION_STATUS_COLORS: Record<string, 'default' | 'warning' | 'succ
 
 /* ───────────────────────── Main Component ───────────────────────── */
 
+const formatDate = (dateStr: string | null) => {
+  if (!dateStr) return null;
+  try {
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+};
+
 export function ChallengeDetailPage() {
   const { t } = useTranslation('ideation');
   const { id } = useParams<{ id: string }>();
@@ -654,19 +667,6 @@ export function ChallengeDetailPage() {
       } catch (err) {
         logError('Failed to fetch campaigns', err);
       }
-    }
-  };
-
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return null;
-    try {
-      return new Date(dateStr).toLocaleDateString(undefined, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-    } catch {
-      return dateStr;
     }
   };
 

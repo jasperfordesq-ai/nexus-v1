@@ -788,6 +788,8 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
   );
 }
 
+const formatHours = (value: number) => `${Number(value.toFixed(1))} h`;
+
 export default function CaringCommunityWorkflowPage() {
   const { t } = useTranslation('admin');
   const { tenantPath } = useTenant();
@@ -1064,7 +1066,6 @@ export default function CaringCommunityWorkflowPage() {
   const stats = summary?.stats;
   const signals = summary?.coordinator_signals;
   const rolePack = summary?.role_pack;
-  const formatHours = (value: number) => `${Number(value.toFixed(1))} h`;
   const formatChf = (value: number) => t('caring_workflow.member_statement.chf_value', {
     value: value.toLocaleString(undefined, { maximumFractionDigits: 0 }),
   });

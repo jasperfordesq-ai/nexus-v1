@@ -20,6 +20,17 @@ import { useToast, useTenant } from '@/contexts';
 import { billingApi, type Plan, type SubscriptionDetails } from '../../api/billingApi';
 import { PageHeader } from '../../components/PageHeader';
 
+const isFreePlan = (plan: Plan) =>
+  plan.price_monthly === 0 && plan.price_yearly === 0;
+
+const formatPrice = (amount: number) => {
+  return new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+  }).format(amount);
+};
+
 export function PlanSelector() {
   const { t } = useTranslation('admin');
   usePageTitle(t('billing.choose_plan'));
@@ -99,19 +110,8 @@ export function PlanSelector() {
     subscription.status !== 'expired' &&
     subscription.plan_tier_level > 0;
 
-  const isFreePlan = (plan: Plan) =>
-    plan.price_monthly === 0 && plan.price_yearly === 0;
-
   const isDowngrade = (plan: Plan) =>
     isActivePaidSubscription && isFreePlan(plan) && !isCurrentPlan(plan);
-
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat(undefined, {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 2,
-    }).format(amount);
-  };
 
   return (
     <div>

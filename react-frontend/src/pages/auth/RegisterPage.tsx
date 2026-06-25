@@ -80,6 +80,19 @@ const STEP_KEYS = ['community', 'details', 'account', 'terms'] as const;
 
 const STEPS = STEP_KEYS.map((key, index) => ({ id: index + 1, key }));
 
+const requiredLabel = (label: string) => (
+  <span className="inline-flex items-center gap-0.5">
+    <span>{label}</span>
+    <span className="text-danger" aria-hidden="true">*</span>
+  </span>
+);
+
+// E.164 phone validation.
+const isPhoneValid = (value: string) => {
+  if (!value.trim()) return false;
+  return /^\+[1-9]\d{6,14}$/.test(value.replace(/[\s\-()]/g, ''));
+};
+
 export function RegisterPage() {
   const { t } = useTranslation('auth');
   usePageTitle(t('page_meta.register.title'));
@@ -128,18 +141,6 @@ export function RegisterPage() {
   const [locationTouched, setLocationTouched] = useState(false);
   const [phoneTouched, setPhoneTouched] = useState(false);
 
-  const requiredLabel = (label: string) => (
-    <span className="inline-flex items-center gap-0.5">
-      <span>{label}</span>
-      <span className="text-danger" aria-hidden="true">*</span>
-    </span>
-  );
-
-  // E.164 phone validation.
-  const isPhoneValid = (value: string) => {
-    if (!value.trim()) return false;
-    return /^\+[1-9]\d{6,14}$/.test(value.replace(/[\s\-()]/g, ''));
-  };
   const phoneError = !phone.trim()
     ? t('register.phone_required')
     : !isPhoneValid(phone)

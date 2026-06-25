@@ -78,6 +78,13 @@ function formatEur(amount: number): string {
   }).format(amount);
 }
 
+const formatUserCount = (row: TenantSnapshot): string => {
+  if (row.subtree_user_count !== row.own_user_count) {
+    return `${row.own_user_count} (${row.subtree_user_count})`;
+  }
+  return String(row.own_user_count);
+};
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -261,13 +268,6 @@ export function BillingControl() {
     if (row.is_in_grace_period) return t('billing.in_grace_period');
     if (row.is_over_limit) return t('billing.over_limit');
     return row.current_plan_name;
-  };
-
-  const formatUserCount = (row: TenantSnapshot): string => {
-    if (row.subtree_user_count !== row.own_user_count) {
-      return `${row.own_user_count} (${row.subtree_user_count})`;
-    }
-    return String(row.own_user_count);
   };
 
   // ---------------------------------------------------------------------------

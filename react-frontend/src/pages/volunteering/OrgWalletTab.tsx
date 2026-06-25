@@ -80,6 +80,15 @@ const itemVariants = {
 
 /* ───────────────────────── Component ───────────────────────── */
 
+const formatAmount = (amount: number) => {
+  if (amount > 0) return `+${amount}`;
+  return `${amount}`;
+};
+
+const getAmountColor = (amount: number) => {
+  return amount >= 0 ? 'text-emerald-500' : 'text-[var(--color-error)]';
+};
+
 export function OrgWalletTab({ orgId, balance, onBalanceChange }: OrgWalletTabProps) {
   const { t } = useTranslation('volunteering');
   const toast = useToast();
@@ -222,15 +231,6 @@ export function OrgWalletTab({ orgId, balance, onBalanceChange }: OrgWalletTabPr
     if (balance <= 0) return 'text-[var(--color-error)]';
     if (balance < 5) return 'text-[var(--color-warning)]';
     return 'text-emerald-500';
-  };
-
-  const formatAmount = (amount: number) => {
-    if (amount > 0) return `+${amount}`;
-    return `${amount}`;
-  };
-
-  const getAmountColor = (amount: number) => {
-    return amount >= 0 ? 'text-emerald-500' : 'text-[var(--color-error)]';
   };
 
   return (

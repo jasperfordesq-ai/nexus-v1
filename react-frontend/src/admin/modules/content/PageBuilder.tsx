@@ -39,6 +39,15 @@ interface PageFormData {
   menu_order: number;
 }
 
+const toSlug = (text: string): string =>
+  text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+
 export function PageBuilder() {
   const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
@@ -62,15 +71,6 @@ export function PageBuilder() {
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [slugTouched, setSlugTouched] = useState(isEdit);
-
-  const toSlug = (text: string): string =>
-    text
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_]+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
 
   // Slugs that conflict with built-in React routes — cannot be used as page slugs
   const RESERVED_SLUGS = new Set([

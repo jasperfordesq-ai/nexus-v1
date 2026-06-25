@@ -390,6 +390,10 @@ function InquiryDetailModal({
 
 // â”€â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
+function handleExport() {
+  window.open('/api/v2/admin/pilot-inquiries/export', '_blank');
+}
+
 export function PilotInquiryAdminPage() {
   const { t } = useTranslation('admin', { keyPrefix: 'pilot_inquiry_admin' });
   const { t: tAdmin } = useTranslation('admin');
@@ -427,10 +431,6 @@ export function PilotInquiryAdminPage() {
   function openDetail(inquiry: PilotInquiry) {
     setSelected(inquiry);
     onOpen();
-  }
-
-  function handleExport() {
-    window.open('/api/v2/admin/pilot-inquiries/export', '_blank');
   }
 
   // In-pipeline = qualified + proposal_sent + pilot_agreed

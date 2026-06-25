@@ -58,6 +58,19 @@ const typeColors: Record<string, 'primary' | 'secondary' | 'default'> = {
   business: 'primary',
 };
 
+function renderRating(rating: number) {
+  const num = Number(rating);
+  if (!num || num === 0) {
+    return <span className="text-sm text-muted">--</span>;
+  }
+  return (
+    <div className="flex items-center gap-1">
+      <Star size={14} className="text-warning fill-warning" />
+      <span className="text-sm text-muted">{num.toFixed(1)}</span>
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -163,21 +176,6 @@ export function MarketplaceSellerAdmin() {
       setConfirmSuspend(null);
     }
   };
-
-  // ─── Render star rating ────────────────────────────────────────────────────
-
-  function renderRating(rating: number) {
-    const num = Number(rating);
-    if (!num || num === 0) {
-      return <span className="text-sm text-muted">--</span>;
-    }
-    return (
-      <div className="flex items-center gap-1">
-        <Star size={14} className="text-warning fill-warning" />
-        <span className="text-sm text-muted">{num.toFixed(1)}</span>
-      </div>
-    );
-  }
 
   // ─── Table columns ─────────────────────────────────────────────────────────
 

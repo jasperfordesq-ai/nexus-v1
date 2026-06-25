@@ -61,6 +61,31 @@ const TAB_ICONS: Record<ContentTab, React.ElementType> = {
   discussion: MessageSquare,
 };
 
+const getDetailPath = (bookmark: BookmarkItem): string => {
+  const { bookmarkable_type: type, bookmarkable_id: id } = bookmark;
+  switch (type) {
+    case 'post': return `/feed/posts/${id}`;
+    case 'listing': return `/listings/${id}`;
+    case 'event': return `/events/${id}`;
+    case 'job': return `/jobs/${id}`;
+    case 'blog': return `/blog/${id}`;
+    case 'discussion': return `/feed/posts/${id}`;
+    default: return `/feed/posts/${id}`;
+  }
+};
+
+const getTypeColor = (type: string) => {
+  const colors: Record<string, 'primary' | 'success' | 'warning' | 'secondary' | 'default'> = {
+    post: 'default',
+    listing: 'primary',
+    event: 'success',
+    job: 'primary',
+    blog: 'secondary',
+    discussion: 'secondary',
+  };
+  return colors[type] || 'default';
+};
+
 export default function BookmarksPage() {
   const { t } = useTranslation('social');
   const { tenantPath } = useTenant();
@@ -198,19 +223,6 @@ export default function BookmarksPage() {
     }
   };
 
-  const getDetailPath = (bookmark: BookmarkItem): string => {
-    const { bookmarkable_type: type, bookmarkable_id: id } = bookmark;
-    switch (type) {
-      case 'post': return `/feed/posts/${id}`;
-      case 'listing': return `/listings/${id}`;
-      case 'event': return `/events/${id}`;
-      case 'job': return `/jobs/${id}`;
-      case 'blog': return `/blog/${id}`;
-      case 'discussion': return `/feed/posts/${id}`;
-      default: return `/feed/posts/${id}`;
-    }
-  };
-
   const getTypeLabel = (type: string): string => {
     const labels: Record<string, string> = {
       post: t('bookmarks.type_post'),
@@ -221,18 +233,6 @@ export default function BookmarksPage() {
       discussion: t('bookmarks.type_discussion'),
     };
     return labels[type] || type;
-  };
-
-  const getTypeColor = (type: string) => {
-    const colors: Record<string, 'primary' | 'success' | 'warning' | 'secondary' | 'default'> = {
-      post: 'default',
-      listing: 'primary',
-      event: 'success',
-      job: 'primary',
-      blog: 'secondary',
-      discussion: 'secondary',
-    };
-    return colors[type] || 'default';
   };
 
   return (

@@ -80,6 +80,32 @@ function buildDraft(item: DecisionItem): DraftState {
   };
 }
 
+const renderValueChip = (item: DecisionItem) => {
+  if (!item.value) {
+    return <span className="text-muted text-sm italic">—</span>;
+  }
+  if (item.type === 'enum' || item.type === 'choice') {
+    return (
+      <Chip size="sm" variant="soft">
+        {item.value}
+      </Chip>
+    );
+  }
+  if (item.type === 'url') {
+    return (
+      <a
+        href={item.value}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-accent text-sm underline break-all"
+      >
+        {item.value}
+      </a>
+    );
+  }
+  return <span className="text-sm break-words">{item.value}</span>;
+};
+
 export default function IsolatedNodeAdminPage() {
   const { t } = useTranslation('admin');
   usePageTitle(t('isolated_node.meta.page_title'));
@@ -154,32 +180,6 @@ export default function IsolatedNodeAdminPage() {
     } finally {
       setSaving(false);
     }
-  };
-
-  const renderValueChip = (item: DecisionItem) => {
-    if (!item.value) {
-      return <span className="text-muted text-sm italic">—</span>;
-    }
-    if (item.type === 'enum' || item.type === 'choice') {
-      return (
-        <Chip size="sm" variant="soft">
-          {item.value}
-        </Chip>
-      );
-    }
-    if (item.type === 'url') {
-      return (
-        <a
-          href={item.value}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-accent text-sm underline break-all"
-        >
-          {item.value}
-        </a>
-      );
-    }
-    return <span className="text-sm break-words">{item.value}</span>;
   };
 
   const renderValueInput = () => {

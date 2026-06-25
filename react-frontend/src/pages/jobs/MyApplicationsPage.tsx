@@ -145,6 +145,19 @@ const TIMELINE_DOT_COLORS: Record<string, string> = {
 
 type FilterTab = 'all' | 'active' | 'accepted' | 'rejected';
 
+const tabToStatus = (tab: FilterTab): string => {
+  switch (tab) {
+    case 'active':
+      return 'applied,pending,screening,reviewed,interview,offer';
+    case 'accepted':
+      return 'accepted';
+    case 'rejected':
+      return 'rejected';
+    default:
+      return '';
+  }
+};
+
 // ---------------------------------------------------------------------------
 // Animation variants
 // ---------------------------------------------------------------------------
@@ -707,19 +720,6 @@ export function MyApplicationsPage() {
 
   // GDPR data export
   const [isExportingGdpr, setIsExportingGdpr] = useState(false);
-
-  const tabToStatus = (tab: FilterTab): string => {
-    switch (tab) {
-      case 'active':
-        return 'applied,pending,screening,reviewed,interview,offer';
-      case 'accepted':
-        return 'accepted';
-      case 'rejected':
-        return 'rejected';
-      default:
-        return '';
-    }
-  };
 
   const loadApplications = useCallback(
     async (append = false) => {

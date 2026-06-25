@@ -34,6 +34,14 @@ function invoiceStatusColor(status: string): 'success' | 'warning' | 'danger' | 
   }
 }
 
+const formatAmount = (amount: number, currency: string) => {
+  return new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: currency || 'EUR',
+    minimumFractionDigits: 2,
+  }).format(amount);
+};
+
 export function InvoiceHistory() {
   const { t } = useTranslation('admin');
   usePageTitle(t('billing.view_invoices'));
@@ -65,14 +73,6 @@ export function InvoiceHistory() {
   useEffect(() => {
     loadInvoices();
   }, [loadInvoices]);
-
-  const formatAmount = (amount: number, currency: string) => {
-    return new Intl.NumberFormat(undefined, {
-      style: 'currency',
-      currency: currency || 'EUR',
-      minimumFractionDigits: 2,
-    }).format(amount);
-  };
 
   const columns: Column<Invoice>[] = [
     {

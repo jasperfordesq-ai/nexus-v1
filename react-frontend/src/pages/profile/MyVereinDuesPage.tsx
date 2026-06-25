@@ -60,6 +60,9 @@ function statusColor(status: string): 'success' | 'warning' | 'danger' | 'defaul
   return 'default';
 }
 
+const formatAmount = (cents: number, currency: string) =>
+  new Intl.NumberFormat(undefined, { style: 'currency', currency: currency || 'CHF' }).format(cents / 100);
+
 export function MyVereinDuesPage() {
   const { t } = useTranslation('common');
   usePageTitle(t('verein_dues.my_page_title'));
@@ -124,9 +127,6 @@ export function MyVereinDuesPage() {
     setActivePayDuesId(null);
     setClientSecret(null);
   }, []);
-
-  const formatAmount = (cents: number, currency: string) =>
-    new Intl.NumberFormat(undefined, { style: 'currency', currency: currency || 'CHF' }).format(cents / 100);
 
   return (
     <>

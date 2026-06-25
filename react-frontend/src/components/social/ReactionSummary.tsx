@@ -51,6 +51,17 @@ export interface ReactionSummaryProps {
 
 /* ───────────────────────── Component ───────────────────────── */
 
+const renderEmoji = (type: string) => {
+  if (type === 'time_credit') {
+    return <Clock className="w-3 h-3 text-purple-400" aria-hidden="true" />;
+  }
+  return (
+    <span role="img" aria-label={REACTION_LABEL_MAP[type as ReactionType] ?? type}>
+      {REACTION_EMOJI_MAP[type as ReactionType] ?? type}
+    </span>
+  );
+};
+
 export function ReactionSummary({
   counts,
   total,
@@ -175,17 +186,6 @@ export function ReactionSummary({
   );
 
   /* ───── Render inline summary ───── */
-
-  const renderEmoji = (type: string) => {
-    if (type === 'time_credit') {
-      return <Clock className="w-3 h-3 text-purple-400" aria-hidden="true" />;
-    }
-    return (
-      <span role="img" aria-label={REACTION_LABEL_MAP[type as ReactionType] ?? type}>
-        {REACTION_EMOJI_MAP[type as ReactionType] ?? type}
-      </span>
-    );
-  };
 
   return (
     <>

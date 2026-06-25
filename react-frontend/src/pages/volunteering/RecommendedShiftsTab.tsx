@@ -122,6 +122,13 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+const getMatchColor = (score: number): 'success' | 'warning' | 'primary' | 'default' => {
+  if (score >= 75) return 'success';
+  if (score >= 50) return 'primary';
+  if (score >= 30) return 'warning';
+  return 'default';
+};
+
 export function RecommendedShiftsTab() {
   const { t } = useTranslation('volunteering');
   const navigate = useNavigate();
@@ -173,13 +180,6 @@ export function RecommendedShiftsTab() {
       abortRef.current?.abort();
     };
   }, [load]);
-
-  const getMatchColor = (score: number): 'success' | 'warning' | 'primary' | 'default' => {
-    if (score >= 75) return 'success';
-    if (score >= 50) return 'primary';
-    if (score >= 30) return 'warning';
-    return 'default';
-  };
 
   return (
     <div className="space-y-4">

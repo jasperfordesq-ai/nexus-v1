@@ -52,6 +52,12 @@ function matchesFilter(name: string, filter: FilterType): boolean {
   return true;
 }
 
+const formatBytes = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
 export function LogFiles() {
   const { t } = useTranslation('admin');
   usePageTitle(t('enterprise.page_title'));
@@ -89,11 +95,6 @@ export function LogFiles() {
   });
 
   const totalSize = files.reduce((sum, f) => sum + (f.size_bytes || 0), 0);
-  const formatBytes = (bytes: number) => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  };
 
   const filters: { key: FilterType; label: string }[] = [
     { key: 'all', label: t('log_files_labels.filter_all') },

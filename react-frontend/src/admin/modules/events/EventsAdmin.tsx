@@ -91,6 +91,17 @@ function normalizeAdminEvent(item: RawAdminEvent): AdminEvent {
   };
 }
 
+const formatDateTime = (iso: string) => {
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -184,19 +195,6 @@ export function EventsAdmin() {
       setActionLoading(false);
       setConfirmCancel(null);
     }
-  };
-
-  // ── Helpers ────────────────────────────────────────────────────────────────
-
-  const formatDateTime = (iso: string) => {
-    const d = new Date(iso);
-    return d.toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
   };
 
   // ── Columns ────────────────────────────────────────────────────────────────

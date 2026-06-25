@@ -51,6 +51,15 @@ function statusColor(status: ResidencyVerification['status']): 'warning' | 'succ
   return 'warning';
 }
 
+const formatDate = (value?: string | null) =>
+  value
+    ? new Date(value).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+    : '—';
+
 export default function ResidencyVerifications() {
   const { t } = useTranslation('admin');
   usePageTitle(t('residency_admin.page_title'));
@@ -135,15 +144,6 @@ export default function ResidencyVerifications() {
     setRejectTarget(null);
     setRejectReason('');
   };
-
-  const formatDate = (value?: string | null) =>
-    value
-      ? new Date(value).toLocaleDateString(undefined, {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-        })
-      : '—';
 
   return (
     <div className="p-6 space-y-6">

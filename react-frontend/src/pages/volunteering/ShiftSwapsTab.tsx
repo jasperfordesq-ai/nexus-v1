@@ -69,6 +69,29 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+const statusColor = (status: string) => {
+  switch (status) {
+    case 'accepted':
+    case 'admin_approved':
+      return 'success';
+    case 'rejected':
+    case 'admin_rejected':
+    case 'cancelled':
+      return 'danger';
+    case 'expired':
+      return 'default';
+    case 'admin_pending':
+    default:
+      return 'warning';
+  }
+};
+
+const formatShiftTime = (shift: SwapShift) => {
+  const start = new Date(shift.start_time);
+  const end = new Date(shift.end_time);
+  return `${start.toLocaleDateString()} ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+};
+
 export function ShiftSwapsTab() {
   const { t } = useTranslation('volunteering');
   const toast = useToast();
@@ -194,23 +217,6 @@ export function ShiftSwapsTab() {
     }
   };
 
-  const statusColor = (status: string) => {
-    switch (status) {
-      case 'accepted':
-      case 'admin_approved':
-        return 'success';
-      case 'rejected':
-      case 'admin_rejected':
-      case 'cancelled':
-        return 'danger';
-      case 'expired':
-        return 'default';
-      case 'admin_pending':
-      default:
-        return 'warning';
-    }
-  };
-
   const filteredSwaps = swaps.filter((s) => {
     if (view === 'sent') return s.direction === 'sent';
     if (view === 'received') return s.direction === 'received';
@@ -219,12 +225,6 @@ export function ShiftSwapsTab() {
 
   const sentCount = swaps.filter((s) => s.direction === 'sent').length;
   const receivedCount = swaps.filter((s) => s.direction === 'received').length;
-
-  const formatShiftTime = (shift: SwapShift) => {
-    const start = new Date(shift.start_time);
-    const end = new Date(shift.end_time);
-    return `${start.toLocaleDateString()} ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-  };
 
   return (
     <div className="space-y-4">

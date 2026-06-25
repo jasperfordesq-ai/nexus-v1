@@ -50,6 +50,13 @@ const TIMELINE_STEP_KEYS: { labelKey: string; dateField: keyof GdprBreachDetailT
   { labelKey: 'enterprise.gdpr_timeline_dpa_notified', dateField: 'dpa_notified_at', icon: Bell },
 ];
 
+const formatCountdown = (ms: number): string => {
+  const abs = Math.abs(ms);
+  const hours = Math.floor(abs / (1000 * 60 * 60));
+  const minutes = Math.floor((abs % (1000 * 60 * 60)) / (1000 * 60));
+  return `${hours}h ${minutes}m`;
+};
+
 export function GdprBreachDetail() {
   const { t } = useTranslation('admin');
   const { id } = useParams();
@@ -193,13 +200,6 @@ export function GdprBreachDetail() {
   const hoursRemaining = remainingMs / (1000 * 60 * 60);
   const isOverdue = remainingMs < 0;
   const dpaUrgent = !breach.dpa_notified_at && hoursRemaining < 24;
-
-  const formatCountdown = (ms: number): string => {
-    const abs = Math.abs(ms);
-    const hours = Math.floor(abs / (1000 * 60 * 60));
-    const minutes = Math.floor((abs % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}m`;
-  };
 
   return (
     <div>

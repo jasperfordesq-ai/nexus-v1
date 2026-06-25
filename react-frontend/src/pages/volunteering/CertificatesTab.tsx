@@ -49,6 +49,10 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+const handleDownload = (code: string) => {
+  window.open(`${API_BASE}/v2/volunteering/certificates/${code}/html`, '_blank');
+};
+
 export function CertificatesTab() {
   const { t } = useTranslation('volunteering');
   const [certificates, setCertificates] = useState<Certificate[]>([]);
@@ -128,10 +132,6 @@ export function CertificatesTab() {
     } finally {
       setIsGenerating(false);
     }
-  };
-
-  const handleDownload = (code: string) => {
-    window.open(`${API_BASE}/v2/volunteering/certificates/${code}/html`, '_blank');
   };
 
   return (

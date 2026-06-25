@@ -45,6 +45,9 @@ interface StoriesBarProps {
 const SCROLL_DISTANCE = 200;
 const MAX_STORY_NAME_LENGTH = 12;
 
+const truncateName = (name: string, max = MAX_STORY_NAME_LENGTH): string =>
+  name.length > max ? `${name.slice(0, max)}...` : name;
+
 export function StoriesBar({ friends: _friends }: StoriesBarProps) {
   const { t } = useTranslation('feed');
   const { user, isAuthenticated } = useAuth();
@@ -130,9 +133,6 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
     // Refresh to update seen/unseen state
     loadStories();
   };
-
-  const truncateName = (name: string, max = MAX_STORY_NAME_LENGTH): string =>
-    name.length > max ? `${name.slice(0, max)}...` : name;
 
   if (!isAuthenticated) return null;
 

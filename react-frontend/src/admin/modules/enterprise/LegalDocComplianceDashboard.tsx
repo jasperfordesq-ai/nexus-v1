@@ -21,6 +21,12 @@ import { useAdminPageMeta } from '../../AdminMetaContext';
 // See NOTICE file for attribution and acknowledgements.
 
 
+const getComplianceColor = (rate: number): 'success' | 'warning' | 'danger' => {
+  if (rate >= 90) return 'success';
+  if (rate >= 70) return 'warning';
+  return 'danger';
+};
+
 export default function LegalDocComplianceDashboard() {
   const { t } = useTranslation('admin');
   useAdminPageMeta({ title: t('enterprise.legal_compliance_dashboard') });
@@ -111,12 +117,6 @@ export default function LegalDocComplianceDashboard() {
     } finally {
       setExportingDocId(null);
     }
-  };
-
-  const getComplianceColor = (rate: number): 'success' | 'warning' | 'danger' => {
-    if (rate >= 90) return 'success';
-    if (rate >= 70) return 'warning';
-    return 'danger';
   };
 
   if (loading) {

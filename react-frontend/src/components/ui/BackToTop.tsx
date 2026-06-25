@@ -15,6 +15,10 @@ import { Button } from '@/components/ui';
 
 const SCROLL_THRESHOLD = 400;
 
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
 export function BackToTop() {
   const { t } = useTranslation('common');
   const [isVisible, setIsVisible] = useState(false);
@@ -27,10 +31,6 @@ export function BackToTop() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   return (
     <AnimatePresence>

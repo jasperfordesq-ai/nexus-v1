@@ -74,6 +74,12 @@ const ALL_SCOPES = [
   'webhooks.manage',
 ];
 
+const statusColor = (s: ApiPartner['status']): 'success' | 'warning' | 'danger' => {
+  if (s === 'active') return 'success';
+  if (s === 'suspended') return 'danger';
+  return 'warning';
+};
+
 // ─── Component ────────────────────────────────────────────────────────────
 
 export default function ApiPartnersAdminPage() {
@@ -164,12 +170,6 @@ export default function ApiPartnersAdminPage() {
     } finally {
       setCallLogLoading(false);
     }
-  };
-
-  const statusColor = (s: ApiPartner['status']): 'success' | 'warning' | 'danger' => {
-    if (s === 'active') return 'success';
-    if (s === 'suspended') return 'danger';
-    return 'warning';
   };
 
   return (

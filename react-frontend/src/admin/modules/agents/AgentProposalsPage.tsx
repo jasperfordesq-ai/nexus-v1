@@ -35,6 +35,14 @@ interface AgentProposal {
   created_at: string;
 }
 
+const confidenceColor = (score: number | string | null): 'success' | 'warning' | 'danger' | 'default' => {
+  const n = typeof score === 'string' ? parseFloat(score) : score ?? 0;
+  if (n >= 0.75) return 'success';
+  if (n >= 0.5) return 'warning';
+  if (n > 0) return 'danger';
+  return 'default';
+};
+
 export default function AgentProposalsPage() {
   const { t } = useTranslation('admin');
   usePageTitle(t('agents.proposals.meta.title'));
@@ -141,14 +149,6 @@ export default function AgentProposalsPage() {
     } finally {
       setBusyId(null);
     }
-  };
-
-  const confidenceColor = (score: number | string | null): 'success' | 'warning' | 'danger' | 'default' => {
-    const n = typeof score === 'string' ? parseFloat(score) : score ?? 0;
-    if (n >= 0.75) return 'success';
-    if (n >= 0.5) return 'warning';
-    if (n > 0) return 'danger';
-    return 'default';
   };
 
   return (

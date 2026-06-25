@@ -54,6 +54,16 @@ interface CommunityDeliveryCardProps {
   informational?: boolean;
 }
 
+const statusColor = (status: string) => {
+  switch (status) {
+    case 'pending': return 'warning';
+    case 'accepted': return 'primary';
+    case 'completed': return 'success';
+    case 'declined': return 'danger';
+    default: return 'default';
+  }
+};
+
 export function CommunityDeliveryCard({
   orderId,
   isOwner = false,
@@ -139,16 +149,6 @@ export function CommunityDeliveryCard({
     } catch (err) {
       logError('Failed to confirm delivery', err);
       toast.error(t('community_delivery.confirm_failed'));
-    }
-  };
-
-  const statusColor = (status: string) => {
-    switch (status) {
-      case 'pending': return 'warning';
-      case 'accepted': return 'primary';
-      case 'completed': return 'success';
-      case 'declined': return 'danger';
-      default: return 'default';
     }
   };
 

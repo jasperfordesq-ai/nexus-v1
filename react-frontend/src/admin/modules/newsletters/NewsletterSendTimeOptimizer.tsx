@@ -20,6 +20,12 @@ import type { SendTimeData } from '../../api/types';
 
 
 
+const formatHour = (hour: number) => {
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const h = hour % 12 || 12;
+  return `${h}${ampm}`;
+};
+
 export function NewsletterSendTimeOptimizer() {
   const { t } = useTranslation('admin');
   usePageTitle(t('newsletters.page_title'));
@@ -85,12 +91,6 @@ export function NewsletterSendTimeOptimizer() {
     if (intensity > 0.4) return 'border-success-500 bg-success-300 text-success-950';
     if (intensity > 0.2) return 'border-success-400 bg-success-200 text-success-950';
     return 'border-success-300 bg-success-100 text-success-950';
-  };
-
-  const formatHour = (hour: number) => {
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const h = hour % 12 || 12;
-    return `${h}${ampm}`;
   };
 
   return (

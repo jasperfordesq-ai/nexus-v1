@@ -138,6 +138,13 @@ function toPayload(form: FormState): Record<string, unknown> {
   };
 }
 
+const formatDelta = (s: SuccessStory): string => {
+  const before = s.before_value === null ? '—' : s.before_value.toLocaleString();
+  const after = s.after_value === null ? '—' : s.after_value.toLocaleString();
+  const unit = s.unit ? ` ${s.unit}` : '';
+  return `${before}${unit} → ${after}${unit}`;
+};
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -304,13 +311,6 @@ export default function SuccessStoryAdminPage(): ReactNode {
     form.narrative.trim() !== '' &&
     form.method_caveat.trim() !== '' &&
     form.evidence_source.trim() !== '';
-
-  const formatDelta = (s: SuccessStory): string => {
-    const before = s.before_value === null ? '—' : s.before_value.toLocaleString();
-    const after = s.after_value === null ? '—' : s.after_value.toLocaleString();
-    const unit = s.unit ? ` ${s.unit}` : '';
-    return `${before}${unit} → ${after}${unit}`;
-  };
 
   return (
     <div className="space-y-6">

@@ -36,6 +36,12 @@ interface ApiKey {
   created_at: string;
 }
 
+const getStatusColor = (item: ApiKey): 'success' | 'danger' | 'warning' => {
+  if (item.status === 'revoked') return 'danger';
+  if (item.expires_at && new Date(item.expires_at) < new Date()) return 'warning';
+  return 'success';
+};
+
 export function ApiKeys() {
   const { t } = useTranslation('admin');
   usePageTitle(t('federation.page_title'));
@@ -84,12 +90,6 @@ export function ApiKeys() {
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
-
-  const getStatusColor = (item: ApiKey): 'success' | 'danger' | 'warning' => {
-    if (item.status === 'revoked') return 'danger';
-    if (item.expires_at && new Date(item.expires_at) < new Date()) return 'warning';
-    return 'success';
-  };
 
   const getStatusLabel = (item: ApiKey): string => {
     if (item.status === 'revoked') return t('federation.status_revoked');

@@ -73,6 +73,12 @@ const STATUS_COLOR: Record<CampaignStatus, 'default' | 'primary' | 'success' | '
   rejected: 'danger',
 };
 
+const formatBudget = (cents: number) =>
+  `€${(cents / 100).toFixed(2)}`;
+
+const formatCtr = (ctr: number) =>
+  `${(ctr * 100).toFixed(2)}%`;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -175,12 +181,6 @@ export function MyAdCampaignsPage() {
       setIsCreating(false);
     }
   };
-
-  const formatBudget = (cents: number) =>
-    `€${(cents / 100).toFixed(2)}`;
-
-  const formatCtr = (ctr: number) =>
-    `${(ctr * 100).toFixed(2)}%`;
 
   const formatMetric = (value: number | undefined) =>
     value == null ? t('empty_dash') : value.toLocaleString();

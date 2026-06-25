@@ -76,6 +76,23 @@ const PRIORITY_COLORS: Record<string, 'default' | 'warning' | 'danger' | 'second
   urgent: 'danger',
 };
 
+const isOverdue = (dueDate: string | null) => {
+  if (!dueDate) return false;
+  return new Date(dueDate) < new Date();
+};
+
+const formatDate = (dateStr: string | null) => {
+  if (!dateStr) return null;
+  try {
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+};
+
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProps) {
@@ -214,23 +231,6 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
     } catch (err) {
       logError('Failed to delete task', err);
       toastRef.current.error(tRef.current('toast.error_generic'));
-    }
-  };
-
-  const isOverdue = (dueDate: string | null) => {
-    if (!dueDate) return false;
-    return new Date(dueDate) < new Date();
-  };
-
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return null;
-    try {
-      return new Date(dateStr).toLocaleDateString(undefined, {
-        month: 'short',
-        day: 'numeric',
-      });
-    } catch {
-      return dateStr;
     }
   };
 

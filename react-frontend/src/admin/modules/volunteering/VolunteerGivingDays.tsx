@@ -89,6 +89,13 @@ const emptyForm = {
   end_date: '',
 };
 
+const getProgressColor = (pct: number): 'success' | 'warning' | 'danger' | 'default' => {
+  if (pct >= 100) return 'success';
+  if (pct >= 60) return 'default';
+  if (pct >= 30) return 'warning';
+  return 'danger';
+};
+
 export default function VolunteerGivingDays() {
   const { t } = useTranslation('admin');
   usePageTitle(t('volunteering.giving_days_title'));
@@ -222,13 +229,6 @@ export default function VolunteerGivingDays() {
     })),
     [givingDays],
   );
-
-  const getProgressColor = (pct: number): 'success' | 'warning' | 'danger' | 'default' => {
-    if (pct >= 100) return 'success';
-    if (pct >= 60) return 'default';
-    if (pct >= 30) return 'warning';
-    return 'danger';
-  };
 
   const loadDonors = useCallback(async (givingDayId: number, cursor?: string) => {
     setDonorsLoading(true);
