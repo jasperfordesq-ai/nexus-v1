@@ -48,9 +48,21 @@ export function LikersModal({ isOpen, onClose, loadLikers, likesCount }: LikersM
     setIsLoading(false);
   }, [loadLikers]);
 
-  useEffect(() => {
+  // Reset the page counter when the modal (re)opens or the loader changes.
+  // Done during render with a prev-prop comparison (not useEffect) so the
+  // pagination never renders a stale page number before the reset lands.
+  const [prevLoadKey, setPrevLoadKey] = useState<{ isOpen: boolean; load: typeof load }>({ isOpen, load });
+  if (prevLoadKey.isOpen !== isOpen || prevLoadKey.load !== load) {
+    setPrevLoadKey({ isOpen, load });
     if (isOpen) {
       setPage(1);
+    }
+  }
+
+  // Kick off the (async) first-page load when the modal opens. This is a real
+  // network fetch, so it stays in an effect.
+  useEffect(() => {
+    if (isOpen) {
       void load(1);
     }
   }, [isOpen, load]);

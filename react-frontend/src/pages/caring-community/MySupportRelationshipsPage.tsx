@@ -282,13 +282,18 @@ function ActionModal({ kind, relationship, isSubmitting, onCancel, onConfirm }: 
   const [reason, setReason] = useState('');
   const [resumeAt, setResumeAt] = useState('');
 
-  // Reset fields whenever the modal opens for a new action.
-  useEffect(() => {
+  // Reset fields whenever the modal opens for a new action. Done during render
+  // with a prev-prop comparison (not useEffect) so the form never shows a stale
+  // frame from the previous action.
+  const [prevActionKey, setPrevActionKey] = useState<string>(`${kind}:${relationship?.id ?? ''}`);
+  const actionKey = `${kind}:${relationship?.id ?? ''}`;
+  if (actionKey !== prevActionKey) {
+    setPrevActionKey(actionKey);
     if (kind !== null) {
       setReason('');
       setResumeAt('');
     }
-  }, [kind, relationship?.id]);
+  }
 
   const isOpen = kind !== null && relationship !== null;
 

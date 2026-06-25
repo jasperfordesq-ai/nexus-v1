@@ -58,10 +58,22 @@ export function FederationCommunityPicker({ isOpen, onClose, onSelect }: Props) 
     }
   }, []);
 
-  useEffect(() => {
+  // Reset the selection and search query when the modal opens. Done during
+  // render with a prev-prop comparison (not useEffect) so the picker never
+  // shows a stale selection/query from a previous open.
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setSelectedSlug(null);
       setQuery('');
+    }
+  }
+
+  // Fetch the federation directory when the modal opens. Real network call, so
+  // it stays in an effect.
+  useEffect(() => {
+    if (isOpen) {
       void loadPeers();
     }
   }, [isOpen, loadPeers]);

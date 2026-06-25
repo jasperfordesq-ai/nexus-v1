@@ -65,10 +65,20 @@ export default function GuardianConsentModal({ isOpen, onOpenChange, onClose, op
   const [relationship, setRelationship] = useState<string>('parent');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Reset to the loading stage when the modal opens. Done during render with a
+  // prev-prop comparison (not useEffect) so the modal never shows a stale
+  // stage from a previous open before the fetch resolves.
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
+    if (isOpen) {
+      setStage('loading');
+    }
+  }
+
   useEffect(() => {
     if (!isOpen) return;
     let cancelled = false;
-    setStage('loading');
     (async () => {
       try {
         const res = await api.get('/v2/volunteering/guardian-consents');

@@ -44,9 +44,30 @@ export default function VereinCrossInvitationButton({ userId }: Props) {
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!isAuthenticated || !hasCaringCommunity || !currentUser || currentUser.id === userId) {
+  // When the viewer can't have shared Vereine, clear the list. Done during
+  // render with a prev-value comparison (not useEffect) so the button's
+  // visibility decision never lags a frame behind the inputs.
+  const eligible = isAuthenticated && hasCaringCommunity && !!currentUser && currentUser.id !== userId;
+  const [prevEligibilityKey, setPrevEligibilityKey] = useState<{
+    isAuthenticated: boolean;
+    hasCaringCommunity: boolean;
+    userId: number;
+    currentUser: typeof currentUser;
+  }>({ isAuthenticated, hasCaringCommunity, userId, currentUser });
+  if (
+    prevEligibilityKey.isAuthenticated !== isAuthenticated ||
+    prevEligibilityKey.hasCaringCommunity !== hasCaringCommunity ||
+    prevEligibilityKey.userId !== userId ||
+    prevEligibilityKey.currentUser !== currentUser
+  ) {
+    setPrevEligibilityKey({ isAuthenticated, hasCaringCommunity, userId, currentUser });
+    if (!eligible) {
       setShared([]);
+    }
+  }
+
+  useEffect(() => {
+    if (!eligible) {
       return;
     }
     let cancelled = false;
@@ -64,7 +85,7 @@ export default function VereinCrossInvitationButton({ userId }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [isAuthenticated, hasCaringCommunity, userId, currentUser]);
+  }, [isAuthenticated, hasCaringCommunity, userId, currentUser, eligible]);
 
   const allTargets = useMemo(() => {
     return shared.flatMap((s) =>

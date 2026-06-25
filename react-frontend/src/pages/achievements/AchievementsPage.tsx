@@ -1107,10 +1107,20 @@ function BadgeDetailModal({ isOpen, onClose, badgeKey }: BadgeDetailModalProps) 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  useEffect(() => {
+  // Clear the badge/error when the modal closes or has no key. Done during
+  // render with a prev-prop comparison (not useEffect) so a stale badge from a
+  // previous open is never shown for a frame.
+  const [prevBadgeKey, setPrevBadgeKey] = useState<{ isOpen: boolean; badgeKey: string | null }>({ isOpen, badgeKey });
+  if (prevBadgeKey.isOpen !== isOpen || prevBadgeKey.badgeKey !== badgeKey) {
+    setPrevBadgeKey({ isOpen, badgeKey });
     if (!isOpen || !badgeKey) {
       setBadge(null);
       setError(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!isOpen || !badgeKey) {
       return;
     }
 

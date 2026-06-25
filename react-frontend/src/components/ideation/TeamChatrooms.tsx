@@ -172,11 +172,32 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
     fetchChatrooms();
   }, [fetchChatrooms]);
 
+  // Collapse the pinned-messages panel when switching chatrooms (or when the
+  // fetchers change, mirroring the effect below). Done during render with a
+  // prev-value comparison (not useEffect) so the panel never renders open
+  // against the new chatroom for a frame.
+  const [prevPinnedResetKey, setPrevPinnedResetKey] = useState<{
+    activeChatroomId: number | null;
+    fetchMessages: typeof fetchMessages;
+    fetchPinnedMessages: typeof fetchPinnedMessages;
+  }>({ activeChatroomId, fetchMessages, fetchPinnedMessages });
+  if (
+    prevPinnedResetKey.activeChatroomId !== activeChatroomId ||
+    prevPinnedResetKey.fetchMessages !== fetchMessages ||
+    prevPinnedResetKey.fetchPinnedMessages !== fetchPinnedMessages
+  ) {
+    setPrevPinnedResetKey({ activeChatroomId, fetchMessages, fetchPinnedMessages });
+    if (activeChatroomId) {
+      setShowPinned(false);
+    }
+  }
+
+  // Fetch messages + pinned messages when the active chatroom changes. Real
+  // network calls, so they stay in an effect.
   useEffect(() => {
     if (activeChatroomId) {
       fetchMessages(activeChatroomId);
       fetchPinnedMessages(activeChatroomId);
-      setShowPinned(false);
     }
   }, [activeChatroomId, fetchMessages, fetchPinnedMessages]);
 

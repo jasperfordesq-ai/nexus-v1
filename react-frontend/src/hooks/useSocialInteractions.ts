@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { dispatchFeedSync } from '@/lib/feedSync';
@@ -106,8 +106,23 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
   const targetKey = `${targetType}:${targetId}`;
   const previousTargetKeyRef = useRef(targetKey);
 
-  // Sync state when initial values change (e.g. after API data loads)
-  useEffect(() => {
+  // Sync state when initial values change (e.g. after API data loads). Done
+  // during render with a prev-prop comparison (not useEffect) so consumers
+  // never see a stale frame between the prop change and the synced state.
+  const [prevSyncDeps, setPrevSyncDeps] = useState({
+    targetKey,
+    initialLiked,
+    initialLikesCount,
+    initialCommentsCount,
+  });
+  if (
+    prevSyncDeps.targetKey !== targetKey ||
+    prevSyncDeps.initialLiked !== initialLiked ||
+    prevSyncDeps.initialLikesCount !== initialLikesCount ||
+    prevSyncDeps.initialCommentsCount !== initialCommentsCount
+  ) {
+    setPrevSyncDeps({ targetKey, initialLiked, initialLikesCount, initialCommentsCount });
+
     if (previousTargetKeyRef.current !== targetKey) {
       previousTargetKeyRef.current = targetKey;
       loadingRef.current = false;
@@ -119,7 +134,7 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
     setIsLiked(initialLiked);
     setLikesCount(initialLikesCount);
     setCommentsCount(initialCommentsCount);
-  }, [targetKey, initialLiked, initialLikesCount, initialCommentsCount]);
+  }
 
   /* ───── Like ───── */
 
