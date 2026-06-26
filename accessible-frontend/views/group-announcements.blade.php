@@ -137,7 +137,7 @@
                 <div id="ann-title-hint" class="govuk-hint">{{ __('govuk_alpha_groups.announcements.title_hint') }}</div>
                 @if (in_array($status, ['ann-title-required'], true))
                     <p class="govuk-error-message" id="ann-title-error">
-                        <span class="govuk-visually-hidden">Error:</span>
+                        <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span>
                         {{ __('govuk_alpha_groups.states.ann-title-required') }}
                     </p>
                 @endif
@@ -154,7 +154,7 @@
                 <div id="ann-content-hint" class="govuk-hint">{{ __('govuk_alpha_groups.announcements.content_hint') }}</div>
                 @if (in_array($status, ['ann-content-required'], true))
                     <p class="govuk-error-message" id="ann-content-error">
-                        <span class="govuk-visually-hidden">Error:</span>
+                        <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span>
                         {{ __('govuk_alpha_groups.states.ann-content-required') }}
                     </p>
                 @endif

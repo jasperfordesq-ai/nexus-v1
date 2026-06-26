@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The Cmd+K search & command palette announces its result count to screen readers.** A polite live region now reports how many results or quick actions matched as you type, so screen-reader users get the same feedback the visible list gives sighted users.
 - **@mention suggestions are now proper, announceable options for screen readers.** When you type `@name` in a post or comment, each suggestion now exposes the listbox `option` role and is linked to the input, so the suggestion you've arrowed to is announced — instead of the dropdown being a list assistive tech couldn't track.
 - **The session-timeout countdown no longer floods screen readers.** The "your session is expiring" warning announced a new number every single second; it now announces at sensible intervals (every 10 seconds, then each of the final 5), so the countdown is heard clearly instead of as a stream of interruptions.
+- **The accessible (GOV.UK) frontend now localises the screen-reader "Error:" prefix on six form errors.** A handful of error messages (exchange request, group announcements, group file upload) hardcoded the English word "Error:" in the visually-hidden screen-reader prefix; they now use the existing translation key, so non-English screen-reader users hear it in their own language like every other form.
 
 ### Added
 

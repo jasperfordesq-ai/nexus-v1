@@ -136,7 +136,7 @@
             <div id="file-input-hint" class="govuk-hint">{{ __('govuk_alpha_groups.files.file_hint') }}</div>
             @if (in_array($status, ['file-missing', 'file-too-large', 'file-type-invalid', 'file-upload-failed'], true))
                 <p class="govuk-error-message" id="file-input-error">
-                    <span class="govuk-visually-hidden">Error:</span>
+                    <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span>
                     {{ __('govuk_alpha_groups.states.' . $status) }}
                 </p>
             @endif

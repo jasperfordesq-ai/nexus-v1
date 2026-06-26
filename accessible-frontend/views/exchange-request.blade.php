@@ -94,7 +94,7 @@
             <label class="govuk-label" for="proposed_hours">{{ __('govuk_alpha.exchanges.hours_label') }}</label>
             <div id="proposed-hours-hint" class="govuk-hint">{{ __('govuk_alpha.exchanges.hours_hint') }}</div>
             @error('proposed_hours')
-                <p id="proposed-hours-error" class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ $message }}</p>
+                <p id="proposed-hours-error" class="govuk-error-message"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_prefix') }}</span> {{ $message }}</p>
             @enderror
             <input class="govuk-input govuk-input--width-5{{ $errors->has('proposed_hours') ? ' govuk-input--error' : '' }}" id="proposed_hours" name="proposed_hours" type="number" min="0.25" max="24" step="0.25" value="{{ old('proposed_hours', $suggestedHours) }}" aria-describedby="proposed-hours-hint{{ $errors->has('proposed_hours') ? ' proposed-hours-error' : '' }}" required>
         </div>
