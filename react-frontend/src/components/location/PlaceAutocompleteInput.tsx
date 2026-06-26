@@ -271,6 +271,7 @@ function PlaceAutocompleteWithGoogle(props: PlaceAutocompleteInputProps) {
         role="combobox"
         aria-expanded={isOpen}
         aria-controls={listboxId}
+        aria-activedescendant={activeIndex >= 0 ? `${listboxId}-opt-${activeIndex}` : undefined}
         aria-haspopup="listbox"
         aria-autocomplete="list"
         startContent={
@@ -295,6 +296,12 @@ function PlaceAutocompleteWithGoogle(props: PlaceAutocompleteInputProps) {
         classNames={classNames}
       />
 
+      <div className="sr-only" role="status" aria-live="polite">
+        {isOpen && suggestions.length > 0
+          ? t('aria.location_results', { count: suggestions.length })
+          : ''}
+      </div>
+
       {/* Suggestions dropdown */}
       {isOpen && suggestions.length > 0 && (
         <ul
@@ -314,6 +321,7 @@ function PlaceAutocompleteWithGoogle(props: PlaceAutocompleteInputProps) {
             return (
               <li
                 key={prediction.placeId}
+                id={`${listboxId}-opt-${index}`}
                 role="option"
                 aria-selected={index === activeIndex}
                 className={`flex flex-col gap-0.5 px-3 py-2.5 cursor-pointer transition-colors

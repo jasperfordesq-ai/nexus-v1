@@ -252,6 +252,7 @@ export function NominatimAutocomplete(props: NominatimAutocompleteProps) {
         role="combobox"
         aria-expanded={isOpen}
         aria-controls={listboxId}
+        aria-activedescendant={activeIndex >= 0 ? `${listboxId}-opt-${activeIndex}` : undefined}
         aria-haspopup="listbox"
         aria-autocomplete="list"
         startContent={
@@ -276,6 +277,12 @@ export function NominatimAutocomplete(props: NominatimAutocompleteProps) {
         classNames={classNames}
       />
 
+      <div className="sr-only" role="status" aria-live="polite">
+        {isOpen && suggestions.length > 0
+          ? t('aria.location_results', { count: suggestions.length })
+          : ''}
+      </div>
+
       {isOpen && suggestions.length > 0 && (
         <ul
           id={listboxId}
@@ -292,6 +299,7 @@ export function NominatimAutocomplete(props: NominatimAutocompleteProps) {
             return (
               <li
                 key={suggestion.place_id}
+                id={`${listboxId}-opt-${index}`}
                 role="option"
                 aria-selected={index === activeIndex}
                 className={`flex flex-col gap-0.5 px-3 py-2.5 cursor-pointer transition-colors

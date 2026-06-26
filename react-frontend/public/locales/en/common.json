@@ -867,6 +867,7 @@
     "current_language": "Language: {{language}}",
     "select_language": "Select language",
     "clear_location": "Clear location",
+    "location_results": "{{count}} address suggestions available",
     "select_category": "Select a category",
     "verification_badges": "Verification badges",
     "search_skills": "Search skills",
