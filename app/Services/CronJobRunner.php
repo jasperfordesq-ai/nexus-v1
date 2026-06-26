@@ -2463,7 +2463,8 @@ class CronJobRunner
         try {
             $totalCached = 0;
             $this->forEachTenant(function ($tenantId, $slug) use (&$totalCached) {
-                $result = SmartMatchingEngine::warmUpCache(20);
+                // SmartMatchingEngine is a DI service (instance method), not static.
+                $result = app(SmartMatchingEngine::class)->warmUpCache(20);
                 $totalCached += $result['cached'] ?? 0;
             });
             echo "   Cached $totalCached matches across all tenants.\n";

@@ -124,6 +124,113 @@ class SmartMatchingEngine
         $this->categoryCache = [];
     }
 
+    /**
+     * Warm the persistent match cache (the `match_cache` table) for active users
+     * in the current tenant.
+     *
+     * This is the SOLE writer of `match_cache`, which backs the matching
+     * analytics, new-match notifications and the matches dashboards. The static
+     * legacy version was dropped in the Laravel-migration refactor (commit
+     * 7bc2a1629), which left the scheduled "warm-match-cache" task calling an
+     * undefined method every 30 minutes (a per-tenant fatal in the scheduler
+     * logs) and the cache permanently unpopulated. Restored here as an instance
+     * method on the DI service.
+     *
+     * For up to $limit active users (who have at least one active listing and no
+     * fresh cache entry) it computes matches via findMatchesForUser() and upserts
+     * them into match_cache with a 7-day TTL. Tenant-scoped via TenantContext.
+     *
+     * @return array{processed:int, cached:int}
+     */
+    public function warmUpCache(int $limit = 50): array
+    {
+        $results = ['processed' => 0, 'cached' => 0];
+        $tenantId = TenantContext::getId();
+        if (!$tenantId) {
+            return $results;
+        }
+
+        // This service is a container singleton (AppServiceProvider), so the
+        // per-tenant scheduler loop reuses ONE instance. Reset the in-process
+        // caches (configCache is not tenant-keyed; userDataCache is per-user) so
+        // each tenant warms with its own config instead of the previous tenant's.
+        $this->clearCache();
+
+        // Active users with an active listing whose cache is missing or expired.
+        // $limit is an internal int (never user input) — inlined because PDO
+        // cannot reliably bind a LIMIT placeholder under emulated prepares.
+        $users = DB::select(
+            "SELECT DISTINCT u.id
+             FROM users u
+             INNER JOIN listings l
+                 ON u.id = l.user_id AND l.status = 'active' AND l.tenant_id = u.tenant_id
+             LEFT JOIN match_cache mc
+                 ON u.id = mc.user_id AND mc.tenant_id = ?
+             WHERE u.tenant_id = ?
+               AND u.status = 'active'
+               AND (mc.id IS NULL OR mc.expires_at < NOW())
+             ORDER BY u.last_login_at DESC
+             LIMIT " . max(1, (int) $limit),
+            [$tenantId, $tenantId]
+        );
+
+        foreach ($users as $row) {
+            $userId = (int) $row->id;
+            $results['processed']++;
+
+            try {
+                $matches = $this->findMatchesForUser($userId, ['limit' => 20]);
+            } catch (\Throwable $e) {
+                Log::warning('SmartMatchingEngine::warmUpCache findMatches failed', [
+                    'user_id' => $userId, 'tenant_id' => $tenantId, 'error' => $e->getMessage(),
+                ]);
+                continue;
+            }
+
+            foreach ($matches as $match) {
+                $listingId = (int) ($match['id'] ?? 0);
+                if ($listingId <= 0) {
+                    continue;
+                }
+                // findMatchesForUser scores are 0–1.0; match_cache.match_score is
+                // 0–100 (per the column comment and the analytics' "score >= 80").
+                $score = round(min(1.0, max(0.0, (float) ($match['match_score'] ?? 0))) * 100, 2);
+                $distance = (isset($match['distance_km']) && is_numeric($match['distance_km'])
+                    && $match['distance_km'] >= 0 && $match['distance_km'] < 999999)
+                    ? round((float) $match['distance_km'], 2)
+                    : null;
+                $type = in_array($match['match_type'] ?? 'one_way', ['one_way', 'potential', 'mutual', 'cold_start'], true)
+                    ? ($match['match_type'] ?? 'one_way')
+                    : 'one_way';
+                $reasons = json_encode($match['match_reasons'] ?? [], JSON_UNESCAPED_UNICODE) ?: '[]';
+
+                try {
+                    // ON DUPLICATE KEY UPDATE deliberately leaves `status` untouched
+                    // so a user's interaction state (viewed/contacted/…) survives a re-warm.
+                    DB::insert(
+                        "INSERT INTO match_cache
+                            (user_id, listing_id, tenant_id, match_score, distance_km, match_type, match_reasons, status, created_at, expires_at)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, 'new', NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))
+                         ON DUPLICATE KEY UPDATE
+                            match_score = VALUES(match_score),
+                            distance_km = VALUES(distance_km),
+                            match_type = VALUES(match_type),
+                            match_reasons = VALUES(match_reasons),
+                            expires_at = DATE_ADD(NOW(), INTERVAL 7 DAY)",
+                        [$userId, $listingId, $tenantId, $score, $distance, $type, $reasons]
+                    );
+                    $results['cached']++;
+                } catch (\Throwable $e) {
+                    Log::warning('SmartMatchingEngine::warmUpCache cache write failed', [
+                        'user_id' => $userId, 'listing_id' => $listingId, 'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+        }
+
+        return $results;
+    }
+
     // =========================================================================
     // MAIN PUBLIC METHODS
     // =========================================================================
