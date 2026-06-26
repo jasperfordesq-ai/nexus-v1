@@ -70,6 +70,7 @@ class EmailTriggerAuditService
             ['module' => 'security', 'event' => 'email_address_changed', 'category' => 'security_alert', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'security', 'event' => 'account_suspended_banned_deleted_reactivated', 'category' => 'admin_user_status', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'security', 'event' => 'account_deleted', 'category' => 'account_deleted', 'critical' => true, 'source_table' => 'email_log'],
+            ['module' => 'gdpr', 'event' => 'gdpr_request_confirmation', 'category' => 'gdpr_request', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'security', 'event' => 'two_factor_reset', 'category' => 'security_alert', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'legal', 'event' => 'legal_document_updated', 'category' => 'legal_document', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'insurance', 'event' => 'insurance_certificate_verified_or_rejected', 'category' => 'insurance_certificate', 'critical' => true, 'source_table' => 'email_log'],
