@@ -14,6 +14,7 @@ use App\Models\Review;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -387,11 +388,17 @@ class ReviewService
             throw new \RuntimeException('You cannot review yourself');
         }
 
+        // Tenant-scope the existence checks: a reviewer must not be able to
+        // reference a user or transaction from another tenant. Without the
+        // scope, `exists:users,id` / `exists:transactions,id` matched rows in
+        // ANY tenant, letting a member create a review row that points at a
+        // foreign-tenant user or attaches to a foreign-tenant transaction.
+        $tenantId = (int) TenantContext::getId();
         validator($data, [
-            'receiver_id'    => 'required|integer|exists:users,id',
+            'receiver_id'    => ['required', 'integer', Rule::exists('users', 'id')->where('tenant_id', $tenantId)],
             'rating'         => 'required|integer|min:1|max:5',
             'comment'        => 'nullable|string|max:2000',
-            'transaction_id' => 'nullable|integer|exists:transactions,id',
+            'transaction_id' => ['nullable', 'integer', Rule::exists('transactions', 'id')->where('tenant_id', $tenantId)],
         ])->validate();
 
         // Prevent duplicate reviews for same transaction
