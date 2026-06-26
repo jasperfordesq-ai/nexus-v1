@@ -223,8 +223,10 @@ export function MentionInput({
         maxRows={maxRows}
         autoFocus={autoFocus}
         isDisabled={isDisabled}
+        role="combobox"
         aria-expanded={showDropdown}
         aria-haspopup="listbox"
+        aria-controls={showDropdown && suggestions.length > 0 ? 'mention-listbox' : undefined}
         aria-activedescendant={activeDescendant}
         aria-autocomplete="list"
         classNames={{

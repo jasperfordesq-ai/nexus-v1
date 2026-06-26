@@ -200,13 +200,18 @@ export function SessionTimeoutWarning() {
               <p className="text-theme-muted">
                 {t('session_expiring_message', { seconds: countdown })}
               </p>
-              {/* Live region so screen readers announce the countdown */}
+              {/* Live region so screen readers announce the countdown.
+                  Throttled so it doesn't speak every single second (which
+                  floods the SR queue): step in 10s increments, then each of
+                  the final 5 seconds. */}
               <p
                 aria-live="polite"
                 aria-atomic="true"
                 className="sr-only"
               >
-                {t('session_expiring_countdown_aria', { seconds: countdown })}
+                {t('session_expiring_countdown_aria', {
+                  seconds: countdown <= 5 ? countdown : Math.ceil(countdown / 10) * 10,
+                })}
               </p>
             </ModalBody>
 

@@ -16,7 +16,7 @@ import { motion, AnimatePresence } from '@/lib/motion';
 import UserCheck from 'lucide-react/icons/user-check';
 import { useTranslation } from 'react-i18next';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { Button, Avatar, Skeleton } from '@/components/ui';
+import { Avatar, Skeleton } from '@/components/ui';
 
 /* ─── Types ─────────────────────────────────────────────────── */
 
@@ -89,6 +89,7 @@ export function MentionAutocomplete(
           transition={{ duration: 0.15 }}
           className={`absolute z-50 w-full max-w-xs bg-[var(--surface-elevated)] border border-[var(--border-default)] rounded-lg shadow-lg overflow-hidden ${className}`}
           style={style}
+          id="mention-listbox"
           role="listbox"
           aria-label={t('mention.suggestions_aria', { count: suggestions.length })}
         >
@@ -114,13 +115,18 @@ export function MentionAutocomplete(
             /* Results list */
             <div className="py-1">
               {suggestions.map((user, idx) => (
-                <Button
+                /* Native role="option" element: a listbox option must expose
+                   the `option` role + id so the combobox's aria-activedescendant
+                   resolves. HeroUI Button does not forward role="option", so a
+                   div is correct here. Keyboard activation is handled by the
+                   combobox input (Enter in MentionInput); the option itself is
+                   not in the tab order. */
+                <div
                   key={user.id}
-                  variant="ghost"
                   role="option"
                   id={`mention-option-${user.id}`}
                   aria-selected={idx === selectedIndex}
-                  className={`w-full min-h-[40px] flex items-center gap-2.5 px-3 py-2 text-left transition-colors justify-start rounded-none ${
+                  className={`w-full min-h-[40px] flex items-center gap-2.5 px-3 py-2 text-left transition-colors justify-start rounded-none cursor-pointer ${
                     idx === selectedIndex
                       ? 'bg-accent-soft dark:bg-accent-soft text-[var(--color-primary)]'
                       : 'text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'
@@ -150,7 +156,7 @@ export function MentionAutocomplete(
                   {user.is_connection && (
                     <UserCheck className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" aria-label={t('mention.connected')} />
                   )}
-                </Button>
+                </div>
               ))}
             </div>
           )}

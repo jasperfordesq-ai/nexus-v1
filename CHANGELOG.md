@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clickable cards can now be operated with the keyboard.** Cards that act as a single button were mouse-only — keyboard and switch users couldn't reach or activate them. They are now focusable and activate with Enter or Space (cards that aren't interactive are unaffected).
 - **Identity-verification errors are now announced to screen readers.** The inline error shown when starting or completing identity verification is now exposed as an assertive alert, and urgent (error/warning) toast notifications announce more reliably across screen readers.
 - **The Cmd+K search & command palette announces its result count to screen readers.** A polite live region now reports how many results or quick actions matched as you type, so screen-reader users get the same feedback the visible list gives sighted users.
+- **@mention suggestions are now proper, announceable options for screen readers.** When you type `@name` in a post or comment, each suggestion now exposes the listbox `option` role and is linked to the input, so the suggestion you've arrowed to is announced — instead of the dropdown being a list assistive tech couldn't track.
+- **The session-timeout countdown no longer floods screen readers.** The "your session is expiring" warning announced a new number every single second; it now announces at sensible intervals (every 10 seconds, then each of the final 5), so the countdown is heard clearly instead of as a stream of interruptions.
 
 ### Added
 
