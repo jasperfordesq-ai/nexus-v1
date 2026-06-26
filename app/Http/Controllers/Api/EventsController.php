@@ -594,58 +594,36 @@ class EventsController extends BaseApiController
             $duration = 24;
         }
 
+        // Mint the attendance credit (organizer -> attendee) via the service,
+        // which performs the transfer behind an atomic idempotency claim so a
+        // double-click / concurrent check-in can never double-charge the
+        // organizer or double-credit the attendee.
         try {
-            DB::transaction(function () use ($userId, $attendeeId, $id, $event, $duration, $tenantId) {
-                // Lock organizer row and check balance before decrementing
-                $organizer = DB::table('users')
-                    ->where('id', $userId)
-                    ->where('tenant_id', $tenantId)
-                    ->lockForUpdate()
-                    ->first();
-
-                if (!$organizer || (float) $organizer->balance < $duration) {
-                    throw new \RuntimeException(__('api.organizer_insufficient_balance'));
-                }
-
-                // Lock attendee row for consistency
-                DB::table('users')
-                    ->where('id', $attendeeId)
-                    ->where('tenant_id', $tenantId)
-                    ->lockForUpdate()
-                    ->first();
-
-                // Create time credit transaction (organizer -> attendee)
-                \App\Models\Transaction::create([
-                    'sender_id'        => $userId,
-                    'receiver_id'      => $attendeeId,
-                    'amount'           => $duration,
-                    'description'      => "Event Attendance: " . ($event['title'] ?? 'Event #' . $id),
-                    'transaction_type' => 'event_checkin',
-                    'status'           => 'completed',
-                ]);
-
-                // Update balances atomically
-                DB::table('users')->where('id', $userId)->where('tenant_id', $tenantId)
-                    ->decrement('balance', $duration);
-                DB::table('users')->where('id', $attendeeId)->where('tenant_id', $tenantId)
-                    ->increment('balance', $duration);
-
-                // Update RSVP status to 'attended' inside the same transaction
-                EventRsvp::rsvp($id, $attendeeId, 'attended');
-            });
-
-            return $this->respondWithData([
-                'checked_in'     => true,
-                'attendee_id'    => $attendeeId,
-                'event_id'       => $id,
-                'hours_credited' => $duration,
-            ]);
-        } catch (\RuntimeException $e) {
-            return $this->respondWithError('INSUFFICIENT_BALANCE', $e->getMessage(), null, 422);
-        } catch (\Exception $e) {
+            $outcome = EventService::recordCheckInCredit(
+                $id,
+                $attendeeId,
+                $userId,
+                (float) $duration,
+                $event['title'] ?? ('Event #' . $id)
+            );
+        } catch (\Throwable $e) {
             \Log::error('Event check-in failed', ['event' => $id, 'error' => $e->getMessage()]);
             return $this->respondWithError('CHECKIN_ERROR', __('api.event_checkin_failed'), null, 500);
         }
+
+        if ($outcome === 'insufficient') {
+            return $this->respondWithError('INSUFFICIENT_BALANCE', __('api.organizer_insufficient_balance'), null, 422);
+        }
+        if ($outcome === 'already') {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.event_already_checked_in'), null, 422);
+        }
+
+        return $this->respondWithData([
+            'checked_in'     => true,
+            'attendee_id'    => $attendeeId,
+            'event_id'       => $id,
+            'hours_credited' => $duration,
+        ]);
     }
 
     // ================================================================

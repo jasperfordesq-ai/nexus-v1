@@ -1706,6 +1706,67 @@ class EventService
     }
 
     /**
+     * Atomically check an attendee in and transfer the organizer's time credits
+     * to them (organizer -> attendee). Idempotent: a repeat or concurrent
+     * check-in of the same attendee collapses to a SINGLE credit transfer via an
+     * atomic "claim" on the RSVP status — only the winner flips going->attended
+     * and mints. The controller's pre-check (a TOCTOU read of the RSVP status
+     * BEFORE the transaction) cannot prevent a double-mint when two check-ins
+     * race; this in-transaction claim can.
+     *
+     * @return string 'credited' | 'already' | 'insufficient'
+     */
+    public static function recordCheckInCredit(int $eventId, int $attendeeId, int $checkedInBy, float $duration, string $eventTitle): string
+    {
+        $tenantId = \App\Core\TenantContext::getId();
+
+        return DB::transaction(function () use ($eventId, $attendeeId, $checkedInBy, $duration, $eventTitle, $tenantId): string {
+            // Lock the payer (checker) and attendee rows; verify the payer can cover it.
+            $checker = DB::table('users')
+                ->where('id', $checkedInBy)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+            if (!$checker || (float) $checker->balance < $duration) {
+                return 'insufficient';
+            }
+            DB::table('users')
+                ->where('id', $attendeeId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+
+            // Idempotency claim: atomically flip the RSVP to 'attended'. Only ONE
+            // caller wins (affected=1); a repeat/concurrent check-in sees 0 and
+            // does NOT mint a second transfer.
+            $claimed = DB::table('event_rsvps')
+                ->where('event_id', $eventId)
+                ->where('user_id', $attendeeId)
+                ->where('tenant_id', $tenantId)
+                ->where('status', '!=', 'attended')
+                ->update(['status' => 'attended', 'updated_at' => now()]);
+
+            if ($claimed === 0) {
+                return 'already';
+            }
+
+            \App\Models\Transaction::create([
+                'sender_id'        => $checkedInBy,
+                'receiver_id'      => $attendeeId,
+                'amount'           => $duration,
+                'description'      => 'Event Attendance: ' . $eventTitle,
+                'transaction_type' => 'event_checkin',
+                'status'           => 'completed',
+            ]);
+
+            DB::table('users')->where('id', $checkedInBy)->where('tenant_id', $tenantId)->decrement('balance', $duration);
+            DB::table('users')->where('id', $attendeeId)->where('tenant_id', $tenantId)->increment('balance', $duration);
+
+            return 'credited';
+        });
+    }
+
+    /**
      * Bulk mark users as attended.
      *
      * @return array{marked: int, failed: int}
