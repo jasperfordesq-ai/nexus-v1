@@ -51,7 +51,7 @@
         <ul class="govuk-list nexus-alpha-image-strip govuk-!-margin-bottom-4">
             @foreach ($images as $imgIdx => $imgUrl)
                 <li>
-                    <a href="{{ $imgUrl }}" target="_blank" rel="noopener noreferrer">
+                    <a href="{{ $imgUrl }}" target="_blank" rel="noopener noreferrer"><span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span>
                         <img src="{{ $imgUrl }}" alt="{{ __('govuk_alpha.listings.gallery_image_alt', ['number' => $imgIdx + 1, 'title' => $iTitle]) }}" loading="lazy" decoding="async">
                     </a>
                 </li>

@@ -117,7 +117,7 @@
                 <ul class="nexus-alpha-thumb-list">
                     @foreach ($gallery as $galleryIndex => $image)
                         <li>
-                            <a href="{{ $image['url'] }}" target="_blank" rel="noopener noreferrer">
+                            <a href="{{ $image['url'] }}" target="_blank" rel="noopener noreferrer"><span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span>
                                 <img src="{{ $image['url'] }}" alt="{{ !empty($image['alt_text']) ? $image['alt_text'] : __('govuk_alpha.listings.gallery_image_alt', ['number' => $galleryIndex + 1, 'title' => $listing['title']]) }}" loading="lazy" decoding="async">
                             </a>
                         </li>

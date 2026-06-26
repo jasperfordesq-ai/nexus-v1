@@ -49,8 +49,8 @@
         </figure>
 
         <div class="govuk-button-group">
-            <a class="govuk-link" href="{{ $viewUrl }}" rel="noopener noreferrer" target="_blank">{{ __('govuk_alpha_events.map.view_on_map_link') }}</a>
-            <a class="govuk-link" href="{{ $directionsUrl }}" rel="noopener noreferrer" target="_blank">{{ __('govuk_alpha_events.map.directions_link') }}</a>
+            <a class="govuk-link" href="{{ $viewUrl }}" rel="noopener noreferrer" target="_blank">{{ __('govuk_alpha_events.map.view_on_map_link') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span></a>
+            <a class="govuk-link" href="{{ $directionsUrl }}" rel="noopener noreferrer" target="_blank">{{ __('govuk_alpha_events.map.directions_link') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span></a>
         </div>
     @else
         <div class="govuk-inset-text">

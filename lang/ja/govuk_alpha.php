@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    'opens_new_tab' => '(新しいタブで開きます)',
     'service_name' => 'Project NEXUS Accessible',
     'phase' => 'ベータ版',
     'feedback' => 'フィードバックを送信する',

@@ -55,7 +55,7 @@
                         @endif
                     </dl>
                     @if ($website !== '')
-                        <p class="govuk-body govuk-!-margin-bottom-0"><a class="govuk-link" href="{{ $asUrl($website) }}" rel="noopener noreferrer" target="_blank">{{ __('govuk_alpha.clubs.visit_website') }}</a></p>
+                        <p class="govuk-body govuk-!-margin-bottom-0"><a class="govuk-link" href="{{ $asUrl($website) }}" rel="noopener noreferrer" target="_blank">{{ __('govuk_alpha.clubs.visit_website') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span></a></p>
                     @endif
                 </article>
             @endforeach

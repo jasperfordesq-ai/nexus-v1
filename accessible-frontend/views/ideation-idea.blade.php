@@ -87,7 +87,7 @@
                     $mTypeLabel = __('govuk_alpha_ideation.media.type_' . (in_array($mType, ['image', 'video', 'document', 'link'], true) ? $mType : 'link'));
                 @endphp
                 <li class="govuk-!-margin-bottom-2">
-                    <a class="govuk-link" href="{{ e($mUrl) }}" rel="noopener noreferrer" target="_blank">{{ $mCaption !== '' ? $mCaption : __('govuk_alpha_ideation.media.open') }}</a>
+                    <a class="govuk-link" href="{{ e($mUrl) }}" rel="noopener noreferrer" target="_blank">{{ $mCaption !== '' ? $mCaption : __('govuk_alpha_ideation.media.open') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span></a>
                     <span class="govuk-body-s nexus-alpha-meta">({{ $mTypeLabel }})</span>
                 </li>
             @endforeach

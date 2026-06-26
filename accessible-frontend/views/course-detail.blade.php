@@ -73,7 +73,7 @@
     @if (!empty($isCompleted))
         <h2 class="govuk-heading-l">{{ __('govuk_alpha.courses.certificate_label') }}</h2>
         <p class="govuk-body">
-            <a class="govuk-button govuk-button--secondary" role="button" data-module="govuk-button" href="{{ route('govuk-alpha.courses.certificate', ['tenantSlug' => $tenantSlug, 'id' => $course['id']]) }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha.courses.certificate_download') }}</a>
+            <a class="govuk-button govuk-button--secondary" role="button" data-module="govuk-button" href="{{ route('govuk-alpha.courses.certificate', ['tenantSlug' => $tenantSlug, 'id' => $course['id']]) }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha.courses.certificate_download') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span></a>
         </p>
     @endif
 

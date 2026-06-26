@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    'opens_new_tab' => '(wird in neuem Tab geöffnet)',
     'service_name' => 'Project NEXUS Accessible',
     'phase' => 'Beta-Version',
     'feedback' => 'Geben Sie Feedback',

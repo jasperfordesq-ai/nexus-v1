@@ -50,7 +50,7 @@
                     @endphp
                     @if ($qFull)
                         <li>
-                            <a href="{{ $qFull }}" target="_blank" rel="noopener noreferrer">
+                            <a href="{{ $qFull }}" target="_blank" rel="noopener noreferrer"><span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span>
                                 <img src="{{ $qThumb }}" alt="{{ $qAlt }}" class="nexus-alpha-feed-image" loading="lazy">
                             </a>
                         </li>

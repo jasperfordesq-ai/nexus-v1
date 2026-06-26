@@ -318,7 +318,7 @@
                                 @endphp
                                 @if ($fullUrl)
                                     <li>
-                                        <a href="{{ $fullUrl }}" target="_blank" rel="noopener noreferrer">
+                                        <a href="{{ $fullUrl }}" target="_blank" rel="noopener noreferrer"><span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span>
                                             <img src="{{ $thumbUrl }}" alt="{{ $altText }}" class="nexus-alpha-feed-image" loading="lazy">
                                             @if ($isLast && $extraMedia > 0)
                                                 <span class="nexus-alpha-feed-media__more" aria-hidden="true">+{{ $extraMedia }}</span>

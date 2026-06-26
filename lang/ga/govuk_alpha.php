@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 return [
+    'opens_new_tab' => '(osclaítear i gcluaisín nua)',
     'service_name' => 'Project NEXUS Accessible',
     'phase' => 'Béite',
     'feedback' => 'Tabhair aiseolas',

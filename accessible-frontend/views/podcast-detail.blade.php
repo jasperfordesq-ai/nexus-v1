@@ -53,7 +53,7 @@
 
     @if ($rssEnabled)
         <p class="govuk-body-s">
-            <a class="govuk-link" href="{{ $rssUrl }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha.polish_commerce.podcast_rss_link') }}</a>
+            <a class="govuk-link" href="{{ $rssUrl }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha.polish_commerce.podcast_rss_link') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span></a>
         </p>
     @endif
 

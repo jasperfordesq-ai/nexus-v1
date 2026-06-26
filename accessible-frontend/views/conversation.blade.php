@@ -157,7 +157,7 @@
                                     @if (!empty($att['file_url']))
                                         <li>
                                             @if (str_starts_with((string) ($att['mime_type'] ?? ''), 'image/'))
-                                                <a class="govuk-link" href="{{ $att['file_url'] }}" target="_blank" rel="noopener">
+                                                <a class="govuk-link" href="{{ $att['file_url'] }}" target="_blank" rel="noopener"><span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span>
                                                     <img src="{{ $att['file_url'] }}" alt="{{ $att['file_name'] ?? __('govuk_alpha_messages.attachments.default_name') }}" width="220" loading="lazy" decoding="async">
                                                 </a>
                                             @else

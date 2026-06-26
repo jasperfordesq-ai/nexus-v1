@@ -126,9 +126,9 @@
                         <source src="{{ $video }}">
                         {{ __('govuk_alpha_commerce.learn.video_unsupported') }}
                     </video>
-                    <p class="govuk-body"><a class="govuk-link" href="{{ $video }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha_commerce.learn.open_video') }}</a></p>
+                    <p class="govuk-body"><a class="govuk-link" href="{{ $video }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha_commerce.learn.open_video') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span></a></p>
                 @elseif ($ctype === 'embed' && $embed !== '')
-                    <p class="govuk-body"><a class="govuk-link" href="{{ $embed }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha_commerce.learn.open_video') }}</a></p>
+                    <p class="govuk-body"><a class="govuk-link" href="{{ $embed }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha_commerce.learn.open_video') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span></a></p>
                 @endif
 
                 @if (trim((string) ($current['body'] ?? '')) !== '')
@@ -136,7 +136,7 @@
                 @endif
 
                 @if ($attachment !== '')
-                    <p class="govuk-body"><a class="govuk-link" href="{{ $attachment }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha_commerce.learn.download_attachment') }}</a></p>
+                    <p class="govuk-body"><a class="govuk-link" href="{{ $attachment }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha_commerce.learn.download_attachment') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span></a></p>
                 @endif
 
                 @if ($ctype === 'quiz')

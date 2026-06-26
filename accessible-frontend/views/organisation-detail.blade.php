@@ -44,7 +44,7 @@
             @if ($oWebsite !== '')
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">{{ __('govuk_alpha.organisations.website_label') }}</dt>
-                    <dd class="govuk-summary-list__value"><a class="govuk-link" href="{{ \Illuminate\Support\Str::startsWith($oWebsite, ['http://', 'https://']) ? $oWebsite : 'https://' . $oWebsite }}" rel="nofollow noopener noreferrer" target="_blank">{{ $oWebsite }}</a></dd>
+                    <dd class="govuk-summary-list__value"><a class="govuk-link" href="{{ \Illuminate\Support\Str::startsWith($oWebsite, ['http://', 'https://']) ? $oWebsite : 'https://' . $oWebsite }}" rel="nofollow noopener noreferrer" target="_blank">{{ $oWebsite }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span></a></dd>
                 </div>
             @endif
         </dl>

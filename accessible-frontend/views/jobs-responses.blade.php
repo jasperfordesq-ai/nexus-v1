@@ -106,7 +106,7 @@
                             }
                         @endphp
                         @if ($calUrl !== '')
-                            <p class="govuk-body-s govuk-!-margin-bottom-2"><a class="govuk-link" href="{{ $calUrl }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha_jobs.responses.add_to_calendar') }}</a></p>
+                            <p class="govuk-body-s govuk-!-margin-bottom-2"><a class="govuk-link" href="{{ $calUrl }}" target="_blank" rel="noopener noreferrer">{{ __('govuk_alpha_jobs.responses.add_to_calendar') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.opens_new_tab') }}</span></a></p>
                         @endif
                     @endif
                     @if ($ivVacId > 0)
