@@ -393,7 +393,7 @@ jobs:
             src/components/social/__tests__/StatusSelector.test.tsx
             src/contexts/__tests__/TenantContext.test.tsx
             src/admin/__tests__/components.test.tsx
-            src/pages/auth/LoginPage.test.tsx
+            # src/pages/auth/LoginPage.test.tsx  # TEMP-REMOVED: deadlocks the parallel smoke run (ERR_IPC_CHANNEL_CLOSED / hang); passes in isolation, still runs in the full suite. Re-add after fixing the hang.
             src/admin/modules/system/OnboardingSettings.test.tsx
           )
           # --pool=forks: the default worker-thread pool intermittently dies
@@ -421,7 +421,7 @@ jobs:
             src/components/social/__tests__/StatusSelector.test.tsx
             src/contexts/__tests__/TenantContext.test.tsx
             src/admin/__tests__/components.test.tsx
-            src/pages/auth/LoginPage.test.tsx
+            # src/pages/auth/LoginPage.test.tsx  # TEMP-REMOVED: deadlocks the parallel smoke run (ERR_IPC_CHANNEL_CLOSED / hang); passes in isolation, still runs in the full suite. Re-add after fixing the hang.
             src/admin/modules/system/OnboardingSettings.test.tsx
           )
           set -o pipefail
