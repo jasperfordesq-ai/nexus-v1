@@ -873,7 +873,9 @@
     "user_menu_trigger": "Menu utente per {{name}}",
     "feed_sidebar": "Barra laterale della comunità",
     "filter_panel": "Pannello filtro",
-    "remove": "Remove"
+    "remove": "Remove",
+    "location_results": "{{count}} address suggestions available",
+    "search_results": "{{count}} results available"
   },
   "skills": {
     "browse_title": "Elenco Competenze della Comunità",
@@ -922,7 +924,8 @@
     "aria_clear_search": "Cancella ricerca",
     "aria_close_members_list": "Chiudi elenco membri",
     "category_optional": "Categoria (opzionale)",
-    "proficiency_level": "Livello di competenza"
+    "proficiency_level": "Livello di competenza",
+    "aria_results": "{{count}} skill suggestions available"
   },
   "hours_display_one": "{{count}} ora",
   "hours_display_other": "{{count}} ore",

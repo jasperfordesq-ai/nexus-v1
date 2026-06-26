@@ -244,7 +244,9 @@
   "skill_tags": {
     "label": "Étiquettes de compétences",
     "placeholder": "Saisissez une compétence et appuyez sur Entrée...",
-    "aria_add": "Ajouter une étiquette de compétence"
+    "aria_add": "Ajouter une étiquette de compétence",
+    "aria_add_count": "Add skill tag ({{current}} of {{max}})",
+    "aria_results": "{{count}} skill suggestions available"
   },
   "more_filters": "Plus de filtres",
   "filters_label": "Filtres",

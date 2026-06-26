@@ -208,5 +208,7 @@
     }
   },
   "character_count": "{{current}}/{{max}}",
-  "loading_older": "Teachtaireachtaí níos sine á lódáil"
+  "loading_older": "Teachtaireachtaí níos sine á lódáil",
+  "aria_read_receipt_read": "Read",
+  "aria_read_receipt_sent": "Sent"
 }

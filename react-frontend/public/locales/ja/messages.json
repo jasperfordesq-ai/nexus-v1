@@ -208,5 +208,7 @@
     }
   },
   "character_count": "{{current}}/{{max}}",
-  "loading_older": "古いメッセージを読み込む"
+  "loading_older": "古いメッセージを読み込む",
+  "aria_read_receipt_read": "Read",
+  "aria_read_receipt_sent": "Sent"
 }

@@ -247,7 +247,9 @@
   "skill_tags": {
     "label": "علامات المهارة",
     "placeholder": "اكتب مهارة واضغط Enter...",
-    "aria_add": "إضافة علامة مهارة"
+    "aria_add": "إضافة علامة مهارة",
+    "aria_add_count": "Add skill tag ({{current}} of {{max}})",
+    "aria_results": "{{count}} skill suggestions available"
   },
   "more_filters": "مزيد من الفلاتر",
   "filters_label": "الفلاتر",

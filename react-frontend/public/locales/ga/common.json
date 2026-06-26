@@ -873,7 +873,9 @@
     "user_menu_trigger": "Roghchlár úsáideora le haghaidh {{name}}",
     "feed_sidebar": "Taobh-bharra pobail",
     "filter_panel": "Painéal scagaire",
-    "remove": "Remove"
+    "remove": "Remove",
+    "location_results": "{{count}} address suggestions available",
+    "search_results": "{{count}} results available"
   },
   "skills": {
     "browse_title": "Eolaire Scileanna Pobail",
@@ -922,7 +924,8 @@
     "aria_clear_search": "Glan cuardach",
     "aria_close_members_list": "Dún liosta ball",
     "category_optional": "Catagóir (roghnach)",
-    "proficiency_level": "Leibhéal Inniúlachta"
+    "proficiency_level": "Leibhéal Inniúlachta",
+    "aria_results": "{{count}} skill suggestions available"
   },
   "hours_display_one": "{{count}} uair",
   "hours_display_other": "{{count}} uair",

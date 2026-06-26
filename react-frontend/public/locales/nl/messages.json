@@ -208,5 +208,7 @@
     }
   },
   "character_count": "{{current}}/{{max}}",
-  "loading_older": "Oudere berichten laden"
+  "loading_older": "Oudere berichten laden",
+  "aria_read_receipt_read": "Read",
+  "aria_read_receipt_sent": "Sent"
 }

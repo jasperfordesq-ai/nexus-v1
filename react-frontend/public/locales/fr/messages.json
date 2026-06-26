@@ -208,5 +208,7 @@
     }
   },
   "character_count": "{{current}}/{{max}}",
-  "loading_older": "Chargement d'anciens messages"
+  "loading_older": "Chargement d'anciens messages",
+  "aria_read_receipt_read": "Read",
+  "aria_read_receipt_sent": "Sent"
 }

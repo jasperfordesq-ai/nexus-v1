@@ -873,7 +873,9 @@
     "user_menu_trigger": "{{name}} のユーザー メニュー",
     "feed_sidebar": "コミュニティサイドバー",
     "filter_panel": "フィルターパネル",
-    "remove": "Remove"
+    "remove": "Remove",
+    "location_results": "{{count}} address suggestions available",
+    "search_results": "{{count}} results available"
   },
   "skills": {
     "browse_title": "コミュニティスキルディレクトリ",
@@ -922,7 +924,8 @@
     "aria_clear_search": "検索をクリア",
     "aria_close_members_list": "メンバーリストを閉じる",
     "category_optional": "カテゴリ（任意）",
-    "proficiency_level": "習熟度"
+    "proficiency_level": "習熟度",
+    "aria_results": "{{count}} skill suggestions available"
   },
   "hours_display_one": "{{count}}時間",
   "hours_display_other": "{{count}}時間",

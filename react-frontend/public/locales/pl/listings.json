@@ -246,7 +246,9 @@
   "skill_tags": {
     "label": "Tagi umiejętności",
     "placeholder": "Wpisz umiejętność i naciśnij Enter...",
-    "aria_add": "Dodaj tag umiejętności"
+    "aria_add": "Dodaj tag umiejętności",
+    "aria_add_count": "Add skill tag ({{current}} of {{max}})",
+    "aria_results": "{{count}} skill suggestions available"
   },
   "more_filters": "Więcej filtrów",
   "filters_label": "Filtry",

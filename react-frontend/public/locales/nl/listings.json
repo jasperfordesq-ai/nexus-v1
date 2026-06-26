@@ -244,7 +244,9 @@
   "skill_tags": {
     "label": "Vaardigheidstags",
     "placeholder": "Typ een vaardigheid en druk op Enter...",
-    "aria_add": "Voeg vaardigheidstag toe"
+    "aria_add": "Voeg vaardigheidstag toe",
+    "aria_add_count": "Add skill tag ({{current}} of {{max}})",
+    "aria_results": "{{count}} skill suggestions available"
   },
   "more_filters": "Meer filters",
   "filters_label": "Filters",

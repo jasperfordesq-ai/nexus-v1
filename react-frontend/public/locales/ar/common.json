@@ -873,7 +873,9 @@
     "user_menu_trigger": "قائمة المستخدم لـ {{name}}",
     "feed_sidebar": "الشريط الجانبي للمجتمع",
     "filter_panel": "لوحة التصفية",
-    "remove": "Remove"
+    "remove": "Remove",
+    "location_results": "{{count}} address suggestions available",
+    "search_results": "{{count}} results available"
   },
   "skills": {
     "browse_title": "دليل مهارات المجتمع",
@@ -922,7 +924,8 @@
     "aria_clear_search": "مسح البحث",
     "aria_close_members_list": "إغلاق قائمة الأعضاء",
     "category_optional": "الفئة (اختياري)",
-    "proficiency_level": "مستوى الإتقان"
+    "proficiency_level": "مستوى الإتقان",
+    "aria_results": "{{count}} skill suggestions available"
   },
   "hours_display_one": "{{count}} ساعة",
   "hours_display_other": "{{count}} ساعات",

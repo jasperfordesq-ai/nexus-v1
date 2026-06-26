@@ -244,7 +244,9 @@
   "skill_tags": {
     "label": "スキルタグ",
     "placeholder": "スキルを入力してEnterを押してください...",
-    "aria_add": "スキルタグを追加"
+    "aria_add": "スキルタグを追加",
+    "aria_add_count": "Add skill tag ({{current}} of {{max}})",
+    "aria_results": "{{count}} skill suggestions available"
   },
   "more_filters": "さらにフィルター",
   "filters_label": "フィルター",

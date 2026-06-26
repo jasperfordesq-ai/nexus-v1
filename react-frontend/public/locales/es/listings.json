@@ -244,7 +244,9 @@
   "skill_tags": {
     "label": "Etiquetas de Habilidades",
     "placeholder": "Escribe una habilidad y pulsa Enter...",
-    "aria_add": "Añadir etiqueta de habilidad"
+    "aria_add": "Añadir etiqueta de habilidad",
+    "aria_add_count": "Add skill tag ({{current}} of {{max}})",
+    "aria_results": "{{count}} skill suggestions available"
   },
   "more_filters": "Más filtros",
   "filters_label": "Filtros",

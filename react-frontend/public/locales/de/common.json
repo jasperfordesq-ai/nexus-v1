@@ -873,7 +873,9 @@
     "user_menu_trigger": "Benutzermenü für {{name}}",
     "feed_sidebar": "Community-Seitenleiste",
     "filter_panel": "Filterplatte",
-    "remove": "Remove"
+    "remove": "Remove",
+    "location_results": "{{count}} address suggestions available",
+    "search_results": "{{count}} results available"
   },
   "skills": {
     "browse_title": "Gemeinschafts-Fähigkeitenverzeichnis",
@@ -922,7 +924,8 @@
     "aria_clear_search": "Suche löschen",
     "aria_close_members_list": "Mitgliederliste schliessen",
     "category_optional": "Kategorie (optional)",
-    "proficiency_level": "Kompetenzstufe"
+    "proficiency_level": "Kompetenzstufe",
+    "aria_results": "{{count}} skill suggestions available"
   },
   "hours_display_one": "{{count}} Stunde",
   "hours_display_other": "{{count}} Stunden",
