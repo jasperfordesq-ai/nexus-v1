@@ -1,4 +1,11 @@
 {
+  "gdpr_request": {
+    "subject": "Hemos recibido tu solicitud de datos",
+    "title": "Solicitud recibida",
+    "greeting": "Hola {name}:",
+    "body": "Hemos recibido tu solicitud sobre tus derechos de datos para {community} y responderemos en un plazo de 30 días, tal como exige la legislación de protección de datos. No necesitas hacer nada más por ahora.",
+    "body_contact": "Si no has realizado esta solicitud, ponte en contacto con nosotros de inmediato."
+  },
   "announcement": {
     "template_name": "Actualización de la plataforma — Primavera 2026",
     "template_description": "Anuncio de Primavera 2026 que cubre marketplace, donaciones, verificación de identidad, pagos de voluntariado, federación, idiomas, SEO y seguridad.",

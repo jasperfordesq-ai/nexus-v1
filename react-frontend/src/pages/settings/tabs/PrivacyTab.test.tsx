@@ -52,6 +52,7 @@ const defaultProps = {
   onInsuranceUpload: vi.fn(),
   onInsuranceTypeChange: vi.fn(),
   onOpenGdprModal: vi.fn(),
+  onOpenDeleteModal: vi.fn(),
 };
 
 describe('PrivacyTab', () => {
@@ -69,26 +70,36 @@ describe('PrivacyTab', () => {
     expect(screen.getByText('Data & Privacy Rights')).toBeDefined();
   });
 
-  it('renders all six GDPR action buttons', () => {
+  it('renders the consolidated GDPR action buttons (no duplicate download/portability requests)', () => {
     render(<PrivacyTab {...defaultProps} />);
-    expect(screen.getByText('Download My Data')).toBeDefined();
-    expect(screen.getByText('Data Portability Request')).toBeDefined();
-    expect(screen.getByText('Request Data Deletion')).toBeDefined();
+    // The instant export page covers access + portability, so those request
+    // buttons are gone; deletion is now the real account-delete action.
+    expect(screen.getByText('Delete your account')).toBeDefined();
     expect(screen.getByText('Data Rectification')).toBeDefined();
     expect(screen.getByText('Restriction of Processing')).toBeDefined();
     expect(screen.getByText('Right to Object')).toBeDefined();
+    // Removed duplicates:
+    expect(screen.queryByText('Download My Data')).toBeNull();
+    expect(screen.queryByText('Data Portability Request')).toBeNull();
   });
 
-  it('calls onOpenGdprModal with correct type when GDPR buttons clicked', async () => {
+  it('routes a request-type button through onOpenGdprModal', async () => {
     const { userEvent } = await import('@/test/test-utils');
     const user = userEvent.setup();
     render(<PrivacyTab {...defaultProps} />);
 
-    await user.click(screen.getByText('Download My Data'));
-    expect(defaultProps.onOpenGdprModal).toHaveBeenCalledWith('download');
+    await user.click(screen.getByText('Data Rectification'));
+    expect(defaultProps.onOpenGdprModal).toHaveBeenCalledWith('rectification');
+  });
 
-    await user.click(screen.getByText('Request Data Deletion'));
-    expect(defaultProps.onOpenGdprModal).toHaveBeenCalledWith('deletion');
+  it('opens the real Delete Account modal (not a GDPR ticket) from the delete button', async () => {
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+    render(<PrivacyTab {...defaultProps} />);
+
+    await user.click(screen.getByText('Delete your account'));
+    expect(defaultProps.onOpenDeleteModal).toHaveBeenCalled();
+    expect(defaultProps.onOpenGdprModal).not.toHaveBeenCalledWith('deletion');
   });
 
   it('renders Save Privacy Settings button', () => {

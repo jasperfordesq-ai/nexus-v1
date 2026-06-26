@@ -31,8 +31,9 @@ import Calendar from 'lucide-react/icons/calendar';
 import Users from 'lucide-react/icons/users';
 import Info from 'lucide-react/icons/info';
 import Languages from 'lucide-react/icons/languages';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { sanitizeRichText } from '@/lib/sanitize';
-import { GlassCard, useDisclosure, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
 import { AvailabilityGrid } from '@/components/availability/AvailabilityGrid';
 import { AppearanceSettings } from '@/components/settings/AppearanceSettings';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -676,6 +677,15 @@ export function SettingsPage() {
     }
   }
 
+  // Open the shared Delete Account modal with a clean slate. Used by both the
+  // Security tab and the Privacy tab so the destructive action is identical
+  // wherever it is surfaced.
+  function handleOpenDeleteModal() {
+    setDeleteConfirmation('');
+    setDeletePassword('');
+    deleteModal.onOpen();
+  }
+
   // ─────────────────────────────────────────────────────────────────────────
   // 2FA Handlers
   // ─────────────────────────────────────────────────────────────────────────
@@ -810,11 +820,10 @@ export function SettingsPage() {
   async function handleGdprRequest() {
     if (!gdprRequestType) return;
 
-    // Map UI types to GDPR API types
+    // Map UI types to GDPR API types. Access/portability are now served by the
+    // instant Data Export page, and erasure by the Delete Account modal — so the
+    // request flow only covers rectification, restriction, and objection.
     const typeMap: Record<string, string> = {
-      download: 'access',
-      portability: 'portability',
-      deletion: 'erasure',
       rectification: 'rectification',
       restriction: 'restriction',
       objection: 'objection',
@@ -1107,6 +1116,7 @@ export function SettingsPage() {
             onInsuranceUpload={handleInsuranceUpload}
             onInsuranceTypeChange={setInsuranceType}
             onOpenGdprModal={openGdprModal}
+            onOpenDeleteModal={handleOpenDeleteModal}
           />
         )}
 
@@ -1129,18 +1139,13 @@ export function SettingsPage() {
             showCurrentPassword={showCurrentPassword}
             showNewPassword={showNewPassword}
             isChangingPassword={isChangingPassword}
-            deleteConfirmation={deleteConfirmation}
-            deletePassword={deletePassword}
-            isDeleting={isDeleting}
             passwordModalOpen={passwordModal.isOpen}
             passwordModalOnClose={passwordModal.onClose}
             passwordModalOnOpen={passwordModal.onOpen}
             logoutModalOpen={logoutModal.isOpen}
             logoutModalOnClose={logoutModal.onClose}
             logoutModalOnOpen={logoutModal.onOpen}
-            deleteModalOpen={deleteModal.isOpen}
-            deleteModalOnClose={deleteModal.onClose}
-            deleteModalOnOpen={deleteModal.onOpen}
+            deleteModalOnOpen={handleOpenDeleteModal}
             twoFactorSetupModalOpen={twoFactorSetupModal.isOpen}
             twoFactorSetupModalOnClose={twoFactorSetupModal.onClose}
             twoFactorDisableModalOpen={twoFactorDisableModal.isOpen}
@@ -1152,9 +1157,6 @@ export function SettingsPage() {
             onShowCurrentPasswordToggle={() => setShowCurrentPassword(!showCurrentPassword)}
             onShowNewPasswordToggle={() => setShowNewPassword(!showNewPassword)}
             onChangePassword={handleChangePassword}
-            onDeleteConfirmationChange={setDeleteConfirmation}
-            onDeletePasswordChange={setDeletePassword}
-            onDeleteAccount={handleDeleteAccount}
             onLogout={handleLogout}
             onSetup2FA={handleSetup2FA}
             onVerify2FA={handleVerify2FA}
@@ -1276,36 +1278,12 @@ export function SettingsPage() {
       >
         <ModalContent>
           <ModalHeader className="text-theme-primary">
-            {gdprRequestType === 'download' && t('gdpr.download_title')}
-            {gdprRequestType === 'portability' && t('gdpr.portability_title')}
-            {gdprRequestType === 'deletion' && t('gdpr.deletion_title')}
             {gdprRequestType === 'rectification' && t('gdpr.rectification_title')}
             {gdprRequestType === 'restriction' && t('gdpr.restriction_title')}
             {gdprRequestType === 'objection' && t('gdpr.objection_title')}
           </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
-              {gdprRequestType === 'deletion' && (
-                <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                  <p className="text-red-600 dark:text-red-400 font-medium">{t("gdpr.deletion_irreversible")}</p>
-                  <p className="text-theme-muted text-sm mt-1">
-                    {t("gdpr.deletion_modal_desc")}
-                  </p>
-                </div>
-              )}
-
-              {gdprRequestType === 'download' && (
-                <p className="text-theme-muted">
-                  {t("gdpr.download_modal_desc")}
-                </p>
-              )}
-
-              {gdprRequestType === 'portability' && (
-                <p className="text-theme-muted">
-                  {t("gdpr.portability_modal_desc")}
-                </p>
-              )}
-
               {gdprRequestType === 'rectification' && (
                 <p className="text-theme-muted">
                   {t("gdpr.rectification_modal_desc")}
@@ -1337,15 +1315,84 @@ export function SettingsPage() {
               {t("cancel")}
             </Button>
             <Button
-              className={
-                gdprRequestType === 'deletion'
-                  ? 'bg-red-500 text-white'
-                  : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-              }
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               onPress={handleGdprRequest}
               isLoading={isSubmittingGdpr}
             >
-              {gdprRequestType === 'deletion' ? t('gdpr.confirm_deletion') : t('gdpr.submit_request')}
+              {t('gdpr.submit_request')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Delete Account Modal — page-level so it can be opened from both the
+          Security tab and the Privacy tab. Performs the immediate, real GDPR
+          Article 17 erasure (password re-auth required). */}
+      <Modal
+        isOpen={deleteModal.isOpen}
+        onClose={deleteModal.onClose}
+        classNames={{
+          base: 'bg-overlay border border-theme-default',
+          header: 'border-b border-theme-default',
+          body: 'py-6',
+          footer: 'border-t border-theme-default',
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-red-600 dark:text-red-400 flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5" aria-hidden="true" />
+            {t('delete_modal.title')}
+          </ModalHeader>
+          <ModalBody>
+            <div className="space-y-4">
+              <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+                <p className="text-red-600 dark:text-red-400 font-medium">{t('delete_modal.warning')}</p>
+                <p className="text-theme-muted text-sm mt-1">
+                  {t('delete_modal.warning_desc')}
+                </p>
+              </div>
+              <div>
+                <p className="text-theme-muted mb-2">
+                  {t('delete_modal.type_confirm')}
+                </p>
+                <Input
+                  value={deleteConfirmation}
+                  onChange={(e) => setDeleteConfirmation(e.target.value)}
+                  placeholder={t('delete_modal.placeholder')}
+                  aria-label={t('delete_modal.aria_label')}
+                  classNames={{
+                    input: 'bg-transparent text-theme-primary font-mono',
+                    inputWrapper: 'bg-theme-elevated border-theme-default',
+                  }}
+                />
+              </div>
+              {/* Password re-authentication — required by the backend before erasure. */}
+              <Input
+                type="password"
+                label={t('password.current')}
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                isRequired
+                autoComplete="current-password"
+                classNames={{
+                  input: 'bg-transparent text-theme-primary',
+                  inputWrapper: 'bg-theme-elevated border-theme-default',
+                  label: 'text-theme-muted',
+                }}
+              />
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="tertiary" onPress={deleteModal.onClose}>
+              {t('cancel')}
+            </Button>
+            <Button
+              variant="danger"
+              onPress={handleDeleteAccount}
+              isLoading={isDeleting}
+              isDisabled={deleteConfirmation !== 'DELETE' || !deletePassword}
+            >
+              {t('delete_modal.submit')}
             </Button>
           </ModalFooter>
         </ModalContent>

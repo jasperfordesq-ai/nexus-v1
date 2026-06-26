@@ -1,4 +1,11 @@
 {
+  "gdpr_request": {
+    "subject": "Wir haben deine Datenanfrage erhalten",
+    "title": "Anfrage eingegangen",
+    "greeting": "Hallo {name},",
+    "body": "Wir haben deine Anfrage zu deinen Datenschutzrechten für {community} erhalten und werden innerhalb von 30 Tagen antworten, wie es das Datenschutzrecht vorschreibt. Du musst jetzt nichts weiter tun.",
+    "body_contact": "Falls du diese Anfrage nicht gestellt hast, kontaktiere uns bitte umgehend."
+  },
   "announcement": {
     "template_name": "Plattform-Update — Frühjahr 2026",
     "template_description": "Ankündigung Frühjahr 2026 zu Marktplatz, Spenden, Identitätsprüfung, Ehrenamtszahlungen, Föderationsnetz, Sprachen, SEO und Sicherheit.",
