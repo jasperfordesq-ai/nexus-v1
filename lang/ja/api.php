@@ -1062,6 +1062,13 @@ return [
     ],
     'onboarding' => [
         'complete' => 'Onboarding complete!',
+        'auto_listing' => [
+            'fallback_category' => 'サービス',
+            'offer_title' => ':category のお手伝いができます',
+            'offer_description' => ':category のお手伝いができます。ご相談はお気軽にご連絡ください！',
+            'request_title' => ':category の手伝いを探しています',
+            'request_description' => ':category を手伝ってくれる方を探しています。',
+        ],
     ],
     'users' => [
         'theme_updated' => 'Theme preferences updated',

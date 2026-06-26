@@ -1105,6 +1105,13 @@ return [
     ],
     'onboarding' => [
         'complete' => 'Onboarding complete!',
+        'auto_listing' => [
+            'fallback_category' => 'Servicio',
+            'offer_title' => 'Puedo ayudar con :category',
+            'offer_description' => 'Estoy disponible para ayudar con :category. ¡Ponte en contacto para organizarlo!',
+            'request_title' => 'Busco ayuda con :category',
+            'request_description' => 'Estoy buscando a alguien que pueda ayudarme con :category.',
+        ],
     ],
     'users' => [
         'theme_updated' => 'Theme preferences updated',

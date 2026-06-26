@@ -1062,6 +1062,13 @@ return [
     ],
     'onboarding' => [
         'complete' => 'Onboarding complete!',
+        'auto_listing' => [
+            'fallback_category' => 'Dienst',
+            'offer_title' => 'Ik kan helpen met :category',
+            'offer_description' => 'Ik ben beschikbaar om te helpen met :category. Neem contact op om het te regelen!',
+            'request_title' => 'Op zoek naar hulp bij :category',
+            'request_description' => 'Ik ben op zoek naar iemand die mij kan helpen met :category.',
+        ],
     ],
     'users' => [
         'theme_updated' => 'Theme preferences updated',

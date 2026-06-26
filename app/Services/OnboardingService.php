@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\Events\OnboardingCompleted;
+use App\I18n\LocaleContext;
 use App\Models\Category;
 use App\Models\Listing;
 use App\Services\OnboardingConfigService;
@@ -262,9 +263,29 @@ class OnboardingService
         };
         $moderationStatus = $mode === 'pending_review' ? 'pending_review' : null;
 
+        // Auto-generated listing copy must render in the creating member's
+        // preferred language, not the request/queue locale. Without this, a
+        // non-English member onboarding on a tenant with auto-listing enabled
+        // gets English titles/descriptions persisted as their own listings.
+        $prefLang = DB::table('users')->where('id', $userId)->value('preferred_language');
+
         foreach ($allItems as $item) {
-            $catName = $categories[$item['category_id']] ?? 'Service';
             $isOffer = $item['type'] === 'offer';
+
+            $copy = LocaleContext::withLocale($prefLang, function () use ($isOffer, $categories, $item) {
+                $catName = $categories[$item['category_id']]
+                    ?? __('api.onboarding.auto_listing.fallback_category');
+
+                return $isOffer
+                    ? [
+                        'title'       => __('api.onboarding.auto_listing.offer_title', ['category' => $catName]),
+                        'description' => __('api.onboarding.auto_listing.offer_description', ['category' => $catName]),
+                    ]
+                    : [
+                        'title'       => __('api.onboarding.auto_listing.request_title', ['category' => $catName]),
+                        'description' => __('api.onboarding.auto_listing.request_description', ['category' => $catName]),
+                    ];
+            });
 
             // firstOrCreate prevents duplicate listings if onboarding is retried
             $listing = Listing::firstOrCreate(
@@ -274,10 +295,8 @@ class OnboardingService
                     'type'        => $item['type'],
                 ],
                 [
-                    'title'            => $isOffer ? "I can help with {$catName}" : "Looking for help with {$catName}",
-                    'description'      => $isOffer
-                        ? "I'm available to help with {$catName}. Get in touch to arrange!"
-                        : "I'm looking for someone who can help me with {$catName}.",
+                    'title'            => $copy['title'],
+                    'description'      => $copy['description'],
                     'status'           => $status,
                     'moderation_status' => $moderationStatus,
                 ]

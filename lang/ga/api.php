@@ -1105,6 +1105,13 @@ return [
     ],
     'onboarding' => [
         'complete' => 'Onboarding complete!',
+        'auto_listing' => [
+            'fallback_category' => 'Seirbhís',
+            'offer_title' => 'Is féidir liom cabhrú le :category',
+            'offer_description' => 'Táim ar fáil chun cabhrú le :category. Déan teagmháil chun é a shocrú!',
+            'request_title' => 'Ag lorg cabhrach le :category',
+            'request_description' => 'Táim ag lorg duine éigin atá in ann cabhrú liom le :category.',
+        ],
     ],
     'users' => [
         'theme_updated' => 'Theme preferences updated',

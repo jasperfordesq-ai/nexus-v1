@@ -1062,6 +1062,13 @@ return [
     ],
     'onboarding' => [
         'complete' => 'Onboarding complete!',
+        'auto_listing' => [
+            'fallback_category' => 'خدمة',
+            'offer_title' => 'يمكنني المساعدة في :category',
+            'offer_description' => 'أنا متاح للمساعدة في :category. تواصل معي لترتيب ذلك!',
+            'request_title' => 'أبحث عن مساعدة في :category',
+            'request_description' => 'أبحث عن شخص يمكنه مساعدتي في :category.',
+        ],
     ],
     'users' => [
         'theme_updated' => 'Theme preferences updated',

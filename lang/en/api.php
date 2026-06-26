@@ -1864,6 +1864,13 @@ return [
     // Onboarding (hardcoded-string audit — 2026-04-14)
     'onboarding' => [
         'complete' => 'Onboarding complete!',
+        'auto_listing' => [
+            'fallback_category' => 'Service',
+            'offer_title' => 'I can help with :category',
+            'offer_description' => 'I\'m available to help with :category. Get in touch to arrange!',
+            'request_title' => 'Looking for help with :category',
+            'request_description' => 'I\'m looking for someone who can help me with :category.',
+        ],
     ],
 
     // Users (hardcoded-string audit — 2026-04-14)
