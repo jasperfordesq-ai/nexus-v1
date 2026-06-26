@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Message read-receipts and "verified" badges are now described to screen readers.** The "read" vs "sent" tick on your own messages, and the verified-member badge in the members directory, were conveyed only by icon shape and colour — with the label hidden in a hover tooltip — so screen-reader users couldn't tell them apart. They now carry explicit text labels, and a member's showcased badges are announced individually instead of collapsing into one unnamed image.
 - **Clickable cards can now be operated with the keyboard.** Cards that act as a single button were mouse-only — keyboard and switch users couldn't reach or activate them. They are now focusable and activate with Enter or Space (cards that aren't interactive are unaffected).
 - **Identity-verification errors are now announced to screen readers.** The inline error shown when starting or completing identity verification is now exposed as an assertive alert, and urgent (error/warning) toast notifications announce more reliably across screen readers.
+- **The Cmd+K search & command palette announces its result count to screen readers.** A polite live region now reports how many results or quick actions matched as you type, so screen-reader users get the same feedback the visible list gives sighted users.
 
 ### Added
 

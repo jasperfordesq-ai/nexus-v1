@@ -319,6 +319,17 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             </Button>
           </div>
 
+          {/* Screen-reader result announcements */}
+          <div className="sr-only" role="status" aria-live="polite">
+            {isLoading
+              ? t('search.searching')
+              : itemCount > 0
+                ? t('aria.search_results', { count: itemCount })
+                : queryIsSearchable
+                  ? t('search.no_suggestions')
+                  : ''}
+          </div>
+
           {/* Results area */}
           <div className="min-h-0 flex-1 overflow-y-auto px-3 sm:px-4 py-3 overscroll-contain">
             {/* Action mode */}

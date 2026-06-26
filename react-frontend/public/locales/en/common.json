@@ -868,6 +868,7 @@
     "select_language": "Select language",
     "clear_location": "Clear location",
     "location_results": "{{count}} address suggestions available",
+    "search_results": "{{count}} results available",
     "select_category": "Select a category",
     "verification_badges": "Verification badges",
     "search_skills": "Search skills",
@@ -1168,7 +1169,7 @@
     },
     "title": "Download Your Data",
     "subtitle": "Your right to access and export everything we hold about you.",
-    "intro": "This archive contains all data we hold about you in this community: your profile, hours given and received, support relationships, transactions, favours, listings, events, and more.",
+    "intro": "This archive contains all data we hold about you in this community: your profile, hours given and received, support relationships, transactions, favours, listings, events, and more. The machine-readable JSON download also satisfies your right to data portability, so you can move your data to another service.",
     "format": {
       "label": "Format",
       "json": "JSON (developer-friendly)",
