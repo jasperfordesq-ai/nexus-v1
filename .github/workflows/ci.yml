@@ -396,7 +396,11 @@ jobs:
             src/pages/auth/LoginPage.test.tsx
             src/admin/modules/system/OnboardingSettings.test.tsx
           )
-          npx vitest run "${TESTS[@]}"
+          # --pool=forks: the default worker-thread pool intermittently dies
+          # mid-run with ERR_IPC_CHANNEL_CLOSED ("Channel closed") on a heavy
+          # file (e.g. LoginPage.test), hanging the whole step until timeout.
+          # Forked processes are memory-isolated and don't hit that crash.
+          npx vitest run "${TESTS[@]}" --pool=forks
         timeout-minutes: 8
 
       - name: Vitest Coverage Report (WARNING)
