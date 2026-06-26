@@ -918,6 +918,7 @@
     "add_skill": "Add Skill",
     "add_a_skill": "Add a Skill",
     "search_result_category": "in {{category}}",
+    "aria_results": "{{count}} skill suggestions available",
     "no_matching_custom": "No matching skill found. You can add \"{{query}}\" as a custom skill.",
     "use_custom": "Use \"{{query}}\"",
     "skill_to_add": "Skill to add:",

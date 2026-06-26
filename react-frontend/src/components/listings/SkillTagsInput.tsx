@@ -9,11 +9,11 @@
  * Provides autocomplete suggestions and popular tags for quick selection.
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';import Tag from 'lucide-react/icons/tag';
+import { useState, useCallback, useRef, useEffect, useId } from 'react';import Tag from 'lucide-react/icons/tag';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { Button, Chip, Input } from '@/components/ui';
+import { Chip, Input } from '@/components/ui';
 
 interface SkillTagsInputProps {
   tags: string[];
@@ -26,6 +26,8 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const listboxId = useId();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -56,6 +58,7 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
 
   const handleInputChange = (value: string) => {
     setInputValue(value);
+    setSelectedIndex(-1);
 
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
@@ -75,6 +78,7 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
     setInputValue('');
     setSuggestions([]);
     setShowSuggestions(false);
+    setSelectedIndex(-1);
   };
 
   const removeTag = (tag: string) => {
@@ -82,11 +86,33 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    const hasSuggestions = showSuggestions && suggestions.length > 0;
+
+    if (hasSuggestions && e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((i) => (i < suggestions.length - 1 ? i + 1 : 0));
+      return;
+    }
+    if (hasSuggestions && e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((i) => (i > 0 ? i - 1 : suggestions.length - 1));
+      return;
+    }
+    if (hasSuggestions && e.key === 'Escape') {
+      e.preventDefault();
+      setShowSuggestions(false);
+      setSelectedIndex(-1);
+      return;
+    }
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
-      if (inputValue.trim()) {
+      if (hasSuggestions && selectedIndex >= 0 && selectedIndex < suggestions.length) {
+        const picked = suggestions[selectedIndex];
+        if (picked) addTag(picked);
+      } else if (inputValue.trim()) {
         addTag(inputValue.trim());
       }
+      return;
     }
     if (e.key === 'Backspace' && !inputValue && tags.length > 0) {
       const lastTag = tags[tags.length - 1];
@@ -125,7 +151,7 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
           <Input
             size="sm"
             placeholder={t('skill_tags.placeholder')}
-            aria-label={t('skill_tags.aria_add')}
+            aria-label={t('skill_tags.aria_add_count', { current: tags.length, max: maxTags })}
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -140,32 +166,48 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
               input: 'bg-transparent text-theme-primary',
               inputWrapper: 'bg-theme-elevated border-theme-default',
             }}
+            role="combobox"
             aria-expanded={showSuggestions && suggestions.length > 0}
-            aria-controls="skill-suggestions-listbox"
+            aria-controls={listboxId}
+            aria-activedescendant={
+              selectedIndex >= 0 && selectedIndex < suggestions.length
+                ? `${listboxId}-opt-${selectedIndex}`
+                : undefined
+            }
             aria-autocomplete="list"
           />
+
+          {/* Screen-reader suggestion count */}
+          <div className="sr-only" role="status" aria-live="polite">
+            {showSuggestions && suggestions.length > 0
+              ? t('skill_tags.aria_results', { count: suggestions.length })
+              : ''}
+          </div>
 
           {/* Autocomplete dropdown */}
           {showSuggestions && suggestions.length > 0 && (
             <div
-              id="skill-suggestions-listbox"
+              id={listboxId}
               role="listbox"
               className="absolute z-10 w-full mt-1 bg-theme-elevated border border-theme-default rounded-lg shadow-lg overflow-hidden"
             >
-              {suggestions.map((suggestion) => (
-                <Button
+              {suggestions.map((suggestion, index) => (
+                <div
                   key={suggestion}
+                  id={`${listboxId}-opt-${index}`}
                   role="option"
-                  aria-selected={false}
-                  variant="tertiary"
-                  className="min-h-9 w-full justify-start rounded-none px-3 py-2 text-left text-sm text-theme-primary transition-colors hover:bg-theme-hover"
-                  onPress={() => addTag(suggestion)}
+                  aria-selected={index === selectedIndex}
+                  className={`min-h-9 w-full cursor-pointer rounded-none px-3 py-2 text-left text-sm text-theme-primary transition-colors ${
+                    index === selectedIndex ? 'bg-theme-hover' : 'hover:bg-theme-hover'
+                  }`}
+                  onMouseEnter={() => setSelectedIndex(index)}
                   onMouseDown={(e) => {
                     e.preventDefault(); // Prevent input blur
+                    addTag(suggestion);
                   }}
                 >
                   {suggestion}
-                </Button>
+                </div>
               ))}
             </div>
           )}

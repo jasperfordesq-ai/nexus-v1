@@ -11,7 +11,7 @@ import { Select, SelectItem, useDisclosure, Button, Chip, Spinner, Input, Modal,
  * Fetches skill categories from API and supports search.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useId } from 'react';
 
 import Search from 'lucide-react/icons/search';
 import Plus from 'lucide-react/icons/plus';
@@ -161,6 +161,8 @@ export function SkillSelector({
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [proficiency, setProficiency] = useState<string>('intermediate');
   const [isAdding, setIsAdding] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const listboxId = useId();
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
@@ -192,6 +194,7 @@ export function SkillSelector({
   // Search skills
   const handleSearch = useCallback(async (query: string) => {
     setSearchQuery(query);
+    setSelectedIndex(-1);
     if (query.length < 2) {
       setSearchResults([]);
       return;
@@ -246,6 +249,34 @@ export function SkillSelector({
       toastRef.current.error(tRef.current('toasts.skill_add_failed'));
     } finally {
       setIsAdding(false);
+    }
+  };
+
+  // Select a search result into the form (shared by click + keyboard)
+  const selectResult = (result: SkillSearchResult) => {
+    setSelectedSkill(result.name);
+    setSelectedCategory(result.category_id.toString());
+    setSearchResults([]);
+    setSearchQuery(result.name);
+    setSelectedIndex(-1);
+  };
+
+  // Combobox keyboard navigation over the search results
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (searchResults.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((i) => (i < searchResults.length - 1 ? i + 1 : 0));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((i) => (i > 0 ? i - 1 : searchResults.length - 1));
+    } else if (e.key === 'Enter' && selectedIndex >= 0 && selectedIndex < searchResults.length) {
+      e.preventDefault();
+      const picked = searchResults[selectedIndex];
+      if (picked) selectResult(picked);
+    } else if (e.key === 'Escape') {
+      setSearchResults([]);
+      setSelectedIndex(-1);
     }
   };
 
@@ -319,33 +350,58 @@ export function SkillSelector({
               aria-label={tc('aria.search_skills')}
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
               startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               endContent={isSearching ? <Spinner size="sm" /> : undefined}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',
               }}
+              role="combobox"
+              aria-expanded={searchResults.length > 0}
+              aria-controls={listboxId}
+              aria-activedescendant={
+                selectedIndex >= 0 && selectedIndex < searchResults.length
+                  ? `${listboxId}-opt-${selectedIndex}`
+                  : undefined
+              }
+              aria-autocomplete="list"
               autoFocus
             />
 
+            {/* Screen-reader result count */}
+            <div className="sr-only" role="status" aria-live="polite">
+              {searchResults.length > 0
+                ? tc('skills.aria_results', { count: searchResults.length })
+                : ''}
+            </div>
+
             {/* Search Results */}
             {searchResults.length > 0 && (
-              <div className="space-y-1 max-h-48 overflow-y-auto">
-                {searchResults.map((result) => (
-                  <Button
+              <div
+                id={listboxId}
+                role="listbox"
+                aria-label={tc('aria.search_skills')}
+                className="space-y-1 max-h-48 overflow-y-auto"
+              >
+                {searchResults.map((result, index) => (
+                  <div
                     key={result.id}
-                    variant="light"
-                    onPress={() => {
-                      setSelectedSkill(result.name);
-                      setSelectedCategory(result.category_id.toString());
-                      setSearchResults([]);
-                      setSearchQuery(result.name);
+                    id={`${listboxId}-opt-${index}`}
+                    role="option"
+                    aria-selected={index === selectedIndex}
+                    onMouseEnter={() => setSelectedIndex(index)}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      selectResult(result);
                     }}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-theme-hover transition-colors justify-start min-h-9"
+                    className={`w-full cursor-pointer px-3 py-2 rounded-lg transition-colors min-h-9 flex items-center ${
+                      index === selectedIndex ? 'bg-theme-hover' : 'hover:bg-theme-hover'
+                    }`}
                   >
                     <span className="text-sm font-medium text-theme-primary">{result.name}</span>
                     <span className="text-xs text-theme-subtle ml-2">{tc('skills.search_result_category', { category: result.category_name })}</span>
-                  </Button>
+                  </div>
                 ))}
               </div>
             )}
