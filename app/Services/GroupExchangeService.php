@@ -328,7 +328,11 @@ class GroupExchangeService
                 ];
             }
         } elseif ($splitType === 'weighted') {
-            // Weighted: distribute total_hours proportionally by weight within each role
+            // Weighted: distribute total_hours proportionally by weight within each role.
+            // The LAST participant in each role absorbs the rounding remainder so the
+            // role's shares sum to total_hours EXACTLY — otherwise independent per-role
+            // rounding makes provider-credits != receiver-debits, minting or destroying
+            // credits on completion (a conservation violation).
             $byRole = $participants->groupBy('role');
 
             foreach ($byRole as $roleParticipants) {
@@ -337,30 +341,47 @@ class GroupExchangeService
                     $totalWeight = $roleParticipants->count();
                 }
 
+                $count = $roleParticipants->count();
+                $allocated = 0.0;
+                $idx = 0;
                 foreach ($roleParticipants as $p) {
-                    $weight = (float) ($p->weight ?: 1.0);
-                    $hours = ($weight / $totalWeight) * $totalHours;
+                    $idx++;
+                    if ($idx === $count) {
+                        $hours = round($totalHours - $allocated, 2);
+                    } else {
+                        $weight = (float) ($p->weight ?: 1.0);
+                        $hours = round(($weight / $totalWeight) * $totalHours, 2);
+                        $allocated += $hours;
+                    }
 
                     $result[] = [
                         'user_id' => (int) $p->user_id,
                         'role'    => $p->role,
-                        'hours'   => round($hours, 2),
+                        'hours'   => $hours,
                     ];
                 }
             }
         } else {
-            // Equal: split total_hours equally within each role
+            // Equal: split total_hours equally within each role. The LAST participant
+            // in each role absorbs the rounding remainder so the role sums to
+            // total_hours EXACTLY (see weighted note above on conservation).
             $byRole = $participants->groupBy('role');
 
             foreach ($byRole as $roleParticipants) {
                 $count = $roleParticipants->count();
                 $hoursEach = $count > 0 ? round($totalHours / $count, 2) : 0;
 
+                $idx = 0;
                 foreach ($roleParticipants as $p) {
+                    $idx++;
+                    $hours = ($idx === $count)
+                        ? round($totalHours - $hoursEach * ($count - 1), 2)
+                        : $hoursEach;
+
                     $result[] = [
                         'user_id' => (int) $p->user_id,
                         'role'    => $p->role,
-                        'hours'   => $hoursEach,
+                        'hours'   => $hours,
                     ];
                 }
             }
