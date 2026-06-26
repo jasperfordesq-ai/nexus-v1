@@ -1817,6 +1817,7 @@ return [
     'deposit_failed'                       => 'Deposit failed',
     'withdrawal_failed'                    => 'Withdrawal failed',
     'donation_failed'                      => 'Donation failed',
+    'donation_failed_check_recipient'      => 'Donation failed. Check your balance and the recipient.',
 
     // Maintenance mode (hardcoded-string audit — 2026-04-14)
     'maintenance_mode'                     => 'Platform is currently under maintenance. Please check back soon.',

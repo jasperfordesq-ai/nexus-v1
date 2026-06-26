@@ -197,7 +197,7 @@ class CreditDonationService
     public function donateToCommunityFund(int $userId, float $amount, string $message = ''): array
     {
         if ($amount <= 0) {
-            return ['success' => false, 'error' => 'Amount must be greater than 0'];
+            return ['success' => false, 'error' => __('api.amount_must_be_greater_than_0')];
         }
 
         // CommunityFundService::receiveDonation handles balance checks, deduction,
@@ -226,7 +226,7 @@ class CreditDonationService
             return ['success' => true];
         }
 
-        return ['success' => false, 'error' => 'Donation failed. Check balance and recipient.'];
+        return ['success' => false, 'error' => __('api.donation_failed_check_recipient')];
     }
 
     /**

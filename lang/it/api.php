@@ -1097,6 +1097,7 @@ return [
     'deposit_failed' => 'Deposit failed',
     'withdrawal_failed' => 'Withdrawal failed',
     'donation_failed' => 'Donation failed',
+    'donation_failed_check_recipient' => 'Donazione non riuscita. Controlla il tuo saldo e il destinatario.',
     'maintenance_mode' => 'Platform is currently under maintenance. Please check back soon.',
     'too_many_login_attempts_seconds' => 'Too many login attempts. Try again in :seconds seconds.',
     'legal' => [
