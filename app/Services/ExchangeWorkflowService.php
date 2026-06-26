@@ -1030,37 +1030,56 @@ class ExchangeWorkflowService
             $requesterId = (int) $exchangeData['requester_id'];
             $providerId = (int) $exchangeData['provider_id'];
 
-            // Lock sender row and check balance to prevent negative balances
-            $sender = DB::table('users')
-                ->where('id', $requesterId)
+            // Credit direction depends on the listing type: the party that
+            // RECEIVES the service pays; the party that PROVIDES it earns.
+            //   - offer   listing: the listing owner (provider_id) does the
+            //       work → the requester (recipient) pays the provider.
+            //   - request listing: the listing owner asked for help and the
+            //       responder (requester_id) does the work → the provider
+            //       (the help-seeker) pays the requester.
+            // Previously this always transferred requester → provider, so on a
+            // request-type listing the helper was charged and the help-seeker
+            // was credited — the credit moved backwards.
+            $listingType = (string) ($exchangeData['listing_type'] ?? 'offer');
+            if ($listingType === 'request') {
+                $payerId = $providerId;
+                $payeeId = $requesterId;
+            } else {
+                $payerId = $requesterId;
+                $payeeId = $providerId;
+            }
+
+            // Lock payer row and check balance to prevent negative balances
+            $payer = DB::table('users')
+                ->where('id', $payerId)
                 ->where('tenant_id', $tenantId)
                 ->lockForUpdate()
                 ->first();
 
-            if (!$sender || (float) $sender->balance < $hours) {
-                Log::warning("Exchange #{$exchangeId}: requester #{$requesterId} has insufficient balance (" . ($sender->balance ?? 0) . " < {$hours})");
+            if (!$payer || (float) $payer->balance < $hours) {
+                Log::warning("Exchange #{$exchangeId}: payer #{$payerId} has insufficient balance (" . ($payer->balance ?? 0) . " < {$hours})");
                 // Typed signal so the confirm endpoint returns a clear 4xx instead
                 // of a generic 500. The surrounding DB::transaction rolls back, so
                 // no credits move and the counterparty's confirmation is preserved.
                 throw new \RuntimeException('INSUFFICIENT_BALANCE');
             }
 
-            // Lock receiver row too for consistency
+            // Lock payee row too for consistency
             DB::table('users')
-                ->where('id', $providerId)
+                ->where('id', $payeeId)
                 ->where('tenant_id', $tenantId)
                 ->lockForUpdate()
                 ->first();
 
-            DB::table('users')->where('id', $requesterId)->where('tenant_id', $tenantId)
+            DB::table('users')->where('id', $payerId)->where('tenant_id', $tenantId)
                 ->decrement('balance', $hours);
-            DB::table('users')->where('id', $providerId)->where('tenant_id', $tenantId)
+            DB::table('users')->where('id', $payeeId)->where('tenant_id', $tenantId)
                 ->increment('balance', $hours);
 
             $transactionId = DB::table('transactions')->insertGetId([
                 'tenant_id' => $tenantId,
-                'sender_id' => $requesterId,
-                'receiver_id' => $providerId,
+                'sender_id' => $payerId,
+                'receiver_id' => $payeeId,
                 'amount' => $hours,
                 'description' => "Exchange #$exchangeId for listing: " . ($exchangeData['listing_title'] ?? ''),
                 'transaction_type' => 'exchange',
