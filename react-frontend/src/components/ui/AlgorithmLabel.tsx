@@ -87,7 +87,7 @@ export function AlgorithmLabel({ area }: AlgorithmLabelProps) {
       <Chip
         variant="flat"
         size="sm"
-        startContent={<Cpu className="w-3 h-3" />}
+        startContent={<Cpu className="w-3 h-3" aria-hidden="true" />}
         className="bg-[var(--surface-elevated)] text-[var(--text-subtle)] border border-[var(--border-default)] cursor-help text-[11px] h-6"
       >
         {info.name}

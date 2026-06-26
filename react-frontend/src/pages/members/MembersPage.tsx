@@ -747,7 +747,9 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                   <h3 className="truncate font-semibold text-theme-primary">{displayName}</h3>
                   {member.is_verified && (
                     <Tooltip content={t('members.verified_member')}>
-                      <BadgeCheck className="w-4 h-4 text-teal-500 shrink-0" aria-hidden="true" />
+                      <span role="img" aria-label={t('members.verified_member')} className="inline-flex shrink-0">
+                        <BadgeCheck className="w-4 h-4 text-teal-500 shrink-0" aria-hidden="true" />
+                      </span>
                     </Tooltip>
                   )}
                   {hasGamification && level > 0 && (
@@ -756,7 +758,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                     </Chip>
                   )}
                   {hasGamification && showcasedBadges.length > 0 && (
-                    <span className="flex items-center gap-0.5 ml-1" role="img" aria-label={t('members.showcased_badges')}>
+                    <span className="flex items-center gap-0.5 ml-1" role="group" aria-label={t('members.showcased_badges')}>
                       {showcasedBadges.map((badge) => (
                         <Tooltip key={badge.badge_key} content={badge.name}>
                           <span className="text-base leading-none cursor-default" role="img" aria-label={badge.name}>{badge.icon || '🏆'}</span>
@@ -830,7 +832,9 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
             <h3 className="font-semibold text-theme-primary">{displayName}</h3>
             {member.is_verified && (
               <Tooltip content={t('members.verified_member')}>
-                <BadgeCheck className="w-4 h-4 text-teal-500 shrink-0" aria-hidden="true" />
+                <span role="img" aria-label={t('members.verified_member')} className="inline-flex shrink-0">
+                  <BadgeCheck className="w-4 h-4 text-teal-500 shrink-0" aria-hidden="true" />
+                </span>
               </Tooltip>
             )}
             {hasGamification && level > 0 && (
@@ -840,7 +844,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
             )}
           </div>
           {hasGamification && showcasedBadges.length > 0 && (
-            <div className="flex items-center justify-center gap-1 mt-1.5" role="img" aria-label={t('members.showcased_badges')}>
+            <div className="flex items-center justify-center gap-1 mt-1.5" role="group" aria-label={t('members.showcased_badges')}>
               {showcasedBadges.map((badge) => (
                 <Tooltip key={badge.badge_key} content={badge.name}>
                   <span className="text-lg leading-none cursor-default" role="img" aria-label={badge.name}>{badge.icon || '🏆'}</span>

@@ -501,11 +501,19 @@ export const MessageBubble = memo(function MessageBubble({
           </span>
           {/* Read receipts - only show for own messages */}
           {isOwn && (
-            <span className="text-theme-subtle">
+            <span
+              className="text-theme-subtle"
+              role="img"
+              aria-label={
+                message.is_read || message.read_at
+                  ? t('aria_read_receipt_read')
+                  : t('aria_read_receipt_sent')
+              }
+            >
               {message.is_read || message.read_at ? (
-                <CheckCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <CheckCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" aria-hidden="true" />
               ) : (
-                <Check className="w-3.5 h-3.5" />
+                <Check className="w-3.5 h-3.5" aria-hidden="true" />
               )}
             </span>
           )}

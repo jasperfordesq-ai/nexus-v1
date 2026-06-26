@@ -350,7 +350,7 @@ export function VerifyIdentityOptionalPage() {
             </div>
 
             {errorMessage && (
-              <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-600 dark:text-red-400">{errorMessage}</div>
+              <div role="alert" className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-600 dark:text-red-400">{errorMessage}</div>
             )}
 
             <div className="space-y-4">
@@ -401,7 +401,7 @@ export function VerifyIdentityOptionalPage() {
             </div>
 
             {errorMessage && (
-              <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-600 dark:text-red-400">{errorMessage}</div>
+              <div role="alert" className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-600 dark:text-red-400">{errorMessage}</div>
             )}
 
             {!clientSecret ? (
@@ -468,7 +468,7 @@ export function VerifyIdentityOptionalPage() {
           </div>
 
           {errorMessage && (
-            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-600 dark:text-red-400">{errorMessage}</motion.div>
+            <motion.div role="alert" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-600 dark:text-red-400">{errorMessage}</motion.div>
           )}
 
           {pageState === 'start' && (

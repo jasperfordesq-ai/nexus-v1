@@ -171,6 +171,7 @@ function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
       {/* Assertive region — errors and warnings that must interrupt the user */}
       <div
         role="alert"
+        aria-live="assertive"
         aria-label={t('toast.aria_urgent_notifications')}
         aria-atomic="false"
         className="flex flex-col gap-2"

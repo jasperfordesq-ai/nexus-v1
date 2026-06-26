@@ -145,11 +145,28 @@ function CardRoot(
       }
     };
 
+    // A click/press handler on the default (non-`as`) card renders a clickable
+    // <div>. Without button semantics that div is mouse-only — invisible to
+    // keyboard and screen-reader users (WCAG 2.1.1). Expose it as a button and
+    // activate on Enter/Space. (`as`-rendered cards keep the element the caller
+    // chose, so their semantics stay the caller's responsibility.)
+    const isInteractive = Boolean(onClick || onPress) && !isDisabled;
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        event.currentTarget.click();
+      }
+    };
+
     const sharedProps = {
       className: rootClassName,
       variant,
       'aria-disabled': isDisabled || undefined,
       onClick: onClick || onPress ? handleClick : undefined,
+      ...(isInteractive
+        ? { role: 'button', tabIndex: 0, onKeyDown: handleKeyDown }
+        : {}),
       ...props,
     };
 

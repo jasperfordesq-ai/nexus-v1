@@ -9,6 +9,8 @@
   "send": "Send",
   "you": "You",
   "unread": "{{count}} unread",
+  "aria_read_receipt_read": "Read",
+  "aria_read_receipt_sent": "Sent",
   "page_subtitle": "Your conversations with community members",
   "disabled_title": "Direct Messaging Disabled",
   "disabled_subtitle": "Direct messaging is not enabled for this community. To arrange services, please use the exchange request system.",

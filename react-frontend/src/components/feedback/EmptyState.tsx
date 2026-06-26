@@ -109,8 +109,6 @@ export function EmptyState({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={`flex flex-col items-center justify-center py-16 text-center ${className}`}
-      role="status"
-      aria-label={title}
     >
       {/* Icon circle */}
       <div

@@ -405,6 +405,7 @@ export function VerifyIdentityPage() {
 
           {errorMessage && (
             <motion.div
+              role="alert"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-600 dark:text-red-400"
