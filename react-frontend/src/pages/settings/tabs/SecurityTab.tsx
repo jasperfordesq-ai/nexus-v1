@@ -61,10 +61,6 @@ interface SecurityTabProps {
   showCurrentPassword: boolean;
   showNewPassword: boolean;
   isChangingPassword: boolean;
-  // Delete
-  deleteConfirmation: string;
-  deletePassword: string;
-  isDeleting: boolean;
   // Modal disclosure objects
   passwordModalOpen: boolean;
   passwordModalOnClose: () => void;
@@ -72,8 +68,8 @@ interface SecurityTabProps {
   logoutModalOpen: boolean;
   logoutModalOnClose: () => void;
   logoutModalOnOpen: () => void;
-  deleteModalOpen: boolean;
-  deleteModalOnClose: () => void;
+  // Delete Account modal lives at the page level (SettingsPage) so it can also
+  // be opened from the Privacy tab; this tab only triggers it.
   deleteModalOnOpen: () => void;
   twoFactorSetupModalOpen: boolean;
   twoFactorSetupModalOnClose: () => void;
@@ -87,9 +83,6 @@ interface SecurityTabProps {
   onShowCurrentPasswordToggle: () => void;
   onShowNewPasswordToggle: () => void;
   onChangePassword: () => void;
-  onDeleteConfirmationChange: (value: string) => void;
-  onDeletePasswordChange: (value: string) => void;
-  onDeleteAccount: () => void;
   onLogout: () => void;
   onSetup2FA: () => void;
   onVerify2FA: () => void;
@@ -137,17 +130,12 @@ export function SecurityTab({
   showCurrentPassword,
   showNewPassword,
   isChangingPassword,
-  deleteConfirmation,
-  deletePassword,
-  isDeleting,
   passwordModalOpen,
   passwordModalOnClose,
   passwordModalOnOpen,
   logoutModalOpen,
   logoutModalOnClose,
   logoutModalOnOpen,
-  deleteModalOpen,
-  deleteModalOnClose,
   deleteModalOnOpen,
   twoFactorSetupModalOpen,
   twoFactorSetupModalOnClose,
@@ -160,9 +148,6 @@ export function SecurityTab({
   onShowCurrentPasswordToggle,
   onShowNewPasswordToggle,
   onChangePassword,
-  onDeleteConfirmationChange,
-  onDeletePasswordChange,
-  onDeleteAccount,
   onLogout,
   onSetup2FA,
   onVerify2FA,
@@ -428,64 +413,6 @@ export function SecurityTab({
               onPress={onLogout}
             >
               {t('logout_modal.submit')}
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      {/* Delete Account Modal */}
-      <Modal isOpen={deleteModalOpen} onClose={deleteModalOnClose} classNames={modalClassNames}>
-        <ModalContent>
-          <ModalHeader className="text-red-600 dark:text-red-400 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5" aria-hidden="true" />
-            {t('delete_modal.title')}
-          </ModalHeader>
-          <ModalBody>
-            <div className="space-y-4">
-              <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-red-600 dark:text-red-400 font-medium">{t('delete_modal.warning')}</p>
-                <p className="text-theme-muted text-sm mt-1">
-                  {t('delete_modal.warning_desc')}
-                </p>
-              </div>
-              <div>
-                <p className="text-theme-muted mb-2">
-                  {t('delete_modal.type_confirm')}
-                </p>
-                <Input
-                  value={deleteConfirmation}
-                  onChange={(e) => onDeleteConfirmationChange(e.target.value)}
-                  placeholder={t('delete_modal.placeholder')}
-                  aria-label={t('delete_modal.aria_label')}
-                  classNames={{
-                    input: 'bg-transparent text-theme-primary font-mono',
-                    inputWrapper: 'bg-theme-elevated border-theme-default',
-                  }}
-                />
-              </div>
-              {/* Password re-authentication — required by the backend before erasure. */}
-              <Input
-                type="password"
-                label={t('password.current')}
-                value={deletePassword}
-                onChange={(e) => onDeletePasswordChange(e.target.value)}
-                isRequired
-                autoComplete="current-password"
-                classNames={inputClassNames}
-              />
-            </div>
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="tertiary" onPress={deleteModalOnClose}>
-              {t('cancel')}
-            </Button>
-            <Button
-              variant="danger"
-              onPress={onDeleteAccount}
-              isLoading={isDeleting}
-              isDisabled={deleteConfirmation !== 'DELETE' || !deletePassword}
-            >
-              {t('delete_modal.submit')}
             </Button>
           </ModalFooter>
         </ModalContent>

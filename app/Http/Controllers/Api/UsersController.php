@@ -848,6 +848,12 @@ class UsersController extends BaseApiController
                 ],
             ]);
 
+            // Acknowledge the request by email so the member has a record of it —
+            // the Privacy settings UI promises a confirmation email. Best-effort:
+            // a mail failure must never fail the request. Rendered in the
+            // recipient's preferred language per the platform i18n rule.
+            $this->sendGdprRequestConfirmation($userId);
+
             return $this->respondWithData([
                 'request_id' => $result['id'],
                 'type'       => $type,
@@ -859,6 +865,56 @@ class UsersController extends BaseApiController
         } catch (\Exception $e) {
             Log::error('GDPR request creation failed', ['user' => $userId, 'type' => $type, 'error' => $e->getMessage()]);
             return $this->respondWithError('REQUEST_FAILED', __('api.user_request_failed'), null, 500);
+        }
+    }
+
+    /**
+     * Send a confirmation email acknowledging a freshly-created GDPR data-rights
+     * request. Best-effort and self-contained: any failure is logged and
+     * swallowed so it can never break the request itself.
+     */
+    private function sendGdprRequestConfirmation(int $userId): void
+    {
+        try {
+            $tenantId = TenantContext::getId();
+            $userRow = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->select(['email', 'first_name', 'name', 'preferred_language'])
+                ->first();
+
+            $recipientEmail = $userRow->email ?? '';
+            if (!$userRow || empty($recipientEmail) || !filter_var($recipientEmail, FILTER_VALIDATE_EMAIL)) {
+                return;
+            }
+
+            LocaleContext::withLocale($userRow->preferred_language ?? null, function () use ($userRow, $recipientEmail, $tenantId) {
+                $userName  = $userRow->first_name ?? $userRow->name ?? __('emails.common.fallback_name');
+                $community = TenantContext::getName();
+                $html = EmailTemplateBuilder::make()
+                    ->theme('brand')
+                    ->title(__('emails.gdpr_request.title'))
+                    ->greeting(__('emails.gdpr_request.greeting', ['name' => $userName]))
+                    ->paragraph(__('emails.gdpr_request.body', ['community' => $community]))
+                    ->paragraph(__('emails.gdpr_request.body_contact'))
+                    ->render();
+
+                \App\Services\EmailDispatchService::sendRaw(
+                    $recipientEmail,
+                    __('emails.gdpr_request.subject', ['community' => $community]),
+                    $html,
+                    null,
+                    null,
+                    null,
+                    'gdpr_request',
+                    ['tenant_id' => (int) $tenantId]
+                );
+            });
+        } catch (\Throwable $e) {
+            Log::warning('[UsersController] GDPR request confirmation email failed', [
+                'user'  => $userId,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 

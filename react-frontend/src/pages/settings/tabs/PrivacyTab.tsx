@@ -75,6 +75,7 @@ interface PrivacyTabProps {
   onInsuranceUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onInsuranceTypeChange: (value: string) => void;
   onOpenGdprModal: (type: string) => void;
+  onOpenDeleteModal: () => void;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -126,6 +127,7 @@ export function PrivacyTab({
   onInsuranceUpload,
   onInsuranceTypeChange,
   onOpenGdprModal,
+  onOpenDeleteModal,
 }: PrivacyTabProps) {
   const { t } = useTranslation('settings');
   const navigate = useNavigate();
@@ -294,38 +296,6 @@ export function PrivacyTab({
           </Button>
 
           <Button
-            variant="secondary"
-            className={actionRowClass}
-            startContent={
-              <div className="p-2 rounded-lg bg-blue-500/20">
-                <Download className="w-4 h-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
-              </div>
-            }
-            onPress={() => onOpenGdprModal('download')}
-          >
-            <div className={rowContentClass}>
-              <p className="font-medium">{t('gdpr.download_title')}</p>
-              <p className={rowDescriptionClass}>{t('gdpr.download_desc')}</p>
-            </div>
-          </Button>
-
-          <Button
-            variant="secondary"
-            className={actionRowClass}
-            startContent={
-              <div className="p-2 rounded-lg bg-emerald-500/20">
-                <RefreshCw className="w-4 h-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-              </div>
-            }
-            onPress={() => onOpenGdprModal('portability')}
-          >
-            <div className={rowContentClass}>
-              <p className="font-medium">{t('gdpr.portability_title')}</p>
-              <p className={rowDescriptionClass}>{t('gdpr.portability_desc')}</p>
-            </div>
-          </Button>
-
-          <Button
             variant="danger-soft"
             className={actionRowClass}
             startContent={
@@ -333,7 +303,7 @@ export function PrivacyTab({
                 <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" aria-hidden="true" />
               </div>
             }
-            onPress={() => onOpenGdprModal('deletion')}
+            onPress={onOpenDeleteModal}
           >
             <div className={rowContentClass}>
               <p className="font-medium text-red-600 dark:text-red-400">{t('gdpr.deletion_title')}</p>

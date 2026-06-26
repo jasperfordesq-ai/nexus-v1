@@ -1,4 +1,11 @@
 {
+  "gdpr_request": {
+    "subject": "We hebben je gegevensverzoek ontvangen",
+    "title": "Verzoek ontvangen",
+    "greeting": "Hallo {name},",
+    "body": "We hebben je verzoek over je gegevensrechten voor {community} ontvangen en reageren binnen 30 dagen, zoals de wetgeving inzake gegevensbescherming vereist. Je hoeft nu verder niets te doen.",
+    "body_contact": "Als je dit verzoek niet hebt ingediend, neem dan meteen contact met ons op."
+  },
   "announcement": {
     "template_name": "Platformupdate — Lente 2026",
     "template_description": "Aankondiging voor lente 2026 over de marktplaats, donaties, identiteitsverificatie, vrijwilligersbetalingen, federatie, talen, SEO en beveiliging.",

@@ -48,10 +48,6 @@ const defaultProps = {
   showCurrentPassword: false,
   showNewPassword: false,
   isChangingPassword: false,
-  // Delete
-  deleteConfirmation: '',
-  deletePassword: '',
-  isDeleting: false,
   // Modals
   passwordModalOpen: false,
   passwordModalOnClose: vi.fn(),
@@ -59,8 +55,6 @@ const defaultProps = {
   logoutModalOpen: false,
   logoutModalOnClose: vi.fn(),
   logoutModalOnOpen: vi.fn(),
-  deleteModalOpen: false,
-  deleteModalOnClose: vi.fn(),
   deleteModalOnOpen: vi.fn(),
   twoFactorSetupModalOpen: false,
   twoFactorSetupModalOnClose: vi.fn(),
@@ -74,9 +68,6 @@ const defaultProps = {
   onShowCurrentPasswordToggle: vi.fn(),
   onShowNewPasswordToggle: vi.fn(),
   onChangePassword: vi.fn(),
-  onDeleteConfirmationChange: vi.fn(),
-  onDeletePasswordChange: vi.fn(),
-  onDeleteAccount: vi.fn(),
   onLogout: vi.fn(),
   onSetup2FA: vi.fn(),
   onVerify2FA: vi.fn(),
@@ -187,36 +178,14 @@ describe('SecurityTab', () => {
     expect(screen.getByTestId('biometric-settings')).toBeDefined();
   });
 
-  // ─── Delete account password re-authentication (H1 regression) ───────────────
-
-  it('renders a password field in the delete account modal', () => {
-    render(<SecurityTab {...defaultProps} deleteModalOpen={true} />);
-    const passwordField = screen.getByLabelText('password.current');
-    expect(passwordField).toBeInTheDocument();
-    expect(passwordField).toHaveAttribute('type', 'password');
-  });
-
-  it('forwards delete-modal password input to onDeletePasswordChange', async () => {
+  // The Delete Account modal now lives at the page level (SettingsPage) so it
+  // can also be opened from the Privacy tab; this tab only triggers it. The
+  // modal contents + password re-auth (H1 regression) are covered there.
+  it('triggers deleteModalOnOpen when the delete account button is clicked', async () => {
     const { userEvent } = await import('@/test/test-utils');
     const user = userEvent.setup();
-    const onDeletePasswordChange = vi.fn();
-    render(
-      <SecurityTab {...defaultProps} deleteModalOpen={true} onDeletePasswordChange={onDeletePasswordChange} />
-    );
-    await user.type(screen.getByLabelText('password.current'), 'a');
-    expect(onDeletePasswordChange).toHaveBeenCalled();
-  });
-
-  it('keeps delete submit disabled until DELETE is typed AND a password is entered', () => {
-    const { rerender } = render(
-      <SecurityTab {...defaultProps} deleteModalOpen={true} deleteConfirmation="DELETE" deletePassword="" />
-    );
-    // DELETE typed but no password yet → still blocked (backend requires re-auth).
-    expect(screen.getByText('delete_modal.submit').closest('button')).toBeDisabled();
-
-    rerender(
-      <SecurityTab {...defaultProps} deleteModalOpen={true} deleteConfirmation="DELETE" deletePassword="hunter2-pw" />
-    );
-    expect(screen.getByText('delete_modal.submit').closest('button')).not.toBeDisabled();
+    render(<SecurityTab {...defaultProps} />);
+    await user.click(screen.getByText('delete_account'));
+    expect(defaultProps.deleteModalOnOpen).toHaveBeenCalled();
   });
 });
