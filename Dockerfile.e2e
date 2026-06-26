@@ -1,0 +1,27 @@
+# Deploy-gate Playwright runner image.
+#
+# Used by scripts/deploy/phases/candidate-journeys.sh to run the @smoke browser
+# journeys against a blue/green CANDIDATE before traffic switches to it.
+#
+# The image bakes ONLY the test dependencies (browsers + @playwright/test) so it
+# is stable and cache-friendly. The actual tests and config are MOUNTED at run
+# time (e2e/ + playwright.deploy.config.ts), so the gate always runs the code
+# from the commit being deployed — never stale baked-in tests.
+#
+# Version pin MUST match @playwright/test in the repo root package-lock.json.
+# (root lockfile @playwright/test: 1.59.1)
+FROM mcr.microsoft.com/playwright:v1.59.1-jammy
+
+WORKDIR /work
+
+# Test-runner deps only. Browsers are already in the base image at the matching
+# 1.59.1 revision. Pinned to the root lockfile versions; keep in sync.
+RUN npm init -y >/dev/null 2>&1 \
+ && npm install --no-save @playwright/test@1.59.1 dotenv@17.4.2
+
+ENV CI=1
+
+# Tests + config are bind-mounted over /work at run time:
+#   -v <repo>/e2e:/work/e2e:ro
+#   -v <repo>/playwright.deploy.config.ts:/work/playwright.deploy.config.ts:ro
+ENTRYPOINT ["npx", "playwright", "test", "--config=playwright.deploy.config.ts"]

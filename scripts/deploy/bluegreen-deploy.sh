@@ -1098,6 +1098,22 @@ cmd_deploy() {
     deploy_candidate "$target" "$release_dir" "$commit"
     smoke_color "$target"
 
+    # Journey gate: run the proven @smoke browser journeys against the freshly
+    # built candidate BEFORE touching workers or switching traffic. If a core
+    # user journey is broken on this build, abort now — the active color $active
+    # and its workers are completely untouched, so live users see nothing. The
+    # gate self-skips (warn, pass) until E2E_GATE_USER_* creds are set in .env,
+    # so it never surprise-blocks a deploy before it is explicitly configured.
+    if [ -f "$SELF_DIR/phases/candidate-journeys.sh" ]; then
+        read -r _gate_api_port _gate_frontend_port < <(ports_for_color "$target")
+        if ! bash "$SELF_DIR/phases/candidate-journeys.sh" "$_gate_api_port" "$_gate_frontend_port" "$target"; then
+            log_err "Candidate journey gate failed — aborting before cutover. Active color $active is unaffected."
+            write_deploy_status "failed" "candidate journey gate failed" "$active" "$target" "$commit"
+            stop_workers_for_color "$target"
+            exit 1
+        fi
+    fi
+
     # Drain active workers before starting target workers. Queue jobs may wait
     # briefly in Redis, but Horizon shuts down gracefully and the scheduler never
     # runs in both colors at once. The target scheduler starts only after public
