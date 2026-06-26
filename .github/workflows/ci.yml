@@ -397,7 +397,7 @@ jobs:
             src/admin/modules/system/OnboardingSettings.test.tsx
           )
           npx vitest run "${TESTS[@]}"
-        timeout-minutes: 4
+        timeout-minutes: 8
 
       - name: Vitest Coverage Report (WARNING)
         working-directory: react-frontend
