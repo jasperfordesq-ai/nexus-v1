@@ -61,6 +61,13 @@ class E2ETestDataSeeder extends Seeder
                     'role'                 => $u['role'],
                     'status'               => 'active',
                     'is_verified'          => 1,
+                    // Must be set too: the login gate (CheckLoginGates) keys email
+                    // verification on `email_verified_at`, NOT `is_verified`. Without
+                    // this, a freshly-seeded member is rejected at login with
+                    // AUTH_EMAIL_NOT_VERIFIED on any tenant that requires email
+                    // verification (the fail-closed default) — silently breaking
+                    // every E2E/journey/deploy-gate flow that logs in as User B.
+                    'email_verified_at'    => $now,
                     'is_approved'          => 1,
                     'balance'              => $u['balance'],
                     'profile_type'         => 'individual',
