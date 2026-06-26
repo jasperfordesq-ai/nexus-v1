@@ -773,6 +773,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
       - name: "BLOCKING: Check for incorrect API response unwrapping (data.data ??)"
         run: |
           echo "Checking for 'data.data ??' pattern in React source..."
@@ -837,6 +842,9 @@ jobs:
           else
             echo "PASS: All DELETE FROM statements appear to include tenant_id scoping."
           fi
+
+      - name: "BLOCKING: Notification recipient-locale guard (Services/Listeners/Jobs)"
+        run: node scripts/check-notification-locale.mjs
 
   # ─────────────────────────────────────────────────────────────────
   # Stage 7: E2E Smoke Tests (Playwright)
