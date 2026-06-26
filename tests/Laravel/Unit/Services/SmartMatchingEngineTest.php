@@ -142,6 +142,51 @@ class SmartMatchingEngineTest extends TestCase
         $this->assertSame(['processed' => 0, 'cached' => 0], $result);
     }
 
+    public function test_warmUpCache_defaults_absent_match_type_to_one_way_not_null(): void
+    {
+        $this->setTenantId(7);
+
+        $engine = Mockery::mock(
+            SmartMatchingEngine::class . '[findMatchesForUser]',
+            [$this->mockEmbedding, $this->mockVetting]
+        );
+        $engine->shouldReceive('findMatchesForUser')->once()->andReturn([[
+            'id' => 55,
+            'match_score' => 0.5,
+            'distance_km' => 1.0,
+            // match_type intentionally absent — must fall back to 'one_way', not null.
+            'match_reasons' => [],
+        ]]);
+
+        DB::shouldReceive('select')->once()->andReturn([(object) ['id' => 9]]);
+        DB::shouldReceive('insert')->once()->withArgs(function ($sql, $bindings) {
+            return $bindings[5] === 'one_way'; // not null
+        })->andReturn(true);
+
+        $result = $engine->warmUpCache(20);
+
+        $this->assertSame(1, $result['cached']);
+    }
+
+    public function test_warmUpCache_resets_singleton_in_process_cache_so_tenants_dont_leak_config(): void
+    {
+        $this->setTenantId(7);
+
+        // Simulate a previous tenant having populated the singleton's config cache.
+        $prop = new \ReflectionProperty(SmartMatchingEngine::class, 'configCache');
+        $prop->setAccessible(true);
+        $prop->setValue($this->engine, ['min_match_score' => 999]); // "tenant N" sentinel
+
+        DB::shouldReceive('select')->once()->andReturn([]); // no users → returns quickly
+
+        $this->engine->warmUpCache(20);
+
+        $this->assertNull(
+            $prop->getValue($this->engine),
+            'warmUpCache must clear the singleton config cache so the next tenant re-reads its own config'
+        );
+    }
+
     // ── extractKeywords ──
 
     public function test_extractKeywords_removes_stop_words(): void

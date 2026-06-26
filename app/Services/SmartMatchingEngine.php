@@ -150,6 +150,12 @@ class SmartMatchingEngine
             return $results;
         }
 
+        // This service is a container singleton (AppServiceProvider), so the
+        // per-tenant scheduler loop reuses ONE instance. Reset the in-process
+        // caches (configCache is not tenant-keyed; userDataCache is per-user) so
+        // each tenant warms with its own config instead of the previous tenant's.
+        $this->clearCache();
+
         // Active users with an active listing whose cache is missing or expired.
         // $limit is an internal int (never user input) — inlined because PDO
         // cannot reliably bind a LIMIT placeholder under emulated prepares.
@@ -194,7 +200,7 @@ class SmartMatchingEngine
                     ? round((float) $match['distance_km'], 2)
                     : null;
                 $type = in_array($match['match_type'] ?? 'one_way', ['one_way', 'potential', 'mutual', 'cold_start'], true)
-                    ? $match['match_type']
+                    ? ($match['match_type'] ?? 'one_way')
                     : 'one_way';
                 $reasons = json_encode($match['match_reasons'] ?? [], JSON_UNESCAPED_UNICODE) ?: '[]';
 
