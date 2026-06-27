@@ -353,13 +353,19 @@ export function GroupExchangeDetailPage() {
 
     try {
       setIsSubmitting(true);
-      await api.post(`/v2/group-exchanges/${exchange.id}/participants`, {
+      const response = await api.post(`/v2/group-exchanges/${exchange.id}/participants`, {
         user_id: userId,
         role: addRole,
       });
-      toastRef.current.success(tRef.current('toast.participant_added'));
-      setSearchResults((prev) => prev.filter((r) => r.id !== userId));
-      loadExchange();
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.participant_added'));
+        setSearchResults((prev) => prev.filter((r) => r.id !== userId));
+        loadExchange();
+      } else {
+        // Don't report a fake success — a failed add resolves to { success: false }
+        // without throwing, so the unconditional success toast was wrong.
+        toastRef.current.error(response.error || tRef.current('toast.add_participant_failed'));
+      }
     } catch (err) {
       toastRef.current.error(tRef.current('toast.add_participant_failed'));
       logError('Failed to add participant', err);
@@ -373,9 +379,13 @@ export function GroupExchangeDetailPage() {
 
     try {
       setIsSubmitting(true);
-      await api.delete(`/v2/group-exchanges/${exchange.id}/participants/${userId}`);
-      toastRef.current.success(tRef.current('toast.participant_removed'));
-      loadExchange();
+      const response = await api.delete(`/v2/group-exchanges/${exchange.id}/participants/${userId}`);
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.participant_removed'));
+        loadExchange();
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.remove_participant_failed'));
+      }
     } catch (err) {
       toastRef.current.error(tRef.current('toast.remove_participant_failed'));
       logError('Failed to remove participant', err);
