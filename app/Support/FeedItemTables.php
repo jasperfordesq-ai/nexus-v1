@@ -117,6 +117,14 @@ final class FeedItemTables
                 return self::canViewPost($targetId, $viewerId, $tenantId);
             }
 
+            if ($targetType === 'discussion') {
+                // Group discussions are members-only and are NOT feed_activity
+                // rows, so the generic fallback below would return true and let a
+                // non-member react to / enumerate reactors of a private group's
+                // discussions. Gate on group membership like the read endpoints.
+                return self::canViewDiscussion($targetId, $viewerId, $tenantId);
+            }
+
             if (!self::exists($targetType, $targetId)) {
                 return false;
             }
@@ -252,6 +260,44 @@ final class FeedItemTables
         return DB::table('group_members')
             ->where('tenant_id', $tenantId)
             ->where('group_id', $groupId)
+            ->where('user_id', $viewerId)
+            ->where('status', 'active')
+            ->exists();
+    }
+
+    /**
+     * Access check for a group discussion (reactable target_type 'discussion').
+     *
+     * Mirrors the discussion read/post endpoints: active membership is required
+     * regardless of the group's visibility (the owner always passes). The
+     * membership lookup intentionally omits tenant_id — some legacy
+     * group_members rows carry tenant_id=1 instead of the group's real tenant,
+     * and group_id already scopes the row to one tenant's group.
+     */
+    private static function canViewDiscussion(int $discussionId, ?int $viewerId, int $tenantId): bool
+    {
+        if (!$viewerId) {
+            return false;
+        }
+
+        $row = DB::table('group_discussions as d')
+            ->join('groups as g', 'g.id', '=', 'd.group_id')
+            ->where('d.id', $discussionId)
+            ->where('d.tenant_id', $tenantId)
+            ->where('g.tenant_id', $tenantId)
+            ->select(['d.group_id', 'g.owner_id'])
+            ->first();
+
+        if (!$row) {
+            return false;
+        }
+
+        if ((int) $row->owner_id === $viewerId) {
+            return true;
+        }
+
+        return DB::table('group_members')
+            ->where('group_id', $row->group_id)
             ->where('user_id', $viewerId)
             ->where('status', 'active')
             ->exists();
