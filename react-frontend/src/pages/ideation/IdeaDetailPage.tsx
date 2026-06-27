@@ -329,10 +329,14 @@ export function IdeaDetailPage() {
         visibility: groupForm.visibility,
       });
 
-      if (response.data) {
+      if (response.success && response.data) {
         toastRef.current.success(tRef.current('convert_to_group.success'));
         setIsConvertOpen(false);
         navigate(tenantPath(`/groups/${response.data.id}`));
+      } else {
+        // A failed convert (4xx/5xx resolves to { success: false } without throwing)
+        // previously fell through silently — no navigation, no feedback. Surface it.
+        toastRef.current.error(tRef.current('convert_to_group.error'));
       }
     } catch (err) {
       logError('Failed to convert idea to group', err);
