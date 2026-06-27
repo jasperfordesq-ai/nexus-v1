@@ -224,7 +224,13 @@ export function GroupExchangeDetailPage() {
 
     try {
       setIsSubmitting(true);
-      await api.put(`/v2/group-exchanges/${exchange.id}`, { status: newStatus });
+      const response = await api.put(`/v2/group-exchanges/${exchange.id}`, { status: newStatus });
+      if (!response.success) {
+        // A failed status change resolves to { success: false } without throwing —
+        // don't report a fake success.
+        toastRef.current.error(response.error || tRef.current('toast.update_failed'));
+        return;
+      }
 
       // If just updating status, use the status endpoint approach
       // Since the update endpoint only handles field changes,
@@ -249,9 +255,15 @@ export function GroupExchangeDetailPage() {
 
     try {
       setIsSubmitting(true);
-      await api.post(`/v2/group-exchanges/${exchange.id}/confirm`);
-      toastRef.current.success(tRef.current('toast.hours_confirmed'));
-      loadExchange();
+      const response = await api.post(`/v2/group-exchanges/${exchange.id}/confirm`);
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.hours_confirmed'));
+        loadExchange();
+      } else {
+        // A failed confirm resolves to { success: false } without throwing, so the
+        // unconditional success toast + reload reported a fake success.
+        toastRef.current.error(response.error || tRef.current('toast.confirm_failed'));
+      }
     } catch (err) {
       toastRef.current.error(tRef.current('toast.confirm_failed'));
       logError('Failed to confirm participation', err);
@@ -288,10 +300,17 @@ export function GroupExchangeDetailPage() {
 
     try {
       setIsSubmitting(true);
-      await api.delete(`/v2/group-exchanges/${exchange.id}`);
-      toastRef.current.success(tRef.current('toast.exchange_cancelled'));
-      setShowCancelModal(false);
-      navigate(tenantPath('/group-exchanges'));
+      const response = await api.delete(`/v2/group-exchanges/${exchange.id}`);
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.exchange_cancelled'));
+        setShowCancelModal(false);
+        navigate(tenantPath('/group-exchanges'));
+      } else {
+        // A failed cancel resolves to { success: false } without throwing — the page
+        // used to show "cancelled" and navigate away, so the exchange looked gone
+        // when it wasn't.
+        toastRef.current.error(response.error || tRef.current('toast.cancel_failed'));
+      }
     } catch (err) {
       toastRef.current.error(tRef.current('toast.cancel_failed'));
       logError('Failed to cancel group exchange', err);

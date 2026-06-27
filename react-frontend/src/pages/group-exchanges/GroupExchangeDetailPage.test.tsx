@@ -9,16 +9,24 @@
 
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 
 vi.mock('@/lib/api', () => ({
   api: {
     get: vi.fn(),
     post: vi.fn(),
+    put: vi.fn(),
     delete: vi.fn(),
   },
 }));
 import { api } from '@/lib/api';
+
+// Stable toast spies so a test can assert success vs error fired (the component
+// stores the toast object in a ref, so each handler call uses the same instance).
+const { toastSuccessSpy, toastErrorSpy } = vi.hoisted(() => ({
+  toastSuccessSpy: vi.fn(),
+  toastErrorSpy: vi.fn(),
+}));
 
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({
@@ -30,7 +38,7 @@ vi.mock('@/contexts', () => ({
     tenantPath: (p: string) => `/test${p}`,
     hasFeature: vi.fn(() => true),
   })),
-  useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() })),
+  useToast: vi.fn(() => ({ success: toastSuccessSpy, error: toastErrorSpy, info: vi.fn() })),
   ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 
   useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
@@ -45,7 +53,7 @@ vi.mock('@/contexts', () => ({
 }));
 
 vi.mock('@/contexts/ToastContext', () => ({
-  useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() })),
+  useToast: vi.fn(() => ({ success: toastSuccessSpy, error: toastErrorSpy, info: vi.fn() })),
   ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
@@ -111,7 +119,26 @@ describe('GroupExchangeDetailPage', () => {
     vi.clearAllMocks();
     api.get.mockResolvedValue({ success: true, data: mockGroupExchange });
     api.post.mockResolvedValue({ success: true });
+    api.put.mockResolvedValue({ success: true });
     api.delete.mockResolvedValue({ success: true });
+  });
+
+  it('shows an error toast (not a fake success) when an action request fails', async () => {
+    // Regression: handleUpdateStatus/handleConfirm/handleCancel did `await api.X(...)`
+    // WITHOUT capturing the response, then unconditionally showed a success toast and
+    // reloaded/navigated. Since api.X resolves { success: false } on a 4xx without
+    // throwing, a failed action reported a fake success — and a failed cancel even
+    // navigated away as if the exchange was gone. Here we exercise the "Start Exchange"
+    // (handleUpdateStatus) path; the cancel path was additionally live-verified on a
+    // real exchange (failed cancel now shows the error and stays on the page).
+    api.put.mockResolvedValue({ success: false, error: 'Not allowed' } as never);
+
+    render(<GroupExchangeDetailPage />);
+    const startBtn = await screen.findByRole('button', { name: /start/i });
+    fireEvent.click(startBtn);
+
+    await waitFor(() => expect(toastErrorSpy).toHaveBeenCalled());
+    expect(toastSuccessSpy).not.toHaveBeenCalled();
   });
 
   it('shows loading screen initially', () => {
