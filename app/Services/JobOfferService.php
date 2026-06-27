@@ -229,6 +229,23 @@ class JobOfferService
                         ->where('tenant_id', $tenantId)
                         ->increment('balance', $creditAmount);
 
+                    // Debit the employer who posted the role so the credit is
+                    // SOURCED, not minted. The transactions row above records an
+                    // employer→candidate transfer, and every other credit path on
+                    // the platform pairs that ledger entry with a real debit of the
+                    // sender (see VolunteerService::verifyHours, which debits the
+                    // org wallet). Without this leg, a timebank hire created
+                    // `time_credits` out of nothing on every accept — and posting a
+                    // high-credit timebank job then self-/sock-puppet-accepting it
+                    // minted arbitrary credits, breaking the timebanking
+                    // conservation invariant. The employer balance may go negative,
+                    // matching the volunteer org-wallet reconciliation semantics
+                    // (the candidate is always paid the offered credits).
+                    DB::table('users')
+                        ->where('id', (int) $vacancy->user_id)
+                        ->where('tenant_id', $tenantId)
+                        ->decrement('balance', $creditAmount);
+
                     return [
                         'candidate_id'  => $candidateId,
                         'credit_amount' => $creditAmount,
