@@ -42,6 +42,14 @@ export function RequestExchangePage() {
   const [config, setConfig] = useState<ExchangeConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Synchronous re-entry guard for the submit handler. A useState flag alone is
+  // not enough: React batches the setIsSubmitting(true) update, so two submits in
+  // the same tick (a rapid double-click, or Enter pressed twice during a slow
+  // request) both observe the old `false` and each fire a POST /v2/exchanges,
+  // creating duplicate pending requests. The native <form> also submits on Enter,
+  // which bypasses the Button's pointer-events-only pending state. A ref updates
+  // synchronously, so a second submit is rejected before it can re-enter.
+  const isSubmittingRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
 
   const [proposedHours, setProposedHours] = useState('');
@@ -109,6 +117,9 @@ export function RequestExchangePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    // Ignore a second submit while the first request is still in flight.
+    if (isSubmittingRef.current) return;
+
     if (!listing) return;
 
     const hours = parseFloat(proposedHours);
@@ -123,6 +134,7 @@ export function RequestExchangePage() {
     }
 
     try {
+      isSubmittingRef.current = true;
       setIsSubmitting(true);
       const prepTimeVal = parseFloat(prepTime);
       const response = await api.post<{ id: number }>('/v2/exchanges', {
@@ -135,11 +147,19 @@ export function RequestExchangePage() {
       if (response.success && response.data) {
         toastRef.current.success(tRef.current('toast.request_sent'));
         navigate(tenantPath(`/exchanges/${response.data.id}`));
+      } else {
+        // A 4xx (already-requested, validation, rate-limited, forbidden) resolves
+        // to { success: false } WITHOUT throwing, and — being < 500 — does not fire
+        // the global error toast. Without this branch the failure is silent: the
+        // spinner stops and nothing happens. Surface the server's (localised)
+        // message, falling back to the generic copy.
+        toastRef.current.error(response.error || tRef.current('toast.request_failed'));
       }
     } catch (err) {
       toastRef.current.error(tRef.current('toast.request_failed'));
       logError('Failed to create exchange request', err);
     } finally {
+      isSubmittingRef.current = false;
       setIsSubmitting(false);
     }
   }
@@ -345,6 +365,7 @@ export function RequestExchangePage() {
               className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
               startContent={<Send className="w-4 h-4" aria-hidden="true" />}
               isLoading={isSubmitting}
+              isDisabled={isSubmitting}
             >
               {t('request.send_request')}
             </Button>

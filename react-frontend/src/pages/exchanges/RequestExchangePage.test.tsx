@@ -18,6 +18,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 import { api } from '@/lib/api';
+import { useToast } from '@/contexts';
 
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({
@@ -196,6 +197,56 @@ describe('RequestExchangePage', () => {
     await waitFor(() => {
       const hoursInput = screen.getByPlaceholderText('How many hours do you need?') as HTMLInputElement;
       expect(hoursInput.value).toBe('2');
+    });
+  });
+
+  it('fires only ONE exchange request when the form is submitted twice in rapid succession', async () => {
+    // Regression: handleSubmit had no re-entry guard and the submit button was not
+    // natively disabled (isLoading renders a spinner but leaves the native button
+    // enabled), so a double-click or a double-Enter — which submits the native form,
+    // bypassing the Button's pointer-events-only pending state — fired two POSTs and
+    // created duplicate pending exchange requests. A synchronous useRef guard now
+    // rejects the second submit. Live-verified: two submits → one POST /v2/exchanges.
+    let resolvePost: (value: { success: boolean; data: { id: number } }) => void = () => {};
+    api.post.mockReturnValue(new Promise((resolve) => { resolvePost = resolve; }));
+
+    const { container } = render(<RequestExchangePage />);
+    // Wait until the hours field is pre-filled from the listing estimate, so the
+    // submit passes client-side validation and actually reaches api.post.
+    await waitFor(() => {
+      const hoursInput = screen.getByPlaceholderText('How many hours do you need?') as HTMLInputElement;
+      expect(hoursInput.value).toBe('2');
+    });
+
+    const form = container.querySelector('form') as HTMLFormElement;
+    fireEvent.submit(form);
+    fireEvent.submit(form);
+
+    expect(api.post).toHaveBeenCalledTimes(1);
+
+    resolvePost({ success: true, data: { id: 99 } });
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1));
+  });
+
+  it('shows an error toast when the request fails with a 4xx (no silent failure)', async () => {
+    // Regression: a 4xx response resolves to { success: false } WITHOUT throwing, and
+    // (being < 500) does not trigger the global error toast. handleSubmit had no else
+    // branch, so the failure was silent — the spinner stopped and nothing happened.
+    const errorToast = vi.fn();
+    vi.mocked(useToast).mockReturnValue({ success: vi.fn(), error: errorToast, info: vi.fn() });
+    api.post.mockResolvedValue({ success: false, error: 'You already have a pending request' });
+
+    const { container } = render(<RequestExchangePage />);
+    // Wait until the hours field is pre-filled so the submit reaches api.post.
+    await waitFor(() => {
+      const hoursInput = screen.getByPlaceholderText('How many hours do you need?') as HTMLInputElement;
+      expect(hoursInput.value).toBe('2');
+    });
+
+    fireEvent.submit(container.querySelector('form') as HTMLFormElement);
+
+    await waitFor(() => {
+      expect(errorToast).toHaveBeenCalledWith('You already have a pending request');
     });
   });
 });
