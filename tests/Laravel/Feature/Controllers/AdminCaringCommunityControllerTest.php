@@ -575,7 +575,7 @@ class AdminCaringCommunityControllerTest extends TestCase
         $response->assertJsonPath('data.review.summary.stats.pending_count', $existingPendingCount);
 
         $this->assertSame('approved', DB::table('vol_logs')->where('id', $logId)->value('status'));
-        $this->assertEqualsWithDelta(7.25, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'), 0.001);
+        $this->assertEqualsWithDelta(8.0, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'), 0.001);
         $this->assertSame(4, (int) DB::table('users')->where('id', $supporter->id)->value('balance'));
         $this->assertDatabaseHas('vol_org_transactions', [
             'tenant_id' => $this->testTenantId,

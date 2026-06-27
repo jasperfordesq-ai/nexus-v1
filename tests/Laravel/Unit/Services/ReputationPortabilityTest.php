@@ -138,6 +138,12 @@ class ReputationPortabilityTest extends TestCase
         $reviewer = User::factory()->forTenant($this->testTenantId)->create();
         $receiver = User::factory()->forTenant($this->testTenantId)->create();
 
+        // Re-pin after factory observers reset TenantContext to tenant 1.
+        // ReviewService::create() now tenant-scopes the receiver_id existence
+        // check to TenantContext::getId(); without this the tenant-2 receiver
+        // is invisible under the leaked tenant-1 scope and validation fails.
+        TenantContext::setById($this->testTenantId);
+
         /** @var ReviewService $service */
         $service = app(ReviewService::class);
         $service->create($reviewer->id, [

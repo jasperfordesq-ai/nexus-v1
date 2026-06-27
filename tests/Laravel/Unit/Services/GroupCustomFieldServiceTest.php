@@ -77,23 +77,28 @@ class GroupCustomFieldServiceTest extends TestCase
 
     public function test_deleteField_returns_true_when_deleted(): void
     {
+        // Ownership guard: the field belongs to this tenant, so deletion proceeds.
+        DB::shouldReceive('table')->with('group_custom_fields')->andReturnSelf();
+        DB::shouldReceive('where')->with('id', 5)->andReturnSelf();
+        DB::shouldReceive('where')->with('tenant_id', $this->testTenantId)->andReturnSelf();
+        DB::shouldReceive('exists')->once()->andReturn(true);
+
         DB::shouldReceive('table')->with('group_custom_field_values')->once()->andReturnSelf();
         DB::shouldReceive('where')->with('field_id', 5)->once()->andReturnSelf();
+        // First delete() = child values (2 rows), second = tenant-scoped parent (1 row).
         DB::shouldReceive('delete')->andReturn(2, 1);
-
-        DB::shouldReceive('table')->with('group_custom_fields')->once()->andReturnSelf();
-        DB::shouldReceive('where')->with('id', 5)->once()->andReturnSelf();
-        DB::shouldReceive('where')->with('tenant_id', $this->testTenantId)->once()->andReturnSelf();
 
         $this->assertTrue(GroupCustomFieldService::deleteField(5));
     }
 
-    public function test_deleteField_returns_false_when_nothing_deleted(): void
+    public function test_deleteField_returns_false_when_not_owned_by_tenant(): void
     {
-        DB::shouldReceive('table')->with('group_custom_field_values')->once()->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('delete')->andReturn(0, 0);
+        // Ownership guard fails: the field is not owned by the current tenant, so
+        // deleteField short-circuits and never touches group_custom_field_values.
         DB::shouldReceive('table')->with('group_custom_fields')->once()->andReturnSelf();
+        DB::shouldReceive('where')->with('id', 5)->once()->andReturnSelf();
+        DB::shouldReceive('where')->with('tenant_id', $this->testTenantId)->once()->andReturnSelf();
+        DB::shouldReceive('exists')->once()->andReturn(false);
 
         $this->assertFalse(GroupCustomFieldService::deleteField(5));
     }
