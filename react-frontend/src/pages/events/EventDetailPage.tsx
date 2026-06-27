@@ -152,6 +152,11 @@ export function EventDetailPage() {
         setEvent(eventRes.data);
         setRsvpStatus(normalizeRsvpStatus(eventRes.data.rsvp_status));
       } else {
+        // Clear any previously-loaded event so the error screen shows. Without
+        // this, navigating from a loaded event to one that fails to load (404/5xx)
+        // leaves the prior event in state, and the `error && !event` render guard
+        // stays false — so the stale event renders under the new URL.
+        setEvent(null);
         setError(tRef.current('detail.not_found_desc'));
       }
       if (attendeesRes.success && attendeesRes.data) {
@@ -160,6 +165,9 @@ export function EventDetailPage() {
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load event', err);
+      // Clear stale event data (see the else branch above) so a failed reload
+      // shows the error screen instead of the previously-loaded event.
+      setEvent(null);
       setError(tRef.current('detail.unable_to_load'));
     } finally {
       setIsLoading(false);

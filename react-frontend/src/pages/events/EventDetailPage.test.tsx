@@ -62,11 +62,15 @@ vi.mock('@/lib/helpers', () => ({
   formatMonthShort: vi.fn(() => 'Jun'),
 }));
 
+// Mutable route id so a test can simulate navigating from one event to another
+// (the stale-data regression needs the :id param to change mid-component-life).
+const routeState = vi.hoisted(() => ({ id: '1' }));
+
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useParams: () => ({ id: '1' }),
+    useParams: () => ({ id: routeState.id }),
     useNavigate: () => vi.fn(),
   };
 });
@@ -123,6 +127,7 @@ const mockEvent = {
 describe('EventDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    routeState.id = '1';
     api.get.mockImplementation((url: string) => {
       if (url.includes('/rsvp') || url.includes('/attendees')) {
         return Promise.resolve({ success: true, data: [] });
@@ -186,5 +191,33 @@ describe('EventDetailPage', () => {
     // RSVP buttons should be present (going/interested/not_going)
     const buttons = screen.getAllByRole('button');
     expect(buttons.length).toBeGreaterThan(0);
+  });
+
+  it('clears the previously-loaded event when a reload (id change) fails — no stale data', async () => {
+    // Regression: loadEvent set `error` on a failed (re)load but never cleared the
+    // already-loaded `event`, so the `error && !event` render guard stayed false and
+    // the PRIOR event rendered under the new URL. Live-verified on the running app:
+    // navigating from a loaded event to a 500ing event id left the stale event on
+    // screen; now it shows the error screen instead.
+    const { rerender } = render(<EventDetailPage />);
+    await waitFor(() => {
+      expect(screen.getAllByText('Community Garden Day').length).toBeGreaterThanOrEqual(1);
+    });
+
+    // Navigate to a different event whose fetch fails.
+    routeState.id = '2';
+    api.get.mockImplementation((url: string) => {
+      if (url.includes('/rsvp') || url.includes('/attendees')) {
+        return Promise.resolve({ success: true, data: [] });
+      }
+      return Promise.resolve({ success: false, data: null });
+    });
+    rerender(<EventDetailPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('The event you are looking for does not exist')).toBeInTheDocument();
+    });
+    // The stale event-1 title must be gone (pre-fix it remained on screen).
+    expect(screen.queryByText('Community Garden Day')).not.toBeInTheDocument();
   });
 });
