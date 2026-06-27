@@ -571,8 +571,8 @@
       "acknowledgements": "Dankbetuigingen",
       "open_source": "Open bron",
       "license_text": "Gelicentieerd onder de GNU Affero General Public License v3 (AGPL-3.0).",
-      "v1_source": "V1 Bronnencode (PHP + React)",
-      "v2_source": "V2 Bronnencode (ASP.NET Core)"
+      "v1_source": "Laravel Edition Bronnencode (PHP + React)",
+      "v2_source": ".NET Edition Bronnencode (ASP.NET Core)"
     },
     "cta": {
       "title": "Klaar om Betrokken te Raken?",

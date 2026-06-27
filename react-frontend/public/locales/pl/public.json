@@ -571,8 +571,8 @@
       "acknowledgements": "Podziękowanie",
       "open_source": "Otwarte Źródło",
       "license_text": "Licencjonowane na mocy GNU Affero General Public License v3 (AGPL-3.0).",
-      "v1_source": "Kod źródłowy V1 (PHP + React)",
-      "v2_source": "Kod źródłowy V2 (ASP.NET Core)"
+      "v1_source": "Kod źródłowy Laravel Edition (PHP + React)",
+      "v2_source": "Kod źródłowy .NET Edition (ASP.NET Core)"
     },
     "cta": {
       "title": "Gotowy, aby się zaangażować?",

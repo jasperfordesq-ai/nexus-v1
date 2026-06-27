@@ -3651,8 +3651,8 @@ return [
             'acknowledgements' => 'Ringraziamenti',
             'open_source' => 'Fonte aperta',
             'license_text' => 'Concesso in licenza con GNU Affero General Public License v3 (AGPL-3.0).',
-            'v1_source' => 'Codice sorgente V1 (PHP + React)',
-            'v2_source' => 'Codice sorgente V2 (ASP.NET Core)',
+            'v1_source' => 'Codice sorgente Laravel Edition (PHP + React)',
+            'v2_source' => 'Codice sorgente .NET Edition (ASP.NET Core)',
         ],
         'cta' => [
             'title' => 'Pronti a partecipare%',

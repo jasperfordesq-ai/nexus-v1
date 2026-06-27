@@ -3651,8 +3651,8 @@ return [
             'acknowledgements' => 'Buíochas',
             'open_source' => 'Foinse oscailte',
             'license_text' => 'Ceadúnaithe faoin GNU Affero General Public License v3 (AGPL-3.0).',
-            'v1_source' => 'Cód foinse V1 (PHP + React)',
-            'v2_source' => 'Cód foinse V2 (ASP.NET Core)',
+            'v1_source' => 'Cód foinse Laravel Edition (PHP + React)',
+            'v2_source' => 'Cód foinse .NET Edition (ASP.NET Core)',
         ],
         'cta' => [
             'title' => 'Réidh le bheith páirteach%',

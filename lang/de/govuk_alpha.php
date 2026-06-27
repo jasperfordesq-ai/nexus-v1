@@ -3651,8 +3651,8 @@ return [
             'acknowledgements' => 'Danksagungen',
             'open_source' => 'Open Source',
             'license_text' => 'Lizenziert unter GNU Affero General Public License v3 (AGPL-3.0).',
-            'v1_source' => 'V1-Quellcode (PHP + React)',
-            'v2_source' => 'V2-Quellcode (ASP.NET Core)',
+            'v1_source' => 'Laravel Edition Quellcode (PHP + React)',
+            'v2_source' => '.NET Edition Quellcode (ASP.NET Core)',
         ],
         'cta' => [
             'title' => 'Bereit, mitzumachen%',

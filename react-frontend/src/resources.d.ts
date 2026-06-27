@@ -34652,8 +34652,8 @@ export default interface Resources {
         "research_heading": "Research Foundation",
         "subtitle": "Open-source community platform created by Jasper Ford. Licensed under AGPL v3.",
         "title": "Powered by Project NEXUS",
-        "v1_source": "V1 Source Code (PHP + React)",
-        "v2_source": "V2 Source Code (ASP.NET Core)"
+        "v1_source": "Laravel Edition Source Code (PHP + React)",
+        "v2_source": ".NET Edition Source Code (ASP.NET Core)"
       },
       "cta": {
         "contact_us": "Contact Us",

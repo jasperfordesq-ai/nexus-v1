@@ -3651,8 +3651,8 @@ return [
             'acknowledgements' => 'Dankbetuigingen',
             'open_source' => 'Open-source',
             'license_text' => 'Gelicentieerd onder de GNU Affero General Public License v3 (AGPL-3.0).',
-            'v1_source' => 'V1-broncode (PHP + React)',
-            'v2_source' => 'V2-broncode (ASP.NET Core)',
+            'v1_source' => 'Laravel Edition broncode (PHP + React)',
+            'v2_source' => '.NET Edition broncode (ASP.NET Core)',
         ],
         'cta' => [
             'title' => 'Klaar om mee te doen%',

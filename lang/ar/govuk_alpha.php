@@ -3651,8 +3651,8 @@ return [
             'acknowledgements' => 'شكر وتقدير',
             'open_source' => 'مفتوح المصدر',
             'license_text' => 'مرخص بموجب GNU Affero General Public License v3 (AGPL-3.0).',
-            'v1_source' => 'كود المصدر V1 (PHP + React)',
-            'v2_source' => 'كود المصدر V2 (ASP.NET Core)',
+            'v1_source' => 'كود المصدر Laravel Edition (PHP + React)',
+            'v2_source' => 'كود المصدر .NET Edition (ASP.NET Core)',
         ],
         'cta' => [
             'title' => 'على استعداد للمشاركة؟',

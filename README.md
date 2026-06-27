@@ -278,14 +278,14 @@ With a link to: <https://github.com/jasperfordesq-ai/nexus-v1>
 
 ## Related Projects
 
-Project NEXUS is being actively developed across two codebases:
+Project NEXUS runs on two backend editions that share the same React frontend:
 
-| Version | Stack | Repository |
+| Edition | Stack | Repository |
 | ------- | ----- | --------- |
-| **V1** (this repo) | Laravel 12 + PHP 8.2+ / React 19 / MariaDB | [nexus-v1](https://github.com/jasperfordesq-ai/nexus-v1) |
-| **V2** | ASP.NET Core 8 / React 19 / PostgreSQL | [api.project-nexus.net](https://github.com/jasperfordesq-ai/api.project-nexus.net) |
+| **Laravel Edition** (this repo) | Laravel 12 + PHP 8.2+ / React 19 / MariaDB | [nexus-v1](https://github.com/jasperfordesq-ai/nexus-v1) |
+| **.NET Edition** | ASP.NET Core 8 / React 19 / PostgreSQL | [api.project-nexus.net](https://github.com/jasperfordesq-ai/api.project-nexus.net) |
 
-V1 is the original platform — functional, in production, and the foundation of all Project NEXUS communities. It runs on Laravel 12 + PHP 8.2+ with a React 19 frontend. V2 is a new backend being built alongside V1, progressively replacing the PHP API using the [Strangler Fig pattern](https://martinfowler.com/bliki/StranglerFigApplication.html). Both share the same React frontend and design system.
+The **Laravel Edition** (this repo) is the canonical, in-production platform and the foundation of all Project NEXUS communities. It runs on Laravel 12 + PHP 8.2+ with a React 19 frontend. The **.NET Edition** is an experimental, next-gen backend that re-implements the same API on ASP.NET Core 8 / PostgreSQL and shares the same React frontend and design system; it is not yet recommended for production.
 
 ## Source Code
 

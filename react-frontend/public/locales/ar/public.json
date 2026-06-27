@@ -571,8 +571,8 @@
       "acknowledgements": "شكر وتقدير",
       "open_source": "مفتوح المصدر",
       "license_text": "مرخص بموجب رخصة جنو العامة التشاركية v3 (AGPL-3.0).",
-      "v1_source": "شفرة المصدر V1 (PHP + React)",
-      "v2_source": "شفرة المصدر V2 (ASP.NET Core)"
+      "v1_source": "شفرة المصدر Laravel Edition (PHP + React)",
+      "v2_source": "شفرة المصدر .NET Edition (ASP.NET Core)"
     },
     "cta": {
       "title": "هل أنت مستعد للمشاركة؟",

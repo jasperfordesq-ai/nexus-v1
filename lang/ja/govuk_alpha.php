@@ -3651,8 +3651,8 @@ return [
             'acknowledgements' => '謝辞',
             'open_source' => 'オープンソース',
             'license_text' => 'GNU Affero General Public License v3 (AGPL-3.0) に基づいてライセンスが付与されています。',
-            'v1_source' => 'V1 ソース コード (PHP + React)',
-            'v2_source' => 'V2 ソース コード (ASP.NET Core)',
+            'v1_source' => 'Laravel Edition ソース コード (PHP + React)',
+            'v2_source' => '.NET Edition ソース コード (ASP.NET Core)',
         ],
         'cta' => [
             'title' => '参加する準備はできていますか%',
