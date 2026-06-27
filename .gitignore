@@ -176,6 +176,7 @@ _deprecated/
 
 /coverage/
 **/coverage/
+/tools/video-walkthroughs/output/
 /bootstrap/cache/*
 !/bootstrap/cache/.gitkeep
 # ─── Logs ─────────────────────────────────────────────────────────────────────

@@ -1,0 +1,13 @@
+{
+  "name": "nexus-video-walkthroughs",
+  "private": true,
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "test": "node --test scripts/lib/*.test.mjs",
+    "run": "node scripts/run.mjs content/video-01-getting-started.json",
+    "voiceover": "node scripts/01-generate-voiceover.mjs content/video-01-getting-started.json",
+    "record": "node scripts/02-record-walkthrough.mjs content/video-01-getting-started.json",
+    "assemble": "node scripts/03-assemble.mjs content/video-01-getting-started.json"
+  }
+}
