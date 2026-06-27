@@ -88,10 +88,11 @@ vi.mock('@/components/navigation', () => ({
 
 vi.mock('@/components/feedback', () => ({
   LoadingScreen: ({ message }: { message: string }) => <div data-testid="loading-screen">{message}</div>,
-  EmptyState: ({ title, description }: { title: string; description?: string }) => (
+  EmptyState: ({ title, description, action }: { title: string; description?: string; action?: React.ReactNode }) => (
     <div data-testid="empty-state">
       <h2>{title}</h2>
       {description && <p>{description}</p>}
+      {action}
     </div>
   ),
   ErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -274,5 +275,41 @@ describe('ListingDetailPage', () => {
     expect(successToast).not.toHaveBeenCalled();
     expect(screen.getByRole('button', { name: /save listing/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /remove saved/i })).not.toBeInTheDocument();
+  });
+
+  it('offers a Try Again retry on a transient load failure instead of a permanent not-found', async () => {
+    // Regression: api.get returns { success:false } (it does NOT throw) for
+    // network/timeout/5xx, so the old loadListing set the SAME not_found_error for a
+    // transient blip as for a real 404 and showed only a Browse link — telling the
+    // user the listing was removed with no way to retry.
+    api.get.mockImplementation((url: string) => {
+      if (url.includes('/config')) return Promise.resolve({ success: true, data: { exchange_workflow_enabled: true } });
+      if (url.includes('/check')) return Promise.resolve({ success: true, data: null });
+      return Promise.resolve({ success: false, error: 'Unable to connect', code: 'NETWORK_ERROR' });
+    });
+
+    render(<ListingDetailPage />);
+
+    const retry = await screen.findByRole('button', { name: /try again/i });
+    expect(retry).toBeInTheDocument();
+
+    // Clicking Try Again re-attempts the listing load.
+    const detailCalls = () => api.get.mock.calls.filter((c) => /\/v2\/listings\/\d+$/.test(String(c[0]))).length;
+    const before = detailCalls();
+    fireEvent.click(retry);
+    await waitFor(() => expect(detailCalls()).toBeGreaterThan(before));
+  });
+
+  it('shows the not-found state with no retry for a genuinely missing listing (404)', async () => {
+    api.get.mockImplementation((url: string) => {
+      if (url.includes('/config')) return Promise.resolve({ success: true, data: { exchange_workflow_enabled: true } });
+      if (url.includes('/check')) return Promise.resolve({ success: true, data: null });
+      return Promise.resolve({ success: false, error: 'Not found', code: 'HTTP_404' });
+    });
+
+    render(<ListingDetailPage />);
+
+    await screen.findByTestId('empty-state');
+    expect(screen.queryByRole('button', { name: /try again/i })).not.toBeInTheDocument();
   });
 });

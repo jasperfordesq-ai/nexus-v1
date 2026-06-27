@@ -62,6 +62,18 @@ function maybeNumber(value: number | string | null | undefined): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+// api.get() returns { success: false } (it does NOT throw) for connection/timeout/
+// server failures too, so a failed listing fetch surfaces with an error code rather
+// than as a thrown error. A failure is treated as a genuine missing/forbidden listing
+// (no retry — retrying won't help) ONLY for an unambiguous 404/403/410; EVERYTHING
+// else (network, timeout, 5xx, parse errors, unknown/custom codes) is treated as
+// transient and offered a retry. We err toward offering recovery: wrongly telling a
+// user a listing was "removed" after a blip is worse than a redundant retry on a 404.
+const NOT_FOUND_ERROR_CODES = new Set(['NOT_FOUND', 'FORBIDDEN', 'HTTP_403', 'HTTP_404', 'HTTP_410']);
+function isGenuineNotFound(code: string | undefined | null): boolean {
+  return !!code && NOT_FOUND_ERROR_CODES.has(code);
+}
+
 function buildListingStructuredData(listing: Listing, options: ListingStructuredDataOptions) {
   const category = listing.category?.name || listing.category_name;
   const authorName = listing.user?.name
@@ -139,6 +151,10 @@ export function ListingDetailPage() {
   const [listing, setListing] = useState<Listing | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Distinguishes a transient/connection failure (retryable) from a genuinely
+  // missing or forbidden listing, so the error screen can offer "Try Again"
+  // instead of falsely telling the user the listing was removed.
+  const [isConnectionError, setIsConnectionError] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -223,6 +239,7 @@ export function ListingDetailPage() {
     try {
       setIsLoading(true);
       setError(null);
+      setIsConnectionError(false);
       const response = await api.get<ListingDetail>(`/v2/listings/${id}`);
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
@@ -233,13 +250,19 @@ export function ListingDetailPage() {
           likes: response.data.likes_count ?? 0,
           comments: response.data.comments_count ?? 0,
         });
-      } else {
+      } else if (isGenuineNotFound(response.code)) {
         setError(tRef.current('not_found_error'));
+      } else {
+        // Transient/unknown (network/timeout/5xx/…) — offer a retry instead of
+        // claiming the listing was removed.
+        setIsConnectionError(true);
+        setError(tRef.current('load_error'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load listing', err);
-      setError(tRef.current('not_found_error'));
+      setIsConnectionError(true);
+      setError(tRef.current('load_error'));
     } finally {
       setIsLoading(false);
     }
@@ -392,19 +415,33 @@ export function ListingDetailPage() {
   }
 
   if (error || !listing) {
+    const errorTitle = isConnectionError ? t('load_error_title') : t('not_found_title');
     return (
       <>
-        <PageMeta title={t('not_found_title')} noIndex />
+        <PageMeta title={errorTitle} noIndex />
         <EmptyState
           icon={<AlertCircle className="w-12 h-12" aria-hidden="true" />}
-          title={t('not_found_title')}
+          title={errorTitle}
           description={error || t('not_found_fallback')}
           action={
-            <Link to={tenantPath('/listings')}>
-              <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
-                {t('browse')}
-              </Button>
-            </Link>
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+              {isConnectionError && (
+                <Button
+                  className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
+                  onPress={() => void loadListing()}
+                >
+                  {t('try_again')}
+                </Button>
+              )}
+              <Link to={tenantPath('/listings')}>
+                <Button
+                  variant={isConnectionError ? 'flat' : undefined}
+                  className={isConnectionError ? undefined : 'bg-linear-to-r from-indigo-500 to-purple-600 text-white'}
+                >
+                  {t('browse')}
+                </Button>
+              </Link>
+            </div>
           }
         />
       </>
