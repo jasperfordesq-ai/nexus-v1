@@ -230,6 +230,16 @@ export function SearchPage() {
     results.events.length +
     results.groups.length;
 
+  // Result count for the currently-selected category tab (null for the "all" tab).
+  // Used to show an empty state when a single category has no matches even though
+  // other categories do — otherwise that tab rendered a blank panel.
+  const activeCategoryCount =
+    activeTab === 'listings' ? results.listings.length
+    : activeTab === 'users' ? results.users.length
+    : activeTab === 'events' ? results.events.length
+    : activeTab === 'groups' ? results.groups.length
+    : null;
+
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       {/* Screen-reader live region: announces result count after each search */}
@@ -363,6 +373,19 @@ export function SearchPage() {
               animate="visible"
               className="space-y-6"
             >
+              {/* Empty state for a single category tab that has no matches even
+                  though other categories do (the "all" tab already shows results,
+                  so this only fires when a specific category is selected). */}
+              {activeCategoryCount === 0 && (
+                <PublicEmptyState
+                  icon={<Search className="w-12 h-12" aria-hidden="true" />}
+                  title={t('no_results_title')}
+                  description={t('no_results_desc', { query })}
+                  tips={[t('empty_tip_spelling'), t('empty_tip_filters'), t('empty_tip_broaden')]}
+                  accent="emerald"
+                />
+              )}
+
               {/* Listings */}
               {(activeTab === 'all' || activeTab === 'listings') && results.listings.length > 0 && (
                 <section>

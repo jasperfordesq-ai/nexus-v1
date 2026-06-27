@@ -219,4 +219,34 @@ describe('SearchPage', () => {
     });
     expect(screen.getByText('Try Again')).toBeInTheDocument();
   });
+
+  it('does not show the "no results" empty state on the All tab when a search returns matches', async () => {
+    // Regression guard for the per-category empty-state fix: a 0-result category tab
+    // now shows an empty state, but that must NOT leak onto the default "all" tab when
+    // results exist (activeCategoryCount is null for "all", so the new guard skips it).
+    // The per-category empty behaviour itself is verified live — the HeroUI Tabs are an
+    // inert stub under the ui mock so tab-switching can't be driven reliably in jsdom.
+    vi.mocked(api.get).mockImplementation((url: string) => {
+      if (url.includes('/v2/search?')) {
+        return Promise.resolve({
+          success: true,
+          data: [
+            { type: 'listing', id: 1, title: 'Test Listing', description: 'A listing', listing_type: 'offer', hours_estimate: 2 },
+          ],
+        });
+      }
+      return Promise.resolve({ success: true, data: [], meta: {} });
+    });
+
+    render(<SearchPage />);
+    const input = screen.getByPlaceholderText('Search for anything...');
+    const form = input.closest('form')!;
+    await import('@testing-library/react').then(({ fireEvent }) => {
+      fireEvent.change(input, { target: { value: 'test' } });
+      fireEvent.submit(form);
+    });
+
+    await waitFor(() => expect(screen.getByText('All (1)')).toBeInTheDocument());
+    expect(screen.queryByText('No results found')).not.toBeInTheDocument();
+  });
 });
