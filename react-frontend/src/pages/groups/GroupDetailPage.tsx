@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { runConfirmedMutation } from '@/lib/confirmedMutation';
 import { logError } from '@/lib/logger';
 import { applyFeedSyncToItem, dispatchFeedSync, FEED_SYNC_EVENT, type FeedSyncPayload } from '@/lib/feedSync';
 import type { FeedItem } from '@/components/feed/types';
@@ -256,19 +257,25 @@ export function GroupDetailPage() {
   const handleSendInvites = async () => {
     if (!id || !inviteEmails.trim()) return;
     setSendingInvites(true);
-    try {
-      const emails = inviteEmails.split(',').map((e: string) => e.trim()).filter(Boolean);
-      await api.post(`/v2/groups/${id}/invites/email`, { emails, message: inviteMessage });
-      toast.success(t('detail.invites_sent'));
-      setInviteEmails('');
-      setInviteMessage('');
-      setShowInviteModal(false);
-    } catch (err) {
-      logError('GroupDetailPage.sendInvites', err);
-      toast.error(t('detail.invites_failed'));
-    } finally {
-      setSendingInvites(false);
-    }
+    const emails = inviteEmails.split(',').map((e: string) => e.trim()).filter(Boolean);
+    // api.post resolves { success: false } (it does not throw) on a 4xx/5xx — without
+    // gating on the confirmed result a rejected invite still cleared the form, closed
+    // the modal and showed "invites sent". runConfirmedMutation only runs onConfirmed
+    // when the server confirmed the send.
+    await runConfirmedMutation(
+      () => api.post(`/v2/groups/${id}/invites/email`, { emails, message: inviteMessage }),
+      {
+        onConfirmed: () => {
+          toast.success(t('detail.invites_sent'));
+          setInviteEmails('');
+          setInviteMessage('');
+          setShowInviteModal(false);
+        },
+        onRejected: () => toast.error(t('detail.invites_failed')),
+        onError: (err) => logError('GroupDetailPage.sendInvites', err),
+      },
+    );
+    setSendingInvites(false);
   };
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -406,28 +413,34 @@ export function GroupDetailPage() {
   };
 
   const handleFeedHidePost = async (item: FeedItem) => {
-    try {
-      await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
-      setFeedItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toastRef.current.success(tRef.current('toast.post_hidden'));
-    } catch (err) {
-      logError('Failed to hide post', err);
-      toastRef.current.error(tRef.current('toast.hide_failed'));
-    }
+    await runConfirmedMutation(
+      () => api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type }),
+      {
+        onConfirmed: () => {
+          setFeedItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+          toastRef.current.success(tRef.current('toast.post_hidden'));
+        },
+        onRejected: () => toastRef.current.error(tRef.current('toast.hide_failed')),
+        onError: (err) => logError('Failed to hide post', err),
+      },
+    );
   };
 
   const handleFeedMuteUser = async (userId: number) => {
-    try {
-      await api.post(`/v2/feed/users/${userId}/mute`);
-      setFeedItems((prev) => prev.filter((fi) => {
-        const author = fi.author ?? (fi as unknown as Record<string, unknown>).user as FeedItem['author'];
-        return !author || author.id !== userId;
-      }));
-      toastRef.current.success(tRef.current('toast.user_muted'));
-    } catch (err) {
-      logError('Failed to mute user', err);
-      toastRef.current.error(tRef.current('toast.mute_failed'));
-    }
+    await runConfirmedMutation(
+      () => api.post(`/v2/feed/users/${userId}/mute`),
+      {
+        onConfirmed: () => {
+          setFeedItems((prev) => prev.filter((fi) => {
+            const author = fi.author ?? (fi as unknown as Record<string, unknown>).user as FeedItem['author'];
+            return !author || author.id !== userId;
+          }));
+          toastRef.current.success(tRef.current('toast.user_muted'));
+        },
+        onRejected: () => toastRef.current.error(tRef.current('toast.mute_failed')),
+        onError: (err) => logError('Failed to mute user', err),
+      },
+    );
   };
 
   const openFeedReportModal = (postId: number) => {
@@ -441,30 +454,35 @@ export function GroupDetailPage() {
       toastRef.current.error(tRef.current('toast.provide_reason'));
       return;
     }
-    try {
-      setIsReporting(true);
-      await api.post(`/v2/feed/posts/${reportPostId}/report`, { reason: reportReason.trim() });
-      onReportClose();
-      setReportPostId(null);
-      setReportReason('');
-      toastRef.current.success(tRef.current('toast.reported'));
-    } catch (err) {
-      logError('Failed to report post', err);
-      toastRef.current.error(tRef.current('toast.report_failed'));
-    } finally {
-      setIsReporting(false);
-    }
+    setIsReporting(true);
+    await runConfirmedMutation(
+      () => api.post(`/v2/feed/posts/${reportPostId}/report`, { reason: reportReason.trim() }),
+      {
+        onConfirmed: () => {
+          onReportClose();
+          setReportPostId(null);
+          setReportReason('');
+          toastRef.current.success(tRef.current('toast.reported'));
+        },
+        onRejected: () => toastRef.current.error(tRef.current('toast.report_failed')),
+        onError: (err) => logError('Failed to report post', err),
+      },
+    );
+    setIsReporting(false);
   };
 
   const handleFeedDeletePost = async (item: FeedItem) => {
-    try {
-      await api.post(`/v2/feed/posts/${item.id}/delete`);
-      setFeedItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toastRef.current.success(tRef.current('toast.post_deleted'));
-    } catch (err) {
-      logError('Failed to delete post', err);
-      toastRef.current.error(tRef.current('toast.post_delete_failed'));
-    }
+    await runConfirmedMutation(
+      () => api.post(`/v2/feed/posts/${item.id}/delete`),
+      {
+        onConfirmed: () => {
+          setFeedItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+          toastRef.current.success(tRef.current('toast.post_deleted'));
+        },
+        onRejected: () => toastRef.current.error(tRef.current('toast.post_delete_failed')),
+        onError: (err) => logError('Failed to delete post', err),
+      },
+    );
   };
 
   const handleFeedVotePoll = async (pollId: number, optionId: number) => {
