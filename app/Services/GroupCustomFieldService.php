@@ -60,6 +60,18 @@ class GroupCustomFieldService
     {
         $tenantId = TenantContext::getId();
 
+        // Verify the field belongs to THIS tenant before deleting its values.
+        // group_custom_field_values has no tenant_id column, so deleting by
+        // field_id alone would remove another tenant's values if a foreign id is
+        // passed — the tenant-scoped parent delete below would then no-op.
+        $owned = DB::table('group_custom_fields')
+            ->where('id', $fieldId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+        if (!$owned) {
+            return false;
+        }
+
         DB::table('group_custom_field_values')->where('field_id', $fieldId)->delete();
         return DB::table('group_custom_fields')
             ->where('id', $fieldId)

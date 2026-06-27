@@ -89,6 +89,20 @@ class GroupCollectionService
     public static function delete(int $id): bool
     {
         $tenantId = TenantContext::getId();
+
+        // Verify the collection belongs to THIS tenant before touching its items.
+        // group_collection_items has no tenant_id column, so deleting by
+        // collection_id alone would remove another tenant's items if a foreign
+        // (e.g. enumerated) id is passed — the tenant-scoped parent delete below
+        // would then no-op, leaving the cross-tenant child rows already gone.
+        $owned = DB::table('group_collections')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+        if (!$owned) {
+            return false;
+        }
+
         DB::table('group_collection_items')->where('collection_id', $id)->delete();
         return DB::table('group_collections')
             ->where('id', $id)->where('tenant_id', $tenantId)->delete() > 0;
