@@ -415,6 +415,10 @@ export function ChallengeDetailPage() {
         }));
 
         toastRef.current.success(result.voted ? tRef.current('toast.vote_added') : tRef.current('toast.vote_removed'));
+      } else {
+        // A failed vote (4xx/5xx resolves to { success: false } without throwing)
+        // previously fell through silently — no update, no feedback. Surface it.
+        toastRef.current.error(tRef.current('toast.error_generic'));
       }
     } catch (err) {
       logError('Failed to vote', err);

@@ -224,9 +224,9 @@ export function IdeaDetailPage() {
     setIsVoting(true);
     try {
       const response = await api.post<VoteResult>(`/v2/ideation-ideas/${idea.id}/vote`);
-      const result = response.data;
 
-      if (result) {
+      if (response.success && response.data) {
+        const result = response.data;
         setIdea(prev => prev ? {
           ...prev,
           has_voted: result.voted,
@@ -234,6 +234,10 @@ export function IdeaDetailPage() {
         } : prev);
 
         toastRef.current.success(result.voted ? tRef.current('toast.vote_added') : tRef.current('toast.vote_removed'));
+      } else {
+        // A failed vote (4xx/5xx resolves to { success: false } without throwing)
+        // previously fell through silently — no update, no feedback. Surface it.
+        toastRef.current.error(tRef.current('toast.error_generic'));
       }
     } catch (err) {
       logError('Failed to vote', err);

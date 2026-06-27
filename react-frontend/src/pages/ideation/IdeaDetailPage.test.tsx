@@ -4,9 +4,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { api } from '@/lib/api';
 import type { ReactNode } from 'react';
+
+// Stable toast spy so a test can assert the error toast fires (the component stores
+// the toast object in a ref, so each handler call uses the same instance).
+const toastErrorSpy = vi.hoisted(() => vi.fn());
 
 vi.mock('@/lib/motion', () => ({
   motion: {
@@ -66,7 +70,7 @@ vi.mock('@/contexts', () => ({
   })),
   useToast: vi.fn(() => ({
     success: vi.fn(),
-    error: vi.fn(),
+    error: toastErrorSpy,
     info: vi.fn(),
     warning: vi.fn(),
   })),
@@ -170,6 +174,28 @@ describe('IdeaDetailPage', () => {
       expect(screen.getByText('Reusable Shopping Bags')).toBeInTheDocument();
     });
     expect(screen.getByText('14')).toBeInTheDocument();
+  });
+
+  it('shows an error toast when a vote fails (no silent failure)', async () => {
+    // Regression: handleVote checked only `if (response.data)` (not response.success)
+    // and had no else branch, so a failed vote — which api.post resolves as
+    // { success: false } WITHOUT throwing — silently did nothing (no update, no
+    // feedback). Live-verified on the running app. Now it shows an error toast.
+    setupMocks();
+    vi.mocked(api.post).mockResolvedValue({ success: false, error: 'Voting is closed' } as never);
+
+    render(<IdeaDetailPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Reusable Shopping Bags')).toBeInTheDocument();
+    });
+
+    const voteBtn = document.querySelector('[aria-label="ideas.vote"]') as HTMLElement;
+    expect(voteBtn).toBeTruthy();
+    fireEvent.click(voteBtn);
+
+    await waitFor(() => {
+      expect(toastErrorSpy).toHaveBeenCalled();
+    });
   });
 
   it('shows comment form for authenticated users', async () => {
