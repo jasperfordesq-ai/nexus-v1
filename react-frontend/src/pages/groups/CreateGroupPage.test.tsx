@@ -144,4 +144,35 @@ describe('CreateGroupPage', () => {
     render(<CreateGroupPage />);
     expect(screen.getByText('JPEG, PNG, GIF, or WebP. Max 5MB.')).toBeInTheDocument();
   });
+
+  it('fires only ONE create request when the form is submitted twice in rapid succession', async () => {
+    // Regression: handleSubmit flipped isSubmitting state (which only toggles the
+    // submit button's pending pointer-events) but the native <button type="submit">
+    // stayed enabled, so a double-Enter / double-click submitted the native form
+    // twice and created TWO duplicate groups before the state could flush. A
+    // synchronous useRef re-entry guard now rejects the second submit. Live-verified
+    // on the running app: a double requestSubmit() created two groups with the same
+    // name before the fix (ids 90119 + 90120) and exactly one after.
+    let resolvePost: (v: { success: boolean; data: { id: number } }) => void = () => {};
+    api.post.mockReturnValue(new Promise((resolve) => { resolvePost = resolve; }));
+
+    const { container } = render(<CreateGroupPage />);
+    fireEvent.change(
+      screen.getByPlaceholderText('e.g., Gardening Enthusiasts, Tech Help...'),
+      { target: { value: 'My Test Group' } },
+    );
+    fireEvent.change(
+      screen.getByPlaceholderText('Describe what your group is about...'),
+      { target: { value: 'A description of the new group, long enough to pass.' } },
+    );
+
+    const form = container.querySelector('form') as HTMLFormElement;
+    fireEvent.submit(form);
+    fireEvent.submit(form);
+
+    expect(api.post).toHaveBeenCalledTimes(1);
+
+    resolvePost({ success: true, data: { id: 10 } });
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1));
+  });
 });

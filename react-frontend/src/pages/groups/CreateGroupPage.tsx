@@ -67,6 +67,12 @@ export function CreateGroupPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Synchronous re-entry guard: setIsSubmitting(true) only flips the button's
+  // pending state (pointer-events), but the native submit button stays enabled,
+  // so a double-Enter / double-click submits the form twice before state flushes
+  // and creates duplicate groups. A ref updates synchronously and blocks the
+  // second submit in the same tick.
+  const isSubmittingRef = useRef(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
@@ -227,9 +233,11 @@ export function CreateGroupPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    if (isSubmittingRef.current) return;
     if (!validateForm()) return;
 
     try {
+      isSubmittingRef.current = true;
       setIsSubmitting(true);
 
       const payload = {
@@ -263,6 +271,7 @@ export function CreateGroupPage() {
       logError('Failed to save group', error);
       toast.error(t('form.toast.something_wrong'));
     } finally {
+      isSubmittingRef.current = false;
       setIsSubmitting(false);
     }
   }

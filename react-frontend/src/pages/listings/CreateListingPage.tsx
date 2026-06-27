@@ -88,6 +88,11 @@ export function CreateListingPage() {
   const tRef = useRef(t);
   tRef.current = t;
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Synchronous re-entry guard — the submit button stays natively enabled while
+  // pending, so a double-Enter / double-click would otherwise fire two POSTs and
+  // create duplicate listings before isSubmitting state flushes. A ref blocks the
+  // second submit in the same tick. See CreateGroupPage for the same fix.
+  const isSubmittingRef = useRef(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -217,9 +222,11 @@ export function CreateListingPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    if (isSubmittingRef.current) return;
     if (!validateForm()) return;
 
     try {
+      isSubmittingRef.current = true;
       setIsSubmitting(true);
 
       // Build enriched description with optional structured details
@@ -304,6 +311,7 @@ export function CreateListingPage() {
       logError('Failed to save listing', error);
       toast.error(t('form.save_error_title'), t('form.save_error_subtitle'));
     } finally {
+      isSubmittingRef.current = false;
       setIsSubmitting(false);
     }
   }

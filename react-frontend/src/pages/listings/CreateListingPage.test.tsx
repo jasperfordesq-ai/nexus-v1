@@ -182,4 +182,36 @@ describe('CreateListingPage', () => {
       expect(screen.getByText('Click to add a photo')).toBeInTheDocument();
     });
   });
+
+  it('fires only ONE create request when the form is submitted twice in rapid succession', async () => {
+    // Regression: same double-submit class as CreateGroupPage. The submit button is
+    // not natively disabled while a request is in flight, so a double-Enter /
+    // double-click submitted the native form twice and created duplicate listings.
+    // A synchronous useRef re-entry guard now blocks the second submit. The sibling
+    // group form was live-verified (two POSTs → one); this guards the identical fix
+    // on the listing form.
+    let resolvePost: (v: { success: boolean; data: { id: number } }) => void = () => {};
+    api.post.mockReturnValue(new Promise((resolve) => { resolvePost = resolve; }));
+
+    const { container } = render(<CreateListingPage />);
+    await waitFor(() => screen.getByText(/Create New Listing/i));
+
+    fireEvent.change(
+      screen.getByPlaceholderText(/grocery shopping/i),
+      { target: { value: 'Valid listing title' } },
+    );
+    fireEvent.change(
+      container.querySelector('textarea') as HTMLTextAreaElement,
+      { target: { value: 'A listing description long enough to pass validation.' } },
+    );
+
+    const form = container.querySelector('form') as HTMLFormElement;
+    fireEvent.submit(form);
+    fireEvent.submit(form);
+
+    expect(api.post).toHaveBeenCalledTimes(1);
+
+    resolvePost({ success: true, data: { id: 42 } });
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1));
+  });
 });
