@@ -65,8 +65,10 @@ interface NotificationsState {
 
 interface NotificationsContextValue extends NotificationsState {
   refreshCounts: () => Promise<void>;
-  markAsRead: (id: number) => Promise<void>;
-  markAllAsRead: () => Promise<void>;
+  /** Resolves true only if the server confirmed the change (callers gate optimistic UI on this). */
+  markAsRead: (id: number) => Promise<boolean>;
+  /** Resolves true only if the server confirmed the change (callers gate optimistic UI on this). */
+  markAllAsRead: () => Promise<boolean>;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -167,7 +169,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   // Mark as Read
   // ─────────────────────────────────────────────────────────────────────────
 
-  const markAsRead = useCallback(async (id: number) => {
+  const markAsRead = useCallback(async (id: number): Promise<boolean> => {
     try {
       const response = await api.post(`/v2/notifications/${id}/read`);
       if (response.success) {
@@ -175,13 +177,16 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
           ...prev,
           unreadCount: Math.max(0, prev.unreadCount - 1),
         }));
+        return true;
       }
+      return false;
     } catch (error) {
       logError('Failed to mark notification as read', error);
+      return false;
     }
   }, []);
 
-  const markAllAsRead = useCallback(async () => {
+  const markAllAsRead = useCallback(async (): Promise<boolean> => {
     try {
       const response = await api.post('/v2/notifications/read-all');
       if (response.success) {
@@ -201,9 +206,12 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
             system: 0,
           },
         }));
+        return true;
       }
+      return false;
     } catch (error) {
       logError('Failed to mark all notifications as read', error);
+      return false;
     }
   }, []);
 

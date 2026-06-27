@@ -19,6 +19,14 @@ vi.mock('@/lib/api', () => ({
   tokenManager: { getTenantId: vi.fn() },
 }));
 
+// Controllable mocks for the notifications context handlers and toast, so tests can
+// drive the success/failure of mark-as-read and assert the resulting toast.
+const notifMocks = vi.hoisted(() => ({
+  markAsRead: vi.fn(),
+  markAllAsRead: vi.fn(),
+  toast: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
+}));
+
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({
     user: { id: 1, first_name: 'Test' },
@@ -30,15 +38,10 @@ vi.mock('@/contexts', () => ({
     hasFeature: vi.fn(() => true),
     hasModule: vi.fn(() => true),
   })),
-  useToast: vi.fn(() => ({
-    success: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
-    warning: vi.fn(),
-  })),
+  useToast: vi.fn(() => notifMocks.toast),
 
   useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
-  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: notifMocks.markAsRead, markAllAsRead: notifMocks.markAllAsRead, hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
   usePusher: () => ({ channel: null, isConnected: false }),
   usePusherOptional: () => null,
   useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
@@ -91,6 +94,10 @@ import { api } from '@/lib/api';
 describe('NotificationsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default both context handlers to "server confirmed" so the happy path works;
+    // individual tests override with mockResolvedValue(false) to exercise failure.
+    notifMocks.markAsRead.mockResolvedValue(true);
+    notifMocks.markAllAsRead.mockResolvedValue(true);
   });
 
   it('renders the page heading and description', () => {
@@ -254,5 +261,52 @@ describe('NotificationsPage', () => {
   it('shows notification settings button', () => {
     render(<NotificationsPage />);
     expect(screen.getByLabelText('Notification settings')).toBeInTheDocument();
+  });
+
+  // Regression: the context mark-as-read handlers swallow errors and never throw, so
+  // the page's `await` always resolved — it then optimistically cleared the list AND
+  // (for mark-all) showed a success toast even when the server rejected the change.
+  // The handlers now return a confirmed boolean and the page gates UI on it.
+  const oneUnread = {
+    success: true,
+    data: [
+      { id: 1, type: 'message', title: 'New', body: 'Unread', read_at: null, created_at: '2026-02-19T10:00:00Z' },
+    ],
+  };
+
+  it('on a failed Mark all read shows an error toast, not a false success', async () => {
+    notifMocks.markAllAsRead.mockResolvedValue(false);
+    vi.mocked(api.get).mockResolvedValue(oneUnread);
+    render(<NotificationsPage />);
+    await waitFor(() => expect(screen.getByText('Mark all read')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Mark all read'));
+
+    await waitFor(() => expect(notifMocks.toast.error).toHaveBeenCalled());
+    expect(notifMocks.toast.success).not.toHaveBeenCalled();
+  });
+
+  it('on a successful Mark all read shows the success toast', async () => {
+    notifMocks.markAllAsRead.mockResolvedValue(true);
+    vi.mocked(api.get).mockResolvedValue(oneUnread);
+    render(<NotificationsPage />);
+    await waitFor(() => expect(screen.getByText('Mark all read')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Mark all read'));
+
+    await waitFor(() => expect(notifMocks.toast.success).toHaveBeenCalled());
+  });
+
+  it('on a failed per-item Mark as read leaves the row unread and shows an error', async () => {
+    notifMocks.markAsRead.mockResolvedValue(false);
+    vi.mocked(api.get).mockResolvedValue(oneUnread);
+    render(<NotificationsPage />);
+    await waitFor(() => expect(screen.getByLabelText('Mark as read')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText('Mark as read'));
+
+    await waitFor(() => expect(notifMocks.toast.error).toHaveBeenCalled());
+    // Still unread → the per-item "Mark as read" affordance remains.
+    expect(screen.getByLabelText('Mark as read')).toBeInTheDocument();
   });
 });

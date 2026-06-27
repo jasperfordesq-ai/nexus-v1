@@ -178,30 +178,33 @@ export function NotificationsPage() {
   }, [pusher, user?.id, refreshCounts]);
 
   async function markAsRead(id: number) {
-    try {
-      // Use context to update both local state and bell badge count
-      await contextMarkAsRead(id);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n))
-      );
-    } catch (error) {
-      logError('Failed to mark as read', error);
+    // The context performs the API call + updates the bell badge, and resolves
+    // false (it never throws) when the server rejects the change. Gate the
+    // optimistic list update on that confirmed result instead of assuming success
+    // — otherwise a failed request still marked the row read while the badge and
+    // the server disagreed.
+    const ok = await contextMarkAsRead(id);
+    if (!ok) {
       toastRef.current.error(tRef.current('toast.mark_read_failed'));
+      return;
     }
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n))
+    );
   }
 
   async function markAllAsRead() {
-    try {
-      // Use context to update both local state and bell badge count
-      await contextMarkAllAsRead();
-      setNotifications((prev) =>
-        prev.map((n) => ({ ...n, read_at: n.read_at || new Date().toISOString() }))
-      );
-      toastRef.current.success(tRef.current('toast.all_read'));
-    } catch (error) {
-      logError('Failed to mark all as read', error);
+    const ok = await contextMarkAllAsRead();
+    if (!ok) {
+      // Without this, a failed request still showed a "marked all read" success
+      // toast and visually cleared every row.
       toastRef.current.error(tRef.current('toast.mark_all_failed'));
+      return;
     }
+    setNotifications((prev) =>
+      prev.map((n) => ({ ...n, read_at: n.read_at || new Date().toISOString() }))
+    );
+    toastRef.current.success(tRef.current('toast.all_read'));
   }
 
   async function markGroupAsRead(notification: Notification) {
