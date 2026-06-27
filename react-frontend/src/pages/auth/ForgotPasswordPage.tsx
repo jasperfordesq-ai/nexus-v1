@@ -7,7 +7,7 @@
  * Forgot Password Page - Request password reset
  */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';import Mail from 'lucide-react/icons/mail';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -27,31 +27,40 @@ export function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Synchronous re-entry guard: the submit button isn't natively disabled while
+  // the request is in flight (isLoading only renders a spinner), and pressing
+  // Enter submits the native form — so a double-Enter would fire two reset-email
+  // requests before isLoading state flushes. A ref blocks the second submit.
+  const isSubmittingRef = useRef(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.trim()) return;
+    if (!email.trim() || isSubmittingRef.current) return;
 
+    isSubmittingRef.current = true;
     setSubmitError(null);
     setIsLoading(true);
 
-    const response = await api.post<{ message?: string }>('/auth/forgot-password', { email });
+    try {
+      const response = await api.post<{ message?: string }>('/auth/forgot-password', { email });
 
-    setIsLoading(false);
+      if (response.success) {
+        setIsSubmitted(true);
+        return;
+      }
 
-    if (response.success) {
-      setIsSubmitted(true);
-      return;
+      // Surface concrete failures so the user knows they should retry rather
+      // than waiting forever for an email that will never arrive.
+      if (response.code === 'RATE_LIMIT_EXCEEDED') {
+        setSubmitError(t('forgot_password.rate_limited'));
+        return;
+      }
+      // Generic fallthrough — show the message so the user has a chance to act.
+      setSubmitError(response.error || t('forgot_password.generic_error'));
+    } finally {
+      isSubmittingRef.current = false;
+      setIsLoading(false);
     }
-
-    // Surface concrete failures so the user knows they should retry rather
-    // than waiting forever for an email that will never arrive.
-    if (response.code === 'RATE_LIMIT_EXCEEDED') {
-      setSubmitError(t('forgot_password.rate_limited'));
-      return;
-    }
-    // Generic fallthrough — show the message so the user has a chance to act.
-    setSubmitError(response.error || t('forgot_password.generic_error'));
   }
 
   if (isSubmitted) {

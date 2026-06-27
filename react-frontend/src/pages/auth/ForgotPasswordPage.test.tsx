@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
 
 vi.mock('@/lib/api', () => ({
   api: {
@@ -54,6 +54,7 @@ vi.mock('@/lib/motion', () => ({
 }));
 
 import { ForgotPasswordPage } from './ForgotPasswordPage';
+import { api } from '@/lib/api';
 
 describe('ForgotPasswordPage', () => {
   beforeEach(() => { vi.clearAllMocks(); });
@@ -71,5 +72,29 @@ describe('ForgotPasswordPage', () => {
   it('shows back to login link', () => {
     render(<ForgotPasswordPage />);
     expect(screen.getByText(/Back to login/i)).toBeInTheDocument();
+  });
+
+  it('fires only ONE reset request when the form is submitted twice in rapid succession', async () => {
+    // Regression: handleSubmit had no re-entry guard and the submit button is not
+    // natively disabled while loading (isLoading only renders a spinner), so a
+    // double-Enter — which submits the native form — fired two POST /auth/forgot-password
+    // requests and sent two reset emails. A synchronous useRef guard now rejects the
+    // second submit. Live-verified: two submits → one POST (was two before the fix).
+    let resolvePost: (v: { success: boolean }) => void = () => {};
+    vi.mocked(api.post).mockReturnValue(new Promise((resolve) => { resolvePost = resolve; }));
+
+    const { container } = render(<ForgotPasswordPage />);
+    fireEvent.change(screen.getByPlaceholderText('you@example.com'), {
+      target: { value: 'user@example.com' },
+    });
+
+    const form = container.querySelector('form') as HTMLFormElement;
+    fireEvent.submit(form);
+    fireEvent.submit(form);
+
+    expect(api.post).toHaveBeenCalledTimes(1);
+
+    resolvePost({ success: true });
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1));
   });
 });
