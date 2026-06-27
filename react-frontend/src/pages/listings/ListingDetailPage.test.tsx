@@ -20,6 +20,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 import { api } from '@/lib/api';
+import { useToast } from '@/contexts';
 
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({
@@ -247,5 +248,31 @@ describe('ListingDetailPage', () => {
       expect(screen.getByTestId('comments-section')).toBeInTheDocument();
     });
     expect(loadComments).toHaveBeenCalledTimes(1);
+  });
+
+  it('rolls back the optimistic save and shows an error — not a false success — when the save request fails', async () => {
+    // Regression: api.post resolves to { success:false } on a 4xx WITHOUT throwing
+    // (and 4xx never fires the global 5xx-only error toast), so the old handler —
+    // which only checked for a thrown error in catch and toasted success
+    // unconditionally — left the heart optimistically "Saved" AND showed a false
+    // "Listing saved" toast despite the failed request. Live-verified with a forced
+    // 400: heart now reverts to "Save" and an error toast appears.
+    const successToast = vi.fn();
+    const errorToast = vi.fn();
+    vi.mocked(useToast).mockReturnValue({ success: successToast, error: errorToast, info: vi.fn() });
+    api.post.mockResolvedValue({ success: false, error: 'Could not save listing' });
+
+    render(<ListingDetailPage />);
+    const saveButton = await screen.findByRole('button', { name: /save listing/i });
+
+    fireEvent.click(saveButton);
+
+    await waitFor(() => {
+      expect(errorToast).toHaveBeenCalledWith('Failed to update saved listing', 'Could not save listing');
+    });
+    // No false success toast, and the optimistic toggle is rolled back (still "Save").
+    expect(successToast).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: /save listing/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /remove saved/i })).not.toBeInTheDocument();
   });
 });

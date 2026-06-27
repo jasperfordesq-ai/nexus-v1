@@ -288,16 +288,29 @@ export function ListingDetailPage() {
     setIsSaved(!wasAlreadySaved); // optimistic update
     setIsSaving(true);
     try {
-      if (wasAlreadySaved) {
-        await api.delete(`/v2/listings/${id}/save`);
-        toastRef.current.info(tRef.current('unsave_title'));
+      const response = wasAlreadySaved
+        ? await api.delete(`/v2/listings/${id}/save`)
+        : await api.post(`/v2/listings/${id}/save`, {});
+
+      if (response.success) {
+        if (wasAlreadySaved) {
+          toastRef.current.info(tRef.current('unsave_title'));
+        } else {
+          toastRef.current.success(tRef.current('save_success_title'), tRef.current('save_success_subtitle'));
+        }
       } else {
-        await api.post(`/v2/listings/${id}/save`, {});
-        toastRef.current.success(tRef.current('save_success_title'), tRef.current('save_success_subtitle'));
+        // api.post/api.delete resolve to { success: false } on a 4xx/5xx WITHOUT
+        // throwing (and 4xx never fires the global, 5xx-only error toast), so the
+        // catch never runs for them. Without this branch the optimistic heart stuck
+        // ON and a false "Saved!" toast fired despite the failed request. Roll the
+        // optimistic toggle back and surface the error instead.
+        setIsSaved(wasAlreadySaved);
+        toastRef.current.error(tRef.current('save_error'), response.error || tRef.current('error_retry'));
       }
     } catch (err) {
       logError('Failed to save listing', err);
-      setIsSaved(wasAlreadySaved); // rollback on failure
+      setIsSaved(wasAlreadySaved); // rollback on network/throw failure
+      toastRef.current.error(tRef.current('save_error'), tRef.current('error_retry'));
     } finally {
       setIsSaving(false);
     }
