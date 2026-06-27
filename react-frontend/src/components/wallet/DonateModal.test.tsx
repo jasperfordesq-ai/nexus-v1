@@ -21,7 +21,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent, act } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent, act, within } from '@/test/test-utils';
 import { api } from '@/lib/api';
 
 /* ------------------------------------------------------------------ mocks */
@@ -527,6 +527,22 @@ describe('DonateModal — member donation (happy path)', () => {
 
     // Remove button should be present
     expect(screen.getByRole('button', { name: /remove recipient/i })).toBeInTheDocument();
+  });
+
+  it('renders recipient results in a labelled group of buttons, not an invalid empty listbox', async () => {
+    // Regression: results were a role="listbox" wrapping HeroUI <Button role="option">s,
+    // but React Aria does not forward role="option" to the DOM, so the listbox had zero
+    // options — invalid ARIA that screen readers announce as an empty list. They are now
+    // a role="group" (aria-label "Search results") of real, focusable result buttons.
+    // Mirrors the same fix in TransferModal.
+    renderOpen({});
+    fireEvent.click(screen.getByRole('radio', { name: /another member/i }));
+    fireEvent.change(screen.getByLabelText(/search by member/i), { target: { value: 'Al' } });
+
+    const results = await screen.findByRole('group', { name: /search results/i });
+    expect(within(results).getAllByRole('button').length).toBeGreaterThan(0);
+    expect(screen.queryByRole('listbox')).toBeNull();
+    expect(screen.queryByRole('option')).toBeNull();
   });
 
   it('clears the selected recipient when remove button is pressed', async () => {

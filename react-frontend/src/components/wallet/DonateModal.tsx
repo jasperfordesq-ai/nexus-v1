@@ -269,15 +269,19 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
                         className="absolute top-full left-0 right-0 mt-2 bg-overlay border border-theme-default rounded-lg shadow-xl overflow-hidden z-50 max-h-60 overflow-y-auto"
-                        role="listbox"
+                        /* A labelled group of result buttons — NOT role="listbox".
+                           The HeroUI Button does not forward role="option" to the DOM
+                           (React Aria keeps the native button role), so a role="listbox"
+                           here wrapped option-less buttons = invalid ARIA (screen readers
+                           announced an empty list). Each result stays a real, focusable,
+                           Enter-activatable button inside a named group. */
+                        role="group"
                         aria-label={t('search_results')}
                       >
                         {searchResults.map((user) => (
                           <Button
                             key={user.id}
                             type="button"
-                            role="option"
-                            aria-selected={false}
                             variant="ghost"
                             onPress={() => handleSelectRecipient(user)}
                             className="w-full min-h-[64px] flex items-center justify-start gap-3 rounded-none p-3 text-left transition-colors hover:bg-theme-hover"
