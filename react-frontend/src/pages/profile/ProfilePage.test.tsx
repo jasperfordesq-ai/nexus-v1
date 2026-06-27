@@ -10,9 +10,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@/test/test-utils';
 
-const { mockApiGet, mockUseFeature } = vi.hoisted(() => ({
+const { mockApiGet, mockUseFeature, routeState } = vi.hoisted(() => ({
   mockApiGet: vi.fn(),
   mockUseFeature: vi.fn(() => true),
+  // Mutable route id so a test can simulate navigating from one profile to another
+  // (the stale-data regression needs the :id param to change mid-component-life).
+  routeState: { id: '42' },
 }));
 
 function installDefaultApiMocks() {
@@ -83,7 +86,7 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useParams: vi.fn(() => ({ id: '42' })),
+    useParams: vi.fn(() => ({ id: routeState.id })),
   };
 });
 
@@ -162,6 +165,7 @@ import { ProfilePage } from './ProfilePage';
 describe('ProfilePage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    routeState.id = '42';
     mockUseFeature.mockReturnValue(true);
     installDefaultApiMocks();
   });
@@ -209,5 +213,33 @@ describe('ProfilePage', () => {
     // `Button as={Link}` is stubbed by the shared uiMock as a button carrying
     // the router destination in an href attribute.
     expect(screen.getByRole('button', { name: /Back to Explore/i })).toHaveAttribute('href', '/test/explore');
+  });
+
+  it('clears the previously-loaded profile when a reload (id change) fails — no stale data', async () => {
+    // Regression: loadProfile set `error`/`errorCode` on a failed (re)load but never
+    // cleared the already-loaded `profile`, so the `error && !profile` render guard
+    // stayed false and the PRIOR profile rendered under the new URL. Live-verified on
+    // the running app (sibling of the same fix in EventDetailPage): navigating from a
+    // loaded profile to a 404ing id now shows the error screen, not the stale profile.
+    const { rerender } = render(<ProfilePage />);
+    await waitFor(() => {
+      expect(screen.getAllByText('John Doe').length).toBeGreaterThanOrEqual(1);
+    });
+
+    // Navigate to a different profile whose fetch fails.
+    routeState.id = '99';
+    mockApiGet.mockImplementation((url: string) => {
+      if (url.includes('/v2/users/')) {
+        return Promise.resolve({ success: false, code: 'NOT_FOUND' });
+      }
+      return Promise.resolve({ success: true, data: [] });
+    });
+    rerender(<ProfilePage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Unable to Load Profile')).toBeInTheDocument();
+    });
+    // The stale profile-1 name must be gone (pre-fix it remained on screen).
+    expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
   });
 });

@@ -305,6 +305,12 @@ export function ProfilePage() {
           });
         }
       } else {
+        // Clear any previously-loaded profile so the error / incomplete state shows.
+        // Without this, navigating from a loaded profile to one that fails to load
+        // leaves the prior profile in state, and the `error && !profile` guard (and
+        // the PROFILE_INCOMPLETE `!profile` fall-through) stay false — so the stale
+        // profile renders under the new URL.
+        setProfile(null);
         const resCode = profileRes.code ?? (profileRes as { code?: string }).code;
         setErrorCode(resCode ?? null);
         // PROFILE_INCOMPLETE gets a friendly EmptyState — don't set error so the
@@ -340,6 +346,9 @@ export function ProfilePage() {
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load profile', err);
+      // Clear stale profile (see the else branch above) so a failed reload shows
+      // the error screen instead of the previously-loaded profile.
+      setProfile(null);
       setError(tRef.current('load_error'));
     } finally {
       setIsLoading(false);
