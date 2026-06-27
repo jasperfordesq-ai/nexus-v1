@@ -495,21 +495,28 @@ class CaringSupportRelationshipService
         int $logId,
         float $hours,
     ): string {
+        // users.balance stores whole hours, so the supporter is credited
+        // floor($hours). Debit the org by that SAME whole-hour amount (not the
+        // raw fractional $hours) so credits are conserved — a fractional
+        // remainder stays in the org wallet rather than being destroyed (and a
+        // sub-one-hour log debits nothing). Mirrors VolunteerService::verifyHours
+        // ("keep fractional remainders in the org wallet").
+        $wholeHours = (int) floor($hours);
+
         $orgLocked = DB::selectOne(
             "SELECT id, balance FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
             [$organizationId, $tenantId]
         );
-        if (!$orgLocked || (float) $orgLocked->balance < $hours) {
+        if (!$orgLocked || (float) $orgLocked->balance < $wholeHours) {
             return 'insufficient_balance';
         }
 
-        DB::table('vol_organizations')
-            ->where('tenant_id', $tenantId)
-            ->where('id', $organizationId)
-            ->update(['balance' => DB::raw('balance - ' . (float) $hours)]);
-
-        $wholeHours = (int) floor($hours);
         if ($wholeHours > 0) {
+            DB::table('vol_organizations')
+                ->where('tenant_id', $tenantId)
+                ->where('id', $organizationId)
+                ->update(['balance' => DB::raw('balance - ' . $wholeHours)]);
+
             DB::table('users')
                 ->where('tenant_id', $tenantId)
                 ->where('id', $supporterId)
@@ -523,8 +530,8 @@ class CaringSupportRelationshipService
             'user_id' => $supporterId,
             'vol_log_id' => $logId,
             'type' => 'volunteer_payment',
-            'amount' => -$hours,
-            'balance_after' => (float) $orgLocked->balance - $hours,
+            'amount' => -$wholeHours,
+            'balance_after' => (float) $orgLocked->balance - $wholeHours,
             'description' => $description,
             'created_at' => now(),
         ]);
