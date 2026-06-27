@@ -113,12 +113,12 @@ function setAmount(value: string) {
   fireEvent.change(screen.getByRole('spinbutton'), { target: { value } });
 }
 
-/** Type into the search box, wait for the results listbox, click the first option. */
+/** Type into the search box, wait for the results group, click the first result. */
 async function selectRecipientViaSearch(recipient = MOCK_RECIPIENT) {
   apiState.users = [recipient];
   fireEvent.change(screen.getByLabelText(/search recipient/i), { target: { value: 'Ali' } });
-  const listbox = await screen.findByRole('listbox');
-  const optionBtn = within(listbox).getAllByRole('button')[0];
+  const results = await screen.findByRole('group', { name: /search results/i });
+  const optionBtn = within(results).getAllByRole('button')[0];
   fireEvent.click(optionBtn);
   // recipient panel now shows the name
   await screen.findByText(`${recipient.first_name} ${recipient.last_name}`);
@@ -185,6 +185,22 @@ describe('TransferModal — recipient search', () => {
     // Remove the selected recipient → search input returns
     fireEvent.click(screen.getByLabelText(/remove recipient/i));
     await waitFor(() => expect(screen.getByLabelText(/search recipient/i)).toBeInTheDocument());
+  });
+
+  it('renders results in a labelled group of buttons, not an invalid empty listbox', async () => {
+    // Regression: results were a role="listbox" wrapping HeroUI <Button>s. React Aria
+    // does not forward role="option" to the DOM, so the listbox had zero options —
+    // invalid ARIA that screen readers announce as an empty list. They are now a
+    // role="group" (aria-label "Search results") of real, focusable result buttons.
+    apiState.users = [MOCK_RECIPIENT];
+    renderModal();
+    fireEvent.change(screen.getByLabelText(/search recipient/i), { target: { value: 'Ali' } });
+
+    const results = await screen.findByRole('group', { name: /search results/i });
+    expect(within(results).getAllByRole('button').length).toBeGreaterThan(0);
+    // No invalid listbox, and no orphan options outside a real listbox.
+    expect(screen.queryByRole('listbox')).toBeNull();
+    expect(screen.queryByRole('option')).toBeNull();
   });
 });
 
