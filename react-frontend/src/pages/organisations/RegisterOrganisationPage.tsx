@@ -10,7 +10,7 @@
  * Organisations are created with status 'pending' and require admin approval.
  */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';
@@ -51,6 +51,10 @@ export default function RegisterOrganisationPage() {
 
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Synchronous re-entry guard: isSubmitting is async state, so a double-Enter (the
+  // form submits on Enter, bypassing the disabled button) or a fast double-click can
+  // fire handleSubmit twice and register two organisations. This blocks the 2nd call.
+  const submittingRef = useRef(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [termsError, setTermsError] = useState<string | null>(null);
@@ -99,9 +103,11 @@ export default function RegisterOrganisationPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (submittingRef.current) return; // block a second in-flight submit
 
     if (!validateForm()) return;
 
+    submittingRef.current = true;
     try {
       setIsSubmitting(true);
 
@@ -128,6 +134,7 @@ export default function RegisterOrganisationPage() {
       toast.error(t('organisations.form_save_error'));
     } finally {
       setIsSubmitting(false);
+      submittingRef.current = false;
     }
   }
 

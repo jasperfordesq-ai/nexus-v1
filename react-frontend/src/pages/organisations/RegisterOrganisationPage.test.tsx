@@ -154,6 +154,32 @@ describe('RegisterOrganisationPage', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/test/organisations/55');
   });
 
+  it('does not register twice on a rapid double-submit', async () => {
+    // Regression: the form submits on Enter (bypassing the disabled button) and had
+    // no synchronous re-entry guard, so a double-Enter / fast double-click fired
+    // api.post twice and registered two organisations. A submittingRef now blocks the
+    // second in-flight submit. Verified live (double requestSubmit -> 1 POST).
+    let pendingResolved = false;
+    vi.mocked(api.post).mockImplementation(
+      () => new Promise(() => { pendingResolved = true; }), // stays in-flight
+    );
+    render(<RegisterOrganisationPage />);
+
+    const inputs = document.querySelectorAll('input');
+    fireEvent.change(inputs[0], { target: { value: 'My Green Organisation' } });
+    fireEvent.change(document.querySelector('input[type="email"]') as HTMLInputElement, { target: { value: 'org@example.com' } });
+    fireEvent.change(document.querySelector('textarea') as HTMLTextAreaElement, { target: { value: 'We are a community organisation focused on sustainability and local action.' } });
+    fireEvent.click(document.querySelector('input[type="checkbox"]') as HTMLInputElement);
+
+    const form = document.querySelector('form') as HTMLFormElement;
+    // Two rapid submits straight at the form (as Enter would), bypassing the button.
+    fireEvent.submit(form);
+    fireEvent.submit(form);
+
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1));
+    expect(pendingResolved).toBe(true); // sanity: the first submit actually fired
+  });
+
   it('shows error toast when API call fails', async () => {
     const mockToastError = vi.fn();
     const { useToast } = await import('@/contexts');
