@@ -177,11 +177,17 @@ export const UserHoverCard = memo(function UserHoverCard({
     if (!userData || isConnecting) return;
     setIsConnecting(true);
     try {
-      await api.post('/v2/connections/request', { user_id: userId });
-      // Optimistic update
-      const updated = { ...userData, connection_status: 'pending' as const };
-      setUserData(updated);
-      userCache.set(userId, updated);
+      const res = await api.post('/v2/connections/request', { user_id: userId });
+      // Only flip to 'pending' on a CONFIRMED request. api.post resolves
+      // { success:false } on a 4xx (already requested / blocked / rate-limited /
+      // cannot connect) WITHOUT throwing, so the unchecked await used to set — and
+      // CACHE — a fake 'pending' state on a rejected request (persisting it to every
+      // later hover). On failure the card stays "Connect" so the user can retry.
+      if (res.success) {
+        const updated = { ...userData, connection_status: 'pending' as const };
+        setUserData(updated);
+        userCache.set(userId, updated);
+      }
     } catch (err) {
       logError('Failed to send connection request from hover card', err);
     } finally {

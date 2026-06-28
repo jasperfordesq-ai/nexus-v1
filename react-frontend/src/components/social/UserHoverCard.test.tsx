@@ -233,6 +233,43 @@ describe('UserHoverCard', () => {
     });
   });
 
+  it('does not flip to (or cache) a pending state when the request returns success:false', async () => {
+    // Regression: handleConnect did an UNCHECKED `await api.post(...)` then set — and
+    // CACHED — connection_status:'pending'. api.post resolves { success:false } on a 4xx
+    // (already requested / blocked / rate-limited) WITHOUT throwing, so a rejected
+    // request used to show (and persist to the module cache) a fake 'pending' state.
+    // The card must stay "Connect" so the user can retry. Unique userId 777 avoids the
+    // module-level cache from other tests.
+    mockApiObj.get.mockResolvedValue({ success: true, data: { ...MOCK_USER_DATA, id: 777, connection_status: 'none' } });
+    mockApiObj.post.mockResolvedValue({ success: false, error: 'You have already sent a request' });
+
+    render(
+      <UserHoverCard userId={777}>
+        <span data-testid="trigger-fail">Carol</span>
+      </UserHoverCard>,
+    );
+    const trigger = screen.getByTestId('trigger-fail').parentElement!;
+    await userEvent.hover(trigger);
+
+    await waitFor(() => {
+      const connectBtn = screen.getAllByRole('button').find((b) => /connect/i.test(b.textContent ?? ''));
+      expect(connectBtn).toBeInTheDocument();
+    });
+    const connectBtn = screen.getAllByRole('button').find((b) => /connect/i.test(b.textContent ?? ''))!;
+    await userEvent.click(connectBtn);
+
+    await waitFor(() => {
+      expect(mockApiObj.post).toHaveBeenCalledWith(
+        '/v2/connections/request',
+        expect.objectContaining({ user_id: 777 }),
+      );
+    });
+    // The optimistic 'pending' was NOT applied on the rejected request: the Connect
+    // button remains and no "pending" state is shown.
+    expect(screen.getAllByRole('button').find((b) => /connect/i.test(b.textContent ?? ''))).toBeDefined();
+    expect(screen.queryByText(/pending/i)).not.toBeInTheDocument();
+  });
+
   it('shows Connected button (disabled) when connection_status is connected', async () => {
     // Use a different userId to avoid the module-level cache returning 'none' status
     mockApiObj.get.mockResolvedValue({
