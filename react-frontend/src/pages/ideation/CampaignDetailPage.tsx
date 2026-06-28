@@ -157,13 +157,19 @@ export function CampaignDetailPage() {
 
     setIsSaving(true);
     try {
-      await api.put(`/v2/ideation-campaigns/${id}`, {
+      const response = await api.put(`/v2/ideation-campaigns/${id}`, {
         title: editForm.name.trim(),
         description: editForm.description.trim() || null,
       });
-      toastRef.current.success(tRef.current('toast.campaign_updated'));
-      onEditClose();
-      fetchCampaign();
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.campaign_updated'));
+        onEditClose();
+        fetchCampaign();
+      } else {
+        // A failed request resolves to { success: false } without throwing — the
+        // unconditional success toast + dialog close used to fake a saved campaign.
+        toastRef.current.error(response.error || tRef.current('toast.error_generic'));
+      }
     } catch (err) {
       logError('Failed to update campaign', err);
       toastRef.current.error(tRef.current('toast.error_generic'));
@@ -175,9 +181,14 @@ export function CampaignDetailPage() {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await api.delete(`/v2/ideation-campaigns/${id}`);
-      toastRef.current.success(tRef.current('toast.campaign_deleted'));
-      navigate(tenantPath('/ideation/campaigns'));
+      const response = await api.delete(`/v2/ideation-campaigns/${id}`);
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.campaign_deleted'));
+        navigate(tenantPath('/ideation/campaigns'));
+      } else {
+        // Don't navigate away as if deleted on a failed request.
+        toastRef.current.error(response.error || tRef.current('toast.error_generic'));
+      }
     } catch (err) {
       logError('Failed to delete campaign', err);
       toastRef.current.error(tRef.current('toast.error_generic'));
@@ -191,10 +202,15 @@ export function CampaignDetailPage() {
 
   const handleUnlinkChallenge = async (challengeId: number) => {
     try {
-      await api.delete(`/v2/ideation-campaigns/${id}/challenges/${challengeId}`);
-      toastRef.current.success(tRef.current('campaigns.unlink_challenge'));
-      setUnlinkTargetId(null);
-      fetchCampaign();
+      const response = await api.delete(`/v2/ideation-campaigns/${id}/challenges/${challengeId}`);
+      if (response.success) {
+        toastRef.current.success(tRef.current('campaigns.unlink_challenge'));
+        setUnlinkTargetId(null);
+        fetchCampaign();
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.error_generic'));
+        setUnlinkTargetId(null);
+      }
     } catch (err) {
       logError('Failed to unlink challenge', err);
       toastRef.current.error(tRef.current('toast.error_generic'));
