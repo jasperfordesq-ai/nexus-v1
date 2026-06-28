@@ -476,6 +476,7 @@ export function ResourcesPage() {
     if (direction === 'up' && currentIndex === 0) return;
     if (direction === 'down' && currentIndex === resources.length - 1) return;
 
+    const previousOrder = resources;
     const newResources = [...resources];
     const swapIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
     const current = newResources[currentIndex];
@@ -486,11 +487,19 @@ export function ResourcesPage() {
 
     try {
       const orderedIds = newResources.map((r) => r.id);
-      await api.put('/v2/resources/reorder', { order: orderedIds });
+      const response = await api.put('/v2/resources/reorder', { order: orderedIds });
+      // A failed reorder resolves to { success: false } WITHOUT throwing, so it
+      // would skip the catch and leave the optimistic swap on screen as if it
+      // saved — a fake-success the admin only notices after a reload reverts it.
+      // Roll the list back to the pre-swap order and surface the failure.
+      if (!response.success) {
+        setResources(previousOrder);
+        toast.error(t('resources.save_order_failed'));
+      }
     } catch (err) {
       logError('Failed to reorder resources', err);
+      setResources(previousOrder);
       toast.error(t('resources.save_order_failed'));
-      loadResources();
     }
   };
 
