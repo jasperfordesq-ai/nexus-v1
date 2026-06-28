@@ -426,10 +426,17 @@ class EmailTriggerAuditServiceTest extends TestCase
             $this->markTestSkipped('Email log table is not available.');
         }
 
+        $tenantId = (int) DB::table('tenants')->insertGetId([
+            'name' => 'Email Trigger Audit Tenant',
+            'slug' => 'email-trigger-audit-' . uniqid(),
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         $createdAt = now()->subMinutes(5);
         $email = 'missing-admin-registration-alert-' . uniqid() . '@audit-fixture.testmail';
         $userId = DB::table('users')->insertGetId([
-            'tenant_id' => 2,
+            'tenant_id' => $tenantId,
             'name' => 'Missing Admin Alert User',
             'email' => $email,
             'role' => 'member',
@@ -439,7 +446,7 @@ class EmailTriggerAuditServiceTest extends TestCase
         ]);
 
         DB::table('email_log')->insert([
-            'tenant_id' => 2,
+            'tenant_id' => $tenantId,
             'user_id' => $userId,
             'recipient_email' => $email,
             'category' => 'activation',
@@ -450,7 +457,7 @@ class EmailTriggerAuditServiceTest extends TestCase
             'updated_at' => now()->subMinutes(4),
         ]);
 
-        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $result = app(EmailTriggerAuditService::class)->run($tenantId, 24);
         $codes = array_column($result['issues'], 'code');
 
         $this->assertContains('new_users_without_admin_registration_alert', $codes);
