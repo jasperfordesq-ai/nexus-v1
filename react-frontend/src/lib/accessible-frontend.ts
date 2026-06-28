@@ -25,7 +25,13 @@ export function buildAccessibleFrontendUrl(
     .replace(/^https?:\/\//, '')
     .replace(/\/+$/, '');
   if (customDomain) {
-    return `https://${customDomain}/alpha${normalizedPath}`;
+    // The custom accessible domain is the clean public entry point: the host
+    // resolves the tenant server-side and redirects the root to the canonical
+    // alpha home, so the entry link is the bare domain (matches the value set
+    // in the admin panel). Deep links still target the /alpha route namespace.
+    return normalizedPath
+      ? `https://${customDomain}/alpha${normalizedPath}`
+      : `https://${customDomain}`;
   }
 
   const slug = tenantSlug?.trim();

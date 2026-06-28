@@ -30,13 +30,13 @@ describe('buildAccessibleFrontendUrl', () => {
     expect(buildAccessibleFrontendUrl('   ')).toBeNull();
   });
 
-  it('uses a slug-less URL on the tenant accessible custom domain', () => {
+  it('uses the bare custom domain as the entry link (host resolves the tenant server-side)', () => {
     expect(
       buildAccessibleFrontendUrl('hour-timebank', '/', undefined, 'accessible.example.org'),
-    ).toBe('https://accessible.example.org/alpha');
+    ).toBe('https://accessible.example.org');
   });
 
-  it('appends subpaths on the accessible custom domain (still slug-less)', () => {
+  it('appends subpaths on the accessible custom domain under the /alpha namespace', () => {
     expect(
       buildAccessibleFrontendUrl('hour-timebank', '/listings', undefined, 'accessible.example.org'),
     ).toBe('https://accessible.example.org/alpha/listings');
@@ -45,12 +45,12 @@ describe('buildAccessibleFrontendUrl', () => {
   it('strips scheme and trailing slash from a configured accessible domain', () => {
     expect(
       buildAccessibleFrontendUrl('hour-timebank', '/', undefined, 'https://accessible.example.org/'),
-    ).toBe('https://accessible.example.org/alpha');
+    ).toBe('https://accessible.example.org');
   });
 
-  it('returns the accessible custom domain URL even without a slug', () => {
+  it('returns the bare accessible custom domain even without a slug', () => {
     expect(buildAccessibleFrontendUrl(null, '/', undefined, 'accessible.example.org')).toBe(
-      'https://accessible.example.org/alpha',
+      'https://accessible.example.org',
     );
   });
 });
