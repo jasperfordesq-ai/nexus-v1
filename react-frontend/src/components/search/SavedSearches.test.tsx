@@ -235,6 +235,65 @@ describe('SavedSearches', () => {
     );
   });
 
+  it('keeps the saved search and shows an error when delete fails (no fake delete)', async () => {
+    // Regression: api.delete was unchecked, so the row was removed + a "deleted" toast
+    // shown unconditionally. A { success:false } (4xx) made the row vanish with a fake
+    // success while the backend kept it. Now gated on res.success. (useConfirm
+    // auto-resolves true in the test harness.)
+    mockApi.get.mockResolvedValue(makeListResponse([makeSavedSearch({ id: 5, name: 'Doomed Search' })]));
+    mockApi.delete.mockResolvedValue({ success: false, error: 'Cannot delete' });
+    const { SavedSearches } = await import('./SavedSearches');
+    render(<SavedSearches />);
+    await waitFor(() => expect(screen.getByText('Doomed Search')).toBeInTheDocument());
+
+    const delBtn = screen.getAllByRole('button').find((b) =>
+      b.getAttribute('aria-label')?.toLowerCase().includes('delete')
+    );
+    fireEvent.click(delBtn!);
+
+    await waitFor(() => expect(mockApi.delete).toHaveBeenCalledWith('/v2/search/saved/5'));
+    // A failed delete must NOT remove the row, and must surface an error (no fake success).
+    expect(screen.getByText('Doomed Search')).toBeInTheDocument();
+    expect(mockToast.error).toHaveBeenCalled();
+    expect(mockToast.success).not.toHaveBeenCalled();
+  });
+
+  it('shows an error (and no fake success) when save fails with success:false', async () => {
+    // Regression: handleSave had no else on the success gate, so a { success:false }
+    // (4xx) gave zero feedback. It must now surface the error. Verified live.
+    mockApi.post.mockResolvedValue({ success: false, error: 'Name already exists' });
+    const { SavedSearches } = await import('./SavedSearches');
+    render(<SavedSearches currentQuery="yoga" />);
+
+    await waitFor(() => screen.getAllByRole('button').some((b) => b.textContent?.toLowerCase().includes('save')));
+    const openSaveBtn = screen.getAllByRole('button').find((b) =>
+      b.textContent?.toLowerCase().includes('save') && !b.textContent?.toLowerCase().includes('cancel')
+    );
+    fireEvent.click(openSaveBtn!);
+
+    await waitFor(() => {
+      const input = screen.getAllByRole('textbox').find((el) =>
+        el.getAttribute('placeholder')?.toLowerCase().includes('name') ||
+        el.getAttribute('aria-label')?.toLowerCase().includes('name')
+      );
+      expect(input).toBeDefined();
+    });
+    const nameInput = screen.getAllByRole('textbox').find((el) =>
+      el.getAttribute('placeholder')?.toLowerCase().includes('name') ||
+      el.getAttribute('aria-label')?.toLowerCase().includes('name')
+    )!;
+    fireEvent.change(nameInput, { target: { value: 'Dupe Name' } });
+
+    const submitBtn = screen.getAllByRole('button').find((b) =>
+      b.textContent?.toLowerCase() === 'save' || (b.textContent?.toLowerCase().includes('save') && !b.textContent?.toLowerCase().includes('cancel'))
+    );
+    fireEvent.click(submitBtn!);
+
+    await waitFor(() => expect(mockApi.post).toHaveBeenCalled());
+    expect(mockToast.error).toHaveBeenCalled();
+    expect(mockToast.success).not.toHaveBeenCalled();
+  });
+
   it('does not render "Save this search" when currentQuery is empty', async () => {
     const { SavedSearches } = await import('./SavedSearches');
     render(<SavedSearches />);

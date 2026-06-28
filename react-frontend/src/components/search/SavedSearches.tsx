@@ -50,6 +50,11 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
   const toastRef = useRef(toast);
   toastRef.current = toast;
 
+  // Synchronous re-entry guard for the save handler: pressing Enter in the name
+  // field calls handleSave directly, and isSaving is async state, so a fast
+  // double-Enter could create two duplicate saved searches before it flips.
+  const savingRef = useRef(false);
+
   const loadSavedSearches = useCallback(async () => {
     if (!isAuthenticated) {
       setIsLoading(false);
@@ -83,7 +88,9 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
 
   const handleSave = async () => {
     if (!saveName.trim() || !currentQuery) return;
+    if (savingRef.current) return; // block a second in-flight save (double-Enter)
 
+    savingRef.current = true;
     setIsSaving(true);
     try {
       const response = await api.post<SavedSearch>('/v2/search/saved', {
@@ -100,12 +107,17 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
         setSaveName('');
         setShowSaveForm(false);
         toastRef.current.success(tRef.current('toast_search_saved'));
+      } else {
+        // api.post resolves { success:false } on a 4xx WITHOUT throwing, so without
+        // this branch a rejected save just left the form open with no feedback.
+        toastRef.current.error(response.error || tRef.current('toast_search_save_failed'));
       }
     } catch (error) {
       logError('Failed to save search', error);
       toastRef.current.error(tRef.current('toast_search_save_failed'));
     } finally {
       setIsSaving(false);
+      savingRef.current = false;
     }
   };
 
@@ -117,9 +129,16 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
     });
     if (!ok) return;
     try {
-      await api.delete(`/v2/search/saved/${id}`);
-      setSavedSearches((prev) => prev.filter((s) => s.id !== id));
-      toastRef.current.success(tRef.current('toast_search_deleted'));
+      const res = await api.delete(`/v2/search/saved/${id}`);
+      // api.delete resolves { success:false } on a 4xx (not-found/not-owned/rate-limit)
+      // WITHOUT throwing — gating the removal + "deleted" toast on res.success stops the
+      // row vanishing with a fake success while the backend still has it.
+      if (res.success) {
+        setSavedSearches((prev) => prev.filter((s) => s.id !== id));
+        toastRef.current.success(tRef.current('toast_search_deleted'));
+      } else {
+        toastRef.current.error(res.error || tRef.current('toast_search_delete_failed'));
+      }
     } catch (error) {
       logError('Failed to delete saved search', error);
       toastRef.current.error(tRef.current('toast_search_delete_failed'));
