@@ -86,9 +86,17 @@ export function VerifyEmailPage() {
 
     try {
       setIsResending(true);
-      await api.post('/auth/resend-verification');
-      setResendSuccess(true);
-      toast.success(t('resend_sent'));
+      const res = await api.post('/auth/resend-verification');
+      // api.post resolves { success:false } on a 4xx (e.g. rate-limited) WITHOUT
+      // throwing, so the catch never fired — gate the "sent" confirmation on a confirmed
+      // resend, else show the error so the user isn't left waiting for an email that
+      // never comes.
+      if (res.success) {
+        setResendSuccess(true);
+        toast.success(t('resend_sent'));
+      } else {
+        setErrorMessage(t('verify_email.resend_error'));
+      }
     } catch {
       setErrorMessage(t('verify_email.resend_error'));
     } finally {

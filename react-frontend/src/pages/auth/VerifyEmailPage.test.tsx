@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 
 vi.mock('@/lib/api', () => ({
   api: {
@@ -168,6 +168,28 @@ describe('VerifyEmailPage', () => {
       const heading = screen.getByRole('heading', { level: 1 });
       expect(heading).toBeInTheDocument();
     });
+  });
+
+  it('keeps the resend button (does not show a fake "sent") when the resend returns success:false', async () => {
+    // Regression: handleResendVerification did an UNCHECKED `await api.post(
+    // .../resend-verification)` then set the success state + a success toast. api.post
+    // resolves { success:false } on a 4xx (e.g. rate-limited) WITHOUT throwing, so a
+    // rejected resend showed a fake "sent" confirmation while no email went out. It must
+    // show an error and keep the resend button (verified live).
+    mockUseAuth.mockReturnValue({ isAuthenticated: true, user: { id: 1 } });
+    vi.mocked(mockApi.post).mockResolvedValue({ success: false, error: 'Too many requests' });
+
+    render(<VerifyEmailPage />);
+
+    const resendBtn = await screen.findByRole('button', { name: /resend/i });
+    fireEvent.click(resendBtn);
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith('/auth/resend-verification');
+    });
+    // The "sent" state was NOT entered: the resend button is still present (a successful
+    // resend would replace it with the success message).
+    expect(screen.getByRole('button', { name: /resend/i })).toBeInTheDocument();
   });
 
   it('shows dashboard link in error state for authenticated users', async () => {
