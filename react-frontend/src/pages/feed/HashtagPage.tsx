@@ -241,9 +241,16 @@ export function HashtagPage() {
 
   const handleHidePost = useCallback(async (item: FeedItem) => {
     try {
-      await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
-      setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toastRef.current.success(tRef.current('toast.post_hidden'));
+      const res = await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
+      // api.post resolves { success:false } on a 4xx WITHOUT throwing — without gating on
+      // it the post vanished from the list and a fake "hidden" toast showed while the
+      // backend kept it (it reappeared on the next reload).
+      if (res.success) {
+        setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+        toastRef.current.success(tRef.current('toast.post_hidden'));
+      } else {
+        toastRef.current.error(tRef.current('toast.hide_failed'));
+      }
     } catch (err) {
       logError('Failed to hide post', err);
       toastRef.current.error(tRef.current('toast.hide_failed'));
@@ -253,9 +260,15 @@ export function HashtagPage() {
   const handleMuteUser = useCallback(async (item: FeedItem) => {
     const userId = getAuthor(item).id;
     try {
-      await api.post(`/v2/feed/users/${userId}/mute`);
-      setItems((prev) => prev.filter((fi) => getAuthor(fi).id !== userId));
-      toastRef.current.success(tRef.current('toast.user_muted'));
+      const res = await api.post(`/v2/feed/users/${userId}/mute`);
+      // Gate on a confirmed mute — otherwise a { success:false } wiped EVERY post by
+      // this user from the list with a fake "muted" toast while the backend muted nobody.
+      if (res.success) {
+        setItems((prev) => prev.filter((fi) => getAuthor(fi).id !== userId));
+        toastRef.current.success(tRef.current('toast.user_muted'));
+      } else {
+        toastRef.current.error(tRef.current('toast.mute_failed'));
+      }
     } catch (err) {
       logError('Failed to mute user', err);
       toastRef.current.error(tRef.current('toast.mute_failed'));
@@ -264,9 +277,13 @@ export function HashtagPage() {
 
   const handleDeletePost = useCallback(async (item: FeedItem) => {
     try {
-      await api.post(`/v2/feed/posts/${item.id}/delete`);
-      setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toastRef.current.success(tRef.current('toast.deleted'));
+      const res = await api.post(`/v2/feed/posts/${item.id}/delete`);
+      if (res.success) {
+        setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+        toastRef.current.success(tRef.current('toast.deleted'));
+      } else {
+        toastRef.current.error(tRef.current('toast.delete_failed'));
+      }
     } catch (err) {
       logError('Failed to delete post', err);
       toastRef.current.error(tRef.current('toast.delete_failed'));
@@ -284,6 +301,9 @@ export function HashtagPage() {
               : fi
           )
         );
+      } else {
+        // Surface a rejected vote instead of silently doing nothing.
+        toastRef.current.error(tRef.current('toast.vote_failed'));
       }
     } catch (err) {
       logError('Failed to vote', err);

@@ -55,8 +55,19 @@ vi.mock('@/components/seo', () => ({
 }));
 
 vi.mock('@/components/feed/FeedCard', () => ({
-  FeedCard: ({ item }: { item: { id: number } }) => (
-    <div data-testid={`feed-card-${item.id}`}>Feed Item {item.id}</div>
+  FeedCard: ({ item, onHidePost, onDeletePost, onMuteUser }: {
+    item: { id: number };
+    onHidePost?: (item: unknown) => void;
+    onDeletePost?: (item: unknown) => void;
+    onMuteUser?: (item: unknown) => void;
+  }) => (
+    <div data-testid={`feed-card-${item.id}`}>
+      Feed Item {item.id}
+      {/* Expose the action callbacks so the hide/delete/mute handlers are testable. */}
+      <button data-testid={`hide-${item.id}`} onClick={() => onHidePost?.(item)}>hide</button>
+      <button data-testid={`delete-${item.id}`} onClick={() => onDeletePost?.(item)}>delete</button>
+      <button data-testid={`mute-${item.id}`} onClick={() => onMuteUser?.(item)}>mute</button>
+    </div>
   ),
 }));
 
@@ -91,6 +102,7 @@ import { HashtagPage } from './HashtagPage';
 import { api } from '@/lib/api';
 
 const mockApiGet = vi.mocked(api.get);
+const mockApiPost = vi.mocked(api.post);
 
 const mockFeedItems = [
   { id: 1, type: 'post', is_liked: false, likes_count: 2, author_id: 5 },
@@ -138,6 +150,54 @@ describe('HashtagPage', () => {
     await waitFor(() => {
       expect(screen.getByTestId('empty-state')).toBeInTheDocument();
     });
+  });
+
+  // Regression: handleHidePost/handleMuteUser/handleDeletePost did UNCHECKED
+  // `await api.post(...)` then removed the post(s) + a success toast. api.post resolves
+  // { success:false } on a 4xx WITHOUT throwing, so a rejected hide/mute/delete used to
+  // make the post(s) vanish with a fake confirmation (they reappeared on reload). The
+  // post(s) must remain when the request is rejected.
+  it('keeps the post in the list when hide returns success:false', async () => {
+    mockApiGet.mockResolvedValue({ success: true, data: mockFeedItems, meta: { has_more: false } });
+    mockApiPost.mockResolvedValue({ success: false, error: 'Cannot hide' });
+    render(<HashtagPage />);
+
+    await waitFor(() => expect(screen.getByTestId('feed-card-1')).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId('hide-1'));
+
+    await waitFor(() => {
+      expect(mockApiPost).toHaveBeenCalledWith('/v2/feed/posts/1/hide', expect.objectContaining({ type: 'post' }));
+    });
+    expect(screen.getByTestId('feed-card-1')).toBeInTheDocument();
+  });
+
+  it('keeps the post in the list when delete returns success:false', async () => {
+    mockApiGet.mockResolvedValue({ success: true, data: mockFeedItems, meta: { has_more: false } });
+    mockApiPost.mockResolvedValue({ success: false, error: 'Cannot delete' });
+    render(<HashtagPage />);
+
+    await waitFor(() => expect(screen.getByTestId('feed-card-1')).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId('delete-1'));
+
+    await waitFor(() => {
+      expect(mockApiPost).toHaveBeenCalledWith('/v2/feed/posts/1/delete');
+    });
+    expect(screen.getByTestId('feed-card-1')).toBeInTheDocument();
+  });
+
+  it('keeps the user\'s posts in the list when mute returns success:false', async () => {
+    mockApiGet.mockResolvedValue({ success: true, data: mockFeedItems, meta: { has_more: false } });
+    mockApiPost.mockResolvedValue({ success: false, error: 'Cannot mute' });
+    render(<HashtagPage />);
+
+    await waitFor(() => expect(screen.getByTestId('feed-card-1')).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId('mute-1'));
+
+    await waitFor(() => {
+      expect(mockApiPost).toHaveBeenCalledWith('/v2/feed/users/5/mute');
+    });
+    // The author's post must not be wiped from the list on a rejected mute.
+    expect(screen.getByTestId('feed-card-1')).toBeInTheDocument();
   });
 
   it('shows error state when API fails', async () => {
