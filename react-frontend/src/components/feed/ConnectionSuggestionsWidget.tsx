@@ -104,8 +104,19 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
       prev.map((s) => s.id === suggestion.id ? { ...s, connection_status: 'pending' } : s)
     );
     try {
-      await api.post('/v2/connections/request', { user_id: suggestion.id });
-      toast.success(t('suggestions.connect_sent'));
+      const res = await api.post('/v2/connections/request', { user_id: suggestion.id });
+      if (res.success) {
+        toast.success(t('suggestions.connect_sent'));
+      } else {
+        // api.post resolves { success:false } on a 4xx (already requested, blocked,
+        // rate-limited, cannot connect) WITHOUT throwing, so the catch never fired —
+        // without this branch the optimistic 'pending' stuck on the card AND a fake
+        // "request sent" toast showed while the backend rejected the request.
+        setSuggestions((prev) =>
+          prev.map((s) => s.id === suggestion.id ? { ...s, connection_status: previousStatus } : s)
+        );
+        toast.error((res as { error?: string }).error || t('suggestions.connect_failed'));
+      }
     } catch (err) {
       logError('Failed to send connection request', err);
       // Revert the optimistic update

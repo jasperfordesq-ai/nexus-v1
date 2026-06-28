@@ -280,6 +280,48 @@ describe('ConnectionSuggestionsWidget — sidebar layout', () => {
     });
   });
 
+  it('reverts the optimistic pending state and shows an error (not a fake success) when the request returns success:false', async () => {
+    // Regression: handleConnect did an UNCHECKED `await api.post(...)` then an
+    // unconditional success toast, with the optimistic-revert only in the catch.
+    // api.post resolves { success:false } on a 4xx (already requested / blocked /
+    // rate-limited) WITHOUT throwing — so the optimistic 'pending' used to stick on the
+    // card and a fake "request sent" toast fired. It must now revert + show an error.
+    const user = userEvent.setup();
+    mockApiGet.mockResolvedValueOnce({
+      success: true,
+      data: { suggestions: [makeSuggestion({ id: 7 })] },
+    });
+    mockApiPost.mockResolvedValueOnce({ success: false, error: 'You have already sent a request' });
+
+    render(<ConnectionSuggestionsWidget />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+    });
+
+    const connectBtn = screen
+      .getAllByRole('button')
+      .find((b) =>
+        b.textContent?.toLowerCase().includes('connect') &&
+        !b.textContent?.toLowerCase().includes('pending')
+      );
+    if (connectBtn) await user.click(connectBtn);
+
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalled();
+    });
+    // No fake success on a rejected request.
+    expect(mockToast.success).not.toHaveBeenCalled();
+    // The optimistic 'pending' was reverted: a non-pending Connect button is back.
+    const revertedBtn = screen
+      .getAllByRole('button')
+      .find((b) =>
+        b.textContent?.toLowerCase().includes('connect') &&
+        !b.textContent?.toLowerCase().includes('pending')
+      );
+    expect(revertedBtn).toBeDefined();
+  });
+
   it('optimistically shows pending button after clicking Connect', async () => {
     const user = userEvent.setup();
     mockApiGet.mockResolvedValueOnce({
