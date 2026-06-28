@@ -180,6 +180,20 @@ describe('MyVereinInvitationsPage', () => {
     });
   });
 
+  it('shows an error toast when the load returns success:false (not just on a throw)', async () => {
+    // Regression: load() gated on `if (res.success && Array.isArray(res.data))` with no
+    // else, and the catch only fires on a thrown error. A { success:false } (4xx, which
+    // api.get resolves without throwing) used to show the empty "Received" tab silently,
+    // indistinguishable from genuinely having no invitations. It must now surface the
+    // error. Verified live.
+    vi.mocked(api.get).mockResolvedValue({ success: false, error: 'Cannot load' });
+    render(<MyVereinInvitationsPage />);
+
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalled();
+    });
+  });
+
   it('shows an error toast when respond API fails with a message', async () => {
     vi.mocked(api.get).mockResolvedValue({ success: true, data: [MOCK_INVITATION] });
     vi.mocked(api.post).mockResolvedValue({ success: false, error: 'Already responded' });

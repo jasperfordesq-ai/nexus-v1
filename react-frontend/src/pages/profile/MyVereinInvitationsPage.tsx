@@ -68,6 +68,11 @@ export default function MyVereinInvitationsPage() {
         const recv = res.data.filter((i) => !myId || i.invitee_user_id === myId || true);
         setReceived(recv);
         setSent([]);
+      } else {
+        // api.get resolves { success:false } on a 4xx/5xx WITHOUT throwing, so the
+        // catch never fired — without this branch a failed load just showed the empty
+        // "Received" tab, indistinguishable from genuinely having no invitations.
+        toast.error(t('verein_federation.load_failed'));
       }
     } catch (err) {
       logError('MyVereinInvitationsPage: load failed', err);
