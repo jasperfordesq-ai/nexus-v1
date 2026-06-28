@@ -198,6 +198,29 @@ describe('CommunityImpactTab', () => {
     });
   });
 
+  it('renders zeros without crashing when the backend returns a degraded payload', async () => {
+    // Regression: a degraded 200 (top-level numbers missing, this_month/last_month/
+    // trends returned as [] instead of objects) made data.total_xp.toLocaleString()
+    // throw and crashed the whole Leaderboard via the error boundary. It must now
+    // coerce to zeros. Verified live by shimming the community-dashboard request.
+    vi.mocked(api.get).mockResolvedValueOnce({
+      success: true,
+      data: { this_month: [], last_month: [], trends: [] },
+    } as never);
+
+    render(<CommunityImpactTab />);
+
+    await waitFor(() => {
+      // The "This Month" section renders — it is built after the stat arrays that
+      // previously threw, so reaching it proves the render got past the crash point.
+      expect(screen.getByText(/This Month|community\.this_month/i)).toBeInTheDocument();
+    });
+    // Degraded numbers render as zeros, not undefined/crash.
+    expect(screen.getAllByText('0').length).toBeGreaterThanOrEqual(1);
+    // It must NOT be the error state.
+    expect(screen.queryByText(/Failed to load community data/i)).not.toBeInTheDocument();
+  });
+
   it('formats large total_xp with locale separators', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({
       success: true,

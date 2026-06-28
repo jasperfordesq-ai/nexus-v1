@@ -96,26 +96,37 @@ export default function CommunityImpactTab() {
 
   if (!data) return null;
 
+  // Backend catch-fallbacks can return a degraded 200 where top-level numbers are
+  // missing and this_month/last_month/trends come back as [] instead of objects.
+  // Coerce to safe shapes so a degraded response renders zeros rather than throwing
+  // on data.total_xp.toLocaleString() — which crashed the whole Leaderboard via the
+  // error boundary.
+  const num = (v: number | undefined | null) => v ?? 0;
+  const thisMonth: Partial<MonthStats> =
+    data.this_month && !Array.isArray(data.this_month) ? data.this_month : {};
+  const trends: Record<string, number> =
+    data.trends && !Array.isArray(data.trends) ? data.trends : {};
+
   const stats = [
-    { label: t('community.total_members'), value: data.total_members, icon: <Users className="w-5 h-5" />, color: 'text-[var(--color-info)]', bg: 'bg-blue-500/10' },
-    { label: t('community.total_badges'), value: data.total_badges_awarded, icon: <Award className="w-5 h-5" />, color: 'text-[var(--color-warning)]', bg: 'bg-amber-500/10' },
-    { label: t('community.volunteer_hours'), value: data.total_volunteer_hours, icon: <Clock className="w-5 h-5" />, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-    { label: t('community.total_xp'), value: data.total_xp.toLocaleString(), icon: <Zap className="w-5 h-5" />, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+    { label: t('community.total_members'), value: num(data.total_members), icon: <Users className="w-5 h-5" />, color: 'text-[var(--color-info)]', bg: 'bg-blue-500/10' },
+    { label: t('community.total_badges'), value: num(data.total_badges_awarded), icon: <Award className="w-5 h-5" />, color: 'text-[var(--color-warning)]', bg: 'bg-amber-500/10' },
+    { label: t('community.volunteer_hours'), value: num(data.total_volunteer_hours), icon: <Clock className="w-5 h-5" />, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    { label: t('community.total_xp'), value: num(data.total_xp).toLocaleString(), icon: <Zap className="w-5 h-5" />, color: 'text-purple-500', bg: 'bg-purple-500/10' },
   ];
 
   const secondaryStats = [
-    { label: t('community.total_listings'), value: data.total_listings, icon: <FileText className="w-4 h-4" /> },
-    { label: t('community.total_connections'), value: data.total_connections, icon: <Handshake className="w-4 h-4" /> },
-    { label: t('community.total_reviews'), value: data.total_reviews, icon: <Heart className="w-4 h-4" /> },
+    { label: t('community.total_listings'), value: num(data.total_listings), icon: <FileText className="w-4 h-4" /> },
+    { label: t('community.total_connections'), value: num(data.total_connections), icon: <Handshake className="w-4 h-4" /> },
+    { label: t('community.total_reviews'), value: num(data.total_reviews), icon: <Heart className="w-4 h-4" /> },
   ];
 
   const monthMetrics = [
-    { label: t('community.new_members'), value: data.this_month.new_members, trend: data.trends.new_members ?? 0, icon: <UserPlus className="w-4 h-4" /> },
-    { label: t('community.badges_awarded'), value: data.this_month.badges_awarded, trend: data.trends.badges_awarded ?? 0, icon: <Award className="w-4 h-4" /> },
-    { label: t('community.new_listings'), value: data.this_month.new_listings, trend: data.trends.new_listings ?? 0, icon: <FileText className="w-4 h-4" /> },
-    { label: t('community.new_connections'), value: data.this_month.new_connections, trend: data.trends.new_connections ?? 0, icon: <Handshake className="w-4 h-4" /> },
-    { label: t('community.volunteer_hours'), value: data.this_month.volunteer_hours, trend: data.trends.volunteer_hours ?? 0, icon: <Clock className="w-4 h-4" /> },
-    { label: t('community.new_posts'), value: data.this_month.new_posts, trend: data.trends.new_posts ?? 0, icon: <FileText className="w-4 h-4" /> },
+    { label: t('community.new_members'), value: num(thisMonth.new_members), trend: trends.new_members ?? 0, icon: <UserPlus className="w-4 h-4" /> },
+    { label: t('community.badges_awarded'), value: num(thisMonth.badges_awarded), trend: trends.badges_awarded ?? 0, icon: <Award className="w-4 h-4" /> },
+    { label: t('community.new_listings'), value: num(thisMonth.new_listings), trend: trends.new_listings ?? 0, icon: <FileText className="w-4 h-4" /> },
+    { label: t('community.new_connections'), value: num(thisMonth.new_connections), trend: trends.new_connections ?? 0, icon: <Handshake className="w-4 h-4" /> },
+    { label: t('community.volunteer_hours'), value: num(thisMonth.volunteer_hours), trend: trends.volunteer_hours ?? 0, icon: <Clock className="w-4 h-4" /> },
+    { label: t('community.new_posts'), value: num(thisMonth.new_posts), trend: trends.new_posts ?? 0, icon: <FileText className="w-4 h-4" /> },
   ];
 
   return (
