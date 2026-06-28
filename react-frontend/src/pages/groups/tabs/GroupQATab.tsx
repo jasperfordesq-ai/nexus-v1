@@ -256,16 +256,22 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
     setAsking(true);
 
     try {
-      await api.post(`/v2/groups/${groupId}/questions`, {
+      const response = await api.post(`/v2/groups/${groupId}/questions`, {
         title: askTitle.trim(),
         body: askBody.trim(),
       });
 
-      toast.success(t('qa.ask_success'));
-      setAskTitle('');
-      setAskBody('');
-      askModal.onClose();
-      loadQuestions(true);
+      if (response.success) {
+        toast.success(t('qa.ask_success'));
+        setAskTitle('');
+        setAskBody('');
+        askModal.onClose();
+        loadQuestions(true);
+      } else {
+        // A failed request resolves to { success: false } without throwing, so the
+        // unconditional success toast + modal close used to fake a posted question.
+        toast.error(response.error || t('qa.ask_error'));
+      }
     } catch (err) {
       logError('GroupQATab.ask', err);
       toast.error(t('qa.ask_error'));
@@ -283,15 +289,19 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
     setSubmittingAnswer(true);
 
     try {
-      await api.post(`/v2/groups/${groupId}/questions/${expandedId}/answers`, {
+      const response = await api.post(`/v2/groups/${groupId}/questions/${expandedId}/answers`, {
         body: answerBody.trim(),
       });
 
-      toast.success(t('qa.answer_success'));
-      setAnswerBody('');
-      // Refresh expanded detail and list counts
-      toggleExpand(expandedId);
-      loadQuestions(true);
+      if (response.success) {
+        toast.success(t('qa.answer_success'));
+        setAnswerBody('');
+        // Refresh expanded detail and list counts
+        toggleExpand(expandedId);
+        loadQuestions(true);
+      } else {
+        toast.error(response.error || t('qa.answer_error'));
+      }
     } catch (err) {
       logError('GroupQATab.answer', err);
       toast.error(t('qa.answer_error'));
@@ -315,11 +325,19 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
     setVotingIds((prev) => new Set(prev).add(key));
 
     try {
-      await api.post(`/v2/groups/${groupId}/qa/vote`, {
+      const response = await api.post(`/v2/groups/${groupId}/qa/vote`, {
         type,
         target_id: targetId,
         vote,
       });
+
+      if (!response.success) {
+        // A failed vote resolves to { success: false } without throwing — don't
+        // apply the optimistic count change (it would leave a wrong, un-rolled-back
+        // vote count) and surface the error instead.
+        toast.error(response.error || t('qa.vote_error'));
+        return;
+      }
 
       // Update local state for immediate feedback
       if (type === 'question') {
@@ -384,7 +402,13 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
     if (!expandedDetail) return;
 
     try {
-      await api.post(`/v2/groups/${groupId}/answers/${answerId}/accept`);
+      const response = await api.post(`/v2/groups/${groupId}/answers/${answerId}/accept`);
+
+      if (!response.success) {
+        // Don't mark the answer accepted (and award the answerer) on a failed request.
+        toast.error(response.error || t('qa.accept_error'));
+        return;
+      }
 
       toast.success(t('qa.accept_success'));
 

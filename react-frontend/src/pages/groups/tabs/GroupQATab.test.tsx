@@ -147,6 +147,27 @@ describe('GroupQATab', () => {
     });
   });
 
+  it('shows an error and does not apply the vote when a vote request fails', async () => {
+    // Regression: handleVote (and ask/answer/accept) ran their success path after
+    // `await api.post(...)` WITHOUT checking response.success — a failed request
+    // resolves { success: false } without throwing, so the vote applied an optimistic
+    // count change that was never rolled back, with no error shown. Now it surfaces
+    // the error and skips the optimistic update. (Same fake-success class as the
+    // group-exchange actions.)
+    mockApi.get.mockResolvedValue(makeListResp([makeQuestion()]));
+    mockApi.post.mockResolvedValue({ success: false, error: 'Vote rejected' });
+    const { GroupQATab } = await import('./GroupQATab');
+    render(<GroupQATab groupId={10} isAdmin={false} isMember={true} />);
+
+    await waitFor(() =>
+      expect(screen.getByText('How does timebanking work?')).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /upvote/i }));
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalled());
+  });
+
   it('shows "Ask Question" button for members', async () => {
     const { GroupQATab } = await import('./GroupQATab');
     render(<GroupQATab groupId={10} isAdmin={false} isMember={true} />);
