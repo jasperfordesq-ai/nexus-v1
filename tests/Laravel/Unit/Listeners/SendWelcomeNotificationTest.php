@@ -41,10 +41,11 @@ class SendWelcomeNotificationTest extends TestCase
         Cache::flush();
     }
 
-    public function test_implements_should_queue(): void
+    public function test_runs_inline_for_activation_delivery(): void
     {
-        $this->assertTrue(
-            in_array(ShouldQueue::class, class_implements(SendWelcomeNotification::class))
+        $this->assertFalse(
+            in_array(ShouldQueue::class, class_implements(SendWelcomeNotification::class), true),
+            'SendWelcomeNotification must not implement ShouldQueue; activation email delivery is registration-critical.'
         );
     }
 
@@ -136,8 +137,8 @@ class SendWelcomeNotificationTest extends TestCase
     }
 
     /**
-     * Regression guard for the 2026-04-02 email-bombing class: if a redis
-     * re-delivery fires the listener again for the SAME registration, the
+     * Regression guard for the 2026-04-02 email-bombing class: if a duplicate
+     * event fires the listener again for the SAME registration, the
      * idempotency guard must short-circuit BEFORE any bell/email/token work.
      */
     public function test_handle_suppresses_duplicate_delivery_when_already_handled(): void

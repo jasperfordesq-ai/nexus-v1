@@ -736,6 +736,7 @@ class TenantBootstrapController extends BaseApiController
             try {
                 $footerSettingKeys = [
                     'general.partner_logo_url',
+                    'general.partner_logo_label',
                     'general.partner_logo_link_url',
                     'general.powered_by_label',
                     'general.powered_by_image_light',

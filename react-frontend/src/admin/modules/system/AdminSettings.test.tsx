@@ -141,6 +141,7 @@ const makeSettingsData = (overrides: Record<string, unknown> = {}) => ({
       maintenance_mode: 'false',
       footer_text: 'Charity No. 12345',
       partner_logo_url: '',
+      partner_logo_label: '',
       partner_logo_link_url: '',
       powered_by_label: '',
       powered_by_image_light: '',
@@ -265,6 +266,27 @@ describe('AdminSettings', () => {
     await waitFor(() => {
       // "Branding & Legal" is the English for system.section_branding_legal
       expect(screen.getByText('Branding & Legal')).toBeInTheDocument();
+    });
+  });
+
+  it('loads and saves the partner logo label', async () => {
+    mockAdminSettings.get.mockResolvedValue(makeSettingsData({
+      partner_logo_label: 'Community sponsor',
+    }));
+
+    const { AdminSettings } = await import('./AdminSettings');
+    render(<AdminSettings />);
+
+    const labelInput = await screen.findByDisplayValue('Community sponsor');
+    await userEvent.clear(labelInput);
+    await userEvent.type(labelInput, 'Local partner');
+
+    const saveBtn = screen.getAllByRole('button').find((b) => b.textContent?.includes('Save settings'));
+    expect(saveBtn).toBeDefined();
+    await userEvent.click(saveBtn!);
+
+    await waitFor(() => {
+      expect(mockAdminSettings.update).toHaveBeenCalledWith({ partner_logo_label: 'Local partner' });
     });
   });
 

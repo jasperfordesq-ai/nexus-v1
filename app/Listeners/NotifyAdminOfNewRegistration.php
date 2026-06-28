@@ -12,7 +12,6 @@ use App\Events\UserRegistered;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Services\EmailDispatchService;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,19 +19,11 @@ use Illuminate\Support\Facades\Log;
 /**
  * Notifies all admins, brokers, and coordinators when a new user registers.
  */
-class NotifyAdminOfNewRegistration implements ShouldQueue
+class NotifyAdminOfNewRegistration
 {
-    /**
-     * Fail fast instead of letting redis re-deliver this fanout mid-flight
-     * (retry_after=90s). A re-delivery would re-email EVERY admin. $timeout<retry_after
-     * plus the Cache idempotency guard keep one event → one fanout.
-     */
-    public int $tries = 1;
-    public int $timeout = 60;
-
     public function handle(UserRegistered $event): void
     {
-        // Idempotency guard: suppress duplicate/concurrent re-deliveries so the admin
+        // Idempotency guard: suppress duplicate/concurrent deliveries so the admin
         // fanout (email + bell to every admin) runs exactly once per event.
         $entityId = (int) ($event->user->id ?? 0);
         $tenantId = (int) ($event->tenantId ?? 0);
@@ -123,7 +114,7 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
                 }
             }
 
-            // Mark handled only after the full fanout ran, so a redis re-delivery can't re-email admins.
+            // Mark handled only after the full fanout ran, so a duplicate delivery can't re-email admins.
             if ($handledKey !== null) {
                 Cache::put($handledKey, 1, now()->addHours(24));
             }

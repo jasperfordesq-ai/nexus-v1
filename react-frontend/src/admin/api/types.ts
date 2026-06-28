@@ -1833,6 +1833,7 @@ export interface AdminSettingsResponse {
     maintenance_mode: string | null;
     footer_text: string | null;
     partner_logo_url: string | null;
+    partner_logo_label: string | null;
     partner_logo_link_url: string | null;
     powered_by_label: string | null;
     powered_by_image_light: string | null;

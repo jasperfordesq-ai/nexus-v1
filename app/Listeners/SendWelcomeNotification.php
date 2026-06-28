@@ -12,7 +12,6 @@ use App\Events\UserRegistered;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Services\EmailDispatchService;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -24,18 +23,8 @@ use Illuminate\Support\Facades\Log;
  * welcome + verification email with a verify link. For already-active users
  * (e.g. admin-created), it sends a generic welcome.
  */
-class SendWelcomeNotification implements ShouldQueue
+class SendWelcomeNotification
 {
-    /**
-     * Fail fast rather than letting redis re-deliver mid-flight. The queue's
-     * retry_after is 90s; a slow welcome (HTML build + email send + token write)
-     * released back to another worker would re-send the activation email and
-     * re-issue the verification token. Killing at 60s and not retrying keeps one
-     * registration → one welcome. Belt-and-braces with the Cache guard in handle().
-     */
-    public int $tries = 1;
-    public int $timeout = 60;
-
     public function __construct()
     {
         //
@@ -46,7 +35,7 @@ class SendWelcomeNotification implements ShouldQueue
      */
     public function handle(UserRegistered $event): void
     {
-        // Idempotency guard: suppress duplicate/concurrent re-deliveries for the
+        // Idempotency guard: suppress duplicate/concurrent deliveries for the
         // same registration so the activation email + verification token are
         // issued exactly once (regression guard for the 2026-04-02 email-bombing class).
         $userId = (int) ($event->user->id ?? 0);
@@ -158,8 +147,8 @@ class SendWelcomeNotification implements ShouldQueue
                 }
             });
 
-            // Mark handled only after the flow ran to completion so a redis
-            // re-delivery cannot re-send the welcome/activation email.
+            // Mark handled only after the flow ran to completion so a duplicate
+            // delivery cannot re-send the welcome/activation email.
             if ($handledKey !== null) {
                 Cache::put($handledKey, 1, now()->addHours(24));
             }

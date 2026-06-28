@@ -60,19 +60,19 @@ class NotifyAdminOfNewRegistrationTest extends TestCase
     // Contract
     // -------------------------------------------------------------------------
 
-    public function test_implements_should_queue(): void
+    public function test_runs_inline_for_registration_admin_alerts(): void
     {
-        $this->assertTrue(
+        $this->assertFalse(
             in_array(ShouldQueue::class, class_implements(NotifyAdminOfNewRegistration::class), true),
-            'NotifyAdminOfNewRegistration must implement ShouldQueue'
+            'NotifyAdminOfNewRegistration must not implement ShouldQueue; registration admin alerts are critical delivery.'
         );
     }
 
-    public function test_tries_is_one_and_timeout_is_sixty(): void
+    public function test_no_queue_retry_contract_is_exposed(): void
     {
         $listener = new NotifyAdminOfNewRegistration();
-        $this->assertSame(1, $listener->tries);
-        $this->assertSame(60, $listener->timeout);
+        $this->assertObjectNotHasProperty('tries', $listener);
+        $this->assertObjectNotHasProperty('timeout', $listener);
     }
 
     // -------------------------------------------------------------------------

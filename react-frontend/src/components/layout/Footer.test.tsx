@@ -150,8 +150,9 @@ describe('Footer', () => {
         },
       });
       render(<Footer />);
-      const img = screen.getByAltText('Logo Tenant');
-      expect(img).toHaveAttribute('src', '/logo.png');
+      const images = screen.getAllByAltText('Logo Tenant');
+      expect(images.length).toBeGreaterThan(0);
+      images.forEach((img) => expect(img).toHaveAttribute('src', '/logo.png'));
     });
 
     it('renders tagline', () => {
@@ -168,6 +169,32 @@ describe('Footer', () => {
       });
       render(<Footer />);
       expect(screen.getByText('Building stronger communities through the exchange of time.')).toBeInTheDocument();
+    });
+  });
+
+  describe('Partner logo label', () => {
+    it('uses the custom partner logo label in the footer and image alternative text', () => {
+      setupDefaultMocks({
+        tenant: {
+          tenant: {
+            id: 2,
+            name: 'Test',
+            slug: 'test',
+            contact: null,
+            config: {
+              partner_logo_url: '/partner.svg',
+              partner_logo_label: 'Local partner',
+            },
+          },
+        },
+      });
+
+      render(<Footer />);
+
+      expect(screen.getByText('Local partner')).toBeInTheDocument();
+      const images = screen.getAllByRole('img', { name: 'Local partner' });
+      expect(images.length).toBeGreaterThan(0);
+      images.forEach((img) => expect(img).toHaveAttribute('src', '/partner.svg'));
     });
   });
 

@@ -52,7 +52,9 @@ export function Footer({ children, copyright }: FooterProps) {
   const pbLabel = tenant?.config?.powered_by_label as string | undefined;
 
   const partnerLogoUrl  = tenant?.config?.partner_logo_url      as string | undefined;
+  const partnerLogoLabel = tenant?.config?.partner_logo_label   as string | undefined;
   const partnerLinkUrl  = tenant?.config?.partner_logo_link_url as string | undefined;
+  const partnerLabel = partnerLogoLabel || t('footer.community_partner');
 
   // Use tenant's footer_text from config if set, otherwise build a default
   const footerText = tenant?.config?.footer_text?.trim()
@@ -79,11 +81,11 @@ export function Footer({ children, copyright }: FooterProps) {
           {/* Tenant partner logo — real or placeholder */}
           {partnerLogoUrl ? (
             partnerLinkUrl ? (
-              <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" className="max-w-full transition-opacity hover:opacity-80">
-                <img src={partnerLogoUrl} alt={branding.name} className="max-h-16 w-auto max-w-full object-contain" />
+              <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" title={partnerLabel} aria-label={partnerLabel} className="max-w-full transition-opacity hover:opacity-80">
+                <img src={partnerLogoUrl} alt={partnerLabel} className="max-h-16 w-auto max-w-full object-contain" />
               </a>
             ) : (
-              <img src={partnerLogoUrl} alt={branding.name} className="max-h-16 w-auto max-w-full object-contain" />
+              <img src={partnerLogoUrl} alt={partnerLabel} className="max-h-16 w-auto max-w-full object-contain" />
             )
           ) : (
             <div className="w-full max-w-[22rem] border-2 border-dashed border-theme-default/40 rounded-xl h-16 flex items-center justify-center">
@@ -251,15 +253,15 @@ export function Footer({ children, copyright }: FooterProps) {
                 {/* COL 1: Community partner logo */}
                 <div className="flex min-w-0 flex-col items-start gap-2">
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-theme-subtle/50">
-                    {t('footer.community_partner')}
+                    {partnerLabel}
                   </span>
                   {partnerLogoUrl ? (
                     partnerLinkUrl ? (
-                      <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" className="max-w-full transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-accent rounded-lg">
-                        <img src={partnerLogoUrl} alt={branding.name} className="max-h-20 w-auto max-w-full object-contain" />
+                      <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" title={partnerLabel} aria-label={partnerLabel} className="max-w-full transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-accent rounded-lg">
+                        <img src={partnerLogoUrl} alt={partnerLabel} className="max-h-20 w-auto max-w-full object-contain" />
                       </a>
                     ) : (
-                      <img src={partnerLogoUrl} alt={branding.name} className="max-h-20 w-auto max-w-full object-contain" />
+                      <img src={partnerLogoUrl} alt={partnerLabel} className="max-h-20 w-auto max-w-full object-contain" />
                     )
                   ) : (
                     <div className="h-20 w-48 border-2 border-dashed border-theme-default/40 rounded-xl flex items-center justify-center">

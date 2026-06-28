@@ -129,6 +129,23 @@ class AdminSettingsControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_update_settings_saves_partner_logo_label(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPut('/v2/admin/settings', [
+            'partner_logo_label' => 'Local partner',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('tenant_settings', [
+            'tenant_id' => $this->testTenantId,
+            'setting_key' => 'general.partner_logo_label',
+            'setting_value' => 'Local partner',
+        ]);
+    }
+
     public function test_closing_registration_through_admin_settings_updates_public_registration_status_after_cache_warm(): void
     {
         DB::table('tenant_registration_policies')->updateOrInsert(

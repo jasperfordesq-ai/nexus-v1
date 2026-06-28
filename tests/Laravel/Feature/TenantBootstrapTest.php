@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Feature;
 
 use App\Models\Tenant;
+use App\Services\RedisCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
@@ -69,6 +70,27 @@ class TenantBootstrapTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonPath('data.slug', $this->testTenantSlug);
+    }
+
+    public function test_bootstrap_exposes_partner_logo_label_in_public_config(): void
+    {
+        $this->seedTestTenant();
+
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'general.partner_logo_label'],
+            [
+                'setting_value' => 'Local partner',
+                'setting_type' => 'string',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        app(RedisCache::class)->delete('tenant_bootstrap', $this->testTenantId);
+
+        $response = $this->apiGet('/v2/tenant/bootstrap?slug=' . $this->testTenantSlug);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.config.partner_logo_label', 'Local partner');
     }
 
     /**

@@ -7,44 +7,35 @@
 namespace Tests\Laravel\Feature\Console;
 
 use App\Core\TenantContext;
-use App\Events\UserRegistered;
+use App\Listeners\NotifyAdminOfNewRegistration;
 use App\Listeners\SendWelcomeNotification;
-use App\Models\User;
-use Illuminate\Events\CallQueuedListener;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Queue;
 use Tests\Laravel\TestCase;
 
 /**
  * H5 regression lock — activation-email queue resilience.
  *
- * The welcome/activation email is queue-only (SendWelcomeNotification is
- * ShouldQueue, deliberately tries=1). A dead worker would silently lock out
- * every new signup. The safety net is the scheduled `emails:resend-stuck-activations`
- * command, which re-sends ONLY to users who have NO activation email on record —
- * so a healthy system sends nothing, and a worker outage self-heals.
+ * Registration emails must not be queue-only. A dead worker would silently
+ * lock out new signups and hide them from admins, so the registration email
+ * listeners run inline while the scheduled `emails:resend-stuck-activations`
+ * command remains a recovery path for users who still have no activation log.
  */
 class ActivationEmailQueueResilienceTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function test_user_registered_queues_the_welcome_notification(): void
+    public function test_registration_email_listeners_run_inline_not_on_the_queue(): void
     {
-        Queue::fake();
-        TenantContext::setById($this->testTenantId);
+        $this->assertFalse(
+            in_array(ShouldQueue::class, class_implements(SendWelcomeNotification::class), true),
+            'Activation/welcome email must run inline so signup is not dependent on a queue worker.'
+        );
 
-        $user = User::factory()->forTenant($this->testTenantId)->create([
-            'status'            => 'pending',
-            'email_verified_at' => null,
-        ]);
-        TenantContext::setById($this->testTenantId);
-
-        event(new UserRegistered($user, $this->testTenantId));
-
-        Queue::assertPushed(
-            CallQueuedListener::class,
-            fn ($job) => $job->class === SendWelcomeNotification::class
+        $this->assertFalse(
+            in_array(ShouldQueue::class, class_implements(NotifyAdminOfNewRegistration::class), true),
+            'Admin new-registration email must run inline so admins are not dependent on a queue worker.'
         );
     }
 
