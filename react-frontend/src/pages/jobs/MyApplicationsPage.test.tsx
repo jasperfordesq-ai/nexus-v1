@@ -8,6 +8,12 @@ import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { api } from '@/lib/api';
 import type { ReactNode } from 'react';
 
+// Stable toast mock so tests can assert on success/error calls (the default
+// useToast mock returned a fresh object per call, which can't be asserted on).
+const { mockToast } = vi.hoisted(() => ({
+  mockToast: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
+}));
+
 vi.mock('@/lib/motion', () => ({
   motion: {
     div: ({ children, ...props }: { children?: ReactNode; [k: string]: unknown }) => {
@@ -58,12 +64,7 @@ vi.mock('@/contexts', () => ({
     hasFeature: vi.fn(() => true),
     hasModule: vi.fn(() => true),
   })),
-  useToast: vi.fn(() => ({
-    success: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
-    warning: vi.fn(),
-  })),
+  useToast: vi.fn(() => mockToast),
 
   useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
   useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
@@ -187,6 +188,52 @@ describe('MyApplicationsPage', () => {
       expect(screen.getByText('something_wrong')).toBeInTheDocument();
     });
     expect(screen.getByText('try_again')).toBeInTheDocument();
+  });
+
+  it('shows an error toast when the GDPR export request is rejected (not a silent no-op)', async () => {
+    // Regression: handleGdprExport gated the download on `if (res.success && res.data)`
+    // with no else, and the catch only fires on a thrown error. A { success:false }
+    // (4xx, which api.get resolves without throwing) produced NO download and NO
+    // message — the "Download my data" button looked dead. It must now surface an error.
+    vi.mocked(api.get).mockImplementation((url: string) =>
+      url.includes('gdpr-export')
+        ? Promise.resolve({ success: false, error: 'Export failed' })
+        : Promise.resolve(emptyApplicationsResponse)
+    );
+    render(<MyApplicationsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('gdpr.export_my_data')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('gdpr.export_my_data'));
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalled();
+    });
+    expect(mockToast.success).not.toHaveBeenCalled();
+  });
+
+  it('shows a success toast after a successful GDPR export', async () => {
+    // jsdom does not implement URL.createObjectURL / revokeObjectURL — stub so the
+    // blob-download path doesn't throw before the success toast.
+    const origCreate = URL.createObjectURL;
+    const origRevoke = URL.revokeObjectURL;
+    URL.createObjectURL = vi.fn(() => 'blob:mock');
+    URL.revokeObjectURL = vi.fn();
+    vi.mocked(api.get).mockImplementation((url: string) =>
+      url.includes('gdpr-export')
+        ? Promise.resolve({ success: true, data: { applications: [] } })
+        : Promise.resolve(emptyApplicationsResponse)
+    );
+    render(<MyApplicationsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('gdpr.export_my_data')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('gdpr.export_my_data'));
+    await waitFor(() => {
+      expect(mockToast.success).toHaveBeenCalled();
+    });
+    expect(mockToast.error).not.toHaveBeenCalled();
+    URL.createObjectURL = origCreate;
+    URL.revokeObjectURL = origRevoke;
   });
 
   it('shows Load More button when has_more is true', async () => {

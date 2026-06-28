@@ -941,9 +941,17 @@ export function MyApplicationsPage() {
         a.download = 'my-job-data.json';
         a.click();
         URL.revokeObjectURL(url);
+        toastRef.current.success(tRef.current('gdpr.export_success'));
+      } else {
+        // api.get resolves { success:false } on a 4xx/5xx WITHOUT throwing, so the
+        // catch never fired — without this branch a failed export did nothing at all
+        // (no download, no message), leaving the user unsure whether their GDPR data
+        // request worked.
+        toastRef.current.error((res as { error?: string }).error ?? tRef.current('something_wrong'));
       }
     } catch (err) {
       logError('GDPR export failed', err);
+      toastRef.current.error(tRef.current('something_wrong'));
     } finally {
       setIsExportingGdpr(false);
     }
