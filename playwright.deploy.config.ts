@@ -21,11 +21,16 @@ import { defineConfig, devices } from '@playwright/test';
  *    API (primeApiAuth) — no shared storage-state files required.
  *  - All outputs go to /tmp so the e2e/ tree can be mounted read-only.
  *
- * Known v1 limitation: page-load tests exercise the candidate BUNDLE, but the
- * SPA's own runtime data calls use the app's configured absolute API URL (the
- * live colour). Direct API assertions (login/bootstrap/categories) DO hit the
- * candidate API. A v2 enhancement can pin SPA traffic to the candidate via
- * Playwright request routing.
+ * SPA traffic pinning (was the v1 limitation): the production bundle hard-codes
+ * the absolute live API origin, so loading the candidate frontend from
+ * 127.0.0.1 would send the SPA's own bootstrap/data fetches cross-origin to the
+ * LIVE colour — and they are CORS-blocked from a 127.0.0.1 origin, leaving the
+ * SPA stuck on "Loading community". pinSpaApiToCandidate() (e2e/helpers/
+ * test-utils.ts), wired into smoke.spec.ts's beforeEach, intercepts those calls
+ * and proxies them to the candidate API (E2E_API_URL, reachable via the
+ * runner's --network host), fulfilling with CORS headers. The gate therefore
+ * now exercises the candidate's own frontend AND API end-to-end. Direct API
+ * assertions (login/bootstrap/categories) already hit the candidate API.
  */
 export default defineConfig({
   testDir: './e2e/tests',

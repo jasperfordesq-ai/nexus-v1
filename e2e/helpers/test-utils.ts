@@ -30,6 +30,85 @@ export async function goToTenantPage(page: Page, path: string, tenant: string = 
 }
 
 /**
+ * Deploy-gate only: pin the SPA's baked absolute API origin to the blue/green
+ * CANDIDATE API.
+ *
+ * The production React bundle hard-codes `https://api.project-nexus.ie` as its
+ * API base. When the deploy gate loads the candidate frontend from
+ * `http://127.0.0.1:<port>`, the browser's bootstrap/data fetches go
+ * cross-origin to the LIVE API, which does not return an
+ * `Access-Control-Allow-Origin` for a `127.0.0.1` origin — so every call is
+ * CORS-blocked and the SPA stays stuck on "Loading community", making every
+ * page-content test time out. (`primeApiAuth` works regardless because it uses
+ * Playwright's server-side request context, which is not subject to CORS.)
+ *
+ * We intercept the SPA's calls to that origin and proxy them to the candidate
+ * API (reachable on 127.0.0.1 via the runner's `--network host`), fulfilling
+ * with permissive CORS headers so the browser accepts the same request it would
+ * have made in production — but served by the candidate being deployed.
+ *
+ * No-op unless `E2E_API_URL` (the candidate API base) is set, so it never
+ * affects normal (non-gate) e2e runs that talk to a same-origin dev server.
+ */
+export async function pinSpaApiToCandidate(page: Page): Promise<void> {
+  const candidateApi = process.env.E2E_API_URL;
+  if (!candidateApi) return;
+
+  const spaApiOrigin = (process.env.E2E_SPA_API_ORIGIN || 'https://api.project-nexus.ie').replace(/\/+$/, '');
+  const target = candidateApi.replace(/\/+$/, '');
+  if (spaApiOrigin === target) return;
+
+  const escaped = spaApiOrigin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  await page.route(new RegExp('^' + escaped + '/'), async (route) => {
+    const request = route.request();
+    let pageOrigin = '*';
+    try {
+      pageOrigin = new URL(page.url()).origin;
+    } catch {
+      pageOrigin = '*';
+    }
+
+    // Answer CORS preflight locally; the actual request follows separately.
+    if (request.method() === 'OPTIONS') {
+      await route.fulfill({
+        status: 204,
+        headers: {
+          'access-control-allow-origin': pageOrigin,
+          'access-control-allow-credentials': 'true',
+          'access-control-allow-methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+          'access-control-allow-headers': request.headers()['access-control-request-headers'] || '*',
+          'access-control-max-age': '600',
+        },
+      });
+      return;
+    }
+
+    try {
+      const response = await route.fetch({ url: request.url().replace(spaApiOrigin, target) });
+      const headers: Record<string, string> = { ...response.headers() };
+      // Body is already decoded by Playwright; stale encoding/length headers
+      // would make the browser mis-parse the fulfilled response.
+      delete headers['content-encoding'];
+      delete headers['content-length'];
+      headers['access-control-allow-origin'] = pageOrigin;
+      headers['access-control-allow-credentials'] = 'true';
+      await route.fulfill({ response, headers });
+    } catch {
+      // The page may have navigated or closed while the request was in flight
+      // (so fulfill/fetch threw), or the route was already handled. A route
+      // handler must never throw or double-handle — abort best-effort and
+      // swallow any "already handled" error.
+      try {
+        await route.abort();
+      } catch {
+        /* route already handled — safe to ignore */
+      }
+    }
+  });
+}
+
+/**
  * Dismiss the development notice modal if present
  * This modal blocks all interactions until dismissed
  */

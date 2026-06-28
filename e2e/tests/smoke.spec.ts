@@ -9,6 +9,7 @@ import {
   goToTenantPage,
   waitForPageLoad,
   dismissBlockingModals,
+  pinSpaApiToCandidate,
   DEFAULT_TENANT,
 } from '../helpers/test-utils';
 
@@ -103,6 +104,11 @@ async function waitForTenantHydration(page: Page): Promise<void> {
 }
 
 test.beforeEach(async ({ page }) => {
+  // Deploy gate: the candidate bundle calls the live API origin, which is
+  // CORS-blocked from the 127.0.0.1 gate origin. Proxy those calls to the
+  // candidate API so the SPA can actually bootstrap and render. No-op outside
+  // the gate (only active when E2E_API_URL points at a candidate API).
+  await pinSpaApiToCandidate(page);
   await primeBrowserState(page);
   consoleErrors = [];
   page.on('pageerror', (error) => {
