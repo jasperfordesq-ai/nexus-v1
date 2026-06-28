@@ -174,24 +174,26 @@ export default function BookmarksPage() {
     setCollSaving(true);
 
     try {
-      if (editingColl) {
-        await api.patch(`/v2/bookmark-collections/${editingColl.id}`, {
-          name: newCollName.trim(),
-          description: newCollDesc.trim() || null,
-        });
-        toast.success(t('bookmarks.collection_updated'));
+      const payload = {
+        name: newCollName.trim(),
+        description: newCollDesc.trim() || null,
+      };
+      const response = editingColl
+        ? await api.patch(`/v2/bookmark-collections/${editingColl.id}`, payload)
+        : await api.post('/v2/bookmark-collections', payload);
+
+      if (response.success) {
+        toast.success(editingColl ? t('bookmarks.collection_updated') : t('bookmarks.collection_created'));
+        onCreateClose();
+        setNewCollName('');
+        setNewCollDesc('');
+        setEditingColl(null);
+        loadCollections();
       } else {
-        await api.post('/v2/bookmark-collections', {
-          name: newCollName.trim(),
-          description: newCollDesc.trim() || null,
-        });
-        toast.success(t('bookmarks.collection_created'));
+        // A failed request resolves to { success: false } without throwing — the
+        // unconditional success toast + form reset used to fake a saved collection.
+        toast.error(response.error || t('bookmarks.collection_save_failed'));
       }
-      onCreateClose();
-      setNewCollName('');
-      setNewCollDesc('');
-      setEditingColl(null);
-      loadCollections();
     } catch (err) {
       logError('Failed to save collection', err);
       toast.error(t('bookmarks.collection_save_failed'));
@@ -209,12 +211,16 @@ export default function BookmarksPage() {
     if (!deletingColl) return;
     setCollDeleting(true);
     try {
-      await api.delete(`/v2/bookmark-collections/${deletingColl.id}`);
-      toast.success(t('bookmarks.collection_deleted'));
-      if (selectedCollection === deletingColl.id) setSelectedCollection(null);
-      onDeleteClose();
-      setDeletingColl(null);
-      loadCollections();
+      const response = await api.delete(`/v2/bookmark-collections/${deletingColl.id}`);
+      if (response.success) {
+        toast.success(t('bookmarks.collection_deleted'));
+        if (selectedCollection === deletingColl.id) setSelectedCollection(null);
+        onDeleteClose();
+        setDeletingColl(null);
+        loadCollections();
+      } else {
+        toast.error(response.error || t('bookmarks.collection_delete_failed'));
+      }
     } catch (err) {
       logError('Failed to delete collection', err);
       toast.error(t('bookmarks.collection_delete_failed'));
