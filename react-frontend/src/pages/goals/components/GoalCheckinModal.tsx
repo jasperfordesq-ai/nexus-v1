@@ -28,6 +28,7 @@ import Zap from 'lucide-react/icons/zap';
 import Star from 'lucide-react/icons/star';
 import Clock from 'lucide-react/icons/clock';
 import TrendingUp from 'lucide-react/icons/trending-up';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import MessageSquare from 'lucide-react/icons/message-square';
 import { GlassCard, Button, Chip, Spinner, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useToast } from '@/contexts';
@@ -106,6 +107,7 @@ export function GoalCheckinModal({
   // History state
   const [checkins, setCheckins] = useState<CheckIn[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [historyError, setHistoryError] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
 
   // Reset form when opening. Done during render with a prev-prop comparison
@@ -127,16 +129,24 @@ export function GoalCheckinModal({
   const loadCheckins = useCallback(async () => {
     try {
       setIsLoadingHistory(true);
+      setHistoryError(null);
       const response = await api.get<CheckIn[]>(`/v2/goals/${goalId}/checkins`);
       if (response.success && response.data) {
         setCheckins(Array.isArray(response.data) ? response.data : []);
+      } else {
+        // api.get resolves { success:false } on a 4xx/5xx WITHOUT throwing, so the
+        // catch never fired — without this branch a failed history load fell through
+        // to the "no check-ins yet" empty state, making a load failure look like a
+        // goal that simply has no check-ins.
+        setHistoryError(t('history.load_failed'));
       }
     } catch (err) {
       logError('Failed to load check-ins', err);
+      setHistoryError(t('history.load_failed'));
     } finally {
       setIsLoadingHistory(false);
     }
-  }, [goalId]);
+  }, [goalId, t]);
 
   useEffect(() => {
     if (isOpen && showHistory) {
@@ -224,6 +234,19 @@ export function GoalCheckinModal({
               {isLoadingHistory ? (
                 <div role="status" aria-busy="true" aria-label={t('insights.loading')} className="flex items-center justify-center py-8">
                   <Spinner size="md" color="primary" />
+                </div>
+              ) : historyError ? (
+                <div role="alert" className="text-center py-8">
+                  <p className="text-sm text-theme-muted mb-2">{historyError}</p>
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    className="bg-theme-elevated text-theme-primary"
+                    startContent={<RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />}
+                    onPress={loadCheckins}
+                  >
+                    {t('history.retry')}
+                  </Button>
                 </div>
               ) : checkins.length === 0 ? (
                 <div className="text-center py-8">

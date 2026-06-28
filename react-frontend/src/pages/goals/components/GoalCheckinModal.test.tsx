@@ -216,6 +216,28 @@ describe('GoalCheckinModal', () => {
     });
   });
 
+  it('shows an error + retry (not the empty state) when history load returns success:false', async () => {
+    // Regression: loadCheckins gated on `if (response.success && response.data)` with
+    // no else, and the catch only fires on a thrown error. A { success:false } (4xx,
+    // which api.get resolves without throwing) used to fall through to the
+    // "no check-ins yet" empty state — a load failure looked like a goal with no
+    // check-ins. It must now reach a distinct error state with a retry control.
+    mockApi.get.mockResolvedValue({ success: false, error: 'Cannot load' });
+    const { GoalCheckinModal } = await import('./GoalCheckinModal');
+    render(<GoalCheckinModal {...defaultProps} />);
+
+    const historyBtn = screen.getAllByRole('button').find((b) => b.textContent?.toLowerCase().includes('history'));
+    if (historyBtn) fireEvent.click(historyBtn);
+
+    await waitFor(() => {
+      expect(document.querySelector('[role="alert"]')).toBeTruthy();
+    });
+    const retryBtn = screen.getAllByRole('button').find((b) =>
+      b.textContent?.toLowerCase().includes('retry') || b.textContent?.toLowerCase().includes('again')
+    );
+    expect(retryBtn).toBeDefined();
+  });
+
   it('displays checkin note when history loads', async () => {
     mockApi.get.mockResolvedValue({ success: true, data: [makeCheckin({ note: 'Great run today' })] });
     const { GoalCheckinModal } = await import('./GoalCheckinModal');
