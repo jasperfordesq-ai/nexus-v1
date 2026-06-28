@@ -388,7 +388,8 @@
     "description": "Membros ativos da comunidade em destaque hoje",
     "member_since": "Membro desde",
     "empty_title": "Sem destaque ainda",
-    "empty_description": "Os membros ativos serão apresentados aqui assim que a comunidade começar a trocar."
+    "empty_description": "Os membros ativos serão apresentados aqui assim que a comunidade começar a trocar.",
+    "load_error": "Não foi possível carregar os membros em destaque. Tenta novamente."
   },
   "nexus_score": {
     "title": "NexusScore",

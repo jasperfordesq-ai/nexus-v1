@@ -388,7 +388,8 @@
     "description": "Today's featured active community members",
     "member_since": "Member since",
     "empty_title": "No Spotlight Yet",
-    "empty_description": "Active members will be featured here once the community starts exchanging."
+    "empty_description": "Active members will be featured here once the community starts exchanging.",
+    "load_error": "Couldn’t load the member spotlight. Please try again."
   },
   "nexus_score": {
     "title": "NexusScore",

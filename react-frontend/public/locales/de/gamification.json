@@ -388,7 +388,8 @@
     "description": "Heutige hervorgehobene aktive Gemeinschaftsmitglieder",
     "member_since": "Mitglied seit",
     "empty_title": "Noch kein Spotlight",
-    "empty_description": "Aktive Mitglieder werden hier vorgestellt, sobald die Gemeinschaft mit dem Tauschen beginnt."
+    "empty_description": "Aktive Mitglieder werden hier vorgestellt, sobald die Gemeinschaft mit dem Tauschen beginnt.",
+    "load_error": "Das Mitglieder-Spotlight konnte nicht geladen werden. Bitte versuche es erneut."
   },
   "nexus_score": {
     "title": "NexusScore",

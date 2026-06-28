@@ -388,7 +388,8 @@
     "description": "Membri attivi della comunità in evidenza oggi",
     "member_since": "Membro dal",
     "empty_title": "Nessun riflettore ancora",
-    "empty_description": "I membri attivi saranno messi in evidenza qui una volta che la comunità inizierà a scambiare."
+    "empty_description": "I membri attivi saranno messi in evidenza qui una volta che la comunità inizierà a scambiare.",
+    "load_error": "Impossibile caricare i membri in evidenza. Riprova."
   },
   "nexus_score": {
     "title": "NexusScore",

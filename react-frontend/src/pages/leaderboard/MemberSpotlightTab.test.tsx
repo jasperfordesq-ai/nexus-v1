@@ -185,7 +185,11 @@ describe('MemberSpotlightTab', () => {
     });
   });
 
-  it('shows empty state when API call fails (success=false)', async () => {
+  it('shows an error state (not the empty state) when the load fails', async () => {
+    // Regression: a failed load (api.get resolves { success:false } without throwing)
+    // used to fall through to the "No Spotlight Yet" empty state, so a server/connection
+    // failure was indistinguishable from a genuinely empty community. It must now show a
+    // distinct error message. Verified live by shimming the spotlight request to fail.
     vi.mocked(api.get).mockResolvedValueOnce({
       success: false,
       error: 'Server error',
@@ -194,8 +198,12 @@ describe('MemberSpotlightTab', () => {
     render(<MemberSpotlightTab />);
 
     await waitFor(() => {
-      expect(screen.queryByText('Alice Smith')).not.toBeInTheDocument();
+      // The error card renders a danger-coloured message.
+      expect(document.querySelector('.text-danger-500')).not.toBeNull();
     });
+    expect(screen.queryByText('Alice Smith')).not.toBeInTheDocument();
+    // It must NOT be the empty state.
+    expect(screen.queryByText(/No Spotlight Yet|spotlight\.empty_title/i)).not.toBeInTheDocument();
   });
 
   it('calls the correct API endpoint with limit param', async () => {

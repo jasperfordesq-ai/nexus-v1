@@ -388,7 +388,8 @@
     "description": "Miembros activos destacados de la comunidad hoy",
     "member_since": "Miembro desde",
     "empty_title": "Sin destacados aún",
-    "empty_description": "Los miembros activos aparecerán aquí una vez que la comunidad comience a intercambiar."
+    "empty_description": "Los miembros activos aparecerán aquí una vez que la comunidad comience a intercambiar.",
+    "load_error": "No se pudo cargar la selección de miembros. Inténtalo de nuevo."
   },
   "nexus_score": {
     "title": "Puntuación Nexus",

@@ -388,7 +388,8 @@
     "description": "Vandaag's uitgelichte actieve gemeenschapsleden",
     "member_since": "Lid sinds",
     "empty_title": "Nog Geen Spotlight",
-    "empty_description": "Actieve leden worden hier uitgelicht zodra de gemeenschap begint met uitwisselen."
+    "empty_description": "Actieve leden worden hier uitgelicht zodra de gemeenschap begint met uitwisselen.",
+    "load_error": "Kan de uitgelichte leden niet laden. Probeer het opnieuw."
   },
   "nexus_score": {
     "title": "NexusScore",

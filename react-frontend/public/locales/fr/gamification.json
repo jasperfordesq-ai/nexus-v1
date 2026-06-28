@@ -388,7 +388,8 @@
     "description": "Les membres actifs mis en lumière aujourd'hui",
     "member_since": "Membre depuis",
     "empty_title": "Pas encore de coup de projecteur",
-    "empty_description": "Les membres actifs seront mis en avant ici dès que la communauté commencera à échanger."
+    "empty_description": "Les membres actifs seront mis en avant ici dès que la communauté commencera à échanger.",
+    "load_error": "Impossible de charger la sélection de membres. Veuillez réessayer."
   },
   "nexus_score": {
     "title": "NexusScore",

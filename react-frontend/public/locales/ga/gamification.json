@@ -388,7 +388,8 @@
     "description": "Baill ghníomhacha molta an phobail inniu",
     "member_since": "Ball ó",
     "empty_title": "Gan Spotsholas fós",
-    "empty_description": "Cuirfear baill ghníomhacha i láthair anseo nuair a thosóidh an pobal ag malartú."
+    "empty_description": "Cuirfear baill ghníomhacha i láthair anseo nuair a thosóidh an pobal ag malartú.",
+    "load_error": "Níorbh fhéidir spotsolas na mball a lódáil. Bain triail eile as."
   },
   "nexus_score": {
     "title": "NexusScór",

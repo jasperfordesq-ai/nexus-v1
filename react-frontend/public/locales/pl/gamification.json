@@ -388,7 +388,8 @@
     "description": "Dzisiaj przedstawieni aktywni członkowie społeczności",
     "member_since": "Członek od",
     "empty_title": "Jeszcze nie ma reflektora",
-    "empty_description": "Aktywni członkowie zostaną tutaj uwzględnieni, gdy społeczność zacznie się wymieniać."
+    "empty_description": "Aktywni członkowie zostaną tutaj uwzględnieni, gdy społeczność zacznie się wymieniać.",
+    "load_error": "Nie udało się załadować wyróżnionych członków. Spróbuj ponownie."
   },
   "nexus_score": {
     "title": "Wynik Nexusa",

@@ -41,20 +41,27 @@ export default function MemberSpotlightTab() {
   const { tenantPath } = useTenant();
   const [members, setMembers] = useState<SpotlightMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
         setIsLoading(true);
+        setError(false);
         const res = await api.get<SpotlightMember[]>('/v2/gamification/member-spotlight?limit=6');
         if (res.success && res.data) {
           setMembers(Array.isArray(res.data) ? res.data : []);
         } else if (!res.success) {
+          // A failed request resolves { success:false } without throwing. Without an
+          // error state the empty "No Spotlight Yet" card rendered, hiding the failure
+          // as "there are no members" — track it and show a distinct error instead.
           logError('MemberSpotlightTab', res.error || 'Failed to load spotlight');
+          setError(true);
         }
       } catch (err: unknown) {
         if (err instanceof Error && err.name !== 'AbortError') {
           logError('MemberSpotlightTab', err);
+          setError(true);
         }
       } finally {
         setIsLoading(false);
@@ -80,6 +87,14 @@ export default function MemberSpotlightTab() {
           </GlassCard>
         ))}
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <GlassCard className="p-6 text-center">
+        <p className="text-danger-500">{t('spotlight.load_error')}</p>
+      </GlassCard>
     );
   }
 
