@@ -244,6 +244,11 @@ export function EventDetailPage() {
           prev.map((p) => (p.id === pollId ? { ...p, ...res.data! } : p))
         );
         toastRef.current.success(t('polls.vote_success'));
+      } else {
+        // api.post resolves { success:false } on a 4xx (poll closed, already voted,
+        // invalid option) WITHOUT throwing, so the catch never fired — without this
+        // branch the vote silently did nothing with no feedback at all.
+        toastRef.current.error((res as { error?: string }).error || t('polls.vote_failed'));
       }
     } catch (err) {
       logError('Failed to vote on poll', err);
