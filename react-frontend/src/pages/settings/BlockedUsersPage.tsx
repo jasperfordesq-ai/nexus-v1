@@ -70,6 +70,11 @@ export function BlockedUsersPage() {
           t('blocked_users.unblocked'),
           t('blocked_users.unblocked_desc', { name: unblockTarget.name })
         );
+      } else {
+        // api.delete resolves { success:false } on a 4xx/5xx WITHOUT throwing (and a
+        // 4xx raises no global toast), so without this branch a failed unblock just
+        // closed the modal (via finally) as if it worked while the user stayed blocked.
+        toast.error(t('error_title', { ns: 'common' }), t('blocked_users.unblock_error'));
       }
     } catch (err) {
       logError('Failed to unblock user', err);

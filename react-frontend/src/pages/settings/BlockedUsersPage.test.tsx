@@ -215,6 +215,31 @@ describe('BlockedUsersPage', () => {
     });
   });
 
+  it('shows an error toast and keeps the user when unblock returns success:false', async () => {
+    // Regression: api.delete resolves { success:false } on a 4xx WITHOUT throwing,
+    // so the success-only `if` was skipped, the catch never fired, and the finally
+    // closed the modal — a silent failure that looked like it worked while the user
+    // stayed blocked. The { success:false } path must now surface an error.
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: [MOCK_BLOCKED_USER] });
+    vi.mocked(api.delete).mockResolvedValue({ success: false, error: 'nope' });
+    render(<BlockedUsersPage />);
+
+    await waitFor(() => expect(screen.getByText('Bob Blocker')).toBeInTheDocument());
+
+    const [unblockBtn] = screen.getAllByRole('button', { name: /unblock/i });
+    fireEvent.click(unblockBtn);
+    await screen.findByRole('button', { name: /cancel/i });
+    await waitFor(() => {
+      const allBtns = screen.getAllByRole('button', { name: /unblock/i });
+      fireEvent.click(allBtns[allBtns.length - 1]);
+    });
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalled());
+    // The user must NOT be removed (the unblock failed), and success must not fire.
+    expect(screen.getByText('Bob Blocker')).toBeInTheDocument();
+    expect(mockToast.success).not.toHaveBeenCalled();
+  });
+
   it('closes the modal when cancel is clicked', async () => {
     vi.mocked(api.get).mockResolvedValue({ success: true, data: [MOCK_BLOCKED_USER] });
     render(<BlockedUsersPage />);
