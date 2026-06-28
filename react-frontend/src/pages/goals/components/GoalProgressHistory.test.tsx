@@ -139,6 +139,25 @@ describe('GoalProgressHistory', () => {
     });
   });
 
+  it('shows the error state and retry button when the load returns success:false', async () => {
+    // Regression: loadHistory gated on `if (response.success && response.data)` with no
+    // else, and the catch only fires on a thrown error. A { success:false } (4xx, which
+    // api.get resolves without throwing) used to fall through to the "no activity yet"
+    // empty state, hiding the error/retry UI — a load failure looked like an empty
+    // history. It must now reach the error state. Verified live.
+    mockApi.get.mockResolvedValue({ success: false, error: 'Cannot load' });
+    const { GoalProgressHistory } = await import('./GoalProgressHistory');
+    render(<GoalProgressHistory goalId={5} />);
+    await waitFor(() => {
+      const retryBtn = screen.getAllByRole('button').find((b) =>
+        b.textContent?.toLowerCase().includes('retry') || b.textContent?.toLowerCase().includes('again')
+      );
+      expect(retryBtn).toBeDefined();
+    });
+    // It is the error alert, not the empty state.
+    expect(document.querySelector('[role="alert"]')).toBeTruthy();
+  });
+
   it('retries load when retry button is clicked', async () => {
     mockApi.get.mockRejectedValueOnce(new Error('network'));
     mockApi.get.mockResolvedValueOnce(makeResponse([makeEvent()]));

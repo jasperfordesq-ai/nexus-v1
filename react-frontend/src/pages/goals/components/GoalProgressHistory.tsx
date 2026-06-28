@@ -159,6 +159,12 @@ export function GoalProgressHistory({ goalId, className = '' }: GoalProgressHist
       const response = await api.get<HistoryEvent[]>(`/v2/goals/${goalId}/history`);
       if (response.success && response.data) {
         setEvents(Array.isArray(response.data) ? response.data : []);
+      } else {
+        // api.get resolves { success:false } on a 4xx/5xx WITHOUT throwing, so the
+        // catch never fired — without this branch a failed load left error null and
+        // rendered the "No activity yet" empty state (hiding the error+retry UI below),
+        // making a load failure look like a goal that simply has no history.
+        setError(t('history.load_failed'));
       }
     } catch (err) {
       logError('Failed to load goal history', err);
