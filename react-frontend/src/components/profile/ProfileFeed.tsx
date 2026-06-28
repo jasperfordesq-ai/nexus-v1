@@ -260,9 +260,16 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
 
   const handleHidePost = useCallback(async (item: FeedItem) => {
     try {
-      await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
-      setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toastRef.current.success(tRef.current('post_hidden'));
+      const res = await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
+      // api.post resolves { success:false } on a 4xx WITHOUT throwing — without gating
+      // on it the post vanished from the list and a fake "hidden" toast showed while the
+      // backend kept it (it reappeared on the next reload).
+      if (res.success) {
+        setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+        toastRef.current.success(tRef.current('post_hidden'));
+      } else {
+        toastRef.current.error(tRef.current('hide_failed'));
+      }
     } catch (err) {
       logError('Failed to hide post', err);
       toastRef.current.error(tRef.current('hide_failed'));
@@ -282,6 +289,9 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
               : fi
           )
         );
+      } else {
+        // Surface a rejected vote instead of silently doing nothing.
+        toastRef.current.error(tRef.current('vote_failed'));
       }
     } catch (err) {
       logError('Failed to vote', err);
@@ -299,9 +309,13 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
     if (item.type !== 'post') {
       // Inline the hide flow to avoid coupling to the other useCallback's identity.
       try {
-        await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
-        setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-        toastRef.current.success(tRef.current('post_hidden'));
+        const res = await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
+        if (res.success) {
+          setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+          toastRef.current.success(tRef.current('post_hidden'));
+        } else {
+          toastRef.current.error(tRef.current('hide_failed'));
+        }
       } catch (err) {
         logError('Failed to hide post', err);
         toastRef.current.error(tRef.current('hide_failed'));
@@ -309,9 +323,16 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
       return;
     }
     try {
-      await api.post(`/v2/feed/posts/${item.id}/delete`);
-      setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toastRef.current.success(tRef.current('post_deleted'));
+      const res = await api.post(`/v2/feed/posts/${item.id}/delete`);
+      // Gate the removal + "deleted" toast on a confirmed delete — a { success:false }
+      // (already deleted / not owned / rate-limited) otherwise made the post vanish with
+      // a fake "deleted" confirmation while the backend kept it.
+      if (res.success) {
+        setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+        toastRef.current.success(tRef.current('post_deleted'));
+      } else {
+        toastRef.current.error(tRef.current('delete_failed'));
+      }
     } catch (err) {
       logError('Failed to delete post', err);
       toastRef.current.error(tRef.current('delete_failed'));

@@ -79,11 +79,18 @@ vi.mock('@/lib/motion', () => ({
 
 // ─── Stub heavy child components ─────────────────────────────────────────────
 vi.mock('@/components/feed/FeedCard', () => ({
-  FeedCard: ({ item }: { item: { id: number; type: string; content?: string; author?: { name?: string } } }) => (
+  FeedCard: ({ item, onHidePost, onDeletePost }: {
+    item: { id: number; type: string; content?: string; author?: { name?: string } };
+    onHidePost?: (item: unknown) => void;
+    onDeletePost?: (item: unknown) => void;
+  }) => (
     <div data-testid={`feed-card-${item.id}`}>
       <span data-testid="feed-card-type">{item.type}</span>
       {item.content && <span data-testid="feed-card-content">{item.content}</span>}
       {item.author?.name && <span>{item.author.name}</span>}
+      {/* Expose the action callbacks so the hide/delete handlers are testable. */}
+      <button data-testid={`hide-${item.id}`} onClick={() => onHidePost?.(item)}>hide</button>
+      <button data-testid={`delete-${item.id}`} onClick={() => onDeletePost?.(item)}>delete</button>
     </div>
   ),
 }));
@@ -170,6 +177,45 @@ describe('ProfileFeed', () => {
     await waitFor(() => {
       expect(screen.getByTestId('feed-card-1')).toBeInTheDocument();
     });
+  });
+
+  it('does not remove the post (and shows an error) when hide returns success:false', async () => {
+    // Regression: handleHidePost did an UNCHECKED `await api.post(.../hide)` then removed
+    // the post + a "hidden" success toast. api.post resolves { success:false } on a 4xx
+    // WITHOUT throwing, so a rejected hide used to make the post vanish with a fake
+    // confirmation (it reappeared on reload). It must keep the post + show an error.
+    mockApi.get.mockResolvedValue(makeResponse([makeFeedItem({ id: 7, type: 'post' })]));
+    mockApi.post.mockResolvedValue({ success: false, error: 'Cannot hide' });
+    const { ProfileFeed } = await import('./ProfileFeed');
+    render(<ProfileFeed userId={42} />);
+
+    await waitFor(() => expect(screen.getByTestId('feed-card-7')).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId('hide-7'));
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith('/v2/feed/posts/7/hide', expect.objectContaining({ type: 'post' }));
+    });
+    // The post is NOT removed on a rejected hide; an error (not success) is shown.
+    expect(screen.getByTestId('feed-card-7')).toBeInTheDocument();
+    expect(mockToast.error).toHaveBeenCalled();
+    expect(mockToast.success).not.toHaveBeenCalled();
+  });
+
+  it('does not remove the post (and shows an error) when delete returns success:false', async () => {
+    mockApi.get.mockResolvedValue(makeResponse([makeFeedItem({ id: 9, type: 'post' })]));
+    mockApi.post.mockResolvedValue({ success: false, error: 'Cannot delete' });
+    const { ProfileFeed } = await import('./ProfileFeed');
+    render(<ProfileFeed userId={42} />);
+
+    await waitFor(() => expect(screen.getByTestId('feed-card-9')).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId('delete-9'));
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith('/v2/feed/posts/9/delete');
+    });
+    expect(screen.getByTestId('feed-card-9')).toBeInTheDocument();
+    expect(mockToast.error).toHaveBeenCalled();
+    expect(mockToast.success).not.toHaveBeenCalled();
   });
 
   it('renders multiple feed cards', async () => {
