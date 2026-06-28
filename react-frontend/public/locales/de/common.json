@@ -2212,7 +2212,7 @@
     "cta": "App installieren",
     "cta_sub": "Schnellerer Zugriff, funktioniert offline",
     "cta_ios_sub": "NEXUS zum Startbildschirm hinzufügen",
-    "banner_title": "NEXUS für schnelleren Zugriff installieren",
+    "banner_title": "{{appName}} für schnelleren Zugriff installieren",
     "banner_sub": "Installation mit einem Tipp — funktioniert offline, kein App Store nötig.",
     "banner_sub_ios": "Zum Startbildschirm hinzufügen — funktioniert offline, kein App Store nötig.",
     "banner_aria": "Banner für App-Installation",

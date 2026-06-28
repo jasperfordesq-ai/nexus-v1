@@ -2212,7 +2212,7 @@
     "cta": "App installeren",
     "cta_sub": "Snellere toegang, werkt offline",
     "cta_ios_sub": "Voeg NEXUS toe aan uw startscherm",
-    "banner_title": "Installeer NEXUS voor snellere toegang",
+    "banner_title": "Installeer {{appName}} voor snellere toegang",
     "banner_sub": "Installatie met één tik — werkt offline, geen app store nodig.",
     "banner_sub_ios": "Voeg toe aan uw startscherm — werkt offline, geen app store nodig.",
     "banner_aria": "Banner voor app-installatie",

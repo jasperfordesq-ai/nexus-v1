@@ -4,8 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';import X from 'lucide-react/icons/x';
+import { useTranslation } from 'react-i18next';
+import X from 'lucide-react/icons/x';
 import Download from 'lucide-react/icons/download';
+import { useTenant } from '@/contexts/TenantContext';
 import { useInstallPrompt, shouldOfferInstall } from '@/lib/installPrompt';
 import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage';
 import { IosInstallModal } from './IosInstallModal';
@@ -31,9 +33,11 @@ const GRACE_MS = 60 * 1000;
  */
 export function InstallBanner() {
   const { t } = useTranslation('common');
+  const { branding } = useTenant();
   const state = useInstallPrompt();
   const [visible, setVisible] = useState(false);
   const [iosOpen, setIosOpen] = useState(false);
+  const appName = branding.name?.trim() || 'NEXUS';
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -87,7 +91,7 @@ export function InstallBanner() {
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-theme-primary truncate">
-            {t('install.banner_title')}
+            {t('install.banner_title', { appName })}
           </p>
           <p className="text-xs text-theme-muted truncate">
             {state.isIosSafari

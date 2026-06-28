@@ -19,11 +19,20 @@ const defaultInstallState = {
 };
 
 let mockInstallState = { ...defaultInstallState };
+let mockTenantContext = {
+  branding: {
+    name: 'Hour Timebank',
+  },
+};
 
 vi.mock('@/lib/installPrompt', () => ({
   useInstallPrompt: () => mockInstallState,
   shouldOfferInstall: (state: typeof mockInstallState) =>
     !state.isInstalled && state.browser !== 'ios-other',
+}));
+
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: () => mockTenantContext,
 }));
 
 // Control localStorage in isolation
@@ -130,11 +139,22 @@ describe('InstallBanner — visible banner interactions (real timers)', () => {
     // Pre-set first_seen far in the past → effect calls setVisible(true) synchronously
     setFirstSeenLongAgo();
     mockInstallState = { ...defaultInstallState, canPrompt: true };
+    mockTenantContext = {
+      branding: {
+        name: 'Hour Timebank',
+      },
+    };
   });
 
   it('renders the install banner region', () => {
     render(<InstallBanner />);
     expect(screen.getByRole('region')).toBeInTheDocument();
+  });
+
+  it('uses the tenant branding name in the install banner title', () => {
+    render(<InstallBanner />);
+    expect(screen.getByText('Install Hour Timebank for faster access')).toBeInTheDocument();
+    expect(screen.queryByText('Install NEXUS for faster access')).not.toBeInTheDocument();
   });
 
   it('dismiss button hides the banner synchronously', () => {

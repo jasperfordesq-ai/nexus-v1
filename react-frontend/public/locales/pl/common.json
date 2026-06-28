@@ -2212,7 +2212,7 @@
     "cta": "Zainstaluj aplikację",
     "cta_sub": "Szybszy dostęp, działa offline",
     "cta_ios_sub": "Dodaj NEXUS do ekranu głównego",
-    "banner_title": "Zainstaluj NEXUS, aby uzyskać szybszy dostęp",
+    "banner_title": "Zainstaluj {{appName}}, aby uzyskać szybszy dostęp",
     "banner_sub": "Instalacja jednym dotknięciem — działa offline, bez sklepu z aplikacjami.",
     "banner_sub_ios": "Dodaj do ekranu głównego — działa offline, bez sklepu z aplikacjami.",
     "banner_aria": "Baner instalacji aplikacji",

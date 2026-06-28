@@ -22739,7 +22739,7 @@ export default interface Resources {
       "banner_dismiss": "Dismiss install banner",
       "banner_sub": "One tap install — works offline, no app store needed.",
       "banner_sub_ios": "Add to your home screen — works offline, no app store needed.",
-      "banner_title": "Install NEXUS for faster access",
+      "banner_title": "Install {{appName}} for faster access",
       "chrome_desktop_intro": "Chrome may not have offered the prompt yet. You can still install NEXUS from Chrome's menu:",
       "chrome_desktop_step_1": "Click the three-dot menu in the top-right of Chrome.",
       "chrome_desktop_step_2": "Click Cast, save, and share, then Install page as app, or look for an install icon in the address bar.",

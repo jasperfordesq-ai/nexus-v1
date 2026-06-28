@@ -2212,7 +2212,7 @@
     "cta": "Suiteáil aip",
     "cta_sub": "Rochtain níos tapúla, oibríonn as líne",
     "cta_ios_sub": "Cuir NEXUS le do scáileán baile",
-    "banner_title": "Suiteáil NEXUS le haghaidh rochtana níos tapúla",
+    "banner_title": "Suiteáil {{appName}} le haghaidh rochtana níos tapúla",
     "banner_sub": "Suiteáil le tapú amháin — oibríonn as líne, gan stór aip ag teastáil.",
     "banner_sub_ios": "Cuir le do scáileán baile í — oibríonn as líne, gan stór aip ag teastáil.",
     "banner_aria": "Meirge suiteála aip",
