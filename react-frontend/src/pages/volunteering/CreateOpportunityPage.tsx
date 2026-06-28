@@ -10,7 +10,7 @@
  * Requires the user to own at least one approved organisation.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { DateInputValue } from '@/components/ui';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -73,6 +73,10 @@ export default function CreateOpportunityPage() {
   const [isLoadingOrgs, setIsLoadingOrgs] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  // Synchronous re-entry guard: isSubmitting is async state, so a double-Enter (the
+  // form submits on Enter, bypassing the disabled button) or a fast double-click can
+  // fire handleSubmit twice and create two opportunities. This blocks the 2nd call.
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     loadMyOrganisations();
@@ -145,9 +149,11 @@ export default function CreateOpportunityPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (submittingRef.current) return; // block a second in-flight submit
 
     if (!validateForm()) return;
 
+    submittingRef.current = true;
     try {
       setIsSubmitting(true);
 
@@ -183,6 +189,7 @@ export default function CreateOpportunityPage() {
       toast.error(t('form_save_error'));
     } finally {
       setIsSubmitting(false);
+      submittingRef.current = false;
     }
   }
 

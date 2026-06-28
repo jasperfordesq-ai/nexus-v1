@@ -234,6 +234,35 @@ describe("CreateOpportunityPage", () => {
     });
   });
 
+  it("does not create the opportunity twice on a rapid double-submit", async () => {
+    // Regression: the form submits on Enter (bypassing the disabled button) and had
+    // no synchronous re-entry guard, so a double-Enter / fast double-click fired
+    // api.post twice and created two opportunities. A submittingRef now blocks the
+    // second in-flight submit.
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: [mockApprovedOrg] });
+    let posted = false;
+    vi.mocked(api.post).mockImplementation(
+      () => new Promise(() => { posted = true; }), // stays in flight
+    );
+    render(<CreateOpportunityPage />);
+    await waitFor(() => expect(screen.getByDisplayValue("Helping Hands")).toBeInTheDocument());
+
+    fireEvent.change(screen.getByPlaceholderText("Opportunity title"), {
+      target: { value: "Help at the food bank" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Describe the opportunity and requirements"), {
+      target: { value: "Help sort donations and prepare food parcels for local families." },
+    });
+
+    const form = (screen.getByRole("button", { name: /Publish Opportunity|Submit|Save/i }).closest("form")) as HTMLFormElement;
+    // Two rapid submits straight at the form (as Enter would), bypassing the button.
+    fireEvent.submit(form);
+    fireEvent.submit(form);
+
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1));
+    expect(posted).toBe(true); // sanity: the first submit actually fired
+  });
+
   it("fetches organisations from the correct endpoint on mount", async () => {
     vi.mocked(api.get).mockResolvedValue({ success: true, data: [] });
     render(<CreateOpportunityPage />);
