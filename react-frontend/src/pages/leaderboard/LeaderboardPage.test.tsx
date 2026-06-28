@@ -190,6 +190,44 @@ describe('LeaderboardPage', () => {
     expect(screen.getByText('Level 12')).toBeInTheDocument();
   });
 
+  it('does not crash when an entry is missing both score and xp (degraded backend)', async () => {
+    // Regression: formatScore did `(entry.score ?? entry.xp).toLocaleString()`. If a
+    // degraded entry has both score and xp null/missing, that value is undefined and
+    // .toLocaleString() threw during render — blanking the WHOLE Leaderboard page via
+    // the error boundary. It must now coerce to 0 and render the row.
+    const { api } = await import('@/lib/api');
+    const mockEntries = [
+      {
+        position: 1,
+        user: { id: 1, name: 'Degraded User', avatar_url: null },
+        xp: null,
+        score: null,
+        level: 7,
+        is_current_user: true,
+      },
+    ];
+
+    vi.mocked(api.get).mockImplementation((url: string) => {
+      if (url.includes('/leaderboard')) {
+        return Promise.resolve({
+          success: true,
+          data: mockEntries,
+          meta: { period: 'all', type: 'xp', your_position: 1, total_entries: 1 },
+        });
+      }
+      return Promise.resolve({ success: true, data: null, meta: {} });
+    });
+
+    render(<LeaderboardPage />);
+
+    // If formatScore threw, the row (and the whole page) would be replaced by the
+    // error boundary and this name would never appear.
+    await waitFor(() => {
+      expect(screen.getByText('Degraded User')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Level 7')).toBeInTheDocument();
+  });
+
   it('highlights current user entry', async () => {
     const { api } = await import('@/lib/api');
     const mockEntries = [

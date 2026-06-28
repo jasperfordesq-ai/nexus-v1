@@ -493,8 +493,11 @@ export function LeaderboardPage() {
    * Format a score value based on the current leaderboard type
    */
   const formatScore = (entry: LeaderboardEntry) => {
-    // Use `score` if available, fallback to `xp` for backwards compat
-    const value = entry.score ?? entry.xp;
+    // Use `score` if available, fallback to `xp` for backwards compat. Coerce to 0
+    // defensively: a degraded entry (both score and xp missing/null — e.g. a partial
+    // backend response) would otherwise make `value.toLocaleString()` throw and blank
+    // the entire Leaderboard page via the error boundary.
+    const value = entry.score ?? entry.xp ?? 0;
 
     switch (type) {
       case 'volunteer_hours':
