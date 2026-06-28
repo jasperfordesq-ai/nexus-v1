@@ -172,6 +172,11 @@ export function CreateEventPage() {
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  // Synchronous re-entry guard: isSubmitting is async state, so a double-Enter (the
+  // form submits on Enter, bypassing the button's disabled state) or a fast
+  // double-click can fire handleSubmit twice before React re-renders and create two
+  // events. This ref blocks the second call immediately.
+  const submittingRef = useRef(false);
 
   // Poll attachment state
   const [availablePolls, setAvailablePolls] = useState<{ id: number; question: string }[]>([]);
@@ -410,6 +415,7 @@ export function CreateEventPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (submittingRef.current) return; // block a second in-flight submit
 
     if (!validateForm()) {
       // Make the failure visible — a silent early-return looked like "nothing
@@ -425,6 +431,7 @@ export function CreateEventPage() {
       return;
     }
 
+    submittingRef.current = true;
     try {
       setIsSubmitting(true);
 
@@ -533,6 +540,7 @@ export function CreateEventPage() {
       toast.error(t('form.toast.error'));
     } finally {
       setIsSubmitting(false);
+      submittingRef.current = false;
     }
   }
 
