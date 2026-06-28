@@ -172,6 +172,37 @@ describe('AppreciationWallPage', () => {
     });
   });
 
+  it('does not change the reaction count when the request returns success:false', async () => {
+    // Regression: react() did an UNCHECKED `await api.post(...)` then applied the
+    // optimistic count/my_reaction change unconditionally. api.post resolves
+    // { success:false } on a 4xx (rate-limited, removed appreciation, invalid reaction)
+    // WITHOUT throwing, so a rejected reaction used to bump the count (off by one until a
+    // reload). The count must stay put on a rejected reaction.
+    vi.mocked(api.get).mockResolvedValueOnce({
+      success: true,
+      data: [makeAppreciation({ id: 8, reactions_count: 3, my_reaction: null })],
+    });
+    vi.mocked(api.post).mockResolvedValueOnce({ success: false, error: 'Rate limited' });
+
+    render(<AppreciationWallPage />);
+
+    await waitFor(() => expect(screen.getByText('Thank you so much!')).toBeInTheDocument());
+    expect(screen.getByText('3')).toBeInTheDocument();
+
+    const buttons = screen.getAllByRole('button');
+    fireEvent.click(buttons[0]);
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith(
+        '/v2/appreciations/8/react',
+        expect.objectContaining({ reaction_type: 'heart' }),
+      );
+    });
+    // The optimistic bump must NOT have been applied on the rejected reaction.
+    expect(screen.queryByText('4')).not.toBeInTheDocument();
+    expect(screen.getByText('3')).toBeInTheDocument();
+  });
+
   it('reaction buttons are disabled when user is not authenticated', async () => {
     // Override auth to unauthenticated for this test only by re-mocking.
     // Because the context mock is module-level, we verify the isDisabled prop

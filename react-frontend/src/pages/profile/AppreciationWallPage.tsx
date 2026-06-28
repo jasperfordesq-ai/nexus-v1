@@ -74,8 +74,12 @@ export default function AppreciationWallPage() {
   const react = useCallback(async (apprId: number, reactionType: string) => {
     if (!user) return;
     try {
-      await api.post(`/v2/appreciations/${apprId}/react`, { reaction_type: reactionType });
-      // Optimistic refresh
+      const res = await api.post(`/v2/appreciations/${apprId}/react`, { reaction_type: reactionType });
+      // api.post resolves { success:false } on a 4xx (rate-limited, removed appreciation,
+      // invalid reaction) WITHOUT throwing, so the catch never fires — only apply the
+      // count/my_reaction change once the server confirms it, else the reaction count
+      // drifts (off by one, until a reload) on a rejected reaction.
+      if (!res.success) return;
       setItems((prev) =>
         prev.map((a) =>
           a.id === apprId
