@@ -157,6 +157,29 @@ describe('GroupAnalyticsTab', () => {
     });
   });
 
+  it('does not crash when a retention cohort is missing retention_pct (degraded backend)', async () => {
+    // Regression: the cohort table did `cohort.retention_pct.toFixed(1)` directly while
+    // every sibling KPI used `?? 0`. The retention array is a blind cast, so a cohort
+    // with retention_pct null/missing threw during render and blanked the whole
+    // analytics tab. It must now coerce to 0 and render the row.
+    const degraded = {
+      ...makeFullDashboard(),
+      retention: [{ month: '2025-03', joined: 10, still_active: 5, retention_pct: null }],
+    };
+    mockApi.get.mockResolvedValue(successResponse(degraded));
+
+    const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
+    render(<GroupAnalyticsTab groupId={1} isAdmin={true} />);
+
+    // If .toFixed threw on the null retention_pct, the component would not finish
+    // rendering and this cohort row label would never appear.
+    await waitFor(() => {
+      expect(screen.getByText('2025-03')).toBeInTheDocument();
+    });
+    // The coerced value renders instead of crashing.
+    expect(screen.getByText('0.0%')).toBeInTheDocument();
+  });
+
   it('calls the API with the groupId and default 30-day range', async () => {
     const { GroupAnalyticsTab } = await import('./GroupAnalyticsTab');
     render(<GroupAnalyticsTab groupId={42} isAdmin={true} />);

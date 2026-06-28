@@ -579,14 +579,18 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                         size="sm"
                         variant="flat"
                         color={
-                          cohort.retention_pct >= 70
+                          (cohort.retention_pct ?? 0) >= 70
                             ? 'success'
-                            : cohort.retention_pct >= 40
+                            : (cohort.retention_pct ?? 0) >= 40
                               ? 'warning'
                               : 'danger'
                         }
                       >
-                        {cohort.retention_pct.toFixed(1)}%
+                        {/* Coerce defensively: retention is a blind cast, so a cohort
+                            missing retention_pct used to crash this table (and blank the
+                            whole analytics tab) via .toFixed on undefined — the sibling
+                            KPIs already use `?? 0`. */}
+                        {(cohort.retention_pct ?? 0).toFixed(1)}%
                       </Chip>
                     </TableCell>
                   </TableRow>
