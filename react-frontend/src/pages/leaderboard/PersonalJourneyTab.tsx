@@ -113,36 +113,46 @@ export default function PersonalJourneyTab() {
     return null;
   }
 
-  const { summary, monthly_activity, badge_progression, milestones } = data;
+  // The backend's catch-fallback returns summary as [] (an empty array, not the
+  // typed object) inside a 200 { success:true } envelope when its journey query
+  // fails, and the list fields may be absent too. Coerce to safe shapes so a
+  // degraded response renders zeros/empty rather than throwing on
+  // summary.xp.toLocaleString() — which previously crashed the whole Leaderboard
+  // section via the error boundary.
+  const summary: Partial<PersonalSummary> =
+    data.summary && !Array.isArray(data.summary) ? data.summary : {};
+  const monthly_activity = Array.isArray(data.monthly_activity) ? data.monthly_activity : [];
+  const badge_progression = Array.isArray(data.badge_progression) ? data.badge_progression : [];
+  const milestones = Array.isArray(data.milestones) ? data.milestones : [];
 
   return (
     <div className="space-y-6">
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <SummaryCard
-          label={summary.level_name || t('journey.level', { level: summary.level })}
-          value={t('journey.xp_value', { xp: summary.xp.toLocaleString() })}
+          label={summary.level_name || t('journey.level', { level: summary.level ?? 0 })}
+          value={t('journey.xp_value', { xp: (summary.xp ?? 0).toLocaleString() })}
           icon={<TrendingUp aria-hidden="true" className="w-4 h-4 text-purple-500" />}
           isText
         />
         <SummaryCard
           label={t('journey.badges')}
-          value={summary.total_badges}
+          value={summary.total_badges ?? 0}
           icon={<Award aria-hidden="true" className="w-4 h-4 text-[var(--color-warning)]" />}
         />
         <SummaryCard
           label={t('journey.listings')}
-          value={summary.total_listings}
+          value={summary.total_listings ?? 0}
           icon={<Target aria-hidden="true" className="w-4 h-4 text-[var(--color-info)]" />}
         />
         <SummaryCard
           label={t('journey.volunteer_hours')}
-          value={summary.volunteer_hours}
+          value={summary.volunteer_hours ?? 0}
           icon={<Target aria-hidden="true" className="w-4 h-4 text-emerald-500" />}
         />
         <SummaryCard
           label={t('journey.connections')}
-          value={summary.total_connections}
+          value={summary.total_connections ?? 0}
           icon={<Target aria-hidden="true" className="w-4 h-4 text-pink-500" />}
         />
         {summary.member_since && (

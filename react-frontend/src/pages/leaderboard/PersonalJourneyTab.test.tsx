@@ -161,6 +161,30 @@ describe('PersonalJourneyTab', () => {
     expect(screen.queryByText('First Trade Badge')).not.toBeInTheDocument();
   });
 
+  // ── degraded backend fallback ─────────────────────────────────────────────
+
+  it('renders without crashing when summary comes back as an empty array', async () => {
+    // Regression: the backend's catch-fallback returns summary:[] (an array, not
+    // the typed object) inside a 200 { success:true } envelope. The component used
+    // to read summary.xp.toLocaleString() unconditionally, which threw a TypeError
+    // on the [] fallback and crashed the whole Leaderboard via its error boundary.
+    // It must now degrade to zeros instead. Verified live by shimming the endpoint.
+    mockApi.get.mockResolvedValueOnce({
+      success: true,
+      data: { summary: [], monthly_activity: [], badge_progression: [], milestones: [] },
+    });
+    render(<PersonalJourneyTab />);
+
+    await waitFor(() => {
+      expect(mockApi.get).toHaveBeenCalledWith('/v2/gamification/personal-journey');
+    });
+    // The summary grid renders past the previously-throwing XP card — the zeroed
+    // numeric cards (badges/listings/volunteer/connections) are present.
+    expect(screen.getAllByText('0').length).toBeGreaterThanOrEqual(1);
+    // It is a (degraded) success, not the error state.
+    expect(document.querySelector('.text-danger-500')).toBeNull();
+  });
+
   // ── error state ───────────────────────────────────────────────────────────
 
   it('renders error paragraph when API returns success=false', async () => {
