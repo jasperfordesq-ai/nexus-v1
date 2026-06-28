@@ -733,14 +733,23 @@ export function JobKanbanPage() {
     if (!id || !bulkStatus || selectedAppIds.size === 0) return;
     setIsBulkUpdating(true);
     try {
-      await api.post(`/v2/jobs/${id}/applications/bulk-status`, {
+      const res = await api.post(`/v2/jobs/${id}/applications/bulk-status`, {
         application_ids: Array.from(selectedAppIds),
         status: bulkStatus,
       });
-      toastRef.current.success(tRef.current('bulk.success'));
-      setSelectedAppIds(new Set());
-      setBulkStatus('');
-      await loadData();
+      // api.post resolves { success:false } on a 4xx/5xx WITHOUT throwing, so the
+      // catch never fired — without gating on res.success a rejected bulk update
+      // (invalid status, not-owned vacancy, app ids outside this vacancy) still
+      // showed the "Applications updated" toast and cleared the selection while the
+      // backend left every application unchanged.
+      if (res.success) {
+        toastRef.current.success(tRef.current('bulk.success'));
+        setSelectedAppIds(new Set());
+        setBulkStatus('');
+        await loadData();
+      } else {
+        toastRef.current.error((res as { error?: string }).error || tRef.current('bulk.error'));
+      }
     } catch (err) {
       logError('JobKanbanPage: bulk update failed', err);
       toastRef.current.error(tRef.current('bulk.error'));
