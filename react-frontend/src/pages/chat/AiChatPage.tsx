@@ -489,15 +489,20 @@ export default function AiChatPage() {
     const next = msg.feedback === vote ? null : vote;
     setMessages((prev) => prev.map((m) => (m.id === messageClientId ? { ...m, feedback: next } : m)));
     if (next === null) return; // we don't support clearing on the server yet — just keep the UI in sync
+    const revert = () =>
+      setMessages((prev) => prev.map((m) => (m.id === messageClientId ? { ...m, feedback: msg.feedback ?? null } : m)));
     try {
-      await api.post('/ai/chat/feedback', {
+      const res = await api.post('/ai/chat/feedback', {
         feedback: vote,
         trace_id: msg.traceId ?? undefined,
         message_id: msg.messageId ?? undefined,
       });
+      // api.post resolves { success:false } on a 4xx/5xx WITHOUT throwing, so the
+      // catch alone never fired for a failed vote — the optimistic highlight stayed
+      // as if it persisted. Revert it when the server didn't accept the feedback.
+      if (!res.success) revert();
     } catch {
-      // Revert on failure
-      setMessages((prev) => prev.map((m) => (m.id === messageClientId ? { ...m, feedback: msg.feedback ?? null } : m)));
+      revert();
     }
   }, [messages]);
 
