@@ -1603,11 +1603,14 @@ export function AchievementsPage() {
                       <div className="flex-1 min-w-0">
                         <h2 className="text-lg font-bold text-theme-primary">{t('achievements.level', { level: profile.level })}</h2>
                         <p className="text-sm text-theme-muted">
-                          {t('achievements.xp_total', { xp: profile.xp.toLocaleString() })}
+                          {/* Coerce defensively: a degraded profile (backend catch-fallback
+                              missing xp / level_progress) used to crash this card and blank
+                              the whole Achievements page via the error boundary. */}
+                          {t('achievements.xp_total', { xp: (profile.xp ?? 0).toLocaleString() })}
                         </p>
                         <div className="mt-2">
                           <Progress
-                            value={profile.level_progress.progress_percentage}
+                            value={profile.level_progress?.progress_percentage ?? 0}
                             className="max-w-md"
                             classNames={{
                               indicator: 'bg-gradient-to-r from-indigo-500 to-purple-600',
@@ -1617,7 +1620,7 @@ export function AchievementsPage() {
                             aria-label={t('achievements.level_progress_aria')}
                           />
                           <p className="text-xs text-theme-subtle mt-1">
-                            {t('achievements.xp_to_next_level', { current: profile.level_progress.current_xp, next: profile.level_progress.xp_for_next_level })}
+                            {t('achievements.xp_to_next_level', { current: profile.level_progress?.current_xp ?? 0, next: profile.level_progress?.xp_for_next_level ?? 0 })}
                           </p>
                         </div>
                       </div>

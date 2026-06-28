@@ -191,6 +191,38 @@ describe('AchievementsPage', () => {
     expect(screen.getByText('1,200 XP total')).toBeInTheDocument();
   });
 
+  it('does not crash the page when the profile is missing xp / level_progress (degraded backend)', async () => {
+    // Regression: the XP profile card did `profile.xp.toLocaleString()` and
+    // `profile.level_progress.progress_percentage` directly. The profile is set from a
+    // blind cast (`as unknown as GamificationProfile`), so a degraded response
+    // (success:true but missing xp / level_progress — e.g. a backend catch-fallback)
+    // threw during render and blanked the WHOLE Achievements page via the error
+    // boundary. The card must now coerce those to 0 and render.
+    vi.mocked(api.get).mockImplementation((url: string) => {
+      if (url.includes('/v2/gamification/profile')) {
+        return Promise.resolve({
+          success: true,
+          data: {
+            user: { id: 1, name: 'Test User', avatar_url: null },
+            level: 5,
+            badges_count: 3,
+            showcased_badges: [],
+            is_own_profile: true,
+            // xp and level_progress deliberately omitted
+          },
+        });
+      }
+      return Promise.resolve({ success: true, data: [], meta: { available_types: [] } });
+    });
+    render(<AchievementsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Level 5')).toBeInTheDocument();
+    });
+    // Renders the card with a coerced 0 instead of crashing to the error boundary.
+    expect(screen.getByText('0 XP total')).toBeInTheDocument();
+    expect(screen.getByText('Achievements')).toBeInTheDocument();
+  });
+
   it('shows badge type filter when types are available', async () => {
     render(<AchievementsPage />);
     await waitFor(() => {
