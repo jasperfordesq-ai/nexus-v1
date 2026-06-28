@@ -166,5 +166,8 @@
     "listings": "{{count}} annunci"
   },
   "reactions_tabs_aria": "Filtro del tipo di reazione",
-  "content_type_tabs_aria": "Filtro del tipo di contenuto dei segnalibri"
+  "content_type_tabs_aria": "Filtro del tipo di contenuto dei segnalibri",
+  "comment_delete_failed": "Impossibile eliminare il commento. Riprova.",
+  "comment_edit_failed": "Impossibile salvare le modifiche. Riprova.",
+  "comment_post_failed": "Impossibile pubblicare il commento. Riprova."
 }

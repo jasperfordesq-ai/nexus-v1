@@ -166,5 +166,8 @@
     "listings": "{{count}} ogłoszeń"
   },
   "reactions_tabs_aria": "Filtr typu reakcji",
-  "content_type_tabs_aria": "Filtr typu zawartości zakładek"
+  "content_type_tabs_aria": "Filtr typu zawartości zakładek",
+  "comment_delete_failed": "Nie udało się usunąć komentarza. Spróbuj ponownie.",
+  "comment_edit_failed": "Nie udało się zapisać zmian. Spróbuj ponownie.",
+  "comment_post_failed": "Nie udało się opublikować komentarza. Spróbuj ponownie."
 }

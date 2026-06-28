@@ -166,5 +166,8 @@
     "listings": "{{count}} anúncios"
   },
   "reactions_tabs_aria": "Filtro de tipo de reação",
-  "content_type_tabs_aria": "Filtro de tipo de conteúdo de marcador"
+  "content_type_tabs_aria": "Filtro de tipo de conteúdo de marcador",
+  "comment_delete_failed": "Não foi possível eliminar o comentário. Tenta novamente.",
+  "comment_edit_failed": "Não foi possível guardar as tuas alterações. Tenta novamente.",
+  "comment_post_failed": "Não foi possível publicar o teu comentário. Tenta novamente."
 }

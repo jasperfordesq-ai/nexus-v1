@@ -21,7 +21,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import Check from 'lucide-react/icons/check';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { useTenant } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 import type { FeedComment } from '@/components/feed/types';
 import { AVAILABLE_REACTIONS, COMMENT_REACTION_EMOJI_MAP } from '@/hooks/useSocialInteractions';
@@ -91,6 +91,7 @@ function CommentItemInner({
 }: CommentItemProps) {
   const { t } = useTranslation('social');
   const { tenantPath } = useTenant();
+  const toast = useToast();
   const tr = (key: string, fallback: string) => {
     const value = t(key);
     return value === key ? fallback : value;
@@ -108,13 +109,27 @@ function CommentItemInner({
     if (!editContent.trim()) return;
     setIsSubmittingEdit(true);
     const ok = await onEdit(comment.id, editContent.trim());
-    if (ok) setIsEditing(false);
+    // onEdit resolves false on a failed request (api.* returns { success:false }
+    // WITHOUT throwing on a 4xx, which gets no global toast) — keep the editor
+    // open and surface the failure instead of silently doing nothing.
+    if (ok) {
+      setIsEditing(false);
+    } else {
+      toast.error(tr('comment_edit_failed', 'Couldn’t save your changes. Please try again.'));
+    }
     setIsSubmittingEdit(false);
   };
 
   const handleDeleteConfirm = async () => {
-    await onDelete(comment.id);
-    setShowDeleteModal(false);
+    const ok = await onDelete(comment.id);
+    // Only close the confirmation on a real success — a failed delete (e.g. 403/404,
+    // which resolves { success:false } without throwing and shows no global toast)
+    // used to close the dialog as if it worked while the comment stayed in the list.
+    if (ok) {
+      setShowDeleteModal(false);
+    } else {
+      toast.error(tr('comment_delete_failed', 'Couldn’t delete the comment. Please try again.'));
+    }
   };
 
   const reactions = comment.reactions ?? {};
@@ -623,6 +638,7 @@ export function CommentsSection({
   searchMentions,
 }: CommentsSectionProps) {
   const { t } = useTranslation('social');
+  const toast = useToast();
   const tr = (key: string, fallback: string) => {
     const value = t(key);
     return value === key ? fallback : value;
@@ -647,7 +663,14 @@ export function CommentsSection({
     if (!newComment.trim() || isSubmitting) return;
     setIsSubmitting(true);
     const ok = await submitComment(newComment.trim());
-    if (ok) setNewComment('');
+    // A rejected comment (api.* returns { success:false } without throwing, and a
+    // 4xx gets no global toast) used to clear nothing and give zero feedback — keep
+    // the user's text and tell them it failed so they can retry.
+    if (ok) {
+      setNewComment('');
+    } else {
+      toast.error(tr('comment_post_failed', 'Couldn’t post your comment. Please try again.'));
+    }
     setIsSubmitting(false);
   };
 
@@ -663,9 +686,12 @@ export function CommentsSection({
     if (ok) {
       setReplyingTo(null);
       setReplyContent('');
+    } else {
+      // Same failed-request class as handleSubmit — keep the reply text + surface it.
+      toast.error(tr('comment_post_failed', 'Couldn’t post your comment. Please try again.'));
     }
     setIsSubmittingReply(false);
-  }, [isSubmittingReply, replyContent, replyingTo, submitComment]);
+  }, [isSubmittingReply, replyContent, replyingTo, submitComment, toast, tr]);
 
   const handleCancelReply = useCallback(() => {
     setReplyingTo(null);

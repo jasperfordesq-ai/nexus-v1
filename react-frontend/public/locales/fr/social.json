@@ -166,5 +166,8 @@
     "listings": "{{count}} annonces"
   },
   "reactions_tabs_aria": "Filtre de type de réaction",
-  "content_type_tabs_aria": "Filtre de type de contenu de signet"
+  "content_type_tabs_aria": "Filtre de type de contenu de signet",
+  "comment_delete_failed": "Impossible de supprimer le commentaire. Veuillez réessayer.",
+  "comment_edit_failed": "Impossible d’enregistrer vos modifications. Veuillez réessayer.",
+  "comment_post_failed": "Impossible de publier votre commentaire. Veuillez réessayer."
 }

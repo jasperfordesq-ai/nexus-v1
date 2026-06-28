@@ -166,5 +166,8 @@
     "listings": "{{count}} advertenties"
   },
   "reactions_tabs_aria": "Reactietypefilter",
-  "content_type_tabs_aria": "Voeg een bladwijzer voor het inhoudstypefilter toe"
+  "content_type_tabs_aria": "Voeg een bladwijzer voor het inhoudstypefilter toe",
+  "comment_delete_failed": "Kan de reactie niet verwijderen. Probeer het opnieuw.",
+  "comment_edit_failed": "Kan je wijzigingen niet opslaan. Probeer het opnieuw.",
+  "comment_post_failed": "Kan je reactie niet plaatsen. Probeer het opnieuw."
 }

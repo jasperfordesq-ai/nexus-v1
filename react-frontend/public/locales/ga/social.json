@@ -166,5 +166,8 @@
     "listings": "{{count}} liostú"
   },
   "reactions_tabs_aria": "Scagaire cineál imoibrithe",
-  "content_type_tabs_aria": "Scagaire cineál ábhair leabharmharc"
+  "content_type_tabs_aria": "Scagaire cineál ábhair leabharmharc",
+  "comment_delete_failed": "Níorbh fhéidir an trácht a scriosadh. Bain triail eile as.",
+  "comment_edit_failed": "Níorbh fhéidir do chuid athruithe a shábháil. Bain triail eile as.",
+  "comment_post_failed": "Níorbh fhéidir do thrácht a phostáil. Bain triail eile as."
 }

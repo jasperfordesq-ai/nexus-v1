@@ -166,5 +166,8 @@
     "listings": "{{count}}件のリスト"
   },
   "reactions_tabs_aria": "反応型フィルター",
-  "content_type_tabs_aria": "ブックマークコンテンツタイプフィルター"
+  "content_type_tabs_aria": "ブックマークコンテンツタイプフィルター",
+  "comment_delete_failed": "コメントを削除できませんでした。もう一度お試しください。",
+  "comment_edit_failed": "変更を保存できませんでした。もう一度お試しください。",
+  "comment_post_failed": "コメントを投稿できませんでした。もう一度お試しください。"
 }

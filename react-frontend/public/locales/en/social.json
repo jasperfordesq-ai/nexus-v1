@@ -3,6 +3,9 @@
   "comments": {
     "edit_label": "Edit comment"
   },
+  "comment_delete_failed": "Couldn’t delete the comment. Please try again.",
+  "comment_edit_failed": "Couldn’t save your changes. Please try again.",
+  "comment_post_failed": "Couldn’t post your comment. Please try again.",
   "comments_title": "Comments",
   "copy_failed": "Failed to copy link",
   "copy_link": "Copy Link",

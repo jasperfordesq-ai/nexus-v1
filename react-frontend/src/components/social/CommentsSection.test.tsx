@@ -5,10 +5,14 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { within } from '@testing-library/react';
 import { createMockContexts } from '@/test/mock-contexts';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import type { CommentsSectionProps } from './CommentsSection';
+
+// Stable toast.error spy so failure-path tests can assert the error toast fired.
+const toastErrorSpy = vi.hoisted(() => vi.fn());
 
 // ─── Stubs for imports ───────────────────────────────────────────────────────
 vi.mock('@/lib/helpers', () => ({
@@ -26,6 +30,7 @@ vi.mock('@/contexts', () =>
       hasFeature: vi.fn(() => true),
       hasModule: vi.fn(() => true),
     }),
+    useToast: () => ({ success: vi.fn(), error: toastErrorSpy, info: vi.fn(), warning: vi.fn() }),
   })
 );
 
@@ -367,6 +372,61 @@ describe('CommentsSection', () => {
     // Reaction badges should show the emoji + count
     expect(screen.getByText('3')).toBeInTheDocument();
     expect(screen.getByText('1')).toBeInTheDocument();
+  });
+
+  // ─── Regression: failed comment mutations must surface, not fake success ──────
+  // api.* resolves { success:false } on a 4xx WITHOUT throwing, and a 4xx gets no
+  // global toast. These handlers used to ignore the returned boolean: the delete
+  // dialog closed as if it worked, and a failed edit/post gave zero feedback.
+
+  it('keeps the delete dialog open and shows an error when the delete is rejected', async () => {
+    const deleteComment = vi.fn(async () => false);
+    const { CommentsSection } = await import('./CommentsSection');
+    render(
+      <CommentsSection
+        {...makeProps({
+          comments: [makeComment({ is_own: true, author: { id: 5, name: 'Me', avatar: null } })],
+          commentsLoaded: true,
+          isAuthenticated: true,
+          currentUserId: 5,
+          deleteComment,
+        })}
+      />
+    );
+    // Open the confirmation dialog (only the action-row Delete exists at this point)
+    await userEvent.click(screen.getByRole('button', { name: /delete/i }));
+    const dialog = await screen.findByRole('dialog');
+    // Confirm the deletion (the Delete button inside the dialog)
+    await userEvent.click(within(dialog).getByRole('button', { name: /delete/i }));
+
+    await waitFor(() => expect(deleteComment).toHaveBeenCalledWith(1));
+    // Pre-fix: the dialog closed unconditionally and no toast fired.
+    expect(toastErrorSpy).toHaveBeenCalled();
+    expect(screen.queryByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('keeps the editor open and shows an error when an edit is rejected', async () => {
+    const editComment = vi.fn(async () => false);
+    const { CommentsSection } = await import('./CommentsSection');
+    render(
+      <CommentsSection
+        {...makeProps({
+          comments: [makeComment({ is_own: true, content: 'Original text', author: { id: 5, name: 'Me', avatar: null } })],
+          commentsLoaded: true,
+          isAuthenticated: true,
+          currentUserId: 5,
+          editComment,
+        })}
+      />
+    );
+    await userEvent.click(screen.getByRole('button', { name: /edit/i }));
+    // Editor opens pre-filled with the existing content; save it unchanged.
+    await userEvent.click(await screen.findByRole('button', { name: /save/i }));
+
+    await waitFor(() => expect(editComment).toHaveBeenCalled());
+    expect(toastErrorSpy).toHaveBeenCalled();
+    // Pre-fix: nothing happened on failure; the editor must stay open to retry.
+    expect(screen.getByLabelText('Edit comment')).toBeInTheDocument();
   });
 
   it('shows react button for authenticated users to pick a reaction', async () => {
