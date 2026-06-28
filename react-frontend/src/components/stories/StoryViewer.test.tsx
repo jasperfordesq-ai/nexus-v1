@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
@@ -297,6 +297,45 @@ describe('StoryViewer', () => {
       const replyInput = screen.queryByRole('textbox');
       expect(replyInput).toBeInTheDocument();
     });
+  });
+
+  it('keeps the reply text and shows an error (not a fake success) when the reply returns success:false', async () => {
+    // Regression: handleReply did an UNCHECKED `await api.post(.../reply)` then a
+    // success toast + cleared the text. api.post resolves { success:false } on a 4xx
+    // WITHOUT throwing, so a rejected reply used to show a fake "reply sent" toast AND
+    // wipe the user's typed text while the DM was never delivered. It must keep the text
+    // and show an error instead.
+    mockApi.post.mockResolvedValue({ success: false, error: 'Cannot send' });
+    const { StoryViewer } = await import('./StoryViewer');
+    render(
+      <StoryViewer
+        storyUsers={[makeStoryUser({ user_id: 10 }), makeStoryUser({ user_id: 20 })]}
+        initialUserIndex={0}
+        onClose={onClose}
+      />
+    );
+
+    const input = await screen.findByRole('textbox') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'Hello there' } });
+    // The send button appears once there is text; click it (onPress = handleReply).
+    const sendBtn = await waitFor(() => {
+      const b = screen.getAllByRole('button').find((btn) => /send/i.test(btn.getAttribute('aria-label') ?? ''));
+      if (!b) throw new Error('send button not shown');
+      return b;
+    });
+    fireEvent.click(sendBtn);
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith(
+        expect.stringContaining('/reply'),
+        expect.objectContaining({ body: 'Hello there' }),
+      );
+    });
+    // The DM was not delivered: the text is kept (not cleared) and an error (not a fake
+    // "sent" toast) is shown.
+    expect((input as HTMLInputElement).value).toBe('Hello there');
+    expect(mockToast.error).toHaveBeenCalled();
+    expect(mockToast.success).not.toHaveBeenCalled();
   });
 
   it('calls onClose when Escape key is pressed', async () => {

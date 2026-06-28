@@ -414,7 +414,10 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
     if (!currentStory || reactedWith) return;
     setReactedWith(reactionType);
     try {
-      await api.post(`/v2/stories/${currentStory.id}/react`, { reaction_type: reactionType });
+      const res = await api.post(`/v2/stories/${currentStory.id}/react`, { reaction_type: reactionType });
+      // api.post resolves { success:false } on a 4xx WITHOUT throwing — the catch only
+      // fires on a throw, so revert the optimistic reaction when the server rejects it.
+      if (!res.success) setReactedWith(null);
     } catch (err) {
       logError('Failed to react to story', err);
       setReactedWith(null);
@@ -507,9 +510,15 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
     });
     if (!ok) return;
     try {
-      await api.delete(`/v2/stories/${currentStory.id}`);
-      setShowMenu(false);
-      goNext();
+      const res = await api.delete(`/v2/stories/${currentStory.id}`);
+      // Only treat the story as gone (close the menu + advance) once the server
+      // confirms. api.delete resolves { success:false } on a 4xx WITHOUT throwing, so
+      // the unchecked call used to advance past the story as if deleted while the
+      // backend kept it (it reappeared on reload). On failure the menu stays open.
+      if (res.success) {
+        setShowMenu(false);
+        goNext();
+      }
     } catch (err) {
       logError('Failed to delete story', err);
     }
@@ -521,9 +530,16 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
     setIsSendingReply(true);
     setIsPaused(true);
     try {
-      await api.post(`/v2/stories/${currentStory.id}/reply`, { body: replyText.trim() });
-      toast.success(t('viewer.reply_sent'));
-      setReplyText('');
+      const res = await api.post(`/v2/stories/${currentStory.id}/reply`, { body: replyText.trim() });
+      // api.post resolves { success:false } on a 4xx WITHOUT throwing — without gating on
+      // it the user got a fake "reply sent" toast AND their typed text was cleared while
+      // the DM was never delivered. Keep the text on failure so they can retry.
+      if (res.success) {
+        toast.success(t('viewer.reply_sent'));
+        setReplyText('');
+      } else {
+        toast.error(t('viewer.reply_error'));
+      }
     } catch (err) {
       logError('Failed to send story reply', err);
       toast.error(t('viewer.reply_error'));
