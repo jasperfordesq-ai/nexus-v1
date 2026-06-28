@@ -114,11 +114,16 @@ class AlphaController extends Controller
         return $default;
     }
 
-    public function tenantChooser(): Response|RedirectResponse
+    public function tenantChooser(Request $request): Response|RedirectResponse
     {
         $tenant = TenantContext::get();
         if (($tenant['id'] ?? 1) > 1 && !empty($tenant['slug'])) {
-            return redirect()->route('govuk-alpha.home', ['tenantSlug' => $tenant['slug']]);
+            // On a custom (host-resolved) accessible domain the host already
+            // identifies the tenant, so serve the accessible home AT THE CLEAN
+            // ROOT instead of redirecting to /{slug}/alpha — which dumped the
+            // internal tenant slug into the address bar of the configured custom
+            // domain (e.g. accessible-uk.timebank.global/ → /timebanking-org/alpha).
+            return $this->home($request, $tenant['slug']);
         }
 
         $tenants = DB::table('tenants')
@@ -138,24 +143,24 @@ class AlphaController extends Controller
         ]);
     }
 
-    public function hostHome(): RedirectResponse
+    public function hostHome(Request $request): Response|RedirectResponse
     {
-        return $this->redirectHostTenantRoute('govuk-alpha.home');
+        return $this->renderForHostTenant(fn (string $slug): Response => $this->home($request, $slug));
     }
 
-    public function hostLogin(): RedirectResponse
+    public function hostLogin(Request $request): Response|RedirectResponse
     {
-        return $this->redirectHostTenantRoute('govuk-alpha.login');
+        return $this->renderForHostTenant(fn (string $slug): Response => $this->login($request, $slug));
     }
 
-    public function hostRegister(): RedirectResponse
+    public function hostRegister(Request $request): Response|RedirectResponse
     {
-        return $this->redirectHostTenantRoute('govuk-alpha.register');
+        return $this->renderForHostTenant(fn (string $slug): Response => $this->register($request, $slug));
     }
 
-    public function hostContact(): RedirectResponse
+    public function hostContact(Request $request): Response|RedirectResponse
     {
-        return $this->redirectHostTenantRoute('govuk-alpha.contact');
+        return $this->renderForHostTenant(fn (string $slug): Response => $this->contact($request, $slug));
     }
 
     public function home(Request $request, string $tenantSlug): Response
@@ -11225,11 +11230,22 @@ class AlphaController extends Controller
         abort_unless(($tenant['slug'] ?? '') === $tenantSlug, 404);
     }
 
-    private function redirectHostTenantRoute(string $routeName): RedirectResponse
+    /**
+     * On a custom (host-resolved) accessible domain the host already identifies
+     * the tenant, so render the requested accessible page AT THE CLEAN host path
+     * (e.g. accessible-uk.timebank.global/ or /alpha/login) instead of
+     * redirecting to the slug-prefixed /{slug}/alpha canonical — which exposed
+     * the internal tenant slug in the address bar of the configured custom
+     * domain. Falls back to the tenant chooser on the shared platform domain
+     * (master tenant, no host match).
+     *
+     * @param  callable(string):Response  $render  Renders the page for the resolved tenant slug.
+     */
+    private function renderForHostTenant(callable $render): Response|RedirectResponse
     {
         $tenant = TenantContext::get();
         if (($tenant['id'] ?? 1) > 1 && !empty($tenant['slug'])) {
-            return redirect()->route($routeName, ['tenantSlug' => $tenant['slug']]);
+            return $render($tenant['slug']);
         }
 
         return redirect()->route('govuk-alpha.tenant-chooser');
