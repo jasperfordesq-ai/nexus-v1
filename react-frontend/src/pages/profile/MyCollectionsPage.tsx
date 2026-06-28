@@ -78,6 +78,12 @@ export default function MyCollectionsPage() {
         setNewDescription('');
         setNewPublic(false);
         setShowCreate(false);
+      } else {
+        // api.post resolves { success:false } on a 4xx (e.g. duplicate/invalid name)
+        // WITHOUT throwing, so the catch never fires — without this branch the modal
+        // just stayed open with no feedback. Surface the failure and keep the dialog
+        // open so the user can fix the name and retry.
+        toast.error(res.error || t('common.error'));
       }
     } catch {
       toast.error(t('common.error'));

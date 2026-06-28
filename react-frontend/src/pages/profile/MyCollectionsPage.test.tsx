@@ -179,6 +179,31 @@ describe('MyCollectionsPage', () => {
     expect(mockToast.success).toHaveBeenCalled();
   });
 
+  it('shows an error toast and keeps the modal open when create returns success:false', async () => {
+    // Regression: a failed create (api.post resolves { success:false } on a 4xx WITHOUT
+    // throwing) used to skip both the success branch and the catch, so the modal stayed
+    // open with no feedback. It must now surface the error. Verified live.
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: [] });
+    vi.mocked(api.post).mockResolvedValueOnce({ success: false, error: 'A collection with that name already exists' });
+
+    render(<MyCollectionsPage />);
+    await waitFor(() => expect(screen.getByRole('button')).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button'));
+    await waitFor(() => expect(document.querySelector('[role="dialog"]')).toBeTruthy());
+
+    const inputs = document.querySelectorAll('input');
+    if (inputs.length > 0) {
+      fireEvent.change(inputs[0], { target: { value: 'Dupe Collection' } });
+    }
+    const allButtons = screen.getAllByRole('button');
+    fireEvent.click(allButtons[allButtons.length - 1]);
+
+    await waitFor(() => expect(mockToast.error).toHaveBeenCalled());
+    // The modal stays open (the success path that closes it did not run) and no fake success.
+    expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+    expect(mockToast.success).not.toHaveBeenCalled();
+  });
+
   it('shows error toast when create API call throws', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: [] });
     vi.mocked(api.post).mockRejectedValueOnce(new Error('Network error'));
