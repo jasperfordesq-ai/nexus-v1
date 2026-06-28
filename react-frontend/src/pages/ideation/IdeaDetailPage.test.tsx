@@ -198,6 +198,28 @@ describe('IdeaDetailPage', () => {
     });
   });
 
+  it('shows an error toast (no fake success) when posting a comment fails', async () => {
+    // Regression: handlePostComment showed an unconditional success toast and cleared
+    // the input after `await api.post(...)` without checking response.success — a
+    // failed post (4xx → { success: false }, no throw) faked a posted comment and
+    // discarded the user's text. Live-verified. (Same class as the vote fix above and
+    // the group-exchange/bookmark actions.)
+    setupMocks();
+    vi.mocked(api.post).mockResolvedValue({ success: false, error: 'nope' } as never);
+
+    render(<IdeaDetailPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Reusable Shopping Bags')).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByPlaceholderText('comments.add_placeholder'), {
+      target: { value: 'My comment' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /add_button/i }));
+
+    await waitFor(() => expect(toastErrorSpy).toHaveBeenCalled());
+  });
+
   it('shows comment form for authenticated users', async () => {
     setupMocks();
     render(<IdeaDetailPage />);

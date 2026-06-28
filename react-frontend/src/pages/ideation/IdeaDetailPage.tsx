@@ -252,17 +252,23 @@ export function IdeaDetailPage() {
 
     setIsPostingComment(true);
     try {
-      await api.post(`/v2/ideation-ideas/${id}/comments`, {
+      const response = await api.post(`/v2/ideation-ideas/${id}/comments`, {
         body: newComment.trim(),
       });
 
-      toastRef.current.success(tRef.current('toast.comment_added'));
-      setNewComment('');
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.comment_added'));
+        setNewComment('');
 
-      // Refresh comments
-      setCommentsCursor(undefined);
-      fetchComments();
-      fetchIdea();
+        // Refresh comments
+        setCommentsCursor(undefined);
+        fetchComments();
+        fetchIdea();
+      } else {
+        // A failed post resolves to { success: false } without throwing — the
+        // unconditional success toast + cleared input used to fake a posted comment.
+        toastRef.current.error(response.error || tRef.current('toast.error_generic'));
+      }
     } catch (err) {
       logError('Failed to post comment', err);
       toastRef.current.error(tRef.current('toast.error_generic'));
@@ -280,12 +286,17 @@ export function IdeaDetailPage() {
     if (!ok) return;
     setDeletingCommentId(commentId);
     try {
-      await api.delete(`/v2/ideation-comments/${commentId}`);
-      toastRef.current.success(tRef.current('toast.comment_deleted'));
+      const response = await api.delete(`/v2/ideation-comments/${commentId}`);
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.comment_deleted'));
 
-      setComments(prev => prev.filter(c => c.id !== commentId));
-      // Update count on idea
-      setIdea(prev => prev ? { ...prev, comments_count: Math.max(0, prev.comments_count - 1) } : prev);
+        setComments(prev => prev.filter(c => c.id !== commentId));
+        // Update count on idea
+        setIdea(prev => prev ? { ...prev, comments_count: Math.max(0, prev.comments_count - 1) } : prev);
+      } else {
+        // Don't remove the comment from the list on a failed delete.
+        toastRef.current.error(response.error || tRef.current('toast.error_generic'));
+      }
     } catch (err) {
       logError('Failed to delete comment', err);
       toastRef.current.error(tRef.current('toast.error_generic'));
@@ -296,9 +307,13 @@ export function IdeaDetailPage() {
 
   const handleIdeaStatusChange = async (newStatus: string) => {
     try {
-      await api.put(`/v2/ideation-ideas/${id}/status`, { status: newStatus });
-      toastRef.current.success(tRef.current('admin.idea_status_updated'));
-      fetchIdea();
+      const response = await api.put(`/v2/ideation-ideas/${id}/status`, { status: newStatus });
+      if (response.success) {
+        toastRef.current.success(tRef.current('admin.idea_status_updated'));
+        fetchIdea();
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.error_generic'));
+      }
     } catch (err) {
       logError('Failed to update idea status', err);
       toastRef.current.error(tRef.current('toast.error_generic'));
@@ -308,9 +323,14 @@ export function IdeaDetailPage() {
   const handleDeleteIdea = async () => {
     setIsDeletingIdea(true);
     try {
-      await api.delete(`/v2/ideation-ideas/${id}`);
-      toastRef.current.success(tRef.current('toast.idea_deleted'));
-      navigate(tenantPath(`/ideation/${challengeId ?? idea?.challenge_id}`));
+      const response = await api.delete(`/v2/ideation-ideas/${id}`);
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.idea_deleted'));
+        navigate(tenantPath(`/ideation/${challengeId ?? idea?.challenge_id}`));
+      } else {
+        // Don't navigate away as if deleted on a failed request.
+        toastRef.current.error(response.error || tRef.current('toast.error_generic'));
+      }
     } catch (err) {
       logError('Failed to delete idea', err);
       toastRef.current.error(tRef.current('toast.error_generic'));
