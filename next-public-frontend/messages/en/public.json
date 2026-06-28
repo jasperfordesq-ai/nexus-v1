@@ -1,0 +1,85 @@
+{
+  "brand": {
+    "platformName": "Project NEXUS"
+  },
+  "navigation": {
+    "aria": "Public navigation",
+    "home": "Home",
+    "about": "About",
+    "help": "Help",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "blog": "Blog"
+  },
+  "metadata": {
+    "canonicalLabel": "Canonical page URL"
+  },
+  "pages": {
+    "home": {
+      "title": "Home",
+      "eyebrow": "Community timebanking",
+      "lead": "{{tenantName}} helps people exchange skills, support, and practical help using time credits.",
+      "fallbackTagline": "A community platform for exchanging time, skills, and support.",
+      "primaryAction": "Contact this community",
+      "secondaryAction": "Read community updates",
+      "sectionTitle": "What members can do",
+      "sectionBody": "Members can offer help, request support, join events, share resources, and build trusted local connections."
+    },
+    "about": {
+      "title": "About",
+      "lead": "Learn how this community uses time credits to recognise everyone's contribution.",
+      "body": "Project NEXUS supports multi-tenant timebanking communities with public information pages and private member tools."
+    },
+    "help": {
+      "title": "Help",
+      "lead": "Find support for joining, taking part, and using your community account.",
+      "body": "For account-specific help, contact the community team or sign in to the member app."
+    },
+    "contact": {
+      "title": "Contact",
+      "lead": "Get in touch with the community team.",
+      "body": "Use the published contact details for this community, or return to the member app if you already have an account."
+    },
+    "faq": {
+      "title": "FAQ",
+      "lead": "Common questions about timebanking and community participation.",
+      "body": "Timebanking lets people exchange support using time as the unit of value. One hour given earns one time credit."
+    },
+    "privacy": {
+      "title": "Privacy",
+      "lead": "Privacy information for public visitors and community members.",
+      "body": "This public page is prepared for tenant-managed privacy content. Member-specific privacy controls remain inside the secure app."
+    },
+    "terms": {
+      "title": "Terms",
+      "lead": "Terms and participation information for this community.",
+      "body": "This public page is prepared for tenant-managed terms content. Community administrators can publish fuller CMS content through the platform."
+    },
+    "accessibility": {
+      "title": "Accessibility",
+      "lead": "Accessibility information for Project NEXUS public pages.",
+      "body": "Project NEXUS provides a modern React member app and a separate accessible frontend track for users who prefer a highly accessible HTML-first experience."
+    },
+    "blog": {
+      "title": "Blog",
+      "lead": "News and updates from this community.",
+      "empty": "No public posts are available yet."
+    },
+    "blogDetail": {
+      "title": "Blog post",
+      "missing": "This public post is not available in the shadow frontend yet."
+    },
+    "cmsPage": {
+      "title": "Page",
+      "missing": "This public page is not available in the shadow frontend yet."
+    },
+    "notFound": {
+      "title": "Page not found",
+      "lead": "This route is not owned by the shadow public frontend."
+    }
+  },
+  "footer": {
+    "attribution": "Project NEXUS is free software licensed under AGPL-3.0-or-later.",
+    "copyright": "Copyright © 2024–2026 Jasper Ford."
+  }
+}

@@ -1,0 +1,34 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import type { TenantBootstrap } from './tenant-api';
+
+export function isFeatureEnabled(tenant: TenantBootstrap | null, key: string): boolean {
+  return normalizeBoolean(tenant?.features?.[key]);
+}
+
+export function isModuleEnabled(tenant: TenantBootstrap | null, key: string): boolean {
+  return normalizeBoolean(tenant?.modules?.[key] ?? tenant?.features?.[key]);
+}
+
+function normalizeBoolean(value: unknown): boolean {
+  if (value === undefined || value === null) {
+    return false;
+  }
+
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  if (typeof value === 'number') {
+    return value > 0;
+  }
+
+  if (typeof value === 'string') {
+    return ['1', 'enabled', 'true', 'yes'].includes(value.toLowerCase());
+  }
+
+  return Boolean(value);
+}

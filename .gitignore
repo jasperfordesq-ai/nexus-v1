@@ -6,6 +6,7 @@
 
 # ─── Dependencies ─────────────────────────────────────────────────────────────
 /node_modules
+/.next/
 /vendor
 composer.phar
 

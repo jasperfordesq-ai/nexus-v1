@@ -1,0 +1,50 @@
+{
+  "mode": "shadow",
+  "description": "Shadow-mode route ownership for the Next.js public frontend. This manifest documents intended ownership only; it does not activate production routing.",
+  "nextPublicRoutes": [
+    { "pattern": "/", "routeKey": "home", "labelKey": "pages.home.title" },
+    { "pattern": "/about", "routeKey": "about", "labelKey": "pages.about.title" },
+    { "pattern": "/help", "routeKey": "help", "labelKey": "pages.help.title" },
+    { "pattern": "/contact", "routeKey": "contact", "labelKey": "pages.contact.title" },
+    { "pattern": "/faq", "routeKey": "faq", "labelKey": "pages.faq.title" },
+    { "pattern": "/privacy", "routeKey": "privacy", "labelKey": "pages.privacy.title" },
+    { "pattern": "/terms", "routeKey": "terms", "labelKey": "pages.terms.title" },
+    { "pattern": "/accessibility", "routeKey": "accessibility", "labelKey": "pages.accessibility.title" },
+    { "pattern": "/blog", "routeKey": "blog-index", "labelKey": "pages.blog.title" },
+    { "pattern": "/blog/:slug", "routeKey": "blog-detail", "labelKey": "pages.blogDetail.title" },
+    { "pattern": "/page/:slug", "routeKey": "cms-page", "labelKey": "pages.cmsPage.title" }
+  ],
+  "vitePrivatePrefixes": [
+    "achievements",
+    "admin",
+    "broker",
+    "connections",
+    "dashboard",
+    "feed",
+    "goals",
+    "groups",
+    "leaderboard",
+    "matches",
+    "members",
+    "messages",
+    "notifications",
+    "profile",
+    "settings",
+    "super-admin",
+    "wallet"
+  ],
+  "vitePrivatePatterns": [
+    "/events/new",
+    "/events/:id/edit",
+    "/jobs/new",
+    "/jobs/:id/edit",
+    "/listings/new",
+    "/listings/:id/edit",
+    "/marketplace/new",
+    "/marketplace/:id/edit",
+    "/organisations/new",
+    "/organisations/:id/edit",
+    "/resources/new",
+    "/resources/:id/edit"
+  ]
+}
