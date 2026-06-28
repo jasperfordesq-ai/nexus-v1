@@ -17133,6 +17133,10 @@
         "title": "O e-mail da conta não foi acionado",
         "body": "Novos usuários do {{count}} não tiveram nenhuma ativação de conta, verificação, aprovação ou tentativa de e-mail de boas-vindas nas últimas horas do {{window_hours}}."
       },
+      "new_users_without_admin_registration_alert": {
+        "title": "O alerta de registro para administradores não foi acionado",
+        "body": "{{count}} novos usuários não tiveram alerta por e-mail de novo registro para administradores nas últimas {{window_hours}} horas."
+      },
       "password_resets_without_email_attempt": {
         "title": "E-mail de redefinição de senha não foi acionado",
         "body": "Os tokens de redefinição de senha {{count}} não têm nenhuma tentativa de e-mail de redefinição de senha correspondente nas últimas horas {{window_hours}}."

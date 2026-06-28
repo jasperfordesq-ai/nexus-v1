@@ -100,7 +100,10 @@ class NotifyAdminOfNewRegistration
                             ->button(__('emails_misc.admin_notify.new_user_cta'), $profileUrl)
                             ->render();
 
-                        if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_registration', ['tenant_id' => $event->tenantId])) {
+                        if (!EmailDispatchService::sendRaw($adminEmail, $subject, $html, null, null, null, 'admin_new_registration', [
+                            'tenant_id' => $event->tenantId,
+                            'idempotency_key' => 'admin_new_registration:' . $event->tenantId . ':' . $user->id . ':' . $admin->id,
+                        ])) {
                             Log::warning('NotifyAdminOfNewRegistration: email send failed', ['admin_id' => $admin->id, 'email' => $adminEmail]);
                         }
                     });

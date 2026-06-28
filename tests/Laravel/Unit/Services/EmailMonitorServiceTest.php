@@ -8,11 +8,16 @@ namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
 use App\Services\EmailMonitorService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class EmailMonitorServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private EmailMonitorService $service;
 
     protected function setUp(): void
@@ -160,5 +165,29 @@ class EmailMonitorServiceTest extends TestCase
 
         $this->assertEquals(0, $result['total_sent']);
         $this->assertArrayHasKey('error', $result);
+    }
+
+    public function test_admin_new_registration_failures_are_critical_email_failures(): void
+    {
+        if (!Schema::hasTable('email_log')) {
+            $this->markTestSkipped('Email log table is not available.');
+        }
+
+        DB::table('email_log')->insert([
+            'tenant_id' => 2,
+            'recipient_email' => 'admin-alert-failure-' . uniqid() . '@audit-fixture.testmail',
+            'category' => 'admin_new_registration',
+            'subject' => 'New registration',
+            'provider' => 'sendgrid',
+            'status' => 'failed',
+            'error' => 'simulated admin registration alert failure',
+            'created_at' => now()->subMinute(),
+            'updated_at' => now()->subMinute(),
+        ]);
+
+        $warnings = (new EmailMonitorService())->getWarnings(2);
+        $codes = array_column($warnings, 'code');
+
+        $this->assertContains('critical_email_failures', $codes);
     }
 }

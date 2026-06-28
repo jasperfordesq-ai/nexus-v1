@@ -17133,6 +17133,10 @@
         "title": "Account-e-mailadres is niet geactiveerd",
         "body": "{{count}} nieuwe gebruikers hebben in de afgelopen {{window_hours}}-uren geen accountactivatie, verificatie, goedkeuring of welkomst-e-mailpoging gehad."
       },
+      "new_users_without_admin_registration_alert": {
+        "title": "Adminregistratiemelding is niet geactiveerd",
+        "body": "{{count}} nieuwe gebruikers hebben in de afgelopen {{window_hours}} uur geen e-mailmelding voor nieuwe registratie aan beheerders gehad."
+      },
       "password_resets_without_email_attempt": {
         "title": "E-mail voor het opnieuw instellen van het wachtwoord is niet geactiveerd",
         "body": "{{count}} tokens voor het opnieuw instellen van het wachtwoord hebben geen overeenkomende e-mailpogingen voor het opnieuw instellen van het wachtwoord gedaan in de afgelopen {{window_hours}}-uren."

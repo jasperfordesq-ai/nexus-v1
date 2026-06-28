@@ -17133,6 +17133,10 @@
         "title": "Adres e-mail konta nie został uruchomiony",
         "body": "{{count}} nowi użytkownicy nie mieli aktywacji konta, weryfikacji, zatwierdzenia ani próby wysłania wiadomości powitalnej w ciągu ostatnich godzin {{window_hours}}."
       },
+      "new_users_without_admin_registration_alert": {
+        "title": "Alert rejestracji dla administratorów nie został uruchomiony",
+        "body": "{{count}} nowych użytkowników nie ma alertu e-mail o nowej rejestracji dla administratorów w ciągu ostatnich {{window_hours}} godzin."
+      },
       "password_resets_without_email_attempt": {
         "title": "E-mail dotyczący resetowania hasła nie został uruchomiony",
         "body": "Dla tokenów resetowania hasła {{count}} nie ma pasującej próby e-maila dotyczącego resetowania hasła w ciągu ostatnich godzin {{window_hours}}."

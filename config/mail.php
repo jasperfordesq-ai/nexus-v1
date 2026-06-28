@@ -115,6 +115,7 @@ return [
         'api_key' => env('SENDGRID_API_KEY'),
         'from_email' => env('SENDGRID_FROM_EMAIL'),
         'from_name' => env('SENDGRID_FROM_NAME'),
+        'reply_to' => env('SENDGRID_REPLY_TO'),
         // Event Webhook authentication is read by SendGridWebhookController
         // directly from env('SENDGRID_WEBHOOK_VERIFICATION_KEY') — kept here
         // as a reference for ops without proxying through config().

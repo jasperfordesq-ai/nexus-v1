@@ -63,8 +63,8 @@ class Mailer
     /** Verified SendGrid domain for category From addresses. */
     private const SENDGRID_DOMAIN   = 'project-nexus.net';
 
-    /** Default Reply-To for all platform SendGrid emails. */
-    private const DEFAULT_REPLY_TO  = 'Jasper Ford <jasper@hour-timebank.ie>';
+    /** Optional Reply-To for platform SendGrid emails. */
+    private ?string $platformReplyTo = null;
 
     /**
      * True when the platform's SENDGRID_API_KEY is the active driver
@@ -139,6 +139,9 @@ class Mailer
             }
             if (!empty($envValues['SENDGRID_FROM_NAME'])) {
                 $this->fromName = $envValues['SENDGRID_FROM_NAME'];
+            }
+            if (!empty($envValues['SENDGRID_REPLY_TO'])) {
+                $this->platformReplyTo = $envValues['SENDGRID_REPLY_TO'];
             }
             $this->driver = 'sendgrid';
             $this->isPlatformSendGrid = true;
@@ -250,6 +253,7 @@ class Mailer
                         $this->sendgridApiKey = $apiKey;
                         $this->driver = 'sendgrid';
                         $this->isPlatformSendGrid = false; // tenant's own key, not platform's
+                        $this->platformReplyTo = null;
                         $fromEmail = EmailSettings::get($tenantId, 'sendgrid_from_email');
                         $fromName = EmailSettings::get($tenantId, 'sendgrid_from_name');
                         if (!empty($fromEmail)) $this->fromEmail = $fromEmail;
@@ -323,6 +327,7 @@ class Mailer
             'SENDGRID_API_KEY'    => (string) (config('mail.sendgrid.api_key') ?? ''),
             'SENDGRID_FROM_EMAIL' => (string) (config('mail.sendgrid.from_email') ?? ''),
             'SENDGRID_FROM_NAME'  => (string) (config('mail.sendgrid.from_name') ?? ''),
+            'SENDGRID_REPLY_TO'   => (string) (config('mail.sendgrid.reply_to') ?? ''),
         ];
     }
 
@@ -522,13 +527,13 @@ class Mailer
     public function send($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $category = null, ?array $metadata = null): bool
     {
         // When using the platform's SendGrid account, set a category-specific
-        // From address (e.g. newsletters@project-nexus.net) and a default
-        // Reply-To so recipients can reach a human when they reply.
+        // From address (e.g. newsletters@project-nexus.net) and the configured
+        // platform Reply-To when one exists.
         // Has no effect for tenant-specific SMTP, Gmail API, or SendGrid.
         if ($this->isPlatformSendGrid && $this->driver === 'sendgrid') {
             $this->fromEmail = $this->resolveSendGridFromPrefix($category) . '@' . self::SENDGRID_DOMAIN;
-            if ($replyTo === null) {
-                $replyTo = self::DEFAULT_REPLY_TO;
+            if ($replyTo === null && $this->platformReplyTo !== null) {
+                $replyTo = $this->platformReplyTo;
             }
         }
 
@@ -640,8 +645,11 @@ class Mailer
             \App\Services\EmailMonitorService::recordEmailSendStatic('smtp', false, $this->tenantId);
         }
 
-        if ($this->usePlatformSendGridFallback()) {
+        if ($this->usePlatformSendGridFallback($category)) {
             \Illuminate\Support\Facades\Log::warning("Mailer: SMTP failed, falling back to platform SendGrid for: " . self::maskEmail($to));
+            if ($replyTo === null && $this->platformReplyTo !== null) {
+                $replyTo = $this->platformReplyTo;
+            }
             $sendGridOk = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $category, $metadata);
             if (class_exists(\App\Services\EmailMonitorService::class)) {
                 \App\Services\EmailMonitorService::recordFallbackToSmtpStatic('smtp_failed_platform_sendgrid', $this->tenantId);
@@ -659,7 +667,7 @@ class Mailer
      * stale or broken SMTP overrides. This preserves tenant-specific SendGrid
      * credentials when present and only switches a failed non-SendGrid path.
      */
-    private function usePlatformSendGridFallback(): bool
+    private function usePlatformSendGridFallback(?string $category = null): bool
     {
         $apiKey = (string) (config('mail.sendgrid.api_key') ?? '');
         if ($apiKey === '') {
@@ -667,18 +675,19 @@ class Mailer
         }
 
         $this->sendgridApiKey = $apiKey;
+        $this->isPlatformSendGrid = true;
 
-        $fromEmail = (string) (config('mail.sendgrid.from_email') ?? '');
         $fromName = (string) (config('mail.sendgrid.from_name') ?? '');
 
-        if ($fromEmail !== '') {
-            $this->fromEmail = $fromEmail;
-        }
         if ($fromName !== '') {
             $this->fromName = $fromName;
         }
+        $replyTo = (string) (config('mail.sendgrid.reply_to') ?? '');
+        $this->platformReplyTo = $replyTo !== '' ? $replyTo : null;
 
-        return $this->fromEmail !== '';
+        $this->fromEmail = $this->resolveSendGridFromPrefix($category) . '@' . self::SENDGRID_DOMAIN;
+
+        return true;
     }
 
     /**

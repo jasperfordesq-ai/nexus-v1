@@ -17133,6 +17133,10 @@
         "title": "L'e-mail dell'account non è stata attivata",
         "body": "I nuovi utenti {{count}} non hanno ricevuto alcun tentativo di attivazione, verifica, approvazione o e-mail di benvenuto dell'account nelle ultime ore {{window_hours}}."
       },
+      "new_users_without_admin_registration_alert": {
+        "title": "L'avviso di registrazione per gli amministratori non è stato attivato",
+        "body": "{{count}} nuovi utenti non hanno generato alcun avviso e-mail di nuova registrazione per gli amministratori nelle ultime {{window_hours}} ore."
+      },
       "password_resets_without_email_attempt": {
         "title": "L'e-mail di reimpostazione della password non è stata attivata",
         "body": "I token di reimpostazione della password {{count}} non hanno alcun tentativo e-mail di reimpostazione della password corrispondente nelle ultime ore {{window_hours}}."

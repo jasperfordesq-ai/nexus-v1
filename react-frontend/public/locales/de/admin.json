@@ -17133,6 +17133,10 @@
         "title": "Konto-E-Mail wurde nicht ausgelöst",
         "body": "Neue {{count}}-Benutzer haben in den letzten {{window_hours}}-Stunden keinen Versuch unternommen, ihr Konto zu aktivieren, zu verifizieren, zu genehmigen oder eine Willkommens-E-Mail zu senden."
       },
+      "new_users_without_admin_registration_alert": {
+        "title": "Admin-Registrierungsbenachrichtigung wurde nicht ausgelöst",
+        "body": "{{count}} neue Benutzer haben in den letzten {{window_hours}} Stunden keine E-Mail-Benachrichtigung über eine neue Registrierung an Administratoren ausgelöst."
+      },
       "password_resets_without_email_attempt": {
         "title": "Die E-Mail zum Zurücksetzen des Passworts wurde nicht ausgelöst",
         "body": "Für {{count}}-Passwort-Reset-Tokens gab es in den letzten {{window_hours}}-Stunden keinen passenden E-Mail-Versuch zum Zurücksetzen des Passworts."

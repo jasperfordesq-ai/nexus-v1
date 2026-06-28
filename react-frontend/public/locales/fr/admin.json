@@ -17133,6 +17133,10 @@
         "title": "L'e-mail du compte ne s'est pas déclenché",
         "body": "Les nouveaux utilisateurs de {{count}} n'ont eu aucune tentative d'activation, de vérification, d'approbation ou d'e-mail de bienvenue au cours des dernières heures de {{window_hours}}."
       },
+      "new_users_without_admin_registration_alert": {
+        "title": "L'alerte d'inscription administrateur ne s'est pas déclenchée",
+        "body": "{{count}} nouveaux utilisateurs n'ont aucune alerte e-mail de nouvelle inscription envoyée aux administrateurs au cours des dernières {{window_hours}} heures."
+      },
       "password_resets_without_email_attempt": {
         "title": "L'e-mail de réinitialisation du mot de passe n'a pas été déclenché",
         "body": "Les jetons de réinitialisation de mot de passe {{count}} n'ont reçu aucune tentative d'e-mail de réinitialisation de mot de passe correspondante au cours des dernières heures {{window_hours}}."

@@ -17133,6 +17133,10 @@
         "title": "Níor spreag ríomhphost an chuntais",
         "body": "Níl aon ghníomhachtú cuntais, fíorú, ceadú nó iarracht ríomhphoist fáilte ag úsáideoirí nua {{count}} sna huaireanta {{window_hours}} deireanach."
       },
+      "new_users_without_admin_registration_alert": {
+        "title": "Níor spreag foláireamh clárúcháin riaracháin",
+        "body": "Níl aon fholáireamh ríomhphoist do riarthóirí faoi chlárú nua ag {{count}} úsáideoir nua sna {{window_hours}} uair an chloig dheireanacha."
+      },
       "password_resets_without_email_attempt": {
         "title": "Níor spreag ríomhphost athshocraithe pasfhocail",
         "body": "Níl aon iarracht ríomhphoist athshocraithe pasfhocal meaitseála ag comharthaí athshocraithe pasfhocail {{count}} sna huaireanta {{window_hours}} deireanach."

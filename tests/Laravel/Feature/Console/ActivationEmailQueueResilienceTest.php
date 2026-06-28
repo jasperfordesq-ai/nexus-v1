@@ -9,9 +9,18 @@ namespace Tests\Laravel\Feature\Console;
 use App\Core\TenantContext;
 use App\Listeners\NotifyAdminOfNewRegistration;
 use App\Listeners\SendWelcomeNotification;
+use App\Models\User;
+use App\Services\DisposableEmailService;
+use App\Services\EmailDispatchService;
+use App\Services\MxRecordValidator;
+use App\Services\PwnedPasswordService;
+use App\Services\RegistrationService;
+use App\Services\TenantSettingsService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Events\CallQueuedListener;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Tests\Laravel\TestCase;
 
 /**
@@ -36,6 +45,71 @@ class ActivationEmailQueueResilienceTest extends TestCase
         $this->assertFalse(
             in_array(ShouldQueue::class, class_implements(NotifyAdminOfNewRegistration::class), true),
             'Admin new-registration email must run inline so admins are not dependent on a queue worker.'
+        );
+    }
+
+    public function test_successful_registration_sends_activation_and_admin_emails_without_queue_worker(): void
+    {
+        Queue::fake();
+
+        $tenantId = (int) DB::table('tenants')->insertGetId([
+            'name'       => 'Inline Registration Tenant',
+            'slug'       => 'inline-registration-' . uniqid(),
+            'is_active'  => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        TenantContext::setById($tenantId);
+
+        User::factory()->forTenant($tenantId)->create([
+            'role'               => 'admin',
+            'status'             => 'active',
+            'email'              => 'admin-inline-' . uniqid() . '@project-nexus.testmail',
+            'preferred_language' => 'en',
+        ]);
+
+        $mailer = new RegistrationInlineEmailDispatchService();
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        $service = new RegistrationService(
+            new User(),
+            app(TenantSettingsService::class),
+            new RegistrationInlinePwnedPasswordService(),
+            new RegistrationInlineDisposableEmailService(),
+            new RegistrationInlineMxRecordValidator(),
+        );
+
+        $result = $service->register([
+            'first_name'            => 'Inline',
+            'last_name'             => 'Signup',
+            'email'                 => 'inline-signup-' . uniqid() . '@project-nexus.testmail',
+            'location'              => 'Toronto, Canada',
+            'phone'                 => '+15551234567',
+            'password'              => 'A uniquely long registration passphrase 2026',
+            'password_confirmation' => 'A uniquely long registration passphrase 2026',
+            'terms_accepted'        => true,
+        ], $tenantId);
+
+        $this->assertArrayNotHasKey('error', $result);
+        $this->assertTrue($result['requires_verification'] ?? false);
+
+        $userId = (int) ($result['user']['id'] ?? 0);
+        $this->assertGreaterThan(0, $userId);
+        $this->assertTrue(DB::table('email_verification_tokens')
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $userId)
+            ->exists());
+
+        $categories = array_column($mailer->calls, 'category');
+        $this->assertContains('activation', $categories);
+        $this->assertContains('admin_new_registration', $categories);
+
+        Queue::assertNotPushed(
+            CallQueuedListener::class,
+            fn ($job) => in_array($job->class, [
+                SendWelcomeNotification::class,
+                NotifyAdminOfNewRegistration::class,
+            ], true)
         );
     }
 
@@ -84,5 +158,47 @@ class ActivationEmailQueueResilienceTest extends TestCase
             ->expectsOutputToContain($bEmail)
             ->doesntExpectOutputToContain($aEmail)
             ->assertExitCode(0);
+    }
+}
+
+class RegistrationInlineEmailDispatchService extends EmailDispatchService
+{
+    /** @var list<array{to:string, subject:string, category:string|null, tenant_id:int|null}> */
+    public array $calls = [];
+
+    public function send(string $to, string $subject, string $body, array $options = []): bool
+    {
+        $this->calls[] = [
+            'to'        => $to,
+            'subject'   => $subject,
+            'category'  => $options['category'] ?? null,
+            'tenant_id' => isset($options['tenant_id']) ? (int) $options['tenant_id'] : null,
+        ];
+
+        return true;
+    }
+}
+
+class RegistrationInlinePwnedPasswordService extends PwnedPasswordService
+{
+    public function isPwned(string $password): bool
+    {
+        return false;
+    }
+}
+
+class RegistrationInlineDisposableEmailService extends DisposableEmailService
+{
+    public function isDisposable(string $email): bool
+    {
+        return false;
+    }
+}
+
+class RegistrationInlineMxRecordValidator extends MxRecordValidator
+{
+    public function isResolvable(string $email): bool
+    {
+        return true;
     }
 }

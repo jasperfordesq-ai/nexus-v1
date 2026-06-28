@@ -182,6 +182,7 @@ class EmailTriggerAuditService
             $issues = array_merge(
                 $issues,
                 $this->checkNewUsersWithoutAccountEmail($tenantId, $since, $windowHours),
+                $this->checkNewUsersWithoutAdminRegistrationAlert($tenantId, $since, $windowHours),
                 $this->checkPasswordResetsWithoutEmail($tenantId, $since, $windowHours),
                 $this->checkGroupInvitesWithoutEmail($tenantId, $since, $windowHours),
                 $this->checkGroupMembershipNotificationHealth($tenantId, $since, $windowHours),
@@ -289,7 +290,7 @@ class EmailTriggerAuditService
             'stripe_webhook_events' => 'checkBillingAndStripeHealth',
             'transaction_notification_deliveries' => 'checkTransactionNotificationDeliveryHealth',
             'user_safeguarding_preferences' => 'checkSafeguardingEmailEvidenceHealth',
-            'users' => 'checkNewUsersWithoutAccountEmail',
+            'users' => 'checkNewUsersWithoutAccountEmail/checkNewUsersWithoutAdminRegistrationAlert',
             'verein_member_dues' => 'checkVereinDuesEmailHealth',
             'vol_donations' => 'checkStripeDonationReceiptEmailHealth',
             'vol_reminder_delivery_claims' => 'checkVolunteerReminderDeliveryClaimHealth',
@@ -367,6 +368,60 @@ class EmailTriggerAuditService
             'critical',
             'registration',
             'welcome_or_activation',
+            ['window_hours' => $windowHours]
+        );
+    }
+
+    /**
+     * @return list<array<string,mixed>>
+     */
+    private function checkNewUsersWithoutAdminRegistrationAlert(?int $tenantId, \DateTimeInterface $since, int $windowHours): array
+    {
+        if (!$this->hasTables(['users', 'email_log'])) {
+            return [];
+        }
+
+        $hasIdempotencyKey = Schema::hasColumn('email_log', 'idempotency_key');
+
+        $q = DB::table('users')
+            ->select('users.tenant_id', DB::raw('COUNT(*) as count'))
+            ->where('users.created_at', '>=', $since)
+            ->whereNull('users.deleted_at')
+            ->whereNotExists(function ($sub) use ($hasIdempotencyKey) {
+                $sub->select(DB::raw(1))
+                    ->from('email_log')
+                    ->whereColumn('email_log.tenant_id', 'users.tenant_id')
+                    ->whereColumn('email_log.created_at', '>=', 'users.created_at')
+                    ->where('email_log.category', 'admin_new_registration')
+                    ->whereIn('email_log.status', ['sent', 'delivered', 'bounced']);
+
+                if ($hasIdempotencyKey) {
+                    $sub->where(function ($evidence) {
+                        $evidence
+                            ->whereRaw("email_log.idempotency_key LIKE CONCAT('admin_new_registration:', users.tenant_id, ':', users.id, ':%')")
+                            ->orWhere(function ($fallback) {
+                                $fallback
+                                    ->whereNull('email_log.idempotency_key')
+                                    ->whereRaw('email_log.created_at <= DATE_ADD(users.created_at, INTERVAL 15 MINUTE)');
+                            });
+                    });
+                } else {
+                    $sub->whereRaw('email_log.created_at <= DATE_ADD(users.created_at, INTERVAL 15 MINUTE)');
+                }
+            })
+            ->groupBy('users.tenant_id');
+        $this->excludeReservedEmailDomains($q, 'users.email');
+
+        if ($tenantId !== null) {
+            $q->where('users.tenant_id', $tenantId);
+        }
+
+        return $this->rowsToIssues(
+            $q->get(),
+            'new_users_without_admin_registration_alert',
+            'critical',
+            'admin_notifications',
+            'admin_new_registration',
             ['window_hours' => $windowHours]
         );
     }

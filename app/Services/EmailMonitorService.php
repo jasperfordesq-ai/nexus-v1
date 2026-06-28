@@ -343,6 +343,7 @@ class EmailMonitorService
 
             $criticalCategories = [
                 'activation',
+                'admin_new_registration',
                 'admin_welcome',
                 'approval',
                 'email_verification',

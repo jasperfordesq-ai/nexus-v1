@@ -17133,6 +17133,10 @@
         "title": "Account email did not trigger",
         "body": "{{count}} new users have no account activation, verification, approval, or welcome email attempt in the last {{window_hours}} hours."
       },
+      "new_users_without_admin_registration_alert": {
+        "title": "Admin registration alert did not trigger",
+        "body": "{{count}} new users have no admin new-registration email alert in the last {{window_hours}} hours."
+      },
       "password_resets_without_email_attempt": {
         "title": "Password reset email did not trigger",
         "body": "{{count}} password reset tokens have no matching password reset email attempt in the last {{window_hours}} hours."

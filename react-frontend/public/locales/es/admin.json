@@ -17133,6 +17133,10 @@
         "title": "El correo electrónico de la cuenta no se activó",
         "body": "Los nuevos usuarios de {{count}} no tuvieron activación de cuenta, verificación, aprobación ni intento de correo electrónico de bienvenida en las últimas horas de {{window_hours}}."
       },
+      "new_users_without_admin_registration_alert": {
+        "title": "La alerta de registro para administradores no se activó",
+        "body": "{{count}} nuevos usuarios no tuvieron una alerta por correo electrónico de nuevo registro para administradores en las últimas {{window_hours}} horas."
+      },
       "password_resets_without_email_attempt": {
         "title": "El correo electrónico de restablecimiento de contraseña no se activó",
         "body": "Los tokens de restablecimiento de contraseña de {{count}} no tienen ningún intento de correo electrónico de restablecimiento de contraseña coincidente en las últimas horas de {{window_hours}}."

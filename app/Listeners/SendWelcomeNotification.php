@@ -116,7 +116,10 @@ class SendWelcomeNotification
                         ->paragraph(__('emails.welcome.pending_ignore'))
                         ->render();
 
-                    if (!EmailDispatchService::sendRaw($userEmail, __('emails.welcome.pending_subject', ['community' => $tenantName]), $html, null, null, null, 'activation', ['tenant_id' => $event->tenantId])) {
+                    if (!EmailDispatchService::sendRaw($userEmail, __('emails.welcome.pending_subject', ['community' => $tenantName]), $html, null, null, null, 'activation', [
+                        'tenant_id' => $event->tenantId,
+                        'idempotency_key' => 'activation:' . $event->tenantId . ':' . $event->user->id,
+                    ])) {
                         Log::warning('SendWelcomeNotification: pending welcome email failed to send', ['user_email' => $userEmail, 'tenant_id' => $event->tenantId]);
                         return;
                     }
@@ -141,7 +144,10 @@ class SendWelcomeNotification
                         ->button(__('emails.welcome.active_button'), EmailTemplateBuilder::tenantUrl('/feed'))
                         ->render();
 
-                    if (!EmailDispatchService::sendRaw($userEmail, __('emails.welcome.subject', ['community' => $tenantName]), $html, null, null, null, 'welcome', ['tenant_id' => $event->tenantId])) {
+                    if (!EmailDispatchService::sendRaw($userEmail, __('emails.welcome.subject', ['community' => $tenantName]), $html, null, null, null, 'welcome', [
+                        'tenant_id' => $event->tenantId,
+                        'idempotency_key' => 'welcome:' . $event->tenantId . ':' . $event->user->id,
+                    ])) {
                         Log::warning('SendWelcomeNotification: welcome email failed to send', ['user_email' => $userEmail, 'tenant_id' => $event->tenantId]);
                     }
                 }

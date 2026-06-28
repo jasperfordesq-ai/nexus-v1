@@ -420,6 +420,43 @@ class EmailTriggerAuditServiceTest extends TestCase
         $this->assertContains('new_users_without_account_email_attempt', $codes);
     }
 
+    public function test_run_detects_new_user_without_admin_registration_alert_even_when_activation_sent(): void
+    {
+        if (!Schema::hasTable('email_log')) {
+            $this->markTestSkipped('Email log table is not available.');
+        }
+
+        $createdAt = now()->subMinutes(5);
+        $email = 'missing-admin-registration-alert-' . uniqid() . '@audit-fixture.testmail';
+        $userId = DB::table('users')->insertGetId([
+            'tenant_id' => 2,
+            'name' => 'Missing Admin Alert User',
+            'email' => $email,
+            'role' => 'member',
+            'status' => 'pending',
+            'created_at' => $createdAt,
+            'updated_at' => $createdAt,
+        ]);
+
+        DB::table('email_log')->insert([
+            'tenant_id' => 2,
+            'user_id' => $userId,
+            'recipient_email' => $email,
+            'category' => 'activation',
+            'subject' => 'Activation',
+            'provider' => 'sendgrid',
+            'status' => 'sent',
+            'created_at' => now()->subMinutes(4),
+            'updated_at' => now()->subMinutes(4),
+        ]);
+
+        $result = app(EmailTriggerAuditService::class)->run(2, 24);
+        $codes = array_column($result['issues'], 'code');
+
+        $this->assertContains('new_users_without_admin_registration_alert', $codes);
+        $this->assertNotContains('new_users_without_account_email_attempt', $codes);
+    }
+
     public function test_run_detects_failed_and_stale_stripe_webhook_events(): void
     {
         if (!Schema::hasTable('stripe_webhook_events') || !Schema::hasColumn('stripe_webhook_events', 'status')) {

@@ -256,6 +256,8 @@ class EmailHealthAlert extends Command
         return match ($code) {
             'new_users_without_activation_email_log' =>
                 $p('count') . ' new signup(s) in ' . $p('window_hours', 24) . 'h with NO activation email logged — verify the registration→email path',
+            'new_users_without_admin_registration_alert' =>
+                $p('count') . ' new signup(s) in ' . $p('window_hours', 24) . 'h with NO admin registration alert logged — verify admins are being notified',
             'critical_email_failures' =>
                 $p('count') . ' critical-category email(s) failed/suppressed/bounced in ' . $p('window_hours', 24) . 'h (activation, password reset, etc.)',
             'recent_email_failures' =>
