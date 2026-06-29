@@ -47,6 +47,16 @@ describe('public content sources', () => {
     ).toBeNull();
   });
 
+  it('refuses auth-only coupon endpoints at runtime', () => {
+    expect(
+      getPublicEndpointForRoute(
+        'couponDetail',
+        { id: '42' },
+        [{ endpoint: '/v2/coupons/{id}', method: 'GET', routeKey: 'couponDetail' }],
+      ),
+    ).toBeNull();
+  });
+
   it.each([
     '/v2/../admin/events',
     '/v2/%2e%2e/admin/events',

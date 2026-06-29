@@ -3,6 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { isPrivateLaravelV2Endpoint } from './private-laravel-endpoints';
+
 interface RouteOwnershipManifest {
   mode?: unknown;
   nextPublicRoutes?: unknown;
@@ -171,20 +173,6 @@ const requiredVitePrivatePatterns = [
   '/resources/:id/edit',
 ];
 
-const privateLaravelV2EndpointPrefixes = [
-  '/v2/admin',
-  '/v2/auth',
-  '/v2/broker',
-  '/v2/coupons',
-  '/v2/dashboard',
-  '/v2/feed',
-  '/v2/messages',
-  '/v2/notifications',
-  '/v2/settings',
-  '/v2/super-admin',
-  '/v2/wallet',
-];
-
 export function validateShadowManifests(
   routeManifest: RouteOwnershipManifest,
   contentSources: ContentSourcesManifest,
@@ -351,12 +339,6 @@ function extractPatternParams(pattern: string): Set<string> {
 
 function extractEndpointParams(endpoint: string): Set<string> {
   return new Set([...endpoint.matchAll(/\{([^}]+)\}/g)].map((match) => match[1]).filter(Boolean));
-}
-
-function isPrivateLaravelV2Endpoint(endpoint: string): boolean {
-  return privateLaravelV2EndpointPrefixes.some((prefix) => (
-    endpoint === prefix || endpoint.startsWith(`${prefix}/`)
-  ));
 }
 
 function hasUnsafeEndpointPathSegments(endpoint: string): boolean {

@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import contentSourcesManifest from '../../content-sources.json';
+import { isPrivateLaravelV2Endpoint } from './private-laravel-endpoints';
 
 export interface PublicApiBackedRoute {
   endpoint: string;
@@ -18,19 +19,6 @@ export interface PublicContentSources {
 }
 
 export const publicContentSources = contentSourcesManifest as PublicContentSources;
-
-const privateLaravelV2EndpointPrefixes = [
-  '/v2/admin',
-  '/v2/auth',
-  '/v2/broker',
-  '/v2/dashboard',
-  '/v2/feed',
-  '/v2/messages',
-  '/v2/notifications',
-  '/v2/settings',
-  '/v2/super-admin',
-  '/v2/wallet',
-];
 
 export function getPublicContentSource(
   routeKey: string,
@@ -70,9 +58,7 @@ function isSafePublicEndpoint(endpoint: string): boolean {
     return false;
   }
 
-  return !privateLaravelV2EndpointPrefixes.some((prefix) => (
-    endpoint === prefix || endpoint.startsWith(`${prefix}/`)
-  ));
+  return !isPrivateLaravelV2Endpoint(endpoint);
 }
 
 function hasUnsafeEndpointPathSegments(endpoint: string): boolean {
