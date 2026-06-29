@@ -224,6 +224,25 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         );
     }
 
+    public function test_remaining_public_route_work_reports_unclassified_manifest_only_routes(): void
+    {
+        $method = new ReflectionMethod(NextPublicFrontendReadinessService::class, 'remainingPublicRouteWork');
+        $method->setAccessible(true);
+
+        $remaining = $method->invoke(new NextPublicFrontendReadinessService(), [
+            [
+                'pattern' => '/future-public-route',
+                'routeKey' => 'futurePublicRoute',
+                'labelKey' => 'pages.future_public_route.title',
+            ],
+        ], []);
+        $groups = array_column($remaining['groups'], null, 'key');
+
+        $this->assertContains('futurePublicRoute', $groups['unclassified_manifest_only']['route_keys']);
+        $this->assertSame('manifest_only_unclassified', $groups['unclassified_manifest_only']['reason']);
+        $this->assertContains('classify_route_before_cutover', $groups['unclassified_manifest_only']['required_actions']);
+    }
+
     public function test_manifest_validation_blocks_api_routes_outside_laravel_v2_public_api(): void
     {
         $validation = $this->validateManifest([

@@ -205,6 +205,17 @@ const readiness = {
           'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php',
         ],
       },
+      {
+        key: 'unclassified_manifest_only',
+        status: 'blocked',
+        route_count: 1,
+        route_keys: ['futurePublicRoute'],
+        reason: 'manifest_only_unclassified',
+        required_actions: ['classify_route_before_cutover'],
+        verification_commands: [
+          'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php',
+        ],
+      },
     ],
   },
   cutover_artifacts: {
@@ -366,11 +377,15 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('Static/manual-review routes')).toBeInTheDocument();
     expect(screen.getByText('Auth-only backend routes')).toBeInTheDocument();
     expect(screen.getByText('Backend contract gaps')).toBeInTheDocument();
+    expect(screen.getByText('Unclassified manifest-only routes')).toBeInTheDocument();
     expect(screen.getByText('Existing backend requires authentication')).toBeInTheDocument();
+    expect(screen.getByText('Manifest-only route not classified yet')).toBeInTheDocument();
     expect(screen.getByText('Keep Vite or prerender until a public contract exists')).toBeInTheDocument();
     expect(screen.getByText('Add a public Laravel API with tests')).toBeInTheDocument();
+    expect(screen.getByText('Classify route ownership and backend contract before cutover')).toBeInTheDocument();
     expect(screen.getAllByText('couponDetail')).not.toHaveLength(0);
     expect(screen.getAllByText('ideationIdeaDetail')).not.toHaveLength(0);
+    expect(screen.getAllByText('futurePublicRoute')).not.toHaveLength(0);
     expect(screen.getByText('npm run build:next-public')).toBeInTheDocument();
     expect(screen.getAllByText('npm run check:next-public:inert')).not.toHaveLength(0);
     expect(screen.getAllByText('npm --prefix next-public-frontend run check')).not.toHaveLength(0);

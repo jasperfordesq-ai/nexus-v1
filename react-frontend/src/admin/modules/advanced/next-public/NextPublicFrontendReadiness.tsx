@@ -384,7 +384,7 @@ function RemainingPublicRouteWorkCard({ readiness }: { readiness: Readiness }) {
         </div>
       </CardHeader>
       <CardBody>
-        <div className="grid gap-3 lg:grid-cols-3">
+        <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-4">
           {remaining.groups.map((group) => (
             <div key={group.key} className="rounded-md border border-divider px-3 py-3 text-sm">
               <div className="flex items-start justify-between gap-3">

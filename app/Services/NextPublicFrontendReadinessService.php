@@ -660,7 +660,7 @@ class NextPublicFrontendReadinessService
         $manifestRouteKeySet = array_flip($manifestRouteKeys);
         $apiBackedRouteKeySet = array_flip(array_column($apiBackedRoutes, 'routeKey'));
 
-        $staticManualReviewRouteKeys = $this->filterRemainingRouteKeys([
+        $staticManualReviewCandidates = [
             'home',
             'about',
             'features',
@@ -684,17 +684,43 @@ class NextPublicFrontendReadinessService
             'hourImpactSummary',
             'hourImpactReport',
             'hourStrategicPlan',
-        ], $manifestRouteKeySet, $apiBackedRouteKeySet);
+        ];
 
-        $authOnlyBackendRouteKeys = $this->filterRemainingRouteKeys([
+        $authOnlyBackendCandidates = [
             'marketplaceCollections',
             'coupons',
             'couponDetail',
-        ], $manifestRouteKeySet, $apiBackedRouteKeySet);
+        ];
 
-        $backendContractMissingRouteKeys = $this->filterRemainingRouteKeys([
+        $backendContractMissingCandidates = [
             'ideationIdeaDetail',
-        ], $manifestRouteKeySet, $apiBackedRouteKeySet);
+        ];
+
+        $staticManualReviewRouteKeys = $this->filterRemainingRouteKeys(
+            $staticManualReviewCandidates,
+            $manifestRouteKeySet,
+            $apiBackedRouteKeySet,
+        );
+        $authOnlyBackendRouteKeys = $this->filterRemainingRouteKeys(
+            $authOnlyBackendCandidates,
+            $manifestRouteKeySet,
+            $apiBackedRouteKeySet,
+        );
+        $backendContractMissingRouteKeys = $this->filterRemainingRouteKeys(
+            $backendContractMissingCandidates,
+            $manifestRouteKeySet,
+            $apiBackedRouteKeySet,
+        );
+        $classifiedRouteKeySet = array_flip(array_merge(
+            $staticManualReviewCandidates,
+            $authOnlyBackendCandidates,
+            $backendContractMissingCandidates,
+        ));
+        $unclassifiedManifestOnlyRouteKeys = array_values(array_filter(
+            $manifestRouteKeys,
+            static fn (string $routeKey): bool => !isset($apiBackedRouteKeySet[$routeKey])
+                && !isset($classifiedRouteKeySet[$routeKey]),
+        ));
 
         return [
             'production_effect' => 'none',
@@ -731,6 +757,17 @@ class NextPublicFrontendReadinessService
                     'required_actions' => ['add_public_laravel_api_with_tests'],
                     'verification_commands' => [
                         'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php',
+                    ],
+                ],
+                [
+                    'key' => 'unclassified_manifest_only',
+                    'status' => 'blocked',
+                    'route_count' => count($unclassifiedManifestOnlyRouteKeys),
+                    'route_keys' => $unclassifiedManifestOnlyRouteKeys,
+                    'reason' => 'manifest_only_unclassified',
+                    'required_actions' => ['classify_route_before_cutover'],
+                    'verification_commands' => [
+                        'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php',
                     ],
                 ],
             ],

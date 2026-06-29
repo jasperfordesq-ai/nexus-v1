@@ -2980,17 +2980,20 @@
       "remaining_route_work_groups": {
         "static_manual_review": "Static/manual-review routes",
         "auth_only_backend": "Auth-only backend routes",
-        "backend_contract_missing": "Backend contract gaps"
+        "backend_contract_missing": "Backend contract gaps",
+        "unclassified_manifest_only": "Unclassified manifest-only routes"
       },
       "remaining_route_work_reasons": {
         "static_or_tenant_bootstrap": "Static or tenant-bootstrap content",
         "existing_backend_requires_auth": "Existing backend requires authentication",
-        "route_params_do_not_match_public_api": "Route params do not match a public API"
+        "route_params_do_not_match_public_api": "Route params do not match a public API",
+        "manifest_only_unclassified": "Manifest-only route not classified yet"
       },
       "remaining_route_work_actions": {
         "manual_no_js_shadow_review": "Run manual no-JavaScript shadow review",
         "keep_vite_or_prerender_until_public_contract": "Keep Vite or prerender until a public contract exists",
-        "add_public_laravel_api_with_tests": "Add a public Laravel API with tests"
+        "add_public_laravel_api_with_tests": "Add a public Laravel API with tests",
+        "classify_route_before_cutover": "Classify route ownership and backend contract before cutover"
       },
       "remaining_route_work_guardrails": {
         "route_status_has_no_production_effect": "Route status has no production effect",
