@@ -1801,6 +1801,8 @@ export interface NextPublicFrontendReadiness {
       build: boolean;
       start: boolean;
       test: boolean;
+      check_manifests: boolean;
+      check_no_js_html: boolean;
     };
   };
   manifest: {

@@ -167,6 +167,7 @@ class NextPublicFrontendReadinessService
             'start' => isset($scripts['start']),
             'test' => isset($scripts['test']),
             'check_manifests' => isset($scripts['check:manifests']),
+            'check_no_js_html' => isset($scripts['check:no-js-html']),
         ];
     }
 

@@ -31,6 +31,8 @@ const readiness = {
       build: true,
       start: true,
       test: true,
+      check_manifests: true,
+      check_no_js_html: true,
     },
   },
   manifest: {
