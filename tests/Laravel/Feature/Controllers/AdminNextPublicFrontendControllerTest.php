@@ -55,7 +55,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
         $response->assertJsonPath('data.manifest.route_counts.public_routes', 76);
-        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 57);
+        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 68);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 38);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 100);
         $response->assertJsonPath('data.manifest.validation.status', 'pass');
@@ -94,7 +94,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.cutover_eligibility.production_effect', 'none');
         $response->assertJsonPath('data.cutover_eligibility.activation_available', false);
         $response->assertJsonPath('data.cutover_eligibility.requires_explicit_cutover_instruction', true);
-        $response->assertJsonPath('data.cutover_eligibility.counts.remaining_public_routes', 19);
+        $response->assertJsonPath('data.cutover_eligibility.counts.remaining_public_routes', 8);
 
         $payload = $response->json('data');
         $publicPatterns = array_column($payload['manifest']['public_routes'], 'pattern');
@@ -168,6 +168,17 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('marketplaceMap', $apiBackedRouteKeys);
         $this->assertContains('marketplaceCategory', $apiBackedRouteKeys);
         $this->assertContains('municipalityCalendar', $apiBackedRouteKeys);
+        $this->assertContains('developers', $apiBackedRouteKeys);
+        $this->assertContains('developersAuth', $apiBackedRouteKeys);
+        $this->assertContains('developersEndpoints', $apiBackedRouteKeys);
+        $this->assertContains('developersWebhooks', $apiBackedRouteKeys);
+        $this->assertContains('regionalAnalytics', $apiBackedRouteKeys);
+        $this->assertContains('caringCommunity', $apiBackedRouteKeys);
+        $this->assertContains('hourPartner', $apiBackedRouteKeys);
+        $this->assertContains('hourSocialPrescribing', $apiBackedRouteKeys);
+        $this->assertContains('hourImpactSummary', $apiBackedRouteKeys);
+        $this->assertContains('hourImpactReport', $apiBackedRouteKeys);
+        $this->assertContains('hourStrategicPlan', $apiBackedRouteKeys);
         $this->assertContains('volunteeringOpportunityDetail', $apiBackedRouteKeys);
         $this->assertContains('ideationDetail', $apiBackedRouteKeys);
         $this->assertContains('groupDetail', $apiBackedRouteKeys);
@@ -297,11 +308,13 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertSame('none', $payload['remaining_public_route_work']['production_effect']);
         $this->assertFalse($payload['remaining_public_route_work']['activation_available']);
         $this->assertSame(76, $payload['remaining_public_route_work']['counts']['public_routes']);
-        $this->assertSame(57, $payload['remaining_public_route_work']['counts']['api_backed_public_routes']);
-        $this->assertSame(19, $payload['remaining_public_route_work']['counts']['remaining_public_routes']);
+        $this->assertSame(68, $payload['remaining_public_route_work']['counts']['api_backed_public_routes']);
+        $this->assertSame(8, $payload['remaining_public_route_work']['counts']['remaining_public_routes']);
         $this->assertSame(0, $payload['remaining_public_route_work']['counts']['unclassified_manifest_only_routes']);
         $this->assertNotContains('changelog', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
         $this->assertNotContains('home', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
+        $this->assertNotContains('developers', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
+        $this->assertContains('platformTerms', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
         $this->assertContains('couponDetail', $remainingRouteWorkByKey['auth_only_backend']['route_keys']);
         $this->assertContains('ideationIdeaDetail', $remainingRouteWorkByKey['backend_contract_missing']['route_keys']);
         $this->assertContains('manual_no_js_shadow_review', $remainingRouteWorkByKey['static_manual_review']['required_actions']);

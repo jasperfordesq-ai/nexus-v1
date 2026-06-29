@@ -827,6 +827,9 @@ Route::get('/v2/blog/{slug}', [\App\Http\Controllers\Api\BlogPublicController::c
 Route::get('/v2/help/faqs', [\App\Http\Controllers\Api\HelpController::class, 'getFaqs'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/public-changelog', [\App\Http\Controllers\Api\PublicChangelogController::class, 'index'])
     ->withoutMiddleware('auth:sanctum');
+Route::get('/v2/public-static-route-content/{pageKey}', [\App\Http\Controllers\Api\PublicStaticRouteContentController::class, 'show'])
+    ->where('pageKey', '[a-z0-9-]+')
+    ->withoutMiddleware('auth:sanctum');
 Route::get('/v2/public-page-content/{pageKey}', [\App\Http\Controllers\Api\StaticPublicPageController::class, 'show'])
     ->where('pageKey', '[a-z0-9-]+')
     ->withoutMiddleware('auth:sanctum');

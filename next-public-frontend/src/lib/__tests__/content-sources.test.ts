@@ -38,6 +38,17 @@ describe('public content sources', () => {
       '/v2/marketplace/categories/repair-tools/listings',
     );
     expect(getPublicEndpointForRoute('municipalityCalendar')).toBe('/v2/municipality/events-calendar');
+    expect(getPublicEndpointForRoute('developers')).toBe('/v2/public-static-route-content/developers');
+    expect(getPublicEndpointForRoute('developersAuth')).toBe('/v2/public-static-route-content/developers-auth');
+    expect(getPublicEndpointForRoute('developersEndpoints')).toBe('/v2/public-static-route-content/developers-endpoints');
+    expect(getPublicEndpointForRoute('developersWebhooks')).toBe('/v2/public-static-route-content/developers-webhooks');
+    expect(getPublicEndpointForRoute('regionalAnalytics')).toBe('/v2/public-static-route-content/regional-analytics');
+    expect(getPublicEndpointForRoute('caringCommunity')).toBe('/v2/public-static-route-content/caring-community');
+    expect(getPublicEndpointForRoute('hourPartner')).toBe('/v2/public-static-route-content/partner');
+    expect(getPublicEndpointForRoute('hourSocialPrescribing')).toBe('/v2/public-static-route-content/social-prescribing');
+    expect(getPublicEndpointForRoute('hourImpactSummary')).toBe('/v2/public-static-route-content/impact-summary');
+    expect(getPublicEndpointForRoute('hourImpactReport')).toBe('/v2/public-static-route-content/impact-report');
+    expect(getPublicEndpointForRoute('hourStrategicPlan')).toBe('/v2/public-static-route-content/strategic-plan');
   });
 
   it('encodes route parameters before calling Laravel public APIs', () => {
