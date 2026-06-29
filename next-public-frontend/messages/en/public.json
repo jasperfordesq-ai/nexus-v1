@@ -33,6 +33,16 @@
       "lead": "Learn how this community uses time credits to recognise everyone's contribution.",
       "body": "Project NEXUS supports multi-tenant timebanking communities with public information pages and private member tools."
     },
+    "features": {
+      "title": "Features",
+      "lead": "Explore the public overview of Project NEXUS community platform capabilities.",
+      "body": "This shadow page is prepared for public feature information. Member tools and administration remain in the secure Vite app."
+    },
+    "changelog": {
+      "title": "Changelog",
+      "lead": "Review public release notes for Project NEXUS.",
+      "body": "This shadow page is prepared for public release-note discovery. The in-app changelog remains available in the React frontend."
+    },
     "help": {
       "title": "Help",
       "lead": "Find support for joining, taking part, and using your community account.",
@@ -53,15 +63,90 @@
       "lead": "Privacy information for public visitors and community members.",
       "body": "This public page is prepared for tenant-managed privacy content. Member-specific privacy controls remain inside the secure app."
     },
+    "privacyVersions": {
+      "title": "Privacy Version History",
+      "lead": "Review public privacy-policy version history for this community.",
+      "body": "This shadow page is prepared for public privacy version history. Legal document editing remains in the secure Vite app."
+    },
     "terms": {
       "title": "Terms",
       "lead": "Terms and participation information for this community.",
       "body": "This public page is prepared for tenant-managed terms content. Community administrators can publish fuller CMS content through the platform."
     },
+    "termsVersions": {
+      "title": "Terms Version History",
+      "lead": "Review public terms version history for this community.",
+      "body": "This shadow page is prepared for public terms version history. Legal document editing remains in the secure Vite app."
+    },
     "accessibility": {
       "title": "Accessibility",
       "lead": "Accessibility information for Project NEXUS public pages.",
       "body": "Project NEXUS provides a modern React member app and a separate accessible frontend track for users who prefer a highly accessible HTML-first experience."
+    },
+    "accessibilityVersions": {
+      "title": "Accessibility Version History",
+      "lead": "Review public accessibility-statement version history.",
+      "body": "This shadow page is prepared for public accessibility version history. Statement editing remains in the secure Vite app."
+    },
+    "cookies": {
+      "title": "Cookies",
+      "lead": "Cookie information for public visitors and community members.",
+      "body": "This shadow page is prepared for public cookie information. Consent controls remain in the existing React frontend."
+    },
+    "cookiesVersions": {
+      "title": "Cookie Policy Version History",
+      "lead": "Review public cookie-policy version history.",
+      "body": "This shadow page is prepared for public cookie-policy version history. Legal document editing remains in the secure Vite app."
+    },
+    "communityGuidelines": {
+      "title": "Community Guidelines",
+      "lead": "Public guidance for safe and respectful community participation.",
+      "body": "This shadow page is prepared for public community guidelines. Moderation workflows remain in the secure Vite app."
+    },
+    "communityGuidelinesVersions": {
+      "title": "Community Guidelines Version History",
+      "lead": "Review public community-guidelines version history.",
+      "body": "This shadow page is prepared for public guidelines version history. Legal document editing remains in the secure Vite app."
+    },
+    "trustSafety": {
+      "title": "Trust and Safety",
+      "lead": "Public trust and safety information for Project NEXUS communities.",
+      "body": "This shadow page is prepared for public trust and safety content. Reporting and moderation tools remain in the secure Vite app."
+    },
+    "acceptableUse": {
+      "title": "Acceptable Use",
+      "lead": "Acceptable-use information for public visitors and community members.",
+      "body": "This shadow page is prepared for public acceptable-use content. Enforcement workflows remain in the secure Vite app."
+    },
+    "acceptableUseVersions": {
+      "title": "Acceptable Use Version History",
+      "lead": "Review public acceptable-use version history.",
+      "body": "This shadow page is prepared for public acceptable-use version history. Legal document editing remains in the secure Vite app."
+    },
+    "legal": {
+      "title": "Legal",
+      "lead": "Find public legal and policy information for this community.",
+      "body": "This shadow page is prepared for public legal navigation. Legal document management remains in the secure Vite app."
+    },
+    "platformTerms": {
+      "title": "Platform Terms",
+      "lead": "Read provider-level terms for Project NEXUS.",
+      "body": "This shadow page is prepared for public platform terms. Provider legal management remains outside the public Next runtime."
+    },
+    "platformPrivacy": {
+      "title": "Platform Privacy",
+      "lead": "Read provider-level privacy information for Project NEXUS.",
+      "body": "This shadow page is prepared for public platform privacy information. Provider legal management remains outside the public Next runtime."
+    },
+    "platformDisclaimer": {
+      "title": "Platform Disclaimer",
+      "lead": "Read provider-level disclaimer information for Project NEXUS.",
+      "body": "This shadow page is prepared for public platform disclaimer content. Provider legal management remains outside the public Next runtime."
+    },
+    "timebankingGuide": {
+      "title": "Timebanking Guide",
+      "lead": "Learn how timebanking works before joining a community.",
+      "body": "This shadow page is prepared for public timebanking guidance. Member participation tools remain in the secure Vite app."
     },
     "blog": {
       "title": "Blog",

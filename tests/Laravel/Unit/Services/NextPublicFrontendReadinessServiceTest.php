@@ -14,35 +14,9 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
 {
     public function test_summary_marks_cutover_env_flag_as_blocker(): void
     {
-        $previousEnv = $_ENV['NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED'] ?? null;
-        $previousServer = $_SERVER['NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED'] ?? null;
-        $previousPutenv = getenv('NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED');
+        config(['app.next_public_frontend_routing_enabled' => true]);
 
-        $_ENV['NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED'] = 'true';
-        $_SERVER['NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED'] = 'true';
-        putenv('NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED=true');
-
-        try {
-            $summary = (new NextPublicFrontendReadinessService())->summary();
-        } finally {
-            if ($previousEnv === null) {
-                unset($_ENV['NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED']);
-            } else {
-                $_ENV['NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED'] = $previousEnv;
-            }
-
-            if ($previousServer === null) {
-                unset($_SERVER['NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED']);
-            } else {
-                $_SERVER['NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED'] = $previousServer;
-            }
-
-            if ($previousPutenv === false) {
-                putenv('NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED');
-            } else {
-                putenv('NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED=' . $previousPutenv);
-            }
-        }
+        $summary = (new NextPublicFrontendReadinessService())->summary();
 
         $safetyChecks = array_column($summary['safety_checks'], 'status', 'key');
 

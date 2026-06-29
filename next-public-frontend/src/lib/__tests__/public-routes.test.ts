@@ -11,12 +11,29 @@ describe('public route ownership', () => {
   it('keeps first-slice public pages in the Next shadow app', () => {
     expect(getRouteOwnership([])).toMatchObject({ owner: 'next-public', routeKey: 'home' });
     expect(getRouteOwnership(['about'])).toMatchObject({ owner: 'next-public', routeKey: 'about' });
+    expect(getRouteOwnership(['features'])).toMatchObject({ owner: 'next-public', routeKey: 'features' });
+    expect(getRouteOwnership(['changelog'])).toMatchObject({ owner: 'next-public', routeKey: 'changelog' });
     expect(getRouteOwnership(['help'])).toMatchObject({ owner: 'next-public', routeKey: 'help' });
     expect(getRouteOwnership(['contact'])).toMatchObject({ owner: 'next-public', routeKey: 'contact' });
     expect(getRouteOwnership(['faq'])).toMatchObject({ owner: 'next-public', routeKey: 'faq' });
     expect(getRouteOwnership(['privacy'])).toMatchObject({ owner: 'next-public', routeKey: 'privacy' });
+    expect(getRouteOwnership(['privacy', 'versions'])).toMatchObject({ owner: 'next-public', routeKey: 'privacyVersions' });
     expect(getRouteOwnership(['terms'])).toMatchObject({ owner: 'next-public', routeKey: 'terms' });
+    expect(getRouteOwnership(['terms', 'versions'])).toMatchObject({ owner: 'next-public', routeKey: 'termsVersions' });
     expect(getRouteOwnership(['accessibility'])).toMatchObject({ owner: 'next-public', routeKey: 'accessibility' });
+    expect(getRouteOwnership(['accessibility', 'versions'])).toMatchObject({ owner: 'next-public', routeKey: 'accessibilityVersions' });
+    expect(getRouteOwnership(['cookies'])).toMatchObject({ owner: 'next-public', routeKey: 'cookies' });
+    expect(getRouteOwnership(['cookies', 'versions'])).toMatchObject({ owner: 'next-public', routeKey: 'cookiesVersions' });
+    expect(getRouteOwnership(['community-guidelines'])).toMatchObject({ owner: 'next-public', routeKey: 'communityGuidelines' });
+    expect(getRouteOwnership(['community-guidelines', 'versions'])).toMatchObject({ owner: 'next-public', routeKey: 'communityGuidelinesVersions' });
+    expect(getRouteOwnership(['trust-and-safety'])).toMatchObject({ owner: 'next-public', routeKey: 'trustSafety' });
+    expect(getRouteOwnership(['acceptable-use'])).toMatchObject({ owner: 'next-public', routeKey: 'acceptableUse' });
+    expect(getRouteOwnership(['acceptable-use', 'versions'])).toMatchObject({ owner: 'next-public', routeKey: 'acceptableUseVersions' });
+    expect(getRouteOwnership(['legal'])).toMatchObject({ owner: 'next-public', routeKey: 'legal' });
+    expect(getRouteOwnership(['platform', 'terms'])).toMatchObject({ owner: 'next-public', routeKey: 'platformTerms' });
+    expect(getRouteOwnership(['platform', 'privacy'])).toMatchObject({ owner: 'next-public', routeKey: 'platformPrivacy' });
+    expect(getRouteOwnership(['platform', 'disclaimer'])).toMatchObject({ owner: 'next-public', routeKey: 'platformDisclaimer' });
+    expect(getRouteOwnership(['timebanking-guide'])).toMatchObject({ owner: 'next-public', routeKey: 'timebankingGuide' });
   });
 
   it('keeps content routes public without claiming private product routes', () => {

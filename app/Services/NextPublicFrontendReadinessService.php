@@ -135,10 +135,7 @@ class NextPublicFrontendReadinessService
         );
 
         $manifestMode = is_array($manifest) ? (string) ($manifest['mode'] ?? 'unknown') : 'missing';
-        $cutoverEnabled = filter_var(
-            env('NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED', false),
-            FILTER_VALIDATE_BOOLEAN,
-        );
+        $cutoverEnabled = (bool) config('app.next_public_frontend_routing_enabled', false);
 
         return [
             'mode' => $manifestMode === 'shadow' ? 'shadow' : $manifestMode,

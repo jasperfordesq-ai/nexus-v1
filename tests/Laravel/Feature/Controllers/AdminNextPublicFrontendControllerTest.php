@@ -54,7 +54,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.shadow_runtime.compose_profile', 'next-public-shadow');
         $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
-        $response->assertJsonPath('data.manifest.route_counts.public_routes', 28);
+        $response->assertJsonPath('data.manifest.route_counts.public_routes', 45);
         $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 16);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 20);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 62);
@@ -76,7 +76,12 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         }
 
         $this->assertContains('/about', $publicPatterns);
+        $this->assertContains('/features', $publicPatterns);
         $this->assertContains('/blog/:slug', $publicPatterns);
+        $this->assertContains('/terms/versions', $publicPatterns);
+        $this->assertContains('/cookies', $publicPatterns);
+        $this->assertContains('/legal', $publicPatterns);
+        $this->assertContains('/platform/privacy', $publicPatterns);
         $this->assertContains('/listings/:id', $publicPatterns);
         $this->assertContains('/marketplace/:id', $publicPatterns);
         $this->assertContains('/marketplace/search', $publicPatterns);
