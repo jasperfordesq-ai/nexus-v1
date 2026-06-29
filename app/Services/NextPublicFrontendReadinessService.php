@@ -295,6 +295,14 @@ class NextPublicFrontendReadinessService
                 ];
             }
 
+            if ($route['method'] !== 'GET') {
+                $issues[] = [
+                    'code' => 'api_backed_route_not_get',
+                    'severity' => 'blocker',
+                    'context' => $route['method'] . ' ' . $route['endpoint'],
+                ];
+            }
+
             if (!str_starts_with($route['endpoint'], '/v2/')) {
                 $issues[] = [
                     'code' => 'api_backed_route_not_laravel_v2_endpoint',
