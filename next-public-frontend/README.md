@@ -20,13 +20,19 @@ does not activate route cutover.
 ## Safe Local Commands
 
 ```bash
+npm run check:next-public:inert
 npm --prefix next-public-frontend run check
 npm --prefix next-public-frontend run build
 npm --prefix next-public-frontend run dev
 ```
 
-The default check command runs manifest validation, message validation,
-no-JavaScript HTML checks, TypeScript, Vitest, and a production build.
+The root inertness check verifies the shadow module is still safe to deploy
+without changing production serving. It fails if the cutover env flag is enabled,
+the inert Apache canary template is referenced by deploy/compose, the Next
+service is no longer behind the `next-public-shadow` compose profile, or the
+current prerender fallback is missing. The default Next check command runs
+manifest validation, message validation, no-JavaScript HTML checks, TypeScript,
+Vitest, and a production build.
 
 Backend/admin readiness checks:
 
@@ -101,15 +107,16 @@ template in Apache.
 Do not enable public traffic until all of the following are true:
 
 1. `npm --prefix next-public-frontend run check` passes.
-2. `npm --prefix react-frontend run build` passes.
-3. `cd react-frontend && npx tsc --noEmit` passes.
-4. `vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php` passes.
-5. Public Next routes have parity checks for status codes, canonicals,
+2. `npm run check:next-public:inert` passes.
+3. `npm --prefix react-frontend run build` passes.
+4. `cd react-frontend && npx tsc --noEmit` passes.
+5. `vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php` passes.
+6. Public Next routes have parity checks for status codes, canonicals,
    metadata, tenant branding, AGPL attribution, and no-JavaScript HTML.
-6. Private Vite routes have regression checks proving gated pages still load.
-7. The Apache/Plesk canary template audit is clean: no private-route
+7. Private Vite routes have regression checks proving gated pages still load.
+8. The Apache/Plesk canary template audit is clean: no private-route
    collisions, no unmatched template paths, and no unsupported rewrite rules.
-8. Apache/Plesk canary routing is reviewed separately and explicitly enabled.
-9. The existing prerender path remains available as fallback during canary.
+9. Apache/Plesk canary routing is reviewed separately and explicitly enabled.
+10. The existing prerender path remains available as fallback during canary.
 
 Cutover is a separate operational decision and must be explicitly requested.

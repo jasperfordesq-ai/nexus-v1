@@ -18,6 +18,7 @@
     "check:docs": "node scripts/check-docs-hygiene.mjs",
     "check:version": "node scripts/check-version-consistency.mjs",
     "check:changelog": "node scripts/check-changelog-updated.mjs",
+    "check:next-public:inert": "node scripts/check-next-public-inert.mjs",
     "translate:i18n:gaps": "node scripts/translate-i18n-gaps.mjs",
     "dev:native": "powershell -ExecutionPolicy Bypass -File scripts/start-native-dev.ps1",
     "dev:frontend": "npm --prefix react-frontend run dev -- --host 127.0.0.1 --port 5173 --strictPort",

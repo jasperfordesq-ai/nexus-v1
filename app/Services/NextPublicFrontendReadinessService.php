@@ -284,6 +284,7 @@ class NextPublicFrontendReadinessService
                 'default_shadow_port' => 3200,
                 'compose_profile_configured' => $this->composeProfileConfigured('next-public-shadow'),
                 'verification_commands' => [
+                    'npm run check:next-public:inert',
                     'npm --prefix next-public-frontend run check',
                     'npm --prefix react-frontend run build',
                     'cd react-frontend && npx tsc --noEmit',
@@ -772,6 +773,11 @@ class NextPublicFrontendReadinessService
                 [
                     'key' => 'no_js_public_html',
                     'command' => 'npm --prefix next-public-frontend run check:no-js-html',
+                    'required_before_cutover' => true,
+                ],
+                [
+                    'key' => 'next_public_inertness',
+                    'command' => 'npm run check:next-public:inert',
                     'required_before_cutover' => true,
                 ],
                 [

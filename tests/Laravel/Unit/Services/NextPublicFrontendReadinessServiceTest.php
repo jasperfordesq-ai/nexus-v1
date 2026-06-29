@@ -98,7 +98,15 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertSame('none', $items['apache_canary_template']['production_effect']);
         $this->assertTrue($items['prerender_fallback']['exists']);
         $this->assertSame('npm --prefix next-public-frontend run check:no-js-html', $commands['no_js_public_html']['command']);
+        $this->assertSame('npm run check:next-public:inert', $commands['next_public_inertness']['command']);
         $this->assertTrue($commands['react_private_regression']['required_before_cutover']);
+    }
+
+    public function test_summary_reports_next_public_inertness_verification_command(): void
+    {
+        $summary = (new NextPublicFrontendReadinessService())->summary();
+
+        $this->assertContains('npm run check:next-public:inert', $summary['shadow_runtime']['verification_commands']);
     }
 
     public function test_summary_reports_tenant_resolution_contract(): void
