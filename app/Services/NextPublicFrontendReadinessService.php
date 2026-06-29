@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Route;
 
 class NextPublicFrontendReadinessService
 {
@@ -637,6 +638,24 @@ class NextPublicFrontendReadinessService
                 ];
             }
 
+            $publicRouteStatus = $this->registeredPublicGetEndpointStatus($route['endpoint']);
+
+            if ($publicRouteStatus === 'missing') {
+                $issues[] = [
+                    'code' => 'api_backed_route_not_registered',
+                    'severity' => 'blocker',
+                    'context' => $route['routeKey'],
+                ];
+            }
+
+            if ($publicRouteStatus === 'auth') {
+                $issues[] = [
+                    'code' => 'api_backed_route_requires_auth',
+                    'severity' => 'blocker',
+                    'context' => $route['routeKey'],
+                ];
+            }
+
             if (!$this->sameStringSet($routeParamsByKey[$route['routeKey']] ?? [], $this->extractEndpointParams($route['endpoint']))) {
                 $issues[] = [
                     'code' => 'api_backed_route_param_mismatch',
@@ -705,6 +724,24 @@ class NextPublicFrontendReadinessService
         }
 
         return false;
+    }
+
+    private function registeredPublicGetEndpointStatus(string $endpoint): string
+    {
+        $routeUri = 'api/' . ltrim($endpoint, '/');
+
+        foreach (Route::getRoutes()->getRoutes() as $route) {
+            if ($route->uri() !== $routeUri || !in_array('GET', $route->methods(), true)) {
+                continue;
+            }
+
+            return in_array('auth:sanctum', $route->gatherMiddleware(), true)
+                && !in_array('auth:sanctum', $route->excludedMiddleware(), true)
+                    ? 'auth'
+                    : 'public';
+        }
+
+        return 'missing';
     }
 
     /**

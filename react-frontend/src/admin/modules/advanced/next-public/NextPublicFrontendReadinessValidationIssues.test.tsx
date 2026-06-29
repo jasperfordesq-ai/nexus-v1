@@ -82,6 +82,16 @@ const readinessWithValidationIssue = {
           context: 'events',
           severity: 'blocker',
         },
+        {
+          code: 'api_backed_route_not_registered',
+          context: 'events',
+          severity: 'blocker',
+        },
+        {
+          code: 'api_backed_route_requires_auth',
+          context: 'jobs',
+          severity: 'blocker',
+        },
       ],
     },
     public_routes: [
@@ -122,6 +132,14 @@ const readinessWithValidationIssue = {
     { key: 'route_cutover_disabled', status: 'pass' },
   ],
   cutover_step_keys: ['verify_next_shadow_build'],
+  cutover_gates: [
+    {
+      key: 'verify_next_shadow_build',
+      status: 'blocker',
+      blockers: ['manual_verification_required'],
+      verification_commands: [],
+    },
+  ],
 };
 
 describe('NextPublicFrontendReadiness validation issues', () => {
@@ -147,6 +165,8 @@ describe('NextPublicFrontendReadiness validation issues', () => {
     expect(screen.getByText('A public route collides with a private Vite route pattern.')).toBeInTheDocument();
     expect(screen.getByText('API-backed public routes must not use private Laravel v2 namespaces.')).toBeInTheDocument();
     expect(screen.getByText('API-backed route endpoints must be plain paths without query strings or fragments.')).toBeInTheDocument();
+    expect(screen.getByText('API-backed route endpoint is not registered in Laravel.')).toBeInTheDocument();
+    expect(screen.getByText('API-backed route endpoint requires authentication.')).toBeInTheDocument();
     expect(screen.getAllByText('next_database')).not.toHaveLength(0);
     expect(screen.getAllByText('login')).not.toHaveLength(0);
     expect(screen.getAllByText('/events/new')).not.toHaveLength(0);
