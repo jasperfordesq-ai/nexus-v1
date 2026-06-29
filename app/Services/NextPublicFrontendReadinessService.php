@@ -281,9 +281,12 @@ class NextPublicFrontendReadinessService
      */
     private function tenantResolutionContract(): array
     {
+        $bootstrapRouteStatus = $this->registeredPublicGetEndpointStatus('/v2/tenant/bootstrap');
+
         return [
-            'status' => 'pass',
+            'status' => $bootstrapRouteStatus === 'public' ? 'pass' : 'blocker',
             'bootstrap_endpoint' => '/v2/tenant/bootstrap',
+            'bootstrap_route_status' => $bootstrapRouteStatus,
             'source_of_truth' => 'laravel_tenant_bootstrap',
             'shared_host_slug_parameter' => 'slug',
             'custom_domain_origin_forwarding' => true,

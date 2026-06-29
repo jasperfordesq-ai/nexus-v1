@@ -2914,6 +2914,11 @@
         "shared_host_slug": "Shared app host with tenant slug",
         "custom_domain": "Custom tenant domain"
       },
+      "tenant_resolution_route_statuses": {
+        "public": "Public Laravel GET route",
+        "missing": "Laravel route is not registered",
+        "auth": "Laravel route requires authentication"
+      },
       "route_gate_blockers": {
         "parity_test_required": "Parity test required"
       },

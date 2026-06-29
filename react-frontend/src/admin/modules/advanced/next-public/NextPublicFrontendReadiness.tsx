@@ -258,6 +258,11 @@ function TenantResolutionCard({ readiness }: { readiness: Readiness }) {
           <RuntimeRow label={t('tenant_resolution.source_of_truth')} value={tenantResolution.source_of_truth} />
           <RuntimeRow label={t('tenant_resolution.slug_parameter')} value={tenantResolution.shared_host_slug_parameter} />
         </div>
+        <div className="mb-4">
+          <Chip size="sm" color={tenantResolution.bootstrap_route_status === 'public' ? 'success' : 'warning'} variant="soft">
+            {t(`tenant_resolution_route_statuses.${tenantResolution.bootstrap_route_status}`)}
+          </Chip>
+        </div>
         <div className="grid gap-3 lg:grid-cols-2">
           {tenantResolution.examples.map((example) => (
             <div key={example.key} className="rounded-md border border-divider px-3 py-3 text-sm">

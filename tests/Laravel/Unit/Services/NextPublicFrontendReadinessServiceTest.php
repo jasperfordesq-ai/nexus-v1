@@ -91,6 +91,7 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
 
         $this->assertSame('pass', $tenantResolution['status']);
         $this->assertSame('/v2/tenant/bootstrap', $tenantResolution['bootstrap_endpoint']);
+        $this->assertSame('public', $tenantResolution['bootstrap_route_status']);
         $this->assertSame('laravel_tenant_bootstrap', $tenantResolution['source_of_truth']);
         $this->assertSame('slug', $tenantResolution['shared_host_slug_parameter']);
         $this->assertTrue($tenantResolution['custom_domain_origin_forwarding']);

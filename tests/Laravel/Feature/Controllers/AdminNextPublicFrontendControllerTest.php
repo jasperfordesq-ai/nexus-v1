@@ -66,6 +66,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.content_sources.manifest_path', 'next-public-frontend/content-sources.json');
         $response->assertJsonPath('data.tenant_resolution.status', 'pass');
         $response->assertJsonPath('data.tenant_resolution.bootstrap_endpoint', '/v2/tenant/bootstrap');
+        $response->assertJsonPath('data.tenant_resolution.bootstrap_route_status', 'public');
         $response->assertJsonPath('data.tenant_resolution.source_of_truth', 'laravel_tenant_bootstrap');
         $response->assertJsonPath('data.tenant_resolution.shared_host_slug_parameter', 'slug');
         $response->assertJsonPath('data.tenant_resolution.custom_domain_origin_forwarding', true);

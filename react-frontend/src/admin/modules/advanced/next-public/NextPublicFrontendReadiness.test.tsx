@@ -85,6 +85,7 @@ const readiness = {
   tenant_resolution: {
     status: 'pass',
     bootstrap_endpoint: '/v2/tenant/bootstrap',
+    bootstrap_route_status: 'public',
     source_of_truth: 'laravel_tenant_bootstrap',
     shared_host_slug_parameter: 'slug',
     custom_domain_origin_forwarding: true,
@@ -202,6 +203,7 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('GET /v2/listings/{id}')).toBeInTheDocument();
     expect(screen.getByText('Tenant resolution contract')).toBeInTheDocument();
     expect(screen.getByText('/v2/tenant/bootstrap')).toBeInTheDocument();
+    expect(screen.getByText('Public Laravel GET route')).toBeInTheDocument();
     expect(screen.getByText('GET /v2/tenant/bootstrap?slug={tenantSlug}')).toBeInTheDocument();
     expect(screen.getByText('Origin: https://<custom-domain>')).toBeInTheDocument();
     expect(screen.getByText('npm run build:next-public')).toBeInTheDocument();

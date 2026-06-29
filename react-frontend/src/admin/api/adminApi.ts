@@ -1827,6 +1827,7 @@ export interface NextPublicTenantResolutionExample {
 export interface NextPublicTenantResolution {
   status: 'pass' | 'blocker' | string;
   bootstrap_endpoint: string;
+  bootstrap_route_status: 'public' | 'missing' | 'auth' | string;
   source_of_truth: string;
   shared_host_slug_parameter: string;
   custom_domain_origin_forwarding: boolean;
