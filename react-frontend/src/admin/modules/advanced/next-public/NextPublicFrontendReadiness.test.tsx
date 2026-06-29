@@ -171,6 +171,12 @@ const readiness = {
   remaining_public_route_work: {
     production_effect: 'none',
     activation_available: false,
+    counts: {
+      public_routes: 76,
+      api_backed_public_routes: 49,
+      remaining_public_routes: 27,
+      unclassified_manifest_only_routes: 1,
+    },
     guardrails: [
       'route_status_has_no_production_effect',
       'do_not_promote_auth_only_routes',
@@ -374,6 +380,10 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('API-backed public content')).toBeInTheDocument();
     expect(screen.getByText('Vite private routes retained')).toBeInTheDocument();
     expect(screen.getByText('Remaining public route work')).toBeInTheDocument();
+    expect(screen.getByText('76 public routes')).toBeInTheDocument();
+    expect(screen.getByText('49 API-backed routes')).toBeInTheDocument();
+    expect(screen.getByText('27 routes remaining')).toBeInTheDocument();
+    expect(screen.getByText('1 unclassified route')).toBeInTheDocument();
     expect(screen.getByText('Static/manual-review routes')).toBeInTheDocument();
     expect(screen.getByText('Auth-only backend routes')).toBeInTheDocument();
     expect(screen.getByText('Backend contract gaps')).toBeInTheDocument();

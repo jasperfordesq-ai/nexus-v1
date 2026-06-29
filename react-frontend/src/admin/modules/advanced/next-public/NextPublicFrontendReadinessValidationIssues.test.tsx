@@ -161,6 +161,12 @@ const readinessWithValidationIssue = {
   remaining_public_route_work: {
     production_effect: 'none',
     activation_available: false,
+    counts: {
+      public_routes: 1,
+      api_backed_public_routes: 0,
+      remaining_public_routes: 1,
+      unclassified_manifest_only_routes: 0,
+    },
     guardrails: ['route_status_has_no_production_effect'],
     groups: [
       {

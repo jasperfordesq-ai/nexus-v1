@@ -1888,6 +1888,12 @@ export interface NextPublicRemainingRouteWorkGroup {
 export interface NextPublicRemainingRouteWork {
   production_effect: string;
   activation_available: boolean;
+  counts: {
+    public_routes: number;
+    api_backed_public_routes: number;
+    remaining_public_routes: number;
+    unclassified_manifest_only_routes: number;
+  };
   guardrails: string[];
   groups: NextPublicRemainingRouteWorkGroup[];
 }

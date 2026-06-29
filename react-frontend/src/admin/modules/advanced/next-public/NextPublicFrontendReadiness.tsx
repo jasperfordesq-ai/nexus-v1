@@ -367,6 +367,13 @@ function RouteBatchReadinessCard({ readiness }: { readiness: Readiness }) {
 function RemainingPublicRouteWorkCard({ readiness }: { readiness: Readiness }) {
   const { t } = useTranslation('admin', { keyPrefix: 'advanced.next_public' });
   const remaining = readiness.remaining_public_route_work;
+  const countLabel = (
+    key: 'api_backed_routes' | 'public_routes' | 'remaining_routes' | 'unclassified_routes',
+    count: number,
+  ) => t(
+    `remaining_route_work.${count === 1 ? key : `${key}_plural`}`,
+    { count },
+  );
 
   return (
     <Card>
@@ -384,6 +391,25 @@ function RemainingPublicRouteWorkCard({ readiness }: { readiness: Readiness }) {
         </div>
       </CardHeader>
       <CardBody>
+        <div className="mb-4 flex flex-wrap gap-2">
+          <Chip size="sm" variant="flat">
+            {countLabel('public_routes', remaining.counts.public_routes)}
+          </Chip>
+          <Chip size="sm" color="success" variant="soft">
+            {countLabel('api_backed_routes', remaining.counts.api_backed_public_routes)}
+          </Chip>
+          <Chip size="sm" color="warning" variant="soft">
+            {countLabel('remaining_routes', remaining.counts.remaining_public_routes)}
+          </Chip>
+          <Chip
+            size="sm"
+            color={remaining.counts.unclassified_manifest_only_routes > 0 ? 'warning' : 'success'}
+            variant="soft"
+          >
+            {countLabel('unclassified_routes', remaining.counts.unclassified_manifest_only_routes)}
+          </Chip>
+        </div>
+
         <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-4">
           {remaining.groups.map((group) => (
             <div key={group.key} className="rounded-md border border-divider px-3 py-3 text-sm">

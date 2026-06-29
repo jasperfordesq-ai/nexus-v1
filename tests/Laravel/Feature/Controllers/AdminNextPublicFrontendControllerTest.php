@@ -271,6 +271,10 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('parity_test_required', $routeReadinessByKey['listingDetail']['blockers']);
         $this->assertSame('none', $payload['remaining_public_route_work']['production_effect']);
         $this->assertFalse($payload['remaining_public_route_work']['activation_available']);
+        $this->assertSame(76, $payload['remaining_public_route_work']['counts']['public_routes']);
+        $this->assertSame(49, $payload['remaining_public_route_work']['counts']['api_backed_public_routes']);
+        $this->assertSame(27, $payload['remaining_public_route_work']['counts']['remaining_public_routes']);
+        $this->assertSame(0, $payload['remaining_public_route_work']['counts']['unclassified_manifest_only_routes']);
         $this->assertContains('home', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
         $this->assertContains('couponDetail', $remainingRouteWorkByKey['auth_only_backend']['route_keys']);
         $this->assertContains('ideationIdeaDetail', $remainingRouteWorkByKey['backend_contract_missing']['route_keys']);

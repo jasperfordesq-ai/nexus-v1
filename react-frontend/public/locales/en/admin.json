@@ -2974,6 +2974,14 @@
       "remaining_route_work": {
         "title": "Remaining public route work",
         "route_count": "{{count}} routes",
+        "public_routes": "{{count}} public route",
+        "public_routes_plural": "{{count}} public routes",
+        "api_backed_routes": "{{count}} API-backed route",
+        "api_backed_routes_plural": "{{count}} API-backed routes",
+        "remaining_routes": "{{count}} route remaining",
+        "remaining_routes_plural": "{{count}} routes remaining",
+        "unclassified_routes": "{{count}} unclassified route",
+        "unclassified_routes_plural": "{{count}} unclassified routes",
         "activation_available": "Activation controls are available",
         "activation_unavailable": "No activation controls"
       },

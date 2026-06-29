@@ -721,10 +721,20 @@ class NextPublicFrontendReadinessService
             static fn (string $routeKey): bool => !isset($apiBackedRouteKeySet[$routeKey])
                 && !isset($classifiedRouteKeySet[$routeKey]),
         ));
+        $remainingRouteCount = count($staticManualReviewRouteKeys)
+            + count($authOnlyBackendRouteKeys)
+            + count($backendContractMissingRouteKeys)
+            + count($unclassifiedManifestOnlyRouteKeys);
 
         return [
             'production_effect' => 'none',
             'activation_available' => false,
+            'counts' => [
+                'public_routes' => count($manifestRouteKeys),
+                'api_backed_public_routes' => count($apiBackedRouteKeySet),
+                'remaining_public_routes' => $remainingRouteCount,
+                'unclassified_manifest_only_routes' => count($unclassifiedManifestOnlyRouteKeys),
+            ],
             'guardrails' => [
                 'route_status_has_no_production_effect',
                 'do_not_promote_auth_only_routes',

@@ -212,6 +212,10 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
 
         $this->assertSame('none', $remaining['production_effect']);
         $this->assertFalse($remaining['activation_available']);
+        $this->assertSame(76, $remaining['counts']['public_routes']);
+        $this->assertSame(49, $remaining['counts']['api_backed_public_routes']);
+        $this->assertSame(27, $remaining['counts']['remaining_public_routes']);
+        $this->assertSame(0, $remaining['counts']['unclassified_manifest_only_routes']);
         $this->assertContains('home', $groups['static_manual_review']['route_keys']);
         $this->assertContains('couponDetail', $groups['auth_only_backend']['route_keys']);
         $this->assertContains('ideationIdeaDetail', $groups['backend_contract_missing']['route_keys']);
