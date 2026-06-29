@@ -84,6 +84,12 @@ class NextPublicFrontendReadinessService
                 'port_env' => 'NEXUS_NEXT_PUBLIC_PORT',
                 'default_shadow_port' => 3200,
                 'compose_profile_configured' => $this->composeProfileConfigured('next-public-shadow'),
+                'verification_commands' => [
+                    'npm --prefix next-public-frontend run check',
+                    'npm --prefix react-frontend run build',
+                    'cd react-frontend && npx tsc --noEmit',
+                    'vendor/bin/phpunit --no-coverage tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php',
+                ],
             ],
             'safety_checks' => [
                 ['key' => 'route_cutover_disabled', 'status' => 'pass'],

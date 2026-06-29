@@ -170,6 +170,17 @@ export default function NextPublicFrontendReadiness() {
                   <RuntimeRow label={t('runtime.build_command')} value={readiness.shadow_runtime.build_command} />
                   <RuntimeRow label={t('runtime.port_env')} value={readiness.shadow_runtime.host_port_env} />
                 </dl>
+                {readiness.shadow_runtime.verification_commands.length > 0 && (
+                  <ul className="mt-4 space-y-2">
+                    {readiness.shadow_runtime.verification_commands.map((command) => (
+                      <li key={command}>
+                        <code className="block break-all rounded bg-surface-secondary px-2 py-1 text-xs">
+                          {command}
+                        </code>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </CardBody>
             </Card>
           </div>

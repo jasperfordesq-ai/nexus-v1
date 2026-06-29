@@ -1851,6 +1851,7 @@ export interface NextPublicFrontendReadiness {
     port_env: string;
     default_shadow_port: number;
     compose_profile_configured: boolean;
+    verification_commands: string[];
   };
   safety_checks: Array<{
     key: string;

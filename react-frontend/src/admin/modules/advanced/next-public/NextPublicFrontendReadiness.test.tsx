@@ -84,6 +84,10 @@ const readiness = {
     port_env: 'NEXUS_NEXT_PUBLIC_PORT',
     default_shadow_port: 3200,
     compose_profile_configured: true,
+    verification_commands: [
+      'npm --prefix next-public-frontend run check',
+      'npm --prefix react-frontend run build',
+    ],
   },
   safety_checks: [
     { key: 'route_cutover_disabled', status: 'pass' },
@@ -117,6 +121,8 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('laravel_public_api')).toBeInTheDocument();
     expect(screen.getByText('GET /v2/listings/{id}')).toBeInTheDocument();
     expect(screen.getByText('npm run build:next-public')).toBeInTheDocument();
+    expect(screen.getByText('npm --prefix next-public-frontend run check')).toBeInTheDocument();
+    expect(screen.getByText('npm --prefix react-frontend run build')).toBeInTheDocument();
     expect(screen.getByText('Manifest validation passed')).toBeInTheDocument();
     expect(screen.getByText('3 public routes')).toBeInTheDocument();
     expect(screen.getByText('3 private prefixes')).toBeInTheDocument();
