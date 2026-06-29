@@ -468,6 +468,14 @@ class NextPublicFrontendReadinessService
                 ];
             }
 
+            if ($this->hasUnsafeEndpointPathSegments($route['endpoint'])) {
+                $issues[] = [
+                    'code' => 'api_backed_route_endpoint_has_path_traversal',
+                    'severity' => 'blocker',
+                    'context' => $route['routeKey'],
+                ];
+            }
+
             if ($this->isPrivateLaravelV2Endpoint($route['endpoint'])) {
                 $issues[] = [
                     'code' => 'api_backed_route_private_endpoint',
@@ -515,6 +523,30 @@ class NextPublicFrontendReadinessService
     {
         foreach (self::PRIVATE_LARAVEL_V2_ENDPOINT_PREFIXES as $prefix) {
             if ($endpoint === $prefix || str_starts_with($endpoint, $prefix . '/')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function hasUnsafeEndpointPathSegments(string $endpoint): bool
+    {
+        if (str_contains($endpoint, '\\')) {
+            return true;
+        }
+
+        foreach (explode('/', $endpoint) as $segment) {
+            $normalizedSegment = strtolower($segment);
+
+            if (
+                $normalizedSegment === '.'
+                || $normalizedSegment === '..'
+                || $normalizedSegment === '%2e'
+                || $normalizedSegment === '%2e%2e'
+                || str_contains($normalizedSegment, '%2f')
+                || str_contains($normalizedSegment, '%5c')
+            ) {
                 return true;
             }
         }

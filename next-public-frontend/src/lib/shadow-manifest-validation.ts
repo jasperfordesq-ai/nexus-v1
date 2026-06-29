@@ -209,6 +209,10 @@ export function validateShadowManifests(
       issues.push({ code: 'api_backed_route_endpoint_not_plain_path', context: routeKey, severity: 'blocker' });
     }
 
+    if (hasUnsafeEndpointPathSegments(endpoint)) {
+      issues.push({ code: 'api_backed_route_endpoint_has_path_traversal', context: routeKey, severity: 'blocker' });
+    }
+
     if (isPrivateLaravelV2Endpoint(endpoint)) {
       issues.push({ code: 'api_backed_route_private_endpoint', context: routeKey, severity: 'blocker' });
     }
@@ -246,6 +250,23 @@ function isPrivateLaravelV2Endpoint(endpoint: string): boolean {
   return privateLaravelV2EndpointPrefixes.some((prefix) => (
     endpoint === prefix || endpoint.startsWith(`${prefix}/`)
   ));
+}
+
+function hasUnsafeEndpointPathSegments(endpoint: string): boolean {
+  if (endpoint.includes('\\')) {
+    return true;
+  }
+
+  return endpoint.split('/').some((segment) => {
+    const normalizedSegment = segment.toLowerCase();
+
+    return normalizedSegment === '.'
+      || normalizedSegment === '..'
+      || normalizedSegment === '%2e'
+      || normalizedSegment === '%2e%2e'
+      || normalizedSegment.includes('%2f')
+      || normalizedSegment.includes('%5c');
+  });
 }
 
 function sameSet(left: Set<string>, right: Set<string>): boolean {

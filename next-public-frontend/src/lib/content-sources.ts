@@ -66,7 +66,28 @@ function isSafePublicEndpoint(endpoint: string): boolean {
     return false;
   }
 
+  if (hasUnsafeEndpointPathSegments(endpoint)) {
+    return false;
+  }
+
   return !privateLaravelV2EndpointPrefixes.some((prefix) => (
     endpoint === prefix || endpoint.startsWith(`${prefix}/`)
   ));
+}
+
+function hasUnsafeEndpointPathSegments(endpoint: string): boolean {
+  if (endpoint.includes('\\')) {
+    return true;
+  }
+
+  return endpoint.split('/').some((segment) => {
+    const normalizedSegment = segment.toLowerCase();
+
+    return normalizedSegment === '.'
+      || normalizedSegment === '..'
+      || normalizedSegment === '%2e'
+      || normalizedSegment === '%2e%2e'
+      || normalizedSegment.includes('%2f')
+      || normalizedSegment.includes('%5c');
+  });
 }

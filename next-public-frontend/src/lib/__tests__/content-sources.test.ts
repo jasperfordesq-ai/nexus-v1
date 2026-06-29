@@ -46,4 +46,18 @@ describe('public content sources', () => {
       ),
     ).toBeNull();
   });
+
+  it.each([
+    '/v2/../admin/events',
+    '/v2/%2e%2e/admin/events',
+    '/v2/events%2fadmin',
+  ])('refuses manifest endpoints with path traversal segments at runtime: %s', (endpoint) => {
+    expect(
+      getPublicEndpointForRoute(
+        'events',
+        {},
+        [{ endpoint, method: 'GET', routeKey: 'events' }],
+      ),
+    ).toBeNull();
+  });
 });

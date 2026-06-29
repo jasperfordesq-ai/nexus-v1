@@ -2966,6 +2966,7 @@
         "api_backed_route_not_laravel_v2_endpoint": "API-backed routes must use relative Laravel v2 endpoints.",
         "api_backed_route_private_endpoint": "API-backed public routes must not use private Laravel v2 namespaces.",
         "api_backed_route_endpoint_not_plain_path": "API-backed route endpoints must be plain paths without query strings or fragments.",
+        "api_backed_route_endpoint_has_path_traversal": "API-backed route endpoints must not contain path traversal segments.",
         "api_backed_route_param_mismatch": "API endpoint parameters must match the public route pattern."
       }
     }

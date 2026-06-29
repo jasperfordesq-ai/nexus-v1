@@ -77,6 +77,11 @@ const readinessWithValidationIssue = {
           context: 'events',
           severity: 'blocker',
         },
+        {
+          code: 'api_backed_route_endpoint_has_path_traversal',
+          context: 'events',
+          severity: 'blocker',
+        },
       ],
     },
     public_routes: [

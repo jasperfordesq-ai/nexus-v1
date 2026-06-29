@@ -90,6 +90,47 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         ], $validation['issues']);
     }
 
+    /**
+     * @dataProvider unsafeEndpointProvider
+     */
+    public function test_manifest_validation_blocks_api_routes_with_path_traversal_segments(string $endpoint): void
+    {
+        $validation = $this->validateManifest([
+            'mode' => 'shadow',
+        ], [
+            [
+                'pattern' => '/events',
+                'routeKey' => 'events',
+                'labelKey' => 'pages.events.title',
+            ],
+        ], [], [
+            [
+                'routeKey' => 'events',
+                'endpoint' => $endpoint,
+                'method' => 'GET',
+            ],
+        ]);
+
+        $this->assertSame('blocker', $validation['status']);
+        $this->assertContains([
+            'code' => 'api_backed_route_endpoint_has_path_traversal',
+            'severity' => 'blocker',
+            'context' => 'events',
+        ], $validation['issues']);
+    }
+
+    /**
+     * @return array<int, array{0: string}>
+     */
+    public static function unsafeEndpointProvider(): array
+    {
+        return [
+            ['/v2/../admin/events'],
+            ['/v2/%2e%2e/admin/events'],
+            ['/v2/events%2fadmin'],
+        ];
+    }
+
     public function test_manifest_validation_blocks_non_get_api_backed_routes(): void
     {
         $validation = $this->validateManifest([

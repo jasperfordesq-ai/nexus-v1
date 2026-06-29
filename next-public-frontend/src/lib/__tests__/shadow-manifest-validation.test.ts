@@ -179,6 +179,28 @@ describe('shadow manifest validation', () => {
     });
   });
 
+  it.each([
+    '/v2/../admin/events',
+    '/v2/%2e%2e/admin/events',
+    '/v2/events%2fadmin',
+  ])('blocks API-backed route endpoints with path traversal segments: %s', (endpoint) => {
+    const result = validateShadowManifests(routeOwnershipManifest, {
+      ...contentSourcesManifest,
+      apiBackedRoutes: contentSourcesManifest.apiBackedRoutes.map((source) => (
+        source.routeKey === 'events'
+          ? { ...source, endpoint }
+          : source
+      )),
+    });
+
+    expect(result.status).toBe('blocker');
+    expect(result.issues).toContainEqual({
+      code: 'api_backed_route_endpoint_has_path_traversal',
+      context: 'events',
+      severity: 'blocker',
+    });
+  });
+
   it('blocks API-backed route endpoints whose placeholders drift from the public route params', () => {
     const result = validateShadowManifests(routeOwnershipManifest, {
       ...contentSourcesManifest,
