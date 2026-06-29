@@ -98,6 +98,7 @@ export function validateShadowManifests(
   }
 
   const apiBackedRoutes = Array.isArray(contentSources.apiBackedRoutes) ? contentSources.apiBackedRoutes : [];
+  const apiBackedRouteKeys = new Set<string>();
 
   for (const source of apiBackedRoutes) {
     if (!isRecord(source)) {
@@ -113,6 +114,11 @@ export function validateShadowManifests(
       issues.push({ code: 'api_backed_route_missing_fields', context: routeKey || endpoint || 'unknown', severity: 'blocker' });
       continue;
     }
+
+    if (apiBackedRouteKeys.has(routeKey)) {
+      issues.push({ code: 'api_backed_route_duplicate_key', context: routeKey, severity: 'blocker' });
+    }
+    apiBackedRouteKeys.add(routeKey);
 
     if (!routeKeys.has(routeKey)) {
       issues.push({ code: 'api_backed_route_not_in_manifest', context: routeKey, severity: 'blocker' });

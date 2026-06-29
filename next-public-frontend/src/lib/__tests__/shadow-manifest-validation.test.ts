@@ -54,6 +54,23 @@ describe('shadow manifest validation', () => {
     });
   });
 
+  it('blocks duplicate API-backed route keys', () => {
+    const result = validateShadowManifests(routeOwnershipManifest, {
+      ...contentSourcesManifest,
+      apiBackedRoutes: [
+        ...contentSourcesManifest.apiBackedRoutes,
+        { endpoint: '/v2/listings-copy', method: 'GET', routeKey: 'listings' },
+      ],
+    });
+
+    expect(result.status).toBe('blocker');
+    expect(result.issues).toContainEqual({
+      code: 'api_backed_route_duplicate_key',
+      context: 'listings',
+      severity: 'blocker',
+    });
+  });
+
   it('blocks API-backed route endpoints whose placeholders drift from the public route params', () => {
     const result = validateShadowManifests(routeOwnershipManifest, {
       ...contentSourcesManifest,
