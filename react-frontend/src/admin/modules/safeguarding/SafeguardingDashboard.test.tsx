@@ -45,7 +45,11 @@ vi.mock('@/components/ui', async (importOriginal) => {
   return {
     ...actual,
     // Table suite — plain HTML so React-Aria doesn't throw "Could not determine key"
-    Table: ({ children, ...props }: React.HTMLAttributes<HTMLTableElement>) => <table {...props}>{children}</table>,
+    Table: ({
+      children,
+      removeWrapper: _removeWrapper,
+      ...props
+    }: React.HTMLAttributes<HTMLTableElement> & { removeWrapper?: boolean }) => <table {...props}>{children}</table>,
     TableHeader: ({ children }: { children?: React.ReactNode }) => <thead><tr>{children}</tr></thead>,
     TableColumn: ({ children }: { children?: React.ReactNode }) => <th>{children}</th>,
     TableBody: ({ children, emptyContent }: { children?: React.ReactNode; emptyContent?: React.ReactNode }) =>
@@ -111,6 +115,18 @@ vi.mock('../../components', () => ({
   ),
 }));
 
+vi.mock('../../components/PageHeader', () => ({
+  PageHeader: ({ title, actions }: { title: string; description?: string; actions?: React.ReactNode }) => (
+    <div><h1>{title}</h1>{actions}</div>
+  ),
+}));
+
+vi.mock('../../components/StatCard', () => ({
+  StatCard: ({ label, value, to }: { label: string; value: number | string; icon?: unknown; color?: string; to?: string; linkAriaLabel?: string }) => (
+    <a data-testid="stat-card" href={to}>{label}: {value}</a>
+  ),
+}));
+
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 const makeStats = () => ({
   active_assignments: 3,
@@ -140,6 +156,23 @@ const makeAssignment = (overrides = {}) => ({
   status: 'active' as const,
   consent_given: true,
   created_at: '2026-01-01T12:00:00Z',
+  ...overrides,
+});
+
+const makeMemberPreference = (overrides = {}) => ({
+  user_id: 301,
+  user_name: 'Margaret Donegan',
+  user_avatar: null,
+  consent_given_at: '2026-05-21T10:00:00Z',
+  options: [
+    {
+      option_key: 'vetted_only',
+      label: 'I would prefer to only interact with members who have been appropriately vetted',
+      is_declination: false,
+    },
+  ],
+  has_triggers: true,
+  is_declination_only: false,
   ...overrides,
 });
 
@@ -375,6 +408,36 @@ describe('SafeguardingDashboard', () => {
       const container = document.body;
       // Locate text containing "no" in any paragraph/div in the preferences panel
       expect(container.textContent).toMatch(/preference/i);
+    });
+  });
+
+  it('renders member preference option labels from the shared admin API shape', async () => {
+    mockApi.get.mockImplementation((url: string) => {
+      if (url.includes('dashboard')) return Promise.resolve(makeApiOk(makeStats()));
+      if (url.includes('flagged-messages')) return Promise.resolve(makeApiOk([]));
+      if (url.includes('assignments')) return Promise.resolve(makeApiOk([]));
+      if (url.includes('member-preferences')) return Promise.resolve(makeApiOk([makeMemberPreference()]));
+      return Promise.resolve(makeApiOk(null));
+    });
+
+    const { SafeguardingDashboard } = await import('./SafeguardingDashboard');
+    render(<SafeguardingDashboard routeBase="/broker/safeguarding" />);
+
+    await waitFor(() => screen.getAllByTestId('stat-card'));
+
+    const statHrefs = screen.getAllByTestId('stat-card').map((el) => el.getAttribute('href'));
+    expect(statHrefs).toContain('/test/broker/safeguarding?tab=assignments&filter=active');
+    expect(statHrefs).not.toContain('/test/admin/safeguarding?tab=assignments&filter=active');
+
+    const tabs = screen.getAllByRole('tab');
+    const prefTab = tabs.find((t) => t.textContent?.toLowerCase().includes('preference'));
+    if (prefTab) await userEvent.click(prefTab);
+
+    await waitFor(() => {
+      expect(screen.getByText('Margaret Donegan')).toBeInTheDocument();
+      expect(screen.getByText('I would prefer to only interact with members who have been appropriately vetted')).toBeInTheDocument();
+      expect(document.body.textContent).not.toContain('[object Object]');
+      expect(screen.getByText('2026-05-21T10:00:00Z')).toBeInTheDocument();
     });
   });
 

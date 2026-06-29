@@ -76,6 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Registration email verification notices now explicitly tell new members to check Junk or spam.** The post-registration verification callout bolds the spam-folder instruction so first-time registrants know where to look if the message is missing. Regression test: `react-frontend/src/pages/auth/RegisterPage.test.tsx`.
 - **Wallet credit transfers now allow the `Idempotency-Key` request header in CORS preflight responses.** Custom-domain tenants such as Timebanking UK can submit transfer requests again instead of being stopped by the browser before the wallet API receives the POST. Regression test: `tests/Laravel/Unit/Middleware/EnsureCorsHeadersTest.php`.
+- **Broker safeguarding now reuses the full admin safeguarding dashboard.** The broker panel now renders the same flagged messages, guardian assignments, member-preference table, and assignment actions as `/admin/safeguarding`, while drill-down cards stay scoped to `/broker/safeguarding`. This fixes member preference rows rendering option objects instead of option labels. Regression tests: `react-frontend/src/admin/modules/safeguarding/SafeguardingDashboard.test.tsx`, `react-frontend/src/broker/pages/SafeguardingPage.test.tsx`.
 
 ## [1.5.4] - 2026-06-29
 

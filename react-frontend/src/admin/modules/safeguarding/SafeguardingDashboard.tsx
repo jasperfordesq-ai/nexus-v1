@@ -105,6 +105,10 @@ interface MemberSafeguardingEntry {
   is_declination_only: boolean;
 }
 
+interface SafeguardingDashboardProps {
+  routeBase?: string;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
@@ -120,7 +124,7 @@ const SEVERITY_COLORS: Record<string, 'default' | 'warning' | 'danger'> = {
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function SafeguardingDashboard() {
+export function SafeguardingDashboard({ routeBase = '/admin/safeguarding' }: SafeguardingDashboardProps = {}) {
   const { t } = useTranslation('admin');
   usePageTitle(t('safeguarding.page_title'));
   const toast = useToast();
@@ -131,7 +135,13 @@ export function SafeguardingDashboard() {
   // and browser back/forward works intuitively. Valid tab keys are the three
   // sections rendered below.
   const rawTab = searchParams.get('tab');
-  const activeTab = rawTab === 'assignments' || rawTab === 'preferences' ? rawTab : 'flagged';
+  const activeTab = rawTab === 'assignments' || rawTab === 'guardians' || rawTab === 'preferences'
+    ? (rawTab === 'guardians' ? 'assignments' : rawTab)
+    : 'flagged';
+  const dashboardPath = useCallback(
+    (query = '') => tenantPath(`${routeBase}${query}`),
+    [tenantPath, routeBase],
+  );
   const setActiveTab = useCallback(
     (next: string) => {
       setSearchParams(
@@ -390,7 +400,7 @@ export function SafeguardingDashboard() {
             value={stats.unreviewed_flags}
             icon={ShieldAlert}
             color={stats.unreviewed_flags > 0 ? 'danger' : 'success'}
-            to={tenantPath('/admin/safeguarding?filter=unreviewed')}
+            to={dashboardPath('?filter=unreviewed')}
             linkAriaLabel={t('safeguarding.cta_view_unreviewed')}
           />
           <StatCard
@@ -398,7 +408,7 @@ export function SafeguardingDashboard() {
             value={stats.critical_flags}
             icon={AlertTriangle}
             color="warning"
-            to={tenantPath('/admin/safeguarding?filter=critical')}
+            to={dashboardPath('?filter=critical')}
             linkAriaLabel={t('safeguarding.cta_view_critical')}
           />
           <StatCard
@@ -406,7 +416,7 @@ export function SafeguardingDashboard() {
             value={stats.active_assignments}
             icon={Shield}
             color="default"
-            to={tenantPath('/admin/safeguarding?tab=assignments&filter=active')}
+            to={dashboardPath('?tab=assignments&filter=active')}
             linkAriaLabel={t('safeguarding.cta_view_active_assignments')}
           />
           <StatCard
@@ -414,7 +424,7 @@ export function SafeguardingDashboard() {
             value={stats.consented_wards}
             icon={ShieldCheck}
             color="success"
-            to={tenantPath('/admin/safeguarding?tab=assignments&filter=consented')}
+            to={dashboardPath('?tab=assignments&filter=consented')}
             linkAriaLabel={t('safeguarding.cta_view_consented')}
           />
           <StatCard
@@ -422,7 +432,7 @@ export function SafeguardingDashboard() {
             value={stats.total_flags_this_month}
             icon={Flag}
             color="default"
-            to={tenantPath('/admin/safeguarding?filter=unreviewed')}
+            to={dashboardPath('?filter=unreviewed')}
             linkAriaLabel={t('safeguarding.cta_view_month_flags')}
           />
         </div>
