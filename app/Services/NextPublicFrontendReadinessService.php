@@ -151,7 +151,7 @@ class NextPublicFrontendReadinessService
                 ],
             ],
             'safety_checks' => [
-                ['key' => 'route_cutover_disabled', 'status' => 'pass'],
+                ['key' => 'route_cutover_disabled', 'status' => $cutoverEnabled ? 'blocker' : 'pass'],
                 ['key' => 'prerender_retained', 'status' => 'pass'],
                 ['key' => 'vite_private_routes_retained', 'status' => 'pass'],
                 ['key' => 'public_edge_not_configured', 'status' => 'pass'],

@@ -3881,7 +3881,10 @@
       "onboarding_failed": "Stripe onboarding could not be started.",
       "finance_load_failed": "Donation finance operations could not be loaded.",
       "gift_aid_export_failed": "Gift Aid export could not be downloaded.",
-      "annual_receipts_export_failed": "Annual receipt export could not be downloaded."
+      "annual_receipts_export_failed": "Annual receipt export could not be downloaded.",
+      "settings_load_failed": "Donation routing settings could not be loaded.",
+      "settings_saved": "Donation routing settings saved.",
+      "settings_save_failed": "Donation routing settings could not be saved."
     },
     "settings": {
       "start_onboarding": "Start Stripe onboarding",
@@ -3894,7 +3897,15 @@
         "restricted": "Action needed",
         "unknown": "Status unknown"
       },
-      "connect_fallback_active": "A Stripe Connect account is configured, but it is not ready for live donations yet. Payments will use the platform fallback until onboarding is complete."
+      "connect_fallback_active": "A Stripe Connect account is configured, but it is not ready for live donations yet. Payments will use the platform fallback until onboarding is complete.",
+      "title": "Stripe routing",
+      "description": "Leave this blank to use the platform Stripe account with tenant metadata. Connect a tenant Stripe account to send future one-off and regular donations to that tenant account.",
+      "stripe_connect_account_id": "Tenant Stripe Connect account ID",
+      "stripe_connect_placeholder": "acct_...",
+      "stripe_connect_description": "Changing this affects future donation checkouts. Re-sync support levels after adding a tenant account so recurring prices exist in that Stripe account.",
+      "route_platform_default": "Platform fallback",
+      "route_tenant_connect": "Tenant Connect",
+      "save": "Save routing"
     },
     "finance": {
       "title": "Finance operations",
