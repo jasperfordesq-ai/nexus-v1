@@ -250,6 +250,12 @@ describe('adminUsers', () => {
     expect(mockPost).toHaveBeenCalledWith('/v2/admin/users/5/send-welcome-email');
   });
 
+  it('sendVerificationEmail posts to endpoint', async () => {
+    mockPost.mockResolvedValueOnce({ success: true, data: {} });
+    await adminUsers.sendVerificationEmail(5);
+    expect(mockPost).toHaveBeenCalledWith('/v2/admin/users/5/send-verification-email');
+  });
+
   it('bulkApprove posts user_ids', async () => {
     mockPost.mockResolvedValueOnce({ success: true, data: {} });
     await adminUsers.bulkApprove([1, 2, 3]);

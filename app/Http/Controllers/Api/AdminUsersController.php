@@ -146,7 +146,7 @@ class AdminUsersController extends BaseApiController
                         THEN u.organization_name
                     ELSE CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))
                 END as name,
-                u.email, u.avatar_url, u.location, u.role, u.is_approved, u.is_super_admin, u.is_tenant_super_admin,
+                u.email, u.email_verified_at, u.avatar_url, u.location, u.role, u.is_approved, u.is_super_admin, u.is_tenant_super_admin,
                 u.status, u.created_at, u.last_active_at, u.last_login_at, u.onboarding_completed, u.profile_type, u.organization_name,
                 u.tenant_id,
                 t.name as tenant_name,
@@ -169,6 +169,7 @@ class AdminUsersController extends BaseApiController
                 'first_name' => $row->first_name ?? '',
                 'last_name' => $row->last_name ?? '',
                 'email' => $row->email,
+                'email_verified_at' => $row->email_verified_at ?? null,
                 'avatar_url' => $row->avatar_url ?? null,
                 'location' => $row->location ?? null,
                 'role' => $row->role ?? 'member',

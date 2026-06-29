@@ -570,6 +570,30 @@ export function UserList() {
       render: (user) => <StatusBadge status={user.status} />,
     },
     {
+      key: 'email_verified_at',
+      label: t('users.col_email_activation'),
+      sortable: true,
+      render: (user) => {
+        const isActivated = Boolean(user.email_verified_at);
+
+        return (
+          <Chip
+            size="sm"
+            variant="soft"
+            color={isActivated ? 'success' : 'warning'}
+            className="gap-1 whitespace-nowrap"
+          >
+            {isActivated ? (
+              <CheckCircle2 size={12} aria-hidden="true" />
+            ) : (
+              <AlertCircle size={12} aria-hidden="true" />
+            )}
+            {isActivated ? t('users.email_activation_activated') : t('users.email_activation_not_activated')}
+          </Chip>
+        );
+      },
+    },
+    {
       key: 'balance',
       label: t('users.col_balance'),
       sortable: true,

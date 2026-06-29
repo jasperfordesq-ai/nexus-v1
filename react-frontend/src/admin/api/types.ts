@@ -183,6 +183,7 @@ export interface AdminUser {
   avatar_url?: string | null;
   role: 'member' | 'admin' | 'moderator' | 'tenant_admin' | 'super_admin';
   status: 'active' | 'inactive' | 'suspended' | 'pending' | 'banned';
+  email_verified_at?: string | null;
   tenant_id?: number;
   balance: number;
   total_earned?: number;

@@ -58,6 +58,22 @@ class AdminUsersControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function test_index_includes_email_activation_timestamp(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $verifiedAt = now()->subDay()->setMicrosecond(0);
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'activated-member-' . uniqid('', true) . '@example.test',
+            'email_verified_at' => $verifiedAt,
+        ]);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet('/v2/admin/users?search=' . urlencode($user->email));
+
+        $response->assertStatus(200);
+        $this->assertSame($verifiedAt->toDateTimeString(), $response->json('data.0.email_verified_at'));
+    }
+
     // ================================================================
     // SHOW — GET /v2/admin/users/{id}
     // ================================================================
@@ -496,6 +512,77 @@ class AdminUsersControllerTest extends TestCase
             ->where('email', $user->email)
             ->where('tenant_id', $this->testTenantId)
             ->value('token'));
+    }
+
+    public function test_send_verification_email_creates_token_for_unverified_user(): void
+    {
+        $this->ensureEmailVerificationTokenTable();
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'admin-verify-resend-' . uniqid('', true) . '@example.test',
+            'email_verified_at' => null,
+            'is_verified' => false,
+            'preferred_language' => 'en',
+        ]);
+        $mailer = new AdminUsersSuccessfulEmailDispatchService();
+        app()->instance(EmailDispatchService::class, $mailer);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/users/' . $user->id . '/send-verification-email');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.sent', true);
+        $this->assertCount(1, $mailer->calls);
+        $this->assertSame($user->email, $mailer->calls[0]['to']);
+        $this->assertSame('email_verification', $mailer->calls[0]['options']['category']);
+        $this->assertSame(1, DB::table('email_verification_tokens')
+            ->where('user_id', $user->id)
+            ->where('tenant_id', $this->testTenantId)
+            ->count());
+    }
+
+    public function test_send_verification_email_skips_already_verified_user(): void
+    {
+        $this->ensureEmailVerificationTokenTable();
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'admin-verify-already-' . uniqid('', true) . '@example.test',
+            'email_verified_at' => now(),
+            'is_verified' => true,
+        ]);
+        $mailer = new AdminUsersSuccessfulEmailDispatchService();
+        app()->instance(EmailDispatchService::class, $mailer);
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/users/' . $user->id . '/send-verification-email');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.already_verified', true);
+        $this->assertCount(0, $mailer->calls);
+        $this->assertSame(0, DB::table('email_verification_tokens')
+            ->where('user_id', $user->id)
+            ->where('tenant_id', $this->testTenantId)
+            ->count());
+    }
+
+    private function ensureEmailVerificationTokenTable(): void
+    {
+        DB::statement("
+            CREATE TABLE IF NOT EXISTS `email_verification_tokens` (
+                `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                `user_id` INT UNSIGNED NOT NULL,
+                `tenant_id` INT(11) NOT NULL,
+                `token` VARCHAR(255) NOT NULL,
+                `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                `expires_at` TIMESTAMP NOT NULL,
+                INDEX `idx_user_id` (`user_id`),
+                INDEX `idx_tenant_id` (`tenant_id`),
+                INDEX `idx_tenant_user` (`tenant_id`, `user_id`),
+                INDEX `idx_expires_at` (`expires_at`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
     }
 }
 

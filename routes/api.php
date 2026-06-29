@@ -1227,6 +1227,7 @@ Route::post('/v2/admin/users/{id}/badges/recheck', [\App\Http\Controllers\Api\Ad
 Route::get('/v2/admin/users/{id}/consents', [\App\Http\Controllers\Api\AdminUsersController::class, 'getConsents'])->whereNumber('id');
 Route::post('/v2/admin/users/{id}/password', [\App\Http\Controllers\Api\AdminUsersController::class, 'setPassword'])->whereNumber('id');
 Route::post('/v2/admin/users/{id}/send-password-reset', [\App\Http\Controllers\Api\AdminUsersController::class, 'sendPasswordReset'])->whereNumber('id');
+Route::post('/v2/admin/users/{id}/send-verification-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'adminResendVerification'])->whereNumber('id');
 Route::post('/v2/admin/users/{id}/send-welcome-email', [\App\Http\Controllers\Api\AdminUsersController::class, 'sendWelcomeEmail']);
 // Listings index is used by the broker panel's Risk Tags create-modal
 // autocomplete. Other listing-management endpoints stay admin-only.

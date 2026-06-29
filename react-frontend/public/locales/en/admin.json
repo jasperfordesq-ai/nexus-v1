@@ -13978,6 +13978,7 @@
       "manage": "Manage",
       "recheck_badges": "Recheck Badges",
       "remove_badge": "Remove Badge",
+      "resend_verification_email": "Resend verification email",
       "resend_welcome_email": "Resend Welcome Email",
       "return_to_list": "Return to List",
       "save_changes": "Save Changes",
@@ -14005,6 +14006,8 @@
     "descriptions": {
       "balance_amount": "Use negative values to deduct time credits from this member",
       "cannot_modify_self": "You cannot modify your own account from this panel",
+      "email_activation_unverified": "This member has not completed the email activation link yet. Resend the verification email so they can finish activating their account.",
+      "email_activation_verified": "This member has completed email activation and can pass the email-verification login gate.",
       "global_super_admin": "Grants full access across all tenants on the platform",
       "municipal_announcer": "Posts by this user will display an Official badge and be pinned to the top of the feed",
       "tenant_super_admin": "Grants full admin access within this tenant"
@@ -14026,6 +14029,7 @@
       "bio": "Bio",
       "current_balance": "Current Balance",
       "email": "Email",
+      "email_activation_status": "Email activation status",
       "first_name": "First Name",
       "last_name": "Last Name",
       "location": "Location",
@@ -14095,6 +14099,7 @@
     "sections": {
       "account_actions": "Account Actions",
       "badges": "Badges",
+      "email_activation": "Email activation",
       "gdpr_consents": "GDPR Consents",
       "global_super_admin": "Global Super Admin",
       "insurance_certificates": "Insurance Certificates",
@@ -14107,10 +14112,13 @@
     "statuses": {
       "active": "Active",
       "banned": "Banned",
+      "email_activated": "Email activated",
+      "email_not_activated": "Email not activated",
       "pending": "Pending",
       "suspended": "Suspended"
     },
     "summary": {
+      "email_activated_on": "Activated on {{date}}",
       "more_certificates": "More Certificates",
       "more_records": "More Records"
     },
@@ -14121,6 +14129,7 @@
       "balance_adjusted": "Balance Adjusted",
       "balance_failed": "Balance Failed",
       "balance_invalid": "Balance Invalid",
+      "email_already_activated": "Email is already activated",
       "generic_error": "Occurred error",
       "global_super_admin_failed": "Failed to update global super admin status",
       "global_super_admin_granted": "Global super admin granted",
@@ -14140,6 +14149,8 @@
       "tenant_super_admin_revoked": "Tenant super admin revoked",
       "update_failed": "Update Failed",
       "update_success": "Update successfully",
+      "verification_email_failed": "Failed to send verification email",
+      "verification_email_sent": "Verification email sent",
       "welcome_email_failed": "Failed to send welcome email",
       "welcome_email_sent": "Welcome email sent"
     },
@@ -14182,6 +14193,7 @@
     "close": "Close",
     "col_actions": "Actions",
     "col_balance": "Balance",
+    "col_email_activation": "Email activation",
     "col_joined": "Joined",
     "col_role": "Role",
     "col_status": "Status",
@@ -14206,6 +14218,8 @@
     "desc_use_negative_values_to_deduct_credits": "Use negative values to deduct time credits from this member",
     "description": "Manage users settings and configuration",
     "error_occurred": "An error occurred",
+    "email_activation_activated": "Activated",
+    "email_activation_not_activated": "Not activated",
     "expires": "Expires",
     "impersonate_failed": "Impersonate Failed",
     "impersonate_started": "Impersonate Started",

@@ -235,6 +235,24 @@ describe('UserList', () => {
     });
   });
 
+  it('renders email activation status for verified and unverified users', async () => {
+    mockAdminUsers.list.mockResolvedValue({
+      success: true,
+      data: [
+        makeUser({ id: 42, name: 'Activated Member', email_verified_at: '2026-06-01T10:00:00Z' }),
+        makeUser({ id: 43, name: 'Waiting Member', email: 'waiting@example.com', email_verified_at: null }),
+      ],
+    });
+    const { UserList } = await import('./UserList');
+    render(<UserList />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Email activation')).toBeInTheDocument();
+      expect(screen.getByText('Activated')).toBeInTheDocument();
+      expect(screen.getByText('Not activated')).toBeInTheDocument();
+    });
+  });
+
   it('renders balance in hours', async () => {
     mockAdminUsers.list.mockResolvedValue({
       success: true,

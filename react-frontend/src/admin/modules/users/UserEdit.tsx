@@ -101,6 +101,7 @@ export function UserEdit() {
 
   // Welcome email
   const [welcomeEmailLoading, setWelcomeEmailLoading] = useState(false);
+  const [verificationEmailLoading, setVerificationEmailLoading] = useState(false);
 
   // GDPR Consents
   const [consents, setConsents] = useState<UserConsent[]>([]);
@@ -443,6 +444,29 @@ export function UserEdit() {
     }
   }
 
+  async function handleSendVerificationEmail() {
+    if (!id) return;
+    setVerificationEmailLoading(true);
+    try {
+      const res = await adminUsers.sendVerificationEmail(Number(id));
+      if (res.success) {
+        const data = res.data as { already_verified?: boolean } | undefined;
+        if (data?.already_verified) {
+          toast.success(t('toasts.email_already_activated'));
+          loadUser();
+        } else {
+          toast.success(t('toasts.verification_email_sent'));
+        }
+      } else {
+        toast.error(res.error || t('toasts.verification_email_failed'));
+      }
+    } catch {
+      toast.error(t('toasts.verification_email_failed'));
+    } finally {
+      setVerificationEmailLoading(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -475,6 +499,10 @@ export function UserEdit() {
   }
 
   const canImpersonate = isSuperAdmin && !user.is_super_admin && !user.is_god && user.id !== currentUser?.id;
+  const emailActivated = Boolean(user.email_verified_at);
+  const emailActivatedDate = user.email_verified_at
+    ? new Date(user.email_verified_at).toLocaleString()
+    : null;
 
   return (
     <div>
@@ -606,6 +634,50 @@ export function UserEdit() {
             </CardBody>
           </Card>
         </form>
+
+        {/* Email Activation */}
+        <Card>
+          <CardHeader className="px-6 pt-5 pb-0">
+            <div className="flex items-center gap-2">
+              <Mail aria-hidden="true" size={18} className="text-accent" />
+              <h3 className="text-lg font-semibold text-foreground">{t('sections.email_activation')}</h3>
+            </div>
+          </CardHeader>
+          <CardBody className="p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-medium text-foreground">{t('fields.email_activation_status')}</p>
+                  <Chip size="sm" variant="soft" color={emailActivated ? 'success' : 'warning'}>
+                    {emailActivated ? t('statuses.email_activated') : t('statuses.email_not_activated')}
+                  </Chip>
+                </div>
+                <p className="mt-1 text-sm text-muted">
+                  {emailActivated
+                    ? t('descriptions.email_activation_verified')
+                    : t('descriptions.email_activation_unverified')}
+                </p>
+                {emailActivatedDate && (
+                  <p className="mt-1 text-xs text-muted">
+                    {t('summary.email_activated_on', { date: emailActivatedDate })}
+                  </p>
+                )}
+              </div>
+              {!emailActivated && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  startContent={!verificationEmailLoading ? <Mail aria-hidden="true" size={14} /> : undefined}
+                  onPress={handleSendVerificationEmail}
+                  isLoading={verificationEmailLoading}
+                  className="sm:shrink-0"
+                >
+                  {t('actions.resend_verification_email')}
+                </Button>
+              )}
+            </div>
+          </CardBody>
+        </Card>
 
         {/* Tenant Super Admin (hierarchy-scoped — visible to super admins) */}
         {isSuperAdmin && (

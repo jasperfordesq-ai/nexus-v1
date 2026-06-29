@@ -16,6 +16,7 @@ const { mockAdminUsers, mockAdminTimebanking, mockAdminVetting, mockAdminInsuran
       get: vi.fn(),
       update: vi.fn(),
       getConsents: vi.fn(),
+      sendVerificationEmail: vi.fn(),
     },
     mockAdminTimebanking: { adjustBalance: vi.fn() },
     mockAdminVetting: { getUserRecords: vi.fn() },
@@ -134,6 +135,7 @@ describe('UserEdit', () => {
     mockAdminUsers.get.mockResolvedValue({ success: true, data: makeUser() });
     mockAdminUsers.update.mockResolvedValue({ success: true, data: makeUser() });
     mockAdminUsers.getConsents.mockResolvedValue({ success: true, data: [] });
+    mockAdminUsers.sendVerificationEmail.mockResolvedValue({ success: true, data: { sent: true } });
     mockAdminVetting.getUserRecords.mockResolvedValue({ success: true, data: [] });
     mockAdminInsurance.getUserCertificates.mockResolvedValue({ success: true, data: [] });
   });
@@ -271,6 +273,37 @@ describe('UserEdit', () => {
     await waitFor(() => {
       expect(mockAdminUsers.getConsents).toHaveBeenCalled();
       expect(mockAdminVetting.getUserRecords).toHaveBeenCalled();
+    });
+  });
+
+  it('shows resend verification email action for an unverified user', async () => {
+    mockAdminUsers.get.mockResolvedValueOnce({
+      success: true,
+      data: makeUser({ email_verified_at: null }),
+    });
+    const { UserEdit } = await import('./UserEdit');
+    render(<UserEdit />);
+
+    const resendButton = await screen.findByRole('button', { name: /resend verification email/i });
+    await userEvent.click(resendButton);
+
+    await waitFor(() => {
+      expect(mockAdminUsers.sendVerificationEmail).toHaveBeenCalledWith(42);
+      expect(mockToast.success).toHaveBeenCalled();
+    });
+  });
+
+  it('shows activated email status instead of resend action for a verified user', async () => {
+    mockAdminUsers.get.mockResolvedValueOnce({
+      success: true,
+      data: makeUser({ email_verified_at: '2026-06-01T10:00:00Z' }),
+    });
+    const { UserEdit } = await import('./UserEdit');
+    render(<UserEdit />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Email activated')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /resend verification email/i })).not.toBeInTheDocument();
     });
   });
 });

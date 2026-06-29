@@ -14,6 +14,7 @@ use App\Core\RateLimiter;
 use App\Core\EmailTemplate;
 use App\Core\EmailTemplateBuilder;
 use App\I18n\LocaleContext;
+use App\Models\ActivityLog;
 use App\Services\EmailDispatchService;
 use App\Services\RateLimitService;
 use Illuminate\Support\Facades\Log;
@@ -239,6 +240,54 @@ class EmailVerificationController extends BaseApiController
         }
 
         return $this->respondWithData($genericResponse);
+    }
+
+    /** POST /api/v2/admin/users/{id}/send-verification-email */
+    public function adminResendVerification($id): JsonResponse
+    {
+        $adminId = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $userId = (int) $id;
+
+        $userRow = DB::selectOne(
+            "SELECT id, email, first_name, email_verified_at, tenant_id, preferred_language FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        );
+        $user = $userRow ? (array) $userRow : null;
+
+        if (!$user) {
+            return $this->respondWithError(
+                ApiErrorCodes::RESOURCE_NOT_FOUND,
+                __('api.user_not_found'),
+                null,
+                404
+            );
+        }
+
+        if (!empty($user['email_verified_at'])) {
+            return $this->respondWithData([
+                'sent' => false,
+                'already_verified' => true,
+                'id' => $userId,
+            ]);
+        }
+
+        if (!$this->sendVerificationEmail($user)) {
+            return $this->respondWithError(
+                'EMAIL_SEND_FAILED',
+                __('api.verification_email_send_failed'),
+                null,
+                503
+            );
+        }
+
+        ActivityLog::log($adminId, 'admin_resend_verification_email', "Resent verification email to user #{$userId} ({$user['email']})");
+
+        return $this->respondWithData([
+            'sent' => true,
+            'already_verified' => false,
+            'id' => $userId,
+        ]);
     }
 
     /**

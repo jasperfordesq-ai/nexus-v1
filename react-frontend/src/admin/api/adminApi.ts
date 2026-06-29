@@ -246,6 +246,9 @@ export const adminUsers = {
   sendPasswordReset: (userId: number) =>
     api.post<{ success: boolean }>(`/v2/admin/users/${userId}/send-password-reset`),
 
+  sendVerificationEmail: (userId: number) =>
+    api.post<{ sent: boolean; already_verified?: boolean; id: number }>(`/v2/admin/users/${userId}/send-verification-email`),
+
   sendWelcomeEmail: (userId: number) =>
     api.post<{ success: boolean }>(`/v2/admin/users/${userId}/send-welcome-email`),
 
