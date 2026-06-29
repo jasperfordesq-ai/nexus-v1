@@ -2,6 +2,7 @@
   "sourceOfTruth": "laravel_public_api",
   "databaseQueriesFromNext": false,
   "apiBackedRoutes": [
+    { "routeKey": "home", "endpoint": "/v2/tenant/bootstrap", "method": "GET" },
     { "routeKey": "blog-index", "endpoint": "/v2/blog", "method": "GET" },
     { "routeKey": "blog-detail", "endpoint": "/v2/blog/{slug}", "method": "GET" },
     { "routeKey": "cms-page", "endpoint": "/v2/pages/{slug}", "method": "GET" },
