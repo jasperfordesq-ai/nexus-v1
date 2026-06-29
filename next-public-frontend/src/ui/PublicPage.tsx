@@ -8,7 +8,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { resolveAssetUrl, safeCssColor } from '../lib/assets';
 import type { Translator } from '../lib/i18n';
 import type { RouteOwnership } from '../lib/public-routes';
-import type { BlogPostSummary, PublicRouteContent, TenantBootstrap } from '../lib/tenant-api';
+import type { BlogPostSummary, PublicContentItem, PublicRouteContent, TenantBootstrap } from '../lib/tenant-api';
 import { getApiBase } from '../lib/tenant-api';
 
 interface PublicPageProps {
@@ -95,7 +95,9 @@ export function PublicPage({
           ) : null}
         </section>
 
-        <section className="content-band">{renderRouteContent(route, routeSegments, content, tenantName, t)}</section>
+        <section className="content-band">
+          {renderRouteContent(route, routeSegments, content, tenantName, tenantBasePath, t)}
+        </section>
       </main>
 
       <footer className="site-footer">
@@ -112,6 +114,7 @@ function renderRouteContent(
   routeSegments: string[],
   content: PublicRouteContent | null,
   tenantName: string,
+  tenantBasePath: string,
   t: Translator,
 ): ReactNode {
   if (route.routeKey === 'home') {
@@ -124,7 +127,7 @@ function renderRouteContent(
   }
 
   if (content?.kind === 'blog-index') {
-    return <BlogIndex posts={content.posts} t={t} />;
+    return <BlogIndex posts={content.posts} tenantBasePath={tenantBasePath} t={t} />;
   }
 
   if (content?.kind === 'blog-detail' && content.post) {
@@ -143,6 +146,21 @@ function renderRouteContent(
         <HtmlBlock html={content.page.content || ''} />
       </article>
     );
+  }
+
+  if (content?.kind === 'public-collection') {
+    return (
+      <PublicCollection
+        basePath={withTenantBase(tenantBasePath, routeSegments[0] ?? '')}
+        emptyTitle={t(route.labelKey ?? 'pages.about.title')}
+        items={content.items}
+        t={t}
+      />
+    );
+  }
+
+  if (content?.kind === 'public-detail' && content.item) {
+    return <PublicDetail item={content.item} />;
   }
 
   if (route.routeKey === 'blog-detail') {
@@ -171,7 +189,15 @@ function renderRouteContent(
   );
 }
 
-function BlogIndex({ posts, t }: { posts: BlogPostSummary[]; t: Translator }): ReactNode {
+function BlogIndex({
+  posts,
+  tenantBasePath,
+  t,
+}: {
+  posts: BlogPostSummary[];
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
   if (posts.length === 0) {
     return (
       <article className="public-panel">
@@ -186,12 +212,55 @@ function BlogIndex({ posts, t }: { posts: BlogPostSummary[]; t: Translator }): R
       {posts.map((post) => (
         <article className="public-panel" key={post.slug}>
           <h2>
-            <a href={`/blog/${post.slug}`}>{post.title}</a>
+            <a href={withTenantBase(tenantBasePath, `blog/${post.slug}`)}>{post.title}</a>
           </h2>
           {post.excerpt ? <p>{post.excerpt}</p> : null}
         </article>
       ))}
     </div>
+  );
+}
+
+function PublicCollection({
+  basePath,
+  emptyTitle,
+  items,
+  t,
+}: {
+  basePath: string;
+  emptyTitle: string;
+  items: PublicContentItem[];
+  t: Translator;
+}): ReactNode {
+  if (items.length === 0) {
+    return (
+      <article className="public-panel">
+        <h2>{emptyTitle}</h2>
+        <p>{t('pages.publicCollection.empty')}</p>
+      </article>
+    );
+  }
+
+  return (
+    <div className="post-list">
+      {items.map((item) => (
+        <article className="public-panel" key={item.slug ?? item.id}>
+          <h2>
+            <a href={withTenantBase(basePath, item.slug ?? item.id)}>{item.title}</a>
+          </h2>
+          {item.description ? <p>{item.description}</p> : null}
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function PublicDetail({ item }: { item: PublicContentItem }): ReactNode {
+  return (
+    <article className="public-panel article-content">
+      <h2>{item.title}</h2>
+      {item.description ? <p>{item.description}</p> : null}
+    </article>
   );
 }
 
@@ -224,6 +293,14 @@ function StructuredData({
           headline: content.post.title,
           url: canonicalUrl,
         }
+      : content?.kind === 'public-detail' && content.item
+        ? {
+            '@context': 'https://schema.org',
+            '@type': 'WebPage',
+            description: content.item.description,
+            name: content.item.title,
+            url: canonicalUrl,
+          }
       : {
           '@context': 'https://schema.org',
           '@type': tenant?.seo?.description ? 'Organization' : 'WebPage',
@@ -243,6 +320,10 @@ function getRouteTitle(route: RouteOwnership, content: PublicRouteContent | null
     return content.page.title;
   }
 
+  if (content?.kind === 'public-detail' && content.item?.title) {
+    return content.item.title;
+  }
+
   return t(route.labelKey ?? 'pages.home.title');
 }
 
@@ -258,6 +339,10 @@ function getRouteLead(
 
   if (content?.kind === 'cms-page' && content.page?.meta_description) {
     return content.page.meta_description;
+  }
+
+  if (content?.kind === 'public-detail' && content.item?.description) {
+    return content.item.description;
   }
 
   return t(`pages.${route.routeKey}.lead`, { tenantName });

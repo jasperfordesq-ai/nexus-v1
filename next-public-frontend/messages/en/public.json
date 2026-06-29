@@ -76,6 +76,9 @@
       "title": "Page",
       "missing": "This public page is not available in the shadow frontend yet."
     },
+    "publicCollection": {
+      "empty": "No public items are available yet."
+    },
     "listings": {
       "title": "Listings",
       "lead": "Browse public offers and requests from {{tenantName}}.",

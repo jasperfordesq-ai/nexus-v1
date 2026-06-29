@@ -79,4 +79,82 @@ describe('PublicPage', () => {
     expect(html).toContain('href="/hour-timebank/listings"');
     expect(html).toContain('AGPL-3.0-or-later');
   });
+
+  it('renders public API collection content as crawler-readable links', () => {
+    const tenant: TenantBootstrap = {
+      default_language: 'en',
+      id: 2,
+      name: 'Hour Timebank',
+      slug: 'hour-timebank',
+    };
+    const route: RouteOwnership = {
+      labelKey: 'pages.events.title',
+      owner: 'next-public',
+      pattern: '/events',
+      routeKey: 'events',
+    };
+
+    const html = renderToStaticMarkup(
+      <PublicPage
+        canonicalUrl="https://app.project-nexus.ie/hour-timebank/events"
+        content={{
+          items: [
+            {
+              description: 'Bring something small to repair with neighbours.',
+              id: '42',
+              title: 'Repair cafe',
+            },
+          ],
+          kind: 'public-collection',
+        }}
+        route={route}
+        routeSegments={['events']}
+        tenant={tenant}
+        tenantBasePath="/hour-timebank"
+        t={createTranslator('en')}
+      />,
+    );
+
+    expect(html).toContain('Repair cafe');
+    expect(html).toContain('Bring something small to repair with neighbours.');
+    expect(html).toContain('href="/hour-timebank/events/42"');
+  });
+
+  it('renders public API detail content as crawler-readable HTML', () => {
+    const tenant: TenantBootstrap = {
+      default_language: 'en',
+      id: 2,
+      name: 'Hour Timebank',
+      slug: 'hour-timebank',
+    };
+    const route: RouteOwnership = {
+      labelKey: 'pages.eventDetail.title',
+      owner: 'next-public',
+      params: { id: '42' },
+      pattern: '/events/:id',
+      routeKey: 'eventDetail',
+    };
+
+    const html = renderToStaticMarkup(
+      <PublicPage
+        canonicalUrl="https://app.project-nexus.ie/hour-timebank/events/42"
+        content={{
+          item: {
+            description: 'Bring something small to repair with neighbours.',
+            id: '42',
+            title: 'Repair cafe',
+          },
+          kind: 'public-detail',
+        }}
+        route={route}
+        routeSegments={['events', '42']}
+        tenant={tenant}
+        tenantBasePath="/hour-timebank"
+        t={createTranslator('en')}
+      />,
+    );
+
+    expect(html).toContain('Repair cafe');
+    expect(html).toContain('Bring something small to repair with neighbours.');
+  });
 });

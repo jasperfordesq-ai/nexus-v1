@@ -15,6 +15,8 @@ import {
   fetchBlogPost,
   fetchBlogPosts,
   fetchCmsPage,
+  fetchPublicCollection,
+  fetchPublicDetail,
   fetchTenantBootstrap,
   type PublicRouteContent,
   type TenantBootstrapResult,
@@ -148,6 +150,22 @@ async function fetchRouteContent(
     };
   }
 
+  if (route.params?.id) {
+    return {
+      item: await fetchPublicDetail(route.routeKey, route.params.id, request, tenant),
+      kind: 'public-detail',
+    };
+  }
+
+  const items = await fetchPublicCollection(route.routeKey, request, tenant);
+
+  if (items.length > 0) {
+    return {
+      items,
+      kind: 'public-collection',
+    };
+  }
+
   return null;
 }
 
@@ -162,6 +180,10 @@ function getMetadataLabel(
 
   if (content?.kind === 'cms-page' && content.page?.title) {
     return content.page.title;
+  }
+
+  if (content?.kind === 'public-detail' && content.item?.title) {
+    return content.item.title;
   }
 
   return t(route.labelKey ?? 'pages.home.title');
@@ -179,6 +201,10 @@ function getMetadataDescription(
 
   if (content?.kind === 'cms-page' && content.page?.meta_description) {
     return content.page.meta_description;
+  }
+
+  if (content?.kind === 'public-detail' && content.item?.description) {
+    return content.item.description;
   }
 
   if (tenant?.seo?.description) {
