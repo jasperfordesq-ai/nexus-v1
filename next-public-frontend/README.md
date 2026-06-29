@@ -102,6 +102,23 @@ private Vite route collides with the template, and whether unsupported rewrite
 rules need manual review. This is read-only reporting and does not include the
 template in Apache.
 
+## Remaining Blockers
+
+The shadow manifests currently classify 76 intended public routes. Of those,
+69 are backed by public Laravel API content sources. The remaining routes are
+blocked deliberately and must not be promoted by adding ad hoc public APIs:
+
+- `platformTerms`, `platformPrivacy`, `platformDisclaimer`: require an
+  authoritative platform legal content source and manual no-JavaScript shadow
+  review before they can be considered API-backed.
+- `marketplaceCollections`, `coupons`, `couponDetail`, `ideationIdeaDetail`:
+  would expand currently auth-only content surfaces and require an explicit
+  public visibility decision plus privacy review before any public API is
+  added.
+
+These blockers keep cutover eligibility false and activation unavailable. They
+do not affect production routing or the current prerender serving path.
+
 ## Before Any Future Cutover
 
 Do not enable public traffic until all of the following are true:
