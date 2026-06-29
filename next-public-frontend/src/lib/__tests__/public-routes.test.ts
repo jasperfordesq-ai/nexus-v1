@@ -69,6 +69,22 @@ describe('public route ownership', () => {
       { segments: ['marketplace', 'collections'], routeKey: 'marketplaceCollections' },
       { segments: ['marketplace', 'free'], routeKey: 'marketplaceFree' },
       { segments: ['marketplace', 'bike-repair'], routeKey: 'marketplaceDetail', params: { id: 'bike-repair' } },
+      { segments: ['developers'], routeKey: 'developers' },
+      { segments: ['developers', 'auth'], routeKey: 'developersAuth' },
+      { segments: ['developers', 'endpoints'], routeKey: 'developersEndpoints' },
+      { segments: ['developers', 'webhooks'], routeKey: 'developersWebhooks' },
+      { segments: ['regional-analytics'], routeKey: 'regionalAnalytics' },
+      { segments: ['explore'], routeKey: 'explore' },
+      { segments: ['partner'], routeKey: 'hourPartner' },
+      { segments: ['social-prescribing'], routeKey: 'hourSocialPrescribing' },
+      { segments: ['impact-summary'], routeKey: 'hourImpactSummary' },
+      { segments: ['impact-report'], routeKey: 'hourImpactReport' },
+      { segments: ['strategic-plan'], routeKey: 'hourStrategicPlan' },
+      { segments: ['municipality-calendar'], routeKey: 'municipalityCalendar' },
+      { segments: ['volunteering'], routeKey: 'volunteering' },
+      { segments: ['volunteering', 'opportunities', '123'], routeKey: 'volunteeringOpportunityDetail', params: { id: '123' } },
+      { segments: ['ideation'], routeKey: 'ideation' },
+      { segments: ['ideation', '42'], routeKey: 'ideationDetail', params: { id: '42' } },
     ];
 
     for (const route of publicRoutes) {
@@ -135,5 +151,14 @@ describe('public route ownership', () => {
     expect(getRouteOwnership(['caring-community', 'my-data-export'])).toMatchObject({ owner: 'vite-private' });
     expect(getRouteOwnership(['caring-community', 'safeguarding', 'my-reports'])).toMatchObject({ owner: 'vite-private' });
     expect(getRouteOwnership(['federation', 'onboarding'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['advertise', 'campaigns'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['advertise', 'push-campaigns'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['pilot-inquiry'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['pilot-apply'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['pilot-apply', 'status', 'abc123'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['partner-analytics', 'dashboard'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['newsletter', 'unsubscribe'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['volunteering', 'guardian-consent', 'verify', 'abc123'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['join', 'invite-code'])).toMatchObject({ owner: 'vite-private' });
   });
 });

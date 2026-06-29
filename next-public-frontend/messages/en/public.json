@@ -249,6 +249,86 @@
       "lead": "View public marketplace item information from {{tenantName}}.",
       "body": "This shadow page is prepared for public marketplace item details. Offers, checkout, and editing remain in the secure Vite app."
     },
+    "developers": {
+      "title": "Developers",
+      "lead": "Read public Partner API documentation for Project NEXUS integrations.",
+      "body": "This shadow page is prepared for public developer documentation. API keys, partner dashboards, and account-specific integration tools remain in the secure Vite app."
+    },
+    "developersAuth": {
+      "title": "Developer Authentication",
+      "lead": "Review public authentication guidance for Partner API integrations.",
+      "body": "This shadow page is prepared for public authentication documentation. Credential creation and rotation remain in the secure Vite app."
+    },
+    "developersEndpoints": {
+      "title": "Developer Endpoints",
+      "lead": "Explore public endpoint guidance for Project NEXUS integrations.",
+      "body": "This shadow page is prepared for public endpoint documentation. Tenant data remains available only through Laravel public APIs."
+    },
+    "developersWebhooks": {
+      "title": "Developer Webhooks",
+      "lead": "Review public webhook guidance for Project NEXUS integrations.",
+      "body": "This shadow page is prepared for public webhook documentation. Webhook registration and secret management remain in the secure Vite app."
+    },
+    "regionalAnalytics": {
+      "title": "Regional Analytics",
+      "lead": "Learn about regional analytics for community timebank networks.",
+      "body": "This shadow page is prepared for public regional analytics information. Partner analytics dashboards remain Vite-owned and token-protected."
+    },
+    "explore": {
+      "title": "Explore",
+      "lead": "Discover public community activity from {{tenantName}}.",
+      "body": "This shadow page is prepared for public discovery. Personalised feeds and member actions remain in the secure Vite app."
+    },
+    "hourPartner": {
+      "title": "Partner",
+      "lead": "Learn about hOUR Timebank partnership opportunities.",
+      "body": "This shadow page is prepared for hOUR Timebank public partnership information. Tenant-specific editing remains in the secure Vite app."
+    },
+    "hourSocialPrescribing": {
+      "title": "Social Prescribing",
+      "lead": "Learn how hOUR Timebank supports social prescribing pathways.",
+      "body": "This shadow page is prepared for hOUR Timebank social prescribing information. Referrals and case workflows remain in the secure Vite app."
+    },
+    "hourImpactSummary": {
+      "title": "Impact Summary",
+      "lead": "Review public impact highlights for hOUR Timebank.",
+      "body": "This shadow page is prepared for hOUR Timebank impact summaries. Detailed reporting workflows remain in the secure Vite app."
+    },
+    "hourImpactReport": {
+      "title": "Impact Report",
+      "lead": "Review public impact reporting for hOUR Timebank.",
+      "body": "This shadow page is prepared for hOUR Timebank impact reporting. Report publishing workflows remain in the secure Vite app."
+    },
+    "hourStrategicPlan": {
+      "title": "Strategic Plan",
+      "lead": "Review public strategic planning information for hOUR Timebank.",
+      "body": "This shadow page is prepared for hOUR Timebank strategic plan content. Plan editing remains in the secure Vite app."
+    },
+    "municipalityCalendar": {
+      "title": "Municipality Calendar",
+      "lead": "Explore public municipality calendar information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public municipality calendar discovery. Calendar administration remains in the secure Vite app."
+    },
+    "volunteering": {
+      "title": "Volunteering",
+      "lead": "Browse public volunteering opportunities from {{tenantName}}.",
+      "body": "This shadow page is prepared for public volunteering discovery. Applications and organisation tools remain in the secure Vite app."
+    },
+    "volunteeringOpportunityDetail": {
+      "title": "Volunteering Opportunity",
+      "lead": "View public volunteering opportunity information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public volunteering opportunity details. Applications and shift tools remain in the secure Vite app."
+    },
+    "ideation": {
+      "title": "Ideation",
+      "lead": "Browse public ideation challenges from {{tenantName}}.",
+      "body": "This shadow page is prepared for public ideation challenge discovery. Submissions and moderation remain in the secure Vite app."
+    },
+    "ideationDetail": {
+      "title": "Ideation Challenge",
+      "lead": "View public ideation challenge information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public ideation challenge details. Submissions, votes, comments, and moderation remain in the secure Vite app."
+    },
     "notFound": {
       "title": "Page not found",
       "lead": "This route is not owned by the shadow public frontend."

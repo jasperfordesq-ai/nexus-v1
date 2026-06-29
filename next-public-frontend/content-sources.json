@@ -17,6 +17,10 @@
     { "routeKey": "kb", "endpoint": "/v2/kb", "method": "GET" },
     { "routeKey": "kbDetail", "endpoint": "/v2/kb/{id}", "method": "GET" },
     { "routeKey": "marketplace", "endpoint": "/v2/marketplace/listings", "method": "GET" },
-    { "routeKey": "marketplaceDetail", "endpoint": "/v2/marketplace/listings/{id}", "method": "GET" }
+    { "routeKey": "marketplaceDetail", "endpoint": "/v2/marketplace/listings/{id}", "method": "GET" },
+    { "routeKey": "volunteering", "endpoint": "/v2/volunteering/opportunities", "method": "GET" },
+    { "routeKey": "volunteeringOpportunityDetail", "endpoint": "/v2/volunteering/opportunities/{id}", "method": "GET" },
+    { "routeKey": "ideation", "endpoint": "/v2/ideation-challenges", "method": "GET" },
+    { "routeKey": "ideationDetail", "endpoint": "/v2/ideation-challenges/{id}", "method": "GET" }
   ]
 }

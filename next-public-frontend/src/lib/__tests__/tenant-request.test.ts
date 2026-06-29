@@ -96,6 +96,17 @@ describe('tenant request resolution', () => {
       'verify-identity',
       'verify-identity-optional',
       'volunteering',
+      'advertise',
+      'developers',
+      'explore',
+      'ideation',
+      'join',
+      'municipality-calendar',
+      'newsletter',
+      'partner-analytics',
+      'pilot-apply',
+      'pilot-inquiry',
+      'regional-analytics',
     ]) {
       expect(
         resolveTenantRequest([prefix], {

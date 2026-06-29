@@ -54,10 +54,10 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.shadow_runtime.compose_profile', 'next-public-shadow');
         $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
-        $response->assertJsonPath('data.manifest.route_counts.public_routes', 45);
-        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 16);
+        $response->assertJsonPath('data.manifest.route_counts.public_routes', 61);
+        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 20);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 25);
-        $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 62);
+        $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 71);
         $response->assertJsonPath('data.manifest.validation.status', 'pass');
         $response->assertJsonPath('data.manifest.validation.issues', []);
         $response->assertJsonPath('data.content_sources.source_of_truth', 'laravel_public_api');
@@ -86,12 +86,18 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('/marketplace/:id', $publicPatterns);
         $this->assertContains('/marketplace/search', $publicPatterns);
         $this->assertContains('/marketplace/map', $publicPatterns);
+        $this->assertContains('/developers', $publicPatterns);
+        $this->assertContains('/regional-analytics', $publicPatterns);
+        $this->assertContains('/volunteering/opportunities/:id', $publicPatterns);
+        $this->assertContains('/ideation/:id', $publicPatterns);
         $this->assertContains('blog-index', $apiBackedRouteKeys);
         $this->assertContains('cms-page', $apiBackedRouteKeys);
         $this->assertContains('listings', $apiBackedRouteKeys);
         $this->assertContains('listingDetail', $apiBackedRouteKeys);
         $this->assertContains('resources', $apiBackedRouteKeys);
         $this->assertContains('marketplaceDetail', $apiBackedRouteKeys);
+        $this->assertContains('volunteeringOpportunityDetail', $apiBackedRouteKeys);
+        $this->assertContains('ideationDetail', $apiBackedRouteKeys);
         $this->assertContains('dashboard', $payload['manifest']['vite_private_prefixes']);
         $this->assertContains('auth', $payload['manifest']['vite_private_prefixes']);
         $this->assertContains('login', $payload['manifest']['vite_private_prefixes']);
@@ -110,6 +116,9 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('/group-exchanges/create', $payload['manifest']['vite_private_patterns']);
         $this->assertContains('/volunteering/org/:orgId/dashboard', $payload['manifest']['vite_private_patterns']);
         $this->assertContains('/caring-community/my-relationships', $payload['manifest']['vite_private_patterns']);
+        $this->assertContains('/pilot-apply/status/:token', $payload['manifest']['vite_private_patterns']);
+        $this->assertContains('/newsletter/unsubscribe', $payload['manifest']['vite_private_patterns']);
+        $this->assertContains('/join/:code', $payload['manifest']['vite_private_patterns']);
         $this->assertContains('route_cutover_disabled', array_column($payload['safety_checks'], 'key'));
         $this->assertContains('npm --prefix next-public-frontend run check', $payload['shadow_runtime']['verification_commands']);
         $this->assertContains('npm --prefix react-frontend run build', $payload['shadow_runtime']['verification_commands']);
@@ -119,6 +128,8 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         );
         $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['about']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['listingDetail']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['volunteeringOpportunityDetail']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['ideationDetail']['content_source']);
         $this->assertSame('blocker', $routeReadinessByKey['listingDetail']['status']);
         $this->assertContains('parity_test_required', $routeReadinessByKey['listingDetail']['blockers']);
     }
