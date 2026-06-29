@@ -3257,6 +3257,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin: tier CRUD + subscriber view
     Route::get('/v2/admin/member-premium/tiers', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'listTiers']);
     Route::post('/v2/admin/member-premium/tiers', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'createTier']);
+    Route::get('/v2/admin/member-premium/settings', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'settings']);
+    Route::put('/v2/admin/member-premium/settings', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'updateSettings']);
+    Route::post('/v2/admin/member-premium/connect/onboarding', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'createConnectOnboarding']);
     Route::get('/v2/admin/member-premium/tiers/{id}', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'showTier'])->whereNumber('id');
     Route::put('/v2/admin/member-premium/tiers/{id}', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'updateTier'])->whereNumber('id');
     Route::delete('/v2/admin/member-premium/tiers/{id}', [\App\Http\Controllers\Api\Admin\MemberPremiumAdminController::class, 'deleteTier'])->whereNumber('id');

@@ -10,15 +10,93 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Core\TenantContext;
 use App\Http\Controllers\Api\BaseApiController;
+use App\Services\DonationStripeAccountService;
 use App\Services\MemberPremiumService;
+use App\Services\TenantSettingsService;
 use Illuminate\Http\JsonResponse;
 
 /**
- * AG58 — Admin CRUD for member premium tiers + subscriber view.
+ * AG58 — Admin CRUD for donation support levels + supporter view.
  */
 class MemberPremiumAdminController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    /**
+     * GET /api/v2/admin/member-premium/settings
+     */
+    public function settings(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        return $this->respondWithData([
+            'settings' => DonationStripeAccountService::settingsPayloadForTenant($tenantId),
+        ]);
+    }
+
+    /**
+     * PUT /api/v2/admin/member-premium/settings
+     */
+    public function updateSettings(TenantSettingsService $settings): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+        $accountId = trim((string) ($this->input('stripe_connect_account_id') ?? ''));
+
+        if ($accountId !== '' && preg_match('/^acct_[A-Za-z0-9_]+$/', $accountId) !== 1) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                'Stripe Connect account ID must be empty or start with acct_.',
+                'stripe_connect_account_id',
+                422,
+            );
+        }
+
+        $settings->set(
+            $tenantId,
+            DonationStripeAccountService::SETTING_CONNECT_ACCOUNT_ID,
+            DonationStripeAccountService::normalizeAccountId($accountId) ?? '',
+            'string',
+        );
+
+        return $this->respondWithData([
+            'settings' => DonationStripeAccountService::settingsPayloadForTenant($tenantId),
+        ]);
+    }
+
+    /**
+     * POST /api/v2/admin/member-premium/connect/onboarding
+     */
+    public function createConnectOnboarding(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $returnUrl = MemberPremiumService::safeReturnUrl(
+            (string) ($this->input('return_url') ?? ''),
+            '/admin/member-premium?stripe_connect=return',
+        );
+        $refreshUrl = MemberPremiumService::safeReturnUrl(
+            (string) ($this->input('refresh_url') ?? ''),
+            '/admin/member-premium?stripe_connect=refresh',
+        );
+
+        try {
+            $result = DonationStripeAccountService::createOrResumeOnboarding($tenantId, $returnUrl, $refreshUrl);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('STRIPE_CONNECT_ONBOARDING_FAILED', $e->getMessage(), null, 500);
+        }
+
+        return $this->respondWithData([
+            'settings' => [
+                'stripe_connect_account_id' => $result['stripe_connect_account_id'],
+                'payment_route' => $result['payment_route'],
+                'account_status' => $result['account_status'],
+            ],
+            'onboarding_url' => $result['onboarding_url'],
+        ]);
+    }
 
     /**
      * GET /api/v2/admin/member-premium/tiers

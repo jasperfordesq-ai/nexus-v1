@@ -226,4 +226,23 @@ class StripeDonationServiceTest extends TestCase
         $this->assertStringContainsString("['tenant_id' => (int) \$donation->tenant_id]", $source);
         $this->assertStringContainsString("->where('tenant_id', \$donation->tenant_id)", $source);
     }
+
+    public function test_paymentIntent_creation_supports_tenant_connect_account_options(): void
+    {
+        $source = file_get_contents(app_path('Services/StripeDonationService.php'));
+
+        $this->assertStringContainsString('DonationStripeAccountService::accountIdForTenant($tenantId)', $source);
+        $this->assertStringContainsString("'stripe_account' => \$tenantStripeAccountId", $source);
+        $this->assertStringContainsString("'nexus_payment_route' => \$paymentRoute", $source);
+    }
+
+    public function test_donation_rows_store_original_stripe_route_for_reporting_and_refunds(): void
+    {
+        $source = file_get_contents(app_path('Services/StripeDonationService.php'));
+
+        $this->assertStringContainsString("'payment_route' => \$paymentRoute", $source);
+        $this->assertStringContainsString("'stripe_account_id' => \$tenantStripeAccountId", $source);
+        $this->assertStringContainsString('DonationStripeAccountService::normalizeAccountId($donation->stripe_account_id ?? null)', $source);
+        $this->assertStringContainsString('DonationStripeAccountService::stripeOptionsForAccountId($stripeAccountId)', $source);
+    }
 }

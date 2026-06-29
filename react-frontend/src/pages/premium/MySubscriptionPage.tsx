@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, Button, Chip, Spinner, useConfirm } from '@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Separator } from '@/components/ui';
-import Crown from 'lucide-react/icons/crown';
+import HandHeart from 'lucide-react/icons/hand-heart';
 import ExternalLink from 'lucide-react/icons/external-link';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
@@ -144,7 +144,7 @@ export function MySubscriptionPage() {
         <PageMeta title={t('premium.manage_title')} noIndex />
         <Card className="border border-border">
           <CardBody className="text-center py-10 flex flex-col items-center gap-4">
-            <Crown size={48} className="text-yellow-500" aria-hidden="true" />
+            <HandHeart size={48} className="text-[var(--color-success)]" aria-hidden="true" />
             <h1 className="text-xl font-semibold">
               {t('premium.no_subscription_title')}
             </h1>
@@ -165,7 +165,7 @@ export function MySubscriptionPage() {
       <PageMeta title={t('premium.manage_title')} noIndex />
       <Card className="border border-border">
         <CardHeader className="flex items-center gap-3">
-          <Crown className="text-yellow-500" size={24} aria-hidden="true" />
+          <HandHeart className="text-[var(--color-success)]" size={24} aria-hidden="true" />
           <div>
             <h1 className="text-2xl font-semibold">{sub.tier_name}</h1>
             <p className="text-sm text-[var(--color-text-secondary)]">

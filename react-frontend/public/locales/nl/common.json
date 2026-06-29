@@ -1662,7 +1662,8 @@
       "advanced_search": "Geavanceerd zoeken",
       "ad_free": "Reclamevrije ervaring"
     },
-    "return_meta_description": "Veilige terugkeerpagina na afrekenen om uw premium-abonnement te activeren, te bevestigen of te beheren."
+    "return_meta_description": "Veilige terugkeerpagina na afrekenen om uw premium-abonnement te activeren, te bevestigen of te beheren.",
+    "one_off_cta": "Make a one-off donation"
   },
   "developers": {
     "page_title": "Ontwikkelaars",

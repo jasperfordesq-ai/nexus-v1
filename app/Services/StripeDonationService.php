@@ -63,11 +63,15 @@ class StripeDonationService
         }
 
         $client = StripeService::client();
+        $tenantStripeAccountId = DonationStripeAccountService::accountIdForTenant($tenantId);
+        $paymentRoute = DonationStripeAccountService::routeForAccountId($tenantStripeAccountId);
 
-        // Get or create Stripe Customer
-        $stripeCustomerId = $user->stripe_customer_id;
+        // Platform fallback can reuse the platform customer. Direct Connect
+        // donations create the PaymentIntent in the tenant account, where the
+        // platform customer ID would be invalid unless separately mapped.
+        $stripeCustomerId = $tenantStripeAccountId ? null : $user->stripe_customer_id;
 
-        if (empty($stripeCustomerId)) {
+        if (! $tenantStripeAccountId && empty($stripeCustomerId)) {
             try {
                 $customer = $client->customers->create([
                     'email' => $user->email,
@@ -93,25 +97,42 @@ class StripeDonationService
             }
         }
 
-        $tenantName = (string) (DB::table('tenants')->where('id', $tenantId)->value('name') ?? 'Community');
+        $tenant = DB::table('tenants')
+            ->where('id', $tenantId)
+            ->first(['name', 'slug']);
+        $tenantName = (string) (($tenant->name ?? null) ?: 'Community');
+        $tenantSlug = (string) (($tenant->slug ?? null) ?: '');
 
         // Create PaymentIntent
         try {
-            $paymentIntent = $client->paymentIntents->create([
+            $paymentIntentParams = [
                 'amount' => (int) round($amount * 100),
                 'currency' => $currency,
-                'customer' => $stripeCustomerId,
                 'description' => "Donation to {$tenantName}",
                 'metadata' => [
-                    'nexus_tenant_id' => $tenantId,
-                    'nexus_user_id' => $userId,
+                    'nexus_tenant_id' => (string) $tenantId,
+                    'nexus_tenant_name' => $tenantName,
+                    'nexus_tenant_slug' => $tenantSlug,
+                    'nexus_user_id' => (string) $userId,
                     'nexus_donation_type' => 'monetary',
+                    'nexus_payment_route' => $paymentRoute,
+                    'nexus_stripe_account_id' => $tenantStripeAccountId ?: 'platform_default',
                 ],
-            ]);
+            ];
+
+            if ($stripeCustomerId) {
+                $paymentIntentParams['customer'] = $stripeCustomerId;
+            }
+
+            $stripeOptions = $tenantStripeAccountId ? ['stripe_account' => $tenantStripeAccountId] : [];
+            $paymentIntent = $stripeOptions
+                ? $client->paymentIntents->create($paymentIntentParams, $stripeOptions)
+                : $client->paymentIntents->create($paymentIntentParams);
         } catch (\Exception $e) {
             Log::error('Stripe: failed to create PaymentIntent', [
                 'user_id' => $userId,
                 'tenant_id' => $tenantId,
+                'stripe_account_id' => $tenantStripeAccountId,
                 'amount' => $amount,
                 'currency' => $currency,
                 'error' => $e->getMessage(),
@@ -121,7 +142,7 @@ class StripeDonationService
 
         // Create pending donation record in a transaction
         $donation = DB::transaction(function () use (
-            $tenantId, $userId, $data, $amount, $currency, $paymentIntent, $user
+            $tenantId, $userId, $data, $amount, $currency, $paymentIntent, $user, $tenantStripeAccountId, $paymentRoute
         ) {
             return VolDonation::create([
                 'tenant_id' => $tenantId,
@@ -133,12 +154,14 @@ class StripeDonationService
                 'currency' => strtoupper($currency),
                 'payment_method' => 'stripe',
                 'payment_reference' => '',
+                'payment_route' => $paymentRoute,
                 'donor_name' => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
                 'donor_email' => $user->email ?? '',
                 'message' => trim($data['message'] ?? ''),
                 'is_anonymous' => !empty($data['is_anonymous']) ? 1 : 0,
                 'status' => 'pending',
                 'stripe_payment_intent_id' => $paymentIntent->id,
+                'stripe_account_id' => $tenantStripeAccountId,
                 'created_at' => now(),
             ]);
         });
@@ -148,6 +171,8 @@ class StripeDonationService
             'payment_intent_id' => $paymentIntent->id,
             'user_id' => $userId,
             'tenant_id' => $tenantId,
+            'payment_route' => $paymentRoute,
+            'stripe_account_id' => $tenantStripeAccountId,
             'amount' => $amount,
             'currency' => $currency,
         ]);
@@ -491,15 +516,21 @@ class StripeDonationService
         }
 
         $client = StripeService::client();
+        $stripeAccountId = DonationStripeAccountService::normalizeAccountId($donation->stripe_account_id ?? null);
 
         try {
-            $refund = $client->refunds->create([
+            $refundParams = [
                 'payment_intent' => $donation->stripe_payment_intent_id,
-            ]);
+            ];
+            $stripeOptions = DonationStripeAccountService::stripeOptionsForAccountId($stripeAccountId);
+            $refund = $stripeOptions
+                ? $client->refunds->create($refundParams, $stripeOptions)
+                : $client->refunds->create($refundParams);
         } catch (\Exception $e) {
             Log::error('Stripe: failed to create refund', [
                 'donation_id' => $donationId,
                 'payment_intent_id' => $donation->stripe_payment_intent_id,
+                'stripe_account_id' => $stripeAccountId,
                 'error' => $e->getMessage(),
             ]);
             throw new \RuntimeException('Failed to process refund: ' . $e->getMessage());
@@ -522,6 +553,8 @@ class StripeDonationService
         Log::info('Stripe donation: admin refund processed', [
             'donation_id' => $donationId,
             'refund_id' => $refund->id,
+            'payment_route' => DonationStripeAccountService::routeForAccountId($stripeAccountId),
+            'stripe_account_id' => $stripeAccountId,
             'amount' => $donation->amount,
         ]);
 

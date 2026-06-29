@@ -1662,7 +1662,8 @@
       "advanced_search": "Ricerca avanzata",
       "ad_free": "Esperienza senza pubblicità"
     },
-    "return_meta_description": "Pagina di ritorno sicura dal checkout per attivare, confermare o gestire il tuo abbonamento premium."
+    "return_meta_description": "Pagina di ritorno sicura dal checkout per attivare, confermare o gestire il tuo abbonamento premium.",
+    "one_off_cta": "Make a one-off donation"
   },
   "developers": {
     "page_title": "Sviluppatori",

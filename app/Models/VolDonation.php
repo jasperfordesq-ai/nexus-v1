@@ -29,6 +29,7 @@ class VolDonation extends Model
         'currency',
         'payment_method',
         'payment_reference',
+        'payment_route',
         'donor_name',
         'donor_email',
         'message',
@@ -36,6 +37,7 @@ class VolDonation extends Model
         'status',
         'created_at',
         'stripe_payment_intent_id',
+        'stripe_account_id',
         'receipt_email_sent_at',
         'receipt_email_failed_at',
     ];

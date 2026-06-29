@@ -1662,7 +1662,8 @@
       "advanced_search": "Cuardach ardleibhéil",
       "ad_free": "Eispéireas saor ó fhógraí"
     },
-    "return_meta_description": "Leathanach fillte slán tar éis na híocaíochta chun do shíntiús préimhe a chur i ngníomh, a dheimhniú nó a bhainistiú."
+    "return_meta_description": "Leathanach fillte slán tar éis na híocaíochta chun do shíntiús préimhe a chur i ngníomh, a dheimhniú nó a bhainistiú.",
+    "one_off_cta": "Make a one-off donation"
   },
   "developers": {
     "page_title": "Forbróirí",

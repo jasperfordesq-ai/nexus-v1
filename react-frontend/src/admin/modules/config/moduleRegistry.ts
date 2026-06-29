@@ -43,7 +43,7 @@ import Mail from 'lucide-react/icons/mail';
 import Languages from 'lucide-react/icons/languages';
 import GraduationCap from 'lucide-react/icons/graduation-cap';
 import Podcast from 'lucide-react/icons/podcast';
-import Crown from 'lucide-react/icons/crown';
+import HandHeart from 'lucide-react/icons/hand-heart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -724,11 +724,12 @@ const FEATURE_MODULES: ModuleDefinition[] = [
   },
   {
     id: 'member_premium',
-    name: 'Premium',
-    description: 'Premium member benefits and paid community upgrades.',
-    icon: Crown,
+    name: 'Donations & Support',
+    description: 'One-off and recurring donations with recognition, not paid features.',
+    icon: HandHeart,
     type: 'feature',
     configSource: 'tenant_features',
+    detailPageUrl: '/admin/member-premium',
     configOptions: [],
   },
 ];

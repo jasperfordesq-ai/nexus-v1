@@ -1662,7 +1662,8 @@
       "advanced_search": "Pesquisa avançada",
       "ad_free": "Experiência sem anúncios"
     },
-    "return_meta_description": "Página de retorno segura do checkout para ativar, confirmar ou gerir a sua subscrição premium."
+    "return_meta_description": "Página de retorno segura do checkout para ativar, confirmar ou gerir a sua subscrição premium.",
+    "one_off_cta": "Make a one-off donation"
   },
   "developers": {
     "page_title": "Programadores",

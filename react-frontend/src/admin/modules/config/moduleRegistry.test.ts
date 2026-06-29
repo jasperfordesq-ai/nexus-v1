@@ -41,11 +41,21 @@ describe('module registry podcast module', () => {
     expect(options.get('podcasts.enable_chapters')?.defaultValue).toBe(true);
   });
 
-  it('places podcasts after courses and before premium community upsells', () => {
+  it('places podcasts after courses and before donations support', () => {
     const ids = getFeatureModules().map(module => module.id);
 
     expect(ids.indexOf('courses')).toBeLessThan(ids.indexOf('podcasts'));
     expect(ids.indexOf('podcasts')).toBeLessThan(ids.indexOf('member_premium'));
+  });
+
+  it('links the donations support module to its admin detail page', () => {
+    const support = getFeatureModules().find(module => module.id === 'member_premium');
+
+    expect(support).toBeDefined();
+    expect(support?.name).toBe('Donations & Support');
+    expect(support?.description).toBe('One-off and recurring donations with recognition, not paid features.');
+    expect(support?.detailPageUrl).toBe('/admin/member-premium');
+    expect(support?.configOptions).toEqual([]);
   });
 
   it('has admin translations for every podcast configuration control', () => {

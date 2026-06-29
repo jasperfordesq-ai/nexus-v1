@@ -55,6 +55,7 @@ class VolunteerDonationService
             ->select([
                 'id', 'user_id', 'opportunity_id', 'giving_day_id',
                 'amount', 'currency', 'payment_method', 'payment_reference',
+                'payment_route', 'stripe_account_id', 'stripe_payment_intent_id',
                 'message', 'is_anonymous', 'status', 'created_at',
             ]);
 

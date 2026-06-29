@@ -12,16 +12,19 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-import Crown from 'lucide-react/icons/crown';
+import HandHeart from 'lucide-react/icons/hand-heart';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Trash from 'lucide-react/icons/trash';
 import Pencil from 'lucide-react/icons/pencil';
 import Users from 'lucide-react/icons/users';
+import Save from 'lucide-react/icons/save';
+import ExternalLink from 'lucide-react/icons/external-link';
 import { useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import {
   memberPremiumAdminApi,
+  type DonationSupportAccountStatus,
   type MemberPremiumTier,
   type TierUpsertPayload,
 } from '../../api/memberPremiumApi';
@@ -73,6 +76,12 @@ export function MemberPremiumAdminPage() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [settingsSaving, setSettingsSaving] = useState(false);
+  const [onboarding, setOnboarding] = useState(false);
+  const [stripeConnectAccountId, setStripeConnectAccountId] = useState('');
+  const [paymentRoute, setPaymentRoute] = useState<'platform_default' | 'tenant_connect'>('platform_default');
+  const [accountStatus, setAccountStatus] = useState<DonationSupportAccountStatus | null>(null);
   const [syncing, setSyncing] = useState<number | null>(null);
   const [deleting, setDeleting] = useState<number | null>(null);
 
@@ -88,9 +97,25 @@ export function MemberPremiumAdminPage() {
     }
   }, [t, toast]);
 
+  const loadSettings = useCallback(async () => {
+    setSettingsLoading(true);
+    try {
+      const res = await memberPremiumAdminApi.getSettings();
+      const settings = res.data?.settings;
+      setStripeConnectAccountId(settings?.stripe_connect_account_id ?? '');
+      setPaymentRoute(settings?.payment_route ?? 'platform_default');
+      setAccountStatus(settings?.account_status ?? null);
+    } catch {
+      toast.error(t('member_premium_admin.toasts.settings_load_failed'));
+    } finally {
+      setSettingsLoading(false);
+    }
+  }, [t, toast]);
+
   useEffect(() => {
     load();
-  }, [load]);
+    loadSettings();
+  }, [load, loadSettings]);
 
   const openCreate = () => {
     setForm(EMPTY_FORM);
@@ -166,6 +191,50 @@ export function MemberPremiumAdminPage() {
     }
   };
 
+  const saveSettings = async () => {
+    setSettingsSaving(true);
+    try {
+      const res = await memberPremiumAdminApi.updateSettings({
+        stripe_connect_account_id: stripeConnectAccountId.trim(),
+      });
+      const settings = res.data?.settings;
+      setStripeConnectAccountId(settings?.stripe_connect_account_id ?? '');
+      setPaymentRoute(settings?.payment_route ?? 'platform_default');
+      setAccountStatus(settings?.account_status ?? null);
+      toast.success(t('member_premium_admin.toasts.settings_saved'));
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : t('member_premium_admin.toasts.settings_save_failed'));
+    } finally {
+      setSettingsSaving(false);
+    }
+  };
+
+  const startConnectOnboarding = async () => {
+    setOnboarding(true);
+    try {
+      const currentUrl = `${window.location.origin}${tenantPath('/admin/member-premium')}`;
+      const res = await memberPremiumAdminApi.createConnectOnboardingLink({
+        return_url: `${currentUrl}?stripe_connect=return`,
+        refresh_url: `${currentUrl}?stripe_connect=refresh`,
+      });
+      const settings = res.data?.settings;
+      setStripeConnectAccountId(settings?.stripe_connect_account_id ?? '');
+      setPaymentRoute(settings?.payment_route ?? 'platform_default');
+      setAccountStatus(settings?.account_status ?? null);
+
+      const onboardingUrl = res.data?.onboarding_url;
+      if (onboardingUrl) {
+        window.location.assign(onboardingUrl);
+      } else {
+        toast.error(t('member_premium_admin.toasts.onboarding_failed'));
+      }
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : t('member_premium_admin.toasts.onboarding_failed'));
+    } finally {
+      setOnboarding(false);
+    }
+  };
+
   const deleteTier = async (tier: MemberPremiumTier) => {
     const ok = await confirm({
       title: t('member_premium_admin.confirm_delete', { name: tier.name }),
@@ -190,7 +259,7 @@ export function MemberPremiumAdminPage() {
       <PageHeader
         title={t('member_premium_admin.meta.title')}
         description={t('member_premium_admin.meta.description')}
-        icon={<Crown size={24} />}
+        icon={<HandHeart size={24} />}
         actions={
           <div className="flex gap-2">
             <Button as={Link} to={tenantPath('/admin/member-premium/subscribers')} variant="tertiary" startContent={<Users size={16} />}>
@@ -202,6 +271,74 @@ export function MemberPremiumAdminPage() {
           </div>
         }
       />
+
+      <Card>
+        <CardBody className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-lg font-semibold text-foreground">
+                {t('member_premium_admin.settings.title')}
+              </h2>
+              <Chip size="sm" color={paymentRoute === 'tenant_connect' ? 'success' : 'warning'} variant="soft">
+                {paymentRoute === 'tenant_connect'
+                  ? t('member_premium_admin.settings.route_tenant_connect')
+                  : t('member_premium_admin.settings.route_platform_default')}
+              </Chip>
+              <Chip
+                size="sm"
+                color={accountStatus?.state === 'ready' ? 'success' : accountStatus?.state === 'restricted' ? 'danger' : 'warning'}
+                variant="soft"
+              >
+                {t(`member_premium_admin.settings.status.${accountStatus?.state ?? 'not_connected'}`)}
+              </Chip>
+            </div>
+            <p className="text-sm text-muted">
+              {t('member_premium_admin.settings.description')}
+            </p>
+            {accountStatus?.requirements_due?.length ? (
+              <p className="text-sm text-warning-600">
+                {t('member_premium_admin.settings.requirements_due', {
+                  count: accountStatus.requirements_due.length,
+                })}
+              </p>
+            ) : null}
+            {accountStatus?.error ? (
+              <p className="text-sm text-danger">
+                {accountStatus.error}
+              </p>
+            ) : null}
+            <Input
+              label={t('member_premium_admin.settings.stripe_connect_account_id')}
+              value={stripeConnectAccountId}
+              onValueChange={setStripeConnectAccountId}
+              placeholder={t('member_premium_admin.settings.stripe_connect_placeholder')}
+              description={t('member_premium_admin.settings.stripe_connect_description')}
+              isDisabled={settingsLoading}
+            />
+          </div>
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button
+              variant="secondary"
+              startContent={<ExternalLink size={16} />}
+              onPress={startConnectOnboarding}
+              isLoading={onboarding}
+              isDisabled={settingsLoading || settingsSaving}
+            >
+              {stripeConnectAccountId
+                ? t('member_premium_admin.settings.continue_onboarding')
+                : t('member_premium_admin.settings.start_onboarding')}
+            </Button>
+            <Button
+              startContent={<Save size={16} />}
+              onPress={saveSettings}
+              isLoading={settingsSaving}
+              isDisabled={settingsLoading || onboarding}
+            >
+              {t('member_premium_admin.settings.save')}
+            </Button>
+          </div>
+        </CardBody>
+      </Card>
 
       {loading ? (
         <div className="flex justify-center py-10" role="status" aria-busy="true" aria-label={t('common.loading')}>

@@ -52,9 +52,9 @@ vi.mock('@/hooks', () => ({
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
 const DONATIONS = [
-  { id: 1, user_id: 10, is_anonymous: false, amount: '25.00', currency: 'EUR', payment_method: 'stripe', status: 'completed', stripe_charge_id: 'ch_abc', refund_id: null, giving_day_id: null, created_at: '2025-01-01T00:00:00Z', updated_at: '2025-01-01T00:00:00Z' },
-  { id: 2, user_id: null, is_anonymous: true,  amount: '10.00', currency: 'EUR', payment_method: 'cash',   status: 'pending',   stripe_charge_id: null,     refund_id: null, giving_day_id: null, created_at: '2025-01-02T00:00:00Z', updated_at: '2025-01-02T00:00:00Z' },
-  { id: 3, user_id: 11, is_anonymous: false, amount: '5.00',  currency: 'EUR', payment_method: 'stripe', status: 'refunded',  stripe_charge_id: 'ch_xyz', refund_id: 're_xyz', giving_day_id: null, created_at: '2025-01-03T00:00:00Z', updated_at: '2025-01-03T00:00:00Z' },
+  { id: 1, user_id: 10, is_anonymous: false, amount: '25.00', currency: 'EUR', payment_method: 'stripe', payment_route: 'tenant_connect', stripe_account_id: 'acct_test_123456', status: 'completed', stripe_charge_id: 'ch_abc', refund_id: null, giving_day_id: null, created_at: '2025-01-01T00:00:00Z', updated_at: '2025-01-01T00:00:00Z' },
+  { id: 2, user_id: null, is_anonymous: true,  amount: '10.00', currency: 'EUR', payment_method: 'cash', payment_route: 'platform_default', stripe_account_id: null, status: 'pending',   stripe_charge_id: null,     refund_id: null, giving_day_id: null, created_at: '2025-01-02T00:00:00Z', updated_at: '2025-01-02T00:00:00Z' },
+  { id: 3, user_id: 11, is_anonymous: false, amount: '5.00',  currency: 'EUR', payment_method: 'stripe', payment_route: 'platform_default', stripe_account_id: null, status: 'refunded',  stripe_charge_id: 'ch_xyz', refund_id: 're_xyz', giving_day_id: null, created_at: '2025-01-03T00:00:00Z', updated_at: '2025-01-03T00:00:00Z' },
 ];
 
 // ─── Import component after mocks ─────────────────────────────────────────────
@@ -80,6 +80,15 @@ describe('DonationRefunds', () => {
   it('calls adminDonations.list on mount', async () => {
     render(<DonationRefunds />);
     await waitFor(() => expect(mockAdminDonations.list).toHaveBeenCalledTimes(1));
+  });
+
+  it('shows donation payment route and Stripe account reporting details', async () => {
+    render(<DonationRefunds />);
+    await waitFor(() => {
+      expect(screen.getByText(/tenant connect/i)).toBeInTheDocument();
+      expect(screen.getByText('acct_test_123456')).toBeInTheDocument();
+      expect(screen.getAllByText(/platform account/i).length).toBeGreaterThan(0);
+    });
   });
 
   it('shows error card when list call fails', async () => {

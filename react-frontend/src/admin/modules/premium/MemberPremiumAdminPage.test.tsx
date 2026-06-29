@@ -12,6 +12,9 @@ const { mockToast, mockConfirm, mockMemberPremiumApi } = vi.hoisted(() => ({
   mockToast: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
   mockConfirm: vi.fn(async () => true),
   mockMemberPremiumApi: {
+    getSettings: vi.fn(),
+    updateSettings: vi.fn(),
+    createConnectOnboardingLink: vi.fn(),
     listTiers: vi.fn(),
     createTier: vi.fn(),
     updateTier: vi.fn(),
@@ -72,6 +75,23 @@ const TIER_A = {
 describe('MemberPremiumAdminPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockMemberPremiumApi.getSettings.mockResolvedValue({
+      data: {
+        settings: {
+          stripe_connect_account_id: '',
+          payment_route: 'platform_default',
+          account_status: {
+            state: 'not_connected',
+            charges_enabled: false,
+            payouts_enabled: false,
+            details_submitted: false,
+            requirements_due: [],
+            disabled_reason: null,
+            error: null,
+          },
+        },
+      },
+    });
   });
 
   it('shows loading spinner while tiers are fetching', () => {
@@ -82,16 +102,54 @@ describe('MemberPremiumAdminPage', () => {
     expect(spinner).toBeDefined();
   });
 
+  it('presents the admin surface as donations and support', async () => {
+    mockMemberPremiumApi.listTiers.mockResolvedValueOnce({ data: { tiers: [TIER_A] } });
+    render(<MemberPremiumAdminPage />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Donations & Support' })).toBeInTheDocument();
+      expect(screen.getByText(/recognition/i)).toBeInTheDocument();
+    });
+  });
+
+  it('shows Stripe Connect onboarding and live status controls', async () => {
+    mockMemberPremiumApi.getSettings.mockResolvedValueOnce({
+      data: {
+        settings: {
+          stripe_connect_account_id: 'acct_test_123456',
+          payment_route: 'tenant_connect',
+          account_status: {
+            state: 'ready',
+            charges_enabled: true,
+            payouts_enabled: true,
+            details_submitted: true,
+            requirements_due: [],
+            disabled_reason: null,
+            error: null,
+          },
+        },
+      },
+    });
+    mockMemberPremiumApi.listTiers.mockResolvedValueOnce({ data: { tiers: [TIER_A] } });
+    render(<MemberPremiumAdminPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/tenant connect/i)).toBeInTheDocument();
+      expect(screen.getByText(/ready/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /continue stripe onboarding/i })).toBeInTheDocument();
+    });
+  });
+
   it('shows empty state when no tiers exist', async () => {
-    mockMemberPremiumApi.listTiers.mockResolvedValueOnce({ data: { tiers: [] } });
+    mockMemberPremiumApi.listTiers.mockResolvedValue({ data: { tiers: [] } });
     render(<MemberPremiumAdminPage />);
     await waitFor(() => {
-      expect(screen.getByText(/empty.tiers|no tiers/i)).toBeInTheDocument();
+      expect(screen.getByText(/no support levels/i)).toBeInTheDocument();
     });
   });
 
   it('renders tier name in table when tiers are loaded', async () => {
-    mockMemberPremiumApi.listTiers.mockResolvedValueOnce({ data: { tiers: [TIER_A] } });
+    mockMemberPremiumApi.listTiers.mockResolvedValue({ data: { tiers: [TIER_A] } });
     render(<MemberPremiumAdminPage />);
     await waitFor(() => {
       expect(screen.getByText('Gold')).toBeInTheDocument();
@@ -99,7 +157,7 @@ describe('MemberPremiumAdminPage', () => {
   });
 
   it('renders tier slug and price cells', async () => {
-    mockMemberPremiumApi.listTiers.mockResolvedValueOnce({ data: { tiers: [TIER_A] } });
+    mockMemberPremiumApi.listTiers.mockResolvedValue({ data: { tiers: [TIER_A] } });
     render(<MemberPremiumAdminPage />);
     await waitFor(() => {
       expect(screen.getByText('gold')).toBeInTheDocument();
@@ -109,7 +167,7 @@ describe('MemberPremiumAdminPage', () => {
   });
 
   it('shows "Synced" chip when stripe IDs are present', async () => {
-    mockMemberPremiumApi.listTiers.mockResolvedValueOnce({ data: { tiers: [TIER_A] } });
+    mockMemberPremiumApi.listTiers.mockResolvedValue({ data: { tiers: [TIER_A] } });
     render(<MemberPremiumAdminPage />);
     await waitFor(() => {
       expect(screen.getByText(/stripe.synced|synced/i)).toBeInTheDocument();
@@ -122,46 +180,44 @@ describe('MemberPremiumAdminPage', () => {
       stripe_price_id_monthly: null,
       stripe_price_id_yearly: null,
     };
-    mockMemberPremiumApi.listTiers.mockResolvedValueOnce({ data: { tiers: [unsynced] } });
+    mockMemberPremiumApi.listTiers.mockResolvedValue({ data: { tiers: [unsynced] } });
     render(<MemberPremiumAdminPage />);
     await waitFor(() => {
       expect(screen.getByText(/needs_sync|needs sync/i)).toBeInTheDocument();
     });
   });
 
-  it('opens create modal when "New tier" button is pressed', async () => {
-    mockMemberPremiumApi.listTiers.mockResolvedValueOnce({ data: { tiers: [] } });
+  it('opens create modal when the new support level button is pressed', async () => {
+    mockMemberPremiumApi.listTiers.mockResolvedValue({ data: { tiers: [] } });
     render(<MemberPremiumAdminPage />);
-    await waitFor(() => screen.getByText(/actions.new_tier|New tier/i));
+    await waitFor(() => screen.getByText(/new support level/i));
 
-    fireEvent.click(screen.getByText(/actions.new_tier|New tier/i));
+    fireEvent.click(screen.getByText(/new support level/i));
     await waitFor(() => {
       // Modal opens — the save/create button becomes visible
-      const createBtns = screen.getAllByText(/actions.create_tier|Create tier/i);
+      const createBtns = screen.getAllByText(/create support level/i);
       expect(createBtns.length).toBeGreaterThan(0);
     });
   });
 
   it('calls createTier and reloads on save with valid form data', async () => {
-    mockMemberPremiumApi.listTiers
-      .mockResolvedValueOnce({ data: { tiers: [] } })
-      .mockResolvedValueOnce({ data: { tiers: [TIER_A] } });
+    const user = userEvent.setup();
+    mockMemberPremiumApi.listTiers.mockResolvedValue({ data: { tiers: [] } });
     mockMemberPremiumApi.createTier.mockResolvedValueOnce({ data: { tier: TIER_A } });
 
     render(<MemberPremiumAdminPage />);
-    await waitFor(() => screen.getByText(/actions.new_tier|New tier/i));
-    fireEvent.click(screen.getByText(/actions.new_tier|New tier/i));
+    await waitFor(() => screen.getByText(/new support level/i));
+    await user.click(screen.getByText(/new support level/i));
 
     // Fill in required fields in the modal
     await waitFor(() => screen.getAllByRole('textbox'));
 
-    // Fill name field (first text input)
+    // Fill name and slug fields inside the modal.
     const textboxes = screen.getAllByRole('textbox');
-    // Name is first, slug is second
     fireEvent.change(textboxes[0], { target: { value: 'Gold' } });
     fireEvent.change(textboxes[1], { target: { value: 'gold' } });
 
-    fireEvent.click(screen.getByText(/actions.create_tier|Create tier/i));
+    await user.click(screen.getByRole('button', { name: /create support level/i }));
 
     await waitFor(() => {
       expect(mockMemberPremiumApi.createTier).toHaveBeenCalledWith(
@@ -172,13 +228,13 @@ describe('MemberPremiumAdminPage', () => {
   });
 
   it('shows validation error when slug is empty on save', async () => {
-    mockMemberPremiumApi.listTiers.mockResolvedValueOnce({ data: { tiers: [] } });
+    mockMemberPremiumApi.listTiers.mockResolvedValue({ data: { tiers: [] } });
     render(<MemberPremiumAdminPage />);
-    await waitFor(() => screen.getByText(/actions.new_tier|New tier/i));
-    fireEvent.click(screen.getByText(/actions.new_tier|New tier/i));
+    await waitFor(() => screen.getByText(/new support level/i));
+    fireEvent.click(screen.getByText(/new support level/i));
 
-    await waitFor(() => screen.getByText(/actions.create_tier|Create tier/i));
-    fireEvent.click(screen.getByText(/actions.create_tier|Create tier/i));
+    await waitFor(() => screen.getByText(/create support level/i));
+    fireEvent.click(screen.getByText(/create support level/i));
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled();
@@ -187,9 +243,7 @@ describe('MemberPremiumAdminPage', () => {
   });
 
   it('calls syncStripe when Sync Stripe button is clicked', async () => {
-    mockMemberPremiumApi.listTiers
-      .mockResolvedValueOnce({ data: { tiers: [TIER_A] } })
-      .mockResolvedValueOnce({ data: { tiers: [TIER_A] } });
+    mockMemberPremiumApi.listTiers.mockResolvedValue({ data: { tiers: [TIER_A] } });
     mockMemberPremiumApi.syncStripe.mockResolvedValueOnce({ data: { tier: TIER_A } });
 
     render(<MemberPremiumAdminPage />);
@@ -212,9 +266,7 @@ describe('MemberPremiumAdminPage', () => {
   });
 
   it('calls deleteTier after confirm dialog and reloads', async () => {
-    mockMemberPremiumApi.listTiers
-      .mockResolvedValueOnce({ data: { tiers: [TIER_A] } })
-      .mockResolvedValueOnce({ data: { tiers: [] } });
+    mockMemberPremiumApi.listTiers.mockResolvedValue({ data: { tiers: [TIER_A] } });
     mockMemberPremiumApi.deleteTier.mockResolvedValueOnce({ data: { deleted: true } });
     mockConfirm.mockResolvedValueOnce(true);
 
@@ -237,7 +289,7 @@ describe('MemberPremiumAdminPage', () => {
   });
 
   it('does not call deleteTier when confirm dialog is cancelled', async () => {
-    mockMemberPremiumApi.listTiers.mockResolvedValueOnce({ data: { tiers: [TIER_A] } });
+    mockMemberPremiumApi.listTiers.mockResolvedValue({ data: { tiers: [TIER_A] } });
     // IMPORTANT: mockConfirm.mockResolvedValueOnce(false) must be set BEFORE mockConfirm is used
     // by the previous test — use a fresh setup here
     mockConfirm.mockResolvedValueOnce(false);

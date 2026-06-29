@@ -47,6 +47,11 @@ const STATUS_COLORS: Record<string, 'success' | 'warning' | 'secondary' | 'dange
   failed: 'danger',
 };
 
+const ROUTE_COLORS: Record<string, 'success' | 'warning' | 'default'> = {
+  tenant_connect: 'success',
+  platform_default: 'warning',
+};
+
 function formatAmount(amount: number | string, currency: string | null): string {
   const value = typeof amount === 'string' ? parseFloat(amount) : amount;
   if (Number.isNaN(value)) return String(amount);
@@ -190,6 +195,8 @@ export function DonationRefunds() {
 
   const statusLabel = (status: string) =>
     t(`donation_refunds.status_${status}`, { defaultValue: status });
+  const routeLabel = (route?: string | null) =>
+    t(`donation_refunds.route_${route || 'platform_default'}`, { defaultValue: route || 'platform_default' });
 
   const columns: Column<AdminDonation>[] = [
     {
@@ -224,6 +231,24 @@ export function DonationRefunds() {
       key: 'payment_method',
       label: t('donation_refunds.payment_method'),
       render: (d) => <span className="text-sm text-muted">{d.payment_method || '—'}</span>,
+    },
+    {
+      key: 'payment_route',
+      label: t('donation_refunds.payment_route'),
+      render: (d) => (
+        <Chip size="sm" variant="soft" color={ROUTE_COLORS[d.payment_route || 'platform_default'] || 'default'}>
+          {routeLabel(d.payment_route)}
+        </Chip>
+      ),
+    },
+    {
+      key: 'stripe_account_id',
+      label: t('donation_refunds.stripe_account'),
+      render: (d) => (
+        <span className="font-mono text-xs text-muted">
+          {d.stripe_account_id || t('donation_refunds.platform_account')}
+        </span>
+      ),
     },
     {
       key: 'status',

@@ -39,6 +39,15 @@ class VolDonationTest extends TestCase
         $this->assertEquals('datetime', $casts['created_at']);
     }
 
+    public function test_fillable_includes_stripe_routing_fields(): void
+    {
+        $fillable = $this->model->getFillable();
+
+        $this->assertContains('payment_route', $fillable);
+        $this->assertContains('stripe_account_id', $fillable);
+        $this->assertContains('stripe_payment_intent_id', $fillable);
+    }
+
     public function test_uses_has_tenant_scope(): void
     {
         $traits = class_uses_recursive(VolDonation::class);

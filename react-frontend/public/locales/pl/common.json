@@ -1662,7 +1662,8 @@
       "advanced_search": "Zaawansowane wyszukiwanie",
       "ad_free": "Bez reklam"
     },
-    "return_meta_description": "Bezpieczna strona powrotu po płatności do aktywacji, potwierdzenia lub zarządzania subskrypcją premium."
+    "return_meta_description": "Bezpieczna strona powrotu po płatności do aktywacji, potwierdzenia lub zarządzania subskrypcją premium.",
+    "one_off_cta": "Make a one-off donation"
   },
   "developers": {
     "page_title": "Programiści",

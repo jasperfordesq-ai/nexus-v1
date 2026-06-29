@@ -1662,7 +1662,8 @@
       "advanced_search": "Búsqueda avanzada",
       "ad_free": "Experiencia sin anuncios"
     },
-    "return_meta_description": "Página de retorno seguro tras el pago para activar, confirmar o gestionar tu suscripción premium."
+    "return_meta_description": "Página de retorno seguro tras el pago para activar, confirmar o gestionar tu suscripción premium.",
+    "one_off_cta": "Make a one-off donation"
   },
   "developers": {
     "page_title": "Desarrolladores",

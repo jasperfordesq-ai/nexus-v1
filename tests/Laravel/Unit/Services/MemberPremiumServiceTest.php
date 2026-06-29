@@ -53,6 +53,16 @@ class MemberPremiumServiceTest extends TestCase
         );
     }
 
+    public function test_recurring_support_stores_and_reuses_original_stripe_account_route(): void
+    {
+        $source = file_get_contents(app_path('Services/MemberPremiumService.php'));
+
+        $this->assertStringContainsString("'payment_route' => \$paymentRoute", $source);
+        $this->assertStringContainsString("'stripe_account_id' => \$stripeAccountId", $source);
+        $this->assertStringContainsString('DonationStripeAccountService::stripeOptionsForAccountId($sub->stripe_account_id ?? null)', $source);
+        $this->assertStringContainsString('DonationStripeAccountService::normalizeAccountId($meta->nexus_stripe_account_id ?? null)', $source);
+    }
+
     private function tenantUrl(string $path): string
     {
         $base = rtrim(TenantContext::getFrontendUrl(), '/');

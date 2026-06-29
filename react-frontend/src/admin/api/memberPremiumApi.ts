@@ -60,7 +60,35 @@ export interface TierUpsertPayload {
   is_active: boolean;
 }
 
+export interface DonationSupportSettings {
+  stripe_connect_account_id: string;
+  payment_route: 'platform_default' | 'tenant_connect';
+  account_status?: DonationSupportAccountStatus;
+}
+
+export interface DonationSupportAccountStatus {
+  state: 'not_connected' | 'pending' | 'ready' | 'restricted' | 'unknown';
+  charges_enabled: boolean;
+  payouts_enabled: boolean;
+  details_submitted: boolean;
+  requirements_due: string[];
+  disabled_reason: string | null;
+  error: string | null;
+}
+
 export const memberPremiumAdminApi = {
+  getSettings: () =>
+    api.get<{ settings: DonationSupportSettings }>('/v2/admin/member-premium/settings'),
+
+  updateSettings: (payload: { stripe_connect_account_id: string }) =>
+    api.put<{ settings: DonationSupportSettings }>('/v2/admin/member-premium/settings', payload),
+
+  createConnectOnboardingLink: (payload: { return_url: string; refresh_url: string }) =>
+    api.post<{ settings: DonationSupportSettings; onboarding_url: string }>(
+      '/v2/admin/member-premium/connect/onboarding',
+      payload,
+    ),
+
   listTiers: () =>
     api.get<{ tiers: MemberPremiumTier[] }>('/v2/admin/member-premium/tiers'),
 

@@ -1662,7 +1662,8 @@
       "advanced_search": "高度な検索",
       "ad_free": "広告なし"
     },
-    "return_meta_description": "プレミアムサブスクリプションの有効化、確認、管理のための安全な決済後ページです。"
+    "return_meta_description": "プレミアムサブスクリプションの有効化、確認、管理のための安全な決済後ページです。",
+    "one_off_cta": "Make a one-off donation"
   },
   "developers": {
     "page_title": "開発者",

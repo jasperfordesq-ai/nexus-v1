@@ -1662,7 +1662,8 @@
       "advanced_search": "Erweiterte Suche",
       "ad_free": "Werbefrei"
     },
-    "return_meta_description": "Sichere Rückkehrseite nach dem Checkout zum Aktivieren, Bestätigen oder Verwalten Ihres Premium-Abonnements."
+    "return_meta_description": "Sichere Rückkehrseite nach dem Checkout zum Aktivieren, Bestätigen oder Verwalten Ihres Premium-Abonnements.",
+    "one_off_cta": "Make a one-off donation"
   },
   "developers": {
     "page_title": "Entwickler",

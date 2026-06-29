@@ -3859,17 +3859,28 @@
       "delete_failed": "Delete failed",
       "settings_load_failed": "Donation routing settings could not be loaded.",
       "settings_saved": "Donation routing settings saved.",
-      "settings_save_failed": "Donation routing settings could not be saved."
+      "settings_save_failed": "Donation routing settings could not be saved.",
+      "onboarding_failed": "Stripe onboarding could not be started."
     },
     "settings": {
       "title": "Stripe routing",
-      "description": "Leave this blank to use the platform Stripe account with tenant metadata. Add a tenant Stripe Connect account ID to send future one-off and regular donations to that tenant account.",
+      "description": "Leave this blank to use the platform Stripe account with tenant metadata. Connect a tenant Stripe account to send future one-off and regular donations to that tenant account.",
       "stripe_connect_account_id": "Tenant Stripe Connect account ID",
       "stripe_connect_placeholder": "acct_...",
       "stripe_connect_description": "Changing this affects future donation checkouts. Re-sync support levels after adding a tenant account so recurring prices exist in that Stripe account.",
       "route_platform_default": "Platform fallback",
       "route_tenant_connect": "Tenant Connect",
-      "save": "Save routing"
+      "start_onboarding": "Start Stripe onboarding",
+      "continue_onboarding": "Continue Stripe onboarding",
+      "requirements_due": "Stripe account requirements needing attention: {{count}}.",
+      "save": "Save routing",
+      "status": {
+        "not_connected": "Not connected",
+        "pending": "Pending",
+        "ready": "Ready",
+        "restricted": "Action needed",
+        "unknown": "Status unknown"
+      }
     }
   },
   "federation_aggregates": {
@@ -17724,6 +17735,11 @@
     "guest": "Guest",
     "amount": "Amount",
     "payment_method": "Payment method",
+    "payment_route": "Payment route",
+    "stripe_account": "Stripe account",
+    "platform_account": "Platform account",
+    "route_platform_default": "Platform fallback",
+    "route_tenant_connect": "Tenant Connect",
     "status": "Status",
     "date": "Date",
     "status_pending": "Pending",

@@ -2780,6 +2780,9 @@ export interface AdminDonation {
   currency: string | null;
   payment_method: string | null;
   payment_reference: string | null;
+  payment_route?: 'platform_default' | 'tenant_connect' | string | null;
+  stripe_account_id?: string | null;
+  stripe_payment_intent_id?: string | null;
   message: string | null;
   is_anonymous: boolean | number;
   status: 'pending' | 'completed' | 'refunded' | 'failed' | string;

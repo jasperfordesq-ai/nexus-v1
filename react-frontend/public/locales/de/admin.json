@@ -3856,7 +3856,20 @@
       "synced": "„{{name}}“ mit Stripe synchronisiert",
       "stripe_sync_failed": "Stripe-Synchronisierung fehlgeschlagen",
       "deleted": "Stufe gelöscht",
-      "delete_failed": "Das Löschen ist fehlgeschlagen"
+      "delete_failed": "Das Löschen ist fehlgeschlagen",
+      "onboarding_failed": "Stripe onboarding could not be started."
+    },
+    "settings": {
+      "start_onboarding": "Start Stripe onboarding",
+      "continue_onboarding": "Continue Stripe onboarding",
+      "requirements_due": "Stripe account requirements needing attention: {{count}}.",
+      "status": {
+        "not_connected": "Not connected",
+        "pending": "Pending",
+        "ready": "Ready",
+        "restricted": "Action needed",
+        "unknown": "Status unknown"
+      }
     }
   },
   "federation_aggregates": {
@@ -17736,7 +17749,12 @@
     "complete_confirm": "Mark donation #{{id}} of {{amount}} as completed? This confirms the money was received outside the platform (cash, bank transfer or PayPal) and adds it to the campaign total.",
     "complete_confirm_label": "Mark completed",
     "complete_success": "Donation marked as completed",
-    "complete_failed": "Failed to mark donation as completed"
+    "complete_failed": "Failed to mark donation as completed",
+    "payment_route": "Payment route",
+    "stripe_account": "Stripe account",
+    "platform_account": "Platform account",
+    "route_platform_default": "Platform fallback",
+    "route_tenant_connect": "Tenant Connect"
   },
   "sso": {
     "page_title": "Single Sign-On",

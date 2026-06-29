@@ -19,6 +19,12 @@ const { mockGet, mockPost, mockShowToast, mockHasFeature, mockTenantPath } = vi.
   mockTenantPath: (p: string) => `/test${p}`,
 }));
 
+vi.mock('@/components/donations/DonationCheckout', () => ({
+  DonationCheckout: ({ isOpen }: { isOpen: boolean }) => (
+    isOpen ? <div data-testid="donation-checkout">One-off donation checkout</div> : null
+  ),
+}));
+
 vi.mock('@/lib/api', () => ({
   api: {
     get: mockGet,
@@ -169,6 +175,29 @@ describe('PricingPage', () => {
     });
   });
 
+  it('presents the module as community donations', async () => {
+    mockGet.mockResolvedValue({ success: true, data: { tiers: [TIER_BASIC] } });
+    render(<PricingPage />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Donate' })).toBeInTheDocument();
+      expect(screen.getByText('Support this community')).toBeInTheDocument();
+    });
+  });
+
+  it('opens one-off donation checkout from the support page', async () => {
+    mockGet.mockResolvedValue({ success: true, data: { tiers: [TIER_BASIC] } });
+    render(<PricingPage />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /make a one-off donation/i })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /make a one-off donation/i }));
+
+    expect(screen.getByTestId('donation-checkout')).toBeInTheDocument();
+  });
+
   it('renders tier descriptions', async () => {
     mockGet.mockResolvedValue({ success: true, data: { tiers: [TIER_BASIC] } });
     render(<PricingPage />);
@@ -217,17 +246,17 @@ describe('PricingPage', () => {
     expect(screen.queryByText('Basic')).not.toBeInTheDocument();
   });
 
-  it('renders a Subscribe button for each tier', async () => {
+  it('renders a regular donation button for each tier', async () => {
     mockGet.mockResolvedValue({ success: true, data: { tiers: [TIER_BASIC, TIER_PRO] } });
     render(<PricingPage />);
 
     await waitFor(() => {
-      const subscribeBtns = screen.getAllByRole('button', { name: /subscribe/i });
+      const subscribeBtns = screen.getAllByRole('button', { name: /donate regularly/i });
       expect(subscribeBtns).toHaveLength(2);
     });
   });
 
-  it('calls checkout API and redirects to checkout_url on Subscribe', async () => {
+  it('calls checkout API and redirects to checkout_url on regular donation', async () => {
     mockGet.mockResolvedValue({ success: true, data: { tiers: [TIER_BASIC] } });
     mockPost.mockResolvedValue({
       success: true,
@@ -237,10 +266,10 @@ describe('PricingPage', () => {
     render(<PricingPage />);
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /subscribe/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /donate regularly/i })).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole('button', { name: /subscribe/i }));
+    fireEvent.click(screen.getByRole('button', { name: /donate regularly/i }));
 
     await waitFor(() => {
       expect(mockPost).toHaveBeenCalledWith(
@@ -285,10 +314,10 @@ describe('PricingPage', () => {
     render(<PricingPage />);
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /subscribe/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /donate regularly/i })).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole('button', { name: /subscribe/i }));
+    fireEvent.click(screen.getByRole('button', { name: /donate regularly/i }));
 
     await waitFor(() => {
       expect(mockShowToast).toHaveBeenCalled();

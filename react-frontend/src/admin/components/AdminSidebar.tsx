@@ -64,6 +64,7 @@ import ClipboardList from 'lucide-react/icons/clipboard-list';
 import Filter from 'lucide-react/icons/filter';
 import Activity from 'lucide-react/icons/activity';
 import Crown from 'lucide-react/icons/crown';
+import HandHeart from 'lucide-react/icons/hand-heart';
 import Network from 'lucide-react/icons/network';
 import Mail from 'lucide-react/icons/mail';
 import Wrench from 'lucide-react/icons/wrench';
@@ -464,7 +465,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
             { label: t('billing'), href: '/admin/billing', icon: CreditCard },
           ] : []),
           ...(isGod && hasFeature('member_premium') ? [
-            { label: t('member_premium'), href: '/admin/member-premium', icon: Crown },
+            { label: t('member_premium'), href: '/admin/member-premium', icon: HandHeart },
             { label: t('premium_subscribers'), href: '/admin/member-premium/subscribers', icon: Users },
           ] : []),
         ],

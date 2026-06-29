@@ -1662,7 +1662,8 @@
       "advanced_search": "بحث متقدم",
       "ad_free": "تجربة خالية من الإعلانات"
     },
-    "return_meta_description": "صفحة العودة الآمنة بعد الدفع لتفعيل أو تأكيد أو إدارة اشتراكك المميز."
+    "return_meta_description": "صفحة العودة الآمنة بعد الدفع لتفعيل أو تأكيد أو إدارة اشتراكك المميز.",
+    "one_off_cta": "Make a one-off donation"
   },
   "developers": {
     "page_title": "المطورون",

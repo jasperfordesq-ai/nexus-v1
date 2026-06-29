@@ -2,12 +2,13 @@ import { Card, CardBody, CardHeader, Button, Chip, Spinner, Switch } from '@/com
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import Crown from 'lucide-react/icons/crown';
+import HandHeart from 'lucide-react/icons/hand-heart';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useToast } from '@/contexts';
+import { DonationCheckout } from '@/components/donations/DonationCheckout';
 import api from '@/lib/api';
 import { logError } from '@/lib/logger';
 // Copyright © 2024–2026 Jasper Ford
@@ -48,6 +49,7 @@ export function PricingPage() {
   const [loading, setLoading] = useState(true);
   const [interval, setInterval] = useState<'monthly' | 'yearly'>('monthly');
   const [submittingTierId, setSubmittingTierId] = useState<number | null>(null);
+  const [oneOffOpen, setOneOffOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -81,7 +83,7 @@ export function PricingPage() {
     );
   }
 
-  const handleSubscribe = async (tier: PremiumTier) => {
+  const handleRegularDonation = async (tier: PremiumTier) => {
     if (!isAuthenticated) {
       navigate(tenantPath('/login'), { state: { from: tenantPath('/premium') } });
       return;
@@ -104,7 +106,7 @@ export function PricingPage() {
         setSubmittingTierId(null);
       }
     } catch (err: unknown) {
-      logError('Premium checkout failed', err);
+      logError('Donation support checkout failed', err);
       showToast(t('premium.checkout_failed'), 'error');
       setSubmittingTierId(null);
     }
@@ -114,13 +116,23 @@ export function PricingPage() {
     <div className="max-w-6xl mx-auto px-4 py-10">
       <PageMeta title={t('premium.pricing_title')} noIndex />
       <div className="text-center mb-10">
-        <Crown className="mx-auto mb-3 text-yellow-500" size={48} aria-hidden="true" />
+        <HandHeart className="mx-auto mb-3 text-[var(--color-success)]" size={48} aria-hidden="true" />
         <h1 className="text-3xl font-bold mb-2">
           {t('premium.pricing_title')}
         </h1>
         <p className="text-[var(--color-text-secondary)] max-w-2xl mx-auto">
           {t('premium.pricing_subtitle')}
         </p>
+
+        <div className="mt-6">
+          <Button
+            variant="primary"
+            startContent={<HandHeart size={18} aria-hidden="true" />}
+            onPress={() => setOneOffOpen(true)}
+          >
+            {t('premium.one_off_cta')}
+          </Button>
+        </div>
 
         <div className="flex items-center justify-center gap-3 mt-6">
           <span className={interval === 'monthly' ? 'font-semibold' : 'text-[var(--color-text-secondary)]'}>
@@ -156,7 +168,7 @@ export function PricingPage() {
               <Card key={tier.id} className="flex flex-col border border-theme-default bg-surface">
                 <CardHeader className="flex flex-col items-start gap-2">
                   <div className="flex items-center gap-2">
-                    <Crown size={20} className="text-yellow-500" aria-hidden="true" />
+                    <HandHeart size={20} className="text-[var(--color-success)]" aria-hidden="true" />
                     <h2 className="text-xl font-semibold">{tier.name}</h2>
                   </div>
                   {tier.description && (
@@ -196,7 +208,7 @@ export function PricingPage() {
 
                   <Button
                     variant="primary"
-                    onPress={() => handleSubscribe(tier)}
+                    onPress={() => handleRegularDonation(tier)}
                     isDisabled={submittingTierId !== null}
                     isLoading={submittingTierId === tier.id}
                   >
@@ -214,6 +226,11 @@ export function PricingPage() {
           {t('premium.cancel_anytime')}
         </Chip>
       </div>
+
+      <DonationCheckout
+        isOpen={oneOffOpen}
+        onClose={() => setOneOffOpen(false)}
+      />
     </div>
   );
 }

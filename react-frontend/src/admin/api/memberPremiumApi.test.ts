@@ -72,6 +72,41 @@ describe('memberPremiumAdminApi', () => {
 
   // ── listTiers ─────────────────────────────────────────────────────────────
 
+  describe('settings', () => {
+    it('gets donation routing settings', async () => {
+      vi.mocked(api.get).mockResolvedValueOnce({ settings: { stripe_connect_account_id: '', payment_route: 'platform_default' } });
+
+      await memberPremiumAdminApi.getSettings();
+
+      expect(api.get).toHaveBeenCalledWith('/v2/admin/member-premium/settings');
+    });
+
+    it('updates donation routing settings', async () => {
+      vi.mocked(api.put).mockResolvedValueOnce({ settings: { stripe_connect_account_id: 'acct_test_123', payment_route: 'tenant_connect' } });
+
+      await memberPremiumAdminApi.updateSettings({ stripe_connect_account_id: 'acct_test_123' });
+
+      expect(api.put).toHaveBeenCalledWith('/v2/admin/member-premium/settings', {
+        stripe_connect_account_id: 'acct_test_123',
+      });
+    });
+
+    it('posts return URLs to create a Connect onboarding link', async () => {
+      const payload = {
+        return_url: 'https://app.example.test/admin/member-premium?stripe_connect=return',
+        refresh_url: 'https://app.example.test/admin/member-premium?stripe_connect=refresh',
+      };
+      vi.mocked(api.post).mockResolvedValueOnce({
+        settings: { stripe_connect_account_id: 'acct_test_123', payment_route: 'tenant_connect' },
+        onboarding_url: 'https://connect.stripe.com/setup/s/test',
+      });
+
+      await memberPremiumAdminApi.createConnectOnboardingLink(payload);
+
+      expect(api.post).toHaveBeenCalledWith('/v2/admin/member-premium/connect/onboarding', payload);
+    });
+  });
+
   describe('listTiers', () => {
     it('calls the tiers list endpoint and returns the tiers array', async () => {
       vi.mocked(api.get).mockResolvedValueOnce({ tiers: [mockTier] });

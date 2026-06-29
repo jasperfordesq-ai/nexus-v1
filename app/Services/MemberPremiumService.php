@@ -17,17 +17,11 @@ use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 /**
- * MemberPremiumService — AG58 Member Premium Tier paywall framework.
+ * MemberPremiumService — AG58 recurring donation support framework.
  *
- * Manages member-facing premium tiers (distinct from tenant billing under
- * StripeSubscriptionService). Each tenant defines its own tiers; members
- * subscribe via Stripe Checkout, and tier feature keys gate UI/server logic.
- *
- * Common feature keys (admin-defined, open-ended):
- *   - verified_badge
- *   - priority_matching
- *   - advanced_search
- *   - ad_free
+ * Keeps the historical member_premium storage/API names for compatibility,
+ * while presenting the feature as optional one-off and recurring community
+ * donations. Support level notes are for recognition, not access inequality.
  */
 class MemberPremiumService
 {
@@ -172,7 +166,7 @@ class MemberPremiumService
     }
 
     /**
-     * Get the user's currently entitled tier — null if no active premium.
+     * Get the user's active support level, if any.
      */
     public static function getMemberTier(int $userId): ?array
     {
@@ -291,45 +285,72 @@ class MemberPremiumService
         }
 
         $client = StripeService::client();
+        $tenantStripeAccountId = DonationStripeAccountService::accountIdForTenant($tenantId);
+        $stripeOptions = $tenantStripeAccountId ? ['stripe_account' => $tenantStripeAccountId] : [];
         $currency = TenantContext::getCurrency();
         $updates = [];
         $params = [];
 
         // Product is implicit per (tenant, tier). Always create a Stripe Product
         // since we don't store the product_id (we rely on price_id directly).
-        $productName = sprintf('Premium: %s', $tier->name);
+        // Connected accounts need their own account-scoped prices, so when a
+        // tenant Connect account is configured we intentionally refresh IDs.
+        $productName = sprintf('Donation support: %s', $tier->name);
         $productDescription = $tier->description ?: $productName;
 
-        $product = $client->products->create([
+        $productParams = [
             'name' => $productName,
             'description' => $productDescription,
             'metadata' => [
                 'nexus_tier_id' => (string) $tierId,
                 'nexus_tenant_id' => (string) $tenantId,
+                'nexus_stripe_account_id' => $tenantStripeAccountId ?: 'platform_default',
                 'nexus_kind' => 'member_premium',
+                'nexus_support_kind' => 'donation_support',
             ],
-        ]);
+        ];
+        $product = $stripeOptions
+            ? $client->products->create($productParams, $stripeOptions)
+            : $client->products->create($productParams);
 
-        if (empty($tier->stripe_price_id_monthly) && (int) $tier->monthly_price_cents > 0) {
-            $price = $client->prices->create([
+        if (($tenantStripeAccountId || empty($tier->stripe_price_id_monthly)) && (int) $tier->monthly_price_cents > 0) {
+            $priceParams = [
                 'product' => $product->id,
                 'unit_amount' => (int) $tier->monthly_price_cents,
                 'currency' => $currency,
                 'recurring' => ['interval' => 'month'],
-                'metadata' => ['nexus_tier_id' => (string) $tierId, 'interval' => 'monthly'],
-            ]);
+                'metadata' => [
+                    'nexus_tier_id' => (string) $tierId,
+                    'nexus_tenant_id' => (string) $tenantId,
+                    'nexus_kind' => 'member_premium',
+                    'nexus_support_kind' => 'donation_support',
+                    'interval' => 'monthly',
+                ],
+            ];
+            $price = $stripeOptions
+                ? $client->prices->create($priceParams, $stripeOptions)
+                : $client->prices->create($priceParams);
             $updates[] = 'stripe_price_id_monthly = ?';
             $params[] = $price->id;
         }
 
-        if (empty($tier->stripe_price_id_yearly) && (int) $tier->yearly_price_cents > 0) {
-            $price = $client->prices->create([
+        if (($tenantStripeAccountId || empty($tier->stripe_price_id_yearly)) && (int) $tier->yearly_price_cents > 0) {
+            $priceParams = [
                 'product' => $product->id,
                 'unit_amount' => (int) $tier->yearly_price_cents,
                 'currency' => $currency,
                 'recurring' => ['interval' => 'year'],
-                'metadata' => ['nexus_tier_id' => (string) $tierId, 'interval' => 'yearly'],
-            ]);
+                'metadata' => [
+                    'nexus_tier_id' => (string) $tierId,
+                    'nexus_tenant_id' => (string) $tenantId,
+                    'nexus_kind' => 'member_premium',
+                    'nexus_support_kind' => 'donation_support',
+                    'interval' => 'yearly',
+                ],
+            ];
+            $price = $stripeOptions
+                ? $client->prices->create($priceParams, $stripeOptions)
+                : $client->prices->create($priceParams);
             $updates[] = 'stripe_price_id_yearly = ?';
             $params[] = $price->id;
         }
@@ -347,6 +368,7 @@ class MemberPremiumService
             'tenant_id' => $tenantId,
             'tier_id' => $tierId,
             'product_id' => $product->id,
+            'stripe_account_id' => $tenantStripeAccountId,
         ]);
     }
 
@@ -390,10 +412,14 @@ class MemberPremiumService
         }
 
         $client = StripeService::client();
+        $tenantStripeAccountId = DonationStripeAccountService::accountIdForTenant($tenantId);
+        $stripeOptions = $tenantStripeAccountId ? ['stripe_account' => $tenantStripeAccountId] : [];
 
-        // Get or create Stripe customer
-        $customerId = $user->stripe_customer_id ?? null;
-        if (empty($customerId)) {
+        // Platform fallback can reuse platform customers. Connected-account
+        // support sessions must create/reuse customers inside the tenant Stripe
+        // account, so we let Checkout create one from the email address.
+        $customerId = $tenantStripeAccountId ? null : ($user->stripe_customer_id ?? null);
+        if (! $tenantStripeAccountId && empty($customerId)) {
             $customer = $client->customers->create([
                 'email' => $user->email,
                 'name' => $user->name ?: $user->first_name,
@@ -414,16 +440,18 @@ class MemberPremiumService
             }
         }
 
-        $session = $client->checkout->sessions->create([
+        $sessionParams = [
             'mode' => 'subscription',
-            'customer' => $customerId,
             'line_items' => [['price' => $priceId, 'quantity' => 1]],
             'metadata' => [
                 'nexus_user_id' => (string) $userId,
                 'nexus_tenant_id' => (string) $tenantId,
                 'nexus_tier_id' => (string) $tierId,
                 'nexus_kind' => 'member_premium',
+                'nexus_support_kind' => 'donation_support',
                 'nexus_interval' => $interval,
+                'nexus_payment_route' => $tenantStripeAccountId ? 'tenant_connect' : 'platform_default',
+                'nexus_stripe_account_id' => $tenantStripeAccountId ?: 'platform_default',
             ],
             'subscription_data' => [
                 'metadata' => [
@@ -431,18 +459,32 @@ class MemberPremiumService
                     'nexus_tenant_id' => (string) $tenantId,
                     'nexus_tier_id' => (string) $tierId,
                     'nexus_kind' => 'member_premium',
+                    'nexus_support_kind' => 'donation_support',
                     'nexus_interval' => $interval,
+                    'nexus_payment_route' => $tenantStripeAccountId ? 'tenant_connect' : 'platform_default',
+                    'nexus_stripe_account_id' => $tenantStripeAccountId ?: 'platform_default',
                 ],
             ],
             'success_url' => rtrim($returnUrl, '/') . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => rtrim($returnUrl, '/') . '?cancelled=1',
-        ]);
+        ];
+
+        if ($customerId) {
+            $sessionParams['customer'] = $customerId;
+        } else {
+            $sessionParams['customer_email'] = $user->email;
+        }
+
+        $session = $stripeOptions
+            ? $client->checkout->sessions->create($sessionParams, $stripeOptions)
+            : $client->checkout->sessions->create($sessionParams);
 
         Log::info('Member premium checkout session created', [
             'tenant_id' => $tenantId,
             'user_id' => $userId,
             'tier_id' => $tierId,
             'session_id' => $session->id,
+            'stripe_account_id' => $tenantStripeAccountId,
         ]);
 
         return [
@@ -468,12 +510,18 @@ class MemberPremiumService
         }
 
         $client = StripeService::client();
+        $stripeOptions = DonationStripeAccountService::stripeOptionsForAccountId($sub->stripe_account_id ?? null);
         if ($atPeriodEnd) {
-            $client->subscriptions->update($sub->stripe_subscription_id, [
+            $params = [
                 'cancel_at_period_end' => true,
-            ]);
+            ];
+            $stripeOptions
+                ? $client->subscriptions->update($sub->stripe_subscription_id, $params, $stripeOptions)
+                : $client->subscriptions->update($sub->stripe_subscription_id, $params);
         } else {
-            $client->subscriptions->cancel($sub->stripe_subscription_id);
+            $stripeOptions
+                ? $client->subscriptions->cancel($sub->stripe_subscription_id, [], $stripeOptions)
+                : $client->subscriptions->cancel($sub->stripe_subscription_id);
         }
 
         DB::update(
@@ -495,7 +543,7 @@ class MemberPremiumService
     {
         $tenantId = TenantContext::getId();
         $sub = DB::selectOne(
-            "SELECT stripe_customer_id FROM member_subscriptions
+            "SELECT stripe_customer_id, stripe_account_id FROM member_subscriptions
              WHERE user_id = ? AND tenant_id = ? AND stripe_customer_id IS NOT NULL
              ORDER BY created_at DESC LIMIT 1",
             [$userId, $tenantId]
@@ -505,10 +553,14 @@ class MemberPremiumService
         }
 
         $client = StripeService::client();
-        $session = $client->billingPortal->sessions->create([
+        $sessionParams = [
             'customer' => $sub->stripe_customer_id,
             'return_url' => $returnUrl,
-        ]);
+        ];
+        $stripeOptions = DonationStripeAccountService::stripeOptionsForAccountId($sub->stripe_account_id ?? null);
+        $session = $stripeOptions
+            ? $client->billingPortal->sessions->create($sessionParams, $stripeOptions)
+            : $client->billingPortal->sessions->create($sessionParams);
 
         return ['portal_url' => $session->url];
     }
@@ -571,6 +623,8 @@ class MemberPremiumService
         $tenantId = (int) ($meta->nexus_tenant_id ?? 0);
         $tierId = (int) ($meta->nexus_tier_id ?? 0);
         $interval = (string) ($meta->nexus_interval ?? 'monthly');
+        $stripeAccountId = DonationStripeAccountService::normalizeAccountId($meta->nexus_stripe_account_id ?? null);
+        $paymentRoute = DonationStripeAccountService::routeForAccountId($stripeAccountId);
 
         if (! $userId || ! $tenantId || ! $tierId) {
             return;
@@ -589,9 +643,9 @@ class MemberPremiumService
             DB::update(
                 "UPDATE member_subscriptions
                  SET tier_id = ?, status = 'active', billing_interval = ?,
-                     stripe_customer_id = ?, updated_at = NOW()
-                 WHERE id = ?",
-                [$tierId, $interval, $stripeCustomerId, $existing->id]
+                     stripe_customer_id = ?, payment_route = ?, stripe_account_id = ?, updated_at = NOW()
+                  WHERE id = ?",
+                [$tierId, $interval, $stripeCustomerId, $paymentRoute, $stripeAccountId, $existing->id]
             );
             $subId = (int) $existing->id;
         } else {
@@ -601,6 +655,8 @@ class MemberPremiumService
                 'tier_id' => $tierId,
                 'stripe_subscription_id' => $stripeSubId,
                 'stripe_customer_id' => $stripeCustomerId,
+                'payment_route' => $paymentRoute,
+                'stripe_account_id' => $stripeAccountId,
                 'status' => 'active',
                 'billing_interval' => $interval,
                 'created_at' => now(),
@@ -627,6 +683,8 @@ class MemberPremiumService
         $tenantId = (int) ($meta->nexus_tenant_id ?? 0);
         $tierId = (int) ($meta->nexus_tier_id ?? 0);
         $interval = (string) ($meta->nexus_interval ?? 'monthly');
+        $stripeAccountId = DonationStripeAccountService::normalizeAccountId($meta->nexus_stripe_account_id ?? null);
+        $paymentRoute = DonationStripeAccountService::routeForAccountId($stripeAccountId);
 
         $stripeStatus = (string) ($sub->status ?? 'active');
         $statusMap = [
@@ -666,11 +724,13 @@ class MemberPremiumService
                      status = ?, billing_interval = ?,
                      current_period_start = ?, current_period_end = ?,
                      canceled_at = ?, grace_period_ends_at = ?,
+                     payment_route = ?, stripe_account_id = ?,
                      updated_at = NOW()
-                 WHERE id = ?",
+                  WHERE id = ?",
                 [
                     $tierId ?: null, $status, $interval,
                     $periodStart, $periodEnd, $canceledAt, $graceEnds,
+                    $paymentRoute, $stripeAccountId,
                     $existing->id,
                 ]
             );
@@ -685,6 +745,8 @@ class MemberPremiumService
                 'tier_id' => $tierId,
                 'stripe_subscription_id' => $stripeSubId,
                 'stripe_customer_id' => $sub->customer ?? null,
+                'payment_route' => $paymentRoute,
+                'stripe_account_id' => $stripeAccountId,
                 'status' => $status,
                 'billing_interval' => $interval,
                 'current_period_start' => $periodStart,
