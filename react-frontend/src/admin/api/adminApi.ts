@@ -1781,6 +1781,12 @@ export interface NextPublicRouteOwnership {
   labelKey: string;
 }
 
+export interface NextPublicApiBackedRoute {
+  routeKey: string;
+  endpoint: string;
+  method: string;
+}
+
 export interface NextPublicFrontendReadiness {
   mode: string;
   app: {
@@ -1802,6 +1808,7 @@ export interface NextPublicFrontendReadiness {
     mode: string | null;
     route_counts: {
       public_routes: number;
+      api_backed_public_routes: number;
       vite_private_prefixes: number;
       vite_private_patterns: number;
     };
@@ -1816,6 +1823,11 @@ export interface NextPublicFrontendReadiness {
     public_routes: NextPublicRouteOwnership[];
     vite_private_prefixes: string[];
     vite_private_patterns: string[];
+  };
+  content_sources: {
+    source_of_truth: string;
+    database_queries_from_next: boolean;
+    api_backed_routes: NextPublicApiBackedRoute[];
   };
   production_routing: {
     active: boolean;

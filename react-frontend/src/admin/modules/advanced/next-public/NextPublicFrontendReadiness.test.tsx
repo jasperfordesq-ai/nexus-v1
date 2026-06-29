@@ -38,6 +38,7 @@ const readiness = {
     mode: 'shadow',
     route_counts: {
       public_routes: 3,
+      api_backed_public_routes: 2,
       vite_private_prefixes: 3,
       vite_private_patterns: 2,
     },
@@ -52,6 +53,14 @@ const readiness = {
     ],
     vite_private_prefixes: ['admin', 'dashboard', 'messages'],
     vite_private_patterns: ['/events/new', '/events/:id/edit'],
+  },
+  content_sources: {
+    source_of_truth: 'laravel_public_api',
+    database_queries_from_next: false,
+    api_backed_routes: [
+      { routeKey: 'blog-index', endpoint: '/v2/blog', method: 'GET' },
+      { routeKey: 'listingDetail', endpoint: '/v2/listings/{id}', method: 'GET' },
+    ],
   },
   production_routing: {
     active: false,
@@ -101,6 +110,8 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('/about')).toBeInTheDocument();
     expect(screen.getByText('/blog/:slug')).toBeInTheDocument();
     expect(screen.getByText('dashboard')).toBeInTheDocument();
+    expect(screen.getByText('laravel_public_api')).toBeInTheDocument();
+    expect(screen.getByText('GET /v2/listings/{id}')).toBeInTheDocument();
     expect(screen.getByText('npm run build:next-public')).toBeInTheDocument();
     expect(screen.getByText('Manifest validation passed')).toBeInTheDocument();
     expect(screen.getByText('3 public routes')).toBeInTheDocument();

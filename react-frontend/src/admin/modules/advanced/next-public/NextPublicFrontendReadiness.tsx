@@ -116,10 +116,14 @@ export default function NextPublicFrontendReadiness() {
                   {t('counts.private_patterns', { count: readiness.manifest.route_counts.vite_private_patterns })}
                 </Chip>
               </div>
-              <div className="grid gap-5 lg:grid-cols-2">
+              <div className="grid gap-5 lg:grid-cols-3">
                 <RouteList
                   title={t('route_ownership.next_public')}
                   items={readiness.manifest.public_routes.map((route) => route.pattern)}
+                />
+                <RouteList
+                  title={readiness.content_sources.source_of_truth}
+                  items={readiness.content_sources.api_backed_routes.map((route) => `${route.method} ${route.endpoint}`)}
                 />
                 <RouteList
                   title={t('route_ownership.vite_private')}
