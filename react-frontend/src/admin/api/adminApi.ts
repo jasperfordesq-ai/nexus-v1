@@ -1875,6 +1875,23 @@ export interface NextPublicRouteBatch {
   verification_commands: string[];
 }
 
+export interface NextPublicRemainingRouteWorkGroup {
+  key: string;
+  status: 'blocked' | 'blocker' | 'pass' | string;
+  route_count: number;
+  route_keys: string[];
+  reason: string;
+  required_actions: string[];
+  verification_commands: string[];
+}
+
+export interface NextPublicRemainingRouteWork {
+  production_effect: string;
+  activation_available: boolean;
+  guardrails: string[];
+  groups: NextPublicRemainingRouteWorkGroup[];
+}
+
 export interface NextPublicCutoverArtifact {
   key: string;
   path: string;
@@ -1946,6 +1963,7 @@ export interface NextPublicFrontendReadiness {
   tenant_resolution: NextPublicTenantResolution;
   edge_canary: NextPublicEdgeCanary;
   route_batches: NextPublicRouteBatch[];
+  remaining_public_route_work: NextPublicRemainingRouteWork;
   cutover_artifacts: NextPublicCutoverArtifactInventory;
   production_routing: {
     active: boolean;

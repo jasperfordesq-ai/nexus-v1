@@ -203,6 +203,27 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertContains('npm --prefix react-frontend run build', $batches['vite_private_retained']['verification_commands']);
     }
 
+    public function test_summary_reports_remaining_public_route_work_without_activation(): void
+    {
+        $summary = (new NextPublicFrontendReadinessService())->summary();
+
+        $remaining = $summary['remaining_public_route_work'];
+        $groups = array_column($remaining['groups'], null, 'key');
+
+        $this->assertSame('none', $remaining['production_effect']);
+        $this->assertFalse($remaining['activation_available']);
+        $this->assertContains('home', $groups['static_manual_review']['route_keys']);
+        $this->assertContains('couponDetail', $groups['auth_only_backend']['route_keys']);
+        $this->assertContains('ideationIdeaDetail', $groups['backend_contract_missing']['route_keys']);
+        $this->assertContains('keep_vite_or_prerender_until_public_contract', $groups['auth_only_backend']['required_actions']);
+        $this->assertContains('add_public_laravel_api_with_tests', $groups['backend_contract_missing']['required_actions']);
+        $this->assertContains('npm --prefix next-public-frontend run check:no-js-html', $groups['static_manual_review']['verification_commands']);
+        $this->assertSame(
+            'route_status_has_no_production_effect',
+            $remaining['guardrails'][0],
+        );
+    }
+
     public function test_manifest_validation_blocks_api_routes_outside_laravel_v2_public_api(): void
     {
         $validation = $this->validateManifest([

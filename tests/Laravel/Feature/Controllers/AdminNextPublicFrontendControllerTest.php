@@ -97,6 +97,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $cutoverGatesByKey = array_column($payload['cutover_gates'], null, 'key');
         $playbookStagesByKey = array_column($payload['operator_playbook']['stages'], null, 'key');
         $tenantResolutionExamplesByKey = array_column($payload['tenant_resolution']['examples'], null, 'key');
+        $remainingRouteWorkByKey = array_column($payload['remaining_public_route_work']['groups'], null, 'key');
         $routeReadinessByKey = [];
         $routeBatchesByKey = array_column($payload['route_batches'], null, 'key');
         $cutoverArtifactsByKey = array_column($payload['cutover_artifacts']['items'], null, 'key');
@@ -268,5 +269,13 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['couponDetail']['content_source']);
         $this->assertSame('blocker', $routeReadinessByKey['listingDetail']['status']);
         $this->assertContains('parity_test_required', $routeReadinessByKey['listingDetail']['blockers']);
+        $this->assertSame('none', $payload['remaining_public_route_work']['production_effect']);
+        $this->assertFalse($payload['remaining_public_route_work']['activation_available']);
+        $this->assertContains('home', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
+        $this->assertContains('couponDetail', $remainingRouteWorkByKey['auth_only_backend']['route_keys']);
+        $this->assertContains('ideationIdeaDetail', $remainingRouteWorkByKey['backend_contract_missing']['route_keys']);
+        $this->assertContains('manual_no_js_shadow_review', $remainingRouteWorkByKey['static_manual_review']['required_actions']);
+        $this->assertContains('keep_vite_or_prerender_until_public_contract', $remainingRouteWorkByKey['auth_only_backend']['required_actions']);
+        $this->assertContains('add_public_laravel_api_with_tests', $remainingRouteWorkByKey['backend_contract_missing']['required_actions']);
     }
 }

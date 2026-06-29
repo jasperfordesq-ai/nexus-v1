@@ -168,6 +168,45 @@ const readiness = {
       verification_commands: ['npm --prefix react-frontend run build'],
     },
   ],
+  remaining_public_route_work: {
+    production_effect: 'none',
+    activation_available: false,
+    guardrails: [
+      'route_status_has_no_production_effect',
+      'do_not_promote_auth_only_routes',
+    ],
+    groups: [
+      {
+        key: 'static_manual_review',
+        status: 'blocked',
+        route_count: 2,
+        route_keys: ['home', 'about'],
+        reason: 'static_or_tenant_bootstrap',
+        required_actions: ['manual_no_js_shadow_review'],
+        verification_commands: ['npm --prefix next-public-frontend run check:no-js-html'],
+      },
+      {
+        key: 'auth_only_backend',
+        status: 'blocked',
+        route_count: 1,
+        route_keys: ['couponDetail'],
+        reason: 'existing_backend_requires_auth',
+        required_actions: ['keep_vite_or_prerender_until_public_contract'],
+        verification_commands: ['npm run check:next-public:inert'],
+      },
+      {
+        key: 'backend_contract_missing',
+        status: 'blocked',
+        route_count: 1,
+        route_keys: ['ideationIdeaDetail'],
+        reason: 'route_params_do_not_match_public_api',
+        required_actions: ['add_public_laravel_api_with_tests'],
+        verification_commands: [
+          'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php',
+        ],
+      },
+    ],
+  },
   cutover_artifacts: {
     production_effect: 'none',
     activation_available: false,
@@ -323,6 +362,15 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('Foundation public pages')).toBeInTheDocument();
     expect(screen.getByText('API-backed public content')).toBeInTheDocument();
     expect(screen.getByText('Vite private routes retained')).toBeInTheDocument();
+    expect(screen.getByText('Remaining public route work')).toBeInTheDocument();
+    expect(screen.getByText('Static/manual-review routes')).toBeInTheDocument();
+    expect(screen.getByText('Auth-only backend routes')).toBeInTheDocument();
+    expect(screen.getByText('Backend contract gaps')).toBeInTheDocument();
+    expect(screen.getByText('Existing backend requires authentication')).toBeInTheDocument();
+    expect(screen.getByText('Keep Vite or prerender until a public contract exists')).toBeInTheDocument();
+    expect(screen.getByText('Add a public Laravel API with tests')).toBeInTheDocument();
+    expect(screen.getAllByText('couponDetail')).not.toHaveLength(0);
+    expect(screen.getAllByText('ideationIdeaDetail')).not.toHaveLength(0);
     expect(screen.getByText('npm run build:next-public')).toBeInTheDocument();
     expect(screen.getAllByText('npm run check:next-public:inert')).not.toHaveLength(0);
     expect(screen.getAllByText('npm --prefix next-public-frontend run check')).not.toHaveLength(0);

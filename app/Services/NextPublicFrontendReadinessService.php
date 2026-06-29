@@ -264,6 +264,7 @@ class NextPublicFrontendReadinessService
             'tenant_resolution' => $this->tenantResolutionContract(),
             'edge_canary' => $edgeCanary,
             'route_batches' => $this->routeBatches($publicRoutes, $privatePrefixes, $privatePatterns, $apiBackedRoutes),
+            'remaining_public_route_work' => $this->remainingPublicRouteWork($publicRoutes, $apiBackedRoutes),
             'cutover_artifacts' => $this->cutoverArtifactInventory(),
             'production_routing' => [
                 'active' => false,
@@ -639,6 +640,116 @@ class NextPublicFrontendReadinessService
                 ],
             ],
         ];
+    }
+
+    /**
+     * @param array<int, mixed> $publicRoutes
+     * @param array<int, array{routeKey: string, endpoint: string, method: string}> $apiBackedRoutes
+     * @return array{production_effect: string, activation_available: bool, guardrails: array<int, string>, groups: array<int, array{key: string, status: string, route_count: int, route_keys: array<int, string>, reason: string, required_actions: array<int, string>, verification_commands: array<int, string>}>}
+     */
+    private function remainingPublicRouteWork(array $publicRoutes, array $apiBackedRoutes): array
+    {
+        $manifestRouteKeys = [];
+
+        foreach ($publicRoutes as $route) {
+            if (is_array($route) && isset($route['routeKey'])) {
+                $manifestRouteKeys[] = (string) $route['routeKey'];
+            }
+        }
+
+        $manifestRouteKeySet = array_flip($manifestRouteKeys);
+        $apiBackedRouteKeySet = array_flip(array_column($apiBackedRoutes, 'routeKey'));
+
+        $staticManualReviewRouteKeys = $this->filterRemainingRouteKeys([
+            'home',
+            'about',
+            'features',
+            'changelog',
+            'contact',
+            'trustSafety',
+            'legal',
+            'platformTerms',
+            'platformPrivacy',
+            'platformDisclaimer',
+            'timebankingGuide',
+            'developmentStatus',
+            'caringCommunity',
+            'developers',
+            'developersAuth',
+            'developersEndpoints',
+            'developersWebhooks',
+            'regionalAnalytics',
+            'hourPartner',
+            'hourSocialPrescribing',
+            'hourImpactSummary',
+            'hourImpactReport',
+            'hourStrategicPlan',
+        ], $manifestRouteKeySet, $apiBackedRouteKeySet);
+
+        $authOnlyBackendRouteKeys = $this->filterRemainingRouteKeys([
+            'marketplaceCollections',
+            'coupons',
+            'couponDetail',
+        ], $manifestRouteKeySet, $apiBackedRouteKeySet);
+
+        $backendContractMissingRouteKeys = $this->filterRemainingRouteKeys([
+            'ideationIdeaDetail',
+        ], $manifestRouteKeySet, $apiBackedRouteKeySet);
+
+        return [
+            'production_effect' => 'none',
+            'activation_available' => false,
+            'guardrails' => [
+                'route_status_has_no_production_effect',
+                'do_not_promote_auth_only_routes',
+            ],
+            'groups' => [
+                [
+                    'key' => 'static_manual_review',
+                    'status' => 'blocked',
+                    'route_count' => count($staticManualReviewRouteKeys),
+                    'route_keys' => $staticManualReviewRouteKeys,
+                    'reason' => 'static_or_tenant_bootstrap',
+                    'required_actions' => ['manual_no_js_shadow_review'],
+                    'verification_commands' => ['npm --prefix next-public-frontend run check:no-js-html'],
+                ],
+                [
+                    'key' => 'auth_only_backend',
+                    'status' => 'blocked',
+                    'route_count' => count($authOnlyBackendRouteKeys),
+                    'route_keys' => $authOnlyBackendRouteKeys,
+                    'reason' => 'existing_backend_requires_auth',
+                    'required_actions' => ['keep_vite_or_prerender_until_public_contract'],
+                    'verification_commands' => ['npm run check:next-public:inert'],
+                ],
+                [
+                    'key' => 'backend_contract_missing',
+                    'status' => 'blocked',
+                    'route_count' => count($backendContractMissingRouteKeys),
+                    'route_keys' => $backendContractMissingRouteKeys,
+                    'reason' => 'route_params_do_not_match_public_api',
+                    'required_actions' => ['add_public_laravel_api_with_tests'],
+                    'verification_commands' => [
+                        'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php',
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param array<int, string> $routeKeys
+     * @param array<string, int> $manifestRouteKeySet
+     * @param array<string, int> $apiBackedRouteKeySet
+     * @return array<int, string>
+     */
+    private function filterRemainingRouteKeys(array $routeKeys, array $manifestRouteKeySet, array $apiBackedRouteKeySet): array
+    {
+        return array_values(array_filter(
+            $routeKeys,
+            static fn (string $routeKey): bool => isset($manifestRouteKeySet[$routeKey])
+                && !isset($apiBackedRouteKeySet[$routeKey]),
+        ));
     }
 
     /**

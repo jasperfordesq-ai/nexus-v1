@@ -145,6 +145,8 @@ export default function NextPublicFrontendReadiness() {
 
           <RouteBatchReadinessCard readiness={readiness} />
 
+          <RemainingPublicRouteWorkCard readiness={readiness} />
+
           <ManifestValidationCard readiness={readiness} />
 
           <RouteCutoverGatesCard readiness={readiness} />
@@ -357,6 +359,92 @@ function RouteBatchReadinessCard({ readiness }: { readiness: Readiness }) {
             </div>
           ))}
         </div>
+      </CardBody>
+    </Card>
+  );
+}
+
+function RemainingPublicRouteWorkCard({ readiness }: { readiness: Readiness }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.next_public' });
+  const remaining = readiness.remaining_public_route_work;
+
+  return (
+    <Card>
+      <CardHeader className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold">{t('remaining_route_work.title')}</h2>
+        <div className="flex flex-wrap justify-end gap-2">
+          <Chip size="sm" color="success" variant="soft">
+            {t(`production_effects.${remaining.production_effect}`)}
+          </Chip>
+          <Chip size="sm" color={remaining.activation_available ? 'danger' : 'success'} variant="soft">
+            {remaining.activation_available
+              ? t('remaining_route_work.activation_available')
+              : t('remaining_route_work.activation_unavailable')}
+          </Chip>
+        </div>
+      </CardHeader>
+      <CardBody>
+        <div className="grid gap-3 lg:grid-cols-3">
+          {remaining.groups.map((group) => (
+            <div key={group.key} className="rounded-md border border-divider px-3 py-3 text-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-medium">{t(`remaining_route_work_groups.${group.key}`)}</div>
+                  <div className="mt-1 text-xs text-muted">
+                    {t('remaining_route_work.route_count', { count: group.route_count })}
+                  </div>
+                </div>
+                <Chip size="sm" color={statusColor(group.status)} variant="soft">
+                  {t(`statuses.${group.status}`)}
+                </Chip>
+              </div>
+
+              <Chip className="mt-3" size="sm" color="warning" variant="soft">
+                {t(`remaining_route_work_reasons.${group.reason}`)}
+              </Chip>
+
+              {group.route_keys.length > 0 && (
+                <div className="mt-3 flex max-h-28 flex-wrap gap-1 overflow-auto">
+                  {group.route_keys.map((routeKey) => (
+                    <Chip key={routeKey} size="sm" variant="flat">
+                      {routeKey}
+                    </Chip>
+                  ))}
+                </div>
+              )}
+
+              {group.required_actions.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {group.required_actions.map((action) => (
+                    <Chip key={action} size="sm" color="warning" variant="soft">
+                      {t(`remaining_route_work_actions.${action}`)}
+                    </Chip>
+                  ))}
+                </div>
+              )}
+
+              {group.verification_commands.length > 0 && (
+                <div className="mt-3 space-y-1">
+                  {group.verification_commands.map((command) => (
+                    <code key={command} className="block break-all rounded bg-surface-secondary px-2 py-1 text-xs">
+                      {command}
+                    </code>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {remaining.guardrails.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {remaining.guardrails.map((guardrail) => (
+              <Chip key={guardrail} size="sm" color="success" variant="soft">
+                {t(`remaining_route_work_guardrails.${guardrail}`)}
+              </Chip>
+            ))}
+          </div>
+        )}
       </CardBody>
     </Card>
   );
