@@ -161,6 +161,11 @@
       "title": "Page",
       "missing": "This public page is not available in the shadow frontend yet."
     },
+    "developmentStatus": {
+      "title": "Development Status",
+      "lead": "Review public platform feature and development status.",
+      "body": "This shadow page follows the existing React redirect target and keeps operational controls in the secure Vite app."
+    },
     "publicCollection": {
       "empty": "No public items are available yet."
     },
@@ -184,6 +189,16 @@
       "lead": "View public event information from {{tenantName}}.",
       "body": "This shadow page is prepared for public event details. Attendance and organiser actions remain in the secure Vite app."
     },
+    "groups": {
+      "title": "Groups",
+      "lead": "Browse public groups from {{tenantName}}.",
+      "body": "This shadow page is prepared for public group discovery. Group creation, membership management, and private discussions remain in the secure Vite app."
+    },
+    "groupDetail": {
+      "title": "Group",
+      "lead": "View public group information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public group details. Joining, moderation, files, and discussions remain in the secure Vite app."
+    },
     "jobs": {
       "title": "Jobs",
       "lead": "Browse public opportunities from {{tenantName}}.",
@@ -193,6 +208,31 @@
       "title": "Job",
       "lead": "View public job information from {{tenantName}}.",
       "body": "This shadow page is prepared for public job details. Applications and pipeline actions remain in the secure Vite app."
+    },
+    "courses": {
+      "title": "Courses",
+      "lead": "Browse public courses from {{tenantName}}.",
+      "body": "This shadow page is prepared for public course discovery. Enrolment, learning progress, instructor tools, and grading remain in the secure Vite app."
+    },
+    "courseDetail": {
+      "title": "Course",
+      "lead": "View public course information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public course details. Enrolment, lessons, progress, and certificates remain in the secure Vite app."
+    },
+    "podcasts": {
+      "title": "Podcasts",
+      "lead": "Browse public podcast shows from {{tenantName}}.",
+      "body": "This shadow page is prepared for public podcast discovery. Studio publishing, subscriptions, reporting, and reactions remain in the secure Vite app."
+    },
+    "podcastShow": {
+      "title": "Podcast Show",
+      "lead": "View public podcast show information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public podcast show details. Publishing and subscriber tools remain in the secure Vite app."
+    },
+    "podcastEpisode": {
+      "title": "Podcast Episode",
+      "lead": "Listen to public podcast episode information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public podcast episode details. Reactions, reports, and studio tools remain in the secure Vite app."
     },
     "organisations": {
       "title": "Organisations",
@@ -248,6 +288,31 @@
       "title": "Marketplace Item",
       "lead": "View public marketplace item information from {{tenantName}}.",
       "body": "This shadow page is prepared for public marketplace item details. Offers, checkout, and editing remain in the secure Vite app."
+    },
+    "marketplaceSeller": {
+      "title": "Marketplace Seller",
+      "lead": "View public seller information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public seller profiles. Seller onboarding, payouts, coupons, and order management remain in the secure Vite app."
+    },
+    "marketplaceCategory": {
+      "title": "Marketplace Category",
+      "lead": "Browse public marketplace category information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public marketplace category discovery. Category management and seller tools remain in the secure Vite app."
+    },
+    "coupons": {
+      "title": "Coupons",
+      "lead": "Browse public merchant coupons from {{tenantName}}.",
+      "body": "This shadow page is prepared for public coupon discovery. Coupon creation, redemption operations, and seller reporting remain in the secure Vite app."
+    },
+    "couponDetail": {
+      "title": "Coupon",
+      "lead": "View public coupon information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public coupon details. QR generation, validation, and redemption remain in the secure Vite app."
+    },
+    "caringCommunity": {
+      "title": "Caring Community",
+      "lead": "Explore public caring-community information from {{tenantName}}.",
+      "body": "This shadow page is prepared for the public caring-community hub. Help requests, safeguarding, caregiver tools, surveys, and member workflows remain in the secure Vite app."
     },
     "developers": {
       "title": "Developers",
@@ -328,6 +393,16 @@
       "title": "Ideation Challenge",
       "lead": "View public ideation challenge information from {{tenantName}}.",
       "body": "This shadow page is prepared for public ideation challenge details. Submissions, votes, comments, and moderation remain in the secure Vite app."
+    },
+    "ideationIdeaDetail": {
+      "title": "Ideation Idea",
+      "lead": "View public ideation idea information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public ideation idea details. Comments, votes, moderation, and campaign operations remain in the secure Vite app."
+    },
+    "clubs": {
+      "title": "Clubs",
+      "lead": "Browse public clubs and associations from {{tenantName}}.",
+      "body": "This shadow page is prepared for public clubs and associations discovery. Imports, dues management, and member invitations remain in the secure Vite app."
     },
     "notFound": {
       "title": "Page not found",
