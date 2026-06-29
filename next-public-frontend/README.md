@@ -28,6 +28,12 @@ npm --prefix next-public-frontend run dev
 The default check command runs manifest validation, message validation,
 no-JavaScript HTML checks, TypeScript, Vitest, and a production build.
 
+Backend/admin readiness checks:
+
+```bash
+vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php
+```
+
 ## Shadow Container
 
 The blue/green compose file includes an opt-in profile:
@@ -70,7 +76,7 @@ Do not enable public traffic until all of the following are true:
 1. `npm --prefix next-public-frontend run check` passes.
 2. `npm --prefix react-frontend run build` passes.
 3. `cd react-frontend && npx tsc --noEmit` passes.
-4. The readiness API regression tests pass.
+4. `vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php` passes.
 5. Public Next routes have parity checks for status codes, canonicals,
    metadata, tenant branding, AGPL attribution, and no-JavaScript HTML.
 6. Private Vite routes have regression checks proving gated pages still load.
