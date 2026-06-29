@@ -2922,7 +2922,8 @@
         "port_env": "Port environment variable"
       },
       "cutover": {
-        "title": "Remaining live cutover sequence"
+        "title": "Remaining live cutover sequence",
+        "verification_commands": "Verification commands"
       },
       "cutover_steps": {
         "verify_next_shadow_build": "Verify the Next.js shadow build and route manifest.",
@@ -2968,6 +2969,14 @@
         "api_backed_route_endpoint_not_plain_path": "API-backed route endpoints must be plain paths without query strings or fragments.",
         "api_backed_route_endpoint_has_path_traversal": "API-backed route endpoints must not contain path traversal segments.",
         "api_backed_route_param_mismatch": "API endpoint parameters must match the public route pattern."
+      },
+      "cutover_gate_blockers": {
+        "manual_verification_required": "Manual verification required",
+        "route_parity_required": "Route parity required",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
+        "edge_routes_not_configured": "Production edge routes are not configured",
+        "cutover_not_active": "Cutover is not active",
+        "prerender_fallback_must_remain": "Prerender fallback must remain available"
       }
     }
   },

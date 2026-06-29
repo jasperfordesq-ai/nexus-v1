@@ -24,6 +24,38 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertSame('blocker', $safetyChecks['route_cutover_disabled']);
     }
 
+    public function test_summary_reports_cutover_gates_as_blocked_until_manual_cutover(): void
+    {
+        $summary = (new NextPublicFrontendReadinessService())->summary();
+
+        $gates = array_column($summary['cutover_gates'], null, 'key');
+
+        $this->assertSame(
+            [
+                'verify_next_shadow_build',
+                'verify_no_js_public_html',
+                'verify_private_vite_regression',
+                'prepare_apache_canary_routes',
+                'enable_canary_for_public_routes_only',
+                'monitor_and_keep_prerender_fallback',
+            ],
+            array_keys($gates),
+        );
+        $this->assertSame('blocker', $gates['prepare_apache_canary_routes']['status']);
+        $this->assertContains('explicit_cutover_instruction_required', $gates['prepare_apache_canary_routes']['blockers']);
+        $this->assertContains('edge_routes_not_configured', $gates['prepare_apache_canary_routes']['blockers']);
+        $this->assertSame('blocker', $gates['enable_canary_for_public_routes_only']['status']);
+        $this->assertContains('explicit_cutover_instruction_required', $gates['enable_canary_for_public_routes_only']['blockers']);
+        $this->assertSame(
+            ['npm --prefix next-public-frontend run check'],
+            $gates['verify_next_shadow_build']['verification_commands'],
+        );
+        $this->assertContains(
+            'npm --prefix react-frontend run build',
+            $gates['verify_private_vite_regression']['verification_commands'],
+        );
+    }
+
     public function test_manifest_validation_blocks_api_routes_outside_laravel_v2_public_api(): void
     {
         $validation = $this->validateManifest([

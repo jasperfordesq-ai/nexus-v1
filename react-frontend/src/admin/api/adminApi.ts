@@ -1795,6 +1795,13 @@ export interface NextPublicRouteReadiness {
   blockers: string[];
 }
 
+export interface NextPublicCutoverGate {
+  key: string;
+  status: 'pass' | 'blocker' | 'info' | string;
+  blockers: string[];
+  verification_commands: string[];
+}
+
 export interface NextPublicFrontendReadiness {
   mode: string;
   app: {
@@ -1867,6 +1874,7 @@ export interface NextPublicFrontendReadiness {
     status: 'pass' | 'blocker' | 'info' | string;
   }>;
   cutover_step_keys: string[];
+  cutover_gates: NextPublicCutoverGate[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

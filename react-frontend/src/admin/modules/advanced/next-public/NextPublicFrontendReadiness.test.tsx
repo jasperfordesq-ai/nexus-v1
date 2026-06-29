@@ -111,6 +111,20 @@ const readiness = {
     { key: 'parity_tests_required_before_cutover', status: 'blocker' },
   ],
   cutover_step_keys: ['verify_next_shadow_build', 'enable_canary_for_public_routes_only'],
+  cutover_gates: [
+    {
+      key: 'verify_next_shadow_build',
+      status: 'blocker',
+      blockers: ['manual_verification_required'],
+      verification_commands: ['npm --prefix next-public-frontend run check'],
+    },
+    {
+      key: 'prepare_apache_canary_routes',
+      status: 'blocker',
+      blockers: ['explicit_cutover_instruction_required', 'edge_routes_not_configured'],
+      verification_commands: [],
+    },
+  ],
 };
 
 describe('NextPublicFrontendReadiness', () => {
@@ -138,7 +152,7 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getAllByText('laravel_public_api')).not.toHaveLength(0);
     expect(screen.getByText('GET /v2/listings/{id}')).toBeInTheDocument();
     expect(screen.getByText('npm run build:next-public')).toBeInTheDocument();
-    expect(screen.getByText('npm --prefix next-public-frontend run check')).toBeInTheDocument();
+    expect(screen.getAllByText('npm --prefix next-public-frontend run check')).not.toHaveLength(0);
     expect(screen.getByText('npm --prefix react-frontend run build')).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -154,6 +168,9 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getAllByText('Parity test required')).not.toHaveLength(0);
     expect(screen.getByText('3 public routes')).toBeInTheDocument();
     expect(screen.getByText('3 private prefixes')).toBeInTheDocument();
+    expect(screen.getByText('Manual verification required')).toBeInTheDocument();
+    expect(screen.getByText('Explicit cutover instruction required')).toBeInTheDocument();
+    expect(screen.getByText('Production edge routes are not configured')).toBeInTheDocument();
   });
 
   it('shows an error state when readiness cannot load', async () => {

@@ -192,13 +192,41 @@ export default function NextPublicFrontendReadiness() {
               <h2 className="text-lg font-semibold">{t('cutover.title')}</h2>
             </CardHeader>
             <CardBody>
-              <ol className="space-y-2 pl-5 text-sm text-muted">
-                {readiness.cutover_step_keys.map((stepKey) => (
-                  <li key={stepKey} className="list-decimal">
-                    {t(`cutover_steps.${stepKey}`)}
-                  </li>
+              <div className="space-y-3">
+                {readiness.cutover_gates.map((gate, index) => (
+                  <div key={gate.key} className="rounded-md border border-divider px-3 py-3 text-sm">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="font-medium">
+                          {index + 1}. {t(`cutover_steps.${gate.key}`)}
+                        </div>
+                        {gate.verification_commands.length > 0 && (
+                          <div className="mt-2 space-y-1">
+                            <div className="text-xs font-medium text-muted">{t('cutover.verification_commands')}</div>
+                            {gate.verification_commands.map((command) => (
+                              <code key={command} className="block break-all rounded bg-surface-secondary px-2 py-1 text-xs">
+                                {command}
+                              </code>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <Chip size="sm" color={statusColor(gate.status)} variant="soft">
+                        {t(`statuses.${gate.status}`)}
+                      </Chip>
+                    </div>
+                    {gate.blockers.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {gate.blockers.map((blocker) => (
+                          <Chip key={blocker} size="sm" color="warning" variant="soft">
+                            {t(`cutover_gate_blockers.${blocker}`)}
+                          </Chip>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
-              </ol>
+              </div>
             </CardBody>
           </Card>
         </div>

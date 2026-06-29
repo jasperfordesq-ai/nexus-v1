@@ -69,6 +69,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $publicPatterns = array_column($payload['manifest']['public_routes'], 'pattern');
         $apiBackedRouteKeys = array_column($payload['content_sources']['api_backed_routes'], 'routeKey');
         $routeReadiness = $payload['manifest']['route_readiness'];
+        $cutoverGatesByKey = array_column($payload['cutover_gates'], null, 'key');
         $routeReadinessByKey = [];
 
         foreach ($routeReadiness as $route) {
@@ -143,6 +144,19 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains(
             'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php',
             $payload['shadow_runtime']['verification_commands'],
+        );
+        $this->assertSame('blocker', $cutoverGatesByKey['prepare_apache_canary_routes']['status']);
+        $this->assertContains(
+            'explicit_cutover_instruction_required',
+            $cutoverGatesByKey['prepare_apache_canary_routes']['blockers'],
+        );
+        $this->assertContains(
+            'edge_routes_not_configured',
+            $cutoverGatesByKey['prepare_apache_canary_routes']['blockers'],
+        );
+        $this->assertSame(
+            ['npm --prefix next-public-frontend run check'],
+            $cutoverGatesByKey['verify_next_shadow_build']['verification_commands'],
         );
         $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['about']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['listingDetail']['content_source']);

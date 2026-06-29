@@ -269,6 +269,55 @@ class NextPublicFrontendReadinessService
                 'enable_canary_for_public_routes_only',
                 'monitor_and_keep_prerender_fallback',
             ],
+            'cutover_gates' => $this->cutoverGates(),
+        ];
+    }
+
+    /**
+     * @return array<int, array{key: string, status: string, blockers: array<int, string>, verification_commands: array<int, string>}>
+     */
+    private function cutoverGates(): array
+    {
+        return [
+            [
+                'key' => 'verify_next_shadow_build',
+                'status' => 'blocker',
+                'blockers' => ['manual_verification_required'],
+                'verification_commands' => ['npm --prefix next-public-frontend run check'],
+            ],
+            [
+                'key' => 'verify_no_js_public_html',
+                'status' => 'blocker',
+                'blockers' => ['manual_verification_required', 'route_parity_required'],
+                'verification_commands' => ['npm --prefix next-public-frontend run check:no-js-html'],
+            ],
+            [
+                'key' => 'verify_private_vite_regression',
+                'status' => 'blocker',
+                'blockers' => ['manual_verification_required'],
+                'verification_commands' => [
+                    'npm --prefix react-frontend run build',
+                    'cd react-frontend && npx tsc --noEmit',
+                ],
+            ],
+            [
+                'key' => 'prepare_apache_canary_routes',
+                'status' => 'blocker',
+                'blockers' => ['explicit_cutover_instruction_required', 'edge_routes_not_configured'],
+                'verification_commands' => [],
+            ],
+            [
+                'key' => 'enable_canary_for_public_routes_only',
+                'status' => 'blocker',
+                'blockers' => ['explicit_cutover_instruction_required', 'route_parity_required'],
+                'verification_commands' => [],
+            ],
+            [
+                'key' => 'monitor_and_keep_prerender_fallback',
+                'status' => 'blocker',
+                'blockers' => ['cutover_not_active', 'prerender_fallback_must_remain'],
+                'verification_commands' => [],
+            ],
         ];
     }
 
