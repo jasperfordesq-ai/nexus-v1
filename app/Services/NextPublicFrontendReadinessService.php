@@ -33,6 +33,21 @@ class NextPublicFrontendReadinessService
         'wallet',
     ];
 
+    private const REQUIRED_VITE_PRIVATE_PATTERNS = [
+        '/events/new',
+        '/events/:id/edit',
+        '/jobs/new',
+        '/jobs/:id/edit',
+        '/listings/new',
+        '/listings/:id/edit',
+        '/marketplace/new',
+        '/marketplace/:id/edit',
+        '/organisations/new',
+        '/organisations/:id/edit',
+        '/resources/new',
+        '/resources/:id/edit',
+    ];
+
     /**
      * @return array<string, mixed>
      */
@@ -47,7 +62,14 @@ class NextPublicFrontendReadinessService
         $privatePrefixes = is_array($manifest) ? array_values($manifest['vitePrivatePrefixes'] ?? []) : [];
         $privatePatterns = is_array($manifest) ? array_values($manifest['vitePrivatePatterns'] ?? []) : [];
         $apiBackedRoutes = $this->apiBackedRoutes($contentSources);
-        $validation = $this->validateManifest($manifest, $publicRoutes, $privatePrefixes, $apiBackedRoutes, $contentSources);
+        $validation = $this->validateManifest(
+            $manifest,
+            $publicRoutes,
+            $privatePrefixes,
+            $apiBackedRoutes,
+            $contentSources,
+            $privatePatterns,
+        );
 
         $manifestMode = is_array($manifest) ? (string) ($manifest['mode'] ?? 'unknown') : 'missing';
         $cutoverEnabled = filter_var(
@@ -251,6 +273,7 @@ class NextPublicFrontendReadinessService
      * @param array<int, mixed> $privatePrefixes
      * @param array<int, array{routeKey: string, endpoint: string, method: string}> $apiBackedRoutes
      * @param array<string, mixed>|null $contentSources
+     * @param array<int, mixed> $privatePatterns
      * @return array{status: string, issues: array<int, array<string, string>>}
      */
     private function validateManifest(
@@ -259,6 +282,7 @@ class NextPublicFrontendReadinessService
         array $privatePrefixes,
         array $apiBackedRoutes,
         ?array $contentSources = null,
+        array $privatePatterns = [],
     ): array
     {
         $issues = [];
@@ -327,6 +351,7 @@ class NextPublicFrontendReadinessService
         $routeKeys = [];
         $routeParamsByKey = [];
         $privatePrefixSet = array_flip(array_filter($privatePrefixes, 'is_string'));
+        $privatePatternSet = array_flip(array_filter($privatePatterns, 'is_string'));
 
         foreach (self::REQUIRED_VITE_PRIVATE_PREFIXES as $prefix) {
             if (!isset($privatePrefixSet[$prefix])) {
@@ -334,6 +359,16 @@ class NextPublicFrontendReadinessService
                     'code' => 'vite_private_prefix_missing_required',
                     'severity' => 'blocker',
                     'context' => $prefix,
+                ];
+            }
+        }
+
+        foreach (self::REQUIRED_VITE_PRIVATE_PATTERNS as $pattern) {
+            if (!isset($privatePatternSet[$pattern])) {
+                $issues[] = [
+                    'code' => 'vite_private_pattern_missing_required',
+                    'severity' => 'blocker',
+                    'context' => $pattern,
                 ];
             }
         }

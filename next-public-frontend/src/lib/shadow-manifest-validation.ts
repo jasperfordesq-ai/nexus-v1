@@ -6,6 +6,7 @@
 interface RouteOwnershipManifest {
   mode?: unknown;
   nextPublicRoutes?: unknown;
+  vitePrivatePatterns?: unknown;
   vitePrivatePrefixes?: unknown;
 }
 
@@ -49,6 +50,21 @@ const requiredVitePrivatePrefixes = [
   'wallet',
 ];
 
+const requiredVitePrivatePatterns = [
+  '/events/new',
+  '/events/:id/edit',
+  '/jobs/new',
+  '/jobs/:id/edit',
+  '/listings/new',
+  '/listings/:id/edit',
+  '/marketplace/new',
+  '/marketplace/:id/edit',
+  '/organisations/new',
+  '/organisations/:id/edit',
+  '/resources/new',
+  '/resources/:id/edit',
+];
+
 export function validateShadowManifests(
   routeManifest: RouteOwnershipManifest,
   contentSources: ContentSourcesManifest,
@@ -85,6 +101,11 @@ export function validateShadowManifests(
       ? routeManifest.vitePrivatePrefixes.filter((prefix): prefix is string => typeof prefix === 'string')
       : [],
   );
+  const privatePatterns = new Set(
+    Array.isArray(routeManifest.vitePrivatePatterns)
+      ? routeManifest.vitePrivatePatterns.filter((pattern): pattern is string => typeof pattern === 'string')
+      : [],
+  );
   const routeKeys = new Set<string>();
   const routeParamsByKey = new Map<string, Set<string>>();
   const patterns = new Set<string>();
@@ -92,6 +113,12 @@ export function validateShadowManifests(
   for (const prefix of requiredVitePrivatePrefixes) {
     if (!privatePrefixes.has(prefix)) {
       issues.push({ code: 'vite_private_prefix_missing_required', context: prefix, severity: 'blocker' });
+    }
+  }
+
+  for (const pattern of requiredVitePrivatePatterns) {
+    if (!privatePatterns.has(pattern)) {
+      issues.push({ code: 'vite_private_pattern_missing_required', context: pattern, severity: 'blocker' });
     }
   }
 

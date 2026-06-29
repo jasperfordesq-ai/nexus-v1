@@ -135,6 +135,22 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         ], $validation['issues']);
     }
 
+    public function test_manifest_validation_blocks_missing_required_private_patterns(): void
+    {
+        $validation = $this->validateManifest([
+            'mode' => 'shadow',
+        ], [], [], [], null, [
+            '/events/:id/edit',
+        ]);
+
+        $this->assertSame('blocker', $validation['status']);
+        $this->assertContains([
+            'code' => 'vite_private_pattern_missing_required',
+            'severity' => 'blocker',
+            'context' => '/events/new',
+        ], $validation['issues']);
+    }
+
     public function test_manifest_validation_blocks_content_sources_outside_laravel_public_api(): void
     {
         $validation = $this->validateManifest([
@@ -224,6 +240,7 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         array $privatePrefixes,
         array $apiBackedRoutes,
         ?array $contentSources = null,
+        ?array $privatePatterns = null,
     ): array
     {
         $method = new ReflectionMethod(NextPublicFrontendReadinessService::class, 'validateManifest');
@@ -236,6 +253,7 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
             $privatePrefixes,
             $apiBackedRoutes,
             $contentSources,
+            $privatePatterns ?? [],
         );
     }
 }

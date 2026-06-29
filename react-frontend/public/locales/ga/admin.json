@@ -2954,6 +2954,7 @@
         "public_route_duplicate_key": "A public route key is duplicated.",
         "public_route_collides_with_private_prefix": "A public route collides with a private Vite route prefix.",
         "vite_private_prefix_missing_required": "Required Vite private route prefix is missing.",
+        "vite_private_pattern_missing_required": "Required Vite private route pattern is missing.",
         "content_sources_not_laravel_api": "Content sources must use Laravel public APIs.",
         "content_sources_allow_next_database_queries": "Next.js content sources must not query the database.",
         "api_backed_route_invalid": "An API-backed route entry is malformed.",
