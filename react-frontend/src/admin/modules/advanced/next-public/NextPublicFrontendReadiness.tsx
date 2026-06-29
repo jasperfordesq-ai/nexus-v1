@@ -378,6 +378,27 @@ function EdgeCanaryCard({ readiness }: { readiness: Readiness }) {
           <RuntimeRow label={t('edge_canary.routing_flag')} value={edgeCanary.routing_flag} />
           <RuntimeRow label={t('edge_canary.route_file_status')} value={t(`edge_canary_route_file_statuses.${edgeCanary.route_file_status}`)} />
         </div>
+        <div className="mb-4 rounded-md border border-divider px-3 py-3 text-sm">
+          <RuntimeRow label={t('edge_canary.config_template')} value={edgeCanary.config_template.path} />
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Chip size="sm" color={edgeCanary.config_template.exists ? 'success' : 'warning'} variant="soft">
+              {edgeCanary.config_template.exists ? t('edge_canary.template_exists') : t('edge_canary.template_missing')}
+            </Chip>
+            <Chip size="sm" color={edgeCanary.config_template.example_only ? 'success' : 'danger'} variant="soft">
+              {edgeCanary.config_template.example_only ? t('edge_canary.example_only') : t('edge_canary.not_example_only')}
+            </Chip>
+            <Chip size="sm" color={edgeCanary.config_template.included_by_deploy ? 'danger' : 'success'} variant="soft">
+              {edgeCanary.config_template.included_by_deploy ? t('edge_canary.included_by_deploy') : t('edge_canary.not_included_by_deploy')}
+            </Chip>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-1">
+            {edgeCanary.config_template.required_review_steps.map((step) => (
+              <Chip key={step} size="sm" color="warning" variant="soft">
+                {t(`edge_canary_review_steps.${step}`)}
+              </Chip>
+            ))}
+          </div>
+        </div>
 
         <div className="mb-4 flex flex-wrap gap-2">
           <Chip size="sm" color={edgeCanary.routing_flag_enabled ? 'danger' : 'success'} variant="soft">

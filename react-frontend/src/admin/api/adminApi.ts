@@ -1845,6 +1845,13 @@ export interface NextPublicEdgeCanary {
   requires_explicit_cutover_instruction: boolean;
   reviewed_config_required: boolean;
   route_file_status: 'not_configured' | string;
+  config_template: {
+    path: string;
+    exists: boolean;
+    example_only: boolean;
+    included_by_deploy: boolean;
+    required_review_steps: string[];
+  };
   guardrails: string[];
 }
 

@@ -119,6 +119,11 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertSame('not_configured', $edgeCanary['route_file_status']);
         $this->assertContains('do_not_edit_plesk_vhosts_directly', $edgeCanary['guardrails']);
         $this->assertContains('do_not_remove_prerender', $edgeCanary['guardrails']);
+        $this->assertSame('scripts/deploy/apache/next-public-foundation-canary.conf.example', $edgeCanary['config_template']['path']);
+        $this->assertTrue($edgeCanary['config_template']['exists']);
+        $this->assertTrue($edgeCanary['config_template']['example_only']);
+        $this->assertFalse($edgeCanary['config_template']['included_by_deploy']);
+        $this->assertContains('explicit_cutover_instruction_required', $edgeCanary['config_template']['required_review_steps']);
     }
 
     public function test_summary_reports_route_batches_for_future_canary_planning(): void

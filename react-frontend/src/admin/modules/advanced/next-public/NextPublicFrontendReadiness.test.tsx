@@ -117,6 +117,16 @@ const readiness = {
     requires_explicit_cutover_instruction: true,
     reviewed_config_required: true,
     route_file_status: 'not_configured',
+    config_template: {
+      path: 'scripts/deploy/apache/next-public-foundation-canary.conf.example',
+      exists: true,
+      example_only: true,
+      included_by_deploy: false,
+      required_review_steps: [
+        'explicit_cutover_instruction_required',
+        'apache_configtest_required',
+      ],
+    },
     guardrails: [
       'do_not_edit_plesk_vhosts_directly',
       'do_not_remove_prerender',
@@ -251,6 +261,9 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('Apache/Plesk')).toBeInTheDocument();
     expect(screen.getByText('NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED')).toBeInTheDocument();
     expect(screen.getByText('No route file configured by this module')).toBeInTheDocument();
+    expect(screen.getByText('scripts/deploy/apache/next-public-foundation-canary.conf.example')).toBeInTheDocument();
+    expect(screen.getByText('Example only')).toBeInTheDocument();
+    expect(screen.getByText('Not included by deploy')).toBeInTheDocument();
     expect(screen.getByText('Route batch readiness')).toBeInTheDocument();
     expect(screen.getByText('Foundation public pages')).toBeInTheDocument();
     expect(screen.getByText('API-backed public content')).toBeInTheDocument();

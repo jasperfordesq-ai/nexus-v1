@@ -342,10 +342,12 @@ class NextPublicFrontendReadinessService
     }
 
     /**
-     * @return array{status: string, edge: string, routing_flag: string, routing_flag_enabled: bool, activation_available: bool, preview_only: bool, requires_explicit_cutover_instruction: bool, reviewed_config_required: bool, route_file_status: string, guardrails: array<int, string>}
+     * @return array{status: string, edge: string, routing_flag: string, routing_flag_enabled: bool, activation_available: bool, preview_only: bool, requires_explicit_cutover_instruction: bool, reviewed_config_required: bool, route_file_status: string, config_template: array{path: string, exists: bool, example_only: bool, included_by_deploy: bool, required_review_steps: array<int, string>}, guardrails: array<int, string>}
      */
     private function edgeCanaryPreview(bool $cutoverEnabled): array
     {
+        $templatePath = 'scripts/deploy/apache/next-public-foundation-canary.conf.example';
+
         return [
             'status' => $cutoverEnabled ? 'blocker' : 'blocked',
             'edge' => 'apache_plesk',
@@ -356,6 +358,25 @@ class NextPublicFrontendReadinessService
             'requires_explicit_cutover_instruction' => true,
             'reviewed_config_required' => true,
             'route_file_status' => 'not_configured',
+            'config_template' => [
+                'path' => $templatePath,
+                'exists' => File::isFile(base_path($templatePath)),
+                'example_only' => true,
+                'included_by_deploy' => $this->fileContains(
+                    base_path('scripts/deploy/bluegreen-deploy.sh'),
+                    'next-public-foundation-canary.conf.example',
+                ) || $this->fileContains(
+                    base_path('compose.bluegreen.yml'),
+                    'next-public-foundation-canary.conf.example',
+                ),
+                'required_review_steps' => [
+                    'explicit_cutover_instruction_required',
+                    'next_shadow_checks_required',
+                    'react_private_regression_required',
+                    'apache_configtest_required',
+                    'prerender_fallback_must_remain',
+                ],
+            ],
             'guardrails' => [
                 'do_not_edit_plesk_vhosts_directly',
                 'do_not_enable_routing_flag_without_cutover_instruction',
@@ -599,6 +620,12 @@ class NextPublicFrontendReadinessService
 
         return File::isFile($composePath)
             && str_contains((string) File::get($composePath), $profile);
+    }
+
+    private function fileContains(string $path, string $needle): bool
+    {
+        return File::isFile($path)
+            && str_contains((string) File::get($path), $needle);
     }
 
     /**

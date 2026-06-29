@@ -2924,6 +2924,13 @@
         "edge": "Production edge",
         "routing_flag": "Routing flag",
         "route_file_status": "Route file status",
+        "config_template": "Config template",
+        "template_exists": "Template exists",
+        "template_missing": "Template missing",
+        "example_only": "Example only",
+        "not_example_only": "Not example only",
+        "included_by_deploy": "Included by deploy",
+        "not_included_by_deploy": "Not included by deploy",
         "routing_flag_on": "Routing flag is enabled",
         "routing_flag_off": "Routing flag is disabled",
         "activation_available": "Activation controls are available",
@@ -2938,6 +2945,13 @@
       },
       "edge_canary_route_file_statuses": {
         "not_configured": "No route file configured by this module"
+      },
+      "edge_canary_review_steps": {
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
+        "next_shadow_checks_required": "Next shadow checks required",
+        "react_private_regression_required": "React private-route regression required",
+        "apache_configtest_required": "Apache configtest required",
+        "prerender_fallback_must_remain": "Prerender fallback must remain"
       },
       "edge_canary_guardrails": {
         "do_not_edit_plesk_vhosts_directly": "Do not edit Plesk vhosts directly",

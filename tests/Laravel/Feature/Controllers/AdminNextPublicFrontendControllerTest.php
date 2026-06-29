@@ -78,6 +78,10 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.edge_canary.activation_available', false);
         $response->assertJsonPath('data.edge_canary.preview_only', true);
         $response->assertJsonPath('data.edge_canary.route_file_status', 'not_configured');
+        $response->assertJsonPath('data.edge_canary.config_template.path', 'scripts/deploy/apache/next-public-foundation-canary.conf.example');
+        $response->assertJsonPath('data.edge_canary.config_template.exists', true);
+        $response->assertJsonPath('data.edge_canary.config_template.example_only', true);
+        $response->assertJsonPath('data.edge_canary.config_template.included_by_deploy', false);
 
         $payload = $response->json('data');
         $publicPatterns = array_column($payload['manifest']['public_routes'], 'pattern');
@@ -191,6 +195,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         );
         $this->assertContains('do_not_edit_plesk_vhosts_directly', $payload['edge_canary']['guardrails']);
         $this->assertContains('do_not_remove_prerender', $payload['edge_canary']['guardrails']);
+        $this->assertContains('apache_configtest_required', $payload['edge_canary']['config_template']['required_review_steps']);
         $this->assertSame('blocked', $routeBatchesByKey['foundation_public_pages']['status']);
         $this->assertContains('home', $routeBatchesByKey['foundation_public_pages']['route_keys']);
         $this->assertContains('manual_shadow_review_required', $routeBatchesByKey['foundation_public_pages']['blockers']);

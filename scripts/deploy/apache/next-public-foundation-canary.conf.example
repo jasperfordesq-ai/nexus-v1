@@ -1,0 +1,30 @@
+# Example only: do not include this file in Apache/Plesk without an explicit
+# Project NEXUS public-frontend cutover instruction.
+#
+# Purpose:
+#   Send only the first foundation public-page batch to the shadow Next.js
+#   public frontend while keeping the existing React/Vite frontend and
+#   prerender fallback in place for everything else.
+#
+# Safety:
+#   - This file is not included by scripts/deploy/bluegreen-deploy.sh.
+#   - This file is not referenced by compose.bluegreen.yml.
+#   - Copy into a reviewed Plesk per-vhost include only after local shadow
+#     checks, React private-route regression checks, and Apache configtest pass.
+#   - Do not hand-edit Plesk-managed vhost files directly.
+#
+# Required before use:
+#   Include /etc/apache2/conf-enabled/nexus-active-upstreams.conf
+#   Define NEXUS_NEXT_PUBLIC_PORT 3200
+#   ProxyPreserveHost On
+#   RequestHeader set X-Forwarded-Proto "https"
+#
+# The rules below are intentionally exact-match foundation routes. They avoid
+# dynamic detail routes and all logged-in/member/workbench paths.
+
+RewriteEngine On
+
+RewriteRule ^/$ http://127.0.0.1:${NEXUS_NEXT_PUBLIC_PORT}/ [P,L]
+RewriteRule ^/(about|features|changelog|help|contact|faq|privacy|terms|accessibility|cookies|community-guidelines|trust-and-safety|acceptable-use|legal|timebanking-guide|development-status)/?$ http://127.0.0.1:${NEXUS_NEXT_PUBLIC_PORT}/$1 [P,L]
+RewriteRule ^/(privacy|terms|accessibility|cookies|community-guidelines|acceptable-use)/versions/?$ http://127.0.0.1:${NEXUS_NEXT_PUBLIC_PORT}/$1/versions [P,L]
+RewriteRule ^/platform/(terms|privacy|disclaimer)/?$ http://127.0.0.1:${NEXUS_NEXT_PUBLIC_PORT}/platform/$1 [P,L]
