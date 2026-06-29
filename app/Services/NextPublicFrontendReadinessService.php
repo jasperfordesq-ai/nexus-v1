@@ -254,6 +254,7 @@ class NextPublicFrontendReadinessService
 
         $patterns = [];
         $routeKeys = [];
+        $routeParamsByKey = [];
         $privatePrefixSet = array_flip(array_filter($privatePrefixes, 'is_string'));
 
         foreach ($publicRoutes as $route) {
@@ -279,6 +280,10 @@ class NextPublicFrontendReadinessService
                 $issues[] = ['code' => 'public_route_duplicate_key', 'severity' => 'blocker', 'context' => $routeKey];
             }
             $routeKeys[$routeKey] = true;
+
+            if ($routeKey !== '') {
+                $routeParamsByKey[$routeKey] = $this->extractRouteParams($pattern);
+            }
 
             $firstSegment = strtok(ltrim($pattern, '/'), '/');
             if (is_string($firstSegment) && $firstSegment !== '' && isset($privatePrefixSet[$firstSegment])) {
@@ -310,11 +315,51 @@ class NextPublicFrontendReadinessService
                     'context' => $route['routeKey'],
                 ];
             }
+
+            if (!$this->sameStringSet($routeParamsByKey[$route['routeKey']] ?? [], $this->extractEndpointParams($route['endpoint']))) {
+                $issues[] = [
+                    'code' => 'api_backed_route_param_mismatch',
+                    'severity' => 'blocker',
+                    'context' => $route['routeKey'],
+                ];
+            }
         }
 
         return [
             'status' => $issues === [] ? 'pass' : 'blocker',
             'issues' => $issues,
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function extractRouteParams(string $pattern): array
+    {
+        preg_match_all('/(?:^|\/):([A-Za-z0-9_]+)/', $pattern, $matches);
+
+        return array_values(array_unique($matches[1] ?? []));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function extractEndpointParams(string $endpoint): array
+    {
+        preg_match_all('/\{([A-Za-z0-9_]+)\}/', $endpoint, $matches);
+
+        return array_values(array_unique($matches[1] ?? []));
+    }
+
+    /**
+     * @param array<int, string> $left
+     * @param array<int, string> $right
+     */
+    private function sameStringSet(array $left, array $right): bool
+    {
+        sort($left);
+        sort($right);
+
+        return $left === $right;
     }
 }

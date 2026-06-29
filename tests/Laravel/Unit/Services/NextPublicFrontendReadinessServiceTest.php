@@ -64,6 +64,32 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         ], $validation['issues']);
     }
 
+    public function test_manifest_validation_blocks_api_route_parameter_drift(): void
+    {
+        $validation = $this->validateManifest([
+            'mode' => 'shadow',
+        ], [
+            [
+                'pattern' => '/events/:id',
+                'routeKey' => 'eventDetail',
+                'labelKey' => 'pages.eventDetail.title',
+            ],
+        ], [], [
+            [
+                'routeKey' => 'eventDetail',
+                'endpoint' => '/v2/events/{slug}',
+                'method' => 'GET',
+            ],
+        ]);
+
+        $this->assertSame('blocker', $validation['status']);
+        $this->assertContains([
+            'code' => 'api_backed_route_param_mismatch',
+            'severity' => 'blocker',
+            'context' => 'eventDetail',
+        ], $validation['issues']);
+    }
+
     /**
      * @param array<string, mixed>|null $manifest
      * @param array<int, mixed> $publicRoutes
