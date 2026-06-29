@@ -3012,6 +3012,34 @@
         "route_status_has_no_production_effect": "Route status has no production effect",
         "do_not_promote_auth_only_routes": "Do not promote auth-only routes"
       },
+      "dry_runs": {
+        "title": "Pre-cutover dry-run checks",
+        "activation_available": "Activation controls are available",
+        "activation_unavailable": "No activation controls",
+        "explicit_instruction_required": "Separate cutover instruction required"
+      },
+      "dry_run_items": {
+        "shadow_manifest_and_html": "Shadow manifest and no-JS HTML",
+        "remaining_static_manual_review": "Platform legal content review",
+        "auth_only_public_contract_review": "Auth-only public contract review",
+        "private_vite_regression": "Private Vite regression",
+        "inertness_guard": "Production inertness guard"
+      },
+      "dry_run_blockers": {
+        "manual_verification_required": "Manual verification required",
+        "route_parity_required": "Route parity required",
+        "authoritative_content_source_required": "Authoritative content source required",
+        "public_visibility_decision_required": "Public visibility decision required",
+        "privacy_review_required_before_public_api": "Privacy review required before public API",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+      },
+      "dry_run_notes": {
+        "shadow_only": "Shadow only",
+        "no_activation_control": "No activation control",
+        "do_not_promote_auth_only_routes": "Do not promote auth-only routes",
+        "vite_private_routes_remain_primary": "Vite private routes remain primary",
+        "do_not_remove_prerender": "Do not remove prerender fallback"
+      },
       "artifacts": {
         "title": "Cutover artifact inventory",
         "path": "Path",

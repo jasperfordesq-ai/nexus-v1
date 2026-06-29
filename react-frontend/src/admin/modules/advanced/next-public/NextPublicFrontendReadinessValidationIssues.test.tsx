@@ -180,6 +180,12 @@ const readinessWithValidationIssue = {
       },
     ],
   },
+  pre_cutover_dry_runs: {
+    production_effect: 'none',
+    activation_available: false,
+    requires_explicit_cutover_instruction: true,
+    items: [],
+  },
   cutover_artifacts: {
     production_effect: 'none',
     activation_available: false,

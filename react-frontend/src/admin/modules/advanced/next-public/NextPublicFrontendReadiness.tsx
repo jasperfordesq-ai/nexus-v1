@@ -149,6 +149,8 @@ export default function NextPublicFrontendReadiness() {
 
           <RemainingPublicRouteWorkCard readiness={readiness} />
 
+          <PreCutoverDryRunsCard readiness={readiness} />
+
           <ManifestValidationCard readiness={readiness} />
 
           <RouteCutoverGatesCard readiness={readiness} />
@@ -539,6 +541,87 @@ function RemainingPublicRouteWorkCard({ readiness }: { readiness: Readiness }) {
             ))}
           </div>
         )}
+      </CardBody>
+    </Card>
+  );
+}
+
+function PreCutoverDryRunsCard({ readiness }: { readiness: Readiness }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.next_public' });
+  const dryRuns = readiness.pre_cutover_dry_runs;
+
+  return (
+    <Card>
+      <CardHeader className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold">{t('dry_runs.title')}</h2>
+        <div className="flex flex-wrap justify-end gap-2">
+          <Chip size="sm" color="success" variant="soft">
+            {t(`production_effects.${dryRuns.production_effect}`)}
+          </Chip>
+          <Chip size="sm" color={dryRuns.activation_available ? 'danger' : 'success'} variant="soft">
+            {dryRuns.activation_available
+              ? t('dry_runs.activation_available')
+              : t('dry_runs.activation_unavailable')}
+          </Chip>
+          <Chip size="sm" color={dryRuns.requires_explicit_cutover_instruction ? 'warning' : 'danger'} variant="soft">
+            {t('dry_runs.explicit_instruction_required')}
+          </Chip>
+        </div>
+      </CardHeader>
+      <CardBody>
+        <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
+          {dryRuns.items.map((item) => (
+            <div key={item.key} className="rounded-md border border-divider px-3 py-3 text-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-medium">{t(`dry_run_items.${item.key}`)}</div>
+                  {item.commands.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {item.commands.map((command) => (
+                        <code key={command} className="block break-all rounded bg-surface-secondary px-2 py-1 text-xs">
+                          {command}
+                        </code>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <Chip size="sm" color={statusColor(item.status)} variant="soft">
+                  {t(`statuses.${item.status}`)}
+                </Chip>
+              </div>
+
+              {item.route_keys.length > 0 && (
+                <div className="mt-3 flex max-h-28 flex-wrap gap-1 overflow-auto">
+                  {item.route_keys.map((routeKey) => (
+                    <Chip key={routeKey} size="sm" variant="flat">
+                      {routeKey}
+                    </Chip>
+                  ))}
+                </div>
+              )}
+
+              {item.blockers.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {item.blockers.map((blocker) => (
+                    <Chip key={blocker} size="sm" color="warning" variant="soft">
+                      {t(`dry_run_blockers.${blocker}`)}
+                    </Chip>
+                  ))}
+                </div>
+              )}
+
+              {item.notes.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {item.notes.map((note) => (
+                    <Chip key={note} size="sm" color="success" variant="soft">
+                      {t(`dry_run_notes.${note}`)}
+                    </Chip>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </CardBody>
     </Card>
   );

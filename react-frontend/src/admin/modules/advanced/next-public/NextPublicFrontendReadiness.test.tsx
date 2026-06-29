@@ -224,6 +224,56 @@ const readiness = {
       },
     ],
   },
+  pre_cutover_dry_runs: {
+    production_effect: 'none',
+    activation_available: false,
+    requires_explicit_cutover_instruction: true,
+    items: [
+      {
+        key: 'shadow_manifest_and_html',
+        status: 'blocked',
+        route_keys: ['home', 'about', 'listingDetail'],
+        commands: [
+          'npm --prefix next-public-frontend run check',
+          'npm --prefix next-public-frontend run check:no-js-html',
+        ],
+        blockers: ['manual_verification_required', 'route_parity_required'],
+        notes: ['shadow_only', 'no_activation_control'],
+      },
+      {
+        key: 'remaining_static_manual_review',
+        status: 'blocked',
+        route_keys: ['platformTerms', 'platformPrivacy', 'platformDisclaimer'],
+        commands: ['npm --prefix next-public-frontend run check:no-js-html'],
+        blockers: ['authoritative_content_source_required'],
+        notes: ['no_activation_control'],
+      },
+      {
+        key: 'auth_only_public_contract_review',
+        status: 'blocked',
+        route_keys: ['couponDetail', 'ideationIdeaDetail'],
+        commands: ['npm run check:next-public:inert'],
+        blockers: ['privacy_review_required_before_public_api'],
+        notes: ['do_not_promote_auth_only_routes'],
+      },
+      {
+        key: 'private_vite_regression',
+        status: 'blocked',
+        route_keys: [],
+        commands: ['npm --prefix react-frontend run build', 'cd react-frontend && npx tsc --noEmit'],
+        blockers: ['manual_verification_required'],
+        notes: ['vite_private_routes_remain_primary'],
+      },
+      {
+        key: 'inertness_guard',
+        status: 'blocked',
+        route_keys: [],
+        commands: ['npm run check:next-public:inert'],
+        blockers: ['explicit_cutover_instruction_required'],
+        notes: ['no_activation_control', 'do_not_remove_prerender'],
+      },
+    ],
+  },
   cutover_artifacts: {
     production_effect: 'none',
     activation_available: false,
@@ -425,6 +475,17 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getAllByText('couponDetail')).not.toHaveLength(0);
     expect(screen.getAllByText('ideationIdeaDetail')).not.toHaveLength(0);
     expect(screen.getAllByText('futurePublicRoute')).not.toHaveLength(0);
+    expect(screen.getByText('Pre-cutover dry-run checks')).toBeInTheDocument();
+    expect(screen.getByText('Shadow manifest and no-JS HTML')).toBeInTheDocument();
+    expect(screen.getByText('Platform legal content review')).toBeInTheDocument();
+    expect(screen.getByText('Auth-only public contract review')).toBeInTheDocument();
+    expect(screen.getByText('Private Vite regression')).toBeInTheDocument();
+    expect(screen.getByText('Production inertness guard')).toBeInTheDocument();
+    expect(screen.getByText('Authoritative content source required')).toBeInTheDocument();
+    expect(screen.getByText('Privacy review required before public API')).toBeInTheDocument();
+    expect(screen.getAllByText('platformTerms')).not.toHaveLength(0);
+    expect(screen.getAllByText('platformPrivacy')).not.toHaveLength(0);
+    expect(screen.getAllByText('platformDisclaimer')).not.toHaveLength(0);
     expect(screen.getByText('npm run build:next-public')).toBeInTheDocument();
     expect(screen.getAllByText('npm run check:next-public:inert')).not.toHaveLength(0);
     expect(screen.getAllByText('npm --prefix next-public-frontend run check')).not.toHaveLength(0);
@@ -443,7 +504,7 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getAllByText('Parity test required')).not.toHaveLength(0);
     expect(screen.getByText('3 public routes')).toBeInTheDocument();
     expect(screen.getByText('3 private prefixes')).toBeInTheDocument();
-    expect(screen.getByText('Manual verification required')).toBeInTheDocument();
+    expect(screen.getAllByText('Manual verification required')).not.toHaveLength(0);
     expect(screen.getAllByText('Explicit cutover instruction required')).not.toHaveLength(0);
     expect(screen.getAllByText('Production edge routes are not configured')).not.toHaveLength(0);
     expect(screen.getByText('Operator playbook')).toBeInTheDocument();

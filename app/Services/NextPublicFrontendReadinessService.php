@@ -229,6 +229,7 @@ class NextPublicFrontendReadinessService
         $remainingPublicRouteWork = $this->remainingPublicRouteWork($publicRoutes, $apiBackedRoutes);
         $cutoverGates = $this->cutoverGates();
         $operatorPlaybook = $this->operatorPlaybook();
+        $preCutoverDryRuns = $this->preCutoverDryRuns($routeBatches, $remainingPublicRouteWork);
 
         return [
             'mode' => $manifestMode === 'shadow' ? 'shadow' : $manifestMode,
@@ -269,6 +270,7 @@ class NextPublicFrontendReadinessService
             'edge_canary' => $edgeCanary,
             'route_batches' => $routeBatches,
             'remaining_public_route_work' => $remainingPublicRouteWork,
+            'pre_cutover_dry_runs' => $preCutoverDryRuns,
             'cutover_artifacts' => $this->cutoverArtifactInventory(),
             'cutover_eligibility' => $this->cutoverEligibility(
                 $validation,
@@ -979,6 +981,89 @@ class NextPublicFrontendReadinessService
                     'status' => 'blocked',
                     'commands' => [],
                     'notes' => ['do_not_remove_prerender', 'rollback_path_required'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param array<int, array{key: string, status: string, route_count: int, route_keys: array<int, string>, blockers: array<int, string>, verification_commands: array<int, string>}> $routeBatches
+     * @param array<string, mixed> $remainingPublicRouteWork
+     * @return array{production_effect: string, activation_available: bool, requires_explicit_cutover_instruction: bool, items: array<int, array{key: string, status: string, route_keys: array<int, string>, commands: array<int, string>, blockers: array<int, string>, notes: array<int, string>}>}
+     */
+    private function preCutoverDryRuns(array $routeBatches, array $remainingPublicRouteWork): array
+    {
+        $batches = array_column($routeBatches, null, 'key');
+        $remainingGroups = is_array($remainingPublicRouteWork['groups'] ?? null)
+            ? array_column($remainingPublicRouteWork['groups'], null, 'key')
+            : [];
+
+        $foundationRouteKeys = is_array($batches['foundation_public_pages']['route_keys'] ?? null)
+            ? $batches['foundation_public_pages']['route_keys']
+            : [];
+        $apiBackedRouteKeys = is_array($batches['api_backed_public_content']['route_keys'] ?? null)
+            ? $batches['api_backed_public_content']['route_keys']
+            : [];
+        $staticManualReviewRouteKeys = is_array($remainingGroups['static_manual_review']['route_keys'] ?? null)
+            ? $remainingGroups['static_manual_review']['route_keys']
+            : [];
+        $authOnlyRouteKeys = is_array($remainingGroups['auth_only_backend']['route_keys'] ?? null)
+            ? $remainingGroups['auth_only_backend']['route_keys']
+            : [];
+
+        return [
+            'production_effect' => 'none',
+            'activation_available' => false,
+            'requires_explicit_cutover_instruction' => true,
+            'items' => [
+                [
+                    'key' => 'shadow_manifest_and_html',
+                    'status' => 'blocked',
+                    'route_keys' => array_values(array_unique(array_merge($foundationRouteKeys, $apiBackedRouteKeys))),
+                    'commands' => [
+                        'npm --prefix next-public-frontend run check',
+                        'npm --prefix next-public-frontend run check:no-js-html',
+                    ],
+                    'blockers' => ['manual_verification_required', 'route_parity_required'],
+                    'notes' => ['shadow_only', 'no_activation_control'],
+                ],
+                [
+                    'key' => 'remaining_static_manual_review',
+                    'status' => 'blocked',
+                    'route_keys' => $staticManualReviewRouteKeys,
+                    'commands' => ['npm --prefix next-public-frontend run check:no-js-html'],
+                    'blockers' => ['authoritative_content_source_required', 'manual_verification_required'],
+                    'notes' => ['no_activation_control'],
+                ],
+                [
+                    'key' => 'auth_only_public_contract_review',
+                    'status' => 'blocked',
+                    'route_keys' => $authOnlyRouteKeys,
+                    'commands' => ['npm run check:next-public:inert'],
+                    'blockers' => [
+                        'public_visibility_decision_required',
+                        'privacy_review_required_before_public_api',
+                    ],
+                    'notes' => ['do_not_promote_auth_only_routes'],
+                ],
+                [
+                    'key' => 'private_vite_regression',
+                    'status' => 'blocked',
+                    'route_keys' => [],
+                    'commands' => [
+                        'npm --prefix react-frontend run build',
+                        'cd react-frontend && npx tsc --noEmit',
+                    ],
+                    'blockers' => ['manual_verification_required'],
+                    'notes' => ['vite_private_routes_remain_primary'],
+                ],
+                [
+                    'key' => 'inertness_guard',
+                    'status' => 'blocked',
+                    'route_keys' => [],
+                    'commands' => ['npm run check:next-public:inert'],
+                    'blockers' => ['explicit_cutover_instruction_required'],
+                    'notes' => ['no_activation_control', 'do_not_remove_prerender'],
                 ],
             ],
         ];

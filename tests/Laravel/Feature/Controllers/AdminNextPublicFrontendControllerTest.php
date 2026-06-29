@@ -104,6 +104,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $playbookStagesByKey = array_column($payload['operator_playbook']['stages'], null, 'key');
         $tenantResolutionExamplesByKey = array_column($payload['tenant_resolution']['examples'], null, 'key');
         $remainingRouteWorkByKey = array_column($payload['remaining_public_route_work']['groups'], null, 'key');
+        $preCutoverDryRunsByKey = array_column($payload['pre_cutover_dry_runs']['items'], null, 'key');
         $routeReadinessByKey = [];
         $routeBatchesByKey = array_column($payload['route_batches'], null, 'key');
         $cutoverArtifactsByKey = array_column($payload['cutover_artifacts']['items'], null, 'key');
@@ -324,5 +325,14 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('public_visibility_decision_required', $remainingRouteWorkByKey['auth_only_backend']['required_actions']);
         $this->assertContains('privacy_review_required_before_public_api', $remainingRouteWorkByKey['auth_only_backend']['required_actions']);
         $this->assertSame('public_api_would_expand_auth_scope', $remainingRouteWorkByKey['auth_only_backend']['reason']);
+        $this->assertSame('none', $payload['pre_cutover_dry_runs']['production_effect']);
+        $this->assertFalse($payload['pre_cutover_dry_runs']['activation_available']);
+        $this->assertTrue($payload['pre_cutover_dry_runs']['requires_explicit_cutover_instruction']);
+        $this->assertContains('npm --prefix next-public-frontend run check', $preCutoverDryRunsByKey['shadow_manifest_and_html']['commands']);
+        $this->assertContains('platformTerms', $preCutoverDryRunsByKey['remaining_static_manual_review']['route_keys']);
+        $this->assertContains('couponDetail', $preCutoverDryRunsByKey['auth_only_public_contract_review']['route_keys']);
+        $this->assertContains('privacy_review_required_before_public_api', $preCutoverDryRunsByKey['auth_only_public_contract_review']['blockers']);
+        $this->assertContains('npm --prefix react-frontend run build', $preCutoverDryRunsByKey['private_vite_regression']['commands']);
+        $this->assertContains('npm run check:next-public:inert', $preCutoverDryRunsByKey['inertness_guard']['commands']);
     }
 }

@@ -82,6 +82,52 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertContains('npm --prefix next-public-frontend run check', $stages['verify_shadow_module']['commands']);
     }
 
+    public function test_summary_reports_pre_cutover_dry_runs_without_activation_controls(): void
+    {
+        $summary = (new NextPublicFrontendReadinessService())->summary();
+
+        $dryRuns = $summary['pre_cutover_dry_runs'];
+        $items = array_column($dryRuns['items'], null, 'key');
+
+        $this->assertSame('none', $dryRuns['production_effect']);
+        $this->assertFalse($dryRuns['activation_available']);
+        $this->assertTrue($dryRuns['requires_explicit_cutover_instruction']);
+        $this->assertSame(
+            [
+                'shadow_manifest_and_html',
+                'remaining_static_manual_review',
+                'auth_only_public_contract_review',
+                'private_vite_regression',
+                'inertness_guard',
+            ],
+            array_keys($items),
+        );
+
+        $this->assertSame('blocked', $items['shadow_manifest_and_html']['status']);
+        $this->assertContains('manual_verification_required', $items['shadow_manifest_and_html']['blockers']);
+        $this->assertContains('npm --prefix next-public-frontend run check', $items['shadow_manifest_and_html']['commands']);
+        $this->assertContains('npm --prefix next-public-frontend run check:no-js-html', $items['shadow_manifest_and_html']['commands']);
+
+        $this->assertSame('blocked', $items['remaining_static_manual_review']['status']);
+        $this->assertContains('platformTerms', $items['remaining_static_manual_review']['route_keys']);
+        $this->assertContains('platformPrivacy', $items['remaining_static_manual_review']['route_keys']);
+        $this->assertContains('platformDisclaimer', $items['remaining_static_manual_review']['route_keys']);
+        $this->assertContains('authoritative_content_source_required', $items['remaining_static_manual_review']['blockers']);
+
+        $this->assertSame('blocked', $items['auth_only_public_contract_review']['status']);
+        $this->assertContains('couponDetail', $items['auth_only_public_contract_review']['route_keys']);
+        $this->assertContains('ideationIdeaDetail', $items['auth_only_public_contract_review']['route_keys']);
+        $this->assertContains('privacy_review_required_before_public_api', $items['auth_only_public_contract_review']['blockers']);
+
+        $this->assertSame('blocked', $items['private_vite_regression']['status']);
+        $this->assertContains('npm --prefix react-frontend run build', $items['private_vite_regression']['commands']);
+        $this->assertContains('cd react-frontend && npx tsc --noEmit', $items['private_vite_regression']['commands']);
+
+        $this->assertSame('blocked', $items['inertness_guard']['status']);
+        $this->assertContains('npm run check:next-public:inert', $items['inertness_guard']['commands']);
+        $this->assertContains('no_activation_control', $items['inertness_guard']['notes']);
+    }
+
     public function test_summary_reports_cutover_eligibility_without_activation_controls(): void
     {
         $summary = (new NextPublicFrontendReadinessService())->summary();

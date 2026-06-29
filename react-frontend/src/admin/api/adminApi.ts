@@ -1898,6 +1898,22 @@ export interface NextPublicRemainingRouteWork {
   groups: NextPublicRemainingRouteWorkGroup[];
 }
 
+export interface NextPublicPreCutoverDryRun {
+  key: string;
+  status: 'blocked' | 'blocker' | 'pass' | string;
+  route_keys: string[];
+  commands: string[];
+  blockers: string[];
+  notes: string[];
+}
+
+export interface NextPublicPreCutoverDryRuns {
+  production_effect: string;
+  activation_available: boolean;
+  requires_explicit_cutover_instruction: boolean;
+  items: NextPublicPreCutoverDryRun[];
+}
+
 export interface NextPublicCutoverArtifact {
   key: string;
   path: string;
@@ -1986,6 +2002,7 @@ export interface NextPublicFrontendReadiness {
   edge_canary: NextPublicEdgeCanary;
   route_batches: NextPublicRouteBatch[];
   remaining_public_route_work: NextPublicRemainingRouteWork;
+  pre_cutover_dry_runs: NextPublicPreCutoverDryRuns;
   cutover_artifacts: NextPublicCutoverArtifactInventory;
   cutover_eligibility: NextPublicCutoverEligibility;
   production_routing: {

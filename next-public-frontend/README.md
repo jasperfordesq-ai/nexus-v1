@@ -102,6 +102,13 @@ private Vite route collides with the template, and whether unsupported rewrite
 rules need manual review. This is read-only reporting and does not include the
 template in Apache.
 
+The readiness API and admin page also expose pre-cutover dry-run checks. These
+checks list the exact local commands and route groups that still need proof
+before a future canary: shadow manifest/no-JavaScript HTML verification,
+platform legal content review, auth-only public contract review, private Vite
+regression, and the inertness guard. They are instructions and evidence only;
+they include no activation controls and have no production routing effect.
+
 ## Remaining Blockers
 
 The shadow manifests currently classify 76 intended public routes. Of those,
