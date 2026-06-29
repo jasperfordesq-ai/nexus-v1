@@ -93,6 +93,10 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('route_cutover_disabled', array_column($payload['safety_checks'], 'key'));
         $this->assertContains('npm --prefix next-public-frontend run check', $payload['shadow_runtime']['verification_commands']);
         $this->assertContains('npm --prefix react-frontend run build', $payload['shadow_runtime']['verification_commands']);
+        $this->assertContains(
+            'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php',
+            $payload['shadow_runtime']['verification_commands'],
+        );
         $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['about']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['listingDetail']['content_source']);
         $this->assertSame('blocker', $routeReadinessByKey['listingDetail']['status']);

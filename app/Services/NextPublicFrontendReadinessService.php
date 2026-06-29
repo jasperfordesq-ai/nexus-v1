@@ -89,7 +89,7 @@ class NextPublicFrontendReadinessService
                     'npm --prefix next-public-frontend run check',
                     'npm --prefix react-frontend run build',
                     'cd react-frontend && npx tsc --noEmit',
-                    'vendor/bin/phpunit --no-coverage tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php',
+                    'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php',
                 ],
             ],
             'safety_checks' => [

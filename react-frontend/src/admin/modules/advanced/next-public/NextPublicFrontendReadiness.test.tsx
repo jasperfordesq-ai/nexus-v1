@@ -103,6 +103,7 @@ const readiness = {
     verification_commands: [
       'npm --prefix next-public-frontend run check',
       'npm --prefix react-frontend run build',
+      'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php',
     ],
   },
   safety_checks: [
@@ -139,6 +140,11 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('npm run build:next-public')).toBeInTheDocument();
     expect(screen.getByText('npm --prefix next-public-frontend run check')).toBeInTheDocument();
     expect(screen.getByText('npm --prefix react-frontend run build')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php',
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText('Manifest validation passed')).toBeInTheDocument();
     expect(screen.getByText('Route cutover gates')).toBeInTheDocument();
     expect(screen.getByText('about')).toBeInTheDocument();
