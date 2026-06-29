@@ -316,9 +316,12 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertNotContains('developers', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
         $this->assertContains('platformTerms', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
         $this->assertContains('couponDetail', $remainingRouteWorkByKey['auth_only_backend']['route_keys']);
-        $this->assertContains('ideationIdeaDetail', $remainingRouteWorkByKey['backend_contract_missing']['route_keys']);
+        $this->assertContains('ideationIdeaDetail', $remainingRouteWorkByKey['auth_only_backend']['route_keys']);
+        $this->assertNotContains('ideationIdeaDetail', $remainingRouteWorkByKey['backend_contract_missing']['route_keys']);
         $this->assertContains('manual_no_js_shadow_review', $remainingRouteWorkByKey['static_manual_review']['required_actions']);
         $this->assertContains('keep_vite_or_prerender_until_public_contract', $remainingRouteWorkByKey['auth_only_backend']['required_actions']);
-        $this->assertContains('add_public_laravel_api_with_tests', $remainingRouteWorkByKey['backend_contract_missing']['required_actions']);
+        $this->assertContains('public_visibility_decision_required', $remainingRouteWorkByKey['auth_only_backend']['required_actions']);
+        $this->assertContains('privacy_review_required_before_public_api', $remainingRouteWorkByKey['auth_only_backend']['required_actions']);
+        $this->assertSame('public_api_would_expand_auth_scope', $remainingRouteWorkByKey['auth_only_backend']['reason']);
     }
 }

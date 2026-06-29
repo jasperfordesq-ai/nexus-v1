@@ -701,10 +701,10 @@ class NextPublicFrontendReadinessService
             'marketplaceCollections',
             'coupons',
             'couponDetail',
+            'ideationIdeaDetail',
         ];
 
         $backendContractMissingCandidates = [
-            'ideationIdeaDetail',
         ];
 
         $staticManualReviewRouteKeys = $this->filterRemainingRouteKeys(
@@ -756,8 +756,8 @@ class NextPublicFrontendReadinessService
                     'status' => 'blocked',
                     'route_count' => count($staticManualReviewRouteKeys),
                     'route_keys' => $staticManualReviewRouteKeys,
-                    'reason' => 'static_or_tenant_bootstrap',
-                    'required_actions' => ['manual_no_js_shadow_review'],
+                    'reason' => 'authoritative_static_content_missing',
+                    'required_actions' => ['publish_authoritative_content_source', 'manual_no_js_shadow_review'],
                     'verification_commands' => ['npm --prefix next-public-frontend run check:no-js-html'],
                 ],
                 [
@@ -765,8 +765,12 @@ class NextPublicFrontendReadinessService
                     'status' => 'blocked',
                     'route_count' => count($authOnlyBackendRouteKeys),
                     'route_keys' => $authOnlyBackendRouteKeys,
-                    'reason' => 'existing_backend_requires_auth',
-                    'required_actions' => ['keep_vite_or_prerender_until_public_contract'],
+                    'reason' => 'public_api_would_expand_auth_scope',
+                    'required_actions' => [
+                        'keep_vite_or_prerender_until_public_contract',
+                        'public_visibility_decision_required',
+                        'privacy_review_required_before_public_api',
+                    ],
                     'verification_commands' => ['npm run check:next-public:inert'],
                 ],
                 [

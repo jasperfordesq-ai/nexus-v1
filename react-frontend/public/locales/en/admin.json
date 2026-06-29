@@ -2993,13 +2993,18 @@
       },
       "remaining_route_work_reasons": {
         "static_or_tenant_bootstrap": "Static or tenant-bootstrap content",
+        "authoritative_static_content_missing": "Authoritative static content source missing",
         "existing_backend_requires_auth": "Existing backend requires authentication",
+        "public_api_would_expand_auth_scope": "Public API would expand an auth-only content surface",
         "route_params_do_not_match_public_api": "Route params do not match a public API",
         "manifest_only_unclassified": "Manifest-only route not classified yet"
       },
       "remaining_route_work_actions": {
         "manual_no_js_shadow_review": "Run manual no-JavaScript shadow review",
+        "publish_authoritative_content_source": "Publish an authoritative content source",
         "keep_vite_or_prerender_until_public_contract": "Keep Vite or prerender until a public contract exists",
+        "public_visibility_decision_required": "Decide what content is safe to make public",
+        "privacy_review_required_before_public_api": "Complete privacy review before adding a public API",
         "add_public_laravel_api_with_tests": "Add a public Laravel API with tests",
         "classify_route_before_cutover": "Classify route ownership and backend contract before cutover"
       },

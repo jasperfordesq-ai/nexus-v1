@@ -260,9 +260,13 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertContains('platformTerms', $groups['static_manual_review']['route_keys']);
         $this->assertContains('developmentStatus', $groups['static_manual_review']['route_keys']);
         $this->assertContains('couponDetail', $groups['auth_only_backend']['route_keys']);
-        $this->assertContains('ideationIdeaDetail', $groups['backend_contract_missing']['route_keys']);
+        $this->assertContains('ideationIdeaDetail', $groups['auth_only_backend']['route_keys']);
+        $this->assertNotContains('ideationIdeaDetail', $groups['backend_contract_missing']['route_keys']);
+        $this->assertSame('authoritative_static_content_missing', $groups['static_manual_review']['reason']);
+        $this->assertSame('public_api_would_expand_auth_scope', $groups['auth_only_backend']['reason']);
         $this->assertContains('keep_vite_or_prerender_until_public_contract', $groups['auth_only_backend']['required_actions']);
-        $this->assertContains('add_public_laravel_api_with_tests', $groups['backend_contract_missing']['required_actions']);
+        $this->assertContains('public_visibility_decision_required', $groups['auth_only_backend']['required_actions']);
+        $this->assertContains('privacy_review_required_before_public_api', $groups['auth_only_backend']['required_actions']);
         $this->assertContains('npm --prefix next-public-frontend run check:no-js-html', $groups['static_manual_review']['verification_commands']);
         $this->assertSame(
             'route_status_has_no_production_effect',
