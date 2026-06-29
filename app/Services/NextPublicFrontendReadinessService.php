@@ -291,7 +291,18 @@ class NextPublicFrontendReadinessService
             }
         }
 
+        $apiBackedRouteKeys = [];
+
         foreach ($apiBackedRoutes as $route) {
+            if (isset($apiBackedRouteKeys[$route['routeKey']])) {
+                $issues[] = [
+                    'code' => 'api_backed_route_duplicate_key',
+                    'severity' => 'blocker',
+                    'context' => $route['routeKey'],
+                ];
+            }
+            $apiBackedRouteKeys[$route['routeKey']] = true;
+
             if (!isset($routeKeys[$route['routeKey']])) {
                 $issues[] = [
                     'code' => 'api_backed_route_not_in_manifest',
