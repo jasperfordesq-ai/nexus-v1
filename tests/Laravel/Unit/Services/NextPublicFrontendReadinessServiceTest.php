@@ -76,6 +76,32 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         ], $validation['issues']);
     }
 
+    public function test_manifest_validation_blocks_api_routes_in_auth_only_coupon_namespace(): void
+    {
+        $validation = $this->validateManifest([
+            'mode' => 'shadow',
+        ], [
+            [
+                'pattern' => '/events',
+                'routeKey' => 'events',
+                'labelKey' => 'pages.events.title',
+            ],
+        ], [], [
+            [
+                'routeKey' => 'events',
+                'endpoint' => '/v2/coupons',
+                'method' => 'GET',
+            ],
+        ]);
+
+        $this->assertSame('blocker', $validation['status']);
+        $this->assertContains([
+            'code' => 'api_backed_route_private_endpoint',
+            'severity' => 'blocker',
+            'context' => 'events',
+        ], $validation['issues']);
+    }
+
     public function test_manifest_validation_blocks_api_routes_with_query_strings_or_fragments(): void
     {
         $validation = $this->validateManifest([

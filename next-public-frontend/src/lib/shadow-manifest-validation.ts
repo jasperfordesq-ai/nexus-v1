@@ -175,6 +175,7 @@ const privateLaravelV2EndpointPrefixes = [
   '/v2/admin',
   '/v2/auth',
   '/v2/broker',
+  '/v2/coupons',
   '/v2/dashboard',
   '/v2/feed',
   '/v2/messages',

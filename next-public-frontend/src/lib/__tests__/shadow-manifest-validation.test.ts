@@ -161,6 +161,24 @@ describe('shadow manifest validation', () => {
     });
   });
 
+  it('blocks API-backed routes that point at auth-only Laravel v2 coupon endpoints', () => {
+    const result = validateShadowManifests(routeOwnershipManifest, {
+      ...contentSourcesManifest,
+      apiBackedRoutes: contentSourcesManifest.apiBackedRoutes.map((source) => (
+        source.routeKey === 'events'
+          ? { ...source, endpoint: '/v2/coupons' }
+          : source
+      )),
+    });
+
+    expect(result.status).toBe('blocker');
+    expect(result.issues).toContainEqual({
+      code: 'api_backed_route_private_endpoint',
+      context: 'events',
+      severity: 'blocker',
+    });
+  });
+
   it('blocks API-backed route endpoints with query strings or fragments', () => {
     const result = validateShadowManifests(routeOwnershipManifest, {
       ...contentSourcesManifest,

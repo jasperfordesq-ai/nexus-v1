@@ -55,7 +55,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
         $response->assertJsonPath('data.manifest.route_counts.public_routes', 76);
-        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 30);
+        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 28);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 38);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 100);
         $response->assertJsonPath('data.manifest.validation.status', 'pass');
@@ -106,7 +106,6 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('groupDetail', $apiBackedRouteKeys);
         $this->assertContains('courseDetail', $apiBackedRouteKeys);
         $this->assertContains('podcastEpisode', $apiBackedRouteKeys);
-        $this->assertContains('couponDetail', $apiBackedRouteKeys);
         $this->assertContains('dashboard', $payload['manifest']['vite_private_prefixes']);
         $this->assertContains('activity', $payload['manifest']['vite_private_prefixes']);
         $this->assertContains('auth', $payload['manifest']['vite_private_prefixes']);
@@ -152,6 +151,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertSame('laravel_public_api', $routeReadinessByKey['groupDetail']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['courseDetail']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['podcastEpisode']['content_source']);
+        $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['couponDetail']['content_source']);
         $this->assertSame('blocker', $routeReadinessByKey['listingDetail']['status']);
         $this->assertContains('parity_test_required', $routeReadinessByKey['listingDetail']['blockers']);
     }
