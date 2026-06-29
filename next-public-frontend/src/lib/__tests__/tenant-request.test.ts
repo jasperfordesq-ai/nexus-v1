@@ -80,18 +80,20 @@ describe('tenant request resolution', () => {
   });
 
   it('does not mistake reserved private route prefixes for tenant slugs on shared hosts', () => {
-    expect(
-      resolveTenantRequest(['dashboard'], {
+    for (const prefix of ['dashboard', 'login', 'register', 'onboarding']) {
+      expect(
+        resolveTenantRequest([prefix], {
+          host: 'app.project-nexus.ie',
+          protocol: 'https',
+        }),
+      ).toEqual({
         host: 'app.project-nexus.ie',
-        protocol: 'https',
-      }),
-    ).toEqual({
-      host: 'app.project-nexus.ie',
-      origin: 'https://app.project-nexus.ie',
-      routeSegments: ['dashboard'],
-      tenantMode: 'host',
-      tenantSlug: undefined,
-    });
+        origin: 'https://app.project-nexus.ie',
+        routeSegments: [prefix],
+        tenantMode: 'host',
+        tenantSlug: undefined,
+      });
+    }
   });
 
   it('does not throw on malformed encoded path segments', () => {
