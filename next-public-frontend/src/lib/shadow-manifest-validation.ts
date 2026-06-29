@@ -151,6 +151,10 @@ export function validateShadowManifests(
     if (firstSegment && privatePrefixes.has(firstSegment)) {
       issues.push({ code: 'public_route_collides_with_private_prefix', context: pattern, severity: 'blocker' });
     }
+
+    if (privatePatterns.has(pattern)) {
+      issues.push({ code: 'public_route_collides_with_private_pattern', context: pattern, severity: 'blocker' });
+    }
   }
 
   const apiBackedRoutes = Array.isArray(contentSources.apiBackedRoutes) ? contentSources.apiBackedRoutes : [];

@@ -2953,6 +2953,7 @@
         "public_route_duplicate_pattern": "A public route pattern is duplicated.",
         "public_route_duplicate_key": "A public route key is duplicated.",
         "public_route_collides_with_private_prefix": "A public route collides with a private Vite route prefix.",
+        "public_route_collides_with_private_pattern": "A public route collides with a private Vite route pattern.",
         "vite_private_prefix_missing_required": "Required Vite private route prefix is missing.",
         "vite_private_pattern_missing_required": "Required Vite private route pattern is missing.",
         "content_sources_not_laravel_api": "Content sources must use Laravel public APIs.",

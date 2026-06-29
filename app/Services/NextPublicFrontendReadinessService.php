@@ -405,6 +405,10 @@ class NextPublicFrontendReadinessService
             if (is_string($firstSegment) && $firstSegment !== '' && isset($privatePrefixSet[$firstSegment])) {
                 $issues[] = ['code' => 'public_route_collides_with_private_prefix', 'severity' => 'blocker', 'context' => $pattern];
             }
+
+            if ($pattern !== '' && isset($privatePatternSet[$pattern])) {
+                $issues[] = ['code' => 'public_route_collides_with_private_pattern', 'severity' => 'blocker', 'context' => $pattern];
+            }
         }
 
         $apiBackedRouteKeys = [];

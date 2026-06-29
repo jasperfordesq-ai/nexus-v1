@@ -151,6 +151,28 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         ], $validation['issues']);
     }
 
+    public function test_manifest_validation_blocks_public_routes_that_collide_with_private_patterns(): void
+    {
+        $validation = $this->validateManifest([
+            'mode' => 'shadow',
+        ], [
+            [
+                'pattern' => '/events/new',
+                'routeKey' => 'eventCreate',
+                'labelKey' => 'pages.events.title',
+            ],
+        ], [], [], null, [
+            '/events/new',
+        ]);
+
+        $this->assertSame('blocker', $validation['status']);
+        $this->assertContains([
+            'code' => 'public_route_collides_with_private_pattern',
+            'severity' => 'blocker',
+            'context' => '/events/new',
+        ], $validation['issues']);
+    }
+
     public function test_manifest_validation_blocks_content_sources_outside_laravel_public_api(): void
     {
         $validation = $this->validateManifest([

@@ -88,6 +88,26 @@ describe('shadow manifest validation', () => {
     });
   });
 
+  it('blocks public routes that collide with Vite-owned private mutation patterns', () => {
+    const result = validateShadowManifests(
+      {
+        ...routeOwnershipManifest,
+        nextPublicRoutes: [
+          ...routeOwnershipManifest.nextPublicRoutes,
+          { pattern: '/events/new', routeKey: 'eventCreate', labelKey: 'pages.events.title' },
+        ],
+      },
+      contentSourcesManifest,
+    );
+
+    expect(result.status).toBe('blocker');
+    expect(result.issues).toContainEqual({
+      code: 'public_route_collides_with_private_pattern',
+      context: '/events/new',
+      severity: 'blocker',
+    });
+  });
+
   it('blocks duplicate API-backed route keys', () => {
     const result = validateShadowManifests(routeOwnershipManifest, {
       ...contentSourcesManifest,
