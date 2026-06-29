@@ -11,6 +11,7 @@
     { "routeKey": "faq", "endpoint": "/v2/help/faqs", "method": "GET" },
     { "routeKey": "about", "endpoint": "/v2/public-page-content/about", "method": "GET" },
     { "routeKey": "features", "endpoint": "/v2/public-page-content/features", "method": "GET" },
+    { "routeKey": "developmentStatus", "endpoint": "/v2/public-page-content/features", "method": "GET" },
     { "routeKey": "contact", "endpoint": "/v2/public-page-content/contact", "method": "GET" },
     { "routeKey": "trustSafety", "endpoint": "/v2/public-page-content/trust-safety", "method": "GET" },
     { "routeKey": "timebankingGuide", "endpoint": "/v2/public-page-content/timebanking-guide", "method": "GET" },
