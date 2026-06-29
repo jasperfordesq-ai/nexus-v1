@@ -82,7 +82,7 @@ class CorsHelper
     public static function setHeaders(
         array $additionalOrigins = [],
         array $methods = ['GET', 'POST', 'OPTIONS'],
-        array $headers = ['Content-Type', 'Authorization']
+        array $headers = ['Content-Type', 'Authorization', 'Idempotency-Key']
     ): bool {
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 

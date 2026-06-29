@@ -8,6 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import i18n from 'i18next';
 import { render, screen } from '@/test/test-utils';
 
 const apiMocks = vi.hoisted(() => ({
@@ -154,5 +155,16 @@ describe('RegisterPage', () => {
 
     expect(await screen.findByText(/registration status unavailable/i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /create account/i })).not.toBeInTheDocument();
+  });
+
+  it('prominently reminds new registrants to check junk or spam for the verification email', () => {
+    const message = i18n.t('register.verify_email_body', {
+      ns: 'auth',
+      email: 'sam@example.org',
+    });
+
+    expect(message).toContain('<strong>Please check your Junk or spam folder');
+    expect(message).toContain('Please check your Junk or spam folder');
+    expect(message).toContain("if you can't see this email in your inbox");
   });
 });

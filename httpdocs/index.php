@@ -43,7 +43,7 @@ if (file_exists(__DIR__ . '/../.maintenance')) {
         // Let OPTIONS preflight succeed so the real request can follow.
         if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
             header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS');
-            header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Tenant-ID, X-Tenant-Slug, Accept, X-CSRF-TOKEN, X-Trusted-Device, X-Timezone, X-Locale');
+            header('Access-Control-Allow-Headers: Content-Type, Authorization, Idempotency-Key, X-Tenant-ID, X-Tenant-Slug, Accept, X-CSRF-TOKEN, X-Trusted-Device, X-Timezone, X-Locale');
             header('Access-Control-Max-Age: 86400');
             http_response_code(204);
             exit;

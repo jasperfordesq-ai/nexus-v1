@@ -19429,7 +19429,7 @@ export default interface Resources {
       "title": "Create your account",
       "type_individual": "Individual",
       "type_organisation": "Organisation",
-      "verify_email_body": "We've sent a verification link to <strong>{{email}}</strong>. Please check your inbox and click the link to verify your email address.",
+      "verify_email_body": "We've sent a verification link to <strong>{{email}}</strong>. Please check your inbox and click the link to verify your email address. <strong>Please check your Junk or spam folder if you do not receive this email, or if you can't see this email in your inbox.</strong>",
       "verify_email_title": "Verify your email",
       "waitlist_body": "We'll send you an email when a spot opens up. Thank you for your patience!",
       "waitlist_joined": "Added to the waitlist",

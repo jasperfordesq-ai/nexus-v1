@@ -69,6 +69,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The in-platform changelog now renders as a polished release-notes page.** The footer changelog link still uses the same `CHANGELOG.md` source as GitHub, but the React page now has a wider layout, clearer section rhythm, styled release/category headings, and readable release-note rows instead of a cramped generic Markdown card. Regression tests: `react-frontend/src/pages/public/ChangelogPage.test.tsx`, `react-frontend/src/components/content/MarkdownRenderer.test.tsx`.
 - **Imported Markdown knowledge-base articles now use a dedicated document presentation.** Knowledge-base `.md` imports keep the same stored Markdown content, but the React article page now renders them with clearer heading hierarchy, readable paragraphs and lists, styled blockquotes, tables, code blocks, links, and images instead of the generic Markdown treatment. Regression test: `react-frontend/src/components/content/MarkdownRenderer.test.tsx`.
 
+### Fixed
+
+- **Registration email verification notices now explicitly tell new members to check Junk or spam.** The post-registration verification callout bolds the spam-folder instruction so first-time registrants know where to look if the message is missing. Regression test: `react-frontend/src/pages/auth/RegisterPage.test.tsx`.
+- **Wallet credit transfers now allow the `Idempotency-Key` request header in CORS preflight responses.** Custom-domain tenants such as Timebanking UK can submit transfer requests again instead of being stopped by the browser before the wallet API receives the POST. Regression test: `tests/Laravel/Unit/Middleware/EnsureCorsHeadersTest.php`.
+
 ## [1.5.4] - 2026-06-29
 
 ### Added

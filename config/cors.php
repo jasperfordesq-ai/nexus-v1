@@ -61,7 +61,7 @@ return [
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['Accept', 'Content-Type', 'Authorization', 'X-Requested-With', 'X-XSRF-TOKEN', 'X-CSRF-TOKEN', 'X-Socket-Id', 'X-Timezone', 'X-Locale', 'X-Tenant-ID', 'X-Tenant-Slug', 'X-Trusted-Device', 'X-Request-Id', 'Cache-Control', 'Pragma'],
+    'allowed_headers' => ['Accept', 'Content-Type', 'Authorization', 'Idempotency-Key', 'X-Requested-With', 'X-XSRF-TOKEN', 'X-CSRF-TOKEN', 'X-Socket-Id', 'X-Timezone', 'X-Locale', 'X-Tenant-ID', 'X-Tenant-Slug', 'X-Trusted-Device', 'X-Request-Id', 'Cache-Control', 'Pragma'],
 
     'exposed_headers' => ['X-Request-Id', 'X-Build'],
 

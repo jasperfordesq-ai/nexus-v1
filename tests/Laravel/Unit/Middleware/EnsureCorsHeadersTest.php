@@ -79,6 +79,24 @@ class EnsureCorsHeadersTest extends TestCase
         $this->assertNotEmpty($response->headers->get('Access-Control-Allow-Methods'));
     }
 
+    public function test_laravel_cors_config_allows_wallet_transfer_idempotency_header(): void
+    {
+        $allowedHeaders = array_map('strtolower', config('cors.allowed_headers', []));
+
+        $this->assertContains('idempotency-key', $allowedHeaders);
+    }
+
+    public function test_wallet_transfer_fallback_cors_headers_allow_idempotency_key(): void
+    {
+        $request = Request::create('/api/v2/wallet/transfer', 'OPTIONS');
+        $request->headers->set('Origin', 'https://app.project-nexus.ie');
+
+        $response = $this->middleware->handle($request, $this->makeNext());
+        $allowedHeaders = strtolower((string) $response->headers->get('Access-Control-Allow-Headers'));
+
+        $this->assertStringContainsString('idempotency-key', $allowedHeaders);
+    }
+
     /** Disallowed (foreign) origin on normal API path → NO CORS headers set (blocked silently) */
     public function test_disallowed_origin_on_api_path_gets_no_cors_headers(): void
     {
