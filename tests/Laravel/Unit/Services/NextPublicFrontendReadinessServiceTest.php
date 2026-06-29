@@ -121,6 +121,35 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertContains('do_not_remove_prerender', $edgeCanary['guardrails']);
     }
 
+    public function test_summary_reports_route_batches_for_future_canary_planning(): void
+    {
+        $summary = (new NextPublicFrontendReadinessService())->summary();
+
+        $batches = array_column($summary['route_batches'], null, 'key');
+
+        $this->assertSame(
+            [
+                'foundation_public_pages',
+                'api_backed_public_content',
+                'vite_private_retained',
+            ],
+            array_keys($batches),
+        );
+        $this->assertSame('blocked', $batches['foundation_public_pages']['status']);
+        $this->assertContains('home', $batches['foundation_public_pages']['route_keys']);
+        $this->assertContains('about', $batches['foundation_public_pages']['route_keys']);
+        $this->assertContains('manual_shadow_review_required', $batches['foundation_public_pages']['blockers']);
+        $this->assertContains('npm --prefix next-public-frontend run check:no-js-html', $batches['foundation_public_pages']['verification_commands']);
+
+        $this->assertSame('blocked', $batches['api_backed_public_content']['status']);
+        $this->assertContains('listingDetail', $batches['api_backed_public_content']['route_keys']);
+        $this->assertContains('public_api_parity_required', $batches['api_backed_public_content']['blockers']);
+
+        $this->assertSame('pass', $batches['vite_private_retained']['status']);
+        $this->assertSame([], $batches['vite_private_retained']['blockers']);
+        $this->assertContains('npm --prefix react-frontend run build', $batches['vite_private_retained']['verification_commands']);
+    }
+
     public function test_manifest_validation_blocks_api_routes_outside_laravel_v2_public_api(): void
     {
         $validation = $this->validateManifest([

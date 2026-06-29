@@ -141,6 +141,8 @@ export default function NextPublicFrontendReadiness() {
 
           <EdgeCanaryCard readiness={readiness} />
 
+          <RouteBatchReadinessCard readiness={readiness} />
+
           <ManifestValidationCard readiness={readiness} />
 
           <RouteCutoverGatesCard readiness={readiness} />
@@ -291,6 +293,67 @@ function TenantResolutionCard({ readiness }: { readiness: Readiness }) {
           <Chip size="sm" color={tenantResolution.next_queries_database ? 'danger' : 'success'} variant="soft">
             {tenantResolution.next_queries_database ? t('tenant_resolution.next_queries_database') : t('tenant_resolution.no_next_database')}
           </Chip>
+        </div>
+      </CardBody>
+    </Card>
+  );
+}
+
+function RouteBatchReadinessCard({ readiness }: { readiness: Readiness }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.next_public' });
+
+  return (
+    <Card>
+      <CardHeader>
+        <h2 className="text-lg font-semibold">{t('route_batches.title')}</h2>
+      </CardHeader>
+      <CardBody>
+        <div className="grid gap-3 lg:grid-cols-3">
+          {readiness.route_batches.map((batch) => (
+            <div key={batch.key} className="rounded-md border border-divider px-3 py-3 text-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-medium">{t(`route_batch_names.${batch.key}`)}</div>
+                  <div className="mt-1 text-xs text-muted">
+                    {t('route_batches.route_count', { count: batch.route_count })}
+                  </div>
+                </div>
+                <Chip size="sm" color={statusColor(batch.status)} variant="soft">
+                  {t(`statuses.${batch.status}`)}
+                </Chip>
+              </div>
+
+              {batch.route_keys.length > 0 && (
+                <div className="mt-3 flex max-h-28 flex-wrap gap-1 overflow-auto">
+                  {batch.route_keys.map((routeKey) => (
+                    <Chip key={routeKey} size="sm" variant="flat">
+                      {routeKey}
+                    </Chip>
+                  ))}
+                </div>
+              )}
+
+              {batch.blockers.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {batch.blockers.map((blocker) => (
+                    <Chip key={blocker} size="sm" color="warning" variant="soft">
+                      {t(`route_batch_blockers.${blocker}`)}
+                    </Chip>
+                  ))}
+                </div>
+              )}
+
+              {batch.verification_commands.length > 0 && (
+                <div className="mt-3 space-y-1">
+                  {batch.verification_commands.map((command) => (
+                    <code key={command} className="block break-all rounded bg-surface-secondary px-2 py-1 text-xs">
+                      {command}
+                    </code>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </CardBody>
     </Card>

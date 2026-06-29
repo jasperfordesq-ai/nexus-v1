@@ -2945,6 +2945,20 @@
         "public_routes_only": "Public routes only",
         "do_not_remove_prerender": "Do not remove prerender fallback"
       },
+      "route_batches": {
+        "title": "Route batch readiness",
+        "route_count": "{{count}} routes"
+      },
+      "route_batch_names": {
+        "foundation_public_pages": "Foundation public pages",
+        "api_backed_public_content": "API-backed public content",
+        "vite_private_retained": "Vite private routes retained"
+      },
+      "route_batch_blockers": {
+        "manual_shadow_review_required": "Manual shadow review required",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
+        "public_api_parity_required": "Public API parity required"
+      },
       "route_gate_blockers": {
         "parity_test_required": "Parity test required"
       },

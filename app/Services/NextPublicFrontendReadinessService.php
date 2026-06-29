@@ -169,6 +169,35 @@ class NextPublicFrontendReadinessService
         '/v2/wallet',
     ];
 
+    private const FOUNDATION_PUBLIC_ROUTE_KEYS = [
+        'home',
+        'about',
+        'features',
+        'changelog',
+        'help',
+        'contact',
+        'faq',
+        'privacy',
+        'privacyVersions',
+        'terms',
+        'termsVersions',
+        'accessibility',
+        'accessibilityVersions',
+        'cookies',
+        'cookiesVersions',
+        'communityGuidelines',
+        'communityGuidelinesVersions',
+        'trustSafety',
+        'acceptableUse',
+        'acceptableUseVersions',
+        'legal',
+        'platformTerms',
+        'platformPrivacy',
+        'platformDisclaimer',
+        'timebankingGuide',
+        'developmentStatus',
+    ];
+
     /**
      * @return array<string, mixed>
      */
@@ -232,6 +261,7 @@ class NextPublicFrontendReadinessService
             ],
             'tenant_resolution' => $this->tenantResolutionContract(),
             'edge_canary' => $this->edgeCanaryPreview($cutoverEnabled),
+            'route_batches' => $this->routeBatches($publicRoutes, $privatePrefixes, $privatePatterns, $apiBackedRoutes),
             'production_routing' => [
                 'active' => false,
                 'route_cutover_enabled' => $cutoverEnabled,
@@ -331,6 +361,68 @@ class NextPublicFrontendReadinessService
                 'do_not_enable_routing_flag_without_cutover_instruction',
                 'public_routes_only',
                 'do_not_remove_prerender',
+            ],
+        ];
+    }
+
+    /**
+     * @param array<int, mixed> $publicRoutes
+     * @param array<int, mixed> $privatePrefixes
+     * @param array<int, mixed> $privatePatterns
+     * @param array<int, array{routeKey: string, endpoint: string, method: string}> $apiBackedRoutes
+     * @return array<int, array{key: string, status: string, route_count: int, route_keys: array<int, string>, blockers: array<int, string>, verification_commands: array<int, string>}>
+     */
+    private function routeBatches(
+        array $publicRoutes,
+        array $privatePrefixes,
+        array $privatePatterns,
+        array $apiBackedRoutes,
+    ): array {
+        $manifestRouteKeys = [];
+
+        foreach ($publicRoutes as $route) {
+            if (is_array($route) && isset($route['routeKey'])) {
+                $manifestRouteKeys[] = (string) $route['routeKey'];
+            }
+        }
+
+        $manifestRouteKeySet = array_flip($manifestRouteKeys);
+        $foundationRouteKeys = array_values(array_filter(
+            self::FOUNDATION_PUBLIC_ROUTE_KEYS,
+            static fn (string $routeKey): bool => isset($manifestRouteKeySet[$routeKey]),
+        ));
+        $apiBackedRouteKeys = array_values(array_unique(array_column($apiBackedRoutes, 'routeKey')));
+
+        return [
+            [
+                'key' => 'foundation_public_pages',
+                'status' => 'blocked',
+                'route_count' => count($foundationRouteKeys),
+                'route_keys' => $foundationRouteKeys,
+                'blockers' => ['manual_shadow_review_required', 'explicit_cutover_instruction_required'],
+                'verification_commands' => ['npm --prefix next-public-frontend run check:no-js-html'],
+            ],
+            [
+                'key' => 'api_backed_public_content',
+                'status' => 'blocked',
+                'route_count' => count($apiBackedRouteKeys),
+                'route_keys' => $apiBackedRouteKeys,
+                'blockers' => ['public_api_parity_required', 'manual_shadow_review_required'],
+                'verification_commands' => [
+                    'npm --prefix next-public-frontend run check',
+                    'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php',
+                ],
+            ],
+            [
+                'key' => 'vite_private_retained',
+                'status' => 'pass',
+                'route_count' => count($privatePrefixes) + count($privatePatterns),
+                'route_keys' => [],
+                'blockers' => [],
+                'verification_commands' => [
+                    'npm --prefix react-frontend run build',
+                    'cd react-frontend && npx tsc --noEmit',
+                ],
             ],
         ];
     }

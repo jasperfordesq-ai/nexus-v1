@@ -1848,6 +1848,15 @@ export interface NextPublicEdgeCanary {
   guardrails: string[];
 }
 
+export interface NextPublicRouteBatch {
+  key: string;
+  status: 'blocked' | 'blocker' | 'pass' | string;
+  route_count: number;
+  route_keys: string[];
+  blockers: string[];
+  verification_commands: string[];
+}
+
 export interface NextPublicFrontendReadiness {
   mode: string;
   app: {
@@ -1897,6 +1906,7 @@ export interface NextPublicFrontendReadiness {
   };
   tenant_resolution: NextPublicTenantResolution;
   edge_canary: NextPublicEdgeCanary;
+  route_batches: NextPublicRouteBatch[];
   production_routing: {
     active: boolean;
     route_cutover_enabled: boolean;

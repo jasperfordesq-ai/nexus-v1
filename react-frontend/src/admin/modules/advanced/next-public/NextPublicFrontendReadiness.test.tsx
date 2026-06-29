@@ -122,6 +122,32 @@ const readiness = {
       'do_not_remove_prerender',
     ],
   },
+  route_batches: [
+    {
+      key: 'foundation_public_pages',
+      status: 'blocked',
+      route_count: 12,
+      route_keys: ['home', 'about', 'help', 'contact', 'faq'],
+      blockers: ['manual_shadow_review_required', 'explicit_cutover_instruction_required'],
+      verification_commands: ['npm --prefix next-public-frontend run check:no-js-html'],
+    },
+    {
+      key: 'api_backed_public_content',
+      status: 'blocked',
+      route_count: 28,
+      route_keys: ['blog-index', 'listingDetail'],
+      blockers: ['public_api_parity_required', 'manual_shadow_review_required'],
+      verification_commands: ['npm --prefix next-public-frontend run check'],
+    },
+    {
+      key: 'vite_private_retained',
+      status: 'pass',
+      route_count: 138,
+      route_keys: [],
+      blockers: [],
+      verification_commands: ['npm --prefix react-frontend run build'],
+    },
+  ],
   production_routing: {
     active: false,
     route_cutover_enabled: false,
@@ -225,9 +251,13 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('Apache/Plesk')).toBeInTheDocument();
     expect(screen.getByText('NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED')).toBeInTheDocument();
     expect(screen.getByText('No route file configured by this module')).toBeInTheDocument();
+    expect(screen.getByText('Route batch readiness')).toBeInTheDocument();
+    expect(screen.getByText('Foundation public pages')).toBeInTheDocument();
+    expect(screen.getByText('API-backed public content')).toBeInTheDocument();
+    expect(screen.getByText('Vite private routes retained')).toBeInTheDocument();
     expect(screen.getByText('npm run build:next-public')).toBeInTheDocument();
     expect(screen.getAllByText('npm --prefix next-public-frontend run check')).not.toHaveLength(0);
-    expect(screen.getByText('npm --prefix react-frontend run build')).toBeInTheDocument();
+    expect(screen.getAllByText('npm --prefix react-frontend run build')).not.toHaveLength(0);
     expect(
       screen.getByText(
         'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php',
@@ -235,15 +265,15 @@ describe('NextPublicFrontendReadiness', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('Manifest validation passed')).toBeInTheDocument();
     expect(screen.getByText('Route cutover gates')).toBeInTheDocument();
-    expect(screen.getByText('about')).toBeInTheDocument();
+    expect(screen.getAllByText('about')).not.toHaveLength(0);
     expect(screen.getByText('static_or_tenant_bootstrap')).toBeInTheDocument();
-    expect(screen.getByText('listingDetail')).toBeInTheDocument();
+    expect(screen.getAllByText('listingDetail')).not.toHaveLength(0);
     expect(screen.getAllByText('laravel_public_api')).not.toHaveLength(0);
     expect(screen.getAllByText('Parity test required')).not.toHaveLength(0);
     expect(screen.getByText('3 public routes')).toBeInTheDocument();
     expect(screen.getByText('3 private prefixes')).toBeInTheDocument();
     expect(screen.getByText('Manual verification required')).toBeInTheDocument();
-    expect(screen.getByText('Explicit cutover instruction required')).toBeInTheDocument();
+    expect(screen.getAllByText('Explicit cutover instruction required')).not.toHaveLength(0);
     expect(screen.getByText('Production edge routes are not configured')).toBeInTheDocument();
     expect(screen.getByText('Operator playbook')).toBeInTheDocument();
     expect(screen.getByText('No activation controls are available on this page.')).toBeInTheDocument();

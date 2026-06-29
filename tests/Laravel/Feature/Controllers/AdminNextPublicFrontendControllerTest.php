@@ -87,6 +87,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $playbookStagesByKey = array_column($payload['operator_playbook']['stages'], null, 'key');
         $tenantResolutionExamplesByKey = array_column($payload['tenant_resolution']['examples'], null, 'key');
         $routeReadinessByKey = [];
+        $routeBatchesByKey = array_column($payload['route_batches'], null, 'key');
 
         foreach ($routeReadiness as $route) {
             $routeReadinessByKey[$route['routeKey']] = $route;
@@ -190,6 +191,14 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         );
         $this->assertContains('do_not_edit_plesk_vhosts_directly', $payload['edge_canary']['guardrails']);
         $this->assertContains('do_not_remove_prerender', $payload['edge_canary']['guardrails']);
+        $this->assertSame('blocked', $routeBatchesByKey['foundation_public_pages']['status']);
+        $this->assertContains('home', $routeBatchesByKey['foundation_public_pages']['route_keys']);
+        $this->assertContains('manual_shadow_review_required', $routeBatchesByKey['foundation_public_pages']['blockers']);
+        $this->assertSame('blocked', $routeBatchesByKey['api_backed_public_content']['status']);
+        $this->assertContains('listingDetail', $routeBatchesByKey['api_backed_public_content']['route_keys']);
+        $this->assertContains('public_api_parity_required', $routeBatchesByKey['api_backed_public_content']['blockers']);
+        $this->assertSame('pass', $routeBatchesByKey['vite_private_retained']['status']);
+        $this->assertSame([], $routeBatchesByKey['vite_private_retained']['blockers']);
         $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['about']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['listingDetail']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['volunteeringOpportunityDetail']['content_source']);
