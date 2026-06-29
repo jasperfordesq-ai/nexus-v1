@@ -86,10 +86,15 @@ describe('tenant request resolution', () => {
       'dashboard',
       'federation',
       'group-exchanges',
+      'auth',
       'login',
       'onboarding',
+      'password',
       'premium',
       'register',
+      'verify-email',
+      'verify-identity',
+      'verify-identity-optional',
       'volunteering',
     ]) {
       expect(

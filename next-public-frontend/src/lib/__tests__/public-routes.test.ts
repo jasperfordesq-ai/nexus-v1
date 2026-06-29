@@ -83,15 +83,20 @@ describe('public route ownership', () => {
   it('marks logged-in and mutation routes as Vite-owned', () => {
     for (const segment of [
       'admin',
+      'auth',
       'broker',
       'dashboard',
       'feed',
       'login',
       'messages',
       'onboarding',
+      'password',
       'register',
       'settings',
       'super-admin',
+      'verify-email',
+      'verify-identity',
+      'verify-identity-optional',
       'wallet',
     ]) {
       expect(getRouteOwnership([segment])).toMatchObject({ owner: 'vite-private' });

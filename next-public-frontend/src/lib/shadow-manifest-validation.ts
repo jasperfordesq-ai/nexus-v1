@@ -30,6 +30,7 @@ interface ManifestValidationResult {
 const requiredVitePrivatePrefixes = [
   'achievements',
   'admin',
+  'auth',
   'broker',
   'connections',
   'dashboard',
@@ -43,10 +44,14 @@ const requiredVitePrivatePrefixes = [
   'messages',
   'notifications',
   'onboarding',
+  'password',
   'profile',
   'register',
   'settings',
   'super-admin',
+  'verify-email',
+  'verify-identity',
+  'verify-identity-optional',
   'wallet',
 ];
 

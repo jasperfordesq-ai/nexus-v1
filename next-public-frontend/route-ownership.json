@@ -51,6 +51,7 @@
   "vitePrivatePrefixes": [
     "achievements",
     "admin",
+    "auth",
     "broker",
     "connections",
     "dashboard",
@@ -64,10 +65,14 @@
     "messages",
     "notifications",
     "onboarding",
+    "password",
     "profile",
     "register",
     "settings",
     "super-admin",
+    "verify-email",
+    "verify-identity",
+    "verify-identity-optional",
     "wallet"
   ],
   "vitePrivatePatterns": [

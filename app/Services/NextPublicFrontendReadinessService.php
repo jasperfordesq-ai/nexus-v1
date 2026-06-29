@@ -13,6 +13,7 @@ class NextPublicFrontendReadinessService
     private const REQUIRED_VITE_PRIVATE_PREFIXES = [
         'achievements',
         'admin',
+        'auth',
         'broker',
         'connections',
         'dashboard',
@@ -26,10 +27,14 @@ class NextPublicFrontendReadinessService
         'messages',
         'notifications',
         'onboarding',
+        'password',
         'profile',
         'register',
         'settings',
         'super-admin',
+        'verify-email',
+        'verify-identity',
+        'verify-identity-optional',
         'wallet',
     ];
 
