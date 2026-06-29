@@ -42,6 +42,21 @@ class StaticPublicPageControllerTest extends TestCase
         $this->assertContains('getting_started', array_column($response->json('data.sections'), 'key'));
     }
 
+    public function test_legal_hub_returns_public_document_summaries(): void
+    {
+        $response = $this->apiGet('/v2/public-page-content/legal');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.route_key', 'legal');
+        $response->assertJsonPath('data.path', '/legal');
+        $response->assertJsonPath('data.translation_namespace', 'govuk_alpha.legal');
+        $this->assertStringContainsString('Hour Timebank', $response->json('data.lead'));
+        $this->assertContains('documents', array_column($response->json('data.sections'), 'key'));
+        $this->assertContains('terms', array_column($response->json('data.sections.0.items'), 'key'));
+        $this->assertContains('privacy', array_column($response->json('data.sections.0.items'), 'key'));
+        $this->assertContains('acceptable_use', array_column($response->json('data.sections.0.items'), 'key'));
+    }
+
     public function test_private_and_unknown_pages_are_not_exposed(): void
     {
         $this->apiGet('/v2/public-page-content/dashboard')->assertStatus(404);

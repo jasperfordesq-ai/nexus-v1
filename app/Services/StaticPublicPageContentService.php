@@ -49,6 +49,13 @@ class StaticPublicPageContentService
             'title' => 'govuk_alpha.guide.title',
             'lead' => 'govuk_alpha.guide.intro',
         ],
+        'legal' => [
+            'route_key' => 'legal',
+            'path' => '/legal',
+            'translation_namespace' => 'govuk_alpha.legal',
+            'title' => 'govuk_alpha.legal.hub_title',
+            'lead' => 'govuk_alpha.legal.hub_intro',
+        ],
     ];
 
     /**
@@ -108,6 +115,7 @@ class StaticPublicPageContentService
             'contact' => $this->contactSections($params),
             'trust-safety' => $this->trustSafetySections($params),
             'timebanking-guide' => $this->timebankingGuideSections($params),
+            'legal' => $this->legalSections($params),
             default => [],
         };
     }
@@ -250,6 +258,48 @@ class StaticPublicPageContentService
                 'title' => $this->translatedString('govuk_alpha.guide.getting_started_title', $params),
                 'body' => $this->translatedString('govuk_alpha.guide.getting_started_body', $params),
                 'items' => [],
+            ],
+        ];
+    }
+
+    /**
+     * @param array<string, string> $params
+     * @return array<int, array<string, mixed>>
+     */
+    private function legalSections(array $params): array
+    {
+        $documentPaths = [
+            'terms' => '/terms',
+            'privacy' => '/privacy',
+            'cookies' => '/cookies',
+            'community_guidelines' => '/community-guidelines',
+            'acceptable_use' => '/acceptable-use',
+            'accessibility' => '/accessibility',
+        ];
+        $documents = $this->translatedArray('govuk_alpha.legal.documents', $params);
+        $items = [];
+
+        foreach ($documentPaths as $documentKey => $path) {
+            $document = $documents[$documentKey] ?? null;
+
+            if (!is_array($document)) {
+                continue;
+            }
+
+            $items[] = [
+                'key' => $documentKey,
+                'title' => is_string($document['title'] ?? null) ? $document['title'] : '',
+                'description' => is_string($document['summary'] ?? null) ? $document['summary'] : '',
+                'path' => $path,
+            ];
+        }
+
+        return [
+            [
+                'key' => 'documents',
+                'title' => $this->translatedString('govuk_alpha.legal.hub_title', $params),
+                'body' => $this->translatedString('govuk_alpha.legal.hub_intro', $params),
+                'items' => $items,
             ],
         ];
     }

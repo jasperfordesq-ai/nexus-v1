@@ -19,6 +19,7 @@ describe('public content sources', () => {
     expect(getPublicEndpointForRoute('contact')).toBe('/v2/public-page-content/contact');
     expect(getPublicEndpointForRoute('trustSafety')).toBe('/v2/public-page-content/trust-safety');
     expect(getPublicEndpointForRoute('timebankingGuide')).toBe('/v2/public-page-content/timebanking-guide');
+    expect(getPublicEndpointForRoute('legal')).toBe('/v2/public-page-content/legal');
     expect(getPublicEndpointForRoute('terms')).toBe('/v2/legal/terms');
     expect(getPublicEndpointForRoute('termsVersions')).toBe('/v2/legal/terms/versions');
     expect(getPublicEndpointForRoute('privacy')).toBe('/v2/legal/privacy');

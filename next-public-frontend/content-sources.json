@@ -13,6 +13,7 @@
     { "routeKey": "contact", "endpoint": "/v2/public-page-content/contact", "method": "GET" },
     { "routeKey": "trustSafety", "endpoint": "/v2/public-page-content/trust-safety", "method": "GET" },
     { "routeKey": "timebankingGuide", "endpoint": "/v2/public-page-content/timebanking-guide", "method": "GET" },
+    { "routeKey": "legal", "endpoint": "/v2/public-page-content/legal", "method": "GET" },
     { "routeKey": "privacy", "endpoint": "/v2/legal/privacy", "method": "GET" },
     { "routeKey": "privacyVersions", "endpoint": "/v2/legal/privacy/versions", "method": "GET" },
     { "routeKey": "terms", "endpoint": "/v2/legal/terms", "method": "GET" },

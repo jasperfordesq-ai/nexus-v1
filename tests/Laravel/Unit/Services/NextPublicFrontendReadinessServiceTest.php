@@ -94,8 +94,8 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertFalse($eligibility['activation_available']);
         $this->assertTrue($eligibility['requires_explicit_cutover_instruction']);
         $this->assertSame(76, $eligibility['counts']['public_routes']);
-        $this->assertSame(55, $eligibility['counts']['api_backed_public_routes']);
-        $this->assertSame(21, $eligibility['counts']['remaining_public_routes']);
+        $this->assertSame(56, $eligibility['counts']['api_backed_public_routes']);
+        $this->assertSame(20, $eligibility['counts']['remaining_public_routes']);
         $this->assertContains('remaining_public_route_work', $eligibility['blockers']);
         $this->assertContains('route_parity_required', $eligibility['blockers']);
         $this->assertContains('edge_routes_not_configured', $eligibility['blockers']);
@@ -235,8 +235,8 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertSame('none', $remaining['production_effect']);
         $this->assertFalse($remaining['activation_available']);
         $this->assertSame(76, $remaining['counts']['public_routes']);
-        $this->assertSame(55, $remaining['counts']['api_backed_public_routes']);
-        $this->assertSame(21, $remaining['counts']['remaining_public_routes']);
+        $this->assertSame(56, $remaining['counts']['api_backed_public_routes']);
+        $this->assertSame(20, $remaining['counts']['remaining_public_routes']);
         $this->assertSame(0, $remaining['counts']['unclassified_manifest_only_routes']);
         $this->assertNotContains('home', $groups['static_manual_review']['route_keys']);
         $this->assertNotContains('about', $groups['static_manual_review']['route_keys']);
@@ -244,6 +244,7 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertNotContains('contact', $groups['static_manual_review']['route_keys']);
         $this->assertNotContains('trustSafety', $groups['static_manual_review']['route_keys']);
         $this->assertNotContains('timebankingGuide', $groups['static_manual_review']['route_keys']);
+        $this->assertNotContains('legal', $groups['static_manual_review']['route_keys']);
         $this->assertContains('couponDetail', $groups['auth_only_backend']['route_keys']);
         $this->assertContains('ideationIdeaDetail', $groups['backend_contract_missing']['route_keys']);
         $this->assertContains('keep_vite_or_prerender_until_public_contract', $groups['auth_only_backend']['required_actions']);
