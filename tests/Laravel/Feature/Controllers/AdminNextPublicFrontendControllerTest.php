@@ -49,6 +49,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.app.lockfile_exists', true);
         $response->assertJsonPath('data.app.package_scripts.build', true);
         $response->assertJsonPath('data.app.package_scripts.start', true);
+        $response->assertJsonPath('data.app.package_scripts.check_manifests', true);
         $response->assertJsonPath('data.shadow_runtime.compose_profile', 'next-public-shadow');
         $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');

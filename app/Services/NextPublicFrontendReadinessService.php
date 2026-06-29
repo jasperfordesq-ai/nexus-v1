@@ -166,6 +166,7 @@ class NextPublicFrontendReadinessService
             'build' => isset($scripts['build']),
             'start' => isset($scripts['start']),
             'test' => isset($scripts['test']),
+            'check_manifests' => isset($scripts['check:manifests']),
         ];
     }
 
