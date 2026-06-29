@@ -63,6 +63,7 @@ export function validateShadowManifests(
       : [],
   );
   const routeKeys = new Set<string>();
+  const routeParamsByKey = new Map<string, Set<string>>();
   const patterns = new Set<string>();
 
   for (const route of publicRoutes) {
@@ -88,6 +89,7 @@ export function validateShadowManifests(
       issues.push({ code: 'public_route_duplicate_key', context: routeKey, severity: 'blocker' });
     }
     routeKeys.add(routeKey);
+    routeParamsByKey.set(routeKey, extractPatternParams(pattern));
 
     const firstSegment = pattern.replace(/^\/+/, '').split('/').filter(Boolean).at(0);
     if (firstSegment && privatePrefixes.has(firstSegment)) {
@@ -119,6 +121,10 @@ export function validateShadowManifests(
     if (method.toUpperCase() !== 'GET') {
       issues.push({ code: 'api_backed_route_not_get', context: `${method} ${endpoint}`, severity: 'blocker' });
     }
+
+    if (!sameSet(routeParamsByKey.get(routeKey) ?? new Set<string>(), extractEndpointParams(endpoint))) {
+      issues.push({ code: 'api_backed_route_param_mismatch', context: routeKey, severity: 'blocker' });
+    }
   }
 
   return {
@@ -129,4 +135,26 @@ export function validateShadowManifests(
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function extractPatternParams(pattern: string): Set<string> {
+  return new Set(
+    pattern
+      .split('/')
+      .filter((segment) => segment.startsWith(':'))
+      .map((segment) => segment.slice(1))
+      .filter(Boolean),
+  );
+}
+
+function extractEndpointParams(endpoint: string): Set<string> {
+  return new Set([...endpoint.matchAll(/\{([^}]+)\}/g)].map((match) => match[1]).filter(Boolean));
+}
+
+function sameSet(left: Set<string>, right: Set<string>): boolean {
+  if (left.size !== right.size) {
+    return false;
+  }
+
+  return [...left].every((value) => right.has(value));
 }

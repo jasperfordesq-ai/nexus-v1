@@ -54,6 +54,24 @@ describe('shadow manifest validation', () => {
     });
   });
 
+  it('blocks API-backed route endpoints whose placeholders drift from the public route params', () => {
+    const result = validateShadowManifests(routeOwnershipManifest, {
+      ...contentSourcesManifest,
+      apiBackedRoutes: contentSourcesManifest.apiBackedRoutes.map((source) => (
+        source.routeKey === 'listingDetail'
+          ? { ...source, endpoint: '/v2/listings/{slug}' }
+          : source
+      )),
+    });
+
+    expect(result.status).toBe('blocker');
+    expect(result.issues).toContainEqual({
+      code: 'api_backed_route_param_mismatch',
+      context: 'listingDetail',
+      severity: 'blocker',
+    });
+  });
+
   it('blocks content sources that would query databases from Next', () => {
     const result = validateShadowManifests(routeOwnershipManifest, {
       ...contentSourcesManifest,
