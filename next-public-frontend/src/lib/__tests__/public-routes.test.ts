@@ -100,5 +100,18 @@ describe('public route ownership', () => {
     expect(getRouteOwnership(['ideation', 'create'])).toMatchObject({ owner: 'vite-private' });
     expect(getRouteOwnership(['courses', 'instructor', 'new'])).toMatchObject({ owner: 'vite-private' });
     expect(getRouteOwnership(['courses', 'instructor', '123', 'edit'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['courses', 'my-learning'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['courses', 'instructor'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['group-exchanges', 'create'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['premium', 'manage'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['reviews', 'create'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['volunteering', 'my-applications'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['volunteering', 'my-organisations'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['volunteering', 'org', '12', 'dashboard'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['caring-community', 'my-relationships'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['caring-community', 'my-trust-tier'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['caring-community', 'my-data-export'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['caring-community', 'safeguarding', 'my-reports'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['federation', 'onboarding'])).toMatchObject({ owner: 'vite-private' });
   });
 });

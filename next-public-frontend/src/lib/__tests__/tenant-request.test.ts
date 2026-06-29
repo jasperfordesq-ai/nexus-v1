@@ -80,7 +80,18 @@ describe('tenant request resolution', () => {
   });
 
   it('does not mistake reserved private route prefixes for tenant slugs on shared hosts', () => {
-    for (const prefix of ['dashboard', 'login', 'register', 'onboarding']) {
+    for (const prefix of [
+      'caring-community',
+      'courses',
+      'dashboard',
+      'federation',
+      'group-exchanges',
+      'login',
+      'onboarding',
+      'premium',
+      'register',
+      'volunteering',
+    ]) {
       expect(
         resolveTenantRequest([prefix], {
           host: 'app.project-nexus.ie',
