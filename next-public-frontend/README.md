@@ -46,6 +46,25 @@ The profile binds the Next app to `NEXUS_NEXT_PUBLIC_PORT` and is disabled by
 default. Starting this profile must not be confused with production cutover; it
 only starts the shadow service.
 
+## Apache Canary Template
+
+The inert Apache/Plesk example route file lives at:
+
+```text
+scripts/deploy/apache/next-public-foundation-canary.conf.example
+```
+
+This file is documentation and future canary preparation only. It is not
+included by `scripts/deploy/bluegreen-deploy.sh`, is not referenced by
+`compose.bluegreen.yml`, and must not be copied into a live Plesk include
+without a separate explicit cutover instruction.
+
+The template currently contains exact-match foundation routes only. It avoids
+dynamic detail routes, logged-in routes, create/edit flows, dashboards, admin
+areas, and member workbench paths. Future Apache/Plesk work should keep this
+config-only until route parity checks pass and an operator deliberately enables
+a reviewed include.
+
 ## Route Ownership
 
 - `route-ownership.json` lists public routes intended for the Next frontend and
@@ -69,6 +88,14 @@ That API reports manifest status, shadow runtime commands, public/private route
 ownership, content-source coverage, cutover blockers, retained prerender
 fallback, and verification commands. It does not provide an activation switch.
 
+It also audits the inert Apache canary template by expanding supported
+`RewriteRule` patterns into concrete paths and comparing them with the shadow
+route manifest. The audit reports the exact public paths in the template,
+whether every template path is Next-owned public route coverage, whether any
+private Vite route collides with the template, and whether unsupported rewrite
+rules need manual review. This is read-only reporting and does not include the
+template in Apache.
+
 ## Before Any Future Cutover
 
 Do not enable public traffic until all of the following are true:
@@ -80,7 +107,9 @@ Do not enable public traffic until all of the following are true:
 5. Public Next routes have parity checks for status codes, canonicals,
    metadata, tenant branding, AGPL attribution, and no-JavaScript HTML.
 6. Private Vite routes have regression checks proving gated pages still load.
-7. Apache/Plesk canary routing is reviewed separately and explicitly enabled.
-8. The existing prerender path remains available as fallback during canary.
+7. The Apache/Plesk canary template audit is clean: no private-route
+   collisions, no unmatched template paths, and no unsupported rewrite rules.
+8. Apache/Plesk canary routing is reviewed separately and explicitly enabled.
+9. The existing prerender path remains available as fallback during canary.
 
 Cutover is a separate operational decision and must be explicitly requested.
