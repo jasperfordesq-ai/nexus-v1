@@ -12,6 +12,7 @@ describe('public content sources', () => {
     expect(publicContentSources.sourceOfTruth).toBe('laravel_public_api');
     expect(publicContentSources.databaseQueriesFromNext).toBe(false);
     expect(getPublicEndpointForRoute('home')).toBe('/v2/tenant/bootstrap');
+    expect(getPublicEndpointForRoute('changelog')).toBe('/v2/public-changelog');
     expect(getPublicEndpointForRoute('help')).toBe('/v2/help/faqs');
     expect(getPublicEndpointForRoute('faq')).toBe('/v2/help/faqs');
     expect(getPublicEndpointForRoute('about')).toBe('/v2/public-page-content/about');

@@ -94,8 +94,8 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertFalse($eligibility['activation_available']);
         $this->assertTrue($eligibility['requires_explicit_cutover_instruction']);
         $this->assertSame(76, $eligibility['counts']['public_routes']);
-        $this->assertSame(56, $eligibility['counts']['api_backed_public_routes']);
-        $this->assertSame(20, $eligibility['counts']['remaining_public_routes']);
+        $this->assertSame(57, $eligibility['counts']['api_backed_public_routes']);
+        $this->assertSame(19, $eligibility['counts']['remaining_public_routes']);
         $this->assertContains('remaining_public_route_work', $eligibility['blockers']);
         $this->assertContains('route_parity_required', $eligibility['blockers']);
         $this->assertContains('edge_routes_not_configured', $eligibility['blockers']);
@@ -235,9 +235,10 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertSame('none', $remaining['production_effect']);
         $this->assertFalse($remaining['activation_available']);
         $this->assertSame(76, $remaining['counts']['public_routes']);
-        $this->assertSame(56, $remaining['counts']['api_backed_public_routes']);
-        $this->assertSame(20, $remaining['counts']['remaining_public_routes']);
+        $this->assertSame(57, $remaining['counts']['api_backed_public_routes']);
+        $this->assertSame(19, $remaining['counts']['remaining_public_routes']);
         $this->assertSame(0, $remaining['counts']['unclassified_manifest_only_routes']);
+        $this->assertNotContains('changelog', $groups['static_manual_review']['route_keys']);
         $this->assertNotContains('home', $groups['static_manual_review']['route_keys']);
         $this->assertNotContains('about', $groups['static_manual_review']['route_keys']);
         $this->assertNotContains('features', $groups['static_manual_review']['route_keys']);
