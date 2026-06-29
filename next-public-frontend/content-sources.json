@@ -5,6 +5,7 @@
     { "routeKey": "blog-index", "endpoint": "/v2/blog", "method": "GET" },
     { "routeKey": "blog-detail", "endpoint": "/v2/blog/{slug}", "method": "GET" },
     { "routeKey": "cms-page", "endpoint": "/v2/pages/{slug}", "method": "GET" },
+    { "routeKey": "help", "endpoint": "/v2/help/faqs", "method": "GET" },
     { "routeKey": "faq", "endpoint": "/v2/help/faqs", "method": "GET" },
     { "routeKey": "privacy", "endpoint": "/v2/legal/privacy", "method": "GET" },
     { "routeKey": "privacyVersions", "endpoint": "/v2/legal/privacy/versions", "method": "GET" },

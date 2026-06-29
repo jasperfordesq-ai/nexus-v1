@@ -55,7 +55,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
         $response->assertJsonPath('data.manifest.route_counts.public_routes', 76);
-        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 46);
+        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 47);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 38);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 100);
         $response->assertJsonPath('data.manifest.validation.status', 'pass');
@@ -127,6 +127,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('/volunteering/opportunities/:id', $publicPatterns);
         $this->assertContains('/ideation/:id', $publicPatterns);
         $this->assertContains('blog-index', $apiBackedRouteKeys);
+        $this->assertContains('help', $apiBackedRouteKeys);
         $this->assertContains('faq', $apiBackedRouteKeys);
         $this->assertContains('terms', $apiBackedRouteKeys);
         $this->assertContains('termsVersions', $apiBackedRouteKeys);
@@ -243,6 +244,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertSame('pass', $routeBatchesByKey['vite_private_retained']['status']);
         $this->assertSame([], $routeBatchesByKey['vite_private_retained']['blockers']);
         $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['about']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['help']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['faq']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['terms']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['privacyVersions']['content_source']);
