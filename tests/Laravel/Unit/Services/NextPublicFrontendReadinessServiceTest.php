@@ -38,6 +38,32 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         ], $validation['issues']);
     }
 
+    public function test_manifest_validation_blocks_api_routes_in_private_laravel_v2_namespaces(): void
+    {
+        $validation = $this->validateManifest([
+            'mode' => 'shadow',
+        ], [
+            [
+                'pattern' => '/events',
+                'routeKey' => 'events',
+                'labelKey' => 'pages.events.title',
+            ],
+        ], [], [
+            [
+                'routeKey' => 'events',
+                'endpoint' => '/v2/admin/events',
+                'method' => 'GET',
+            ],
+        ]);
+
+        $this->assertSame('blocker', $validation['status']);
+        $this->assertContains([
+            'code' => 'api_backed_route_private_endpoint',
+            'severity' => 'blocker',
+            'context' => 'events',
+        ], $validation['issues']);
+    }
+
     public function test_manifest_validation_blocks_non_get_api_backed_routes(): void
     {
         $validation = $this->validateManifest([

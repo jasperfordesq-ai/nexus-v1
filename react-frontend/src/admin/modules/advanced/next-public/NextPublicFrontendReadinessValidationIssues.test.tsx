@@ -67,6 +67,11 @@ const readinessWithValidationIssue = {
           context: '/events/new',
           severity: 'blocker',
         },
+        {
+          code: 'api_backed_route_private_endpoint',
+          context: 'events',
+          severity: 'blocker',
+        },
       ],
     },
     public_routes: [
@@ -130,6 +135,7 @@ describe('NextPublicFrontendReadiness validation issues', () => {
     expect(screen.getByText('Required Vite private route prefix is missing.')).toBeInTheDocument();
     expect(screen.getByText('Required Vite private route pattern is missing.')).toBeInTheDocument();
     expect(screen.getByText('A public route collides with a private Vite route pattern.')).toBeInTheDocument();
+    expect(screen.getByText('API-backed public routes must not use private Laravel v2 namespaces.')).toBeInTheDocument();
     expect(screen.getAllByText('next_database')).not.toHaveLength(0);
     expect(screen.getAllByText('login')).not.toHaveLength(0);
     expect(screen.getAllByText('/events/new')).not.toHaveLength(0);

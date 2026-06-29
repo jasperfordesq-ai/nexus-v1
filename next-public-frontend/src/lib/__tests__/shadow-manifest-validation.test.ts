@@ -143,6 +143,24 @@ describe('shadow manifest validation', () => {
     });
   });
 
+  it('blocks API-backed routes that point at private Laravel v2 namespaces', () => {
+    const result = validateShadowManifests(routeOwnershipManifest, {
+      ...contentSourcesManifest,
+      apiBackedRoutes: contentSourcesManifest.apiBackedRoutes.map((source) => (
+        source.routeKey === 'events'
+          ? { ...source, endpoint: '/v2/admin/events' }
+          : source
+      )),
+    });
+
+    expect(result.status).toBe('blocker');
+    expect(result.issues).toContainEqual({
+      code: 'api_backed_route_private_endpoint',
+      context: 'events',
+      severity: 'blocker',
+    });
+  });
+
   it('blocks API-backed route endpoints whose placeholders drift from the public route params', () => {
     const result = validateShadowManifests(routeOwnershipManifest, {
       ...contentSourcesManifest,

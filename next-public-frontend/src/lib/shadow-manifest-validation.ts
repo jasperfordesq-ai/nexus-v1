@@ -65,6 +65,19 @@ const requiredVitePrivatePatterns = [
   '/resources/:id/edit',
 ];
 
+const privateLaravelV2EndpointPrefixes = [
+  '/v2/admin',
+  '/v2/auth',
+  '/v2/broker',
+  '/v2/dashboard',
+  '/v2/feed',
+  '/v2/messages',
+  '/v2/notifications',
+  '/v2/settings',
+  '/v2/super-admin',
+  '/v2/wallet',
+];
+
 export function validateShadowManifests(
   routeManifest: RouteOwnershipManifest,
   contentSources: ContentSourcesManifest,
@@ -192,6 +205,10 @@ export function validateShadowManifests(
       issues.push({ code: 'api_backed_route_not_laravel_v2_endpoint', context: routeKey, severity: 'blocker' });
     }
 
+    if (isPrivateLaravelV2Endpoint(endpoint)) {
+      issues.push({ code: 'api_backed_route_private_endpoint', context: routeKey, severity: 'blocker' });
+    }
+
     if (!sameSet(routeParamsByKey.get(routeKey) ?? new Set<string>(), extractEndpointParams(endpoint))) {
       issues.push({ code: 'api_backed_route_param_mismatch', context: routeKey, severity: 'blocker' });
     }
@@ -219,6 +236,12 @@ function extractPatternParams(pattern: string): Set<string> {
 
 function extractEndpointParams(endpoint: string): Set<string> {
   return new Set([...endpoint.matchAll(/\{([^}]+)\}/g)].map((match) => match[1]).filter(Boolean));
+}
+
+function isPrivateLaravelV2Endpoint(endpoint: string): boolean {
+  return privateLaravelV2EndpointPrefixes.some((prefix) => (
+    endpoint === prefix || endpoint.startsWith(`${prefix}/`)
+  ));
 }
 
 function sameSet(left: Set<string>, right: Set<string>): boolean {

@@ -48,6 +48,19 @@ class NextPublicFrontendReadinessService
         '/resources/:id/edit',
     ];
 
+    private const PRIVATE_LARAVEL_V2_ENDPOINT_PREFIXES = [
+        '/v2/admin',
+        '/v2/auth',
+        '/v2/broker',
+        '/v2/dashboard',
+        '/v2/feed',
+        '/v2/messages',
+        '/v2/notifications',
+        '/v2/settings',
+        '/v2/super-admin',
+        '/v2/wallet',
+    ];
+
     /**
      * @return array<string, mixed>
      */
@@ -447,6 +460,14 @@ class NextPublicFrontendReadinessService
                 ];
             }
 
+            if ($this->isPrivateLaravelV2Endpoint($route['endpoint'])) {
+                $issues[] = [
+                    'code' => 'api_backed_route_private_endpoint',
+                    'severity' => 'blocker',
+                    'context' => $route['routeKey'],
+                ];
+            }
+
             if (!$this->sameStringSet($routeParamsByKey[$route['routeKey']] ?? [], $this->extractEndpointParams($route['endpoint']))) {
                 $issues[] = [
                     'code' => 'api_backed_route_param_mismatch',
@@ -480,6 +501,17 @@ class NextPublicFrontendReadinessService
         preg_match_all('/\{([A-Za-z0-9_]+)\}/', $endpoint, $matches);
 
         return array_values(array_unique($matches[1] ?? []));
+    }
+
+    private function isPrivateLaravelV2Endpoint(string $endpoint): bool
+    {
+        foreach (self::PRIVATE_LARAVEL_V2_ENDPOINT_PREFIXES as $prefix) {
+            if ($endpoint === $prefix || str_starts_with($endpoint, $prefix . '/')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

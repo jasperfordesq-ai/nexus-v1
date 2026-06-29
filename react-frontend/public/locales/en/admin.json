@@ -2964,6 +2964,7 @@
         "api_backed_route_not_in_manifest": "An API-backed route is missing from the public route manifest.",
         "api_backed_route_not_get": "API-backed public routes must use GET.",
         "api_backed_route_not_laravel_v2_endpoint": "API-backed routes must use relative Laravel v2 endpoints.",
+        "api_backed_route_private_endpoint": "API-backed public routes must not use private Laravel v2 namespaces.",
         "api_backed_route_param_mismatch": "API endpoint parameters must match the public route pattern."
       }
     }
