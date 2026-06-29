@@ -26,9 +26,11 @@
     { "routeKey": "marketplace", "endpoint": "/v2/marketplace/listings", "method": "GET" },
     { "routeKey": "marketplaceDetail", "endpoint": "/v2/marketplace/listings/{id}", "method": "GET" },
     { "routeKey": "marketplaceSeller", "endpoint": "/v2/marketplace/sellers/{id}", "method": "GET" },
+    { "routeKey": "explore", "endpoint": "/v2/explore", "method": "GET" },
     { "routeKey": "volunteering", "endpoint": "/v2/volunteering/opportunities", "method": "GET" },
     { "routeKey": "volunteeringOpportunityDetail", "endpoint": "/v2/volunteering/opportunities/{id}", "method": "GET" },
     { "routeKey": "ideation", "endpoint": "/v2/ideation-challenges", "method": "GET" },
-    { "routeKey": "ideationDetail", "endpoint": "/v2/ideation-challenges/{id}", "method": "GET" }
+    { "routeKey": "ideationDetail", "endpoint": "/v2/ideation-challenges/{id}", "method": "GET" },
+    { "routeKey": "clubs", "endpoint": "/v2/clubs", "method": "GET" }
   ]
 }

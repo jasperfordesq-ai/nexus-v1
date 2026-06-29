@@ -55,7 +55,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
         $response->assertJsonPath('data.manifest.route_counts.public_routes', 76);
-        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 28);
+        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 30);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 38);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 100);
         $response->assertJsonPath('data.manifest.validation.status', 'pass');
@@ -130,6 +130,8 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('cms-page', $apiBackedRouteKeys);
         $this->assertContains('listings', $apiBackedRouteKeys);
         $this->assertContains('listingDetail', $apiBackedRouteKeys);
+        $this->assertContains('explore', $apiBackedRouteKeys);
+        $this->assertContains('clubs', $apiBackedRouteKeys);
         $this->assertContains('resources', $apiBackedRouteKeys);
         $this->assertContains('marketplaceDetail', $apiBackedRouteKeys);
         $this->assertContains('volunteeringOpportunityDetail', $apiBackedRouteKeys);
@@ -231,6 +233,8 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertSame('laravel_public_api', $routeReadinessByKey['groupDetail']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['courseDetail']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['podcastEpisode']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['explore']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['clubs']['content_source']);
         $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['couponDetail']['content_source']);
         $this->assertSame('blocker', $routeReadinessByKey['listingDetail']['status']);
         $this->assertContains('parity_test_required', $routeReadinessByKey['listingDetail']['blockers']);

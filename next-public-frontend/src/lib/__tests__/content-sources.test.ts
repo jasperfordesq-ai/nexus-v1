@@ -13,6 +13,8 @@ describe('public content sources', () => {
     expect(publicContentSources.databaseQueriesFromNext).toBe(false);
     expect(getPublicEndpointForRoute('listings')).toBe('/v2/listings');
     expect(getPublicEndpointForRoute('listingDetail', { id: '42' })).toBe('/v2/listings/42');
+    expect(getPublicEndpointForRoute('explore')).toBe('/v2/explore');
+    expect(getPublicEndpointForRoute('clubs')).toBe('/v2/clubs');
   });
 
   it('encodes route parameters before calling Laravel public APIs', () => {
