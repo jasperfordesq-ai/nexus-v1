@@ -121,6 +121,20 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         ], $validation['issues']);
     }
 
+    public function test_manifest_validation_blocks_missing_required_private_prefixes(): void
+    {
+        $validation = $this->validateManifest([
+            'mode' => 'shadow',
+        ], [], ['dashboard', 'admin'], []);
+
+        $this->assertSame('blocker', $validation['status']);
+        $this->assertContains([
+            'code' => 'vite_private_prefix_missing_required',
+            'severity' => 'blocker',
+            'context' => 'login',
+        ], $validation['issues']);
+    }
+
     public function test_manifest_validation_blocks_content_sources_outside_laravel_public_api(): void
     {
         $validation = $this->validateManifest([

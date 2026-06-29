@@ -54,6 +54,23 @@ describe('shadow manifest validation', () => {
     });
   });
 
+  it('blocks removal of required Vite-owned private prefixes', () => {
+    const result = validateShadowManifests(
+      {
+        ...routeOwnershipManifest,
+        vitePrivatePrefixes: routeOwnershipManifest.vitePrivatePrefixes.filter((prefix) => prefix !== 'login'),
+      },
+      contentSourcesManifest,
+    );
+
+    expect(result.status).toBe('blocker');
+    expect(result.issues).toContainEqual({
+      code: 'vite_private_prefix_missing_required',
+      context: 'login',
+      severity: 'blocker',
+    });
+  });
+
   it('blocks duplicate API-backed route keys', () => {
     const result = validateShadowManifests(routeOwnershipManifest, {
       ...contentSourcesManifest,

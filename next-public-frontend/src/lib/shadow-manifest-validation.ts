@@ -26,6 +26,29 @@ interface ManifestValidationResult {
   status: 'blocker' | 'pass';
 }
 
+const requiredVitePrivatePrefixes = [
+  'achievements',
+  'admin',
+  'broker',
+  'connections',
+  'dashboard',
+  'feed',
+  'goals',
+  'groups',
+  'leaderboard',
+  'login',
+  'matches',
+  'members',
+  'messages',
+  'notifications',
+  'onboarding',
+  'profile',
+  'register',
+  'settings',
+  'super-admin',
+  'wallet',
+];
+
 export function validateShadowManifests(
   routeManifest: RouteOwnershipManifest,
   contentSources: ContentSourcesManifest,
@@ -65,6 +88,12 @@ export function validateShadowManifests(
   const routeKeys = new Set<string>();
   const routeParamsByKey = new Map<string, Set<string>>();
   const patterns = new Set<string>();
+
+  for (const prefix of requiredVitePrivatePrefixes) {
+    if (!privatePrefixes.has(prefix)) {
+      issues.push({ code: 'vite_private_prefix_missing_required', context: prefix, severity: 'blocker' });
+    }
+  }
 
   for (const route of publicRoutes) {
     if (!isRecord(route)) {

@@ -52,6 +52,11 @@ const readinessWithValidationIssue = {
           context: 'next_database',
           severity: 'blocker',
         },
+        {
+          code: 'vite_private_prefix_missing_required',
+          context: 'login',
+          severity: 'blocker',
+        },
       ],
     },
     public_routes: [
@@ -112,6 +117,8 @@ describe('NextPublicFrontendReadiness validation issues', () => {
     });
 
     expect(screen.getByText('Content sources must use Laravel public APIs.')).toBeInTheDocument();
+    expect(screen.getByText('Required Vite private route prefix is missing.')).toBeInTheDocument();
     expect(screen.getAllByText('next_database')).not.toHaveLength(0);
+    expect(screen.getAllByText('login')).not.toHaveLength(0);
   });
 });

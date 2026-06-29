@@ -10,6 +10,29 @@ use Illuminate\Support\Facades\File;
 
 class NextPublicFrontendReadinessService
 {
+    private const REQUIRED_VITE_PRIVATE_PREFIXES = [
+        'achievements',
+        'admin',
+        'broker',
+        'connections',
+        'dashboard',
+        'feed',
+        'goals',
+        'groups',
+        'leaderboard',
+        'login',
+        'matches',
+        'members',
+        'messages',
+        'notifications',
+        'onboarding',
+        'profile',
+        'register',
+        'settings',
+        'super-admin',
+        'wallet',
+    ];
+
     /**
      * @return array<string, mixed>
      */
@@ -304,6 +327,16 @@ class NextPublicFrontendReadinessService
         $routeKeys = [];
         $routeParamsByKey = [];
         $privatePrefixSet = array_flip(array_filter($privatePrefixes, 'is_string'));
+
+        foreach (self::REQUIRED_VITE_PRIVATE_PREFIXES as $prefix) {
+            if (!isset($privatePrefixSet[$prefix])) {
+                $issues[] = [
+                    'code' => 'vite_private_prefix_missing_required',
+                    'severity' => 'blocker',
+                    'context' => $prefix,
+                ];
+            }
+        }
 
         foreach ($publicRoutes as $route) {
             if (!is_array($route)) {
