@@ -13978,6 +13978,7 @@
       "manage": "Maneggio",
       "recheck_badges": "Ricontrolla i badge",
       "remove_badge": "Rimuovi distintivo",
+      "resend_verification_email": "Invia di nuovo l?email di verifica",
       "resend_welcome_email": "Invia nuovamente l'e-mail di benvenuto",
       "return_to_list": "Ritorna all'elenco",
       "save_changes": "Salva modifiche",
@@ -14005,6 +14006,8 @@
     "descriptions": {
       "balance_amount": "Utilizzare valori negativi per detrarre crediti di tempo da questo membro",
       "cannot_modify_self": "Non puoi modificare il tuo account da questo pannello",
+      "email_activation_unverified": "Questo membro non ha ancora completato il link di attivazione email. Invia di nuovo l?email di verifica cos? potr? completare l?attivazione dell?account.",
+      "email_activation_verified": "Questo membro ha completato l?attivazione email e pu? superare il controllo di verifica email all?accesso.",
       "global_super_admin": "Garantisce l'accesso completo a tutti i tenant sulla piattaforma",
       "municipal_announcer": "I post di questo utente visualizzeranno un badge ufficiale e verranno fissati nella parte superiore del feed",
       "tenant_super_admin": "Concede l'accesso amministrativo completo all'interno di questo tenant"
@@ -14026,6 +14029,7 @@
       "bio": "Bio",
       "current_balance": "Saldo attuale",
       "email": "E-mail",
+      "email_activation_status": "Stato di attivazione email",
       "first_name": "Nome di battesimo",
       "last_name": "Cognome",
       "location": "Posizione",
@@ -14095,6 +14099,7 @@
     "sections": {
       "account_actions": "Azioni dell'account",
       "badges": "Distintivi",
+      "email_activation": "Attivazione email",
       "gdpr_consents": "GDPR Acconsente",
       "global_super_admin": "Super amministratore globale",
       "insurance_certificates": "Certificati assicurativi",
@@ -14107,10 +14112,13 @@
     "statuses": {
       "active": "Attivo",
       "banned": "Vietato",
+      "email_activated": "Email attivata",
+      "email_not_activated": "Email non attivata",
       "pending": "In attesa di",
       "suspended": "Sospeso"
     },
     "summary": {
+      "email_activated_on": "Attivata il {{date}}",
       "more_certificates": "Più certificati",
       "more_records": "Più record"
     },
@@ -14121,6 +14129,7 @@
       "balance_adjusted": "Saldo rettificato",
       "balance_failed": "Saldo non riuscito",
       "balance_invalid": "Saldo non valido",
+      "email_already_activated": "L?email ? gi? attivata",
       "generic_error": "Si è verificato un errore",
       "global_super_admin_failed": "Impossibile aggiornare lo stato di super amministratore globale",
       "global_super_admin_granted": "Super amministratore globale concesso",
@@ -14140,6 +14149,8 @@
       "tenant_super_admin_revoked": "Super amministratore dell'inquilino revocato",
       "update_failed": "Aggiornamento non riuscito",
       "update_success": "Aggiornamento riuscito",
+      "verification_email_failed": "Impossibile inviare l?email di verifica",
+      "verification_email_sent": "Email di verifica inviata",
       "welcome_email_failed": "Impossibile inviare l'e-mail di benvenuto",
       "welcome_email_sent": "Email di benvenuto inviata"
     },
@@ -14182,6 +14193,7 @@
     "close": "Vicino",
     "col_actions": "Azioni",
     "col_balance": "Equilibrio",
+    "col_email_activation": "Attivazione email",
     "col_joined": "Iscritto",
     "col_role": "Ruolo",
     "col_status": "Stato",
@@ -14206,6 +14218,8 @@
     "desc_use_negative_values_to_deduct_credits": "Utilizzare valori negativi per detrarre crediti di tempo da questo membro",
     "description": "Gestire le impostazioni e la configurazione degli utenti",
     "error_occurred": "Si è verificato un errore",
+    "email_activation_activated": "Attivata",
+    "email_activation_not_activated": "Non attivata",
     "expires": "Scade",
     "impersonate_failed": "Rappresentazione non riuscita",
     "impersonate_started": "Impersonare iniziato",

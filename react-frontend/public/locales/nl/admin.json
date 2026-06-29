@@ -13978,6 +13978,7 @@
       "manage": "Beheren",
       "recheck_badges": "Controleer de badges opnieuw",
       "remove_badge": "Badge verwijderen",
+      "resend_verification_email": "Verificatie-e-mail opnieuw verzenden",
       "resend_welcome_email": "Welkomstmail opnieuw verzenden",
       "return_to_list": "Terug naar lijst",
       "save_changes": "Wijzigingen opslaan",
@@ -14005,6 +14006,8 @@
     "descriptions": {
       "balance_amount": "Gebruik negatieve waarden om tijdskredieten van dit lid af te trekken",
       "cannot_modify_self": "U kunt uw eigen account niet vanuit dit paneel wijzigen",
+      "email_activation_unverified": "Dit lid heeft de activatielink voor e-mail nog niet voltooid. Verzend de verificatie-e-mail opnieuw zodat het account kan worden geactiveerd.",
+      "email_activation_verified": "Dit lid heeft e-mailactivatie voltooid en kan de e-mailverificatie bij het aanmelden passeren.",
       "global_super_admin": "Verleent volledige toegang aan alle tenants op het platform",
       "municipal_announcer": "Bij berichten van deze gebruiker wordt een officiële badge weergegeven en bovenaan de feed vastgezet",
       "tenant_super_admin": "Verleent volledige beheerderstoegang binnen deze tenant"
@@ -14026,6 +14029,7 @@
       "bio": "Biografie",
       "current_balance": "Huidig ​​saldo",
       "email": "E-mail",
+      "email_activation_status": "Status e-mailactivatie",
       "first_name": "Voornaam",
       "last_name": "Achternaam",
       "location": "Locatie",
@@ -14095,6 +14099,7 @@
     "sections": {
       "account_actions": "Accountacties",
       "badges": "Insignes",
+      "email_activation": "E-mailactivatie",
       "gdpr_consents": "GDPR Toestemmingen",
       "global_super_admin": "Wereldwijde superbeheerder",
       "insurance_certificates": "Verzekeringscertificaten",
@@ -14107,10 +14112,13 @@
     "statuses": {
       "active": "Actief",
       "banned": "Verboden",
+      "email_activated": "E-mail geactiveerd",
+      "email_not_activated": "E-mail niet geactiveerd",
       "pending": "In behandeling",
       "suspended": "Opgeschort"
     },
     "summary": {
+      "email_activated_on": "Geactiveerd op {{date}}",
       "more_certificates": "Meer certificaten",
       "more_records": "Meer records"
     },
@@ -14121,6 +14129,7 @@
       "balance_adjusted": "Saldo aangepast",
       "balance_failed": "Saldo mislukt",
       "balance_invalid": "Saldo ongeldig",
+      "email_already_activated": "E-mail is al geactiveerd",
       "generic_error": "Er is een fout opgetreden",
       "global_super_admin_failed": "Kan de status van de globale hoofdbeheerder niet updaten",
       "global_super_admin_granted": "Globale superbeheerder toegestaan",
@@ -14140,6 +14149,8 @@
       "tenant_super_admin_revoked": "Superbeheerder van huurder ingetrokken",
       "update_failed": "Update mislukt",
       "update_success": "Update succesvol",
+      "verification_email_failed": "Verificatie-e-mail kon niet worden verzonden",
+      "verification_email_sent": "Verificatie-e-mail verzonden",
       "welcome_email_failed": "Kan geen welkomstmail verzenden",
       "welcome_email_sent": "Welkomstmail verzonden"
     },
@@ -14182,6 +14193,7 @@
     "close": "Dichtbij",
     "col_actions": "Acties",
     "col_balance": "Balans",
+    "col_email_activation": "E-mailactivatie",
     "col_joined": "Aangesloten",
     "col_role": "Rol",
     "col_status": "Status",
@@ -14206,6 +14218,8 @@
     "desc_use_negative_values_to_deduct_credits": "Gebruik negatieve waarden om tijdskredieten van dit lid af te trekken",
     "description": "Beheer gebruikersinstellingen en configuratie",
     "error_occurred": "Er is een fout opgetreden",
+    "email_activation_activated": "Geactiveerd",
+    "email_activation_not_activated": "Niet geactiveerd",
     "expires": "Verloopt",
     "impersonate_failed": "Imiteren is mislukt",
     "impersonate_started": "Nabootsen gestart",

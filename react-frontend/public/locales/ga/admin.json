@@ -13978,6 +13978,7 @@
       "manage": "Bainistigh",
       "recheck_badges": "Suaitheantais a Athsheiceáil",
       "remove_badge": "Bain Suaitheantas",
+      "resend_verification_email": "Seol an r?omhphost f?or?ch?in ar?s",
       "resend_welcome_email": "Seol Ríomhphost Fáilte arís",
       "return_to_list": "Fill ar an Liosta",
       "save_changes": "Sábháil Athruithe",
@@ -14005,6 +14006,8 @@
     "descriptions": {
       "balance_amount": "Úsáid luachanna diúltacha chun creidmheasanna ama a asbhaint ón mball seo",
       "cannot_modify_self": "Ní féidir leat do chuntas féin a mhionathrú ón bpainéal seo",
+      "email_activation_unverified": "N?or chr?ochnaigh an ball seo an nasc gn?omhachtaithe r?omhphoist f?s. Seol an r?omhphost f?or?ch?in ar?s ionas gur f?idir leo a gcuntas a ghn?omhacht?.",
+      "email_activation_verified": "T? gn?omhacht? r?omhphoist cr?ochnaithe ag an mball seo agus is f?idir leo geata log?la isteach an fh?or?ch?in r?omhphoist a rith.",
       "global_super_admin": "Tugann sé rochtain iomlán do gach tionónta ar an ardán",
       "municipal_announcer": "Taispeánfaidh postálacha ón úsáideoir seo suaitheantas Oifigiúil agus pinneofar iad ar bharr an fhotha",
       "tenant_super_admin": "Deonaíonn rochtain iomlán riaracháin laistigh den tionónta seo"
@@ -14026,6 +14029,7 @@
       "bio": "Bith",
       "current_balance": "Iarmhéid Reatha",
       "email": "Ríomhphost",
+      "email_activation_status": "St?das gn?omhachtaithe r?omhphoist",
       "first_name": "Céad Ainm",
       "last_name": "Sloinne",
       "location": "Suíomh",
@@ -14095,6 +14099,7 @@
     "sections": {
       "account_actions": "Gníomhartha Cuntas",
       "badges": "Suaitheantais",
+      "email_activation": "Gn?omhacht? r?omhphoist",
       "gdpr_consents": "GDPR Toiliú",
       "global_super_admin": "Sár-Riarachán Domhanda",
       "insurance_certificates": "Deimhnithe Árachais",
@@ -14107,10 +14112,13 @@
     "statuses": {
       "active": "Gníomhach",
       "banned": "Cosc",
+      "email_activated": "R?omhphost gn?omhachtaithe",
+      "email_not_activated": "R?omhphost gan ghn?omhacht?",
       "pending": "Ar feitheamh",
       "suspended": "Ar fionraí"
     },
     "summary": {
+      "email_activated_on": "Gn?omhachtaithe ar {{date}}",
       "more_certificates": "Tuilleadh Deimhnithe",
       "more_records": "Tuilleadh Taifead"
     },
@@ -14121,6 +14129,7 @@
       "balance_adjusted": "Iarmhéid Coigeartaithe",
       "balance_failed": "Theip ar Iarmhéid",
       "balance_invalid": "Iarmhéid Neamhbhailí",
+      "email_already_activated": "T? an r?omhphost gn?omhachtaithe cheana",
       "generic_error": "Tharla earráid",
       "global_super_admin_failed": "Theip ar an stádas sár-riaracháin domhanda a nuashonrú",
       "global_super_admin_granted": "Sár-riarthóir domhanda ceadaithe",
@@ -14140,6 +14149,8 @@
       "tenant_super_admin_revoked": "Cúlghairm an t-ard-riarthóir tionónta",
       "update_failed": "Theip ar Nuashonrú",
       "update_success": "D'éirigh leis an nuashonrú",
+      "verification_email_failed": "N?orbh fh?idir an r?omhphost f?or?ch?in a sheoladh",
+      "verification_email_sent": "R?omhphost f?or?ch?in seolta",
       "welcome_email_failed": "Theip ar ríomhphost fáilte a sheoladh",
       "welcome_email_sent": "Seoladh ríomhphost fáilte"
     },
@@ -14182,6 +14193,7 @@
     "close": "Dún",
     "col_actions": "Gníomhartha",
     "col_balance": "Iarmhéid",
+    "col_email_activation": "Gn?omhacht? r?omhphoist",
     "col_joined": "Chuaigh isteach",
     "col_role": "Ról",
     "col_status": "Stádas",
@@ -14206,6 +14218,8 @@
     "desc_use_negative_values_to_deduct_credits": "Úsáid luachanna diúltacha chun creidmheasanna ama a asbhaint ón mball seo",
     "description": "Bainistigh socruithe agus cumraíocht úsáideoirí",
     "error_occurred": "Tharla earráid",
+    "email_activation_activated": "Gn?omhachtaithe",
+    "email_activation_not_activated": "Gan ghn?omhacht?",
     "expires": "In éag",
     "impersonate_failed": "Theip ar Impersonate",
     "impersonate_started": "Impersonate Thosaigh",

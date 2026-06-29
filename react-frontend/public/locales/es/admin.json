@@ -13978,6 +13978,7 @@
       "manage": "Administrar",
       "recheck_badges": "Volver a comprobar las insignias",
       "remove_badge": "Quitar insignia",
+      "resend_verification_email": "Reenviar correo de verificaci?n",
       "resend_welcome_email": "Reenviar correo electrónico de bienvenida",
       "return_to_list": "Volver a la lista",
       "save_changes": "Guardar cambios",
@@ -14005,6 +14006,8 @@
     "descriptions": {
       "balance_amount": "Utilice valores negativos para deducir créditos de tiempo de este miembro",
       "cannot_modify_self": "No puedes modificar tu propia cuenta desde este panel",
+      "email_activation_unverified": "Este miembro a?n no ha completado el enlace de activaci?n del correo electr?nico. Reenv?a el correo de verificaci?n para que pueda terminar de activar su cuenta.",
+      "email_activation_verified": "Este miembro complet? la activaci?n del correo electr?nico y puede superar la verificaci?n de email al iniciar sesi?n.",
       "global_super_admin": "Otorga acceso completo a todos los inquilinos de la plataforma.",
       "municipal_announcer": "Las publicaciones de este usuario mostrarán una insignia oficial y se fijarán en la parte superior del feed.",
       "tenant_super_admin": "Otorga acceso completo de administrador dentro de este inquilino"
@@ -14026,6 +14029,7 @@
       "bio": "Biografía",
       "current_balance": "Saldo actual",
       "email": "Correo electrónico",
+      "email_activation_status": "Estado de activaci?n del correo electr?nico",
       "first_name": "Nombre de pila",
       "last_name": "Apellido",
       "location": "Ubicación",
@@ -14095,6 +14099,7 @@
     "sections": {
       "account_actions": "Acciones de cuenta",
       "badges": "Insignias",
+      "email_activation": "Activaci?n del correo electr?nico",
       "gdpr_consents": "GDPR Consentimientos",
       "global_super_admin": "Superadministrador global",
       "insurance_certificates": "Certificados de seguro",
@@ -14107,10 +14112,13 @@
     "statuses": {
       "active": "Activo",
       "banned": "Prohibido",
+      "email_activated": "Correo electr?nico activado",
+      "email_not_activated": "Correo electr?nico no activado",
       "pending": "Pendiente",
       "suspended": "Suspendido"
     },
     "summary": {
+      "email_activated_on": "Activado el {{date}}",
       "more_certificates": "Más certificados",
       "more_records": "Más registros"
     },
@@ -14121,6 +14129,7 @@
       "balance_adjusted": "Saldo ajustado",
       "balance_failed": "Saldo fallido",
       "balance_invalid": "Saldo no válido",
+      "email_already_activated": "El correo electr?nico ya est? activado",
       "generic_error": "Error ocurrido",
       "global_super_admin_failed": "No se pudo actualizar el estado global del superadministrador",
       "global_super_admin_granted": "Superadministrador global concedido",
@@ -14140,6 +14149,8 @@
       "tenant_super_admin_revoked": "Superadministrador de inquilinos revocado",
       "update_failed": "Actualización fallida",
       "update_success": "Actualizar exitosamente",
+      "verification_email_failed": "No se pudo enviar el correo de verificaci?n",
+      "verification_email_sent": "Correo de verificaci?n enviado",
       "welcome_email_failed": "No se pudo enviar el correo electrónico de bienvenida",
       "welcome_email_sent": "Correo electrónico de bienvenida enviado"
     },
@@ -14182,6 +14193,7 @@
     "close": "Cerca",
     "col_actions": "Acciones",
     "col_balance": "Saldo",
+    "col_email_activation": "Activaci?n del correo",
     "col_joined": "Se unió",
     "col_role": "Rol",
     "col_status": "Estado",
@@ -14206,6 +14218,8 @@
     "desc_use_negative_values_to_deduct_credits": "Utilice valores negativos para deducir créditos de tiempo de este miembro",
     "description": "Administrar la configuración y configuración de los usuarios",
     "error_occurred": "Se produjo un error",
+    "email_activation_activated": "Activado",
+    "email_activation_not_activated": "Sin activar",
     "expires": "Vence",
     "impersonate_failed": "Suplantación fallida",
     "impersonate_started": "Suplantar iniciado",

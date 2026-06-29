@@ -13978,6 +13978,7 @@
       "manage": "Zarządzać",
       "recheck_badges": "Sprawdź ponownie odznaki",
       "remove_badge": "Usuń odznakę",
+      "resend_verification_email": "Wy?lij ponownie e-mail weryfikacyjny",
       "resend_welcome_email": "Wyślij ponownie wiadomość powitalną",
       "return_to_list": "Wróć do listy",
       "save_changes": "Zapisz zmiany",
@@ -14005,6 +14006,8 @@
     "descriptions": {
       "balance_amount": "Użyj wartości ujemnych, aby odliczyć kredyty czasowe od tego członka",
       "cannot_modify_self": "Z poziomu tego panelu nie można modyfikować własnego konta",
+      "email_activation_unverified": "Ten cz?onek nie uko?czy? jeszcze aktywacji przez link e-mail. Wy?lij ponownie e-mail weryfikacyjny, aby m?g? doko?czy? aktywacj? konta.",
+      "email_activation_verified": "Ten cz?onek uko?czy? aktywacj? e-mail i mo?e przej?? bramk? weryfikacji e-mail podczas logowania.",
       "global_super_admin": "Zapewnia pełny dostęp wszystkim dzierżawcom na platformie",
       "municipal_announcer": "Posty tego użytkownika będą oznaczone oficjalną plakietką i będą przypięte na górze kanału",
       "tenant_super_admin": "Przyznaje pełny dostęp administracyjny w ramach tej dzierżawy"
@@ -14026,6 +14029,7 @@
       "bio": "Bio",
       "current_balance": "Aktualne saldo",
       "email": "E-mail",
+      "email_activation_status": "Status aktywacji e-mail",
       "first_name": "Imię",
       "last_name": "Nazwisko",
       "location": "Lokalizacja",
@@ -14095,6 +14099,7 @@
     "sections": {
       "account_actions": "Działania na koncie",
       "badges": "Odznaki",
+      "email_activation": "Aktywacja e-mail",
       "gdpr_consents": "GDPR Zgody",
       "global_super_admin": "Globalny superadministrator",
       "insurance_certificates": "Certyfikaty ubezpieczeniowe",
@@ -14107,10 +14112,13 @@
     "statuses": {
       "active": "Aktywny",
       "banned": "Zakazany",
+      "email_activated": "E-mail aktywowany",
+      "email_not_activated": "E-mail nieaktywowany",
       "pending": "Aż do",
       "suspended": "Zawieszony"
     },
     "summary": {
+      "email_activated_on": "Aktywowano {{date}}",
       "more_certificates": "Więcej certyfikatów",
       "more_records": "Więcej rekordów"
     },
@@ -14121,6 +14129,7 @@
       "balance_adjusted": "Saldo skorygowane",
       "balance_failed": "Saldo nie powiodło się",
       "balance_invalid": "Saldo nieprawidłowe",
+      "email_already_activated": "E-mail jest ju? aktywowany",
       "generic_error": "Wystąpił błąd",
       "global_super_admin_failed": "Nie udało się zaktualizować statusu superadministratora globalnego",
       "global_super_admin_granted": "Przyznano globalnego superadministratora",
@@ -14140,6 +14149,8 @@
       "tenant_super_admin_revoked": "Superadministrator najemcy został odwołany",
       "update_failed": "Aktualizacja nie powiodła się",
       "update_success": "Aktualizacja pomyślnie",
+      "verification_email_failed": "Nie uda?o si? wys?a? e-maila weryfikacyjnego",
+      "verification_email_sent": "E-mail weryfikacyjny wys?any",
       "welcome_email_failed": "Nie udało się wysłać wiadomości powitalnej",
       "welcome_email_sent": "Wiadomość powitalna została wysłana"
     },
@@ -14182,6 +14193,7 @@
     "close": "Zamknąć",
     "col_actions": "Działania",
     "col_balance": "Równowaga",
+    "col_email_activation": "Aktywacja e-mail",
     "col_joined": "Dołączył",
     "col_role": "Rola",
     "col_status": "Stan",
@@ -14206,6 +14218,8 @@
     "desc_use_negative_values_to_deduct_credits": "Użyj wartości ujemnych, aby odliczyć kredyty czasowe od tego członka",
     "description": "Zarządzaj ustawieniami i konfiguracją użytkowników",
     "error_occurred": "Wystąpił błąd",
+    "email_activation_activated": "Aktywowano",
+    "email_activation_not_activated": "Nieaktywowany",
     "expires": "Wygasa",
     "impersonate_failed": "Podszywanie się nie powiodło się",
     "impersonate_started": "Rozpoczęło się podszywanie się pod osobę",
