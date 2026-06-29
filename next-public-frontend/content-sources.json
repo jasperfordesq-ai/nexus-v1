@@ -24,6 +24,7 @@
     { "routeKey": "kb", "endpoint": "/v2/kb", "method": "GET" },
     { "routeKey": "kbDetail", "endpoint": "/v2/kb/{id}", "method": "GET" },
     { "routeKey": "marketplace", "endpoint": "/v2/marketplace/listings", "method": "GET" },
+    { "routeKey": "marketplaceSearch", "endpoint": "/v2/marketplace/listings", "method": "GET" },
     { "routeKey": "marketplaceMap", "endpoint": "/v2/marketplace/listings/nearby", "method": "GET" },
     { "routeKey": "marketplaceFree", "endpoint": "/v2/marketplace/listings/free", "method": "GET" },
     { "routeKey": "marketplaceDetail", "endpoint": "/v2/marketplace/listings/{id}", "method": "GET" },

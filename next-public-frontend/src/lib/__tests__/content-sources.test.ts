@@ -15,6 +15,7 @@ describe('public content sources', () => {
     expect(getPublicEndpointForRoute('listingDetail', { id: '42' })).toBe('/v2/listings/42');
     expect(getPublicEndpointForRoute('explore')).toBe('/v2/explore');
     expect(getPublicEndpointForRoute('clubs')).toBe('/v2/clubs');
+    expect(getPublicEndpointForRoute('marketplaceSearch')).toBe('/v2/marketplace/listings');
     expect(getPublicEndpointForRoute('marketplaceFree')).toBe('/v2/marketplace/listings/free');
     expect(getPublicEndpointForRoute('marketplaceMap')).toBe('/v2/marketplace/listings/nearby');
   });
