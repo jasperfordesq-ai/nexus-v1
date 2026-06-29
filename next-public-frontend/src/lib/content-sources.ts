@@ -19,17 +19,34 @@ export interface PublicContentSources {
 
 export const publicContentSources = contentSourcesManifest as PublicContentSources;
 
-export function getPublicContentSource(routeKey: string): PublicApiBackedRoute | null {
-  return publicContentSources.apiBackedRoutes.find((source) => source.routeKey === routeKey) ?? null;
+const privateLaravelV2EndpointPrefixes = [
+  '/v2/admin',
+  '/v2/auth',
+  '/v2/broker',
+  '/v2/dashboard',
+  '/v2/feed',
+  '/v2/messages',
+  '/v2/notifications',
+  '/v2/settings',
+  '/v2/super-admin',
+  '/v2/wallet',
+];
+
+export function getPublicContentSource(
+  routeKey: string,
+  sources: PublicApiBackedRoute[] = publicContentSources.apiBackedRoutes,
+): PublicApiBackedRoute | null {
+  return sources.find((source) => source.routeKey === routeKey) ?? null;
 }
 
 export function getPublicEndpointForRoute(
   routeKey: string,
   params: Record<string, string> = {},
+  sources: PublicApiBackedRoute[] = publicContentSources.apiBackedRoutes,
 ): string | null {
-  const source = getPublicContentSource(routeKey);
+  const source = getPublicContentSource(routeKey, sources);
 
-  if (!source) {
+  if (!source || !isSafePublicEndpoint(source.endpoint)) {
     return null;
   }
 
@@ -42,4 +59,14 @@ export function getPublicEndpointForRoute(
   }
 
   return source.endpoint.replace(/\{([^}]+)\}/g, (_match, paramName: string) => encodeURIComponent(params[paramName] ?? ''));
+}
+
+function isSafePublicEndpoint(endpoint: string): boolean {
+  if (!endpoint.startsWith('/v2/') || endpoint.includes('?') || endpoint.includes('#')) {
+    return false;
+  }
+
+  return !privateLaravelV2EndpointPrefixes.some((prefix) => (
+    endpoint === prefix || endpoint.startsWith(`${prefix}/`)
+  ));
 }

@@ -18,4 +18,32 @@ describe('public content sources', () => {
   it('encodes route parameters before calling Laravel public APIs', () => {
     expect(getPublicEndpointForRoute('blog-detail', { slug: 'summer news' })).toBe('/v2/blog/summer%20news');
   });
+
+  it('refuses manifest endpoints with query strings or fragments at runtime', () => {
+    expect(
+      getPublicEndpointForRoute(
+        'events',
+        {},
+        [{ endpoint: '/v2/events?include_private=1', method: 'GET', routeKey: 'events' }],
+      ),
+    ).toBeNull();
+
+    expect(
+      getPublicEndpointForRoute(
+        'events',
+        {},
+        [{ endpoint: '/v2/events#private', method: 'GET', routeKey: 'events' }],
+      ),
+    ).toBeNull();
+  });
+
+  it('refuses private Laravel API namespaces at runtime', () => {
+    expect(
+      getPublicEndpointForRoute(
+        'events',
+        {},
+        [{ endpoint: '/v2/admin/events', method: 'GET', routeKey: 'events' }],
+      ),
+    ).toBeNull();
+  });
 });
