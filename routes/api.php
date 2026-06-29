@@ -1152,6 +1152,8 @@ Route::get('/v2/marketplace/listings/featured', [\App\Http\Controllers\Api\Marke
 Route::get('/v2/marketplace/listings/free', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'free']);
 Route::get('/v2/marketplace/listings/{id}', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'show']);
 Route::get('/v2/marketplace/categories', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'categories']);
+Route::get('/v2/marketplace/categories/{slug}/listings', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'categoryListings'])
+    ->where('slug', '[A-Za-z0-9_-]+');
 Route::get('/v2/marketplace/categories/{id}/template', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'categoryTemplate']);
 Route::get('/v2/marketplace/sellers/{id}', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'show']);
 Route::get('/v2/marketplace/sellers/{id}/listings', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'listings']);

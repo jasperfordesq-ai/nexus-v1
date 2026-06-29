@@ -15,6 +15,7 @@ use App\Services\ImageUploadService;
 use App\Services\MarketplaceConfigurationService;
 use App\Services\MarketplaceListingService;
 use App\Services\MarketplaceSellerService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -785,6 +786,48 @@ class MarketplaceListingController extends BaseApiController
             'limit'           => $limit,
             'cursor'          => $cursor,
             'price_type'      => 'free',
+            'current_user_id' => $userId,
+        ]);
+
+        return $this->respondWithCollection(
+            $result['items'],
+            $result['cursor'],
+            $limit,
+            $result['has_more']
+        );
+    }
+
+    /**
+     * GET /v2/marketplace/categories/{slug}/listings — Listings for a category slug.
+     *
+     * Public, read-only browse endpoint for shadow-rendered category pages.
+     */
+    public function categoryListings(string $slug): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('marketplace_browse', 60, 60);
+
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+        $limit = $this->queryInt('limit', 20, 1, 100);
+        $cursor = $this->query('cursor');
+        $categoryId = DB::table('marketplace_categories')
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->where(function ($query) {
+                $query->where('tenant_id', TenantContext::getId())
+                    ->orWhereNull('tenant_id');
+            })
+            ->orderByRaw('CASE WHEN tenant_id = ? THEN 0 ELSE 1 END', [TenantContext::getId()])
+            ->value('id');
+
+        if ($categoryId === null) {
+            return $this->respondWithCollection([], null, $limit, false);
+        }
+
+        $result = MarketplaceListingService::getAll([
+            'limit'           => $limit,
+            'cursor'          => $cursor,
+            'category_id'     => (int) $categoryId,
             'current_user_id' => $userId,
         ]);
 

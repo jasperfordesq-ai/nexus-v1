@@ -26,6 +26,9 @@ describe('public content sources', () => {
     expect(getPublicEndpointForRoute('marketplaceSearch')).toBe('/v2/marketplace/listings');
     expect(getPublicEndpointForRoute('marketplaceFree')).toBe('/v2/marketplace/listings/free');
     expect(getPublicEndpointForRoute('marketplaceMap')).toBe('/v2/marketplace/listings/nearby');
+    expect(getPublicEndpointForRoute('marketplaceCategory', { slug: 'repair-tools' })).toBe(
+      '/v2/marketplace/categories/repair-tools/listings',
+    );
   });
 
   it('encodes route parameters before calling Laravel public APIs', () => {
