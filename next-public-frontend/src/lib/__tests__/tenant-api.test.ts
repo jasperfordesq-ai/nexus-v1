@@ -100,4 +100,38 @@ describe('tenant API client', () => {
       title: 'Repair cafe',
     });
   });
+
+  it('fetches public detail routes with named manifest parameters', async () => {
+    process.env.NEXUS_API_BASE = 'https://api.example.test/api';
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: {
+            description: 'A practical course for neighbours.',
+            id: 12,
+            slug: 'garden-skills',
+            title: 'Garden skills',
+          },
+        }),
+      ),
+    );
+
+    await expect(fetchPublicDetail('courseDetail', { idOrSlug: 'garden skills' }, request, null)).resolves.toEqual({
+      description: 'A practical course for neighbours.',
+      id: '12',
+      slug: 'garden-skills',
+      title: 'Garden skills',
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://api.example.test/api/v2/courses/garden%20skills',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Accept: 'application/json',
+          Origin: 'https://app.project-nexus.ie',
+          'X-Tenant-Slug': 'hour-timebank',
+        }),
+      }),
+    );
+  });
 });

@@ -150,9 +150,9 @@ async function fetchRouteContent(
     };
   }
 
-  if (route.params?.id) {
+  if (route.params && Object.keys(route.params).length > 0) {
     return {
-      item: await fetchPublicDetail(route.routeKey, route.params.id, request, tenant),
+      item: await fetchPublicDetail(route.routeKey, route.params, request, tenant),
       kind: 'public-detail',
     };
   }

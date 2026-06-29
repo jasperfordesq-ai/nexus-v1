@@ -175,11 +175,12 @@ export async function fetchPublicCollection(
 
 export async function fetchPublicDetail(
   routeKey: string,
-  id: string,
+  paramsOrId: Record<string, string> | string,
   request: ResolvedTenantRequest,
   tenant: TenantBootstrap | null,
 ): Promise<PublicContentItem | null> {
-  const endpoint = getPublicEndpointForRoute(routeKey, { id });
+  const params = typeof paramsOrId === 'string' ? { id: paramsOrId } : paramsOrId;
+  const endpoint = getPublicEndpointForRoute(routeKey, params);
 
   if (!endpoint) {
     return null;
