@@ -324,7 +324,7 @@ export function KBArticlePage() {
           {/* Article Content */}
           {article.content_type === 'markdown' ? (
             <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('loading')}><Spinner size="sm" /></div>}>
-              <MarkdownRenderer content={article.content} />
+              <MarkdownRenderer content={article.content} variant="knowledgeBase" />
             </Suspense>
           ) : (
             <div

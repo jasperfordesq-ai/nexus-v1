@@ -10,8 +10,22 @@ import { createMockContexts } from '@/test/mock-contexts';
 // PageMeta is globally mocked to a no-op in src/test/setup.ts.
 // MarkdownRenderer is a real component; mock it to avoid markdown-parsing overhead.
 vi.mock('@/components/content/MarkdownRenderer', () => ({
-  MarkdownRenderer: ({ content }: { content: string }) => (
-    <div data-testid="markdown-renderer">{content}</div>
+  MarkdownRenderer: ({
+    className,
+    content,
+    variant,
+  }: {
+    className?: string;
+    content: string;
+    variant?: string;
+  }) => (
+    <div
+      className={[variant === 'changelog' && 'changelog-markdown', className].filter(Boolean).join(' ')}
+      data-testid="markdown-renderer"
+      data-variant={variant}
+    >
+      {content}
+    </div>
   ),
 }));
 
@@ -75,6 +89,19 @@ describe('ChangelogPage', () => {
       const renderer = screen.getByTestId('markdown-renderer');
       expect(renderer).toBeInTheDocument();
       expect(renderer).toHaveTextContent('# v1.0.0');
+    });
+  });
+
+  it('uses the dedicated changelog markdown presentation', async () => {
+    stubFetch({
+      ok: true,
+      text: async () => '## [1.5.4] - 2026-06-29\n\n### Fixed\n\n- **Cleaner release notes.**',
+    });
+    render(<ChangelogPage />);
+    await waitFor(() => {
+      const renderer = screen.getByTestId('markdown-renderer');
+      expect(renderer).toHaveAttribute('data-variant', 'changelog');
+      expect(renderer.className).toContain('changelog-markdown');
     });
   });
 

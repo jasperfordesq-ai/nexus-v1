@@ -139,6 +139,35 @@ describe('MarkdownRenderer', () => {
     expect(wrapper.className).toContain('custom-class');
   });
 
+  it('applies the changelog presentation variant', async () => {
+    const { MarkdownRenderer } = await import('./MarkdownRenderer');
+    const { container } = render(
+      <MarkdownRenderer
+        content={'# Changelog\n\n## [1.5.4] - 2026-06-29\n\n### Fixed\n\n- **Cleaner release notes.**'}
+        variant="changelog"
+      />
+    );
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper.className).toContain('changelog-markdown');
+    expect(wrapper.className).toContain('[&_h2]:scroll-mt-24');
+    expect(wrapper.className).toContain('[&_li]:rounded-md');
+  });
+
+  it('applies the knowledge base article presentation variant', async () => {
+    const { MarkdownRenderer } = await import('./MarkdownRenderer');
+    const { container } = render(
+      <MarkdownRenderer
+        content={'# Article\n\n## Setup\n\n- First step\n\n| Key | Value |\n| --- | --- |\n| API | Ready |'}
+        variant="knowledgeBase"
+      />
+    );
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper.className).toContain('kb-markdown');
+    expect(wrapper.className).toContain('[&_h2]:scroll-mt-24');
+    expect(wrapper.className).toContain('[&_table]:min-w-full');
+    expect(wrapper.className).toContain('[&_li]:pl-1');
+  });
+
   it('renders GFM strikethrough via remark-gfm', async () => {
     const { MarkdownRenderer } = await import('./MarkdownRenderer');
     const { container } = render(<MarkdownRenderer content="~~deleted~~" />);
