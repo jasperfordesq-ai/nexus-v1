@@ -161,6 +161,24 @@ describe('shadow manifest validation', () => {
     });
   });
 
+  it('blocks API-backed route endpoints with query strings or fragments', () => {
+    const result = validateShadowManifests(routeOwnershipManifest, {
+      ...contentSourcesManifest,
+      apiBackedRoutes: contentSourcesManifest.apiBackedRoutes.map((source) => (
+        source.routeKey === 'events'
+          ? { ...source, endpoint: '/v2/events?include_private=1' }
+          : source
+      )),
+    });
+
+    expect(result.status).toBe('blocker');
+    expect(result.issues).toContainEqual({
+      code: 'api_backed_route_endpoint_not_plain_path',
+      context: 'events',
+      severity: 'blocker',
+    });
+  });
+
   it('blocks API-backed route endpoints whose placeholders drift from the public route params', () => {
     const result = validateShadowManifests(routeOwnershipManifest, {
       ...contentSourcesManifest,

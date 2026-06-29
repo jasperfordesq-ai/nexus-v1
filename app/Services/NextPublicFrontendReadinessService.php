@@ -460,6 +460,14 @@ class NextPublicFrontendReadinessService
                 ];
             }
 
+            if (str_contains($route['endpoint'], '?') || str_contains($route['endpoint'], '#')) {
+                $issues[] = [
+                    'code' => 'api_backed_route_endpoint_not_plain_path',
+                    'severity' => 'blocker',
+                    'context' => $route['routeKey'],
+                ];
+            }
+
             if ($this->isPrivateLaravelV2Endpoint($route['endpoint'])) {
                 $issues[] = [
                     'code' => 'api_backed_route_private_endpoint',

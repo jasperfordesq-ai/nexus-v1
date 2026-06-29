@@ -205,6 +205,10 @@ export function validateShadowManifests(
       issues.push({ code: 'api_backed_route_not_laravel_v2_endpoint', context: routeKey, severity: 'blocker' });
     }
 
+    if (endpoint.includes('?') || endpoint.includes('#')) {
+      issues.push({ code: 'api_backed_route_endpoint_not_plain_path', context: routeKey, severity: 'blocker' });
+    }
+
     if (isPrivateLaravelV2Endpoint(endpoint)) {
       issues.push({ code: 'api_backed_route_private_endpoint', context: routeKey, severity: 'blocker' });
     }
