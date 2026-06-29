@@ -53,18 +53,28 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
         $response->assertJsonPath('data.manifest.route_counts.public_routes', 24);
+        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 16);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 17);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 12);
         $response->assertJsonPath('data.manifest.validation.status', 'pass');
         $response->assertJsonPath('data.manifest.validation.issues', []);
+        $response->assertJsonPath('data.content_sources.source_of_truth', 'laravel_public_api');
+        $response->assertJsonPath('data.content_sources.database_queries_from_next', false);
 
         $payload = $response->json('data');
         $publicPatterns = array_column($payload['manifest']['public_routes'], 'pattern');
+        $apiBackedRouteKeys = array_column($payload['content_sources']['api_backed_routes'], 'routeKey');
 
         $this->assertContains('/about', $publicPatterns);
         $this->assertContains('/blog/:slug', $publicPatterns);
         $this->assertContains('/listings/:id', $publicPatterns);
         $this->assertContains('/marketplace/:id', $publicPatterns);
+        $this->assertContains('blog-index', $apiBackedRouteKeys);
+        $this->assertContains('cms-page', $apiBackedRouteKeys);
+        $this->assertContains('listings', $apiBackedRouteKeys);
+        $this->assertContains('listingDetail', $apiBackedRouteKeys);
+        $this->assertContains('resources', $apiBackedRouteKeys);
+        $this->assertContains('marketplaceDetail', $apiBackedRouteKeys);
         $this->assertContains('dashboard', $payload['manifest']['vite_private_prefixes']);
         $this->assertContains('/events/new', $payload['manifest']['vite_private_patterns']);
         $this->assertContains('route_cutover_disabled', array_column($payload['safety_checks'], 'key'));

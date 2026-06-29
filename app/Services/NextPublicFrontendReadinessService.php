@@ -21,7 +21,8 @@ class NextPublicFrontendReadinessService
         $publicRoutes = is_array($manifest) ? array_values($manifest['nextPublicRoutes'] ?? []) : [];
         $privatePrefixes = is_array($manifest) ? array_values($manifest['vitePrivatePrefixes'] ?? []) : [];
         $privatePatterns = is_array($manifest) ? array_values($manifest['vitePrivatePatterns'] ?? []) : [];
-        $validation = $this->validateManifest($manifest, $publicRoutes, $privatePrefixes);
+        $apiBackedRoutes = $this->apiBackedRoutes();
+        $validation = $this->validateManifest($manifest, $publicRoutes, $privatePrefixes, $apiBackedRoutes);
 
         $manifestMode = is_array($manifest) ? (string) ($manifest['mode'] ?? 'unknown') : 'missing';
         $cutoverEnabled = filter_var(
@@ -45,6 +46,7 @@ class NextPublicFrontendReadinessService
                 'mode' => is_array($manifest) ? ($manifest['mode'] ?? null) : null,
                 'route_counts' => [
                     'public_routes' => count($publicRoutes),
+                    'api_backed_public_routes' => count($apiBackedRoutes),
                     'vite_private_prefixes' => count($privatePrefixes),
                     'vite_private_patterns' => count($privatePatterns),
                 ],
@@ -52,6 +54,11 @@ class NextPublicFrontendReadinessService
                 'public_routes' => $publicRoutes,
                 'vite_private_prefixes' => $privatePrefixes,
                 'vite_private_patterns' => $privatePatterns,
+            ],
+            'content_sources' => [
+                'source_of_truth' => 'laravel_public_api',
+                'database_queries_from_next' => false,
+                'api_backed_routes' => $apiBackedRoutes,
             ],
             'production_routing' => [
                 'active' => false,
@@ -87,6 +94,31 @@ class NextPublicFrontendReadinessService
                 'enable_canary_for_public_routes_only',
                 'monitor_and_keep_prerender_fallback',
             ],
+        ];
+    }
+
+    /**
+     * @return array<int, array{routeKey: string, endpoint: string, method: string}>
+     */
+    private function apiBackedRoutes(): array
+    {
+        return [
+            ['routeKey' => 'blog-index', 'endpoint' => '/v2/blog', 'method' => 'GET'],
+            ['routeKey' => 'blog-detail', 'endpoint' => '/v2/blog/{slug}', 'method' => 'GET'],
+            ['routeKey' => 'cms-page', 'endpoint' => '/v2/pages/{slug}', 'method' => 'GET'],
+            ['routeKey' => 'listings', 'endpoint' => '/v2/listings', 'method' => 'GET'],
+            ['routeKey' => 'listingDetail', 'endpoint' => '/v2/listings/{id}', 'method' => 'GET'],
+            ['routeKey' => 'events', 'endpoint' => '/v2/events', 'method' => 'GET'],
+            ['routeKey' => 'eventDetail', 'endpoint' => '/v2/events/{id}', 'method' => 'GET'],
+            ['routeKey' => 'jobs', 'endpoint' => '/v2/jobs', 'method' => 'GET'],
+            ['routeKey' => 'jobDetail', 'endpoint' => '/v2/jobs/{id}', 'method' => 'GET'],
+            ['routeKey' => 'organisations', 'endpoint' => '/v2/volunteering/organisations', 'method' => 'GET'],
+            ['routeKey' => 'organisationDetail', 'endpoint' => '/v2/volunteering/organisations/{id}', 'method' => 'GET'],
+            ['routeKey' => 'resources', 'endpoint' => '/v2/resources', 'method' => 'GET'],
+            ['routeKey' => 'kb', 'endpoint' => '/v2/kb', 'method' => 'GET'],
+            ['routeKey' => 'kbDetail', 'endpoint' => '/v2/kb/{id}', 'method' => 'GET'],
+            ['routeKey' => 'marketplace', 'endpoint' => '/v2/marketplace/listings', 'method' => 'GET'],
+            ['routeKey' => 'marketplaceDetail', 'endpoint' => '/v2/marketplace/listings/{id}', 'method' => 'GET'],
         ];
     }
 
@@ -134,9 +166,10 @@ class NextPublicFrontendReadinessService
      * @param array<string, mixed>|null $manifest
      * @param array<int, mixed> $publicRoutes
      * @param array<int, mixed> $privatePrefixes
+     * @param array<int, array{routeKey: string, endpoint: string, method: string}> $apiBackedRoutes
      * @return array{status: string, issues: array<int, array<string, string>>}
      */
-    private function validateManifest(?array $manifest, array $publicRoutes, array $privatePrefixes): array
+    private function validateManifest(?array $manifest, array $publicRoutes, array $privatePrefixes, array $apiBackedRoutes): array
     {
         $issues = [];
 
@@ -190,6 +223,16 @@ class NextPublicFrontendReadinessService
             $firstSegment = strtok(ltrim($pattern, '/'), '/');
             if (is_string($firstSegment) && $firstSegment !== '' && isset($privatePrefixSet[$firstSegment])) {
                 $issues[] = ['code' => 'public_route_collides_with_private_prefix', 'severity' => 'blocker', 'context' => $pattern];
+            }
+        }
+
+        foreach ($apiBackedRoutes as $route) {
+            if (!isset($routeKeys[$route['routeKey']])) {
+                $issues[] = [
+                    'code' => 'api_backed_route_not_in_manifest',
+                    'severity' => 'blocker',
+                    'context' => $route['routeKey'],
+                ];
             }
         }
 
