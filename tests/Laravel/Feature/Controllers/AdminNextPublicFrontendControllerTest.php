@@ -55,7 +55,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
         $response->assertJsonPath('data.manifest.route_counts.public_routes', 76);
-        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 34);
+        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 46);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 38);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 100);
         $response->assertJsonPath('data.manifest.validation.status', 'pass');
@@ -128,6 +128,18 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('/ideation/:id', $publicPatterns);
         $this->assertContains('blog-index', $apiBackedRouteKeys);
         $this->assertContains('faq', $apiBackedRouteKeys);
+        $this->assertContains('terms', $apiBackedRouteKeys);
+        $this->assertContains('termsVersions', $apiBackedRouteKeys);
+        $this->assertContains('privacy', $apiBackedRouteKeys);
+        $this->assertContains('privacyVersions', $apiBackedRouteKeys);
+        $this->assertContains('cookies', $apiBackedRouteKeys);
+        $this->assertContains('cookiesVersions', $apiBackedRouteKeys);
+        $this->assertContains('accessibility', $apiBackedRouteKeys);
+        $this->assertContains('accessibilityVersions', $apiBackedRouteKeys);
+        $this->assertContains('communityGuidelines', $apiBackedRouteKeys);
+        $this->assertContains('communityGuidelinesVersions', $apiBackedRouteKeys);
+        $this->assertContains('acceptableUse', $apiBackedRouteKeys);
+        $this->assertContains('acceptableUseVersions', $apiBackedRouteKeys);
         $this->assertContains('cms-page', $apiBackedRouteKeys);
         $this->assertContains('listings', $apiBackedRouteKeys);
         $this->assertContains('listingDetail', $apiBackedRouteKeys);
@@ -232,6 +244,10 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertSame([], $routeBatchesByKey['vite_private_retained']['blockers']);
         $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['about']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['faq']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['terms']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['privacyVersions']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['communityGuidelines']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['acceptableUseVersions']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['listingDetail']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['volunteeringOpportunityDetail']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['ideationDetail']['content_source']);

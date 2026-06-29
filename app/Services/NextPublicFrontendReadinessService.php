@@ -1228,7 +1228,7 @@ class NextPublicFrontendReadinessService
         $routeUri = 'api/' . ltrim($endpoint, '/');
 
         foreach (Route::getRoutes()->getRoutes() as $route) {
-            if ($route->uri() !== $routeUri || !in_array('GET', $route->methods(), true)) {
+            if (!$this->routeUriMatchesEndpoint($route->uri(), $routeUri) || !in_array('GET', $route->methods(), true)) {
                 continue;
             }
 
@@ -1239,6 +1239,18 @@ class NextPublicFrontendReadinessService
         }
 
         return 'missing';
+    }
+
+    private function routeUriMatchesEndpoint(string $routeUri, string $endpointUri): bool
+    {
+        if ($routeUri === $endpointUri) {
+            return true;
+        }
+
+        $quoted = preg_quote($routeUri, '#');
+        $pattern = preg_replace('#\\\\\{[^/]+\\\\\}#', '[^/]+', $quoted);
+
+        return is_string($pattern) && (bool) preg_match('#^' . $pattern . '$#', $endpointUri);
     }
 
     /**

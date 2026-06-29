@@ -535,6 +535,16 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         ], $validation['issues']);
     }
 
+    public function test_registered_public_get_endpoint_status_matches_laravel_route_parameters(): void
+    {
+        $method = new ReflectionMethod(NextPublicFrontendReadinessService::class, 'registeredPublicGetEndpointStatus');
+        $method->setAccessible(true);
+
+        $status = $method->invoke(new NextPublicFrontendReadinessService(), '/v2/legal/privacy');
+
+        $this->assertSame('public', $status);
+    }
+
     public function test_manifest_validation_blocks_content_sources_outside_laravel_public_api(): void
     {
         $validation = $this->validateManifest([

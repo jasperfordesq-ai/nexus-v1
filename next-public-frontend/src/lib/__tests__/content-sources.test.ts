@@ -12,6 +12,12 @@ describe('public content sources', () => {
     expect(publicContentSources.sourceOfTruth).toBe('laravel_public_api');
     expect(publicContentSources.databaseQueriesFromNext).toBe(false);
     expect(getPublicEndpointForRoute('faq')).toBe('/v2/help/faqs');
+    expect(getPublicEndpointForRoute('terms')).toBe('/v2/legal/terms');
+    expect(getPublicEndpointForRoute('termsVersions')).toBe('/v2/legal/terms/versions');
+    expect(getPublicEndpointForRoute('privacy')).toBe('/v2/legal/privacy');
+    expect(getPublicEndpointForRoute('privacyVersions')).toBe('/v2/legal/privacy/versions');
+    expect(getPublicEndpointForRoute('communityGuidelines')).toBe('/v2/legal/community_guidelines');
+    expect(getPublicEndpointForRoute('acceptableUseVersions')).toBe('/v2/legal/acceptable_use/versions');
     expect(getPublicEndpointForRoute('listings')).toBe('/v2/listings');
     expect(getPublicEndpointForRoute('listingDetail', { id: '42' })).toBe('/v2/listings/42');
     expect(getPublicEndpointForRoute('explore')).toBe('/v2/explore');
