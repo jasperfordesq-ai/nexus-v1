@@ -57,7 +57,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.manifest.route_counts.public_routes', 24);
         $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 16);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 20);
-        $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 12);
+        $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 42);
         $response->assertJsonPath('data.manifest.validation.status', 'pass');
         $response->assertJsonPath('data.manifest.validation.issues', []);
         $response->assertJsonPath('data.content_sources.source_of_truth', 'laravel_public_api');
@@ -90,6 +90,10 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('onboarding', $payload['manifest']['vite_private_prefixes']);
         $this->assertContains('register', $payload['manifest']['vite_private_prefixes']);
         $this->assertContains('/events/new', $payload['manifest']['vite_private_patterns']);
+        $this->assertContains('/events/create', $payload['manifest']['vite_private_patterns']);
+        $this->assertContains('/listings/edit/:id', $payload['manifest']['vite_private_patterns']);
+        $this->assertContains('/marketplace/sell', $payload['manifest']['vite_private_patterns']);
+        $this->assertContains('/organisations/register', $payload['manifest']['vite_private_patterns']);
         $this->assertContains('route_cutover_disabled', array_column($payload['safety_checks'], 'key'));
         $this->assertContains('npm --prefix next-public-frontend run check', $payload['shadow_runtime']['verification_commands']);
         $this->assertContains('npm --prefix react-frontend run build', $payload['shadow_runtime']['verification_commands']);

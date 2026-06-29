@@ -271,14 +271,14 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $validation = $this->validateManifest([
             'mode' => 'shadow',
         ], [], [], [], null, [
-            '/events/:id/edit',
+            '/events/edit/:id',
         ]);
 
         $this->assertSame('blocker', $validation['status']);
         $this->assertContains([
             'code' => 'vite_private_pattern_missing_required',
             'severity' => 'blocker',
-            'context' => '/events/new',
+            'context' => '/events/create',
         ], $validation['issues']);
     }
 
@@ -288,19 +288,19 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
             'mode' => 'shadow',
         ], [
             [
-                'pattern' => '/events/new',
+                'pattern' => '/events/create',
                 'routeKey' => 'eventCreate',
                 'labelKey' => 'pages.events.title',
             ],
         ], [], [], null, [
-            '/events/new',
+            '/events/create',
         ]);
 
         $this->assertSame('blocker', $validation['status']);
         $this->assertContains([
             'code' => 'public_route_collides_with_private_pattern',
             'severity' => 'blocker',
-            'context' => '/events/new',
+            'context' => '/events/create',
         ], $validation['issues']);
     }
 

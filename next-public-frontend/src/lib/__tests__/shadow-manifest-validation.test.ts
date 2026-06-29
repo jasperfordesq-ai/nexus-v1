@@ -75,7 +75,7 @@ describe('shadow manifest validation', () => {
     const result = validateShadowManifests(
       {
         ...routeOwnershipManifest,
-        vitePrivatePatterns: routeOwnershipManifest.vitePrivatePatterns.filter((pattern) => pattern !== '/events/new'),
+        vitePrivatePatterns: routeOwnershipManifest.vitePrivatePatterns.filter((pattern) => pattern !== '/events/create'),
       },
       contentSourcesManifest,
     );
@@ -83,7 +83,7 @@ describe('shadow manifest validation', () => {
     expect(result.status).toBe('blocker');
     expect(result.issues).toContainEqual({
       code: 'vite_private_pattern_missing_required',
-      context: '/events/new',
+      context: '/events/create',
       severity: 'blocker',
     });
   });
@@ -94,7 +94,7 @@ describe('shadow manifest validation', () => {
         ...routeOwnershipManifest,
         nextPublicRoutes: [
           ...routeOwnershipManifest.nextPublicRoutes,
-          { pattern: '/events/new', routeKey: 'eventCreate', labelKey: 'pages.events.title' },
+          { pattern: '/events/create', routeKey: 'eventCreate', labelKey: 'pages.events.title' },
         ],
       },
       contentSourcesManifest,
@@ -103,7 +103,7 @@ describe('shadow manifest validation', () => {
     expect(result.status).toBe('blocker');
     expect(result.issues).toContainEqual({
       code: 'public_route_collides_with_private_pattern',
-      context: '/events/new',
+      context: '/events/create',
       severity: 'blocker',
     });
   });

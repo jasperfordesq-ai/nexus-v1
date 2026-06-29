@@ -76,9 +76,18 @@ describe('public route ownership', () => {
       expect(getRouteOwnership([segment])).toMatchObject({ owner: 'vite-private' });
     }
 
-    expect(getRouteOwnership(['events', 'new'])).toMatchObject({ owner: 'vite-private' });
-    expect(getRouteOwnership(['listings', '123', 'edit'])).toMatchObject({ owner: 'vite-private' });
-    expect(getRouteOwnership(['jobs', 'new'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['events', 'create'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['events', 'edit', '123'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['listings', 'create'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['listings', 'edit', '123'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['jobs', 'create'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['marketplace', 'sell'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['marketplace', 'my-listings'])).toMatchObject({ owner: 'vite-private' });
     expect(getRouteOwnership(['marketplace', 'bike-repair', 'edit'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['organisations', 'register'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['volunteering', 'create'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['ideation', 'create'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['courses', 'instructor', 'new'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['courses', 'instructor', '123', 'edit'])).toMatchObject({ owner: 'vite-private' });
   });
 });
