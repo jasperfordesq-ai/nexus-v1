@@ -1919,6 +1919,22 @@ export interface NextPublicCutoverArtifactInventory {
   required_commands: NextPublicCutoverRequiredCommand[];
 }
 
+export interface NextPublicCutoverEligibility {
+  status: 'blocked' | 'eligible' | string;
+  eligible: boolean;
+  production_effect: string;
+  activation_available: boolean;
+  requires_explicit_cutover_instruction: boolean;
+  counts: {
+    public_routes: number;
+    api_backed_public_routes: number;
+    remaining_public_routes: number;
+    unclassified_manifest_only_routes: number;
+  };
+  blockers: string[];
+  required_actions: string[];
+}
+
 export interface NextPublicFrontendReadiness {
   mode: string;
   app: {
@@ -1971,6 +1987,7 @@ export interface NextPublicFrontendReadiness {
   route_batches: NextPublicRouteBatch[];
   remaining_public_route_work: NextPublicRemainingRouteWork;
   cutover_artifacts: NextPublicCutoverArtifactInventory;
+  cutover_eligibility: NextPublicCutoverEligibility;
   production_routing: {
     active: boolean;
     route_cutover_enabled: boolean;

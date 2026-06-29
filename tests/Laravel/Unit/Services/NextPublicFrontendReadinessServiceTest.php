@@ -82,6 +82,28 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertContains('npm --prefix next-public-frontend run check', $stages['verify_shadow_module']['commands']);
     }
 
+    public function test_summary_reports_cutover_eligibility_without_activation_controls(): void
+    {
+        $summary = (new NextPublicFrontendReadinessService())->summary();
+
+        $eligibility = $summary['cutover_eligibility'];
+
+        $this->assertSame('blocked', $eligibility['status']);
+        $this->assertFalse($eligibility['eligible']);
+        $this->assertSame('none', $eligibility['production_effect']);
+        $this->assertFalse($eligibility['activation_available']);
+        $this->assertTrue($eligibility['requires_explicit_cutover_instruction']);
+        $this->assertSame(76, $eligibility['counts']['public_routes']);
+        $this->assertSame(49, $eligibility['counts']['api_backed_public_routes']);
+        $this->assertSame(27, $eligibility['counts']['remaining_public_routes']);
+        $this->assertContains('remaining_public_route_work', $eligibility['blockers']);
+        $this->assertContains('route_parity_required', $eligibility['blockers']);
+        $this->assertContains('edge_routes_not_configured', $eligibility['blockers']);
+        $this->assertContains('explicit_cutover_instruction_required', $eligibility['blockers']);
+        $this->assertContains('complete_remaining_public_route_work', $eligibility['required_actions']);
+        $this->assertContains('keep_prerender_fallback', $eligibility['required_actions']);
+    }
+
     public function test_summary_reports_cutover_artifact_inventory_without_activation_controls(): void
     {
         $summary = (new NextPublicFrontendReadinessService())->summary();

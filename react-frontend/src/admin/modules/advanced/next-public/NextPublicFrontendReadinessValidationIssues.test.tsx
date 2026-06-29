@@ -186,6 +186,31 @@ const readinessWithValidationIssue = {
     items: [],
     required_commands: [],
   },
+  cutover_eligibility: {
+    status: 'blocked',
+    eligible: false,
+    production_effect: 'none',
+    activation_available: false,
+    requires_explicit_cutover_instruction: true,
+    counts: {
+      public_routes: 1,
+      api_backed_public_routes: 0,
+      remaining_public_routes: 1,
+      unclassified_manifest_only_routes: 0,
+    },
+    blockers: [
+      'manifest_validation_blocked',
+      'remaining_public_route_work',
+      'edge_routes_not_configured',
+      'explicit_cutover_instruction_required',
+    ],
+    required_actions: [
+      'complete_remaining_public_route_work',
+      'run_shadow_verification',
+      'prepare_reviewed_edge_config_after_instruction',
+      'keep_prerender_fallback',
+    ],
+  },
   production_routing: {
     active: false,
     route_cutover_enabled: false,

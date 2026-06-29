@@ -89,6 +89,12 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.edge_canary.route_audit.unmatched_template_paths', []);
         $response->assertJsonPath('data.cutover_artifacts.production_effect', 'none');
         $response->assertJsonPath('data.cutover_artifacts.activation_available', false);
+        $response->assertJsonPath('data.cutover_eligibility.status', 'blocked');
+        $response->assertJsonPath('data.cutover_eligibility.eligible', false);
+        $response->assertJsonPath('data.cutover_eligibility.production_effect', 'none');
+        $response->assertJsonPath('data.cutover_eligibility.activation_available', false);
+        $response->assertJsonPath('data.cutover_eligibility.requires_explicit_cutover_instruction', true);
+        $response->assertJsonPath('data.cutover_eligibility.counts.remaining_public_routes', 27);
 
         $payload = $response->json('data');
         $publicPatterns = array_column($payload['manifest']['public_routes'], 'pattern');
@@ -238,6 +244,12 @@ class AdminNextPublicFrontendControllerTest extends TestCase
             'npm --prefix next-public-frontend run check:no-js-html',
             $cutoverCommandsByKey['no_js_public_html']['command'],
         );
+        $this->assertContains('remaining_public_route_work', $payload['cutover_eligibility']['blockers']);
+        $this->assertContains('route_parity_required', $payload['cutover_eligibility']['blockers']);
+        $this->assertContains('edge_routes_not_configured', $payload['cutover_eligibility']['blockers']);
+        $this->assertContains('explicit_cutover_instruction_required', $payload['cutover_eligibility']['blockers']);
+        $this->assertContains('complete_remaining_public_route_work', $payload['cutover_eligibility']['required_actions']);
+        $this->assertContains('keep_prerender_fallback', $payload['cutover_eligibility']['required_actions']);
         $this->assertSame('blocked', $routeBatchesByKey['foundation_public_pages']['status']);
         $this->assertContains('home', $routeBatchesByKey['foundation_public_pages']['route_keys']);
         $this->assertContains('manual_shadow_review_required', $routeBatchesByKey['foundation_public_pages']['blockers']);

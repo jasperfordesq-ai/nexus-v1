@@ -256,6 +256,30 @@ const readiness = {
       },
     ],
   },
+  cutover_eligibility: {
+    status: 'blocked',
+    eligible: false,
+    production_effect: 'none',
+    activation_available: false,
+    requires_explicit_cutover_instruction: true,
+    counts: {
+      public_routes: 76,
+      api_backed_public_routes: 49,
+      remaining_public_routes: 27,
+    },
+    blockers: [
+      'remaining_public_route_work',
+      'route_parity_required',
+      'edge_routes_not_configured',
+      'explicit_cutover_instruction_required',
+    ],
+    required_actions: [
+      'complete_remaining_public_route_work',
+      'run_shadow_verification',
+      'prepare_reviewed_edge_config_after_instruction',
+      'keep_prerender_fallback',
+    ],
+  },
   production_routing: {
     active: false,
     route_cutover_enabled: false,
@@ -375,12 +399,17 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('Edge canary template')).toBeInTheDocument();
     expect(screen.getAllByText('No production effect')).not.toHaveLength(0);
     expect(screen.getAllByText('npm --prefix next-public-frontend run check:no-js-html')).not.toHaveLength(0);
+    expect(screen.getByText('Cutover eligibility')).toBeInTheDocument();
+    expect(screen.getByText('Not eligible for cutover')).toBeInTheDocument();
+    expect(screen.getByText('27 remaining public routes')).toBeInTheDocument();
+    expect(screen.getByText('Remaining public route work is incomplete')).toBeInTheDocument();
+    expect(screen.getByText('Complete remaining public route work')).toBeInTheDocument();
     expect(screen.getByText('Route batch readiness')).toBeInTheDocument();
     expect(screen.getByText('Foundation public pages')).toBeInTheDocument();
     expect(screen.getByText('API-backed public content')).toBeInTheDocument();
     expect(screen.getByText('Vite private routes retained')).toBeInTheDocument();
     expect(screen.getByText('Remaining public route work')).toBeInTheDocument();
-    expect(screen.getByText('76 public routes')).toBeInTheDocument();
+    expect(screen.getAllByText('76 public routes')).not.toHaveLength(0);
     expect(screen.getByText('49 API-backed routes')).toBeInTheDocument();
     expect(screen.getByText('27 routes remaining')).toBeInTheDocument();
     expect(screen.getByText('1 unclassified route')).toBeInTheDocument();
@@ -416,7 +445,7 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('3 private prefixes')).toBeInTheDocument();
     expect(screen.getByText('Manual verification required')).toBeInTheDocument();
     expect(screen.getAllByText('Explicit cutover instruction required')).not.toHaveLength(0);
-    expect(screen.getByText('Production edge routes are not configured')).toBeInTheDocument();
+    expect(screen.getAllByText('Production edge routes are not configured')).not.toHaveLength(0);
     expect(screen.getByText('Operator playbook')).toBeInTheDocument();
     expect(screen.getByText('No activation controls are available on this page.')).toBeInTheDocument();
     expect(screen.getByText(/Prepare Apache canary routing as a reviewed config-only change\./)).toBeInTheDocument();

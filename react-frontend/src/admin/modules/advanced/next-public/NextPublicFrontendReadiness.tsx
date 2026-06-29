@@ -143,6 +143,8 @@ export default function NextPublicFrontendReadiness() {
 
           <CutoverArtifactInventoryCard readiness={readiness} />
 
+          <CutoverEligibilityCard readiness={readiness} />
+
           <RouteBatchReadinessCard readiness={readiness} />
 
           <RemainingPublicRouteWorkCard readiness={readiness} />
@@ -245,6 +247,72 @@ export default function NextPublicFrontendReadiness() {
         </div>
       )}
     </div>
+  );
+}
+
+function CutoverEligibilityCard({ readiness }: { readiness: Readiness }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.next_public' });
+  const eligibility = readiness.cutover_eligibility;
+
+  return (
+    <Card>
+      <CardHeader className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold">{t('cutover_eligibility.title')}</h2>
+        <Chip color={statusColor(eligibility.status)} variant="soft">
+          {eligibility.eligible ? t('cutover_eligibility.eligible') : t('cutover_eligibility.blocked')}
+        </Chip>
+      </CardHeader>
+      <CardBody>
+        <div className="mb-4 flex flex-wrap gap-2">
+          <Chip size="sm" color="success" variant="soft">
+            {t(`production_effects.${eligibility.production_effect}`)}
+          </Chip>
+          <Chip size="sm" color={eligibility.activation_available ? 'danger' : 'success'} variant="soft">
+            {eligibility.activation_available
+              ? t('cutover_eligibility.activation_available')
+              : t('cutover_eligibility.activation_unavailable')}
+          </Chip>
+          <Chip size="sm" color={eligibility.requires_explicit_cutover_instruction ? 'warning' : 'danger'} variant="soft">
+            {t('edge_canary.explicit_instruction_required')}
+          </Chip>
+        </div>
+
+        <div className="mb-4 flex flex-wrap gap-2">
+          <Chip size="sm" variant="flat">
+            {t('cutover_eligibility.public_routes', { count: eligibility.counts.public_routes })}
+          </Chip>
+          <Chip size="sm" color="success" variant="soft">
+            {t('cutover_eligibility.api_backed_public_routes', { count: eligibility.counts.api_backed_public_routes })}
+          </Chip>
+          <Chip size="sm" color="warning" variant="soft">
+            {t('cutover_eligibility.remaining_public_routes', { count: eligibility.counts.remaining_public_routes })}
+          </Chip>
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-2">
+          <div className="rounded-md border border-divider px-3 py-3 text-sm">
+            <div className="mb-2 font-medium">{t('cutover_eligibility.blockers')}</div>
+            <div className="flex flex-wrap gap-1">
+              {eligibility.blockers.map((blocker) => (
+                <Chip key={blocker} size="sm" color="warning" variant="soft">
+                  {t(`cutover_eligibility_blockers.${blocker}`)}
+                </Chip>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-md border border-divider px-3 py-3 text-sm">
+            <div className="mb-2 font-medium">{t('cutover_eligibility.required_actions')}</div>
+            <div className="flex flex-wrap gap-1">
+              {eligibility.required_actions.map((action) => (
+                <Chip key={action} size="sm" color="warning" variant="soft">
+                  {t(`cutover_eligibility_actions.${action}`)}
+                </Chip>
+              ))}
+            </div>
+          </div>
+        </div>
+      </CardBody>
+    </Card>
   );
 }
 

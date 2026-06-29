@@ -225,6 +225,10 @@ class NextPublicFrontendReadinessService
         $cutoverEnabled = (bool) config('app.next_public_frontend_routing_enabled', false);
         $edgeCanary = $this->edgeCanaryPreview($cutoverEnabled, $publicRoutes, $privatePrefixes, $privatePatterns);
         $apacheTemplateIncluded = (bool) ($edgeCanary['config_template']['included_by_deploy'] ?? true);
+        $routeBatches = $this->routeBatches($publicRoutes, $privatePrefixes, $privatePatterns, $apiBackedRoutes);
+        $remainingPublicRouteWork = $this->remainingPublicRouteWork($publicRoutes, $apiBackedRoutes);
+        $cutoverGates = $this->cutoverGates();
+        $operatorPlaybook = $this->operatorPlaybook();
 
         return [
             'mode' => $manifestMode === 'shadow' ? 'shadow' : $manifestMode,
@@ -263,9 +267,16 @@ class NextPublicFrontendReadinessService
             ],
             'tenant_resolution' => $this->tenantResolutionContract(),
             'edge_canary' => $edgeCanary,
-            'route_batches' => $this->routeBatches($publicRoutes, $privatePrefixes, $privatePatterns, $apiBackedRoutes),
-            'remaining_public_route_work' => $this->remainingPublicRouteWork($publicRoutes, $apiBackedRoutes),
+            'route_batches' => $routeBatches,
+            'remaining_public_route_work' => $remainingPublicRouteWork,
             'cutover_artifacts' => $this->cutoverArtifactInventory(),
+            'cutover_eligibility' => $this->cutoverEligibility(
+                $validation,
+                $edgeCanary,
+                $remainingPublicRouteWork,
+                $cutoverGates,
+                $cutoverEnabled,
+            ),
             'production_routing' => [
                 'active' => false,
                 'route_cutover_enabled' => $cutoverEnabled,
@@ -308,8 +319,8 @@ class NextPublicFrontendReadinessService
                 'enable_canary_for_public_routes_only',
                 'monitor_and_keep_prerender_fallback',
             ],
-            'cutover_gates' => $this->cutoverGates(),
-            'operator_playbook' => $this->operatorPlaybook(),
+            'cutover_gates' => $cutoverGates,
+            'operator_playbook' => $operatorPlaybook,
         ];
     }
 
@@ -843,6 +854,78 @@ class NextPublicFrontendReadinessService
                 'status' => 'blocker',
                 'blockers' => ['cutover_not_active', 'prerender_fallback_must_remain'],
                 'verification_commands' => [],
+            ],
+        ];
+    }
+
+    /**
+     * @param array{status: string, issues: array<int, array<string, string>>} $validation
+     * @param array<string, mixed> $edgeCanary
+     * @param array<string, mixed> $remainingPublicRouteWork
+     * @param array<int, array{key: string, status: string, blockers: array<int, string>, verification_commands: array<int, string>}> $cutoverGates
+     * @return array{status: string, eligible: bool, production_effect: string, activation_available: bool, requires_explicit_cutover_instruction: bool, counts: array{public_routes: int, api_backed_public_routes: int, remaining_public_routes: int, unclassified_manifest_only_routes: int}, blockers: array<int, string>, required_actions: array<int, string>}
+     */
+    private function cutoverEligibility(
+        array $validation,
+        array $edgeCanary,
+        array $remainingPublicRouteWork,
+        array $cutoverGates,
+        bool $cutoverEnabled,
+    ): array {
+        $counts = is_array($remainingPublicRouteWork['counts'] ?? null)
+            ? $remainingPublicRouteWork['counts']
+            : [];
+        $blockers = [];
+
+        if (($validation['status'] ?? null) !== 'pass') {
+            $blockers[] = 'manifest_validation_blocked';
+        }
+
+        if ((int) ($counts['remaining_public_routes'] ?? 0) > 0) {
+            $blockers[] = 'remaining_public_route_work';
+        }
+
+        if (($edgeCanary['route_audit']['status'] ?? null) !== 'pass') {
+            $blockers[] = 'edge_canary_template_audit_blocked';
+        }
+
+        if (($edgeCanary['route_file_status'] ?? null) !== 'configured') {
+            $blockers[] = 'edge_routes_not_configured';
+        }
+
+        foreach ($cutoverGates as $gate) {
+            foreach ($gate['blockers'] as $blocker) {
+                if ($blocker === 'route_parity_required') {
+                    $blockers[] = $blocker;
+                }
+            }
+        }
+
+        if ($cutoverEnabled) {
+            $blockers[] = 'routing_flag_enabled_before_cutover';
+        }
+
+        $blockers[] = 'explicit_cutover_instruction_required';
+        $blockers = array_values(array_unique($blockers));
+
+        return [
+            'status' => 'blocked',
+            'eligible' => false,
+            'production_effect' => 'none',
+            'activation_available' => false,
+            'requires_explicit_cutover_instruction' => true,
+            'counts' => [
+                'public_routes' => (int) ($counts['public_routes'] ?? 0),
+                'api_backed_public_routes' => (int) ($counts['api_backed_public_routes'] ?? 0),
+                'remaining_public_routes' => (int) ($counts['remaining_public_routes'] ?? 0),
+                'unclassified_manifest_only_routes' => (int) ($counts['unclassified_manifest_only_routes'] ?? 0),
+            ],
+            'blockers' => $blockers,
+            'required_actions' => [
+                'complete_remaining_public_route_work',
+                'run_shadow_verification',
+                'prepare_reviewed_edge_config_after_instruction',
+                'keep_prerender_fallback',
             ],
         ];
     }
