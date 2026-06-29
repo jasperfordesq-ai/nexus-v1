@@ -54,10 +54,10 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.shadow_runtime.compose_profile', 'next-public-shadow');
         $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
-        $response->assertJsonPath('data.manifest.route_counts.public_routes', 24);
+        $response->assertJsonPath('data.manifest.route_counts.public_routes', 28);
         $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 16);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 20);
-        $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 42);
+        $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 49);
         $response->assertJsonPath('data.manifest.validation.status', 'pass');
         $response->assertJsonPath('data.manifest.validation.issues', []);
         $response->assertJsonPath('data.content_sources.source_of_truth', 'laravel_public_api');
@@ -79,6 +79,8 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('/blog/:slug', $publicPatterns);
         $this->assertContains('/listings/:id', $publicPatterns);
         $this->assertContains('/marketplace/:id', $publicPatterns);
+        $this->assertContains('/marketplace/search', $publicPatterns);
+        $this->assertContains('/marketplace/map', $publicPatterns);
         $this->assertContains('blog-index', $apiBackedRouteKeys);
         $this->assertContains('cms-page', $apiBackedRouteKeys);
         $this->assertContains('listings', $apiBackedRouteKeys);
@@ -91,6 +93,8 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('register', $payload['manifest']['vite_private_prefixes']);
         $this->assertContains('/events/new', $payload['manifest']['vite_private_patterns']);
         $this->assertContains('/events/create', $payload['manifest']['vite_private_patterns']);
+        $this->assertContains('/jobs/alerts', $payload['manifest']['vite_private_patterns']);
+        $this->assertContains('/jobs/my-applications', $payload['manifest']['vite_private_patterns']);
         $this->assertContains('/listings/edit/:id', $payload['manifest']['vite_private_patterns']);
         $this->assertContains('/marketplace/sell', $payload['manifest']['vite_private_patterns']);
         $this->assertContains('/organisations/register', $payload['manifest']['vite_private_patterns']);

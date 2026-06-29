@@ -47,6 +47,10 @@ describe('public route ownership', () => {
       { segments: ['kb'], routeKey: 'kb' },
       { segments: ['kb', 'getting-started'], routeKey: 'kbDetail', params: { id: 'getting-started' } },
       { segments: ['marketplace'], routeKey: 'marketplace' },
+      { segments: ['marketplace', 'search'], routeKey: 'marketplaceSearch' },
+      { segments: ['marketplace', 'map'], routeKey: 'marketplaceMap' },
+      { segments: ['marketplace', 'collections'], routeKey: 'marketplaceCollections' },
+      { segments: ['marketplace', 'free'], routeKey: 'marketplaceFree' },
       { segments: ['marketplace', 'bike-repair'], routeKey: 'marketplaceDetail', params: { id: 'bike-repair' } },
     ];
 
@@ -81,6 +85,13 @@ describe('public route ownership', () => {
     expect(getRouteOwnership(['listings', 'create'])).toMatchObject({ owner: 'vite-private' });
     expect(getRouteOwnership(['listings', 'edit', '123'])).toMatchObject({ owner: 'vite-private' });
     expect(getRouteOwnership(['jobs', 'create'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['jobs', 'alerts'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['jobs', 'my-applications'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['jobs', 'talent-search'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['jobs', 'bias-audit'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['jobs', 'employer-onboarding'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['jobs', '42', 'analytics'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['jobs', '42', 'kanban'])).toMatchObject({ owner: 'vite-private' });
     expect(getRouteOwnership(['marketplace', 'sell'])).toMatchObject({ owner: 'vite-private' });
     expect(getRouteOwnership(['marketplace', 'my-listings'])).toMatchObject({ owner: 'vite-private' });
     expect(getRouteOwnership(['marketplace', 'bike-repair', 'edit'])).toMatchObject({ owner: 'vite-private' });

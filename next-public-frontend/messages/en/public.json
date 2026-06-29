@@ -139,6 +139,26 @@
       "lead": "Browse public marketplace items from {{tenantName}}.",
       "body": "This shadow page is prepared for public marketplace discovery. Checkout, seller, and listing management stay in the secure Vite app."
     },
+    "marketplaceSearch": {
+      "title": "Marketplace Search",
+      "lead": "Search public marketplace items from {{tenantName}}.",
+      "body": "This shadow page is prepared for public marketplace search. Offers, checkout, and listing management stay in the secure Vite app."
+    },
+    "marketplaceMap": {
+      "title": "Marketplace Map",
+      "lead": "Explore public marketplace items near {{tenantName}}.",
+      "body": "This shadow page is prepared for public marketplace map discovery. Location filters and seller tools stay in the secure Vite app."
+    },
+    "marketplaceCollections": {
+      "title": "Marketplace Collections",
+      "lead": "Browse curated public marketplace collections from {{tenantName}}.",
+      "body": "This shadow page is prepared for public marketplace collections. Collection management stays in the secure Vite app."
+    },
+    "marketplaceFree": {
+      "title": "Free Items",
+      "lead": "Browse free public marketplace items from {{tenantName}}.",
+      "body": "This shadow page is prepared for public free-item discovery. Pickup coordination and listing management stay in the secure Vite app."
+    },
     "marketplaceDetail": {
       "title": "Marketplace Item",
       "lead": "View public marketplace item information from {{tenantName}}.",
