@@ -3863,7 +3863,10 @@
       "stripe_sync_failed": "Stripe sincronizzazione non riuscita",
       "deleted": "Livello eliminato",
       "delete_failed": "Eliminazione non riuscita",
-      "onboarding_failed": "Stripe onboarding could not be started."
+      "onboarding_failed": "Stripe onboarding could not be started.",
+      "finance_load_failed": "Donation finance operations could not be loaded.",
+      "gift_aid_export_failed": "Gift Aid export could not be downloaded.",
+      "annual_receipts_export_failed": "Annual receipt export could not be downloaded."
     },
     "settings": {
       "start_onboarding": "Start Stripe onboarding",
@@ -3877,6 +3880,25 @@
         "unknown": "Status unknown"
       },
       "connect_fallback_active": "A Stripe Connect account is configured, but it is not ready for live donations yet. Payments will use the platform fallback until onboarding is complete."
+    },
+    "finance": {
+      "title": "Finance operations",
+      "description": "Track tenant Connect routing, platform fallback liability, Gift Aid readiness, disputes, and receipt follow-up for this tenant.",
+      "completed_volume": "Completed volume",
+      "platform_fallback_volume": "Platform fallback volume",
+      "tenant_connect_volume": "Tenant Connect volume",
+      "gift_aid_ready": "Gift Aid ready",
+      "open_disputes": "Open disputes",
+      "active_recurring": "Active recurring",
+      "failed_receipts": "Failed receipts",
+      "donation_count": "{{count}} donation",
+      "donation_count_other": "{{count}} donations",
+      "declaration_count": "{{count}} declaration",
+      "declaration_count_other": "{{count}} declarations",
+      "past_due_count": "{{count}} past due",
+      "export_gift_aid": "Export Gift Aid",
+      "export_annual_receipts": "Export annual receipts",
+      "empty": "No finance activity has been recorded yet."
     }
   },
   "federation_aggregates": {

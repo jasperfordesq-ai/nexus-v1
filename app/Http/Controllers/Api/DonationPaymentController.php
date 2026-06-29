@@ -46,6 +46,14 @@ class DonationPaymentController extends BaseApiController
             'community_project_id' => 'nullable|integer|min:1',
             'message' => 'nullable|string|max:500',
             'is_anonymous' => 'nullable|boolean',
+            'fund_code' => 'nullable|string|max:80',
+            'gift_aid_enabled' => 'nullable|boolean',
+            'gift_aid.declaration_name' => 'nullable|string|max:160',
+            'gift_aid.address_line1' => 'nullable|string|max:190',
+            'gift_aid.address_line2' => 'nullable|string|max:190',
+            'gift_aid.town' => 'nullable|string|max:120',
+            'gift_aid.postcode' => 'nullable|string|max:40',
+            'gift_aid.country' => 'nullable|string|size:2',
         ]);
 
         if ($validator->fails()) {

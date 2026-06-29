@@ -35,7 +35,7 @@ class StripeDonationService
      * @param int   $tenantId Current tenant ID
      * @param array $data     Keys: amount (decimal), currency (3-letter ISO),
      *                        giving_day_id?, opportunity_id?, community_project_id?,
-     *                        message?, is_anonymous?
+     *                        message?, is_anonymous?, fund_code?, gift_aid?
      * @return array{client_secret: string, donation_id: int}
      *
      * @throws \RuntimeException On Stripe API failure
@@ -144,12 +144,15 @@ class StripeDonationService
         $donation = DB::transaction(function () use (
             $tenantId, $userId, $data, $amount, $currency, $paymentIntent, $user, $tenantStripeAccountId, $paymentRoute
         ) {
-            return VolDonation::create([
+            $giftAid = self::normalizeGiftAidDeclaration($data);
+
+            $attributes = [
                 'tenant_id' => $tenantId,
                 'user_id' => $userId,
                 'opportunity_id' => isset($data['opportunity_id']) ? (int) $data['opportunity_id'] : null,
                 'community_project_id' => isset($data['community_project_id']) ? (int) $data['community_project_id'] : null,
                 'giving_day_id' => isset($data['giving_day_id']) ? (int) $data['giving_day_id'] : null,
+                'fund_code' => self::normalizeFundCode($data['fund_code'] ?? null),
                 'amount' => $amount,
                 'currency' => strtoupper($currency),
                 'payment_method' => 'stripe',
@@ -160,10 +163,20 @@ class StripeDonationService
                 'message' => trim($data['message'] ?? ''),
                 'is_anonymous' => !empty($data['is_anonymous']) ? 1 : 0,
                 'status' => 'pending',
+                'gift_aid_claim_status' => $giftAid['claim_status'],
+                'gift_aid_declaration_name' => $giftAid['declaration_name'],
+                'gift_aid_address_line1' => $giftAid['address_line1'],
+                'gift_aid_address_line2' => $giftAid['address_line2'],
+                'gift_aid_town' => $giftAid['town'],
+                'gift_aid_postcode' => $giftAid['postcode'],
+                'gift_aid_country' => $giftAid['country'],
+                'gift_aid_consented_at' => $giftAid['consented_at'],
                 'stripe_payment_intent_id' => $paymentIntent->id,
                 'stripe_account_id' => $tenantStripeAccountId,
                 'created_at' => now(),
-            ]);
+            ];
+
+            return VolDonation::create(self::filterVolDonationColumns($attributes));
         });
 
         Log::info('Stripe: PaymentIntent created for donation', [
@@ -180,6 +193,60 @@ class StripeDonationService
         return [
             'client_secret' => $paymentIntent->client_secret,
             'donation_id' => $donation->id,
+        ];
+    }
+
+    private static function normalizeFundCode(mixed $value): string
+    {
+        $fundCode = strtolower(trim((string) $value));
+        if ($fundCode === '') {
+            return 'general';
+        }
+
+        $fundCode = preg_replace('/[^a-z0-9_-]+/', '-', $fundCode) ?: 'general';
+
+        return substr(trim($fundCode, '-_'), 0, 80) ?: 'general';
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     * @return array<string, mixed>
+     */
+    private static function filterVolDonationColumns(array $attributes): array
+    {
+        static $columns = null;
+
+        if ($columns === null) {
+            $columns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('vol_donations'));
+        }
+
+        return array_intersect_key($attributes, $columns);
+    }
+
+    /**
+     * @return array{claim_status:string,declaration_name:?string,address_line1:?string,address_line2:?string,town:?string,postcode:?string,country:?string,consented_at:?string}
+     */
+    private static function normalizeGiftAidDeclaration(array $data): array
+    {
+        $giftAid = is_array($data['gift_aid'] ?? null) ? $data['gift_aid'] : [];
+        $enabled = !empty($data['gift_aid_enabled']) || !empty($giftAid['enabled']);
+        $country = strtoupper(trim((string) ($giftAid['country'] ?? $data['gift_aid_country'] ?? 'GB')));
+        $name = trim((string) ($giftAid['declaration_name'] ?? $data['gift_aid_declaration_name'] ?? ''));
+        $line1 = trim((string) ($giftAid['address_line1'] ?? $data['gift_aid_address_line1'] ?? ''));
+        $line2 = trim((string) ($giftAid['address_line2'] ?? $data['gift_aid_address_line2'] ?? ''));
+        $town = trim((string) ($giftAid['town'] ?? $data['gift_aid_town'] ?? ''));
+        $postcode = strtoupper(trim((string) ($giftAid['postcode'] ?? $data['gift_aid_postcode'] ?? '')));
+        $ready = $enabled && $country === 'GB' && $name !== '' && $line1 !== '' && $postcode !== '';
+
+        return [
+            'claim_status' => $ready ? 'ready' : 'not_eligible',
+            'declaration_name' => $ready ? $name : null,
+            'address_line1' => $ready ? $line1 : null,
+            'address_line2' => $ready && $line2 !== '' ? $line2 : null,
+            'town' => $ready && $town !== '' ? $town : null,
+            'postcode' => $ready ? $postcode : null,
+            'country' => $ready ? 'GB' : null,
+            'consented_at' => $ready ? now()->toDateTimeString() : null,
         ];
     }
 

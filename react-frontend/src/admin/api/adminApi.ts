@@ -2815,6 +2815,50 @@ export interface AdminDonation {
   created_at: string | null;
 }
 
+export interface DonationFinanceOverview {
+  totals: {
+    completed_cents: number;
+    refunded_cents: number;
+    pending_cents: number;
+    failed_count: number;
+  };
+  routing: {
+    platform_fallback_cents: number;
+    tenant_connect_cents: number;
+    platform_fallback_count: number;
+    tenant_connect_count: number;
+  };
+  gift_aid: {
+    ready_cents: number;
+    ready_count: number;
+  };
+  recurring: {
+    active_count: number;
+    past_due_count: number;
+    canceled_count: number;
+  };
+  disputes: {
+    open_count: number;
+  };
+  receipts: {
+    failed_email_count: number;
+  };
+}
+
+export interface DonationDispute {
+  id: number;
+  stripe_dispute_id: string;
+  payment_intent_id: string | null;
+  amount: number;
+  currency: string;
+  status: string;
+  reason: string | null;
+  evidence_due_at: string | null;
+  payment_route: string;
+  stripe_account_id: string | null;
+  created_at: string | null;
+}
+
 export const adminDonations = {
   /**
    * Lists all donations for the tenant (optionally filtered by created_at
@@ -2838,6 +2882,22 @@ export const adminDonations = {
     api.post<{ id: number; status: string; already_completed: boolean }>(
       `/v2/admin/volunteering/donations/${id}/complete`
     ),
+
+  financeOverview: () =>
+    api.get<{ overview: DonationFinanceOverview }>('/v2/admin/member-premium/finance/overview'),
+
+  disputes: (limit = 50) =>
+    api.get<{ items: DonationDispute[] }>(`/v2/admin/member-premium/finance/disputes?limit=${limit}`),
+
+  giftAidExport: () =>
+    api.download('/v2/admin/member-premium/finance/gift-aid-export', {
+      filename: 'gift-aid-donations.csv',
+    }),
+
+  annualReceiptsExport: (year: number) =>
+    api.download(`/v2/admin/member-premium/finance/annual-receipts?year=${year}`, {
+      filename: `donation-annual-receipts-${year}.csv`,
+    }),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

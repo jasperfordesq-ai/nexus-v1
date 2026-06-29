@@ -2084,4 +2084,10 @@ return [
     'partner_wallet_credit_reference_conflict' => 'Questo riferimento partner è già stato utilizzato per un altro accredito del portafoglio.',
     'partner_wallet_credit_default_note' => 'Accredito portafoglio partner',
     'partner_wallet_credit_description' => 'Accredito partner da :partner, riferimento :reference. :note',
+    'member_premium_invalid_interval' => 'Scegli donazioni mensili o annuali.',
+    'member_premium_no_subscription' => 'Non esiste una donazione ricorrente attiva da annullare.',
+    'member_premium_connect_account_invalid' => 'L?ID account Stripe Connect deve essere vuoto o iniziare con acct_.',
+    'member_premium_tier_not_found' => 'Livello di supporto non trovato.',
+    'member_premium_invalid_slug' => 'Usa lettere minuscole, numeri, trattini o underscore per lo slug del livello di supporto.',
+    'member_premium_features_array' => 'Le note di riconoscimento devono essere inviate come array di stringhe.',
 ];

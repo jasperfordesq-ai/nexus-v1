@@ -2085,4 +2085,10 @@ return [
     'partner_wallet_credit_reference_conflict' => 'Deze partnerreferentie is al gebruikt voor een andere wallet-bijschrijving.',
     'partner_wallet_credit_default_note' => 'Partner-wallet-bijschrijving',
     'partner_wallet_credit_description' => 'Partnerbijschrijving van :partner, referentie :reference. :note',
+    'member_premium_invalid_interval' => 'Kies maandelijkse of jaarlijkse donaties.',
+    'member_premium_no_subscription' => 'Er is geen actieve terugkerende donatie om te annuleren.',
+    'member_premium_connect_account_invalid' => 'De Stripe Connect-account-ID moet leeg zijn of beginnen met acct_.',
+    'member_premium_tier_not_found' => 'Steunniveau niet gevonden.',
+    'member_premium_invalid_slug' => 'Gebruik kleine letters, cijfers, koppeltekens of underscores voor de slug van het steunniveau.',
+    'member_premium_features_array' => 'Erkenningsnotities moeten als een array met tekenreeksen worden verzonden.',
 ];

@@ -80,7 +80,7 @@ class MemberPremiumController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'tier_id']), 'tier_id', 422);
         }
         if (! in_array($interval, ['monthly', 'yearly'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Invalid interval (must be monthly or yearly)', 'interval', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.member_premium_invalid_interval'), 'interval', 422);
         }
         $returnUrl = MemberPremiumService::safeReturnUrl($returnUrl, '/premium/return');
 
@@ -106,7 +106,7 @@ class MemberPremiumController extends BaseApiController
         try {
             $ok = MemberPremiumService::cancel($userId, true);
             if (! $ok) {
-                return $this->respondWithError('NO_SUBSCRIPTION', 'No active subscription to cancel', null, 404);
+                return $this->respondWithError('NO_SUBSCRIPTION', __('api.member_premium_no_subscription'), null, 404);
             }
             return $this->respondWithData(['cancelled' => true]);
         } catch (\Throwable $e) {

@@ -2085,4 +2085,10 @@ return [
     'partner_wallet_credit_reference_conflict' => 'Ta referencja partnera została już użyta dla innego zasilenia portfela.',
     'partner_wallet_credit_default_note' => 'Zasilenie portfela od partnera',
     'partner_wallet_credit_description' => 'Zasilenie od partnera :partner, referencja :reference. :note',
+    'member_premium_invalid_interval' => 'Wybierz darowizny miesi?czne lub roczne.',
+    'member_premium_no_subscription' => 'Nie ma aktywnej darowizny cyklicznej do anulowania.',
+    'member_premium_connect_account_invalid' => 'Identyfikator konta Stripe Connect musi by? pusty albo zaczyna? si? od acct_.',
+    'member_premium_tier_not_found' => 'Nie znaleziono poziomu wsparcia.',
+    'member_premium_invalid_slug' => 'U?yj ma?ych liter, cyfr, my?lnik?w lub podkre?le? w slugu poziomu wsparcia.',
+    'member_premium_features_array' => 'Notatki o uznaniu musz? by? wys?ane jako tablica ci?g?w tekstowych.',
 ];

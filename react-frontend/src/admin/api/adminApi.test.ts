@@ -2286,4 +2286,30 @@ describe('adminDonations', () => {
     await adminDonations.complete(5);
     expect(mockPost).toHaveBeenCalledWith('/v2/admin/volunteering/donations/5/complete');
   });
+
+  it('financeOverview calls member support finance overview endpoint', async () => {
+    mockGet.mockResolvedValueOnce({ success: true, data: {} });
+    await adminDonations.financeOverview();
+    expect(mockGet).toHaveBeenCalledWith('/v2/admin/member-premium/finance/overview');
+  });
+
+  it('disputes calls member support disputes endpoint with limit', async () => {
+    mockGet.mockResolvedValueOnce({ success: true, data: {} });
+    await adminDonations.disputes(25);
+    expect(mockGet).toHaveBeenCalledWith('/v2/admin/member-premium/finance/disputes?limit=25');
+  });
+
+  it('giftAidExport downloads the Gift Aid CSV', async () => {
+    await adminDonations.giftAidExport();
+    expect(mockDownload).toHaveBeenCalledWith('/v2/admin/member-premium/finance/gift-aid-export', {
+      filename: 'gift-aid-donations.csv',
+    });
+  });
+
+  it('annualReceiptsExport downloads the annual donor receipt CSV for a year', async () => {
+    await adminDonations.annualReceiptsExport(2026);
+    expect(mockDownload).toHaveBeenCalledWith('/v2/admin/member-premium/finance/annual-receipts?year=2026', {
+      filename: 'donation-annual-receipts-2026.csv',
+    });
+  });
 });

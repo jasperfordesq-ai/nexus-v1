@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Core\TenantContext;
 use App\Http\Controllers\Api\BaseApiController;
+use App\Services\DonationOperationsService;
 use App\Services\DonationStripeAccountService;
 use App\Services\MemberPremiumService;
 use App\Services\TenantSettingsService;
@@ -47,7 +48,7 @@ class MemberPremiumAdminController extends BaseApiController
         if ($accountId !== '' && preg_match('/^acct_[A-Za-z0-9_]+$/', $accountId) !== 1) {
             return $this->respondWithError(
                 'VALIDATION_ERROR',
-                'Stripe Connect account ID must be empty or start with acct_.',
+                __('api.member_premium_connect_account_invalid'),
                 'stripe_connect_account_id',
                 422,
             );
@@ -121,7 +122,7 @@ class MemberPremiumAdminController extends BaseApiController
         $this->requireAdmin();
         $tier = MemberPremiumService::getTier(TenantContext::getId(), $id);
         if (! $tier) {
-            return $this->respondNotFound('TIER_NOT_FOUND', 'Tier not found');
+            return $this->respondNotFound('TIER_NOT_FOUND', __('api.member_premium_tier_not_found'));
         }
         return $this->respondWithData(['tier' => $tier]);
     }
@@ -159,7 +160,7 @@ class MemberPremiumAdminController extends BaseApiController
 
         $existing = MemberPremiumService::getTier($tenantId, $id);
         if (! $existing) {
-            return $this->respondNotFound('TIER_NOT_FOUND', 'Tier not found');
+            return $this->respondNotFound('TIER_NOT_FOUND', __('api.member_premium_tier_not_found'));
         }
 
         $payload = $this->validateTierPayload(partial: true);
@@ -245,6 +246,61 @@ class MemberPremiumAdminController extends BaseApiController
     }
 
     /**
+     * GET /api/v2/admin/member-premium/finance/overview
+     */
+    public function financeOverview(): JsonResponse
+    {
+        $this->requireAdmin();
+
+        return $this->respondWithData([
+            'overview' => DonationOperationsService::overview(TenantContext::getId()),
+        ]);
+    }
+
+    /**
+     * GET /api/v2/admin/member-premium/finance/disputes
+     */
+    public function financeDisputes(): JsonResponse
+    {
+        $this->requireAdmin();
+        $limit = max(1, min(200, (int) ($this->inputInt('limit') ?? 50)));
+
+        return $this->respondWithData([
+            'items' => DonationOperationsService::disputes(TenantContext::getId(), $limit),
+        ]);
+    }
+
+    /**
+     * GET /api/v2/admin/member-premium/finance/gift-aid-export
+     */
+    public function giftAidExport(): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $this->requireAdmin();
+
+        return $this->csvResponse(
+            'gift-aid-donations.csv',
+            DonationOperationsService::giftAidExportRows(TenantContext::getId()),
+        );
+    }
+
+    /**
+     * GET /api/v2/admin/member-premium/finance/annual-receipts?year=YYYY
+     */
+    public function annualReceiptsExport(): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $this->requireAdmin();
+        $year = (int) ($this->inputInt('year') ?? (int) date('Y'));
+        if ($year < 2000 || $year > ((int) date('Y') + 1)) {
+            $year = (int) date('Y');
+        }
+
+        return $this->csvResponse(
+            'donation-annual-receipts-' . $year . '.csv',
+            DonationOperationsService::annualReceiptRows(TenantContext::getId(), $year),
+        );
+    }
+
+    /**
      * Validate and coerce the tier payload.
      *
      * @return array|JsonResponse
@@ -266,7 +322,7 @@ class MemberPremiumAdminController extends BaseApiController
             $slug = trim((string) ($this->input('slug') ?? ($data['slug'] ?? '')));
             if ($slug !== '') {
                 if (! preg_match('/^[a-z0-9][a-z0-9-_]{0,79}$/', $slug)) {
-                    return $this->respondWithError('VALIDATION_ERROR', 'Invalid slug (lowercase a-z, 0-9, -_)', 'slug', 422);
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.member_premium_invalid_slug'), 'slug', 422);
                 }
                 $data['slug'] = $slug;
             }
@@ -294,11 +350,43 @@ class MemberPremiumAdminController extends BaseApiController
         if ($this->input('features') !== null) {
             $features = $this->input('features');
             if (! is_array($features)) {
-                return $this->respondWithError('VALIDATION_ERROR', 'features must be an array of strings', 'features', 422);
+                return $this->respondWithError('VALIDATION_ERROR', __('api.member_premium_features_array'), 'features', 422);
             }
             $data['features'] = array_values(array_filter(array_map('strval', $features), fn ($f) => $f !== ''));
         }
 
         return $data;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $rows
+     */
+    private function csvResponse(string $filename, array $rows): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        return response()->streamDownload(function () use ($rows): void {
+            $out = fopen('php://output', 'w');
+            if ($out === false) {
+                return;
+            }
+
+            $headers = [];
+            foreach ($rows as $row) {
+                $headers = array_values(array_unique(array_merge($headers, array_keys($row))));
+            }
+            if ($headers === []) {
+                $headers = ['empty'];
+            }
+
+            fputcsv($out, $headers);
+            foreach ($rows as $row) {
+                fputcsv($out, array_map(
+                    static fn (string $key): mixed => $row[$key] ?? '',
+                    $headers,
+                ));
+            }
+            fclose($out);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 }

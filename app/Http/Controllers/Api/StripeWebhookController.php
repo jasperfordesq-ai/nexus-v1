@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\MemberPremiumService;
 use App\Services\StripeDonationService;
+use App\Services\DonationOperationsService;
 use App\Services\MarketplacePaymentService;
 use App\Services\StripeService;
 use App\Services\StripeSubscriptionService;
@@ -163,6 +164,7 @@ class StripeWebhookController extends BaseApiController
                     'payment_intent.succeeded' => $this->handlePaymentSucceeded($event->data->object),
                     'payment_intent.payment_failed' => $this->handlePaymentFailed($event->data->object),
                     'charge.refunded' => $this->handleChargeRefunded($event->data->object),
+                    'charge.dispute.created', 'charge.dispute.updated', 'charge.dispute.closed' => $this->handleDisputeUpdated($event->data->object),
                     'account.updated' => $this->handleAccountUpdated($event->data->object),
                     default => Log::info("Stripe webhook: unhandled event type {$event->type}"),
                 };
@@ -301,6 +303,11 @@ class StripeWebhookController extends BaseApiController
 
         // Also dispatch to marketplace handler (it checks for marketplace payments internally)
         MarketplacePaymentService::handleWebhookEvent('charge.refunded', $charge);
+    }
+
+    private function handleDisputeUpdated(object $dispute): void
+    {
+        DonationOperationsService::recordStripeDispute($dispute);
     }
 
     private function handleAccountUpdated(object $account): void

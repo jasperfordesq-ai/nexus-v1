@@ -2084,4 +2084,10 @@ return [
     'partner_wallet_credit_reference_conflict' => 'Esta referência de parceiro já foi usada para um crédito de carteira diferente.',
     'partner_wallet_credit_default_note' => 'Crédito de carteira de parceiro',
     'partner_wallet_credit_description' => 'Crédito de parceiro de :partner, referência :reference. :note',
+    'member_premium_invalid_interval' => 'Escolha donativos mensais ou anuais.',
+    'member_premium_no_subscription' => 'N?o existe nenhum donativo recorrente ativo para cancelar.',
+    'member_premium_connect_account_invalid' => 'O ID da conta Stripe Connect deve estar vazio ou come?ar por acct_.',
+    'member_premium_tier_not_found' => 'N?vel de apoio n?o encontrado.',
+    'member_premium_invalid_slug' => 'Use letras min?sculas, n?meros, h?fenes ou underscores no slug do n?vel de apoio.',
+    'member_premium_features_array' => 'As notas de reconhecimento devem ser enviadas como uma matriz de textos.',
 ];

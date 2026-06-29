@@ -2616,4 +2616,10 @@ return [
     'xp_shop_already_owned' => 'Already owned',
     'xp_shop_not_enough_xp' => 'Not enough XP',
     'poll_end_date_future' => 'Poll end date must be in the future',
+    'member_premium_invalid_interval' => 'Choose monthly or yearly donations.',
+    'member_premium_no_subscription' => 'There is no active recurring donation to cancel.',
+    'member_premium_connect_account_invalid' => 'Stripe Connect account ID must be empty or start with acct_.',
+    'member_premium_tier_not_found' => 'Support level not found.',
+    'member_premium_invalid_slug' => 'Use lowercase letters, numbers, hyphens, or underscores for the support level slug.',
+    'member_premium_features_array' => 'Recognition notes must be sent as an array of strings.',
 ];

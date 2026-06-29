@@ -2085,4 +2085,10 @@ return [
     'partner_wallet_credit_reference_conflict' => 'Úsáideadh an tagairt chomhpháirtí seo cheana le haghaidh creidmheas sparáin eile.',
     'partner_wallet_credit_default_note' => 'Creidmheas sparáin comhpháirtí',
     'partner_wallet_credit_description' => 'Creidmheas comhpháirtí ó :partner, tagairt :reference. :note',
+    'member_premium_invalid_interval' => 'Roghnaigh s?nti?is mh?os?la n? bhliant?la.',
+    'member_premium_no_subscription' => 'N?l aon s?nti?s athfhillteach gn?omhach le ceal?.',
+    'member_premium_connect_account_invalid' => 'Caithfidh ID an chuntais Stripe Connect a bheith folamh n? tos? le acct_.',
+    'member_premium_tier_not_found' => 'N?or aims?odh an leibh?al taca?ochta.',
+    'member_premium_invalid_slug' => '?s?id litreacha beaga, uimhreacha, fleisc?n? n? fo-l?nte do shlug an leibh?il taca?ochta.',
+    'member_premium_features_array' => 'Caithfear n?ta? aitheantais a sheoladh mar eagar teaghr?n.',
 ];

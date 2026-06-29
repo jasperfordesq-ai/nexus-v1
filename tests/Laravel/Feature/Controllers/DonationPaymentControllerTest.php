@@ -116,4 +116,31 @@ class DonationPaymentControllerTest extends TestCase
         $response = $this->apiPost('/v2/admin/donations/99999999/refund', []);
         $this->assertNotContains($response->status(), [401, 403]);
     }
+
+    public function test_member_support_invalid_interval_uses_translated_api_error(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Sanctum::actingAs($user, ['*']);
+
+        $features = json_decode((string) \Illuminate\Support\Facades\DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->value('features'), true) ?: [];
+        $features['member_premium'] = true;
+        \Illuminate\Support\Facades\DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update(['features' => json_encode($features)]);
+
+        $response = $this->apiPost('/v2/member-premium/checkout', [
+            'tier_id' => 1,
+            'interval' => 'weekly',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonFragment([
+            'message' => __('api.member_premium_invalid_interval'),
+        ]);
+    }
 }

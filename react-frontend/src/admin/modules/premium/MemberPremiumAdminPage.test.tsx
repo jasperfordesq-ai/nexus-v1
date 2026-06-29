@@ -8,7 +8,7 @@ import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 
 // ── Stable mock refs (hoisted so they're available inside vi.mock factories) ──
-const { mockToast, mockConfirm, mockMemberPremiumApi } = vi.hoisted(() => ({
+const { mockToast, mockConfirm, mockMemberPremiumApi, mockAdminDonations } = vi.hoisted(() => ({
   mockToast: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
   mockConfirm: vi.fn(async () => true),
   mockMemberPremiumApi: {
@@ -22,6 +22,12 @@ const { mockToast, mockConfirm, mockMemberPremiumApi } = vi.hoisted(() => ({
     syncStripe: vi.fn(),
     getTier: vi.fn(),
     listSubscribers: vi.fn(),
+  },
+  mockAdminDonations: {
+    financeOverview: vi.fn(),
+    disputes: vi.fn(),
+    giftAidExport: vi.fn(),
+    annualReceiptsExport: vi.fn(),
   },
 }));
 
@@ -40,6 +46,10 @@ vi.mock('@/contexts', () =>
 // ── memberPremiumAdminApi mock ────────────────────────────────────────────────
 vi.mock('@/admin/api/memberPremiumApi', () => ({
   memberPremiumAdminApi: mockMemberPremiumApi,
+}));
+
+vi.mock('@/admin/api/adminApi', () => ({
+  adminDonations: mockAdminDonations,
 }));
 
 // ── useConfirm mock ───────────────────────────────────────────────────────────
@@ -92,6 +102,41 @@ describe('MemberPremiumAdminPage', () => {
         },
       },
     });
+    mockAdminDonations.financeOverview.mockResolvedValue({
+      data: {
+        overview: {
+          totals: {
+            completed_cents: 3500,
+            refunded_cents: 0,
+            pending_cents: 1000,
+            failed_count: 1,
+          },
+          routing: {
+            platform_fallback_cents: 1000,
+            tenant_connect_cents: 2500,
+            platform_fallback_count: 1,
+            tenant_connect_count: 1,
+          },
+          gift_aid: {
+            ready_cents: 1000,
+            ready_count: 1,
+          },
+          recurring: {
+            active_count: 7,
+            past_due_count: 1,
+            canceled_count: 2,
+          },
+          disputes: {
+            open_count: 1,
+          },
+          receipts: {
+            failed_email_count: 2,
+          },
+        },
+      },
+    });
+    mockAdminDonations.giftAidExport.mockResolvedValue(undefined);
+    mockAdminDonations.annualReceiptsExport.mockResolvedValue(undefined);
   });
 
   it('shows loading spinner while tiers are fetching', () => {
@@ -134,10 +179,29 @@ describe('MemberPremiumAdminPage', () => {
     render(<MemberPremiumAdminPage />);
 
     await waitFor(() => {
-      expect(screen.getByText(/tenant connect/i)).toBeInTheDocument();
-      expect(screen.getByText(/ready/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/tenant connect/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/ready/i).length).toBeGreaterThan(0);
       expect(screen.getByRole('button', { name: /continue stripe onboarding/i })).toBeInTheDocument();
     });
+  });
+
+  it('shows donation finance operations and export controls', async () => {
+    const user = userEvent.setup();
+    mockMemberPremiumApi.listTiers.mockResolvedValueOnce({ data: { tiers: [TIER_A] } });
+    render(<MemberPremiumAdminPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/finance operations/i)).toBeInTheDocument();
+      expect(screen.getByText(/tenant connect volume/i)).toBeInTheDocument();
+      expect(screen.getByText(/gift aid ready/i)).toBeInTheDocument();
+      expect(screen.getByText(/open disputes/i)).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: /export gift aid/i }));
+    await user.click(screen.getByRole('button', { name: /export annual receipts/i }));
+
+    expect(mockAdminDonations.giftAidExport).toHaveBeenCalledTimes(1);
+    expect(mockAdminDonations.annualReceiptsExport).toHaveBeenCalledWith(new Date().getFullYear());
   });
 
   it('warns when Connect is configured but payments are falling back to the platform account', async () => {

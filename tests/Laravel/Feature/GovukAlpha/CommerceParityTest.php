@@ -495,6 +495,32 @@ class CommerceParityTest extends TestCase
     //  Premium — manage subscription
     // ==================================================================
 
+    public function test_commerce_donation_support_page_uses_equal_community_language(): void
+    {
+        $this->authenticatedUser(['name' => 'Supporter']);
+        $this->enableAlphaFeatures(['member_premium']);
+
+        DB::table('member_premium_tiers')->insert([
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Community Supporter',
+            'slug' => 'supporter-' . uniqid(),
+            'monthly_price_cents' => 500,
+            'yearly_price_cents' => 5000,
+            'features' => json_encode(['Recognition in community thank-yous']),
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/premium");
+
+        $res->assertOk();
+        $res->assertSee('Donate');
+        $res->assertSee('Support this community');
+        $res->assertDontSee('Premium');
+        $res->assertDontSee('unlock extra features');
+    }
+
     public function test_commerce_premium_manage_redirects_without_subscription(): void
     {
         $this->authenticatedUser(['name' => 'No Sub']);

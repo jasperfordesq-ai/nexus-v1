@@ -20,8 +20,13 @@ import Pencil from 'lucide-react/icons/pencil';
 import Users from 'lucide-react/icons/users';
 import Save from 'lucide-react/icons/save';
 import ExternalLink from 'lucide-react/icons/external-link';
+import Download from 'lucide-react/icons/download';
 import { useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import {
+  adminDonations,
+  type DonationFinanceOverview,
+} from '../../api/adminApi';
 import {
   memberPremiumAdminApi,
   type DonationSupportAccountStatus,
@@ -64,6 +69,13 @@ function inputToCents(v: string): number {
   return Math.round(n * 100);
 }
 
+function formatAmount(cents: number): string {
+  return (cents / 100).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
 export function MemberPremiumAdminPage() {
   const { t } = useTranslation(['admin', 'common']);
   const confirm = useConfirm();
@@ -83,6 +95,9 @@ export function MemberPremiumAdminPage() {
   const [paymentRoute, setPaymentRoute] = useState<'platform_default' | 'tenant_connect'>('platform_default');
   const [fallbackReason, setFallbackReason] = useState<string | null>(null);
   const [accountStatus, setAccountStatus] = useState<DonationSupportAccountStatus | null>(null);
+  const [financeOverview, setFinanceOverview] = useState<DonationFinanceOverview | null>(null);
+  const [financeLoading, setFinanceLoading] = useState(true);
+  const [exporting, setExporting] = useState<'gift_aid' | 'annual_receipts' | null>(null);
   const [syncing, setSyncing] = useState<number | null>(null);
   const [deleting, setDeleting] = useState<number | null>(null);
 
@@ -114,10 +129,23 @@ export function MemberPremiumAdminPage() {
     }
   }, [t, toast]);
 
+  const loadFinance = useCallback(async () => {
+    setFinanceLoading(true);
+    try {
+      const res = await adminDonations.financeOverview();
+      setFinanceOverview(res.data?.overview ?? null);
+    } catch {
+      toast.error(t('member_premium_admin.toasts.finance_load_failed'));
+    } finally {
+      setFinanceLoading(false);
+    }
+  }, [t, toast]);
+
   useEffect(() => {
     load();
     loadSettings();
-  }, [load, loadSettings]);
+    loadFinance();
+  }, [load, loadSettings, loadFinance]);
 
   const openCreate = () => {
     setForm(EMPTY_FORM);
@@ -258,6 +286,73 @@ export function MemberPremiumAdminPage() {
     }
   };
 
+  const exportGiftAid = async () => {
+    setExporting('gift_aid');
+    try {
+      await adminDonations.giftAidExport();
+    } catch {
+      toast.error(t('member_premium_admin.toasts.gift_aid_export_failed'));
+    } finally {
+      setExporting(null);
+    }
+  };
+
+  const exportAnnualReceipts = async () => {
+    setExporting('annual_receipts');
+    try {
+      await adminDonations.annualReceiptsExport(new Date().getFullYear());
+    } catch {
+      toast.error(t('member_premium_admin.toasts.annual_receipts_export_failed'));
+    } finally {
+      setExporting(null);
+    }
+  };
+
+  const financeStats = financeOverview
+    ? [
+        {
+          label: t('member_premium_admin.finance.completed_volume'),
+          value: formatAmount(financeOverview.totals.completed_cents),
+        },
+        {
+          label: t('member_premium_admin.finance.platform_fallback_volume'),
+          value: formatAmount(financeOverview.routing.platform_fallback_cents),
+          detail: t('member_premium_admin.finance.donation_count', {
+            count: financeOverview.routing.platform_fallback_count,
+          }),
+        },
+        {
+          label: t('member_premium_admin.finance.tenant_connect_volume'),
+          value: formatAmount(financeOverview.routing.tenant_connect_cents),
+          detail: t('member_premium_admin.finance.donation_count', {
+            count: financeOverview.routing.tenant_connect_count,
+          }),
+        },
+        {
+          label: t('member_premium_admin.finance.gift_aid_ready'),
+          value: formatAmount(financeOverview.gift_aid.ready_cents),
+          detail: t('member_premium_admin.finance.declaration_count', {
+            count: financeOverview.gift_aid.ready_count,
+          }),
+        },
+        {
+          label: t('member_premium_admin.finance.open_disputes'),
+          value: String(financeOverview.disputes.open_count),
+        },
+        {
+          label: t('member_premium_admin.finance.active_recurring'),
+          value: String(financeOverview.recurring.active_count),
+          detail: t('member_premium_admin.finance.past_due_count', {
+            count: financeOverview.recurring.past_due_count,
+          }),
+        },
+        {
+          label: t('member_premium_admin.finance.failed_receipts'),
+          value: String(financeOverview.receipts.failed_email_count),
+        },
+      ]
+    : [];
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -346,6 +441,61 @@ export function MemberPremiumAdminPage() {
               {t('member_premium_admin.settings.save')}
             </Button>
           </div>
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardBody className="space-y-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div className="space-y-1">
+              <h2 className="text-lg font-semibold text-foreground">
+                {t('member_premium_admin.finance.title')}
+              </h2>
+              <p className="text-sm text-muted">
+                {t('member_premium_admin.finance.description')}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="secondary"
+                startContent={<Download size={16} />}
+                onPress={exportGiftAid}
+                isLoading={exporting === 'gift_aid'}
+              >
+                {t('member_premium_admin.finance.export_gift_aid')}
+              </Button>
+              <Button
+                variant="secondary"
+                startContent={<Download size={16} />}
+                onPress={exportAnnualReceipts}
+                isLoading={exporting === 'annual_receipts'}
+              >
+                {t('member_premium_admin.finance.export_annual_receipts')}
+              </Button>
+            </div>
+          </div>
+
+          {financeLoading ? (
+            <div className="flex justify-center py-6" role="status" aria-busy="true" aria-label={t('common.loading')}>
+              <Spinner />
+            </div>
+          ) : financeStats.length > 0 ? (
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {financeStats.map((stat) => (
+                <div key={stat.label} className="rounded-md border border-divider bg-surface-2 p-3">
+                  <p className="text-xs font-medium uppercase text-muted">{stat.label}</p>
+                  <p className="mt-2 text-xl font-semibold text-foreground">{stat.value}</p>
+                  {stat.detail ? (
+                    <p className="mt-1 text-xs text-muted">{stat.detail}</p>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted">
+              {t('member_premium_admin.finance.empty')}
+            </p>
+          )}
         </CardBody>
       </Card>
 

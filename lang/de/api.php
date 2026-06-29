@@ -2084,4 +2084,10 @@ return [
     'partner_wallet_credit_reference_conflict' => 'Diese Partnerreferenz wurde bereits für eine andere Wallet-Gutschrift verwendet.',
     'partner_wallet_credit_default_note' => 'Partner-Wallet-Gutschrift',
     'partner_wallet_credit_description' => 'Partnergutschrift von :partner, Referenz :reference. :note',
+    'member_premium_invalid_interval' => 'W?hlen Sie monatliche oder j?hrliche Spenden.',
+    'member_premium_no_subscription' => 'Es gibt keine aktive wiederkehrende Spende, die storniert werden kann.',
+    'member_premium_connect_account_invalid' => 'Die Stripe-Connect-Konto-ID muss leer sein oder mit acct_ beginnen.',
+    'member_premium_tier_not_found' => 'Support-Stufe nicht gefunden.',
+    'member_premium_invalid_slug' => 'Verwenden Sie Kleinbuchstaben, Zahlen, Bindestriche oder Unterstriche f?r den Slug der Support-Stufe.',
+    'member_premium_features_array' => 'Anerkennungshinweise m?ssen als Array von Zeichenfolgen gesendet werden.',
 ];

@@ -2084,4 +2084,10 @@ return [
     'partner_wallet_credit_reference_conflict' => 'Esta referencia de socio ya se ha utilizado para un abono de monedero diferente.',
     'partner_wallet_credit_default_note' => 'Abono de monedero de socio',
     'partner_wallet_credit_description' => 'Abono de socio de :partner, referencia :reference. :note',
+    'member_premium_invalid_interval' => 'Elige donaciones mensuales o anuales.',
+    'member_premium_no_subscription' => 'No hay ninguna donaci?n recurrente activa para cancelar.',
+    'member_premium_connect_account_invalid' => 'El ID de cuenta de Stripe Connect debe estar vac?o o empezar por acct_.',
+    'member_premium_tier_not_found' => 'No se encontr? el nivel de apoyo.',
+    'member_premium_invalid_slug' => 'Usa letras min?sculas, n?meros, guiones o guiones bajos para el slug del nivel de apoyo.',
+    'member_premium_features_array' => 'Las notas de reconocimiento deben enviarse como una matriz de textos.',
 ];

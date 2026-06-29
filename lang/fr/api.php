@@ -2084,4 +2084,10 @@ return [
     'partner_wallet_credit_reference_conflict' => 'Cette référence partenaire a déjà été utilisée pour un autre crédit de portefeuille.',
     'partner_wallet_credit_default_note' => 'Crédit de portefeuille partenaire',
     'partner_wallet_credit_description' => 'Crédit partenaire de :partner, référence :reference. :note',
+    'member_premium_invalid_interval' => 'Choisissez des dons mensuels ou annuels.',
+    'member_premium_no_subscription' => 'Aucun don r?current actif ne peut ?tre annul?.',
+    'member_premium_connect_account_invalid' => 'L?identifiant du compte Stripe Connect doit ?tre vide ou commencer par acct_.',
+    'member_premium_tier_not_found' => 'Niveau de soutien introuvable.',
+    'member_premium_invalid_slug' => 'Utilisez des lettres minuscules, des chiffres, des traits d?union ou des underscores pour le slug du niveau de soutien.',
+    'member_premium_features_array' => 'Les notes de reconnaissance doivent ?tre envoy?es sous forme de tableau de cha?nes.',
 ];
