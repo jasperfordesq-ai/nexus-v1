@@ -181,6 +181,17 @@ describe('AdminSidebar', () => {
     expect(usersLinks.length).toBeGreaterThan(0);
   });
 
+  it('hides newsletter navigation when the newsletter module is disabled', async () => {
+    mockHasFeature.mockImplementation((feature: string) => feature !== 'newsletter');
+    const { AdminSidebar } = await import('./AdminSidebar');
+    render(<AdminSidebar collapsed={false} />);
+
+    const newsletterLinks = screen.getAllByRole('link').filter((link) =>
+      link.getAttribute('href')?.includes('/admin/newsletters'),
+    );
+    expect(newsletterLinks).toHaveLength(0);
+  });
+
   it('filters navigation results when search query is entered', async () => {
     const { AdminSidebar } = await import('./AdminSidebar');
     render(<AdminSidebar collapsed={false} />);

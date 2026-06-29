@@ -68,3 +68,13 @@ describe('module registry podcast module', () => {
     }
   });
 });
+
+describe('module registry newsletter module', () => {
+  it('registers newsletter as a tenant feature with its admin surface', () => {
+    const newsletter = getFeatureModules().find(module => module.id === 'newsletter');
+
+    expect(newsletter).toBeDefined();
+    expect(newsletter?.configSource).toBe('tenant_features');
+    expect(newsletter?.detailPageUrl).toBe('/admin/newsletters');
+  });
+});

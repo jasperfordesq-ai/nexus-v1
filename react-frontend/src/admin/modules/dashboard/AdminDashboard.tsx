@@ -57,14 +57,16 @@ import type { AdminDashboardStats, ActivityLogEntry, MonthlyTrend } from '../../
 export function AdminDashboard() {
   const { t } = useTranslation('admin_dashboard');
   useAdminPageMeta({ title: t('title'), description: t('subtitle') });
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
   const toast = useToast();
 
   /** Quick action items matching the legacy PHP dashboard sidebar */
-  const QUICK_ACTIONS = [
+  const quickActions = [
     { label: t('quick_actions.manage_users'), path: '/admin/users', icon: UserPlus, color: 'text-accent bg-accent/10' },
     { label: t('quick_actions.view_listings'), path: '/admin/listings', icon: ListChecks, color: 'text-success bg-success/10' },
-    { label: t('quick_actions.send_newsletter'), path: '/admin/newsletters', icon: Send, color: 'text-accent bg-accent-soft' },
+    ...(hasFeature('newsletter') ? [
+      { label: t('quick_actions.send_newsletter'), path: '/admin/newsletters', icon: Send, color: 'text-accent bg-accent-soft' },
+    ] : []),
     { label: t('quick_actions.new_blog_post'), path: '/admin/blog/create', icon: PenSquare, color: 'text-danger bg-danger/10' },
     { label: t('quick_actions.gamification'), path: '/admin/gamification', icon: Trophy, color: 'text-warning bg-warning/10' },
     { label: t('quick_actions.settings'), path: '/admin/settings', icon: Settings, color: 'text-muted bg-surface-secondary' },
@@ -288,7 +290,7 @@ export function AdminDashboard() {
           </CardHeader>
           <CardBody className="px-4 pb-4">
             <div className="grid grid-cols-2 gap-2">
-              {QUICK_ACTIONS.map((action) => {
+              {quickActions.map((action) => {
                 const Icon = action.icon;
                 return (
                   <Link

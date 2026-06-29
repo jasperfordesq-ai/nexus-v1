@@ -10,13 +10,14 @@ import userEvent from '@testing-library/user-event';
 
 // ── @/contexts ────────────────────────────────────────────────────────────────
 const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() };
+const mockHasFeature = vi.hoisted(() => vi.fn(() => true));
 vi.mock('@/contexts', () =>
   createMockContexts({
     useToast: () => mockToast,
     useTenant: () => ({
       tenant: { id: 2, name: 'Test', slug: 'test' },
       tenantPath: (p: string) => `/test${p}`,
-      hasFeature: vi.fn(() => true),
+      hasFeature: mockHasFeature,
       hasModule: vi.fn(() => true),
     }),
   }),
@@ -113,6 +114,7 @@ function setupSuccessfulLoad(overrides: Partial<typeof STATS> = {}) {
 describe('AdminDashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockHasFeature.mockReturnValue(true);
     mockUseOnboardingConfig.mockReturnValue({ config: { step_safeguarding_enabled: true }, isLoading: false });
   });
 
@@ -131,9 +133,7 @@ describe('AdminDashboard', () => {
     setupSuccessfulLoad();
     render(<AdminDashboard />);
     await waitFor(() => {
-      const cards = screen.getAllByTestId('stat-card');
-      expect(cards.length).toBeGreaterThan(0);
-      // total_users = 120
+      expect(screen.getByText(/total members/i)).toBeInTheDocument();
       expect(screen.getByText('120')).toBeInTheDocument();
     });
   });
@@ -202,6 +202,28 @@ describe('AdminDashboard', () => {
     await waitFor(() => {
       const links = screen.getAllByRole('link');
       expect(links.length).toBeGreaterThan(0);
+    });
+  });
+
+  it('shows the newsletter quick action when the newsletter module is enabled', async () => {
+    setupSuccessfulLoad();
+    render(<AdminDashboard />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: /send newsletter/i })).toHaveAttribute(
+        'href',
+        '/test/admin/newsletters',
+      );
+    });
+  });
+
+  it('hides the newsletter quick action when the newsletter module is disabled', async () => {
+    mockHasFeature.mockImplementation((feature: string) => feature !== 'newsletter');
+    setupSuccessfulLoad();
+    render(<AdminDashboard />);
+
+    await waitFor(() => {
+      expect(screen.queryByRole('link', { name: /send newsletter/i })).not.toBeInTheDocument();
     });
   });
 
