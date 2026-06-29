@@ -13,6 +13,11 @@ describe('public content sources', () => {
     expect(publicContentSources.databaseQueriesFromNext).toBe(false);
     expect(getPublicEndpointForRoute('help')).toBe('/v2/help/faqs');
     expect(getPublicEndpointForRoute('faq')).toBe('/v2/help/faqs');
+    expect(getPublicEndpointForRoute('about')).toBe('/v2/public-page-content/about');
+    expect(getPublicEndpointForRoute('features')).toBe('/v2/public-page-content/features');
+    expect(getPublicEndpointForRoute('contact')).toBe('/v2/public-page-content/contact');
+    expect(getPublicEndpointForRoute('trustSafety')).toBe('/v2/public-page-content/trust-safety');
+    expect(getPublicEndpointForRoute('timebankingGuide')).toBe('/v2/public-page-content/timebanking-guide');
     expect(getPublicEndpointForRoute('terms')).toBe('/v2/legal/terms');
     expect(getPublicEndpointForRoute('termsVersions')).toBe('/v2/legal/terms/versions');
     expect(getPublicEndpointForRoute('privacy')).toBe('/v2/legal/privacy');

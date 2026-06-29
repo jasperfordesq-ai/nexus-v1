@@ -55,7 +55,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
         $response->assertJsonPath('data.manifest.route_counts.public_routes', 76);
-        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 49);
+        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 54);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 38);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 100);
         $response->assertJsonPath('data.manifest.validation.status', 'pass');
@@ -94,7 +94,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.cutover_eligibility.production_effect', 'none');
         $response->assertJsonPath('data.cutover_eligibility.activation_available', false);
         $response->assertJsonPath('data.cutover_eligibility.requires_explicit_cutover_instruction', true);
-        $response->assertJsonPath('data.cutover_eligibility.counts.remaining_public_routes', 27);
+        $response->assertJsonPath('data.cutover_eligibility.counts.remaining_public_routes', 22);
 
         $payload = $response->json('data');
         $publicPatterns = array_column($payload['manifest']['public_routes'], 'pattern');
@@ -136,6 +136,11 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('blog-index', $apiBackedRouteKeys);
         $this->assertContains('help', $apiBackedRouteKeys);
         $this->assertContains('faq', $apiBackedRouteKeys);
+        $this->assertContains('about', $apiBackedRouteKeys);
+        $this->assertContains('features', $apiBackedRouteKeys);
+        $this->assertContains('contact', $apiBackedRouteKeys);
+        $this->assertContains('trustSafety', $apiBackedRouteKeys);
+        $this->assertContains('timebankingGuide', $apiBackedRouteKeys);
         $this->assertContains('terms', $apiBackedRouteKeys);
         $this->assertContains('termsVersions', $apiBackedRouteKeys);
         $this->assertContains('privacy', $apiBackedRouteKeys);
@@ -258,7 +263,11 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('public_api_parity_required', $routeBatchesByKey['api_backed_public_content']['blockers']);
         $this->assertSame('pass', $routeBatchesByKey['vite_private_retained']['status']);
         $this->assertSame([], $routeBatchesByKey['vite_private_retained']['blockers']);
-        $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['about']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['about']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['features']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['contact']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['trustSafety']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['timebankingGuide']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['help']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['faq']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['terms']['content_source']);
@@ -284,8 +293,8 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertSame('none', $payload['remaining_public_route_work']['production_effect']);
         $this->assertFalse($payload['remaining_public_route_work']['activation_available']);
         $this->assertSame(76, $payload['remaining_public_route_work']['counts']['public_routes']);
-        $this->assertSame(49, $payload['remaining_public_route_work']['counts']['api_backed_public_routes']);
-        $this->assertSame(27, $payload['remaining_public_route_work']['counts']['remaining_public_routes']);
+        $this->assertSame(54, $payload['remaining_public_route_work']['counts']['api_backed_public_routes']);
+        $this->assertSame(22, $payload['remaining_public_route_work']['counts']['remaining_public_routes']);
         $this->assertSame(0, $payload['remaining_public_route_work']['counts']['unclassified_manifest_only_routes']);
         $this->assertContains('home', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
         $this->assertContains('couponDetail', $remainingRouteWorkByKey['auth_only_backend']['route_keys']);
