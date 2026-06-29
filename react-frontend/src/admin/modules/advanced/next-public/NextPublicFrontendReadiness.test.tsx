@@ -82,6 +82,30 @@ const readiness = {
       { routeKey: 'listingDetail', endpoint: '/v2/listings/{id}', method: 'GET' },
     ],
   },
+  tenant_resolution: {
+    status: 'pass',
+    bootstrap_endpoint: '/v2/tenant/bootstrap',
+    source_of_truth: 'laravel_tenant_bootstrap',
+    shared_host_slug_parameter: 'slug',
+    custom_domain_origin_forwarding: true,
+    next_queries_database: false,
+    examples: [
+      {
+        key: 'shared_host_slug',
+        request_host: 'app.project-nexus.ie',
+        request_path: '/{tenantSlug}',
+        bootstrap_request: 'GET /v2/tenant/bootstrap?slug={tenantSlug}',
+        headers: ['Origin: https://app.project-nexus.ie'],
+      },
+      {
+        key: 'custom_domain',
+        request_host: '<custom-domain>',
+        request_path: '/',
+        bootstrap_request: 'GET /v2/tenant/bootstrap',
+        headers: ['Origin: https://<custom-domain>'],
+      },
+    ],
+  },
   production_routing: {
     active: false,
     route_cutover_enabled: false,
@@ -176,6 +200,10 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('dashboard')).toBeInTheDocument();
     expect(screen.getAllByText('laravel_public_api')).not.toHaveLength(0);
     expect(screen.getByText('GET /v2/listings/{id}')).toBeInTheDocument();
+    expect(screen.getByText('Tenant resolution contract')).toBeInTheDocument();
+    expect(screen.getByText('/v2/tenant/bootstrap')).toBeInTheDocument();
+    expect(screen.getByText('GET /v2/tenant/bootstrap?slug={tenantSlug}')).toBeInTheDocument();
+    expect(screen.getByText('Origin: https://<custom-domain>')).toBeInTheDocument();
     expect(screen.getByText('npm run build:next-public')).toBeInTheDocument();
     expect(screen.getAllByText('npm --prefix next-public-frontend run check')).not.toHaveLength(0);
     expect(screen.getByText('npm --prefix react-frontend run build')).toBeInTheDocument();

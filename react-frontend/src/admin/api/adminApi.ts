@@ -1816,6 +1816,24 @@ export interface NextPublicOperatorPlaybook {
   stages: NextPublicOperatorPlaybookStage[];
 }
 
+export interface NextPublicTenantResolutionExample {
+  key: string;
+  request_host: string;
+  request_path: string;
+  bootstrap_request: string;
+  headers: string[];
+}
+
+export interface NextPublicTenantResolution {
+  status: 'pass' | 'blocker' | string;
+  bootstrap_endpoint: string;
+  source_of_truth: string;
+  shared_host_slug_parameter: string;
+  custom_domain_origin_forwarding: boolean;
+  next_queries_database: boolean;
+  examples: NextPublicTenantResolutionExample[];
+}
+
 export interface NextPublicFrontendReadiness {
   mode: string;
   app: {
@@ -1863,6 +1881,7 @@ export interface NextPublicFrontendReadiness {
     database_queries_from_next: boolean;
     api_backed_routes: NextPublicApiBackedRoute[];
   };
+  tenant_resolution: NextPublicTenantResolution;
   production_routing: {
     active: boolean;
     route_cutover_enabled: boolean;

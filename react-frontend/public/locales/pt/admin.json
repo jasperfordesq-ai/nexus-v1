@@ -2898,6 +2898,22 @@
       "route_gates": {
         "title": "Route cutover gates"
       },
+      "tenant_resolution": {
+        "title": "Tenant resolution contract",
+        "bootstrap_endpoint": "Bootstrap endpoint",
+        "source_of_truth": "Source of truth",
+        "slug_parameter": "Shared-host slug parameter",
+        "request_host": "Request host",
+        "request_path": "Request path",
+        "bootstrap_request": "Bootstrap request",
+        "origin_forwarding": "Custom-domain Origin forwarding enabled",
+        "no_next_database": "Next.js does not query the database",
+        "next_queries_database": "Next.js database queries detected"
+      },
+      "tenant_resolution_examples": {
+        "shared_host_slug": "Shared app host with tenant slug",
+        "custom_domain": "Custom tenant domain"
+      },
       "route_gate_blockers": {
         "parity_test_required": "Parity test required"
       },

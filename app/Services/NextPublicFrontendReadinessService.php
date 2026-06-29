@@ -230,6 +230,7 @@ class NextPublicFrontendReadinessService
                     : true,
                 'api_backed_routes' => $apiBackedRoutes,
             ],
+            'tenant_resolution' => $this->tenantResolutionContract(),
             'production_routing' => [
                 'active' => false,
                 'route_cutover_enabled' => $cutoverEnabled,
@@ -272,6 +273,37 @@ class NextPublicFrontendReadinessService
             ],
             'cutover_gates' => $this->cutoverGates(),
             'operator_playbook' => $this->operatorPlaybook(),
+        ];
+    }
+
+    /**
+     * @return array{status: string, bootstrap_endpoint: string, source_of_truth: string, shared_host_slug_parameter: string, custom_domain_origin_forwarding: bool, next_queries_database: bool, examples: array<int, array{key: string, request_host: string, request_path: string, bootstrap_request: string, headers: array<int, string>}>}
+     */
+    private function tenantResolutionContract(): array
+    {
+        return [
+            'status' => 'pass',
+            'bootstrap_endpoint' => '/v2/tenant/bootstrap',
+            'source_of_truth' => 'laravel_tenant_bootstrap',
+            'shared_host_slug_parameter' => 'slug',
+            'custom_domain_origin_forwarding' => true,
+            'next_queries_database' => false,
+            'examples' => [
+                [
+                    'key' => 'shared_host_slug',
+                    'request_host' => 'app.project-nexus.ie',
+                    'request_path' => '/{tenantSlug}',
+                    'bootstrap_request' => 'GET /v2/tenant/bootstrap?slug={tenantSlug}',
+                    'headers' => ['Origin: https://app.project-nexus.ie'],
+                ],
+                [
+                    'key' => 'custom_domain',
+                    'request_host' => '<custom-domain>',
+                    'request_path' => '/',
+                    'bootstrap_request' => 'GET /v2/tenant/bootstrap',
+                    'headers' => ['Origin: https://<custom-domain>'],
+                ],
+            ],
         ];
     }
 

@@ -64,6 +64,12 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.content_sources.database_queries_from_next', false);
         $response->assertJsonPath('data.content_sources.manifest_exists', true);
         $response->assertJsonPath('data.content_sources.manifest_path', 'next-public-frontend/content-sources.json');
+        $response->assertJsonPath('data.tenant_resolution.status', 'pass');
+        $response->assertJsonPath('data.tenant_resolution.bootstrap_endpoint', '/v2/tenant/bootstrap');
+        $response->assertJsonPath('data.tenant_resolution.source_of_truth', 'laravel_tenant_bootstrap');
+        $response->assertJsonPath('data.tenant_resolution.shared_host_slug_parameter', 'slug');
+        $response->assertJsonPath('data.tenant_resolution.custom_domain_origin_forwarding', true);
+        $response->assertJsonPath('data.tenant_resolution.next_queries_database', false);
 
         $payload = $response->json('data');
         $publicPatterns = array_column($payload['manifest']['public_routes'], 'pattern');
@@ -71,6 +77,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $routeReadiness = $payload['manifest']['route_readiness'];
         $cutoverGatesByKey = array_column($payload['cutover_gates'], null, 'key');
         $playbookStagesByKey = array_column($payload['operator_playbook']['stages'], null, 'key');
+        $tenantResolutionExamplesByKey = array_column($payload['tenant_resolution']['examples'], null, 'key');
         $routeReadinessByKey = [];
 
         foreach ($routeReadiness as $route) {
@@ -165,6 +172,14 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertSame('blocked', $playbookStagesByKey['prepare_reviewed_edge_config']['status']);
         $this->assertContains('no_activation_control', $playbookStagesByKey['prepare_reviewed_edge_config']['notes']);
         $this->assertContains('do_not_remove_prerender', $playbookStagesByKey['monitor_with_prerender_fallback']['notes']);
+        $this->assertSame(
+            'GET /v2/tenant/bootstrap?slug={tenantSlug}',
+            $tenantResolutionExamplesByKey['shared_host_slug']['bootstrap_request'],
+        );
+        $this->assertContains(
+            'Origin: https://<custom-domain>',
+            $tenantResolutionExamplesByKey['custom_domain']['headers'],
+        );
         $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['about']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['listingDetail']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['volunteeringOpportunityDetail']['content_source']);

@@ -82,6 +82,25 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertContains('npm --prefix next-public-frontend run check', $stages['verify_shadow_module']['commands']);
     }
 
+    public function test_summary_reports_tenant_resolution_contract(): void
+    {
+        $summary = (new NextPublicFrontendReadinessService())->summary();
+
+        $tenantResolution = $summary['tenant_resolution'];
+        $examples = array_column($tenantResolution['examples'], null, 'key');
+
+        $this->assertSame('pass', $tenantResolution['status']);
+        $this->assertSame('/v2/tenant/bootstrap', $tenantResolution['bootstrap_endpoint']);
+        $this->assertSame('laravel_tenant_bootstrap', $tenantResolution['source_of_truth']);
+        $this->assertSame('slug', $tenantResolution['shared_host_slug_parameter']);
+        $this->assertTrue($tenantResolution['custom_domain_origin_forwarding']);
+        $this->assertFalse($tenantResolution['next_queries_database']);
+        $this->assertSame('GET /v2/tenant/bootstrap?slug={tenantSlug}', $examples['shared_host_slug']['bootstrap_request']);
+        $this->assertContains('Origin: https://app.project-nexus.ie', $examples['shared_host_slug']['headers']);
+        $this->assertSame('GET /v2/tenant/bootstrap', $examples['custom_domain']['bootstrap_request']);
+        $this->assertContains('Origin: https://<custom-domain>', $examples['custom_domain']['headers']);
+    }
+
     public function test_manifest_validation_blocks_api_routes_outside_laravel_v2_public_api(): void
     {
         $validation = $this->validateManifest([

@@ -137,6 +137,8 @@ export default function NextPublicFrontendReadiness() {
             </CardBody>
           </Card>
 
+          <TenantResolutionCard readiness={readiness} />
+
           <ManifestValidationCard readiness={readiness} />
 
           <RouteCutoverGatesCard readiness={readiness} />
@@ -235,6 +237,56 @@ export default function NextPublicFrontendReadiness() {
         </div>
       )}
     </div>
+  );
+}
+
+function TenantResolutionCard({ readiness }: { readiness: Readiness }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.next_public' });
+  const tenantResolution = readiness.tenant_resolution;
+
+  return (
+    <Card>
+      <CardHeader className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold">{t('tenant_resolution.title')}</h2>
+        <Chip color={statusColor(tenantResolution.status)} variant="soft">
+          {t(`statuses.${tenantResolution.status}`)}
+        </Chip>
+      </CardHeader>
+      <CardBody>
+        <div className="mb-4 grid gap-3 md:grid-cols-3">
+          <RuntimeRow label={t('tenant_resolution.bootstrap_endpoint')} value={tenantResolution.bootstrap_endpoint} />
+          <RuntimeRow label={t('tenant_resolution.source_of_truth')} value={tenantResolution.source_of_truth} />
+          <RuntimeRow label={t('tenant_resolution.slug_parameter')} value={tenantResolution.shared_host_slug_parameter} />
+        </div>
+        <div className="grid gap-3 lg:grid-cols-2">
+          {tenantResolution.examples.map((example) => (
+            <div key={example.key} className="rounded-md border border-divider px-3 py-3 text-sm">
+              <div className="font-medium">{t(`tenant_resolution_examples.${example.key}`)}</div>
+              <dl className="mt-2 space-y-2">
+                <RuntimeRow label={t('tenant_resolution.request_host')} value={example.request_host} />
+                <RuntimeRow label={t('tenant_resolution.request_path')} value={example.request_path} />
+                <RuntimeRow label={t('tenant_resolution.bootstrap_request')} value={example.bootstrap_request} />
+              </dl>
+              <div className="mt-2 space-y-1">
+                {example.headers.map((header) => (
+                  <code key={header} className="block break-all rounded bg-surface-secondary px-2 py-1 text-xs">
+                    {header}
+                  </code>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Chip size="sm" color={tenantResolution.custom_domain_origin_forwarding ? 'success' : 'warning'} variant="soft">
+            {t('tenant_resolution.origin_forwarding')}
+          </Chip>
+          <Chip size="sm" color={tenantResolution.next_queries_database ? 'danger' : 'success'} variant="soft">
+            {tenantResolution.next_queries_database ? t('tenant_resolution.next_queries_database') : t('tenant_resolution.no_next_database')}
+          </Chip>
+        </div>
+      </CardBody>
+    </Card>
   );
 }
 
