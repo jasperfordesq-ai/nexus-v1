@@ -25,10 +25,26 @@ const readiness = {
     version: '1.5.4',
     next_version: '16.2.9',
     react_version: '19.2.7',
+    lockfile_exists: true,
+    package_scripts: {
+      dev: true,
+      build: true,
+      start: true,
+      test: true,
+    },
   },
   manifest: {
     exists: true,
     mode: 'shadow',
+    route_counts: {
+      public_routes: 3,
+      vite_private_prefixes: 3,
+      vite_private_patterns: 2,
+    },
+    validation: {
+      status: 'pass',
+      issues: [],
+    },
     public_routes: [
       { pattern: '/', routeKey: 'home', labelKey: 'pages.home.title' },
       { pattern: '/about', routeKey: 'about', labelKey: 'pages.about.title' },
@@ -54,6 +70,7 @@ const readiness = {
     host_port_env: 'NEXUS_NEXT_PUBLIC_PORT',
     port_env: 'NEXUS_NEXT_PUBLIC_PORT',
     default_shadow_port: 3200,
+    compose_profile_configured: true,
   },
   safety_checks: [
     { key: 'route_cutover_disabled', status: 'pass' },
@@ -85,6 +102,9 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('/blog/:slug')).toBeInTheDocument();
     expect(screen.getByText('dashboard')).toBeInTheDocument();
     expect(screen.getByText('npm run build:next-public')).toBeInTheDocument();
+    expect(screen.getByText('Manifest validation passed')).toBeInTheDocument();
+    expect(screen.getByText('3 public routes')).toBeInTheDocument();
+    expect(screen.getByText('3 private prefixes')).toBeInTheDocument();
   });
 
   it('shows an error state when readiness cannot load', async () => {

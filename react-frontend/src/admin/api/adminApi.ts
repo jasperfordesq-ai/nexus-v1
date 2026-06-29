@@ -1789,10 +1789,30 @@ export interface NextPublicFrontendReadiness {
     version: string | null;
     next_version: string | null;
     react_version: string | null;
+    lockfile_exists: boolean;
+    package_scripts: {
+      dev: boolean;
+      build: boolean;
+      start: boolean;
+      test: boolean;
+    };
   };
   manifest: {
     exists: boolean;
     mode: string | null;
+    route_counts: {
+      public_routes: number;
+      vite_private_prefixes: number;
+      vite_private_patterns: number;
+    };
+    validation: {
+      status: 'pass' | 'blocker' | string;
+      issues: Array<{
+        code: string;
+        severity: 'blocker' | 'warning' | 'info' | string;
+        context: string;
+      }>;
+    };
     public_routes: NextPublicRouteOwnership[];
     vite_private_prefixes: string[];
     vite_private_patterns: string[];
@@ -1814,6 +1834,7 @@ export interface NextPublicFrontendReadiness {
     host_port_env: string;
     port_env: string;
     default_shadow_port: number;
+    compose_profile_configured: boolean;
   };
   safety_checks: Array<{
     key: string;

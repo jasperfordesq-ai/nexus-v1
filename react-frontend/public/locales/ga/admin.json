@@ -2925,6 +2925,28 @@
         "prepare_apache_canary_routes": "Prepare Apache canary routing for public routes only.",
         "enable_canary_for_public_routes_only": "Enable a canary route for public pages after explicit approval.",
         "monitor_and_keep_prerender_fallback": "Monitor responses and keep prerender available as fallback until parity is proven."
+      },
+      "counts": {
+        "public_routes": "{{count}} public routes",
+        "private_prefixes": "{{count}} private prefixes",
+        "private_patterns": "{{count}} private edit/create patterns"
+      },
+      "validation": {
+        "title": "Manifest validation",
+        "passed": "Manifest validation passed",
+        "blocked": "Manifest validation blocked",
+        "lockfile": "Lockfile pinned",
+        "package_scripts": "Package scripts present",
+        "compose_profile": "Shadow Compose profile present"
+      },
+      "validation_issues": {
+        "manifest_missing": "Route ownership manifest is missing.",
+        "manifest_not_shadow": "Route ownership manifest is not in shadow mode.",
+        "public_route_invalid": "A public route entry is malformed.",
+        "public_route_missing_fields": "A public route is missing required fields.",
+        "public_route_duplicate_pattern": "A public route pattern is duplicated.",
+        "public_route_duplicate_key": "A public route key is duplicated.",
+        "public_route_collides_with_private_prefix": "A public route collides with a private Vite route prefix."
       }
     }
   },

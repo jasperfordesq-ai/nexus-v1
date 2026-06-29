@@ -46,8 +46,17 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.prerender.status', 'unchanged');
         $response->assertJsonPath('data.prerender.fallback_retained', true);
         $response->assertJsonPath('data.app.exists', true);
+        $response->assertJsonPath('data.app.lockfile_exists', true);
+        $response->assertJsonPath('data.app.package_scripts.build', true);
+        $response->assertJsonPath('data.app.package_scripts.start', true);
         $response->assertJsonPath('data.shadow_runtime.compose_profile', 'next-public-shadow');
+        $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
+        $response->assertJsonPath('data.manifest.route_counts.public_routes', 11);
+        $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 17);
+        $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 12);
+        $response->assertJsonPath('data.manifest.validation.status', 'pass');
+        $response->assertJsonPath('data.manifest.validation.issues', []);
 
         $payload = $response->json('data');
         $publicPatterns = array_column($payload['manifest']['public_routes'], 'pattern');

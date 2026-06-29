@@ -105,6 +105,17 @@ export default function NextPublicFrontendReadiness() {
               <h2 className="text-lg font-semibold">{t('route_ownership.title')}</h2>
             </CardHeader>
             <CardBody>
+              <div className="mb-4 flex flex-wrap gap-2">
+                <Chip size="sm" variant="soft">
+                  {t('counts.public_routes', { count: readiness.manifest.route_counts.public_routes })}
+                </Chip>
+                <Chip size="sm" variant="soft">
+                  {t('counts.private_prefixes', { count: readiness.manifest.route_counts.vite_private_prefixes })}
+                </Chip>
+                <Chip size="sm" variant="soft">
+                  {t('counts.private_patterns', { count: readiness.manifest.route_counts.vite_private_patterns })}
+                </Chip>
+              </div>
               <div className="grid gap-5 lg:grid-cols-2">
                 <RouteList
                   title={t('route_ownership.next_public')}
@@ -120,6 +131,8 @@ export default function NextPublicFrontendReadiness() {
               </div>
             </CardBody>
           </Card>
+
+          <ManifestValidationCard readiness={readiness} />
 
           <div className="grid gap-4 lg:grid-cols-2">
             <Card>
@@ -210,6 +223,54 @@ function RouteList({ title, items }: { title: string; items: string[] }) {
         ))}
       </div>
     </section>
+  );
+}
+
+function ManifestValidationCard({ readiness }: { readiness: Readiness }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.next_public' });
+  const validation = readiness.manifest.validation;
+  const passed = validation.status === 'pass';
+
+  return (
+    <Card>
+      <CardHeader className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold">{t('validation.title')}</h2>
+        <Chip color={passed ? 'success' : 'warning'} variant="soft">
+          {passed ? t('validation.passed') : t('validation.blocked')}
+        </Chip>
+      </CardHeader>
+      <CardBody>
+        <div className="grid gap-3 md:grid-cols-3">
+          <RuntimeCheck label={t('validation.lockfile')} ok={readiness.app.lockfile_exists} />
+          <RuntimeCheck label={t('validation.package_scripts')} ok={Object.values(readiness.app.package_scripts).every(Boolean)} />
+          <RuntimeCheck label={t('validation.compose_profile')} ok={readiness.shadow_runtime.compose_profile_configured} />
+        </div>
+
+        {validation.issues.length > 0 && (
+          <div className="mt-4 space-y-2">
+            {validation.issues.map((issue) => (
+              <div key={`${issue.code}-${issue.context}`} className="rounded-md border border-warning/40 bg-warning/10 px-3 py-2 text-sm">
+                <span className="font-medium">{t(`validation_issues.${issue.code}`)}</span>
+                <code className="ml-2 text-xs">{issue.context}</code>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardBody>
+    </Card>
+  );
+}
+
+function RuntimeCheck({ label, ok }: { label: string; ok: boolean }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.next_public' });
+
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-md border border-divider px-3 py-2 text-sm">
+      <span>{label}</span>
+      <Chip size="sm" color={ok ? 'success' : 'warning'} variant="soft">
+        {ok ? t('statuses.pass') : t('statuses.blocker')}
+      </Chip>
+    </div>
   );
 }
 

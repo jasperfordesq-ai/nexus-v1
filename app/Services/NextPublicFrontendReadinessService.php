@@ -18,6 +18,10 @@ class NextPublicFrontendReadinessService
         $appDir = base_path('next-public-frontend');
         $manifest = $this->readJson($appDir . DIRECTORY_SEPARATOR . 'route-ownership.json');
         $package = $this->readJson($appDir . DIRECTORY_SEPARATOR . 'package.json');
+        $publicRoutes = is_array($manifest) ? array_values($manifest['nextPublicRoutes'] ?? []) : [];
+        $privatePrefixes = is_array($manifest) ? array_values($manifest['vitePrivatePrefixes'] ?? []) : [];
+        $privatePatterns = is_array($manifest) ? array_values($manifest['vitePrivatePatterns'] ?? []) : [];
+        $validation = $this->validateManifest($manifest, $publicRoutes, $privatePrefixes);
 
         $manifestMode = is_array($manifest) ? (string) ($manifest['mode'] ?? 'unknown') : 'missing';
         $cutoverEnabled = filter_var(
@@ -33,13 +37,21 @@ class NextPublicFrontendReadinessService
                 'version' => is_array($package) ? ($package['version'] ?? null) : null,
                 'next_version' => is_array($package) ? ($package['dependencies']['next'] ?? null) : null,
                 'react_version' => is_array($package) ? ($package['dependencies']['react'] ?? null) : null,
+                'lockfile_exists' => File::isFile($appDir . DIRECTORY_SEPARATOR . 'package-lock.json'),
+                'package_scripts' => $this->packageScriptPresence($package),
             ],
             'manifest' => [
                 'exists' => is_array($manifest),
                 'mode' => is_array($manifest) ? ($manifest['mode'] ?? null) : null,
-                'public_routes' => is_array($manifest) ? array_values($manifest['nextPublicRoutes'] ?? []) : [],
-                'vite_private_prefixes' => is_array($manifest) ? array_values($manifest['vitePrivatePrefixes'] ?? []) : [],
-                'vite_private_patterns' => is_array($manifest) ? array_values($manifest['vitePrivatePatterns'] ?? []) : [],
+                'route_counts' => [
+                    'public_routes' => count($publicRoutes),
+                    'vite_private_prefixes' => count($privatePrefixes),
+                    'vite_private_patterns' => count($privatePatterns),
+                ],
+                'validation' => $validation,
+                'public_routes' => $publicRoutes,
+                'vite_private_prefixes' => $privatePrefixes,
+                'vite_private_patterns' => $privatePatterns,
             ],
             'production_routing' => [
                 'active' => false,
@@ -58,6 +70,7 @@ class NextPublicFrontendReadinessService
                 'host_port_env' => 'NEXUS_NEXT_PUBLIC_PORT',
                 'port_env' => 'NEXUS_NEXT_PUBLIC_PORT',
                 'default_shadow_port' => 3200,
+                'compose_profile_configured' => $this->composeProfileConfigured('next-public-shadow'),
             ],
             'safety_checks' => [
                 ['key' => 'route_cutover_disabled', 'status' => 'pass'],
@@ -89,5 +102,100 @@ class NextPublicFrontendReadinessService
         $decoded = json_decode((string) File::get($path), true);
 
         return is_array($decoded) ? $decoded : null;
+    }
+
+    /**
+     * @param array<string, mixed>|null $package
+     * @return array<string, bool>
+     */
+    private function packageScriptPresence(?array $package): array
+    {
+        $scripts = is_array($package) && is_array($package['scripts'] ?? null)
+            ? $package['scripts']
+            : [];
+
+        return [
+            'dev' => isset($scripts['dev']),
+            'build' => isset($scripts['build']),
+            'start' => isset($scripts['start']),
+            'test' => isset($scripts['test']),
+        ];
+    }
+
+    private function composeProfileConfigured(string $profile): bool
+    {
+        $composePath = base_path('compose.bluegreen.yml');
+
+        return File::isFile($composePath)
+            && str_contains((string) File::get($composePath), $profile);
+    }
+
+    /**
+     * @param array<string, mixed>|null $manifest
+     * @param array<int, mixed> $publicRoutes
+     * @param array<int, mixed> $privatePrefixes
+     * @return array{status: string, issues: array<int, array<string, string>>}
+     */
+    private function validateManifest(?array $manifest, array $publicRoutes, array $privatePrefixes): array
+    {
+        $issues = [];
+
+        if (!is_array($manifest)) {
+            return [
+                'status' => 'blocker',
+                'issues' => [[
+                    'code' => 'manifest_missing',
+                    'severity' => 'blocker',
+                    'context' => 'route-ownership.json',
+                ]],
+            ];
+        }
+
+        if (($manifest['mode'] ?? null) !== 'shadow') {
+            $issues[] = [
+                'code' => 'manifest_not_shadow',
+                'severity' => 'blocker',
+                'context' => (string) ($manifest['mode'] ?? 'missing'),
+            ];
+        }
+
+        $patterns = [];
+        $routeKeys = [];
+        $privatePrefixSet = array_flip(array_filter($privatePrefixes, 'is_string'));
+
+        foreach ($publicRoutes as $route) {
+            if (!is_array($route)) {
+                $issues[] = ['code' => 'public_route_invalid', 'severity' => 'blocker', 'context' => 'non-object'];
+                continue;
+            }
+
+            $pattern = isset($route['pattern']) ? (string) $route['pattern'] : '';
+            $routeKey = isset($route['routeKey']) ? (string) $route['routeKey'] : '';
+            $labelKey = isset($route['labelKey']) ? (string) $route['labelKey'] : '';
+
+            if ($pattern === '' || $routeKey === '' || $labelKey === '') {
+                $issues[] = ['code' => 'public_route_missing_fields', 'severity' => 'blocker', 'context' => $pattern ?: 'unknown'];
+            }
+
+            if ($pattern !== '' && isset($patterns[$pattern])) {
+                $issues[] = ['code' => 'public_route_duplicate_pattern', 'severity' => 'blocker', 'context' => $pattern];
+            }
+            $patterns[$pattern] = true;
+
+            if ($routeKey !== '' && isset($routeKeys[$routeKey])) {
+                $issues[] = ['code' => 'public_route_duplicate_key', 'severity' => 'blocker', 'context' => $routeKey];
+            }
+            $routeKeys[$routeKey] = true;
+
+            $firstSegment = strtok(ltrim($pattern, '/'), '/');
+            if (is_string($firstSegment) && $firstSegment !== '' && isset($privatePrefixSet[$firstSegment])) {
+                $issues[] = ['code' => 'public_route_collides_with_private_prefix', 'severity' => 'blocker', 'context' => $pattern];
+            }
+        }
+
+        return [
+            'status' => $issues === [] ? 'pass' : 'blocker',
+            'issues' => $issues,
+        ];
     }
 }

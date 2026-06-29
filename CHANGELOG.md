@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Admins can inspect the shadow-mode Next.js public frontend readiness without enabling it.** A new read-only admin API endpoint and `/admin/seo/next-public-frontend` page report the Next app package, route ownership manifest, shadow runtime commands, retained Vite private-route ownership, unchanged prerender fallback, and remaining cutover blockers. This does not activate production routing, does not alter Apache/Plesk edge behavior, and does not change the current prerender serving path. Regression tests: `tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php`, `react-frontend/src/admin/modules/advanced/next-public/NextPublicFrontendReadiness.test.tsx`, `react-frontend/src/admin/api/adminApi.test.ts`.
+- **The Next.js public frontend readiness page now validates the shadow route manifest.** The read-only admin endpoint checks for the pinned lockfile, required package scripts, configured shadow Compose profile, duplicate public route patterns/keys, malformed route entries, and accidental collisions between Next public routes and Vite private prefixes. The admin page shows route counts and manifest validation status only; it still cannot enable production routing or change prerender behaviour. Regression tests: `tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php`, `react-frontend/src/admin/modules/advanced/next-public/NextPublicFrontendReadiness.test.tsx`.
 
 ## [1.5.4] - 2026-06-29
 
