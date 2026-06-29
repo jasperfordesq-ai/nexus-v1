@@ -71,7 +71,8 @@
     "accessibility_alpha_tooltip": "Version accessible améliorée — Conforme aux WCAG 2.2 AA. S'ouvre dans un nouvel onglet.",
     "features": "Fonctionnalités",
     "courses": "Cours",
-    "podcasts": "Baladodiffusions"
+    "podcasts": "Baladodiffusions",
+    "switch_community": "Changer de communauté"
   },
   "landing_links": {
     "title": "Explorez cette communauté",
@@ -849,6 +850,7 @@
     "main_navigation": "Navigation principale",
     "timebanking_navigation": "Navigation banque de temps",
     "community_navigation": "Navigation communauté",
+    "tenant_switcher_navigation": "Sélecteur de communauté",
     "create_actions": "Actions de création",
     "user_actions": "Actions utilisateur",
     "close_menu": "Fermer le menu",

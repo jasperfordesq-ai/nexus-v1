@@ -129,6 +129,7 @@ const i18nMap: Record<string, string> = {
   'sections.explore': 'Explore',
   'nav.unread_notifications': 'Notifications, 5 unread',
   'nav.accessibility_alpha': 'Accessibility (alpha)',
+  'nav.switch_community': 'Switch community',
   'theme_picker.open_label': 'Theme',
   'accessibility.create_new': 'Create new',
   'accessibility.open_menu': 'Open menu',
@@ -141,6 +142,7 @@ const i18nMap: Record<string, string> = {
   'aria.main_navigation': 'Main navigation',
   'aria.timebanking_navigation': 'Timebanking navigation',
   'aria.community_navigation': 'Community navigation',
+  'aria.tenant_switcher_navigation': 'Community switcher',
   'aria.create_actions': 'Create actions',
   'aria.user_actions': 'User actions',
   'aria.user_menu_trigger': 'Open user menu',
@@ -409,6 +411,43 @@ describe('Navbar', () => {
   });
 
   describe('Utility bar', () => {
+    it('renders child tenants in the utility switcher and opens the resolved tenant URL', async () => {
+      const user = userEvent.setup();
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+      setupDefaultMocks({
+        tenant: {
+          tenant: {
+            id: 990101,
+            name: 'UK Timebank Global',
+            slug: 'uk-timebank-global-test',
+            tenant_switcher: {
+              source: 'children',
+              items: [
+                {
+                  id: 990102,
+                  name: 'Cardiff Timebank',
+                  slug: 'cardiff-timebank-test',
+                  url: 'https://uk.timebank.global/cardiff-timebank-test',
+                },
+              ],
+            },
+          },
+        },
+      });
+
+      render(<Navbar />);
+
+      await user.click(screen.getByRole('button', { name: 'Switch community' }));
+
+      const cardiffItem = await screen.findByText('Cardiff Timebank');
+      expect(cardiffItem).toBeInTheDocument();
+
+      await user.click(cardiffItem);
+
+      expect(openSpy).toHaveBeenCalledWith('https://uk.timebank.global/cardiff-timebank-test', '_self');
+      openSpy.mockRestore();
+    });
+
     it('renders compact controls with transparent styling', () => {
       setupDefaultMocks({
         auth: {

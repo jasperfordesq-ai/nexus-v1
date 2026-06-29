@@ -216,6 +216,17 @@ export const tenantBootstrapSchema = z.object({
     name: z.string(),
     slug: z.string(),
   }).passthrough()).optional(),
+  tenant_switcher: z.object({
+    source: z.string(),
+    items: z.array(z.object({
+      id: z.number(),
+      name: z.string(),
+      slug: z.string(),
+      url: z.string(),
+      domain: z.string().optional(),
+      tagline: z.string().optional(),
+    }).passthrough()),
+  }).passthrough().optional(),
 }).passthrough();
 
 // ─────────────────────────────────────────────────────────────────────────────

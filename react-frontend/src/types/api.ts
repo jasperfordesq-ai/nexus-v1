@@ -1197,6 +1197,20 @@ export interface TenantBranding {
   og_image_url?: string;
 }
 
+export interface TenantSwitcherItem {
+  id: number;
+  name: string;
+  slug: string;
+  url: string;
+  domain?: string;
+  tagline?: string;
+}
+
+export interface TenantSwitcherConfig {
+  source: string;
+  items: TenantSwitcherItem[];
+}
+
 export interface TenantConfig {
   id: number;
   name: string;
@@ -1255,6 +1269,8 @@ export interface TenantConfig {
   default_language?: string;
   /** Per-tenant landing page configuration (sections, content, ordering) */
   landing_page_config?: import('./landing-page').LandingPageConfig;
+  /** Utility-bar tenant switcher options resolved by the backend. */
+  tenant_switcher?: TenantSwitcherConfig;
   /**
    * Custom domain of the immediate parent tenant.
    * Present only for slug-only sub-tenants whose parent has a custom domain

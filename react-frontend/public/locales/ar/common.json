@@ -71,7 +71,8 @@
     "accessibility_alpha_tooltip": "نسخة محسنة يمكن الوصول إليها — متوافقة مع WCAG 2.2 AA. يفتح في علامة تبويب جديدة.",
     "features": "الميزات",
     "courses": "الدورات",
-    "podcasts": "البودكاست"
+    "podcasts": "البودكاست",
+    "switch_community": "تبديل المجتمع"
   },
   "landing_links": {
     "title": "استكشف هذا المجتمع",
@@ -849,6 +850,7 @@
     "main_navigation": "التنقل الرئيسي",
     "timebanking_navigation": "تنقل بنك الوقت",
     "community_navigation": "تنقل المجتمع",
+    "tenant_switcher_navigation": "محدد المجتمع",
     "create_actions": "إجراءات الإنشاء",
     "user_actions": "إجراءات المستخدم",
     "close_menu": "إغلاق القائمة",

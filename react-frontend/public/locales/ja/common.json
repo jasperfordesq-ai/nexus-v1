@@ -71,7 +71,8 @@
     "accessibility_alpha_tooltip": "拡張されたアクセス可能なバージョン - WCAG 2.2 AA 準拠。新しいタブで開きます。",
     "features": "機能",
     "courses": "コース",
-    "podcasts": "ポッドキャスト"
+    "podcasts": "ポッドキャスト",
+    "switch_community": "コミュニティを切り替え"
   },
   "landing_links": {
     "title": "このコミュニティを探索",
@@ -849,6 +850,7 @@
     "main_navigation": "メインナビゲーション",
     "timebanking_navigation": "タイムバンキングナビゲーション",
     "community_navigation": "コミュニティナビゲーション",
+    "tenant_switcher_navigation": "コミュニティ切り替え",
     "create_actions": "作成アクション",
     "user_actions": "ユーザーアクション",
     "close_menu": "メニューを閉じる",

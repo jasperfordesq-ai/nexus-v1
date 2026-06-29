@@ -71,7 +71,8 @@
     "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Otwiera się w nowej karcie.",
     "features": "Funkcje",
     "courses": "Kursy",
-    "podcasts": "Podcasty"
+    "podcasts": "Podcasty",
+    "switch_community": "Zmień społeczność"
   },
   "landing_links": {
     "title": "Poznaj tę społeczność",
@@ -849,6 +850,7 @@
     "main_navigation": "Nawigacja główna",
     "timebanking_navigation": "Nawigacja banku czasu",
     "community_navigation": "Nawigacja społeczności",
+    "tenant_switcher_navigation": "Przełącznik społeczności",
     "create_actions": "Akcje tworzenia",
     "user_actions": "Akcje użytkownika",
     "close_menu": "Zamknij menu",

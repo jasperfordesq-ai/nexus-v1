@@ -71,7 +71,8 @@
     "accessibility_alpha_tooltip": "Versão acessível aprimorada – compatível com WCAG 2.2 AA. Abre em uma nova guia.",
     "features": "Funcionalidades",
     "courses": "Cursos",
-    "podcasts": "Podcasts"
+    "podcasts": "Podcasts",
+    "switch_community": "Mudar comunidade"
   },
   "landing_links": {
     "title": "Explore esta comunidade",
@@ -849,6 +850,7 @@
     "main_navigation": "Navegação principal",
     "timebanking_navigation": "Navegação do banco de tempo",
     "community_navigation": "Navegação da comunidade",
+    "tenant_switcher_navigation": "Seletor de comunidade",
     "create_actions": "Ações de criação",
     "user_actions": "Ações do utilizador",
     "close_menu": "Fechar menu",

@@ -6,6 +6,8 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Services\RedisCache;
+use App\Services\TenantHierarchyService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
@@ -55,6 +57,126 @@ class TenantBootstrapControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonPath('data.slug', $this->testTenantSlug);
         $response->assertJsonPath('data.id', $this->testTenantId);
+    }
+
+    public function test_bootstrap_exposes_child_tenants_for_tenant_switcher_with_resolved_urls(): void
+    {
+        DB::table('tenants')->updateOrInsert(
+            ['id' => 990101],
+            [
+                'name' => 'UK Timebank Global',
+                'slug' => 'uk-timebank-global-test',
+                'domain' => 'uk.timebank.global',
+                'parent_id' => null,
+                'path' => '/990101/',
+                'depth' => 0,
+                'allows_subtenants' => true,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        DB::table('tenants')->updateOrInsert(
+            ['id' => 990102],
+            [
+                'name' => 'Cardiff Timebank',
+                'slug' => 'cardiff-timebank-test',
+                'domain' => null,
+                'parent_id' => 990101,
+                'path' => '/990101/990102/',
+                'depth' => 1,
+                'allows_subtenants' => false,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        DB::table('tenants')->updateOrInsert(
+            ['id' => 990103],
+            [
+                'name' => 'Bristol Timebank',
+                'slug' => 'bristol-timebank-test',
+                'domain' => 'bristol.timebank.example',
+                'parent_id' => 990101,
+                'path' => '/990101/990103/',
+                'depth' => 1,
+                'allows_subtenants' => false,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        DB::table('tenants')->updateOrInsert(
+            ['id' => 990104],
+            [
+                'name' => 'Inactive Timebank',
+                'slug' => 'inactive-switcher-test',
+                'domain' => null,
+                'parent_id' => 990101,
+                'path' => '/990101/990104/',
+                'depth' => 1,
+                'allows_subtenants' => false,
+                'is_active' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        app(RedisCache::class)->delete('tenant_bootstrap', 990101);
+
+        $response = $this->apiGet('/v2/tenant/bootstrap?slug=uk-timebank-global-test');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.tenant_switcher.source', 'children');
+        $response->assertJsonCount(2, 'data.tenant_switcher.items');
+
+        $items = collect($response->json('data.tenant_switcher.items'))->keyBy('slug');
+        $this->assertSame('https://uk.timebank.global/cardiff-timebank-test', $items['cardiff-timebank-test']['url']);
+        $this->assertSame('https://bristol.timebank.example', $items['bristol-timebank-test']['url']);
+        $this->assertFalse($items->has('inactive-switcher-test'));
+    }
+
+    public function test_creating_child_tenant_invalidates_parent_switcher_cache(): void
+    {
+        DB::table('tenants')->updateOrInsert(
+            ['id' => 990201],
+            [
+                'name' => 'Cached Parent Timebank',
+                'slug' => 'cached-parent-timebank-test',
+                'domain' => 'cached-parent.timebank.example',
+                'parent_id' => null,
+                'path' => '/990201/',
+                'depth' => 0,
+                'allows_subtenants' => true,
+                'max_depth' => 2,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+        app(RedisCache::class)->delete('tenant_bootstrap', 990201);
+
+        try {
+            $initialResponse = $this->apiGet('/v2/tenant/bootstrap?slug=cached-parent-timebank-test');
+            $initialResponse->assertStatus(200);
+            $initialResponse->assertJsonCount(0, 'data.tenant_switcher.items');
+
+            $result = TenantHierarchyService::createTenant([
+                'name' => 'Leeds Timebank',
+                'slug' => 'leeds-cache-switcher-test',
+                'is_active' => true,
+            ], 990201);
+
+            $this->assertTrue($result['success'], $result['error'] ?? 'Tenant creation failed');
+
+            $response = $this->apiGet('/v2/tenant/bootstrap?slug=cached-parent-timebank-test');
+            $response->assertStatus(200);
+
+            $items = collect($response->json('data.tenant_switcher.items'))->keyBy('slug');
+            $this->assertSame('https://cached-parent.timebank.example/leeds-cache-switcher-test', $items['leeds-cache-switcher-test']['url']);
+        } finally {
+            app(RedisCache::class)->delete('tenant_bootstrap', 990201);
+        }
     }
 
     public function test_bootstrap_returns_404_for_unknown_slug(): void

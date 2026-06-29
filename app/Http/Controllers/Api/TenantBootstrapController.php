@@ -410,7 +410,83 @@ class TenantBootstrapController extends BaseApiController
         // Landing page configuration (per-tenant customizable sections)
         $data['landing_page_config'] = $this->buildLandingPageConfig((int) $tenant['id']);
 
+        $data['tenant_switcher'] = $this->buildTenantSwitcherData($tenant);
+
         return $data;
+    }
+
+    /**
+     * Build the utility-bar tenant switcher payload.
+     * Default source is active direct child tenants in the hierarchy.
+     */
+    private function buildTenantSwitcherData(array $tenant): array
+    {
+        $tenantId = (int) ($tenant['id'] ?? 0);
+        if ($tenantId <= 0) {
+            return [
+                'source' => 'children',
+                'items' => [],
+            ];
+        }
+
+        $children = DB::table('tenants')
+            ->select('id', 'name', 'slug', 'domain', 'tagline')
+            ->where('parent_id', $tenantId)
+            ->where('is_active', 1)
+            ->orderBy('name', 'asc')
+            ->get();
+
+        $items = [];
+        foreach ($children as $child) {
+            $childData = (array) $child;
+            $item = [
+                'id' => (int) $childData['id'],
+                'name' => (string) ($childData['name'] ?? ''),
+                'slug' => (string) ($childData['slug'] ?? ''),
+                'url' => $this->buildTenantSwitcherUrl($childData, $tenant),
+            ];
+
+            if (!empty($childData['domain'])) {
+                $item['domain'] = $this->normalizeTenantDomain((string) $childData['domain']);
+            }
+            if (!empty($childData['tagline'])) {
+                $item['tagline'] = (string) $childData['tagline'];
+            }
+
+            $items[] = $item;
+        }
+
+        return [
+            'source' => 'children',
+            'items' => $items,
+        ];
+    }
+
+    private function buildTenantSwitcherUrl(array $child, array $parent): string
+    {
+        $childDomain = $this->normalizeTenantDomain((string) ($child['domain'] ?? ''));
+        if ($childDomain !== '') {
+            return "https://{$childDomain}";
+        }
+
+        $parentDomain = $this->normalizeTenantDomain((string) ($parent['domain'] ?? ''));
+        $slug = rawurlencode((string) ($child['slug'] ?? ''));
+
+        if ($parentDomain !== '' && $slug !== '') {
+            return "https://{$parentDomain}/{$slug}";
+        }
+
+        $frontendUrl = rtrim((string) config('app.frontend_url', 'https://app.project-nexus.ie'), '/');
+
+        return $slug !== '' ? "{$frontendUrl}/{$slug}" : $frontendUrl;
+    }
+
+    private function normalizeTenantDomain(string $domain): string
+    {
+        $domain = trim($domain);
+        $domain = (string) preg_replace('#^https?://#i', '', $domain);
+
+        return rtrim($domain, '/');
     }
 
     /**

@@ -71,7 +71,8 @@
     "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
     "features": "Features",
     "courses": "Courses",
-    "podcasts": "Podcasts"
+    "podcasts": "Podcasts",
+    "switch_community": "Switch community"
   },
   "landing_links": {
     "title": "Explore this community",
@@ -849,6 +850,7 @@
     "main_navigation": "Main navigation",
     "timebanking_navigation": "Timebanking navigation",
     "community_navigation": "Community navigation",
+    "tenant_switcher_navigation": "Community switcher",
     "create_actions": "Create actions",
     "user_actions": "User actions",
     "close_menu": "Close menu",

@@ -177,6 +177,8 @@ class TenantHierarchyService
                 "Created tenant '{$name}' under parent ID {$parentId}"
             );
 
+            self::bustBootstrapCache($parentId);
+
             return ['success' => true, 'tenant_id' => $tenantId];
         } catch (\Throwable $e) {
             Log::error('TenantHierarchyService::createTenant failed', ['error' => $e->getMessage()]);
@@ -305,6 +307,10 @@ class TenantHierarchyService
             // If the domain changed, also bust all direct children: they cache a parent_domain
             // field that references this tenant's domain — their cached value is now stale.
             $idsToFlush = [$tenantId];
+            $parentSwitcherFields = ['name', 'slug', 'domain', 'tagline', 'is_active'];
+            if (!empty($tenant->parent_id) && array_intersect(array_keys($update), $parentSwitcherFields)) {
+                $idsToFlush[] = (int) $tenant->parent_id;
+            }
             if (array_key_exists('domain', $update)) {
                 $childIds = DB::table('tenants')
                     ->where('parent_id', $tenantId)
@@ -394,6 +400,8 @@ class TenantHierarchyService
                 ($hardDelete ? 'Hard deleted' : 'Soft deleted (deactivated)') . " tenant '{$tenant->name}'"
             );
 
+            self::bustBootstrapCache($tenantId, (int) ($tenant->parent_id ?? 0));
+
             return ['success' => true];
         } catch (\Throwable $e) {
             Log::error('TenantHierarchyService::deleteTenant failed', ['error' => $e->getMessage()]);
@@ -477,9 +485,8 @@ class TenantHierarchyService
                 "Moved tenant '{$tenant->name}' from parent ID {$oldParentId} to {$newParentId}"
             );
 
-            // The moved tenant's parent_domain in the bootstrap response has changed.
-            // Bust its cache immediately so the next bootstrap call reflects the new parent.
-            self::bustBootstrapCache($tenantId);
+            // The moved tenant's parent_domain changed, and both parent switcher lists changed.
+            self::bustBootstrapCache($tenantId, (int) ($oldParentId ?? 0), $newParentId);
 
             return ['success' => true];
         } catch (\Throwable $e) {
@@ -777,14 +784,17 @@ class TenantHierarchyService
      * Invalidate the bootstrap cache for one or more tenants.
      *
      * The cache key format mirrors RedisCache::buildKey(): "t{id}:tenant_bootstrap".
-     * Called after any mutation that changes hierarchy-derived data (parent_domain):
+     * Called after any mutation that changes hierarchy-derived data:
+     *   - createTenant/deleteTenant: bust the parent tenant's child switcher list
      *   - moveTenant: bust the moved tenant (its parent_domain changes)
+     *     plus old/new parents (their switcher lists change)
+     *   - updateTenant with child display or routing fields: bust the parent
      *   - updateTenant with domain change: bust the tenant + all direct children
      *     (direct children expose parent_domain pointing to this tenant's domain)
      */
     private static function bustBootstrapCache(int ...$tenantIds): void
     {
-        foreach ($tenantIds as $id) {
+        foreach (array_unique(array_filter($tenantIds, fn (int $id): bool => $id > 0)) as $id) {
             try {
                 Cache::store('redis')->forget("t{$id}:tenant_bootstrap");
             } catch (\Throwable $e) {

@@ -71,7 +71,8 @@
     "accessibility_alpha_tooltip": "Leagan inrochtana feabhsaithe — WCAG 2.2 AA comhlíontach. Osclaítear i gcluaisín nua é.",
     "features": "Gnéithe",
     "courses": "Cúrsaí",
-    "podcasts": "Podchraoltaí"
+    "podcasts": "Podchraoltaí",
+    "switch_community": "Athraigh pobal"
   },
   "landing_links": {
     "title": "Déan iniúchadh ar an bpobal seo",
@@ -849,6 +850,7 @@
     "main_navigation": "Príomhnascléanúint",
     "timebanking_navigation": "Nascléanúint baincéireachta ama",
     "community_navigation": "Nascléanúint phobail",
+    "tenant_switcher_navigation": "Roghnóir pobail",
     "create_actions": "Gníomhartha cruthúcháin",
     "user_actions": "Gníomhartha úsáideora",
     "close_menu": "Dún roghchlár",

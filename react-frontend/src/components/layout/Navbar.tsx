@@ -186,6 +186,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const [moreOpen, setMoreOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
+  const [tenantSwitcherOpen, setTenantSwitcherOpen] = useState(false);
 
   const closeAllDropdowns = useCallback(() => {
     setTimebankingOpen(false);
@@ -193,27 +194,32 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     setMoreOpen(false);
     setCreateOpen(false);
     setUserOpen(false);
+    setTenantSwitcherOpen(false);
   }, []);
 
   const handleTimebankingOpenChange = useCallback((open: boolean) => {
-    if (open) { setCommunityOpen(false); setMoreOpen(false); setCreateOpen(false); setUserOpen(false); }
+    if (open) { setCommunityOpen(false); setMoreOpen(false); setCreateOpen(false); setUserOpen(false); setTenantSwitcherOpen(false); }
     setTimebankingOpen(open);
   }, []);
   const handleCommunityOpenChange = useCallback((open: boolean) => {
-    if (open) { setTimebankingOpen(false); setMoreOpen(false); setCreateOpen(false); setUserOpen(false); }
+    if (open) { setTimebankingOpen(false); setMoreOpen(false); setCreateOpen(false); setUserOpen(false); setTenantSwitcherOpen(false); }
     setCommunityOpen(open);
   }, []);
   const handleMoreOpenChange = useCallback((open: boolean) => {
-    if (open) { setTimebankingOpen(false); setCommunityOpen(false); setCreateOpen(false); setUserOpen(false); }
+    if (open) { setTimebankingOpen(false); setCommunityOpen(false); setCreateOpen(false); setUserOpen(false); setTenantSwitcherOpen(false); }
     setMoreOpen(open);
   }, []);
   const handleCreateOpenChange = useCallback((open: boolean) => {
-    if (open) { setTimebankingOpen(false); setCommunityOpen(false); setMoreOpen(false); setUserOpen(false); }
+    if (open) { setTimebankingOpen(false); setCommunityOpen(false); setMoreOpen(false); setUserOpen(false); setTenantSwitcherOpen(false); }
     setCreateOpen(open);
   }, []);
   const handleUserOpenChange = useCallback((open: boolean) => {
-    if (open) { setTimebankingOpen(false); setCommunityOpen(false); setMoreOpen(false); setCreateOpen(false); }
+    if (open) { setTimebankingOpen(false); setCommunityOpen(false); setMoreOpen(false); setCreateOpen(false); setTenantSwitcherOpen(false); }
     setUserOpen(open);
+  }, []);
+  const handleTenantSwitcherOpenChange = useCallback((open: boolean) => {
+    if (open) { setTimebankingOpen(false); setCommunityOpen(false); setMoreOpen(false); setCreateOpen(false); setUserOpen(false); }
+    setTenantSwitcherOpen(open);
   }, []);
 
   const handleInstallClick = useCallback(() => {
@@ -498,6 +504,12 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     () => buildAccessibleFrontendUrl(tenant?.slug, '/', undefined, tenant?.accessible_domain),
     [tenant?.slug, tenant?.accessible_domain],
   );
+  const tenantSwitcherItems = tenant?.tenant_switcher?.items ?? [];
+  const hasTenantSwitcherItems = tenantSwitcherItems.length > 0;
+  const handleTenantSwitch = useCallback((url: string) => {
+    closeAllDropdowns();
+    window.open(url, '_self');
+  }, [closeAllDropdowns]);
 
   return (
     <>
@@ -513,6 +525,47 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         >
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-end gap-2 h-9 flex-nowrap overflow-x-auto">
+              {hasTenantSwitcherItems && (
+                <>
+                  <Dropdown placement="bottom-end" isOpen={tenantSwitcherOpen} onOpenChange={handleTenantSwitcherOpenChange} shouldBlockScroll={false}>
+                    <DropdownTrigger>
+                      <Button
+                        variant="light"
+                        size="sm"
+                        className={utilityBarActionClass}
+                        aria-label={t('nav.switch_community')}
+                        endContent={<ChevronDown className="w-3 h-3 shrink-0" aria-hidden="true" />}
+                      >
+                        <Globe className="w-4 h-4 shrink-0" aria-hidden="true" />
+                        <span className="hidden md:inline">{t('nav.switch_community')}</span>
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu
+                      aria-label={t('aria.tenant_switcher_navigation')}
+                      className="min-w-[240px]"
+                      classNames={{
+                        base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl max-h-[70vh] overflow-y-auto',
+                      }}
+                      onAction={(key) => {
+                        handleTenantSwitch(String(key));
+                      }}
+                    >
+                      {tenantSwitcherItems.map((item) => (
+                        <DropdownItem
+                          key={item.url}
+                          id={item.url}
+                          description={item.tagline}
+                          startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
+                          textValue={item.name}
+                        >
+                          {item.name}
+                        </DropdownItem>
+                      ))}
+                    </DropdownMenu>
+                  </Dropdown>
+                  <span className={utilityBarDividerClass}>|</span>
+                </>
+              )}
               {/* Identity verification status — only when the feature is enabled */}
               {isAuthenticated && identityVerificationEnabled && idVerifiedLoaded && (
                 <>

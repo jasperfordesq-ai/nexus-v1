@@ -71,7 +71,8 @@
     "accessibility_alpha_tooltip": "Verbeterde toegankelijke versie — WCAG 2.2 AA-compatibel. Opent in een nieuw tabblad.",
     "features": "Functies",
     "courses": "Cursussen",
-    "podcasts": "Podcasts"
+    "podcasts": "Podcasts",
+    "switch_community": "Van gemeenschap wisselen"
   },
   "landing_links": {
     "title": "Verken deze gemeenschap",
@@ -849,6 +850,7 @@
     "main_navigation": "Hoofdnavigatie",
     "timebanking_navigation": "Tijdbanknavigatie",
     "community_navigation": "Gemeenschapsnavigatie",
+    "tenant_switcher_navigation": "Gemeenschapskiezer",
     "create_actions": "Aanmaakacties",
     "user_actions": "Gebruikersacties",
     "close_menu": "Menu sluiten",
