@@ -24,7 +24,7 @@ class NextPublicFrontendReadinessService
         $privatePrefixes = is_array($manifest) ? array_values($manifest['vitePrivatePrefixes'] ?? []) : [];
         $privatePatterns = is_array($manifest) ? array_values($manifest['vitePrivatePatterns'] ?? []) : [];
         $apiBackedRoutes = $this->apiBackedRoutes($contentSources);
-        $validation = $this->validateManifest($manifest, $publicRoutes, $privatePrefixes, $apiBackedRoutes);
+        $validation = $this->validateManifest($manifest, $publicRoutes, $privatePrefixes, $apiBackedRoutes, $contentSources);
 
         $manifestMode = is_array($manifest) ? (string) ($manifest['mode'] ?? 'unknown') : 'missing';
         $cutoverEnabled = filter_var(
@@ -227,9 +227,16 @@ class NextPublicFrontendReadinessService
      * @param array<int, mixed> $publicRoutes
      * @param array<int, mixed> $privatePrefixes
      * @param array<int, array{routeKey: string, endpoint: string, method: string}> $apiBackedRoutes
+     * @param array<string, mixed>|null $contentSources
      * @return array{status: string, issues: array<int, array<string, string>>}
      */
-    private function validateManifest(?array $manifest, array $publicRoutes, array $privatePrefixes, array $apiBackedRoutes): array
+    private function validateManifest(
+        ?array $manifest,
+        array $publicRoutes,
+        array $privatePrefixes,
+        array $apiBackedRoutes,
+        ?array $contentSources = null,
+    ): array
     {
         $issues = [];
 
@@ -249,6 +256,22 @@ class NextPublicFrontendReadinessService
                 'code' => 'manifest_not_shadow',
                 'severity' => 'blocker',
                 'context' => (string) ($manifest['mode'] ?? 'missing'),
+            ];
+        }
+
+        if (($contentSources['sourceOfTruth'] ?? null) !== 'laravel_public_api') {
+            $issues[] = [
+                'code' => 'content_sources_not_laravel_api',
+                'severity' => 'blocker',
+                'context' => (string) ($contentSources['sourceOfTruth'] ?? 'missing'),
+            ];
+        }
+
+        if (($contentSources['databaseQueriesFromNext'] ?? true) !== false) {
+            $issues[] = [
+                'code' => 'content_sources_allow_next_database_queries',
+                'severity' => 'blocker',
+                'context' => 'databaseQueriesFromNext',
             ];
         }
 
