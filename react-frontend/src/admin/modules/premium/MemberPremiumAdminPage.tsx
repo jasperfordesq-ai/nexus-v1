@@ -81,6 +81,7 @@ export function MemberPremiumAdminPage() {
   const [onboarding, setOnboarding] = useState(false);
   const [stripeConnectAccountId, setStripeConnectAccountId] = useState('');
   const [paymentRoute, setPaymentRoute] = useState<'platform_default' | 'tenant_connect'>('platform_default');
+  const [fallbackReason, setFallbackReason] = useState<string | null>(null);
   const [accountStatus, setAccountStatus] = useState<DonationSupportAccountStatus | null>(null);
   const [syncing, setSyncing] = useState<number | null>(null);
   const [deleting, setDeleting] = useState<number | null>(null);
@@ -104,6 +105,7 @@ export function MemberPremiumAdminPage() {
       const settings = res.data?.settings;
       setStripeConnectAccountId(settings?.stripe_connect_account_id ?? '');
       setPaymentRoute(settings?.payment_route ?? 'platform_default');
+      setFallbackReason(settings?.fallback_reason ?? null);
       setAccountStatus(settings?.account_status ?? null);
     } catch {
       toast.error(t('member_premium_admin.toasts.settings_load_failed'));
@@ -200,6 +202,7 @@ export function MemberPremiumAdminPage() {
       const settings = res.data?.settings;
       setStripeConnectAccountId(settings?.stripe_connect_account_id ?? '');
       setPaymentRoute(settings?.payment_route ?? 'platform_default');
+      setFallbackReason(settings?.fallback_reason ?? null);
       setAccountStatus(settings?.account_status ?? null);
       toast.success(t('member_premium_admin.toasts.settings_saved'));
     } catch (err: unknown) {
@@ -220,6 +223,7 @@ export function MemberPremiumAdminPage() {
       const settings = res.data?.settings;
       setStripeConnectAccountId(settings?.stripe_connect_account_id ?? '');
       setPaymentRoute(settings?.payment_route ?? 'platform_default');
+      setFallbackReason(settings?.fallback_reason ?? null);
       setAccountStatus(settings?.account_status ?? null);
 
       const onboardingUrl = res.data?.onboarding_url;
@@ -300,6 +304,11 @@ export function MemberPremiumAdminPage() {
                 {t('member_premium_admin.settings.requirements_due', {
                   count: accountStatus.requirements_due.length,
                 })}
+              </p>
+            ) : null}
+            {fallbackReason === 'stripe_connect_not_ready' ? (
+              <p className="text-sm text-warning-600">
+                {t('member_premium_admin.settings.connect_fallback_active')}
               </p>
             ) : null}
             {accountStatus?.error ? (

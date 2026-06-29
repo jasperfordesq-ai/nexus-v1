@@ -8430,6 +8430,7 @@ CREATE TABLE `member_premium_tiers` (
   `yearly_price_cents` int(10) unsigned NOT NULL DEFAULT 0,
   `stripe_price_id_monthly` varchar(120) DEFAULT NULL,
   `stripe_price_id_yearly` varchar(120) DEFAULT NULL,
+  `stripe_price_account_id` varchar(100) NOT NULL DEFAULT 'platform_default',
   `features` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`features`)),
   `sort_order` smallint(5) unsigned NOT NULL DEFAULT 0,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
@@ -8437,6 +8438,7 @@ CREATE TABLE `member_premium_tiers` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `member_premium_tiers_tenant_id_slug_unique` (`tenant_id`,`slug`),
+  KEY `idx_member_premium_tiers_price_account` (`stripe_price_account_id`),
   KEY `member_premium_tiers_tenant_id_is_active_index` (`tenant_id`,`is_active`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

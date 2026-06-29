@@ -89,11 +89,7 @@ class MemberPremiumAdminController extends BaseApiController
         }
 
         return $this->respondWithData([
-            'settings' => [
-                'stripe_connect_account_id' => $result['stripe_connect_account_id'],
-                'payment_route' => $result['payment_route'],
-                'account_status' => $result['account_status'],
-            ],
+            'settings' => DonationStripeAccountService::settingsPayloadForTenant($tenantId),
             'onboarding_url' => $result['onboarding_url'],
         ]);
     }
@@ -176,19 +172,21 @@ class MemberPremiumAdminController extends BaseApiController
             (array_key_exists('monthly_price_cents', $payload) && (int) $payload['monthly_price_cents'] !== (int) $existing['monthly_price_cents'])
         ) {
             $payload['stripe_price_id_monthly'] = null;
+            $payload['stripe_price_account_id'] = null;
         }
         if (
             (array_key_exists('yearly_price_cents', $payload) && (int) $payload['yearly_price_cents'] !== (int) $existing['yearly_price_cents'])
         ) {
             $payload['stripe_price_id_yearly'] = null;
+            $payload['stripe_price_account_id'] = null;
         }
 
         // updateTier() in service ignores stripe_price_id_* fields, so clear them via direct DB update.
-        if (array_key_exists('stripe_price_id_monthly', $payload) || array_key_exists('stripe_price_id_yearly', $payload)) {
+        if (array_key_exists('stripe_price_id_monthly', $payload) || array_key_exists('stripe_price_id_yearly', $payload) || array_key_exists('stripe_price_account_id', $payload)) {
             \Illuminate\Support\Facades\DB::table('member_premium_tiers')
                 ->where('id', $id)->where('tenant_id', $tenantId)
-                ->update(array_intersect_key($payload, ['stripe_price_id_monthly' => true, 'stripe_price_id_yearly' => true]));
-            unset($payload['stripe_price_id_monthly'], $payload['stripe_price_id_yearly']);
+                ->update(array_intersect_key($payload, ['stripe_price_id_monthly' => true, 'stripe_price_id_yearly' => true, 'stripe_price_account_id' => true]));
+            unset($payload['stripe_price_id_monthly'], $payload['stripe_price_id_yearly'], $payload['stripe_price_account_id']);
         }
 
         MemberPremiumService::updateTier($tenantId, $id, $payload);

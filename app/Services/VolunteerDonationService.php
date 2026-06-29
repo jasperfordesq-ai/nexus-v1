@@ -12,6 +12,7 @@ use App\Models\VolGivingDay;
 use App\Models\VolOpportunity;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * VolunteerDonationService — manages monetary donations linked to volunteer
@@ -52,12 +53,11 @@ class VolunteerDonationService
         $cursor = isset($filters['cursor']) ? (int) $filters['cursor'] : null;
 
         $query = VolDonation::query()
-            ->select([
+            ->select(array_merge([
                 'id', 'user_id', 'opportunity_id', 'giving_day_id',
                 'amount', 'currency', 'payment_method', 'payment_reference',
-                'payment_route', 'stripe_account_id', 'stripe_payment_intent_id',
                 'message', 'is_anonymous', 'status', 'created_at',
-            ]);
+            ], self::donationRoutingColumns()));
 
         if (!empty($filters['user_id'])) {
             $query->where('user_id', (int) $filters['user_id']);
@@ -429,11 +429,11 @@ class VolunteerDonationService
     {
         $query = VolDonation::query()
             ->where('tenant_id', $tenantId)
-            ->select([
+            ->select(array_merge([
                 'id', 'user_id', 'opportunity_id', 'giving_day_id',
                 'amount', 'currency', 'payment_method', 'payment_reference',
                 'message', 'is_anonymous', 'status', 'created_at',
-            ]);
+            ], self::donationRoutingColumns()));
 
         if (!empty($filters['opportunity_id'])) {
             $query->where('opportunity_id', (int) $filters['opportunity_id']);
@@ -534,5 +534,16 @@ class VolunteerDonationService
         }
 
         return $day;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function donationRoutingColumns(): array
+    {
+        return array_values(array_filter(
+            ['payment_route', 'stripe_account_id', 'stripe_payment_intent_id'],
+            static fn (string $column): bool => Schema::hasColumn('vol_donations', $column),
+        ));
     }
 }

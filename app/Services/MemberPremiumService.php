@@ -285,8 +285,9 @@ class MemberPremiumService
         }
 
         $client = StripeService::client();
-        $tenantStripeAccountId = DonationStripeAccountService::accountIdForTenant($tenantId);
+        $tenantStripeAccountId = DonationStripeAccountService::accountIdForTenantReadyForCharges($tenantId);
         $stripeOptions = $tenantStripeAccountId ? ['stripe_account' => $tenantStripeAccountId] : [];
+        $priceAccountId = $tenantStripeAccountId ?: 'platform_default';
         $currency = TenantContext::getCurrency();
         $updates = [];
         $params = [];
@@ -313,7 +314,7 @@ class MemberPremiumService
             ? $client->products->create($productParams, $stripeOptions)
             : $client->products->create($productParams);
 
-        if (($tenantStripeAccountId || empty($tier->stripe_price_id_monthly)) && (int) $tier->monthly_price_cents > 0) {
+        if ((empty($tier->stripe_price_id_monthly) || ($tier->stripe_price_account_id ?? 'platform_default') !== $priceAccountId) && (int) $tier->monthly_price_cents > 0) {
             $priceParams = [
                 'product' => $product->id,
                 'unit_amount' => (int) $tier->monthly_price_cents,
@@ -334,7 +335,7 @@ class MemberPremiumService
             $params[] = $price->id;
         }
 
-        if (($tenantStripeAccountId || empty($tier->stripe_price_id_yearly)) && (int) $tier->yearly_price_cents > 0) {
+        if ((empty($tier->stripe_price_id_yearly) || ($tier->stripe_price_account_id ?? 'platform_default') !== $priceAccountId) && (int) $tier->yearly_price_cents > 0) {
             $priceParams = [
                 'product' => $product->id,
                 'unit_amount' => (int) $tier->yearly_price_cents,
@@ -356,6 +357,8 @@ class MemberPremiumService
         }
 
         if (! empty($updates)) {
+            $updates[] = 'stripe_price_account_id = ?';
+            $params[] = $priceAccountId;
             $updates[] = 'updated_at = NOW()';
             $params[] = $tierId;
             DB::update(
@@ -396,6 +399,16 @@ class MemberPremiumService
             throw new RuntimeException("Tier {$tierId} not found or inactive");
         }
 
+        $tenantStripeAccountId = DonationStripeAccountService::accountIdForTenantReadyForCharges($tenantId);
+        $priceAccountId = $tenantStripeAccountId ?: 'platform_default';
+        if (($tier->stripe_price_account_id ?? 'platform_default') !== $priceAccountId) {
+            self::syncTierToStripe($tenantId, $tierId);
+            $tier = DB::selectOne(
+                "SELECT * FROM member_premium_tiers WHERE id = ? AND tenant_id = ? AND is_active = 1",
+                [$tierId, $tenantId]
+            );
+        }
+
         $priceId = $interval === 'yearly' ? $tier->stripe_price_id_yearly : $tier->stripe_price_id_monthly;
         if (empty($priceId)) {
             throw new RuntimeException(
@@ -412,7 +425,6 @@ class MemberPremiumService
         }
 
         $client = StripeService::client();
-        $tenantStripeAccountId = DonationStripeAccountService::accountIdForTenant($tenantId);
         $stripeOptions = $tenantStripeAccountId ? ['stripe_account' => $tenantStripeAccountId] : [];
 
         // Platform fallback can reuse platform customers. Connected-account
@@ -877,7 +889,33 @@ class MemberPremiumService
         if (! $obj) {
             return false;
         }
-        return self::isMemberPremiumMeta($obj->metadata ?? null);
+        return self::isMemberPremiumMeta(self::metadataFromStripeObject($obj));
+    }
+
+    private static function metadataFromStripeObject(object $obj)
+    {
+        if (self::isMemberPremiumMeta($obj->metadata ?? null)) {
+            return $obj->metadata;
+        }
+
+        $subscriptionDetailsMeta = $obj->subscription_details->metadata ?? null;
+        if (self::isMemberPremiumMeta($subscriptionDetailsMeta)) {
+            return $subscriptionDetailsMeta;
+        }
+
+        $lines = $obj->lines->data ?? null;
+        if (is_iterable($lines)) {
+            foreach ($lines as $line) {
+                if (self::isMemberPremiumMeta($line->metadata ?? null)) {
+                    return $line->metadata;
+                }
+                if (self::isMemberPremiumMeta($line->subscription_item_details->metadata ?? null)) {
+                    return $line->subscription_item_details->metadata;
+                }
+            }
+        }
+
+        return $obj->metadata ?? null;
     }
 
     /**
@@ -1180,6 +1218,7 @@ class MemberPremiumService
             'yearly_price_cents' => (int) $row->yearly_price_cents,
             'stripe_price_id_monthly' => $row->stripe_price_id_monthly,
             'stripe_price_id_yearly' => $row->stripe_price_id_yearly,
+            'stripe_price_account_id' => $row->stripe_price_account_id ?? null,
             'features' => self::decodeFeatures($row->features),
             'sort_order' => (int) $row->sort_order,
             'is_active' => (bool) $row->is_active,

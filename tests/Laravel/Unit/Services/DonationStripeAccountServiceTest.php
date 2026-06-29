@@ -112,4 +112,13 @@ class DonationStripeAccountServiceTest extends TestCase
         $this->assertStringContainsString('self::SETTING_CONNECT_ACCOUNT_ID', $source);
         $this->assertStringContainsString("'type' => 'account_onboarding'", $source);
     }
+
+    public function test_payment_routing_uses_connect_only_after_account_is_ready(): void
+    {
+        $source = file_get_contents(app_path('Services/DonationStripeAccountService.php'));
+
+        $this->assertStringContainsString('accountIdForTenantReadyForCharges', $source);
+        $this->assertStringContainsString("return (\$status['state'] ?? null) === 'ready' ? \$accountId : null", $source);
+        $this->assertStringContainsString("'fallback_reason' => \$accountId && !\$activeAccountId ? 'stripe_connect_not_ready' : null", $source);
+    }
 }

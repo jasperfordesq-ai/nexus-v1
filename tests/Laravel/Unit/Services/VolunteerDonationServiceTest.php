@@ -10,6 +10,7 @@ use Tests\Laravel\TestCase;
 use App\Services\VolunteerDonationService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class VolunteerDonationServiceTest extends TestCase
 {
@@ -137,6 +138,40 @@ class VolunteerDonationServiceTest extends TestCase
 
         $this->assertSame('pending', $donation['status']);
         $this->assertEquals(0.0, (float) DB::table('vol_giving_days')->where('id', $givingDayId)->value('raised_amount'));
+    }
+
+    public function test_exportDonations_includes_stripe_route_reporting_fields(): void
+    {
+        if (!Schema::hasColumn('vol_donations', 'payment_route')) {
+            $source = file_get_contents(app_path('Services/VolunteerDonationService.php'));
+            $this->assertStringContainsString("'payment_route', 'stripe_account_id', 'stripe_payment_intent_id'", $source);
+            $this->assertStringContainsString('donationRoutingColumns', $source);
+            return;
+        }
+
+        DB::table('vol_donations')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => 1,
+            'amount' => 25,
+            'currency' => 'EUR',
+            'payment_method' => 'stripe',
+            'payment_reference' => '',
+            'payment_route' => 'tenant_connect',
+            'stripe_account_id' => 'acct_test_123456',
+            'stripe_payment_intent_id' => 'pi_test_123456',
+            'message' => 'Thank you',
+            'is_anonymous' => 0,
+            'status' => 'completed',
+            'created_at' => now(),
+        ]);
+
+        $rows = VolunteerDonationService::exportDonations($this->testTenantId, null);
+
+        $this->assertNotEmpty($rows);
+        $row = $rows[0];
+        $this->assertSame('tenant_connect', $row['payment_route']);
+        $this->assertSame('acct_test_123456', $row['stripe_account_id']);
+        $this->assertSame('pi_test_123456', $row['stripe_payment_intent_id']);
     }
 
     public function test_createGivingDay_throws_for_empty_title(): void

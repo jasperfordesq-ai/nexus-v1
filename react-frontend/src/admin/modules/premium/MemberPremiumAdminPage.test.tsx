@@ -140,6 +140,34 @@ describe('MemberPremiumAdminPage', () => {
     });
   });
 
+  it('warns when Connect is configured but payments are falling back to the platform account', async () => {
+    mockMemberPremiumApi.getSettings.mockResolvedValueOnce({
+      data: {
+        settings: {
+          stripe_connect_account_id: 'acct_test_123456',
+          payment_route: 'platform_default',
+          fallback_reason: 'stripe_connect_not_ready',
+          account_status: {
+            state: 'restricted',
+            charges_enabled: false,
+            payouts_enabled: false,
+            details_submitted: false,
+            requirements_due: ['external_account'],
+            disabled_reason: 'requirements.past_due',
+            error: null,
+          },
+        },
+      },
+    });
+    mockMemberPremiumApi.listTiers.mockResolvedValueOnce({ data: { tiers: [TIER_A] } });
+    render(<MemberPremiumAdminPage />);
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/platform fallback/i).length).toBeGreaterThan(0);
+      expect(screen.getByText(/not ready for live donations/i)).toBeInTheDocument();
+    });
+  });
+
   it('shows empty state when no tiers exist', async () => {
     mockMemberPremiumApi.listTiers.mockResolvedValue({ data: { tiers: [] } });
     render(<MemberPremiumAdminPage />);

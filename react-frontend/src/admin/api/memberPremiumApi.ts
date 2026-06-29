@@ -19,6 +19,7 @@ export interface MemberPremiumTier {
   yearly_price_cents: number;
   stripe_price_id_monthly: string | null;
   stripe_price_id_yearly: string | null;
+  stripe_price_account_id?: string | null;
   features: string[];
   sort_order: number;
   is_active: boolean;
@@ -62,7 +63,10 @@ export interface TierUpsertPayload {
 
 export interface DonationSupportSettings {
   stripe_connect_account_id: string;
+  active_stripe_account_id?: string;
   payment_route: 'platform_default' | 'tenant_connect';
+  configured_payment_route?: 'platform_default' | 'tenant_connect';
+  fallback_reason?: string | null;
   account_status?: DonationSupportAccountStatus;
 }
 

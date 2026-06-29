@@ -3869,7 +3869,8 @@
         "ready": "Ready",
         "restricted": "Action needed",
         "unknown": "Status unknown"
-      }
+      },
+      "connect_fallback_active": "A Stripe Connect account is configured, but it is not ready for live donations yet. Payments will use the platform fallback until onboarding is complete."
     }
   },
   "federation_aggregates": {

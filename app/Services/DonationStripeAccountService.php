@@ -69,17 +69,39 @@ class DonationStripeAccountService
     }
 
     /**
-     * @return array{stripe_connect_account_id:string,payment_route:string,account_status:array<string,mixed>}
+     * @return array{stripe_connect_account_id:string,active_stripe_account_id:string,payment_route:string,configured_payment_route:string,account_status:array<string,mixed>,fallback_reason:?string}
      */
     public static function settingsPayloadForTenant(int $tenantId): array
     {
         $accountId = self::accountIdForTenant($tenantId);
+        $accountStatus = $accountId ? self::accountStatusForTenant($tenantId) : self::notConnectedStatus();
+        $activeAccountId = self::accountIdForTenantReadyForCharges($tenantId, $accountStatus);
 
         return [
             'stripe_connect_account_id' => $accountId ?? '',
-            'payment_route' => self::routeForAccountId($accountId),
-            'account_status' => self::accountStatusForTenant($tenantId),
+            'active_stripe_account_id' => $activeAccountId ?? '',
+            'payment_route' => self::routeForAccountId($activeAccountId),
+            'configured_payment_route' => self::routeForAccountId($accountId),
+            'account_status' => $accountStatus,
+            'fallback_reason' => $accountId && !$activeAccountId ? 'stripe_connect_not_ready' : null,
         ];
+    }
+
+    public static function accountIdForTenantReadyForCharges(int $tenantId, ?array $knownStatus = null): ?string
+    {
+        $accountId = self::accountIdForTenant($tenantId);
+        if (!$accountId) {
+            return null;
+        }
+
+        $status = $knownStatus ?? self::accountStatusForTenant($tenantId);
+
+        return ($status['state'] ?? null) === 'ready' ? $accountId : null;
+    }
+
+    public static function chargeRouteForTenant(int $tenantId): string
+    {
+        return self::routeForAccountId(self::accountIdForTenantReadyForCharges($tenantId));
     }
 
     /**
@@ -149,10 +171,13 @@ class DonationStripeAccountService
             throw new \RuntimeException('Failed to create Stripe onboarding link: ' . $e->getMessage(), 0, $e);
         }
 
+        $accountStatus = $account ? self::statusFromAccountObject($account) : self::accountStatusForTenant($tenantId);
+        $activeAccountId = self::accountIdForTenantReadyForCharges($tenantId, $accountStatus);
+
         return [
             'stripe_connect_account_id' => $accountId,
-            'payment_route' => self::ROUTE_TENANT_CONNECT,
-            'account_status' => $account ? self::statusFromAccountObject($account) : self::accountStatusForTenant($tenantId),
+            'payment_route' => self::routeForAccountId($activeAccountId),
+            'account_status' => $accountStatus,
             'onboarding_url' => (string) $accountLink->url,
         ];
     }

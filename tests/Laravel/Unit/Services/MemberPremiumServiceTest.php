@@ -63,6 +63,34 @@ class MemberPremiumServiceTest extends TestCase
         $this->assertStringContainsString('DonationStripeAccountService::normalizeAccountId($meta->nexus_stripe_account_id ?? null)', $source);
     }
 
+    public function test_recurring_support_prices_are_account_scoped_and_checkout_self_heals_route_changes(): void
+    {
+        $source = file_get_contents(app_path('Services/MemberPremiumService.php'));
+
+        $this->assertStringContainsString('DonationStripeAccountService::accountIdForTenantReadyForCharges($tenantId)', $source);
+        $this->assertStringContainsString('$priceAccountId = $tenantStripeAccountId ?: \'platform_default\'', $source);
+        $this->assertStringContainsString('stripe_price_account_id = ?', $source);
+        $this->assertStringContainsString('self::syncTierToStripe($tenantId, $tierId)', $source);
+    }
+
+    public function test_eventBelongsHere_recognises_invoice_subscription_details_metadata(): void
+    {
+        $event = (object) [
+            'data' => (object) [
+                'object' => (object) [
+                    'metadata' => (object) [],
+                    'subscription_details' => (object) [
+                        'metadata' => (object) [
+                            'nexus_kind' => 'member_premium',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertTrue(MemberPremiumService::eventBelongsHere($event));
+    }
+
     private function tenantUrl(string $path): string
     {
         $base = rtrim(TenantContext::getFrontendUrl(), '/');

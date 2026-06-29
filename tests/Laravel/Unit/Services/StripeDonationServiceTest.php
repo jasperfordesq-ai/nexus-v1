@@ -231,7 +231,7 @@ class StripeDonationServiceTest extends TestCase
     {
         $source = file_get_contents(app_path('Services/StripeDonationService.php'));
 
-        $this->assertStringContainsString('DonationStripeAccountService::accountIdForTenant($tenantId)', $source);
+        $this->assertStringContainsString('DonationStripeAccountService::accountIdForTenantReadyForCharges($tenantId)', $source);
         $this->assertStringContainsString("'stripe_account' => \$tenantStripeAccountId", $source);
         $this->assertStringContainsString("'nexus_payment_route' => \$paymentRoute", $source);
     }

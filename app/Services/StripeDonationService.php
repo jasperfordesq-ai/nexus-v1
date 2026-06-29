@@ -63,7 +63,7 @@ class StripeDonationService
         }
 
         $client = StripeService::client();
-        $tenantStripeAccountId = DonationStripeAccountService::accountIdForTenant($tenantId);
+        $tenantStripeAccountId = DonationStripeAccountService::accountIdForTenantReadyForCharges($tenantId);
         $paymentRoute = DonationStripeAccountService::routeForAccountId($tenantStripeAccountId);
 
         // Platform fallback can reuse the platform customer. Direct Connect
