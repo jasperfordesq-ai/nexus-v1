@@ -189,6 +189,62 @@ describe('DonationCheckout', () => {
     );
   });
 
+  it('sends the selected fund and Gift Aid declaration to the payment intent API', async () => {
+    vi.mocked(api.post).mockResolvedValueOnce({
+      success: true,
+      data: { client_secret: 'pi_test_secret', donation_id: 99 },
+    });
+    const user = userEvent.setup();
+    render(<DonationCheckout {...defaultProps} />);
+
+    await user.type(screen.getByRole('spinbutton'), '25');
+
+    const currencyTrigger = screen.getAllByRole('button').find((button) =>
+      button.getAttribute('data-slot') === 'select-trigger' && button.textContent?.includes('EUR'),
+    );
+    expect(currencyTrigger).toBeDefined();
+    await user.click(currencyTrigger!);
+    const gbpOption = await waitFor(
+      () => {
+        const option = Array.from(document.body.querySelectorAll('[role="option"]')).find((node) =>
+          node.textContent?.includes('GBP'),
+        );
+        if (!option) throw new Error('GBP option not found');
+        return option;
+      },
+      { timeout: 3000 },
+    );
+    await user.click(gbpOption as HTMLElement);
+
+    await user.click(screen.getByRole('switch', { name: /gift aid/i }));
+    await user.type(screen.getByLabelText(/full name on declaration/i), 'Ada Lovelace');
+    await user.type(screen.getByLabelText(/address line 1/i), '1 Example Street');
+    await user.type(screen.getByLabelText(/town or city/i), 'London');
+    await user.type(screen.getByLabelText(/postcode/i), 'SW1A 1AA');
+
+    await user.click(screen.getByRole('button', { name: /continue/i }));
+
+    await waitFor(() =>
+      expect(api.post).toHaveBeenCalledWith(
+        '/v2/donations/payment-intent',
+        expect.objectContaining({
+          amount: 25,
+          currency: 'GBP',
+          fund_code: 'general',
+          gift_aid_enabled: true,
+          gift_aid: {
+            declaration_name: 'Ada Lovelace',
+            address_line1: '1 Example Street',
+            address_line2: null,
+            town: 'London',
+            postcode: 'SW1A 1AA',
+            country: 'GB',
+          },
+        }),
+      ),
+    );
+  });
+
   it('shows error toast when payment intent creation fails', async () => {
     vi.mocked(api.post).mockResolvedValueOnce({
       success: false,
@@ -340,7 +396,7 @@ describe('DonationCheckout', () => {
 
   it('anonymous toggle is present on form step', () => {
     render(<DonationCheckout {...defaultProps} />);
-    const toggle = screen.getByRole('switch');
+    const toggle = screen.getByRole('switch', { name: /donate anonymously/i });
     expect(toggle).toBeInTheDocument();
   });
 
@@ -358,7 +414,7 @@ describe('DonationCheckout', () => {
     await user.type(amountInput, '10');
 
     // Toggle anonymous
-    const toggle = screen.getByRole('switch');
+    const toggle = screen.getByRole('switch', { name: /donate anonymously/i });
     await user.click(toggle);
 
     await waitFor(() => {

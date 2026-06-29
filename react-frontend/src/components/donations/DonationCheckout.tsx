@@ -1,13 +1,14 @@
-import { Select, SelectItem, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Select, SelectItem, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
+
 /**
  * DonationCheckout - Multi-step modal for making a Stripe donation
  *
- * Step 1: Form (amount, currency, message, anonymous toggle)
+ * Step 1: Form (amount, currency, fund, Gift Aid, message, anonymous toggle)
  * Step 2: Stripe payment via StripePaymentForm
  * Step 3: Success confirmation with receipt link
  */
@@ -45,10 +46,25 @@ interface PaymentIntentResponse {
   donation_id: number;
 }
 
+interface GiftAidDeclaration {
+  declarationName: string;
+  addressLine1: string;
+  addressLine2: string;
+  town: string;
+  postcode: string;
+}
+
 const CURRENCIES = [
   { key: 'EUR', labelKey: 'donations.currencies.EUR' },
   { key: 'GBP', labelKey: 'donations.currencies.GBP' },
   { key: 'USD', labelKey: 'donations.currencies.USD' },
+];
+
+const DONATION_FUNDS = [
+  { key: 'general', labelKey: 'donations.fund_options.general' },
+  { key: 'community', labelKey: 'donations.fund_options.community' },
+  { key: 'hardship', labelKey: 'donations.fund_options.hardship' },
+  { key: 'accessibility', labelKey: 'donations.fund_options.accessibility' },
 ];
 
 /* ───────────────────────── Component ───────────────────────── */
@@ -66,8 +82,17 @@ export function DonationCheckout({
   // Form state
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('EUR');
+  const [fundCode, setFundCode] = useState('general');
   const [message, setMessage] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [giftAidEnabled, setGiftAidEnabled] = useState(false);
+  const [giftAid, setGiftAid] = useState<GiftAidDeclaration>({
+    declarationName: '',
+    addressLine1: '',
+    addressLine2: '',
+    town: '',
+    postcode: '',
+  });
 
   // Checkout flow state
   const [step, setStep] = useState<CheckoutStep>('form');
@@ -78,8 +103,17 @@ export function DonationCheckout({
   const resetForm = () => {
     setAmount('');
     setCurrency('EUR');
+    setFundCode('general');
     setMessage('');
     setIsAnonymous(false);
+    setGiftAidEnabled(false);
+    setGiftAid({
+      declarationName: '',
+      addressLine1: '',
+      addressLine2: '',
+      town: '',
+      postcode: '',
+    });
     setStep('form');
     setClientSecret('');
     setDonationId(null);
@@ -98,16 +132,44 @@ export function DonationCheckout({
       return;
     }
 
+    const canUseGiftAid = giftAidEnabled && currency === 'GBP';
+    if (giftAidEnabled && !canUseGiftAid) {
+      toast.error(t('donations.gift_aid_gbp_required'));
+      return;
+    }
+
+    if (
+      canUseGiftAid &&
+      (!giftAid.declarationName.trim() ||
+        !giftAid.addressLine1.trim() ||
+        !giftAid.postcode.trim())
+    ) {
+      toast.error(t('donations.gift_aid_required'));
+      return;
+    }
+
     try {
       setIsCreatingIntent(true);
 
       const response = await api.post<PaymentIntentResponse>('/v2/donations/payment-intent', {
         amount: numAmount,
         currency,
+        fund_code: fundCode,
         giving_day_id: givingDayId ?? null,
         opportunity_id: opportunityId ?? null,
         message: message || null,
         is_anonymous: isAnonymous,
+        gift_aid_enabled: canUseGiftAid,
+        gift_aid: canUseGiftAid
+          ? {
+              declaration_name: giftAid.declarationName.trim(),
+              address_line1: giftAid.addressLine1.trim(),
+              address_line2: giftAid.addressLine2.trim() || null,
+              town: giftAid.town.trim() || null,
+              postcode: giftAid.postcode.trim().toUpperCase(),
+              country: 'GB',
+            }
+          : null,
       });
 
       if (response.success && response.data) {
@@ -134,6 +196,13 @@ export function DonationCheckout({
   const handlePaymentError = (error: string) => {
     logError('Donation payment failed', error);
     toast.error(t('donations.payment_error'));
+  };
+
+  const updateGiftAid = (field: keyof GiftAidDeclaration) => (value: string) => {
+    setGiftAid((current) => ({
+      ...current,
+      [field]: value,
+    }));
   };
 
   const formattedAmount = amount
@@ -195,13 +264,93 @@ export function DonationCheckout({
                     selectedKeys={[currency]}
                     onSelectionChange={(keys) => {
                       const selected = Array.from(keys)[0] as string;
-                      if (selected) setCurrency(selected);
+                      if (selected) {
+                        setCurrency(selected);
+                        if (selected !== 'GBP') {
+                          setGiftAidEnabled(false);
+                        }
+                      }
                     }}
                   >
                     {CURRENCIES.map((c) => (
                       <SelectItem key={c.key} id={c.key}>{t(c.labelKey)}</SelectItem>
                     ))}
                   </Select>
+
+                  <Select
+                    label={t('donations.fund_label')}
+                    variant="bordered"
+                    selectedKeys={[fundCode]}
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+                      if (selected) setFundCode(selected);
+                    }}
+                  >
+                    {DONATION_FUNDS.map((fund) => (
+                      <SelectItem key={fund.key} id={fund.key}>{t(fund.labelKey)}</SelectItem>
+                    ))}
+                  </Select>
+
+                  <div className="rounded-lg border border-theme-default bg-surface-secondary/50 p-3">
+                    <Switch
+                      isSelected={giftAidEnabled}
+                      isDisabled={currency !== 'GBP'}
+                      onValueChange={setGiftAidEnabled}
+                      size="sm"
+                      classNames={{
+                        base: 'flex w-full max-w-none flex-row-reverse justify-between',
+                        label: 'text-sm font-medium text-theme-secondary',
+                      }}
+                    >
+                      {t('donations.gift_aid_toggle')}
+                    </Switch>
+                    <p className="mt-2 text-xs text-theme-muted">
+                      {currency === 'GBP'
+                        ? t('donations.gift_aid_description')
+                        : t('donations.gift_aid_gbp_hint')}
+                    </p>
+
+                    {giftAidEnabled && currency === 'GBP' && (
+                      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <Input
+                          label={t('donations.gift_aid_name_label')}
+                          variant="bordered"
+                          value={giftAid.declarationName}
+                          onValueChange={updateGiftAid('declarationName')}
+                          isRequired
+                          className="sm:col-span-2"
+                        />
+                        <Input
+                          label={t('donations.gift_aid_address1_label')}
+                          variant="bordered"
+                          value={giftAid.addressLine1}
+                          onValueChange={updateGiftAid('addressLine1')}
+                          isRequired
+                          className="sm:col-span-2"
+                        />
+                        <Input
+                          label={t('donations.gift_aid_address2_label')}
+                          variant="bordered"
+                          value={giftAid.addressLine2}
+                          onValueChange={updateGiftAid('addressLine2')}
+                          className="sm:col-span-2"
+                        />
+                        <Input
+                          label={t('donations.gift_aid_town_label')}
+                          variant="bordered"
+                          value={giftAid.town}
+                          onValueChange={updateGiftAid('town')}
+                        />
+                        <Input
+                          label={t('donations.gift_aid_postcode_label')}
+                          variant="bordered"
+                          value={giftAid.postcode}
+                          onValueChange={updateGiftAid('postcode')}
+                          isRequired
+                        />
+                      </div>
+                    )}
+                  </div>
 
                   <Textarea
                     label={t('donations.message_label')}
