@@ -56,6 +56,7 @@ class NextPublicFrontendReadinessService
                 'public_routes' => $publicRoutes,
                 'vite_private_prefixes' => $privatePrefixes,
                 'vite_private_patterns' => $privatePatterns,
+                'route_readiness' => $this->routeReadiness($publicRoutes, $apiBackedRoutes),
             ],
             'content_sources' => [
                 'manifest_exists' => is_array($contentSources),
@@ -183,6 +184,42 @@ class NextPublicFrontendReadinessService
 
         return File::isFile($composePath)
             && str_contains((string) File::get($composePath), $profile);
+    }
+
+    /**
+     * @param array<int, mixed> $publicRoutes
+     * @param array<int, array{routeKey: string, endpoint: string, method: string}> $apiBackedRoutes
+     * @return array<int, array{pattern: string, routeKey: string, content_source: string, status: string, blockers: array<int, string>}>
+     */
+    private function routeReadiness(array $publicRoutes, array $apiBackedRoutes): array
+    {
+        $apiBackedRouteKeys = array_flip(array_column($apiBackedRoutes, 'routeKey'));
+        $readiness = [];
+
+        foreach ($publicRoutes as $route) {
+            if (!is_array($route)) {
+                continue;
+            }
+
+            $pattern = isset($route['pattern']) ? (string) $route['pattern'] : '';
+            $routeKey = isset($route['routeKey']) ? (string) $route['routeKey'] : '';
+
+            if ($pattern === '' || $routeKey === '') {
+                continue;
+            }
+
+            $readiness[] = [
+                'pattern' => $pattern,
+                'routeKey' => $routeKey,
+                'content_source' => isset($apiBackedRouteKeys[$routeKey])
+                    ? 'laravel_public_api'
+                    : 'static_or_tenant_bootstrap',
+                'status' => 'blocker',
+                'blockers' => ['parity_test_required'],
+            ];
+        }
+
+        return $readiness;
     }
 
     /**

@@ -1787,6 +1787,14 @@ export interface NextPublicApiBackedRoute {
   method: string;
 }
 
+export interface NextPublicRouteReadiness {
+  pattern: string;
+  routeKey: string;
+  content_source: string;
+  status: 'pass' | 'blocker' | 'info' | string;
+  blockers: string[];
+}
+
 export interface NextPublicFrontendReadiness {
   mode: string;
   app: {
@@ -1825,6 +1833,7 @@ export interface NextPublicFrontendReadiness {
     public_routes: NextPublicRouteOwnership[];
     vite_private_prefixes: string[];
     vite_private_patterns: string[];
+    route_readiness: NextPublicRouteReadiness[];
   };
   content_sources: {
     manifest_exists: boolean;

@@ -138,6 +138,8 @@ export default function NextPublicFrontendReadiness() {
 
           <ManifestValidationCard readiness={readiness} />
 
+          <RouteCutoverGatesCard readiness={readiness} />
+
           <div className="grid gap-4 lg:grid-cols-2">
             <Card>
               <CardHeader className="flex items-center gap-2">
@@ -202,6 +204,45 @@ export default function NextPublicFrontendReadiness() {
         </div>
       )}
     </div>
+  );
+}
+
+function RouteCutoverGatesCard({ readiness }: { readiness: Readiness }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.next_public' });
+
+  return (
+    <Card>
+      <CardHeader>
+        <h2 className="text-lg font-semibold">{t('route_gates.title')}</h2>
+      </CardHeader>
+      <CardBody>
+        <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+          {readiness.manifest.route_readiness.map((route) => (
+            <div key={route.routeKey} className="rounded-md border border-divider px-3 py-2 text-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-medium">{route.routeKey}</div>
+                  <code className="mt-1 block break-all text-xs text-muted">{route.pattern}</code>
+                  <code className="mt-1 block break-all text-xs">{route.content_source}</code>
+                </div>
+                <Chip size="sm" color={statusColor(route.status)} variant="soft">
+                  {t(`statuses.${route.status}`)}
+                </Chip>
+              </div>
+              {route.blockers.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {route.blockers.map((blocker) => (
+                    <Chip key={blocker} size="sm" color="warning" variant="soft">
+                      {t(`route_gate_blockers.${blocker}`)}
+                    </Chip>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </CardBody>
+    </Card>
   );
 }
 

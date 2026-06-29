@@ -2895,6 +2895,12 @@
       "safety": {
         "title": "Safety checks"
       },
+      "route_gates": {
+        "title": "Route cutover gates"
+      },
+      "route_gate_blockers": {
+        "parity_test_required": "Parity test required"
+      },
       "safety_checks": {
         "route_cutover_disabled": "Public route cutover remains disabled",
         "prerender_retained": "Current prerender fallback remains retained",

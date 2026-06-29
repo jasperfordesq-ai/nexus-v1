@@ -68,6 +68,12 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $payload = $response->json('data');
         $publicPatterns = array_column($payload['manifest']['public_routes'], 'pattern');
         $apiBackedRouteKeys = array_column($payload['content_sources']['api_backed_routes'], 'routeKey');
+        $routeReadiness = $payload['manifest']['route_readiness'];
+        $routeReadinessByKey = [];
+
+        foreach ($routeReadiness as $route) {
+            $routeReadinessByKey[$route['routeKey']] = $route;
+        }
 
         $this->assertContains('/about', $publicPatterns);
         $this->assertContains('/blog/:slug', $publicPatterns);
@@ -84,5 +90,9 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('route_cutover_disabled', array_column($payload['safety_checks'], 'key'));
         $this->assertContains('npm --prefix next-public-frontend run check', $payload['shadow_runtime']['verification_commands']);
         $this->assertContains('npm --prefix react-frontend run build', $payload['shadow_runtime']['verification_commands']);
+        $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['about']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['listingDetail']['content_source']);
+        $this->assertSame('blocker', $routeReadinessByKey['listingDetail']['status']);
+        $this->assertContains('parity_test_required', $routeReadinessByKey['listingDetail']['blockers']);
     }
 }

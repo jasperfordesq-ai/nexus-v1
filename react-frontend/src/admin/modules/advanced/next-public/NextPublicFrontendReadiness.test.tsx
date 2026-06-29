@@ -55,6 +55,22 @@ const readiness = {
     ],
     vite_private_prefixes: ['admin', 'dashboard', 'messages'],
     vite_private_patterns: ['/events/new', '/events/:id/edit'],
+    route_readiness: [
+      {
+        pattern: '/about',
+        routeKey: 'about',
+        content_source: 'static_or_tenant_bootstrap',
+        status: 'blocker',
+        blockers: ['parity_test_required'],
+      },
+      {
+        pattern: '/listings/:id',
+        routeKey: 'listingDetail',
+        content_source: 'laravel_public_api',
+        status: 'blocker',
+        blockers: ['parity_test_required'],
+      },
+    ],
   },
   content_sources: {
     manifest_exists: true,
@@ -115,15 +131,21 @@ describe('NextPublicFrontendReadiness', () => {
 
     expect(screen.getByText('Public traffic is not served by Next.js')).toBeInTheDocument();
     expect(screen.getByText('Prerender fallback retained')).toBeInTheDocument();
-    expect(screen.getByText('/about')).toBeInTheDocument();
+    expect(screen.getAllByText('/about')).not.toHaveLength(0);
     expect(screen.getByText('/blog/:slug')).toBeInTheDocument();
     expect(screen.getByText('dashboard')).toBeInTheDocument();
-    expect(screen.getByText('laravel_public_api')).toBeInTheDocument();
+    expect(screen.getAllByText('laravel_public_api')).not.toHaveLength(0);
     expect(screen.getByText('GET /v2/listings/{id}')).toBeInTheDocument();
     expect(screen.getByText('npm run build:next-public')).toBeInTheDocument();
     expect(screen.getByText('npm --prefix next-public-frontend run check')).toBeInTheDocument();
     expect(screen.getByText('npm --prefix react-frontend run build')).toBeInTheDocument();
     expect(screen.getByText('Manifest validation passed')).toBeInTheDocument();
+    expect(screen.getByText('Route cutover gates')).toBeInTheDocument();
+    expect(screen.getByText('about')).toBeInTheDocument();
+    expect(screen.getByText('static_or_tenant_bootstrap')).toBeInTheDocument();
+    expect(screen.getByText('listingDetail')).toBeInTheDocument();
+    expect(screen.getAllByText('laravel_public_api')).not.toHaveLength(0);
+    expect(screen.getAllByText('Parity test required')).not.toHaveLength(0);
     expect(screen.getByText('3 public routes')).toBeInTheDocument();
     expect(screen.getByText('3 private prefixes')).toBeInTheDocument();
   });
