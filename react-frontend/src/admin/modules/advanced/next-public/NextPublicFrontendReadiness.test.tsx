@@ -127,6 +127,16 @@ const readiness = {
         'apache_configtest_required',
       ],
     },
+    route_audit: {
+      status: 'pass',
+      template_path: 'scripts/deploy/apache/next-public-foundation-canary.conf.example',
+      exact_path_count: 26,
+      public_only: true,
+      template_paths: ['/', '/about', '/privacy/versions', '/platform/disclaimer'],
+      private_collisions: [],
+      unmatched_template_paths: [],
+      unsupported_rules: [],
+    },
     guardrails: [
       'do_not_edit_plesk_vhosts_directly',
       'do_not_remove_prerender',
@@ -291,6 +301,11 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getAllByText('scripts/deploy/apache/next-public-foundation-canary.conf.example')).not.toHaveLength(0);
     expect(screen.getByText('Example only')).toBeInTheDocument();
     expect(screen.getByText('Not included by deploy')).toBeInTheDocument();
+    expect(screen.getByText('Template route audit')).toBeInTheDocument();
+    expect(screen.getByText('26 exact paths')).toBeInTheDocument();
+    expect(screen.getByText('Public routes only')).toBeInTheDocument();
+    expect(screen.getByText('No private-route collisions')).toBeInTheDocument();
+    expect(screen.getByText('/platform/disclaimer')).toBeInTheDocument();
     expect(screen.getByText('Cutover artifact inventory')).toBeInTheDocument();
     expect(screen.getAllByText('Route ownership manifest')).not.toHaveLength(0);
     expect(screen.getByText('Edge canary template')).toBeInTheDocument();

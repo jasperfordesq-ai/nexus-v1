@@ -82,6 +82,11 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.edge_canary.config_template.exists', true);
         $response->assertJsonPath('data.edge_canary.config_template.example_only', true);
         $response->assertJsonPath('data.edge_canary.config_template.included_by_deploy', false);
+        $response->assertJsonPath('data.edge_canary.route_audit.status', 'pass');
+        $response->assertJsonPath('data.edge_canary.route_audit.exact_path_count', 26);
+        $response->assertJsonPath('data.edge_canary.route_audit.public_only', true);
+        $response->assertJsonPath('data.edge_canary.route_audit.private_collisions', []);
+        $response->assertJsonPath('data.edge_canary.route_audit.unmatched_template_paths', []);
         $response->assertJsonPath('data.cutover_artifacts.production_effect', 'none');
         $response->assertJsonPath('data.cutover_artifacts.activation_available', false);
 
@@ -200,6 +205,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('do_not_edit_plesk_vhosts_directly', $payload['edge_canary']['guardrails']);
         $this->assertContains('do_not_remove_prerender', $payload['edge_canary']['guardrails']);
         $this->assertContains('apache_configtest_required', $payload['edge_canary']['config_template']['required_review_steps']);
+        $this->assertContains('/platform/disclaimer', $payload['edge_canary']['route_audit']['template_paths']);
         $this->assertSame(
             'scripts/deploy/apache/next-public-foundation-canary.conf.example',
             $cutoverArtifactsByKey['apache_canary_template']['path'],

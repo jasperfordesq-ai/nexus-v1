@@ -260,7 +260,7 @@ class NextPublicFrontendReadinessService
                 'api_backed_routes' => $apiBackedRoutes,
             ],
             'tenant_resolution' => $this->tenantResolutionContract(),
-            'edge_canary' => $this->edgeCanaryPreview($cutoverEnabled),
+            'edge_canary' => $this->edgeCanaryPreview($cutoverEnabled, $publicRoutes, $privatePrefixes, $privatePatterns),
             'route_batches' => $this->routeBatches($publicRoutes, $privatePrefixes, $privatePatterns, $apiBackedRoutes),
             'cutover_artifacts' => $this->cutoverArtifactInventory(),
             'production_routing' => [
@@ -343,9 +343,17 @@ class NextPublicFrontendReadinessService
     }
 
     /**
-     * @return array{status: string, edge: string, routing_flag: string, routing_flag_enabled: bool, activation_available: bool, preview_only: bool, requires_explicit_cutover_instruction: bool, reviewed_config_required: bool, route_file_status: string, config_template: array{path: string, exists: bool, example_only: bool, included_by_deploy: bool, required_review_steps: array<int, string>}, guardrails: array<int, string>}
+     * @param array<int, mixed> $publicRoutes
+     * @param array<int, mixed> $privatePrefixes
+     * @param array<int, mixed> $privatePatterns
+     * @return array{status: string, edge: string, routing_flag: string, routing_flag_enabled: bool, activation_available: bool, preview_only: bool, requires_explicit_cutover_instruction: bool, reviewed_config_required: bool, route_file_status: string, config_template: array{path: string, exists: bool, example_only: bool, included_by_deploy: bool, required_review_steps: array<int, string>}, route_audit: array{status: string, template_path: string, template_exists: bool, exact_path_count: int, public_only: bool, template_paths: array<int, string>, private_collisions: array<int, string>, unmatched_template_paths: array<int, string>, unsupported_rules: array<int, string>}, guardrails: array<int, string>}
      */
-    private function edgeCanaryPreview(bool $cutoverEnabled): array
+    private function edgeCanaryPreview(
+        bool $cutoverEnabled,
+        array $publicRoutes,
+        array $privatePrefixes,
+        array $privatePatterns,
+    ): array
     {
         $templatePath = 'scripts/deploy/apache/next-public-foundation-canary.conf.example';
 
@@ -378,6 +386,7 @@ class NextPublicFrontendReadinessService
                     'prerender_fallback_must_remain',
                 ],
             ],
+            'route_audit' => $this->apacheCanaryRouteAudit($templatePath, $publicRoutes, $privatePrefixes, $privatePatterns),
             'guardrails' => [
                 'do_not_edit_plesk_vhosts_directly',
                 'do_not_enable_routing_flag_without_cutover_instruction',
@@ -385,6 +394,185 @@ class NextPublicFrontendReadinessService
                 'do_not_remove_prerender',
             ],
         ];
+    }
+
+    /**
+     * @param array<int, mixed> $publicRoutes
+     * @param array<int, mixed> $privatePrefixes
+     * @param array<int, mixed> $privatePatterns
+     * @return array{status: string, template_path: string, template_exists: bool, exact_path_count: int, public_only: bool, template_paths: array<int, string>, private_collisions: array<int, string>, unmatched_template_paths: array<int, string>, unsupported_rules: array<int, string>}
+     */
+    private function apacheCanaryRouteAudit(
+        string $templatePath,
+        array $publicRoutes,
+        array $privatePrefixes,
+        array $privatePatterns,
+    ): array {
+        [$templatePaths, $unsupportedRules] = $this->apacheCanaryTemplatePaths($templatePath);
+        $publicPatterns = [];
+
+        foreach ($publicRoutes as $route) {
+            if (is_array($route) && is_string($route['pattern'] ?? null)) {
+                $publicPatterns[(string) $route['pattern']] = true;
+            }
+        }
+
+        $unmatchedTemplatePaths = [];
+        $privateCollisions = [];
+
+        foreach ($templatePaths as $path) {
+            if (!isset($publicPatterns[$path])) {
+                $unmatchedTemplatePaths[] = $path;
+            }
+
+            if ($this->pathCollidesWithPrivateOwnership($path, $privatePrefixes, $privatePatterns)) {
+                $privateCollisions[] = $path;
+            }
+        }
+
+        $templateExists = File::isFile(base_path($templatePath));
+        $publicOnly = $templateExists
+            && $unmatchedTemplatePaths === []
+            && $privateCollisions === []
+            && $unsupportedRules === [];
+
+        return [
+            'status' => $publicOnly ? 'pass' : 'blocker',
+            'template_path' => $templatePath,
+            'template_exists' => $templateExists,
+            'exact_path_count' => count($templatePaths),
+            'public_only' => $publicOnly,
+            'template_paths' => $templatePaths,
+            'private_collisions' => $privateCollisions,
+            'unmatched_template_paths' => $unmatchedTemplatePaths,
+            'unsupported_rules' => $unsupportedRules,
+        ];
+    }
+
+    /**
+     * @return array{0: array<int, string>, 1: array<int, string>}
+     */
+    private function apacheCanaryTemplatePaths(string $templatePath): array
+    {
+        $fullPath = base_path($templatePath);
+
+        if (!File::isFile($fullPath)) {
+            return [[], ['template_missing']];
+        }
+
+        $paths = [];
+        $unsupportedRules = [];
+        $lines = preg_split('/\R/', (string) File::get($fullPath)) ?: [];
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            if ($line === '' || str_starts_with($line, '#') || !str_starts_with($line, 'RewriteRule ')) {
+                continue;
+            }
+
+            $parts = preg_split('/\s+/', $line);
+            $sourcePattern = is_array($parts) ? (string) ($parts[1] ?? '') : '';
+            $expandedPaths = $this->expandApacheRewriteSourcePattern($sourcePattern);
+
+            if ($expandedPaths === []) {
+                $unsupportedRules[] = $sourcePattern;
+                continue;
+            }
+
+            foreach ($expandedPaths as $path) {
+                $paths[] = $path;
+            }
+        }
+
+        return [array_values(array_unique($paths)), $unsupportedRules];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function expandApacheRewriteSourcePattern(string $sourcePattern): array
+    {
+        $body = $sourcePattern;
+
+        if (!str_starts_with($body, '^') || !str_ends_with($body, '$')) {
+            return [];
+        }
+
+        $body = substr($body, 1, -1);
+
+        if (str_ends_with($body, '/?')) {
+            $body = substr($body, 0, -2);
+        }
+
+        if ($body === '/') {
+            return ['/'];
+        }
+
+        if (!preg_match('/^\([^()]+\)$/', $body) && !preg_match('/\([^()]+\)/', $body)) {
+            return str_contains($body, '(') || str_contains($body, ')') ? [] : [$body];
+        }
+
+        if (!preg_match('/^(?<prefix>.*)\((?<options>[^()]+)\)(?<suffix>.*)$/', $body, $matches)) {
+            return [];
+        }
+
+        $paths = [];
+        $prefix = (string) $matches['prefix'];
+        $suffix = (string) $matches['suffix'];
+
+        foreach (explode('|', (string) $matches['options']) as $option) {
+            if ($option === '' || preg_match('/[^A-Za-z0-9_-]/', $option)) {
+                return [];
+            }
+
+            $paths[] = $prefix . $option . $suffix;
+        }
+
+        return $paths;
+    }
+
+    /**
+     * @param array<int, mixed> $privatePrefixes
+     * @param array<int, mixed> $privatePatterns
+     */
+    private function pathCollidesWithPrivateOwnership(string $path, array $privatePrefixes, array $privatePatterns): bool
+    {
+        $firstSegment = explode('/', trim($path, '/'))[0] ?? '';
+        $privatePrefixSet = array_flip(array_filter($privatePrefixes, 'is_string'));
+
+        if ($firstSegment !== '' && isset($privatePrefixSet[$firstSegment])) {
+            return true;
+        }
+
+        foreach ($privatePatterns as $privatePattern) {
+            if (!is_string($privatePattern)) {
+                continue;
+            }
+
+            $regex = $this->routePatternRegex($privatePattern);
+
+            if (preg_match($regex, $path) === 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function routePatternRegex(string $pattern): string
+    {
+        if ($pattern === '/') {
+            return '#^/$#';
+        }
+
+        $segments = array_filter(explode('/', trim($pattern, '/')), static fn (string $segment): bool => $segment !== '');
+        $regexSegments = array_map(
+            static fn (string $segment): string => str_starts_with($segment, ':') ? '[^/]+' : preg_quote($segment, '#'),
+            $segments,
+        );
+
+        return '#^/' . implode('/', $regexSegments) . '$#';
     }
 
     /**

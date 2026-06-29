@@ -1852,6 +1852,17 @@ export interface NextPublicEdgeCanary {
     included_by_deploy: boolean;
     required_review_steps: string[];
   };
+  route_audit: {
+    status: 'pass' | 'blocker' | string;
+    template_path: string;
+    template_exists: boolean;
+    exact_path_count: number;
+    public_only: boolean;
+    template_paths: string[];
+    private_collisions: string[];
+    unmatched_template_paths: string[];
+    unsupported_rules: string[];
+  };
   guardrails: string[];
 }
 

@@ -461,6 +461,49 @@ function EdgeCanaryCard({ readiness }: { readiness: Readiness }) {
           </div>
         </div>
 
+        <div className="mb-4 rounded-md border border-divider px-3 py-3 text-sm">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div className="font-medium">{t('edge_canary.route_audit_title')}</div>
+            <Chip size="sm" color={statusColor(edgeCanary.route_audit.status)} variant="soft">
+              {t(`statuses.${edgeCanary.route_audit.status}`)}
+            </Chip>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Chip size="sm" color="success" variant="soft">
+              {t('edge_canary.exact_path_count', { count: edgeCanary.route_audit.exact_path_count })}
+            </Chip>
+            <Chip size="sm" color={edgeCanary.route_audit.public_only ? 'success' : 'danger'} variant="soft">
+              {edgeCanary.route_audit.public_only ? t('edge_canary.public_only') : t('edge_canary.not_public_only')}
+            </Chip>
+            <Chip size="sm" color={edgeCanary.route_audit.private_collisions.length === 0 ? 'success' : 'danger'} variant="soft">
+              {edgeCanary.route_audit.private_collisions.length === 0 ? t('edge_canary.no_private_collisions') : t('edge_canary.private_collisions')}
+            </Chip>
+          </div>
+          {edgeCanary.route_audit.template_paths.length > 0 && (
+            <div className="mt-3 flex max-h-28 flex-wrap gap-1 overflow-auto">
+              {edgeCanary.route_audit.template_paths.map((path) => (
+                <Chip key={path} size="sm" variant="flat">
+                  {path}
+                </Chip>
+              ))}
+            </div>
+          )}
+          {(edgeCanary.route_audit.unmatched_template_paths.length > 0 || edgeCanary.route_audit.unsupported_rules.length > 0) && (
+            <div className="mt-3 flex flex-wrap gap-1">
+              {edgeCanary.route_audit.unmatched_template_paths.map((path) => (
+                <Chip key={`unmatched-${path}`} size="sm" color="danger" variant="soft">
+                  {t('edge_canary.unmatched_template_path', { path })}
+                </Chip>
+              ))}
+              {edgeCanary.route_audit.unsupported_rules.map((rule) => (
+                <Chip key={`unsupported-${rule}`} size="sm" color="danger" variant="soft">
+                  {t('edge_canary.unsupported_rule', { rule })}
+                </Chip>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div className="mb-4 flex flex-wrap gap-2">
           <Chip size="sm" color={edgeCanary.routing_flag_enabled ? 'danger' : 'success'} variant="soft">
             {edgeCanary.routing_flag_enabled ? t('edge_canary.routing_flag_on') : t('edge_canary.routing_flag_off')}

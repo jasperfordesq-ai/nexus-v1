@@ -145,6 +145,25 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertContains('explicit_cutover_instruction_required', $edgeCanary['config_template']['required_review_steps']);
     }
 
+    public function test_summary_audits_apache_canary_template_against_public_route_ownership(): void
+    {
+        $summary = (new NextPublicFrontendReadinessService())->summary();
+
+        $audit = $summary['edge_canary']['route_audit'];
+
+        $this->assertSame('pass', $audit['status']);
+        $this->assertSame('scripts/deploy/apache/next-public-foundation-canary.conf.example', $audit['template_path']);
+        $this->assertSame(26, $audit['exact_path_count']);
+        $this->assertTrue($audit['public_only']);
+        $this->assertSame([], $audit['private_collisions']);
+        $this->assertSame([], $audit['unmatched_template_paths']);
+        $this->assertSame([], $audit['unsupported_rules']);
+        $this->assertContains('/', $audit['template_paths']);
+        $this->assertContains('/about', $audit['template_paths']);
+        $this->assertContains('/privacy/versions', $audit['template_paths']);
+        $this->assertContains('/platform/disclaimer', $audit['template_paths']);
+    }
+
     public function test_summary_reports_route_batches_for_future_canary_planning(): void
     {
         $summary = (new NextPublicFrontendReadinessService())->summary();
