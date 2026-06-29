@@ -52,7 +52,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.shadow_runtime.compose_profile', 'next-public-shadow');
         $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
-        $response->assertJsonPath('data.manifest.route_counts.public_routes', 11);
+        $response->assertJsonPath('data.manifest.route_counts.public_routes', 24);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 17);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 12);
         $response->assertJsonPath('data.manifest.validation.status', 'pass');
@@ -63,6 +63,8 @@ class AdminNextPublicFrontendControllerTest extends TestCase
 
         $this->assertContains('/about', $publicPatterns);
         $this->assertContains('/blog/:slug', $publicPatterns);
+        $this->assertContains('/listings/:id', $publicPatterns);
+        $this->assertContains('/marketplace/:id', $publicPatterns);
         $this->assertContains('dashboard', $payload['manifest']['vite_private_prefixes']);
         $this->assertContains('/events/new', $payload['manifest']['vite_private_patterns']);
         $this->assertContains('route_cutover_disabled', array_column($payload['safety_checks'], 'key'));

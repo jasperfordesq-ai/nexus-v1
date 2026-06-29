@@ -28,6 +28,9 @@ const navigationItems = [
   { href: 'contact', labelKey: 'navigation.contact' },
   { href: 'faq', labelKey: 'navigation.faq' },
   { href: 'blog', labelKey: 'navigation.blog' },
+  { href: 'listings', labelKey: 'navigation.listings' },
+  { href: 'events', labelKey: 'navigation.events' },
+  { href: 'resources', labelKey: 'navigation.resources' },
 ];
 
 export function PublicPage({

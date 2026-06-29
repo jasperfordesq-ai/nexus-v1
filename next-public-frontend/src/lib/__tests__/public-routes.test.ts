@@ -33,6 +33,32 @@ describe('public route ownership', () => {
     });
   });
 
+  it('keeps second-batch public discovery routes in the Next shadow app', () => {
+    const publicRoutes = [
+      { segments: ['listings'], routeKey: 'listings' },
+      { segments: ['listings', '123'], routeKey: 'listingDetail', params: { id: '123' } },
+      { segments: ['events'], routeKey: 'events' },
+      { segments: ['events', 'summer-picnic'], routeKey: 'eventDetail', params: { id: 'summer-picnic' } },
+      { segments: ['jobs'], routeKey: 'jobs' },
+      { segments: ['jobs', '42'], routeKey: 'jobDetail', params: { id: '42' } },
+      { segments: ['organisations'], routeKey: 'organisations' },
+      { segments: ['organisations', 'local-hub'], routeKey: 'organisationDetail', params: { id: 'local-hub' } },
+      { segments: ['resources'], routeKey: 'resources' },
+      { segments: ['kb'], routeKey: 'kb' },
+      { segments: ['kb', 'getting-started'], routeKey: 'kbDetail', params: { id: 'getting-started' } },
+      { segments: ['marketplace'], routeKey: 'marketplace' },
+      { segments: ['marketplace', 'bike-repair'], routeKey: 'marketplaceDetail', params: { id: 'bike-repair' } },
+    ];
+
+    for (const route of publicRoutes) {
+      expect(getRouteOwnership(route.segments)).toMatchObject({
+        owner: 'next-public',
+        routeKey: route.routeKey,
+        ...(route.params ? { params: route.params } : {}),
+      });
+    }
+  });
+
   it('marks logged-in and mutation routes as Vite-owned', () => {
     for (const segment of [
       'admin',
@@ -49,5 +75,7 @@ describe('public route ownership', () => {
 
     expect(getRouteOwnership(['events', 'new'])).toMatchObject({ owner: 'vite-private' });
     expect(getRouteOwnership(['listings', '123', 'edit'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['jobs', 'new'])).toMatchObject({ owner: 'vite-private' });
+    expect(getRouteOwnership(['marketplace', 'bike-repair', 'edit'])).toMatchObject({ owner: 'vite-private' });
   });
 });

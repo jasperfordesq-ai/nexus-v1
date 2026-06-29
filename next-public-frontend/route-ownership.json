@@ -12,7 +12,20 @@
     { "pattern": "/accessibility", "routeKey": "accessibility", "labelKey": "pages.accessibility.title" },
     { "pattern": "/blog", "routeKey": "blog-index", "labelKey": "pages.blog.title" },
     { "pattern": "/blog/:slug", "routeKey": "blog-detail", "labelKey": "pages.blogDetail.title" },
-    { "pattern": "/page/:slug", "routeKey": "cms-page", "labelKey": "pages.cmsPage.title" }
+    { "pattern": "/page/:slug", "routeKey": "cms-page", "labelKey": "pages.cmsPage.title" },
+    { "pattern": "/listings", "routeKey": "listings", "labelKey": "pages.listings.title" },
+    { "pattern": "/listings/:id", "routeKey": "listingDetail", "labelKey": "pages.listingDetail.title" },
+    { "pattern": "/events", "routeKey": "events", "labelKey": "pages.events.title" },
+    { "pattern": "/events/:id", "routeKey": "eventDetail", "labelKey": "pages.eventDetail.title" },
+    { "pattern": "/jobs", "routeKey": "jobs", "labelKey": "pages.jobs.title" },
+    { "pattern": "/jobs/:id", "routeKey": "jobDetail", "labelKey": "pages.jobDetail.title" },
+    { "pattern": "/organisations", "routeKey": "organisations", "labelKey": "pages.organisations.title" },
+    { "pattern": "/organisations/:id", "routeKey": "organisationDetail", "labelKey": "pages.organisationDetail.title" },
+    { "pattern": "/resources", "routeKey": "resources", "labelKey": "pages.resources.title" },
+    { "pattern": "/kb", "routeKey": "kb", "labelKey": "pages.kb.title" },
+    { "pattern": "/kb/:id", "routeKey": "kbDetail", "labelKey": "pages.kbDetail.title" },
+    { "pattern": "/marketplace", "routeKey": "marketplace", "labelKey": "pages.marketplace.title" },
+    { "pattern": "/marketplace/:id", "routeKey": "marketplaceDetail", "labelKey": "pages.marketplaceDetail.title" }
   ],
   "vitePrivatePrefixes": [
     "achievements",

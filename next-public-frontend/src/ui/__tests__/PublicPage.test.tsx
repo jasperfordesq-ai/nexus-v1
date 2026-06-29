@@ -48,4 +48,35 @@ describe('PublicPage', () => {
     expect(html).toContain('AGPL-3.0-or-later');
     expect(html).toContain('https://app.project-nexus.ie/hour-timebank/about');
   });
+
+  it('renders second-batch public discovery routes as no-JavaScript HTML', () => {
+    const tenant: TenantBootstrap = {
+      default_language: 'en',
+      id: 2,
+      name: 'Hour Timebank',
+      slug: 'hour-timebank',
+    };
+    const route: RouteOwnership = {
+      labelKey: 'pages.listings.title',
+      owner: 'next-public',
+      pattern: '/listings',
+      routeKey: 'listings',
+    };
+
+    const html = renderToStaticMarkup(
+      <PublicPage
+        canonicalUrl="https://app.project-nexus.ie/hour-timebank/listings"
+        route={route}
+        routeSegments={['listings']}
+        tenant={tenant}
+        tenantBasePath="/hour-timebank"
+        t={createTranslator('en')}
+      />,
+    );
+
+    expect(html).toContain('Listings');
+    expect(html).toContain('Browse public offers and requests from Hour Timebank.');
+    expect(html).toContain('href="/hour-timebank/listings"');
+    expect(html).toContain('AGPL-3.0-or-later');
+  });
 });

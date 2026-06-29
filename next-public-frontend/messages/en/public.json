@@ -9,7 +9,10 @@
     "help": "Help",
     "contact": "Contact",
     "faq": "FAQ",
-    "blog": "Blog"
+    "blog": "Blog",
+    "listings": "Listings",
+    "events": "Events",
+    "resources": "Resources"
   },
   "metadata": {
     "canonicalLabel": "Canonical page URL"
@@ -72,6 +75,71 @@
     "cmsPage": {
       "title": "Page",
       "missing": "This public page is not available in the shadow frontend yet."
+    },
+    "listings": {
+      "title": "Listings",
+      "lead": "Browse public offers and requests from {{tenantName}}.",
+      "body": "This shadow page is prepared for public listings discovery. Creating, editing, and member-only listing tools stay in the secure Vite app."
+    },
+    "listingDetail": {
+      "title": "Listing",
+      "lead": "View public listing information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public listing details. Booking and editing actions remain in the secure Vite app."
+    },
+    "events": {
+      "title": "Events",
+      "lead": "Explore public events from {{tenantName}}.",
+      "body": "This shadow page is prepared for public event discovery. Event creation, RSVP management, and edits stay in the secure Vite app."
+    },
+    "eventDetail": {
+      "title": "Event",
+      "lead": "View public event information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public event details. Attendance and organiser actions remain in the secure Vite app."
+    },
+    "jobs": {
+      "title": "Jobs",
+      "lead": "Browse public opportunities from {{tenantName}}.",
+      "body": "This shadow page is prepared for public job discovery. Applications and employer workflows stay in the secure Vite app."
+    },
+    "jobDetail": {
+      "title": "Job",
+      "lead": "View public job information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public job details. Applications and pipeline actions remain in the secure Vite app."
+    },
+    "organisations": {
+      "title": "Organisations",
+      "lead": "Browse public organisation profiles from {{tenantName}}.",
+      "body": "This shadow page is prepared for public organisation discovery. Organisation administration remains in the secure Vite app."
+    },
+    "organisationDetail": {
+      "title": "Organisation",
+      "lead": "View public organisation information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public organisation details. Management actions remain in the secure Vite app."
+    },
+    "resources": {
+      "title": "Resources",
+      "lead": "Browse public resources from {{tenantName}}.",
+      "body": "This shadow page is prepared for public resource discovery. Resource management remains in the secure Vite app."
+    },
+    "kb": {
+      "title": "Knowledge Base",
+      "lead": "Find public guidance and help articles from {{tenantName}}.",
+      "body": "This shadow page is prepared for public knowledge-base discovery. Article management remains in the secure Vite app."
+    },
+    "kbDetail": {
+      "title": "Knowledge Base Article",
+      "lead": "Read public guidance from {{tenantName}}.",
+      "body": "This shadow page is prepared for public knowledge-base article details. Editing remains in the secure Vite app."
+    },
+    "marketplace": {
+      "title": "Marketplace",
+      "lead": "Browse public marketplace items from {{tenantName}}.",
+      "body": "This shadow page is prepared for public marketplace discovery. Checkout, seller, and listing management stay in the secure Vite app."
+    },
+    "marketplaceDetail": {
+      "title": "Marketplace Item",
+      "lead": "View public marketplace item information from {{tenantName}}.",
+      "body": "This shadow page is prepared for public marketplace item details. Offers, checkout, and editing remain in the secure Vite app."
     },
     "notFound": {
       "title": "Page not found",
