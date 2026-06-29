@@ -56,6 +56,32 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         );
     }
 
+    public function test_summary_reports_operator_playbook_without_activation_controls(): void
+    {
+        $summary = (new NextPublicFrontendReadinessService())->summary();
+
+        $playbook = $summary['operator_playbook'];
+        $stages = array_column($playbook['stages'], null, 'key');
+
+        $this->assertFalse($playbook['activation_available']);
+        $this->assertTrue($playbook['requires_explicit_cutover_instruction']);
+        $this->assertTrue($playbook['no_production_effect']);
+        $this->assertSame(
+            [
+                'verify_shadow_module',
+                'prepare_reviewed_edge_config',
+                'run_private_route_regression',
+                'canary_public_routes_only',
+                'monitor_with_prerender_fallback',
+            ],
+            array_keys($stages),
+        );
+        $this->assertSame('blocked', $stages['prepare_reviewed_edge_config']['status']);
+        $this->assertContains('no_activation_control', $stages['prepare_reviewed_edge_config']['notes']);
+        $this->assertContains('do_not_remove_prerender', $stages['monitor_with_prerender_fallback']['notes']);
+        $this->assertContains('npm --prefix next-public-frontend run check', $stages['verify_shadow_module']['commands']);
+    }
+
     public function test_manifest_validation_blocks_api_routes_outside_laravel_v2_public_api(): void
     {
         $validation = $this->validateManifest([

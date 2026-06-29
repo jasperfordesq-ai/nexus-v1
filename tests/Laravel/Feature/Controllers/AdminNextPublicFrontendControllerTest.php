@@ -70,6 +70,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $apiBackedRouteKeys = array_column($payload['content_sources']['api_backed_routes'], 'routeKey');
         $routeReadiness = $payload['manifest']['route_readiness'];
         $cutoverGatesByKey = array_column($payload['cutover_gates'], null, 'key');
+        $playbookStagesByKey = array_column($payload['operator_playbook']['stages'], null, 'key');
         $routeReadinessByKey = [];
 
         foreach ($routeReadiness as $route) {
@@ -158,6 +159,12 @@ class AdminNextPublicFrontendControllerTest extends TestCase
             ['npm --prefix next-public-frontend run check'],
             $cutoverGatesByKey['verify_next_shadow_build']['verification_commands'],
         );
+        $this->assertFalse($payload['operator_playbook']['activation_available']);
+        $this->assertTrue($payload['operator_playbook']['requires_explicit_cutover_instruction']);
+        $this->assertTrue($payload['operator_playbook']['no_production_effect']);
+        $this->assertSame('blocked', $playbookStagesByKey['prepare_reviewed_edge_config']['status']);
+        $this->assertContains('no_activation_control', $playbookStagesByKey['prepare_reviewed_edge_config']['notes']);
+        $this->assertContains('do_not_remove_prerender', $playbookStagesByKey['monitor_with_prerender_fallback']['notes']);
         $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['about']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['listingDetail']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['volunteeringOpportunityDetail']['content_source']);

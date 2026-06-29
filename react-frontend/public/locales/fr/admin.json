@@ -2912,7 +2912,8 @@
         "pass": "Pass",
         "blocker": "Blocker",
         "info": "Info",
-        "fail": "Fail"
+        "fail": "Fail",
+        "blocked": "Blocked"
       },
       "runtime": {
         "title": "Shadow runtime",
@@ -2979,6 +2980,29 @@
         "edge_routes_not_configured": "Production edge routes are not configured",
         "cutover_not_active": "Cutover is not active",
         "prerender_fallback_must_remain": "Prerender fallback must remain available"
+      },
+      "playbook": {
+        "title": "Operator playbook",
+        "activation_available": "Activation controls are available",
+        "no_activation_control": "No activation controls are available on this page.",
+        "explicit_instruction_required": "Separate cutover instruction required",
+        "no_production_effect": "No production routing change"
+      },
+      "playbook_stages": {
+        "verify_shadow_module": "Verify the shadow module locally.",
+        "prepare_reviewed_edge_config": "Prepare Apache canary routing as a reviewed config-only change.",
+        "run_private_route_regression": "Re-check the existing Vite private application.",
+        "canary_public_routes_only": "Canary public routes only after approval.",
+        "monitor_with_prerender_fallback": "Monitor live responses while preserving fallback."
+      },
+      "playbook_notes": {
+        "shadow_only": "Shadow only",
+        "no_activation_control": "No activation control",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
+        "vite_private_routes_remain_primary": "Vite private routes remain primary",
+        "public_routes_only": "Public routes only",
+        "do_not_remove_prerender": "Do not remove prerender fallback.",
+        "rollback_path_required": "Rollback path required"
       }
     }
   },

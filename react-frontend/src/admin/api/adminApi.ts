@@ -1802,6 +1802,20 @@ export interface NextPublicCutoverGate {
   verification_commands: string[];
 }
 
+export interface NextPublicOperatorPlaybookStage {
+  key: string;
+  status: 'blocked' | 'ready' | string;
+  commands: string[];
+  notes: string[];
+}
+
+export interface NextPublicOperatorPlaybook {
+  activation_available: boolean;
+  requires_explicit_cutover_instruction: boolean;
+  no_production_effect: boolean;
+  stages: NextPublicOperatorPlaybookStage[];
+}
+
 export interface NextPublicFrontendReadiness {
   mode: string;
   app: {
@@ -1875,6 +1889,7 @@ export interface NextPublicFrontendReadiness {
   }>;
   cutover_step_keys: string[];
   cutover_gates: NextPublicCutoverGate[];
+  operator_playbook: NextPublicOperatorPlaybook;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

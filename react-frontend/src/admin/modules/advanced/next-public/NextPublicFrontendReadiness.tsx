@@ -19,6 +19,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@/components/
 const statusColor = (status: string): 'success' | 'warning' | 'danger' | 'default' => {
   if (status === 'pass') return 'success';
   if (status === 'blocker') return 'warning';
+  if (status === 'blocked') return 'warning';
   if (status === 'fail') return 'danger';
   return 'default';
 };
@@ -140,6 +141,8 @@ export default function NextPublicFrontendReadiness() {
 
           <RouteCutoverGatesCard readiness={readiness} />
 
+          <OperatorPlaybookCard readiness={readiness} />
+
           <div className="grid gap-4 lg:grid-cols-2">
             <Card>
               <CardHeader className="flex items-center gap-2">
@@ -232,6 +235,67 @@ export default function NextPublicFrontendReadiness() {
         </div>
       )}
     </div>
+  );
+}
+
+function OperatorPlaybookCard({ readiness }: { readiness: Readiness }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.next_public' });
+  const playbook = readiness.operator_playbook;
+
+  return (
+    <Card>
+      <CardHeader>
+        <h2 className="text-lg font-semibold">{t('playbook.title')}</h2>
+      </CardHeader>
+      <CardBody>
+        <div className="mb-4 flex flex-wrap gap-2">
+          <Chip size="sm" color={playbook.activation_available ? 'danger' : 'success'} variant="soft">
+            {playbook.activation_available ? t('playbook.activation_available') : t('playbook.no_activation_control')}
+          </Chip>
+          <Chip size="sm" color="warning" variant="soft">
+            {t('playbook.explicit_instruction_required')}
+          </Chip>
+          <Chip size="sm" color="success" variant="soft">
+            {t('playbook.no_production_effect')}
+          </Chip>
+        </div>
+
+        <div className="space-y-3">
+          {playbook.stages.map((stage, index) => (
+            <div key={stage.key} className="rounded-md border border-divider px-3 py-3 text-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-medium">
+                    {index + 1}. {t(`playbook_stages.${stage.key}`)}
+                  </div>
+                  {stage.commands.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {stage.commands.map((command) => (
+                        <code key={command} className="block break-all rounded bg-surface-secondary px-2 py-1 text-xs">
+                          {command}
+                        </code>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <Chip size="sm" color={statusColor(stage.status)} variant="soft">
+                  {t(`statuses.${stage.status}`)}
+                </Chip>
+              </div>
+              {stage.notes.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {stage.notes.map((note) => (
+                    <Chip key={note} size="sm" color="warning" variant="soft">
+                      {t(`playbook_notes.${note}`)}
+                    </Chip>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </CardBody>
+    </Card>
   );
 }
 

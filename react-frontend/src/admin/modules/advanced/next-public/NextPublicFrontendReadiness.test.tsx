@@ -125,6 +125,31 @@ const readiness = {
       verification_commands: [],
     },
   ],
+  operator_playbook: {
+    activation_available: false,
+    requires_explicit_cutover_instruction: true,
+    no_production_effect: true,
+    stages: [
+      {
+        key: 'verify_shadow_module',
+        status: 'blocked',
+        commands: ['npm --prefix next-public-frontend run check'],
+        notes: ['shadow_only'],
+      },
+      {
+        key: 'prepare_reviewed_edge_config',
+        status: 'blocked',
+        commands: [],
+        notes: ['no_activation_control'],
+      },
+      {
+        key: 'monitor_with_prerender_fallback',
+        status: 'blocked',
+        commands: [],
+        notes: ['do_not_remove_prerender'],
+      },
+    ],
+  },
 };
 
 describe('NextPublicFrontendReadiness', () => {
@@ -171,6 +196,10 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('Manual verification required')).toBeInTheDocument();
     expect(screen.getByText('Explicit cutover instruction required')).toBeInTheDocument();
     expect(screen.getByText('Production edge routes are not configured')).toBeInTheDocument();
+    expect(screen.getByText('Operator playbook')).toBeInTheDocument();
+    expect(screen.getByText('No activation controls are available on this page.')).toBeInTheDocument();
+    expect(screen.getByText(/Prepare Apache canary routing as a reviewed config-only change\./)).toBeInTheDocument();
+    expect(screen.getByText('Do not remove prerender fallback.')).toBeInTheDocument();
   });
 
   it('shows an error state when readiness cannot load', async () => {

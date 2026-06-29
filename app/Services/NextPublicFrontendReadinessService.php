@@ -271,6 +271,7 @@ class NextPublicFrontendReadinessService
                 'monitor_and_keep_prerender_fallback',
             ],
             'cutover_gates' => $this->cutoverGates(),
+            'operator_playbook' => $this->operatorPlaybook(),
         ];
     }
 
@@ -318,6 +319,56 @@ class NextPublicFrontendReadinessService
                 'status' => 'blocker',
                 'blockers' => ['cutover_not_active', 'prerender_fallback_must_remain'],
                 'verification_commands' => [],
+            ],
+        ];
+    }
+
+    /**
+     * @return array{activation_available: bool, requires_explicit_cutover_instruction: bool, no_production_effect: bool, stages: array<int, array{key: string, status: string, commands: array<int, string>, notes: array<int, string>}>}
+     */
+    private function operatorPlaybook(): array
+    {
+        return [
+            'activation_available' => false,
+            'requires_explicit_cutover_instruction' => true,
+            'no_production_effect' => true,
+            'stages' => [
+                [
+                    'key' => 'verify_shadow_module',
+                    'status' => 'blocked',
+                    'commands' => [
+                        'npm --prefix next-public-frontend run check',
+                        'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php',
+                    ],
+                    'notes' => ['shadow_only', 'no_activation_control'],
+                ],
+                [
+                    'key' => 'prepare_reviewed_edge_config',
+                    'status' => 'blocked',
+                    'commands' => [],
+                    'notes' => ['explicit_cutover_instruction_required', 'no_activation_control'],
+                ],
+                [
+                    'key' => 'run_private_route_regression',
+                    'status' => 'blocked',
+                    'commands' => [
+                        'npm --prefix react-frontend run build',
+                        'cd react-frontend && npx tsc --noEmit',
+                    ],
+                    'notes' => ['vite_private_routes_remain_primary'],
+                ],
+                [
+                    'key' => 'canary_public_routes_only',
+                    'status' => 'blocked',
+                    'commands' => [],
+                    'notes' => ['explicit_cutover_instruction_required', 'public_routes_only'],
+                ],
+                [
+                    'key' => 'monitor_with_prerender_fallback',
+                    'status' => 'blocked',
+                    'commands' => [],
+                    'notes' => ['do_not_remove_prerender', 'rollback_path_required'],
+                ],
             ],
         ];
     }
