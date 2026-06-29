@@ -72,6 +72,9 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/api.php'));
 
             Route::middleware([
+                // Outermost: post-processes the final response to strip the
+                // /{slug}/alpha prefix on custom accessible domains (no-op elsewhere).
+                \App\Http\Middleware\StripTenantSlugOnAccessibleDomain::class,
                 \App\Http\Middleware\SecurityHeaders::class,
                 \App\Http\Middleware\ResolveTenant::class,
                 \App\Http\Middleware\CheckMaintenanceMode::class,

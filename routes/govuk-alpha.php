@@ -11,19 +11,23 @@ Route::pattern('tenantSlug', '[a-zA-Z0-9_-]+');
 
 Route::get('/', [AlphaController::class, 'tenantChooser'])->name('govuk-alpha.tenant-chooser');
 
-Route::prefix('alpha')
-    ->name('govuk-alpha.host.')
-    ->group(function () {
-        Route::get('/', [AlphaController::class, 'hostHome'])->name('home');
-        Route::get('/login', [AlphaController::class, 'hostLogin'])->name('login');
-        Route::get('/register', [AlphaController::class, 'hostRegister'])->name('register');
-        Route::get('/contact', [AlphaController::class, 'hostContact'])->name('contact');
-    });
-
-Route::prefix('{tenantSlug}/alpha')
-    ->name('govuk-alpha.')
-    ->group(function () {
-        Route::get('/', [AlphaController::class, 'home'])->name('home');
+// The accessible (GOV.UK) route set is registered TWICE from one definition:
+//   1. Shared platform domain — /{tenantSlug}/alpha/... — the slug in the URL
+//      identifies the tenant (tenants WITHOUT a custom accessible domain).
+//   2. Custom accessible domain — bare, slug-less paths (mirrors the React
+//      custom domains). The host identifies the tenant; InjectHostTenantSlug
+//      supplies the slug the controllers expect, EnsureAccessibleCustomDomain
+//      keeps these routes off the shared/API hosts, and
+//      StripTenantSlugOnAccessibleDomain removes the slug from generated links.
+$alphaRoutes = function (bool $hostMode) {
+        // On a custom accessible domain the home is served at the bare root by the
+        // tenant-chooser route (which renders the home there), so the host group
+        // must NOT register its own "/" — a second GET "/" would clobber the
+        // chooser in Laravel's static-route map (last registration wins). The
+        // slug group keeps its /{tenantSlug}/alpha home as normal.
+        if (!$hostMode) {
+            Route::get('/', [AlphaController::class, 'home'])->name('home');
+        }
         Route::get('/contact', [AlphaController::class, 'contact'])->name('contact');
         Route::post('/contact', [AlphaController::class, 'storeContact'])->middleware('throttle:5,1')->name('contact.store');
 
@@ -416,4 +420,21 @@ Route::prefix('{tenantSlug}/alpha')
         foreach ((glob(__DIR__ . '/govuk-alpha-parity/*.php') ?: []) as $__parityRoutes) {
             require $__parityRoutes;
         }
+};
+
+// 1. Shared platform domain: the tenant slug is carried in the URL path.
+Route::prefix('{tenantSlug}/alpha')->name('govuk-alpha.')->group(function () use ($alphaRoutes) {
+    $alphaRoutes(false);
+});
+
+// 2. Custom accessible domain: the SAME routes, slug-less, at the bare root.
+//    EnsureAccessibleCustomDomain 404s these on any host that did not resolve
+//    via a tenant's accessible_domain (shared platform domain, API host, etc.).
+Route::name('govuk-alpha.host.')
+    ->middleware([
+        \App\Http\Middleware\EnsureAccessibleCustomDomain::class,
+        \App\Http\Middleware\InjectHostTenantSlug::class,
+    ])
+    ->group(function () use ($alphaRoutes) {
+        $alphaRoutes(true);
     });

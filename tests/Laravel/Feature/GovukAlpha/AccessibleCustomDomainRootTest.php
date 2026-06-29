@@ -12,19 +12,13 @@ use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
 /**
- * Regression: a tenant's dedicated accessible (GOV.UK) custom domain must serve
- * the accessible home AT THE CLEAN ROOT, not 302-redirect to the slug-prefixed
- * /{slug}/alpha canonical.
- *
- * Before the fix, hitting a configured accessible custom domain
- * (e.g. https://accessible-uk.timebank.global/) bounced to
- * https://accessible-uk.timebank.global/timebanking-org/alpha — dumping the
- * internal tenant slug into the address bar of the clean custom domain the
- * administrator configured. On a host-resolved domain the host already
- * identifies the tenant, so the entry points now render the page in place.
+ * The accessible (GOV.UK) frontend must behave like the React custom domains:
+ * on a tenant's dedicated accessible custom domain the tenant is resolved by
+ * the HOST and every URL is slug-less (bare paths). The tenant slug only appears
+ * for tenants WITHOUT a custom domain (the shared /{tenantSlug}/alpha routes).
  *
  * The request is driven through the tenant's accessible_domain host so the
- * ResolveTenant middleware resolves the tenant exactly as it does in production.
+ * ResolveTenant middleware resolves it exactly as in production.
  */
 class AccessibleCustomDomainRootTest extends TestCase
 {
@@ -41,8 +35,7 @@ class AccessibleCustomDomainRootTest extends TestCase
         }
 
         // Give the test tenant a dedicated accessible custom domain so the
-        // ResolveTenant middleware resolves it by host, just like a real
-        // accessible-uk.timebank.global request.
+        // ResolveTenant middleware resolves it by host, like accessible-uk.timebank.global.
         DB::table('tenants')->where('id', $this->testTenantId)->update([
             'accessible_domain' => self::ACCESSIBLE_HOST,
         ]);
@@ -55,29 +48,57 @@ class AccessibleCustomDomainRootTest extends TestCase
         return $this->get('http://' . self::ACCESSIBLE_HOST . $uri);
     }
 
-    public function test_root_renders_accessible_home_instead_of_redirecting_to_slug_path(): void
+    private function slugPrefix(): string
+    {
+        return '/' . $this->testTenantSlug . '/alpha';
+    }
+
+    public function test_root_renders_home_with_no_slug_in_the_page(): void
     {
         $response = $this->getOnAccessibleDomain('/');
 
-        // Was a 302 to /{slug}/alpha; must now render the home in place.
         $response->assertOk();
         $response->assertSee(__('govuk_alpha.home.title'));
-        $response->assertDontSee(__('govuk_alpha.tenant_chooser.title'));
+        // No /{slug}/alpha anywhere — every link is slug-less.
+        $response->assertDontSee($this->slugPrefix());
     }
 
-    public function test_host_alpha_entry_renders_home_instead_of_redirecting(): void
+    public function test_bare_login_path_works_and_is_slug_less(): void
     {
-        $response = $this->getOnAccessibleDomain('/alpha');
-
-        $response->assertOk();
-        $response->assertSee(__('govuk_alpha.home.title'));
-    }
-
-    public function test_host_alpha_login_renders_login_in_place(): void
-    {
-        $response = $this->getOnAccessibleDomain('/alpha/login');
+        // No slug, no /alpha — just like a React custom domain.
+        $response = $this->getOnAccessibleDomain('/login');
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha.auth.login_title'));
+        $response->assertDontSee($this->slugPrefix());
+    }
+
+    public function test_bare_register_path_works_and_is_slug_less(): void
+    {
+        $response = $this->getOnAccessibleDomain('/register');
+
+        $response->assertOk();
+        $response->assertDontSee($this->slugPrefix());
+    }
+
+    public function test_slug_routes_still_carry_the_slug_without_a_custom_domain(): void
+    {
+        // Default (non-accessible) host → the canonical slug route still works and
+        // its links KEEP the slug (the behaviour is unchanged for tenants with no
+        // custom accessible domain).
+        $response = $this->get($this->slugPrefix() . '/login');
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.auth.login_title'));
+        $response->assertSee($this->slugPrefix(), false);
+    }
+
+    public function test_bare_paths_do_not_serve_on_a_non_custom_host(): void
+    {
+        // The slug-less host routes are gated to accessible custom domains. On any
+        // other host the bare path must NOT render the accessible login page.
+        $response = $this->get('/login');
+
+        $this->assertNotSame(200, $response->getStatusCode());
     }
 }

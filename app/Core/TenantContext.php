@@ -56,6 +56,15 @@ class TenantContext
     private static array $parentDomainByParentId = [];
 
     /**
+     * True when the current tenant was resolved by matching a tenant's dedicated
+     * accessible (GOV.UK) custom domain (tenants.accessible_domain). On that
+     * domain the accessible frontend is served slug-lessly — mirroring how the
+     * React custom domains drop the tenant slug — so the slug only appears for
+     * tenants WITHOUT a custom domain (the shared platform domain). Cleared by reset().
+     */
+    private static bool $viaAccessibleDomain = false;
+
+    /**
      * Query a single tenant row and return as associative array (or false/null).
      *
      * @param string $column Column to match
@@ -99,9 +108,11 @@ class TenantContext
             // domain (tenants.accessible_domain) both resolve to the SAME tenant —
             // the Plesk vhost decides which container renders. getFrontendUrl()
             // still keys off the React `domain`, so this is presentation-only and
-            // lets the host-based /alpha routes serve a clean slug-less entry.
+            // lets the accessible frontend serve clean, slug-less URLs on that host.
+            $viaAccessibleDomain = false;
             if (!$domainTenant && $hostIsValid) {
                 $domainTenant = self::fetchTenant('accessible_domain', $host);
+                $viaAccessibleDomain = $domainTenant !== null;
             }
 
             if ($domainTenant && $domainTenant['id'] != 1) {
@@ -110,6 +121,10 @@ class TenantContext
                     self::showInactiveTenantError($domainTenant['name'] ?? 'This community');
                     return;
                 }
+
+                // Remember that this request arrived on a dedicated accessible
+                // custom domain so the accessible frontend can render slug-lessly.
+                self::$viaAccessibleDomain = $viaAccessibleDomain;
 
                 // Check if the path contains a direct child tenant's slug.
                 // This enables sub-tenants to be reached at the parent's domain:
@@ -350,6 +365,22 @@ class TenantContext
     }
 
     /**
+     * True when the current request arrived on a tenant's dedicated accessible
+     * (GOV.UK) custom domain. The accessible frontend uses this to serve clean,
+     * slug-less URLs on that domain (the slug is only used on the shared platform
+     * domain, for tenants without a custom domain).
+     */
+    public static function isAccessibleDomain(): bool
+    {
+        // Reflects the result of the resolution that already ran (ResolveTenant
+        // middleware resolves before any caller here). Deliberately does NOT
+        // re-resolve: on an unknown-tenant request resolve() throws, and
+        // re-triggering it from a response/guard path would surface as a 404/500
+        // instead of the intended 400 the resolver already returned.
+        return self::$viaAccessibleDomain;
+    }
+
+    /**
      * Return the tenant already set on this request/job without resolving a
      * default tenant from host state. Use this in queued email paths where a
      * missing tenant must remain visible instead of silently becoming tenant 1.
@@ -377,6 +408,7 @@ class TenantContext
         self::$headerTenantId = null;
         self::$parentDomain = null;
         self::$parentDomainByParentId = [];
+        self::$viaAccessibleDomain = false;
     }
 
     /**
