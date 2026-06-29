@@ -60,6 +60,8 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.manifest.validation.issues', []);
         $response->assertJsonPath('data.content_sources.source_of_truth', 'laravel_public_api');
         $response->assertJsonPath('data.content_sources.database_queries_from_next', false);
+        $response->assertJsonPath('data.content_sources.manifest_exists', true);
+        $response->assertJsonPath('data.content_sources.manifest_path', 'next-public-frontend/content-sources.json');
 
         $payload = $response->json('data');
         $publicPatterns = array_column($payload['manifest']['public_routes'], 'pattern');

@@ -55,6 +55,8 @@ const readiness = {
     vite_private_patterns: ['/events/new', '/events/:id/edit'],
   },
   content_sources: {
+    manifest_exists: true,
+    manifest_path: 'next-public-frontend/content-sources.json',
     source_of_truth: 'laravel_public_api',
     database_queries_from_next: false,
     api_backed_routes: [

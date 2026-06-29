@@ -17,11 +17,13 @@ class NextPublicFrontendReadinessService
     {
         $appDir = base_path('next-public-frontend');
         $manifest = $this->readJson($appDir . DIRECTORY_SEPARATOR . 'route-ownership.json');
+        $contentSourcesPath = $appDir . DIRECTORY_SEPARATOR . 'content-sources.json';
+        $contentSources = $this->readJson($contentSourcesPath);
         $package = $this->readJson($appDir . DIRECTORY_SEPARATOR . 'package.json');
         $publicRoutes = is_array($manifest) ? array_values($manifest['nextPublicRoutes'] ?? []) : [];
         $privatePrefixes = is_array($manifest) ? array_values($manifest['vitePrivatePrefixes'] ?? []) : [];
         $privatePatterns = is_array($manifest) ? array_values($manifest['vitePrivatePatterns'] ?? []) : [];
-        $apiBackedRoutes = $this->apiBackedRoutes();
+        $apiBackedRoutes = $this->apiBackedRoutes($contentSources);
         $validation = $this->validateManifest($manifest, $publicRoutes, $privatePrefixes, $apiBackedRoutes);
 
         $manifestMode = is_array($manifest) ? (string) ($manifest['mode'] ?? 'unknown') : 'missing';
@@ -56,8 +58,12 @@ class NextPublicFrontendReadinessService
                 'vite_private_patterns' => $privatePatterns,
             ],
             'content_sources' => [
-                'source_of_truth' => 'laravel_public_api',
-                'database_queries_from_next' => false,
+                'manifest_exists' => is_array($contentSources),
+                'manifest_path' => 'next-public-frontend/content-sources.json',
+                'source_of_truth' => is_array($contentSources) ? (string) ($contentSources['sourceOfTruth'] ?? 'unknown') : 'missing',
+                'database_queries_from_next' => is_array($contentSources)
+                    ? (bool) ($contentSources['databaseQueriesFromNext'] ?? true)
+                    : true,
                 'api_backed_routes' => $apiBackedRoutes,
             ],
             'production_routing' => [
@@ -100,26 +106,35 @@ class NextPublicFrontendReadinessService
     /**
      * @return array<int, array{routeKey: string, endpoint: string, method: string}>
      */
-    private function apiBackedRoutes(): array
+    private function apiBackedRoutes(?array $contentSources): array
     {
-        return [
-            ['routeKey' => 'blog-index', 'endpoint' => '/v2/blog', 'method' => 'GET'],
-            ['routeKey' => 'blog-detail', 'endpoint' => '/v2/blog/{slug}', 'method' => 'GET'],
-            ['routeKey' => 'cms-page', 'endpoint' => '/v2/pages/{slug}', 'method' => 'GET'],
-            ['routeKey' => 'listings', 'endpoint' => '/v2/listings', 'method' => 'GET'],
-            ['routeKey' => 'listingDetail', 'endpoint' => '/v2/listings/{id}', 'method' => 'GET'],
-            ['routeKey' => 'events', 'endpoint' => '/v2/events', 'method' => 'GET'],
-            ['routeKey' => 'eventDetail', 'endpoint' => '/v2/events/{id}', 'method' => 'GET'],
-            ['routeKey' => 'jobs', 'endpoint' => '/v2/jobs', 'method' => 'GET'],
-            ['routeKey' => 'jobDetail', 'endpoint' => '/v2/jobs/{id}', 'method' => 'GET'],
-            ['routeKey' => 'organisations', 'endpoint' => '/v2/volunteering/organisations', 'method' => 'GET'],
-            ['routeKey' => 'organisationDetail', 'endpoint' => '/v2/volunteering/organisations/{id}', 'method' => 'GET'],
-            ['routeKey' => 'resources', 'endpoint' => '/v2/resources', 'method' => 'GET'],
-            ['routeKey' => 'kb', 'endpoint' => '/v2/kb', 'method' => 'GET'],
-            ['routeKey' => 'kbDetail', 'endpoint' => '/v2/kb/{id}', 'method' => 'GET'],
-            ['routeKey' => 'marketplace', 'endpoint' => '/v2/marketplace/listings', 'method' => 'GET'],
-            ['routeKey' => 'marketplaceDetail', 'endpoint' => '/v2/marketplace/listings/{id}', 'method' => 'GET'],
-        ];
+        if (!is_array($contentSources) || !is_array($contentSources['apiBackedRoutes'] ?? null)) {
+            return [];
+        }
+
+        $routes = [];
+
+        foreach ($contentSources['apiBackedRoutes'] as $route) {
+            if (!is_array($route)) {
+                continue;
+            }
+
+            $routeKey = isset($route['routeKey']) ? (string) $route['routeKey'] : '';
+            $endpoint = isset($route['endpoint']) ? (string) $route['endpoint'] : '';
+            $method = isset($route['method']) ? (string) $route['method'] : '';
+
+            if ($routeKey === '' || $endpoint === '' || $method === '') {
+                continue;
+            }
+
+            $routes[] = [
+                'routeKey' => $routeKey,
+                'endpoint' => $endpoint,
+                'method' => strtoupper($method),
+            ];
+        }
+
+        return $routes;
     }
 
     /**

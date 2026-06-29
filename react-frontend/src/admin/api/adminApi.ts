@@ -1825,6 +1825,8 @@ export interface NextPublicFrontendReadiness {
     vite_private_patterns: string[];
   };
   content_sources: {
+    manifest_exists: boolean;
+    manifest_path: string;
     source_of_truth: string;
     database_queries_from_next: boolean;
     api_backed_routes: NextPublicApiBackedRoute[];

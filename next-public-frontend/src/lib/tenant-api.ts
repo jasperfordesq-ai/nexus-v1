@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { buildTenantBootstrapRequest, type ResolvedTenantRequest } from './tenant-request';
+import { getPublicEndpointForRoute } from './content-sources';
 
 export interface TenantBranding {
   logo_url?: string;
@@ -76,25 +77,6 @@ interface ApiEnvelope<T> {
   errors?: Array<{ code?: string; message?: string }>;
 }
 
-const publicCollectionEndpoints: Record<string, string> = {
-  events: '/v2/events',
-  jobs: '/v2/jobs',
-  kb: '/v2/kb',
-  listings: '/v2/listings',
-  marketplace: '/v2/marketplace/listings',
-  organisations: '/v2/volunteering/organisations',
-  resources: '/v2/resources',
-};
-
-const publicDetailEndpoints: Record<string, string> = {
-  eventDetail: '/v2/events/:id',
-  jobDetail: '/v2/jobs/:id',
-  kbDetail: '/v2/kb/:id',
-  listingDetail: '/v2/listings/:id',
-  marketplaceDetail: '/v2/marketplace/listings/:id',
-  organisationDetail: '/v2/volunteering/organisations/:id',
-};
-
 const defaultApiBase = 'https://api.project-nexus.ie/api';
 
 export function getApiBase(): string {
@@ -134,7 +116,8 @@ export async function fetchBlogPosts(
   request: ResolvedTenantRequest,
   tenant: TenantBootstrap | null,
 ): Promise<BlogPostSummary[]> {
-  const url = buildApiUrl('/v2/blog', { per_page: '12' });
+  const endpoint = getPublicEndpointForRoute('blog-index') ?? '/v2/blog';
+  const url = buildApiUrl(endpoint, { per_page: '12' });
   const posts = await fetchApiEnvelope<BlogPostSummary[]>(url, buildPublicHeaders(request, tenant));
 
   return posts ?? [];
@@ -145,7 +128,13 @@ export async function fetchBlogPost(
   request: ResolvedTenantRequest,
   tenant: TenantBootstrap | null,
 ): Promise<BlogPost | null> {
-  const url = buildApiUrl(`/v2/blog/${encodeURIComponent(slug)}`);
+  const endpoint = getPublicEndpointForRoute('blog-detail', { slug });
+
+  if (!endpoint) {
+    return null;
+  }
+
+  const url = buildApiUrl(endpoint);
 
   return fetchApiEnvelope<BlogPost>(url, buildPublicHeaders(request, tenant));
 }
@@ -156,7 +145,13 @@ export async function fetchCmsPage(
   tenant: TenantBootstrap | null,
 ): Promise<CmsPage | null> {
   const query = tenant?.id && tenant.id > 1 ? { context_tenant: String(tenant.id) } : undefined;
-  const url = buildApiUrl(`/v2/pages/${encodeURIComponent(slug)}`, query);
+  const endpoint = getPublicEndpointForRoute('cms-page', { slug });
+
+  if (!endpoint) {
+    return null;
+  }
+
+  const url = buildApiUrl(endpoint, query);
 
   return fetchApiEnvelope<CmsPage>(url, buildPublicHeaders(request, tenant));
 }
@@ -166,7 +161,7 @@ export async function fetchPublicCollection(
   request: ResolvedTenantRequest,
   tenant: TenantBootstrap | null,
 ): Promise<PublicContentItem[]> {
-  const endpoint = publicCollectionEndpoints[routeKey];
+  const endpoint = getPublicEndpointForRoute(routeKey);
 
   if (!endpoint) {
     return [];
@@ -184,13 +179,13 @@ export async function fetchPublicDetail(
   request: ResolvedTenantRequest,
   tenant: TenantBootstrap | null,
 ): Promise<PublicContentItem | null> {
-  const endpoint = publicDetailEndpoints[routeKey];
+  const endpoint = getPublicEndpointForRoute(routeKey, { id });
 
   if (!endpoint) {
     return null;
   }
 
-  const url = buildApiUrl(endpoint.replace(':id', encodeURIComponent(id)));
+  const url = buildApiUrl(endpoint);
   const payload = await fetchApiPayload<unknown>(url, buildPublicHeaders(request, tenant));
 
   return normalizePublicItem(payload);
