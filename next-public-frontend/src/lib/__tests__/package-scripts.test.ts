@@ -10,8 +10,10 @@ import packageJson from '../../../package.json';
 describe('Next public frontend package scripts', () => {
   it('keeps manifest validation in the default isolated check command', () => {
     expect(packageJson.scripts['check:manifests']).toBe('vitest run src/lib/__tests__/shadow-manifest-validation.test.ts');
+    expect(packageJson.scripts['check:messages']).toBe('vitest run src/lib/__tests__/public-messages-validation.test.ts');
     expect(packageJson.scripts['check:no-js-html']).toBe('vitest run src/ui/__tests__/PublicRouteNoJsHtml.test.tsx');
     expect(packageJson.scripts.check).toContain('npm run check:manifests');
+    expect(packageJson.scripts.check).toContain('npm run check:messages');
     expect(packageJson.scripts.check).toContain('npm run check:no-js-html');
   });
 });

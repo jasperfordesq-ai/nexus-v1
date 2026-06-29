@@ -12,8 +12,9 @@
     "test:watch": "vitest",
     "typecheck": "next typegen && tsc --noEmit",
     "check:manifests": "vitest run src/lib/__tests__/shadow-manifest-validation.test.ts",
+    "check:messages": "vitest run src/lib/__tests__/public-messages-validation.test.ts",
     "check:no-js-html": "vitest run src/ui/__tests__/PublicRouteNoJsHtml.test.tsx",
-    "check": "npm run check:manifests && npm run check:no-js-html && npm run typecheck && npm run test && npm run build"
+    "check": "npm run check:manifests && npm run check:messages && npm run check:no-js-html && npm run typecheck && npm run test && npm run build"
   },
   "dependencies": {
     "next": "16.2.9",
