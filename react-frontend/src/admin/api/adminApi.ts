@@ -1762,6 +1762,7 @@ export const adminSettings = {
 
   getSeoSettings: () => api.get<Record<string, unknown>>('/v2/admin/config/seo'),
   updateSeoSettings: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/config/seo', data),
+  getNextPublicFrontendReadiness: () => api.get<NextPublicFrontendReadiness>('/v2/admin/config/next-public-frontend'),
   getSitemapStats: () => api.get<{ sitemap_url: string; total_urls: number; content_types: Record<string, number> }>('/v2/admin/config/sitemap-stats'),
   clearSitemapCache: () => api.post<{ cleared: number }>('/v2/admin/config/sitemap-clear-cache'),
 
@@ -1773,6 +1774,53 @@ export const adminSettings = {
   updateEmailConfig: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/email/config', data),
   testEmailProvider: (data: { to: string }) => api.post<{ success: boolean; message: string }>('/v2/admin/email/test-provider', data),
 };
+
+export interface NextPublicRouteOwnership {
+  pattern: string;
+  routeKey: string;
+  labelKey: string;
+}
+
+export interface NextPublicFrontendReadiness {
+  mode: string;
+  app: {
+    exists: boolean;
+    package_name: string | null;
+    version: string | null;
+    next_version: string | null;
+    react_version: string | null;
+  };
+  manifest: {
+    exists: boolean;
+    mode: string | null;
+    public_routes: NextPublicRouteOwnership[];
+    vite_private_prefixes: string[];
+    vite_private_patterns: string[];
+  };
+  production_routing: {
+    active: boolean;
+    route_cutover_enabled: boolean;
+    edge_routes_configured: boolean;
+  };
+  prerender: {
+    status: 'unchanged' | string;
+    fallback_retained: boolean;
+  };
+  shadow_runtime: {
+    compose_profile: string;
+    dev_command: string;
+    build_command: string;
+    container_port: number;
+    host_port_env: string;
+    port_env: string;
+    default_shadow_port: number;
+  };
+  safety_checks: Array<{
+    key: string;
+    status: 'pass' | 'blocker' | 'info' | string;
+  }>;
+  cutover_step_keys: string[];
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Admin Tools (SEO, Health, WebP, Seeds, Backups)
