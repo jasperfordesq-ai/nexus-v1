@@ -155,6 +155,47 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         ], $validation['issues']);
     }
 
+    public function test_manifest_validation_blocks_invalid_api_backed_route_entries(): void
+    {
+        $validation = $this->validateManifest([
+            'mode' => 'shadow',
+        ], [], [], [], [
+            'sourceOfTruth' => 'laravel_public_api',
+            'databaseQueriesFromNext' => false,
+            'apiBackedRoutes' => ['not-an-object'],
+        ]);
+
+        $this->assertSame('blocker', $validation['status']);
+        $this->assertContains([
+            'code' => 'api_backed_route_invalid',
+            'severity' => 'blocker',
+            'context' => 'non-object',
+        ], $validation['issues']);
+    }
+
+    public function test_manifest_validation_blocks_api_backed_route_entries_with_missing_fields(): void
+    {
+        $validation = $this->validateManifest([
+            'mode' => 'shadow',
+        ], [], [], [], [
+            'sourceOfTruth' => 'laravel_public_api',
+            'databaseQueriesFromNext' => false,
+            'apiBackedRoutes' => [
+                [
+                    'routeKey' => 'events',
+                    'method' => 'GET',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('blocker', $validation['status']);
+        $this->assertContains([
+            'code' => 'api_backed_route_missing_fields',
+            'severity' => 'blocker',
+            'context' => 'events',
+        ], $validation['issues']);
+    }
+
     /**
      * @param array<string, mixed>|null $manifest
      * @param array<int, mixed> $publicRoutes

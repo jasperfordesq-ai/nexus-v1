@@ -275,6 +275,31 @@ class NextPublicFrontendReadinessService
             ];
         }
 
+        if (is_array($contentSources) && is_array($contentSources['apiBackedRoutes'] ?? null)) {
+            foreach ($contentSources['apiBackedRoutes'] as $route) {
+                if (!is_array($route)) {
+                    $issues[] = [
+                        'code' => 'api_backed_route_invalid',
+                        'severity' => 'blocker',
+                        'context' => 'non-object',
+                    ];
+                    continue;
+                }
+
+                $routeKey = isset($route['routeKey']) ? (string) $route['routeKey'] : '';
+                $endpoint = isset($route['endpoint']) ? (string) $route['endpoint'] : '';
+                $method = isset($route['method']) ? (string) $route['method'] : '';
+
+                if ($routeKey === '' || $endpoint === '' || $method === '') {
+                    $issues[] = [
+                        'code' => 'api_backed_route_missing_fields',
+                        'severity' => 'blocker',
+                        'context' => $routeKey !== '' ? $routeKey : ($endpoint !== '' ? $endpoint : 'unknown'),
+                    ];
+                }
+            }
+        }
+
         $patterns = [];
         $routeKeys = [];
         $routeParamsByKey = [];
