@@ -6,7 +6,7 @@
 
 return [
     'name' => env('APP_NAME', 'Project NEXUS'),
-    'version' => env('APP_VERSION', '1.5.3'),
+    'version' => env('APP_VERSION', '1.5.4'),
     'env' => env('APP_ENV', 'production'),
     'debug' => (bool) env('APP_DEBUG', false),
     'url' => env('APP_URL', 'http://localhost'),

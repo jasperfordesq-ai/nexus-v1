@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.4] - 2026-06-29
+
 ### Added
 
 - **Admin user management now shows email activation status and can resend verification emails.** The users table includes an email activation column, and the edit-user screen shows activation status with a resend action for members who have not completed email verification. The admin resend endpoint reuses the existing verification-token email flow and skips already verified accounts. Regression tests: `tests/Laravel/Feature/Controllers/AdminUsersControllerTest.php`, `react-frontend/src/admin/modules/users/UserList.test.tsx`, `react-frontend/src/admin/modules/users/UserEdit.test.tsx`, `react-frontend/src/admin/api/adminApi.test.ts`.
@@ -1235,7 +1237,8 @@ For the people behind the project, see [CONTRIBUTORS.md](CONTRIBUTORS.md) — th
 
 ---
 
-[Unreleased]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.3...HEAD
+[Unreleased]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.4...HEAD
+[1.5.4]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.3...v1.5.4
 [1.5.3]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.0...v1.5.1
