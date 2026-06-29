@@ -357,6 +357,32 @@ describe('MemberPremiumAdminPage', () => {
     });
   });
 
+  it('does not show a synced toast when Stripe sync returns a tier that still needs sync', async () => {
+    const unsynced = {
+      ...TIER_A,
+      stripe_price_id_monthly: null,
+      stripe_price_id_yearly: null,
+    };
+    mockMemberPremiumApi.listTiers.mockResolvedValue({ data: { tiers: [unsynced] } });
+    mockMemberPremiumApi.syncStripe.mockResolvedValueOnce({ data: { tier: unsynced } });
+
+    render(<MemberPremiumAdminPage />);
+    await waitFor(() => screen.getByText('Gold'));
+
+    const syncBtn = screen.getAllByRole('button').find(
+      (b) => b.getAttribute('aria-label')?.toLowerCase().includes('sync') ||
+             b.getAttribute('aria-label')?.includes('actions.sync_stripe'),
+    );
+    expect(syncBtn).toBeDefined();
+    fireEvent.click(syncBtn!);
+
+    await waitFor(() => {
+      expect(mockMemberPremiumApi.syncStripe).toHaveBeenCalledWith(TIER_A.id);
+      expect(mockToast.success).not.toHaveBeenCalled();
+      expect(mockToast.error).toHaveBeenCalled();
+    });
+  });
+
   it('calls deleteTier after confirm dialog and reloads', async () => {
     mockMemberPremiumApi.listTiers.mockResolvedValue({ data: { tiers: [TIER_A] } });
     mockMemberPremiumApi.deleteTier.mockResolvedValueOnce({ data: { deleted: true } });

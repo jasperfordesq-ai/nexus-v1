@@ -76,6 +76,12 @@ function formatAmount(cents: number): string {
   });
 }
 
+function isTierStripeSynced(tier: MemberPremiumTier): boolean {
+  const monthSynced = !!tier.stripe_price_id_monthly || tier.monthly_price_cents === 0;
+  const yearSynced = !!tier.stripe_price_id_yearly || tier.yearly_price_cents === 0;
+  return monthSynced && yearSynced;
+}
+
 export function MemberPremiumAdminPage() {
   const { t } = useTranslation(['admin', 'common']);
   const confirm = useConfirm();
@@ -211,7 +217,20 @@ export function MemberPremiumAdminPage() {
   const syncTier = async (tier: MemberPremiumTier) => {
     setSyncing(tier.id);
     try {
-      await memberPremiumAdminApi.syncStripe(tier.id);
+      const res = await memberPremiumAdminApi.syncStripe(tier.id);
+      const syncedTier = res.data?.tier;
+      if (syncedTier) {
+        setTiers((current) => current.map((item) =>
+          item.id === syncedTier.id
+            ? { ...syncedTier, active_subscriber_count: item.active_subscriber_count }
+            : item,
+        ));
+      }
+      if (!syncedTier || !isTierStripeSynced(syncedTier)) {
+        toast.error(t('member_premium_admin.toasts.stripe_sync_failed'));
+        await load();
+        return;
+      }
       toast.success(t('member_premium_admin.toasts.synced', { name: tier.name }));
       await load();
     } catch (err: unknown) {
@@ -526,9 +545,7 @@ export function MemberPremiumAdminPage() {
               </TableHeader>
               <TableBody>
                 {tiers.map((tier) => {
-                  const monthSynced = !!tier.stripe_price_id_monthly || tier.monthly_price_cents === 0;
-                  const yearSynced = !!tier.stripe_price_id_yearly || tier.yearly_price_cents === 0;
-                  const fullySynced = monthSynced && yearSynced;
+                  const fullySynced = isTierStripeSynced(tier);
                   return (
                     <TableRow key={tier.id}>
                       <TableCell>{tier.name}</TableCell>

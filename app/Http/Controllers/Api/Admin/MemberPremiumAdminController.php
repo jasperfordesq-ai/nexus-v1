@@ -217,11 +217,10 @@ class MemberPremiumAdminController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
         try {
-            MemberPremiumService::syncTierToStripe($tenantId, $id);
+            $tier = MemberPremiumService::syncTierToStripe($tenantId, $id);
         } catch (\Throwable $e) {
             return $this->respondWithError('STRIPE_SYNC_FAILED', $e->getMessage(), null, 500);
         }
-        $tier = MemberPremiumService::getTier($tenantId, $id);
         return $this->respondWithData(['tier' => $tier]);
     }
 

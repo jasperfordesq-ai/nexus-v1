@@ -274,7 +274,7 @@ class MemberPremiumService
     /**
      * Sync a tier's prices to Stripe (creates Product + Prices if missing).
      */
-    public static function syncTierToStripe(int $tenantId, int $tierId): void
+    public static function syncTierToStripe(int $tenantId, int $tierId): array
     {
         $tier = DB::selectOne(
             "SELECT * FROM member_premium_tiers WHERE id = ? AND tenant_id = ?",
@@ -367,12 +367,42 @@ class MemberPremiumService
             );
         }
 
+        $syncedTier = self::getTier($tenantId, $tierId);
+        if (! $syncedTier || self::tierRequiresStripeSync($syncedTier, $priceAccountId)) {
+            throw new RuntimeException('Stripe sync did not create all required recurring donation prices.');
+        }
+
         Log::info('MemberPremiumService::syncTierToStripe ok', [
             'tenant_id' => $tenantId,
             'tier_id' => $tierId,
             'product_id' => $product->id,
             'stripe_account_id' => $tenantStripeAccountId,
         ]);
+
+        return $syncedTier;
+    }
+
+    public static function tierRequiresStripeSync(array $tier, ?string $expectedPriceAccountId = null): bool
+    {
+        $monthlyPriceCents = (int) ($tier['monthly_price_cents'] ?? 0);
+        $yearlyPriceCents = (int) ($tier['yearly_price_cents'] ?? 0);
+
+        if ($monthlyPriceCents > 0 && empty($tier['stripe_price_id_monthly'])) {
+            return true;
+        }
+
+        if ($yearlyPriceCents > 0 && empty($tier['stripe_price_id_yearly'])) {
+            return true;
+        }
+
+        if ($expectedPriceAccountId !== null) {
+            $storedPriceAccountId = (string) (($tier['stripe_price_account_id'] ?? null) ?: 'platform_default');
+            if ($storedPriceAccountId !== $expectedPriceAccountId) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

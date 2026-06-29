@@ -73,6 +73,35 @@ class MemberPremiumServiceTest extends TestCase
         $this->assertStringContainsString('self::syncTierToStripe($tenantId, $tierId)', $source);
     }
 
+    public function test_tier_requires_stripe_sync_when_paid_price_ids_or_account_scope_are_missing(): void
+    {
+        $synced = [
+            'monthly_price_cents' => 1000,
+            'yearly_price_cents' => 10000,
+            'stripe_price_id_monthly' => 'price_monthly',
+            'stripe_price_id_yearly' => 'price_yearly',
+            'stripe_price_account_id' => 'platform_default',
+        ];
+
+        $this->assertFalse(MemberPremiumService::tierRequiresStripeSync($synced, 'platform_default'));
+
+        $this->assertTrue(MemberPremiumService::tierRequiresStripeSync([
+            ...$synced,
+            'stripe_price_id_monthly' => null,
+        ], 'platform_default'));
+
+        $this->assertTrue(MemberPremiumService::tierRequiresStripeSync([
+            ...$synced,
+            'stripe_price_account_id' => 'acct_test_123',
+        ], 'platform_default'));
+
+        $this->assertFalse(MemberPremiumService::tierRequiresStripeSync([
+            ...$synced,
+            'monthly_price_cents' => 0,
+            'stripe_price_id_monthly' => null,
+        ], 'platform_default'));
+    }
+
     public function test_eventBelongsHere_recognises_invoice_subscription_details_metadata(): void
     {
         $event = (object) [
