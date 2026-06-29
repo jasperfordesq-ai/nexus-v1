@@ -221,6 +221,7 @@ const readiness = {
   },
   safety_checks: [
     { key: 'route_cutover_disabled', status: 'pass' },
+    { key: 'apache_canary_template_not_included', status: 'pass' },
     { key: 'parity_tests_required_before_cutover', status: 'blocker' },
   ],
   cutover_step_keys: ['verify_next_shadow_build', 'enable_canary_for_public_routes_only'],
@@ -284,6 +285,7 @@ describe('NextPublicFrontendReadiness', () => {
 
     expect(screen.getByText('Public traffic is not served by Next.js')).toBeInTheDocument();
     expect(screen.getByText('Prerender fallback retained')).toBeInTheDocument();
+    expect(screen.getByText('Apache canary template is not included by deploy')).toBeInTheDocument();
     expect(screen.getAllByText('/about')).not.toHaveLength(0);
     expect(screen.getByText('/blog/:slug')).toBeInTheDocument();
     expect(screen.getByText('dashboard')).toBeInTheDocument();

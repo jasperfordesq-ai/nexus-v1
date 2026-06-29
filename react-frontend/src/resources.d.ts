@@ -1298,6 +1298,7 @@ export default interface Resources {
           "title": "Safety checks"
         },
         "safety_checks": {
+          "apache_canary_template_not_included": "Apache canary template is not included by deploy",
           "parity_tests_required_before_cutover": "Parity tests are still required before any cutover",
           "prerender_retained": "Current prerender fallback remains retained",
           "public_edge_not_configured": "No production edge route is configured for Next.js",

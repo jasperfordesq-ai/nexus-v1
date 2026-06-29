@@ -126,6 +126,7 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $summary = (new NextPublicFrontendReadinessService())->summary();
 
         $edgeCanary = $summary['edge_canary'];
+        $safetyChecks = array_column($summary['safety_checks'], 'status', 'key');
 
         $this->assertSame('blocked', $edgeCanary['status']);
         $this->assertSame('apache_plesk', $edgeCanary['edge']);
@@ -143,6 +144,7 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertTrue($edgeCanary['config_template']['example_only']);
         $this->assertFalse($edgeCanary['config_template']['included_by_deploy']);
         $this->assertContains('explicit_cutover_instruction_required', $edgeCanary['config_template']['required_review_steps']);
+        $this->assertSame('pass', $safetyChecks['apache_canary_template_not_included']);
     }
 
     public function test_summary_audits_apache_canary_template_against_public_route_ownership(): void

@@ -223,6 +223,8 @@ class NextPublicFrontendReadinessService
 
         $manifestMode = is_array($manifest) ? (string) ($manifest['mode'] ?? 'unknown') : 'missing';
         $cutoverEnabled = (bool) config('app.next_public_frontend_routing_enabled', false);
+        $edgeCanary = $this->edgeCanaryPreview($cutoverEnabled, $publicRoutes, $privatePrefixes, $privatePatterns);
+        $apacheTemplateIncluded = (bool) ($edgeCanary['config_template']['included_by_deploy'] ?? true);
 
         return [
             'mode' => $manifestMode === 'shadow' ? 'shadow' : $manifestMode,
@@ -260,7 +262,7 @@ class NextPublicFrontendReadinessService
                 'api_backed_routes' => $apiBackedRoutes,
             ],
             'tenant_resolution' => $this->tenantResolutionContract(),
-            'edge_canary' => $this->edgeCanaryPreview($cutoverEnabled, $publicRoutes, $privatePrefixes, $privatePatterns),
+            'edge_canary' => $edgeCanary,
             'route_batches' => $this->routeBatches($publicRoutes, $privatePrefixes, $privatePatterns, $apiBackedRoutes),
             'cutover_artifacts' => $this->cutoverArtifactInventory(),
             'production_routing' => [
@@ -293,6 +295,7 @@ class NextPublicFrontendReadinessService
                 ['key' => 'prerender_retained', 'status' => 'pass'],
                 ['key' => 'vite_private_routes_retained', 'status' => 'pass'],
                 ['key' => 'public_edge_not_configured', 'status' => 'pass'],
+                ['key' => 'apache_canary_template_not_included', 'status' => $apacheTemplateIncluded ? 'blocker' : 'pass'],
                 ['key' => 'parity_tests_required_before_cutover', 'status' => 'blocker'],
             ],
             'cutover_step_keys' => [
