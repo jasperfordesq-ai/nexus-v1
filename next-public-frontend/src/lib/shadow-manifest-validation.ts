@@ -128,6 +128,10 @@ export function validateShadowManifests(
       issues.push({ code: 'api_backed_route_not_get', context: `${method} ${endpoint}`, severity: 'blocker' });
     }
 
+    if (!endpoint.startsWith('/v2/')) {
+      issues.push({ code: 'api_backed_route_not_laravel_v2_endpoint', context: routeKey, severity: 'blocker' });
+    }
+
     if (!sameSet(routeParamsByKey.get(routeKey) ?? new Set<string>(), extractEndpointParams(endpoint))) {
       issues.push({ code: 'api_backed_route_param_mismatch', context: routeKey, severity: 'blocker' });
     }

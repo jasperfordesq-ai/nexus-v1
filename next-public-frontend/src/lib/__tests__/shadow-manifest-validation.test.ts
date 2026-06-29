@@ -71,6 +71,24 @@ describe('shadow manifest validation', () => {
     });
   });
 
+  it('blocks API-backed routes that are not relative Laravel v2 endpoints', () => {
+    const result = validateShadowManifests(routeOwnershipManifest, {
+      ...contentSourcesManifest,
+      apiBackedRoutes: contentSourcesManifest.apiBackedRoutes.map((source) => (
+        source.routeKey === 'events'
+          ? { ...source, endpoint: 'https://example.test/v2/events' }
+          : source
+      )),
+    });
+
+    expect(result.status).toBe('blocker');
+    expect(result.issues).toContainEqual({
+      code: 'api_backed_route_not_laravel_v2_endpoint',
+      context: 'events',
+      severity: 'blocker',
+    });
+  });
+
   it('blocks API-backed route endpoints whose placeholders drift from the public route params', () => {
     const result = validateShadowManifests(routeOwnershipManifest, {
       ...contentSourcesManifest,
