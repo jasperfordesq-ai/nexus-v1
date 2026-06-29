@@ -137,6 +137,55 @@ class VereinFederationMemberController extends BaseApiController
         return $this->respondWithData($this->service->getMunicipalityCalendar($tenantId, $municipalityCode, $period));
     }
 
+    /**
+     * GET /v2/municipality/events-calendar  (public, throttled)
+     *
+     * Tenant-scoped default calendar for public pages without a route parameter.
+     */
+    public function defaultMunicipalityCalendar(Request $request): JsonResponse
+    {
+        if (!TenantContext::hasFeature('caring_community')) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
+        }
+
+        $tenantId = TenantContext::getId();
+        $period = (string) $request->query('period', 'month');
+        $municipalityCode = DB::table('verein_federation_consents')
+            ->where('tenant_id', $tenantId)
+            ->where('is_active', 1)
+            ->whereIn('sharing_scope', ['events', 'both'])
+            ->whereNotNull('municipality_code')
+            ->orderBy('municipality_code')
+            ->value('municipality_code');
+
+        if ($municipalityCode === null || $municipalityCode === '') {
+            return $this->respondWithData($this->emptyMunicipalityCalendar($period));
+        }
+
+        return $this->respondWithData($this->service->getMunicipalityCalendar($tenantId, (string) $municipalityCode, $period));
+    }
+
+    /**
+     * @return array{municipality_code: null, period: string, start: string, end: string, buckets: array<int, mixed>}
+     */
+    private function emptyMunicipalityCalendar(string $period): array
+    {
+        $start = now()->startOfDay();
+        $end = match ($period) {
+            'week' => $start->copy()->addDays(7),
+            'year' => $start->copy()->addYear(),
+            default => $start->copy()->addMonth(),
+        };
+
+        return [
+            'municipality_code' => null,
+            'period' => $period,
+            'start' => $start->toDateString(),
+            'end' => $end->toDateString(),
+            'buckets' => [],
+        ];
+    }
+
     private function guardCaringCommunity(): ?JsonResponse
     {
         if (!TenantContext::hasFeature('caring_community')) {

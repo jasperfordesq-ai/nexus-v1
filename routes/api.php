@@ -1540,6 +1540,9 @@ Route::get('/v2/me/verein-invitations', [\App\Http\Controllers\Api\Verein\Verein
 Route::post('/v2/me/verein-invitations/{id}/respond', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'respond'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 // Public municipality events calendar (consent-gated upstream; throttled)
+Route::get('/v2/municipality/events-calendar', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'defaultMunicipalityCalendar'])
+    ->middleware('throttle:30,1')
+    ->withoutMiddleware(['auth:sanctum', \App\Http\Middleware\EnsureIsAdmin::class]);
 Route::get('/v2/municipality/{municipalityCode}/events-calendar', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'municipalityCalendar'])
     ->middleware('throttle:30,1')
     ->withoutMiddleware(['auth:sanctum', \App\Http\Middleware\EnsureIsAdmin::class]);

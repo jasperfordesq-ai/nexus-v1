@@ -44,6 +44,7 @@
     { "routeKey": "marketplaceDetail", "endpoint": "/v2/marketplace/listings/{id}", "method": "GET" },
     { "routeKey": "marketplaceSeller", "endpoint": "/v2/marketplace/sellers/{id}", "method": "GET" },
     { "routeKey": "marketplaceCategory", "endpoint": "/v2/marketplace/categories/{slug}/listings", "method": "GET" },
+    { "routeKey": "municipalityCalendar", "endpoint": "/v2/municipality/events-calendar", "method": "GET" },
     { "routeKey": "explore", "endpoint": "/v2/explore", "method": "GET" },
     { "routeKey": "volunteering", "endpoint": "/v2/volunteering/opportunities", "method": "GET" },
     { "routeKey": "volunteeringOpportunityDetail", "endpoint": "/v2/volunteering/opportunities/{id}", "method": "GET" },

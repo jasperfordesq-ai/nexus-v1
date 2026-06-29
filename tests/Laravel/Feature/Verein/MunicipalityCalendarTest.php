@@ -110,4 +110,44 @@ class MunicipalityCalendarTest extends TestCase
         $this->assertNotContains('Event from C', $allTitles);
         $this->assertNotContains('Event from D', $allTitles);
     }
+
+    public function test_default_public_calendar_uses_first_consenting_municipality(): void
+    {
+        $svc = app(VereinFederationService::class);
+
+        $ownerA = $this->makeUser();
+        $ownerB = $this->makeUser();
+        $a = $this->makeVerein($ownerA, 'Default Calendar A');
+        $b = $this->makeVerein($ownerB, 'Default Calendar B');
+
+        $svc->setConsent($a, 'both', '8001');
+        $svc->setConsent($b, 'both', '8002');
+
+        $this->makeEvent($ownerA, 'Default event from A');
+        $this->makeEvent($ownerB, 'Default event from B');
+
+        $response = $this->apiGet('/v2/municipality/events-calendar');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.municipality_code', '8001');
+
+        $allTitles = [];
+        foreach ($response->json('data.buckets') as $bucket) {
+            foreach ($bucket as $event) {
+                $allTitles[] = $event['title'];
+            }
+        }
+
+        $this->assertContains('Default event from A', $allTitles);
+        $this->assertNotContains('Default event from B', $allTitles);
+    }
+
+    public function test_default_public_calendar_returns_empty_payload_without_consents(): void
+    {
+        $response = $this->apiGet('/v2/municipality/events-calendar');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.municipality_code', null);
+        $response->assertJsonPath('data.buckets', []);
+    }
 }
