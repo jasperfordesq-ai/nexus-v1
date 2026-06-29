@@ -1864,6 +1864,27 @@ export interface NextPublicRouteBatch {
   verification_commands: string[];
 }
 
+export interface NextPublicCutoverArtifact {
+  key: string;
+  path: string;
+  exists: boolean;
+  category: string;
+  production_effect: string;
+}
+
+export interface NextPublicCutoverRequiredCommand {
+  key: string;
+  command: string;
+  required_before_cutover: boolean;
+}
+
+export interface NextPublicCutoverArtifactInventory {
+  production_effect: string;
+  activation_available: boolean;
+  items: NextPublicCutoverArtifact[];
+  required_commands: NextPublicCutoverRequiredCommand[];
+}
+
 export interface NextPublicFrontendReadiness {
   mode: string;
   app: {
@@ -1914,6 +1935,7 @@ export interface NextPublicFrontendReadiness {
   tenant_resolution: NextPublicTenantResolution;
   edge_canary: NextPublicEdgeCanary;
   route_batches: NextPublicRouteBatch[];
+  cutover_artifacts: NextPublicCutoverArtifactInventory;
   production_routing: {
     active: boolean;
     route_cutover_enabled: boolean;

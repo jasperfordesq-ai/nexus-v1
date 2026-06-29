@@ -2963,6 +2963,34 @@
         "title": "Route batch readiness",
         "route_count": "{{count}} routes"
       },
+      "artifacts": {
+        "title": "Cutover artifact inventory",
+        "path": "Path",
+        "present": "Present",
+        "missing": "Missing",
+        "required_commands": "Required commands",
+        "required_before_cutover": "Required before cutover",
+        "activation_available": "Activation controls are available",
+        "no_activation_control": "No activation controls"
+      },
+      "artifact_items": {
+        "route_ownership_manifest": "Route ownership manifest",
+        "content_sources_manifest": "Content sources manifest",
+        "apache_canary_template": "Edge canary template",
+        "shadow_compose_profile": "Shadow Compose profile",
+        "routing_flag_config": "Routing flag config",
+        "prerender_fallback": "Prerender fallback"
+      },
+      "artifact_categories": {
+        "manifest": "Manifest",
+        "edge_config": "Edge config",
+        "runtime": "Runtime",
+        "guard": "Guard",
+        "fallback": "Fallback"
+      },
+      "production_effects": {
+        "none": "No production effect"
+      },
       "route_batch_names": {
         "foundation_public_pages": "Foundation public pages",
         "api_backed_public_content": "API-backed public content",

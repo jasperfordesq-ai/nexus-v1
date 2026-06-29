@@ -262,6 +262,7 @@ class NextPublicFrontendReadinessService
             'tenant_resolution' => $this->tenantResolutionContract(),
             'edge_canary' => $this->edgeCanaryPreview($cutoverEnabled),
             'route_batches' => $this->routeBatches($publicRoutes, $privatePrefixes, $privatePatterns, $apiBackedRoutes),
+            'cutover_artifacts' => $this->cutoverArtifactInventory(),
             'production_routing' => [
                 'active' => false,
                 'route_cutover_enabled' => $cutoverEnabled,
@@ -543,6 +544,75 @@ class NextPublicFrontendReadinessService
                     'notes' => ['do_not_remove_prerender', 'rollback_path_required'],
                 ],
             ],
+        ];
+    }
+
+    /**
+     * @return array{production_effect: string, activation_available: bool, items: array<int, array{key: string, path: string, exists: bool, category: string, production_effect: string}>, required_commands: array<int, array{key: string, command: string, required_before_cutover: bool}>}
+     */
+    private function cutoverArtifactInventory(): array
+    {
+        $artifactPaths = [
+            'route_ownership_manifest' => 'next-public-frontend/route-ownership.json',
+            'content_sources_manifest' => 'next-public-frontend/content-sources.json',
+            'apache_canary_template' => 'scripts/deploy/apache/next-public-foundation-canary.conf.example',
+            'shadow_compose_profile' => 'compose.bluegreen.yml',
+            'routing_flag_config' => 'config/app.php',
+            'prerender_fallback' => 'react-frontend/scripts/prerender.mjs',
+        ];
+
+        return [
+            'production_effect' => 'none',
+            'activation_available' => false,
+            'items' => [
+                $this->cutoverArtifact('route_ownership_manifest', $artifactPaths['route_ownership_manifest'], 'manifest'),
+                $this->cutoverArtifact('content_sources_manifest', $artifactPaths['content_sources_manifest'], 'manifest'),
+                $this->cutoverArtifact('apache_canary_template', $artifactPaths['apache_canary_template'], 'edge_config'),
+                $this->cutoverArtifact('shadow_compose_profile', $artifactPaths['shadow_compose_profile'], 'runtime'),
+                $this->cutoverArtifact('routing_flag_config', $artifactPaths['routing_flag_config'], 'guard'),
+                $this->cutoverArtifact('prerender_fallback', $artifactPaths['prerender_fallback'], 'fallback'),
+            ],
+            'required_commands' => [
+                [
+                    'key' => 'next_shadow_checks',
+                    'command' => 'npm --prefix next-public-frontend run check',
+                    'required_before_cutover' => true,
+                ],
+                [
+                    'key' => 'no_js_public_html',
+                    'command' => 'npm --prefix next-public-frontend run check:no-js-html',
+                    'required_before_cutover' => true,
+                ],
+                [
+                    'key' => 'react_private_regression',
+                    'command' => 'npm --prefix react-frontend run build',
+                    'required_before_cutover' => true,
+                ],
+                [
+                    'key' => 'php_readiness_contract',
+                    'command' => 'vendor/bin/phpunit --no-coverage tests/Laravel/Unit/Services/NextPublicFrontendReadinessServiceTest.php tests/Laravel/Feature/Controllers/AdminNextPublicFrontendControllerTest.php',
+                    'required_before_cutover' => true,
+                ],
+                [
+                    'key' => 'apache_configtest',
+                    'command' => 'apachectl -t',
+                    'required_before_cutover' => true,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array{key: string, path: string, exists: bool, category: string, production_effect: string}
+     */
+    private function cutoverArtifact(string $key, string $path, string $category): array
+    {
+        return [
+            'key' => $key,
+            'path' => $path,
+            'exists' => File::exists(base_path($path)),
+            'category' => $category,
+            'production_effect' => 'none',
         ];
     }
 

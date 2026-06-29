@@ -82,6 +82,25 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertContains('npm --prefix next-public-frontend run check', $stages['verify_shadow_module']['commands']);
     }
 
+    public function test_summary_reports_cutover_artifact_inventory_without_activation_controls(): void
+    {
+        $summary = (new NextPublicFrontendReadinessService())->summary();
+
+        $inventory = $summary['cutover_artifacts'];
+        $items = array_column($inventory['items'], null, 'key');
+        $commands = array_column($inventory['required_commands'], null, 'key');
+
+        $this->assertSame('none', $inventory['production_effect']);
+        $this->assertFalse($inventory['activation_available']);
+        $this->assertSame('next-public-frontend/route-ownership.json', $items['route_ownership_manifest']['path']);
+        $this->assertTrue($items['route_ownership_manifest']['exists']);
+        $this->assertSame('scripts/deploy/apache/next-public-foundation-canary.conf.example', $items['apache_canary_template']['path']);
+        $this->assertSame('none', $items['apache_canary_template']['production_effect']);
+        $this->assertTrue($items['prerender_fallback']['exists']);
+        $this->assertSame('npm --prefix next-public-frontend run check:no-js-html', $commands['no_js_public_html']['command']);
+        $this->assertTrue($commands['react_private_regression']['required_before_cutover']);
+    }
+
     public function test_summary_reports_tenant_resolution_contract(): void
     {
         $summary = (new NextPublicFrontendReadinessService())->summary();

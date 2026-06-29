@@ -158,6 +158,33 @@ const readiness = {
       verification_commands: ['npm --prefix react-frontend run build'],
     },
   ],
+  cutover_artifacts: {
+    production_effect: 'none',
+    activation_available: false,
+    items: [
+      {
+        key: 'route_ownership_manifest',
+        path: 'next-public-frontend/route-ownership.json',
+        exists: true,
+        category: 'manifest',
+        production_effect: 'none',
+      },
+      {
+        key: 'apache_canary_template',
+        path: 'scripts/deploy/apache/next-public-foundation-canary.conf.example',
+        exists: true,
+        category: 'edge_config',
+        production_effect: 'none',
+      },
+    ],
+    required_commands: [
+      {
+        key: 'no_js_public_html',
+        command: 'npm --prefix next-public-frontend run check:no-js-html',
+        required_before_cutover: true,
+      },
+    ],
+  },
   production_routing: {
     active: false,
     route_cutover_enabled: false,
@@ -261,9 +288,14 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('Apache/Plesk')).toBeInTheDocument();
     expect(screen.getByText('NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED')).toBeInTheDocument();
     expect(screen.getByText('No route file configured by this module')).toBeInTheDocument();
-    expect(screen.getByText('scripts/deploy/apache/next-public-foundation-canary.conf.example')).toBeInTheDocument();
+    expect(screen.getAllByText('scripts/deploy/apache/next-public-foundation-canary.conf.example')).not.toHaveLength(0);
     expect(screen.getByText('Example only')).toBeInTheDocument();
     expect(screen.getByText('Not included by deploy')).toBeInTheDocument();
+    expect(screen.getByText('Cutover artifact inventory')).toBeInTheDocument();
+    expect(screen.getAllByText('Route ownership manifest')).not.toHaveLength(0);
+    expect(screen.getByText('Edge canary template')).toBeInTheDocument();
+    expect(screen.getAllByText('No production effect')).not.toHaveLength(0);
+    expect(screen.getAllByText('npm --prefix next-public-frontend run check:no-js-html')).not.toHaveLength(0);
     expect(screen.getByText('Route batch readiness')).toBeInTheDocument();
     expect(screen.getByText('Foundation public pages')).toBeInTheDocument();
     expect(screen.getByText('API-backed public content')).toBeInTheDocument();

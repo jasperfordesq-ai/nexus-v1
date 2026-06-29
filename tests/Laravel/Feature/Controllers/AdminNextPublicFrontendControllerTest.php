@@ -82,6 +82,8 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.edge_canary.config_template.exists', true);
         $response->assertJsonPath('data.edge_canary.config_template.example_only', true);
         $response->assertJsonPath('data.edge_canary.config_template.included_by_deploy', false);
+        $response->assertJsonPath('data.cutover_artifacts.production_effect', 'none');
+        $response->assertJsonPath('data.cutover_artifacts.activation_available', false);
 
         $payload = $response->json('data');
         $publicPatterns = array_column($payload['manifest']['public_routes'], 'pattern');
@@ -92,6 +94,8 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $tenantResolutionExamplesByKey = array_column($payload['tenant_resolution']['examples'], null, 'key');
         $routeReadinessByKey = [];
         $routeBatchesByKey = array_column($payload['route_batches'], null, 'key');
+        $cutoverArtifactsByKey = array_column($payload['cutover_artifacts']['items'], null, 'key');
+        $cutoverCommandsByKey = array_column($payload['cutover_artifacts']['required_commands'], null, 'key');
 
         foreach ($routeReadiness as $route) {
             $routeReadinessByKey[$route['routeKey']] = $route;
@@ -196,6 +200,16 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('do_not_edit_plesk_vhosts_directly', $payload['edge_canary']['guardrails']);
         $this->assertContains('do_not_remove_prerender', $payload['edge_canary']['guardrails']);
         $this->assertContains('apache_configtest_required', $payload['edge_canary']['config_template']['required_review_steps']);
+        $this->assertSame(
+            'scripts/deploy/apache/next-public-foundation-canary.conf.example',
+            $cutoverArtifactsByKey['apache_canary_template']['path'],
+        );
+        $this->assertSame('none', $cutoverArtifactsByKey['apache_canary_template']['production_effect']);
+        $this->assertTrue($cutoverArtifactsByKey['prerender_fallback']['exists']);
+        $this->assertSame(
+            'npm --prefix next-public-frontend run check:no-js-html',
+            $cutoverCommandsByKey['no_js_public_html']['command'],
+        );
         $this->assertSame('blocked', $routeBatchesByKey['foundation_public_pages']['status']);
         $this->assertContains('home', $routeBatchesByKey['foundation_public_pages']['route_keys']);
         $this->assertContains('manual_shadow_review_required', $routeBatchesByKey['foundation_public_pages']['blockers']);

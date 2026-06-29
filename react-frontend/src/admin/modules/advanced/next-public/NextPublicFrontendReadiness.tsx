@@ -141,6 +141,8 @@ export default function NextPublicFrontendReadiness() {
 
           <EdgeCanaryCard readiness={readiness} />
 
+          <CutoverArtifactInventoryCard readiness={readiness} />
+
           <RouteBatchReadinessCard readiness={readiness} />
 
           <ManifestValidationCard readiness={readiness} />
@@ -355,6 +357,65 @@ function RouteBatchReadinessCard({ readiness }: { readiness: Readiness }) {
             </div>
           ))}
         </div>
+      </CardBody>
+    </Card>
+  );
+}
+
+function CutoverArtifactInventoryCard({ readiness }: { readiness: Readiness }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.next_public' });
+  const inventory = readiness.cutover_artifacts;
+
+  return (
+    <Card>
+      <CardHeader className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold">{t('artifacts.title')}</h2>
+        <Chip color={inventory.activation_available ? 'danger' : 'success'} variant="soft">
+          {inventory.activation_available ? t('artifacts.activation_available') : t('artifacts.no_activation_control')}
+        </Chip>
+      </CardHeader>
+      <CardBody>
+        <div className="mb-4 flex flex-wrap gap-2">
+          <Chip size="sm" color="success" variant="soft">
+            {t(`production_effects.${inventory.production_effect}`)}
+          </Chip>
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-2">
+          {inventory.items.map((item) => (
+            <div key={item.key} className="rounded-md border border-divider px-3 py-3 text-sm">
+              <div className="mb-2 font-medium">{t(`artifact_items.${item.key}`)}</div>
+              <RuntimeRow label={t('artifacts.path')} value={item.path} />
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Chip size="sm" color={item.exists ? 'success' : 'warning'} variant="soft">
+                  {item.exists ? t('artifacts.present') : t('artifacts.missing')}
+                </Chip>
+                <Chip size="sm" variant="soft">
+                  {t(`artifact_categories.${item.category}`)}
+                </Chip>
+                <Chip size="sm" color={item.production_effect === 'none' ? 'success' : 'warning'} variant="soft">
+                  {t(`production_effects.${item.production_effect}`)}
+                </Chip>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {inventory.required_commands.length > 0 && (
+          <div className="mt-4 space-y-2">
+            <div className="text-sm font-medium">{t('artifacts.required_commands')}</div>
+            {inventory.required_commands.map((command) => (
+              <div key={command.key} className="rounded-md border border-divider px-3 py-2">
+                <code className="block break-all text-xs">{command.command}</code>
+                {command.required_before_cutover && (
+                  <Chip className="mt-2" size="sm" color="warning" variant="soft">
+                    {t('artifacts.required_before_cutover')}
+                  </Chip>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </CardBody>
     </Card>
   );
