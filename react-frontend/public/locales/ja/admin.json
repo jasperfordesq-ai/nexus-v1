@@ -2952,7 +2952,16 @@
         "public_route_missing_fields": "A public route is missing required fields.",
         "public_route_duplicate_pattern": "A public route pattern is duplicated.",
         "public_route_duplicate_key": "A public route key is duplicated.",
-        "public_route_collides_with_private_prefix": "A public route collides with a private Vite route prefix."
+        "public_route_collides_with_private_prefix": "A public route collides with a private Vite route prefix.",
+        "content_sources_not_laravel_api": "Content sources must use Laravel public APIs.",
+        "content_sources_allow_next_database_queries": "Next.js content sources must not query the database.",
+        "api_backed_route_invalid": "An API-backed route entry is malformed.",
+        "api_backed_route_missing_fields": "An API-backed route is missing required fields.",
+        "api_backed_route_duplicate_key": "An API-backed route key is duplicated.",
+        "api_backed_route_not_in_manifest": "An API-backed route is missing from the public route manifest.",
+        "api_backed_route_not_get": "API-backed public routes must use GET.",
+        "api_backed_route_not_laravel_v2_endpoint": "API-backed routes must use relative Laravel v2 endpoints.",
+        "api_backed_route_param_mismatch": "API endpoint parameters must match the public route pattern."
       }
     }
   },
