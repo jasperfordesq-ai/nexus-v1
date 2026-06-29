@@ -56,7 +56,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
         $response->assertJsonPath('data.manifest.route_counts.public_routes', 24);
         $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 16);
-        $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 17);
+        $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 20);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 12);
         $response->assertJsonPath('data.manifest.validation.status', 'pass');
         $response->assertJsonPath('data.manifest.validation.issues', []);
@@ -86,6 +86,9 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('resources', $apiBackedRouteKeys);
         $this->assertContains('marketplaceDetail', $apiBackedRouteKeys);
         $this->assertContains('dashboard', $payload['manifest']['vite_private_prefixes']);
+        $this->assertContains('login', $payload['manifest']['vite_private_prefixes']);
+        $this->assertContains('onboarding', $payload['manifest']['vite_private_prefixes']);
+        $this->assertContains('register', $payload['manifest']['vite_private_prefixes']);
         $this->assertContains('/events/new', $payload['manifest']['vite_private_patterns']);
         $this->assertContains('route_cutover_disabled', array_column($payload['safety_checks'], 'key'));
         $this->assertContains('npm --prefix next-public-frontend run check', $payload['shadow_runtime']['verification_commands']);
