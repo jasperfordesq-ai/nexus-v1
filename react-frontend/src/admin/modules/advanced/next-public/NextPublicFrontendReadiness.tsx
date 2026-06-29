@@ -139,6 +139,8 @@ export default function NextPublicFrontendReadiness() {
 
           <TenantResolutionCard readiness={readiness} />
 
+          <EdgeCanaryCard readiness={readiness} />
+
           <ManifestValidationCard readiness={readiness} />
 
           <RouteCutoverGatesCard readiness={readiness} />
@@ -289,6 +291,55 @@ function TenantResolutionCard({ readiness }: { readiness: Readiness }) {
           <Chip size="sm" color={tenantResolution.next_queries_database ? 'danger' : 'success'} variant="soft">
             {tenantResolution.next_queries_database ? t('tenant_resolution.next_queries_database') : t('tenant_resolution.no_next_database')}
           </Chip>
+        </div>
+      </CardBody>
+    </Card>
+  );
+}
+
+function EdgeCanaryCard({ readiness }: { readiness: Readiness }) {
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced.next_public' });
+  const edgeCanary = readiness.edge_canary;
+
+  return (
+    <Card>
+      <CardHeader className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold">{t('edge_canary.title')}</h2>
+        <Chip color={statusColor(edgeCanary.status)} variant="soft">
+          {t(`statuses.${edgeCanary.status}`)}
+        </Chip>
+      </CardHeader>
+      <CardBody>
+        <div className="mb-4 grid gap-3 md:grid-cols-3">
+          <RuntimeRow label={t('edge_canary.edge')} value={t(`edge_canary_edges.${edgeCanary.edge}`)} />
+          <RuntimeRow label={t('edge_canary.routing_flag')} value={edgeCanary.routing_flag} />
+          <RuntimeRow label={t('edge_canary.route_file_status')} value={t(`edge_canary_route_file_statuses.${edgeCanary.route_file_status}`)} />
+        </div>
+
+        <div className="mb-4 flex flex-wrap gap-2">
+          <Chip size="sm" color={edgeCanary.routing_flag_enabled ? 'danger' : 'success'} variant="soft">
+            {edgeCanary.routing_flag_enabled ? t('edge_canary.routing_flag_on') : t('edge_canary.routing_flag_off')}
+          </Chip>
+          <Chip size="sm" color={edgeCanary.activation_available ? 'danger' : 'success'} variant="soft">
+            {edgeCanary.activation_available ? t('edge_canary.activation_available') : t('edge_canary.no_activation_control')}
+          </Chip>
+          <Chip size="sm" color={edgeCanary.preview_only ? 'success' : 'warning'} variant="soft">
+            {edgeCanary.preview_only ? t('edge_canary.preview_only') : t('edge_canary.not_preview_only')}
+          </Chip>
+          <Chip size="sm" color={edgeCanary.reviewed_config_required ? 'warning' : 'danger'} variant="soft">
+            {t('edge_canary.reviewed_config_required')}
+          </Chip>
+          <Chip size="sm" color={edgeCanary.requires_explicit_cutover_instruction ? 'warning' : 'danger'} variant="soft">
+            {t('edge_canary.explicit_instruction_required')}
+          </Chip>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {edgeCanary.guardrails.map((guardrail) => (
+            <Chip key={guardrail} size="sm" color="warning" variant="soft">
+              {t(`edge_canary_guardrails.${guardrail}`)}
+            </Chip>
+          ))}
         </div>
       </CardBody>
     </Card>

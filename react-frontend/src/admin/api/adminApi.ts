@@ -1835,6 +1835,19 @@ export interface NextPublicTenantResolution {
   examples: NextPublicTenantResolutionExample[];
 }
 
+export interface NextPublicEdgeCanary {
+  status: 'blocked' | 'blocker' | string;
+  edge: 'apache_plesk' | string;
+  routing_flag: string;
+  routing_flag_enabled: boolean;
+  activation_available: boolean;
+  preview_only: boolean;
+  requires_explicit_cutover_instruction: boolean;
+  reviewed_config_required: boolean;
+  route_file_status: 'not_configured' | string;
+  guardrails: string[];
+}
+
 export interface NextPublicFrontendReadiness {
   mode: string;
   app: {
@@ -1883,6 +1896,7 @@ export interface NextPublicFrontendReadiness {
     api_backed_routes: NextPublicApiBackedRoute[];
   };
   tenant_resolution: NextPublicTenantResolution;
+  edge_canary: NextPublicEdgeCanary;
   production_routing: {
     active: boolean;
     route_cutover_enabled: boolean;

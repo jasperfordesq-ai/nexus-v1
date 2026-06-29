@@ -71,6 +71,13 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.tenant_resolution.shared_host_slug_parameter', 'slug');
         $response->assertJsonPath('data.tenant_resolution.custom_domain_origin_forwarding', true);
         $response->assertJsonPath('data.tenant_resolution.next_queries_database', false);
+        $response->assertJsonPath('data.edge_canary.status', 'blocked');
+        $response->assertJsonPath('data.edge_canary.edge', 'apache_plesk');
+        $response->assertJsonPath('data.edge_canary.routing_flag', 'NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED');
+        $response->assertJsonPath('data.edge_canary.routing_flag_enabled', false);
+        $response->assertJsonPath('data.edge_canary.activation_available', false);
+        $response->assertJsonPath('data.edge_canary.preview_only', true);
+        $response->assertJsonPath('data.edge_canary.route_file_status', 'not_configured');
 
         $payload = $response->json('data');
         $publicPatterns = array_column($payload['manifest']['public_routes'], 'pattern');
@@ -181,6 +188,8 @@ class AdminNextPublicFrontendControllerTest extends TestCase
             'Origin: https://<custom-domain>',
             $tenantResolutionExamplesByKey['custom_domain']['headers'],
         );
+        $this->assertContains('do_not_edit_plesk_vhosts_directly', $payload['edge_canary']['guardrails']);
+        $this->assertContains('do_not_remove_prerender', $payload['edge_canary']['guardrails']);
         $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['about']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['listingDetail']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['volunteeringOpportunityDetail']['content_source']);

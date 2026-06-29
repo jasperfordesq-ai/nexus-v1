@@ -102,6 +102,25 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertContains('Origin: https://<custom-domain>', $examples['custom_domain']['headers']);
     }
 
+    public function test_summary_reports_edge_canary_preview_without_activation_controls(): void
+    {
+        $summary = (new NextPublicFrontendReadinessService())->summary();
+
+        $edgeCanary = $summary['edge_canary'];
+
+        $this->assertSame('blocked', $edgeCanary['status']);
+        $this->assertSame('apache_plesk', $edgeCanary['edge']);
+        $this->assertSame('NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED', $edgeCanary['routing_flag']);
+        $this->assertFalse($edgeCanary['routing_flag_enabled']);
+        $this->assertFalse($edgeCanary['activation_available']);
+        $this->assertTrue($edgeCanary['preview_only']);
+        $this->assertTrue($edgeCanary['requires_explicit_cutover_instruction']);
+        $this->assertTrue($edgeCanary['reviewed_config_required']);
+        $this->assertSame('not_configured', $edgeCanary['route_file_status']);
+        $this->assertContains('do_not_edit_plesk_vhosts_directly', $edgeCanary['guardrails']);
+        $this->assertContains('do_not_remove_prerender', $edgeCanary['guardrails']);
+    }
+
     public function test_manifest_validation_blocks_api_routes_outside_laravel_v2_public_api(): void
     {
         $validation = $this->validateManifest([

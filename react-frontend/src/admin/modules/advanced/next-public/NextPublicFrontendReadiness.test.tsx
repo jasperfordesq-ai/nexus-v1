@@ -107,6 +107,21 @@ const readiness = {
       },
     ],
   },
+  edge_canary: {
+    status: 'blocked',
+    edge: 'apache_plesk',
+    routing_flag: 'NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED',
+    routing_flag_enabled: false,
+    activation_available: false,
+    preview_only: true,
+    requires_explicit_cutover_instruction: true,
+    reviewed_config_required: true,
+    route_file_status: 'not_configured',
+    guardrails: [
+      'do_not_edit_plesk_vhosts_directly',
+      'do_not_remove_prerender',
+    ],
+  },
   production_routing: {
     active: false,
     route_cutover_enabled: false,
@@ -206,6 +221,10 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getByText('Public Laravel GET route')).toBeInTheDocument();
     expect(screen.getByText('GET /v2/tenant/bootstrap?slug={tenantSlug}')).toBeInTheDocument();
     expect(screen.getByText('Origin: https://<custom-domain>')).toBeInTheDocument();
+    expect(screen.getByText('Edge canary preview')).toBeInTheDocument();
+    expect(screen.getByText('Apache/Plesk')).toBeInTheDocument();
+    expect(screen.getByText('NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED')).toBeInTheDocument();
+    expect(screen.getByText('No route file configured by this module')).toBeInTheDocument();
     expect(screen.getByText('npm run build:next-public')).toBeInTheDocument();
     expect(screen.getAllByText('npm --prefix next-public-frontend run check')).not.toHaveLength(0);
     expect(screen.getByText('npm --prefix react-frontend run build')).toBeInTheDocument();

@@ -231,6 +231,7 @@ class NextPublicFrontendReadinessService
                 'api_backed_routes' => $apiBackedRoutes,
             ],
             'tenant_resolution' => $this->tenantResolutionContract(),
+            'edge_canary' => $this->edgeCanaryPreview($cutoverEnabled),
             'production_routing' => [
                 'active' => false,
                 'route_cutover_enabled' => $cutoverEnabled,
@@ -277,7 +278,7 @@ class NextPublicFrontendReadinessService
     }
 
     /**
-     * @return array{status: string, bootstrap_endpoint: string, source_of_truth: string, shared_host_slug_parameter: string, custom_domain_origin_forwarding: bool, next_queries_database: bool, examples: array<int, array{key: string, request_host: string, request_path: string, bootstrap_request: string, headers: array<int, string>}>}
+     * @return array{status: string, bootstrap_endpoint: string, bootstrap_route_status: string, source_of_truth: string, shared_host_slug_parameter: string, custom_domain_origin_forwarding: bool, next_queries_database: bool, examples: array<int, array{key: string, request_host: string, request_path: string, bootstrap_request: string, headers: array<int, string>}>}
      */
     private function tenantResolutionContract(): array
     {
@@ -306,6 +307,30 @@ class NextPublicFrontendReadinessService
                     'bootstrap_request' => 'GET /v2/tenant/bootstrap',
                     'headers' => ['Origin: https://<custom-domain>'],
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array{status: string, edge: string, routing_flag: string, routing_flag_enabled: bool, activation_available: bool, preview_only: bool, requires_explicit_cutover_instruction: bool, reviewed_config_required: bool, route_file_status: string, guardrails: array<int, string>}
+     */
+    private function edgeCanaryPreview(bool $cutoverEnabled): array
+    {
+        return [
+            'status' => $cutoverEnabled ? 'blocker' : 'blocked',
+            'edge' => 'apache_plesk',
+            'routing_flag' => 'NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED',
+            'routing_flag_enabled' => $cutoverEnabled,
+            'activation_available' => false,
+            'preview_only' => true,
+            'requires_explicit_cutover_instruction' => true,
+            'reviewed_config_required' => true,
+            'route_file_status' => 'not_configured',
+            'guardrails' => [
+                'do_not_edit_plesk_vhosts_directly',
+                'do_not_enable_routing_flag_without_cutover_instruction',
+                'public_routes_only',
+                'do_not_remove_prerender',
             ],
         ];
     }
