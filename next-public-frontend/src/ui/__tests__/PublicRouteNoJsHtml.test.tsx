@@ -22,6 +22,39 @@ const tenant: TenantBootstrap = {
 };
 
 describe('public route no-JavaScript HTML', () => {
+  it('renders tenant-slug home routes as crawler-readable HTML', () => {
+    const routeSegments: string[] = [];
+    const route = getRouteOwnership(routeSegments);
+    const canonicalUrl = buildCanonicalUrl({
+      origin: 'https://app.project-nexus.ie',
+      routeSegments,
+      tenantMode: 'path',
+      tenantSlug: tenant.slug,
+    });
+
+    const html = renderToStaticMarkup(
+      <PublicPage
+        canonicalUrl={canonicalUrl}
+        route={route}
+        routeSegments={routeSegments}
+        tenant={tenant}
+        tenantBasePath={`/${tenant.slug}`}
+        t={createTranslator('en')}
+      />,
+    );
+
+    expect(route).toMatchObject({ owner: 'next-public', routeKey: 'home' });
+    expect(canonicalUrl).toBe('https://app.project-nexus.ie/hour-timebank');
+    expect(html).toContain('Hour Timebank');
+    expect(html).toContain('Neighbour-powered support');
+    expect(html).toContain('href="/hour-timebank/about"');
+    expect(html).toContain('href="/hour-timebank/contact"');
+    expect(html).toContain('AGPL-3.0-or-later');
+    expect(html).toContain(canonicalUrl);
+    expect(html).toContain('type="application/ld+json"');
+    expect(html).toContain('<h1>');
+  });
+
   it('renders every shadow-owned public route as crawler-readable HTML', () => {
     for (const manifestRoute of routeOwnershipManifest.nextPublicRoutes) {
       const routeSegments = sampleSegments(manifestRoute.pattern);
