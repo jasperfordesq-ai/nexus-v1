@@ -11,6 +11,7 @@ describe('public content sources', () => {
   it('resolves collection and detail endpoints from the shared manifest', () => {
     expect(publicContentSources.sourceOfTruth).toBe('laravel_public_api');
     expect(publicContentSources.databaseQueriesFromNext).toBe(false);
+    expect(getPublicEndpointForRoute('faq')).toBe('/v2/help/faqs');
     expect(getPublicEndpointForRoute('listings')).toBe('/v2/listings');
     expect(getPublicEndpointForRoute('listingDetail', { id: '42' })).toBe('/v2/listings/42');
     expect(getPublicEndpointForRoute('explore')).toBe('/v2/explore');

@@ -55,7 +55,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
         $response->assertJsonPath('data.manifest.route_counts.public_routes', 76);
-        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 33);
+        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 34);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 38);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 100);
         $response->assertJsonPath('data.manifest.validation.status', 'pass');
@@ -127,6 +127,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('/volunteering/opportunities/:id', $publicPatterns);
         $this->assertContains('/ideation/:id', $publicPatterns);
         $this->assertContains('blog-index', $apiBackedRouteKeys);
+        $this->assertContains('faq', $apiBackedRouteKeys);
         $this->assertContains('cms-page', $apiBackedRouteKeys);
         $this->assertContains('listings', $apiBackedRouteKeys);
         $this->assertContains('listingDetail', $apiBackedRouteKeys);
@@ -230,6 +231,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertSame('pass', $routeBatchesByKey['vite_private_retained']['status']);
         $this->assertSame([], $routeBatchesByKey['vite_private_retained']['blockers']);
         $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['about']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['faq']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['listingDetail']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['volunteeringOpportunityDetail']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['ideationDetail']['content_source']);
