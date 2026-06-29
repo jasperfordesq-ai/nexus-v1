@@ -128,9 +128,17 @@ function normalizeHost(host: string | undefined): string {
 }
 
 function normalizeSegments(segments: string[]): string[] {
-  return segments.map((segment) => decodeURIComponent(segment).trim().toLowerCase()).filter(Boolean);
+  return segments.map((segment) => decodePathSegment(segment).trim().toLowerCase()).filter(Boolean);
 }
 
 function stripPort(host: string): string {
   return host.split(':')[0] ?? host;
+}
+
+function decodePathSegment(segment: string): string {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return segment;
+  }
 }

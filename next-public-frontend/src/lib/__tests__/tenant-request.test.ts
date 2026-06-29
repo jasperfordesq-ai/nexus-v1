@@ -93,4 +93,13 @@ describe('tenant request resolution', () => {
       tenantSlug: undefined,
     });
   });
+
+  it('does not throw on malformed encoded path segments', () => {
+    expect(() => {
+      resolveTenantRequest(['%E0%A4%A', 'about'], {
+        host: 'app.project-nexus.ie',
+        protocol: 'https',
+      });
+    }).not.toThrow();
+  });
 });
