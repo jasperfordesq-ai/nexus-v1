@@ -145,7 +145,10 @@ export function PublicNavbar({ accessibleFrontendUrl }: PublicNavbarProps): Reac
     .filter((entry) => entry.items.length > 0);
 
   return (
-    <header className="sticky top-0 left-0 right-0 z-40 backdrop-blur-xl border-b border-theme-default glass-surface overflow-x-clip">
+    <header
+      data-nexus-ui="react-public-navbar"
+      className="sticky top-0 left-0 right-0 z-40 backdrop-blur-xl border-b border-theme-default glass-surface overflow-x-clip"
+    >
       {/* Utility bar */}
       <div className="hidden sm:block border-b border-theme-default bg-theme-elevated">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -190,9 +193,15 @@ export function PublicNavbar({ accessibleFrontendUrl }: PublicNavbarProps): Reac
         <div className="flex items-center justify-between gap-2 min-h-14 sm:min-h-16 py-1.5">
           {/* Left: mobile toggle + brand */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 lg:flex-none">
-            <span className="lg:hidden inline-flex items-center justify-center text-theme-muted min-w-[44px] min-h-[44px]" aria-hidden="true">
-              <Menu className="w-5 h-5" />
-            </span>
+            <button
+              type="button"
+              className="lg:hidden inline-flex items-center justify-center text-theme-muted hover:text-theme-primary min-w-[44px] min-h-[44px]"
+              aria-label={t('accessibility.open_menu')}
+              aria-expanded={false}
+              aria-controls="mobile-drawer"
+            >
+              <Menu className="w-5 h-5" aria-hidden="true" />
+            </button>
             <TenantLogo size="md" showName />
           </div>
 
