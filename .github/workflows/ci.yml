@@ -23,9 +23,10 @@ jobs:
   # Stage 1a: PHP Tests — PHPUnit, sharded across parallel runners.
   #
   # The ~12.5k-test Laravel suite ran single-threaded and took ~2h, making it
-  # the long pole every PR waited on. It is now split into SHARD_TOTAL balanced
-  # buckets by scripts/ci/phpunit-shard.php and run as a matrix, cutting the
-  # wall-clock to roughly 1/N. Each shard gets its OWN MariaDB + Redis service,
+  # the long pole every PR waited on. It is now split into SHARD_TOTAL stable
+  # buckets by scripts/ci/phpunit-shard.php and run as a matrix. Stable path
+  # hashing avoids surprise shard reshuffles, but runtime balance can drift as
+  # the suite changes. Each shard gets its OWN MariaDB + Redis service,
   # so there is no cross-worker DB contention — every shard is the same
   # isolated, single-threaded environment the suite was written for, just
   # smaller. (Keep the matrix list length in sync with SHARD_TOTAL.)
@@ -33,10 +34,11 @@ jobs:
   php-tests:
     name: PHP Tests (shard ${{ matrix.shard }})
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     env:
       SHARD_TOTAL: '6'
+      PHPUNIT_SHARD_TIMEOUT_SECONDS: '2400'
 
     strategy:
       fail-fast: false
@@ -147,14 +149,45 @@ jobs:
         shell: bash
         run: |
           mapfile -t FILES < <(php scripts/ci/phpunit-shard.php "${{ matrix.shard }}" "$SHARD_TOTAL")
-          echo "Shard ${{ matrix.shard }}/$SHARD_TOTAL → ${#FILES[@]} test files"
+          echo "Shard ${{ matrix.shard }}/$SHARD_TOTAL -> ${#FILES[@]} test files"
           if [ "${#FILES[@]}" -eq 0 ]; then
             echo "::error::No test files assigned to shard ${{ matrix.shard }}/$SHARD_TOTAL"
             exit 1
           fi
-          vendor/bin/phpunit --colors=always --no-coverage \
+
+          {
+            echo "### PHP shard ${{ matrix.shard }}/$SHARD_TOTAL"
+            echo ""
+            echo "- Test files: ${#FILES[@]}"
+            echo "- PHPUnit timeout: ${PHPUNIT_SHARD_TIMEOUT_SECONDS}s"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "::group::Shard ${{ matrix.shard }} test files"
+          printf '%s\n' "${FILES[@]}"
+          echo "::endgroup::"
+
+          start_epoch="$(date +%s)"
+          set +e
+          timeout --kill-after=60s "${PHPUNIT_SHARD_TIMEOUT_SECONDS}s" \
+            vendor/bin/phpunit --colors=always --no-coverage \
             --display-warnings --display-deprecations --display-incomplete --display-skipped \
             "${FILES[@]}"
+          status=$?
+          set -e
+          elapsed=$(( $(date +%s) - start_epoch ))
+
+          {
+            echo "- PHPUnit elapsed: ${elapsed}s"
+            echo "- Exit code: ${status}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$status" -eq 124 ]; then
+            echo "::error::PHPUnit shard ${{ matrix.shard }}/$SHARD_TOTAL exceeded ${PHPUNIT_SHARD_TIMEOUT_SECONDS}s before completing. Rebalance this shard or raise the shard timeout."
+          elif [ "$status" -eq 137 ]; then
+            echo "::error::PHPUnit shard ${{ matrix.shard }}/$SHARD_TOTAL was killed after exceeding the grace period."
+          fi
+
+          exit "$status"
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
