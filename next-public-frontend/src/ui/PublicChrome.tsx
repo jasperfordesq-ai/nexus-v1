@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 
 import { resolveAssetUrl, safeCssColor } from '../lib/assets';
+import { NavbarHost } from './NavbarHost';
 import type { Translator } from '../lib/i18n';
 import type { TenantBootstrap } from '../lib/tenant-api';
 import { getApiBase } from '../lib/tenant-api';
@@ -113,7 +114,11 @@ export function PublicChrome({ canonicalUrl, children, tenant, tenantBasePath, t
       data-slot="surface"
       style={context.style}
     >
-      <PublicNavbar {...context} />
+      <NavbarHost
+        tenant={tenant}
+        tenantBasePath={tenantBasePath}
+        accessibleFrontendUrl={context.accessibleFrontendUrl}
+      />
       <PublicMobileDrawer {...context} />
       <main>{children}</main>
       <PublicFooter {...context} canonicalUrl={canonicalUrl} />
