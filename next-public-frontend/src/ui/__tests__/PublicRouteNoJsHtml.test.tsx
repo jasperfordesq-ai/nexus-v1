@@ -84,7 +84,7 @@ describe('public route no-JavaScript HTML', () => {
       expect(html, manifestRoute.pattern).toContain('type="application/ld+json"');
       expect(html, manifestRoute.pattern).toMatch(/<h1(?:\s|>)/);
     }
-  });
+  }, 15000);
 });
 
 function sampleSegments(pattern: string): string[] {

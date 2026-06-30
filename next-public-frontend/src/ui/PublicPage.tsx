@@ -313,6 +313,256 @@ function BrandLogo({ logoUrl }: { logoUrl: string | undefined }): ReactNode {
   );
 }
 
+interface RichImage {
+  altText?: string | null;
+  sortOrder?: number;
+  url: string;
+}
+
+interface RichFact {
+  label: string;
+  value?: null | string;
+}
+
+function EmptyStatePanel({ body, title }: { body: string; title: string }): ReactNode {
+  return (
+    <Card className="border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)]" variant="default">
+      <Card.Header>
+        <h2 className="text-xl font-bold text-[color:var(--nexus-ink)]">{title}</h2>
+      </Card.Header>
+      <Card.Content>
+        <p className="leading-7 text-[color:var(--nexus-muted)]">{body}</p>
+      </Card.Content>
+    </Card>
+  );
+}
+
+function RichIndexGrid({ children }: { children: ReactNode }): ReactNode {
+  return <div className="grid gap-5">{children}</div>;
+}
+
+function RichIndexCard({
+  description,
+  facts,
+  href,
+  image,
+  imageAltFallback,
+  meta,
+  title,
+}: {
+  description: string;
+  facts: RichFact[];
+  href: string;
+  image?: RichImage | null;
+  imageAltFallback: string;
+  meta: Array<null | string | undefined>;
+  title: string;
+}): ReactNode {
+  const metaItems = compactText(meta);
+
+  return (
+    <article>
+      <Card
+        className="overflow-hidden border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)] shadow-sm"
+        data-nexus-ui="rich-index-card"
+        variant="default"
+      >
+        <div className="grid md:grid-cols-[minmax(220px,32%)_1fr]">
+          <MediaFrame href={href} image={image} imageAltFallback={imageAltFallback} variant="card" />
+          <Card.Content className="p-5">
+            {metaItems.length > 0 ? (
+              <div className="mb-3 flex flex-wrap gap-2">
+                {metaItems.map((item) => (
+                  <Chip color="accent" key={item} size="sm" variant="soft">
+                    {item}
+                  </Chip>
+                ))}
+              </div>
+            ) : null}
+            <h2 className="text-xl font-bold leading-tight text-[color:var(--nexus-ink)]">
+              <Link
+                className="text-[color:var(--nexus-ink)] underline-offset-4 hover:text-[color:var(--nexus-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
+                href={href}
+              >
+                {title}
+              </Link>
+            </h2>
+            <p className="mt-3 leading-7 text-[color:var(--nexus-muted)]">{description}</p>
+            <FactList className="mt-5 md:grid-cols-2" facts={facts} />
+          </Card.Content>
+        </div>
+      </Card>
+    </article>
+  );
+}
+
+function RichDetailLayout({
+  asideTitle,
+  backHref,
+  backLabel,
+  breadcrumbLabel,
+  children,
+  facts,
+  gallery = [],
+  galleryTitle,
+  image,
+  imageAltFallback,
+  title,
+}: {
+  asideTitle: string;
+  backHref: string;
+  backLabel: string;
+  breadcrumbLabel: string;
+  children: ReactNode;
+  facts: RichFact[];
+  gallery?: RichImage[];
+  galleryTitle?: string;
+  image?: RichImage | null;
+  imageAltFallback: string;
+  title: string;
+}): ReactNode {
+  return (
+    <article className="grid gap-5" data-nexus-ui="rich-detail">
+      <DetailBreadcrumb backHref={backHref} backLabel={backLabel} breadcrumbLabel={breadcrumbLabel} title={title} />
+      {image ? <MediaFrame image={image} imageAltFallback={imageAltFallback} variant="hero" /> : null}
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(260px,320px)] lg:items-start">
+        <div className="grid gap-5">
+          {children}
+          {gallery.length > 0 && galleryTitle ? (
+            <ContentCard title={galleryTitle}>
+              <GalleryGrid imageAltFallback={imageAltFallback} images={gallery} />
+            </ContentCard>
+          ) : null}
+        </div>
+        <aside>
+          <Card
+            className="border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)] lg:sticky lg:top-4"
+            variant="default"
+          >
+            <Card.Header>
+              <h2 className="text-xl font-bold text-[color:var(--nexus-ink)]">{asideTitle}</h2>
+            </Card.Header>
+            <Card.Content>
+              <FactList facts={facts} />
+            </Card.Content>
+          </Card>
+        </aside>
+      </div>
+    </article>
+  );
+}
+
+function ContentCard({ children, title }: { children: ReactNode; title: string }): ReactNode {
+  return (
+    <Card className="border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)]" variant="default">
+      <Card.Header>
+        <h2 className="text-xl font-bold text-[color:var(--nexus-ink)]">{title}</h2>
+      </Card.Header>
+      <Card.Content>
+        <div className="space-y-4 leading-7 text-[color:var(--nexus-muted)]">{children}</div>
+      </Card.Content>
+    </Card>
+  );
+}
+
+function DetailBreadcrumb({
+  backHref,
+  backLabel,
+  breadcrumbLabel,
+  title,
+}: {
+  backHref: string;
+  backLabel: string;
+  breadcrumbLabel: string;
+  title: string;
+}): ReactNode {
+  return (
+    <nav aria-label={breadcrumbLabel} className="flex flex-wrap items-center gap-2 text-sm text-[color:var(--nexus-muted)]">
+      <Link
+        className="font-bold text-[color:var(--nexus-accent)] hover:text-[color:var(--nexus-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
+        href={backHref}
+      >
+        {backLabel}
+      </Link>
+      <span aria-hidden="true">/</span>
+      <span className="text-[color:var(--nexus-ink)]">{title}</span>
+    </nav>
+  );
+}
+
+function FactList({ className = '', facts }: { className?: string; facts: RichFact[] }): ReactNode {
+  const visibleFacts = facts.filter((fact) => Boolean(fact.value));
+
+  if (visibleFacts.length === 0) {
+    return null;
+  }
+
+  return (
+    <dl className={('grid gap-3 ' + className).trim()}>
+      {visibleFacts.map((fact) => (
+        <div className="min-w-0" key={fact.label}>
+          <dt className="text-xs font-bold uppercase text-[color:var(--nexus-muted)]">{fact.label}</dt>
+          <dd className="mt-1 [overflow-wrap:anywhere] text-[color:var(--nexus-ink)]">{fact.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function MediaFrame({
+  href,
+  image,
+  imageAltFallback,
+  variant,
+}: {
+  href?: string;
+  image?: RichImage | null;
+  imageAltFallback: string;
+  variant: 'card' | 'hero';
+}): ReactNode {
+  const frameClassName =
+    variant === 'hero'
+      ? 'aspect-[16/7] max-h-[460px] rounded-lg'
+      : 'aspect-[4/3] min-h-56 md:min-h-full';
+  const content = image ? (
+    <img alt={image.altText || imageAltFallback} className="h-full w-full object-cover" src={image.url} />
+  ) : (
+    <span aria-hidden="true" className="block h-full w-full bg-[color:var(--nexus-accent-soft)]" />
+  );
+  const className = 'block overflow-hidden bg-[color:var(--nexus-accent-soft)] ' + frameClassName;
+
+  if (href) {
+    return (
+      <Link className={className} href={href}>
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className={className}>{content}</div>;
+}
+
+function GalleryGrid({
+  imageAltFallback,
+  images,
+}: {
+  imageAltFallback: string;
+  images: RichImage[];
+}): ReactNode {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {images.map((image) => (
+        <img
+          alt={image.altText || imageAltFallback}
+          className="aspect-[4/3] w-full rounded-lg bg-[color:var(--nexus-accent-soft)] object-cover"
+          key={image.url + '-' + (image.sortOrder ?? 0)}
+          src={image.url}
+        />
+      ))}
+    </div>
+  );
+}
+
 function buildThemeStyle(
   accentColor: string | undefined,
   secondaryColor: string | undefined,
@@ -492,44 +742,27 @@ function ListingsIndex({
   t: Translator;
 }): ReactNode {
   if (listings.items.length === 0) {
-    return (
-      <article className="public-panel">
-        <h2>{t('pages.listings.title')}</h2>
-        <p>{t('listings.empty')}</p>
-      </article>
-    );
+    return <EmptyStatePanel body={t('listings.empty')} title={t('pages.listings.title')} />;
   }
 
   return (
-    <div className="listings-grid">
+    <RichIndexGrid>
       {listings.items.map((listing) => (
-        <article className="listing-card" key={listing.id}>
-          <a className="listing-card-image" href={withTenantBase(tenantBasePath, `listings/${listing.slug}`)}>
-            {listing.primaryImage ? (
-              <img
-                alt={listing.primaryImage.altText || t('listings.imageAltFallback')}
-                src={listing.primaryImage.url}
-              />
-            ) : (
-              <span aria-hidden="true" />
-            )}
-          </a>
-          <div className="listing-card-body">
-            <p className="listing-card-meta">
-              {compactText([listing.category?.name, formatTimeValue(listing, t)]).join(' · ')}
-            </p>
-            <h2>
-              <a href={withTenantBase(tenantBasePath, `listings/${listing.slug}`)}>{listing.title}</a>
-            </h2>
-            <p>{listing.excerpt || listing.description}</p>
-            <dl className="listing-facts">
-              <DefinitionRow label={t('listings.locationLabel')} value={listing.location.label} />
-              <DefinitionRow label={t('listings.providerLabel')} value={listing.provider.displayName} />
-            </dl>
-          </div>
-        </article>
+        <RichIndexCard
+          description={listing.excerpt || listing.description}
+          facts={[
+            { label: t('listings.locationLabel'), value: listing.location.label },
+            { label: t('listings.providerLabel'), value: listing.provider.displayName },
+          ]}
+          href={withTenantBase(tenantBasePath, 'listings/' + listing.slug)}
+          image={listing.primaryImage}
+          imageAltFallback={t('listings.imageAltFallback')}
+          key={listing.id}
+          meta={[listing.category?.name, formatTimeValue(listing, t)]}
+          title={listing.title}
+        />
       ))}
-    </div>
+    </RichIndexGrid>
   );
 }
 
@@ -545,58 +778,30 @@ function ListingDetail({
   const gallery = listing.gallery.length > 0 ? listing.gallery : compactImages([listing.primaryImage]);
 
   return (
-    <article className="listing-detail">
-      <nav aria-label={t('listings.breadcrumbLabel')} className="listing-breadcrumb">
-        <a href={withTenantBase(tenantBasePath, 'listings')}>{t('listings.backToListings')}</a>
-        <span aria-hidden="true">/</span>
-        <span>{listing.title}</span>
-      </nav>
-
-      {listing.primaryImage ? (
-        <img
-          alt={listing.primaryImage.altText || t('listings.imageAltFallback')}
-          className="listing-hero-image"
-          src={listing.primaryImage.url}
-        />
-      ) : null}
-
-      <div className="listing-detail-grid">
-        <div className="listing-detail-main">
-          <section className="public-panel article-content">
-            <h2>{listing.title}</h2>
-            <p>{listing.description}</p>
-          </section>
-
-          {gallery.length > 0 ? (
-            <section className="public-panel">
-              <h2>{t('listings.galleryLabel')}</h2>
-              <div className="listing-gallery">
-                {gallery.map((image) => (
-                  <img
-                    alt={image.altText || t('listings.imageAltFallback')}
-                    key={`${image.url}-${image.sortOrder ?? 0}`}
-                    src={image.url}
-                  />
-                ))}
-              </div>
-            </section>
-          ) : null}
-        </div>
-
-        <aside className="public-panel listing-detail-aside">
-          <h2>{t('listings.providerLabel')}</h2>
-          <p>{listing.provider.displayName}</p>
-          <dl className="listing-facts stacked">
-            <DefinitionRow label={t('listings.categoryLabel')} value={listing.category?.name} />
-            <DefinitionRow label={t('listings.valueLabel')} value={formatTimeValue(listing, t)} />
-            <DefinitionRow label={t('listings.locationLabel')} value={listing.location.label} />
-            <DefinitionRow label={t('listings.statusLabel')} value={listing.status} />
-            <DefinitionRow label={t('listings.updatedLabel')} value={formatDate(listing.updatedAt)} />
-            <DefinitionRow label={t('listings.createdLabel')} value={formatDate(listing.createdAt)} />
-          </dl>
-        </aside>
-      </div>
-    </article>
+    <RichDetailLayout
+      asideTitle={t('listings.providerLabel')}
+      backHref={withTenantBase(tenantBasePath, 'listings')}
+      backLabel={t('listings.backToListings')}
+      breadcrumbLabel={t('listings.breadcrumbLabel')}
+      facts={[
+        { label: t('listings.providerLabel'), value: listing.provider.displayName },
+        { label: t('listings.categoryLabel'), value: listing.category?.name },
+        { label: t('listings.valueLabel'), value: formatTimeValue(listing, t) },
+        { label: t('listings.locationLabel'), value: listing.location.label },
+        { label: t('listings.statusLabel'), value: listing.status },
+        { label: t('listings.updatedLabel'), value: formatDate(listing.updatedAt) },
+        { label: t('listings.createdLabel'), value: formatDate(listing.createdAt) },
+      ]}
+      gallery={gallery}
+      galleryTitle={t('listings.galleryLabel')}
+      image={listing.primaryImage}
+      imageAltFallback={t('listings.imageAltFallback')}
+      title={listing.title}
+    >
+      <ContentCard title={listing.title}>
+        <p>{listing.description}</p>
+      </ContentCard>
+    </RichDetailLayout>
   );
 }
 
@@ -610,41 +815,27 @@ function EventsIndex({
   t: Translator;
 }): ReactNode {
   if (events.events.length === 0) {
-    return (
-      <article className="public-panel">
-        <h2>{t('pages.events.title')}</h2>
-        <p>{t('events.empty')}</p>
-      </article>
-    );
+    return <EmptyStatePanel body={t('events.empty')} title={t('pages.events.title')} />;
   }
 
   return (
-    <div className="listings-grid">
+    <RichIndexGrid>
       {events.events.map((event) => (
-        <article className="listing-card" key={event.id}>
-          <a className="listing-card-image" href={withTenantBase(tenantBasePath, `events/${event.slug}`)}>
-            {event.primaryImage ? (
-              <img alt={event.primaryImage.altText || t('events.imageAltFallback')} src={event.primaryImage.url} />
-            ) : (
-              <span aria-hidden="true" />
-            )}
-          </a>
-          <div className="listing-card-body">
-            <p className="listing-card-meta">
-              {compactText([event.category?.name, formatEventRange(event)]).join(' / ')}
-            </p>
-            <h2>
-              <a href={withTenantBase(tenantBasePath, `events/${event.slug}`)}>{event.title}</a>
-            </h2>
-            <p>{event.excerpt || event.description}</p>
-            <dl className="listing-facts">
-              <DefinitionRow label={t('events.locationLabel')} value={event.location.label} />
-              <DefinitionRow label={t('events.organiserLabel')} value={event.organiser.displayName} />
-            </dl>
-          </div>
-        </article>
+        <RichIndexCard
+          description={event.excerpt || event.description}
+          facts={[
+            { label: t('events.locationLabel'), value: event.location.label },
+            { label: t('events.organiserLabel'), value: event.organiser.displayName },
+          ]}
+          href={withTenantBase(tenantBasePath, 'events/' + event.slug)}
+          image={event.primaryImage}
+          imageAltFallback={t('events.imageAltFallback')}
+          key={event.id}
+          meta={[event.category?.name, formatEventRange(event)]}
+          title={event.title}
+        />
       ))}
-    </div>
+    </RichIndexGrid>
   );
 }
 
@@ -658,43 +849,28 @@ function EventDetail({
   t: Translator;
 }): ReactNode {
   return (
-    <article className="listing-detail">
-      <nav aria-label={t('events.breadcrumbLabel')} className="listing-breadcrumb">
-        <a href={withTenantBase(tenantBasePath, 'events')}>{t('events.backToEvents')}</a>
-        <span aria-hidden="true">/</span>
-        <span>{event.title}</span>
-      </nav>
-
-      {event.primaryImage ? (
-        <img
-          alt={event.primaryImage.altText || t('events.imageAltFallback')}
-          className="listing-hero-image"
-          src={event.primaryImage.url}
-        />
-      ) : null}
-
-      <div className="listing-detail-grid">
-        <div className="listing-detail-main">
-          <section className="public-panel article-content">
-            <h2>{event.title}</h2>
-            <p>{event.description}</p>
-          </section>
-        </div>
-
-        <aside className="public-panel listing-detail-aside">
-          <h2>{t('events.organiserLabel')}</h2>
-          <p>{event.organiser.displayName}</p>
-          <dl className="listing-facts stacked">
-            <DefinitionRow label={t('events.dateLabel')} value={formatEventRange(event)} />
-            <DefinitionRow label={t('events.categoryLabel')} value={event.category?.name} />
-            <DefinitionRow label={t('events.locationLabel')} value={event.location.label} />
-            <DefinitionRow label={t('events.statusLabel')} value={event.status} />
-            <DefinitionRow label={t('events.updatedLabel')} value={formatDate(event.updatedAt)} />
-            <DefinitionRow label={t('events.createdLabel')} value={formatDate(event.createdAt)} />
-          </dl>
-        </aside>
-      </div>
-    </article>
+    <RichDetailLayout
+      asideTitle={t('events.organiserLabel')}
+      backHref={withTenantBase(tenantBasePath, 'events')}
+      backLabel={t('events.backToEvents')}
+      breadcrumbLabel={t('events.breadcrumbLabel')}
+      facts={[
+        { label: t('events.organiserLabel'), value: event.organiser.displayName },
+        { label: t('events.dateLabel'), value: formatEventRange(event) },
+        { label: t('events.categoryLabel'), value: event.category?.name },
+        { label: t('events.locationLabel'), value: event.location.label },
+        { label: t('events.statusLabel'), value: event.status },
+        { label: t('events.updatedLabel'), value: formatDate(event.updatedAt) },
+        { label: t('events.createdLabel'), value: formatDate(event.createdAt) },
+      ]}
+      image={event.primaryImage}
+      imageAltFallback={t('events.imageAltFallback')}
+      title={event.title}
+    >
+      <ContentCard title={event.title}>
+        <p>{event.description}</p>
+      </ContentCard>
+    </RichDetailLayout>
   );
 }
 
@@ -708,41 +884,27 @@ function JobsIndex({
   t: Translator;
 }): ReactNode {
   if (jobs.jobs.length === 0) {
-    return (
-      <article className="public-panel">
-        <h2>{t('pages.jobs.title')}</h2>
-        <p>{t('jobs.empty')}</p>
-      </article>
-    );
+    return <EmptyStatePanel body={t('jobs.empty')} title={t('pages.jobs.title')} />;
   }
 
   return (
-    <div className="listings-grid">
+    <RichIndexGrid>
       {jobs.jobs.map((job) => (
-        <article className="listing-card" key={job.id}>
-          <a className="listing-card-image" href={withTenantBase(tenantBasePath, `jobs/${job.slug}`)}>
-            {job.primaryImage ? (
-              <img alt={job.primaryImage.altText || t('jobs.imageAltFallback')} src={job.primaryImage.url} />
-            ) : (
-              <span aria-hidden="true" />
-            )}
-          </a>
-          <div className="listing-card-body">
-            <p className="listing-card-meta">
-              {compactText([job.category?.name, formatJobType(job), formatJobCompensation(job, t)]).join(' / ')}
-            </p>
-            <h2>
-              <a href={withTenantBase(tenantBasePath, `jobs/${job.slug}`)}>{job.title}</a>
-            </h2>
-            <p>{job.excerpt || job.description}</p>
-            <dl className="listing-facts">
-              <DefinitionRow label={t('jobs.locationLabel')} value={formatJobLocation(job, t)} />
-              <DefinitionRow label={t('jobs.employerLabel')} value={job.employer.displayName} />
-            </dl>
-          </div>
-        </article>
+        <RichIndexCard
+          description={job.excerpt || job.description}
+          facts={[
+            { label: t('jobs.locationLabel'), value: formatJobLocation(job, t) },
+            { label: t('jobs.employerLabel'), value: job.employer.displayName },
+          ]}
+          href={withTenantBase(tenantBasePath, 'jobs/' + job.slug)}
+          image={job.primaryImage}
+          imageAltFallback={t('jobs.imageAltFallback')}
+          key={job.id}
+          meta={[job.category?.name, formatJobType(job), formatJobCompensation(job, t)]}
+          title={job.title}
+        />
       ))}
-    </div>
+    </RichIndexGrid>
   );
 }
 
@@ -758,68 +920,38 @@ function JobDetail({
   const gallery = job.gallery.length > 0 ? job.gallery : compactJobImages([job.primaryImage]);
 
   return (
-    <article className="listing-detail">
-      <nav aria-label={t('jobs.breadcrumbLabel')} className="listing-breadcrumb">
-        <a href={withTenantBase(tenantBasePath, 'jobs')}>{t('jobs.backToJobs')}</a>
-        <span aria-hidden="true">/</span>
-        <span>{job.title}</span>
-      </nav>
-
-      {job.primaryImage ? (
-        <img
-          alt={job.primaryImage.altText || t('jobs.imageAltFallback')}
-          className="listing-hero-image"
-          src={job.primaryImage.url}
-        />
+    <RichDetailLayout
+      asideTitle={t('jobs.employerLabel')}
+      backHref={withTenantBase(tenantBasePath, 'jobs')}
+      backLabel={t('jobs.backToJobs')}
+      breadcrumbLabel={t('jobs.breadcrumbLabel')}
+      facts={[
+        { label: t('jobs.employerLabel'), value: job.employer.displayName },
+        { label: t('jobs.compensationLabel'), value: formatJobCompensation(job, t) },
+        { label: t('jobs.locationLabel'), value: formatJobLocation(job, t) },
+        { label: t('jobs.categoryLabel'), value: job.category?.name },
+        { label: t('jobs.typeLabel'), value: job.jobType },
+        { label: t('jobs.commitmentLabel'), value: job.commitment },
+        { label: t('jobs.deadlineLabel'), value: formatDate(job.deadlineAt) },
+        { label: t('jobs.statusLabel'), value: job.status },
+        { label: t('jobs.updatedLabel'), value: formatDate(job.updatedAt) },
+        { label: t('jobs.createdLabel'), value: formatDate(job.createdAt) },
+      ]}
+      gallery={gallery}
+      galleryTitle={t('jobs.galleryLabel')}
+      image={job.primaryImage}
+      imageAltFallback={t('jobs.imageAltFallback')}
+      title={job.title}
+    >
+      <ContentCard title={job.title}>
+        <p>{job.description}</p>
+      </ContentCard>
+      {job.skills.length > 0 ? (
+        <ContentCard title={t('jobs.skillsLabel')}>
+          <p>{job.skills.join(', ')}</p>
+        </ContentCard>
       ) : null}
-
-      <div className="listing-detail-grid">
-        <div className="listing-detail-main">
-          <section className="public-panel article-content">
-            <h2>{job.title}</h2>
-            <p>{job.description}</p>
-          </section>
-
-          {job.skills.length > 0 ? (
-            <section className="public-panel">
-              <h2>{t('jobs.skillsLabel')}</h2>
-              <p>{job.skills.join(', ')}</p>
-            </section>
-          ) : null}
-
-          {gallery.length > 0 ? (
-            <section className="public-panel">
-              <h2>{t('jobs.galleryLabel')}</h2>
-              <div className="listing-gallery">
-                {gallery.map((image) => (
-                  <img
-                    alt={image.altText || t('jobs.imageAltFallback')}
-                    key={`${image.url}-${image.sortOrder ?? 0}`}
-                    src={image.url}
-                  />
-                ))}
-              </div>
-            </section>
-          ) : null}
-        </div>
-
-        <aside className="public-panel listing-detail-aside">
-          <h2>{t('jobs.employerLabel')}</h2>
-          <p>{job.employer.displayName}</p>
-          <dl className="listing-facts stacked">
-            <DefinitionRow label={t('jobs.compensationLabel')} value={formatJobCompensation(job, t)} />
-            <DefinitionRow label={t('jobs.locationLabel')} value={formatJobLocation(job, t)} />
-            <DefinitionRow label={t('jobs.categoryLabel')} value={job.category?.name} />
-            <DefinitionRow label={t('jobs.typeLabel')} value={job.jobType} />
-            <DefinitionRow label={t('jobs.commitmentLabel')} value={job.commitment} />
-            <DefinitionRow label={t('jobs.deadlineLabel')} value={formatDate(job.deadlineAt)} />
-            <DefinitionRow label={t('jobs.statusLabel')} value={job.status} />
-            <DefinitionRow label={t('jobs.updatedLabel')} value={formatDate(job.updatedAt)} />
-            <DefinitionRow label={t('jobs.createdLabel')} value={formatDate(job.createdAt)} />
-          </dl>
-        </aside>
-      </div>
-    </article>
+    </RichDetailLayout>
   );
 }
 
@@ -833,44 +965,27 @@ function MarketplaceIndex({
   t: Translator;
 }): ReactNode {
   if (items.items.length === 0) {
-    return (
-      <article className="public-panel">
-        <h2>{t('pages.marketplace.title')}</h2>
-        <p>{t('marketplaceItems.empty')}</p>
-      </article>
-    );
+    return <EmptyStatePanel body={t('marketplaceItems.empty')} title={t('pages.marketplace.title')} />;
   }
 
   return (
-    <div className="listings-grid">
+    <RichIndexGrid>
       {items.items.map((item) => (
-        <article className="listing-card" key={item.id}>
-          <a className="listing-card-image" href={withTenantBase(tenantBasePath, `marketplace/${item.slug}`)}>
-            {item.primaryImage ? (
-              <img
-                alt={item.primaryImage.altText || t('marketplaceItems.imageAltFallback')}
-                src={item.primaryImage.url}
-              />
-            ) : (
-              <span aria-hidden="true" />
-            )}
-          </a>
-          <div className="listing-card-body">
-            <p className="listing-card-meta">
-              {compactText([item.category?.name, formatMarketplacePrice(item, t)]).join(' / ')}
-            </p>
-            <h2>
-              <a href={withTenantBase(tenantBasePath, `marketplace/${item.slug}`)}>{item.title}</a>
-            </h2>
-            <p>{item.excerpt || item.description}</p>
-            <dl className="listing-facts">
-              <DefinitionRow label={t('marketplaceItems.locationLabel')} value={item.location.label} />
-              <DefinitionRow label={t('marketplaceItems.sellerLabel')} value={item.seller.displayName} />
-            </dl>
-          </div>
-        </article>
+        <RichIndexCard
+          description={item.excerpt || item.description}
+          facts={[
+            { label: t('marketplaceItems.locationLabel'), value: item.location.label },
+            { label: t('marketplaceItems.sellerLabel'), value: item.seller.displayName },
+          ]}
+          href={withTenantBase(tenantBasePath, 'marketplace/' + item.slug)}
+          image={item.primaryImage}
+          imageAltFallback={t('marketplaceItems.imageAltFallback')}
+          key={item.id}
+          meta={[item.category?.name, formatMarketplacePrice(item, t)]}
+          title={item.title}
+        />
       ))}
-    </div>
+    </RichIndexGrid>
   );
 }
 
@@ -886,62 +1001,34 @@ function MarketplaceDetail({
   const gallery = item.gallery.length > 0 ? item.gallery : compactMarketplaceImages([item.primaryImage]);
 
   return (
-    <article className="listing-detail">
-      <nav aria-label={t('marketplaceItems.breadcrumbLabel')} className="listing-breadcrumb">
-        <a href={withTenantBase(tenantBasePath, 'marketplace')}>{t('marketplaceItems.backToMarketplace')}</a>
-        <span aria-hidden="true">/</span>
-        <span>{item.title}</span>
-      </nav>
-
-      {item.primaryImage ? (
-        <img
-          alt={item.primaryImage.altText || t('marketplaceItems.imageAltFallback')}
-          className="listing-hero-image"
-          src={item.primaryImage.url}
-        />
-      ) : null}
-
-      <div className="listing-detail-grid">
-        <div className="listing-detail-main">
-          <section className="public-panel article-content">
-            <h2>{item.title}</h2>
-            <p>{item.description}</p>
-          </section>
-
-          {gallery.length > 0 ? (
-            <section className="public-panel">
-              <h2>{t('marketplaceItems.galleryLabel')}</h2>
-              <div className="listing-gallery">
-                {gallery.map((image) => (
-                  <img
-                    alt={image.altText || t('marketplaceItems.imageAltFallback')}
-                    key={`${image.url}-${image.sortOrder ?? 0}`}
-                    src={image.url}
-                  />
-                ))}
-              </div>
-            </section>
-          ) : null}
-        </div>
-
-        <aside className="public-panel listing-detail-aside">
-          <h2>{t('marketplaceItems.sellerLabel')}</h2>
-          <p>{item.seller.displayName}</p>
-          <dl className="listing-facts stacked">
-            <DefinitionRow label={t('marketplaceItems.priceLabel')} value={formatMarketplacePrice(item, t)} />
-            <DefinitionRow label={t('marketplaceItems.categoryLabel')} value={item.category?.name} />
-            <DefinitionRow label={t('marketplaceItems.locationLabel')} value={item.location.label} />
-            <DefinitionRow label={t('marketplaceItems.conditionLabel')} value={item.condition} />
-            <DefinitionRow label={t('marketplaceItems.deliveryLabel')} value={formatMarketplaceDelivery(item, t)} />
-            <DefinitionRow label={t('marketplaceItems.quantityLabel')} value={formatNullableNumber(item.quantity)} />
-            <DefinitionRow label={t('marketplaceItems.statusLabel')} value={item.status} />
-            <DefinitionRow label={t('marketplaceItems.expiresLabel')} value={formatDate(item.expiresAt)} />
-            <DefinitionRow label={t('marketplaceItems.updatedLabel')} value={formatDate(item.updatedAt)} />
-            <DefinitionRow label={t('marketplaceItems.createdLabel')} value={formatDate(item.createdAt)} />
-          </dl>
-        </aside>
-      </div>
-    </article>
+    <RichDetailLayout
+      asideTitle={t('marketplaceItems.sellerLabel')}
+      backHref={withTenantBase(tenantBasePath, 'marketplace')}
+      backLabel={t('marketplaceItems.backToMarketplace')}
+      breadcrumbLabel={t('marketplaceItems.breadcrumbLabel')}
+      facts={[
+        { label: t('marketplaceItems.sellerLabel'), value: item.seller.displayName },
+        { label: t('marketplaceItems.priceLabel'), value: formatMarketplacePrice(item, t) },
+        { label: t('marketplaceItems.categoryLabel'), value: item.category?.name },
+        { label: t('marketplaceItems.locationLabel'), value: item.location.label },
+        { label: t('marketplaceItems.conditionLabel'), value: item.condition },
+        { label: t('marketplaceItems.deliveryLabel'), value: formatMarketplaceDelivery(item, t) },
+        { label: t('marketplaceItems.quantityLabel'), value: formatNullableNumber(item.quantity) },
+        { label: t('marketplaceItems.statusLabel'), value: item.status },
+        { label: t('marketplaceItems.expiresLabel'), value: formatDate(item.expiresAt) },
+        { label: t('marketplaceItems.updatedLabel'), value: formatDate(item.updatedAt) },
+        { label: t('marketplaceItems.createdLabel'), value: formatDate(item.createdAt) },
+      ]}
+      gallery={gallery}
+      galleryTitle={t('marketplaceItems.galleryLabel')}
+      image={item.primaryImage}
+      imageAltFallback={t('marketplaceItems.imageAltFallback')}
+      title={item.title}
+    >
+      <ContentCard title={item.title}>
+        <p>{item.description}</p>
+      </ContentCard>
+    </RichDetailLayout>
   );
 }
 
@@ -955,47 +1042,30 @@ function OrganisationsIndex({
   t: Translator;
 }): ReactNode {
   if (organisations.organisations.length === 0) {
-    return (
-      <article className="public-panel">
-        <h2>{t('pages.organisations.title')}</h2>
-        <p>{t('organisationProfiles.empty')}</p>
-      </article>
-    );
+    return <EmptyStatePanel body={t('organisationProfiles.empty')} title={t('pages.organisations.title')} />;
   }
 
   return (
-    <div className="listings-grid">
+    <RichIndexGrid>
       {organisations.organisations.map((organisation) => (
-        <article className="listing-card" key={organisation.id}>
-          <a className="listing-card-image" href={withTenantBase(tenantBasePath, `organisations/${organisation.slug}`)}>
-            {organisation.logoImage ? (
-              <img
-                alt={organisation.logoImage.altText || t('organisationProfiles.logoAltFallback')}
-                src={organisation.logoImage.url}
-              />
-            ) : (
-              <span aria-hidden="true" />
-            )}
-          </a>
-          <div className="listing-card-body">
-            <p className="listing-card-meta">
-              {compactText([
-                formatCount(organisation.stats.opportunityCount, 'organisationProfiles.opportunityCount', t),
-                formatCount(organisation.stats.volunteerCount, 'organisationProfiles.volunteerCount', t),
-              ]).join(' / ')}
-            </p>
-            <h2>
-              <a href={withTenantBase(tenantBasePath, `organisations/${organisation.slug}`)}>{organisation.name}</a>
-            </h2>
-            <p>{organisation.excerpt || organisation.description}</p>
-            <dl className="listing-facts">
-              <DefinitionRow label={t('organisationProfiles.ownerLabel')} value={organisation.owner.displayName} />
-              <DefinitionRow label={t('organisationProfiles.websiteLabel')} value={organisation.website} />
-            </dl>
-          </div>
-        </article>
+        <RichIndexCard
+          description={organisation.excerpt || organisation.description}
+          facts={[
+            { label: t('organisationProfiles.ownerLabel'), value: organisation.owner.displayName },
+            { label: t('organisationProfiles.websiteLabel'), value: organisation.website },
+          ]}
+          href={withTenantBase(tenantBasePath, 'organisations/' + organisation.slug)}
+          image={organisation.logoImage}
+          imageAltFallback={t('organisationProfiles.logoAltFallback')}
+          key={organisation.id}
+          meta={[
+            formatCount(organisation.stats.opportunityCount, 'organisationProfiles.opportunityCount', t),
+            formatCount(organisation.stats.volunteerCount, 'organisationProfiles.volunteerCount', t),
+          ]}
+          title={organisation.name}
+        />
       ))}
-    </div>
+    </RichIndexGrid>
   );
 }
 
@@ -1009,57 +1079,42 @@ function OrganisationDetail({
   t: Translator;
 }): ReactNode {
   return (
-    <article className="listing-detail">
-      <nav aria-label={t('organisationProfiles.breadcrumbLabel')} className="listing-breadcrumb">
-        <a href={withTenantBase(tenantBasePath, 'organisations')}>{t('organisationProfiles.backToOrganisations')}</a>
-        <span aria-hidden="true">/</span>
-        <span>{organisation.name}</span>
-      </nav>
-
-      {organisation.logoImage ? (
-        <img
-          alt={organisation.logoImage.altText || t('organisationProfiles.logoAltFallback')}
-          className="listing-hero-image"
-          src={organisation.logoImage.url}
-        />
-      ) : null}
-
-      <div className="listing-detail-grid">
-        <div className="listing-detail-main">
-          <section className="public-panel article-content">
-            <h2>{organisation.name}</h2>
-            <p>{organisation.description}</p>
-          </section>
-        </div>
-
-        <aside className="public-panel listing-detail-aside">
-          <h2>{t('organisationProfiles.profileLabel')}</h2>
-          <dl className="listing-facts stacked">
-            <DefinitionRow label={t('organisationProfiles.ownerLabel')} value={organisation.owner.displayName} />
-            <DefinitionRow label={t('organisationProfiles.websiteLabel')} value={organisation.website} />
-            <DefinitionRow label={t('organisationProfiles.emailLabel')} value={organisation.contactEmail} />
-            <DefinitionRow label={t('organisationProfiles.locationLabel')} value={organisation.location.label} />
-            <DefinitionRow
-              label={t('organisationProfiles.opportunitiesLabel')}
-              value={formatCount(organisation.stats.opportunityCount, 'organisationProfiles.opportunityCount', t)}
-            />
-            <DefinitionRow
-              label={t('organisationProfiles.volunteersLabel')}
-              value={formatCount(organisation.stats.volunteerCount, 'organisationProfiles.volunteerCount', t)}
-            />
-            <DefinitionRow
-              label={t('organisationProfiles.hoursLabel')}
-              value={t('organisationProfiles.hourCount', { count: formatNumber(organisation.stats.totalHours) })}
-            />
-            <DefinitionRow label={t('organisationProfiles.ratingLabel')} value={formatRating(organisation)} />
-            <DefinitionRow label={t('organisationProfiles.typeLabel')} value={organisation.orgType} />
-            <DefinitionRow label={t('organisationProfiles.statusLabel')} value={organisation.status} />
-            <DefinitionRow label={t('organisationProfiles.updatedLabel')} value={formatDate(organisation.updatedAt)} />
-            <DefinitionRow label={t('organisationProfiles.createdLabel')} value={formatDate(organisation.createdAt)} />
-          </dl>
-        </aside>
-      </div>
-    </article>
+    <RichDetailLayout
+      asideTitle={t('organisationProfiles.profileLabel')}
+      backHref={withTenantBase(tenantBasePath, 'organisations')}
+      backLabel={t('organisationProfiles.backToOrganisations')}
+      breadcrumbLabel={t('organisationProfiles.breadcrumbLabel')}
+      facts={[
+        { label: t('organisationProfiles.ownerLabel'), value: organisation.owner.displayName },
+        { label: t('organisationProfiles.websiteLabel'), value: organisation.website },
+        { label: t('organisationProfiles.emailLabel'), value: organisation.contactEmail },
+        { label: t('organisationProfiles.locationLabel'), value: organisation.location.label },
+        {
+          label: t('organisationProfiles.opportunitiesLabel'),
+          value: formatCount(organisation.stats.opportunityCount, 'organisationProfiles.opportunityCount', t),
+        },
+        {
+          label: t('organisationProfiles.volunteersLabel'),
+          value: formatCount(organisation.stats.volunteerCount, 'organisationProfiles.volunteerCount', t),
+        },
+        {
+          label: t('organisationProfiles.hoursLabel'),
+          value: t('organisationProfiles.hourCount', { count: formatNumber(organisation.stats.totalHours) }),
+        },
+        { label: t('organisationProfiles.ratingLabel'), value: formatRating(organisation) },
+        { label: t('organisationProfiles.typeLabel'), value: organisation.orgType },
+        { label: t('organisationProfiles.statusLabel'), value: organisation.status },
+        { label: t('organisationProfiles.updatedLabel'), value: formatDate(organisation.updatedAt) },
+        { label: t('organisationProfiles.createdLabel'), value: formatDate(organisation.createdAt) },
+      ]}
+      image={organisation.logoImage}
+      imageAltFallback={t('organisationProfiles.logoAltFallback')}
+      title={organisation.name}
+    >
+      <ContentCard title={organisation.name}>
+        <p>{organisation.description}</p>
+      </ContentCard>
+    </RichDetailLayout>
   );
 }
 
@@ -1097,18 +1152,7 @@ function PublicCollection({
   );
 }
 
-function DefinitionRow({ label, value }: { label: string; value?: null | string }): ReactNode {
-  if (!value) {
-    return null;
-  }
 
-  return (
-    <div>
-      <dt>{label}</dt>
-      <dd>{value}</dd>
-    </div>
-  );
-}
 
 function formatTimeValue(listing: PublicListing, t: Translator): string | null {
   if (listing.timeCreditValue.hours === null) {

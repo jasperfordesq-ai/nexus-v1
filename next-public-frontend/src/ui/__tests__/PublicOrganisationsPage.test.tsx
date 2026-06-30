@@ -93,6 +93,9 @@ describe('Public organisations rendering', () => {
     expect(html).toContain('src="https://cdn.example.test/organisations/care-collective.png"');
     expect(html).toContain('href="/hour-timebank/organisations/neighbourhood-care-collective"');
     expect(html).toContain('"@type":"ItemList"');
+    expect(html).toContain('data-nexus-ui="rich-index-card"');
+    expect(html).not.toContain('listing-card');
+    expect(html).not.toContain('listing-facts');
   });
 
   it('renders organisation detail with public stats and Organization JSON-LD', () => {
@@ -126,5 +129,8 @@ describe('Public organisations rendering', () => {
     expect(html).toContain('42.5 hours');
     expect(html).toContain('"@type":"Organization"');
     expect(html).toContain('"name":"Neighbourhood Care Collective"');
+    expect(html).toContain('data-nexus-ui="rich-detail"');
+    expect(html).not.toContain('listing-detail');
+    expect(html).not.toContain('public-panel');
   });
 });

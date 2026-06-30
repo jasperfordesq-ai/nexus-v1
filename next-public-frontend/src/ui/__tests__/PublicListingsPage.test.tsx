@@ -105,6 +105,9 @@ describe('Public listings rendering', () => {
     expect(html).toContain('src="https://cdn.example.test/bike.jpg"');
     expect(html).toContain('href="/hour-timebank/listings/7"');
     expect(html).toContain('"@type":"ItemList"');
+    expect(html).toContain('data-nexus-ui="rich-index-card"');
+    expect(html).not.toContain('listing-card');
+    expect(html).not.toContain('listing-facts');
   });
 
   it('renders listing detail with gallery, breadcrumb, provider, and Service JSON-LD', () => {
@@ -140,5 +143,8 @@ describe('Public listings rendering', () => {
     expect(html).toContain('Public Provider');
     expect(html).toContain('"@type":"Service"');
     expect(html).toContain('"provider":{"@type":"Organization","name":"Public Provider"}');
+    expect(html).toContain('data-nexus-ui="rich-detail"');
+    expect(html).not.toContain('listing-detail');
+    expect(html).not.toContain('public-panel');
   });
 });

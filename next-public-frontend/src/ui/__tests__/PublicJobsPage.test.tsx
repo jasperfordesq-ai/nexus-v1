@@ -111,6 +111,9 @@ describe('Public jobs rendering', () => {
     expect(html).toContain('src="https://cdn.example.test/jobs/civic-works.png"');
     expect(html).toContain('href="/hour-timebank/jobs/21"');
     expect(html).toContain('"@type":"ItemList"');
+    expect(html).toContain('data-nexus-ui="rich-index-card"');
+    expect(html).not.toContain('listing-card');
+    expect(html).not.toContain('listing-facts');
   });
 
   it('renders job detail with employer, compensation, gallery, and JobPosting JSON-LD', () => {
@@ -145,5 +148,8 @@ describe('Public jobs rendering', () => {
     expect(html).toContain('src="https://cdn.example.test/jobs/outreach-team.jpg"');
     expect(html).toContain('"@type":"JobPosting"');
     expect(html).toContain('"hiringOrganization":{"@type":"Organization","name":"Civic Works Co-op"');
+    expect(html).toContain('data-nexus-ui="rich-detail"');
+    expect(html).not.toContain('listing-detail');
+    expect(html).not.toContain('public-panel');
   });
 });
