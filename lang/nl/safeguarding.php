@@ -16,7 +16,7 @@ return [
         'contact_restricted_action' => 'Help openen',
         'coordination_not_required' => 'Direct contact met dit lid is momenteel mogelijk — u heeft geen coördinator nodig om dat te regelen. Vernieuw de pagina en probeer opnieuw een bericht te sturen.',
         'coordination_request_failed' => 'We konden uw verzoek op dit moment niet naar de coördinator sturen. Probeer het binnenkort opnieuw.',
-        'vetting_check_failed' => 'We could not verify your vetting status just now. Please try again shortly.',
+        'vetting_check_failed' => 'We konden uw screeningstatus op dit moment niet verifiëren. Probeer het binnenkort opnieuw.',
         'statement_required' => 'A Child Safeguarding Statement PDF is required before you can declare that this community works with children or vulnerable adults. Please upload one to continue.',
         'invalid_file' => 'The uploaded file could not be read. Please try again with a valid PDF.',
         'pdf_required' => 'The safeguarding statement must be a PDF file.',

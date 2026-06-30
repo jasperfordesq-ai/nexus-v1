@@ -16,7 +16,7 @@ return [
         'contact_restricted_action' => 'Herupu o hiraku',
         'coordination_not_required' => 'このメンバーへの直接連絡は現在ご利用いただけます。コーディネーターによる調整は必要ありません。ページを更新して、メッセージの送信をお試しください。',
         'coordination_request_failed' => '現在、コーディネーターへの依頼を送信できませんでした。しばらくしてからもう一度お試しください。',
-        'vetting_check_failed' => 'We could not verify your vetting status just now. Please try again shortly.',
+        'vetting_check_failed' => '現在、審査状況を確認できませんでした。しばらくしてからもう一度お試しください。',
         'statement_required' => 'A Child Safeguarding Statement PDF is required before you can declare that this community works with children or vulnerable adults. Please upload one to continue.',
         'invalid_file' => 'The uploaded file could not be read. Please try again with a valid PDF.',
         'pdf_required' => 'The safeguarding statement must be a PDF file.',

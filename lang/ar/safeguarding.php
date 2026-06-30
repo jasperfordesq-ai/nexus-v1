@@ -16,7 +16,7 @@ return [
         'contact_restricted_action' => 'Iftah almusaada',
         'coordination_not_required' => 'التواصل المباشر مع هذا العضو متاح حاليًا — لا تحتاج إلى منسق لترتيبه. يرجى تحديث الصفحة والمحاولة مرة أخرى.',
         'coordination_request_failed' => 'تعذّر إرسال طلبك إلى المنسق في الوقت الحالي. يرجى المحاولة مرة أخرى بعد قليل.',
-        'vetting_check_failed' => 'We could not verify your vetting status just now. Please try again shortly.',
+        'vetting_check_failed' => 'تعذّر تأكيد حالة التحقق الخاصة بك في الوقت الحالي. يرجى المحاولة مرة أخرى بعد قليل.',
         'statement_required' => 'A Child Safeguarding Statement PDF is required before you can declare that this community works with children or vulnerable adults. Please upload one to continue.',
         'invalid_file' => 'The uploaded file could not be read. Please try again with a valid PDF.',
         'pdf_required' => 'The safeguarding statement must be a PDF file.',
