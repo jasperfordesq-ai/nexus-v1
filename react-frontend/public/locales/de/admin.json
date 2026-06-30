@@ -3115,6 +3115,102 @@
         "public_routes_only": "Public routes only",
         "do_not_remove_prerender": "Do not remove prerender fallback.",
         "rollback_path_required": "Rollback path required"
+      },
+      "remaining_route_work": {
+        "title": "Remaining public route work",
+        "route_count": "{{count}} routes",
+        "public_routes": "{{count}} public route",
+        "public_routes_plural": "{{count}} public routes",
+        "api_backed_routes": "{{count}} API-backed route",
+        "api_backed_routes_plural": "{{count}} API-backed routes",
+        "remaining_routes": "{{count}} route remaining",
+        "remaining_routes_plural": "{{count}} routes remaining",
+        "unclassified_routes": "{{count}} unclassified route",
+        "unclassified_routes_plural": "{{count}} unclassified routes",
+        "activation_available": "Activation controls are available",
+        "activation_unavailable": "No activation controls"
+      },
+      "remaining_route_work_groups": {
+        "static_manual_review": "Static/manual-review routes",
+        "auth_only_backend": "Auth-only backend routes",
+        "backend_contract_missing": "Backend contract gaps",
+        "unclassified_manifest_only": "Unclassified manifest-only routes"
+      },
+      "remaining_route_work_reasons": {
+        "static_or_tenant_bootstrap": "Static or tenant-bootstrap content",
+        "authoritative_static_content_missing": "Authoritative static content source missing",
+        "existing_backend_requires_auth": "Existing backend requires authentication",
+        "public_api_would_expand_auth_scope": "Public API would expand an auth-only content surface",
+        "route_params_do_not_match_public_api": "Route params do not match a public API",
+        "manifest_only_unclassified": "Manifest-only route not classified yet"
+      },
+      "remaining_route_work_actions": {
+        "manual_no_js_shadow_review": "Run manual no-JavaScript shadow review",
+        "publish_authoritative_content_source": "Publish an authoritative content source",
+        "keep_vite_or_prerender_until_public_contract": "Keep Vite or prerender until a public contract exists",
+        "public_visibility_decision_required": "Decide what content is safe to make public",
+        "privacy_review_required_before_public_api": "Complete privacy review before adding a public API",
+        "add_public_laravel_api_with_tests": "Add a public Laravel API with tests",
+        "classify_route_before_cutover": "Classify route ownership and backend contract before cutover"
+      },
+      "remaining_route_work_guardrails": {
+        "route_status_has_no_production_effect": "Route status has no production effect",
+        "do_not_promote_auth_only_routes": "Do not promote auth-only routes"
+      },
+      "dry_runs": {
+        "title": "Pre-cutover dry-run checks",
+        "activation_available": "Activation controls are available",
+        "activation_unavailable": "No activation controls",
+        "explicit_instruction_required": "Separate cutover instruction required"
+      },
+      "dry_run_items": {
+        "shadow_manifest_and_html": "Shadow manifest and no-JS HTML",
+        "remaining_static_manual_review": "Platform legal content review",
+        "auth_only_public_contract_review": "Auth-only public contract review",
+        "private_vite_regression": "Private Vite regression",
+        "inertness_guard": "Production inertness guard"
+      },
+      "dry_run_blockers": {
+        "manual_verification_required": "Manual verification required",
+        "route_parity_required": "Route parity required",
+        "authoritative_content_source_required": "Authoritative content source required",
+        "public_visibility_decision_required": "Public visibility decision required",
+        "privacy_review_required_before_public_api": "Privacy review required before public API",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+      },
+      "dry_run_notes": {
+        "shadow_only": "Shadow only",
+        "no_activation_control": "No activation control",
+        "do_not_promote_auth_only_routes": "Do not promote auth-only routes",
+        "vite_private_routes_remain_primary": "Vite private routes remain primary",
+        "do_not_remove_prerender": "Do not remove prerender fallback"
+      },
+      "cutover_eligibility": {
+        "title": "Cutover eligibility",
+        "eligible": "Eligible for cutover",
+        "blocked": "Not eligible for cutover",
+        "public_routes": "{{count}} public routes",
+        "api_backed_public_routes": "{{count}} API-backed public routes",
+        "remaining_public_routes": "{{count}} remaining public routes",
+        "activation_available": "Activation controls available",
+        "activation_unavailable": "No activation controls",
+        "blockers": "Blockers",
+        "required_actions": "Required actions"
+      },
+      "cutover_eligibility_blockers": {
+        "manifest_validation_blocked": "Manifest validation is blocked",
+        "remaining_public_route_work": "Remaining public route work is incomplete",
+        "edge_canary_template_audit_blocked": "Edge canary template audit is blocked",
+        "edge_routes_not_configured": "Production edge routes are not configured",
+        "route_parity_required": "Route parity is still required",
+        "routing_flag_enabled_before_cutover": "Routing flag is enabled before cutover",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+      },
+      "cutover_eligibility_actions": {
+        "complete_remaining_public_route_work": "Complete remaining public route work",
+        "run_shadow_verification": "Run shadow verification",
+        "prepare_reviewed_edge_config_after_instruction": "Prepare reviewed edge config only after instruction",
+        "keep_prerender_fallback": "Keep prerender fallback"
       }
     }
   },
