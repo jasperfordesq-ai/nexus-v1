@@ -80,11 +80,15 @@ describe('PublicPage', () => {
       />,
     );
 
-    expect(html).toContain('class="site-header brand-chrome"');
+    expect(html).toContain('data-nexus-ui="heroui-public"');
+    expect(html).toContain('data-slot="surface"');
+    expect(html).toContain('data-slot="card"');
+    expect(html).not.toContain('site-header');
+    expect(html).not.toContain('public-shell');
+    expect(html).not.toContain('hero-band');
+    expect(html).not.toContain('home-hero-panel');
     expect(html).toContain('--nexus-accent:#0f766e');
     expect(html).toContain('--nexus-accent-secondary:#4338ca');
-    expect(html).toContain('class="hero-band home-hero"');
-    expect(html).toContain('class="home-hero-panel"');
     expect(html).toContain('href="/hour-timebank/jobs"');
     expect(html).toContain('href="/hour-timebank/marketplace"');
     expect(html).toContain('href="/hour-timebank/organisations"');

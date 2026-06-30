@@ -52,7 +52,7 @@ describe('public route no-JavaScript HTML', () => {
     expect(html).toContain('AGPL-3.0-or-later');
     expect(html).toContain(canonicalUrl);
     expect(html).toContain('type="application/ld+json"');
-    expect(html).toContain('<h1>');
+    expect(html).toMatch(/<h1(?:\s|>)/);
   });
 
   it('renders every shadow-owned public route as crawler-readable HTML', () => {
@@ -82,7 +82,7 @@ describe('public route no-JavaScript HTML', () => {
       expect(html, manifestRoute.pattern).toContain('AGPL-3.0-or-later');
       expect(html, manifestRoute.pattern).toContain(canonicalUrl);
       expect(html, manifestRoute.pattern).toContain('type="application/ld+json"');
-      expect(html, manifestRoute.pattern).toContain('<h1>');
+      expect(html, manifestRoute.pattern).toMatch(/<h1(?:\s|>)/);
     }
   });
 });

@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { CSSProperties, ReactNode } from 'react';
+import { Card, Chip, Link, Surface } from '@heroui/react';
 
 import { resolveAssetUrl, safeCssColor } from '../lib/assets';
 import type { Translator } from '../lib/i18n';
@@ -106,7 +107,11 @@ export function PublicPage({
   const isHome = route.routeKey === 'home';
 
   return (
-    <div className="public-shell" style={style}>
+    <Surface
+      className="min-h-screen bg-[color:var(--nexus-bg)] text-[color:var(--nexus-ink)]"
+      data-nexus-ui="heroui-public"
+      style={style}
+    >
       <StructuredData
         canonicalUrl={canonicalUrl}
         content={content}
@@ -114,97 +119,197 @@ export function PublicPage({
         tenant={tenant}
         tenantName={tenantName}
       />
-      <header className="site-header brand-chrome">
-        <a className="brand-link" href={withTenantBase(tenantBasePath, '')}>
-          {logoUrl ? <img alt="" className="brand-logo" src={logoUrl} /> : null}
-          <span>
-            <strong>{tenantName}</strong>
-            <span>{tagline}</span>
-          </span>
-        </a>
-        <nav aria-label={t('navigation.aria')} className="public-nav">
-          {navigationItems.map((item) => (
-            <a href={withTenantBase(tenantBasePath, item.href)} key={item.labelKey}>
-              {t(item.labelKey)}
-            </a>
-          ))}
-        </nav>
+      <header className="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+        <Card
+          className="border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)]/95 shadow-sm"
+          variant="secondary"
+        >
+          <Card.Content className="flex flex-col gap-4 p-4 lg:flex-row lg:items-center lg:justify-between">
+            <BrandLink href={withTenantBase(tenantBasePath, '')} logoUrl={logoUrl} tagline={tagline} tenantName={tenantName} />
+            <nav aria-label={t('navigation.aria')} className="flex flex-wrap gap-2 lg:justify-end">
+              {navigationItems.map((item) => (
+                <Link
+                  className="rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-[color:var(--nexus-muted)] hover:border-[color:var(--nexus-border)] hover:bg-[color:var(--nexus-accent-soft)] hover:text-[color:var(--nexus-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
+                  href={withTenantBase(tenantBasePath, item.href)}
+                  key={item.labelKey}
+                >
+                  {t(item.labelKey)}
+                </Link>
+              ))}
+            </nav>
+          </Card.Content>
+        </Card>
       </header>
 
       <main>
-        <section className={`hero-band${isHome ? ' home-hero' : ''}`}>
-          <div className="hero-copy">
-            <p className="eyebrow">{isHome ? t('pages.home.eyebrow') : tenantName}</p>
-            <h1>{pageTitle}</h1>
-            <p>{pageLead}</p>
+        <section
+          className={`mx-auto grid w-full max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8 lg:py-14 ${
+            isHome ? 'lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)] lg:items-center' : ''
+          }`}
+        >
+          <div className="min-w-0">
+            <Chip className="mb-4" color="accent" size="sm" variant="soft">
+              {isHome ? t('pages.home.eyebrow') : tenantName}
+            </Chip>
+            <h1 className="max-w-4xl text-4xl font-bold leading-tight text-[color:var(--nexus-ink)] sm:text-5xl lg:text-6xl">
+              {pageTitle}
+            </h1>
+            <p className="mt-5 max-w-3xl text-lg leading-8 text-[color:var(--nexus-muted)]">{pageLead}</p>
             {isHome ? (
-              <div className="action-row">
-                <a className="button primary" href={withTenantBase(tenantBasePath, 'contact')}>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Link
+                  className="rounded-lg bg-[color:var(--nexus-accent)] px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
+                  href={withTenantBase(tenantBasePath, 'contact')}
+                >
                   {t('pages.home.primaryAction')}
-                </a>
-                <a className="button secondary" href={withTenantBase(tenantBasePath, 'blog')}>
+                </Link>
+                <Link
+                  className="rounded-lg border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)] px-4 py-2.5 text-sm font-bold text-[color:var(--nexus-ink)] shadow-sm hover:bg-[color:var(--nexus-accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
+                  href={withTenantBase(tenantBasePath, 'blog')}
+                >
                   {t('pages.home.secondaryAction')}
-                </a>
+                </Link>
               </div>
             ) : null}
           </div>
           {isHome ? (
-            <aside aria-label={t('pages.home.sectionTitle')} className="home-hero-panel">
-              <div className="home-hero-brand">
-                {logoUrl ? <img alt="" className="brand-logo" src={logoUrl} /> : null}
-                <div>
-                  <strong>{tenantName}</strong>
-                  <span>{tagline}</span>
+            <Card
+              aria-label={t('pages.home.sectionTitle')}
+              className="border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)] shadow-lg"
+              variant="default"
+            >
+              <Card.Header className="pb-3">
+                <BrandMark logoUrl={logoUrl} tagline={tagline} tenantName={tenantName} />
+              </Card.Header>
+              <Card.Content className="space-y-5 pt-0">
+                <p className="leading-7 text-[color:var(--nexus-muted)]">{t('pages.home.sectionBody')}</p>
+                <div className="grid gap-2">
+                  {homeHeroLinks.map((item) => (
+                    <Link
+                      className="rounded-lg border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface-raised)] px-3 py-2.5 font-bold text-[color:var(--nexus-ink)] hover:bg-[color:var(--nexus-accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
+                      href={withTenantBase(tenantBasePath, item.href)}
+                      key={item.labelKey}
+                    >
+                      {t(item.labelKey)}
+                    </Link>
+                  ))}
                 </div>
-              </div>
-              <p>{t('pages.home.sectionBody')}</p>
-              <div className="home-hero-links">
-                {homeHeroLinks.map((item) => (
-                  <a href={withTenantBase(tenantBasePath, item.href)} key={item.labelKey}>
-                    {t(item.labelKey)}
-                  </a>
-                ))}
-              </div>
-            </aside>
+              </Card.Content>
+            </Card>
           ) : null}
         </section>
 
-        <section className="content-band">
+        <section className="mx-auto w-full max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
           {renderRouteContent(route, routeSegments, content, tenantName, tenantBasePath, t)}
         </section>
       </main>
 
-      <footer className="site-footer">
-        <div className="footer-grid">
-          <div className="footer-brand">
-            <a className="brand-link" href={withTenantBase(tenantBasePath, '')}>
-              {logoUrl ? <img alt="" className="brand-logo" src={logoUrl} /> : null}
-              <span>
-                <strong>{tenantName}</strong>
-                <span>{tagline}</span>
-              </span>
-            </a>
-            <p>{t('footer.attribution')}</p>
+      <footer className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="border-t border-[color:var(--nexus-border)] pt-8">
+          <div className="grid gap-8 lg:grid-cols-[minmax(260px,1.4fr)_repeat(3,minmax(150px,1fr))]">
+            <div className="grid gap-4">
+              <BrandLink
+                href={withTenantBase(tenantBasePath, '')}
+                logoUrl={logoUrl}
+                tagline={tagline}
+                tenantName={tenantName}
+              />
+              <p className="max-w-md leading-7 text-[color:var(--nexus-muted)]">{t('footer.attribution')}</p>
+            </div>
+            {footerSections.map((section) => (
+              <nav aria-label={t(section.labelKey)} className="grid content-start gap-3" key={section.labelKey}>
+                <h2 className="text-sm font-bold text-[color:var(--nexus-ink)]">{t(section.labelKey)}</h2>
+                <ul className="grid gap-2">
+                  {section.links.map((link) => (
+                    <li key={`${section.labelKey}-${link.href}`}>
+                      <Link
+                        className="text-sm text-[color:var(--nexus-muted)] hover:text-[color:var(--nexus-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
+                        href={withTenantBase(tenantBasePath, link.href)}
+                      >
+                        {t(link.labelKey)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            ))}
           </div>
-          {footerSections.map((section) => (
-            <nav aria-label={t(section.labelKey)} className="footer-nav-group" key={section.labelKey}>
-              <h2>{t(section.labelKey)}</h2>
-              <ul>
-                {section.links.map((link) => (
-                  <li key={`${section.labelKey}-${link.href}`}>
-                    <a href={withTenantBase(tenantBasePath, link.href)}>{t(link.labelKey)}</a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          ))}
-        </div>
-        <div className="footer-bottom">
-          <p>{t('footer.copyright')}</p>
-          <a href={canonicalUrl}>{t('metadata.canonicalLabel')}</a>
+          <div className="mt-7 flex flex-wrap justify-between gap-3 border-t border-[color:var(--nexus-border)] pt-5 text-sm text-[color:var(--nexus-muted)]">
+            <p>{t('footer.copyright')}</p>
+            <Link
+              className="text-[color:var(--nexus-muted)] hover:text-[color:var(--nexus-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
+              href={canonicalUrl}
+            >
+              {t('metadata.canonicalLabel')}
+            </Link>
+          </div>
         </div>
       </footer>
+    </Surface>
+  );
+}
+
+function BrandLink({
+  href,
+  logoUrl,
+  tagline,
+  tenantName,
+}: {
+  href: string;
+  logoUrl: string | undefined;
+  tagline: string;
+  tenantName: string;
+}): ReactNode {
+  return (
+    <Link
+      className="inline-flex min-w-0 items-center gap-3 rounded-lg text-[color:var(--nexus-ink)] no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
+      href={href}
+    >
+      <BrandLogo logoUrl={logoUrl} />
+      <span className="min-w-0">
+        <strong className="block truncate text-base font-bold">{tenantName}</strong>
+        <span className="block truncate text-sm text-[color:var(--nexus-muted)]">{tagline}</span>
+      </span>
+    </Link>
+  );
+}
+
+function BrandMark({
+  logoUrl,
+  tagline,
+  tenantName,
+}: {
+  logoUrl: string | undefined;
+  tagline: string;
+  tenantName: string;
+}): ReactNode {
+  return (
+    <div className="flex min-w-0 items-center gap-3">
+      <BrandLogo logoUrl={logoUrl} />
+      <div className="min-w-0">
+        <strong className="block truncate text-base font-bold text-[color:var(--nexus-ink)]">{tenantName}</strong>
+        <span className="block truncate text-sm text-[color:var(--nexus-muted)]">{tagline}</span>
+      </div>
     </div>
+  );
+}
+
+function BrandLogo({ logoUrl }: { logoUrl: string | undefined }): ReactNode {
+  if (!logoUrl) {
+    return (
+      <span
+        aria-hidden="true"
+        className="block size-12 shrink-0 rounded-lg border border-[color:var(--nexus-border)] bg-[color:var(--nexus-accent-soft)]"
+      />
+    );
+  }
+
+  return (
+    <img
+      alt=""
+      className="size-12 shrink-0 rounded-lg border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)] object-contain p-1"
+      src={logoUrl}
+    />
   );
 }
 
