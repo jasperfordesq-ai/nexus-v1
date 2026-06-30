@@ -16,13 +16,14 @@
  * parity test renders it under both host runtimes and asserts identical HTML.
  */
 
-import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const appRoot = resolve(here, '..');
-const SRC = resolve(appRoot, '../react-frontend/src/public-shared');
+const reactRoot = resolve(appRoot, '../react-frontend');
+const SRC = resolve(reactRoot, 'src/public-shared');
 const DEST = resolve(appRoot, 'src/_shared');
 
 if (!existsSync(SRC)) {
@@ -30,11 +31,28 @@ if (!existsSync(SRC)) {
   process.exit(1);
 }
 
+// 1) Shared presentational core (components + runtime port).
 rmSync(DEST, { recursive: true, force: true });
 mkdirSync(DEST, { recursive: true });
 cpSync(SRC, DEST, {
   recursive: true,
   filter: (s) => !/[\\/]__tests__[\\/]/.test(s) && !/\.test\.tsx?$/.test(s),
 });
-
 console.log(`[sync-shared] copied ${SRC} -> ${DEST}`);
+
+// 2) Shared `common` translation namespace (the public chrome — Navbar/Footer —
+//    uses t('common')). Synced from the React app's locale source of truth so the
+//    shared chrome renders identical labels in all 11 locales. Gitignored.
+const LOCALES = ['ar', 'de', 'en', 'es', 'fr', 'ga', 'it', 'ja', 'nl', 'pl', 'pt'];
+const MSG_DEST = resolve(appRoot, 'src/_shared-messages');
+rmSync(MSG_DEST, { recursive: true, force: true });
+for (const loc of LOCALES) {
+  const from = resolve(reactRoot, `public/locales/${loc}/common.json`);
+  if (!existsSync(from)) {
+    console.error(`[sync-shared] missing common locale: ${from}`);
+    process.exit(1);
+  }
+  mkdirSync(resolve(MSG_DEST, loc), { recursive: true });
+  copyFileSync(from, resolve(MSG_DEST, loc, 'common.json'));
+}
+console.log(`[sync-shared] copied common.json x${LOCALES.length} -> ${MSG_DEST}`);
