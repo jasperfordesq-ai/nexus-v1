@@ -482,6 +482,28 @@
     "timeCredits": "{{count}} time credits",
     "updatedLabel": "Updated"
   },
+  "organisationProfiles": {
+    "backToOrganisations": "Organisations",
+    "breadcrumbLabel": "Organisation breadcrumb",
+    "createdLabel": "Created",
+    "emailLabel": "Email",
+    "empty": "No public organisation profiles are available yet.",
+    "hourCount": "{{count}} hours",
+    "hoursLabel": "Hours",
+    "locationLabel": "Location",
+    "logoAltFallback": "Organisation logo",
+    "opportunitiesLabel": "Opportunities",
+    "opportunityCount": "{{count}} opportunities",
+    "ownerLabel": "Owner",
+    "profileLabel": "Profile",
+    "ratingLabel": "Rating",
+    "statusLabel": "Status",
+    "typeLabel": "Type",
+    "updatedLabel": "Updated",
+    "volunteerCount": "{{count}} volunteers",
+    "volunteersLabel": "Volunteers",
+    "websiteLabel": "Website"
+  },
   "footer": {
     "attribution": "Project NEXUS is free software licensed under AGPL-3.0-or-later.",
     "copyright": "Copyright © 2024–2026 Jasper Ford."

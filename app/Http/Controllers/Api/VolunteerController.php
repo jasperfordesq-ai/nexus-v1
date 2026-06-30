@@ -15,6 +15,7 @@ use App\Http\Requests\Volunteering\HandleApplicationRequest;
 use App\Http\Requests\Volunteering\LogHoursRequest;
 use App\Http\Requests\Volunteering\UpdateOpportunityRequest;
 use App\Http\Requests\Volunteering\VerifyHoursRequest;
+use App\Http\Resources\PublicOrganisationResource;
 use App\Services\VolunteerService;
 use App\Services\VolunteerMatchingService;
 use App\Core\TenantContext;
@@ -549,7 +550,7 @@ class VolunteerController extends BaseApiController
         // wallet/financial state, mirroring showOrganisation() below.
         $items = array_map(static function (array $org): array {
             unset($org['balance'], $org['auto_pay_enabled']);
-            return $org;
+            return PublicOrganisationResource::augment($org);
         }, $result['items']);
         return $this->respondWithCollection($items, $result['cursor'], $filters['limit'], $result['has_more']);
     }
@@ -565,7 +566,7 @@ class VolunteerController extends BaseApiController
         // read balance/auto-pay from the ownership-scoped /organisations/{id}/stats
         // endpoint instead.
         unset($org['balance'], $org['auto_pay_enabled']);
-        return $this->respondWithData($org);
+        return $this->respondWithData(PublicOrganisationResource::augment($org));
     }
 
     public function myOrganisations(): JsonResponse

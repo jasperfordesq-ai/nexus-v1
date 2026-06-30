@@ -21,6 +21,8 @@ const routeModuleKeys: Record<string, string> = {
   marketplaceMap: 'marketplace',
   marketplaceSearch: 'marketplace',
   marketplaceSeller: 'marketplace',
+  organisationDetail: 'organisations',
+  organisations: 'organisations',
 };
 
 export function isFeatureEnabled(tenant: TenantBootstrap | null, key: string): boolean {

@@ -19,6 +19,8 @@ import type {
   PublicListingsIndex,
   PublicMarketplaceIndex,
   PublicMarketplaceListing,
+  PublicOrganisation,
+  PublicOrganisationsIndex,
   PublicRouteContent,
   TenantBootstrap,
 } from '../lib/tenant-api';
@@ -191,6 +193,14 @@ function renderRouteContent(
 
   if (content?.kind === 'marketplace-detail' && content.item) {
     return <MarketplaceDetail item={content.item} tenantBasePath={tenantBasePath} t={t} />;
+  }
+
+  if (content?.kind === 'organisations-index') {
+    return <OrganisationsIndex organisations={content.organisations} tenantBasePath={tenantBasePath} t={t} />;
+  }
+
+  if (content?.kind === 'organisation-detail' && content.organisation) {
+    return <OrganisationDetail organisation={content.organisation} tenantBasePath={tenantBasePath} t={t} />;
   }
 
   if (content?.kind === 'public-collection') {
@@ -729,6 +739,124 @@ function MarketplaceDetail({
   );
 }
 
+function OrganisationsIndex({
+  organisations,
+  tenantBasePath,
+  t,
+}: {
+  organisations: PublicOrganisationsIndex;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  if (organisations.organisations.length === 0) {
+    return (
+      <article className="public-panel">
+        <h2>{t('pages.organisations.title')}</h2>
+        <p>{t('organisationProfiles.empty')}</p>
+      </article>
+    );
+  }
+
+  return (
+    <div className="listings-grid">
+      {organisations.organisations.map((organisation) => (
+        <article className="listing-card" key={organisation.id}>
+          <a className="listing-card-image" href={withTenantBase(tenantBasePath, `organisations/${organisation.slug}`)}>
+            {organisation.logoImage ? (
+              <img
+                alt={organisation.logoImage.altText || t('organisationProfiles.logoAltFallback')}
+                src={organisation.logoImage.url}
+              />
+            ) : (
+              <span aria-hidden="true" />
+            )}
+          </a>
+          <div className="listing-card-body">
+            <p className="listing-card-meta">
+              {compactText([
+                formatCount(organisation.stats.opportunityCount, 'organisationProfiles.opportunityCount', t),
+                formatCount(organisation.stats.volunteerCount, 'organisationProfiles.volunteerCount', t),
+              ]).join(' / ')}
+            </p>
+            <h2>
+              <a href={withTenantBase(tenantBasePath, `organisations/${organisation.slug}`)}>{organisation.name}</a>
+            </h2>
+            <p>{organisation.excerpt || organisation.description}</p>
+            <dl className="listing-facts">
+              <DefinitionRow label={t('organisationProfiles.ownerLabel')} value={organisation.owner.displayName} />
+              <DefinitionRow label={t('organisationProfiles.websiteLabel')} value={organisation.website} />
+            </dl>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function OrganisationDetail({
+  organisation,
+  tenantBasePath,
+  t,
+}: {
+  organisation: PublicOrganisation;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  return (
+    <article className="listing-detail">
+      <nav aria-label={t('organisationProfiles.breadcrumbLabel')} className="listing-breadcrumb">
+        <a href={withTenantBase(tenantBasePath, 'organisations')}>{t('organisationProfiles.backToOrganisations')}</a>
+        <span aria-hidden="true">/</span>
+        <span>{organisation.name}</span>
+      </nav>
+
+      {organisation.logoImage ? (
+        <img
+          alt={organisation.logoImage.altText || t('organisationProfiles.logoAltFallback')}
+          className="listing-hero-image"
+          src={organisation.logoImage.url}
+        />
+      ) : null}
+
+      <div className="listing-detail-grid">
+        <div className="listing-detail-main">
+          <section className="public-panel article-content">
+            <h2>{organisation.name}</h2>
+            <p>{organisation.description}</p>
+          </section>
+        </div>
+
+        <aside className="public-panel listing-detail-aside">
+          <h2>{t('organisationProfiles.profileLabel')}</h2>
+          <dl className="listing-facts stacked">
+            <DefinitionRow label={t('organisationProfiles.ownerLabel')} value={organisation.owner.displayName} />
+            <DefinitionRow label={t('organisationProfiles.websiteLabel')} value={organisation.website} />
+            <DefinitionRow label={t('organisationProfiles.emailLabel')} value={organisation.contactEmail} />
+            <DefinitionRow label={t('organisationProfiles.locationLabel')} value={organisation.location.label} />
+            <DefinitionRow
+              label={t('organisationProfiles.opportunitiesLabel')}
+              value={formatCount(organisation.stats.opportunityCount, 'organisationProfiles.opportunityCount', t)}
+            />
+            <DefinitionRow
+              label={t('organisationProfiles.volunteersLabel')}
+              value={formatCount(organisation.stats.volunteerCount, 'organisationProfiles.volunteerCount', t)}
+            />
+            <DefinitionRow
+              label={t('organisationProfiles.hoursLabel')}
+              value={t('organisationProfiles.hourCount', { count: formatNumber(organisation.stats.totalHours) })}
+            />
+            <DefinitionRow label={t('organisationProfiles.ratingLabel')} value={formatRating(organisation)} />
+            <DefinitionRow label={t('organisationProfiles.typeLabel')} value={organisation.orgType} />
+            <DefinitionRow label={t('organisationProfiles.statusLabel')} value={organisation.status} />
+            <DefinitionRow label={t('organisationProfiles.updatedLabel')} value={formatDate(organisation.updatedAt)} />
+            <DefinitionRow label={t('organisationProfiles.createdLabel')} value={formatDate(organisation.createdAt)} />
+          </dl>
+        </aside>
+      </div>
+    </article>
+  );
+}
+
 function PublicCollection({
   basePath,
   emptyTitle,
@@ -868,6 +996,18 @@ function formatMarketplaceDelivery(item: PublicMarketplaceListing, t: Translator
 
 function formatNullableNumber(value: number | null): string | null {
   return value === null ? null : formatNumber(value);
+}
+
+function formatCount(value: number, key: string, t: Translator): string {
+  return t(key, { count: formatNumber(value) });
+}
+
+function formatRating(organisation: PublicOrganisation): string | null {
+  if (organisation.stats.averageRating <= 0 || organisation.stats.reviewCount <= 0) {
+    return null;
+  }
+
+  return `${formatNumber(organisation.stats.averageRating)} / 5`;
 }
 
 function formatDateTime(value: string | null): string | null {
@@ -1065,6 +1205,24 @@ function buildStructuredData({
     };
   }
 
+  if (content?.kind === 'organisations-index') {
+    const baseUrl = canonicalUrl.replace(/\/+$/, '');
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      itemListElement: content.organisations.organisations.map((organisation, index) => ({
+        '@type': 'ListItem',
+        image: organisation.logoImage?.url,
+        name: organisation.name,
+        position: index + 1,
+        url: `${baseUrl}/${encodeURIComponent(organisation.slug)}`,
+      })),
+      name: pageTitle,
+      url: canonicalUrl,
+    };
+  }
+
   if (content?.kind === 'listing-detail' && content.listing) {
     return {
       '@context': 'https://schema.org',
@@ -1182,6 +1340,26 @@ function buildStructuredData({
     };
   }
 
+  if (content?.kind === 'organisation-detail' && content.organisation) {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      aggregateRating:
+        content.organisation.stats.averageRating > 0 && content.organisation.stats.reviewCount > 0
+          ? {
+              '@type': 'AggregateRating',
+              ratingCount: content.organisation.stats.reviewCount,
+              ratingValue: content.organisation.stats.averageRating,
+            }
+          : undefined,
+      description: content.organisation.description,
+      email: content.organisation.contactEmail ?? undefined,
+      logo: content.organisation.logoImage?.url,
+      name: content.organisation.name,
+      url: content.organisation.website ?? canonicalUrl,
+    };
+  }
+
   if (content?.kind === 'public-detail' && content.item) {
     return {
       '@context': 'https://schema.org',
@@ -1229,6 +1407,10 @@ function getRouteTitle(route: RouteOwnership, content: PublicRouteContent | null
     return content.item.title;
   }
 
+  if (content?.kind === 'organisation-detail' && content.organisation?.name) {
+    return content.organisation.name;
+  }
+
   return t(route.labelKey ?? 'pages.home.title');
 }
 
@@ -1264,6 +1446,10 @@ function getRouteLead(
 
   if (content?.kind === 'marketplace-detail' && content.item?.excerpt) {
     return content.item.excerpt;
+  }
+
+  if (content?.kind === 'organisation-detail' && content.organisation?.excerpt) {
+    return content.organisation.excerpt;
   }
 
   return t(`pages.${route.routeKey}.lead`, { tenantName });

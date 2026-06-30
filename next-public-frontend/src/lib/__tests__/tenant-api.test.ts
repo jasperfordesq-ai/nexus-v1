@@ -14,6 +14,8 @@ import {
   fetchJobsIndex,
   fetchMarketplaceDetail,
   fetchMarketplaceIndex,
+  fetchOrganisationDetail,
+  fetchOrganisationsIndex,
   fetchPublicCollection,
   fetchPublicDetail,
   fetchTenantBootstrap,
@@ -790,6 +792,153 @@ describe('tenant API client', () => {
 
     expect(fetchSpy).toHaveBeenCalledWith(
       'https://api.example.test/api/v2/marketplace/listings/32',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'X-Public-Contract': '1',
+        }),
+      }),
+    );
+  });
+
+  it('maps the full public organisations contract and opts in to Laravel public contracts', async () => {
+    process.env.NEXUS_API_BASE = 'https://api.example.test/api';
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: [
+            {
+              public_contract: {
+                id: 41,
+                slug: 'neighbourhood-care-collective',
+                name: 'Neighbourhood Care Collective',
+                description: 'A public organisation profile for local care and volunteering.',
+                excerpt: 'A public organisation profile for local care and volunteering.',
+                logo_image: {
+                  url: '/uploads/tenants/hour-timebank/organisations/care-collective.png',
+                  alt_text: 'Neighbourhood Care Collective',
+                },
+                website: 'https://example.test/care',
+                contact_email: 'hello@example.test',
+                location: {
+                  label: null,
+                },
+                owner: {
+                  id: 9,
+                  display_name: 'Organisation Owner',
+                  avatar_url: '/uploads/tenants/hour-timebank/owner.jpg',
+                },
+                stats: {
+                  opportunity_count: 3,
+                  volunteer_count: 12,
+                  total_hours: 42.5,
+                  review_count: 2,
+                  average_rating: 4.5,
+                },
+                org_type: 'organisation',
+                created_at: '2026-06-01T10:00:00+00:00',
+                updated_at: '2026-06-02T11:00:00+00:00',
+                status: 'active',
+              },
+            },
+          ],
+          meta: {
+            cursor: null,
+            has_more: false,
+            page: 1,
+            per_page: 12,
+            total: 1,
+          },
+        }),
+      ),
+    );
+
+    await expect(fetchOrganisationsIndex(request, null)).resolves.toMatchObject({
+      organisations: [
+        {
+          id: '41',
+          logoImage: {
+            url: 'https://api.example.test/uploads/tenants/hour-timebank/organisations/care-collective.png',
+          },
+          name: 'Neighbourhood Care Collective',
+          owner: {
+            displayName: 'Organisation Owner',
+          },
+          stats: {
+            opportunityCount: 3,
+            volunteerCount: 12,
+          },
+          website: 'https://example.test/care',
+        },
+      ],
+      pagination: {
+        hasMore: false,
+        page: 1,
+        perPage: 12,
+        total: 1,
+      },
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://api.example.test/api/v2/volunteering/organisations?per_page=12',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'X-Public-Contract': '1',
+        }),
+      }),
+    );
+  });
+
+  it('maps public organisation detail through the dedicated contract path', async () => {
+    process.env.NEXUS_API_BASE = 'https://api.example.test/api';
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: {
+            public_contract: {
+              id: 42,
+              slug: 'community-kitchen',
+              name: 'Community Kitchen',
+              description: 'A detailed organisation profile for a community kitchen.',
+              excerpt: 'A detailed organisation profile for a community kitchen.',
+              logo_image: null,
+              website: 'https://example.test/kitchen',
+              contact_email: 'kitchen@example.test',
+              location: {
+                label: null,
+              },
+              owner: {
+                id: 10,
+                display_name: 'Detail Owner',
+                avatar_url: null,
+              },
+              stats: {
+                opportunity_count: 1,
+                volunteer_count: 5,
+                total_hours: 18,
+                review_count: 1,
+                average_rating: 5,
+              },
+              org_type: 'organisation',
+              created_at: '2026-06-01T10:00:00+00:00',
+              updated_at: '2026-06-02T11:00:00+00:00',
+              status: 'active',
+            },
+          },
+        }),
+      ),
+    );
+
+    await expect(fetchOrganisationDetail('42', request, null)).resolves.toMatchObject({
+      id: '42',
+      name: 'Community Kitchen',
+      owner: {
+        displayName: 'Detail Owner',
+      },
+      website: 'https://example.test/kitchen',
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://api.example.test/api/v2/volunteering/organisations/42',
       expect.objectContaining({
         headers: expect.objectContaining({
           'X-Public-Contract': '1',

@@ -289,6 +289,52 @@ export interface PublicMarketplaceIndex {
   pagination: PublicListingsPagination;
 }
 
+export interface PublicOrganisationImage {
+  altText: string;
+  url: string;
+}
+
+export interface PublicOrganisationLocation {
+  label: string | null;
+}
+
+export interface PublicOrganisationOwner {
+  avatarUrl: string | null;
+  displayName: string | null;
+  id: string | null;
+}
+
+export interface PublicOrganisationStats {
+  averageRating: number;
+  opportunityCount: number;
+  reviewCount: number;
+  totalHours: number;
+  volunteerCount: number;
+}
+
+export interface PublicOrganisation {
+  contactEmail: string | null;
+  createdAt: string | null;
+  description: string;
+  excerpt: string;
+  id: string;
+  location: PublicOrganisationLocation;
+  logoImage: PublicOrganisationImage | null;
+  name: string;
+  orgType: string | null;
+  owner: PublicOrganisationOwner;
+  slug: string;
+  stats: PublicOrganisationStats;
+  status: string;
+  updatedAt: string | null;
+  website: string | null;
+}
+
+export interface PublicOrganisationsIndex {
+  organisations: PublicOrganisation[];
+  pagination: PublicListingsPagination;
+}
+
 export type PublicRouteContent =
   | { kind: 'blog-detail'; post: BlogPost | null }
   | { kind: 'blog-index'; posts: BlogPostSummary[] }
@@ -301,6 +347,8 @@ export type PublicRouteContent =
   | { kind: 'listings-index'; listings: PublicListingsIndex }
   | { item: PublicMarketplaceListing | null; kind: 'marketplace-detail' }
   | { items: PublicMarketplaceIndex; kind: 'marketplace-index' }
+  | { kind: 'organisation-detail'; organisation: PublicOrganisation | null }
+  | { kind: 'organisations-index'; organisations: PublicOrganisationsIndex }
   | { items: PublicContentItem[]; kind: 'public-collection' }
   | { item: PublicContentItem | null; kind: 'public-detail' };
 
@@ -471,6 +519,21 @@ export async function fetchMarketplaceIndex(
   };
 }
 
+export async function fetchOrganisationsIndex(
+  request: ResolvedTenantRequest,
+  tenant: TenantBootstrap | null,
+): Promise<PublicOrganisationsIndex> {
+  const endpoint = getPublicEndpointForRoute('organisations') ?? '/v2/volunteering/organisations';
+  const url = buildApiUrl(endpoint, { per_page: '12' });
+  const response = await fetchApiResponse<unknown>(url, buildPublicHeaders(request, tenant, { publicContract: true }));
+  const organisations = normalizePublicOrganisations(response?.data);
+
+  return {
+    organisations,
+    pagination: normalizeListingsPagination(response?.meta, organisations.length),
+  };
+}
+
 export async function fetchPublicDetail(
   routeKey: string,
   paramsOrId: Record<string, string> | string,
@@ -556,6 +619,23 @@ export async function fetchMarketplaceDetail(
   const payload = await fetchApiPayload<unknown>(url, buildPublicHeaders(request, tenant, { publicContract: true }));
 
   return normalizePublicMarketplaceListing(payload);
+}
+
+export async function fetchOrganisationDetail(
+  id: string,
+  request: ResolvedTenantRequest,
+  tenant: TenantBootstrap | null,
+): Promise<PublicOrganisation | null> {
+  const endpoint = getPublicEndpointForRoute('organisationDetail', { id });
+
+  if (!endpoint) {
+    return null;
+  }
+
+  const url = buildApiUrl(endpoint);
+  const payload = await fetchApiPayload<unknown>(url, buildPublicHeaders(request, tenant, { publicContract: true }));
+
+  return normalizePublicOrganisation(payload);
 }
 
 async function fetchApiEnvelope<T>(url: string, headers: HeadersInit): Promise<T | null> {
@@ -1077,6 +1157,92 @@ function normalizeMarketplaceDelivery(value: unknown): PublicMarketplaceDelivery
     localPickup: firstBoolean(delivery.local_pickup, delivery.localPickup) ?? null,
     method: firstString(delivery.method) ?? null,
     shippingAvailable: firstBoolean(delivery.shipping_available, delivery.shippingAvailable) ?? null,
+  };
+}
+
+function normalizePublicOrganisations(payload: unknown): PublicOrganisation[] {
+  return extractPublicItemArray(payload)
+    .map(normalizePublicOrganisation)
+    .filter((organisation): organisation is PublicOrganisation => organisation !== null);
+}
+
+function normalizePublicOrganisation(payload: unknown): PublicOrganisation | null {
+  if (!isRecord(payload)) {
+    return null;
+  }
+
+  const contract = isRecord(payload.public_contract) ? payload.public_contract : payload;
+  const id = firstString(contract.id, contract.slug);
+  const name = firstString(contract.name, contract.title);
+
+  if (!id || !name) {
+    return null;
+  }
+
+  return {
+    contactEmail: firstString(contract.contact_email, contract.contactEmail) ?? null,
+    createdAt: firstString(contract.created_at) ?? null,
+    description: firstString(contract.description) ?? '',
+    excerpt: firstString(contract.excerpt, contract.description) ?? '',
+    id,
+    location: normalizeOrganisationLocation(contract.location),
+    logoImage: normalizeOrganisationImage(contract.logo_image, name),
+    name,
+    orgType: firstString(contract.org_type, contract.orgType) ?? null,
+    owner: normalizeOrganisationOwner(contract.owner),
+    slug: firstString(contract.slug, id) ?? id,
+    stats: normalizeOrganisationStats(contract.stats),
+    status: firstString(contract.status) ?? 'active',
+    updatedAt: firstString(contract.updated_at) ?? null,
+    website: firstString(contract.website) ?? null,
+  };
+}
+
+function normalizeOrganisationImage(value: unknown, fallbackAlt: string): PublicOrganisationImage | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const url = resolveAssetUrl(firstString(value.url), getApiBase());
+
+  if (!url) {
+    return null;
+  }
+
+  return {
+    altText: firstString(value.alt_text, value.altText) ?? fallbackAlt,
+    url,
+  };
+}
+
+function normalizeOrganisationLocation(value: unknown): PublicOrganisationLocation {
+  const location = isRecord(value) ? value : {};
+
+  return {
+    label: firstString(location.label) ?? null,
+  };
+}
+
+function normalizeOrganisationOwner(value: unknown): PublicOrganisationOwner {
+  const owner = isRecord(value) ? value : {};
+  const avatarUrl = resolveAssetUrl(firstString(owner.avatar_url, owner.avatarUrl), getApiBase()) ?? null;
+
+  return {
+    avatarUrl,
+    displayName: firstString(owner.display_name, owner.displayName) ?? null,
+    id: firstString(owner.id) ?? null,
+  };
+}
+
+function normalizeOrganisationStats(value: unknown): PublicOrganisationStats {
+  const stats = isRecord(value) ? value : {};
+
+  return {
+    averageRating: firstNumber(stats.average_rating, stats.averageRating) ?? 0,
+    opportunityCount: firstNumber(stats.opportunity_count, stats.opportunityCount) ?? 0,
+    reviewCount: firstNumber(stats.review_count, stats.reviewCount) ?? 0,
+    totalHours: firstNumber(stats.total_hours, stats.totalHours) ?? 0,
+    volunteerCount: firstNumber(stats.volunteer_count, stats.volunteerCount) ?? 0,
   };
 }
 

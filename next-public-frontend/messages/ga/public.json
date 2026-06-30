@@ -103,5 +103,27 @@
     "statusLabel": "Stádas",
     "timeCredits": "{{count}} creidmheas ama",
     "updatedLabel": "Nuashonraithe"
+  },
+  "organisationProfiles": {
+    "backToOrganisations": "Eagraíochtaí",
+    "breadcrumbLabel": "Conair eagraíochta",
+    "createdLabel": "Cruthaithe",
+    "emailLabel": "Ríomhphost",
+    "empty": "Níl aon phróifílí poiblí eagraíochta ar fáil fós.",
+    "hourCount": "{{count}} uair",
+    "hoursLabel": "Uaireanta",
+    "locationLabel": "Suíomh",
+    "logoAltFallback": "Lógó eagraíochta",
+    "opportunitiesLabel": "Deiseanna",
+    "opportunityCount": "{{count}} deis",
+    "ownerLabel": "Úinéir",
+    "profileLabel": "Próifíl",
+    "ratingLabel": "Rátáil",
+    "statusLabel": "Stádas",
+    "typeLabel": "Cineál",
+    "updatedLabel": "Nuashonraithe",
+    "volunteerCount": "{{count}} oibrí deonach",
+    "volunteersLabel": "Oibrithe deonacha",
+    "websiteLabel": "Suíomh gréasáin"
   }
 }

@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Core\TenantContext;
 use App\Services\VolunteerService;
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -77,6 +78,35 @@ class VolunteerControllerTest extends TestCase
                 'updated_at' => now(),
             ]
         );
+    }
+
+    private function enableVolunteeringFeature(): void
+    {
+        DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update(['features' => json_encode(['volunteering' => true, 'organisations' => true])]);
+
+        TenantContext::setById($this->testTenantId);
+    }
+
+    private function createPublicOrganisation(User $owner, array $overrides = []): int
+    {
+        return (int) DB::table('vol_organizations')->insertGetId(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'name' => 'Neighbourhood Care Collective',
+            'slug' => 'neighbourhood-care-collective-' . uniqid(),
+            'description' => 'A public organisation profile for local care and volunteering.',
+            'contact_email' => 'hello@example.test',
+            'website' => 'https://example.test/care',
+            'logo_url' => '/uploads/tenants/hour-timebank/organisations/care-collective.png',
+            'status' => 'active',
+            'org_type' => 'organisation',
+            'auto_pay_enabled' => true,
+            'balance' => 42.50,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $overrides));
     }
 
     // ------------------------------------------------------------------
@@ -295,6 +325,105 @@ public function test_apply_requires_auth(): void
         $response = $this->apiGet('/v2/volunteering/organisations');
 
         $response->assertStatus(200);
+    }
+
+    public function test_organisations_public_contract_is_opt_in(): void
+    {
+        $this->enableVolunteeringFeature();
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name' => 'Organisation',
+            'last_name' => 'Owner',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $orgId = $this->createPublicOrganisation($owner);
+
+        $defaultResponse = $this->apiGet('/v2/volunteering/organisations?per_page=1');
+        $defaultResponse->assertOk();
+        $this->assertArrayNotHasKey('public_contract', $defaultResponse->json('data.0'));
+        $this->assertArrayNotHasKey('balance', $defaultResponse->json('data.0'));
+        $this->assertArrayNotHasKey('auto_pay_enabled', $defaultResponse->json('data.0'));
+
+        $contractResponse = $this->apiGet('/v2/volunteering/organisations?per_page=1', [
+            'X-Public-Contract' => '1',
+        ]);
+        $contractResponse->assertOk();
+        $contractResponse->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'id',
+                    'name',
+                    'public_contract' => [
+                        'id',
+                        'slug',
+                        'name',
+                        'description',
+                        'excerpt',
+                        'logo_image' => ['url', 'alt_text'],
+                        'website',
+                        'contact_email',
+                        'location' => ['label'],
+                        'owner' => ['id', 'display_name', 'avatar_url'],
+                        'stats' => ['opportunity_count', 'volunteer_count', 'total_hours', 'review_count', 'average_rating'],
+                        'org_type',
+                        'created_at',
+                        'updated_at',
+                        'status',
+                    ],
+                ],
+            ],
+        ]);
+
+        $contract = $contractResponse->json('data.0.public_contract');
+        $this->assertSame($orgId, $contract['id']);
+        $this->assertSame('Neighbourhood Care Collective', $contract['name']);
+        $this->assertSame('A public organisation profile for local care and volunteering.', $contract['excerpt']);
+        $this->assertSame('/uploads/tenants/hour-timebank/organisations/care-collective.png', $contract['logo_image']['url']);
+        $this->assertSame('https://example.test/care', $contract['website']);
+        $this->assertSame('hello@example.test', $contract['contact_email']);
+        $this->assertSame('Organisation Owner', $contract['owner']['display_name']);
+        $this->assertSame('organisation', $contract['org_type']);
+        $this->assertSame('active', $contract['status']);
+        $this->assertArrayNotHasKey('balance', $contract);
+        $this->assertArrayNotHasKey('auto_pay_enabled', $contract);
+    }
+
+    public function test_show_organisation_public_contract_is_opt_in(): void
+    {
+        $this->enableVolunteeringFeature();
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name' => 'Detail',
+            'last_name' => 'Owner',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $orgId = $this->createPublicOrganisation($owner, [
+            'name' => 'Community Kitchen',
+            'slug' => 'community-kitchen',
+            'description' => 'A detailed organisation profile for a community kitchen.',
+            'website' => 'https://example.test/kitchen',
+        ]);
+
+        $defaultResponse = $this->apiGet("/v2/volunteering/organisations/{$orgId}");
+        $defaultResponse->assertOk();
+        $this->assertArrayNotHasKey('public_contract', $defaultResponse->json('data'));
+        $this->assertArrayNotHasKey('balance', $defaultResponse->json('data'));
+        $this->assertArrayNotHasKey('auto_pay_enabled', $defaultResponse->json('data'));
+
+        $contractResponse = $this->apiGet("/v2/volunteering/organisations/{$orgId}", [
+            'X-Public-Contract' => '1',
+        ]);
+        $contractResponse->assertOk();
+
+        $contract = $contractResponse->json('data.public_contract');
+        $this->assertSame($orgId, $contract['id']);
+        $this->assertSame('community-kitchen', $contract['slug']);
+        $this->assertSame('Community Kitchen', $contract['name']);
+        $this->assertSame('A detailed organisation profile for a community kitchen.', $contract['description']);
+        $this->assertSame('https://example.test/kitchen', $contract['website']);
+        $this->assertSame('Detail Owner', $contract['owner']['display_name']);
+        $this->assertArrayNotHasKey('balance', $contract);
+        $this->assertArrayNotHasKey('auto_pay_enabled', $contract);
     }
 
     // ------------------------------------------------------------------

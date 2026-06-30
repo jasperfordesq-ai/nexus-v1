@@ -14,6 +14,7 @@ import { buildJobMetadata } from '../../src/lib/jobs-seo';
 import { buildListingMetadata } from '../../src/lib/listings-seo';
 import { buildMarketplaceMetadata } from '../../src/lib/marketplace-seo';
 import { buildCanonicalUrl, buildPageTitle } from '../../src/lib/metadata';
+import { buildOrganisationMetadata } from '../../src/lib/organisations-seo';
 import { isRouteEnabledForTenant } from '../../src/lib/module-gates';
 import { getRouteOwnership, type RouteOwnership } from '../../src/lib/public-routes';
 import {
@@ -23,6 +24,8 @@ import {
   fetchJobsIndex,
   fetchMarketplaceDetail,
   fetchMarketplaceIndex,
+  fetchOrganisationDetail,
+  fetchOrganisationsIndex,
   fetchListingDetail,
   fetchListingsIndex,
   fetchBlogPost,
@@ -110,6 +113,15 @@ export async function generateMetadata({ params }: PublicPageProps): Promise<Met
     });
   }
 
+  if (content?.kind === 'organisation-detail' && content.organisation) {
+    return buildOrganisationMetadata({
+      canonicalUrl: context.canonicalUrl,
+      organisation: content.organisation,
+      platformName: t('brand.platformName'),
+      tenantName: context.tenant?.name,
+    });
+  }
+
   return {
     alternates: {
       canonical: context.canonicalUrl,
@@ -157,6 +169,10 @@ export default async function PublicRoutePage({ params }: PublicPageProps): Prom
   }
 
   if (content?.kind === 'marketplace-detail' && !content.item) {
+    notFound();
+  }
+
+  if (content?.kind === 'organisation-detail' && !content.organisation) {
     notFound();
   }
 
@@ -291,6 +307,20 @@ async function fetchRouteContent(
     };
   }
 
+  if (route.routeKey === 'organisations') {
+    return {
+      kind: 'organisations-index',
+      organisations: await fetchOrganisationsIndex(request, tenant),
+    };
+  }
+
+  if (route.routeKey === 'organisationDetail' && route.params?.id) {
+    return {
+      kind: 'organisation-detail',
+      organisation: await fetchOrganisationDetail(route.params.id, request, tenant),
+    };
+  }
+
   if (route.params && Object.keys(route.params).length > 0) {
     return {
       item: await fetchPublicDetail(route.routeKey, route.params, request, tenant),
@@ -347,6 +377,10 @@ function getMetadataLabel(
     return content.item.title;
   }
 
+  if (content?.kind === 'organisation-detail' && content.organisation?.name) {
+    return content.organisation.name;
+  }
+
   return t(route.labelKey ?? 'pages.home.title');
 }
 
@@ -382,6 +416,10 @@ function getMetadataDescription(
 
   if (content?.kind === 'marketplace-detail' && content.item?.excerpt) {
     return content.item.excerpt;
+  }
+
+  if (content?.kind === 'organisation-detail' && content.organisation?.excerpt) {
+    return content.organisation.excerpt;
   }
 
   if (tenant?.seo?.description) {
