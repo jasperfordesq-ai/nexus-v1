@@ -333,7 +333,7 @@ class SmartMatchingEngineTest extends TestCase
         DB::shouldReceive('whereNull')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('get')->andReturn(collect([
-            (object) ['user_id' => 10, 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])],
+            (object) ['user_id' => 10, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
         ]));
 
         // Searcher holds it
@@ -362,7 +362,7 @@ class SmartMatchingEngineTest extends TestCase
         DB::shouldReceive('whereNull')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('get')->andReturn(collect([
-            (object) ['user_id' => 10, 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])],
+            (object) ['user_id' => 10, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
         ]));
 
         // Searcher lacks garda_vetting
@@ -396,9 +396,9 @@ class SmartMatchingEngineTest extends TestCase
         DB::shouldReceive('whereNull')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('get')->andReturn(collect([
-            (object) ['user_id' => 10, 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])],
-            (object) ['user_id' => 20, 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])],
-            (object) ['user_id' => 30, 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])],
+            (object) ['user_id' => 10, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
+            (object) ['user_id' => 20, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
+            (object) ['user_id' => 30, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
         ]));
 
         $mockVetting = Mockery::mock(VettingService::class);
@@ -431,8 +431,8 @@ class SmartMatchingEngineTest extends TestCase
         DB::shouldReceive('whereNull')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('get')->andReturn(collect([
-            (object) ['user_id' => 20, 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])],
-            (object) ['user_id' => 30, 'triggers' => json_encode(['vetting_type_required' => 'dbs_enhanced'])],
+            (object) ['user_id' => 20, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
+            (object) ['user_id' => 30, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'dbs_enhanced'])],
         ]));
 
         $mockVetting = Mockery::mock(VettingService::class);
