@@ -5,6 +5,11 @@
   "license": "AGPL-3.0-or-later",
   "type": "module",
   "scripts": {
+    "sync:shared": "node scripts/sync-shared.mjs",
+    "predev": "node scripts/sync-shared.mjs",
+    "prebuild": "node scripts/sync-shared.mjs",
+    "pretest": "node scripts/sync-shared.mjs",
+    "pretypecheck": "node scripts/sync-shared.mjs",
     "dev": "next dev -H 127.0.0.1 -p 5175",
     "build": "next build",
     "start": "next start -H 0.0.0.0 -p 3000",
