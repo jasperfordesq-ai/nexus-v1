@@ -16,6 +16,13 @@ const listingsRoute: RouteOwnership = {
   routeKey: 'listings',
 };
 
+const eventsRoute: RouteOwnership = {
+  labelKey: 'pages.events.title',
+  owner: 'next-public',
+  pattern: '/events',
+  routeKey: 'events',
+};
+
 describe('module route gates', () => {
   it('keeps the Next listings route unavailable when the tenant listings module is disabled', () => {
     const tenant: TenantBootstrap = {
@@ -53,5 +60,19 @@ describe('module route gates', () => {
         tenant,
       ),
     ).toBe(true);
+  });
+
+  it('keeps the Next events route unavailable when the tenant events module is disabled', () => {
+    const tenant: TenantBootstrap = {
+      default_language: 'en',
+      id: 2,
+      modules: {
+        events: false,
+      },
+      name: 'Hour Timebank',
+      slug: 'hour-timebank',
+    };
+
+    expect(isRouteEnabledForTenant(eventsRoute, tenant)).toBe(false);
   });
 });

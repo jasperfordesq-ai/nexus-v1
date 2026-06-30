@@ -11,6 +11,8 @@ import type { RouteOwnership } from '../lib/public-routes';
 import type {
   BlogPostSummary,
   PublicContentItem,
+  PublicEvent,
+  PublicEventsIndex,
   PublicListing,
   PublicListingsIndex,
   PublicRouteContent,
@@ -161,6 +163,14 @@ function renderRouteContent(
 
   if (content?.kind === 'listing-detail' && content.listing) {
     return <ListingDetail listing={content.listing} tenantBasePath={tenantBasePath} t={t} />;
+  }
+
+  if (content?.kind === 'events-index') {
+    return <EventsIndex events={content.events} tenantBasePath={tenantBasePath} t={t} />;
+  }
+
+  if (content?.kind === 'event-detail' && content.event) {
+    return <EventDetail event={content.event} tenantBasePath={tenantBasePath} t={t} />;
   }
 
   if (content?.kind === 'public-collection') {
@@ -354,6 +364,104 @@ function ListingDetail({
   );
 }
 
+function EventsIndex({
+  events,
+  tenantBasePath,
+  t,
+}: {
+  events: PublicEventsIndex;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  if (events.events.length === 0) {
+    return (
+      <article className="public-panel">
+        <h2>{t('pages.events.title')}</h2>
+        <p>{t('events.empty')}</p>
+      </article>
+    );
+  }
+
+  return (
+    <div className="listings-grid">
+      {events.events.map((event) => (
+        <article className="listing-card" key={event.id}>
+          <a className="listing-card-image" href={withTenantBase(tenantBasePath, `events/${event.slug}`)}>
+            {event.primaryImage ? (
+              <img alt={event.primaryImage.altText || t('events.imageAltFallback')} src={event.primaryImage.url} />
+            ) : (
+              <span aria-hidden="true" />
+            )}
+          </a>
+          <div className="listing-card-body">
+            <p className="listing-card-meta">
+              {compactText([event.category?.name, formatEventRange(event)]).join(' / ')}
+            </p>
+            <h2>
+              <a href={withTenantBase(tenantBasePath, `events/${event.slug}`)}>{event.title}</a>
+            </h2>
+            <p>{event.excerpt || event.description}</p>
+            <dl className="listing-facts">
+              <DefinitionRow label={t('events.locationLabel')} value={event.location.label} />
+              <DefinitionRow label={t('events.organiserLabel')} value={event.organiser.displayName} />
+            </dl>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function EventDetail({
+  event,
+  tenantBasePath,
+  t,
+}: {
+  event: PublicEvent;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  return (
+    <article className="listing-detail">
+      <nav aria-label={t('events.breadcrumbLabel')} className="listing-breadcrumb">
+        <a href={withTenantBase(tenantBasePath, 'events')}>{t('events.backToEvents')}</a>
+        <span aria-hidden="true">/</span>
+        <span>{event.title}</span>
+      </nav>
+
+      {event.primaryImage ? (
+        <img
+          alt={event.primaryImage.altText || t('events.imageAltFallback')}
+          className="listing-hero-image"
+          src={event.primaryImage.url}
+        />
+      ) : null}
+
+      <div className="listing-detail-grid">
+        <div className="listing-detail-main">
+          <section className="public-panel article-content">
+            <h2>{event.title}</h2>
+            <p>{event.description}</p>
+          </section>
+        </div>
+
+        <aside className="public-panel listing-detail-aside">
+          <h2>{t('events.organiserLabel')}</h2>
+          <p>{event.organiser.displayName}</p>
+          <dl className="listing-facts stacked">
+            <DefinitionRow label={t('events.dateLabel')} value={formatEventRange(event)} />
+            <DefinitionRow label={t('events.categoryLabel')} value={event.category?.name} />
+            <DefinitionRow label={t('events.locationLabel')} value={event.location.label} />
+            <DefinitionRow label={t('events.statusLabel')} value={event.status} />
+            <DefinitionRow label={t('events.updatedLabel')} value={formatDate(event.updatedAt)} />
+            <DefinitionRow label={t('events.createdLabel')} value={formatDate(event.createdAt)} />
+          </dl>
+        </aside>
+      </div>
+    </article>
+  );
+}
+
 function PublicCollection({
   basePath,
   emptyTitle,
@@ -407,6 +515,37 @@ function formatTimeValue(listing: PublicListing, t: Translator): string | null {
   }
 
   return t('listings.valueHours', { count: formatNumber(listing.timeCreditValue.hours) });
+}
+
+function formatEventRange(event: PublicEvent): string | null {
+  const start = formatDateTime(event.startAt);
+  const end = formatDateTime(event.endAt);
+
+  if (start && end) {
+    return `${start} - ${end}`;
+  }
+
+  return start ?? end;
+}
+
+function formatDateTime(value: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat('en', {
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(date);
 }
 
 function formatDate(value: string | null): string | null {
@@ -520,6 +659,24 @@ function buildStructuredData({
     };
   }
 
+  if (content?.kind === 'events-index') {
+    const baseUrl = canonicalUrl.replace(/\/+$/, '');
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      itemListElement: content.events.events.map((event, index) => ({
+        '@type': 'ListItem',
+        image: event.primaryImage?.url,
+        name: event.title,
+        position: index + 1,
+        url: `${baseUrl}/${encodeURIComponent(event.slug)}`,
+      })),
+      name: pageTitle,
+      url: canonicalUrl,
+    };
+  }
+
   if (content?.kind === 'listing-detail' && content.listing) {
     return {
       '@context': 'https://schema.org',
@@ -537,6 +694,30 @@ function buildStructuredData({
         '@type': 'Organization',
         name: content.listing.provider.displayName ?? tenantName,
       },
+      url: canonicalUrl,
+    };
+  }
+
+  if (content?.kind === 'event-detail' && content.event) {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Event',
+      description: content.event.description,
+      endDate: content.event.endAt ?? undefined,
+      eventStatus: 'https://schema.org/EventScheduled',
+      image: content.event.primaryImage?.url,
+      location: content.event.location.label
+        ? {
+            '@type': 'Place',
+            name: content.event.location.label,
+          }
+        : undefined,
+      name: content.event.title,
+      organizer: {
+        '@type': 'Organization',
+        name: content.event.organiser.displayName ?? tenantName,
+      },
+      startDate: content.event.startAt ?? undefined,
       url: canonicalUrl,
     };
   }
@@ -576,6 +757,10 @@ function getRouteTitle(route: RouteOwnership, content: PublicRouteContent | null
     return content.listing.title;
   }
 
+  if (content?.kind === 'event-detail' && content.event?.title) {
+    return content.event.title;
+  }
+
   return t(route.labelKey ?? 'pages.home.title');
 }
 
@@ -599,6 +784,10 @@ function getRouteLead(
 
   if (content?.kind === 'listing-detail' && content.listing?.excerpt) {
     return content.listing.excerpt;
+  }
+
+  if (content?.kind === 'event-detail' && content.event?.excerpt) {
+    return content.event.excerpt;
   }
 
   return t(`pages.${route.routeKey}.lead`, { tenantName });

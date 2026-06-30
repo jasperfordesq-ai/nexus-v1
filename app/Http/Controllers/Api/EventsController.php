@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\EventService;
 use App\Services\EventNotificationService;
+use App\Http\Resources\PublicEventResource;
 use App\Models\Poll;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -98,7 +99,7 @@ class EventsController extends BaseApiController
         }
 
         return $this->respondWithCollection(
-            $result['items'],
+            array_map(static fn (array $event): array => PublicEventResource::augment($event), $result['items']),
             $result['cursor'],
             $filters['limit'],
             $result['has_more']
@@ -118,7 +119,7 @@ class EventsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
 
-        return $this->respondWithData($event);
+        return $this->respondWithData(PublicEventResource::augment($event));
     }
 
     /**

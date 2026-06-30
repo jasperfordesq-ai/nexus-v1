@@ -9,6 +9,16 @@
       "body": "Tá an leathanach seo ullmhaithe le haghaidh aimsithe poiblí liostuithe. Fanann cruthú, eagarthóireacht agus uirlisí ball san aip shlán Vite.",
       "lead": "Brabhsáil tairiscintí agus iarratais phoiblí ó {{tenantName}}.",
       "title": "Liostuithe"
+    },
+    "eventDetail": {
+      "body": "Fanann gníomhartha freastail agus eagraithe san aip shlán Vite.",
+      "lead": "Féach ar fhaisnéis phoiblí imeachta ó {{tenantName}}.",
+      "title": "Imeacht"
+    },
+    "events": {
+      "body": "Tá an leathanach seo ullmhaithe le haghaidh aimsithe poiblí imeachtaí. Fanann cruthú, RSVP agus eagarthóireacht san aip shlán Vite.",
+      "lead": "Brabhsáil imeachtaí poiblí ó {{tenantName}}.",
+      "title": "Imeachtaí"
     }
   },
   "listings": {
@@ -25,5 +35,18 @@
     "updatedLabel": "Nuashonraithe",
     "valueHours": "{{count}} uair",
     "valueLabel": "Luach ama"
+  },
+  "events": {
+    "backToEvents": "Imeachtaí",
+    "breadcrumbLabel": "Conair imeachta",
+    "categoryLabel": "Catagóir",
+    "createdLabel": "Cruthaithe",
+    "dateLabel": "Dáta agus am",
+    "empty": "Níl aon imeachtaí poiblí ar fáil fós.",
+    "imageAltFallback": "Íomhá imeachta",
+    "locationLabel": "Suíomh",
+    "organiserLabel": "Eagraí",
+    "statusLabel": "Stádas",
+    "updatedLabel": "Nuashonraithe"
   }
 }

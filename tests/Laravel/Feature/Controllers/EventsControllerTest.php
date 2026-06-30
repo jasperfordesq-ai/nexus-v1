@@ -107,6 +107,75 @@ class EventsControllerTest extends TestCase
             'data',
             'meta' => ['per_page', 'has_more'],
         ]);
+        $this->assertArrayNotHasKey('public_contract', $response->json('data.0'));
+    }
+
+    public function test_public_index_returns_full_next_public_event_contract_when_opted_in(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name' => 'Event',
+            'last_name' => 'Organiser',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $categoryId = $this->seedCategory();
+        $eventId = $this->createEvent($user->id, [
+            'category_id' => $categoryId,
+            'title' => 'Community repair morning',
+            'description' => 'A public community event for sharing repair skills.',
+            'location' => 'Remote or local',
+            'latitude' => null,
+            'longitude' => null,
+            'image_url' => '/uploads/tenants/hour-timebank/events/repair.jpg',
+            'start_time' => '2026-07-10 10:00:00',
+            'end_time' => '2026-07-10 12:00:00',
+        ]);
+
+        $response = $this->apiGet('/v2/events?per_page=1', [
+            'X-Public-Contract' => '1',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'id',
+                    'title',
+                    'description',
+                    'public_contract' => [
+                        'id',
+                        'slug',
+                        'title',
+                        'description',
+                        'excerpt',
+                        'primary_image' => ['url', 'alt_text'],
+                        'category' => ['id', 'name', 'slug'],
+                        'location' => ['label', 'latitude', 'longitude'],
+                        'organiser' => ['id', 'display_name'],
+                        'start_at',
+                        'end_at',
+                        'created_at',
+                        'updated_at',
+                        'status',
+                    ],
+                ],
+            ],
+        ]);
+
+        $contract = $response->json('data.0.public_contract');
+        $this->assertSame($eventId, $contract['id']);
+        $this->assertSame((string) $eventId, $contract['slug']);
+        $this->assertSame('Community repair morning', $contract['title']);
+        $this->assertSame('A public community event for sharing repair skills.', $contract['description']);
+        $this->assertSame('/uploads/tenants/hour-timebank/events/repair.jpg', $contract['primary_image']['url']);
+        $this->assertSame('Community', $contract['category']['name']);
+        $this->assertSame('Remote or local', $contract['location']['label']);
+        $this->assertNull($contract['location']['latitude']);
+        $this->assertNull($contract['location']['longitude']);
+        $this->assertSame('Event Organiser', $contract['organiser']['display_name']);
+        $this->assertSame('2026-07-10T10:00:00+00:00', $contract['start_at']);
+        $this->assertSame('2026-07-10T12:00:00+00:00', $contract['end_at']);
+        $this->assertSame('active', $contract['status']);
     }
 
     // ================================================================
@@ -136,6 +205,42 @@ class EventsControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
+        $this->assertArrayNotHasKey('public_contract', $response->json('data'));
+    }
+
+    public function test_public_show_returns_full_next_public_event_contract_when_opted_in(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name' => 'Detail',
+            'last_name' => 'Organiser',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $categoryId = $this->seedCategory();
+        $eventId = $this->createEvent($user->id, [
+            'category_id' => $categoryId,
+            'title' => 'Neighbourhood welcome session',
+            'description' => 'A detailed public event description for newcomers.',
+            'location' => 'Online',
+            'image_url' => '/uploads/tenants/hour-timebank/events/welcome.jpg',
+            'start_time' => '2026-08-01 18:30:00',
+            'end_time' => '2026-08-01 20:00:00',
+        ]);
+
+        $response = $this->apiGet("/v2/events/{$eventId}", [
+            'X-Public-Contract' => '1',
+        ]);
+
+        $response->assertOk();
+        $contract = $response->json('data.public_contract');
+        $this->assertSame($eventId, $contract['id']);
+        $this->assertSame('Neighbourhood welcome session', $contract['title']);
+        $this->assertSame('A detailed public event description for newcomers.', $contract['description']);
+        $this->assertSame('/uploads/tenants/hour-timebank/events/welcome.jpg', $contract['primary_image']['url']);
+        $this->assertSame('Online', $contract['location']['label']);
+        $this->assertSame('Detail Organiser', $contract['organiser']['display_name']);
+        $this->assertSame('2026-08-01T18:30:00+00:00', $contract['start_at']);
+        $this->assertSame('2026-08-01T20:00:00+00:00', $contract['end_at']);
     }
 
     // ================================================================

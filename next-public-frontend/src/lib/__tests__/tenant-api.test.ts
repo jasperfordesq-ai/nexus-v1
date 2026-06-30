@@ -8,6 +8,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   fetchListingDetail,
   fetchListingsIndex,
+  fetchEventDetail,
+  fetchEventsIndex,
   fetchPublicCollection,
   fetchPublicDetail,
   fetchTenantBootstrap,
@@ -290,6 +292,145 @@ describe('tenant API client', () => {
         headers: expect.objectContaining({
           Accept: 'application/json',
           Origin: 'https://app.project-nexus.ie',
+          'X-Public-Contract': '1',
+        }),
+      }),
+    );
+  });
+
+  it('maps the full public events contract and opts in to Laravel public contracts', async () => {
+    process.env.NEXUS_API_BASE = 'https://api.example.test/api';
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: [
+            {
+              public_contract: {
+                id: 12,
+                slug: '12',
+                title: 'Community repair morning',
+                description: 'A public community event for sharing repair skills.',
+                excerpt: 'A public community event for sharing repair skills.',
+                primary_image: {
+                  url: '/uploads/tenants/hour-timebank/events/repair.jpg',
+                  alt_text: 'Community repair morning',
+                },
+                category: {
+                  id: 10,
+                  name: 'Community',
+                  slug: 'community',
+                },
+                location: {
+                  label: 'Remote or local',
+                  latitude: null,
+                  longitude: null,
+                },
+                organiser: {
+                  id: 9,
+                  display_name: 'Event Organiser',
+                },
+                start_at: '2026-07-10T10:00:00+00:00',
+                end_at: '2026-07-10T12:00:00+00:00',
+                created_at: '2026-06-01T10:00:00+00:00',
+                updated_at: '2026-06-02T11:00:00+00:00',
+                status: 'active',
+              },
+            },
+          ],
+          meta: {
+            cursor: null,
+            has_more: false,
+            page: 1,
+            per_page: 12,
+            total: 1,
+          },
+        }),
+      ),
+    );
+
+    await expect(fetchEventsIndex(request, null)).resolves.toMatchObject({
+      events: [
+        {
+          id: '12',
+          location: { label: 'Remote or local' },
+          organiser: { displayName: 'Event Organiser' },
+          primaryImage: {
+            url: 'https://api.example.test/uploads/tenants/hour-timebank/events/repair.jpg',
+          },
+          startAt: '2026-07-10T10:00:00+00:00',
+          title: 'Community repair morning',
+        },
+      ],
+      pagination: {
+        hasMore: false,
+        page: 1,
+        perPage: 12,
+        total: 1,
+      },
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://api.example.test/api/v2/events?per_page=12',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'X-Public-Contract': '1',
+        }),
+      }),
+    );
+  });
+
+  it('maps public event detail through the dedicated contract path', async () => {
+    process.env.NEXUS_API_BASE = 'https://api.example.test/api';
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: {
+            public_contract: {
+              id: 12,
+              slug: '12',
+              title: 'Community repair morning',
+              description: 'A public community event for sharing repair skills.',
+              excerpt: 'A public community event for sharing repair skills.',
+              primary_image: {
+                url: '/uploads/tenants/hour-timebank/events/repair.jpg',
+                alt_text: 'Community repair morning',
+              },
+              category: {
+                id: 10,
+                name: 'Community',
+                slug: 'community',
+              },
+              location: {
+                label: 'Remote or local',
+                latitude: null,
+                longitude: null,
+              },
+              organiser: {
+                id: 9,
+                display_name: 'Event Organiser',
+              },
+              start_at: '2026-07-10T10:00:00+00:00',
+              end_at: '2026-07-10T12:00:00+00:00',
+              created_at: '2026-06-01T10:00:00+00:00',
+              updated_at: '2026-06-02T11:00:00+00:00',
+              status: 'active',
+            },
+          },
+        }),
+      ),
+    );
+
+    await expect(fetchEventDetail('12', request, null)).resolves.toMatchObject({
+      id: '12',
+      organiser: { displayName: 'Event Organiser' },
+      startAt: '2026-07-10T10:00:00+00:00',
+      title: 'Community repair morning',
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://api.example.test/api/v2/events/12',
+      expect.objectContaining({
+        headers: expect.objectContaining({
           'X-Public-Contract': '1',
         }),
       }),

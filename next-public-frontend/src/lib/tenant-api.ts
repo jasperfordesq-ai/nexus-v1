@@ -120,10 +120,56 @@ export interface PublicListingsIndex {
   pagination: PublicListingsPagination;
 }
 
+export interface PublicEventImage {
+  altText: string;
+  url: string;
+}
+
+export interface PublicEventCategory {
+  id: string | null;
+  name: string | null;
+  slug: string | null;
+}
+
+export interface PublicEventLocation {
+  label: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+export interface PublicEventOrganiser {
+  displayName: string | null;
+  id: string | null;
+}
+
+export interface PublicEvent {
+  category: PublicEventCategory | null;
+  createdAt: string | null;
+  description: string;
+  endAt: string | null;
+  excerpt: string;
+  id: string;
+  location: PublicEventLocation;
+  organiser: PublicEventOrganiser;
+  primaryImage: PublicEventImage | null;
+  slug: string;
+  startAt: string | null;
+  status: string;
+  title: string;
+  updatedAt: string | null;
+}
+
+export interface PublicEventsIndex {
+  events: PublicEvent[];
+  pagination: PublicListingsPagination;
+}
+
 export type PublicRouteContent =
   | { kind: 'blog-detail'; post: BlogPost | null }
   | { kind: 'blog-index'; posts: BlogPostSummary[] }
   | { kind: 'cms-page'; page: CmsPage | null }
+  | { events: PublicEventsIndex; kind: 'events-index' }
+  | { event: PublicEvent | null; kind: 'event-detail' }
   | { kind: 'listing-detail'; listing: PublicListing | null }
   | { kind: 'listings-index'; listings: PublicListingsIndex }
   | { items: PublicContentItem[]; kind: 'public-collection' }
@@ -251,6 +297,21 @@ export async function fetchListingsIndex(
   };
 }
 
+export async function fetchEventsIndex(
+  request: ResolvedTenantRequest,
+  tenant: TenantBootstrap | null,
+): Promise<PublicEventsIndex> {
+  const endpoint = getPublicEndpointForRoute('events') ?? '/v2/events';
+  const url = buildApiUrl(endpoint, { per_page: '12' });
+  const response = await fetchApiResponse<unknown>(url, buildPublicHeaders(request, tenant, { publicContract: true }));
+  const events = normalizePublicEvents(response?.data);
+
+  return {
+    events,
+    pagination: normalizeListingsPagination(response?.meta, events.length),
+  };
+}
+
 export async function fetchPublicDetail(
   routeKey: string,
   paramsOrId: Record<string, string> | string,
@@ -285,6 +346,23 @@ export async function fetchListingDetail(
   const payload = await fetchApiPayload<unknown>(url, buildPublicHeaders(request, tenant, { publicContract: true }));
 
   return normalizePublicListing(payload);
+}
+
+export async function fetchEventDetail(
+  id: string,
+  request: ResolvedTenantRequest,
+  tenant: TenantBootstrap | null,
+): Promise<PublicEvent | null> {
+  const endpoint = getPublicEndpointForRoute('eventDetail', { id });
+
+  if (!endpoint) {
+    return null;
+  }
+
+  const url = buildApiUrl(endpoint);
+  const payload = await fetchApiPayload<unknown>(url, buildPublicHeaders(request, tenant, { publicContract: true }));
+
+  return normalizePublicEvent(payload);
 }
 
 async function fetchApiEnvelope<T>(url: string, headers: HeadersInit): Promise<T | null> {
@@ -478,6 +556,91 @@ function normalizeListingsPagination(meta: Record<string, unknown> | undefined, 
     page: firstNumber(meta?.page, meta?.current_page) ?? 1,
     perPage: firstNumber(meta?.per_page, meta?.perPage) ?? 12,
     total: firstNumber(meta?.total, meta?.total_items, meta?.totalItems) ?? fallbackTotal,
+  };
+}
+
+function normalizePublicEvents(payload: unknown): PublicEvent[] {
+  return extractPublicItemArray(payload)
+    .map(normalizePublicEvent)
+    .filter((event): event is PublicEvent => event !== null);
+}
+
+function normalizePublicEvent(payload: unknown): PublicEvent | null {
+  if (!isRecord(payload)) {
+    return null;
+  }
+
+  const contract = isRecord(payload.public_contract) ? payload.public_contract : payload;
+  const id = firstString(contract.id, contract.slug);
+  const title = firstString(contract.title, contract.name);
+
+  if (!id || !title) {
+    return null;
+  }
+
+  return {
+    category: normalizeEventCategory(contract.category),
+    createdAt: firstString(contract.created_at) ?? null,
+    description: firstString(contract.description) ?? '',
+    endAt: firstString(contract.end_at) ?? null,
+    excerpt: firstString(contract.excerpt, contract.description) ?? '',
+    id,
+    location: normalizeEventLocation(contract.location),
+    organiser: normalizeEventOrganiser(contract.organiser),
+    primaryImage: normalizeEventImage(contract.primary_image),
+    slug: firstString(contract.slug, id) ?? id,
+    startAt: firstString(contract.start_at) ?? null,
+    status: firstString(contract.status) ?? 'active',
+    title,
+    updatedAt: firstString(contract.updated_at) ?? null,
+  };
+}
+
+function normalizeEventImage(value: unknown): PublicEventImage | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const url = resolveAssetUrl(firstString(value.url), getApiBase());
+
+  if (!url) {
+    return null;
+  }
+
+  return {
+    altText: firstString(value.alt_text, value.altText) ?? '',
+    url,
+  };
+}
+
+function normalizeEventCategory(value: unknown): PublicEventCategory | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  return {
+    id: firstString(value.id) ?? null,
+    name: firstString(value.name) ?? null,
+    slug: firstString(value.slug) ?? null,
+  };
+}
+
+function normalizeEventLocation(value: unknown): PublicEventLocation {
+  const location = isRecord(value) ? value : {};
+
+  return {
+    label: firstString(location.label) ?? null,
+    latitude: firstNumber(location.latitude) ?? null,
+    longitude: firstNumber(location.longitude) ?? null,
+  };
+}
+
+function normalizeEventOrganiser(value: unknown): PublicEventOrganiser {
+  const organiser = isRecord(value) ? value : {};
+
+  return {
+    displayName: firstString(organiser.display_name, organiser.displayName) ?? null,
+    id: firstString(organiser.id) ?? null,
   };
 }
 

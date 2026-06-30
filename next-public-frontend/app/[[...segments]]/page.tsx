@@ -9,11 +9,14 @@ import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import { createTranslator } from '../../src/lib/i18n';
+import { buildEventMetadata } from '../../src/lib/events-seo';
 import { buildListingMetadata } from '../../src/lib/listings-seo';
 import { buildCanonicalUrl, buildPageTitle } from '../../src/lib/metadata';
 import { isRouteEnabledForTenant } from '../../src/lib/module-gates';
 import { getRouteOwnership, type RouteOwnership } from '../../src/lib/public-routes';
 import {
+  fetchEventDetail,
+  fetchEventsIndex,
   fetchListingDetail,
   fetchListingsIndex,
   fetchBlogPost,
@@ -74,6 +77,15 @@ export async function generateMetadata({ params }: PublicPageProps): Promise<Met
     });
   }
 
+  if (content?.kind === 'event-detail' && content.event) {
+    return buildEventMetadata({
+      canonicalUrl: context.canonicalUrl,
+      event: content.event,
+      platformName: t('brand.platformName'),
+      tenantName: context.tenant?.name,
+    });
+  }
+
   return {
     alternates: {
       canonical: context.canonicalUrl,
@@ -109,6 +121,10 @@ export default async function PublicRoutePage({ params }: PublicPageProps): Prom
   const content = await fetchRouteContent(context.route, context.request, context.tenant);
 
   if (content?.kind === 'listing-detail' && !content.listing) {
+    notFound();
+  }
+
+  if (content?.kind === 'event-detail' && !content.event) {
     notFound();
   }
 
@@ -201,6 +217,20 @@ async function fetchRouteContent(
     };
   }
 
+  if (route.routeKey === 'events') {
+    return {
+      events: await fetchEventsIndex(request, tenant),
+      kind: 'events-index',
+    };
+  }
+
+  if (route.routeKey === 'eventDetail' && route.params?.id) {
+    return {
+      event: await fetchEventDetail(route.params.id, request, tenant),
+      kind: 'event-detail',
+    };
+  }
+
   if (route.params && Object.keys(route.params).length > 0) {
     return {
       item: await fetchPublicDetail(route.routeKey, route.params, request, tenant),
@@ -245,6 +275,10 @@ function getMetadataLabel(
     return content.listing.title;
   }
 
+  if (content?.kind === 'event-detail' && content.event?.title) {
+    return content.event.title;
+  }
+
   return t(route.labelKey ?? 'pages.home.title');
 }
 
@@ -268,6 +302,10 @@ function getMetadataDescription(
 
   if (content?.kind === 'listing-detail' && content.listing?.excerpt) {
     return content.listing.excerpt;
+  }
+
+  if (content?.kind === 'event-detail' && content.event?.excerpt) {
+    return content.event.excerpt;
   }
 
   if (tenant?.seo?.description) {
