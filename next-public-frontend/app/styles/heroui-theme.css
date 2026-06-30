@@ -1,0 +1,124 @@
+/*
+ * Copyright © 2024–2026 Jasper Ford
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ * Author: Jasper Ford
+ * See NOTICE file for attribution and acknowledgements.
+ */
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-primary: var(--accent);
+  --color-default: var(--default);
+  --color-surface: var(--surface);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+}
+
+:root,
+:root[data-theme="dark"],
+.dark,
+[data-theme="dark"] {
+  --white: #ffffff;
+  --black: #000000;
+  --snow: #ffffff;
+  --eclipse: #0a0a0f;
+  --radius: var(--radius-sm);
+  --field-radius: var(--radius-md);
+  --border-width: 1px;
+  --field-border-width: 1px;
+  --disabled-opacity: 0.5;
+  --ring-offset-width: 2px;
+
+  --background: var(--surface-base);
+  --foreground: var(--text-primary);
+  --background-secondary: color-mix(in srgb, var(--surface-base) 92%, var(--text-primary) 8%);
+  --background-tertiary: color-mix(in srgb, var(--surface-base) 88%, var(--text-primary) 12%);
+  --background-inverse: var(--text-primary);
+
+  --surface: var(--surface-elevated);
+  --surface-foreground: var(--text-primary);
+  --surface-secondary: var(--card-bg);
+  --surface-secondary-foreground: var(--text-primary);
+  --surface-tertiary: var(--surface-hover);
+  --surface-tertiary-foreground: var(--text-primary);
+  --surface-hover: var(--glass-bg-hover);
+  --overlay: var(--surface-dropdown);
+  --overlay-foreground: var(--text-primary);
+  --muted: var(--text-muted);
+
+  --default: var(--surface-hover);
+  --default-foreground: var(--text-primary);
+  --default-hover: var(--surface-active);
+  --default-soft: color-mix(in srgb, var(--default) 60%, transparent);
+  --default-soft-foreground: var(--default-foreground);
+  --default-soft-hover: color-mix(in srgb, var(--default) 78%, transparent);
+
+  --accent: var(--accent-color, var(--color-primary));
+  --accent-foreground: #ffffff;
+  --accent-hover: var(--accent-color-hover);
+  --accent-soft: var(--accent-color-subtle);
+  --accent-soft-foreground: var(--accent-color, var(--color-primary));
+  --accent-soft-hover: color-mix(in srgb, var(--accent-color, var(--color-primary)) 28%, transparent);
+
+  --success: var(--color-success);
+  --success-foreground: #ffffff;
+  --success-hover: color-mix(in srgb, var(--color-success) 86%, black);
+  --success-soft: color-mix(in srgb, var(--color-success) 18%, transparent);
+  --success-soft-foreground: var(--color-success);
+  --success-soft-hover: color-mix(in srgb, var(--color-success) 26%, transparent);
+
+  --warning: var(--color-warning);
+  --warning-foreground: #0a0a0f;
+  --warning-hover: color-mix(in srgb, var(--color-warning) 86%, black);
+  --warning-soft: color-mix(in srgb, var(--color-warning) 18%, transparent);
+  --warning-soft-foreground: var(--color-warning);
+  --warning-soft-hover: color-mix(in srgb, var(--color-warning) 26%, transparent);
+
+  --danger: var(--color-error);
+  --danger-foreground: #ffffff;
+  --danger-hover: color-mix(in srgb, var(--color-error) 86%, black);
+  --danger-soft: color-mix(in srgb, var(--color-error) 18%, transparent);
+  --danger-soft-foreground: var(--color-error);
+  --danger-soft-hover: color-mix(in srgb, var(--color-error) 26%, transparent);
+
+  --field-background: var(--input-bg);
+  --field-foreground: var(--text-primary);
+  --field-placeholder: var(--input-placeholder);
+  --field-border: var(--input-border);
+  --field-border-hover: var(--border-hover);
+  --field-border-focus: var(--input-focus-border);
+  --field-hover: var(--surface-hover);
+  --field-focus: var(--input-bg);
+  --field-shadow: none;
+
+  --segment: var(--surface-hover);
+  --segment-foreground: var(--text-primary);
+  --border: var(--border-default);
+  --border-secondary: var(--border-hover);
+  --border-tertiary: var(--border-focus);
+  --separator: var(--border-default);
+  --separator-secondary: var(--border-hover);
+  --separator-tertiary: var(--border-focus);
+  --focus: var(--border-focus);
+  --link: var(--accent-color, var(--color-primary));
+  --backdrop: rgba(0, 0, 0, 0.72);
+  --surface-shadow: var(--shadow-sm);
+  --overlay-shadow: var(--shadow-lg);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  font-family: var(--font-sans);
+}
+
+:root[data-theme="light"],
+.light,
+[data-theme="light"] {
+  --accent-foreground: #ffffff;
+  --success-hover: color-mix(in srgb, var(--color-success) 88%, black);
+  --warning-hover: color-mix(in srgb, var(--color-warning) 88%, black);
+  --danger-hover: color-mix(in srgb, var(--color-error) 88%, black);
+  --backdrop: rgba(15, 23, 42, 0.45);
+}

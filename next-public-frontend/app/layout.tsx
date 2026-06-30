@@ -5,19 +5,26 @@
 
 import type { ReactNode } from 'react';
 import { headers } from 'next/headers';
+import { Inter } from 'next/font/google';
 
 import './globals.css';
 import { NEXUS_PUBLIC_PATHNAME_HEADER, getHtmlDirection, normalizeSeoLocale } from '../src/lib/metadata';
 import { resolvePathOwnership } from '../src/lib/route-guard';
 import { fetchTenantBootstrap } from '../src/lib/tenant-api';
 
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>): Promise<ReactNode> {
   const locale = await resolveDocumentLocale();
   const htmlLocale = normalizeSeoLocale(locale);
 
   return (
-    <html dir={getHtmlDirection(htmlLocale)} lang={htmlLocale}>
-      <body>{children}</body>
+    <html className={inter.variable} data-theme="dark" dir={getHtmlDirection(htmlLocale)} lang={htmlLocale}>
+      <body className="font-sans">{children}</body>
     </html>
   );
 }
