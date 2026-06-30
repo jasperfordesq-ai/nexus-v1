@@ -17,6 +17,10 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@nexus/public-shared/*": ["../react-frontend/src/public-shared/*"]
+    },
     "plugins": [
       {
         "name": "next"
@@ -27,6 +31,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "../react-frontend/src/public-shared/**/*.ts",
+    "../react-frontend/src/public-shared/**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],

@@ -172,6 +172,9 @@ export default defineConfig(({ command, mode }) => {
   },
   resolve: {
     alias: [
+      // Shared public-frontend presentational core. Same physical files render in
+      // both this SPA and the Next.js SSR public frontend (single source of truth).
+      { find: '@nexus/public-shared', replacement: path.resolve(__dirname, './src/public-shared') },
       { find: '@', replacement: path.resolve(__dirname, './src') },
       // lucide-react v0.453.0 has no package exports map, so sub-path imports
       // like `lucide-react/icons/lock` don't resolve. Map them to the actual
