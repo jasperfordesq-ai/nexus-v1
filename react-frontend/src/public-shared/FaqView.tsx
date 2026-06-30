@@ -21,11 +21,12 @@
  */
 
 import { useMemo, useState } from 'react';
-import { Card } from '@heroui/react';
+import { Card, SearchField } from '@heroui/react';
 import {
   CircleHelp,
   Handshake,
   Rocket,
+  Search,
   ShieldCheck,
   Trophy,
   Wallet,
@@ -375,14 +376,20 @@ export function FaqView() {
             </Link>{' '}
             {t('faq.subtitle_after_link')}
           </p>
-          <input
-            type="search"
-            placeholder={t('faq.search_placeholder')}
+          <SearchField
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={setSearchQuery}
             aria-label={t('faq.search_placeholder')}
-            className="glass-input w-full rounded-xl px-4 py-2.5 bg-theme-subtle/10 border border-theme-default text-theme-primary"
-          />
+            className="w-full"
+          >
+            <SearchField.Group className="glass-input rounded-xl bg-theme-subtle/10 border border-theme-default">
+              <SearchField.SearchIcon>
+                <Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
+              </SearchField.SearchIcon>
+              <SearchField.Input placeholder={t('faq.search_placeholder')} className="bg-transparent text-theme-primary" />
+              <SearchField.ClearButton />
+            </SearchField.Group>
+          </SearchField>
         </GlassCard>
 
         {filteredCategories.length === 0 ? (
