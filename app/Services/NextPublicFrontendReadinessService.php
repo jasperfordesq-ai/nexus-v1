@@ -298,6 +298,7 @@ class NextPublicFrontendReadinessService
                 'default_shadow_port' => 3200,
                 'compose_profile_configured' => $this->composeProfileConfigured('next-public-shadow'),
                 'verification_commands' => [
+                    'npm run check:next-public:dry-run',
                     'npm run check:next-public:inert',
                     'npm --prefix next-public-frontend run check',
                     'npm --prefix react-frontend run build',
@@ -1095,6 +1096,11 @@ class NextPublicFrontendReadinessService
                 $this->cutoverArtifact('prerender_fallback', $artifactPaths['prerender_fallback'], 'fallback'),
             ],
             'required_commands' => [
+                [
+                    'key' => 'next_public_dry_run',
+                    'command' => 'npm run check:next-public:dry-run',
+                    'required_before_cutover' => true,
+                ],
                 [
                     'key' => 'next_shadow_checks',
                     'command' => 'npm --prefix next-public-frontend run check',

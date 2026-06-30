@@ -295,6 +295,11 @@ const readiness = {
     ],
     required_commands: [
       {
+        key: 'next_public_dry_run',
+        command: 'npm run check:next-public:dry-run',
+        required_before_cutover: true,
+      },
+      {
         key: 'next_public_inertness',
         command: 'npm run check:next-public:inert',
         required_before_cutover: true,
@@ -349,6 +354,7 @@ const readiness = {
     default_shadow_port: 3200,
     compose_profile_configured: true,
     verification_commands: [
+      'npm run check:next-public:dry-run',
       'npm run check:next-public:inert',
       'npm --prefix next-public-frontend run check',
       'npm --prefix react-frontend run build',
@@ -487,6 +493,7 @@ describe('NextPublicFrontendReadiness', () => {
     expect(screen.getAllByText('platformPrivacy')).not.toHaveLength(0);
     expect(screen.getAllByText('platformDisclaimer')).not.toHaveLength(0);
     expect(screen.getByText('npm run build:next-public')).toBeInTheDocument();
+    expect(screen.getAllByText('npm run check:next-public:dry-run')).not.toHaveLength(0);
     expect(screen.getAllByText('npm run check:next-public:inert')).not.toHaveLength(0);
     expect(screen.getAllByText('npm --prefix next-public-frontend run check')).not.toHaveLength(0);
     expect(screen.getAllByText('npm --prefix react-frontend run build')).not.toHaveLength(0);

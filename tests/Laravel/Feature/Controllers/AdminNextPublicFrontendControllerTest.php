@@ -264,6 +264,10 @@ class AdminNextPublicFrontendControllerTest extends TestCase
             'npm --prefix next-public-frontend run check:no-js-html',
             $cutoverCommandsByKey['no_js_public_html']['command'],
         );
+        $this->assertSame(
+            'npm run check:next-public:dry-run',
+            $cutoverCommandsByKey['next_public_dry_run']['command'],
+        );
         $this->assertContains('remaining_public_route_work', $payload['cutover_eligibility']['blockers']);
         $this->assertContains('route_parity_required', $payload['cutover_eligibility']['blockers']);
         $this->assertContains('edge_routes_not_configured', $payload['cutover_eligibility']['blockers']);
@@ -328,6 +332,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertSame('none', $payload['pre_cutover_dry_runs']['production_effect']);
         $this->assertFalse($payload['pre_cutover_dry_runs']['activation_available']);
         $this->assertTrue($payload['pre_cutover_dry_runs']['requires_explicit_cutover_instruction']);
+        $this->assertContains('npm run check:next-public:dry-run', $payload['shadow_runtime']['verification_commands']);
         $this->assertContains('npm --prefix next-public-frontend run check', $preCutoverDryRunsByKey['shadow_manifest_and_html']['commands']);
         $this->assertContains('platformTerms', $preCutoverDryRunsByKey['remaining_static_manual_review']['route_keys']);
         $this->assertContains('couponDetail', $preCutoverDryRunsByKey['auth_only_public_contract_review']['route_keys']);
