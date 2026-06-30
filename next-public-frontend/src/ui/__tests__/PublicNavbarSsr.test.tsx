@@ -52,19 +52,22 @@ describe('shared PublicNavbar SSR', () => {
     expect(html).toContain('TimeBank Ireland');
   });
 
-  it('renders the tenant-aware primary nav', () => {
-    expect(html).toContain('href="/hour-timebank/listings"');
-    expect(html).toContain('href="/hour-timebank/events"');
-    expect(html).toContain('href="/hour-timebank/blog"');
+  it('renders the Timebanking / Community / More dropdown triggers', () => {
+    expect(html).toContain('nav.timebanking');
+    expect(html).toContain('nav.community');
+    expect(html).toContain('nav.more');
   });
 
-  it('renders login + sign-up actions', () => {
+  it('renders login + sign-up actions with the correct auth keys', () => {
+    expect(html).toContain('auth.log_in');
+    expect(html).toContain('auth.sign_up');
     expect(html).toContain('href="/hour-timebank/login"');
     expect(html).toContain('href="/hour-timebank/register"');
   });
 
-  it('renders the utility bar (accessible frontend + search)', () => {
+  it('renders the utility bar (accessible frontend + language + search)', () => {
     expect(html).toContain('https://accessible.project-nexus.ie');
     expect(html).toContain('utility-bar-action');
+    expect(html).toContain('language.select_language');
   });
 });
