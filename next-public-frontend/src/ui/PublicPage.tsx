@@ -264,6 +264,67 @@ function RichIndexCard({
   );
 }
 
+function BlogPublicCard({
+  post,
+  tenantBasePath,
+}: {
+  post: BlogPostSummary;
+  tenantBasePath: string;
+}): ReactNode {
+  const href = withTenantBase(tenantBasePath, 'blog/' + post.slug);
+  const metaItems = compactText([post.author_name, formatDate(post.published_at ?? null)]);
+
+  return (
+    <article className="h-full" data-nexus-ui="react-blog-card">
+      <Card className="h-full border border-theme-default bg-theme-card p-5 transition-all hover:-translate-y-0.5 hover:bg-theme-hover hover:shadow-md" variant="default">
+        <Card.Content className="p-0">
+          {metaItems.length > 0 ? (
+            <div className="mb-3 flex flex-wrap gap-2">
+              {metaItems.map((item) => (
+                <Chip color="accent" key={item} size="sm" variant="soft">
+                  {item}
+                </Chip>
+              ))}
+            </div>
+          ) : null}
+          <h2 className="text-xl font-semibold leading-tight text-theme-primary">
+            <Link
+              className="text-theme-primary underline-offset-4 hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+              href={href}
+            >
+              {post.title}
+            </Link>
+          </h2>
+          {post.excerpt ? <p className="mt-3 line-clamp-3 text-sm leading-6 text-theme-muted">{post.excerpt}</p> : null}
+        </Card.Content>
+      </Card>
+    </article>
+  );
+}
+
+function ProseContentCard({
+  children,
+  routeKey,
+  title,
+  uiMarker,
+}: {
+  children: ReactNode;
+  routeKey?: string;
+  title: string;
+  uiMarker: string;
+}): ReactNode {
+  return (
+    <Card className="border border-theme-default bg-theme-card shadow-sm" variant="default">
+      <Card.Content className="p-6 sm:p-8">
+        <article className="legal-content" data-nexus-ui={uiMarker} data-route-key={routeKey}>
+          <h2>{title}</h2>
+          {children}
+        </article>
+      </Card.Content>
+    </Card>
+  );
+}
+
 function ListingPublicCard({
   listing,
   tenantBasePath,
@@ -928,17 +989,17 @@ function renderRouteContent(
 
   if (content?.kind === 'blog-detail' && content.post) {
     return (
-      <ContentCard title={content.post.title}>
+      <ProseContentCard routeKey={route.routeKey} title={content.post.title} uiMarker="react-blog-detail">
         <HtmlBlock html={content.post.content || content.post.excerpt || ''} />
-      </ContentCard>
+      </ProseContentCard>
     );
   }
 
   if (content?.kind === 'cms-page' && content.page) {
     return (
-      <ContentCard title={content.page.title}>
+      <ProseContentCard routeKey={route.routeKey} title={content.page.title} uiMarker="react-cms-page">
         <HtmlBlock html={content.page.content || ''} />
-      </ContentCard>
+      </ProseContentCard>
     );
   }
 
@@ -1003,16 +1064,24 @@ function renderRouteContent(
 
   if (route.routeKey === 'cms-page') {
     return (
-      <ContentCard title={routeSegments.at(-1) ?? t('pages.cmsPage.title')}>
+      <ProseContentCard
+        routeKey={route.routeKey}
+        title={routeSegments.at(-1) ?? t('pages.cmsPage.title')}
+        uiMarker="react-cms-page"
+      >
         <p>{t('pages.cmsPage.missing')}</p>
-      </ContentCard>
+      </ProseContentCard>
     );
   }
 
   return (
-    <ContentCard title={t(route.labelKey ?? 'pages.about.title')}>
+    <ProseContentCard
+      routeKey={route.routeKey}
+      title={t(route.labelKey ?? 'pages.about.title')}
+      uiMarker="react-static-page"
+    >
       <p>{t(`pages.${route.routeKey}.body`, { tenantName })}</p>
-    </ContentCard>
+    </ProseContentCard>
   );
 }
 
@@ -1030,18 +1099,9 @@ function BlogIndex({
   }
 
   return (
-    <RichIndexGrid>
+    <RichIndexGrid className={publicFamilyGridClassName}>
       {posts.map((post) => (
-        <RichIndexCard
-          description={post.excerpt || ''}
-          facts={[]}
-          href={withTenantBase(tenantBasePath, 'blog/' + post.slug)}
-          image={null}
-          imageAltFallback={post.title}
-          key={post.slug}
-          meta={[post.author_name, formatDate(post.published_at ?? null)]}
-          title={post.title}
-        />
+        <BlogPublicCard key={post.slug} post={post} tenantBasePath={tenantBasePath} />
       ))}
     </RichIndexGrid>
   );
@@ -1583,9 +1643,9 @@ function compactMarketplaceImages(
 
 function PublicDetail({ item }: { item: PublicContentItem }): ReactNode {
   return (
-    <ContentCard title={item.title}>
+    <ProseContentCard title={item.title} uiMarker="react-public-detail">
       {item.description ? <p>{item.description}</p> : null}
-    </ContentCard>
+    </ProseContentCard>
   );
 }
 

@@ -48,7 +48,9 @@ describe('PublicPage', () => {
     expect(html).toContain('AGPL-3.0-or-later');
     expect(html).toContain('https://app.project-nexus.ie/hour-timebank/about');
     expect(html).toContain('data-slot="card"');
-    expect(html).not.toContain('public-panel');
+    expect(html).toContain('data-nexus-ui="react-static-page"');
+    expect(html).toContain('data-route-key="about"');
+    expect(html).toContain('legal-content');
     expect(html).not.toContain('post-list');
   });
 
@@ -219,6 +221,82 @@ describe('PublicPage', () => {
     expect(html).toContain('Repair cafe');
     expect(html).toContain('Bring something small to repair with neighbours.');
     expect(html).toContain('data-slot="card"');
-    expect(html).not.toContain('public-panel');
+    expect(html).toContain('data-nexus-ui="react-public-detail"');
+    expect(html).toContain('legal-content');
+  });
+
+  it('renders blog index and content pages with React public prose layout hooks', () => {
+    const tenant: TenantBootstrap = {
+      default_language: 'en',
+      id: 2,
+      name: 'Hour Timebank',
+      slug: 'hour-timebank',
+    };
+    const blogRoute: RouteOwnership = {
+      labelKey: 'pages.blog.title',
+      owner: 'next-public',
+      pattern: '/blog',
+      routeKey: 'blog-index',
+    };
+
+    const indexHtml = renderToStaticMarkup(
+      <PublicPage
+        canonicalUrl="https://app.project-nexus.ie/hour-timebank/blog"
+        content={{
+          kind: 'blog-index',
+          posts: [
+            {
+              author_name: 'Community Team',
+              excerpt: 'A public update for neighbours.',
+              published_at: '2026-06-01T10:00:00+00:00',
+              slug: 'public-update',
+              title: 'Public update',
+            },
+          ],
+        }}
+        route={blogRoute}
+        routeSegments={['blog']}
+        tenant={tenant}
+        tenantBasePath="/hour-timebank"
+        t={createTranslator('en')}
+      />,
+    );
+
+    expect(indexHtml).toContain('data-nexus-ui="react-blog-card"');
+    expect(indexHtml).toContain('href="/hour-timebank/blog/public-update"');
+    expect(indexHtml).toContain('grid gap-4 sm:grid-cols-2 lg:grid-cols-3');
+
+    const detailRoute: RouteOwnership = {
+      labelKey: 'pages.blogDetail.title',
+      owner: 'next-public',
+      params: { slug: 'public-update' },
+      pattern: '/blog/:slug',
+      routeKey: 'blog-detail',
+    };
+    const detailHtml = renderToStaticMarkup(
+      <PublicPage
+        canonicalUrl="https://app.project-nexus.ie/hour-timebank/blog/public-update"
+        content={{
+          kind: 'blog-detail',
+          post: {
+            author_name: 'Community Team',
+            content: '<p>A richer public update for neighbours.</p>',
+            excerpt: 'A public update for neighbours.',
+            published_at: '2026-06-01T10:00:00+00:00',
+            slug: 'public-update',
+            title: 'Public update',
+          },
+        }}
+        route={detailRoute}
+        routeSegments={['blog', 'public-update']}
+        tenant={tenant}
+        tenantBasePath="/hour-timebank"
+        t={createTranslator('en')}
+      />,
+    );
+
+    expect(detailHtml).toContain('data-nexus-ui="react-blog-detail"');
+    expect(detailHtml).toContain('legal-content');
+    expect(detailHtml).toContain('A richer public update for neighbours.');
   });
 });
