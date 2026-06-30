@@ -37,7 +37,7 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import type { NewMessageEvent, TypingEvent } from '@/contexts';
-import { api } from '@/lib/api';
+import { api, type ApiErrorDetail, type ApiResponse } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { safeLocalStorageGet, safeLocalStorageSet, safeLocalStorageGetJSON, safeLocalStorageSetJSON } from '@/lib/safeStorage';
@@ -75,6 +75,70 @@ interface PaginationState {
   newerCursor: string | null;
   hasOlderMessages: boolean;
   hasNewerMessages: boolean;
+}
+
+interface SafeguardingBlockNotice {
+  code: 'VETTING_REQUIRED' | 'SAFEGUARDING_CONTACT_RESTRICTED';
+  translationKey: 'safeguarding_vetting_required' | 'safeguarding_contact_restricted';
+  title?: string;
+  message: string;
+  detail?: string;
+  actionLabel?: string;
+  requiredVettingTypes: string[];
+  requiredVettingLabels: string[];
+}
+
+type MessageSendFailure = Pick<ApiResponse<unknown>, 'code' | 'error' | 'errors'>;
+
+const SAFEGUARDING_BLOCK_CODES = new Set(['VETTING_REQUIRED', 'SAFEGUARDING_CONTACT_RESTRICTED']);
+
+function asString(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim() !== '' ? value : undefined;
+}
+
+function asStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.filter((item): item is string => typeof item === 'string' && item.trim() !== '');
+}
+
+function fallbackVettingLabel(type: string): string {
+  return type
+    .split('_')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function extractSafeguardingBlockNotice(response: MessageSendFailure): SafeguardingBlockNotice | null {
+  const details = Array.isArray(response.errors) ? response.errors : [];
+  const safeguardingError = details.find((error) => error.code && SAFEGUARDING_BLOCK_CODES.has(error.code))
+    ?? (response.code && SAFEGUARDING_BLOCK_CODES.has(response.code) ? details[0] : undefined);
+  const code = safeguardingError?.code ?? response.code;
+
+  if (code !== 'VETTING_REQUIRED' && code !== 'SAFEGUARDING_CONTACT_RESTRICTED') {
+    return null;
+  }
+
+  const detail = safeguardingError as ApiErrorDetail | undefined;
+  const requiredVettingTypes = asStringArray(detail?.required_vetting_types);
+  const requiredVettingLabels = asStringArray(detail?.required_vetting_labels);
+  const labels = requiredVettingLabels.length > 0
+    ? requiredVettingLabels
+    : requiredVettingTypes.map(fallbackVettingLabel);
+
+  return {
+    code,
+    translationKey: code === 'SAFEGUARDING_CONTACT_RESTRICTED'
+      ? 'safeguarding_contact_restricted'
+      : 'safeguarding_vetting_required',
+    title: asString(detail?.title),
+    message: asString(detail?.message) ?? response.error ?? '',
+    detail: asString(detail?.detail),
+    actionLabel: asString(detail?.action_label),
+    requiredVettingTypes,
+    requiredVettingLabels: labels,
+  };
 }
 
 /**
@@ -168,6 +232,7 @@ export function ConversationPage() {
 
   // Safeguarding notice state (reappears on reload)
   const [isSafeguardingDismissed, setIsSafeguardingDismissed] = useState(false);
+  const [safeguardingBlockNotice, setSafeguardingBlockNotice] = useState<SafeguardingBlockNotice | null>(null);
 
   // Broker messaging restriction state
   const [messagingRestriction, setMessagingRestriction] = useState<{
@@ -633,6 +698,23 @@ export function ConversationPage() {
     refreshRestrictionStatus();
   }, [refreshRestrictionStatus]);
 
+  useEffect(() => {
+    setSafeguardingBlockNotice(null);
+  }, [targetId]);
+
+  function handleSendFailure(response: MessageSendFailure, fallbackKey: string): void {
+    const notice = extractSafeguardingBlockNotice(response);
+
+    if (notice) {
+      setSafeguardingBlockNotice(notice);
+      refreshRestrictionStatus();
+      return;
+    }
+
+    toast.error(t('error_title'), response.error || t(fallbackKey));
+    refreshRestrictionStatus();
+  }
+
   // Set up polling (fallback when Pusher not available) - pause when tab hidden
   useEffect(() => {
     // Clear any existing interval
@@ -834,7 +916,7 @@ export function ConversationPage() {
    * Start voice recording
    */
   async function startRecording() {
-    if (messagingRestriction?.messaging_disabled) return;
+    if (messagingRestriction?.messaging_disabled || safeguardingBlockNotice) return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaStreamRef.current = stream;
@@ -905,6 +987,7 @@ export function ConversationPage() {
    */
   async function sendVoiceMessage() {
     if (!audioBlob || !targetId || isSending) return;
+    if (safeguardingBlockNotice) return;
     if (messagingRestriction?.messaging_disabled) {
       toast.error(t('error'), t('messaging_restricted'));
       return;
@@ -923,6 +1006,7 @@ export function ConversationPage() {
       if (response.success && response.data) {
         const sentMessage = response.data;
         lastMessageIdRef.current = sentMessage.id;
+        setSafeguardingBlockNotice(null);
 
         setConversation((prev) => {
           if (!prev) return null;
@@ -943,8 +1027,7 @@ export function ConversationPage() {
 
         setTimeout(() => scrollToBottom(), 50);
       } else {
-        toast.error(t('error_title'), response.error || t('voice_send_error'));
-        refreshRestrictionStatus();
+        handleSendFailure(response, 'voice_send_error');
       }
     } catch (error) {
       logError('Failed to send voice message', error);
@@ -1091,6 +1174,7 @@ export function ConversationPage() {
   async function sendMessageWithAttachments(e: FormEvent) {
     e.preventDefault();
     if ((!newMessage.trim() && attachments.length === 0) || !targetId || isSending) return;
+    if (safeguardingBlockNotice) return;
     if (messagingRestriction?.messaging_disabled) {
       toast.error(t('error'), t('messaging_restricted'));
       return;
@@ -1124,6 +1208,7 @@ export function ConversationPage() {
         if (response.success && response.data) {
           const sentMessage = response.data;
           lastMessageIdRef.current = sentMessage.id;
+          setSafeguardingBlockNotice(null);
 
           setConversation((prev) => {
             if (!prev) return null;
@@ -1148,8 +1233,7 @@ export function ConversationPage() {
 
           setTimeout(() => scrollToBottom(), 50);
         } else {
-          toast.error(t('error_title'), response.error || t('send_error'));
-          refreshRestrictionStatus();
+          handleSendFailure(response, 'send_error');
         }
       } else {
         // Regular text message (no attachments)
@@ -1174,6 +1258,7 @@ export function ConversationPage() {
         if (response.success && response.data) {
           const sentMessage = response.data;
           lastMessageIdRef.current = sentMessage.id;
+          setSafeguardingBlockNotice(null);
 
           setConversation((prev) => {
             if (!prev) return null;
@@ -1194,8 +1279,7 @@ export function ConversationPage() {
           setTimeout(() => scrollToBottom(), 50);
         } else {
           logError('Message send failed', response);
-          toast.error(t('error_title'), response.error || t('send_error'));
-          refreshRestrictionStatus();
+          handleSendFailure(response, 'send_error');
         }
       }
     } catch (error) {
@@ -1211,6 +1295,7 @@ export function ConversationPage() {
    */
   async function handleGifSelect(gifUrl: string) {
     if (!targetId || isSending) return;
+    if (safeguardingBlockNotice) return;
     if (messagingRestriction?.messaging_disabled) {
       toast.error(t('error'), t('messaging_restricted'));
       return;
@@ -1236,6 +1321,7 @@ export function ConversationPage() {
       if (response.success && response.data) {
         const sentMessage = response.data;
         lastMessageIdRef.current = sentMessage.id;
+        setSafeguardingBlockNotice(null);
 
         setConversation((prev) => {
           if (!prev) return null;
@@ -1253,8 +1339,7 @@ export function ConversationPage() {
         setTimeout(() => scrollToBottom(), 50);
       } else {
         logError('GIF message send failed', response);
-        toast.error(t('error_title'), response.error || t('send_error'));
-        refreshRestrictionStatus();
+        handleSendFailure(response, 'send_error');
       }
     } catch (error) {
       logError('Failed to send GIF message', error);
@@ -1398,6 +1483,9 @@ export function ConversationPage() {
 
   const { meta, messages } = conversation;
   const other_user = meta.other_user;
+  const safeguardingRequiredVettingLabels = safeguardingBlockNotice?.requiredVettingLabels.length
+    ? safeguardingBlockNotice.requiredVettingLabels
+    : safeguardingBlockNotice?.requiredVettingTypes.map(fallbackVettingLabel) ?? [];
   const statusLabel = other_user.is_online === undefined
     ? null
     : other_user.is_online ? t('online_status') : t('offline_status');
@@ -1620,6 +1708,68 @@ export function ConversationPage() {
         </div>
       )}
 
+      {safeguardingBlockNotice && (
+        <div
+          className="flex shrink-0 flex-col gap-3 rounded-lg border border-red-500/30 bg-red-500/10 p-4 sm:flex-row sm:items-start"
+          role="alert"
+          aria-live="assertive"
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500/15 text-[var(--color-error)]">
+            <AlertTriangle className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-red-700 dark:text-red-200">
+              {safeguardingBlockNotice.title || t(`${safeguardingBlockNotice.translationKey}.title`)}
+            </p>
+            <p className="mt-1 text-sm text-red-700/90 dark:text-red-200/90">
+              {safeguardingBlockNotice.detail || safeguardingBlockNotice.message || t(`${safeguardingBlockNotice.translationKey}.body`)}
+            </p>
+            {safeguardingRequiredVettingLabels.length > 0 && (
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+                <span className="text-xs font-medium uppercase tracking-wide text-red-700/80 dark:text-red-200/80">
+                  {t('safeguarding_vetting_required.required_checks')}
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {safeguardingRequiredVettingLabels.map((label) => (
+                    <Chip
+                      key={label}
+                      size="sm"
+                      variant="soft"
+                      className="border border-red-500/20 bg-theme-surface text-red-700 dark:text-red-200"
+                    >
+                      {label}
+                    </Chip>
+                  ))}
+                </div>
+              </div>
+            )}
+            <p className="mt-3 text-xs text-red-700/80 dark:text-red-200/80">
+              {t(`${safeguardingBlockNotice.translationKey}.contact_broker`)}
+            </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-2 sm:flex-col">
+            <Button
+              size="sm"
+              variant="secondary"
+              className="bg-theme-elevated text-theme-primary"
+              onPress={() => navigate(tenantPath('/help'))}
+            >
+              {safeguardingBlockNotice.actionLabel || t(`${safeguardingBlockNotice.translationKey}.action`)}
+            </Button>
+            <Button
+              isIconOnly
+              size="sm"
+              variant="tertiary"
+              className="text-red-500 hover:text-red-700 dark:hover:text-red-200"
+              onPress={() => setSafeguardingBlockNotice(null)}
+              aria-label={t(`${safeguardingBlockNotice.translationKey}.dismiss`)}
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Translation feature hint — shown once, dismissible */}
       {translationFeatureEnabled && !translationHintDismissed && (
         <div className="flex shrink-0 items-start gap-3 rounded-lg border border-indigo-500/20 bg-indigo-500/10 p-3" role="status">
@@ -1795,6 +1945,7 @@ export function ConversationPage() {
         <MessageInputArea
           isDirectMessagingEnabled={isDirectMessagingEnabled}
           messagingRestriction={messagingRestriction}
+          isInteractionBlocked={!!safeguardingBlockNotice}
           newMessage={newMessage}
           onNewMessageChange={setNewMessage}
           onSendMessage={sendMessageWithAttachments}

@@ -6,7 +6,14 @@
 
 return [
     'errors' => [
-        'vetting_required' => 'This member requires additional vetting before you can interact with them. Please complete the required checks in your profile to continue.',
+        'vetting_required' => 'This conversation is paused by a community safeguarding rule. You need verified :types vetting before you can message this member. Please contact your broker or community administrator to confirm your vetting status or arrange the next step.',
+        'vetting_required_title' => 'Safeguarding check needed',
+        'vetting_required_detail' => 'This member can only be contacted for this type of interaction by members with verified :types vetting. Your message has not been sent.',
+        'vetting_required_action' => 'Open help',
+        'contact_restricted' => 'This member has asked for a coordinator to arrange contact on their behalf. Your message has not been sent. Please contact your broker or community administrator so they can help arrange the next safe step.',
+        'contact_restricted_title' => 'Coordinator arrangement needed',
+        'contact_restricted_detail' => 'This member is not available for direct messages because their safeguarding preferences require coordinator-mediated contact. The safeguarding team has been alerted.',
+        'contact_restricted_action' => 'Open help',
         'vetting_check_failed' => 'We could not verify your vetting status just now. Please try again shortly.',
         'statement_required' => 'A Child Safeguarding Statement PDF is required before you can declare that this community works with children or vulnerable adults. Please upload one to continue.',
         'invalid_file' => 'The uploaded file could not be read. Please try again with a valid PDF.',
@@ -16,6 +23,16 @@ return [
         'statement_missing' => 'No safeguarding statement is on file for this community.',
         'file_missing' => 'The safeguarding statement file could not be found on the server. Please upload it again.',
         'revoke_failed' => 'We could not revoke that preference. It may already have been revoked.',
+    ],
+    'vetting_types' => [
+        'dbs_basic' => 'DBS Basic',
+        'dbs_standard' => 'DBS Standard',
+        'dbs_enhanced' => 'DBS Enhanced',
+        'garda_vetting' => 'Garda vetting',
+        'access_ni' => 'AccessNI',
+        'pvg_scotland' => 'PVG Scotland',
+        'international' => 'International background check',
+        'other' => 'Other vetting check',
     ],
     'confirmation' => [
         'title' => 'Your safeguarding preferences have been saved',

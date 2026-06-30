@@ -210,5 +210,20 @@
   "character_count": "{{current}}/{{max}}",
   "loading_older": "Oudere berichten laden",
   "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent"
+  "aria_read_receipt_sent": "Sent",
+  "safeguarding_vetting_required": {
+    "title": "Veiligheidscontrole nodig",
+    "body": "Dit gesprek is gepauzeerd omdat een veiligheidsregel van de community een bevestigde screening vereist voordat je dit lid kunt berichten.",
+    "contact_broker": "Neem contact op met je bemiddelaar of communitybeheerder om je screeningsstatus te controleren of de volgende veilige stap af te spreken.",
+    "required_checks": "Vereiste controles",
+    "action": "Help openen",
+    "dismiss": "Veiligheidsmelding sluiten"
+  },
+  "safeguarding_contact_restricted": {
+    "title": "Coordinatorafspraak nodig",
+    "body": "Dit lid is niet beschikbaar voor directe berichten omdat de safeguarding-voorkeuren contact via een coordinator vereisen.",
+    "contact_broker": "Neem contact op met je broker of communitybeheerder zodat zij de volgende veilige stap kunnen regelen. Het safeguarding-team is gewaarschuwd.",
+    "action": "Help openen",
+    "dismiss": "Veiligheidsmelding sluiten"
+  }
 }

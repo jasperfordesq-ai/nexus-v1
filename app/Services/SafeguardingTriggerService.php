@@ -86,8 +86,11 @@ class SafeguardingTriggerService
                     }
                 }
 
-                // Collect vetting type requirements
-                if (!empty($triggers['vetting_type_required'])) {
+                // Collect vetting type requirements only for options that
+                // explicitly make vetted interaction a gate. Provider-side
+                // declarations may record their own required check without
+                // blocking everyone else from contacting that provider.
+                if (self::requiresVettedInteractionTrigger($triggers) && !empty($triggers['vetting_type_required'])) {
                     $vettingTypes[] = $triggers['vetting_type_required'];
                 }
             }
@@ -323,6 +326,7 @@ class SafeguardingTriggerService
 
                 $vettingType = $triggers['vetting_type_required'] ?? null;
                 if (is_string($vettingType) && $vettingType !== ''
+                    && self::requiresVettedInteractionTrigger($triggers)
                     && !in_array($vettingType, $result[$userId], true)) {
                     $result[$userId][] = $vettingType;
                 }
@@ -336,6 +340,11 @@ class SafeguardingTriggerService
         }
 
         return $result;
+    }
+
+    private static function requiresVettedInteractionTrigger(array $triggers): bool
+    {
+        return !empty($triggers['requires_vetted_interaction']);
     }
 
     /**

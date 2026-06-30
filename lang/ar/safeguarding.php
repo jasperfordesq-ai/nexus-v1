@@ -6,7 +6,14 @@
 
 return [
     'errors' => [
-        'vetting_required' => 'This member requires additional vetting before you can interact with them. Please complete the required checks in your profile to continue.',
+        'vetting_required' => 'Tum iyqaf hadhihi almuhadatha biqaida himaya almujtama. Tahtaj ila tahqiq :types muwathaq qabla irsal risala ila hadha aludw. Tawasul maa alwasit aw mudir almujtama litakid halat altahqiq aw tartib alkhutwa altaliya.',
+        'vetting_required_title' => 'Yalzam fahs himaya',
+        'vetting_required_detail' => 'Yumkin altasul maa hadha aludw fi hadha alnaw min altafauul faqat min qibal aada ladayhim tahqiq :types muwathaq. Lam yutam irsal risalatak.',
+        'vetting_required_action' => 'Iftah almusaada',
+        'contact_restricted' => 'Hatha aludw talab an yuratib almunasiq altawasul niyabatan anhu. Lam yursil risalatak. Ittasil bialwasit aw mudir almujtamaa litarteeb alkhatwa alamina altaalia.',
+        'contact_restricted_title' => 'Yalzam tartib min almunasiq',
+        'contact_restricted_detail' => 'Hatha aludw ghayr mutah lirasail mubashara lianna tafdilat alsalama tatlubu tawasulan biwasatat almunasiq. Tama tanbih fariq alsalama.',
+        'contact_restricted_action' => 'Iftah almusaada',
         'vetting_check_failed' => 'We could not verify your vetting status just now. Please try again shortly.',
         'statement_required' => 'A Child Safeguarding Statement PDF is required before you can declare that this community works with children or vulnerable adults. Please upload one to continue.',
         'invalid_file' => 'The uploaded file could not be read. Please try again with a valid PDF.',
@@ -16,6 +23,16 @@ return [
         'statement_missing' => 'No safeguarding statement is on file for this community.',
         'file_missing' => 'The safeguarding statement file could not be found on the server. Please upload it again.',
         'revoke_failed' => 'We could not revoke that preference. It may already have been revoked.',
+    ],
+    'vetting_types' => [
+        'dbs_basic' => 'DBS Basic',
+        'dbs_standard' => 'DBS Standard',
+        'dbs_enhanced' => 'DBS Enhanced',
+        'garda_vetting' => 'Garda vetting',
+        'access_ni' => 'AccessNI',
+        'pvg_scotland' => 'PVG Scotland',
+        'international' => 'International background check',
+        'other' => 'Other vetting check',
     ],
     'confirmation' => [
         'title' => 'Your safeguarding preferences have been saved',

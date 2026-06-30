@@ -210,5 +210,20 @@
   "character_count": "{{current}}/{{max}}",
   "loading_older": "Cargando mensajes antiguos",
   "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent"
+  "aria_read_receipt_sent": "Sent",
+  "safeguarding_vetting_required": {
+    "title": "Se necesita una comprobacion de proteccion",
+    "body": "Esta conversacion esta pausada porque una norma de proteccion de la comunidad exige una verificacion confirmada antes de que puedas enviar mensajes a este miembro.",
+    "contact_broker": "Contacta con tu intermediario o administrador de la comunidad para comprobar tu estado de verificacion o acordar el siguiente paso seguro.",
+    "required_checks": "Comprobaciones requeridas",
+    "action": "Abrir ayuda",
+    "dismiss": "Descartar aviso de proteccion"
+  },
+  "safeguarding_contact_restricted": {
+    "title": "Hace falta coordinacion",
+    "body": "Esta persona no esta disponible para mensajes directos porque sus preferencias de salvaguarda requieren contacto mediado por un coordinador.",
+    "contact_broker": "Contacta con tu broker o administrador de la comunidad para organizar el siguiente paso seguro. El equipo de salvaguarda ha sido avisado.",
+    "action": "Abrir ayuda",
+    "dismiss": "Descartar aviso de proteccion"
+  }
 }

@@ -8,6 +8,7 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\Events\MessageSent;
+use App\Events\SafeguardingContactAttemptBlocked;
 use App\Models\Message;
 use App\Models\User;
 use App\Services\SafeguardingTriggerService;
@@ -285,10 +286,36 @@ class MessageService
             return [];
         }
 
-        // Vetting gate — National Vetting Bureau Acts 2012–2016 / DBS / PVG / AccessNI.
+        // Recipient-side safeguarding can require coordinator-mediated contact.
+        // In that case the direct message is not sent and staff are alerted.
+        $recipientMessagingRestricted = false;
+        try {
+            $recipientMessagingRestricted = SafeguardingTriggerService::isMessagingRestricted($receiverId, $tenantId);
+        } catch (\Throwable $e) {
+            Log::warning('MessageService::send safeguarding contact restriction lookup failed (continuing)', [
+                'error' => $e->getMessage(),
+                'receiver_id' => $receiverId,
+            ]);
+        }
+        if ($recipientMessagingRestricted) {
+            self::dispatchSafeguardingContactAttemptBlocked(
+                $tenantId,
+                $senderId,
+                $receiverId,
+                'SAFEGUARDING_CONTACT_RESTRICTED'
+            );
+            self::$errors = [[
+                'code' => 'SAFEGUARDING_CONTACT_RESTRICTED',
+                'message' => __('safeguarding.errors.contact_restricted'),
+                'title' => __('safeguarding.errors.contact_restricted_title'),
+                'detail' => __('safeguarding.errors.contact_restricted_detail'),
+                'action_label' => __('safeguarding.errors.contact_restricted_action'),
+            ]];
+            return [];
+        }
+
         // If the recipient's safeguarding preferences require vetting types the sender
-        // does not hold, block with VETTING_REQUIRED. One-directional: we protect the
-        // flagged recipient but do not restrict the flagged sender's outbound autonomy.
+        // does not hold, block with VETTING_REQUIRED.
         $recipientVettingTypes = [];
         try {
             $recipientVettingTypes = SafeguardingTriggerService::getRequiredVettingTypes($receiverId, $tenantId);
@@ -301,10 +328,27 @@ class MessageService
         }
         if (!empty($recipientVettingTypes)) {
             if (!app(VettingService::class)->userHasAllValidVettings($senderId, $recipientVettingTypes)) {
+                $requiredVettingLabels = self::vettingTypeLabels($recipientVettingTypes);
+                self::dispatchSafeguardingContactAttemptBlocked(
+                    $tenantId,
+                    $senderId,
+                    $receiverId,
+                    'VETTING_REQUIRED',
+                    array_values($recipientVettingTypes),
+                    $requiredVettingLabels
+                );
                 self::$errors = [[
                     'code' => 'VETTING_REQUIRED',
-                    'message' => __('safeguarding.errors.vetting_required'),
+                    'message' => __('safeguarding.errors.vetting_required', [
+                        'types' => implode(', ', $requiredVettingLabels),
+                    ]),
+                    'title' => __('safeguarding.errors.vetting_required_title'),
+                    'detail' => __('safeguarding.errors.vetting_required_detail', [
+                        'types' => implode(', ', $requiredVettingLabels),
+                    ]),
+                    'action_label' => __('safeguarding.errors.vetting_required_action'),
                     'required_vetting_types' => array_values($recipientVettingTypes),
+                    'required_vetting_labels' => $requiredVettingLabels,
                 ]];
                 return [];
             }
@@ -468,6 +512,60 @@ class MessageService
     public static function getErrors(): array
     {
         return self::$errors;
+    }
+
+    /**
+     * @param string[] $vettingTypes
+     * @return string[]
+     */
+    private static function vettingTypeLabels(array $vettingTypes): array
+    {
+        $labels = [];
+        foreach (array_values(array_unique($vettingTypes)) as $type) {
+            if (!is_string($type) || $type === '') {
+                continue;
+            }
+
+            $key = 'safeguarding.vetting_types.' . $type;
+            $label = __($key);
+            $labels[] = $label === $key
+                ? ucwords(str_replace('_', ' ', $type))
+                : $label;
+        }
+
+        return $labels;
+    }
+
+    /**
+     * @param string[] $requiredVettingTypes
+     * @param string[] $requiredVettingLabels
+     */
+    private static function dispatchSafeguardingContactAttemptBlocked(
+        int $tenantId,
+        int $senderId,
+        int $recipientId,
+        string $reasonCode,
+        array $requiredVettingTypes = [],
+        array $requiredVettingLabels = []
+    ): void {
+        try {
+            event(new SafeguardingContactAttemptBlocked(
+                tenantId: $tenantId,
+                senderId: $senderId,
+                recipientId: $recipientId,
+                reasonCode: $reasonCode,
+                requiredVettingTypes: $requiredVettingTypes,
+                requiredVettingLabels: $requiredVettingLabels,
+            ));
+        } catch (\Throwable $e) {
+            Log::critical('MessageService::send failed to dispatch safeguarding contact-attempt alert', [
+                'tenant_id' => $tenantId,
+                'sender_id' => $senderId,
+                'recipient_id' => $recipientId,
+                'reason_code' => $reasonCode,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     // -----------------------------------------------------------------

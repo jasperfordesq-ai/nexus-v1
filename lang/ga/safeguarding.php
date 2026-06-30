@@ -6,7 +6,14 @@
 
 return [
     'errors' => [
-        'vetting_required' => 'Éilíonn an ball seo grinnfhiosrúchán breise sula bhféadfá teagmháil a dhéanamh leis. Comhlánaigh na seiceálacha riachtanacha i do phróifíl le leanúint ar aghaidh.',
+        'vetting_required' => 'Ta an comhra seo curtha ar sos ag riail chosanta pobail. Teastaionn grinnfhiosru :types fioraithe uait sula feidir leat teachtaireacht a chur chuig an gcomhalta seo. Dean teagmhail le do bhroiceir no riarthoir an phobail chun do stadas a dheimhniu no an chead cheim eile a shocru.',
+        'vetting_required_title' => 'Ta seiceail chosanta de dhith',
+        'vetting_required_detail' => 'Ni feidir teagmhail a dheanamh leis an gcomhalta seo don chineal idirghniomhaiochta seo ach ag comhaltai le grinnfhiosru :types fioraithe. Nior seoladh do theachtaireacht.',
+        'vetting_required_action' => 'Oscail cabhair',
+        'contact_restricted' => 'D iarr an comhalta seo go socroidh comhordaitheoir teagmhail thar a cheann. Nior seoladh do theachtaireacht. Dean teagmhail le do bhroiceir no riarthoir pobail chun an chead cheim shabhailte eile a shocru.',
+        'contact_restricted_title' => 'Ta socru comhordaitheora ag teastail',
+        'contact_restricted_detail' => 'Nil an comhalta seo ar fail do theachtaireachtai direacha mar go n-eilionn a roghanna cosanta teagmhail tri chomhordaitheoir. Cuireadh folairimh chuig an bhfoireann cosanta.',
+        'contact_restricted_action' => 'Oscail cabhair',
         'vetting_check_failed' => 'Níorbh fhéidir linn do stádas grinnfhiosrúcháin a dheimhniú faoi láthair. Bain triail eile as i gceann tamaill.',
         'statement_required' => 'Teastaíonn Ráiteas Cosanta Leanaí (PDF) sula bhféadfaidh tú a dhearbhú go n-oibríonn an pobal seo le leanaí nó le daoine fásta leochaileacha. Uaslódáil ceann chun leanúint ar aghaidh.',
         'invalid_file' => 'Níorbh fhéidir an comhad uaslódáilte a léamh. Bain triail as comhad PDF bailí.',
@@ -16,6 +23,16 @@ return [
         'statement_missing' => 'Níl aon ráiteas cosanta ar comhad don phobal seo.',
         'file_missing' => 'Níorbh fhéidir an comhad ráitis cosanta a aimsiú ar an bhfreastalaí. Uaslódáil arís é.',
         'revoke_failed' => 'Níorbh fhéidir an rogha sin a chúlghairm. B’fhéidir go raibh sí cúlghairthe cheana.',
+    ],
+    'vetting_types' => [
+        'dbs_basic' => 'DBS Basic',
+        'dbs_standard' => 'DBS Standard',
+        'dbs_enhanced' => 'DBS Enhanced',
+        'garda_vetting' => 'Garda vetting',
+        'access_ni' => 'AccessNI',
+        'pvg_scotland' => 'PVG Scotland',
+        'international' => 'International background check',
+        'other' => 'Other vetting check',
     ],
     'confirmation' => [
         'title' => 'Sábháladh do shainroghanna cosanta',

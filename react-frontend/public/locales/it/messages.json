@@ -210,5 +210,20 @@
   "character_count": "{{current}}/{{max}}",
   "loading_older": "Caricamento dei messaggi più vecchi",
   "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent"
+  "aria_read_receipt_sent": "Sent",
+  "safeguarding_vetting_required": {
+    "title": "Controllo di tutela necessario",
+    "body": "Questa conversazione e in pausa perche una regola di tutela della comunita richiede una verifica approvata prima che tu possa inviare messaggi a questo membro.",
+    "contact_broker": "Contatta il tuo referente o amministratore della comunita per verificare lo stato dei controlli o concordare il prossimo passo sicuro.",
+    "required_checks": "Controlli richiesti",
+    "action": "Apri aiuto",
+    "dismiss": "Chiudi avviso di tutela"
+  },
+  "safeguarding_contact_restricted": {
+    "title": "Serve accordo con coordinatore",
+    "body": "Questo membro non e disponibile per messaggi diretti perche le preferenze di salvaguardia richiedono contatto mediato da coordinatore.",
+    "contact_broker": "Contatta il tuo broker o amministratore della comunita per organizzare il prossimo passo sicuro. Il team di salvaguardia e stato avvisato.",
+    "action": "Apri aiuto",
+    "dismiss": "Chiudi avviso di tutela"
+  }
 }

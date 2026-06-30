@@ -6,7 +6,14 @@
 
 return [
     'errors' => [
-        'vetting_required' => 'This member requires additional vetting before you can interact with them. Please complete the required checks in your profile to continue.',
+        'vetting_required' => 'Dieses Gespraech wurde durch eine Schutzregel der Community pausiert. Du brauchst bestaetigte :types-Vetting, bevor du diesem Mitglied schreiben kannst. Wende dich an deine vermittelnde Person oder Community-Administration, um deinen Status zu klaeren oder den naechsten Schritt zu vereinbaren.',
+        'vetting_required_title' => 'Schutzpruefung erforderlich',
+        'vetting_required_detail' => 'Dieses Mitglied kann fuer diese Art von Kontakt nur von Mitgliedern mit bestaetigter :types-Vetting angeschrieben werden. Deine Nachricht wurde nicht gesendet.',
+        'vetting_required_action' => 'Hilfe oeffnen',
+        'contact_restricted' => 'Dieses Mitglied moechte, dass ein Koordinator den Kontakt in seinem Namen arrangiert. Deine Nachricht wurde nicht gesendet. Bitte kontaktiere deinen Broker oder Community-Administrator, damit der naechste sichere Schritt arrangiert werden kann.',
+        'contact_restricted_title' => 'Koordinator-Arrangement erforderlich',
+        'contact_restricted_detail' => 'Dieses Mitglied ist nicht fuer Direktnachrichten verfuegbar, weil seine Schutzpraeferenzen koordinatorvermittelten Kontakt verlangen. Das Safeguarding-Team wurde benachrichtigt.',
+        'contact_restricted_action' => 'Hilfe oeffnen',
         'vetting_check_failed' => 'We could not verify your vetting status just now. Please try again shortly.',
         'statement_required' => 'A Child Safeguarding Statement PDF is required before you can declare that this community works with children or vulnerable adults. Please upload one to continue.',
         'invalid_file' => 'The uploaded file could not be read. Please try again with a valid PDF.',
@@ -16,6 +23,16 @@ return [
         'statement_missing' => 'No safeguarding statement is on file for this community.',
         'file_missing' => 'The safeguarding statement file could not be found on the server. Please upload it again.',
         'revoke_failed' => 'We could not revoke that preference. It may already have been revoked.',
+    ],
+    'vetting_types' => [
+        'dbs_basic' => 'DBS Basic',
+        'dbs_standard' => 'DBS Standard',
+        'dbs_enhanced' => 'DBS Enhanced',
+        'garda_vetting' => 'Garda vetting',
+        'access_ni' => 'AccessNI',
+        'pvg_scotland' => 'PVG Scotland',
+        'international' => 'International background check',
+        'other' => 'Other vetting check',
     ],
     'confirmation' => [
         'title' => 'Your safeguarding preferences have been saved',

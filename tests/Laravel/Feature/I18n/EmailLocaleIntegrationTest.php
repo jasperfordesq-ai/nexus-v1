@@ -160,4 +160,14 @@ class EmailLocaleIntegrationTest extends TestCase
         $this->assertStringContainsString('Get Started', $afterThrow, 'English resolves after exception');
         $this->assertStringNotContainsString('Tosaigh', $afterThrow, 'Irish translation does not leak after exception');
     }
+
+    public function test_json_translation_cache_does_not_shadow_matching_php_translation_group(): void
+    {
+        App::setLocale('en');
+
+        $message = __('safeguarding.errors.vetting_required');
+
+        $this->assertStringContainsString('community safeguarding rule', $message);
+        $this->assertNotSame('safeguarding.errors.vetting_required', $message);
+    }
 }

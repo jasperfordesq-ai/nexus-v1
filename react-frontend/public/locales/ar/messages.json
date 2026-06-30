@@ -210,5 +210,20 @@
   "character_count": "{{current}}/{{max}}",
   "loading_older": "تحميل الرسائل القديمة",
   "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent"
+  "aria_read_receipt_sent": "Sent",
+  "safeguarding_vetting_required": {
+    "title": "Yalzam fahs himaya",
+    "body": "Tum iyqaf hadhihi almuhadatha muakkatan lianna qaida himaya almujtama tatlub tahqiqan muwathaqan qabla irsal risala ila hadha aludw.",
+    "contact_broker": "Tawasul maa alwasit aw mudir almujtama liltahaqquq min halat altahqiq aw tartib alkhutwa alamna altaliya.",
+    "required_checks": "Alfuhusat almatluba",
+    "action": "Iftah almusaada",
+    "dismiss": "Aghliq ishara alhimaya"
+  },
+  "safeguarding_contact_restricted": {
+    "title": "Yalzam tartib min almunasiq",
+    "body": "Hatha aludw ghayr mutah lirasail mubashara lianna tafdilat alsalama tatlubu tawasulan biwasatat almunasiq.",
+    "contact_broker": "Ittasil bialwasit aw mudir almujtamaa litarteeb alkhatwa alamina altaalia. Tama tanbih fariq alsalama.",
+    "action": "Iftah almusaada",
+    "dismiss": "Aghliq ishara alhimaya"
+  }
 }

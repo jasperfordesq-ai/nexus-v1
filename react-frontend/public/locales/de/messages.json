@@ -210,5 +210,20 @@
   "character_count": "{{current}}/{{max}}",
   "loading_older": "Ältere Nachrichten werden geladen",
   "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent"
+  "aria_read_receipt_sent": "Sent",
+  "safeguarding_vetting_required": {
+    "title": "Schutzpruefung erforderlich",
+    "body": "Dieses Gespraech wurde pausiert, weil eine Schutzregel der Community eine bestaetigte Ueberpruefung verlangt, bevor du diesem Mitglied schreiben kannst.",
+    "contact_broker": "Wende dich an deine vermittelnde Person oder Community-Administration, um deinen Pruefstatus zu klaeren oder den naechsten sicheren Schritt zu vereinbaren.",
+    "required_checks": "Erforderliche Pruefungen",
+    "action": "Hilfe oeffnen",
+    "dismiss": "Schutzhinweis schliessen"
+  },
+  "safeguarding_contact_restricted": {
+    "title": "Koordinator-Arrangement erforderlich",
+    "body": "Dieses Mitglied ist nicht fuer Direktnachrichten verfuegbar, weil seine Schutzpraeferenzen koordinatorvermittelten Kontakt verlangen.",
+    "contact_broker": "Wende dich an deine vermittelnde Person oder Community-Administration, damit der naechste sichere Schritt arrangiert werden kann. Das Safeguarding-Team wurde benachrichtigt.",
+    "action": "Hilfe oeffnen",
+    "dismiss": "Schutzhinweis schliessen"
+  }
 }

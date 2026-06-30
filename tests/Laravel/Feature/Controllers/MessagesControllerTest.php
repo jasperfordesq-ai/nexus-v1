@@ -6,9 +6,12 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Events\SafeguardingContactAttemptBlocked;
 use App\Models\User;
+use App\Services\SafeguardingTriggerService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\Sanctum;
@@ -33,6 +36,39 @@ class MessagesControllerTest extends TestCase
         Sanctum::actingAs($user, ['*']);
 
         return $user;
+    }
+
+    private function createSafeguardingOption(array $triggers, string $optionKey): int
+    {
+        return DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'option_key' => $optionKey . '_' . uniqid(),
+            'option_type' => 'checkbox',
+            'label' => 'Test safeguarding option',
+            'description' => 'Test safeguarding option',
+            'sort_order' => 0,
+            'is_active' => 1,
+            'is_required' => 0,
+            'triggers' => json_encode($triggers),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function selectSafeguardingOptionForUser(User $user, int $optionId): void
+    {
+        DB::table('user_safeguarding_preferences')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'option_id' => $optionId,
+            'selected_value' => '1',
+            'consent_given_at' => now(),
+            'consent_ip' => '127.0.0.1',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        SafeguardingTriggerService::invalidateCache($user->id, $this->testTenantId);
     }
 
     // ================================================================
@@ -77,6 +113,174 @@ class MessagesControllerTest extends TestCase
         $response = $this->apiPost('/v2/messages', [
             'recipient_id' => $recipient->id,
             'body' => 'Hello, how are you?',
+        ]);
+
+        $this->assertContains($response->getStatusCode(), [200, 201]);
+    }
+
+    public function test_send_message_allows_provider_declaration_that_only_records_required_vetting(): void
+    {
+        $sender = $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+
+        $optionId = $this->createSafeguardingOption([
+            'notify_admin_on_selection' => true,
+            'vetting_type_required' => 'dbs_enhanced',
+        ], 'provider_declaration');
+        $this->selectSafeguardingOptionForUser($recipient, $optionId);
+
+        $response = $this->apiPost('/v2/messages', [
+            'recipient_id' => $recipient->id,
+            'body' => 'Hello, can we arrange a time?',
+        ]);
+
+        $this->assertContains($response->getStatusCode(), [200, 201]);
+        $this->assertDatabaseHas('messages', [
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $sender->id,
+            'receiver_id' => $recipient->id,
+            'body' => 'Hello, can we arrange a time?',
+        ]);
+    }
+
+    public function test_send_message_blocks_when_recipient_requires_vetted_interaction_and_sender_lacks_vetting(): void
+    {
+        $sender = $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+
+        $optionId = $this->createSafeguardingOption([
+            'requires_vetted_interaction' => true,
+            'vetting_type_required' => 'dbs_enhanced',
+        ], 'vetted_interaction');
+        $this->selectSafeguardingOptionForUser($recipient, $optionId);
+
+        $response = $this->apiPost('/v2/messages', [
+            'recipient_id' => $recipient->id,
+            'body' => 'Hello, can we arrange a time?',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('errors.0.code', 'VETTING_REQUIRED');
+        $response->assertJsonPath('errors.0.required_vetting_types.0', 'dbs_enhanced');
+        $response->assertJsonPath('errors.0.required_vetting_labels.0', 'DBS Enhanced');
+        $this->assertStringContainsString('community safeguarding rule', $response->json('errors.0.message'));
+        $this->assertStringNotContainsString('safeguarding.errors.vetting_required', $response->json('errors.0.message'));
+        $this->assertDatabaseMissing('messages', [
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $sender->id,
+            'receiver_id' => $recipient->id,
+            'body' => 'Hello, can we arrange a time?',
+        ]);
+    }
+
+    public function test_send_message_dispatches_staff_alert_when_safeguarding_blocks_contact_attempt(): void
+    {
+        Event::fake([SafeguardingContactAttemptBlocked::class]);
+
+        $sender = $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+
+        $optionId = $this->createSafeguardingOption([
+            'requires_vetted_interaction' => true,
+            'vetting_type_required' => 'dbs_enhanced',
+        ], 'vetted_interaction_alert');
+        $this->selectSafeguardingOptionForUser($recipient, $optionId);
+
+        $response = $this->apiPost('/v2/messages', [
+            'recipient_id' => $recipient->id,
+            'body' => 'Hello, can we arrange a time?',
+        ]);
+
+        $response->assertStatus(422);
+
+        Event::assertDispatched(
+            SafeguardingContactAttemptBlocked::class,
+            fn (SafeguardingContactAttemptBlocked $event) =>
+                $event->tenantId === $this->testTenantId
+                && $event->senderId === $sender->id
+                && $event->recipientId === $recipient->id
+                && $event->reasonCode === 'VETTING_REQUIRED'
+                && $event->requiredVettingTypes === ['dbs_enhanced']
+        );
+    }
+
+    public function test_send_message_blocks_when_recipient_requires_coordinator_mediated_contact(): void
+    {
+        Event::fake([SafeguardingContactAttemptBlocked::class]);
+
+        $sender = $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+
+        $optionId = $this->createSafeguardingOption([
+            'restricts_messaging' => true,
+            'notify_admin_on_selection' => true,
+        ], 'coordinator_contact');
+        $this->selectSafeguardingOptionForUser($recipient, $optionId);
+
+        $response = $this->apiPost('/v2/messages', [
+            'recipient_id' => $recipient->id,
+            'body' => 'Hello, can we arrange a time?',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('errors.0.code', 'SAFEGUARDING_CONTACT_RESTRICTED');
+        $this->assertStringContainsString('coordinator', $response->json('errors.0.message'));
+        $this->assertStringNotContainsString('safeguarding.errors.contact_restricted', $response->json('errors.0.message'));
+        $this->assertDatabaseMissing('messages', [
+            'tenant_id' => $this->testTenantId,
+            'sender_id' => $sender->id,
+            'receiver_id' => $recipient->id,
+            'body' => 'Hello, can we arrange a time?',
+        ]);
+
+        Event::assertDispatched(
+            SafeguardingContactAttemptBlocked::class,
+            fn (SafeguardingContactAttemptBlocked $event) =>
+                $event->tenantId === $this->testTenantId
+                && $event->senderId === $sender->id
+                && $event->recipientId === $recipient->id
+                && $event->reasonCode === 'SAFEGUARDING_CONTACT_RESTRICTED'
+                && $event->requiredVettingTypes === []
+        );
+    }
+
+    public function test_send_message_allows_vetted_interaction_when_sender_holds_valid_required_vetting(): void
+    {
+        $sender = $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+
+        $optionId = $this->createSafeguardingOption([
+            'requires_vetted_interaction' => true,
+            'vetting_type_required' => 'dbs_enhanced',
+        ], 'vetted_interaction_allowed');
+        $this->selectSafeguardingOptionForUser($recipient, $optionId);
+
+        DB::table('vetting_records')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $sender->id,
+            'vetting_type' => 'dbs_enhanced',
+            'status' => 'verified',
+            'reference_number' => 'TEST-DBS-1',
+            'issue_date' => now()->subMonth()->toDateString(),
+            'expiry_date' => now()->addYear()->toDateString(),
+            'verified_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/v2/messages', [
+            'recipient_id' => $recipient->id,
+            'body' => 'Hello, can we arrange a time?',
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201]);

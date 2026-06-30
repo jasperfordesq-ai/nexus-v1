@@ -6,7 +6,14 @@
 
 return [
     'errors' => [
-        'vetting_required' => 'This member requires additional vetting before you can interact with them. Please complete the required checks in your profile to continue.',
+        'vetting_required' => 'Kono kaiwa wa komyuniti no anzen ruuru ni yori ichiji teishi sareteimasu. Kono menba ni messeji o okuru mae ni kakunin-zumi no :types shinsa ga hitsuyo desu. Shinsa jokyo no kakunin ya tsugi no tetsuzuki ni tsuite, buroka mata wa komyuniti kanrisha ni renraku shite kudasai.',
+        'vetting_required_title' => 'Anzen kakunin ga hitsuyo desu',
+        'vetting_required_detail' => 'Kono taipu no yaritori de kono menba ni renraku dekiru no wa, kakunin-zumi no :types shinsa o motsu menba dake desu. Messeji wa soshin saremasen deshita.',
+        'vetting_required_action' => 'Herupu o hiraku',
+        'contact_restricted' => 'Kono menba wa koordineeta ga dairi de renraku wo seiri suru koto wo kibou shite imasu. Messeji wa soshin saremasen deshita. Tsugi no anzen na tejun no tame, buroka mata wa komyuniti kanrisha ni renraku shite kudasai.',
+        'contact_restricted_title' => 'Koordineeta no tehai ga hitsuyo desu',
+        'contact_restricted_detail' => 'Kono menba wa anzen hogo settei ni yori koordineeta kaizai no renraku ga hitsuyo na tame, chokusetsu messeji wa dekimasen. Safeguarding chiimu ni tsuchi shimashita.',
+        'contact_restricted_action' => 'Herupu o hiraku',
         'vetting_check_failed' => 'We could not verify your vetting status just now. Please try again shortly.',
         'statement_required' => 'A Child Safeguarding Statement PDF is required before you can declare that this community works with children or vulnerable adults. Please upload one to continue.',
         'invalid_file' => 'The uploaded file could not be read. Please try again with a valid PDF.',
@@ -16,6 +23,16 @@ return [
         'statement_missing' => 'No safeguarding statement is on file for this community.',
         'file_missing' => 'The safeguarding statement file could not be found on the server. Please upload it again.',
         'revoke_failed' => 'We could not revoke that preference. It may already have been revoked.',
+    ],
+    'vetting_types' => [
+        'dbs_basic' => 'DBS Basic',
+        'dbs_standard' => 'DBS Standard',
+        'dbs_enhanced' => 'DBS Enhanced',
+        'garda_vetting' => 'Garda vetting',
+        'access_ni' => 'AccessNI',
+        'pvg_scotland' => 'PVG Scotland',
+        'international' => 'International background check',
+        'other' => 'Other vetting check',
     ],
     'confirmation' => [
         'title' => 'Your safeguarding preferences have been saved',

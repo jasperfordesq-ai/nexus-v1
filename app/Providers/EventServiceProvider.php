@@ -30,6 +30,7 @@ use App\Events\MemberProfileUpdated;
 use App\Events\MessageSent;
 use App\Events\OnboardingCompleted;
 use App\Events\ReviewCreated;
+use App\Events\SafeguardingContactAttemptBlocked;
 use App\Events\SafeguardingFlaggedEvent;
 use App\Events\TransactionCompleted;
 use App\Events\UserFederatedOptOut;
@@ -59,6 +60,7 @@ use App\Listeners\NotifyConnectionAccepted;
 use App\Listeners\NotifyConnectionRequest;
 use App\Listeners\NotifyJobAlertSubscribers;
 use App\Listeners\NotifyMessageReceived;
+use App\Listeners\NotifySafeguardingContactAttemptBlocked;
 use App\Listeners\NotifySafeguardingStaff;
 use App\Listeners\NotifyTransactionCompleted;
 use App\Listeners\PushCommunityEventToFederatedPartners;
@@ -140,6 +142,10 @@ class EventServiceProvider extends ServiceProvider
 
         SafeguardingFlaggedEvent::class => [
             NotifySafeguardingStaff::class,
+        ],
+
+        SafeguardingContactAttemptBlocked::class => [
+            NotifySafeguardingContactAttemptBlocked::class,
         ],
 
         ReviewCreated::class => [

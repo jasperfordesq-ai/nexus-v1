@@ -30,6 +30,7 @@ export interface MessageInputAreaProps {
     under_monitoring: boolean;
     restriction_reason: string | null;
   } | null;
+  isInteractionBlocked?: boolean;
   // Text message state
   newMessage: string;
   onNewMessageChange: (value: string) => void;
@@ -72,6 +73,7 @@ function formatRecordingTime(seconds: number): string {
 export function MessageInputArea({
   isDirectMessagingEnabled,
   messagingRestriction,
+  isInteractionBlocked = false,
   newMessage,
   onNewMessageChange,
   onSendMessage,
@@ -96,6 +98,7 @@ export function MessageInputArea({
   const { t } = useTranslation('messages');
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
+  const isComposerBlocked = !!messagingRestriction?.messaging_disabled || isInteractionBlocked;
 
   return (
     <div className="border-t border-theme-default p-3 sm:p-4" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
@@ -131,7 +134,7 @@ export function MessageInputArea({
       )}
 
       {/* Voice recording preview */}
-      {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && audioBlob && !isRecording && (
+      {isDirectMessagingEnabled && !isComposerBlocked && audioBlob && !isRecording && (
         <div className="flex min-w-0 flex-col gap-3 mb-3 p-3 bg-theme-elevated rounded-lg sm:flex-row sm:items-center">
           <VoiceMessagePlayer audioBlob={audioBlob} />
           <div className="flex gap-2 sm:ml-auto">
@@ -156,7 +159,7 @@ export function MessageInputArea({
       )}
 
       {/* Recording indicator */}
-      {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && isRecording && (
+      {isDirectMessagingEnabled && !isComposerBlocked && isRecording && (
         <div className="flex flex-wrap items-center gap-3 mb-3 p-3 bg-red-500/10 rounded-lg border border-red-500/20">
           <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse shrink-0" aria-hidden="true" />
           <span className="text-theme-primary font-medium">{formatRecordingTime(recordingTime)}</span>
@@ -183,7 +186,7 @@ export function MessageInputArea({
       )}
 
       {/* Attachment previews */}
-      {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && attachmentPreviews.length > 0 && (
+      {isDirectMessagingEnabled && !isComposerBlocked && attachmentPreviews.length > 0 && (
         <div className="flex gap-2 mb-3 flex-wrap">
           {attachmentPreviews.map((item, index) => (
             <div key={item.preview} className="relative group">
@@ -216,7 +219,7 @@ export function MessageInputArea({
       )}
 
       {/* Text input form */}
-      {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && !isRecording && !audioBlob && (
+      {isDirectMessagingEnabled && !isComposerBlocked && !isRecording && !audioBlob && (
         <form onSubmit={onSendMessage} className="flex min-w-0 gap-2 sm:gap-3">
           {/* Hidden file input — triggered programmatically via the labelled Button; hidden from AT */}
           <input

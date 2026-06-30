@@ -1178,12 +1178,37 @@ class AppServiceProvider extends ServiceProvider
             // on Docker Desktop bind mounts.
             foreach ($this->loadCachedJsonTranslations($basePath) as $locale => $lines) {
                 if (!empty($lines)) {
+                    $this->preloadPhpGroupsForJsonLines($translator, $basePath, $locale, $lines);
                     $translator->addLines($lines, $locale);
                 }
             }
         } catch (\Throwable $e) {
             // Non-fatal — emails will show raw keys but the app won't crash
             \Illuminate\Support\Facades\Log::warning('loadJsonTranslations failed: ' . $e->getMessage());
+        }
+    }
+
+    private function preloadPhpGroupsForJsonLines(object $translator, string $basePath, string $locale, array $lines): void
+    {
+        $loadedGroups = [];
+
+        foreach (array_keys($lines) as $key) {
+            if (!is_string($key) || !str_contains($key, '.')) {
+                continue;
+            }
+
+            [$group] = explode('.', $key, 2);
+            if (isset($loadedGroups[$group])) {
+                continue;
+            }
+
+            $phpGroupPath = $basePath . DIRECTORY_SEPARATOR . $locale . DIRECTORY_SEPARATOR . $group . '.php';
+            if (!is_file($phpGroupPath)) {
+                continue;
+            }
+
+            $translator->load('*', $group, $locale);
+            $loadedGroups[$group] = true;
         }
     }
 

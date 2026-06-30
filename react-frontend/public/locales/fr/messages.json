@@ -210,5 +210,20 @@
   "character_count": "{{current}}/{{max}}",
   "loading_older": "Chargement d'anciens messages",
   "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent"
+  "aria_read_receipt_sent": "Sent",
+  "safeguarding_vetting_required": {
+    "title": "Verification de protection necessaire",
+    "body": "Cette conversation est suspendue, car une regle de protection de la communaute exige une verification validee avant que vous puissiez ecrire a ce membre.",
+    "contact_broker": "Contactez votre referent ou administrateur de communaute pour verifier votre statut ou organiser la prochaine etape sure.",
+    "required_checks": "Verifications requises",
+    "action": "Ouvrir aide",
+    "dismiss": "Ignorer avis de protection"
+  },
+  "safeguarding_contact_restricted": {
+    "title": "Arrangement par coordinateur requis",
+    "body": "Ce membre n est pas disponible pour les messages directs car ses preferences de protection exigent un contact medie par coordinateur.",
+    "contact_broker": "Contactez votre broker ou administrateur de communaute pour organiser la prochaine etape sure. L equipe de protection a ete alertee.",
+    "action": "Ouvrir aide",
+    "dismiss": "Ignorer avis de protection"
+  }
 }

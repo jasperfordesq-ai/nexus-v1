@@ -3,7 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { render, screen, waitFor } from '@/test/test-utils';
+import { fireEvent, render, screen, waitFor } from '@/test/test-utils';
+import type { FormEventHandler } from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 const stableMocks = vi.hoisted(() => ({
@@ -13,6 +14,7 @@ const stableMocks = vi.hoisted(() => ({
   refreshCounts: vi.fn(() => Promise.resolve()),
   setSearchParams: vi.fn(),
   showToast: vi.fn(),
+  toastError: vi.fn(),
   tenantPath: vi.fn((p: string) => `/t/test${p}`),
   t: vi.fn((key: string) => key),
 }));
@@ -35,7 +37,7 @@ vi.mock('@/lib/helpers', () => ({
 
 vi.mock('@/contexts', () => ({
   useAuth: () => ({ user: { id: 1, name: 'Alice' }, isAuthenticated: true }),
-  useToast: () => ({ showToast: stableMocks.showToast, error: vi.fn(), success: vi.fn() }),
+  useToast: () => ({ showToast: stableMocks.showToast, error: stableMocks.toastError, success: vi.fn(), info: vi.fn() }),
   useTenant: () => ({
     tenantPath: stableMocks.tenantPath,
     hasFeature: stableMocks.hasFeature,
@@ -146,7 +148,20 @@ vi.mock('./components/MessageBubble', () => ({
 }));
 
 vi.mock('./components/MessageInputArea', () => ({
-  MessageInputArea: () => <div data-testid="message-input-area" />,
+  MessageInputArea: ({ newMessage, onNewMessageChange, onSendMessage }: {
+    newMessage: string;
+    onNewMessageChange: (value: string) => void;
+    onSendMessage: FormEventHandler<HTMLFormElement>;
+  }) => (
+    <form data-testid="message-input-area" onSubmit={onSendMessage}>
+      <input
+        aria-label="mock-message-input"
+        value={newMessage}
+        onChange={(event) => onNewMessageChange(event.target.value)}
+      />
+      <button type="submit">mock-send</button>
+    </form>
+  ),
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -244,5 +259,66 @@ describe('ConversationPage', () => {
       // Back button should be present with aria-label (t('aria_back') returns the key)
       expect(screen.getByLabelText(/back/i)).toBeDefined();
     });
+  });
+
+  it('shows an in-page safeguarding panel when vetting is required to message', async () => {
+    mockApi.get.mockResolvedValue(mockConversationResponse);
+    mockApi.put.mockResolvedValue({ success: true });
+    mockApi.post.mockResolvedValue({
+      success: false,
+      code: 'VETTING_REQUIRED',
+      error: 'This conversation is paused by a community safeguarding rule.',
+      errors: [{
+        code: 'VETTING_REQUIRED',
+        message: 'This conversation is paused by a community safeguarding rule.',
+        required_vetting_types: ['dbs_enhanced'],
+        required_vetting_labels: ['DBS Enhanced'],
+      }],
+    });
+
+    render(<ConversationPage />);
+
+    await waitFor(() => expect(screen.getByLabelText('mock-message-input')).toBeDefined());
+
+    fireEvent.change(screen.getByLabelText('mock-message-input'), {
+      target: { value: 'Hello Sarah' },
+    });
+    fireEvent.submit(screen.getByTestId('message-input-area'));
+
+    await waitFor(() => {
+      expect(screen.getByText('safeguarding_vetting_required.title')).toBeDefined();
+      expect(screen.getByText('DBS Enhanced')).toBeDefined();
+    });
+    expect(stableMocks.toastError).not.toHaveBeenCalledWith('error_title', expect.any(String));
+  });
+
+  it('shows an in-page safeguarding panel when coordinator-mediated contact is required', async () => {
+    mockApi.get.mockResolvedValue(mockConversationResponse);
+    mockApi.put.mockResolvedValue({ success: true });
+    mockApi.post.mockResolvedValue({
+      success: false,
+      code: 'SAFEGUARDING_CONTACT_RESTRICTED',
+      error: 'This member has asked for a coordinator to arrange contact on their behalf.',
+      errors: [{
+        code: 'SAFEGUARDING_CONTACT_RESTRICTED',
+        message: 'This member has asked for a coordinator to arrange contact on their behalf.',
+        detail: 'This member is not available for direct messages because their safeguarding preferences require coordinator-mediated contact.',
+      }],
+    });
+
+    render(<ConversationPage />);
+
+    await waitFor(() => expect(screen.getByLabelText('mock-message-input')).toBeDefined());
+
+    fireEvent.change(screen.getByLabelText('mock-message-input'), {
+      target: { value: 'Hello Sarah' },
+    });
+    fireEvent.submit(screen.getByTestId('message-input-area'));
+
+    await waitFor(() => {
+      expect(screen.getByText('safeguarding_contact_restricted.title')).toBeDefined();
+      expect(screen.getByText(/coordinator-mediated contact/i)).toBeDefined();
+    });
+    expect(stableMocks.toastError).not.toHaveBeenCalledWith('error_title', expect.any(String));
   });
 });

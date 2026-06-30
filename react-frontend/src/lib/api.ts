@@ -175,7 +175,15 @@ export interface ApiResponse<T = unknown> {
   message?: string;
   error?: string;
   code?: string;
+  errors?: ApiErrorDetail[];
   meta?: PaginationMeta;
+}
+
+export interface ApiErrorDetail {
+  code?: string;
+  message?: string;
+  field?: string;
+  [key: string]: unknown;
 }
 
 export interface ApiError {
@@ -702,11 +710,13 @@ class ApiClient {
             return { success: true, data: data as T, message: data.message, meta: data.meta };
           }
 
-          const firstError = Array.isArray(data.errors) && data.errors.length > 0 ? data.errors[0] : null;
+          const errors = Array.isArray(data.errors) ? data.errors as ApiErrorDetail[] : undefined;
+          const firstError = errors && errors.length > 0 ? errors[0] : null;
           const result: ApiResponse<T> = {
             success: false,
             error: data.error ?? firstError?.message ?? data.message ?? 'Request failed',
             code: data.code ?? firstError?.code ?? 'REQUEST_FAILED',
+            errors,
             meta: data.meta,
           };
 
@@ -729,7 +739,8 @@ class ApiClient {
       }
 
       // Handle error response (v2 API uses {errors: [{code, message}]}, v1 uses {error, code})
-      const firstError = Array.isArray(data.errors) && data.errors.length > 0 ? data.errors[0] : null;
+      const errors = Array.isArray(data.errors) ? data.errors as ApiErrorDetail[] : undefined;
+      const firstError = errors && errors.length > 0 ? errors[0] : null;
       const errorMessage = data.error ?? firstError?.message ?? data.message ?? 'Request failed';
       const errorCode = data.code ?? firstError?.code ?? `HTTP_${response.status}`;
 
@@ -743,6 +754,7 @@ class ApiClient {
         success: false,
         error: errorMessage,
         code: errorCode,
+        errors,
       };
     } catch (error) {
       clearTimeout(timeoutId);
@@ -1013,11 +1025,13 @@ class ApiClient {
           return { success: true, data: undefined as T };
         }
         if (typeof data === 'object' && data !== null && 'success' in data && data.success === false) {
-          const firstError = Array.isArray(data.errors) && data.errors.length > 0 ? data.errors[0] : null;
+          const errors = Array.isArray(data.errors) ? data.errors as ApiErrorDetail[] : undefined;
+          const firstError = errors && errors.length > 0 ? errors[0] : null;
           return {
             success: false,
             error: data.error ?? firstError?.message ?? data.message ?? 'Upload failed',
             code: data.code ?? firstError?.code ?? 'UPLOAD_ERROR',
+            errors,
             meta: data.meta,
           };
         }
@@ -1025,11 +1039,13 @@ class ApiClient {
       }
 
       // Handle error response (v2 API uses {errors: [{code, message}]}, v1 uses {error, code})
-      const firstError = Array.isArray(data.errors) && data.errors.length > 0 ? data.errors[0] : null;
+      const errors = Array.isArray(data.errors) ? data.errors as ApiErrorDetail[] : undefined;
+      const firstError = errors && errors.length > 0 ? errors[0] : null;
       return {
         success: false,
         error: data.error ?? firstError?.message ?? data.message ?? 'Upload failed',
         code: data.code ?? firstError?.code ?? 'UPLOAD_ERROR',
+        errors,
       };
     } catch (error) {
       clearTimeout(uploadTimeoutId);
@@ -1101,7 +1117,7 @@ class ApiClient {
         }
 
         const data = parse();
-        const errors = data && Array.isArray(data.errors) ? (data.errors as Array<{ code?: string; message?: string }>) : null;
+        const errors = data && Array.isArray(data.errors) ? (data.errors as ApiErrorDetail[]) : undefined;
         const firstError = errors && errors.length > 0 ? errors[0] : null;
         const meta = (data?.meta ?? undefined) as PaginationMeta | undefined;
 
@@ -1115,6 +1131,7 @@ class ApiClient {
               success: false,
               error: (data.error as string) ?? firstError?.message ?? (data.message as string) ?? 'Upload failed',
               code: (data.code as string) ?? firstError?.code ?? 'UPLOAD_ERROR',
+              errors,
               meta,
             });
             return;
@@ -1127,6 +1144,7 @@ class ApiClient {
           success: false,
           error: (data?.error as string) ?? firstError?.message ?? (data?.message as string) ?? 'Upload failed',
           code: (data?.code as string) ?? firstError?.code ?? 'UPLOAD_ERROR',
+          errors,
         });
       };
 

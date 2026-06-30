@@ -210,5 +210,20 @@
   "character_count": "{{current}}/{{max}}",
   "loading_older": "古いメッセージを読み込む",
   "aria_read_receipt_read": "Read",
-  "aria_read_receipt_sent": "Sent"
+  "aria_read_receipt_sent": "Sent",
+  "safeguarding_vetting_required": {
+    "title": "Anzen kakunin ga hitsuyo desu",
+    "body": "Kono kaiwa wa, kono menba ni messeji o okuru mae ni kakunin-zumi no shinsa ga hitsuyo na tame, komyuniti no anzen ruuru ni yori ichiji teishi sareteimasu.",
+    "contact_broker": "Shinsa jokyo no kakunin ya tsugi no anzen na tetsuzuki ni tsuite, buroka mata wa komyuniti kanrisha ni renraku shite kudasai.",
+    "required_checks": "Hitsuyo na kakunin",
+    "action": "Herupu o hiraku",
+    "dismiss": "Anzen oshirase o tojiru"
+  },
+  "safeguarding_contact_restricted": {
+    "title": "Koordineeta no tehai ga hitsuyo desu",
+    "body": "Kono menba wa anzen hogo settei ni yori koordineeta kaizai no renraku ga hitsuyo na tame, chokusetsu messeji wa dekimasen.",
+    "contact_broker": "Tsugi no anzen na tejun no tame, buroka mata wa komyuniti kanrisha ni renraku shite kudasai. Safeguarding chiimu ni tsuchi shimashita.",
+    "action": "Herupu o hiraku",
+    "dismiss": "Anzen oshirase o tojiru"
+  }
 }

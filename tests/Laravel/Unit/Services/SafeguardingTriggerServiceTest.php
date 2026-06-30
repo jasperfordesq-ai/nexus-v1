@@ -236,13 +236,41 @@ class SafeguardingTriggerServiceTest extends TestCase
         $this->assertSame([5 => [], 10 => [], 15 => []], $result);
     }
 
-    public function test_getRequiredVettingTypesForUsers_aggregatesVettingTypesPerUser(): void
+    public function test_getRequiredVettingTypesForUsers_ignoresVettingTypesWithoutVettedInteractionTrigger(): void
+    {
+        $rows = collect([
+            (object) [
+                'user_id' => 5,
+                'triggers' => json_encode([
+                    'notify_admin_on_selection' => true,
+                    'vetting_type_required' => 'dbs_enhanced',
+                ]),
+            ],
+        ]);
+
+        DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
+        DB::shouldReceive('join')->andReturnSelf();
+        DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
+        DB::shouldReceive('whereNull')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
+        DB::shouldReceive('get')->andReturn($rows);
+
+        $result = SafeguardingTriggerService::getRequiredVettingTypesForUsers(
+            [5],
+            $this->testTenantId
+        );
+
+        $this->assertSame([5 => []], $result);
+    }
+
+    public function test_getRequiredVettingTypesForUsers_aggregatesOnlyInteractionBlockingVettingTypesPerUser(): void
     {
         // Simulated rows: user 5 has two options, one with garda_vetting and one with dbs_enhanced.
-        // user 10 has one option with garda_vetting. user 15 has an option with no vetting_type.
+        // user 10 has one informational provider declaration. user 15 has an option with no vetting_type.
         $rows = collect([
-            (object) ['user_id' => 5, 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])],
-            (object) ['user_id' => 5, 'triggers' => json_encode(['vetting_type_required' => 'dbs_enhanced'])],
+            (object) ['user_id' => 5, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting'])],
+            (object) ['user_id' => 5, 'triggers' => json_encode(['requires_vetted_interaction' => true, 'vetting_type_required' => 'dbs_enhanced'])],
             (object) ['user_id' => 5, 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])], // duplicate — should dedupe
             (object) ['user_id' => 10, 'triggers' => json_encode(['vetting_type_required' => 'garda_vetting'])],
             (object) ['user_id' => 15, 'triggers' => json_encode(['requires_broker_approval' => true])],
@@ -271,7 +299,7 @@ class SafeguardingTriggerServiceTest extends TestCase
         $this->assertContains('dbs_enhanced', $result[5]);
 
         // User 10 — single type
-        $this->assertSame(['garda_vetting'], $result[10]);
+        $this->assertSame([], $result[10]);
 
         // User 15 — no vetting_type_required in triggers
         $this->assertSame([], $result[15]);
@@ -324,7 +352,7 @@ class SafeguardingTriggerServiceTest extends TestCase
         // Some rows may return triggers as a decoded array rather than a JSON string,
         // depending on the driver / Eloquent casting. Both paths must work.
         $rows = collect([
-            (object) ['user_id' => 5, 'triggers' => ['vetting_type_required' => 'garda_vetting']],
+            (object) ['user_id' => 5, 'triggers' => ['requires_vetted_interaction' => true, 'vetting_type_required' => 'garda_vetting']],
         ]);
 
         DB::shouldReceive('table')->with('user_safeguarding_preferences as p')->andReturnSelf();
