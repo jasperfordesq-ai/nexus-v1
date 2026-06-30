@@ -222,8 +222,17 @@
   "safeguarding_contact_restricted": {
     "title": "Ta socru comhordaitheora ag teastail",
     "body": "Nil an comhalta seo ar fail do theachtaireachtai direacha mar go n-eilionn a roghanna cosanta teagmhail tri chomhordaitheoir.",
-    "contact_broker": "Dean teagmhail le do bhroiceir no riarthoir pobail chun an chead cheim shabhailte eile a shocru. Cuireadh folairimh chuig an bhfoireann cosanta.",
+    "contact_broker": "Is féidir leat iarraidh ar bhróicéir, riarthóir nó comhordaitheoir cabhrú leis an teagmháil a eagrú. Úsáid an cnaipe thíos — beidh siad i dteagmháil leat.",
     "action": "Oscail cabhair",
     "dismiss": "Dibir fogra cosanta"
-  }
+  },
+  "coordinator_request": {
+    "button": "Iarr cabhair comhordaitheora",
+    "aria_button": "Iarr cabhair comhordaitheora chun teagmháil a eagrú",
+    "success_title": "Iarratas seolta",
+    "success_body": "Tá comhordaitheoir pobail curtha ar an eolas go mbíonn tú ag iarraidh cabhair chun teagmháil a dhéanamh. Beidh siad i dteagmháil leat.",
+    "sent": "Comhordaitheoir curtha ar an eolas — beidh siad i dteagmháil leat chun cabhrú leis an teagmháil a eagrú.",
+    "error": "Níorbh fhéidir do iarratas a sheoladh faoi láthair. Bain triail eile as ar ball."
+  },
+  "composer_blocked_safeguarding": "Níl teachtaireachtaí díreacha ar fáil leis an gcomhalta seo. Úsáid an rogha thuas chun iarraidh ar chomhordaitheoir cabhrú leis an teagmháil a eagrú."
 }

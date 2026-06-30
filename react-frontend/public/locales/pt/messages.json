@@ -222,8 +222,17 @@
   "safeguarding_contact_restricted": {
     "title": "E necessario acordo com coordenador",
     "body": "Este membro nao esta disponivel para mensagens diretas porque as preferencias de salvaguarda exigem contacto mediado por coordenador.",
-    "contact_broker": "Contacta o teu broker ou administrador da comunidade para organizar o proximo passo seguro. A equipa de salvaguarda foi alertada.",
+    "contact_broker": "Pode pedir a um mediador, administrador ou coordenador que ajude a organizar o contacto. Utilize o botão abaixo — alguém entrará em contacto consigo.",
     "action": "Abrir ajuda",
     "dismiss": "Dispensar aviso de protecao"
-  }
+  },
+  "coordinator_request": {
+    "button": "Pedir ajuda a um coordenador",
+    "aria_button": "Pedir ajuda a um coordenador para organizar o contacto",
+    "success_title": "Pedido enviado",
+    "success_body": "Informámos um coordenador da comunidade de que gostaria de ajuda para entrar em contacto. O coordenador entrará em contacto consigo.",
+    "sent": "Coordenador notificado — entrará em contacto para ajudar a organizar a comunicação.",
+    "error": "Não foi possível enviar o seu pedido neste momento. Por favor, tente novamente em breve."
+  },
+  "composer_blocked_safeguarding": "A troca de mensagens diretas não está disponível com este membro. Utilize a opção acima para pedir a um coordenador que ajude a organizar o contacto."
 }

@@ -224,6 +224,20 @@ export interface PaginationMeta {
     };
     unread_count?: number;
     message_count?: number;
+    // Server-authoritative safeguarding preflight state for a 1:1 conversation.
+    // Present with restricted=true when direct contact with other_user is gated;
+    // null/absent when contact is permitted. Rendering it never alerts staff.
+    safeguarding?: {
+      restricted: boolean;
+      code: string;
+      title?: string | null;
+      message?: string | null;
+      detail?: string | null;
+      action_label?: string | null;
+      required_vetting_types?: string[];
+      required_vetting_labels?: string[];
+      can_request_coordinator?: boolean;
+    } | null;
   };
 }
 

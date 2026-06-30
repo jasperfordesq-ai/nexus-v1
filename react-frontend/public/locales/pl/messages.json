@@ -222,8 +222,17 @@
   "safeguarding_contact_restricted": {
     "title": "Wymagane ustalenie z koordynatorem",
     "body": "Ten czlonek nie jest dostepny dla wiadomosci bezposrednich, poniewaz jego preferencje safeguarding wymagaja kontaktu przez koordynatora.",
-    "contact_broker": "Skontaktuj sie z brokerem lub administratorem spolecznosci, aby ustalic kolejny bezpieczny krok. Zespol safeguarding zostal powiadomiony.",
+    "contact_broker": "Możesz poprosić pośrednika, administratora lub koordynatora o pomoc w nawiązaniu kontaktu. Użyj przycisku poniżej — skontaktują się z Tobą.",
     "action": "Otworz pomoc",
     "dismiss": "Zamknij powiadomienie o ochronie"
-  }
+  },
+  "coordinator_request": {
+    "button": "Poproś koordynatora o pomoc",
+    "aria_button": "Poproś koordynatora o pomoc w nawiązaniu kontaktu",
+    "success_title": "Prośba wysłana",
+    "success_body": "Poinformowaliśmy koordynatora społeczności, że chcesz uzyskać pomoc w nawiązaniu kontaktu. Skontaktuje się z Tobą.",
+    "sent": "Koordynator został powiadomiony — skontaktuje się z Tobą, aby pomóc w nawiązaniu kontaktu.",
+    "error": "Nie udało się wysłać Twojej prośby. Spróbuj ponownie za chwilę."
+  },
+  "composer_blocked_safeguarding": "Bezpośrednia wiadomość do tego członka nie jest dostępna. Skorzystaj z opcji powyżej, aby poprosić koordynatora o pomoc w nawiązaniu kontaktu."
 }

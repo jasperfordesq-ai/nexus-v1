@@ -222,8 +222,17 @@
   "safeguarding_contact_restricted": {
     "title": "Coordinatorafspraak nodig",
     "body": "Dit lid is niet beschikbaar voor directe berichten omdat de safeguarding-voorkeuren contact via een coordinator vereisen.",
-    "contact_broker": "Neem contact op met je broker of communitybeheerder zodat zij de volgende veilige stap kunnen regelen. Het safeguarding-team is gewaarschuwd.",
+    "contact_broker": "U kunt een bemiddelaar, beheerder of coördinator vragen om het contact te helpen regelen. Gebruik de onderstaande knop — zij nemen contact met u op.",
     "action": "Help openen",
     "dismiss": "Veiligheidsmelding sluiten"
-  }
+  },
+  "coordinator_request": {
+    "button": "Hulp van coördinator aanvragen",
+    "aria_button": "Hulp van coördinator aanvragen om contact te regelen",
+    "success_title": "Verzoek verzonden",
+    "success_body": "We hebben een communitycoördinator laten weten dat u graag hulp wilt bij het leggen van contact. Zij nemen contact met u op.",
+    "sent": "Coördinator op de hoogte gesteld — zij nemen contact op om het gesprek te helpen regelen.",
+    "error": "We konden uw verzoek op dit moment niet verzenden. Probeer het binnenkort opnieuw."
+  },
+  "composer_blocked_safeguarding": "Directe berichten zijn niet beschikbaar met dit lid. Gebruik de optie hierboven om een coördinator te vragen het contact te helpen regelen."
 }

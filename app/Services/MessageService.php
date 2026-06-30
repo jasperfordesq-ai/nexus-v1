@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\TenantContext;
 use App\Events\MessageSent;
 use App\Events\SafeguardingContactAttemptBlocked;
+use App\Events\SafeguardingCoordinationRequested;
 use App\Models\Message;
 use App\Models\User;
 use App\Services\SafeguardingTriggerService;
@@ -286,72 +287,24 @@ class MessageService
             return [];
         }
 
-        // Recipient-side safeguarding can require coordinator-mediated contact.
-        // In that case the direct message is not sent and staff are alerted.
-        $recipientMessagingRestricted = false;
-        try {
-            $recipientMessagingRestricted = SafeguardingTriggerService::isMessagingRestricted($receiverId, $tenantId);
-        } catch (\Throwable $e) {
-            Log::warning('MessageService::send safeguarding contact restriction lookup failed (continuing)', [
-                'error' => $e->getMessage(),
-                'receiver_id' => $receiverId,
-            ]);
-        }
-        if ($recipientMessagingRestricted) {
+        // Recipient-side safeguarding can block direct contact — either the member
+        // requires coordinator-mediated contact, or the interaction requires vetting
+        // the sender does not hold. The gate is evaluated server-side by the same
+        // method that powers the preflight notice shown when the conversation opens.
+        // When it blocks HERE — on an actual send attempt — the message is not stored
+        // and staff are alerted. Merely opening the conversation never alerts staff.
+        $safeguardingGate = self::evaluateSafeguardingContactGate($senderId, $receiverId, $tenantId);
+        if ($safeguardingGate !== null) {
             self::dispatchSafeguardingContactAttemptBlocked(
                 $tenantId,
                 $senderId,
                 $receiverId,
-                'SAFEGUARDING_CONTACT_RESTRICTED'
+                $safeguardingGate['code'],
+                $safeguardingGate['required_vetting_types'],
+                $safeguardingGate['required_vetting_labels'],
             );
-            self::$errors = [[
-                'code' => 'SAFEGUARDING_CONTACT_RESTRICTED',
-                'message' => __('safeguarding.errors.contact_restricted'),
-                'title' => __('safeguarding.errors.contact_restricted_title'),
-                'detail' => __('safeguarding.errors.contact_restricted_detail'),
-                'action_label' => __('safeguarding.errors.contact_restricted_action'),
-            ]];
+            self::$errors = [self::buildSafeguardingError($safeguardingGate)];
             return [];
-        }
-
-        // If the recipient's safeguarding preferences require vetting types the sender
-        // does not hold, block with VETTING_REQUIRED.
-        $recipientVettingTypes = [];
-        try {
-            $recipientVettingTypes = SafeguardingTriggerService::getRequiredVettingTypes($receiverId, $tenantId);
-        } catch (\Throwable $e) {
-            // Lookup failure is not fatal — other safeguarding gates remain in place.
-            Log::warning('MessageService::send safeguarding lookup failed (continuing)', [
-                'error' => $e->getMessage(),
-                'receiver_id' => $receiverId,
-            ]);
-        }
-        if (!empty($recipientVettingTypes)) {
-            if (!app(VettingService::class)->userHasAllValidVettings($senderId, $recipientVettingTypes)) {
-                $requiredVettingLabels = self::vettingTypeLabels($recipientVettingTypes);
-                self::dispatchSafeguardingContactAttemptBlocked(
-                    $tenantId,
-                    $senderId,
-                    $receiverId,
-                    'VETTING_REQUIRED',
-                    array_values($recipientVettingTypes),
-                    $requiredVettingLabels
-                );
-                self::$errors = [[
-                    'code' => 'VETTING_REQUIRED',
-                    'message' => __('safeguarding.errors.vetting_required', [
-                        'types' => implode(', ', $requiredVettingLabels),
-                    ]),
-                    'title' => __('safeguarding.errors.vetting_required_title'),
-                    'detail' => __('safeguarding.errors.vetting_required_detail', [
-                        'types' => implode(', ', $requiredVettingLabels),
-                    ]),
-                    'action_label' => __('safeguarding.errors.vetting_required_action'),
-                    'required_vetting_types' => array_values($recipientVettingTypes),
-                    'required_vetting_labels' => $requiredVettingLabels,
-                ]];
-                return [];
-            }
         }
 
         // Check if either user has blocked the other in this tenant.
@@ -472,6 +425,84 @@ class MessageService
     }
 
     /**
+     * Record an explicit request for coordinator-mediated contact.
+     *
+     * This is the action behind the "Request coordinator help" button in the
+     * safeguarding panel. Unlike opening the conversation — which only renders the
+     * preflight notice and never alerts staff — this IS an explicit contact attempt:
+     * it alerts brokers/admins via SafeguardingCoordinationRequested and is audit-logged.
+     *
+     * The safeguarding gate is re-evaluated server-side so a client cannot trigger an
+     * alert for a member who is not actually restricted.
+     *
+     * @return array{success: bool, code: string}|array{} Empty array on failure (inspect getErrors()).
+     */
+    public static function requestCoordinatorAssistance(int $senderId, int $recipientId): array
+    {
+        self::$errors = [];
+        $tenantId = app('tenant.id');
+
+        if ($recipientId <= 0 || $senderId === $recipientId) {
+            self::$errors = [['code' => 'VALIDATION_ERROR', 'message' => __('api.message_recipient_required')]];
+            return [];
+        }
+
+        $recipient = User::withoutGlobalScopes()
+            ->where('id', $recipientId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+        if (!$recipient) {
+            self::$errors = [['code' => 'NOT_FOUND', 'message' => __('api.message_recipient_not_found')]];
+            return [];
+        }
+
+        // Server-authoritative: only a genuinely restricted recipient warrants a staff alert.
+        $gate = self::evaluateSafeguardingContactGate($senderId, $recipientId, $tenantId);
+        if ($gate === null) {
+            self::$errors = [[
+                'code' => 'SAFEGUARDING_NOT_RESTRICTED',
+                'message' => __('safeguarding.errors.coordination_not_required'),
+            ]];
+            return [];
+        }
+
+        // Alert staff. De-duplication of *delivery* (so a member tapping repeatedly does
+        // not e-mail staff twice) is handled inside NotifySafeguardingCoordinationRequested
+        // via its own claim/handled cache keys, which are only marked "done" AFTER a
+        // successful delivery. We therefore dispatch on every request rather than
+        // pre-claiming a window here: a failed delivery (queued listener, flaky mailer,
+        // tenant with no staff) must NOT leave the member with a false success and a
+        // suppressed retry — their next request re-dispatches and the listener re-attempts.
+        try {
+            event(new SafeguardingCoordinationRequested(
+                tenantId: $tenantId,
+                senderId: $senderId,
+                recipientId: $recipientId,
+                reasonCode: $gate['code'],
+                requiredVettingTypes: $gate['required_vetting_types'],
+                requiredVettingLabels: $gate['required_vetting_labels'],
+            ));
+        } catch (\Throwable $e) {
+            Log::critical('MessageService::requestCoordinatorAssistance failed to dispatch coordination alert', [
+                'tenant_id' => $tenantId,
+                'sender_id' => $senderId,
+                'recipient_id' => $recipientId,
+                'reason_code' => $gate['code'],
+                'error' => $e->getMessage(),
+            ]);
+            self::$errors = [[
+                'code' => 'COORDINATION_REQUEST_FAILED',
+                'message' => __('safeguarding.errors.coordination_request_failed'),
+            ]];
+            return [];
+        }
+
+        self::auditCoordinationRequest($tenantId, $senderId, $recipientId, $gate);
+
+        return ['success' => true, 'code' => $gate['code']];
+    }
+
+    /**
      * Mark all messages from a partner as read.
      */
     public static function markAsRead(int $partnerId, int $userId): int
@@ -568,6 +599,119 @@ class MessageService
         }
     }
 
+    /**
+     * Evaluate recipient-side safeguarding contact gating for a sender → recipient pair.
+     *
+     * Pure read: never dispatches events, sends notifications, or writes audit rows.
+     * Shared by send() (block + alert on a real send attempt), getConversation() (render
+     * the preflight notice when the page opens — no alert), and requestCoordinatorAssistance()
+     * (confirm a restriction exists before alerting staff).
+     *
+     * @return array{code: string, required_vetting_types: string[], required_vetting_labels: string[]}|null
+     *         Null when direct contact is permitted.
+     */
+    public static function evaluateSafeguardingContactGate(int $senderId, int $recipientId, int $tenantId): ?array
+    {
+        // 1. Coordinator-mediated contact required (recipient opted into restricted messaging).
+        try {
+            if (SafeguardingTriggerService::isMessagingRestricted($recipientId, $tenantId)) {
+                return [
+                    'code' => 'SAFEGUARDING_CONTACT_RESTRICTED',
+                    'required_vetting_types' => [],
+                    'required_vetting_labels' => [],
+                ];
+            }
+        } catch (\Throwable $e) {
+            Log::warning('MessageService safeguarding contact-restriction lookup failed (continuing)', [
+                'error' => $e->getMessage(),
+                'recipient_id' => $recipientId,
+            ]);
+        }
+
+        // 2. Interaction requires vetting the sender does not hold.
+        try {
+            $recipientVettingTypes = SafeguardingTriggerService::getRequiredVettingTypes($recipientId, $tenantId);
+            if (!empty($recipientVettingTypes)
+                && !app(VettingService::class)->userHasAllValidVettings($senderId, $recipientVettingTypes)) {
+                return [
+                    'code' => 'VETTING_REQUIRED',
+                    'required_vetting_types' => array_values($recipientVettingTypes),
+                    'required_vetting_labels' => self::vettingTypeLabels($recipientVettingTypes),
+                ];
+            }
+        } catch (\Throwable $e) {
+            Log::warning('MessageService safeguarding vetting lookup failed (continuing)', [
+                'error' => $e->getMessage(),
+                'recipient_id' => $recipientId,
+            ]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Build the structured, translated error/notice payload for a safeguarding gate result.
+     *
+     * Shared by send() (validation error array) and getConversation() (preflight notice) so the
+     * panel content is identical whether it appears on load or after a blocked send attempt.
+     *
+     * @param array{code: string, required_vetting_types: string[], required_vetting_labels: string[]} $gate
+     * @return array<string, mixed>
+     */
+    public static function buildSafeguardingError(array $gate): array
+    {
+        if (($gate['code'] ?? null) === 'VETTING_REQUIRED') {
+            $labels = array_values($gate['required_vetting_labels'] ?? []);
+            $typesString = implode(', ', $labels);
+
+            return [
+                'code' => 'VETTING_REQUIRED',
+                'message' => __('safeguarding.errors.vetting_required', ['types' => $typesString]),
+                'title' => __('safeguarding.errors.vetting_required_title'),
+                'detail' => __('safeguarding.errors.vetting_required_detail', ['types' => $typesString]),
+                'action_label' => __('safeguarding.errors.vetting_required_action'),
+                'required_vetting_types' => array_values($gate['required_vetting_types'] ?? []),
+                'required_vetting_labels' => $labels,
+            ];
+        }
+
+        return [
+            'code' => 'SAFEGUARDING_CONTACT_RESTRICTED',
+            'message' => __('safeguarding.errors.contact_restricted'),
+            'title' => __('safeguarding.errors.contact_restricted_title'),
+            'detail' => __('safeguarding.errors.contact_restricted_detail'),
+            'action_label' => __('safeguarding.errors.contact_restricted_action'),
+        ];
+    }
+
+    /**
+     * Audit an explicit coordinator-assistance request (consistent with the
+     * safeguarding trigger-activation audit trail). Failures never block the request.
+     *
+     * @param array{code: string, required_vetting_types: string[], required_vetting_labels: string[]} $gate
+     */
+    private static function auditCoordinationRequest(int $tenantId, int $senderId, int $recipientId, array $gate): void
+    {
+        try {
+            DB::table('activity_log')->insert([
+                'tenant_id' => $tenantId,
+                'user_id' => $senderId,
+                'action' => 'safeguarding_coordination_requested',
+                'action_type' => 'safeguarding',
+                'entity_type' => 'user',
+                'entity_id' => $recipientId,
+                'details' => json_encode([
+                    'reason_code' => $gate['code'],
+                    'required_vetting_types' => array_values($gate['required_vetting_types'] ?? []),
+                ]),
+                'ip_address' => request()?->ip(),
+                'created_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Failed to log safeguarding coordination request', ['error' => $e->getMessage()]);
+        }
+    }
+
     // -----------------------------------------------------------------
     //  Conversation summary
     // -----------------------------------------------------------------
@@ -605,6 +749,28 @@ class MessageService
             ->where('is_federated', 0)
             ->count();
 
+        // Preflight safeguarding state: surfaced so the conversation page can show the
+        // restriction notice and disable the composer the moment it opens — BEFORE the
+        // member types. This is a pure read; it never alerts staff. Only an actual send
+        // attempt (MessageService::send) or an explicit "Request coordinator help" action
+        // (MessageService::requestCoordinatorAssistance) notifies brokers/admins.
+        $safeguarding = null;
+        $gate = self::evaluateSafeguardingContactGate($userId, $otherUserId, $tenantId);
+        if ($gate !== null) {
+            $error = self::buildSafeguardingError($gate);
+            $safeguarding = [
+                'restricted'              => true,
+                'code'                    => $error['code'],
+                'title'                   => $error['title'] ?? null,
+                'message'                 => $error['message'] ?? null,
+                'detail'                  => $error['detail'] ?? null,
+                'action_label'            => $error['action_label'] ?? null,
+                'required_vetting_types'  => $error['required_vetting_types'] ?? [],
+                'required_vetting_labels' => $error['required_vetting_labels'] ?? [],
+                'can_request_coordinator' => true,
+            ];
+        }
+
         return [
             'id' => $otherUserId,
             'other_user' => [
@@ -617,6 +783,7 @@ class MessageService
             ],
             'unread_count'  => $unreadCount,
             'message_count' => $messageCount,
+            'safeguarding'  => $safeguarding,
         ];
     }
 

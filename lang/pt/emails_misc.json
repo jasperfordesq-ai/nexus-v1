@@ -172,7 +172,15 @@
     "escalation_subject": "Escalada — relatório de salvaguarda #{{id}}",
     "escalation_title": "Relatório de salvaguarda escalado",
     "escalation_body": "O relatório de salvaguarda #{{id}} (gravidade: {{severity}}, categoria: {{category}}) foi escalado porque o seu prazo de revisão ({{review_due_at}}) expirou. É necessária uma revisão imediata.",
-    "escalation_cta": "Rever agora"
+    "escalation_cta": "Rever agora",
+    "coordination_request_bell": "Ajuda de coordenador solicitada: {{sender}} gostaria de ajuda para entrar em contacto com {{recipient}}",
+    "coordination_request_subject": "[NEXUS] Ajuda de coordenador solicitada - {{recipient}}",
+    "coordination_request_title": "Ajuda de Coordenador Solicitada",
+    "coordination_request_preview": "{{sender}} pediu ajuda para organizar o contacto com {{recipient}}",
+    "coordination_request_body": "Um membro pediu a um coordenador que o ajude a organizar o contacto com outro membro com quem não pode comunicar diretamente devido às definições de salvaguarda.",
+    "coordination_request_review": "Por favor, reveja as definições de salvaguarda do membro em questão e entre em contacto para ajudar a organizar uma comunicação segura, quando apropriado.",
+    "coordination_request_audit_note": "Nenhuma mensagem direta foi enviada. O membro solicitou explicitamente a ajuda de um coordenador. Todo o acesso a dados de salvaguarda é registado para efeitos de auditoria.",
+    "coordination_request_cta": "Rever perfil de salvaguarda"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

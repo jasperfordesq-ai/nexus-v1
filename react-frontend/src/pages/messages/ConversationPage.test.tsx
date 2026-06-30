@@ -45,6 +45,7 @@ vi.mock('@/contexts', () => ({
     tenantSlug: 'test',
   }),
   usePusherOptional: () => null,
+  usePresenceOptional: () => null,
 
   useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
   useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn(), refreshCounts: stableMocks.refreshCounts }),
@@ -148,19 +149,26 @@ vi.mock('./components/MessageBubble', () => ({
 }));
 
 vi.mock('./components/MessageInputArea', () => ({
-  MessageInputArea: ({ newMessage, onNewMessageChange, onSendMessage }: {
+  MessageInputArea: ({ newMessage, onNewMessageChange, onSendMessage, isInteractionBlocked }: {
     newMessage: string;
     onNewMessageChange: (value: string) => void;
     onSendMessage: FormEventHandler<HTMLFormElement>;
+    isInteractionBlocked?: boolean;
   }) => (
-    <form data-testid="message-input-area" onSubmit={onSendMessage}>
-      <input
-        aria-label="mock-message-input"
-        value={newMessage}
-        onChange={(event) => onNewMessageChange(event.target.value)}
-      />
-      <button type="submit">mock-send</button>
-    </form>
+    // Mirror the real component: when interaction is blocked (safeguarding), the
+    // composer is replaced rather than rendered, so the member cannot type.
+    isInteractionBlocked ? (
+      <div data-testid="composer-blocked" />
+    ) : (
+      <form data-testid="message-input-area" onSubmit={onSendMessage}>
+        <input
+          aria-label="mock-message-input"
+          value={newMessage}
+          onChange={(event) => onNewMessageChange(event.target.value)}
+        />
+        <button type="submit">mock-send</button>
+      </form>
+    )
   ),
 }));
 
@@ -319,6 +327,86 @@ describe('ConversationPage', () => {
       expect(screen.getByText('safeguarding_contact_restricted.title')).toBeDefined();
       expect(screen.getByText(/coordinator-mediated contact/i)).toBeDefined();
     });
+    // A blocked-SEND notice IS dismissable (re-sending is itself an explicit attempt).
+    expect(screen.getByLabelText('safeguarding_contact_restricted.dismiss')).toBeDefined();
     expect(stableMocks.toastError).not.toHaveBeenCalledWith('error_title', expect.any(String));
+  });
+
+  it('shows the safeguarding panel immediately on load (before typing) and disables the composer', async () => {
+    mockApi.get.mockResolvedValue({
+      ...mockConversationResponse,
+      meta: {
+        ...mockConversationResponse.meta,
+        conversation: {
+          ...mockConversationResponse.meta.conversation,
+          safeguarding: {
+            restricted: true,
+            code: 'SAFEGUARDING_CONTACT_RESTRICTED',
+            message: 'Coordinator arrangement needed',
+            detail: 'This member is not available for direct messages because their safeguarding preferences require coordinator-mediated contact.',
+            action_label: null,
+            required_vetting_types: [],
+            required_vetting_labels: [],
+            can_request_coordinator: true,
+          },
+        },
+      },
+    });
+    mockApi.put.mockResolvedValue({ success: true });
+
+    render(<ConversationPage />);
+
+    // Panel appears purely from the load payload — no typing, no submit.
+    await waitFor(() => {
+      expect(screen.getByText('safeguarding_contact_restricted.title')).toBeDefined();
+      expect(screen.getByText(/coordinator-mediated contact/i)).toBeDefined();
+    });
+
+    // Composer is replaced before the member can type.
+    expect(screen.queryByTestId('message-input-area')).toBeNull();
+    expect(screen.getByTestId('composer-blocked')).toBeDefined();
+
+    // The load-time (preflight) panel must NOT be dismissable — dismissing would
+    // re-enable the composer and let a blocked send alert staff, bypassing the
+    // explicit "Request coordinator help" affordance.
+    expect(screen.queryByLabelText('safeguarding_contact_restricted.dismiss')).toBeNull();
+
+    // Opening the conversation must not fire any coordinator/alert request.
+    expect(mockApi.post).not.toHaveBeenCalled();
+  });
+
+  it('fires a coordinator help request when the panel button is clicked and confirms success', async () => {
+    mockApi.get.mockResolvedValue({
+      ...mockConversationResponse,
+      meta: {
+        ...mockConversationResponse.meta,
+        conversation: {
+          ...mockConversationResponse.meta.conversation,
+          safeguarding: {
+            restricted: true,
+            code: 'SAFEGUARDING_CONTACT_RESTRICTED',
+            detail: 'This member is not available for direct messages because their safeguarding preferences require coordinator-mediated contact.',
+            required_vetting_types: [],
+            required_vetting_labels: [],
+            can_request_coordinator: true,
+          },
+        },
+      },
+    });
+    mockApi.put.mockResolvedValue({ success: true });
+    mockApi.post.mockResolvedValue({ success: true, data: { success: true, code: 'SAFEGUARDING_CONTACT_RESTRICTED' } });
+
+    render(<ConversationPage />);
+
+    await waitFor(() => expect(screen.getByText('coordinator_request.button')).toBeDefined());
+
+    fireEvent.click(screen.getByText('coordinator_request.button'));
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith('/v2/messages/42/request-coordinator', {});
+    });
+
+    // Sender gets clear in-panel confirmation.
+    await waitFor(() => expect(screen.getByText('coordinator_request.sent')).toBeDefined());
   });
 });

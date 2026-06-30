@@ -222,8 +222,17 @@
   "safeguarding_contact_restricted": {
     "title": "Arrangement par coordinateur requis",
     "body": "Ce membre n est pas disponible pour les messages directs car ses preferences de protection exigent un contact medie par coordinateur.",
-    "contact_broker": "Contactez votre broker ou administrateur de communaute pour organiser la prochaine etape sure. L equipe de protection a ete alertee.",
+    "contact_broker": "Vous pouvez demander à un intermédiaire, un administrateur ou un coordinateur de vous aider à organiser un contact. Utilisez le bouton ci-dessous — ils vous contacteront.",
     "action": "Ouvrir aide",
     "dismiss": "Ignorer avis de protection"
-  }
+  },
+  "coordinator_request": {
+    "button": "Demander l'aide d'un coordinateur",
+    "aria_button": "Demander l'aide d'un coordinateur pour organiser un contact",
+    "success_title": "Demande envoyée",
+    "success_body": "Nous avons informé un coordinateur de la communauté que vous souhaitez de l'aide pour prendre contact. Il vous contactera prochainement.",
+    "sent": "Coordinateur notifié — il vous contactera pour vous aider à organiser le contact.",
+    "error": "Nous n'avons pas pu envoyer votre demande pour le moment. Veuillez réessayer dans quelques instants."
+  },
+  "composer_blocked_safeguarding": "La messagerie directe n'est pas disponible avec ce membre. Utilisez l'option ci-dessus pour demander à un coordinateur de vous aider à organiser un contact."
 }

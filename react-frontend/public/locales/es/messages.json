@@ -222,8 +222,17 @@
   "safeguarding_contact_restricted": {
     "title": "Hace falta coordinacion",
     "body": "Esta persona no esta disponible para mensajes directos porque sus preferencias de salvaguarda requieren contacto mediado por un coordinador.",
-    "contact_broker": "Contacta con tu broker o administrador de la comunidad para organizar el siguiente paso seguro. El equipo de salvaguarda ha sido avisado.",
+    "contact_broker": "Puedes pedir a un intermediario, administrador o coordinador que ayude a gestionar el contacto. Usa el botón de abajo — se pondrán en contacto contigo.",
     "action": "Abrir ayuda",
     "dismiss": "Descartar aviso de proteccion"
-  }
+  },
+  "coordinator_request": {
+    "button": "Solicitar ayuda de un coordinador",
+    "aria_button": "Solicitar ayuda de un coordinador para gestionar el contacto",
+    "success_title": "Solicitud enviada",
+    "success_body": "Hemos informado a un coordinador de la comunidad de que deseas ponerte en contacto. Se pondrán en contacto contigo.",
+    "sent": "Coordinador notificado — se pondrá en contacto contigo para ayudar a gestionar el contacto.",
+    "error": "No pudimos enviar tu solicitud en este momento. Por favor, inténtalo de nuevo en breve."
+  },
+  "composer_blocked_safeguarding": "La mensajería directa no está disponible con este miembro. Usa la opción anterior para pedir a un coordinador que ayude a gestionar el contacto."
 }

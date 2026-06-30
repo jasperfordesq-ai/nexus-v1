@@ -172,7 +172,15 @@
     "escalation_subject": "Eskalation — Schutzmeldung #{{id}}",
     "escalation_title": "Schutzmeldung eskaliert",
     "escalation_body": "Die Schutzmeldung #{{id}} (Schweregrad: {{severity}}, Kategorie: {{category}}) wurde eskaliert, weil ihre Prüffrist ({{review_due_at}}) überschritten wurde. Eine sofortige Prüfung ist erforderlich.",
-    "escalation_cta": "Jetzt prüfen"
+    "escalation_cta": "Jetzt prüfen",
+    "coordination_request_bell": "Koordinatorhilfe angefordert: {{sender}} möchte Hilfe bei der Kontaktaufnahme mit {{recipient}}",
+    "coordination_request_subject": "[NEXUS] Koordinatorhilfe angefordert – {{recipient}}",
+    "coordination_request_title": "Koordinatorhilfe angefordert",
+    "coordination_request_preview": "{{sender}} hat um Hilfe bei der Kontaktvermittlung mit {{recipient}} gebeten",
+    "coordination_request_body": "Ein Mitglied hat darum gebeten, dass ein Koordinator ihm hilft, Kontakt mit einem Mitglied aufzunehmen, dem es aufgrund von Schutzeinstellungen keine Direktnachrichten senden kann.",
+    "coordination_request_review": "Bitte prüfen Sie die Schutzeinstellungen des betreffenden Mitglieds und nehmen Sie Kontakt auf, um — wo angemessen — eine sichere Kontaktaufnahme zu ermöglichen.",
+    "coordination_request_audit_note": "Es wurde keine Direktnachricht gesendet. Das Mitglied hat ausdrücklich Koordinatorhilfe angefordert. Alle Zugriffe auf Schutzdaten werden protokolliert.",
+    "coordination_request_cta": "Schutzprofil prüfen"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

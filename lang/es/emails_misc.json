@@ -172,7 +172,15 @@
     "escalation_subject": "Escalada — informe de protección #{{id}}",
     "escalation_title": "Informe de protección escalado",
     "escalation_body": "El informe de protección #{{id}} (gravedad: {{severity}}, categoría: {{category}}) se ha escalado porque su fecha límite de revisión ({{review_due_at}}) ha vencido. Se requiere una revisión inmediata.",
-    "escalation_cta": "Revisar ahora"
+    "escalation_cta": "Revisar ahora",
+    "coordination_request_bell": "Ayuda de coordinador solicitada: {{sender}} desea ayuda para ponerse en contacto con {{recipient}}",
+    "coordination_request_subject": "[NEXUS] Ayuda de coordinador solicitada - {{recipient}}",
+    "coordination_request_title": "Ayuda de Coordinador Solicitada",
+    "coordination_request_preview": "{{sender}} ha pedido ayuda para gestionar el contacto con {{recipient}}",
+    "coordination_request_body": "Un miembro ha solicitado que un coordinador le ayude a gestionar el contacto con otro miembro con quien no puede comunicarse directamente debido a la configuración de salvaguarda.",
+    "coordination_request_review": "Por favor, revisa la configuración de salvaguarda del miembro y comunícate con él para ayudar a gestionar un contacto seguro cuando sea apropiado.",
+    "coordination_request_audit_note": "No se envió ningún mensaje directo. El miembro solicitó expresamente la ayuda de un coordinador. Todo acceso a los datos de salvaguarda queda registrado en el registro de auditoría.",
+    "coordination_request_cta": "Revisar perfil de salvaguarda"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

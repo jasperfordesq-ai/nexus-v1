@@ -225,6 +225,7 @@ Route::delete('/v2/messages/conversations/{id}', [\App\Http\Controllers\Api\Mess
 Route::get('/v2/messages/{id}', [\App\Http\Controllers\Api\MessagesController::class, 'show']);
 Route::put('/v2/messages/{id}/read', [\App\Http\Controllers\Api\MessagesController::class, 'markRead']);
 Route::post('/v2/messages/{id}/reactions', [\App\Http\Controllers\Api\MessagesController::class, 'toggleReaction']);
+Route::post('/v2/messages/{id}/request-coordinator', [\App\Http\Controllers\Api\MessagesController::class, 'requestCoordinator']);
 Route::post('/v2/messages/{id}/translate', [\App\Http\Controllers\Api\MessagesController::class, 'translateTranscript']);
 Route::post('/v2/ugc-translate', [\App\Http\Controllers\Api\UgcTranslationController::class, 'translate']);
 Route::put('/v2/messages/{id}', [\App\Http\Controllers\Api\MessagesController::class, 'update']);

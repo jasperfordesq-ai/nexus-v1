@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Events\SafeguardingContactAttemptBlocked;
+use App\Events\SafeguardingCoordinationRequested;
 use App\Models\User;
 use App\Services\SafeguardingTriggerService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -250,6 +251,158 @@ class MessagesControllerTest extends TestCase
                 && $event->reasonCode === 'SAFEGUARDING_CONTACT_RESTRICTED'
                 && $event->requiredVettingTypes === []
         );
+    }
+
+    // ================================================================
+    // SAFEGUARDING — Preflight (conversation open) must NOT alert staff
+    // ================================================================
+
+    public function test_conversation_preflight_returns_contact_restricted_state_without_alerting_staff(): void
+    {
+        Event::fake([SafeguardingContactAttemptBlocked::class, SafeguardingCoordinationRequested::class]);
+
+        $sender = $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+
+        $optionId = $this->createSafeguardingOption([
+            'restricts_messaging' => true,
+        ], 'preflight_restricted');
+        $this->selectSafeguardingOptionForUser($recipient, $optionId);
+
+        $response = $this->apiGet('/v2/messages/' . $recipient->id);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('meta.conversation.safeguarding.restricted', true);
+        $response->assertJsonPath('meta.conversation.safeguarding.code', 'SAFEGUARDING_CONTACT_RESTRICTED');
+        $response->assertJsonPath('meta.conversation.safeguarding.can_request_coordinator', true);
+
+        // Opening the conversation must NEVER alert staff.
+        Event::assertNotDispatched(SafeguardingContactAttemptBlocked::class);
+        Event::assertNotDispatched(SafeguardingCoordinationRequested::class);
+    }
+
+    public function test_conversation_preflight_returns_vetting_required_state_without_alerting_staff(): void
+    {
+        Event::fake([SafeguardingContactAttemptBlocked::class, SafeguardingCoordinationRequested::class]);
+
+        $sender = $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+
+        $optionId = $this->createSafeguardingOption([
+            'requires_vetted_interaction' => true,
+            'vetting_type_required' => 'dbs_enhanced',
+        ], 'preflight_vetting');
+        $this->selectSafeguardingOptionForUser($recipient, $optionId);
+
+        $response = $this->apiGet('/v2/messages/' . $recipient->id);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('meta.conversation.safeguarding.restricted', true);
+        $response->assertJsonPath('meta.conversation.safeguarding.code', 'VETTING_REQUIRED');
+        $response->assertJsonPath('meta.conversation.safeguarding.required_vetting_types.0', 'dbs_enhanced');
+        $response->assertJsonPath('meta.conversation.safeguarding.required_vetting_labels.0', 'DBS Enhanced');
+
+        Event::assertNotDispatched(SafeguardingContactAttemptBlocked::class);
+        Event::assertNotDispatched(SafeguardingCoordinationRequested::class);
+    }
+
+    public function test_conversation_preflight_has_no_safeguarding_state_for_unrestricted_recipient(): void
+    {
+        Event::fake([SafeguardingContactAttemptBlocked::class, SafeguardingCoordinationRequested::class]);
+
+        $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+
+        $response = $this->apiGet('/v2/messages/' . $recipient->id);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('meta.conversation.safeguarding', null);
+
+        Event::assertNotDispatched(SafeguardingContactAttemptBlocked::class);
+        Event::assertNotDispatched(SafeguardingCoordinationRequested::class);
+    }
+
+    // ================================================================
+    // SAFEGUARDING — Explicit "request coordinator help" action
+    // ================================================================
+
+    public function test_request_coordinator_dispatches_alert_when_contact_is_restricted(): void
+    {
+        Event::fake([SafeguardingCoordinationRequested::class]);
+
+        $sender = $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+
+        $optionId = $this->createSafeguardingOption([
+            'restricts_messaging' => true,
+        ], 'coordinator_help_restricted');
+        $this->selectSafeguardingOptionForUser($recipient, $optionId);
+
+        $response = $this->apiPost('/v2/messages/' . $recipient->id . '/request-coordinator', []);
+
+        $this->assertContains($response->getStatusCode(), [200, 201]);
+        $response->assertJsonPath('data.success', true);
+
+        Event::assertDispatched(
+            SafeguardingCoordinationRequested::class,
+            fn (SafeguardingCoordinationRequested $event) =>
+                $event->tenantId === $this->testTenantId
+                && $event->senderId === $sender->id
+                && $event->recipientId === $recipient->id
+                && $event->reasonCode === 'SAFEGUARDING_CONTACT_RESTRICTED'
+        );
+    }
+
+    public function test_request_coordinator_dispatches_alert_when_vetting_is_required(): void
+    {
+        Event::fake([SafeguardingCoordinationRequested::class]);
+
+        $sender = $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+
+        $optionId = $this->createSafeguardingOption([
+            'requires_vetted_interaction' => true,
+            'vetting_type_required' => 'dbs_enhanced',
+        ], 'coordinator_help_vetting');
+        $this->selectSafeguardingOptionForUser($recipient, $optionId);
+
+        $response = $this->apiPost('/v2/messages/' . $recipient->id . '/request-coordinator', []);
+
+        $this->assertContains($response->getStatusCode(), [200, 201]);
+
+        Event::assertDispatched(
+            SafeguardingCoordinationRequested::class,
+            fn (SafeguardingCoordinationRequested $event) =>
+                $event->reasonCode === 'VETTING_REQUIRED'
+                && $event->requiredVettingTypes === ['dbs_enhanced']
+        );
+    }
+
+    public function test_request_coordinator_does_not_alert_when_recipient_is_not_restricted(): void
+    {
+        Event::fake([SafeguardingCoordinationRequested::class]);
+
+        $this->authenticatedUser();
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+        ]);
+
+        $response = $this->apiPost('/v2/messages/' . $recipient->id . '/request-coordinator', []);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('errors.0.code', 'SAFEGUARDING_NOT_RESTRICTED');
+
+        Event::assertNotDispatched(SafeguardingCoordinationRequested::class);
     }
 
     public function test_send_message_allows_vetted_interaction_when_sender_holds_valid_required_vetting(): void

@@ -222,8 +222,17 @@
   "safeguarding_contact_restricted": {
     "title": "Coordinator arrangement needed",
     "body": "This member is not available for direct messages because their safeguarding preferences require coordinator-mediated contact.",
-    "contact_broker": "Contact your broker or community administrator so they can help arrange the next safe step. The safeguarding team has been alerted.",
+    "contact_broker": "You can ask a broker, administrator or coordinator to help arrange contact. Use the button below — they will be in touch.",
     "action": "Open help",
     "dismiss": "Dismiss safeguarding notice"
-  }
+  },
+  "coordinator_request": {
+    "button": "Request coordinator help",
+    "aria_button": "Request coordinator help to arrange contact",
+    "success_title": "Request sent",
+    "success_body": "We have let a community coordinator know you would like help getting in touch. They will be in contact with you.",
+    "sent": "Coordinator notified — they will be in touch to help arrange contact.",
+    "error": "We could not send your request just now. Please try again shortly."
+  },
+  "composer_blocked_safeguarding": "Direct messaging is not available with this member. Use the option above to ask a coordinator to help arrange contact."
 }

@@ -172,7 +172,15 @@
     "escalation_subject": "Géarú — tuairisc chosanta #{{id}}",
     "escalation_title": "Géaraíodh tuairisc chosanta",
     "escalation_body": "Géaraíodh tuairisc chosanta #{{id}} (déine: {{severity}}, catagóir: {{category}}) toisc gur sháraigh sé a spriocdháta athbhreithnithe ({{review_due_at}}). Tá athbhreithniú láithreach ag teastáil.",
-    "escalation_cta": "Athbhreithnigh anois"
+    "escalation_cta": "Athbhreithnigh anois",
+    "coordination_request_bell": "Cabhair comhordaitheora iarrtha: ba mhaith le {{sender}} cabhair chun teagmháil a dhéanamh le {{recipient}}",
+    "coordination_request_subject": "[NEXUS] Cabhair comhordaitheora iarrtha - {{recipient}}",
+    "coordination_request_title": "Cabhair Comhordaitheora Iarrtha",
+    "coordination_request_preview": "D'iarr {{sender}} cabhair chun teagmháil a eagrú le {{recipient}}",
+    "coordination_request_body": "D'iarr comhalta ar chomhordaitheoir cabhrú leo teagmháil a eagrú le comhalta nach féidir leo teachtaireacht dhíreach a sheoladh chuige de bharr socruithe coimirce.",
+    "coordination_request_review": "Déan athbhreithniú ar shocruithe an chomhalta choimircigh agus déan teagmháil chun cabhrú le teagmháil shábháilte a eagrú nuair is cuí.",
+    "coordination_request_audit_note": "Níor seoladh aon teachtaireacht dhíreach. D'iarr an comhalta go sainráiteach cabhair comhordaitheora. Tá gach rochtain ar shonraí coimirce logáilte le haghaidh iniúchta.",
+    "coordination_request_cta": "Athbhreithnigh próifíl choimirce"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

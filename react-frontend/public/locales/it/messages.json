@@ -222,8 +222,17 @@
   "safeguarding_contact_restricted": {
     "title": "Serve accordo con coordinatore",
     "body": "Questo membro non e disponibile per messaggi diretti perche le preferenze di salvaguardia richiedono contatto mediato da coordinatore.",
-    "contact_broker": "Contatta il tuo broker o amministratore della comunita per organizzare il prossimo passo sicuro. Il team di salvaguardia e stato avvisato.",
+    "contact_broker": "Puoi chiedere a un mediatore, un amministratore o un coordinatore di aiutarti a organizzare il contatto. Usa il pulsante qui sotto — ti contatteranno a breve.",
     "action": "Apri aiuto",
     "dismiss": "Chiudi avviso di tutela"
-  }
+  },
+  "coordinator_request": {
+    "button": "Richiedi l'aiuto di un coordinatore",
+    "aria_button": "Richiedi l'aiuto di un coordinatore per organizzare il contatto",
+    "success_title": "Richiesta inviata",
+    "success_body": "Abbiamo informato un coordinatore della comunità che desideri assistenza per metterti in contatto. Ti contatteranno a breve.",
+    "sent": "Coordinatore avvisato — ti contatterà per aiutarti a organizzare il contatto.",
+    "error": "Non è stato possibile inviare la tua richiesta in questo momento. Riprova tra poco."
+  },
+  "composer_blocked_safeguarding": "La messaggistica diretta non è disponibile con questo membro. Usa l'opzione qui sopra per chiedere a un coordinatore di aiutarti a organizzare il contatto."
 }

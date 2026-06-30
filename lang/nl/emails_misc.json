@@ -172,7 +172,15 @@
     "escalation_subject": "Escalatie — beschermingsmelding #{{id}}",
     "escalation_title": "Beschermingsmelding geëscaleerd",
     "escalation_body": "Beschermingsmelding #{{id}} (ernst: {{severity}}, categorie: {{category}}) is geëscaleerd omdat de beoordelingsdeadline ({{review_due_at}}) is verstreken. Onmiddellijke beoordeling is vereist.",
-    "escalation_cta": "Nu beoordelen"
+    "escalation_cta": "Nu beoordelen",
+    "coordination_request_bell": "Hulp van coördinator gevraagd: {{sender}} wil hulp bij het leggen van contact met {{recipient}}",
+    "coordination_request_subject": "[NEXUS] Hulp van coördinator gevraagd - {{recipient}}",
+    "coordination_request_title": "Hulp van coördinator gevraagd",
+    "coordination_request_preview": "{{sender}} heeft gevraagd om hulp bij het regelen van contact met {{recipient}}",
+    "coordination_request_body": "Een lid heeft gevraagd of een coördinator hen kan helpen contact te leggen met een lid met wie zij niet rechtstreeks berichten kunnen uitwisselen vanwege de beveiligingsinstellingen.",
+    "coordination_request_review": "Bekijk de beveiligingsinstellingen van het betrokken lid en neem contact op om, waar passend, een veilig contact te helpen regelen.",
+    "coordination_request_audit_note": "Er is geen rechtstreeks bericht verzonden. Het lid heeft uitdrukkelijk om hulp van een coördinator gevraagd. Alle toegang tot beveiligingsgegevens wordt in een auditlog vastgelegd.",
+    "coordination_request_cta": "Beveiligingsprofiel bekijken"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

@@ -172,7 +172,15 @@
     "escalation_subject": "تصعيد — بلاغ الحماية رقم {{id}}",
     "escalation_title": "تم تصعيد بلاغ الحماية",
     "escalation_body": "تم تصعيد بلاغ الحماية رقم {{id}} (الخطورة: {{severity}}، الفئة: {{category}}) لأن الموعد النهائي لمراجعته ({{review_due_at}}) قد انقضى. المراجعة الفورية مطلوبة.",
-    "escalation_cta": "راجع الآن"
+    "escalation_cta": "راجع الآن",
+    "coordination_request_bell": "طُلبت مساعدة منسق: {{sender}} يرغب في الحصول على مساعدة للتواصل مع {{recipient}}",
+    "coordination_request_subject": "[NEXUS] طُلبت مساعدة منسق - {{recipient}}",
+    "coordination_request_title": "طُلبت مساعدة منسق",
+    "coordination_request_preview": "طلب {{sender}} المساعدة في ترتيب التواصل مع {{recipient}}",
+    "coordination_request_body": "طلب أحد الأعضاء من منسق مساعدته في ترتيب التواصل مع عضو لا يستطيع مراسلته مباشرةً بسبب إعدادات الحماية.",
+    "coordination_request_review": "يرجى مراجعة إعدادات الحماية الخاصة بالعضو والتواصل معه لمساعدته في ترتيب تواصل آمن عند الاقتضاء.",
+    "coordination_request_audit_note": "لم تُرسَل أي رسالة مباشرة. طلب العضو صراحةً مساعدة منسق. يتم توثيق جميع عمليات الوصول إلى بيانات الحماية في سجلات المراجعة.",
+    "coordination_request_cta": "مراجعة ملف الحماية"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

@@ -172,7 +172,15 @@
     "escalation_subject": "Escalade — signalement de protection #{{id}}",
     "escalation_title": "Signalement de protection escaladé",
     "escalation_body": "Le signalement de protection #{{id}} (gravité : {{severity}}, catégorie : {{category}}) a été escaladé car son échéance d'examen ({{review_due_at}}) est dépassée. Un examen immédiat est requis.",
-    "escalation_cta": "Examiner maintenant"
+    "escalation_cta": "Examiner maintenant",
+    "coordination_request_bell": "Aide de coordinateur demandée : {{sender}} souhaite de l'aide pour contacter {{recipient}}",
+    "coordination_request_subject": "[NEXUS] Aide de coordinateur demandée - {{recipient}}",
+    "coordination_request_title": "Aide de coordinateur demandée",
+    "coordination_request_preview": "{{sender}} a demandé de l'aide pour organiser un contact avec {{recipient}}",
+    "coordination_request_body": "Un membre a demandé à un coordinateur de l'aider à organiser un contact avec un membre auquel il ne peut pas envoyer de message directement en raison des paramètres de protection.",
+    "coordination_request_review": "Veuillez examiner les paramètres de protection du membre concerné et intervenir pour aider à organiser un contact sécurisé, le cas échéant.",
+    "coordination_request_audit_note": "Aucun message direct n'a été envoyé. Le membre a explicitement demandé l'aide d'un coordinateur. Tout accès aux données de protection est consigné dans le journal d'audit.",
+    "coordination_request_cta": "Consulter le profil de protection"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

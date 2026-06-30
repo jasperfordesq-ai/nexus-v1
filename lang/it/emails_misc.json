@@ -172,7 +172,15 @@
     "escalation_subject": "Inoltro — segnalazione di tutela #{{id}}",
     "escalation_title": "Segnalazione di tutela inoltrata",
     "escalation_body": "La segnalazione di tutela #{{id}} (gravità: {{severity}}, categoria: {{category}}) è stata inoltrata perché la scadenza di revisione ({{review_due_at}}) è trascorsa. È richiesta una revisione immediata.",
-    "escalation_cta": "Rivedi ora"
+    "escalation_cta": "Rivedi ora",
+    "coordination_request_bell": "Richiesta di assistenza coordinatore: {{sender}} desidera aiuto per mettersi in contatto con {{recipient}}",
+    "coordination_request_subject": "[NEXUS] Richiesta di assistenza coordinatore - {{recipient}}",
+    "coordination_request_title": "Richiesta di assistenza coordinatore",
+    "coordination_request_preview": "{{sender}} ha chiesto assistenza per organizzare un contatto con {{recipient}}",
+    "coordination_request_body": "Un membro ha chiesto a un coordinatore di aiutarlo a organizzare un contatto con un membro con cui non può comunicare direttamente a causa delle impostazioni di salvaguardia.",
+    "coordination_request_review": "Si prega di esaminare le impostazioni del membro soggetto a salvaguardia e di intervenire per facilitare un contatto sicuro, ove appropriato.",
+    "coordination_request_audit_note": "Nessun messaggio diretto è stato inviato. Il membro ha esplicitamente richiesto l'assistenza di un coordinatore. Tutti gli accessi ai dati di salvaguardia sono registrati nel registro di controllo.",
+    "coordination_request_cta": "Esamina il profilo di salvaguardia"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

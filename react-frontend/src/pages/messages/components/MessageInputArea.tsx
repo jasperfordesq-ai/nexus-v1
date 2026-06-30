@@ -133,6 +133,18 @@ export function MessageInputArea({
         </div>
       )}
 
+      {/* Safeguarding: composer replaced — direct contact requires coordinator/vetting.
+          The full safeguarding panel (with the "Request coordinator help" action) renders
+          above the message list; this is the in-composer explanation of why there is no input. */}
+      {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && isInteractionBlocked && (
+        <div className="flex items-start gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg" role="status">
+          <AlertTriangle className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <p className="text-amber-700 dark:text-amber-300 text-sm flex-1">
+            {t('composer_blocked_safeguarding')}
+          </p>
+        </div>
+      )}
+
       {/* Voice recording preview */}
       {isDirectMessagingEnabled && !isComposerBlocked && audioBlob && !isRecording && (
         <div className="flex min-w-0 flex-col gap-3 mb-3 p-3 bg-theme-elevated rounded-lg sm:flex-row sm:items-center">

@@ -205,6 +205,34 @@ class MessagesController extends BaseApiController
     }
 
     // ================================================================
+    // SAFEGUARDING — COORDINATOR ASSISTANCE
+    // ================================================================
+
+    /**
+     * POST /api/v2/messages/{id}/request-coordinator
+     *
+     * Explicit request for a broker/admin/coordinator to help arrange contact with a
+     * member who cannot be messaged directly because of safeguarding rules. This — not
+     * opening the conversation — is what alerts staff. The restriction is re-checked
+     * server-side, so an unrestricted recipient yields a no-op error rather than an alert.
+     *
+     * @param int $id The recipient (other user) ID.
+     */
+    public function requestCoordinator(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $this->rateLimit('messages_request_coordinator', 5, 300);
+
+        $result = $this->messageService->requestCoordinatorAssistance($userId, $id);
+
+        if (empty($result)) {
+            return $this->respondWithErrors($this->messageService->getErrors(), 422);
+        }
+
+        return $this->respondWithData($result);
+    }
+
+    // ================================================================
     // RESTRICTION STATUS
     // ================================================================
 

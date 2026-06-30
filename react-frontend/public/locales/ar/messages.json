@@ -222,8 +222,17 @@
   "safeguarding_contact_restricted": {
     "title": "Yalzam tartib min almunasiq",
     "body": "Hatha aludw ghayr mutah lirasail mubashara lianna tafdilat alsalama tatlubu tawasulan biwasatat almunasiq.",
-    "contact_broker": "Ittasil bialwasit aw mudir almujtamaa litarteeb alkhatwa alamina altaalia. Tama tanbih fariq alsalama.",
+    "contact_broker": "يمكنك طلب مساعدة وسيط أو مسؤول أو منسق لترتيب التواصل. استخدم الزر أدناه — وسيتواصلون معك.",
     "action": "Iftah almusaada",
     "dismiss": "Aghliq ishara alhimaya"
-  }
+  },
+  "coordinator_request": {
+    "button": "طلب مساعدة منسق",
+    "aria_button": "طلب مساعدة منسق لترتيب التواصل",
+    "success_title": "تم إرسال الطلب",
+    "success_body": "لقد أبلغنا منسق المجتمع بأنك تودّ الحصول على مساعدة في التواصل. سيتواصل معك قريبًا.",
+    "sent": "تم إخطار المنسق — وسيتواصل معك لمساعدتك في ترتيب التواصل.",
+    "error": "تعذّر إرسال طلبك في الوقت الحالي. يرجى المحاولة مرة أخرى بعد قليل."
+  },
+  "composer_blocked_safeguarding": "المراسلة المباشرة غير متاحة مع هذا العضو. استخدم الخيار أعلاه لطلب مساعدة منسق في ترتيب التواصل."
 }

@@ -32,7 +32,7 @@ import { useToast,
   useNotifications } from '@/contexts';
 import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, SearchField, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip, Skeleton, Spinner } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
-import { useAuth, usePusherOptional, useTenant } from '@/contexts';
+import { useAuth, usePresenceOptional, usePusherOptional, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
@@ -58,11 +58,26 @@ interface OtherUser {
   is_online?: boolean;
 }
 
+interface SafeguardingMeta {
+  restricted: boolean;
+  code: string;
+  title?: string | null;
+  message?: string | null;
+  detail?: string | null;
+  action_label?: string | null;
+  required_vetting_types?: string[];
+  required_vetting_labels?: string[];
+  can_request_coordinator?: boolean;
+}
+
 interface ConversationMeta {
   id: number;
   other_user: OtherUser;
   context_type?: string;
   context_id?: number;
+  // Server-authoritative preflight safeguarding state. Present (restricted=true)
+  // when direct contact with other_user is gated; absent/null otherwise.
+  safeguarding?: SafeguardingMeta | null;
 }
 
 interface ConversationData {
@@ -79,6 +94,11 @@ interface PaginationState {
 
 interface SafeguardingBlockNotice {
   code: 'VETTING_REQUIRED' | 'SAFEGUARDING_CONTACT_RESTRICTED';
+  // 'preflight' = shown on conversation open; the composer must stay disabled and the
+  // panel is NOT dismissable, so a user cannot reveal the composer and trigger a staff
+  // alert via a blocked send. 'send' = shown after a blocked send attempt (dismissable,
+  // since re-sending is itself an explicit contact attempt).
+  source: 'preflight' | 'send';
   translationKey: 'safeguarding_vetting_required' | 'safeguarding_contact_restricted';
   title?: string;
   message: string;
@@ -129,6 +149,7 @@ function extractSafeguardingBlockNotice(response: MessageSendFailure): Safeguard
 
   return {
     code,
+    source: 'send',
     translationKey: code === 'SAFEGUARDING_CONTACT_RESTRICTED'
       ? 'safeguarding_contact_restricted'
       : 'safeguarding_vetting_required',
@@ -136,6 +157,43 @@ function extractSafeguardingBlockNotice(response: MessageSendFailure): Safeguard
     message: asString(detail?.message) ?? response.error ?? '',
     detail: asString(detail?.detail),
     actionLabel: asString(detail?.action_label),
+    requiredVettingTypes,
+    requiredVettingLabels: labels,
+  };
+}
+
+/**
+ * Build a safeguarding panel notice from the server-authoritative preflight state
+ * delivered in the conversation payload. Lets the panel render — and the composer
+ * disable — the moment the conversation opens, before the member types anything.
+ * No request is made and no staff are alerted by rendering this.
+ */
+function buildSafeguardingNoticeFromMeta(
+  safeguarding: SafeguardingMeta | null | undefined
+): SafeguardingBlockNotice | null {
+  if (!safeguarding || !safeguarding.restricted) {
+    return null;
+  }
+
+  const code = safeguarding.code === 'VETTING_REQUIRED'
+    ? 'VETTING_REQUIRED'
+    : 'SAFEGUARDING_CONTACT_RESTRICTED';
+  const requiredVettingTypes = asStringArray(safeguarding.required_vetting_types);
+  const requiredVettingLabels = asStringArray(safeguarding.required_vetting_labels);
+  const labels = requiredVettingLabels.length > 0
+    ? requiredVettingLabels
+    : requiredVettingTypes.map(fallbackVettingLabel);
+
+  return {
+    code,
+    source: 'preflight',
+    translationKey: code === 'SAFEGUARDING_CONTACT_RESTRICTED'
+      ? 'safeguarding_contact_restricted'
+      : 'safeguarding_vetting_required',
+    title: asString(safeguarding.title ?? undefined),
+    message: asString(safeguarding.message ?? undefined) ?? '',
+    detail: asString(safeguarding.detail ?? undefined),
+    actionLabel: asString(safeguarding.action_label ?? undefined),
     requiredVettingTypes,
     requiredVettingLabels: labels,
   };
@@ -167,6 +225,7 @@ export function ConversationPage() {
   const toast = useToast();
   const { refreshCounts } = useNotifications();
   const pusher = usePusherOptional();
+  const presence = usePresenceOptional();
   const { hasFeature, hasModule, tenantPath, tenantSlug } = useTenant();
   const isDirectMessagingEnabled = hasFeature('direct_messaging');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -233,6 +292,9 @@ export function ConversationPage() {
   // Safeguarding notice state (reappears on reload)
   const [isSafeguardingDismissed, setIsSafeguardingDismissed] = useState(false);
   const [safeguardingBlockNotice, setSafeguardingBlockNotice] = useState<SafeguardingBlockNotice | null>(null);
+  // Explicit "request coordinator help" action state
+  const [isRequestingCoordinator, setIsRequestingCoordinator] = useState(false);
+  const [coordinatorRequestSent, setCoordinatorRequestSent] = useState(false);
 
   // Broker messaging restriction state
   const [messagingRestriction, setMessagingRestriction] = useState<{
@@ -289,6 +351,17 @@ export function ConversationPage() {
       setAutoTranslateOn(isAutoTranslateEnabled(conversation.meta.other_user.id));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-check when other_user changes
+  }, [conversation?.meta?.other_user?.id]);
+
+  // Fetch canonical presence for the other participant so the header dot/label reflect
+  // live online status (consistent with the conversation list, which uses PresenceContext)
+  // rather than only the is_online snapshot baked into the initial conversation payload.
+  useEffect(() => {
+    const otherId = conversation?.meta?.other_user?.id;
+    if (otherId && otherId > 0 && presence) {
+      presence.fetchPresence([otherId]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fetch when the participant changes; presence is a stable ref
   }, [conversation?.meta?.other_user?.id]);
 
   // Auto-translate effect: translate untranslated messages from the other user
@@ -577,10 +650,16 @@ export function ConversationPage() {
         // Reverse to chronological order (oldest first) for chat display.
         const chronologicalMessages = [...messages].reverse();
 
+        const conversationMeta = meta.conversation as ConversationMeta;
         setConversation({
-          meta: meta.conversation as ConversationMeta,
+          meta: conversationMeta,
           messages: chronologicalMessages,
         });
+
+        // Surface the server-authoritative safeguarding restriction immediately, so the
+        // panel shows and the composer is disabled before the member types. Page load
+        // never alerts staff — only an actual send or an explicit coordinator request does.
+        setSafeguardingBlockNotice(buildSafeguardingNoticeFromMeta(conversationMeta.safeguarding));
 
         // Track pagination state from response
         setPagination({
@@ -700,7 +779,32 @@ export function ConversationPage() {
 
   useEffect(() => {
     setSafeguardingBlockNotice(null);
+    setCoordinatorRequestSent(false);
   }, [targetId]);
+
+  /**
+   * Explicitly ask a coordinator/broker to help arrange contact. This — not opening
+   * the conversation — is the action that alerts staff. The server re-checks the
+   * restriction, so it is a safe no-op if contact is actually permitted.
+   */
+  const requestCoordinatorHelp = useCallback(async () => {
+    if (!targetId || isRequestingCoordinator || coordinatorRequestSent) return;
+    try {
+      setIsRequestingCoordinator(true);
+      const response = await api.post(`/v2/messages/${targetId}/request-coordinator`, {});
+      if (response.success) {
+        setCoordinatorRequestSent(true);
+        toast.success(t('coordinator_request.success_title'), t('coordinator_request.success_body'));
+      } else {
+        toast.error(t('error_title'), response.error || t('coordinator_request.error'));
+      }
+    } catch (error) {
+      logError('Failed to request coordinator help', error);
+      toast.error(t('error_title'), t('coordinator_request.error'));
+    } finally {
+      setIsRequestingCoordinator(false);
+    }
+  }, [targetId, isRequestingCoordinator, coordinatorRequestSent, toast, t]);
 
   function handleSendFailure(response: MessageSendFailure, fallbackKey: string): void {
     const notice = extractSafeguardingBlockNotice(response);
@@ -1486,9 +1590,19 @@ export function ConversationPage() {
   const safeguardingRequiredVettingLabels = safeguardingBlockNotice?.requiredVettingLabels.length
     ? safeguardingBlockNotice.requiredVettingLabels
     : safeguardingBlockNotice?.requiredVettingTypes.map(fallbackVettingLabel) ?? [];
-  const statusLabel = other_user.is_online === undefined
+  // Prefer live canonical presence (populated by the fetch effect above) over the
+  // is_online snapshot from the initial payload. Fall back to is_online when the
+  // participant isn't cached yet — the backend keeps that column fresh off the
+  // presence heartbeat, so it is no longer permanently stale.
+  const cachedPresence = presence?.onlineUsers.has(other_user.id)
+    ? presence.getPresence(other_user.id)
+    : null;
+  const effectiveOnline = cachedPresence
+    ? cachedPresence.status !== 'offline'
+    : other_user.is_online;
+  const statusLabel = effectiveOnline === undefined
     ? null
-    : other_user.is_online ? t('online_status') : t('offline_status');
+    : effectiveOnline ? t('online_status') : t('offline_status');
 
   return (
     <div className="-my-6 mx-auto flex h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-7rem)] min-h-0 w-full max-w-4xl flex-col gap-3 sm:-my-8 sm:gap-4 md:h-[calc(100dvh-var(--safe-area-top)-4rem)]">
@@ -1519,9 +1633,9 @@ export function ConversationPage() {
                   name={other_user.name}
                   size="md"
                   className="ring-2 ring-white/20" />
-                {other_user.is_online !== undefined && (
+                {effectiveOnline !== undefined && (
                   <span
-                    className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[var(--color-surface)] ${other_user.is_online ? 'bg-success' : 'bg-muted'}`}
+                    className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[var(--color-surface)] ${effectiveOnline ? 'bg-success' : 'bg-muted'}`}
                     aria-label={statusLabel ?? undefined}
                     role={statusLabel ? 'img' : undefined} />
                 )}
@@ -1746,8 +1860,26 @@ export function ConversationPage() {
             <p className="mt-3 text-xs text-red-700/80 dark:text-red-200/80">
               {t(`${safeguardingBlockNotice.translationKey}.contact_broker`)}
             </p>
+            {coordinatorRequestSent && (
+              <p
+                className="mt-3 text-sm font-medium text-emerald-700 dark:text-emerald-300"
+                role="status"
+              >
+                {t('coordinator_request.sent')}
+              </p>
+            )}
           </div>
-          <div className="flex shrink-0 items-center gap-2 sm:flex-col">
+          <div className="flex shrink-0 items-center gap-2 sm:flex-col sm:items-stretch">
+            <Button
+              size="sm"
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white dark:text-white"
+              onPress={requestCoordinatorHelp}
+              isLoading={isRequestingCoordinator}
+              isDisabled={coordinatorRequestSent}
+              aria-label={t('coordinator_request.aria_button')}
+            >
+              {t('coordinator_request.button')}
+            </Button>
             <Button
               size="sm"
               variant="secondary"
@@ -1756,16 +1888,22 @@ export function ConversationPage() {
             >
               {safeguardingBlockNotice.actionLabel || t(`${safeguardingBlockNotice.translationKey}.action`)}
             </Button>
-            <Button
-              isIconOnly
-              size="sm"
-              variant="tertiary"
-              className="text-red-500 hover:text-red-700 dark:hover:text-red-200"
-              onPress={() => setSafeguardingBlockNotice(null)}
-              aria-label={t(`${safeguardingBlockNotice.translationKey}.dismiss`)}
-            >
-              <X className="h-4 w-4" aria-hidden="true" />
-            </Button>
+            {/* Preflight (load-time) notices are NOT dismissable: dismissing would
+                re-enable the composer and let a blocked send alert staff, bypassing the
+                explicit coordinator-request affordance. Send-failure notices stay
+                dismissable (re-sending is itself an explicit attempt). */}
+            {safeguardingBlockNotice.source !== 'preflight' && (
+              <Button
+                isIconOnly
+                size="sm"
+                variant="tertiary"
+                className="text-red-500 hover:text-red-700 dark:hover:text-red-200"
+                onPress={() => setSafeguardingBlockNotice(null)}
+                aria-label={t(`${safeguardingBlockNotice.translationKey}.dismiss`)}
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </Button>
+            )}
           </div>
         </div>
       )}
