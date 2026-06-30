@@ -105,9 +105,11 @@ describe('Public listings rendering', () => {
     expect(html).toContain('src="https://cdn.example.test/bike.jpg"');
     expect(html).toContain('href="/hour-timebank/listings/7"');
     expect(html).toContain('"@type":"ItemList"');
-    expect(html).toContain('data-nexus-ui="rich-index-card"');
-    expect(html).not.toContain('listing-card');
-    expect(html).not.toContain('listing-facts');
+    expect(html).toContain('data-nexus-ui="react-listing-card"');
+    expect(html).toContain('border-l-emerald-500/70');
+    expect(html).toContain('grid gap-4 sm:grid-cols-2 lg:grid-cols-3');
+    expect(html).toContain('data-slot="button"');
+    expect(html).toContain('data-nexus-ui="listing-facts"');
   });
 
   it('renders listing detail with gallery, breadcrumb, provider, and Service JSON-LD', () => {
@@ -143,8 +145,7 @@ describe('Public listings rendering', () => {
     expect(html).toContain('Public Provider');
     expect(html).toContain('"@type":"Service"');
     expect(html).toContain('"provider":{"@type":"Organization","name":"Public Provider"}');
-    expect(html).toContain('data-nexus-ui="rich-detail"');
-    expect(html).not.toContain('listing-detail');
-    expect(html).not.toContain('public-panel');
+    expect(html).toContain('data-nexus-ui="react-listing-detail"');
+    expect(html).toContain('data-nexus-ui="public-detail-panel"');
   });
 });

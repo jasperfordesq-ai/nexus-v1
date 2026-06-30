@@ -114,9 +114,10 @@ describe('Public marketplace rendering', () => {
     expect(html).toContain('src="https://cdn.example.test/marketplace/repair-kit.jpg"');
     expect(html).toContain('href="/hour-timebank/marketplace/31"');
     expect(html).toContain('"@type":"ItemList"');
-    expect(html).toContain('data-nexus-ui="rich-index-card"');
-    expect(html).not.toContain('listing-card');
-    expect(html).not.toContain('listing-facts');
+    expect(html).toContain('data-nexus-ui="react-marketplace-card"');
+    expect(html).toContain('grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4');
+    expect(html).toContain('data-slot="button"');
+    expect(html).toContain('data-nexus-ui="marketplace-facts"');
   });
 
   it('renders marketplace detail with gallery, seller, price, and Product Offer JSON-LD', () => {
@@ -151,8 +152,7 @@ describe('Public marketplace rendering', () => {
     expect(html).toContain('src="https://cdn.example.test/marketplace/repair-kit.jpg"');
     expect(html).toContain('"@type":"Product"');
     expect(html).toContain('"offers":{"@type":"Offer","price":25,"priceCurrency":"EUR"');
-    expect(html).toContain('data-nexus-ui="rich-detail"');
-    expect(html).not.toContain('listing-detail');
-    expect(html).not.toContain('public-panel');
+    expect(html).toContain('data-nexus-ui="react-marketplace-detail"');
+    expect(html).toContain('data-nexus-ui="public-detail-panel"');
   });
 });

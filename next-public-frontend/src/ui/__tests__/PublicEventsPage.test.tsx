@@ -91,9 +91,10 @@ describe('Public events rendering', () => {
     expect(html).toContain('src="https://cdn.example.test/events/repair.jpg"');
     expect(html).toContain('href="/hour-timebank/events/12"');
     expect(html).toContain('"@type":"ItemList"');
-    expect(html).toContain('data-nexus-ui="rich-index-card"');
-    expect(html).not.toContain('listing-card');
-    expect(html).not.toContain('listing-facts');
+    expect(html).toContain('data-nexus-ui="react-event-card"');
+    expect(html).toContain('grid gap-4 sm:grid-cols-2 lg:grid-cols-3');
+    expect(html).toContain('data-slot="button"');
+    expect(html).toContain('data-nexus-ui="event-facts"');
   });
 
   it('renders event detail with organiser, date range, location, and Event JSON-LD', () => {
@@ -127,8 +128,7 @@ describe('Public events rendering', () => {
     expect(html).toContain('Remote or local');
     expect(html).toContain('"@type":"Event"');
     expect(html).toContain('"organizer":{"@type":"Organization","name":"Event Organiser"}');
-    expect(html).toContain('data-nexus-ui="rich-detail"');
-    expect(html).not.toContain('listing-detail');
-    expect(html).not.toContain('public-panel');
+    expect(html).toContain('data-nexus-ui="react-event-detail"');
+    expect(html).toContain('data-nexus-ui="public-detail-panel"');
   });
 });

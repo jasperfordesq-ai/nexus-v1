@@ -93,9 +93,10 @@ describe('Public organisations rendering', () => {
     expect(html).toContain('src="https://cdn.example.test/organisations/care-collective.png"');
     expect(html).toContain('href="/hour-timebank/organisations/neighbourhood-care-collective"');
     expect(html).toContain('"@type":"ItemList"');
-    expect(html).toContain('data-nexus-ui="rich-index-card"');
-    expect(html).not.toContain('listing-card');
-    expect(html).not.toContain('listing-facts');
+    expect(html).toContain('data-nexus-ui="react-organisation-card"');
+    expect(html).toContain('grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4');
+    expect(html).toContain('data-slot="button"');
+    expect(html).toContain('data-nexus-ui="organisation-facts"');
   });
 
   it('renders organisation detail with public stats and Organization JSON-LD', () => {
@@ -129,8 +130,7 @@ describe('Public organisations rendering', () => {
     expect(html).toContain('42.5 hours');
     expect(html).toContain('"@type":"Organization"');
     expect(html).toContain('"name":"Neighbourhood Care Collective"');
-    expect(html).toContain('data-nexus-ui="rich-detail"');
-    expect(html).not.toContain('listing-detail');
-    expect(html).not.toContain('public-panel');
+    expect(html).toContain('data-nexus-ui="react-organisation-detail"');
+    expect(html).toContain('data-nexus-ui="public-detail-panel"');
   });
 });

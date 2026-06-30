@@ -5,7 +5,8 @@
 
 import type { ReactNode } from 'react';
 import Image from 'next/image';
-import { Card, Chip, Link } from '@heroui/react';
+import { Button, Card, Chip, Link } from '@heroui/react';
+import { BriefcaseBusiness, CalendarDays, Heart, MapPin, ShoppingBag, Star, UserRound } from 'lucide-react';
 
 import { resolveAssetUrl } from '../lib/assets';
 import type { Translator } from '../lib/i18n';
@@ -187,6 +188,10 @@ interface RichFact {
   value?: null | string;
 }
 
+const publicFamilyGridClassName = 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3';
+const marketplaceGridClassName = 'grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4';
+const organisationsGridClassName = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4';
+
 function EmptyStatePanel({ body, title }: { body: string; title: string }): ReactNode {
   return (
     <Card className="border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)]" variant="default">
@@ -200,8 +205,8 @@ function EmptyStatePanel({ body, title }: { body: string; title: string }): Reac
   );
 }
 
-function RichIndexGrid({ children }: { children: ReactNode }): ReactNode {
-  return <div className="grid gap-5">{children}</div>;
+function RichIndexGrid({ children, className = 'grid gap-5' }: { children: ReactNode; className?: string }): ReactNode {
+  return <div className={className}>{children}</div>;
 }
 
 function RichIndexCard({
@@ -259,6 +264,447 @@ function RichIndexCard({
   );
 }
 
+function ListingPublicCard({
+  listing,
+  tenantBasePath,
+  t,
+}: {
+  listing: PublicListing;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  const href = withTenantBase(tenantBasePath, 'listings/' + listing.slug);
+  const borderClass = listing.type === 'request' ? 'border-l-amber-500/70' : 'border-l-emerald-500/70';
+
+  return (
+    <article className="h-full" data-nexus-ui="react-listing-card">
+      <Card
+        className={
+          'relative h-full cursor-pointer border border-theme-default bg-theme-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:bg-theme-hover hover:shadow-md border-l-4 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent ' +
+          borderClass
+        }
+        variant="default"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 space-y-2">
+            <div className="flex flex-wrap gap-2">
+              {listing.category?.name ? (
+                <Chip color="accent" size="sm" variant="soft">
+                  {listing.category.name}
+                </Chip>
+              ) : null}
+              {formatTimeValue(listing, t) ? (
+                <Chip color="success" size="sm" variant="soft">
+                  {formatTimeValue(listing, t)}
+                </Chip>
+              ) : null}
+            </div>
+            <h2 className="text-lg font-semibold leading-tight text-theme-primary">
+              <Link
+                className="text-theme-primary underline-offset-4 hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                href={href}
+              >
+                {listing.title}
+              </Link>
+            </h2>
+          </div>
+          <IndexIconButton label={listing.title} />
+        </div>
+        <Card.Content className="mt-4 p-0">
+          <CardImageLink
+            href={href}
+            image={listing.primaryImage}
+            imageAltFallback={t('listings.imageAltFallback')}
+          />
+          <p className="mt-4 line-clamp-3 text-sm leading-6 text-theme-muted">{listing.excerpt || listing.description}</p>
+          <CompactFactRow
+            facts={[
+              {
+                icon: <MapPin aria-hidden="true" className="size-4 shrink-0" />,
+                label: t('listings.locationLabel'),
+                value: listing.location.label,
+              },
+              {
+                icon: <UserRound aria-hidden="true" className="size-4 shrink-0" />,
+                label: t('listings.providerLabel'),
+                value: listing.provider.displayName,
+              },
+            ]}
+            uiMarker="listing-facts"
+          />
+        </Card.Content>
+      </Card>
+    </article>
+  );
+}
+
+function EventPublicCard({
+  event,
+  tenantBasePath,
+  t,
+}: {
+  event: PublicEvent;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  const href = withTenantBase(tenantBasePath, 'events/' + event.slug);
+
+  return (
+    <article className="h-full" data-nexus-ui="react-event-card">
+      <Card className="h-full border border-theme-default bg-theme-card p-4 transition-all hover:-translate-y-0.5 hover:bg-theme-hover hover:shadow-md" variant="default">
+        <CardImageLink href={href} image={event.primaryImage} imageAltFallback={t('events.imageAltFallback')} />
+        <Card.Content className="mt-4 p-0">
+          <div className="mb-3 flex items-start justify-between gap-3">
+            <div className="flex flex-wrap gap-2">
+              {event.category?.name ? (
+                <Chip color="accent" size="sm" variant="soft">
+                  {event.category.name}
+                </Chip>
+              ) : null}
+              {formatEventRange(event) ? (
+                <Chip color="accent" size="sm" variant="soft">
+                  {formatEventRange(event)}
+                </Chip>
+              ) : null}
+            </div>
+            <IndexIconButton label={event.title} />
+          </div>
+          <h2 className="text-lg font-semibold leading-tight text-theme-primary">
+            <Link
+              className="text-theme-primary underline-offset-4 hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+              href={href}
+            >
+              {event.title}
+            </Link>
+          </h2>
+          <p className="mt-3 line-clamp-3 text-sm leading-6 text-theme-muted">{event.excerpt || event.description}</p>
+          <CompactFactRow
+            facts={[
+              {
+                icon: <CalendarDays aria-hidden="true" className="size-4 shrink-0" />,
+                label: t('events.dateLabel'),
+                value: formatEventRange(event),
+              },
+              {
+                icon: <MapPin aria-hidden="true" className="size-4 shrink-0" />,
+                label: t('events.locationLabel'),
+                value: event.location.label,
+              },
+              {
+                icon: <UserRound aria-hidden="true" className="size-4 shrink-0" />,
+                label: t('events.organiserLabel'),
+                value: event.organiser.displayName,
+              },
+            ]}
+            uiMarker="event-facts"
+          />
+        </Card.Content>
+      </Card>
+    </article>
+  );
+}
+
+function JobPublicCard({
+  job,
+  tenantBasePath,
+  t,
+}: {
+  job: PublicJob;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  const href = withTenantBase(tenantBasePath, 'jobs/' + job.slug);
+
+  return (
+    <article className="h-full" data-nexus-ui="react-job-card">
+      <Card className="h-full border border-theme-default bg-theme-card p-5 transition-transform hover:scale-[1.01] motion-reduce:transition-none motion-reduce:hover:scale-100" variant="default">
+        <div className="flex items-start gap-4">
+          <Link
+            className="rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-base)]"
+            href={href}
+          >
+            <CardLogoImage image={job.primaryImage} imageAltFallback={t('jobs.imageAltFallback')} />
+          </Link>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h2 className="text-lg font-semibold leading-tight text-theme-primary">
+                  <Link
+                    className="text-theme-primary underline-offset-4 hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                    href={href}
+                  >
+                    {job.title}
+                  </Link>
+                </h2>
+                <p className="mt-1 text-sm font-medium text-theme-secondary">{job.employer.displayName}</p>
+              </div>
+              <IndexIconButton label={job.title} />
+            </div>
+            <p className="mt-3 line-clamp-2 text-sm leading-6 text-theme-muted">{job.excerpt || job.description}</p>
+          </div>
+        </div>
+        <CompactFactRow
+          facts={[
+            {
+              icon: <BriefcaseBusiness aria-hidden="true" className="size-4 shrink-0" />,
+              label: t('jobs.categoryLabel'),
+              value: job.category?.name,
+            },
+            {
+              icon: <MapPin aria-hidden="true" className="size-4 shrink-0" />,
+              label: t('jobs.locationLabel'),
+              value: formatJobLocation(job, t),
+            },
+            {
+              icon: <Clock3Icon />,
+              label: t('jobs.compensationLabel'),
+              value: formatJobCompensation(job, t),
+            },
+          ]}
+          uiMarker="job-facts"
+        />
+      </Card>
+    </article>
+  );
+}
+
+function MarketplacePublicCard({
+  item,
+  tenantBasePath,
+  t,
+}: {
+  item: PublicMarketplaceListing;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  const href = withTenantBase(tenantBasePath, 'marketplace/' + item.slug);
+
+  return (
+    <article className="h-full" data-nexus-ui="react-marketplace-card">
+      <Card className="h-full overflow-hidden border border-theme-default bg-theme-card transition-colors hover:bg-theme-hover" variant="default">
+        <div className="relative">
+          <CardImageLink
+            className="aspect-square rounded-none"
+            href={href}
+            image={item.primaryImage}
+            imageAltFallback={t('marketplaceItems.imageAltFallback')}
+          />
+          <div className="absolute inset-x-3 top-3 flex flex-wrap justify-between gap-2">
+            {formatMarketplacePrice(item, t) ? (
+              <Chip color="accent" size="sm" variant="primary">
+                {formatMarketplacePrice(item, t)}
+              </Chip>
+            ) : null}
+            {item.condition ? (
+              <Chip color="accent" size="sm" variant="soft">
+                {item.condition}
+              </Chip>
+            ) : null}
+          </div>
+        </div>
+        <Card.Content className="p-4">
+          <div className="flex items-start justify-between gap-3">
+            <h2 className="line-clamp-2 text-base font-semibold leading-tight text-theme-primary">
+              <Link
+                className="text-theme-primary underline-offset-4 hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                href={href}
+              >
+                {item.title}
+              </Link>
+            </h2>
+            <IndexIconButton label={item.title} />
+          </div>
+          <p className="mt-3 line-clamp-2 text-sm leading-6 text-theme-muted">{item.excerpt || item.description}</p>
+          <CompactFactRow
+            facts={[
+              {
+                icon: <ShoppingBag aria-hidden="true" className="size-4 shrink-0" />,
+                label: t('marketplaceItems.categoryLabel'),
+                value: item.category?.name,
+              },
+              {
+                icon: <MapPin aria-hidden="true" className="size-4 shrink-0" />,
+                label: t('marketplaceItems.locationLabel'),
+                value: item.location.label,
+              },
+              {
+                icon: <UserRound aria-hidden="true" className="size-4 shrink-0" />,
+                label: t('marketplaceItems.sellerLabel'),
+                value: item.seller.displayName,
+              },
+            ]}
+            uiMarker="marketplace-facts"
+          />
+        </Card.Content>
+      </Card>
+    </article>
+  );
+}
+
+function OrganisationPublicCard({
+  organisation,
+  tenantBasePath,
+  t,
+}: {
+  organisation: PublicOrganisation;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  const href = withTenantBase(tenantBasePath, 'organisations/' + organisation.slug);
+
+  return (
+    <article className="h-full" data-nexus-ui="react-organisation-card">
+      <Card className="h-full border border-theme-default bg-theme-card p-5 transition-colors hover:bg-theme-hover" variant="default">
+        <div className="flex items-start gap-4">
+          <Link
+            className="rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-base)]"
+            href={href}
+          >
+            <CardLogoImage image={organisation.logoImage} imageAltFallback={t('organisationProfiles.logoAltFallback')} />
+          </Link>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h2 className="text-lg font-semibold leading-tight text-theme-primary">
+                  <Link
+                    className="text-theme-primary underline-offset-4 hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                    href={href}
+                  >
+                    {organisation.name}
+                  </Link>
+                </h2>
+                {organisation.location.label ? (
+                  <p className="mt-1 text-sm text-theme-muted">{organisation.location.label}</p>
+                ) : null}
+              </div>
+              <IndexIconButton label={organisation.name} />
+            </div>
+          </div>
+        </div>
+        <p className="mt-4 line-clamp-2 text-sm leading-6 text-theme-muted">
+          {organisation.excerpt || organisation.description}
+        </p>
+        <CompactFactRow
+          facts={[
+            {
+              icon: <UserRound aria-hidden="true" className="size-4 shrink-0" />,
+              label: t('organisationProfiles.ownerLabel'),
+              value: organisation.owner.displayName,
+            },
+            {
+              icon: <BriefcaseBusiness aria-hidden="true" className="size-4 shrink-0" />,
+              label: t('organisationProfiles.opportunitiesLabel'),
+              value: formatCount(organisation.stats.opportunityCount, 'organisationProfiles.opportunityCount', t),
+            },
+            {
+              icon: <Star aria-hidden="true" className="size-4 shrink-0" />,
+              label: t('organisationProfiles.volunteersLabel'),
+              value: formatCount(organisation.stats.volunteerCount, 'organisationProfiles.volunteerCount', t),
+            },
+          ]}
+          uiMarker="organisation-facts"
+        />
+      </Card>
+    </article>
+  );
+}
+
+function IndexIconButton({ label }: { label: string }): ReactNode {
+  return (
+    <Button aria-label={label} className="shrink-0 text-theme-muted hover:text-accent" isIconOnly size="sm" variant="ghost">
+      <Heart aria-hidden="true" className="size-4" />
+    </Button>
+  );
+}
+
+function CardImageLink({
+  className = 'aspect-[4/3] rounded-lg',
+  href,
+  image,
+  imageAltFallback,
+}: {
+  className?: string;
+  href: string;
+  image?: RichImage | null;
+  imageAltFallback: string;
+}): ReactNode {
+  const content = image ? (
+    <Image
+      alt={image.altText || imageAltFallback}
+      className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+      height={480}
+      src={image.url}
+      unoptimized
+      width={640}
+    />
+  ) : (
+    <span aria-hidden="true" className="block h-full w-full bg-accent/10" />
+  );
+
+  return (
+    <Link className={'group block overflow-hidden bg-accent/10 ' + className} href={href}>
+      {content}
+    </Link>
+  );
+}
+
+function CardLogoImage({
+  image,
+  imageAltFallback,
+}: {
+  image?: RichImage | null;
+  imageAltFallback: string;
+}): ReactNode {
+  if (!image) {
+    return <span aria-hidden="true" className="size-14 shrink-0 rounded-xl bg-accent/10 ring-1 ring-border" />;
+  }
+
+  return (
+    <Image
+      alt={image.altText || imageAltFallback}
+      className="size-14 shrink-0 rounded-xl bg-theme-elevated object-cover ring-1 ring-border"
+      height={112}
+      src={image.url}
+      unoptimized
+      width={112}
+    />
+  );
+}
+
+function CompactFactRow({
+  facts,
+  uiMarker,
+}: {
+  facts: Array<{ icon: ReactNode; label: string; value?: null | string }>;
+  uiMarker: string;
+}): ReactNode {
+  const visibleFacts = facts.filter((fact) => Boolean(fact.value));
+
+  if (visibleFacts.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-4 grid gap-2 text-sm text-theme-muted" data-nexus-ui={uiMarker}>
+      {visibleFacts.map((fact) => (
+        <div className="flex min-w-0 items-center gap-2" key={fact.label + fact.value}>
+          <span className="text-theme-subtle">{fact.icon}</span>
+          <span className="sr-only">{fact.label}</span>
+          <span className="truncate">{fact.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Clock3Icon(): ReactNode {
+  return (
+    <span aria-hidden="true" className="inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-current text-[10px] font-bold">
+      h
+    </span>
+  );
+}
+
 function RichDetailLayout({
   asideTitle,
   backHref,
@@ -271,6 +717,7 @@ function RichDetailLayout({
   image,
   imageAltFallback,
   title,
+  uiMarker = 'rich-detail',
 }: {
   asideTitle: string;
   backHref: string;
@@ -283,9 +730,10 @@ function RichDetailLayout({
   image?: RichImage | null;
   imageAltFallback: string;
   title: string;
+  uiMarker?: string;
 }): ReactNode {
   return (
-    <article className="grid gap-5" data-nexus-ui="rich-detail">
+    <article className="grid gap-5" data-nexus-ui={uiMarker}>
       <DetailBreadcrumb backHref={backHref} backLabel={backLabel} breadcrumbLabel={breadcrumbLabel} title={title} />
       {image ? <MediaFrame image={image} imageAltFallback={imageAltFallback} variant="hero" /> : null}
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(260px,320px)] lg:items-start">
@@ -299,11 +747,11 @@ function RichDetailLayout({
         </div>
         <aside>
           <Card
-            className="border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)] lg:sticky lg:top-4"
+            className="border border-theme-default bg-theme-card lg:sticky lg:top-4"
             variant="default"
           >
             <Card.Header>
-              <h2 className="text-xl font-bold text-[color:var(--nexus-ink)]">{asideTitle}</h2>
+              <h2 className="text-xl font-bold text-theme-primary">{asideTitle}</h2>
             </Card.Header>
             <Card.Content>
               <FactList facts={facts} />
@@ -315,14 +763,18 @@ function RichDetailLayout({
   );
 }
 
-function ContentCard({ children, title }: { children: ReactNode; title: string }): ReactNode {
+function ContentCard({ children, title, uiMarker }: { children: ReactNode; title: string; uiMarker?: string }): ReactNode {
   return (
-    <Card className="border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)]" variant="default">
+    <Card
+      className="border border-theme-default bg-theme-card"
+      data-nexus-ui={uiMarker}
+      variant="default"
+    >
       <Card.Header>
-        <h2 className="text-xl font-bold text-[color:var(--nexus-ink)]">{title}</h2>
+        <h2 className="text-xl font-bold text-theme-primary">{title}</h2>
       </Card.Header>
       <Card.Content>
-        <div className="space-y-4 leading-7 text-[color:var(--nexus-muted)]">{children}</div>
+        <div className="space-y-4 leading-7 text-theme-muted">{children}</div>
       </Card.Content>
     </Card>
   );
@@ -340,20 +792,28 @@ function DetailBreadcrumb({
   title: string;
 }): ReactNode {
   return (
-    <nav aria-label={breadcrumbLabel} className="flex flex-wrap items-center gap-2 text-sm text-[color:var(--nexus-muted)]">
+    <nav aria-label={breadcrumbLabel} className="flex flex-wrap items-center gap-2 text-sm text-theme-muted">
       <Link
-        className="font-bold text-[color:var(--nexus-accent)] hover:text-[color:var(--nexus-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
+        className="font-bold text-accent hover:text-theme-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
         href={backHref}
       >
         {backLabel}
       </Link>
       <span aria-hidden="true">/</span>
-      <span className="text-[color:var(--nexus-ink)]">{title}</span>
+      <span className="text-theme-primary">{title}</span>
     </nav>
   );
 }
 
-function FactList({ className = '', facts }: { className?: string; facts: RichFact[] }): ReactNode {
+function FactList({
+  className = '',
+  facts,
+  uiMarker,
+}: {
+  className?: string;
+  facts: RichFact[];
+  uiMarker?: string;
+}): ReactNode {
   const visibleFacts = facts.filter((fact) => Boolean(fact.value));
 
   if (visibleFacts.length === 0) {
@@ -361,11 +821,11 @@ function FactList({ className = '', facts }: { className?: string; facts: RichFa
   }
 
   return (
-    <dl className={('grid gap-3 ' + className).trim()}>
+    <dl className={('grid gap-3 ' + className).trim()} data-nexus-ui={uiMarker}>
       {visibleFacts.map((fact) => (
         <div className="min-w-0" key={fact.label}>
-          <dt className="text-xs font-bold uppercase text-[color:var(--nexus-muted)]">{fact.label}</dt>
-          <dd className="mt-1 [overflow-wrap:anywhere] text-[color:var(--nexus-ink)]">{fact.value}</dd>
+          <dt className="text-xs font-bold uppercase text-theme-subtle">{fact.label}</dt>
+          <dd className="mt-1 [overflow-wrap:anywhere] text-theme-primary">{fact.value}</dd>
         </div>
       ))}
     </dl>
@@ -601,21 +1061,9 @@ function ListingsIndex({
   }
 
   return (
-    <RichIndexGrid>
+    <RichIndexGrid className={publicFamilyGridClassName}>
       {listings.items.map((listing) => (
-        <RichIndexCard
-          description={listing.excerpt || listing.description}
-          facts={[
-            { label: t('listings.locationLabel'), value: listing.location.label },
-            { label: t('listings.providerLabel'), value: listing.provider.displayName },
-          ]}
-          href={withTenantBase(tenantBasePath, 'listings/' + listing.slug)}
-          image={listing.primaryImage}
-          imageAltFallback={t('listings.imageAltFallback')}
-          key={listing.id}
-          meta={[listing.category?.name, formatTimeValue(listing, t)]}
-          title={listing.title}
-        />
+        <ListingPublicCard key={listing.id} listing={listing} tenantBasePath={tenantBasePath} t={t} />
       ))}
     </RichIndexGrid>
   );
@@ -652,8 +1100,9 @@ function ListingDetail({
       image={listing.primaryImage}
       imageAltFallback={t('listings.imageAltFallback')}
       title={listing.title}
+      uiMarker="react-listing-detail"
     >
-      <ContentCard title={listing.title}>
+      <ContentCard title={listing.title} uiMarker="public-detail-panel">
         <p>{listing.description}</p>
       </ContentCard>
     </RichDetailLayout>
@@ -674,21 +1123,9 @@ function EventsIndex({
   }
 
   return (
-    <RichIndexGrid>
+    <RichIndexGrid className={publicFamilyGridClassName}>
       {events.events.map((event) => (
-        <RichIndexCard
-          description={event.excerpt || event.description}
-          facts={[
-            { label: t('events.locationLabel'), value: event.location.label },
-            { label: t('events.organiserLabel'), value: event.organiser.displayName },
-          ]}
-          href={withTenantBase(tenantBasePath, 'events/' + event.slug)}
-          image={event.primaryImage}
-          imageAltFallback={t('events.imageAltFallback')}
-          key={event.id}
-          meta={[event.category?.name, formatEventRange(event)]}
-          title={event.title}
-        />
+        <EventPublicCard event={event} key={event.id} tenantBasePath={tenantBasePath} t={t} />
       ))}
     </RichIndexGrid>
   );
@@ -721,8 +1158,9 @@ function EventDetail({
       image={event.primaryImage}
       imageAltFallback={t('events.imageAltFallback')}
       title={event.title}
+      uiMarker="react-event-detail"
     >
-      <ContentCard title={event.title}>
+      <ContentCard title={event.title} uiMarker="public-detail-panel">
         <p>{event.description}</p>
       </ContentCard>
     </RichDetailLayout>
@@ -743,21 +1181,9 @@ function JobsIndex({
   }
 
   return (
-    <RichIndexGrid>
+    <RichIndexGrid className={publicFamilyGridClassName}>
       {jobs.jobs.map((job) => (
-        <RichIndexCard
-          description={job.excerpt || job.description}
-          facts={[
-            { label: t('jobs.locationLabel'), value: formatJobLocation(job, t) },
-            { label: t('jobs.employerLabel'), value: job.employer.displayName },
-          ]}
-          href={withTenantBase(tenantBasePath, 'jobs/' + job.slug)}
-          image={job.primaryImage}
-          imageAltFallback={t('jobs.imageAltFallback')}
-          key={job.id}
-          meta={[job.category?.name, formatJobType(job), formatJobCompensation(job, t)]}
-          title={job.title}
-        />
+        <JobPublicCard job={job} key={job.id} tenantBasePath={tenantBasePath} t={t} />
       ))}
     </RichIndexGrid>
   );
@@ -797,8 +1223,9 @@ function JobDetail({
       image={job.primaryImage}
       imageAltFallback={t('jobs.imageAltFallback')}
       title={job.title}
+      uiMarker="react-job-detail"
     >
-      <ContentCard title={job.title}>
+      <ContentCard title={job.title} uiMarker="public-detail-panel">
         <p>{job.description}</p>
       </ContentCard>
       {job.skills.length > 0 ? (
@@ -824,21 +1251,9 @@ function MarketplaceIndex({
   }
 
   return (
-    <RichIndexGrid>
+    <RichIndexGrid className={marketplaceGridClassName}>
       {items.items.map((item) => (
-        <RichIndexCard
-          description={item.excerpt || item.description}
-          facts={[
-            { label: t('marketplaceItems.locationLabel'), value: item.location.label },
-            { label: t('marketplaceItems.sellerLabel'), value: item.seller.displayName },
-          ]}
-          href={withTenantBase(tenantBasePath, 'marketplace/' + item.slug)}
-          image={item.primaryImage}
-          imageAltFallback={t('marketplaceItems.imageAltFallback')}
-          key={item.id}
-          meta={[item.category?.name, formatMarketplacePrice(item, t)]}
-          title={item.title}
-        />
+        <MarketplacePublicCard item={item} key={item.id} tenantBasePath={tenantBasePath} t={t} />
       ))}
     </RichIndexGrid>
   );
@@ -879,8 +1294,9 @@ function MarketplaceDetail({
       image={item.primaryImage}
       imageAltFallback={t('marketplaceItems.imageAltFallback')}
       title={item.title}
+      uiMarker="react-marketplace-detail"
     >
-      <ContentCard title={item.title}>
+      <ContentCard title={item.title} uiMarker="public-detail-panel">
         <p>{item.description}</p>
       </ContentCard>
     </RichDetailLayout>
@@ -901,23 +1317,13 @@ function OrganisationsIndex({
   }
 
   return (
-    <RichIndexGrid>
+    <RichIndexGrid className={organisationsGridClassName}>
       {organisations.organisations.map((organisation) => (
-        <RichIndexCard
-          description={organisation.excerpt || organisation.description}
-          facts={[
-            { label: t('organisationProfiles.ownerLabel'), value: organisation.owner.displayName },
-            { label: t('organisationProfiles.websiteLabel'), value: organisation.website },
-          ]}
-          href={withTenantBase(tenantBasePath, 'organisations/' + organisation.slug)}
-          image={organisation.logoImage}
-          imageAltFallback={t('organisationProfiles.logoAltFallback')}
+        <OrganisationPublicCard
           key={organisation.id}
-          meta={[
-            formatCount(organisation.stats.opportunityCount, 'organisationProfiles.opportunityCount', t),
-            formatCount(organisation.stats.volunteerCount, 'organisationProfiles.volunteerCount', t),
-          ]}
-          title={organisation.name}
+          organisation={organisation}
+          tenantBasePath={tenantBasePath}
+          t={t}
         />
       ))}
     </RichIndexGrid>
@@ -965,8 +1371,9 @@ function OrganisationDetail({
       image={organisation.logoImage}
       imageAltFallback={t('organisationProfiles.logoAltFallback')}
       title={organisation.name}
+      uiMarker="react-organisation-detail"
     >
-      <ContentCard title={organisation.name}>
+      <ContentCard title={organisation.name} uiMarker="public-detail-panel">
         <p>{organisation.description}</p>
       </ContentCard>
     </RichDetailLayout>
