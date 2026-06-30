@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Listings public contracts are now opt-in so live API payloads stay unchanged.** The `public_contract` block on `/api/v2/listings` and `/api/v2/listings/{id}` is only attached for explicit Next public-frontend callers using `include=public_contract` or `X-Public-Contract: 1`; normal SPA, mobile, and prerender reads retain their prior response shape. Regression tests: `tests/Laravel/Feature/Controllers/ListingsControllerTest.php`, `next-public-frontend/src/lib/__tests__/tenant-api.test.ts`.
 - **i18n: propagated 72 new `advanced.next_public.*` admin translation keys to all 10 non-English locales.** The next-public workstream added these keys to `en/admin.json` without backfilling non-EN files, breaking the translation drift CI gate. English placeholder values have been added to `ar`, `de`, `es`, `fr`, `ga`, `it`, `ja`, `nl`, `pl`, and `pt` pending proper translation.
 
 ### Added

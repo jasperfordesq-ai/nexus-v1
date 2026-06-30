@@ -242,7 +242,7 @@ export async function fetchListingsIndex(
 ): Promise<PublicListingsIndex> {
   const endpoint = getPublicEndpointForRoute('listings') ?? '/v2/listings';
   const url = buildApiUrl(endpoint, { per_page: '12' });
-  const response = await fetchApiResponse<unknown>(url, buildPublicHeaders(request, tenant));
+  const response = await fetchApiResponse<unknown>(url, buildPublicHeaders(request, tenant, { publicContract: true }));
   const items = normalizePublicListings(response?.data);
 
   return {
@@ -282,7 +282,7 @@ export async function fetchListingDetail(
   }
 
   const url = buildApiUrl(endpoint);
-  const payload = await fetchApiPayload<unknown>(url, buildPublicHeaders(request, tenant));
+  const payload = await fetchApiPayload<unknown>(url, buildPublicHeaders(request, tenant, { publicContract: true }));
 
   return normalizePublicListing(payload);
 }
@@ -552,6 +552,7 @@ function buildApiUrl(path: string, query: Record<string, string> = {}): string {
 function buildPublicHeaders(
   request: ResolvedTenantRequest,
   tenant: TenantBootstrap | null,
+  options: { publicContract?: boolean } = {},
 ): HeadersInit {
   const headers: Record<string, string> = {
     Accept: 'application/json',
@@ -566,6 +567,10 @@ function buildPublicHeaders(
 
   if (tenant?.default_language) {
     headers['Accept-Language'] = tenant.default_language;
+  }
+
+  if (options.publicContract) {
+    headers['X-Public-Contract'] = '1';
   }
 
   return headers;

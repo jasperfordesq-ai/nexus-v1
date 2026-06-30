@@ -192,6 +192,7 @@ describe('tenant API client', () => {
         headers: expect.objectContaining({
           'Accept-Language': 'ga',
           Origin: 'https://app.project-nexus.ie',
+          'X-Public-Contract': '1',
           'X-Tenant-Slug': 'hour-timebank',
         }),
       }),
@@ -289,6 +290,7 @@ describe('tenant API client', () => {
         headers: expect.objectContaining({
           Accept: 'application/json',
           Origin: 'https://app.project-nexus.ie',
+          'X-Public-Contract': '1',
         }),
       }),
     );

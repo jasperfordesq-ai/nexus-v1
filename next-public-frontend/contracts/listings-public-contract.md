@@ -8,7 +8,8 @@ current field semantics.
 ## Envelope
 
 - `data`: listing rows retain the existing SPA fields and include a
-  `public_contract` object.
+  `public_contract` object only when the caller opts in with
+  `include=public_contract` or `X-Public-Contract: 1`.
 - `meta.page`: current requested page, currently informational while cursor
   pagination remains the backend source of truth.
 - `meta.cursor`: next cursor, or `null` when no further page exists.
@@ -40,4 +41,6 @@ current field semantics.
   refinement.
 
 The Next.js listings renderer must use only `public_contract` for listing SEO,
-cards, detail pages, JSON-LD, and no-JavaScript HTML.
+cards, detail pages, JSON-LD, and no-JavaScript HTML. Its fetchers must send the
+explicit opt-in header so live SPA, mobile, prerender, and other API consumers
+keep their existing response shapes.

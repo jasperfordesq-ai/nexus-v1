@@ -82,9 +82,10 @@ class ListingsControllerTest extends TestCase
             'data',
             'meta' => ['per_page', 'has_more'],
         ]);
+        $this->assertArrayNotHasKey('public_contract', $response->json('data.0'));
     }
 
-    public function test_public_index_returns_full_next_public_contract_without_auth(): void
+    public function test_public_index_returns_full_next_public_contract_when_opted_in_without_auth(): void
     {
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'first_name' => 'Public',
@@ -108,7 +109,7 @@ class ListingsControllerTest extends TestCase
             'moderation_status' => 'approved',
         ]);
 
-        $response = $this->apiGet('/v2/listings?per_page=1');
+        $response = $this->apiGet('/v2/listings?per_page=1&include=public_contract');
 
         $response->assertOk();
         $response->assertJsonStructure([
@@ -151,6 +152,25 @@ class ListingsControllerTest extends TestCase
         $this->assertSame(2.5, (float) $contract['time_credit_value']['hours']);
         $this->assertSame('hour', $contract['time_credit_value']['unit']);
         $this->assertSame('Public Provider', $contract['provider']['display_name']);
+    }
+
+    public function test_public_index_omits_next_public_contract_without_explicit_flag(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'title' => 'Existing SPA payload stays unchanged',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+        ]);
+
+        $response = $this->apiGet('/v2/listings?per_page=1');
+
+        $response->assertOk();
+        $this->assertArrayNotHasKey('public_contract', $response->json('data.0'));
     }
 
     public function test_index_returns_403_when_listings_module_disabled(): void
@@ -351,7 +371,7 @@ class ListingsControllerTest extends TestCase
         $response->assertJsonStructure(['data']);
     }
 
-    public function test_public_show_returns_gallery_and_full_next_public_contract(): void
+    public function test_public_show_returns_gallery_and_full_next_public_contract_when_opted_in(): void
     {
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'first_name' => 'Gallery',
@@ -392,7 +412,9 @@ class ListingsControllerTest extends TestCase
             ],
         ]);
 
-        $response = $this->apiGet("/v2/listings/{$listing->id}");
+        $response = $this->apiGet("/v2/listings/{$listing->id}", [
+            'X-Public-Contract' => '1',
+        ]);
 
         $response->assertOk();
         $contract = $response->json('data.public_contract');
@@ -403,6 +425,25 @@ class ListingsControllerTest extends TestCase
         $this->assertSame('/uploads/tenants/hour-timebank/listings/garden-1.jpg', $contract['gallery'][0]['url']);
         $this->assertSame('Gallery Provider', $contract['provider']['display_name']);
         $this->assertSame('active', $contract['status']);
+    }
+
+    public function test_public_show_omits_next_public_contract_without_explicit_flag(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'title' => 'Existing detail payload stays unchanged',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+        ]);
+
+        $response = $this->apiGet("/v2/listings/{$listing->id}");
+
+        $response->assertOk();
+        $this->assertArrayNotHasKey('public_contract', $response->json('data'));
     }
 
     // ================================================================

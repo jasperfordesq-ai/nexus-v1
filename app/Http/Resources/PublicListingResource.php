@@ -16,6 +16,10 @@ final class PublicListingResource
      */
     public static function augment(array $listing): array
     {
+        if (!self::shouldIncludePublicContract()) {
+            return $listing;
+        }
+
         $listing['public_contract'] = self::fromArray($listing);
 
         return $listing;
@@ -203,5 +207,22 @@ final class PublicListingResource
         }
 
         return is_numeric($value) ? (float) $value : null;
+    }
+
+    private static function shouldIncludePublicContract(): bool
+    {
+        $header = request()->headers->get('X-Public-Contract');
+        if ($header !== null && in_array(strtolower($header), ['1', 'true', 'yes'], true)) {
+            return true;
+        }
+
+        $include = request()->query('include');
+        if ($include === null) {
+            return false;
+        }
+
+        $values = is_array($include) ? $include : explode(',', (string) $include);
+
+        return in_array('public_contract', array_map(static fn ($value): string => trim((string) $value), $values), true);
     }
 }
