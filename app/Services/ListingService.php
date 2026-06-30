@@ -410,6 +410,7 @@ class ListingService
         $cat = $listing->relationLoaded('category') ? $listing->getRelation('category') : null;
         $data['category_name']  = $cat?->name;
         $data['category_color'] = $cat?->color;
+        $data['category_slug']  = $cat?->slug;
 
         // Lightweight trust signals for list view
         if ($user) {
@@ -710,6 +711,7 @@ class ListingService
         $cat = $listing->relationLoaded('category') ? $listing->getRelation('category') : null;
         $data['category_name'] = $cat?->name;
         $data['category_color'] = $cat?->color;
+        $data['category_slug'] = $cat?->slug;
 
         // Engagement counts (wrapped in try/catch — tables may not exist during migration)
         try {

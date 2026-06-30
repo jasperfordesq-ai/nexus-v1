@@ -1,0 +1,29 @@
+{
+  "pages": {
+    "listingDetail": {
+      "body": "Fanann gníomhartha áirithinte agus eagarthóireachta san aip shlán Vite.",
+      "lead": "Féach ar fhaisnéis phoiblí liostaithe ó {{tenantName}}.",
+      "title": "Liostú"
+    },
+    "listings": {
+      "body": "Tá an leathanach seo ullmhaithe le haghaidh aimsithe poiblí liostuithe. Fanann cruthú, eagarthóireacht agus uirlisí ball san aip shlán Vite.",
+      "lead": "Brabhsáil tairiscintí agus iarratais phoiblí ó {{tenantName}}.",
+      "title": "Liostuithe"
+    }
+  },
+  "listings": {
+    "backToListings": "Liostuithe",
+    "breadcrumbLabel": "Conair liostaithe",
+    "categoryLabel": "Catagóir",
+    "createdLabel": "Cruthaithe",
+    "empty": "Níl aon liostuithe poiblí ar fáil fós.",
+    "galleryLabel": "Gailearaí",
+    "imageAltFallback": "Íomhá liostaithe",
+    "locationLabel": "Suíomh",
+    "providerLabel": "Soláthraí",
+    "statusLabel": "Stádas",
+    "updatedLabel": "Nuashonraithe",
+    "valueHours": "{{count}} uair",
+    "valueLabel": "Luach ama"
+  }
+}

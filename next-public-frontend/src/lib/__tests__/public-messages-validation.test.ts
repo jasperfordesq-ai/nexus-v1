@@ -16,4 +16,12 @@ describe('public message validation', () => {
       expect(t(route.labelKey), route.routeKey).not.toBe(route.labelKey);
     }
   });
+
+  it('resolves listings chrome through the Irish locale path', () => {
+    const t = createTranslator('ga');
+
+    expect(t('pages.listings.title')).toBe('Liostuithe');
+    expect(t('listings.providerLabel')).toBe('Soláthraí');
+    expect(t('listings.valueHours', { count: 2 })).toBe('2 uair');
+  });
 });

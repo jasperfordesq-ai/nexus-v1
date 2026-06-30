@@ -8,7 +8,14 @@ import type { CSSProperties, ReactNode } from 'react';
 import { resolveAssetUrl, safeCssColor } from '../lib/assets';
 import type { Translator } from '../lib/i18n';
 import type { RouteOwnership } from '../lib/public-routes';
-import type { BlogPostSummary, PublicContentItem, PublicRouteContent, TenantBootstrap } from '../lib/tenant-api';
+import type {
+  BlogPostSummary,
+  PublicContentItem,
+  PublicListing,
+  PublicListingsIndex,
+  PublicRouteContent,
+  TenantBootstrap,
+} from '../lib/tenant-api';
 import { getApiBase } from '../lib/tenant-api';
 
 interface PublicPageProps {
@@ -148,6 +155,14 @@ function renderRouteContent(
     );
   }
 
+  if (content?.kind === 'listings-index') {
+    return <ListingsIndex listings={content.listings} tenantBasePath={tenantBasePath} t={t} />;
+  }
+
+  if (content?.kind === 'listing-detail' && content.listing) {
+    return <ListingDetail listing={content.listing} tenantBasePath={tenantBasePath} t={t} />;
+  }
+
   if (content?.kind === 'public-collection') {
     return (
       <PublicCollection
@@ -221,6 +236,124 @@ function BlogIndex({
   );
 }
 
+function ListingsIndex({
+  listings,
+  tenantBasePath,
+  t,
+}: {
+  listings: PublicListingsIndex;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  if (listings.items.length === 0) {
+    return (
+      <article className="public-panel">
+        <h2>{t('pages.listings.title')}</h2>
+        <p>{t('listings.empty')}</p>
+      </article>
+    );
+  }
+
+  return (
+    <div className="listings-grid">
+      {listings.items.map((listing) => (
+        <article className="listing-card" key={listing.id}>
+          <a className="listing-card-image" href={withTenantBase(tenantBasePath, `listings/${listing.slug}`)}>
+            {listing.primaryImage ? (
+              <img
+                alt={listing.primaryImage.altText || t('listings.imageAltFallback')}
+                src={listing.primaryImage.url}
+              />
+            ) : (
+              <span aria-hidden="true" />
+            )}
+          </a>
+          <div className="listing-card-body">
+            <p className="listing-card-meta">
+              {compactText([listing.category?.name, formatTimeValue(listing, t)]).join(' · ')}
+            </p>
+            <h2>
+              <a href={withTenantBase(tenantBasePath, `listings/${listing.slug}`)}>{listing.title}</a>
+            </h2>
+            <p>{listing.excerpt || listing.description}</p>
+            <dl className="listing-facts">
+              <DefinitionRow label={t('listings.locationLabel')} value={listing.location.label} />
+              <DefinitionRow label={t('listings.providerLabel')} value={listing.provider.displayName} />
+            </dl>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function ListingDetail({
+  listing,
+  tenantBasePath,
+  t,
+}: {
+  listing: PublicListing;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  const gallery = listing.gallery.length > 0 ? listing.gallery : compactImages([listing.primaryImage]);
+
+  return (
+    <article className="listing-detail">
+      <nav aria-label={t('listings.breadcrumbLabel')} className="listing-breadcrumb">
+        <a href={withTenantBase(tenantBasePath, 'listings')}>{t('listings.backToListings')}</a>
+        <span aria-hidden="true">/</span>
+        <span>{listing.title}</span>
+      </nav>
+
+      {listing.primaryImage ? (
+        <img
+          alt={listing.primaryImage.altText || t('listings.imageAltFallback')}
+          className="listing-hero-image"
+          src={listing.primaryImage.url}
+        />
+      ) : null}
+
+      <div className="listing-detail-grid">
+        <div className="listing-detail-main">
+          <section className="public-panel article-content">
+            <h2>{listing.title}</h2>
+            <p>{listing.description}</p>
+          </section>
+
+          {gallery.length > 0 ? (
+            <section className="public-panel">
+              <h2>{t('listings.galleryLabel')}</h2>
+              <div className="listing-gallery">
+                {gallery.map((image) => (
+                  <img
+                    alt={image.altText || t('listings.imageAltFallback')}
+                    key={`${image.url}-${image.sortOrder ?? 0}`}
+                    src={image.url}
+                  />
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </div>
+
+        <aside className="public-panel listing-detail-aside">
+          <h2>{t('listings.providerLabel')}</h2>
+          <p>{listing.provider.displayName}</p>
+          <dl className="listing-facts stacked">
+            <DefinitionRow label={t('listings.categoryLabel')} value={listing.category?.name} />
+            <DefinitionRow label={t('listings.valueLabel')} value={formatTimeValue(listing, t)} />
+            <DefinitionRow label={t('listings.locationLabel')} value={listing.location.label} />
+            <DefinitionRow label={t('listings.statusLabel')} value={listing.status} />
+            <DefinitionRow label={t('listings.updatedLabel')} value={formatDate(listing.updatedAt)} />
+            <DefinitionRow label={t('listings.createdLabel')} value={formatDate(listing.createdAt)} />
+          </dl>
+        </aside>
+      </div>
+    </article>
+  );
+}
+
 function PublicCollection({
   basePath,
   emptyTitle,
@@ -255,6 +388,57 @@ function PublicCollection({
   );
 }
 
+function DefinitionRow({ label, value }: { label: string; value?: null | string }): ReactNode {
+  if (!value) {
+    return null;
+  }
+
+  return (
+    <div>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  );
+}
+
+function formatTimeValue(listing: PublicListing, t: Translator): string | null {
+  if (listing.timeCreditValue.hours === null) {
+    return null;
+  }
+
+  return t('listings.valueHours', { count: formatNumber(listing.timeCreditValue.hours) });
+}
+
+function formatDate(value: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat('en', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(date);
+}
+
+function formatNumber(value: number): string {
+  return Number.isInteger(value) ? String(value) : String(value);
+}
+
+function compactText(values: Array<null | string | undefined>): string[] {
+  return values.filter((value): value is string => Boolean(value));
+}
+
+function compactImages(values: Array<PublicListing['primaryImage']>): PublicListing['gallery'] {
+  return values.filter((value): value is PublicListing['gallery'][number] => value !== null);
+}
+
 function PublicDetail({ item }: { item: PublicContentItem }): ReactNode {
   return (
     <article className="public-panel article-content">
@@ -285,30 +469,94 @@ function StructuredData({
   tenant: TenantBootstrap | null;
   tenantName: string;
 }): ReactNode {
-  const data =
-    content?.kind === 'blog-detail' && content.post
-      ? {
-          '@context': 'https://schema.org',
-          '@type': 'BlogPosting',
-          headline: content.post.title,
-          url: canonicalUrl,
-        }
-      : content?.kind === 'public-detail' && content.item
-        ? {
-            '@context': 'https://schema.org',
-            '@type': 'WebPage',
-            description: content.item.description,
-            name: content.item.title,
-            url: canonicalUrl,
-          }
-      : {
-          '@context': 'https://schema.org',
-          '@type': tenant?.seo?.description ? 'Organization' : 'WebPage',
-          name: pageTitle || tenantName,
-          url: canonicalUrl,
-        };
+  const data = buildStructuredData({
+    canonicalUrl,
+    content,
+    pageTitle,
+    tenant,
+    tenantName,
+  });
 
   return <script dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} type="application/ld+json" />;
+}
+
+function buildStructuredData({
+  canonicalUrl,
+  content,
+  pageTitle,
+  tenant,
+  tenantName,
+}: {
+  canonicalUrl: string;
+  content: PublicRouteContent | null;
+  pageTitle: string;
+  tenant: TenantBootstrap | null;
+  tenantName: string;
+}): Record<string, unknown> {
+  if (content?.kind === 'blog-detail' && content.post) {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: content.post.title,
+      url: canonicalUrl,
+    };
+  }
+
+  if (content?.kind === 'listings-index') {
+    const baseUrl = canonicalUrl.replace(/\/+$/, '');
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      itemListElement: content.listings.items.map((listing, index) => ({
+        '@type': 'ListItem',
+        image: listing.primaryImage?.url,
+        name: listing.title,
+        position: index + 1,
+        url: `${baseUrl}/${encodeURIComponent(listing.slug)}`,
+      })),
+      name: pageTitle,
+      url: canonicalUrl,
+    };
+  }
+
+  if (content?.kind === 'listing-detail' && content.listing) {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
+      areaServed: content.listing.location.label
+        ? {
+            '@type': 'Place',
+            name: content.listing.location.label,
+          }
+        : undefined,
+      description: content.listing.description,
+      image: content.listing.primaryImage?.url,
+      name: content.listing.title,
+      provider: {
+        '@type': 'Organization',
+        name: content.listing.provider.displayName ?? tenantName,
+      },
+      url: canonicalUrl,
+    };
+  }
+
+  if (content?.kind === 'public-detail' && content.item) {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      description: content.item.description,
+      name: content.item.title,
+      url: canonicalUrl,
+    };
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': tenant?.seo?.description ? 'Organization' : 'WebPage',
+    name: pageTitle || tenantName,
+    url: canonicalUrl,
+  };
 }
 
 function getRouteTitle(route: RouteOwnership, content: PublicRouteContent | null, t: Translator): string {
@@ -322,6 +570,10 @@ function getRouteTitle(route: RouteOwnership, content: PublicRouteContent | null
 
   if (content?.kind === 'public-detail' && content.item?.title) {
     return content.item.title;
+  }
+
+  if (content?.kind === 'listing-detail' && content.listing?.title) {
+    return content.listing.title;
   }
 
   return t(route.labelKey ?? 'pages.home.title');
@@ -343,6 +595,10 @@ function getRouteLead(
 
   if (content?.kind === 'public-detail' && content.item?.description) {
     return content.item.description;
+  }
+
+  if (content?.kind === 'listing-detail' && content.listing?.excerpt) {
+    return content.listing.excerpt;
   }
 
   return t(`pages.${route.routeKey}.lead`, { tenantName });

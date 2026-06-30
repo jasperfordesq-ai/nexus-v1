@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { resolveAssetUrl } from './assets';
 import { buildTenantBootstrapRequest, type ResolvedTenantRequest } from './tenant-request';
 import { getPublicEndpointForRoute } from './content-sources';
 
@@ -60,10 +61,71 @@ export interface PublicContentItem {
   title: string;
 }
 
+export interface PublicListingImage {
+  altText: string;
+  sortOrder?: number;
+  url: string;
+}
+
+export interface PublicListingCategory {
+  id: string | null;
+  name: string | null;
+  slug: string | null;
+}
+
+export interface PublicListingLocation {
+  label: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+export interface PublicListingTimeCreditValue {
+  hours: number | null;
+  unit: string;
+}
+
+export interface PublicListingProvider {
+  displayName: string | null;
+  id: string | null;
+}
+
+export interface PublicListing {
+  category: PublicListingCategory | null;
+  createdAt: string | null;
+  description: string;
+  excerpt: string;
+  gallery: PublicListingImage[];
+  id: string;
+  location: PublicListingLocation;
+  primaryImage: PublicListingImage | null;
+  provider: PublicListingProvider;
+  slug: string;
+  status: string;
+  timeCreditValue: PublicListingTimeCreditValue;
+  title: string;
+  type?: string | null;
+  updatedAt: string | null;
+}
+
+export interface PublicListingsPagination {
+  cursor: string | null;
+  hasMore: boolean;
+  page: number;
+  perPage: number;
+  total: number;
+}
+
+export interface PublicListingsIndex {
+  items: PublicListing[];
+  pagination: PublicListingsPagination;
+}
+
 export type PublicRouteContent =
   | { kind: 'blog-detail'; post: BlogPost | null }
   | { kind: 'blog-index'; posts: BlogPostSummary[] }
   | { kind: 'cms-page'; page: CmsPage | null }
+  | { kind: 'listing-detail'; listing: PublicListing | null }
+  | { kind: 'listings-index'; listings: PublicListingsIndex }
   | { items: PublicContentItem[]; kind: 'public-collection' }
   | { item: PublicContentItem | null; kind: 'public-detail' };
 
@@ -75,6 +137,7 @@ export type TenantBootstrapResult =
 interface ApiEnvelope<T> {
   data?: T;
   errors?: Array<{ code?: string; message?: string }>;
+  meta?: Record<string, unknown>;
 }
 
 const defaultApiBase = 'https://api.project-nexus.ie/api';
@@ -173,6 +236,21 @@ export async function fetchPublicCollection(
   return normalizePublicItems(payload);
 }
 
+export async function fetchListingsIndex(
+  request: ResolvedTenantRequest,
+  tenant: TenantBootstrap | null,
+): Promise<PublicListingsIndex> {
+  const endpoint = getPublicEndpointForRoute('listings') ?? '/v2/listings';
+  const url = buildApiUrl(endpoint, { per_page: '12' });
+  const response = await fetchApiResponse<unknown>(url, buildPublicHeaders(request, tenant));
+  const items = normalizePublicListings(response?.data);
+
+  return {
+    items,
+    pagination: normalizeListingsPagination(response?.meta, items.length),
+  };
+}
+
 export async function fetchPublicDetail(
   routeKey: string,
   paramsOrId: Record<string, string> | string,
@@ -192,6 +270,23 @@ export async function fetchPublicDetail(
   return normalizePublicItem(payload);
 }
 
+export async function fetchListingDetail(
+  id: string,
+  request: ResolvedTenantRequest,
+  tenant: TenantBootstrap | null,
+): Promise<PublicListing | null> {
+  const endpoint = getPublicEndpointForRoute('listingDetail', { id });
+
+  if (!endpoint) {
+    return null;
+  }
+
+  const url = buildApiUrl(endpoint);
+  const payload = await fetchApiPayload<unknown>(url, buildPublicHeaders(request, tenant));
+
+  return normalizePublicListing(payload);
+}
+
 async function fetchApiEnvelope<T>(url: string, headers: HeadersInit): Promise<T | null> {
   const payload = await fetchApiPayload<T>(url, headers);
 
@@ -199,6 +294,12 @@ async function fetchApiEnvelope<T>(url: string, headers: HeadersInit): Promise<T
 }
 
 async function fetchApiPayload<T>(url: string, headers: HeadersInit): Promise<T | null> {
+  const envelope = await fetchApiResponse<T>(url, headers);
+
+  return envelope?.data ?? null;
+}
+
+async function fetchApiResponse<T>(url: string, headers: HeadersInit): Promise<ApiEnvelope<T> | null> {
   try {
     const response = await fetch(url, {
       headers,
@@ -211,7 +312,7 @@ async function fetchApiPayload<T>(url: string, headers: HeadersInit): Promise<T 
 
     const envelope = (await response.json()) as ApiEnvelope<T>;
 
-    return envelope.data ?? null;
+    return envelope;
   } catch {
     return null;
   }
@@ -263,6 +364,123 @@ function normalizePublicItem(payload: unknown): PublicContentItem | null {
   };
 }
 
+function normalizePublicListings(payload: unknown): PublicListing[] {
+  return extractPublicItemArray(payload)
+    .map(normalizePublicListing)
+    .filter((listing): listing is PublicListing => listing !== null);
+}
+
+function normalizePublicListing(payload: unknown): PublicListing | null {
+  if (!isRecord(payload)) {
+    return null;
+  }
+
+  const contract = isRecord(payload.public_contract) ? payload.public_contract : payload;
+  const id = firstString(contract.id, contract.slug);
+  const title = firstString(contract.title);
+
+  if (!id || !title) {
+    return null;
+  }
+
+  const gallery = normalizeListingGallery(contract.gallery);
+  const primaryImage = normalizeListingImage(contract.primary_image) ?? gallery[0] ?? null;
+
+  return {
+    category: normalizeListingCategory(contract.category),
+    createdAt: firstString(contract.created_at) ?? null,
+    description: firstString(contract.description) ?? '',
+    excerpt: firstString(contract.excerpt, contract.description) ?? '',
+    gallery,
+    id,
+    location: normalizeListingLocation(contract.location),
+    primaryImage,
+    provider: normalizeListingProvider(contract.provider),
+    slug: firstString(contract.slug, id) ?? id,
+    status: firstString(contract.status) ?? 'active',
+    timeCreditValue: normalizeListingTimeCreditValue(contract.time_credit_value),
+    title,
+    type: firstString(contract.type) ?? null,
+    updatedAt: firstString(contract.updated_at) ?? null,
+  };
+}
+
+function normalizeListingGallery(value: unknown): PublicListingImage[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map(normalizeListingImage).filter((image): image is PublicListingImage => image !== null);
+}
+
+function normalizeListingImage(value: unknown): PublicListingImage | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const url = resolveAssetUrl(firstString(value.url), getApiBase());
+
+  if (!url) {
+    return null;
+  }
+
+  return {
+    altText: firstString(value.alt_text, value.altText) ?? '',
+    sortOrder: firstNumber(value.sort_order, value.sortOrder),
+    url,
+  };
+}
+
+function normalizeListingCategory(value: unknown): PublicListingCategory | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  return {
+    id: firstString(value.id) ?? null,
+    name: firstString(value.name) ?? null,
+    slug: firstString(value.slug) ?? null,
+  };
+}
+
+function normalizeListingLocation(value: unknown): PublicListingLocation {
+  const location = isRecord(value) ? value : {};
+
+  return {
+    label: firstString(location.label) ?? null,
+    latitude: firstNumber(location.latitude) ?? null,
+    longitude: firstNumber(location.longitude) ?? null,
+  };
+}
+
+function normalizeListingTimeCreditValue(value: unknown): PublicListingTimeCreditValue {
+  const timeValue = isRecord(value) ? value : {};
+
+  return {
+    hours: firstNumber(timeValue.hours) ?? null,
+    unit: firstString(timeValue.unit) ?? 'hour',
+  };
+}
+
+function normalizeListingProvider(value: unknown): PublicListingProvider {
+  const provider = isRecord(value) ? value : {};
+
+  return {
+    displayName: firstString(provider.display_name, provider.displayName) ?? null,
+    id: firstString(provider.id) ?? null,
+  };
+}
+
+function normalizeListingsPagination(meta: Record<string, unknown> | undefined, fallbackTotal: number): PublicListingsPagination {
+  return {
+    cursor: firstString(meta?.cursor) ?? null,
+    hasMore: firstBoolean(meta?.has_more, meta?.hasMore) ?? false,
+    page: firstNumber(meta?.page, meta?.current_page) ?? 1,
+    perPage: firstNumber(meta?.per_page, meta?.perPage) ?? 12,
+    total: firstNumber(meta?.total, meta?.total_items, meta?.totalItems) ?? fallbackTotal,
+  };
+}
+
 function firstString(...values: unknown[]): string | undefined {
   for (const value of values) {
     if (typeof value === 'string' && value.trim() !== '') {
@@ -271,6 +489,46 @@ function firstString(...values: unknown[]): string | undefined {
 
     if (typeof value === 'number' && Number.isFinite(value)) {
       return String(value);
+    }
+  }
+
+  return undefined;
+}
+
+function firstNumber(...values: unknown[]): number | undefined {
+  for (const value of values) {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string' && value.trim() !== '' && Number.isFinite(Number(value))) {
+      return Number(value);
+    }
+  }
+
+  return undefined;
+}
+
+function firstBoolean(...values: unknown[]): boolean | undefined {
+  for (const value of values) {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (typeof value === 'number') {
+      return value > 0;
+    }
+
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+
+      if (['1', 'true', 'yes'].includes(normalized)) {
+        return true;
+      }
+
+      if (['0', 'false', 'no'].includes(normalized)) {
+        return false;
+      }
     }
   }
 
@@ -304,6 +562,10 @@ function buildPublicHeaders(
     headers['X-Tenant-Slug'] = request.tenantSlug;
   } else if (tenant?.slug) {
     headers['X-Tenant-Slug'] = tenant.slug;
+  }
+
+  if (tenant?.default_language) {
+    headers['Accept-Language'] = tenant.default_language;
   }
 
   return headers;

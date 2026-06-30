@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import enPublicMessages from '../../messages/en/public.json';
+import gaPublicMessages from '../../messages/ga/public.json';
 
 interface MessageTree {
   [key: string]: MessageTree | string;
@@ -13,6 +14,7 @@ export type Translator = (key: string, replacements?: Replacements) => string;
 
 const messagesByLocale: Record<string, MessageTree> = {
   en: enPublicMessages,
+  ga: gaPublicMessages,
 };
 
 export function createTranslator(locale: string | undefined): Translator {

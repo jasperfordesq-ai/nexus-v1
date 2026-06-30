@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Http\Requests\Listings\ListListingsRequest;
+use App\Http\Resources\PublicListingResource;
 use App\Models\ListingImage;
 use App\Models\Notification;
 use App\Services\AiChatService;
@@ -173,12 +174,24 @@ class ListingsController extends BaseApiController
             $result['items'] = $this->personalisedFeedService->rank($userId, 'listings', $result['items']);
         }
 
+        $result['items'] = array_map(
+            static fn (array $item): array => PublicListingResource::augment($item),
+            $result['items']
+        );
+
+        $page = $this->queryInt('page', 1, 1, PHP_INT_MAX) ?? 1;
+
         return $this->respondWithCollection(
             $result['items'],
             $result['cursor'],
             $filters['limit'],
             $result['has_more'],
-            ['total_items' => $totalCount]
+            [
+                'cursor' => $result['cursor'],
+                'page' => $page,
+                'total' => $totalCount,
+                'total_items' => $totalCount,
+            ]
         );
     }
 
@@ -303,7 +316,7 @@ class ListingsController extends BaseApiController
             $listing['member_requests'] = [];
         }
 
-        return $this->respondWithData($listing);
+        return $this->respondWithData(PublicListingResource::augment($listing));
     }
 
     // -----------------------------------------------------------------

@@ -4,6 +4,12 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { TenantBootstrap } from './tenant-api';
+import type { RouteOwnership } from './public-routes';
+
+const routeModuleKeys: Record<string, string> = {
+  listingDetail: 'listings',
+  listings: 'listings',
+};
 
 export function isFeatureEnabled(tenant: TenantBootstrap | null, key: string): boolean {
   return normalizeBoolean(tenant?.features?.[key]);
@@ -11,6 +17,16 @@ export function isFeatureEnabled(tenant: TenantBootstrap | null, key: string): b
 
 export function isModuleEnabled(tenant: TenantBootstrap | null, key: string): boolean {
   return normalizeBoolean(tenant?.modules?.[key] ?? tenant?.features?.[key]);
+}
+
+export function isRouteEnabledForTenant(route: RouteOwnership, tenant: TenantBootstrap | null): boolean {
+  const moduleKey = routeModuleKeys[route.routeKey];
+
+  if (!moduleKey) {
+    return true;
+  }
+
+  return isModuleEnabled(tenant, moduleKey);
 }
 
 function normalizeBoolean(value: unknown): boolean {

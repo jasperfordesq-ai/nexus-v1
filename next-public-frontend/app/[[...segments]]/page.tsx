@@ -9,9 +9,13 @@ import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import { createTranslator } from '../../src/lib/i18n';
+import { buildListingMetadata } from '../../src/lib/listings-seo';
 import { buildCanonicalUrl, buildPageTitle } from '../../src/lib/metadata';
+import { isRouteEnabledForTenant } from '../../src/lib/module-gates';
 import { getRouteOwnership, type RouteOwnership } from '../../src/lib/public-routes';
 import {
+  fetchListingDetail,
+  fetchListingsIndex,
   fetchBlogPost,
   fetchBlogPosts,
   fetchCmsPage,
@@ -39,7 +43,11 @@ export async function generateMetadata({ params }: PublicPageProps): Promise<Met
   const context = await buildRouteContext((await params).segments ?? []);
   const t = createTranslator(context.tenant?.default_language ?? 'en');
 
-  if (context.route.owner !== 'next-public' || context.tenantBootstrap.status === 'not-found') {
+  if (
+    context.route.owner !== 'next-public'
+    || context.tenantBootstrap.status === 'not-found'
+    || isModuleUnavailable(context.route, context.tenant)
+  ) {
     return {
       title: buildPageTitle({
         pageLabel: t('pages.notFound.title'),
@@ -51,29 +59,58 @@ export async function generateMetadata({ params }: PublicPageProps): Promise<Met
   const content = await fetchRouteContent(context.route, context.request, context.tenant);
   const pageLabel = getMetadataLabel(context.route, content, t);
   const description = getMetadataDescription(context.route, content, context.tenant, t);
+  const title = buildPageTitle({
+    pageLabel,
+    platformName: t('brand.platformName'),
+    tenantName: context.tenant?.name,
+  });
+
+  if (content?.kind === 'listing-detail' && content.listing) {
+    return buildListingMetadata({
+      canonicalUrl: context.canonicalUrl,
+      listing: content.listing,
+      platformName: t('brand.platformName'),
+      tenantName: context.tenant?.name,
+    });
+  }
 
   return {
     alternates: {
       canonical: context.canonicalUrl,
     },
     description,
-    title: buildPageTitle({
-      pageLabel,
-      platformName: t('brand.platformName'),
-      tenantName: context.tenant?.name,
-    }),
+    openGraph: {
+      description,
+      title,
+      type: 'website',
+      url: context.canonicalUrl,
+    },
+    title,
+    twitter: {
+      card: 'summary',
+      description,
+      title,
+    },
   };
 }
 
 export default async function PublicRoutePage({ params }: PublicPageProps): Promise<ReactNode> {
   const context = await buildRouteContext((await params).segments ?? []);
 
-  if (context.route.owner !== 'next-public' || context.tenantBootstrap.status === 'not-found') {
+  if (
+    context.route.owner !== 'next-public'
+    || context.tenantBootstrap.status === 'not-found'
+    || isModuleUnavailable(context.route, context.tenant)
+  ) {
     notFound();
   }
 
   const t = createTranslator(context.tenant?.default_language ?? 'en');
   const content = await fetchRouteContent(context.route, context.request, context.tenant);
+
+  if (content?.kind === 'listing-detail' && !content.listing) {
+    notFound();
+  }
 
   return (
     <PublicPage
@@ -150,6 +187,20 @@ async function fetchRouteContent(
     };
   }
 
+  if (route.routeKey === 'listings') {
+    return {
+      kind: 'listings-index',
+      listings: await fetchListingsIndex(request, tenant),
+    };
+  }
+
+  if (route.routeKey === 'listingDetail' && route.params?.id) {
+    return {
+      kind: 'listing-detail',
+      listing: await fetchListingDetail(route.params.id, request, tenant),
+    };
+  }
+
   if (route.params && Object.keys(route.params).length > 0) {
     return {
       item: await fetchPublicDetail(route.routeKey, route.params, request, tenant),
@@ -169,6 +220,10 @@ async function fetchRouteContent(
   return null;
 }
 
+function isModuleUnavailable(route: RouteOwnership, tenant: TenantBootstrap | null): boolean {
+  return tenant !== null && !isRouteEnabledForTenant(route, tenant);
+}
+
 function getMetadataLabel(
   route: RouteOwnership,
   content: PublicRouteContent | null,
@@ -184,6 +239,10 @@ function getMetadataLabel(
 
   if (content?.kind === 'public-detail' && content.item?.title) {
     return content.item.title;
+  }
+
+  if (content?.kind === 'listing-detail' && content.listing?.title) {
+    return content.listing.title;
   }
 
   return t(route.labelKey ?? 'pages.home.title');
@@ -205,6 +264,10 @@ function getMetadataDescription(
 
   if (content?.kind === 'public-detail' && content.item?.description) {
     return content.item.description;
+  }
+
+  if (content?.kind === 'listing-detail' && content.listing?.excerpt) {
+    return content.listing.excerpt;
   }
 
   if (tenant?.seo?.description) {

@@ -84,6 +84,75 @@ class ListingsControllerTest extends TestCase
         ]);
     }
 
+    public function test_public_index_returns_full_next_public_contract_without_auth(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name' => 'Public',
+            'last_name' => 'Provider',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $this->ensureListingCategory();
+
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'category_id' => 1,
+            'title' => 'Repair a community bike',
+            'description' => 'A friendly public offer to repair a community bike.',
+            'image_url' => '/uploads/tenants/hour-timebank/listings/bike.jpg',
+            'location' => 'Remote or local',
+            'latitude' => null,
+            'longitude' => null,
+            'hours_estimate' => 2.5,
+            'status' => 'active',
+            'moderation_status' => 'approved',
+        ]);
+
+        $response = $this->apiGet('/v2/listings?per_page=1');
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'id',
+                    'title',
+                    'description',
+                    'public_contract' => [
+                        'id',
+                        'slug',
+                        'title',
+                        'description',
+                        'excerpt',
+                        'primary_image' => ['url', 'alt_text'],
+                        'gallery',
+                        'category' => ['id', 'name', 'slug'],
+                        'location' => ['label', 'latitude', 'longitude'],
+                        'time_credit_value' => ['hours', 'unit'],
+                        'provider' => ['id', 'display_name'],
+                        'created_at',
+                        'updated_at',
+                        'status',
+                    ],
+                ],
+            ],
+            'meta' => ['cursor', 'page', 'per_page', 'total', 'total_items', 'has_more'],
+        ]);
+
+        $contract = $response->json('data.0.public_contract');
+        $this->assertSame($listing->id, $contract['id']);
+        $this->assertSame((string) $listing->id, $contract['slug']);
+        $this->assertSame('Repair a community bike', $contract['title']);
+        $this->assertSame('A friendly public offer to repair a community bike.', $contract['description']);
+        $this->assertSame('General', $contract['category']['name']);
+        $this->assertSame('general', $contract['category']['slug']);
+        $this->assertSame('Remote or local', $contract['location']['label']);
+        $this->assertNull($contract['location']['latitude']);
+        $this->assertNull($contract['location']['longitude']);
+        $this->assertSame(2.5, (float) $contract['time_credit_value']['hours']);
+        $this->assertSame('hour', $contract['time_credit_value']['unit']);
+        $this->assertSame('Public Provider', $contract['provider']['display_name']);
+    }
+
     public function test_index_returns_403_when_listings_module_disabled(): void
     {
         DB::table('tenants')
@@ -280,6 +349,60 @@ class ListingsControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
+    }
+
+    public function test_public_show_returns_gallery_and_full_next_public_contract(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name' => 'Gallery',
+            'last_name' => 'Provider',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $this->ensureListingCategory();
+        $listing = Listing::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $user->id,
+            'category_id' => 1,
+            'title' => 'Garden mentoring',
+            'description' => 'Detailed public description for a gardening skills exchange.',
+            'image_url' => '/uploads/tenants/hour-timebank/listings/garden-cover.jpg',
+            'location' => 'Online',
+            'hours_estimate' => 1.25,
+            'status' => 'active',
+            'moderation_status' => 'approved',
+        ]);
+        DB::table('listing_images')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'listing_id' => $listing->id,
+                'image_url' => '/uploads/tenants/hour-timebank/listings/garden-1.jpg',
+                'sort_order' => 0,
+                'alt_text' => 'Raised beds',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'listing_id' => $listing->id,
+                'image_url' => '/uploads/tenants/hour-timebank/listings/garden-2.jpg',
+                'sort_order' => 1,
+                'alt_text' => 'Seedlings',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $response = $this->apiGet("/v2/listings/{$listing->id}");
+
+        $response->assertOk();
+        $contract = $response->json('data.public_contract');
+        $this->assertSame('Garden mentoring', $contract['title']);
+        $this->assertSame('/uploads/tenants/hour-timebank/listings/garden-cover.jpg', $contract['primary_image']['url']);
+        $this->assertSame('Garden mentoring', $contract['primary_image']['alt_text']);
+        $this->assertCount(2, $contract['gallery']);
+        $this->assertSame('/uploads/tenants/hour-timebank/listings/garden-1.jpg', $contract['gallery'][0]['url']);
+        $this->assertSame('Gallery Provider', $contract['provider']['display_name']);
+        $this->assertSame('active', $contract['status']);
     }
 
     // ================================================================

@@ -409,6 +409,21 @@
       "lead": "This route is not owned by the shadow public frontend."
     }
   },
+  "listings": {
+    "backToListings": "Listings",
+    "breadcrumbLabel": "Listing breadcrumb",
+    "categoryLabel": "Category",
+    "createdLabel": "Created",
+    "empty": "No public listings are available yet.",
+    "galleryLabel": "Gallery",
+    "imageAltFallback": "Listing image",
+    "locationLabel": "Location",
+    "providerLabel": "Provider",
+    "statusLabel": "Status",
+    "updatedLabel": "Updated",
+    "valueHours": "{{count}} hours",
+    "valueLabel": "Time value"
+  },
   "footer": {
     "attribution": "Project NEXUS is free software licensed under AGPL-3.0-or-later.",
     "copyright": "Copyright © 2024–2026 Jasper Ford."
