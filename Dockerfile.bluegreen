@@ -9,7 +9,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # `apt-get -y upgrade` first: the pinned php base image ships Debian packages
 # that accumulate known CVEs between its releases — the Trivy container gate
 # blocks on fixed-but-not-installed CRITICAL/HIGH findings.
-RUN apt-get update && apt-get -y upgrade && apt-get install -y --no-install-recommends \
+RUN apt-get -o Acquire::Retries=3 update && apt-get -o Acquire::Retries=3 -y upgrade && apt-get -o Acquire::Retries=3 install -y --no-install-recommends \
     libpng-dev \
     libjpeg-dev \
     libwebp-dev \
@@ -45,7 +45,19 @@ RUN docker-php-ext-configure gd \
         fileinfo \
         pcntl
 
-RUN pecl install redis && docker-php-ext-enable redis
+# pecl.php.net intermittently 504s / serves truncated tarballs, which repeatedly
+# broke CI ("Docker Build Verify") and production image builds on an unchanged
+# line. Retry with backoff and a clean download dir each attempt so a transient
+# blip doesn't fail the build; fail hard only after 5 genuine failures.
+RUN ok=0; \
+    for i in 1 2 3 4 5; do \
+        rm -rf /tmp/pear/download/* 2>/dev/null || true; \
+        if pecl install redis; then ok=1; break; fi; \
+        echo "pecl install redis failed (attempt $i/5)" >&2; \
+        if [ "$i" -lt 5 ]; then sleep "$((i * 10))"; fi; \
+    done; \
+    if [ "$ok" != 1 ]; then echo "pecl install redis failed after 5 attempts" >&2; exit 1; fi; \
+    docker-php-ext-enable redis
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -156,7 +168,15 @@ WORKDIR /var/www/html
 COPY docker/preload.php /var/www/html/docker/preload.php
 
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-scripts
+# Retry composer install — packagist / GitHub archive downloads flake intermittently
+# and a single transient blip should not fail a production image build.
+RUN ok=0; \
+    for i in 1 2 3; do \
+        if composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-scripts; then ok=1; break; fi; \
+        echo "composer install failed (attempt $i/3)" >&2; \
+        if [ "$i" -lt 3 ]; then sleep "$((i * 10))"; fi; \
+    done; \
+    if [ "$ok" != 1 ]; then echo "composer install failed after 3 attempts" >&2; exit 1; fi
 
 COPY accessible-frontend ./accessible-frontend
 COPY app ./app

@@ -16,7 +16,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # `apt-get -y upgrade` first: the pinned php base image ships Debian packages
 # that accumulate known CVEs between its releases — the Trivy container gate
 # blocks on fixed-but-not-installed CRITICAL/HIGH findings.
-RUN apt-get update && apt-get -y upgrade && apt-get install -y --no-install-recommends \
+RUN apt-get -o Acquire::Retries=3 update && apt-get -o Acquire::Retries=3 -y upgrade && apt-get -o Acquire::Retries=3 install -y --no-install-recommends \
     # Build tools
     libpng-dev \
     libjpeg-dev \
@@ -58,11 +58,32 @@ RUN docker-php-ext-configure gd \
         curl \
         fileinfo
 
-# Redis extension (for sessions/cache)
-RUN pecl install redis && docker-php-ext-enable redis
+# Redis extension (for sessions/cache).
+# pecl.php.net intermittently 504s / serves truncated tarballs, which repeatedly
+# broke CI ("Docker Build Verify") and production image builds on an unchanged
+# line. Retry with backoff and a clean download dir each attempt so a transient
+# blip doesn't fail the build; fail hard only after 5 genuine failures.
+RUN ok=0; \
+    for i in 1 2 3 4 5; do \
+        rm -rf /tmp/pear/download/* 2>/dev/null || true; \
+        if pecl install redis; then ok=1; break; fi; \
+        echo "pecl install redis failed (attempt $i/5)" >&2; \
+        if [ "$i" -lt 5 ]; then sleep "$((i * 10))"; fi; \
+    done; \
+    if [ "$ok" != 1 ]; then echo "pecl install redis failed after 5 attempts" >&2; exit 1; fi; \
+    docker-php-ext-enable redis
 
-# PCOV extension (for PHPUnit code coverage — lightweight, no overhead when disabled)
-RUN pecl install pcov && docker-php-ext-enable pcov
+# PCOV extension (for PHPUnit code coverage — lightweight, no overhead when disabled).
+# Same pecl.php.net resilience wrapper as redis above.
+RUN ok=0; \
+    for i in 1 2 3 4 5; do \
+        rm -rf /tmp/pear/download/* 2>/dev/null || true; \
+        if pecl install pcov; then ok=1; break; fi; \
+        echo "pecl install pcov failed (attempt $i/5)" >&2; \
+        if [ "$i" -lt 5 ]; then sleep "$((i * 10))"; fi; \
+    done; \
+    if [ "$ok" != 1 ]; then echo "pecl install pcov failed after 5 attempts" >&2; exit 1; fi; \
+    docker-php-ext-enable pcov
 
 # =============================================================================
 # Apache Configuration
