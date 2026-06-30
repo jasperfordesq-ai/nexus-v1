@@ -1576,12 +1576,6 @@ describe('adminSettings', () => {
     expect(mockGet).toHaveBeenCalledWith('/v2/admin/config/sitemap-stats');
   });
 
-  it('getNextPublicFrontendReadiness calls the shadow readiness endpoint', async () => {
-    mockGet.mockResolvedValueOnce({ success: true, data: {} });
-    await adminSettings.getNextPublicFrontendReadiness();
-    expect(mockGet).toHaveBeenCalledWith('/v2/admin/config/next-public-frontend');
-  });
-
   it('clearSitemapCache posts to sitemap-clear-cache', async () => {
     mockPost.mockResolvedValueOnce({ success: true, data: { cleared: 10 } });
     await adminSettings.clearSitemapCache();

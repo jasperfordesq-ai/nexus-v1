@@ -1324,7 +1324,6 @@ Route::get('/v2/admin/config/images', [\App\Http\Controllers\Api\AdminConfigCont
 Route::put('/v2/admin/config/images', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateImageConfig']);
 Route::get('/v2/admin/config/seo', [\App\Http\Controllers\Api\AdminConfigController::class, 'getSeoConfig']);
 Route::put('/v2/admin/config/seo', [\App\Http\Controllers\Api\AdminConfigController::class, 'updateSeoConfig']);
-Route::get('/v2/admin/config/next-public-frontend', [\App\Http\Controllers\Api\AdminNextPublicFrontendController::class, 'show']);
 Route::get('/v2/admin/config/sitemap-stats', [\App\Http\Controllers\Api\AdminConfigController::class, 'getSitemapStats']);
 Route::post('/v2/admin/config/sitemap-clear-cache', [\App\Http\Controllers\Api\AdminConfigController::class, 'clearSitemapCache']);
 Route::get('/v2/admin/config/languages', [\App\Http\Controllers\Api\AdminConfigController::class, 'getLanguageConfig']);

@@ -57,8 +57,6 @@ CLAUDE.md
 !/scripts/check-docs-hygiene.mjs
 !/scripts/check-version-consistency.mjs
 !/scripts/check-changelog-updated.mjs
-!/scripts/check-next-public-inert.mjs
-!/scripts/check-next-public-dry-run.mjs
 !/scripts/check-govuk-alpha-translations.mjs
 !/scripts/check-notification-locale.mjs
 !/scripts/safe_migrate.php

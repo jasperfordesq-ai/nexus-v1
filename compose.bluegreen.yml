@@ -100,38 +100,6 @@ services:
       retries: 12
       start_period: 10s
 
-  next_public_frontend:
-    profiles:
-      - next-public-shadow
-    build:
-      context: ./next-public-frontend
-      dockerfile: Dockerfile
-      args:
-        NEXUS_API_BASE: ${NEXUS_NEXT_PUBLIC_API_BASE:-https://api.project-nexus.ie/api}
-    image: nexus-next-public-shadow:${BUILD_COMMIT:-candidate}
-    container_name: nexus-${NEXUS_COLOR:-green}-next-public-shadow
-    restart: unless-stopped
-    stop_grace_period: 30s
-    deploy:
-      resources:
-        limits:
-          memory: 384M
-        reservations:
-          memory: 128M
-    ports:
-      - "${NEXUS_NEXT_PUBLIC_PORT:-3200}:3000"
-    environment:
-      - NEXUS_API_BASE=${NEXUS_NEXT_PUBLIC_API_BASE:-https://api.project-nexus.ie/api}
-      - NODE_ENV=production
-    networks:
-      - nexus-php-internal
-    healthcheck:
-      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3000/about').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
-      interval: 10s
-      timeout: 5s
-      retries: 12
-      start_period: 20s
-
   queue:
     image: nexus-php-app:${BUILD_COMMIT:-candidate}
     container_name: nexus-${NEXUS_COLOR:-green}-php-queue

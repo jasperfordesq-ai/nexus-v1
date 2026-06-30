@@ -11,10 +11,6 @@ return [
     'debug' => (bool) env('APP_DEBUG', false),
     'url' => env('APP_URL', 'http://localhost'),
     'frontend_url' => env('FRONTEND_URL', env('APP_FRONTEND_URL', env('APP_URL', 'http://localhost'))),
-    'next_public_frontend_routing_enabled' => filter_var(
-        env('NEXT_PUBLIC_FRONTEND_ROUTING_ENABLED', false),
-        FILTER_VALIDATE_BOOLEAN,
-    ),
     // Deploy-injected build commit (set by bluegreen-deploy.sh). Read via
     // config('app.build_commit') so it survives config:cache — env() returns
     // null once the config cache is built.
