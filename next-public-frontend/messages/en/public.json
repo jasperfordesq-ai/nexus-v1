@@ -437,6 +437,28 @@
     "statusLabel": "Status",
     "updatedLabel": "Updated"
   },
+  "jobs": {
+    "backToJobs": "Jobs",
+    "breadcrumbLabel": "Job breadcrumb",
+    "categoryLabel": "Category",
+    "commitmentLabel": "Commitment",
+    "compensationLabel": "Compensation",
+    "createdLabel": "Created",
+    "deadlineLabel": "Deadline",
+    "empty": "No public jobs are available yet.",
+    "employerLabel": "Employer",
+    "galleryLabel": "Gallery",
+    "hoursPerWeek": "{{count}} hours per week",
+    "imageAltFallback": "Job image",
+    "locationLabel": "Location",
+    "remoteLabel": "Remote",
+    "salaryNegotiable": "Salary negotiable",
+    "skillsLabel": "Skills",
+    "statusLabel": "Status",
+    "timeCredits": "{{count}} time credits",
+    "typeLabel": "Type",
+    "updatedLabel": "Updated"
+  },
   "footer": {
     "attribution": "Project NEXUS is free software licensed under AGPL-3.0-or-later.",
     "copyright": "Copyright © 2024–2026 Jasper Ford."

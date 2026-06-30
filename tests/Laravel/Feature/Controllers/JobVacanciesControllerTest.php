@@ -11,6 +11,7 @@ use App\Models\JobApplication;
 use App\Models\JobVacancy;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -75,6 +76,115 @@ class JobVacanciesControllerTest extends TestCase
         $response = $this->apiGet('/v2/jobs');
 
         $response->assertStatus(200);
+        $this->assertArrayNotHasKey('public_contract', $response->json('data.0'));
+    }
+
+    public function test_public_index_returns_full_next_public_job_contract_when_opted_in(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name' => 'Hiring',
+            'last_name' => 'Lead',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $organizationId = DB::table('organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'name' => 'Civic Works Co-op',
+            'logo_url' => '/uploads/tenants/hour-timebank/jobs/civic-works.png',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $vacancy = $this->createVacancy([
+            'user_id' => $user->id,
+            'organization_id' => $organizationId,
+            'status' => 'open',
+            'moderation_status' => 'approved',
+            'title' => 'Community outreach coordinator',
+            'description' => 'Coordinate public outreach and community partner events.',
+            'tagline' => 'Help neighbours discover practical support.',
+            'location' => 'Remote or local',
+            'latitude' => null,
+            'longitude' => null,
+            'is_remote' => true,
+            'type' => 'paid',
+            'commitment' => 'part_time',
+            'category' => 'community',
+            'skills_required' => 'coordination, outreach',
+            'hours_per_week' => 12.5,
+            'time_credits' => 4,
+            'salary_min' => 25000,
+            'salary_max' => 35000,
+            'salary_type' => 'annual',
+            'salary_currency' => 'EUR',
+            'deadline' => '2030-07-10 00:00:00',
+            'culture_photos' => ['/uploads/tenants/hour-timebank/jobs/outreach-team.jpg'],
+        ]);
+
+        $response = $this->apiGet('/v2/jobs?per_page=1', [
+            'X-Public-Contract' => '1',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'id',
+                    'title',
+                    'description',
+                    'public_contract' => [
+                        'id',
+                        'slug',
+                        'title',
+                        'description',
+                        'excerpt',
+                        'primary_image' => ['url', 'alt_text'],
+                        'gallery' => [['url', 'alt_text', 'sort_order']],
+                        'category' => ['name', 'slug'],
+                        'location' => ['label', 'latitude', 'longitude', 'is_remote'],
+                        'employer' => ['id', 'display_name', 'logo_url'],
+                        'job_type',
+                        'commitment',
+                        'skills',
+                        'compensation' => [
+                            'salary_min',
+                            'salary_max',
+                            'salary_currency',
+                            'salary_type',
+                            'salary_negotiable',
+                            'time_credits',
+                            'hours_per_week',
+                        ],
+                        'deadline_at',
+                        'created_at',
+                        'updated_at',
+                        'status',
+                    ],
+                ],
+            ],
+        ]);
+
+        $contract = $response->json('data.0.public_contract');
+        $this->assertSame($vacancy->id, $contract['id']);
+        $this->assertSame((string) $vacancy->id, $contract['slug']);
+        $this->assertSame('Community outreach coordinator', $contract['title']);
+        $this->assertSame('Help neighbours discover practical support.', $contract['excerpt']);
+        $this->assertSame('/uploads/tenants/hour-timebank/jobs/civic-works.png', $contract['primary_image']['url']);
+        $this->assertSame('/uploads/tenants/hour-timebank/jobs/outreach-team.jpg', $contract['gallery'][0]['url']);
+        $this->assertSame('community', $contract['category']['name']);
+        $this->assertSame('Remote or local', $contract['location']['label']);
+        $this->assertTrue($contract['location']['is_remote']);
+        $this->assertSame('Civic Works Co-op', $contract['employer']['display_name']);
+        $this->assertSame('paid', $contract['job_type']);
+        $this->assertSame('part_time', $contract['commitment']);
+        $this->assertSame(['coordination', 'outreach'], $contract['skills']);
+        $this->assertEquals(25000.0, $contract['compensation']['salary_min']);
+        $this->assertEquals(35000.0, $contract['compensation']['salary_max']);
+        $this->assertSame('EUR', $contract['compensation']['salary_currency']);
+        $this->assertEquals(4.0, $contract['compensation']['time_credits']);
+        $this->assertEquals(12.5, $contract['compensation']['hours_per_week']);
+        $this->assertSame('2030-07-10T00:00:00+00:00', $contract['deadline_at']);
     }
 
     public function test_index_supports_status_filter(): void
@@ -256,6 +366,50 @@ class JobVacanciesControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
+        $this->assertArrayNotHasKey('public_contract', $response->json('data'));
+    }
+
+    public function test_public_show_returns_full_next_public_job_contract_when_opted_in(): void
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name' => 'Detail',
+            'last_name' => 'Employer',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $vacancy = $this->createVacancy([
+            'user_id' => $user->id,
+            'status' => 'open',
+            'moderation_status' => 'approved',
+            'title' => 'Repair cafe coordinator',
+            'description' => 'Lead a public repair cafe and welcome new volunteers.',
+            'tagline' => 'Coordinate a weekly repair cafe.',
+            'location' => 'Online',
+            'is_remote' => true,
+            'type' => 'timebank',
+            'commitment' => 'flexible',
+            'category' => 'repairs',
+            'skills_required' => 'repair, facilitation',
+            'time_credits' => 3,
+            'deadline' => '2030-08-01 17:00:00',
+        ]);
+
+        $response = $this->apiGet("/v2/jobs/{$vacancy->id}", [
+            'X-Public-Contract' => '1',
+        ]);
+
+        $response->assertOk();
+        $contract = $response->json('data.public_contract');
+        $this->assertSame($vacancy->id, $contract['id']);
+        $this->assertSame('Repair cafe coordinator', $contract['title']);
+        $this->assertSame('Coordinate a weekly repair cafe.', $contract['excerpt']);
+        $this->assertSame('Online', $contract['location']['label']);
+        $this->assertTrue($contract['location']['is_remote']);
+        $this->assertSame('Detail Employer', $contract['employer']['display_name']);
+        $this->assertSame('timebank', $contract['job_type']);
+        $this->assertSame('flexible', $contract['commitment']);
+        $this->assertEquals(3.0, $contract['compensation']['time_credits']);
+        $this->assertSame('2030-08-01T17:00:00+00:00', $contract['deadline_at']);
     }
 
     public function test_show_returns_404_for_nonexistent(): void

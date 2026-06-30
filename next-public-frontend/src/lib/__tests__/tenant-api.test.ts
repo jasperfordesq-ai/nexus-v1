@@ -10,6 +10,8 @@ import {
   fetchListingsIndex,
   fetchEventDetail,
   fetchEventsIndex,
+  fetchJobDetail,
+  fetchJobsIndex,
   fetchPublicCollection,
   fetchPublicDetail,
   fetchTenantBootstrap,
@@ -429,6 +431,176 @@ describe('tenant API client', () => {
 
     expect(fetchSpy).toHaveBeenCalledWith(
       'https://api.example.test/api/v2/events/12',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'X-Public-Contract': '1',
+        }),
+      }),
+    );
+  });
+
+  it('maps the full public jobs contract and opts in to Laravel public contracts', async () => {
+    process.env.NEXUS_API_BASE = 'https://api.example.test/api';
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: [
+            {
+              public_contract: {
+                id: 21,
+                slug: '21',
+                title: 'Community outreach coordinator',
+                description: 'Coordinate public outreach and community partner events.',
+                excerpt: 'Help neighbours discover practical support.',
+                primary_image: {
+                  url: '/uploads/tenants/hour-timebank/jobs/civic-works.png',
+                  alt_text: 'Civic Works Co-op',
+                },
+                gallery: [
+                  {
+                    url: '/uploads/tenants/hour-timebank/jobs/outreach-team.jpg',
+                    alt_text: 'Community outreach coordinator',
+                    sort_order: 0,
+                  },
+                ],
+                category: {
+                  name: 'community',
+                  slug: 'community',
+                },
+                location: {
+                  label: 'Remote or local',
+                  latitude: null,
+                  longitude: null,
+                  is_remote: true,
+                },
+                employer: {
+                  id: 9,
+                  display_name: 'Civic Works Co-op',
+                  logo_url: '/uploads/tenants/hour-timebank/jobs/civic-works.png',
+                },
+                job_type: 'paid',
+                commitment: 'part_time',
+                skills: ['coordination', 'outreach'],
+                compensation: {
+                  salary_min: 25000,
+                  salary_max: 35000,
+                  salary_currency: 'EUR',
+                  salary_type: 'annual',
+                  salary_negotiable: false,
+                  time_credits: 4,
+                  hours_per_week: 12.5,
+                },
+                deadline_at: '2030-07-10T00:00:00+00:00',
+                created_at: '2026-06-01T10:00:00+00:00',
+                updated_at: '2026-06-02T11:00:00+00:00',
+                status: 'open',
+              },
+            },
+          ],
+          meta: {
+            cursor: null,
+            has_more: false,
+            page: 1,
+            per_page: 12,
+            total: 1,
+          },
+        }),
+      ),
+    );
+
+    await expect(fetchJobsIndex(request, null)).resolves.toMatchObject({
+      jobs: [
+        {
+          employer: { displayName: 'Civic Works Co-op' },
+          id: '21',
+          jobType: 'paid',
+          location: { isRemote: true, label: 'Remote or local' },
+          primaryImage: {
+            url: 'https://api.example.test/uploads/tenants/hour-timebank/jobs/civic-works.png',
+          },
+          title: 'Community outreach coordinator',
+        },
+      ],
+      pagination: {
+        hasMore: false,
+        page: 1,
+        perPage: 12,
+        total: 1,
+      },
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://api.example.test/api/v2/jobs?per_page=12',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'X-Public-Contract': '1',
+        }),
+      }),
+    );
+  });
+
+  it('maps public job detail through the dedicated contract path', async () => {
+    process.env.NEXUS_API_BASE = 'https://api.example.test/api';
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: {
+            public_contract: {
+              id: 22,
+              slug: '22',
+              title: 'Repair cafe coordinator',
+              description: 'Lead a public repair cafe and welcome new volunteers.',
+              excerpt: 'Coordinate a weekly repair cafe.',
+              primary_image: null,
+              gallery: [],
+              category: {
+                name: 'repairs',
+                slug: 'repairs',
+              },
+              location: {
+                label: 'Online',
+                latitude: null,
+                longitude: null,
+                is_remote: true,
+              },
+              employer: {
+                id: 10,
+                display_name: 'Detail Employer',
+                logo_url: null,
+              },
+              job_type: 'timebank',
+              commitment: 'flexible',
+              skills: ['repair', 'facilitation'],
+              compensation: {
+                salary_min: null,
+                salary_max: null,
+                salary_currency: null,
+                salary_type: null,
+                salary_negotiable: false,
+                time_credits: 3,
+                hours_per_week: null,
+              },
+              deadline_at: '2030-08-01T17:00:00+00:00',
+              created_at: '2026-06-01T10:00:00+00:00',
+              updated_at: '2026-06-02T11:00:00+00:00',
+              status: 'open',
+            },
+          },
+        }),
+      ),
+    );
+
+    await expect(fetchJobDetail('22', request, null)).resolves.toMatchObject({
+      commitment: 'flexible',
+      employer: { displayName: 'Detail Employer' },
+      id: '22',
+      jobType: 'timebank',
+      location: { isRemote: true, label: 'Online' },
+      title: 'Repair cafe coordinator',
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://api.example.test/api/v2/jobs/22',
       expect.objectContaining({
         headers: expect.objectContaining({
           'X-Public-Contract': '1',

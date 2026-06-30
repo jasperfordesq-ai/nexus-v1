@@ -13,6 +13,8 @@ import type {
   PublicContentItem,
   PublicEvent,
   PublicEventsIndex,
+  PublicJob,
+  PublicJobsIndex,
   PublicListing,
   PublicListingsIndex,
   PublicRouteContent,
@@ -171,6 +173,14 @@ function renderRouteContent(
 
   if (content?.kind === 'event-detail' && content.event) {
     return <EventDetail event={content.event} tenantBasePath={tenantBasePath} t={t} />;
+  }
+
+  if (content?.kind === 'jobs-index') {
+    return <JobsIndex jobs={content.jobs} tenantBasePath={tenantBasePath} t={t} />;
+  }
+
+  if (content?.kind === 'job-detail' && content.job) {
+    return <JobDetail job={content.job} tenantBasePath={tenantBasePath} t={t} />;
   }
 
   if (content?.kind === 'public-collection') {
@@ -462,6 +472,131 @@ function EventDetail({
   );
 }
 
+function JobsIndex({
+  jobs,
+  tenantBasePath,
+  t,
+}: {
+  jobs: PublicJobsIndex;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  if (jobs.jobs.length === 0) {
+    return (
+      <article className="public-panel">
+        <h2>{t('pages.jobs.title')}</h2>
+        <p>{t('jobs.empty')}</p>
+      </article>
+    );
+  }
+
+  return (
+    <div className="listings-grid">
+      {jobs.jobs.map((job) => (
+        <article className="listing-card" key={job.id}>
+          <a className="listing-card-image" href={withTenantBase(tenantBasePath, `jobs/${job.slug}`)}>
+            {job.primaryImage ? (
+              <img alt={job.primaryImage.altText || t('jobs.imageAltFallback')} src={job.primaryImage.url} />
+            ) : (
+              <span aria-hidden="true" />
+            )}
+          </a>
+          <div className="listing-card-body">
+            <p className="listing-card-meta">
+              {compactText([job.category?.name, formatJobType(job), formatJobCompensation(job, t)]).join(' / ')}
+            </p>
+            <h2>
+              <a href={withTenantBase(tenantBasePath, `jobs/${job.slug}`)}>{job.title}</a>
+            </h2>
+            <p>{job.excerpt || job.description}</p>
+            <dl className="listing-facts">
+              <DefinitionRow label={t('jobs.locationLabel')} value={formatJobLocation(job, t)} />
+              <DefinitionRow label={t('jobs.employerLabel')} value={job.employer.displayName} />
+            </dl>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function JobDetail({
+  job,
+  tenantBasePath,
+  t,
+}: {
+  job: PublicJob;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  const gallery = job.gallery.length > 0 ? job.gallery : compactJobImages([job.primaryImage]);
+
+  return (
+    <article className="listing-detail">
+      <nav aria-label={t('jobs.breadcrumbLabel')} className="listing-breadcrumb">
+        <a href={withTenantBase(tenantBasePath, 'jobs')}>{t('jobs.backToJobs')}</a>
+        <span aria-hidden="true">/</span>
+        <span>{job.title}</span>
+      </nav>
+
+      {job.primaryImage ? (
+        <img
+          alt={job.primaryImage.altText || t('jobs.imageAltFallback')}
+          className="listing-hero-image"
+          src={job.primaryImage.url}
+        />
+      ) : null}
+
+      <div className="listing-detail-grid">
+        <div className="listing-detail-main">
+          <section className="public-panel article-content">
+            <h2>{job.title}</h2>
+            <p>{job.description}</p>
+          </section>
+
+          {job.skills.length > 0 ? (
+            <section className="public-panel">
+              <h2>{t('jobs.skillsLabel')}</h2>
+              <p>{job.skills.join(', ')}</p>
+            </section>
+          ) : null}
+
+          {gallery.length > 0 ? (
+            <section className="public-panel">
+              <h2>{t('jobs.galleryLabel')}</h2>
+              <div className="listing-gallery">
+                {gallery.map((image) => (
+                  <img
+                    alt={image.altText || t('jobs.imageAltFallback')}
+                    key={`${image.url}-${image.sortOrder ?? 0}`}
+                    src={image.url}
+                  />
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </div>
+
+        <aside className="public-panel listing-detail-aside">
+          <h2>{t('jobs.employerLabel')}</h2>
+          <p>{job.employer.displayName}</p>
+          <dl className="listing-facts stacked">
+            <DefinitionRow label={t('jobs.compensationLabel')} value={formatJobCompensation(job, t)} />
+            <DefinitionRow label={t('jobs.locationLabel')} value={formatJobLocation(job, t)} />
+            <DefinitionRow label={t('jobs.categoryLabel')} value={job.category?.name} />
+            <DefinitionRow label={t('jobs.typeLabel')} value={job.jobType} />
+            <DefinitionRow label={t('jobs.commitmentLabel')} value={job.commitment} />
+            <DefinitionRow label={t('jobs.deadlineLabel')} value={formatDate(job.deadlineAt)} />
+            <DefinitionRow label={t('jobs.statusLabel')} value={job.status} />
+            <DefinitionRow label={t('jobs.updatedLabel')} value={formatDate(job.updatedAt)} />
+            <DefinitionRow label={t('jobs.createdLabel')} value={formatDate(job.createdAt)} />
+          </dl>
+        </aside>
+      </div>
+    </article>
+  );
+}
+
 function PublicCollection({
   basePath,
   emptyTitle,
@@ -528,6 +663,49 @@ function formatEventRange(event: PublicEvent): string | null {
   return start ?? end;
 }
 
+function formatJobCompensation(job: PublicJob, t: Translator): string | null {
+  const { compensation } = job;
+  const currency = compensation.salaryCurrency ?? '';
+
+  if (compensation.salaryMin !== null && compensation.salaryMax !== null) {
+    return `${currency} ${formatNumber(compensation.salaryMin)} - ${formatNumber(compensation.salaryMax)}`.trim();
+  }
+
+  if (compensation.salaryMin !== null) {
+    return `${currency} ${formatNumber(compensation.salaryMin)}`.trim();
+  }
+
+  if (compensation.timeCredits !== null) {
+    return t('jobs.timeCredits', { count: formatNumber(compensation.timeCredits) });
+  }
+
+  if (compensation.hoursPerWeek !== null) {
+    return t('jobs.hoursPerWeek', { count: formatNumber(compensation.hoursPerWeek) });
+  }
+
+  if (compensation.salaryNegotiable) {
+    return t('jobs.salaryNegotiable');
+  }
+
+  return null;
+}
+
+function formatJobLocation(job: PublicJob, t: Translator): string | null {
+  if (job.location.isRemote && job.location.label) {
+    return `${job.location.label} / ${t('jobs.remoteLabel')}`;
+  }
+
+  if (job.location.isRemote) {
+    return t('jobs.remoteLabel');
+  }
+
+  return job.location.label;
+}
+
+function formatJobType(job: PublicJob): string | null {
+  return compactText([job.jobType, job.commitment]).join(' / ') || null;
+}
+
 function formatDateTime(value: string | null): string | null {
   if (!value) {
     return null;
@@ -567,7 +745,7 @@ function formatDate(value: string | null): string | null {
 }
 
 function formatNumber(value: number): string {
-  return Number.isInteger(value) ? String(value) : String(value);
+  return new Intl.NumberFormat('en').format(value);
 }
 
 function compactText(values: Array<null | string | undefined>): string[] {
@@ -576,6 +754,10 @@ function compactText(values: Array<null | string | undefined>): string[] {
 
 function compactImages(values: Array<PublicListing['primaryImage']>): PublicListing['gallery'] {
   return values.filter((value): value is PublicListing['gallery'][number] => value !== null);
+}
+
+function compactJobImages(values: Array<PublicJob['primaryImage']>): PublicJob['gallery'] {
+  return values.filter((value): value is PublicJob['gallery'][number] => value !== null);
 }
 
 function PublicDetail({ item }: { item: PublicContentItem }): ReactNode {
@@ -677,6 +859,24 @@ function buildStructuredData({
     };
   }
 
+  if (content?.kind === 'jobs-index') {
+    const baseUrl = canonicalUrl.replace(/\/+$/, '');
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      itemListElement: content.jobs.jobs.map((job, index) => ({
+        '@type': 'ListItem',
+        image: job.primaryImage?.url,
+        name: job.title,
+        position: index + 1,
+        url: `${baseUrl}/${encodeURIComponent(job.slug)}`,
+      })),
+      name: pageTitle,
+      url: canonicalUrl,
+    };
+  }
+
   if (content?.kind === 'listing-detail' && content.listing) {
     return {
       '@context': 'https://schema.org',
@@ -722,6 +922,50 @@ function buildStructuredData({
     };
   }
 
+  if (content?.kind === 'job-detail' && content.job) {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'JobPosting',
+      applicantLocationRequirements: content.job.location.isRemote
+        ? {
+            '@type': 'Country',
+            name: content.job.location.label ?? 'Remote',
+          }
+        : undefined,
+      baseSalary:
+        content.job.compensation.salaryMin !== null || content.job.compensation.salaryMax !== null
+          ? {
+              '@type': 'MonetaryAmount',
+              currency: content.job.compensation.salaryCurrency ?? undefined,
+              value: {
+                '@type': 'QuantitativeValue',
+                maxValue: content.job.compensation.salaryMax ?? undefined,
+                minValue: content.job.compensation.salaryMin ?? undefined,
+                unitText: content.job.compensation.salaryType ?? undefined,
+              },
+            }
+          : undefined,
+      datePosted: content.job.createdAt ?? undefined,
+      description: content.job.description,
+      employmentType: content.job.commitment ?? undefined,
+      hiringOrganization: {
+        '@type': 'Organization',
+        name: content.job.employer.displayName ?? tenantName,
+        logo: content.job.employer.logoUrl ?? undefined,
+      },
+      image: content.job.primaryImage?.url,
+      jobLocation: content.job.location.label
+        ? {
+            '@type': 'Place',
+            address: content.job.location.label,
+          }
+        : undefined,
+      title: content.job.title,
+      url: canonicalUrl,
+      validThrough: content.job.deadlineAt ?? undefined,
+    };
+  }
+
   if (content?.kind === 'public-detail' && content.item) {
     return {
       '@context': 'https://schema.org',
@@ -761,6 +1005,10 @@ function getRouteTitle(route: RouteOwnership, content: PublicRouteContent | null
     return content.event.title;
   }
 
+  if (content?.kind === 'job-detail' && content.job?.title) {
+    return content.job.title;
+  }
+
   return t(route.labelKey ?? 'pages.home.title');
 }
 
@@ -788,6 +1036,10 @@ function getRouteLead(
 
   if (content?.kind === 'event-detail' && content.event?.excerpt) {
     return content.event.excerpt;
+  }
+
+  if (content?.kind === 'job-detail' && content.job?.excerpt) {
+    return content.job.excerpt;
   }
 
   return t(`pages.${route.routeKey}.lead`, { tenantName });

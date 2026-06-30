@@ -10,6 +10,7 @@ import type { ReactNode } from 'react';
 
 import { createTranslator } from '../../src/lib/i18n';
 import { buildEventMetadata } from '../../src/lib/events-seo';
+import { buildJobMetadata } from '../../src/lib/jobs-seo';
 import { buildListingMetadata } from '../../src/lib/listings-seo';
 import { buildCanonicalUrl, buildPageTitle } from '../../src/lib/metadata';
 import { isRouteEnabledForTenant } from '../../src/lib/module-gates';
@@ -17,6 +18,8 @@ import { getRouteOwnership, type RouteOwnership } from '../../src/lib/public-rou
 import {
   fetchEventDetail,
   fetchEventsIndex,
+  fetchJobDetail,
+  fetchJobsIndex,
   fetchListingDetail,
   fetchListingsIndex,
   fetchBlogPost,
@@ -86,6 +89,15 @@ export async function generateMetadata({ params }: PublicPageProps): Promise<Met
     });
   }
 
+  if (content?.kind === 'job-detail' && content.job) {
+    return buildJobMetadata({
+      canonicalUrl: context.canonicalUrl,
+      job: content.job,
+      platformName: t('brand.platformName'),
+      tenantName: context.tenant?.name,
+    });
+  }
+
   return {
     alternates: {
       canonical: context.canonicalUrl,
@@ -125,6 +137,10 @@ export default async function PublicRoutePage({ params }: PublicPageProps): Prom
   }
 
   if (content?.kind === 'event-detail' && !content.event) {
+    notFound();
+  }
+
+  if (content?.kind === 'job-detail' && !content.job) {
     notFound();
   }
 
@@ -231,6 +247,20 @@ async function fetchRouteContent(
     };
   }
 
+  if (route.routeKey === 'jobs') {
+    return {
+      jobs: await fetchJobsIndex(request, tenant),
+      kind: 'jobs-index',
+    };
+  }
+
+  if (route.routeKey === 'jobDetail' && route.params?.id) {
+    return {
+      job: await fetchJobDetail(route.params.id, request, tenant),
+      kind: 'job-detail',
+    };
+  }
+
   if (route.params && Object.keys(route.params).length > 0) {
     return {
       item: await fetchPublicDetail(route.routeKey, route.params, request, tenant),
@@ -279,6 +309,10 @@ function getMetadataLabel(
     return content.event.title;
   }
 
+  if (content?.kind === 'job-detail' && content.job?.title) {
+    return content.job.title;
+  }
+
   return t(route.labelKey ?? 'pages.home.title');
 }
 
@@ -306,6 +340,10 @@ function getMetadataDescription(
 
   if (content?.kind === 'event-detail' && content.event?.excerpt) {
     return content.event.excerpt;
+  }
+
+  if (content?.kind === 'job-detail' && content.job?.excerpt) {
+    return content.job.excerpt;
   }
 
   if (tenant?.seo?.description) {

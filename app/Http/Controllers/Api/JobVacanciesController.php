@@ -33,6 +33,7 @@ use App\Core\Mailer;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Http\Requests\Jobs\ListJobVacanciesRequest;
+use App\Http\Resources\PublicJobResource;
 use App\Models\JobVacancyTeam;
 use App\Models\JobVacancy;
 use App\Models\Review;
@@ -256,7 +257,7 @@ class JobVacanciesController extends BaseApiController
         }
 
         return $this->respondWithCollection(
-            $result['items'],
+            array_map(static fn (array $job): array => PublicJobResource::augment($job), $result['items']),
             $result['cursor'],
             $filters['limit'],
             $result['has_more'],
@@ -288,7 +289,7 @@ class JobVacanciesController extends BaseApiController
         // Increment views
         $this->jobService->incrementViews($id, $userId);
 
-        return $this->respondWithData($job);
+        return $this->respondWithData($job ? PublicJobResource::augment($job) : $job);
     }
 
     /** POST /api/v2/jobs — create a new job vacancy */

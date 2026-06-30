@@ -164,12 +164,74 @@ export interface PublicEventsIndex {
   pagination: PublicListingsPagination;
 }
 
+export interface PublicJobImage {
+  altText: string;
+  sortOrder?: number;
+  url: string;
+}
+
+export interface PublicJobCategory {
+  name: string | null;
+  slug: string | null;
+}
+
+export interface PublicJobLocation {
+  isRemote: boolean;
+  label: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+export interface PublicJobEmployer {
+  displayName: string | null;
+  id: string | null;
+  logoUrl: string | null;
+}
+
+export interface PublicJobCompensation {
+  hoursPerWeek: number | null;
+  salaryCurrency: string | null;
+  salaryMax: number | null;
+  salaryMin: number | null;
+  salaryNegotiable: boolean;
+  salaryType: string | null;
+  timeCredits: number | null;
+}
+
+export interface PublicJob {
+  category: PublicJobCategory | null;
+  commitment: string | null;
+  compensation: PublicJobCompensation;
+  createdAt: string | null;
+  deadlineAt: string | null;
+  description: string;
+  employer: PublicJobEmployer;
+  excerpt: string;
+  gallery: PublicJobImage[];
+  id: string;
+  jobType: string | null;
+  location: PublicJobLocation;
+  primaryImage: PublicJobImage | null;
+  skills: string[];
+  slug: string;
+  status: string;
+  title: string;
+  updatedAt: string | null;
+}
+
+export interface PublicJobsIndex {
+  jobs: PublicJob[];
+  pagination: PublicListingsPagination;
+}
+
 export type PublicRouteContent =
   | { kind: 'blog-detail'; post: BlogPost | null }
   | { kind: 'blog-index'; posts: BlogPostSummary[] }
   | { kind: 'cms-page'; page: CmsPage | null }
   | { events: PublicEventsIndex; kind: 'events-index' }
   | { event: PublicEvent | null; kind: 'event-detail' }
+  | { job: PublicJob | null; kind: 'job-detail' }
+  | { jobs: PublicJobsIndex; kind: 'jobs-index' }
   | { kind: 'listing-detail'; listing: PublicListing | null }
   | { kind: 'listings-index'; listings: PublicListingsIndex }
   | { items: PublicContentItem[]; kind: 'public-collection' }
@@ -312,6 +374,21 @@ export async function fetchEventsIndex(
   };
 }
 
+export async function fetchJobsIndex(
+  request: ResolvedTenantRequest,
+  tenant: TenantBootstrap | null,
+): Promise<PublicJobsIndex> {
+  const endpoint = getPublicEndpointForRoute('jobs') ?? '/v2/jobs';
+  const url = buildApiUrl(endpoint, { per_page: '12' });
+  const response = await fetchApiResponse<unknown>(url, buildPublicHeaders(request, tenant, { publicContract: true }));
+  const jobs = normalizePublicJobs(response?.data);
+
+  return {
+    jobs,
+    pagination: normalizeListingsPagination(response?.meta, jobs.length),
+  };
+}
+
 export async function fetchPublicDetail(
   routeKey: string,
   paramsOrId: Record<string, string> | string,
@@ -363,6 +440,23 @@ export async function fetchEventDetail(
   const payload = await fetchApiPayload<unknown>(url, buildPublicHeaders(request, tenant, { publicContract: true }));
 
   return normalizePublicEvent(payload);
+}
+
+export async function fetchJobDetail(
+  id: string,
+  request: ResolvedTenantRequest,
+  tenant: TenantBootstrap | null,
+): Promise<PublicJob | null> {
+  const endpoint = getPublicEndpointForRoute('jobDetail', { id });
+
+  if (!endpoint) {
+    return null;
+  }
+
+  const url = buildApiUrl(endpoint);
+  const payload = await fetchApiPayload<unknown>(url, buildPublicHeaders(request, tenant, { publicContract: true }));
+
+  return normalizePublicJob(payload);
 }
 
 async function fetchApiEnvelope<T>(url: string, headers: HeadersInit): Promise<T | null> {
@@ -642,6 +736,131 @@ function normalizeEventOrganiser(value: unknown): PublicEventOrganiser {
     displayName: firstString(organiser.display_name, organiser.displayName) ?? null,
     id: firstString(organiser.id) ?? null,
   };
+}
+
+function normalizePublicJobs(payload: unknown): PublicJob[] {
+  return extractPublicItemArray(payload)
+    .map(normalizePublicJob)
+    .filter((job): job is PublicJob => job !== null);
+}
+
+function normalizePublicJob(payload: unknown): PublicJob | null {
+  if (!isRecord(payload)) {
+    return null;
+  }
+
+  const contract = isRecord(payload.public_contract) ? payload.public_contract : payload;
+  const id = firstString(contract.id, contract.slug);
+  const title = firstString(contract.title);
+
+  if (!id || !title) {
+    return null;
+  }
+
+  const gallery = normalizeJobGallery(contract.gallery);
+  const primaryImage = normalizeJobImage(contract.primary_image) ?? gallery[0] ?? null;
+
+  return {
+    category: normalizeJobCategory(contract.category),
+    commitment: firstString(contract.commitment) ?? null,
+    compensation: normalizeJobCompensation(contract.compensation),
+    createdAt: firstString(contract.created_at) ?? null,
+    deadlineAt: firstString(contract.deadline_at) ?? null,
+    description: firstString(contract.description) ?? '',
+    employer: normalizeJobEmployer(contract.employer),
+    excerpt: firstString(contract.excerpt, contract.description) ?? '',
+    gallery,
+    id,
+    jobType: firstString(contract.job_type, contract.jobType) ?? null,
+    location: normalizeJobLocation(contract.location),
+    primaryImage,
+    skills: normalizeStringList(contract.skills),
+    slug: firstString(contract.slug, id) ?? id,
+    status: firstString(contract.status) ?? 'open',
+    title,
+    updatedAt: firstString(contract.updated_at) ?? null,
+  };
+}
+
+function normalizeJobGallery(value: unknown): PublicJobImage[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map(normalizeJobImage).filter((image): image is PublicJobImage => image !== null);
+}
+
+function normalizeJobImage(value: unknown): PublicJobImage | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const url = resolveAssetUrl(firstString(value.url), getApiBase());
+
+  if (!url) {
+    return null;
+  }
+
+  return {
+    altText: firstString(value.alt_text, value.altText) ?? '',
+    sortOrder: firstNumber(value.sort_order, value.sortOrder),
+    url,
+  };
+}
+
+function normalizeJobCategory(value: unknown): PublicJobCategory | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  return {
+    name: firstString(value.name) ?? null,
+    slug: firstString(value.slug) ?? null,
+  };
+}
+
+function normalizeJobLocation(value: unknown): PublicJobLocation {
+  const location = isRecord(value) ? value : {};
+
+  return {
+    isRemote: firstBoolean(location.is_remote, location.isRemote) ?? false,
+    label: firstString(location.label) ?? null,
+    latitude: firstNumber(location.latitude) ?? null,
+    longitude: firstNumber(location.longitude) ?? null,
+  };
+}
+
+function normalizeJobEmployer(value: unknown): PublicJobEmployer {
+  const employer = isRecord(value) ? value : {};
+  const logoUrl = resolveAssetUrl(firstString(employer.logo_url, employer.logoUrl), getApiBase()) ?? null;
+
+  return {
+    displayName: firstString(employer.display_name, employer.displayName) ?? null,
+    id: firstString(employer.id) ?? null,
+    logoUrl,
+  };
+}
+
+function normalizeJobCompensation(value: unknown): PublicJobCompensation {
+  const compensation = isRecord(value) ? value : {};
+
+  return {
+    hoursPerWeek: firstNumber(compensation.hours_per_week, compensation.hoursPerWeek) ?? null,
+    salaryCurrency: firstString(compensation.salary_currency, compensation.salaryCurrency) ?? null,
+    salaryMax: firstNumber(compensation.salary_max, compensation.salaryMax) ?? null,
+    salaryMin: firstNumber(compensation.salary_min, compensation.salaryMin) ?? null,
+    salaryNegotiable: firstBoolean(compensation.salary_negotiable, compensation.salaryNegotiable) ?? false,
+    salaryType: firstString(compensation.salary_type, compensation.salaryType) ?? null,
+    timeCredits: firstNumber(compensation.time_credits, compensation.timeCredits) ?? null,
+  };
+}
+
+function normalizeStringList(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map((item) => firstString(item)).filter((item): item is string => item !== undefined);
 }
 
 function firstString(...values: unknown[]): string | undefined {

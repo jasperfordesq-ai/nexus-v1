@@ -9,6 +9,8 @@ import type { RouteOwnership } from './public-routes';
 const routeModuleKeys: Record<string, string> = {
   eventDetail: 'events',
   events: 'events',
+  jobDetail: 'job_vacancies',
+  jobs: 'job_vacancies',
   listingDetail: 'listings',
   listings: 'listings',
 };

@@ -19,6 +19,16 @@
       "body": "Tá an leathanach seo ullmhaithe le haghaidh aimsithe poiblí imeachtaí. Fanann cruthú, RSVP agus eagarthóireacht san aip shlán Vite.",
       "lead": "Brabhsáil imeachtaí poiblí ó {{tenantName}}.",
       "title": "Imeachtaí"
+    },
+    "jobDetail": {
+      "body": "Fanann iarratais agus sreafaí fostóra san aip shlán Vite.",
+      "lead": "Féach ar fhaisnéis phoiblí poist ó {{tenantName}}.",
+      "title": "Post"
+    },
+    "jobs": {
+      "body": "Tá an leathanach seo ullmhaithe le haghaidh aimsithe poiblí post. Fanann iarratais agus sreafaí fostóra san aip shlán Vite.",
+      "lead": "Brabhsáil deiseanna poiblí ó {{tenantName}}.",
+      "title": "Poist"
     }
   },
   "listings": {
@@ -47,6 +57,28 @@
     "locationLabel": "Suíomh",
     "organiserLabel": "Eagraí",
     "statusLabel": "Stádas",
+    "updatedLabel": "Nuashonraithe"
+  },
+  "jobs": {
+    "backToJobs": "Poist",
+    "breadcrumbLabel": "Conair poist",
+    "categoryLabel": "Catagóir",
+    "commitmentLabel": "Tiomantas",
+    "compensationLabel": "Cúiteamh",
+    "createdLabel": "Cruthaithe",
+    "deadlineLabel": "Spriocdháta",
+    "empty": "Níl aon phoist phoiblí ar fáil fós.",
+    "employerLabel": "Fostóir",
+    "galleryLabel": "Gailearaí",
+    "hoursPerWeek": "{{count}} uair sa tseachtain",
+    "imageAltFallback": "Íomhá poist",
+    "locationLabel": "Suíomh",
+    "remoteLabel": "Cianda",
+    "salaryNegotiable": "Tuarastal soshannta",
+    "skillsLabel": "Scileanna",
+    "statusLabel": "Stádas",
+    "timeCredits": "{{count}} creidmheas ama",
+    "typeLabel": "Cineál",
     "updatedLabel": "Nuashonraithe"
   }
 }

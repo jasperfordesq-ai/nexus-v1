@@ -23,6 +23,13 @@ const eventsRoute: RouteOwnership = {
   routeKey: 'events',
 };
 
+const jobsRoute: RouteOwnership = {
+  labelKey: 'pages.jobs.title',
+  owner: 'next-public',
+  pattern: '/jobs',
+  routeKey: 'jobs',
+};
+
 describe('module route gates', () => {
   it('keeps the Next listings route unavailable when the tenant listings module is disabled', () => {
     const tenant: TenantBootstrap = {
@@ -74,5 +81,19 @@ describe('module route gates', () => {
     };
 
     expect(isRouteEnabledForTenant(eventsRoute, tenant)).toBe(false);
+  });
+
+  it('keeps the Next jobs route unavailable when the tenant job vacancies module is disabled', () => {
+    const tenant: TenantBootstrap = {
+      default_language: 'en',
+      id: 2,
+      modules: {
+        job_vacancies: false,
+      },
+      name: 'Hour Timebank',
+      slug: 'hour-timebank',
+    };
+
+    expect(isRouteEnabledForTenant(jobsRoute, tenant)).toBe(false);
   });
 });
