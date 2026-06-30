@@ -524,5 +524,201 @@
     "legal": "Legal",
     "platform": "Platform",
     "support": "Support"
+  },
+  "faq": {
+    "page_title": "Veelgestelde vragen",
+    "meta_description": "Veelgestelde vragen over timebanking, tijdskredieten, vermeldingen, uitwisselingen, vertrouwen en veiligheid, en lidmaatschap van de community: alles wat u nodig heeft om aan de slag te gaan.",
+    "title": "Veelgestelde Vragen",
+    "subtitle_before_link": "Kun je niet vinden wat je zoekt? Bezoek ons",
+    "help_center_link": "Helpcentrum",
+    "subtitle_after_link": "voor gedetailleerde handleidingen.",
+    "search_placeholder": "Zoek vragen...",
+    "no_results": "Geen overeenkomende vragen gevonden. Probeer een andere zoekterm.",
+    "cta_title": "Heb je nog vragen?",
+    "cta_description": "Ons ondersteuningsteam staat klaar om te helpen.",
+    "cta_button": "Neem contact op met Ondersteuning",
+    "categories": {
+      "getting_started": {
+        "title": "Aan de Slag",
+        "q1": {
+          "question": "Wat is time banking?",
+          "answer_p1": "Time banking is een gemeenschapsuitwisselingssysteem waarbij één uur hulp gelijkstaat aan één tijdskrediet, ongeacht de geleverde dienst. Of je nu een taal leert, helpt met tuinieren of technische ondersteuning biedt, jouw tijd wordt gelijk gewaardeerd.",
+          "answer_p2": "Het is een manier om gemeenschapsverbindingen op te bouwen terwijl je vaardigheden en diensten uitwisselt zonder traditioneel geld."
+        },
+        "q2": {
+          "question": "Is het gratis om lid te worden?",
+          "answer_p1": "Ja! Lidmaatschap is volledig gratis. De enige valuta die wordt gebruikt zijn tijdskredieten, die je verdient door anderen in de gemeenschap te helpen.",
+          "answer_p2": "Nieuwe leden ontvangen vaak een klein aantal startkredieten om hen op weg te helpen."
+        },
+        "q3": {
+          "question": "Hoe begin ik?",
+          "answer_intro": "Zo begin je:",
+          "step1_bold": "Voltooi je profiel",
+          "step1_text": "Voeg een foto, bio en je vaardigheden toe",
+          "step2_bold": "Blader door de marktplaats",
+          "step2_text": "Bekijk welke diensten worden aangeboden en nodig zijn",
+          "step3_bold": "Plaats een aanbod",
+          "step3_text": "Deel waarmee je anderen kunt helpen",
+          "step4_bold": "Doe een verzoek",
+          "step4_text": "Vraag om iets wat je nodig hebt",
+          "step5_bold": "Verbind met leden",
+          "step5_text": "Bouw je netwerk op"
+        },
+        "q4": {
+          "question": "Welke vaardigheden kan ik aanbieden?",
+          "answer_intro": "Bijna alles! Veelvoorkomende aanbiedingen zijn:",
+          "skill1": "Hulp thuis (tuinieren, schoonmaken, kleine reparaties)",
+          "skill2": "Technische ondersteuning (computerhulp, telefooninstellingen)",
+          "skill3": "Onderwijs (talen, muziek, academische vakken)",
+          "skill4": "Creatieve diensten (ontwerp, fotografie, schrijven)",
+          "skill5": "Vervoer (ritten, boodschappen)",
+          "skill6": "Gezelschap (wandelen, bezoeken, gesprekken)",
+          "skill7": "Professionele vaardigheden (boekhouding, juridisch advies, enz.)",
+          "answer_outro": "Iedereen heeft iets waardevols te bieden!"
+        }
+      },
+      "time_credits": {
+        "title": "Tijdcredits",
+        "q1": {
+          "question": "Wat is een tijdcredit?",
+          "answer_p1": "Één tijdcredit staat gelijk aan één uur dienstverlening. Het is de valuta van onze gemeenschap.",
+          "answer_p2": "Je kunt ook gedeeltelijke uren uitwisselen: 30 minuten = 0,5 credits, 15 minuten = 0,25 credits."
+        },
+        "q2": {
+          "question": "Hoe verdien ik tijdcredits?",
+          "answer_intro": "Je verdient credits door:",
+          "way1_bold": "Diensten te verlenen",
+          "way1_text": "aan andere leden",
+          "way2_bold": "Vrijwilligersuren te registreren",
+          "way2_text": "bij goedgekeurde organisaties",
+          "way3_bold": "Donaties te ontvangen",
+          "way3_text": "van andere leden",
+          "way4_bold": "Startcredits",
+          "way4_text": "wanneer je je voor het eerst aanmeldt"
+        },
+        "q3": {
+          "question": "Kan ik mijn credits doneren?",
+          "answer_intro": "Ja! Je kunt:",
+          "option1": "Credits overdragen naar een andere lid",
+          "option2": "Doneren aan de gemeenschapspot (helpt leden die extra ondersteuning nodig hebben)",
+          "answer_link_before": "Ga naar je ",
+          "wallet_link": "Portemonnee",
+          "answer_link_after": " om credits te versturen."
+        },
+        "q4": {
+          "question": "Kan mijn saldo negatief worden?",
+          "answer": "Sommige gemeenschappen staan beperkte negatieve saldi toe om nieuwe leden te helpen beginnen voordat ze de kans hebben gehad om credits te verdienen. Controleer bij je gemeenschapscoördinator voor de specifieke regels in jouw tijdbank."
+        },
+        "q5": {
+          "question": "Wat als ik credits naar de verkeerde persoon heb gestuurd?",
+          "answer_intro": "Transacties kunnen niet automatisch worden teruggedraaid. Als je een fout hebt gemaakt:",
+          "step1": "Neem contact op met de ontvanger en vraag hen om de credits terug te sturen",
+          "step2": "Als je het niet kunt oplossen, neem dan contact op met de ondersteuning voor hulp",
+          "answer_outro": "Controleer altijd de ontvanger voordat je een overdracht bevestigt."
+        }
+      },
+      "exchanges_safety": {
+        "title": "Wisselingen & Veiligheid",
+        "q1": {
+          "question": "Hoe regel ik een wisseling?",
+          "answer_intro": "Het typische proces is:",
+          "step1": "Vind een aanbod of verzoek dat je interesseert",
+          "step2": "Stuur een bericht naar het lid om details te bespreken",
+          "step3": "Stem af wanneer, waar en de geschatte tijd",
+          "step4": "Ontmoet elkaar en voltooi de wisseling",
+          "step5": "De persoon die hulp heeft ontvangen, stuurt tijdcredits",
+          "step6": "Laat een beoordeling voor elkaar achter"
+        },
+        "q2": {
+          "question": "Is het veilig om vreemden te ontmoeten?",
+          "answer_intro": "We raden deze veiligheidspraktijken aan:",
+          "tip1": "Ontmoet elkaar op openbare plaatsen voor de eerste wisselingen",
+          "tip2": "Controleer het profiel en de beoordelingen van het lid",
+          "tip3": "Vertel iemand waar je naartoe gaat",
+          "tip4": "Vertrouw op je instinct — als iets verkeerd aanvoelt, ga dan weg",
+          "tip5": "Begin met kleinere, laag-risico wisselingen",
+          "answer_outro": "Rapporteer verontrustend gedrag aan ons ondersteuningsteam."
+        },
+        "q3": {
+          "question": "Wat als iemand niet op komt dagen of de service niet voltooit?",
+          "answer_intro": "Communicatie is de sleutel. Als er een probleem is:",
+          "step1": "Stuur een bericht naar het lid om te bespreken wat er is gebeurd",
+          "step2": "Probeer samen een oplossing te vinden",
+          "step3": "Als je het niet kunt oplossen, neem dan contact op met de ondersteuning",
+          "answer_outro": "Herhaalde no-shows of slecht gedrag kunnen leiden tot beperkingen op je account."
+        },
+        "q4": {
+          "question": "Zijn de diensten verzekerd?",
+          "answer": "Uitwisselingen zijn informele afspraken tussen leden van de gemeenschap. We bieden geen verzekeringsdekking voor diensten. Voor activiteiten met een hoger risico, bespreek aansprakelijkheid van tevoren met het andere lid. Sommige leden hebben hun eigen professionele verzekering."
+        }
+      },
+      "badges_rewards": {
+        "title": "Badges & Beloningen",
+        "q1": {
+          "question": "Wat zijn badges en XP?",
+          "answer_intro": "Ons gamificatiesysteem beloont deelname aan de gemeenschap:",
+          "item1_bold": "XP (Ervaringspunten)",
+          "item1_text": "Verdiend voor verschillende activiteiten, helpt je om te levelen",
+          "item2_bold": "Insignes",
+          "item2_text": "Prestaties voor het bereiken van mijlpalen (60+ om te verzamelen!)",
+          "item3_bold": "Niveaus",
+          "item3_text": "Vooruitgang van Nieuwkomer naar Tijdbank Legende",
+          "item4_bold": "Strepen",
+          "item4_text": "Beloningen voor dagelijkse betrokkenheid"
+        },
+        "q2": {
+          "question": "Hoe verdien ik XP?",
+          "answer_intro": "Je verdient XP voor veel activiteiten:",
+          "activity1": "Tijdcredits verzenden/ontvangen",
+          "activity2": "Lijsten maken",
+          "activity3": "Vrijwilligersuren registreren",
+          "activity4": "Evenementen bijwonen",
+          "activity5": "Verbindingen maken",
+          "activity6": "Dagelijkse inlog",
+          "activity7": "Badges verdienen"
+        },
+        "q3": {
+          "question": "Kan ik me afmelden voor ranglijsten?",
+          "answer_before_link": "Ja! Als je privacy verkiest, kun je je afmelden om op openbare ranglijsten te verschijnen in je ",
+          "settings_link": "Instellingen",
+          "answer_after_link": ". Je verdient nog steeds XP en badges, ze zijn alleen niet zichtbaar voor anderen in de ranglijsten."
+        }
+      },
+      "account_privacy": {
+        "title": "Account en privacy",
+        "q1": {
+          "question": "Hoe wijzig ik mijn wachtwoord?",
+          "answer_before_link": "Ga naar ",
+          "settings_link": "Instellingen",
+          "answer_after_link": " > Beveiliging om je wachtwoord te wijzigen. Je moet eerst je huidige wachtwoord invoeren. Als je je wachtwoord bent vergeten, gebruik dan de link \"Wachtwoord Vergeten\" op de inlogpagina."
+        },
+        "q2": {
+          "question": "Wie kan mijn profiel zien?",
+          "answer_intro": "Standaard is je profiel zichtbaar voor andere leden van de gemeenschap. Je kunt het volgende beheren:",
+          "item1": "Welke contactinformatie wordt weergegeven",
+          "item2": "Of je op ranglijsten verschijnt",
+          "item3": "De zichtbaarheid van je algemene locatie",
+          "answer_link_before": "Pas deze aan in je ",
+          "settings_link": "Instellingen",
+          "answer_link_after": "."
+        },
+        "q3": {
+          "question": "Hoe verwijder ik mijn account?",
+          "answer_intro": "Als je de gemeenschap wilt verlaten:",
+          "step1": "Ga naar Instellingen > Account",
+          "step2": "Klik op \"Account Verwijderen\"",
+          "step3": "Bevestig je beslissing",
+          "answer_outro": "Opmerking: Je transactiegeschiedenis wordt bewaard voor administratieve doeleinden, maar je persoonlijke informatie wordt verwijderd."
+        },
+        "q4": {
+          "question": "Hoe wordt mijn data beschermd?",
+          "answer_intro": "We nemen privacy serieus:",
+          "item1": "Je gegevens zijn versleuteld en veilig opgeslagen",
+          "item2": "We verkopen je informatie nooit",
+          "item3": "Je kunt op elk moment een kopie van je gegevens aanvragen",
+          "item4": "We voldoen aan de AVG en gegevensbeschermingsregels"
+        }
+      }
+    }
   }
 }

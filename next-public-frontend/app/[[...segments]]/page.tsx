@@ -47,6 +47,8 @@ import {
 } from '../../src/lib/tenant-api';
 import { resolveTenantRequest, type ResolvedTenantRequest } from '../../src/lib/tenant-request';
 import { PublicPage } from '../../src/ui/PublicPage';
+import { PublicChrome } from '../../src/ui/PublicChrome';
+import { FaqHost } from '../../src/ui/FaqHost';
 
 export const dynamic = 'force-dynamic';
 
@@ -174,6 +176,25 @@ export default async function PublicRoutePage({ params }: PublicPageProps): Prom
   }
 
   const t = createTranslator(context.tenant?.default_language ?? 'en');
+
+  // FAQ is the first page served by the SHARED presentational core (one source of
+  // truth, rendered identically here and in the React SPA). Real chrome + shared body.
+  if (context.route.routeKey === 'faq') {
+    return (
+      <PublicChrome
+        canonicalUrl={context.canonicalUrl}
+        tenant={context.tenant}
+        tenantBasePath={context.tenantBasePath}
+        t={t}
+      >
+        <FaqHost
+          locale={context.tenant?.default_language ?? 'en'}
+          tenantBasePath={context.tenantBasePath}
+        />
+      </PublicChrome>
+    );
+  }
+
   const content = await fetchRouteContent(context.route, context.request, context.tenant);
 
   if (content?.kind === 'listing-detail' && !content.listing) {

@@ -524,5 +524,201 @@
     "legal": "Legal",
     "platform": "Platform",
     "support": "Support"
+  },
+  "faq": {
+    "page_title": "Często zadawane pytania",
+    "meta_description": "Często zadawane pytania dotyczące banków czasu, kredytów czasowych, ofert, giełd, zaufania i bezpieczeństwa oraz członkostwa w społeczności — wszystko, czego potrzebujesz, aby zacząć.",
+    "title": "Najczęściej Zadawane Pytania",
+    "subtitle_before_link": "Nie możesz znaleźć tego, czego szukasz? Odwiedź nasze",
+    "help_center_link": "Centrum Pomocy",
+    "subtitle_after_link": "aby uzyskać szczegółowe przewodniki.",
+    "search_placeholder": "Szukaj pytań...",
+    "no_results": "Nie znaleziono pasujących pytań. Spróbuj innego hasła.",
+    "cta_title": "Masz jeszcze pytania?",
+    "cta_description": "Nasz zespół wsparcia jest tutaj, aby pomóc.",
+    "cta_button": "Skontaktuj się z pomocą",
+    "categories": {
+      "getting_started": {
+        "title": "Jak zacząć",
+        "q1": {
+          "question": "Czym jest time banking?",
+          "answer_p1": "Time banking to system wymiany społecznej, w którym jedna godzina pomocy równa się jednemu kredytowi czasowemu, niezależnie od świadczonej usługi. Niezależnie od tego, czy uczysz języka, pomagasz w ogrodzie, czy zapewniasz wsparcie techniczne, twój czas jest ceniony równo.",
+          "answer_p2": "To sposób na budowanie więzi społecznych podczas wymiany umiejętności i usług bez tradycyjnych pieniędzy."
+        },
+        "q2": {
+          "question": "Czy przystąpienie jest darmowe?",
+          "answer_p1": "Tak! Członkostwo jest całkowicie darmowe. Jedyną walutą są kredyty czasowe, które zdobywasz, pomagając innym w społeczności.",
+          "answer_p2": "Nowi członkowie często otrzymują niewielką liczbę kredytów startowych, aby pomóc im w rozpoczęciu."
+        },
+        "q3": {
+          "question": "Jak mogę zacząć?",
+          "answer_intro": "Oto jak zacząć:",
+          "step1_bold": "Uzupełnij swój profil",
+          "step1_text": "Dodaj zdjęcie, biografię i swoje umiejętności",
+          "step2_bold": "Przeglądaj rynek",
+          "step2_text": "Zobacz, jakie usługi są oferowane i potrzebne",
+          "step3_bold": "Opublikuj ofertę",
+          "step3_text": "Podziel się tym, w czym możesz pomóc innym",
+          "step4_bold": "Złóż prośbę",
+          "step4_text": "Poproś o coś, czego potrzebujesz",
+          "step5_bold": "Połącz się z członkami",
+          "step5_text": "Zbuduj swoją sieć"
+        },
+        "q4": {
+          "question": "Jakie umiejętności mogę zaoferować?",
+          "answer_intro": "Prawie wszystko! Najczęściej oferowane usługi to:",
+          "skill1": "Pomoc domowa (ogrodnictwo, sprzątanie, drobne naprawy)",
+          "skill2": "Wsparcie techniczne (pomoc komputerowa, konfiguracja telefonu)",
+          "skill3": "Nauczanie (języki, muzyka, przedmioty akademickie)",
+          "skill4": "Usługi kreatywne (projektowanie, fotografia, pisanie)",
+          "skill5": "Transport (przejazdy, załatwianie spraw)",
+          "skill6": "Towarzystwo (spacery, wizyty, rozmowy)",
+          "skill7": "Umiejętności zawodowe (księgowość, porady prawne itp.)",
+          "answer_outro": "Każdy ma coś cennego do zaoferowania!"
+        }
+      },
+      "time_credits": {
+        "title": "Kredyty czasowe",
+        "q1": {
+          "question": "Czym jest kredyt czasowy?",
+          "answer_p1": "Jeden kredyt czasowy to jedna godzina usługi. To waluta naszej społeczności.",
+          "answer_p2": "Możesz również wymieniać częściowe godziny: 30 minut = 0,5 kredytu, 15 minut = 0,25 kredytu."
+        },
+        "q2": {
+          "question": "Jak mogę zarobić kredyty czasowe?",
+          "answer_intro": "Zarabiasz kredyty poprzez:",
+          "way1_bold": "Świadczenie usług",
+          "way1_text": "dla innych członków",
+          "way2_bold": "Rejestrowanie godzin wolontariatu",
+          "way2_text": "w zatwierdzonych organizacjach",
+          "way3_bold": "Otrzymywanie darowizn",
+          "way3_text": "od innych członków",
+          "way4_bold": "Kredyty startowe",
+          "way4_text": "gdy dołączasz po raz pierwszy"
+        },
+        "q3": {
+          "question": "Czy mogę przekazać swoje kredyty?",
+          "answer_intro": "Tak! Możesz:",
+          "option1": "Przenieść kredyty do innego członka",
+          "option2": "Przekazać do wspólnej puli (pomaga członkom, którzy potrzebują dodatkowego wsparcia)",
+          "answer_link_before": "Przejdź do swojego ",
+          "wallet_link": "Portfel",
+          "answer_link_after": " aby wysłać kredyty."
+        },
+        "q4": {
+          "question": "Czy mój bilans może być ujemny?",
+          "answer": "Niektóre społeczności pozwalają na ograniczone ujemne salda, aby pomóc nowym członkom rozpocząć, zanim będą mieli szansę zarobić kredyty. Sprawdź z koordynatorem swojej społeczności konkretne zasady w twoim timebanku."
+        },
+        "q5": {
+          "question": "Co jeśli wysłałem kredyty do niewłaściwej osoby?",
+          "answer_intro": "Transakcje nie mogą być automatycznie cofnięte. Jeśli popełniłeś błąd:",
+          "step1": "Skontaktuj się z odbiorcą i poproś go o odesłanie kredytów",
+          "step2": "Jeśli nie możesz tego rozwiązać, skontaktuj się z pomocą techniczną w celu uzyskania wsparcia",
+          "answer_outro": "Zawsze dokładnie sprawdzaj odbiorcę przed potwierdzeniem transferu."
+        }
+      },
+      "exchanges_safety": {
+        "title": "Wymiany i bezpieczeństwo",
+        "q1": {
+          "question": "Jak zorganizować wymianę?",
+          "answer_intro": "Typowy proces to:",
+          "step1": "Znajdź ofertę lub prośbę, która Cię interesuje",
+          "step2": "Napisz do członka, aby omówić szczegóły",
+          "step3": "Uzgodnij, kiedy, gdzie i szacowany czas",
+          "step4": "Spotkaj się i zakończ wymianę",
+          "step5": "Osoba, która otrzymała pomoc, wysyła kredyty czasowe",
+          "step6": "Zostawcie sobie nawzajem recenzję"
+        },
+        "q2": {
+          "question": "Czy bezpiecznie jest spotykać się z nieznajomymi?",
+          "answer_intro": "Zalecamy te praktyki bezpieczeństwa:",
+          "tip1": "Spotykaj się w miejscach publicznych podczas pierwszych wymian",
+          "tip2": "Sprawdź profil członka i recenzje",
+          "tip3": "Powiedz komuś, dokąd idziesz",
+          "tip4": "Zaufaj swoim instynktom — jeśli coś wydaje się nie tak, odejdź",
+          "tip5": "Zacznij od mniejszych, niskoryzykownych wymian",
+          "answer_outro": "Zgłaszaj wszelkie niepokojące zachowania naszemu zespołowi wsparcia."
+        },
+        "q3": {
+          "question": "Co jeśli ktoś się nie pojawi lub nie wykona usługi?",
+          "answer_intro": "Komunikacja jest kluczem. Jeśli wystąpi problem:",
+          "step1": "Napisz do członka, aby omówić, co się stało",
+          "step2": "Spróbujcie wspólnie znaleźć rozwiązanie",
+          "step3": "Jeśli nie możecie tego rozwiązać, skontaktuj się z pomocą techniczną",
+          "answer_outro": "Powtarzające się nieobecności lub złe zachowanie mogą skutkować ograniczeniami konta."
+        },
+        "q4": {
+          "question": "Czy usługi są ubezpieczone?",
+          "answer": "Wymiany to nieformalne ustalenia między członkami społeczności. Nie zapewniamy ochrony ubezpieczeniowej dla usług. W przypadku działań o wyższym ryzyku, omów odpowiedzialność z innym członkiem wcześniej. Niektórzy członkowie mają własne ubezpieczenie zawodowe."
+        }
+      },
+      "badges_rewards": {
+        "title": "Odznaki i nagrody",
+        "q1": {
+          "question": "Czym są odznaki i XP?",
+          "answer_intro": "Nasz system gamifikacji nagradza uczestnictwo w społeczności:",
+          "item1_bold": "XP (Punkty Doświadczenia)",
+          "item1_text": "Zdobywane za różne aktywności, pomagające Ci awansować",
+          "item2_bold": "Odznaki",
+          "item2_text": "Osiągnięcia za osiągnięcie kamieni milowych (60+ do zebrania!)",
+          "item3_bold": "Poziomy",
+          "item3_text": "Postęp od Nowicjusza do Legendy Timebanku",
+          "item4_bold": "Pasemko",
+          "item4_text": "Nagrody za codzienne zaangażowanie"
+        },
+        "q2": {
+          "question": "Jak mogę zdobywać XP?",
+          "answer_intro": "Zdobywasz XP za wiele aktywności:",
+          "activity1": "Wysyłanie/odbieranie kredytów czasowych",
+          "activity2": "Tworzenie ogłoszeń",
+          "activity3": "Rejestrowanie godzin wolontariatu",
+          "activity4": "Uczestnictwo w wydarzeniach",
+          "activity5": "Nawiązywanie kontaktów",
+          "activity6": "Codzienne logowania",
+          "activity7": "Zdobywanie odznak"
+        },
+        "q3": {
+          "question": "Czy mogę zrezygnować z tablic liderów?",
+          "answer_before_link": "Tak! Jeśli wolisz prywatność, możesz zrezygnować z pojawiania się na publicznych tablicach liderów w swoim ",
+          "settings_link": "Ustawienia",
+          "answer_after_link": ". Nadal będziesz zdobywać XP i odznaki, po prostu nie będą one widoczne dla innych w rankingach."
+        }
+      },
+      "account_privacy": {
+        "title": "Konto i prywatność",
+        "q1": {
+          "question": "Jak mogę zmienić swoje hasło?",
+          "answer_before_link": "Przejdź do ",
+          "settings_link": "Ustawienia",
+          "answer_after_link": " > Bezpieczeństwo, aby zmienić swoje hasło. Najpierw musisz wprowadzić swoje aktualne hasło. Jeśli zapomniałeś hasła, skorzystaj z linku \"Zapomniałeś hasła\" na stronie logowania."
+        },
+        "q2": {
+          "question": "Kto może zobaczyć mój profil?",
+          "answer_intro": "Domyślnie twój profil jest widoczny dla innych członków społeczności. Możesz kontrolować:",
+          "item1": "Jakie informacje kontaktowe są wyświetlane",
+          "item2": "Czy pojawiasz się na rankingach",
+          "item3": "Widoczność twojej ogólnej lokalizacji",
+          "answer_link_before": "Dostosuj to w swoim ",
+          "settings_link": "Ustawienia",
+          "answer_link_after": "."
+        },
+        "q3": {
+          "question": "Jak mogę usunąć swoje konto?",
+          "answer_intro": "Jeśli chcesz opuścić społeczność:",
+          "step1": "Przejdź do Ustawienia > Konto",
+          "step2": "Kliknij \"Usuń konto\"",
+          "step3": "Potwierdź swoją decyzję",
+          "answer_outro": "Uwaga: Twoja historia transakcji zostanie zachowana dla celów archiwalnych, ale twoje dane osobowe zostaną usunięte."
+        },
+        "q4": {
+          "question": "Jak są chronione moje dane?",
+          "answer_intro": "Traktujemy prywatność poważnie:",
+          "item1": "Twoje dane są szyfrowane i bezpiecznie przechowywane",
+          "item2": "Nigdy nie sprzedajemy twoich informacji",
+          "item3": "Możesz w każdej chwili poprosić o kopię swoich danych",
+          "item4": "Przestrzegamy przepisów RODO i regulacji dotyczących ochrony danych"
+        }
+      }
+    }
   }
 }

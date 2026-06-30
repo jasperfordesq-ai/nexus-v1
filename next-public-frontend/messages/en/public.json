@@ -524,5 +524,201 @@
     "legal": "Legal",
     "platform": "Platform",
     "support": "Support"
+  },
+  "faq": {
+    "page_title": "Frequently Asked Questions",
+    "meta_description": "Common questions about timebanking, time credits, listings, exchanges, trust and safety, and community membership — everything you need to get started.",
+    "title": "Frequently Asked Questions",
+    "subtitle_before_link": "Can't find what you're looking for? Visit our",
+    "help_center_link": "Help Center",
+    "subtitle_after_link": "for detailed guides.",
+    "search_placeholder": "Search questions...",
+    "no_results": "No matching questions found. Try a different search term.",
+    "cta_title": "Still have questions?",
+    "cta_description": "Our support team is here to help.",
+    "cta_button": "Contact Support",
+    "categories": {
+      "getting_started": {
+        "title": "Getting Started",
+        "q1": {
+          "question": "What is time banking?",
+          "answer_p1": "Time banking is a community exchange system where one hour of help equals one time credit, regardless of the service provided. Whether you're teaching a language, helping with gardening, or providing tech support, your time is valued equally.",
+          "answer_p2": "It's a way to build community connections while exchanging skills and services without traditional money."
+        },
+        "q2": {
+          "question": "Is it free to join?",
+          "answer_p1": "Yes! Membership is completely free. The only currency used is time credits, which you earn by helping others in the community.",
+          "answer_p2": "New members often receive a small number of starter credits to help them get started."
+        },
+        "q3": {
+          "question": "How do I get started?",
+          "answer_intro": "Here's how to begin:",
+          "step1_bold": "Complete your profile",
+          "step1_text": "Add a photo, bio, and your skills",
+          "step2_bold": "Browse the marketplace",
+          "step2_text": "See what services are offered and needed",
+          "step3_bold": "Post an offer",
+          "step3_text": "Share what you can help others with",
+          "step4_bold": "Make a request",
+          "step4_text": "Ask for something you need",
+          "step5_bold": "Connect with members",
+          "step5_text": "Build your network"
+        },
+        "q4": {
+          "question": "What skills can I offer?",
+          "answer_intro": "Almost anything! Common offerings include:",
+          "skill1": "Home help (gardening, cleaning, minor repairs)",
+          "skill2": "Tech support (computer help, phone setup)",
+          "skill3": "Teaching (languages, music, academic subjects)",
+          "skill4": "Creative services (design, photography, writing)",
+          "skill5": "Transportation (rides, errands)",
+          "skill6": "Companionship (walks, visits, conversation)",
+          "skill7": "Professional skills (accounting, legal advice, etc.)",
+          "answer_outro": "Everyone has something valuable to offer!"
+        }
+      },
+      "time_credits": {
+        "title": "Time Credits",
+        "q1": {
+          "question": "What is a time credit?",
+          "answer_p1": "One time credit equals one hour of service. It's the currency of our community.",
+          "answer_p2": "You can also exchange partial hours: 30 minutes = 0.5 credits, 15 minutes = 0.25 credits."
+        },
+        "q2": {
+          "question": "How do I earn time credits?",
+          "answer_intro": "You earn credits by:",
+          "way1_bold": "Providing services",
+          "way1_text": "to other members",
+          "way2_bold": "Logging volunteer hours",
+          "way2_text": "with approved organisations",
+          "way3_bold": "Receiving donations",
+          "way3_text": "from other members",
+          "way4_bold": "Starter credits",
+          "way4_text": "when you first join"
+        },
+        "q3": {
+          "question": "Can I donate my credits?",
+          "answer_intro": "Yes! You can:",
+          "option1": "Transfer credits to any other member",
+          "option2": "Donate to the community pot (helps members who need extra support)",
+          "answer_link_before": "Go to your ",
+          "wallet_link": "Wallet",
+          "answer_link_after": " to send credits."
+        },
+        "q4": {
+          "question": "Can my balance go negative?",
+          "answer": "Some communities allow limited negative balances to help new members get started before they've had a chance to earn credits. Check with your community coordinator for the specific rules in your timebank."
+        },
+        "q5": {
+          "question": "What if I sent credits to the wrong person?",
+          "answer_intro": "Transactions cannot be automatically reversed. If you made a mistake:",
+          "step1": "Contact the recipient and ask them to send the credits back",
+          "step2": "If you can't resolve it, contact support for assistance",
+          "answer_outro": "Always double-check the recipient before confirming a transfer."
+        }
+      },
+      "exchanges_safety": {
+        "title": "Exchanges & Safety",
+        "q1": {
+          "question": "How do I arrange an exchange?",
+          "answer_intro": "The typical process is:",
+          "step1": "Find an offer or request that interests you",
+          "step2": "Message the member to discuss details",
+          "step3": "Agree on when, where, and estimated time",
+          "step4": "Meet and complete the exchange",
+          "step5": "The person who received help sends time credits",
+          "step6": "Leave a review for each other"
+        },
+        "q2": {
+          "question": "Is it safe to meet strangers?",
+          "answer_intro": "We recommend these safety practices:",
+          "tip1": "Meet in public places for first exchanges",
+          "tip2": "Check the member's profile and reviews",
+          "tip3": "Tell someone where you're going",
+          "tip4": "Trust your instincts — if something feels wrong, leave",
+          "tip5": "Start with smaller, low-risk exchanges",
+          "answer_outro": "Report any concerning behaviour to our support team."
+        },
+        "q3": {
+          "question": "What if someone doesn't show up or complete the service?",
+          "answer_intro": "Communication is key. If there's an issue:",
+          "step1": "Message the member to discuss what happened",
+          "step2": "Try to find a resolution together",
+          "step3": "If you can't resolve it, contact support",
+          "answer_outro": "Repeated no-shows or poor behaviour may result in account restrictions."
+        },
+        "q4": {
+          "question": "Are the services insured?",
+          "answer": "Exchanges are informal arrangements between community members. We don't provide insurance coverage for services. For higher-risk activities, discuss liability with the other member beforehand. Some members have their own professional insurance."
+        }
+      },
+      "badges_rewards": {
+        "title": "Badges & Rewards",
+        "q1": {
+          "question": "What are badges and XP?",
+          "answer_intro": "Our gamification system rewards community participation:",
+          "item1_bold": "XP (Experience Points)",
+          "item1_text": "Earned for various activities, helping you level up",
+          "item2_bold": "Badges",
+          "item2_text": "Achievements for reaching milestones (60+ to collect!)",
+          "item3_bold": "Levels",
+          "item3_text": "Progress from Newcomer to Timebank Legend",
+          "item4_bold": "Streaks",
+          "item4_text": "Rewards for daily engagement"
+        },
+        "q2": {
+          "question": "How do I earn XP?",
+          "answer_intro": "You earn XP for many activities:",
+          "activity1": "Sending/receiving time credits",
+          "activity2": "Creating listings",
+          "activity3": "Logging volunteer hours",
+          "activity4": "Attending events",
+          "activity5": "Making connections",
+          "activity6": "Daily logins",
+          "activity7": "Earning badges"
+        },
+        "q3": {
+          "question": "Can I opt out of leaderboards?",
+          "answer_before_link": "Yes! If you prefer privacy, you can opt out of appearing on public leaderboards in your ",
+          "settings_link": "Settings",
+          "answer_after_link": ". You'll still earn XP and badges, they just won't be visible to others on the rankings."
+        }
+      },
+      "account_privacy": {
+        "title": "Account & Privacy",
+        "q1": {
+          "question": "How do I change my password?",
+          "answer_before_link": "Go to ",
+          "settings_link": "Settings",
+          "answer_after_link": " > Security to change your password. You'll need to enter your current password first. If you've forgotten your password, use the \"Forgot Password\" link on the login page."
+        },
+        "q2": {
+          "question": "Who can see my profile?",
+          "answer_intro": "By default, your profile is visible to other community members. You can control:",
+          "item1": "What contact information is displayed",
+          "item2": "Whether you appear on leaderboards",
+          "item3": "Your general location visibility",
+          "answer_link_before": "Adjust these in your ",
+          "settings_link": "Settings",
+          "answer_link_after": "."
+        },
+        "q3": {
+          "question": "How do I delete my account?",
+          "answer_intro": "If you wish to leave the community:",
+          "step1": "Go to Settings > Account",
+          "step2": "Click \"Delete Account\"",
+          "step3": "Confirm your decision",
+          "answer_outro": "Note: Your transaction history will be retained for record-keeping, but your personal information will be removed."
+        },
+        "q4": {
+          "question": "How is my data protected?",
+          "answer_intro": "We take privacy seriously:",
+          "item1": "Your data is encrypted and securely stored",
+          "item2": "We never sell your information",
+          "item3": "You can request a copy of your data at any time",
+          "item4": "We comply with GDPR and data protection regulations"
+        }
+      }
+    }
   }
 }
