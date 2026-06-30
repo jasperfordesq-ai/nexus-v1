@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **i18n: propagated 72 new `advanced.next_public.*` admin translation keys to all 10 non-English locales.** The next-public workstream added these keys to `en/admin.json` without backfilling non-EN files, breaking the translation drift CI gate. English placeholder values have been added to `ar`, `de`, `es`, `fr`, `ga`, `it`, `ja`, `nl`, `pl`, and `pt` pending proper translation.
+
 ### Added
 
 - **The former member-premium module is now presented as community donations and support.** The member-facing page is labelled "Donate" with the subtitle "Support this community", adds a one-off donation CTA using the existing Stripe donation checkout, and reframes recurring monthly/yearly tiers as support levels with recognition rather than paid feature access. Admin navigation and module configuration now show "Donations & Support" and link directly to the support admin page. Donation Stripe routing can now be configured per tenant with Stripe Connect onboarding/status controls; when unset, payments continue through the platform Stripe account with tenant metadata for reporting. One-off donation rows and recurring support subscriptions store the original payment route and Stripe account for later refunds, cancellation, billing-portal access, admin reporting, and CSV export. Regression tests: `react-frontend/src/pages/premium/PricingPage.test.tsx`, `react-frontend/src/admin/modules/premium/MemberPremiumAdminPage.test.tsx`, `react-frontend/src/admin/modules/volunteering/DonationRefunds.test.tsx`, `react-frontend/src/admin/modules/config/moduleRegistry.test.ts`, `tests/Laravel/Unit/Services/DonationStripeAccountServiceTest.php`, `tests/Laravel/Unit/Services/StripeDonationServiceTest.php`, `tests/Laravel/Unit/Services/MemberPremiumServiceTest.php`, `tests/Laravel/Unit/Models/VolDonationTest.php`.
