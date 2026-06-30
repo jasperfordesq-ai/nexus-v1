@@ -109,9 +109,9 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertContains('npm --prefix next-public-frontend run check:no-js-html', $items['shadow_manifest_and_html']['commands']);
 
         $this->assertSame('blocked', $items['remaining_static_manual_review']['status']);
-        $this->assertContains('platformTerms', $items['remaining_static_manual_review']['route_keys']);
-        $this->assertContains('platformPrivacy', $items['remaining_static_manual_review']['route_keys']);
-        $this->assertContains('platformDisclaimer', $items['remaining_static_manual_review']['route_keys']);
+        $this->assertNotContains('platformTerms', $items['remaining_static_manual_review']['route_keys']);
+        $this->assertNotContains('platformPrivacy', $items['remaining_static_manual_review']['route_keys']);
+        $this->assertNotContains('platformDisclaimer', $items['remaining_static_manual_review']['route_keys']);
         $this->assertContains('authoritative_content_source_required', $items['remaining_static_manual_review']['blockers']);
 
         $this->assertSame('blocked', $items['auth_only_public_contract_review']['status']);
@@ -140,8 +140,8 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertFalse($eligibility['activation_available']);
         $this->assertTrue($eligibility['requires_explicit_cutover_instruction']);
         $this->assertSame(76, $eligibility['counts']['public_routes']);
-        $this->assertSame(69, $eligibility['counts']['api_backed_public_routes']);
-        $this->assertSame(7, $eligibility['counts']['remaining_public_routes']);
+        $this->assertSame(72, $eligibility['counts']['api_backed_public_routes']);
+        $this->assertSame(4, $eligibility['counts']['remaining_public_routes']);
         $this->assertContains('remaining_public_route_work', $eligibility['blockers']);
         $this->assertContains('route_parity_required', $eligibility['blockers']);
         $this->assertContains('edge_routes_not_configured', $eligibility['blockers']);
@@ -283,8 +283,8 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertSame('none', $remaining['production_effect']);
         $this->assertFalse($remaining['activation_available']);
         $this->assertSame(76, $remaining['counts']['public_routes']);
-        $this->assertSame(69, $remaining['counts']['api_backed_public_routes']);
-        $this->assertSame(7, $remaining['counts']['remaining_public_routes']);
+        $this->assertSame(72, $remaining['counts']['api_backed_public_routes']);
+        $this->assertSame(4, $remaining['counts']['remaining_public_routes']);
         $this->assertSame(0, $remaining['counts']['unclassified_manifest_only_routes']);
         $this->assertNotContains('changelog', $groups['static_manual_review']['route_keys']);
         $this->assertNotContains('home', $groups['static_manual_review']['route_keys']);
@@ -305,7 +305,9 @@ class NextPublicFrontendReadinessServiceTest extends TestCase
         $this->assertNotContains('hourImpactSummary', $groups['static_manual_review']['route_keys']);
         $this->assertNotContains('hourImpactReport', $groups['static_manual_review']['route_keys']);
         $this->assertNotContains('hourStrategicPlan', $groups['static_manual_review']['route_keys']);
-        $this->assertContains('platformTerms', $groups['static_manual_review']['route_keys']);
+        $this->assertNotContains('platformTerms', $groups['static_manual_review']['route_keys']);
+        $this->assertNotContains('platformPrivacy', $groups['static_manual_review']['route_keys']);
+        $this->assertNotContains('platformDisclaimer', $groups['static_manual_review']['route_keys']);
         $this->assertNotContains('developmentStatus', $groups['static_manual_review']['route_keys']);
         $this->assertContains('couponDetail', $groups['auth_only_backend']['route_keys']);
         $this->assertContains('ideationIdeaDetail', $groups['auth_only_backend']['route_keys']);

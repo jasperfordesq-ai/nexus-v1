@@ -235,6 +235,39 @@ class PublicStaticRouteContentService
                 ['key' => 'vision', 'title' => 'vision_heading', 'body' => 'vision_text'],
             ],
         ],
+        'platform-terms' => [
+            'route_key' => 'platformTerms',
+            'path' => '/platform/terms',
+            'locale_file' => 'legal.json',
+            'namespace' => 'platform_terms',
+            'title' => 'title',
+            'lead' => 'subtitle',
+            'sections' => [
+                ['key' => 'sections', 'title' => 'title', 'body' => 'subtitle', 'items_from' => 'sections'],
+            ],
+        ],
+        'platform-privacy' => [
+            'route_key' => 'platformPrivacy',
+            'path' => '/platform/privacy',
+            'locale_file' => 'legal.json',
+            'namespace' => 'platform_privacy',
+            'title' => 'title',
+            'lead' => 'subtitle',
+            'sections' => [
+                ['key' => 'sections', 'title' => 'title', 'body' => 'subtitle', 'items_from' => 'sections'],
+            ],
+        ],
+        'platform-disclaimer' => [
+            'route_key' => 'platformDisclaimer',
+            'path' => '/platform/disclaimer',
+            'locale_file' => 'legal.json',
+            'namespace' => 'platform_disclaimer',
+            'title' => 'title',
+            'lead' => 'subtitle',
+            'sections' => [
+                ['key' => 'sections', 'title' => 'title', 'body' => 'subtitle', 'items_from' => 'sections'],
+            ],
+        ],
     ];
 
     /**

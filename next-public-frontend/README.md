@@ -118,12 +118,9 @@ they include no activation controls and have no production routing effect.
 ## Remaining Blockers
 
 The shadow manifests currently classify 76 intended public routes. Of those,
-69 are backed by public Laravel API content sources. The remaining routes are
+72 are backed by public Laravel API content sources. The remaining routes are
 blocked deliberately and must not be promoted by adding ad hoc public APIs:
 
-- `platformTerms`, `platformPrivacy`, `platformDisclaimer`: require an
-  authoritative platform legal content source and manual no-JavaScript shadow
-  review before they can be considered API-backed.
 - `marketplaceCollections`, `coupons`, `couponDetail`, `ideationIdeaDetail`:
   would expand currently auth-only content surfaces and require an explicit
   public visibility decision plus privacy review before any public API is

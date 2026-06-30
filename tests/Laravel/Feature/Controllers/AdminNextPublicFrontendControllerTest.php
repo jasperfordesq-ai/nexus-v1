@@ -55,7 +55,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.shadow_runtime.compose_profile_configured', true);
         $response->assertJsonPath('data.shadow_runtime.port_env', 'NEXUS_NEXT_PUBLIC_PORT');
         $response->assertJsonPath('data.manifest.route_counts.public_routes', 76);
-        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 69);
+        $response->assertJsonPath('data.manifest.route_counts.api_backed_public_routes', 72);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_prefixes', 38);
         $response->assertJsonPath('data.manifest.route_counts.vite_private_patterns', 100);
         $response->assertJsonPath('data.manifest.validation.status', 'pass');
@@ -94,7 +94,7 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $response->assertJsonPath('data.cutover_eligibility.production_effect', 'none');
         $response->assertJsonPath('data.cutover_eligibility.activation_available', false);
         $response->assertJsonPath('data.cutover_eligibility.requires_explicit_cutover_instruction', true);
-        $response->assertJsonPath('data.cutover_eligibility.counts.remaining_public_routes', 7);
+        $response->assertJsonPath('data.cutover_eligibility.counts.remaining_public_routes', 4);
 
         $payload = $response->json('data');
         $publicPatterns = array_column($payload['manifest']['public_routes'], 'pattern');
@@ -180,6 +180,9 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertContains('hourImpactSummary', $apiBackedRouteKeys);
         $this->assertContains('hourImpactReport', $apiBackedRouteKeys);
         $this->assertContains('hourStrategicPlan', $apiBackedRouteKeys);
+        $this->assertContains('platformTerms', $apiBackedRouteKeys);
+        $this->assertContains('platformPrivacy', $apiBackedRouteKeys);
+        $this->assertContains('platformDisclaimer', $apiBackedRouteKeys);
         $this->assertContains('volunteeringOpportunityDetail', $apiBackedRouteKeys);
         $this->assertContains('ideationDetail', $apiBackedRouteKeys);
         $this->assertContains('groupDetail', $apiBackedRouteKeys);
@@ -307,20 +310,25 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertSame('laravel_public_api', $routeReadinessByKey['marketplaceMap']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['marketplaceCategory']['content_source']);
         $this->assertSame('laravel_public_api', $routeReadinessByKey['municipalityCalendar']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['platformTerms']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['platformPrivacy']['content_source']);
+        $this->assertSame('laravel_public_api', $routeReadinessByKey['platformDisclaimer']['content_source']);
         $this->assertSame('static_or_tenant_bootstrap', $routeReadinessByKey['couponDetail']['content_source']);
         $this->assertSame('blocker', $routeReadinessByKey['listingDetail']['status']);
         $this->assertContains('parity_test_required', $routeReadinessByKey['listingDetail']['blockers']);
         $this->assertSame('none', $payload['remaining_public_route_work']['production_effect']);
         $this->assertFalse($payload['remaining_public_route_work']['activation_available']);
         $this->assertSame(76, $payload['remaining_public_route_work']['counts']['public_routes']);
-        $this->assertSame(69, $payload['remaining_public_route_work']['counts']['api_backed_public_routes']);
-        $this->assertSame(7, $payload['remaining_public_route_work']['counts']['remaining_public_routes']);
+        $this->assertSame(72, $payload['remaining_public_route_work']['counts']['api_backed_public_routes']);
+        $this->assertSame(4, $payload['remaining_public_route_work']['counts']['remaining_public_routes']);
         $this->assertSame(0, $payload['remaining_public_route_work']['counts']['unclassified_manifest_only_routes']);
         $this->assertNotContains('changelog', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
         $this->assertNotContains('home', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
         $this->assertNotContains('developers', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
         $this->assertNotContains('developmentStatus', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
-        $this->assertContains('platformTerms', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
+        $this->assertNotContains('platformTerms', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
+        $this->assertNotContains('platformPrivacy', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
+        $this->assertNotContains('platformDisclaimer', $remainingRouteWorkByKey['static_manual_review']['route_keys']);
         $this->assertContains('couponDetail', $remainingRouteWorkByKey['auth_only_backend']['route_keys']);
         $this->assertContains('ideationIdeaDetail', $remainingRouteWorkByKey['auth_only_backend']['route_keys']);
         $this->assertNotContains('ideationIdeaDetail', $remainingRouteWorkByKey['backend_contract_missing']['route_keys']);
@@ -334,7 +342,9 @@ class AdminNextPublicFrontendControllerTest extends TestCase
         $this->assertTrue($payload['pre_cutover_dry_runs']['requires_explicit_cutover_instruction']);
         $this->assertContains('npm run check:next-public:dry-run', $payload['shadow_runtime']['verification_commands']);
         $this->assertContains('npm --prefix next-public-frontend run check', $preCutoverDryRunsByKey['shadow_manifest_and_html']['commands']);
-        $this->assertContains('platformTerms', $preCutoverDryRunsByKey['remaining_static_manual_review']['route_keys']);
+        $this->assertNotContains('platformTerms', $preCutoverDryRunsByKey['remaining_static_manual_review']['route_keys']);
+        $this->assertNotContains('platformPrivacy', $preCutoverDryRunsByKey['remaining_static_manual_review']['route_keys']);
+        $this->assertNotContains('platformDisclaimer', $preCutoverDryRunsByKey['remaining_static_manual_review']['route_keys']);
         $this->assertContains('couponDetail', $preCutoverDryRunsByKey['auth_only_public_contract_review']['route_keys']);
         $this->assertContains('privacy_review_required_before_public_api', $preCutoverDryRunsByKey['auth_only_public_contract_review']['blockers']);
         $this->assertContains('npm --prefix react-frontend run build', $preCutoverDryRunsByKey['private_vite_regression']['commands']);

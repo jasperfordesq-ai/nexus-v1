@@ -50,6 +50,9 @@ describe('public content sources', () => {
     expect(getPublicEndpointForRoute('hourImpactSummary')).toBe('/v2/public-static-route-content/impact-summary');
     expect(getPublicEndpointForRoute('hourImpactReport')).toBe('/v2/public-static-route-content/impact-report');
     expect(getPublicEndpointForRoute('hourStrategicPlan')).toBe('/v2/public-static-route-content/strategic-plan');
+    expect(getPublicEndpointForRoute('platformTerms')).toBe('/v2/public-static-route-content/platform-terms');
+    expect(getPublicEndpointForRoute('platformPrivacy')).toBe('/v2/public-static-route-content/platform-privacy');
+    expect(getPublicEndpointForRoute('platformDisclaimer')).toBe('/v2/public-static-route-content/platform-disclaimer');
   });
 
   it('encodes route parameters before calling Laravel public APIs', () => {
