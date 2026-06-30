@@ -609,5 +609,20 @@
     "impact_major": "Poważny",
     "impact_minor": "Drobny",
     "impact_cosmetic": "Kosmetyczny"
+  },
+  "donation_admin": {
+    "created_subject": "Nowa darowizna: :amount dla :community",
+    "created_title": "Otrzymano nową darowiznę",
+    "created_preview": ":donor przekazał(a) :amount na rzecz :community.",
+    "created_body": "Twoja społeczność właśnie otrzymała darowiznę. Oto szczegóły do Twojej dokumentacji.",
+    "created_bell": "Nowa darowizna: :amount od :donor",
+    "amount_label": "Kwota",
+    "donor_label": "Darczyńca",
+    "fund_label": "Fundusz",
+    "message_label": "Wiadomość",
+    "date_label": "Data",
+    "anonymous_donor": "Anonimowy",
+    "anonymous_note": "(oznaczone jako anonimowe publicznie)",
+    "review_cta": "Zobacz darowizny"
   }
 }

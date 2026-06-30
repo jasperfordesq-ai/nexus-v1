@@ -609,5 +609,20 @@
     "impact_major": "رئيسي",
     "impact_minor": "ثانوي",
     "impact_cosmetic": "شكلي"
+  },
+  "donation_admin": {
+    "created_subject": "تبرع جديد: :amount إلى :community",
+    "created_title": "تم استلام تبرع جديد",
+    "created_preview": "تبرّع :donor بمبلغ :amount إلى :community.",
+    "created_body": "تلقّى مجتمعك تبرعًا للتو. إليك التفاصيل لسجلاتك.",
+    "created_bell": "تبرع جديد: :amount من :donor",
+    "amount_label": "المبلغ",
+    "donor_label": "المتبرع",
+    "fund_label": "الصندوق",
+    "message_label": "الرسالة",
+    "date_label": "التاريخ",
+    "anonymous_donor": "مجهول",
+    "anonymous_note": "(محدد كمجهول للعموم)",
+    "review_cta": "عرض التبرعات"
   }
 }

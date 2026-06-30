@@ -609,5 +609,20 @@
     "impact_major": "Mor",
     "impact_minor": "Mionur",
     "impact_cosmetic": "Cosmaiteach"
+  },
+  "donation_admin": {
+    "created_subject": "Síntiús nua: :amount chuig :community",
+    "created_title": "Síntiús nua faighte",
+    "created_preview": "Bhronn :donor :amount ar :community.",
+    "created_body": "Fuair do phobal síntiús díreach anois. Seo na sonraí do do thaifid.",
+    "created_bell": "Síntiús nua: :amount ó :donor",
+    "amount_label": "Méid",
+    "donor_label": "Deontóir",
+    "fund_label": "Ciste",
+    "message_label": "Teachtaireacht",
+    "date_label": "Dáta",
+    "anonymous_donor": "Gan ainm",
+    "anonymous_note": "(marcáilte gan ainm go poiblí)",
+    "review_cta": "Féach ar Shíntiúis"
   }
 }

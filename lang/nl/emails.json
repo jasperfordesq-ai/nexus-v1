@@ -609,5 +609,20 @@
     "impact_major": "Ernstig",
     "impact_minor": "Klein",
     "impact_cosmetic": "Cosmetisch"
+  },
+  "donation_admin": {
+    "created_subject": "Nieuwe donatie: :amount aan :community",
+    "created_title": "Nieuwe donatie ontvangen",
+    "created_preview": ":donor doneerde :amount aan :community.",
+    "created_body": "Je community heeft zojuist een donatie ontvangen. Hier zijn de details voor je administratie.",
+    "created_bell": "Nieuwe donatie: :amount van :donor",
+    "amount_label": "Bedrag",
+    "donor_label": "Donateur",
+    "fund_label": "Fonds",
+    "message_label": "Bericht",
+    "date_label": "Datum",
+    "anonymous_donor": "Anoniem",
+    "anonymous_note": "(openbaar als anoniem gemarkeerd)",
+    "review_cta": "Donaties bekijken"
   }
 }

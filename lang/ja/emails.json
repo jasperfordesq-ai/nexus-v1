@@ -609,5 +609,20 @@
     "impact_major": "重大",
     "impact_minor": "軽微",
     "impact_cosmetic": "外観上のみ"
+  },
+  "donation_admin": {
+    "created_subject": "新しい寄付: :community に :amount",
+    "created_title": "新しい寄付を受け取りました",
+    "created_preview": ":donor さんが :community に :amount を寄付しました。",
+    "created_body": "あなたのコミュニティに寄付が届きました。記録用の詳細は以下のとおりです。",
+    "created_bell": "新しい寄付: :donor さんから :amount",
+    "amount_label": "金額",
+    "donor_label": "寄付者",
+    "fund_label": "基金",
+    "message_label": "メッセージ",
+    "date_label": "日付",
+    "anonymous_donor": "匿名",
+    "anonymous_note": "（公開上は匿名に設定）",
+    "review_cta": "寄付を表示"
   }
 }

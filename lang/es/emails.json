@@ -609,5 +609,20 @@
     "impact_major": "Mayor",
     "impact_minor": "Menor",
     "impact_cosmetic": "Cosmético"
+  },
+  "donation_admin": {
+    "created_subject": "Nueva donación: :amount a :community",
+    "created_title": "Nueva donación recibida",
+    "created_preview": ":donor donó :amount a :community.",
+    "created_body": "Tu comunidad acaba de recibir una donación. Aquí están los detalles para tus registros.",
+    "created_bell": "Nueva donación: :amount de :donor",
+    "amount_label": "Importe",
+    "donor_label": "Donante",
+    "fund_label": "Fondo",
+    "message_label": "Mensaje",
+    "date_label": "Fecha",
+    "anonymous_donor": "Anónimo",
+    "anonymous_note": "(marcado como anónimo públicamente)",
+    "review_cta": "Ver donaciones"
   }
 }

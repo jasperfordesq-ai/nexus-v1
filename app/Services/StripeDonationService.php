@@ -332,6 +332,19 @@ class StripeDonationService
                 'donation_id' => $donation->id,
             ]);
         }
+
+        // Notify tenant admins that a donation was received. Only on first
+        // completion (this branch) so re-delivered webhook events don't re-notify.
+        // Self-isolating, but guarded again here: a notification failure must
+        // never fail the webhook or Stripe retries the event for days.
+        try {
+            DonationAdminNotificationService::notifyDonationReceived($donation);
+        } catch (\Throwable $e) {
+            Log::warning('Stripe donation: admin notification failed (will not fail webhook)', [
+                'donation_id' => $donation->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     private static function sendDonationReceiptEmail(object $donation): bool

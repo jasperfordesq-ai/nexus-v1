@@ -609,5 +609,20 @@
     "impact_major": "Schwerwiegend",
     "impact_minor": "Gering",
     "impact_cosmetic": "Kosmetisch"
+  },
+  "donation_admin": {
+    "created_subject": "Neue Spende: :amount an :community",
+    "created_title": "Neue Spende erhalten",
+    "created_preview": ":donor hat :amount an :community gespendet.",
+    "created_body": "Ihre Community hat soeben eine Spende erhalten. Hier sind die Details für Ihre Unterlagen.",
+    "created_bell": "Neue Spende: :amount von :donor",
+    "amount_label": "Betrag",
+    "donor_label": "Spender:in",
+    "fund_label": "Fonds",
+    "message_label": "Nachricht",
+    "date_label": "Datum",
+    "anonymous_donor": "Anonym",
+    "anonymous_note": "(öffentlich als anonym markiert)",
+    "review_cta": "Spenden ansehen"
   }
 }

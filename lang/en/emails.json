@@ -609,5 +609,20 @@
     "public_note": "This appreciation is public — others can see it on your profile.",
     "private_note": "This appreciation is private — only you can see it.",
     "cta_view": "View on your profile"
+  },
+  "donation_admin": {
+    "created_subject": "New donation: :amount to :community",
+    "created_title": "New Donation Received",
+    "created_preview": ":donor donated :amount to :community.",
+    "created_body": "Your community just received a donation. Here are the details for your records.",
+    "created_bell": "New donation: :amount from :donor",
+    "amount_label": "Amount",
+    "donor_label": "Donor",
+    "fund_label": "Fund",
+    "message_label": "Message",
+    "date_label": "Date",
+    "anonymous_donor": "Anonymous",
+    "anonymous_note": "(marked anonymous publicly)",
+    "review_cta": "View Donations"
   }
 }
