@@ -3,11 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import Image from 'next/image';
-import { Card, Chip, Link, Surface } from '@heroui/react';
+import { Card, Chip, Link } from '@heroui/react';
 
-import { resolveAssetUrl, safeCssColor } from '../lib/assets';
+import { resolveAssetUrl } from '../lib/assets';
 import type { Translator } from '../lib/i18n';
 import type { RouteOwnership } from '../lib/public-routes';
 import type {
@@ -27,6 +27,7 @@ import type {
   TenantBootstrap,
 } from '../lib/tenant-api';
 import { getApiBase } from '../lib/tenant-api';
+import { PublicChrome } from './PublicChrome';
 
 interface PublicPageProps {
   canonicalUrl: string;
@@ -38,54 +39,10 @@ interface PublicPageProps {
   t: Translator;
 }
 
-const navigationItems = [
-  { href: '', labelKey: 'navigation.home' },
-  { href: 'listings', labelKey: 'navigation.listings' },
-  { href: 'events', labelKey: 'navigation.events' },
-  { href: 'jobs', labelKey: 'navigation.jobs' },
-  { href: 'marketplace', labelKey: 'navigation.marketplace' },
-  { href: 'organisations', labelKey: 'navigation.organisations' },
-  { href: 'resources', labelKey: 'navigation.resources' },
-  { href: 'blog', labelKey: 'navigation.blog' },
-  { href: 'help', labelKey: 'navigation.help' },
-  { href: 'contact', labelKey: 'navigation.contact' },
-];
-
 const homeHeroLinks = [
   { href: 'listings', labelKey: 'navigation.listings' },
   { href: 'events', labelKey: 'navigation.events' },
   { href: 'resources', labelKey: 'navigation.resources' },
-];
-
-const footerSections = [
-  {
-    labelKey: 'footer.platform',
-    links: [
-      { href: 'listings', labelKey: 'navigation.listings' },
-      { href: 'events', labelKey: 'navigation.events' },
-      { href: 'jobs', labelKey: 'navigation.jobs' },
-      { href: 'marketplace', labelKey: 'navigation.marketplace' },
-      { href: 'organisations', labelKey: 'navigation.organisations' },
-    ],
-  },
-  {
-    labelKey: 'footer.support',
-    links: [
-      { href: 'help', labelKey: 'navigation.help' },
-      { href: 'contact', labelKey: 'navigation.contact' },
-      { href: 'faq', labelKey: 'navigation.faq' },
-      { href: 'about', labelKey: 'navigation.about' },
-    ],
-  },
-  {
-    labelKey: 'footer.legal',
-    links: [
-      { href: 'legal', labelKey: 'pages.legal.title' },
-      { href: 'terms', labelKey: 'pages.terms.title' },
-      { href: 'privacy', labelKey: 'pages.privacy.title' },
-      { href: 'accessibility', labelKey: 'pages.accessibility.title' },
-    ],
-  },
 ];
 
 export function PublicPage({
@@ -100,19 +57,12 @@ export function PublicPage({
   const tenantName = tenant?.name || t('brand.platformName');
   const tagline = tenant?.tagline || t('pages.home.fallbackTagline');
   const logoUrl = resolveAssetUrl(tenant?.branding?.logo_url, getApiBase());
-  const accentColor = safeCssColor(tenant?.branding?.primary_color);
-  const secondaryColor = safeCssColor(tenant?.branding?.secondary_color);
   const pageTitle = getRouteTitle(route, content, t);
   const pageLead = getRouteLead(route, tenantName, t, content);
-  const style = buildThemeStyle(accentColor, secondaryColor);
   const isHome = route.routeKey === 'home';
 
   return (
-    <Surface
-      className="min-h-screen bg-[color:var(--nexus-bg)] text-[color:var(--nexus-ink)]"
-      data-nexus-ui="heroui-public"
-      style={style}
-    >
+    <PublicChrome canonicalUrl={canonicalUrl} tenant={tenant} tenantBasePath={tenantBasePath} t={t}>
       <StructuredData
         canonicalUrl={canonicalUrl}
         content={content}
@@ -120,158 +70,67 @@ export function PublicPage({
         tenant={tenant}
         tenantName={tenantName}
       />
-      <header className="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
-        <Card
-          className="border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)]/95 shadow-sm"
-          variant="secondary"
-        >
-          <Card.Content className="flex flex-col gap-4 p-4 lg:flex-row lg:items-center lg:justify-between">
-            <BrandLink href={withTenantBase(tenantBasePath, '')} logoUrl={logoUrl} tagline={tagline} tenantName={tenantName} />
-            <nav aria-label={t('navigation.aria')} className="flex flex-wrap gap-2 lg:justify-end">
-              {navigationItems.map((item) => (
-                <Link
-                  className="rounded-lg border border-transparent px-3 py-2 text-sm font-semibold text-[color:var(--nexus-muted)] hover:border-[color:var(--nexus-border)] hover:bg-[color:var(--nexus-accent-soft)] hover:text-[color:var(--nexus-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
-                  href={withTenantBase(tenantBasePath, item.href)}
-                  key={item.labelKey}
-                >
-                  {t(item.labelKey)}
-                </Link>
-              ))}
-            </nav>
-          </Card.Content>
-        </Card>
-      </header>
-
-      <main>
-        <section
-          className={`mx-auto grid w-full max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8 lg:py-14 ${
-            isHome ? 'lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)] lg:items-center' : ''
-          }`}
-        >
-          <div className="min-w-0">
-            <Chip className="mb-4" color="accent" size="sm" variant="soft">
-              {isHome ? t('pages.home.eyebrow') : tenantName}
-            </Chip>
-            <h1 className="max-w-4xl text-4xl font-bold leading-tight text-[color:var(--nexus-ink)] sm:text-5xl lg:text-6xl">
-              {pageTitle}
-            </h1>
-            <p className="mt-5 max-w-3xl text-lg leading-8 text-[color:var(--nexus-muted)]">{pageLead}</p>
-            {isHome ? (
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Link
-                  className="rounded-lg bg-[color:var(--nexus-accent)] px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
-                  href={withTenantBase(tenantBasePath, 'contact')}
-                >
-                  {t('pages.home.primaryAction')}
-                </Link>
-                <Link
-                  className="rounded-lg border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)] px-4 py-2.5 text-sm font-bold text-[color:var(--nexus-ink)] shadow-sm hover:bg-[color:var(--nexus-accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
-                  href={withTenantBase(tenantBasePath, 'blog')}
-                >
-                  {t('pages.home.secondaryAction')}
-                </Link>
-              </div>
-            ) : null}
-          </div>
+      <section
+        className={`mx-auto grid w-full max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8 lg:py-14 ${
+          isHome ? 'lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)] lg:items-center' : ''
+        }`}
+      >
+        <div className="min-w-0">
+          <Chip className="mb-4" color="accent" size="sm" variant="soft">
+            {isHome ? t('pages.home.eyebrow') : tenantName}
+          </Chip>
+          <h1 className="max-w-4xl text-4xl font-bold leading-tight text-theme-primary sm:text-5xl lg:text-6xl">
+            {pageTitle}
+          </h1>
+          <p className="mt-5 max-w-3xl text-lg leading-8 text-theme-muted">{pageLead}</p>
           {isHome ? (
-            <Card
-              aria-label={t('pages.home.sectionTitle')}
-              className="border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)] shadow-lg"
-              variant="default"
-            >
-              <Card.Header className="pb-3">
-                <BrandMark logoUrl={logoUrl} tagline={tagline} tenantName={tenantName} />
-              </Card.Header>
-              <Card.Content className="space-y-5 pt-0">
-                <p className="leading-7 text-[color:var(--nexus-muted)]">{t('pages.home.sectionBody')}</p>
-                <div className="grid gap-2">
-                  {homeHeroLinks.map((item) => (
-                    <Link
-                      className="rounded-lg border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface-raised)] px-3 py-2.5 font-bold text-[color:var(--nexus-ink)] hover:bg-[color:var(--nexus-accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
-                      href={withTenantBase(tenantBasePath, item.href)}
-                      key={item.labelKey}
-                    >
-                      {t(item.labelKey)}
-                    </Link>
-                  ))}
-                </div>
-              </Card.Content>
-            </Card>
-          ) : null}
-        </section>
-
-        <section className="mx-auto w-full max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
-          {renderRouteContent(route, routeSegments, content, tenantName, tenantBasePath, t)}
-        </section>
-      </main>
-
-      <footer className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="border-t border-[color:var(--nexus-border)] pt-8">
-          <div className="grid gap-8 lg:grid-cols-[minmax(260px,1.4fr)_repeat(3,minmax(150px,1fr))]">
-            <div className="grid gap-4">
-              <BrandLink
-                href={withTenantBase(tenantBasePath, '')}
-                logoUrl={logoUrl}
-                tagline={tagline}
-                tenantName={tenantName}
-              />
-              <p className="max-w-md leading-7 text-[color:var(--nexus-muted)]">{t('footer.attribution')}</p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                className="button button--primary button--md"
+                href={withTenantBase(tenantBasePath, 'contact')}
+              >
+                {t('pages.home.primaryAction')}
+              </Link>
+              <Link
+                className="button button--outline button--md"
+                href={withTenantBase(tenantBasePath, 'blog')}
+              >
+                {t('pages.home.secondaryAction')}
+              </Link>
             </div>
-            {footerSections.map((section) => (
-              <nav aria-label={t(section.labelKey)} className="grid content-start gap-3" key={section.labelKey}>
-                <h2 className="text-sm font-bold text-[color:var(--nexus-ink)]">{t(section.labelKey)}</h2>
-                <ul className="grid gap-2">
-                  {section.links.map((link) => (
-                    <li key={`${section.labelKey}-${link.href}`}>
-                      <Link
-                        className="text-sm text-[color:var(--nexus-muted)] hover:text-[color:var(--nexus-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
-                        href={withTenantBase(tenantBasePath, link.href)}
-                      >
-                        {t(link.labelKey)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            ))}
-          </div>
-          <div className="mt-7 flex flex-wrap justify-between gap-3 border-t border-[color:var(--nexus-border)] pt-5 text-sm text-[color:var(--nexus-muted)]">
-            <p>{t('footer.copyright')}</p>
-            <Link
-              className="text-[color:var(--nexus-muted)] hover:text-[color:var(--nexus-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
-              href={canonicalUrl}
-            >
-              {t('metadata.canonicalLabel')}
-            </Link>
-          </div>
+          ) : null}
         </div>
-      </footer>
-    </Surface>
-  );
-}
+        {isHome ? (
+          <Card
+            aria-label={t('pages.home.sectionTitle')}
+            className="border border-theme-default bg-theme-card shadow-lg"
+            variant="default"
+          >
+            <Card.Header className="pb-3">
+              <BrandMark logoUrl={logoUrl} tagline={tagline} tenantName={tenantName} />
+            </Card.Header>
+            <Card.Content className="space-y-5 pt-0">
+              <p className="leading-7 text-theme-muted">{t('pages.home.sectionBody')}</p>
+              <div className="grid gap-2">
+                {homeHeroLinks.map((item) => (
+                  <Link
+                    className="rounded-lg border border-theme-default bg-theme-elevated px-3 py-2.5 font-bold text-theme-primary hover:bg-theme-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                    href={withTenantBase(tenantBasePath, item.href)}
+                    key={item.labelKey}
+                  >
+                    {t(item.labelKey)}
+                  </Link>
+                ))}
+              </div>
+            </Card.Content>
+          </Card>
+        ) : null}
+      </section>
 
-function BrandLink({
-  href,
-  logoUrl,
-  tagline,
-  tenantName,
-}: {
-  href: string;
-  logoUrl: string | undefined;
-  tagline: string;
-  tenantName: string;
-}): ReactNode {
-  return (
-    <Link
-      className="inline-flex min-w-0 items-center gap-3 rounded-lg text-[color:var(--nexus-ink)] no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
-      href={href}
-    >
-      <BrandLogo logoUrl={logoUrl} tenantName={tenantName} />
-      <span className="min-w-0">
-        <strong className="block truncate text-base font-bold">{tenantName}</strong>
-        <span className="block truncate text-sm text-[color:var(--nexus-muted)]">{tagline}</span>
-      </span>
-    </Link>
+      <section className="mx-auto w-full max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
+        {renderRouteContent(route, routeSegments, content, tenantName, tenantBasePath, t)}
+      </section>
+    </PublicChrome>
   );
 }
 
@@ -585,23 +444,6 @@ function GalleryGrid({
       ))}
     </div>
   );
-}
-
-function buildThemeStyle(
-  accentColor: string | undefined,
-  secondaryColor: string | undefined,
-): CSSProperties | undefined {
-  const style: CSSProperties & Record<string, string> = {};
-
-  if (accentColor) {
-    style['--nexus-accent'] = accentColor;
-  }
-
-  if (secondaryColor) {
-    style['--nexus-accent-secondary'] = secondaryColor;
-  }
-
-  return Object.keys(style).length > 0 ? style : undefined;
 }
 
 function renderRouteContent(

@@ -84,8 +84,12 @@ describe('PublicPage', () => {
     );
 
     expect(html).toContain('data-nexus-ui="heroui-public"');
+    expect(html).toContain('data-nexus-ui="react-public-navbar"');
+    expect(html).toContain('data-nexus-ui="react-public-mobile-drawer"');
+    expect(html).toContain('data-nexus-ui="react-public-footer"');
     expect(html).toContain('data-slot="surface"');
-    expect(html).toContain('data-slot="card"');
+    expect(html).toContain('data-slot="button"');
+    expect(html).toContain('utility-bar-action');
     expect(html).not.toContain('site-header');
     expect(html).not.toContain('public-shell');
     expect(html).not.toContain('hero-band');
@@ -95,6 +99,9 @@ describe('PublicPage', () => {
     expect(html).toContain('href="/hour-timebank/jobs"');
     expect(html).toContain('href="/hour-timebank/marketplace"');
     expect(html).toContain('href="/hour-timebank/organisations"');
+    expect(html).toContain('href="/hour-timebank/login"');
+    expect(html).toContain('href="/hour-timebank/register"');
+    expect(html).toContain('aria-controls="mobile-drawer"');
     expect(html).toContain('aria-label="Platform"');
     expect(html).toContain('aria-label="Legal"');
     expect(html).toContain('AGPL-3.0-or-later');

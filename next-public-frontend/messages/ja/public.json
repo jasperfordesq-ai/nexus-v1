@@ -15,7 +15,18 @@
     "jobs": "Jobs",
     "marketplace": "Marketplace",
     "organisations": "Organisations",
-    "resources": "Resources"
+    "resources": "Resources",
+    "timebanking": "Timebanking",
+    "community": "Community",
+    "legal": "Legal",
+    "login": "Log in",
+    "signup": "Sign up",
+    "search": "Search",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "mobileNavigation": "Mobile navigation",
+    "accessibleFrontend": "Accessible frontend",
+    "sourceCode": "Source code"
   },
   "metadata": {
     "canonicalLabel": "Canonical page URL"
