@@ -38,14 +38,52 @@ interface PublicPageProps {
 
 const navigationItems = [
   { href: '', labelKey: 'navigation.home' },
-  { href: 'about', labelKey: 'navigation.about' },
+  { href: 'listings', labelKey: 'navigation.listings' },
+  { href: 'events', labelKey: 'navigation.events' },
+  { href: 'jobs', labelKey: 'navigation.jobs' },
+  { href: 'marketplace', labelKey: 'navigation.marketplace' },
+  { href: 'organisations', labelKey: 'navigation.organisations' },
+  { href: 'resources', labelKey: 'navigation.resources' },
+  { href: 'blog', labelKey: 'navigation.blog' },
   { href: 'help', labelKey: 'navigation.help' },
   { href: 'contact', labelKey: 'navigation.contact' },
-  { href: 'faq', labelKey: 'navigation.faq' },
-  { href: 'blog', labelKey: 'navigation.blog' },
+];
+
+const homeHeroLinks = [
   { href: 'listings', labelKey: 'navigation.listings' },
   { href: 'events', labelKey: 'navigation.events' },
   { href: 'resources', labelKey: 'navigation.resources' },
+];
+
+const footerSections = [
+  {
+    labelKey: 'footer.platform',
+    links: [
+      { href: 'listings', labelKey: 'navigation.listings' },
+      { href: 'events', labelKey: 'navigation.events' },
+      { href: 'jobs', labelKey: 'navigation.jobs' },
+      { href: 'marketplace', labelKey: 'navigation.marketplace' },
+      { href: 'organisations', labelKey: 'navigation.organisations' },
+    ],
+  },
+  {
+    labelKey: 'footer.support',
+    links: [
+      { href: 'help', labelKey: 'navigation.help' },
+      { href: 'contact', labelKey: 'navigation.contact' },
+      { href: 'faq', labelKey: 'navigation.faq' },
+      { href: 'about', labelKey: 'navigation.about' },
+    ],
+  },
+  {
+    labelKey: 'footer.legal',
+    links: [
+      { href: 'legal', labelKey: 'pages.legal.title' },
+      { href: 'terms', labelKey: 'pages.terms.title' },
+      { href: 'privacy', labelKey: 'pages.privacy.title' },
+      { href: 'accessibility', labelKey: 'pages.accessibility.title' },
+    ],
+  },
 ];
 
 export function PublicPage({
@@ -61,11 +99,11 @@ export function PublicPage({
   const tagline = tenant?.tagline || t('pages.home.fallbackTagline');
   const logoUrl = resolveAssetUrl(tenant?.branding?.logo_url, getApiBase());
   const accentColor = safeCssColor(tenant?.branding?.primary_color);
+  const secondaryColor = safeCssColor(tenant?.branding?.secondary_color);
   const pageTitle = getRouteTitle(route, content, t);
   const pageLead = getRouteLead(route, tenantName, t, content);
-  const style = accentColor
-    ? ({ '--nexus-accent': accentColor } as CSSProperties & Record<'--nexus-accent', string>)
-    : undefined;
+  const style = buildThemeStyle(accentColor, secondaryColor);
+  const isHome = route.routeKey === 'home';
 
   return (
     <div className="public-shell" style={style}>
@@ -76,7 +114,7 @@ export function PublicPage({
         tenant={tenant}
         tenantName={tenantName}
       />
-      <header className="site-header">
+      <header className="site-header brand-chrome">
         <a className="brand-link" href={withTenantBase(tenantBasePath, '')}>
           {logoUrl ? <img alt="" className="brand-logo" src={logoUrl} /> : null}
           <span>
@@ -94,19 +132,40 @@ export function PublicPage({
       </header>
 
       <main>
-        <section className="hero-band">
-          <p className="eyebrow">{route.routeKey === 'home' ? t('pages.home.eyebrow') : tenantName}</p>
-          <h1>{pageTitle}</h1>
-          <p>{pageLead}</p>
-          {route.routeKey === 'home' ? (
-            <div className="action-row">
-              <a className="button primary" href={withTenantBase(tenantBasePath, 'contact')}>
-                {t('pages.home.primaryAction')}
-              </a>
-              <a className="button secondary" href={withTenantBase(tenantBasePath, 'blog')}>
-                {t('pages.home.secondaryAction')}
-              </a>
-            </div>
+        <section className={`hero-band${isHome ? ' home-hero' : ''}`}>
+          <div className="hero-copy">
+            <p className="eyebrow">{isHome ? t('pages.home.eyebrow') : tenantName}</p>
+            <h1>{pageTitle}</h1>
+            <p>{pageLead}</p>
+            {isHome ? (
+              <div className="action-row">
+                <a className="button primary" href={withTenantBase(tenantBasePath, 'contact')}>
+                  {t('pages.home.primaryAction')}
+                </a>
+                <a className="button secondary" href={withTenantBase(tenantBasePath, 'blog')}>
+                  {t('pages.home.secondaryAction')}
+                </a>
+              </div>
+            ) : null}
+          </div>
+          {isHome ? (
+            <aside aria-label={t('pages.home.sectionTitle')} className="home-hero-panel">
+              <div className="home-hero-brand">
+                {logoUrl ? <img alt="" className="brand-logo" src={logoUrl} /> : null}
+                <div>
+                  <strong>{tenantName}</strong>
+                  <span>{tagline}</span>
+                </div>
+              </div>
+              <p>{t('pages.home.sectionBody')}</p>
+              <div className="home-hero-links">
+                {homeHeroLinks.map((item) => (
+                  <a href={withTenantBase(tenantBasePath, item.href)} key={item.labelKey}>
+                    {t(item.labelKey)}
+                  </a>
+                ))}
+              </div>
+            </aside>
           ) : null}
         </section>
 
@@ -116,12 +175,54 @@ export function PublicPage({
       </main>
 
       <footer className="site-footer">
-        <p>{t('footer.attribution')}</p>
-        <p>{t('footer.copyright')}</p>
-        <a href={canonicalUrl}>{t('metadata.canonicalLabel')}</a>
+        <div className="footer-grid">
+          <div className="footer-brand">
+            <a className="brand-link" href={withTenantBase(tenantBasePath, '')}>
+              {logoUrl ? <img alt="" className="brand-logo" src={logoUrl} /> : null}
+              <span>
+                <strong>{tenantName}</strong>
+                <span>{tagline}</span>
+              </span>
+            </a>
+            <p>{t('footer.attribution')}</p>
+          </div>
+          {footerSections.map((section) => (
+            <nav aria-label={t(section.labelKey)} className="footer-nav-group" key={section.labelKey}>
+              <h2>{t(section.labelKey)}</h2>
+              <ul>
+                {section.links.map((link) => (
+                  <li key={`${section.labelKey}-${link.href}`}>
+                    <a href={withTenantBase(tenantBasePath, link.href)}>{t(link.labelKey)}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
+        </div>
+        <div className="footer-bottom">
+          <p>{t('footer.copyright')}</p>
+          <a href={canonicalUrl}>{t('metadata.canonicalLabel')}</a>
+        </div>
       </footer>
     </div>
   );
+}
+
+function buildThemeStyle(
+  accentColor: string | undefined,
+  secondaryColor: string | undefined,
+): CSSProperties | undefined {
+  const style: CSSProperties & Record<string, string> = {};
+
+  if (accentColor) {
+    style['--nexus-accent'] = accentColor;
+  }
+
+  if (secondaryColor) {
+    style['--nexus-accent-secondary'] = secondaryColor;
+  }
+
+  return Object.keys(style).length > 0 ? style : undefined;
 }
 
 function renderRouteContent(

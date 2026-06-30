@@ -12,6 +12,9 @@
     "blog": "Blog",
     "listings": "Listings",
     "events": "Events",
+    "jobs": "Jobs",
+    "marketplace": "Marketplace",
+    "organisations": "Organisations",
     "resources": "Resources"
   },
   "metadata": {
@@ -506,6 +509,9 @@
   },
   "footer": {
     "attribution": "Project NEXUS is free software licensed under AGPL-3.0-or-later.",
-    "copyright": "Copyright © 2024–2026 Jasper Ford."
+    "copyright": "Copyright © 2024–2026 Jasper Ford.",
+    "legal": "Legal",
+    "platform": "Platform",
+    "support": "Support"
   }
 }

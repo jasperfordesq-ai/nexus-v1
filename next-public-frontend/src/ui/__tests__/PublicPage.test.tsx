@@ -49,6 +49,50 @@ describe('PublicPage', () => {
     expect(html).toContain('https://app.project-nexus.ie/hour-timebank/about');
   });
 
+  it('renders the shared public chrome with tenant theme tokens and grouped footer links', () => {
+    const tenant: TenantBootstrap = {
+      branding: {
+        logo_url: 'https://cdn.example/hour-logo.png',
+        primary_color: '#0f766e',
+        secondary_color: '#4338ca',
+      },
+      default_language: 'en',
+      id: 2,
+      name: 'Hour Timebank',
+      slug: 'hour-timebank',
+      tagline: 'Neighbour-powered support',
+    };
+    const route: RouteOwnership = {
+      labelKey: 'pages.home.title',
+      owner: 'next-public',
+      pattern: '/',
+      routeKey: 'home',
+    };
+
+    const html = renderToStaticMarkup(
+      <PublicPage
+        canonicalUrl="https://app.project-nexus.ie/hour-timebank"
+        route={route}
+        routeSegments={[]}
+        tenant={tenant}
+        tenantBasePath="/hour-timebank"
+        t={createTranslator('en')}
+      />,
+    );
+
+    expect(html).toContain('class="site-header brand-chrome"');
+    expect(html).toContain('--nexus-accent:#0f766e');
+    expect(html).toContain('--nexus-accent-secondary:#4338ca');
+    expect(html).toContain('class="hero-band home-hero"');
+    expect(html).toContain('class="home-hero-panel"');
+    expect(html).toContain('href="/hour-timebank/jobs"');
+    expect(html).toContain('href="/hour-timebank/marketplace"');
+    expect(html).toContain('href="/hour-timebank/organisations"');
+    expect(html).toContain('aria-label="Platform"');
+    expect(html).toContain('aria-label="Legal"');
+    expect(html).toContain('AGPL-3.0-or-later');
+  });
+
   it('renders second-batch public discovery routes as no-JavaScript HTML', () => {
     const tenant: TenantBootstrap = {
       default_language: 'en',
