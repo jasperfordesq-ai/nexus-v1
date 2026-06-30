@@ -5,12 +5,14 @@
 
 import type { Metadata } from 'next';
 
-import { buildPageTitle } from './metadata';
+import { buildMetadataAlternates, buildPageTitle, formatOpenGraphLocale } from './metadata';
 import type { PublicMarketplaceListing } from './tenant-api';
 
 interface BuildMarketplaceMetadataInput {
   canonicalUrl: string;
+  fallbackImageUrl?: string;
   item: PublicMarketplaceListing;
+  locale?: string;
   platformName: string;
   tenantName?: string;
 }
@@ -22,16 +24,15 @@ export function buildMarketplaceMetadata(input: BuildMarketplaceMetadataInput): 
     tenantName: input.tenantName,
   });
   const description = input.item.excerpt || input.item.description;
-  const imageUrl = input.item.primaryImage?.url;
+  const imageUrl = input.item.primaryImage?.url ?? input.fallbackImageUrl;
 
   return {
-    alternates: {
-      canonical: input.canonicalUrl,
-    },
+    alternates: buildMetadataAlternates({ canonicalUrl: input.canonicalUrl, locale: input.locale }),
     description,
     openGraph: {
       description,
       images: imageUrl ? [imageUrl] : undefined,
+      locale: formatOpenGraphLocale(input.locale),
       title,
       type: 'website',
       url: input.canonicalUrl,

@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { CSSProperties, ReactNode } from 'react';
+import Image from 'next/image';
 import { Card, Chip, Link, Surface } from '@heroui/react';
 
 import { resolveAssetUrl, safeCssColor } from '../lib/assets';
@@ -265,7 +266,7 @@ function BrandLink({
       className="inline-flex min-w-0 items-center gap-3 rounded-lg text-[color:var(--nexus-ink)] no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
       href={href}
     >
-      <BrandLogo logoUrl={logoUrl} />
+      <BrandLogo logoUrl={logoUrl} tenantName={tenantName} />
       <span className="min-w-0">
         <strong className="block truncate text-base font-bold">{tenantName}</strong>
         <span className="block truncate text-sm text-[color:var(--nexus-muted)]">{tagline}</span>
@@ -285,7 +286,7 @@ function BrandMark({
 }): ReactNode {
   return (
     <div className="flex min-w-0 items-center gap-3">
-      <BrandLogo logoUrl={logoUrl} />
+      <BrandLogo logoUrl={logoUrl} tenantName={tenantName} />
       <div className="min-w-0">
         <strong className="block truncate text-base font-bold text-[color:var(--nexus-ink)]">{tenantName}</strong>
         <span className="block truncate text-sm text-[color:var(--nexus-muted)]">{tagline}</span>
@@ -294,7 +295,7 @@ function BrandMark({
   );
 }
 
-function BrandLogo({ logoUrl }: { logoUrl: string | undefined }): ReactNode {
+function BrandLogo({ logoUrl, tenantName }: { logoUrl: string | undefined; tenantName: string }): ReactNode {
   if (!logoUrl) {
     return (
       <span
@@ -305,10 +306,13 @@ function BrandLogo({ logoUrl }: { logoUrl: string | undefined }): ReactNode {
   }
 
   return (
-    <img
-      alt=""
+    <Image
+      alt={tenantName}
       className="size-12 shrink-0 rounded-lg border border-[color:var(--nexus-border)] bg-[color:var(--nexus-surface)] object-contain p-1"
+      height={96}
       src={logoUrl}
+      unoptimized
+      width={96}
     />
   );
 }
@@ -524,8 +528,25 @@ function MediaFrame({
     variant === 'hero'
       ? 'aspect-[16/7] max-h-[460px] rounded-lg'
       : 'aspect-[4/3] min-h-56 md:min-h-full';
+  const dimensions =
+    variant === 'hero'
+      ? {
+          height: 700,
+          width: 1600,
+        }
+      : {
+          height: 480,
+          width: 640,
+        };
   const content = image ? (
-    <img alt={image.altText || imageAltFallback} className="h-full w-full object-cover" src={image.url} />
+    <Image
+      alt={image.altText || imageAltFallback}
+      className="h-full w-full object-cover"
+      height={dimensions.height}
+      src={image.url}
+      unoptimized
+      width={dimensions.width}
+    />
   ) : (
     <span aria-hidden="true" className="block h-full w-full bg-[color:var(--nexus-accent-soft)]" />
   );
@@ -552,11 +573,14 @@ function GalleryGrid({
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {images.map((image) => (
-        <img
+        <Image
           alt={image.altText || imageAltFallback}
           className="aspect-[4/3] w-full rounded-lg bg-[color:var(--nexus-accent-soft)] object-cover"
+          height={480}
           key={image.url + '-' + (image.sortOrder ?? 0)}
           src={image.url}
+          unoptimized
+          width={640}
         />
       ))}
     </div>
@@ -1512,7 +1536,7 @@ function buildStructuredData({
       applicantLocationRequirements: content.job.location.isRemote
         ? {
             '@type': 'Country',
-            name: content.job.location.label ?? 'Remote',
+            name: content.job.location.label ?? tenantName,
           }
         : undefined,
       baseSalary:
@@ -1609,7 +1633,7 @@ function buildStructuredData({
 
   return {
     '@context': 'https://schema.org',
-    '@type': tenant?.seo?.description ? 'Organization' : 'WebPage',
+    '@type': (tenant?.seo?.meta_description ?? tenant?.seo?.description) ? 'Organization' : 'WebPage',
     name: pageTitle || tenantName,
     url: canonicalUrl,
   };

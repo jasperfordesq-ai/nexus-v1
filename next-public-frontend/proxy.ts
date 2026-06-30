@@ -5,6 +5,7 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 
+import { NEXUS_PUBLIC_PATHNAME_HEADER } from './src/lib/metadata';
 import { resolvePathOwnership } from './src/lib/route-guard';
 
 export function proxy(request: NextRequest): NextResponse {
@@ -21,7 +22,14 @@ export function proxy(request: NextRequest): NextResponse {
     return new NextResponse(null, { status: 404 });
   }
 
-  return NextResponse.next();
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set(NEXUS_PUBLIC_PATHNAME_HEADER, request.nextUrl.pathname);
+
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 }
 
 export const config = {

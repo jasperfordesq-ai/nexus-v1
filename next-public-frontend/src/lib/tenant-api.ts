@@ -9,6 +9,7 @@ import { getPublicEndpointForRoute } from './content-sources';
 
 export interface TenantBranding {
   logo_url?: string;
+  og_image_url?: string;
   primary_color?: string;
   secondary_color?: string;
 }
@@ -25,6 +26,11 @@ export interface TenantBootstrap {
   name: string;
   seo?: {
     description?: string;
+    h1_headline?: string;
+    hero_intro?: string;
+    meta_description?: string;
+    meta_title?: string;
+    robots_directive?: string;
     title?: string;
   };
   slug: string;

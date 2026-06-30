@@ -8,12 +8,18 @@ import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
+import { resolveAssetUrl } from '../../src/lib/assets';
 import { createTranslator } from '../../src/lib/i18n';
 import { buildEventMetadata } from '../../src/lib/events-seo';
 import { buildJobMetadata } from '../../src/lib/jobs-seo';
 import { buildListingMetadata } from '../../src/lib/listings-seo';
 import { buildMarketplaceMetadata } from '../../src/lib/marketplace-seo';
-import { buildCanonicalUrl, buildPageTitle } from '../../src/lib/metadata';
+import {
+  buildCanonicalUrl,
+  buildMetadataAlternates,
+  buildPageTitle,
+  formatOpenGraphLocale,
+} from '../../src/lib/metadata';
 import { buildOrganisationMetadata } from '../../src/lib/organisations-seo';
 import { isRouteEnabledForTenant } from '../../src/lib/module-gates';
 import { getRouteOwnership, type RouteOwnership } from '../../src/lib/public-routes';
@@ -34,6 +40,7 @@ import {
   fetchPublicCollection,
   fetchPublicDetail,
   fetchTenantBootstrap,
+  getApiBase,
   type PublicRouteContent,
   type TenantBootstrapResult,
   type TenantBootstrap,
@@ -53,7 +60,8 @@ interface PublicPageProps {
 
 export async function generateMetadata({ params }: PublicPageProps): Promise<Metadata> {
   const context = await buildRouteContext((await params).segments ?? []);
-  const t = createTranslator(context.tenant?.default_language ?? 'en');
+  const locale = context.tenant?.default_language ?? 'en';
+  const t = createTranslator(locale);
 
   if (
     context.route.owner !== 'next-public'
@@ -71,6 +79,7 @@ export async function generateMetadata({ params }: PublicPageProps): Promise<Met
   const content = await fetchRouteContent(context.route, context.request, context.tenant);
   const pageLabel = getMetadataLabel(context.route, content, t);
   const description = getMetadataDescription(context.route, content, context.tenant, t);
+  const fallbackImageUrl = getTenantSocialImageUrl(context.tenant);
   const title = buildPageTitle({
     pageLabel,
     platformName: t('brand.platformName'),
@@ -80,7 +89,9 @@ export async function generateMetadata({ params }: PublicPageProps): Promise<Met
   if (content?.kind === 'listing-detail' && content.listing) {
     return buildListingMetadata({
       canonicalUrl: context.canonicalUrl,
+      fallbackImageUrl,
       listing: content.listing,
+      locale,
       platformName: t('brand.platformName'),
       tenantName: context.tenant?.name,
     });
@@ -90,6 +101,8 @@ export async function generateMetadata({ params }: PublicPageProps): Promise<Met
     return buildEventMetadata({
       canonicalUrl: context.canonicalUrl,
       event: content.event,
+      fallbackImageUrl,
+      locale,
       platformName: t('brand.platformName'),
       tenantName: context.tenant?.name,
     });
@@ -98,7 +111,9 @@ export async function generateMetadata({ params }: PublicPageProps): Promise<Met
   if (content?.kind === 'job-detail' && content.job) {
     return buildJobMetadata({
       canonicalUrl: context.canonicalUrl,
+      fallbackImageUrl,
       job: content.job,
+      locale,
       platformName: t('brand.platformName'),
       tenantName: context.tenant?.name,
     });
@@ -107,7 +122,9 @@ export async function generateMetadata({ params }: PublicPageProps): Promise<Met
   if (content?.kind === 'marketplace-detail' && content.item) {
     return buildMarketplaceMetadata({
       canonicalUrl: context.canonicalUrl,
+      fallbackImageUrl,
       item: content.item,
+      locale,
       platformName: t('brand.platformName'),
       tenantName: context.tenant?.name,
     });
@@ -116,6 +133,8 @@ export async function generateMetadata({ params }: PublicPageProps): Promise<Met
   if (content?.kind === 'organisation-detail' && content.organisation) {
     return buildOrganisationMetadata({
       canonicalUrl: context.canonicalUrl,
+      fallbackImageUrl,
+      locale,
       organisation: content.organisation,
       platformName: t('brand.platformName'),
       tenantName: context.tenant?.name,
@@ -123,20 +142,21 @@ export async function generateMetadata({ params }: PublicPageProps): Promise<Met
   }
 
   return {
-    alternates: {
-      canonical: context.canonicalUrl,
-    },
+    alternates: buildMetadataAlternates({ canonicalUrl: context.canonicalUrl, locale }),
     description,
     openGraph: {
       description,
+      images: fallbackImageUrl ? [fallbackImageUrl] : undefined,
+      locale: formatOpenGraphLocale(locale),
       title,
       type: 'website',
       url: context.canonicalUrl,
     },
     title,
     twitter: {
-      card: 'summary',
+      card: fallbackImageUrl ? 'summary_large_image' : 'summary',
       description,
+      images: fallbackImageUrl ? [fallbackImageUrl] : undefined,
       title,
     },
   };
@@ -422,11 +442,17 @@ function getMetadataDescription(
     return content.organisation.excerpt;
   }
 
-  if (tenant?.seo?.description) {
-    return tenant.seo.description;
+  const seoDescription = tenant?.seo?.meta_description ?? tenant?.seo?.description;
+
+  if (seoDescription) {
+    return seoDescription;
   }
 
   return t(`pages.${route.routeKey}.lead`, {
     tenantName: tenant?.name ?? t('brand.platformName'),
   });
+}
+
+function getTenantSocialImageUrl(tenant: TenantBootstrap | null): string | undefined {
+  return resolveAssetUrl(tenant?.branding?.og_image_url ?? tenant?.branding?.logo_url, getApiBase());
 }

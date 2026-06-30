@@ -5,12 +5,14 @@
 
 import type { Metadata } from 'next';
 
-import { buildPageTitle } from './metadata';
+import { buildMetadataAlternates, buildPageTitle, formatOpenGraphLocale } from './metadata';
 import type { PublicJob } from './tenant-api';
 
 interface BuildJobMetadataInput {
   canonicalUrl: string;
+  fallbackImageUrl?: string;
   job: PublicJob;
+  locale?: string;
   platformName: string;
   tenantName?: string;
 }
@@ -22,16 +24,15 @@ export function buildJobMetadata(input: BuildJobMetadataInput): Metadata {
     tenantName: input.tenantName,
   });
   const description = input.job.excerpt || input.job.description;
-  const imageUrl = input.job.primaryImage?.url;
+  const imageUrl = input.job.primaryImage?.url ?? input.fallbackImageUrl;
 
   return {
-    alternates: {
-      canonical: input.canonicalUrl,
-    },
+    alternates: buildMetadataAlternates({ canonicalUrl: input.canonicalUrl, locale: input.locale }),
     description,
     openGraph: {
       description,
       images: imageUrl ? [imageUrl] : undefined,
+      locale: formatOpenGraphLocale(input.locale),
       title,
       type: 'website',
       url: input.canonicalUrl,

@@ -44,21 +44,27 @@ const listing: PublicListing = {
 
 describe('listing SEO metadata', () => {
   it('builds canonical, OpenGraph, Twitter, and image metadata from the listing contract', () => {
-    expect(
-      buildListingMetadata({
-        canonicalUrl: 'https://app.project-nexus.ie/hour-timebank/listings/7',
-        listing,
-        platformName: 'Project NEXUS',
-        tenantName: 'Hour Timebank',
-      }),
-    ).toMatchObject({
+    const metadata = buildListingMetadata({
+      canonicalUrl: 'https://app.project-nexus.ie/hour-timebank/listings/7',
+      listing,
+      locale: 'ga',
+      platformName: 'Project NEXUS',
+      tenantName: 'Hour Timebank',
+    });
+
+    expect(metadata).toMatchObject({
       alternates: {
         canonical: 'https://app.project-nexus.ie/hour-timebank/listings/7',
+        languages: {
+          ga: 'https://app.project-nexus.ie/hour-timebank/listings/7',
+          'x-default': 'https://app.project-nexus.ie/hour-timebank/listings/7',
+        },
       },
       description: 'A friendly public offer to repair a community bike.',
       openGraph: {
         description: 'A friendly public offer to repair a community bike.',
         images: ['https://cdn.example.test/bike.jpg'],
+        locale: 'ga',
         title: 'Repair a community bike | Hour Timebank | Project NEXUS',
         url: 'https://app.project-nexus.ie/hour-timebank/listings/7',
       },
@@ -70,5 +76,23 @@ describe('listing SEO metadata', () => {
         title: 'Repair a community bike | Hour Timebank | Project NEXUS',
       },
     });
+    expect(Object.keys(metadata.alternates?.languages ?? {})).toHaveLength(12);
+  });
+
+  it('falls back to the tenant social image when the listing has no primary image', () => {
+    const metadata = buildListingMetadata({
+      canonicalUrl: 'https://app.project-nexus.ie/hour-timebank/listings/7',
+      fallbackImageUrl: 'https://cdn.example.test/tenant/social.png',
+      listing: {
+        ...listing,
+        primaryImage: null,
+      },
+      platformName: 'Project NEXUS',
+      tenantName: 'Hour Timebank',
+    });
+
+    expect(metadata.openGraph?.images).toEqual(['https://cdn.example.test/tenant/social.png']);
+    expect(metadata.twitter?.images).toEqual(['https://cdn.example.test/tenant/social.png']);
+    expect(metadata.twitter).toMatchObject({ card: 'summary_large_image' });
   });
 });

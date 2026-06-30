@@ -14,6 +14,9 @@ import type { TenantBootstrap } from '../../lib/tenant-api';
 import { PublicPage } from '../PublicPage';
 
 const tenant: TenantBootstrap = {
+  branding: {
+    logo_url: 'https://cdn.example.test/hour-timebank/logo.png',
+  },
   default_language: 'en',
   id: 2,
   name: 'Hour Timebank',
@@ -52,7 +55,8 @@ describe('public route no-JavaScript HTML', () => {
     expect(html).toContain('AGPL-3.0-or-later');
     expect(html).toContain(canonicalUrl);
     expect(html).toContain('type="application/ld+json"');
-    expect(html).toMatch(/<h1(?:\s|>)/);
+    expect(html).toContain('alt="Hour Timebank"');
+    expectSingleH1(html);
   });
 
   it('renders every shadow-owned public route as crawler-readable HTML', () => {
@@ -82,10 +86,15 @@ describe('public route no-JavaScript HTML', () => {
       expect(html, manifestRoute.pattern).toContain('AGPL-3.0-or-later');
       expect(html, manifestRoute.pattern).toContain(canonicalUrl);
       expect(html, manifestRoute.pattern).toContain('type="application/ld+json"');
-      expect(html, manifestRoute.pattern).toMatch(/<h1(?:\s|>)/);
+      expect(html, manifestRoute.pattern).toContain('alt="Hour Timebank"');
+      expectSingleH1(html, manifestRoute.pattern);
     }
   }, 15000);
 });
+
+function expectSingleH1(html: string, label = 'route'): void {
+  expect(html.match(/<h1(?:\s|>)/g)?.length ?? 0, label).toBe(1);
+}
 
 function sampleSegments(pattern: string): string[] {
   const sampleValues: Record<string, string> = {

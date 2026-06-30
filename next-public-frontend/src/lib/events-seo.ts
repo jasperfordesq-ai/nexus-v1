@@ -5,12 +5,14 @@
 
 import type { Metadata } from 'next';
 
-import { buildPageTitle } from './metadata';
+import { buildMetadataAlternates, buildPageTitle, formatOpenGraphLocale } from './metadata';
 import type { PublicEvent } from './tenant-api';
 
 interface BuildEventMetadataInput {
   canonicalUrl: string;
   event: PublicEvent;
+  fallbackImageUrl?: string;
+  locale?: string;
   platformName: string;
   tenantName?: string;
 }
@@ -22,16 +24,15 @@ export function buildEventMetadata(input: BuildEventMetadataInput): Metadata {
     tenantName: input.tenantName,
   });
   const description = input.event.excerpt || input.event.description;
-  const imageUrl = input.event.primaryImage?.url;
+  const imageUrl = input.event.primaryImage?.url ?? input.fallbackImageUrl;
 
   return {
-    alternates: {
-      canonical: input.canonicalUrl,
-    },
+    alternates: buildMetadataAlternates({ canonicalUrl: input.canonicalUrl, locale: input.locale }),
     description,
     openGraph: {
       description,
       images: imageUrl ? [imageUrl] : undefined,
+      locale: formatOpenGraphLocale(input.locale),
       title,
       type: 'website',
       url: input.canonicalUrl,

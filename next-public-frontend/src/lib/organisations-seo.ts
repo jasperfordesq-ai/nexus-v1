@@ -5,11 +5,13 @@
 
 import type { Metadata } from 'next';
 
-import { buildPageTitle } from './metadata';
+import { buildMetadataAlternates, buildPageTitle, formatOpenGraphLocale } from './metadata';
 import type { PublicOrganisation } from './tenant-api';
 
 interface BuildOrganisationMetadataInput {
   canonicalUrl: string;
+  fallbackImageUrl?: string;
+  locale?: string;
   organisation: PublicOrganisation;
   platformName: string;
   tenantName?: string;
@@ -22,16 +24,15 @@ export function buildOrganisationMetadata(input: BuildOrganisationMetadataInput)
     tenantName: input.tenantName,
   });
   const description = input.organisation.excerpt || input.organisation.description;
-  const imageUrl = input.organisation.logoImage?.url;
+  const imageUrl = input.organisation.logoImage?.url ?? input.fallbackImageUrl;
 
   return {
-    alternates: {
-      canonical: input.canonicalUrl,
-    },
+    alternates: buildMetadataAlternates({ canonicalUrl: input.canonicalUrl, locale: input.locale }),
     description,
     openGraph: {
       description,
       images: imageUrl ? [imageUrl] : undefined,
+      locale: formatOpenGraphLocale(input.locale),
       title,
       type: 'website',
       url: input.canonicalUrl,

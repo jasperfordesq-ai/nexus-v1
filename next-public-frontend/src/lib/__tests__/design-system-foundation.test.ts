@@ -42,4 +42,14 @@ describe('HeroUI public design-system foundation', () => {
     expect(globalsCss).not.toContain('.listing-card');
     expect(globalsCss).not.toContain('.public-panel');
   });
+
+  it('uses Next image rendering with intrinsic dimensions for public media', () => {
+    const publicPageSource = readFileSync(join(root, 'src', 'ui', 'PublicPage.tsx'), 'utf8');
+
+    expect(publicPageSource).toContain("from 'next/image'");
+    expect(publicPageSource).not.toContain('<img');
+    expect(publicPageSource).toContain('unoptimized');
+    expect(publicPageSource).toContain('height={');
+    expect(publicPageSource).toContain('width={');
+  });
 });

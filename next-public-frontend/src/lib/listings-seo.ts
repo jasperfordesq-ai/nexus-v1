@@ -5,12 +5,14 @@
 
 import type { Metadata } from 'next';
 
-import { buildPageTitle } from './metadata';
+import { buildMetadataAlternates, buildPageTitle, formatOpenGraphLocale } from './metadata';
 import type { PublicListing } from './tenant-api';
 
 interface BuildListingMetadataInput {
   canonicalUrl: string;
+  fallbackImageUrl?: string;
   listing: PublicListing;
+  locale?: string;
   platformName: string;
   tenantName?: string;
 }
@@ -22,16 +24,15 @@ export function buildListingMetadata(input: BuildListingMetadataInput): Metadata
     tenantName: input.tenantName,
   });
   const description = input.listing.excerpt || input.listing.description;
-  const imageUrl = input.listing.primaryImage?.url;
+  const imageUrl = input.listing.primaryImage?.url ?? input.fallbackImageUrl;
 
   return {
-    alternates: {
-      canonical: input.canonicalUrl,
-    },
+    alternates: buildMetadataAlternates({ canonicalUrl: input.canonicalUrl, locale: input.locale }),
     description,
     openGraph: {
       description,
       images: imageUrl ? [imageUrl] : undefined,
+      locale: formatOpenGraphLocale(input.locale),
       title,
       type: 'website',
       url: input.canonicalUrl,
