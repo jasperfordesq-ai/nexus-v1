@@ -33,7 +33,7 @@
   },
   "pages": {
     "home": {
-      "title": "Home",
+      "title": "Exchange Skills, Build Community",
       "eyebrow": "Community timebanking",
       "lead": "{{tenantName}} helps people exchange skills, support, and practical help using time credits.",
       "fallbackTagline": "A community platform for exchanging time, skills, and support.",
@@ -58,7 +58,7 @@
       "body": "This shadow page is prepared for public release-note discovery. The in-app changelog remains available in the React frontend."
     },
     "help": {
-      "title": "Help",
+      "title": "Help Center",
       "lead": "Find support for joining, taking part, and using your community account.",
       "body": "For account-specific help, contact the community team or sign in to the member app."
     },
@@ -214,7 +214,7 @@
       "body": "This shadow page is prepared for public group details. Joining, moderation, files, and discussions remain in the secure Vite app."
     },
     "jobs": {
-      "title": "Jobs",
+      "title": "Job Vacancies",
       "lead": "Browse public opportunities from {{tenantName}}.",
       "body": "This shadow page is prepared for public job discovery. Applications and employer workflows stay in the secure Vite app."
     },

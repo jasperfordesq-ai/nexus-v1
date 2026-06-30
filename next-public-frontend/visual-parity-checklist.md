@@ -39,26 +39,29 @@ Evidence:
 
 - Live-vs-Next screenshots and `report.json` were written to `.local-docs-archive/next-public-frontend/parity-live-2026-06-30/`.
 - Local React-vs-Next screenshots showing the stalled local React shell were written to `.local-docs-archive/next-public-frontend/parity-2026-06-30/`.
+- Post-port live-vs-Next screenshots and `report.json` were written to `.local-docs-archive/next-public-frontend/parity-live-post-port-2026-06-30/`.
 
 ## Results
 
-All sampled live public routes and all sampled shadow Next routes returned HTTP 200.
+All sampled live public routes and all sampled shadow Next routes returned HTTP 200 in the post-port capture.
 
 H1 parity:
 
-- Matching: listings, events, marketplace, organisations.
-- Mismatched: home (`Exchange Skills, Build Community` vs `Home`), jobs (`Job Vacancies` vs `Jobs`), about (`About TimeBank Ireland` vs `About`), help (`Help Center` vs `Help`).
+- Matching after this pass: home, listings, events, jobs, marketplace, organisations, about, help.
+- Home, jobs, and help now use the same public H1 copy as the live React pages.
+- About now composes the translated About label with the tenant name from bootstrap, matching `About TimeBank Ireland` for the sampled tenant.
 
-Visual delta range from screenshot comparison:
+Post-port visual deltas from screenshot comparison:
 
-- Lowest deltas: jobs desktop, organisations desktop, home desktop.
-- Highest deltas: listings mobile, marketplace mobile, about/help mobile.
-- The major visible gaps are public chrome shape, live utility bar/search/login controls, live home hero treatment, mobile navigation layout, cookie banner overlap in the live baseline, and richer React-side filters on listings.
+- Lowest deltas: about desktop light `0.0446`, help desktop light `0.0460`, events desktop light/dark `0.0473`.
+- Rich family desktop deltas are closer after porting cards: events `0.0473`, jobs `0.0587-0.0590`, organisations `0.0576-0.0577`, marketplace `0.0710-0.0719`.
+- Highest remaining deltas: listings mobile `0.3412-0.3413`, marketplace mobile `0.3253-0.3254`, listings desktop `0.2541`.
+- The major remaining visible gaps are live-side cookie banner overlap, live listings search/filter controls while content is still loading, marketplace/listings mobile composition, and the fact that the live React app and the shadow Next app can be in different public data states during unauthenticated capture.
 
 Current conclusion:
 
-- The shadow Next app is SSR-safe and closer to the React visual system than the original bespoke CSS implementation.
-- It is not yet visually indistinguishable from the live React public surface. Do not use this checklist as approval for public cutover.
+- The shadow Next app is SSR-safe and materially closer to the React visual system than the previous generic HeroUI pass: brand theme, typography, chrome, public cards, detail panels, static prose, and H1 copy now follow the React source of truth.
+- It is still not honestly pixel-indistinguishable from the live React public surface on every sampled mobile route. Do not use this checklist as approval for public cutover.
 
 ## Performance And Caching Posture
 
@@ -70,8 +73,8 @@ Current conclusion:
 
 ## Remaining Parity Work Before Cutover
 
-- Reproduce the React public utility bar, guest navigation, search affordance, login/signup actions, and mobile drawer structure in the shadow Next chrome.
-- Align home, jobs, about, and help route labels/headlines to the React public pages using translation keys and tenant SEO fields.
+- Decide whether the public Next listings and marketplace pages must SSR the React app's filter/search panels above results, or whether the cutover baseline should compare loaded result cards without the live filter-loading state.
+- Re-run the matrix with the live cookie banner dismissed or controlled in both baselines; current live captures include cookie UI that the shadow Next app does not render.
 - Bring listings and marketplace mobile layouts closer to React filters/cards while keeping the no-JavaScript HTML contract intact.
 - Re-run the matrix against a healthy local React dev server and the live app after the above changes.
 - Only after parity screenshots are reviewed should any separate canary or public route cutover be considered.

@@ -58,7 +58,7 @@ export function PublicPage({
   const tenantName = tenant?.name || t('brand.platformName');
   const tagline = tenant?.tagline || t('pages.home.fallbackTagline');
   const logoUrl = resolveAssetUrl(tenant?.branding?.logo_url, getApiBase());
-  const pageTitle = getRouteTitle(route, content, t);
+  const pageTitle = getRouteTitle(route, content, tenantName, t);
   const pageLead = getRouteLead(route, tenantName, t, content);
   const isHome = route.routeKey === 'home';
 
@@ -1948,7 +1948,12 @@ function buildStructuredData({
   };
 }
 
-function getRouteTitle(route: RouteOwnership, content: PublicRouteContent | null, t: Translator): string {
+function getRouteTitle(
+  route: RouteOwnership,
+  content: PublicRouteContent | null,
+  tenantName: string,
+  t: Translator,
+): string {
   if (content?.kind === 'blog-detail' && content.post?.title) {
     return content.post.title;
   }
@@ -1979,6 +1984,10 @@ function getRouteTitle(route: RouteOwnership, content: PublicRouteContent | null
 
   if (content?.kind === 'organisation-detail' && content.organisation?.name) {
     return content.organisation.name;
+  }
+
+  if (route.routeKey === 'about') {
+    return `${t(route.labelKey ?? 'pages.about.title')} ${tenantName}`;
   }
 
   return t(route.labelKey ?? 'pages.home.title');
