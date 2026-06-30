@@ -47,6 +47,9 @@ describe('PublicPage', () => {
     expect(html).toContain('href="/hour-timebank/contact"');
     expect(html).toContain('AGPL-3.0-or-later');
     expect(html).toContain('https://app.project-nexus.ie/hour-timebank/about');
+    expect(html).toContain('data-slot="card"');
+    expect(html).not.toContain('public-panel');
+    expect(html).not.toContain('post-list');
   });
 
   it('renders the shared public chrome with tenant theme tokens and grouped footer links', () => {
@@ -95,6 +98,8 @@ describe('PublicPage', () => {
     expect(html).toContain('aria-label="Platform"');
     expect(html).toContain('aria-label="Legal"');
     expect(html).toContain('AGPL-3.0-or-later');
+    expect(html).not.toContain('public-panel');
+    expect(html).not.toContain('post-list');
   });
 
   it('renders second-batch public discovery routes as no-JavaScript HTML', () => {
@@ -166,6 +171,8 @@ describe('PublicPage', () => {
     expect(html).toContain('Repair cafe');
     expect(html).toContain('Bring something small to repair with neighbours.');
     expect(html).toContain('href="/hour-timebank/events/42"');
+    expect(html).toContain('data-nexus-ui="rich-index-card"');
+    expect(html).not.toContain('post-list');
   });
 
   it('renders public API detail content as crawler-readable HTML', () => {
@@ -204,5 +211,7 @@ describe('PublicPage', () => {
 
     expect(html).toContain('Repair cafe');
     expect(html).toContain('Bring something small to repair with neighbours.');
+    expect(html).toContain('data-slot="card"');
+    expect(html).not.toContain('public-panel');
   });
 });

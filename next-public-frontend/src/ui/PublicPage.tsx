@@ -590,10 +590,9 @@ function renderRouteContent(
 ): ReactNode {
   if (route.routeKey === 'home') {
     return (
-      <article className="public-panel">
-        <h2>{t('pages.home.sectionTitle')}</h2>
+      <ContentCard title={t('pages.home.sectionTitle')}>
         <p>{t('pages.home.sectionBody')}</p>
-      </article>
+      </ContentCard>
     );
   }
 
@@ -603,19 +602,17 @@ function renderRouteContent(
 
   if (content?.kind === 'blog-detail' && content.post) {
     return (
-      <article className="public-panel article-content">
-        <h2>{content.post.title}</h2>
+      <ContentCard title={content.post.title}>
         <HtmlBlock html={content.post.content || content.post.excerpt || ''} />
-      </article>
+      </ContentCard>
     );
   }
 
   if (content?.kind === 'cms-page' && content.page) {
     return (
-      <article className="public-panel article-content">
-        <h2>{content.page.title}</h2>
+      <ContentCard title={content.page.title}>
         <HtmlBlock html={content.page.content || ''} />
-      </article>
+      </ContentCard>
     );
   }
 
@@ -675,28 +672,21 @@ function renderRouteContent(
   }
 
   if (route.routeKey === 'blog-detail') {
-    return (
-      <article className="public-panel">
-        <h2>{t('pages.blogDetail.title')}</h2>
-        <p>{t('pages.blogDetail.missing')}</p>
-      </article>
-    );
+    return <EmptyStatePanel body={t('pages.blogDetail.missing')} title={t('pages.blogDetail.title')} />;
   }
 
   if (route.routeKey === 'cms-page') {
     return (
-      <article className="public-panel">
-        <h2>{routeSegments.at(-1) ?? t('pages.cmsPage.title')}</h2>
+      <ContentCard title={routeSegments.at(-1) ?? t('pages.cmsPage.title')}>
         <p>{t('pages.cmsPage.missing')}</p>
-      </article>
+      </ContentCard>
     );
   }
 
   return (
-    <article className="public-panel">
-      <h2>{t(route.labelKey ?? 'pages.about.title')}</h2>
+    <ContentCard title={t(route.labelKey ?? 'pages.about.title')}>
       <p>{t(`pages.${route.routeKey}.body`, { tenantName })}</p>
-    </article>
+    </ContentCard>
   );
 }
 
@@ -710,25 +700,24 @@ function BlogIndex({
   t: Translator;
 }): ReactNode {
   if (posts.length === 0) {
-    return (
-      <article className="public-panel">
-        <h2>{t('pages.blog.title')}</h2>
-        <p>{t('pages.blog.empty')}</p>
-      </article>
-    );
+    return <EmptyStatePanel body={t('pages.blog.empty')} title={t('pages.blog.title')} />;
   }
 
   return (
-    <div className="post-list">
+    <RichIndexGrid>
       {posts.map((post) => (
-        <article className="public-panel" key={post.slug}>
-          <h2>
-            <a href={withTenantBase(tenantBasePath, `blog/${post.slug}`)}>{post.title}</a>
-          </h2>
-          {post.excerpt ? <p>{post.excerpt}</p> : null}
-        </article>
+        <RichIndexCard
+          description={post.excerpt || ''}
+          facts={[]}
+          href={withTenantBase(tenantBasePath, 'blog/' + post.slug)}
+          image={null}
+          imageAltFallback={post.title}
+          key={post.slug}
+          meta={[post.author_name, formatDate(post.published_at ?? null)]}
+          title={post.title}
+        />
       ))}
-    </div>
+    </RichIndexGrid>
   );
 }
 
@@ -1130,25 +1119,24 @@ function PublicCollection({
   t: Translator;
 }): ReactNode {
   if (items.length === 0) {
-    return (
-      <article className="public-panel">
-        <h2>{emptyTitle}</h2>
-        <p>{t('pages.publicCollection.empty')}</p>
-      </article>
-    );
+    return <EmptyStatePanel body={t('pages.publicCollection.empty')} title={emptyTitle} />;
   }
 
   return (
-    <div className="post-list">
+    <RichIndexGrid>
       {items.map((item) => (
-        <article className="public-panel" key={item.slug ?? item.id}>
-          <h2>
-            <a href={withTenantBase(basePath, item.slug ?? item.id)}>{item.title}</a>
-          </h2>
-          {item.description ? <p>{item.description}</p> : null}
-        </article>
+        <RichIndexCard
+          description={item.description || ''}
+          facts={[]}
+          href={withTenantBase(basePath, item.slug ?? item.id)}
+          image={null}
+          imageAltFallback={item.title}
+          key={item.slug ?? item.id}
+          meta={[]}
+          title={item.title}
+        />
       ))}
-    </div>
+    </RichIndexGrid>
   );
 }
 
@@ -1322,10 +1310,9 @@ function compactMarketplaceImages(
 
 function PublicDetail({ item }: { item: PublicContentItem }): ReactNode {
   return (
-    <article className="public-panel article-content">
-      <h2>{item.title}</h2>
+    <ContentCard title={item.title}>
       {item.description ? <p>{item.description}</p> : null}
-    </article>
+    </ContentCard>
   );
 }
 
