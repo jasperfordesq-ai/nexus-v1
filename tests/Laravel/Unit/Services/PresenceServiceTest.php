@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Models\User;
 use App\Services\PresenceService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -94,6 +95,87 @@ class PresenceServiceTest extends TestCase
         $this->assertGreaterThan(
             now()->subMinutes(5)->timestamp,
             strtotime($row->last_activity_at)
+        );
+    }
+
+    public function test_heartbeat_bridges_users_last_active_at(): void
+    {
+        // Regression: the React SPA only pings /v2/presence/heartbeat, never
+        // /auth/heartbeat, so users.last_active_at went permanently stale and the
+        // legacy is_online consumers (messages, members, feed sidebar) showed an
+        // actively-online user as "offline". The heartbeat must now bridge that column.
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'last_active_at' => now()->subMinutes(30),
+        ]);
+
+        // Re-establish the tenant context: creating a model via the factory re-resolves
+        // TenantContext (a test-only artifact), and the bridge writes WHERE tenant_id =
+        // TenantContext::getId(). In production the heartbeat runs inside a stable
+        // tenant-scoped request, so this just mirrors that.
+        \App\Core\TenantContext::setById($this->testTenantId);
+
+        // The bridge write rides the once-per-60s DB-write throttle. DatabaseTransactions
+        // rolls back the row but NOT the Redis throttle key, so across rapid re-runs the
+        // reused auto-increment id can still be throttled — clear it so the DB path runs.
+        try {
+            Redis::del("nexus:presence:throttle:{$this->testTenantId}:{$user->id}");
+        } catch (\Throwable) {
+            // Redis unavailable — heartbeat falls through to the DB write anyway.
+        }
+
+        PresenceService::heartbeat((int) $user->id);
+
+        $row = DB::table('users')->where('id', $user->id)->first();
+        $this->assertNotNull($row);
+        $this->assertNotNull($row->last_active_at);
+        $this->assertGreaterThan(
+            now()->subMinutes(5)->timestamp,
+            strtotime($row->last_active_at),
+            'heartbeat should refresh users.last_active_at to within the 5-minute online window'
+        );
+
+        // Assert the EXACT predicate the legacy consumers use (e.g. MessageService.php:131,616,
+        // GroupConversationService.php:352) now evaluates true — this is the literal user-visible bug.
+        $lastActive = \Carbon\Carbon::parse($row->last_active_at);
+        $isOnline = $lastActive->gt(now()->subMinutes(5));
+        $this->assertTrue($isOnline, 'partner is_online must be true after a presence heartbeat');
+    }
+
+    public function test_heartbeat_bridge_is_tenant_scoped(): void
+    {
+        // A user belonging to a DIFFERENT tenant must not have last_active_at rewritten
+        // when a heartbeat fires under the current tenant context. Guards against a
+        // future refactor dropping the where('tenant_id', …) clause on the bridge write.
+        $stale = now()->subMinutes(30);
+        $otherTenantUser = User::factory()->forTenant(999)->create([
+            'last_active_at' => $stale,
+        ]);
+
+        // Pin the active tenant to testTenantId (2) — the factory create above re-resolved
+        // TenantContext, and we need it to be tenant 2 (NOT 999) to prove the bridge's
+        // tenant_id filter blocks the cross-tenant write rather than the throttle.
+        \App\Core\TenantContext::setById($this->testTenantId);
+
+        // Clear the throttle so the bridge write genuinely RUNS (and we prove the
+        // tenant_id filter is what blocks it, not the throttle short-circuit).
+        try {
+            Redis::del("nexus:presence:throttle:{$this->testTenantId}:{$otherTenantUser->id}");
+        } catch (\Throwable) {
+            // Redis unavailable — heartbeat falls through to the DB write anyway.
+        }
+
+        // TenantContext is testTenantId (2) here; heartbeat for the other-tenant user id
+        // must not touch that row because the bridge filters on tenant_id.
+        PresenceService::heartbeat((int) $otherTenantUser->id);
+
+        $row = DB::table('users')->where('id', $otherTenantUser->id)->first();
+        $this->assertNotNull($row);
+        $this->assertNotNull($row->last_active_at);
+        $this->assertEqualsWithDelta(
+            $stale->timestamp,
+            strtotime($row->last_active_at),
+            2,
+            'cross-tenant heartbeat must not refresh another tenant user\'s last_active_at'
         );
     }
 

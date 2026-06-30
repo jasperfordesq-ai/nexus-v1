@@ -111,6 +111,25 @@ class PresenceService
         } catch (\Throwable $e) {
             Log::error('Presence DB write failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
         }
+
+        // Bridge: keep users.last_active_at fresh for the legacy is_online consumers
+        // (MessageService, UserService, GroupConversationService, FeedSidebarController, …).
+        // The React SPA only pings /v2/presence/heartbeat — it never calls /auth/heartbeat,
+        // which is the ONLY other writer of users.last_active_at. Without this bridge,
+        // last_active_at goes stale ~5 min into every session and those surfaces show an
+        // actively-online user as "offline". Rides the same once-per-60s throttle above, and
+        // is wrapped in its own try so a users-row failure can never abort the presence write.
+        try {
+            DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $tenantId)
+                ->update(['last_active_at' => $now]);
+        } catch (\Throwable $e) {
+            Log::warning('Presence last_active_at bridge write failed', [
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
