@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use App\Core\TenantContext;
+use App\Http\Resources\PublicMarketplaceListingResource;
 use App\Models\MarketplaceCategoryTemplate;
 use App\Models\MarketplaceListing;
 use App\Services\AiChatService;
@@ -164,7 +165,7 @@ class MarketplaceListingController extends BaseApiController
         $result = MarketplaceListingService::getAll($filters);
 
         return $this->respondWithCollection(
-            $result['items'],
+            $this->augmentPublicMarketplaceListings($result['items']),
             $result['cursor'],
             $limit,
             $result['has_more']
@@ -193,7 +194,7 @@ class MarketplaceListingController extends BaseApiController
         // Record view asynchronously (best-effort)
         MarketplaceListingService::recordView($id);
 
-        return $this->respondWithData($listing);
+        return $this->respondWithData(PublicMarketplaceListingResource::augment($listing));
     }
 
     // =====================================================================
@@ -739,7 +740,7 @@ class MarketplaceListingController extends BaseApiController
 
         $items = MarketplaceListingService::getNearby($lat, $lng, $radius, $limit);
 
-        return $this->respondWithData($items);
+        return $this->respondWithData($this->augmentPublicMarketplaceListings($items));
     }
 
     /**
@@ -765,7 +766,7 @@ class MarketplaceListingController extends BaseApiController
         // Filter to only promoted items
         $featured = array_filter($result['items'], fn ($item) => !empty($item['is_promoted']));
 
-        return $this->respondWithData(array_values($featured));
+        return $this->respondWithData($this->augmentPublicMarketplaceListings(array_values($featured)));
     }
 
     /**
@@ -790,7 +791,7 @@ class MarketplaceListingController extends BaseApiController
         ]);
 
         return $this->respondWithCollection(
-            $result['items'],
+            $this->augmentPublicMarketplaceListings($result['items']),
             $result['cursor'],
             $limit,
             $result['has_more']
@@ -832,10 +833,24 @@ class MarketplaceListingController extends BaseApiController
         ]);
 
         return $this->respondWithCollection(
-            $result['items'],
+            $this->augmentPublicMarketplaceListings($result['items']),
             $result['cursor'],
             $limit,
             $result['has_more']
+        );
+    }
+
+    /**
+     * @param array<int, mixed> $items
+     * @return array<int, mixed>
+     */
+    private function augmentPublicMarketplaceListings(array $items): array
+    {
+        return array_map(
+            static fn (mixed $item): mixed => is_array($item)
+                ? PublicMarketplaceListingResource::augment($item)
+                : $item,
+            $items
         );
     }
 

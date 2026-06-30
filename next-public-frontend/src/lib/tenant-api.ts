@@ -224,6 +224,71 @@ export interface PublicJobsIndex {
   pagination: PublicListingsPagination;
 }
 
+export interface PublicMarketplaceImage {
+  altText: string;
+  sortOrder?: number;
+  url: string;
+}
+
+export interface PublicMarketplaceCategory {
+  id: string | null;
+  name: string | null;
+  slug: string | null;
+}
+
+export interface PublicMarketplaceLocation {
+  label: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+export interface PublicMarketplacePrice {
+  amount: number | null;
+  currency: string | null;
+  priceType: string;
+  timeCredits: number | null;
+}
+
+export interface PublicMarketplaceSeller {
+  avatarUrl: string | null;
+  displayName: string | null;
+  id: string | null;
+  isVerified: boolean;
+  sellerType: string | null;
+}
+
+export interface PublicMarketplaceDelivery {
+  localPickup: boolean | null;
+  method: string | null;
+  shippingAvailable: boolean | null;
+}
+
+export interface PublicMarketplaceListing {
+  category: PublicMarketplaceCategory | null;
+  condition: string | null;
+  createdAt: string | null;
+  delivery: PublicMarketplaceDelivery;
+  description: string;
+  excerpt: string;
+  expiresAt: string | null;
+  gallery: PublicMarketplaceImage[];
+  id: string;
+  location: PublicMarketplaceLocation;
+  price: PublicMarketplacePrice;
+  primaryImage: PublicMarketplaceImage | null;
+  quantity: number | null;
+  seller: PublicMarketplaceSeller;
+  slug: string;
+  status: string;
+  title: string;
+  updatedAt: string | null;
+}
+
+export interface PublicMarketplaceIndex {
+  items: PublicMarketplaceListing[];
+  pagination: PublicListingsPagination;
+}
+
 export type PublicRouteContent =
   | { kind: 'blog-detail'; post: BlogPost | null }
   | { kind: 'blog-index'; posts: BlogPostSummary[] }
@@ -234,6 +299,8 @@ export type PublicRouteContent =
   | { jobs: PublicJobsIndex; kind: 'jobs-index' }
   | { kind: 'listing-detail'; listing: PublicListing | null }
   | { kind: 'listings-index'; listings: PublicListingsIndex }
+  | { item: PublicMarketplaceListing | null; kind: 'marketplace-detail' }
+  | { items: PublicMarketplaceIndex; kind: 'marketplace-index' }
   | { items: PublicContentItem[]; kind: 'public-collection' }
   | { item: PublicContentItem | null; kind: 'public-detail' };
 
@@ -389,6 +456,21 @@ export async function fetchJobsIndex(
   };
 }
 
+export async function fetchMarketplaceIndex(
+  request: ResolvedTenantRequest,
+  tenant: TenantBootstrap | null,
+): Promise<PublicMarketplaceIndex> {
+  const endpoint = getPublicEndpointForRoute('marketplace') ?? '/v2/marketplace/listings';
+  const url = buildApiUrl(endpoint, { limit: '12' });
+  const response = await fetchApiResponse<unknown>(url, buildPublicHeaders(request, tenant, { publicContract: true }));
+  const items = normalizePublicMarketplaceListings(response?.data);
+
+  return {
+    items,
+    pagination: normalizeListingsPagination(response?.meta, items.length),
+  };
+}
+
 export async function fetchPublicDetail(
   routeKey: string,
   paramsOrId: Record<string, string> | string,
@@ -457,6 +539,23 @@ export async function fetchJobDetail(
   const payload = await fetchApiPayload<unknown>(url, buildPublicHeaders(request, tenant, { publicContract: true }));
 
   return normalizePublicJob(payload);
+}
+
+export async function fetchMarketplaceDetail(
+  id: string,
+  request: ResolvedTenantRequest,
+  tenant: TenantBootstrap | null,
+): Promise<PublicMarketplaceListing | null> {
+  const endpoint = getPublicEndpointForRoute('marketplaceDetail', { id });
+
+  if (!endpoint) {
+    return null;
+  }
+
+  const url = buildApiUrl(endpoint);
+  const payload = await fetchApiPayload<unknown>(url, buildPublicHeaders(request, tenant, { publicContract: true }));
+
+  return normalizePublicMarketplaceListing(payload);
 }
 
 async function fetchApiEnvelope<T>(url: string, headers: HeadersInit): Promise<T | null> {
@@ -852,6 +951,132 @@ function normalizeJobCompensation(value: unknown): PublicJobCompensation {
     salaryNegotiable: firstBoolean(compensation.salary_negotiable, compensation.salaryNegotiable) ?? false,
     salaryType: firstString(compensation.salary_type, compensation.salaryType) ?? null,
     timeCredits: firstNumber(compensation.time_credits, compensation.timeCredits) ?? null,
+  };
+}
+
+function normalizePublicMarketplaceListings(payload: unknown): PublicMarketplaceListing[] {
+  return extractPublicItemArray(payload)
+    .map(normalizePublicMarketplaceListing)
+    .filter((item): item is PublicMarketplaceListing => item !== null);
+}
+
+function normalizePublicMarketplaceListing(payload: unknown): PublicMarketplaceListing | null {
+  if (!isRecord(payload)) {
+    return null;
+  }
+
+  const contract = isRecord(payload.public_contract) ? payload.public_contract : payload;
+  const id = firstString(contract.id, contract.slug);
+  const title = firstString(contract.title);
+
+  if (!id || !title) {
+    return null;
+  }
+
+  const gallery = normalizeMarketplaceGallery(contract.gallery);
+  const primaryImage = normalizeMarketplaceImage(contract.primary_image) ?? gallery[0] ?? null;
+
+  return {
+    category: normalizeMarketplaceCategory(contract.category),
+    condition: firstString(contract.condition) ?? null,
+    createdAt: firstString(contract.created_at) ?? null,
+    delivery: normalizeMarketplaceDelivery(contract.delivery),
+    description: firstString(contract.description) ?? '',
+    excerpt: firstString(contract.excerpt, contract.description) ?? '',
+    expiresAt: firstString(contract.expires_at) ?? null,
+    gallery,
+    id,
+    location: normalizeMarketplaceLocation(contract.location),
+    price: normalizeMarketplacePrice(contract.price),
+    primaryImage,
+    quantity: firstNumber(contract.quantity) ?? null,
+    seller: normalizeMarketplaceSeller(contract.seller),
+    slug: firstString(contract.slug, id) ?? id,
+    status: firstString(contract.status) ?? 'active',
+    title,
+    updatedAt: firstString(contract.updated_at) ?? null,
+  };
+}
+
+function normalizeMarketplaceGallery(value: unknown): PublicMarketplaceImage[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map(normalizeMarketplaceImage).filter((image): image is PublicMarketplaceImage => image !== null);
+}
+
+function normalizeMarketplaceImage(value: unknown): PublicMarketplaceImage | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const url = resolveAssetUrl(firstString(value.url), getApiBase());
+
+  if (!url) {
+    return null;
+  }
+
+  return {
+    altText: firstString(value.alt_text, value.altText) ?? '',
+    sortOrder: firstNumber(value.sort_order, value.sortOrder),
+    url,
+  };
+}
+
+function normalizeMarketplaceCategory(value: unknown): PublicMarketplaceCategory | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  return {
+    id: firstString(value.id) ?? null,
+    name: firstString(value.name) ?? null,
+    slug: firstString(value.slug) ?? null,
+  };
+}
+
+function normalizeMarketplaceLocation(value: unknown): PublicMarketplaceLocation {
+  const location = isRecord(value) ? value : {};
+
+  return {
+    label: firstString(location.label) ?? null,
+    latitude: firstNumber(location.latitude) ?? null,
+    longitude: firstNumber(location.longitude) ?? null,
+  };
+}
+
+function normalizeMarketplacePrice(value: unknown): PublicMarketplacePrice {
+  const price = isRecord(value) ? value : {};
+
+  return {
+    amount: firstNumber(price.amount) ?? null,
+    currency: firstString(price.currency) ?? null,
+    priceType: firstString(price.price_type, price.priceType) ?? 'fixed',
+    timeCredits: firstNumber(price.time_credits, price.timeCredits) ?? null,
+  };
+}
+
+function normalizeMarketplaceSeller(value: unknown): PublicMarketplaceSeller {
+  const seller = isRecord(value) ? value : {};
+  const avatarUrl = resolveAssetUrl(firstString(seller.avatar_url, seller.avatarUrl), getApiBase()) ?? null;
+
+  return {
+    avatarUrl,
+    displayName: firstString(seller.display_name, seller.displayName) ?? null,
+    id: firstString(seller.id) ?? null,
+    isVerified: firstBoolean(seller.is_verified, seller.isVerified) ?? false,
+    sellerType: firstString(seller.seller_type, seller.sellerType) ?? null,
+  };
+}
+
+function normalizeMarketplaceDelivery(value: unknown): PublicMarketplaceDelivery {
+  const delivery = isRecord(value) ? value : {};
+
+  return {
+    localPickup: firstBoolean(delivery.local_pickup, delivery.localPickup) ?? null,
+    method: firstString(delivery.method) ?? null,
+    shippingAvailable: firstBoolean(delivery.shipping_available, delivery.shippingAvailable) ?? null,
   };
 }
 

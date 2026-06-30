@@ -30,6 +30,13 @@ const jobsRoute: RouteOwnership = {
   routeKey: 'jobs',
 };
 
+const marketplaceRoute: RouteOwnership = {
+  labelKey: 'pages.marketplace.title',
+  owner: 'next-public',
+  pattern: '/marketplace',
+  routeKey: 'marketplace',
+};
+
 describe('module route gates', () => {
   it('keeps the Next listings route unavailable when the tenant listings module is disabled', () => {
     const tenant: TenantBootstrap = {
@@ -95,5 +102,19 @@ describe('module route gates', () => {
     };
 
     expect(isRouteEnabledForTenant(jobsRoute, tenant)).toBe(false);
+  });
+
+  it('keeps the Next marketplace route unavailable when the tenant marketplace module is disabled', () => {
+    const tenant: TenantBootstrap = {
+      default_language: 'en',
+      id: 2,
+      modules: {
+        marketplace: false,
+      },
+      name: 'Hour Timebank',
+      slug: 'hour-timebank',
+    };
+
+    expect(isRouteEnabledForTenant(marketplaceRoute, tenant)).toBe(false);
   });
 });

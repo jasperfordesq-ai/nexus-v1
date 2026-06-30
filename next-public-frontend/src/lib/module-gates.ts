@@ -13,6 +13,14 @@ const routeModuleKeys: Record<string, string> = {
   jobs: 'job_vacancies',
   listingDetail: 'listings',
   listings: 'listings',
+  marketplace: 'marketplace',
+  marketplaceCategory: 'marketplace',
+  marketplaceCollections: 'marketplace',
+  marketplaceDetail: 'marketplace',
+  marketplaceFree: 'marketplace',
+  marketplaceMap: 'marketplace',
+  marketplaceSearch: 'marketplace',
+  marketplaceSeller: 'marketplace',
 };
 
 export function isFeatureEnabled(tenant: TenantBootstrap | null, key: string): boolean {

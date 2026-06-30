@@ -17,6 +17,8 @@ import type {
   PublicJobsIndex,
   PublicListing,
   PublicListingsIndex,
+  PublicMarketplaceIndex,
+  PublicMarketplaceListing,
   PublicRouteContent,
   TenantBootstrap,
 } from '../lib/tenant-api';
@@ -181,6 +183,14 @@ function renderRouteContent(
 
   if (content?.kind === 'job-detail' && content.job) {
     return <JobDetail job={content.job} tenantBasePath={tenantBasePath} t={t} />;
+  }
+
+  if (content?.kind === 'marketplace-index') {
+    return <MarketplaceIndex items={content.items} tenantBasePath={tenantBasePath} t={t} />;
+  }
+
+  if (content?.kind === 'marketplace-detail' && content.item) {
+    return <MarketplaceDetail item={content.item} tenantBasePath={tenantBasePath} t={t} />;
   }
 
   if (content?.kind === 'public-collection') {
@@ -597,6 +607,128 @@ function JobDetail({
   );
 }
 
+function MarketplaceIndex({
+  items,
+  tenantBasePath,
+  t,
+}: {
+  items: PublicMarketplaceIndex;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  if (items.items.length === 0) {
+    return (
+      <article className="public-panel">
+        <h2>{t('pages.marketplace.title')}</h2>
+        <p>{t('marketplaceItems.empty')}</p>
+      </article>
+    );
+  }
+
+  return (
+    <div className="listings-grid">
+      {items.items.map((item) => (
+        <article className="listing-card" key={item.id}>
+          <a className="listing-card-image" href={withTenantBase(tenantBasePath, `marketplace/${item.slug}`)}>
+            {item.primaryImage ? (
+              <img
+                alt={item.primaryImage.altText || t('marketplaceItems.imageAltFallback')}
+                src={item.primaryImage.url}
+              />
+            ) : (
+              <span aria-hidden="true" />
+            )}
+          </a>
+          <div className="listing-card-body">
+            <p className="listing-card-meta">
+              {compactText([item.category?.name, formatMarketplacePrice(item, t)]).join(' / ')}
+            </p>
+            <h2>
+              <a href={withTenantBase(tenantBasePath, `marketplace/${item.slug}`)}>{item.title}</a>
+            </h2>
+            <p>{item.excerpt || item.description}</p>
+            <dl className="listing-facts">
+              <DefinitionRow label={t('marketplaceItems.locationLabel')} value={item.location.label} />
+              <DefinitionRow label={t('marketplaceItems.sellerLabel')} value={item.seller.displayName} />
+            </dl>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function MarketplaceDetail({
+  item,
+  tenantBasePath,
+  t,
+}: {
+  item: PublicMarketplaceListing;
+  tenantBasePath: string;
+  t: Translator;
+}): ReactNode {
+  const gallery = item.gallery.length > 0 ? item.gallery : compactMarketplaceImages([item.primaryImage]);
+
+  return (
+    <article className="listing-detail">
+      <nav aria-label={t('marketplaceItems.breadcrumbLabel')} className="listing-breadcrumb">
+        <a href={withTenantBase(tenantBasePath, 'marketplace')}>{t('marketplaceItems.backToMarketplace')}</a>
+        <span aria-hidden="true">/</span>
+        <span>{item.title}</span>
+      </nav>
+
+      {item.primaryImage ? (
+        <img
+          alt={item.primaryImage.altText || t('marketplaceItems.imageAltFallback')}
+          className="listing-hero-image"
+          src={item.primaryImage.url}
+        />
+      ) : null}
+
+      <div className="listing-detail-grid">
+        <div className="listing-detail-main">
+          <section className="public-panel article-content">
+            <h2>{item.title}</h2>
+            <p>{item.description}</p>
+          </section>
+
+          {gallery.length > 0 ? (
+            <section className="public-panel">
+              <h2>{t('marketplaceItems.galleryLabel')}</h2>
+              <div className="listing-gallery">
+                {gallery.map((image) => (
+                  <img
+                    alt={image.altText || t('marketplaceItems.imageAltFallback')}
+                    key={`${image.url}-${image.sortOrder ?? 0}`}
+                    src={image.url}
+                  />
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </div>
+
+        <aside className="public-panel listing-detail-aside">
+          <h2>{t('marketplaceItems.sellerLabel')}</h2>
+          <p>{item.seller.displayName}</p>
+          <dl className="listing-facts stacked">
+            <DefinitionRow label={t('marketplaceItems.priceLabel')} value={formatMarketplacePrice(item, t)} />
+            <DefinitionRow label={t('marketplaceItems.categoryLabel')} value={item.category?.name} />
+            <DefinitionRow label={t('marketplaceItems.locationLabel')} value={item.location.label} />
+            <DefinitionRow label={t('marketplaceItems.conditionLabel')} value={item.condition} />
+            <DefinitionRow label={t('marketplaceItems.deliveryLabel')} value={formatMarketplaceDelivery(item, t)} />
+            <DefinitionRow label={t('marketplaceItems.quantityLabel')} value={formatNullableNumber(item.quantity)} />
+            <DefinitionRow label={t('marketplaceItems.statusLabel')} value={item.status} />
+            <DefinitionRow label={t('marketplaceItems.expiresLabel')} value={formatDate(item.expiresAt)} />
+            <DefinitionRow label={t('marketplaceItems.updatedLabel')} value={formatDate(item.updatedAt)} />
+            <DefinitionRow label={t('marketplaceItems.createdLabel')} value={formatDate(item.createdAt)} />
+          </dl>
+        </aside>
+      </div>
+    </article>
+  );
+}
+
 function PublicCollection({
   basePath,
   emptyTitle,
@@ -706,6 +838,38 @@ function formatJobType(job: PublicJob): string | null {
   return compactText([job.jobType, job.commitment]).join(' / ') || null;
 }
 
+function formatMarketplacePrice(item: PublicMarketplaceListing, t: Translator): string | null {
+  if (item.price.priceType === 'free') {
+    return t('marketplaceItems.freePrice');
+  }
+
+  if (item.price.amount !== null) {
+    return `${item.price.currency ?? ''} ${formatNumber(item.price.amount)}`.trim();
+  }
+
+  if (item.price.timeCredits !== null) {
+    return t('marketplaceItems.timeCredits', { count: formatNumber(item.price.timeCredits) });
+  }
+
+  if (item.price.priceType === 'contact') {
+    return t('marketplaceItems.contactPrice');
+  }
+
+  return item.price.priceType;
+}
+
+function formatMarketplaceDelivery(item: PublicMarketplaceListing, t: Translator): string | null {
+  return compactText([
+    item.delivery.method,
+    item.delivery.localPickup ? t('marketplaceItems.localPickupLabel') : null,
+    item.delivery.shippingAvailable ? t('marketplaceItems.shippingLabel') : null,
+  ]).join(' / ') || null;
+}
+
+function formatNullableNumber(value: number | null): string | null {
+  return value === null ? null : formatNumber(value);
+}
+
 function formatDateTime(value: string | null): string | null {
   if (!value) {
     return null;
@@ -758,6 +922,12 @@ function compactImages(values: Array<PublicListing['primaryImage']>): PublicList
 
 function compactJobImages(values: Array<PublicJob['primaryImage']>): PublicJob['gallery'] {
   return values.filter((value): value is PublicJob['gallery'][number] => value !== null);
+}
+
+function compactMarketplaceImages(
+  values: Array<PublicMarketplaceListing['primaryImage']>,
+): PublicMarketplaceListing['gallery'] {
+  return values.filter((value): value is PublicMarketplaceListing['gallery'][number] => value !== null);
 }
 
 function PublicDetail({ item }: { item: PublicContentItem }): ReactNode {
@@ -877,6 +1047,24 @@ function buildStructuredData({
     };
   }
 
+  if (content?.kind === 'marketplace-index') {
+    const baseUrl = canonicalUrl.replace(/\/+$/, '');
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      itemListElement: content.items.items.map((item, index) => ({
+        '@type': 'ListItem',
+        image: item.primaryImage?.url,
+        name: item.title,
+        position: index + 1,
+        url: `${baseUrl}/${encodeURIComponent(item.slug)}`,
+      })),
+      name: pageTitle,
+      url: canonicalUrl,
+    };
+  }
+
   if (content?.kind === 'listing-detail' && content.listing) {
     return {
       '@context': 'https://schema.org',
@@ -966,6 +1154,34 @@ function buildStructuredData({
     };
   }
 
+  if (content?.kind === 'marketplace-detail' && content.item) {
+    const price = content.item.price.amount ?? (content.item.price.priceType === 'free' ? 0 : undefined);
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      category: content.item.category?.name ?? undefined,
+      description: content.item.description,
+      image: content.item.primaryImage?.url,
+      name: content.item.title,
+      offers: {
+        '@type': 'Offer',
+        price,
+        priceCurrency: content.item.price.currency ?? undefined,
+        availability:
+          content.item.status === 'active'
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock',
+        url: canonicalUrl,
+        seller: {
+          '@type': 'Person',
+          name: content.item.seller.displayName ?? tenantName,
+        },
+      },
+      url: canonicalUrl,
+    };
+  }
+
   if (content?.kind === 'public-detail' && content.item) {
     return {
       '@context': 'https://schema.org',
@@ -1009,6 +1225,10 @@ function getRouteTitle(route: RouteOwnership, content: PublicRouteContent | null
     return content.job.title;
   }
 
+  if (content?.kind === 'marketplace-detail' && content.item?.title) {
+    return content.item.title;
+  }
+
   return t(route.labelKey ?? 'pages.home.title');
 }
 
@@ -1040,6 +1260,10 @@ function getRouteLead(
 
   if (content?.kind === 'job-detail' && content.job?.excerpt) {
     return content.job.excerpt;
+  }
+
+  if (content?.kind === 'marketplace-detail' && content.item?.excerpt) {
+    return content.item.excerpt;
   }
 
   return t(`pages.${route.routeKey}.lead`, { tenantName });

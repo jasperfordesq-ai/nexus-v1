@@ -12,6 +12,8 @@ import {
   fetchEventsIndex,
   fetchJobDetail,
   fetchJobsIndex,
+  fetchMarketplaceDetail,
+  fetchMarketplaceIndex,
   fetchPublicCollection,
   fetchPublicDetail,
   fetchTenantBootstrap,
@@ -601,6 +603,193 @@ describe('tenant API client', () => {
 
     expect(fetchSpy).toHaveBeenCalledWith(
       'https://api.example.test/api/v2/jobs/22',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'X-Public-Contract': '1',
+        }),
+      }),
+    );
+  });
+
+  it('maps the full public marketplace contract and opts in to Laravel public contracts', async () => {
+    process.env.NEXUS_API_BASE = 'https://api.example.test/api';
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: [
+            {
+              public_contract: {
+                id: 31,
+                slug: '31',
+                title: 'Community repair kit',
+                description: 'A public marketplace item for a community repair kit.',
+                excerpt: 'A practical kit for local repair sessions.',
+                primary_image: {
+                  url: '/uploads/tenants/hour-timebank/marketplace/repair-kit.jpg',
+                  alt_text: 'Community repair kit',
+                },
+                gallery: [
+                  {
+                    url: '/uploads/tenants/hour-timebank/marketplace/repair-kit.jpg',
+                    alt_text: 'Community repair kit',
+                    sort_order: 0,
+                  },
+                ],
+                category: {
+                  id: 4,
+                  name: 'Repair Tools',
+                  slug: 'repair-tools',
+                },
+                location: {
+                  label: 'Remote or local',
+                  latitude: null,
+                  longitude: null,
+                },
+                price: {
+                  amount: 25,
+                  currency: 'EUR',
+                  price_type: 'fixed',
+                  time_credits: 2,
+                },
+                seller: {
+                  id: 9,
+                  display_name: 'Market Seller',
+                  avatar_url: '/uploads/tenants/hour-timebank/avatar.jpg',
+                  is_verified: true,
+                  seller_type: 'private',
+                },
+                delivery: {
+                  method: 'both',
+                  shipping_available: true,
+                  local_pickup: true,
+                },
+                condition: 'good',
+                quantity: 1,
+                expires_at: '2030-07-10T00:00:00+00:00',
+                created_at: '2026-06-01T10:00:00+00:00',
+                updated_at: '2026-06-02T11:00:00+00:00',
+                status: 'active',
+              },
+            },
+          ],
+          meta: {
+            cursor: null,
+            has_more: false,
+            page: 1,
+            per_page: 12,
+            total: 1,
+          },
+        }),
+      ),
+    );
+
+    await expect(fetchMarketplaceIndex(request, null)).resolves.toMatchObject({
+      items: [
+        {
+          id: '31',
+          price: {
+            amount: 25,
+            currency: 'EUR',
+            priceType: 'fixed',
+            timeCredits: 2,
+          },
+          primaryImage: {
+            url: 'https://api.example.test/uploads/tenants/hour-timebank/marketplace/repair-kit.jpg',
+          },
+          seller: {
+            displayName: 'Market Seller',
+          },
+          title: 'Community repair kit',
+        },
+      ],
+      pagination: {
+        hasMore: false,
+        page: 1,
+        perPage: 12,
+        total: 1,
+      },
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://api.example.test/api/v2/marketplace/listings?limit=12',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'X-Public-Contract': '1',
+        }),
+      }),
+    );
+  });
+
+  it('maps public marketplace detail through the dedicated contract path', async () => {
+    process.env.NEXUS_API_BASE = 'https://api.example.test/api';
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: {
+            public_contract: {
+              id: 32,
+              slug: '32',
+              title: 'Shared cordless drill',
+              description: 'A detailed public marketplace description for a cordless drill.',
+              excerpt: 'Borrow a drill for local projects.',
+              primary_image: {
+                url: '/uploads/tenants/hour-timebank/marketplace/drill.jpg',
+                alt_text: 'Shared cordless drill',
+              },
+              gallery: [],
+              category: {
+                id: 5,
+                name: 'Shared Tools',
+                slug: 'shared-tools',
+              },
+              location: {
+                label: 'Online',
+                latitude: null,
+                longitude: null,
+              },
+              price: {
+                amount: null,
+                currency: 'EUR',
+                price_type: 'free',
+                time_credits: null,
+              },
+              seller: {
+                id: 10,
+                display_name: 'Detail Seller',
+                avatar_url: null,
+                is_verified: false,
+                seller_type: 'private',
+              },
+              delivery: {
+                method: 'pickup',
+                shipping_available: false,
+                local_pickup: true,
+              },
+              condition: 'good',
+              quantity: 1,
+              expires_at: '2030-08-01T00:00:00+00:00',
+              created_at: '2026-06-01T10:00:00+00:00',
+              updated_at: '2026-06-02T11:00:00+00:00',
+              status: 'active',
+            },
+          },
+        }),
+      ),
+    );
+
+    await expect(fetchMarketplaceDetail('32', request, null)).resolves.toMatchObject({
+      id: '32',
+      price: {
+        priceType: 'free',
+      },
+      seller: {
+        displayName: 'Detail Seller',
+      },
+      title: 'Shared cordless drill',
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://api.example.test/api/v2/marketplace/listings/32',
       expect.objectContaining({
         headers: expect.objectContaining({
           'X-Public-Contract': '1',

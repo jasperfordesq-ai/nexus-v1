@@ -459,6 +459,29 @@
     "typeLabel": "Type",
     "updatedLabel": "Updated"
   },
+  "marketplaceItems": {
+    "backToMarketplace": "Marketplace",
+    "breadcrumbLabel": "Marketplace breadcrumb",
+    "categoryLabel": "Category",
+    "conditionLabel": "Condition",
+    "contactPrice": "Contact seller",
+    "createdLabel": "Created",
+    "deliveryLabel": "Delivery",
+    "empty": "No public marketplace items are available yet.",
+    "expiresLabel": "Expires",
+    "freePrice": "Free",
+    "galleryLabel": "Gallery",
+    "imageAltFallback": "Marketplace item image",
+    "localPickupLabel": "Local pickup",
+    "locationLabel": "Location",
+    "priceLabel": "Price",
+    "quantityLabel": "Quantity",
+    "sellerLabel": "Seller",
+    "shippingLabel": "Shipping available",
+    "statusLabel": "Status",
+    "timeCredits": "{{count}} time credits",
+    "updatedLabel": "Updated"
+  },
   "footer": {
     "attribution": "Project NEXUS is free software licensed under AGPL-3.0-or-later.",
     "copyright": "Copyright © 2024–2026 Jasper Ford."

@@ -39,6 +39,62 @@ class MarketplaceListingControllerTest extends TestCase
         TenantContext::setById($this->testTenantId);
     }
 
+    private function createMarketplaceCategory(string $name = 'Repair Tools'): int
+    {
+        return DB::table('marketplace_categories')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'name' => $name,
+            'slug' => strtolower(str_replace(' ', '-', $name)) . '-' . uniqid(),
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function createMarketplaceListing(User $seller, int $categoryId, array $overrides = []): int
+    {
+        return DB::table('marketplace_listings')->insertGetId(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $seller->id,
+            'category_id' => $categoryId,
+            'title' => 'Community repair kit',
+            'tagline' => 'A practical kit for local repair sessions.',
+            'description' => 'A public marketplace item for a community repair kit.',
+            'price' => 25,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'time_credit_price' => 2,
+            'condition' => 'good',
+            'quantity' => 1,
+            'location' => 'Remote or local',
+            'latitude' => null,
+            'longitude' => null,
+            'shipping_available' => true,
+            'local_pickup' => true,
+            'delivery_method' => 'both',
+            'seller_type' => 'private',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'expires_at' => '2030-07-10 00:00:00',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $overrides));
+    }
+
+    private function addMarketplaceImage(int $listingId, string $url, bool $primary = true, int $sortOrder = 0): void
+    {
+        DB::table('marketplace_images')->insert([
+            'tenant_id' => $this->testTenantId,
+            'marketplace_listing_id' => $listingId,
+            'image_url' => $url,
+            'thumbnail_url' => $url,
+            'alt_text' => 'Community repair kit',
+            'sort_order' => $sortOrder,
+            'is_primary' => $primary,
+            'created_at' => now(),
+        ]);
+    }
+
     public function test_store_requires_auth(): void
     {
         $response = $this->apiPost('/v2/marketplace/listings', []);
@@ -62,6 +118,116 @@ class MarketplaceListingControllerTest extends TestCase
         // Public endpoint (outside auth middleware group)
         $response = $this->apiGet('/v2/marketplace/listings');
         $this->assertLessThan(500, $response->status());
+    }
+
+    public function test_index_keeps_marketplace_public_contract_opt_in(): void
+    {
+        $this->enableMarketplaceFeature();
+        $seller = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name' => 'Market',
+            'last_name' => 'Seller',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $categoryId = $this->createMarketplaceCategory();
+        $listingId = $this->createMarketplaceListing($seller, $categoryId);
+        $this->addMarketplaceImage($listingId, '/uploads/tenants/hour-timebank/marketplace/repair-kit.jpg');
+
+        $defaultResponse = $this->apiGet('/v2/marketplace/listings?limit=1');
+        $defaultResponse->assertOk();
+        $this->assertArrayNotHasKey('public_contract', $defaultResponse->json('data.0'));
+
+        $contractResponse = $this->apiGet('/v2/marketplace/listings?limit=1', [
+            'X-Public-Contract' => '1',
+        ]);
+        $contractResponse->assertOk();
+        $contractResponse->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'id',
+                    'title',
+                    'public_contract' => [
+                        'id',
+                        'slug',
+                        'title',
+                        'description',
+                        'excerpt',
+                        'primary_image' => ['url', 'alt_text'],
+                        'gallery' => [['url', 'alt_text', 'sort_order']],
+                        'category' => ['id', 'name', 'slug'],
+                        'location' => ['label', 'latitude', 'longitude'],
+                        'price' => ['amount', 'currency', 'price_type', 'time_credits'],
+                        'seller' => ['id', 'display_name', 'avatar_url', 'is_verified', 'seller_type'],
+                        'delivery' => ['method', 'shipping_available', 'local_pickup'],
+                        'condition',
+                        'quantity',
+                        'expires_at',
+                        'created_at',
+                        'updated_at',
+                        'status',
+                    ],
+                ],
+            ],
+        ]);
+
+        $contract = $contractResponse->json('data.0.public_contract');
+        $this->assertSame($listingId, $contract['id']);
+        $this->assertSame((string) $listingId, $contract['slug']);
+        $this->assertSame('Community repair kit', $contract['title']);
+        $this->assertSame('A practical kit for local repair sessions.', $contract['excerpt']);
+        $this->assertSame('/uploads/tenants/hour-timebank/marketplace/repair-kit.jpg', $contract['primary_image']['url']);
+        $this->assertSame('Repair Tools', $contract['category']['name']);
+        $this->assertSame('Remote or local', $contract['location']['label']);
+        $this->assertEquals(25.0, $contract['price']['amount']);
+        $this->assertSame('EUR', $contract['price']['currency']);
+        $this->assertEquals(2.0, $contract['price']['time_credits']);
+        $this->assertSame('Market Seller', $contract['seller']['display_name']);
+        $this->assertSame('both', $contract['delivery']['method']);
+        $this->assertTrue($contract['delivery']['shipping_available']);
+        $this->assertTrue($contract['delivery']['local_pickup']);
+        $this->assertSame('good', $contract['condition']);
+        $this->assertSame(1, $contract['quantity']);
+    }
+
+    public function test_show_keeps_marketplace_public_contract_opt_in(): void
+    {
+        $this->enableMarketplaceFeature();
+        $seller = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name' => 'Detail',
+            'last_name' => 'Seller',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $categoryId = $this->createMarketplaceCategory('Shared Tools');
+        $listingId = $this->createMarketplaceListing($seller, $categoryId, [
+            'title' => 'Shared cordless drill',
+            'tagline' => 'Borrow a drill for local projects.',
+            'description' => 'A detailed public marketplace description for a cordless drill.',
+            'price_type' => 'free',
+            'price' => null,
+            'time_credit_price' => null,
+            'location' => 'Online',
+        ]);
+        $this->addMarketplaceImage($listingId, '/uploads/tenants/hour-timebank/marketplace/drill.jpg');
+
+        $defaultResponse = $this->apiGet("/v2/marketplace/listings/{$listingId}");
+        $defaultResponse->assertOk();
+        $this->assertArrayNotHasKey('public_contract', $defaultResponse->json('data'));
+
+        $contractResponse = $this->apiGet("/v2/marketplace/listings/{$listingId}", [
+            'X-Public-Contract' => '1',
+        ]);
+        $contractResponse->assertOk();
+
+        $contract = $contractResponse->json('data.public_contract');
+        $this->assertSame($listingId, $contract['id']);
+        $this->assertSame('Shared cordless drill', $contract['title']);
+        $this->assertSame('Borrow a drill for local projects.', $contract['excerpt']);
+        $this->assertSame('/uploads/tenants/hour-timebank/marketplace/drill.jpg', $contract['primary_image']['url']);
+        $this->assertSame('Shared Tools', $contract['category']['name']);
+        $this->assertSame('Online', $contract['location']['label']);
+        $this->assertSame('free', $contract['price']['price_type']);
+        $this->assertSame('Detail Seller', $contract['seller']['display_name']);
     }
 
     public function test_categories_public_smoke(): void
