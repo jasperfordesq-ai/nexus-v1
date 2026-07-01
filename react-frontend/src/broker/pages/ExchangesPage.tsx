@@ -5,25 +5,58 @@
 
 /**
  * Exchange Management
- * List and manage exchange requests with approve/reject actions.
+ * List and manage exchange requests with approve/reject actions,
+ * restyled to the broker design language: KPI header, deep-linkable
+ * status tabs, party avatars, BrokerStatusChip statuses.
  * Parity: PHP BrokerControlsController::exchanges()
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import ArrowLeft from 'lucide-react/icons/arrow-left';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import ArrowRight from 'lucide-react/icons/arrow-right';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
+import CheckCheck from 'lucide-react/icons/check-check';
 import XCircle from 'lucide-react/icons/circle-x';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Ban from 'lucide-react/icons/ban';
+import Clock from 'lucide-react/icons/clock';
 import Eye from 'lucide-react/icons/eye';
+import Hourglass from 'lucide-react/icons/hourglass';
+import Inbox from 'lucide-react/icons/inbox';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Users from 'lucide-react/icons/users';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { formatServerDate } from '@/lib/serverTime';
 import { adminBroker } from '@/admin/api/adminApi';
-import { DataTable, StatusBadge, PageHeader, type Column } from '@/admin/components';
+import { DataTable, type Column } from '@/admin/components';
 import type { ExchangeRequest } from '@/admin/api/types';
-import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
+import {
+  Button,
+  Chip,
+  Textarea,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Tabs,
+  Tab,
+  Avatar,
+} from '@/components/ui';
+import {
+  BrokerPageShell,
+  BrokerStatCard,
+  BrokerEmptyState,
+  BrokerSkeleton,
+  BrokerStatusChip,
+} from '../components';
 
 type ActionType = 'approve' | 'reject';
 
@@ -32,6 +65,14 @@ type ActionType = 'approve' | 'reject';
 const EXCHANGE_STATUSES = [
   'all', 'pending_broker', 'accepted', 'in_progress', 'completed', 'cancelled', 'disputed',
 ] as const;
+
+/** Reads the paginated total out of a getExchanges response (same meta shape the list load uses). */
+function readTotal(res: Awaited<ReturnType<typeof adminBroker.getExchanges>>): number | null {
+  if (!res.success || !Array.isArray(res.data)) return null;
+  const meta = res.meta as Record<string, unknown> | undefined;
+  const value = Number(meta?.total ?? meta?.total_items ?? res.data.length);
+  return Number.isFinite(value) ? value : null;
+}
 
 export function ExchangeManagement() {
   const { t } = useTranslation('broker');
@@ -65,7 +106,19 @@ export function ExchangeManagement() {
   const [items, setItems] = useState<ExchangeRequest[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [page, setPage] = useState(1);
+
+  // KPI header state. There is no dedicated exchange-stats endpoint, so the
+  // header reuses the page's own list endpoint: one unfiltered probe for the
+  // grand total and one pending_broker probe for the review queue, reading
+  // only meta.total from each.
+  const [stats, setStats] = useState<{ total: number | null; pending: number | null }>({
+    total: null,
+    pending: null,
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
 
   // Action modal state
   const [actionModal, setActionModal] = useState<{
@@ -75,8 +128,17 @@ export function ExchangeManagement() {
   const [actionText, setActionText] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
+  // Stash the latest `t`/`toast` in refs so the fetch callbacks key on the
+  // page/status params only — otherwise a language switch (or an unstable
+  // toast identity) would refetch the whole list for no reason.
+  const tRef = useRef(t);
+  const toastRef = useRef(toast);
+  tRef.current = t;
+  toastRef.current = toast;
+
   const loadItems = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await adminBroker.getExchanges({
         page,
@@ -86,18 +148,45 @@ export function ExchangeManagement() {
         setItems(res.data as ExchangeRequest[]);
         const meta = res.meta as Record<string, unknown> | undefined;
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
+      } else {
+        setLoadError(true);
       }
     } catch {
-      toast.error(t('exchanges.load_failed'));
+      setLoadError(true);
+      toastRef.current.error(tRef.current('exchanges.load_failed'));
     } finally {
       setLoading(false);
+      setInitialLoad(false);
     }
-  }, [page, status, toast, t])
+  }, [page, status]);
 
+  const loadStats = useCallback(async () => {
+    setStatsLoading(true);
+    try {
+      const [allRes, pendingRes] = await Promise.all([
+        adminBroker.getExchanges({ page: 1 }),
+        adminBroker.getExchanges({ page: 1, status: 'pending_broker' }),
+      ]);
+      setStats({ total: readTotal(allRes), pending: readTotal(pendingRes) });
+    } catch {
+      // KPI header degrades to em-dashes; the list load owns error messaging.
+    } finally {
+      setStatsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     loadItems();
   }, [loadItems]);
+
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
+
+  const refreshAll = () => {
+    loadItems();
+    loadStats();
+  };
 
   const handleAction = async () => {
     if (!actionModal) return;
@@ -116,7 +205,7 @@ export function ExchangeManagement() {
 
       if (res?.success) {
         toast.success(t('exchanges.action_succeeded'));
-        loadItems();
+        refreshAll();
       } else {
         toast.error(res?.error || t('exchanges.action_failed'));
       }
@@ -136,19 +225,22 @@ export function ExchangeManagement() {
 
   const columns: Column<ExchangeRequest>[] = [
     {
-      key: 'requester_name',
-      label: t('exchanges.col_requester'),
-      sortable: true,
+      key: 'parties',
+      label: t('exchanges.col_parties'),
       render: (item) => (
-        <span className="font-medium text-foreground">{item.requester_name}</span>
-      ),
-    },
-    {
-      key: 'provider_name',
-      label: t('exchanges.col_provider'),
-      sortable: true,
-      render: (item) => (
-        <span className="font-medium text-foreground">{item.provider_name}</span>
+        <div className="flex min-w-0 items-center gap-2">
+          <Avatar name={item.requester_name} size="sm" className="shrink-0" />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-foreground">{item.requester_name}</p>
+            <p className="truncate text-xs text-muted">{t('exchanges.col_requester')}</p>
+          </div>
+          <ArrowRight size={14} className="shrink-0 text-muted" aria-hidden="true" />
+          <Avatar name={item.provider_name} size="sm" className="shrink-0" />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-foreground">{item.provider_name}</p>
+            <p className="truncate text-xs text-muted">{t('exchanges.col_provider')}</p>
+          </div>
+        </div>
       ),
     },
     {
@@ -156,7 +248,7 @@ export function ExchangeManagement() {
       label: t('exchanges.col_listing'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-foreground/70">
+        <span className="block max-w-[220px] truncate text-sm text-foreground/70">
           {item.listing_title || '—'}
         </span>
       ),
@@ -165,14 +257,14 @@ export function ExchangeManagement() {
       key: 'status',
       label: t('exchanges.col_status'),
       sortable: true,
-      render: (item) => <StatusBadge status={item.status} />,
+      render: (item) => <BrokerStatusChip status={item.status} />,
     },
     {
       key: 'final_hours',
       label: t('exchanges.col_hours'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm">
+        <span className="text-sm tabular-nums text-foreground">
           {item.final_hours != null ? `${item.final_hours}h` : '—'}
         </span>
       ),
@@ -182,7 +274,7 @@ export function ExchangeManagement() {
       label: t('exchanges.col_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-muted">
+        <span className="text-sm tabular-nums text-muted">
           {formatServerDate(item.created_at)}
         </span>
       ),
@@ -195,8 +287,7 @@ export function ExchangeManagement() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="default"
+            variant="tertiary"
             as={Link}
             to={tenantPath(`/broker/exchanges/${item.id}`)}
             aria-label={t('exchanges.view_details_aria')}
@@ -208,7 +299,7 @@ export function ExchangeManagement() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 color="success"
                 onPress={() => openActionModal('approve', item)}
                 aria-label={t('exchanges.approve_aria')}
@@ -218,8 +309,7 @@ export function ExchangeManagement() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
-                color="danger"
+                variant="danger"
                 onPress={() => openActionModal('reject', item)}
                 aria-label={t('exchanges.reject_aria')}
               >
@@ -233,24 +323,58 @@ export function ExchangeManagement() {
   ];
 
   return (
-    <div>
-      <PageHeader
-        title={t('exchanges.title')}
-        description={t('exchanges.description')}
-        actions={
+    <BrokerPageShell
+      title={t('exchanges.title')}
+      description={t('exchanges.description')}
+      icon={ArrowLeftRight}
+      color="accent"
+      actions={
+        <>
           <Button
             as={Link}
             to={tenantPath('/broker')}
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
             {t('exchanges.back')}
           </Button>
-        }
-      />
+          <Button
+            variant="tertiary"
+            size="sm"
+            startContent={<RefreshCw size={16} />}
+            onPress={refreshAll}
+            isLoading={loading && statsLoading}
+          >
+            {t('common.refresh')}
+          </Button>
+        </>
+      }
+    >
+      {/* KPI header — deep-links into the matching filtered view */}
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <BrokerStatCard
+          label={t('exchanges.stat_total')}
+          value={stats.total}
+          icon={ArrowLeftRight}
+          color="accent"
+          loading={statsLoading}
+          description={t('exchanges.stat_total_hint')}
+          to={tenantPath('/broker/exchanges')}
+        />
+        <BrokerStatCard
+          label={t('exchanges.stat_pending')}
+          value={stats.pending}
+          icon={Clock}
+          color="warning"
+          loading={statsLoading}
+          description={t('exchanges.stat_pending_hint')}
+          to={tenantPath('/broker/exchanges?status=pending_broker')}
+        />
+      </div>
 
-      <div className="mb-4">
+      {/* Status tabs — deep-linkable via ?status= */}
+      <div className="mb-4 rounded-2xl border border-divider/70 bg-surface p-2 shadow-sm shadow-black/[0.03]">
         <Tabs
           aria-label={t('exchanges.tabs_aria')}
           selectedKey={status}
@@ -258,27 +382,123 @@ export function ExchangeManagement() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={t('exchanges.tab_all')} />
-          <Tab key="pending_broker" title={t('exchanges.tab_pending_broker')} />
-          <Tab key="accepted" title={t('exchanges.tab_accepted')} />
-          <Tab key="in_progress" title={t('exchanges.tab_in_progress')} />
-          <Tab key="completed" title={t('exchanges.tab_completed')} />
-          <Tab key="cancelled" title={t('exchanges.tab_cancelled')} />
-          <Tab key="disputed" title={t('exchanges.tab_disputed')} />
+          <Tab
+            key="all"
+            title={
+              <div className="flex items-center gap-2">
+                <Users size={14} aria-hidden="true" />
+                <span>{t('exchanges.tab_all')}</span>
+              </div>
+            }
+          />
+          <Tab
+            key="pending_broker"
+            title={
+              <div className="flex items-center gap-2">
+                <Clock size={14} aria-hidden="true" />
+                <span>{t('exchanges.tab_pending_broker')}</span>
+                {stats.pending != null && stats.pending > 0 && (
+                  <Chip size="sm" variant="soft" color="warning" className="tabular-nums">
+                    {stats.pending}
+                  </Chip>
+                )}
+              </div>
+            }
+          />
+          <Tab
+            key="accepted"
+            title={
+              <div className="flex items-center gap-2">
+                <CheckCircle size={14} aria-hidden="true" />
+                <span>{t('exchanges.tab_accepted')}</span>
+              </div>
+            }
+          />
+          <Tab
+            key="in_progress"
+            title={
+              <div className="flex items-center gap-2">
+                <Hourglass size={14} aria-hidden="true" />
+                <span>{t('exchanges.tab_in_progress')}</span>
+              </div>
+            }
+          />
+          <Tab
+            key="completed"
+            title={
+              <div className="flex items-center gap-2">
+                <CheckCheck size={14} aria-hidden="true" />
+                <span>{t('exchanges.tab_completed')}</span>
+              </div>
+            }
+          />
+          <Tab
+            key="cancelled"
+            title={
+              <div className="flex items-center gap-2">
+                <Ban size={14} aria-hidden="true" />
+                <span>{t('exchanges.tab_cancelled')}</span>
+              </div>
+            }
+          />
+          <Tab
+            key="disputed"
+            title={
+              <div className="flex items-center gap-2">
+                <AlertTriangle size={14} aria-hidden="true" />
+                <span>{t('exchanges.tab_disputed')}</span>
+              </div>
+            }
+          />
         </Tabs>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={items}
-        isLoading={loading}
-        searchable={false}
-        onRefresh={loadItems}
-        totalItems={total}
-        page={page}
-        pageSize={20}
-        onPageChange={setPage}
-      />
+      {initialLoad ? (
+        <BrokerSkeleton variant="table" />
+      ) : loadError && items.length === 0 ? (
+        // Honest failure state — an errored load must never masquerade as an
+        // empty-but-healthy queue.
+        <BrokerEmptyState
+          icon={AlertCircle}
+          color="danger"
+          title={t('exchanges.load_error_title')}
+          hint={t('exchanges.load_error_hint')}
+          action={
+            <Button size="sm" variant="danger-soft" onPress={refreshAll}>
+              {t('common.refresh')}
+            </Button>
+          }
+        />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={items}
+          isLoading={loading}
+          searchable={false}
+          onRefresh={refreshAll}
+          totalItems={total}
+          page={page}
+          pageSize={20}
+          onPageChange={setPage}
+          emptyContent={
+            <BrokerEmptyState
+              bare
+              icon={status === 'pending_broker' ? Sparkles : Inbox}
+              color={status === 'pending_broker' ? 'success' : 'neutral'}
+              title={
+                status === 'pending_broker'
+                  ? t('exchanges.empty_pending_title')
+                  : t('exchanges.no_exchanges')
+              }
+              hint={
+                status === 'pending_broker'
+                  ? t('exchanges.empty_pending_hint')
+                  : t('exchanges.empty_hint')
+              }
+            />
+          }
+        />
+      )}
 
       {/* Approve/Reject Modal */}
       {actionModal && (
@@ -287,12 +507,12 @@ export function ExchangeManagement() {
             <ModalHeader className="flex items-center gap-2">
               {actionModal.type === 'approve' ? (
                 <>
-                  <CheckCircle size={20} className="text-success" />
+                  <CheckCircle size={20} className="text-success" aria-hidden="true" />
                   {t('exchanges.approve_modal_title')}
                 </>
               ) : (
                 <>
-                  <XCircle size={20} className="text-danger" />
+                  <XCircle size={20} className="text-danger" aria-hidden="true" />
                   {t('exchanges.reject_modal_title')}
                 </>
               )}
@@ -313,30 +533,32 @@ export function ExchangeManagement() {
                 value={actionText}
                 onValueChange={setActionText}
                 minRows={3}
-                variant="bordered"
+                variant="secondary"
                 isRequired={actionModal.type === 'reject'}
               />
             </ModalBody>
             <ModalFooter>
               <Button
-                variant="flat"
+                variant="tertiary"
                 onPress={() => { setActionModal(null); setActionText(''); }}
                 isDisabled={actionLoading}
               >
                 {t('common.cancel')}
               </Button>
-              <Button
-                color={actionModal.type === 'approve' ? 'success' : 'danger'}
-                onPress={handleAction}
-                isLoading={actionLoading}
-              >
-                {actionModal.type === 'approve' ? t('exchanges.approve') : t('exchanges.reject')}
-              </Button>
+              {actionModal.type === 'approve' ? (
+                <Button color="success" onPress={handleAction} isLoading={actionLoading}>
+                  {t('exchanges.approve')}
+                </Button>
+              ) : (
+                <Button variant="danger" onPress={handleAction} isLoading={actionLoading}>
+                  {t('exchanges.reject')}
+                </Button>
+              )}
             </ModalFooter>
           </ModalContent>
         </Modal>
       )}
-    </div>
+    </BrokerPageShell>
   );
 }
 

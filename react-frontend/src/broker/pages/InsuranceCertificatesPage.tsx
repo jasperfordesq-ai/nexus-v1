@@ -1,4 +1,3 @@
-import { Select, SelectItem, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,13 +7,36 @@ import { Select, SelectItem, Button, Spinner, Input, Textarea, Modal, ModalConte
  * Insurance Certificates Management
  * Manage insurance certificates for compliance.
  * Parity: PHP AdminInsuranceCertificateApiController
+ *
+ * Broker design language: BrokerPageShell frame (compliance = success),
+ * deep-linked BrokerStatCard KPI header, expiry-urgency countdown chips
+ * (danger expired / warning inside the configurable warning window),
+ * panel-wide BrokerStatusChip statuses, BrokerSkeleton first load and
+ * BrokerEmptyState empties. The `?status=` and `?user_id=` params are
+ * preserved exactly so dashboard tiles and User Edit deep-links keep working.
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 
-import { Chip } from '@/components/ui';
+import {
+  Select,
+  SelectItem,
+  Button,
+  Spinner,
+  Input,
+  Textarea,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Avatar,
+  Tabs,
+  Tab,
+  Chip,
+} from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
@@ -24,7 +46,6 @@ import Check from 'lucide-react/icons/check';
 import X from 'lucide-react/icons/x';
 import Search from 'lucide-react/icons/search';
 import FileText from 'lucide-react/icons/file-text';
-import Users from 'lucide-react/icons/users';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Eye from 'lucide-react/icons/eye';
 import FileCheck from 'lucide-react/icons/file-check';
@@ -35,8 +56,15 @@ import { useTenant, useToast } from '@/contexts';
 import { resolveAssetUrl, resolveAvatarUrl } from '@/lib/helpers';
 import { parseServerTimestamp, formatServerDate, formatServerDateTime } from '@/lib/serverTime';
 import { adminInsurance, adminUsers, adminBroker } from '@/admin/api/adminApi';
-import { DataTable, StatCard, PageHeader, ConfirmModal, EmptyState, type Column } from '@/admin/components';
+import { DataTable, ConfirmModal, type Column } from '@/admin/components';
 import type { InsuranceCertificate, InsuranceStats, BrokerConfig } from '@/admin/api/types';
+import {
+  BrokerPageShell,
+  BrokerStatCard,
+  BrokerEmptyState,
+  BrokerSkeleton,
+  BrokerStatusChip,
+} from '../components';
 
 const INSURANCE_TYPE_KEYS = [
   'public_liability',
@@ -56,16 +84,8 @@ const INSURANCE_TYPE_LABEL_KEYS: Record<(typeof INSURANCE_TYPE_KEYS)[number], st
   other: 'insurance.type_other',
 };
 
-const STATUS_COLOR_MAP: Record<string, 'warning' | 'success' | 'danger' | 'accent' | 'default'> = {
-  pending: 'warning',
-  submitted: 'accent',
-  verified: 'success',
-  expired: 'danger',
-  rejected: 'danger',
-  revoked: 'default',
-};
-
 const SEARCH_DEBOUNCE_MS = 300;
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 // Status filter is mirrored to `?status=` so stat-card deep-links and
 // browser back/forward work correctly.
@@ -77,6 +97,11 @@ const INSURANCE_STATUSES = [
   'all', 'pending_review', 'pending', 'submitted', 'verified', 'expired', 'expiring_soon', 'rejected',
 ] as const;
 type InsuranceStatus = (typeof INSURANCE_STATUSES)[number];
+
+// Pre-verification queues where "empty" means the broker is all caught up.
+const REVIEW_QUEUE_STATUSES: ReadonlySet<InsuranceStatus> = new Set([
+  'pending_review', 'pending', 'submitted',
+]);
 
 interface UserSearchResult {
   id: number;
@@ -90,6 +115,14 @@ export function InsuranceCertificates() {
   usePageTitle(t('insurance.title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
+
+  // Stash the latest `t`/`toast` in refs so the fetch callbacks don't churn
+  // identity on language switches (which would refetch for no reason) — same
+  // pattern as BrokerDashboardPage.
+  const tRef = useRef(t);
+  const toastRef = useRef(toast);
+  tRef.current = t;
+  toastRef.current = toast;
 
   const formatInsuranceType = (type: string | null | undefined): string => {
     if (!type) return '—';
@@ -127,6 +160,8 @@ export function InsuranceCertificates() {
   const [items, setItems] = useState<InsuranceCertificate[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const [listError, setListError] = useState(false);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -243,9 +278,9 @@ export function InsuranceCertificates() {
     }
   }, []);
 
-  // #5: Added toast to dependency array
   const loadItems = useCallback(async () => {
     setLoading(true);
+    setListError(false);
     try {
       const params: Record<string, unknown> = { page };
       if (statusFilter === 'expiring_soon') {
@@ -265,14 +300,17 @@ export function InsuranceCertificates() {
         setItems(res.data as InsuranceCertificate[]);
         const meta = res.meta as Record<string, unknown> | undefined;
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
+      } else {
+        setListError(true);
       }
     } catch {
-      toast.error(t('insurance.load_failed'));
+      setListError(true);
+      toastRef.current.error(tRef.current('insurance.load_failed'));
     } finally {
       setLoading(false);
+      setHasLoadedOnce(true);
     }
-  }, [page, statusFilter, debouncedSearch, userIdFilter, toast, t])
-
+  }, [page, statusFilter, debouncedSearch, userIdFilter]);
 
   useEffect(() => { loadStats(); }, [loadStats]);
   useEffect(() => { loadItems(); }, [loadItems]);
@@ -469,6 +507,42 @@ export function InsuranceCertificates() {
     setUserSearchResults([]);
   };
 
+  // Expiry-urgency countdown chip — danger once expired, warning inside the
+  // configurable warning window. Rendered next to the raw date so the broker
+  // can scan the column without doing date arithmetic.
+  const renderExpiryCell = (item: InsuranceCertificate) => {
+    const expiry = parseServerTimestamp(item.expiry_date);
+    if (!expiry) return <span className="text-sm text-muted">{'—'}</span>;
+    const daysUntilExpiry = Math.ceil((expiry.getTime() - Date.now()) / MS_PER_DAY);
+    // #12: Use configurable expiry warning days
+    const isExpired = daysUntilExpiry <= 0;
+    const isExpiringSoon = daysUntilExpiry > 0 && daysUntilExpiry <= expiryWarningDays;
+
+    return (
+      <div className="flex min-w-0 items-center gap-2">
+        <span
+          className={`text-sm tabular-nums ${
+            isExpired ? 'font-medium text-danger' : isExpiringSoon ? 'font-medium text-warning' : 'text-muted'
+          }`}
+        >
+          {expiry.toLocaleDateString()}
+        </span>
+        {isExpired && (
+          <Chip size="sm" variant="soft" color="danger" className="shrink-0 tabular-nums">
+            {daysUntilExpiry === 0
+              ? t('insurance.expiry_expired_today')
+              : t('insurance.expiry_expired_days_ago', { days: Math.abs(daysUntilExpiry) })}
+          </Chip>
+        )}
+        {isExpiringSoon && (
+          <Chip size="sm" variant="soft" color="warning" className="shrink-0 tabular-nums">
+            {t('insurance.expiry_days_left', { days: daysUntilExpiry })}
+          </Chip>
+        )}
+      </div>
+    );
+  };
+
   const columns: Column<InsuranceCertificate>[] = [
     {
       key: 'member',
@@ -483,10 +557,10 @@ export function InsuranceCertificates() {
             className="shrink-0"
           />
           <div className="min-w-0">
-            <p className="font-medium text-foreground truncate">
+            <p className="truncate font-medium text-foreground">
               {item.first_name} {item.last_name}
             </p>
-            <p className="text-xs text-muted truncate">{item.email}</p>
+            <p className="truncate text-xs text-muted">{item.email}</p>
           </div>
         </div>
       ),
@@ -505,22 +579,13 @@ export function InsuranceCertificates() {
       key: 'status',
       label: t('insurance.col_status'),
       sortable: true,
-      render: (item) => (
-        <Chip
-          size="sm"
-          variant="soft"
-          color={STATUS_COLOR_MAP[item.status] || 'default'}
-          className="capitalize"
-        >
-          {t(`status.${item.status}`)}
-        </Chip>
-      ),
+      render: (item) => <BrokerStatusChip status={item.status} />,
     },
     {
       key: 'provider_name',
       label: t('insurance.col_provider'),
       render: (item) => (
-        <span className="text-sm text-muted">
+        <span className="block max-w-[160px] truncate text-sm text-muted">
           {item.provider_name || '—'}
         </span>
       ),
@@ -529,7 +594,7 @@ export function InsuranceCertificates() {
       key: 'policy_number',
       label: t('insurance.col_policy'),
       render: (item) => (
-        <span className="text-sm text-muted font-mono">
+        <span className="font-mono text-sm tabular-nums text-muted">
           {item.policy_number || '—'}
         </span>
       ),
@@ -538,21 +603,7 @@ export function InsuranceCertificates() {
       key: 'expiry_date',
       label: t('insurance.col_expiry'),
       sortable: true,
-      render: (item) => {
-        const expiry = parseServerTimestamp(item.expiry_date);
-        if (!expiry) return <span className="text-sm text-muted">{'—'}</span>;
-        const now = new Date();
-        const daysUntilExpiry = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-        // #12: Use configurable expiry warning days
-        const isExpiringSoon = daysUntilExpiry > 0 && daysUntilExpiry <= expiryWarningDays;
-        const isExpired = daysUntilExpiry <= 0;
-
-        return (
-          <span className={`text-sm ${isExpired ? 'text-danger font-medium' : isExpiringSoon ? 'text-warning font-medium' : 'text-muted'}`}>
-            {expiry.toLocaleDateString()}
-          </span>
-        );
-      },
+      render: renderExpiryCell,
     },
     {
       key: 'actions',
@@ -583,8 +634,8 @@ export function InsuranceCertificates() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="secondary"
-                className="text-success"
+                variant="tertiary"
+                color="success"
                 isPending={verifyingId === item.id}
                 onPress={() => handleVerify(item)}
                 aria-label={t('insurance.verify_certificate_aria')}
@@ -616,137 +667,200 @@ export function InsuranceCertificates() {
     },
   ];
 
-  return (
-    <div>
-      <PageHeader
-        title={t('insurance.page_title')}
-        description={t('insurance.page_description')}
-        actions={
-          <div className="flex gap-2">
-            <Button
-              variant="primary"
-              startContent={<Plus size={16} />}
-              size="sm"
-              onPress={() => { resetCreateForm(); setCreateOpen(true); }}
-            >
-              {t('insurance.add_certificate')}
-            </Button>
-            <Button
-              as={Link}
-              to={tenantPath('/broker')}
-              variant="secondary"
-              startContent={<ArrowLeft size={16} />}
-              size="sm"
-            >
-              {t('insurance.back')}
-            </Button>
-          </div>
-        }
-      />
+  const isReviewQueue = REVIEW_QUEUE_STATUSES.has(statusFilter);
+  const hasActiveNarrowing = Boolean(debouncedSearch.trim()) || statusFilter !== 'all' || Boolean(userIdFilter);
+  const pendingReviewCount = stats?.pending_review ?? stats?.pending ?? 0;
 
+  const emptyState = isReviewQueue && !debouncedSearch.trim() ? (
+    <BrokerEmptyState
+      bare
+      icon={ShieldCheck}
+      color="success"
+      title={t('insurance.empty_queue_title')}
+      hint={t('insurance.empty_queue_hint')}
+    />
+  ) : hasActiveNarrowing ? (
+    <BrokerEmptyState
+      bare
+      icon={Search}
+      color="neutral"
+      title={t('insurance.empty_title')}
+      hint={t('insurance.empty_try_filter')}
+    />
+  ) : (
+    <BrokerEmptyState
+      bare
+      icon={FileText}
+      color="neutral"
+      title={t('insurance.empty_title')}
+      hint={t('insurance.empty_add_to_start')}
+      action={
+        <Button
+          size="sm"
+          variant="primary"
+          startContent={<Plus size={14} />}
+          onPress={() => { resetCreateForm(); setCreateOpen(true); }}
+        >
+          {t('insurance.add_certificate')}
+        </Button>
+      }
+    />
+  );
+
+  return (
+    <BrokerPageShell
+      title={t('insurance.page_title')}
+      description={t('insurance.page_description')}
+      icon={ShieldCheck}
+      color="success"
+      actions={
+        <>
+          <Button
+            variant="primary"
+            startContent={<Plus size={16} />}
+            size="sm"
+            onPress={() => { resetCreateForm(); setCreateOpen(true); }}
+          >
+            {t('insurance.add_certificate')}
+          </Button>
+          <Button
+            as={Link}
+            to={tenantPath('/broker')}
+            variant="secondary"
+            startContent={<ArrowLeft size={16} />}
+            size="sm"
+          >
+            {t('insurance.back')}
+          </Button>
+        </>
+      }
+    >
       {statsError && (
-        <div className="rounded-lg border border-warning-200 bg-warning-50/50 p-3 flex items-start gap-3 mb-4">
-          <ShieldAlert size={20} className="text-warning shrink-0 mt-0.5" />
+        <div className="mb-4 flex items-start gap-3 rounded-2xl border border-warning/40 bg-warning/10 p-4">
+          <ShieldAlert size={20} className="mt-0.5 shrink-0 text-warning" aria-hidden="true" />
           <div className="flex-1 text-sm">
-            <p className="font-medium text-warning-700">{t('insurance.stats_error_title')}</p>
+            <p className="font-medium text-foreground">{t('insurance.stats_error_title')}</p>
             <p className="text-muted">{t('insurance.stats_error_body')}</p>
           </div>
-          <Button size="sm" variant="secondary" className="text-warning" onPress={loadStats}>
+          <Button size="sm" variant="tertiary" onPress={loadStats}>
             {t('insurance.retry')}
           </Button>
         </div>
       )}
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard
+      {/* KPI header — cards deep-link into the matching filtered view */}
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <BrokerStatCard
           label={t('insurance.stat_total')}
           value={stats?.total ?? 0}
           icon={FileText}
-          color="default"
+          color="neutral"
           loading={statsLoading}
         />
-        <StatCard
+        <BrokerStatCard
           label={t('insurance.stat_pending_review')}
           // pending_review = pending + submitted (pre-verification states
           // the broker still owns). Falls back to legacy `pending` for
           // backwards compat with API responses that pre-date the field.
-          value={stats?.pending_review ?? stats?.pending ?? 0}
+          value={pendingReviewCount}
           icon={Clock}
           color="warning"
           loading={statsLoading}
+          to={tenantPath('/broker/insurance?status=pending_review')}
         />
-        <StatCard
+        <BrokerStatCard
           label={t('insurance.stat_verified')}
           value={stats?.verified ?? 0}
           icon={ShieldCheck}
           color="success"
           loading={statsLoading}
+          to={tenantPath('/broker/insurance?status=verified')}
         />
-        <StatCard
+        <BrokerStatCard
           label={t('insurance.stat_expiring_soon')}
           value={stats?.expiring_soon ?? 0}
           icon={ShieldAlert}
           color="danger"
           loading={statsLoading}
+          to={tenantPath('/broker/insurance?status=expiring_soon')}
         />
       </div>
 
-      {/* Search — #6: now debounced */}
-      <div className="mb-4">
-        <Input
-          placeholder={t('insurance.search_placeholder')}
-          aria-label={t('insurance.search_aria')}
-          value={searchQuery}
-          onValueChange={setSearchQuery}
-          startContent={<Search size={16} className="text-muted" />}
-          variant="secondary"
-          size="sm"
-          className="max-w-md"
-          isClearable
-          onClear={() => setSearchQuery('')}
-        />
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="mb-4">
-        <Tabs
-          aria-label={t('insurance.tabs_aria')}
-          selectedKey={statusFilter}
-          onSelectionChange={(key) => { setStatusFilter(key as InsuranceStatus); setPage(1); }}
-          variant="underlined"
-          size="sm"
-        >
-          <Tab key="all" title={t('insurance.tab_all')} />
-          <Tab key="pending_review" title={t('insurance.tab_pending_review')} />
-          <Tab key="pending" title={t('insurance.tab_pending')} />
-          <Tab key="submitted" title={t('insurance.tab_submitted')} />
-          <Tab key="verified" title={t('insurance.tab_verified')} />
-          <Tab key="expired" title={t('insurance.tab_expired')} />
-          <Tab key="expiring_soon" title={t('insurance.tab_expiring_soon')} />
-          <Tab key="rejected" title={t('insurance.tab_rejected')} />
-        </Tabs>
-      </div>
-
-      {/* Data Table */}
-      <DataTable
-        columns={columns}
-        data={items}
-        isLoading={loading}
-        searchable={false}
-        onRefresh={loadItems}
-        totalItems={total}
-        page={page}
-        pageSize={20}
-        onPageChange={setPage}
-        emptyContent={
-          <EmptyState
-            icon={Users}
-            title={t('insurance.empty_title')}
-            description={statusFilter !== 'all' ? t('insurance.empty_try_filter') : t('insurance.empty_add_to_start')}
+      {/* Search + status tabs — deep-linkable via ?status= */}
+      <div className="mb-4 rounded-2xl border border-divider/70 bg-surface p-2 shadow-sm shadow-black/[0.03]">
+        <div className="flex flex-col gap-2">
+          <Input
+            placeholder={t('insurance.search_placeholder')}
+            aria-label={t('insurance.search_aria')}
+            value={searchQuery}
+            onValueChange={setSearchQuery}
+            startContent={<Search size={16} className="text-muted" aria-hidden="true" />}
+            variant="secondary"
+            size="sm"
+            className="max-w-md"
+            isClearable
+            onClear={() => setSearchQuery('')}
           />
-        }
-      />
+          <Tabs
+            aria-label={t('insurance.tabs_aria')}
+            selectedKey={statusFilter}
+            onSelectionChange={(key) => { setStatusFilter(key as InsuranceStatus); setPage(1); }}
+            variant="underlined"
+            size="sm"
+          >
+            <Tab key="all" title={t('insurance.tab_all')} />
+            <Tab
+              key="pending_review"
+              title={
+                <div className="flex items-center gap-2">
+                  <span>{t('insurance.tab_pending_review')}</span>
+                  {!statsLoading && pendingReviewCount > 0 && (
+                    <Chip size="sm" variant="soft" color="warning" className="tabular-nums">
+                      {pendingReviewCount}
+                    </Chip>
+                  )}
+                </div>
+              }
+            />
+            <Tab key="pending" title={t('insurance.tab_pending')} />
+            <Tab key="submitted" title={t('insurance.tab_submitted')} />
+            <Tab key="verified" title={t('insurance.tab_verified')} />
+            <Tab key="expired" title={t('insurance.tab_expired')} />
+            <Tab key="expiring_soon" title={t('insurance.tab_expiring_soon')} />
+            <Tab key="rejected" title={t('insurance.tab_rejected')} />
+          </Tabs>
+        </div>
+      </div>
+
+      {/* First load: shaped skeleton. Refreshes keep DataTable's own isLoading. */}
+      {!hasLoadedOnce && loading ? (
+        <BrokerSkeleton variant="table" />
+      ) : listError && !loading && items.length === 0 ? (
+        <BrokerEmptyState
+          icon={ShieldAlert}
+          color="danger"
+          title={t('insurance.load_failed')}
+          hint={t('insurance.load_error_hint')}
+          action={
+            <Button size="sm" variant="tertiary" onPress={loadItems}>
+              {t('insurance.retry')}
+            </Button>
+          }
+        />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={items}
+          isLoading={loading}
+          searchable={false}
+          onRefresh={loadItems}
+          totalItems={total}
+          page={page}
+          pageSize={20}
+          onPageChange={setPage}
+          emptyContent={emptyState}
+        />
+      )}
 
       {/* Create Modal — #9: User search instead of raw ID */}
       <Modal
@@ -757,13 +871,13 @@ export function InsuranceCertificates() {
       >
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Plus size={20} className="text-accent" />
+            <Plus size={20} className="text-accent" aria-hidden="true" />
             {t('insurance.modal_create_title')}
           </ModalHeader>
           <ModalBody className="gap-4">
             {/* #9: Member search autocomplete */}
             {selectedUser ? (
-              <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-surface-secondary">
+              <div className="flex items-center justify-between rounded-lg border border-border bg-surface-secondary p-3">
                 <div className="flex items-center gap-2">
                   <Avatar name={`${selectedUser.first_name} ${selectedUser.last_name}`} size="sm" />
                   <div>
@@ -792,16 +906,16 @@ export function InsuranceCertificates() {
                   onValueChange={setUserSearchQuery}
                   variant="secondary"
                   isRequired
-                  startContent={<Search size={14} className="text-muted" />}
+                  startContent={<Search size={14} className="text-muted" aria-hidden="true" />}
                   endContent={userSearchLoading ? <Spinner size="sm" /> : undefined}
                 />
                 {userSearchResults.length > 0 && (
-                  <div className="mt-1 border border-border rounded-lg overflow-hidden max-h-48 overflow-y-auto">
+                  <div className="mt-1 max-h-48 overflow-hidden overflow-y-auto rounded-lg border border-border">
                     {userSearchResults.map((u) => (
                       <Button
                         key={u.id}
                         variant="tertiary"
-                        className="w-full min-h-12 flex items-center gap-2 p-2 justify-start rounded-none"
+                        className="flex min-h-12 w-full items-center justify-start gap-2 rounded-none p-2"
                         onPress={() => {
                           setSelectedUser(u);
                           setCreateForm(prev => ({ ...prev, user_id: String(u.id) }));
@@ -811,15 +925,15 @@ export function InsuranceCertificates() {
                       >
                         <Avatar name={`${u.first_name} ${u.last_name}`} size="sm" className="shrink-0" />
                         <div className="min-w-0 text-left">
-                          <p className="text-sm font-medium truncate">{u.first_name} {u.last_name}</p>
-                          <p className="text-xs text-muted truncate">{u.email}</p>
+                          <p className="truncate text-sm font-medium">{u.first_name} {u.last_name}</p>
+                          <p className="truncate text-xs text-muted">{u.email}</p>
                         </div>
                       </Button>
                     ))}
                   </div>
                 )}
                 {userSearchQuery.trim().length >= 2 && !userSearchLoading && userSearchResults.length === 0 && (
-                  <p className="text-xs text-muted mt-1">{t('insurance.no_members_found')}</p>
+                  <p className="mt-1 text-xs text-muted">{t('insurance.no_members_found')}</p>
                 )}
               </div>
             )}
@@ -859,7 +973,7 @@ export function InsuranceCertificates() {
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, coverage_amount: val }))}
               variant="secondary"
               type="number"
-              startContent={<span className="text-muted text-sm">&euro;</span>}
+              startContent={<span className="text-sm text-muted">&euro;</span>}
             />
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -915,11 +1029,11 @@ export function InsuranceCertificates() {
         >
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
-              <Pencil size={20} className="text-accent" />
+              <Pencil size={20} className="text-accent" aria-hidden="true" />
               {t('insurance.modal_edit_title')}
             </ModalHeader>
             <ModalBody className="gap-4">
-              <div className="flex items-center gap-2 p-3 rounded-lg border border-border bg-surface-secondary">
+              <div className="flex items-center gap-2 rounded-lg border border-border bg-surface-secondary p-3">
                 <Avatar
                   src={resolveAvatarUrl(editItem.avatar_url) || undefined}
                   name={`${editItem.first_name} ${editItem.last_name}`}
@@ -965,7 +1079,7 @@ export function InsuranceCertificates() {
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, coverage_amount: val }))}
                 variant="secondary"
                 type="number"
-                startContent={<span className="text-muted text-sm">&euro;</span>}
+                startContent={<span className="text-sm text-muted">&euro;</span>}
               />
               <div className="grid grid-cols-2 gap-4">
                 <Input
@@ -1021,11 +1135,11 @@ export function InsuranceCertificates() {
         >
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
-              <X size={20} className="text-danger" />
+              <X size={20} className="text-danger" aria-hidden="true" />
               {t('insurance.modal_reject_title')}
             </ModalHeader>
             <ModalBody>
-              <p className="text-muted mb-3">
+              <p className="mb-3 text-muted">
                 {t('insurance.confirm_reject')}
               </p>
               <Textarea
@@ -1067,18 +1181,18 @@ export function InsuranceCertificates() {
         >
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
-              <FileCheck size={20} className="text-accent" />
+              <FileCheck size={20} className="text-accent" aria-hidden="true" />
               {t('insurance.modal_view_title')}
             </ModalHeader>
             <ModalBody>
-              <div className="flex items-center gap-3 mb-4">
+              <div className="mb-4 flex items-center gap-3">
                 <Avatar
                   src={resolveAvatarUrl(viewItem.avatar_url) || undefined}
                   name={`${viewItem.first_name} ${viewItem.last_name}`}
                   size="lg"
                 />
                 <div>
-                  <p className="text-lg font-semibold">{viewItem.first_name} {viewItem.last_name}</p>
+                  <p className="text-lg font-semibold tracking-tight">{viewItem.first_name} {viewItem.last_name}</p>
                   <p className="text-sm text-muted">{viewItem.email}</p>
                 </div>
               </div>
@@ -1089,9 +1203,7 @@ export function InsuranceCertificates() {
                 </div>
                 <div>
                   <p className="text-muted">{t('insurance.label_status')}</p>
-                  <Chip size="sm" variant="soft" color={STATUS_COLOR_MAP[viewItem.status] || 'default'} className="capitalize">
-                    {t(`status.${viewItem.status}`)}
-                  </Chip>
+                  <BrokerStatusChip status={viewItem.status} />
                 </div>
                 <div>
                   <p className="text-muted">{t('insurance.label_provider')}</p>
@@ -1099,20 +1211,20 @@ export function InsuranceCertificates() {
                 </div>
                 <div>
                   <p className="text-muted">{t('insurance.label_policy_number')}</p>
-                  <p className="font-medium font-mono">{viewItem.policy_number || '—'}</p>
+                  <p className="font-mono font-medium tabular-nums">{viewItem.policy_number || '—'}</p>
                 </div>
                 <div>
                   <p className="text-muted">{t('insurance.label_coverage_amount')}</p>
                   {/* #11: EUR instead of GBP */}
-                  <p className="font-medium">{viewItem.coverage_amount ? `€${Number(viewItem.coverage_amount).toLocaleString()}` : '—'}</p>
+                  <p className="font-medium tabular-nums">{viewItem.coverage_amount ? `€${Number(viewItem.coverage_amount).toLocaleString()}` : '—'}</p>
                 </div>
                 <div>
                   <p className="text-muted">{t('insurance.label_start_date')}</p>
-                  <p className="font-medium">{viewItem.start_date ? formatServerDate(viewItem.start_date) : '—'}</p>
+                  <p className="font-medium tabular-nums">{viewItem.start_date ? formatServerDate(viewItem.start_date) : '—'}</p>
                 </div>
                 <div>
                   <p className="text-muted">{t('insurance.label_expiry_date')}</p>
-                  <p className="font-medium">{viewItem.expiry_date ? formatServerDate(viewItem.expiry_date) : '—'}</p>
+                  <p className="font-medium tabular-nums">{viewItem.expiry_date ? formatServerDate(viewItem.expiry_date) : '—'}</p>
                 </div>
                 <div>
                   <p className="text-muted">{t('insurance.label_verified_by')}</p>
@@ -1124,33 +1236,33 @@ export function InsuranceCertificates() {
                 </div>
                 <div>
                   <p className="text-muted">{t('insurance.label_verified_at')}</p>
-                  <p className="font-medium">{viewItem.verified_at ? formatServerDateTime(viewItem.verified_at) : '—'}</p>
+                  <p className="font-medium tabular-nums">{viewItem.verified_at ? formatServerDateTime(viewItem.verified_at) : '—'}</p>
                 </div>
                 <div>
                   <p className="text-muted">{t('insurance.label_created')}</p>
-                  <p className="font-medium">{formatServerDateTime(viewItem.created_at)}</p>
+                  <p className="font-medium tabular-nums">{formatServerDateTime(viewItem.created_at)}</p>
                 </div>
               </div>
               {/* #1: Certificate file display/download */}
               {viewItem.certificate_file_path && (
                 <div className="mt-4">
-                  <p className="text-muted text-sm mb-1">{t('insurance.label_certificate_file')}</p>
+                  <p className="mb-1 text-sm text-muted">{t('insurance.label_certificate_file')}</p>
                   <a
                     href={resolveAssetUrl(viewItem.certificate_file_path)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-accent hover:underline bg-accent-soft dark:bg-accent-soft px-3 py-2 rounded-lg"
+                    className="inline-flex items-center gap-2 rounded-lg bg-accent-soft px-3 py-2 text-sm text-accent hover:underline dark:bg-accent-soft"
                   >
-                    <FileText size={16} />
+                    <FileText size={16} aria-hidden="true" />
                     {t('insurance.view_certificate_file')}
-                    <ExternalLink size={14} />
+                    <ExternalLink size={14} aria-hidden="true" />
                   </a>
                 </div>
               )}
               {viewItem.notes && (
                 <div className="mt-4">
-                  <p className="text-muted text-sm mb-1">{t('insurance.label_notes')}</p>
-                  <p className="text-sm bg-surface-secondary p-3 rounded-lg">{viewItem.notes}</p>
+                  <p className="mb-1 text-sm text-muted">{t('insurance.label_notes')}</p>
+                  <p className="rounded-lg bg-surface-secondary p-3 text-sm">{viewItem.notes}</p>
                 </div>
               )}
             </ModalBody>
@@ -1176,7 +1288,7 @@ export function InsuranceCertificates() {
         confirmColor="danger"
         isLoading={deleteLoading}
       />
-    </div>
+    </BrokerPageShell>
   );
 }
 

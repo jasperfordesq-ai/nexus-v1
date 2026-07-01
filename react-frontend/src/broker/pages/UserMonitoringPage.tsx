@@ -1,4 +1,3 @@
-import { Select, SelectItem, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,12 +7,34 @@ import { Select, SelectItem, Button, Spinner, Input, Textarea, Modal, ModalConte
  * User Monitoring
  * View users currently under messaging monitoring restrictions.
  * Parity: PHP BrokerControlsController::monitoring()
+ *
+ * Restyled to the broker design language: BrokerPageShell frame, KPI header
+ * derived from the loaded list (total / messaging disabled / expiring soon),
+ * avatar member cells, readable reason column, expiry countdown chips, and
+ * honest skeleton / empty / error states. The add/edit/remove modals — and
+ * the expiry-preservation logic on edit — are unchanged.
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
-import { Chip } from '@/components/ui';
+import {
+  Select,
+  SelectItem,
+  Button,
+  Spinner,
+  Input,
+  Textarea,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Avatar,
+  Switch,
+  Chip,
+} from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Eye from 'lucide-react/icons/eye';
 import MessageCircleOff from 'lucide-react/icons/message-circle-off';
@@ -22,18 +43,39 @@ import UserMinus from 'lucide-react/icons/user-minus';
 import Pencil from 'lucide-react/icons/pencil';
 import X from 'lucide-react/icons/x';
 import Search from 'lucide-react/icons/search';
-import { useTranslation } from 'react-i18next';
+import Clock from 'lucide-react/icons/clock';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import AlertCircle from 'lucide-react/icons/circle-alert';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { parseServerTimestamp, formatServerDate } from '@/lib/serverTime';
 import { adminBroker, adminUsers } from '@/admin/api/adminApi';
-import { DataTable, PageHeader, EmptyState, ConfirmModal, type Column } from '@/admin/components';
+import { DataTable, ConfirmModal, type Column } from '@/admin/components';
 import type { MonitoredUser, AdminUser } from '@/admin/api/types';
+import {
+  BrokerPageShell,
+  BrokerStatCard,
+  BrokerEmptyState,
+  BrokerSkeleton,
+} from '../components';
 
 // Duration options offered by the modal's Select (in days). Prefilling the
 // Select on edit only reflects a record whose remaining days match one of these.
 const DURATION_OPTIONS = ['7', '14', '30', '60', '90'];
+
+const DAY_MS = 86_400_000;
+const EXPIRING_SOON_DAYS = 7;
+
+// Countdown state for an expiry timestamp — one source of truth shared by the
+// KPI header and the row chips so "expiring soon" always means the same thing.
+function expiryState(expiresAt: Date): { days: number; state: 'expired' | 'soon' | 'ok' } {
+  if (expiresAt.getTime() <= Date.now()) {
+    return { days: 0, state: 'expired' };
+  }
+  const days = Math.ceil((expiresAt.getTime() - Date.now()) / DAY_MS);
+  return { days, state: days <= EXPIRING_SOON_DAYS ? 'soon' : 'ok' };
+}
 
 export function UserMonitoring() {
   const { t } = useTranslation('broker');
@@ -43,6 +85,7 @@ export function UserMonitoring() {
 
   const [items, setItems] = useState<MonitoredUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   // Add to monitoring modal state
   const [monitoringModalOpen, setMonitoringModalOpen] = useState(false);
@@ -71,20 +114,31 @@ export function UserMonitoring() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Stash the latest `t` and `toast` in refs so loadItems' identity is stable —
+  // keying the fetch effect on them would refetch on every language switch.
+  const tRef = useRef(t);
+  const toastRef = useRef(toast);
+  tRef.current = t;
+  toastRef.current = toast;
+
   const loadItems = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await adminBroker.getMonitoring();
       if (res.success && Array.isArray(res.data)) {
         setItems(res.data);
+      } else {
+        // A malformed or failed response must not masquerade as "all clear".
+        setLoadError(true);
       }
     } catch {
-      toast.error(t('monitoring.load_failed'));
+      setLoadError(true);
+      toastRef.current.error(tRef.current('monitoring.load_failed'));
     } finally {
       setLoading(false);
     }
-  }, [toast, t])
-
+  }, []);
 
   useEffect(() => {
     loadItems();
@@ -260,13 +314,24 @@ export function UserMonitoring() {
     }
   };
 
+  // ── KPI header — derived entirely from the already-loaded list ─────────────
+  const initialLoading = loading && items.length === 0;
+  const messagingDisabledCount = items.filter((i) => !!i.messaging_disabled).length;
+  const expiringSoonCount = items.filter((i) => {
+    const expiresAt = parseServerTimestamp(i.monitoring_expires_at);
+    return !!expiresAt && expiryState(expiresAt).state === 'soon';
+  }).length;
+
   const columns: Column<MonitoredUser>[] = [
     {
       key: 'user_name',
       label: t('monitoring.col_user'),
       sortable: true,
       render: (item) => (
-        <span className="font-medium text-foreground">{item.user_name}</span>
+        <div className="flex min-w-0 items-center gap-3">
+          <Avatar name={item.user_name} size="sm" className="shrink-0" />
+          <p className="min-w-0 truncate text-sm font-medium text-foreground">{item.user_name}</p>
+        </div>
       ),
     },
     {
@@ -276,19 +341,19 @@ export function UserMonitoring() {
         <div className="flex flex-wrap gap-1">
           <Chip
             size="sm"
-            variant="tertiary"
+            variant="soft"
             color={item.under_monitoring ? 'warning' : 'default'}
           >
-            <Eye size={12} />
+            <Eye size={12} aria-hidden="true" />
             <Chip.Label>{t('monitoring.status_monitored')}</Chip.Label>
           </Chip>
           {item.messaging_disabled && (
             <Chip
               size="sm"
-              variant="tertiary"
+              variant="soft"
               color="danger"
             >
-              <MessageCircleOff size={12} />
+              <MessageCircleOff size={12} aria-hidden="true" />
               <Chip.Label>{t('monitoring.status_messaging_off')}</Chip.Label>
             </Chip>
           )}
@@ -298,18 +363,24 @@ export function UserMonitoring() {
     {
       key: 'monitoring_reason',
       label: t('monitoring.col_reason'),
-      render: (item) => (
-        <span className="text-sm text-foreground/70">
-          {item.monitoring_reason || '—'}
-        </span>
-      ),
+      render: (item) =>
+        item.monitoring_reason ? (
+          <p
+            className="line-clamp-2 min-w-[12rem] max-w-md whitespace-normal break-words text-sm leading-5 text-foreground/80"
+            title={item.monitoring_reason}
+          >
+            {item.monitoring_reason}
+          </p>
+        ) : (
+          <span className="text-sm text-muted">—</span>
+        ),
     },
     {
       key: 'monitoring_started_at',
       label: t('monitoring.col_started'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-muted">
+        <span className="text-sm tabular-nums text-muted">
           {item.monitoring_started_at
             ? formatServerDate(item.monitoring_started_at)
             : '—'
@@ -326,15 +397,26 @@ export function UserMonitoring() {
         if (!expiresAt) {
           return <span className="text-sm text-muted">{t('monitoring.no_expiry')}</span>;
         }
-        const isExpired = expiresAt <= new Date();
+        const { days, state } = expiryState(expiresAt);
         return (
-          <Chip
-            size="sm"
-            variant="tertiary"
-            color={isExpired ? 'danger' : 'default'}
-          >
-            {expiresAt.toLocaleDateString()}
-          </Chip>
+          <div className="flex min-w-[7rem] flex-col items-start gap-1">
+            <Chip
+              size="sm"
+              variant="soft"
+              color={state === 'expired' ? 'danger' : state === 'soon' ? 'warning' : 'default'}
+              className="tabular-nums"
+            >
+              <Clock size={12} aria-hidden="true" />
+              <Chip.Label>
+                {state === 'expired'
+                  ? t('status.expired')
+                  : t('monitoring.expiry_days_left', { count: days })}
+              </Chip.Label>
+            </Chip>
+            <span className="text-xs tabular-nums text-muted">
+              {expiresAt.toLocaleDateString()}
+            </span>
+          </div>
         );
       },
     },
@@ -346,7 +428,7 @@ export function UserMonitoring() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
+            variant="tertiary"
             onPress={() => openEditModal(item)}
             aria-label={t('monitoring.edit_aria')}
           >
@@ -355,8 +437,7 @@ export function UserMonitoring() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger-soft"
             onPress={() => setConfirmRemoveUserId(item.user_id)}
             isLoading={removingId === item.user_id}
             aria-label={t('monitoring.remove_aria')}
@@ -369,47 +450,103 @@ export function UserMonitoring() {
   ];
 
   return (
-    <div>
-      <PageHeader
-        title={t('monitoring.page_title')}
-        description={t('monitoring.page_description')}
-        actions={
-          <div className="flex gap-2">
-            <Button
-              color="primary"
-              startContent={<UserPlus size={16} />}
-              size="sm"
-              onPress={() => setMonitoringModalOpen(true)}
-            >
-              {t('monitoring.add_button')}
+    <BrokerPageShell
+      title={t('monitoring.page_title')}
+      description={t('monitoring.page_description')}
+      icon={Eye}
+      color="warning"
+      actions={
+        <>
+          <Button
+            variant="primary"
+            startContent={<UserPlus size={16} />}
+            size="sm"
+            onPress={() => setMonitoringModalOpen(true)}
+          >
+            {t('monitoring.add_button')}
+          </Button>
+          <Button
+            as={Link}
+            to={tenantPath('/broker')}
+            variant="tertiary"
+            startContent={<ArrowLeft size={16} />}
+            size="sm"
+          >
+            {t('monitoring.back_button')}
+          </Button>
+        </>
+      }
+    >
+      {loadError && items.length === 0 ? (
+        // Honest failure state — a load error must never render as an
+        // "all clear" queue.
+        <BrokerEmptyState
+          icon={AlertCircle}
+          color="danger"
+          title={t('monitoring.load_error_title')}
+          hint={t('monitoring.load_error_hint')}
+          action={
+            <Button size="sm" variant="danger-soft" onPress={loadItems}>
+              {t('monitoring.retry_button')}
             </Button>
-            <Button
-              as={Link}
-              to={tenantPath('/broker')}
-              variant="flat"
-              startContent={<ArrowLeft size={16} />}
-              size="sm"
-            >
-              {t('monitoring.back_button')}
-            </Button>
-          </div>
-        }
-      />
-
-      {!loading && items.length === 0 ? (
-        <EmptyState
-          icon={Eye}
-          title={t('monitoring.empty_title')}
-          description={t('monitoring.empty_description')}
+          }
         />
       ) : (
-        <DataTable
-          columns={columns}
-          data={items}
-          isLoading={loading}
-          searchable={false}
-          onRefresh={loadItems}
-        />
+        <>
+          {/* KPI header — who is monitored, how tightly, and what lapses next */}
+          <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <BrokerStatCard
+              label={t('monitoring.stat_total')}
+              value={items.length}
+              icon={Eye}
+              color="warning"
+              loading={initialLoading}
+            />
+            <BrokerStatCard
+              label={t('monitoring.status_messaging_off')}
+              value={messagingDisabledCount}
+              icon={MessageCircleOff}
+              color="danger"
+              loading={initialLoading}
+            />
+            <BrokerStatCard
+              label={t('monitoring.stat_expiring_soon')}
+              value={expiringSoonCount}
+              icon={Clock}
+              color="warning"
+              loading={initialLoading}
+            />
+          </div>
+
+          {initialLoading ? (
+            <BrokerSkeleton variant="table" count={4} />
+          ) : items.length === 0 ? (
+            <BrokerEmptyState
+              icon={ShieldCheck}
+              color="success"
+              title={t('monitoring.empty_all_clear_title')}
+              hint={t('monitoring.empty_all_clear_hint')}
+              action={
+                <Button
+                  size="sm"
+                  variant="primary"
+                  startContent={<UserPlus size={14} />}
+                  onPress={() => setMonitoringModalOpen(true)}
+                >
+                  {t('monitoring.add_button')}
+                </Button>
+              }
+            />
+          ) : (
+            <DataTable
+              columns={columns}
+              data={items}
+              isLoading={loading}
+              searchable={false}
+              onRefresh={loadItems}
+            />
+          )}
+        </>
       )}
 
       {/* Add to Monitoring Modal */}
@@ -595,7 +732,7 @@ export function UserMonitoring() {
         cancelLabel={t('common.cancel')}
         isLoading={removingId !== null}
       />
-    </div>
+    </BrokerPageShell>
   );
 }
 

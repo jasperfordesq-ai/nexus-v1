@@ -4,7 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { render, screen, fireEvent } from '@/test/test-utils';
+import userEvent from '@testing-library/user-event';
 import { createMockContexts } from '@/test/mock-contexts';
 
 // ── Mocks ───────────────────────────────────────────────────────────────────
@@ -125,9 +126,12 @@ describe('BrokerControlsHelp (presentational component)', () => {
   });
 });
 
-describe('BrokerHelpPage (standalone route wrapper)', () => {
+describe('BrokerHelpPage (standalone searchable help center)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Tests share the real BrowserRouter history — reset the deep-linkable
+    // ?q= param so one test's search can't leak into the next.
+    window.history.replaceState({}, '', '/');
   });
 
   it('renders without crashing', () => {
@@ -135,14 +139,81 @@ describe('BrokerHelpPage (standalone route wrapper)', () => {
     expect(document.body).toBeInTheDocument();
   });
 
-  it('renders the BrokerControlsHelp content (section tag)', () => {
+  it('renders the broker shell header with the help title and description', () => {
     render(<BrokerHelpPage />);
-    expect(document.querySelector('section')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Guidance & reference' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/How the brokering and safeguarding system works/)
+    ).toBeInTheDocument();
   });
 
-  it('renders accordion items inside the wrapper (smoke test)', () => {
+  it('renders all help section accordion triggers (smoke test)', () => {
     render(<BrokerHelpPage />);
     const buttons = screen.getAllByRole('button');
     expect(buttons.length).toBeGreaterThanOrEqual(10);
+    expect(
+      buttons.find((b) => b.textContent?.includes('What this module manages'))
+    ).toBeTruthy();
+  });
+
+  it('renders the search input with placeholder and topic count', () => {
+    render(<BrokerHelpPage />);
+    const input = screen.getByLabelText('Search help topics');
+    expect(input).toBeInTheDocument();
+    expect(input).toHaveAttribute('placeholder', 'Search help topics...');
+    expect(screen.getByText('Showing 10 of 10 topics')).toBeInTheDocument();
+  });
+
+  it('filters sections client-side by body copy, case-insensitively', () => {
+    render(<BrokerHelpPage />);
+    // "Tusla" only appears in the alerts section's escalation guidance.
+    fireEvent.change(screen.getByLabelText('Search help topics'), {
+      target: { value: 'tusla' },
+    });
+
+    expect(screen.getByText('Showing 1 of 10 topics')).toBeInTheDocument();
+    expect(
+      screen
+        .getAllByRole('button')
+        .find((b) => b.textContent?.includes('Safeguarding alerts & escalation'))
+    ).toBeTruthy();
+    expect(screen.queryByText('What this module manages')).not.toBeInTheDocument();
+  });
+
+  it('syncs the search query to the URL (?q=) for deep-linking', () => {
+    render(<BrokerHelpPage />);
+    fireEvent.change(screen.getByLabelText('Search help topics'), {
+      target: { value: 'Tusla' },
+    });
+    expect(window.location.search).toContain('q=Tusla');
+  });
+
+  it('honours a deep-linked ?q= filter on first render', () => {
+    window.history.replaceState({}, '', '/?q=tusla');
+    render(<BrokerHelpPage />);
+    expect(screen.getByText('Showing 1 of 10 topics')).toBeInTheDocument();
+    expect(screen.getByLabelText('Search help topics')).toHaveValue('tusla');
+  });
+
+  it('shows an empty state with a working clear action when nothing matches', async () => {
+    const user = userEvent.setup();
+    render(<BrokerHelpPage />);
+
+    fireEvent.change(screen.getByLabelText('Search help topics'), {
+      target: { value: 'zzz-definitely-not-a-help-topic' },
+    });
+
+    expect(screen.getByText('No topics match your search')).toBeInTheDocument();
+    expect(
+      screen.getByText('Try a different keyword, or clear the search to browse every topic.')
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Clear search' }));
+
+    expect(screen.getByText('Showing 10 of 10 topics')).toBeInTheDocument();
+    expect(screen.queryByText('No topics match your search')).not.toBeInTheDocument();
+    expect(window.location.search).toBe('');
   });
 });

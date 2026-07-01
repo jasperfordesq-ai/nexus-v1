@@ -7,7 +7,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
-import userEvent from '@testing-library/user-event';
 
 // ─── Hoisted mocks ────────────────────────────────────────────────────────────
 const { mockAdminBroker } = vi.hoisted(() => ({
@@ -31,11 +30,6 @@ vi.mock('@/lib/serverTime', () => ({
   formatServerDateTime: (s: string) => s ?? '',
   formatServerDate: (s: string) => s ?? '',
   parseServerTimestamp: (s: string) => (s ? new Date(s) : null),
-}));
-
-// Stub PageHeader from admin components
-vi.mock('@/admin/components', () => ({
-  PageHeader: ({ title }: { title: string }) => <div data-testid="page-header">{title}</div>,
 }));
 
 const mockNavigate = vi.fn();
@@ -111,7 +105,7 @@ describe('MessageDetail (broker)', () => {
     mockAdminBroker.showMessage.mockResolvedValue(makeSuccess(makeDetail()));
   });
 
-  it('shows a loading spinner initially', async () => {
+  it('shows a shaped skeleton loading state initially', async () => {
     mockAdminBroker.showMessage.mockImplementation(() => new Promise(() => {}));
     const { MessageDetail } = await import('./MessageDetailPage');
     render(<MessageDetail />);
@@ -121,15 +115,35 @@ describe('MessageDetail (broker)', () => {
     expect(busy).toBeDefined();
   });
 
-  it('shows error state when API returns failure', async () => {
+  it('shows an honest error state with a retry button when the API fails', async () => {
     mockAdminBroker.showMessage.mockResolvedValue(makeError());
     const { MessageDetail } = await import('./MessageDetailPage');
     render(<MessageDetail />);
 
     await waitFor(() => {
-      // Component renders "Message not found." when API returns { success: false }
-      expect(document.body.textContent).toMatch(/not found|detail_not_found/i);
+      expect(screen.getByText('Message not found.')).toBeInTheDocument();
     });
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
+  });
+
+  it('reloads the detail when Retry is pressed after a failure', async () => {
+    mockAdminBroker.showMessage
+      .mockResolvedValueOnce(makeError())
+      .mockResolvedValueOnce(makeSuccess(makeDetail()));
+
+    const { MessageDetail } = await import('./MessageDetailPage');
+    render(<MessageDetail />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Message not found.')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Bob Receiver')).toBeInTheDocument();
+    });
+    expect(mockAdminBroker.showMessage).toHaveBeenCalledTimes(2);
   });
 
   it('renders metadata card with sender and receiver', async () => {
@@ -151,6 +165,40 @@ describe('MessageDetail (broker)', () => {
     await waitFor(() => {
       expect(screen.getByText('Hello there')).toBeInTheDocument();
     });
+  });
+
+  it('marks the copied message in the thread with a Copied badge', async () => {
+    const { MessageDetail } = await import('./MessageDetailPage');
+    render(<MessageDetail />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Copied')).toBeInTheDocument();
+    });
+  });
+
+  it('renders a color-coded severity banner when the copy is flagged', async () => {
+    mockAdminBroker.showMessage.mockResolvedValue(
+      makeSuccess(
+        makeDetail({
+          copy: makeCopy({
+            flagged: true,
+            flag_reason: 'Suspicious contact details',
+            flag_severity: 'urgent',
+          }),
+        })
+      )
+    );
+
+    const { MessageDetail } = await import('./MessageDetailPage');
+    render(<MessageDetail />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Flagged for review')).toBeInTheDocument();
+      expect(screen.getByText('Suspicious contact details')).toBeInTheDocument();
+      expect(screen.getByText('Urgent')).toBeInTheDocument();
+    });
+    // Already-flagged copies must not offer the Flag action again
+    expect(screen.queryByRole('button', { name: 'Flag' })).toBeNull();
   });
 
   it('shows Mark Reviewed button when message is unreviewed', async () => {
@@ -262,6 +310,32 @@ describe('MessageDetail (broker)', () => {
     await waitFor(() => {
       expect(screen.getByText('Admin User')).toBeInTheDocument();
     });
+    expect(screen.getByText('Approved')).toBeInTheDocument();
+    expect(screen.getByText('Looks fine')).toBeInTheDocument();
+  });
+
+  it('hides decision actions and shows the read-only notice when archived', async () => {
+    mockAdminBroker.showMessage.mockResolvedValue(
+      makeSuccess(makeDetail({
+        archive: {
+          decision: 'flagged',
+          decided_by_name: 'Admin User',
+          decided_at: '2025-01-02T10:00:00Z',
+          decision_notes: null,
+        },
+      }))
+    );
+
+    const { MessageDetail } = await import('./MessageDetailPage');
+    render(<MessageDetail />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('This record is archived. No further actions are available.')
+      ).toBeInTheDocument();
+    });
+    expect(screen.queryByRole('button', { name: 'Approve & Archive' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Flag' })).toBeNull();
   });
 
   it('calls approveMessage and navigates away on success', async () => {

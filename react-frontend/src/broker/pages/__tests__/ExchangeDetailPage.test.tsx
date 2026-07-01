@@ -33,13 +33,17 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, options?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
-        'common:loading': 'Loading',
+        'common.loading': 'Loading...',
         'exchanges.detail_title': 'Exchange Details',
-        'exchanges.detail_header_title': 'Exchange Details',
+        'exchanges.detail_title_with_id': `Exchange #${String(options?.id ?? '')}`,
         'exchanges.detail_default_description': 'Review exchange details',
         'exchanges.back': 'Back',
+        'exchanges.detail_back_to_exchanges': 'Back to Exchanges',
+        'exchanges.detail_pipeline_title': 'Exchange progress',
         'exchanges.detail_status_label': 'Status',
         'exchanges.detail_created_label': 'Created',
+        'exchanges.detail_hours_label': 'Hours',
+        'exchanges.detail_approved_label': 'Broker approved',
         'exchanges.detail_requester': 'Requester',
         'exchanges.detail_provider': 'Provider',
         'exchanges.detail_history': 'History',
@@ -47,6 +51,12 @@ vi.mock('react-i18next', () => ({
         'exchanges.detail_no_history': 'No history available.',
         'exchanges.detail_history_actions.request_created': 'Request created',
         'exchanges.detail_history_actions.status_changed': 'Status changed',
+        'status.pending': 'Pending',
+        'status.pending_broker': 'Pending Broker Approval',
+        'status.accepted': 'Accepted',
+        'status.completed': 'Completed',
+        'status.cancelled': 'Cancelled',
+        'status.disputed': 'Disputed',
         'status.in_progress': 'In progress',
       };
 
@@ -58,43 +68,42 @@ vi.mock('react-i18next', () => ({
 
 import ExchangeDetailPage from '../ExchangeDetailPage';
 
+const DETAIL = {
+  exchange: {
+    id: 14,
+    status: 'in_progress',
+    requester_name: 'Kate Liddell',
+    provider_name: 'Nikita Serkevich',
+    listing_title: 'Data Protection and Information Security',
+    created_at: '2026-03-13T21:24:39Z',
+  },
+  history: [
+    {
+      id: 1,
+      exchange_id: 14,
+      action: 'request_created',
+      actor_name: 'hOUR Timebank',
+      created_at: '2026-03-13T21:24:39Z',
+    },
+    {
+      id: 2,
+      exchange_id: 14,
+      action: 'status_changed',
+      actor_name: 'Nikita',
+      notes: 'Provider accepted request',
+      created_at: '2026-03-14T07:58:55Z',
+    },
+  ],
+  risk_tag: null,
+};
+
 describe('ExchangeDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('renders translated history action labels', async () => {
-    mockShowExchange.mockResolvedValue({
-      success: true,
-      data: {
-        exchange: {
-          id: 14,
-          status: 'in_progress',
-          requester_name: 'Kate Liddell',
-          provider_name: 'Nikita Serkevich',
-          listing_title: 'Data Protection and Information Security',
-          created_at: '2026-03-13T21:24:39Z',
-        },
-        history: [
-          {
-            id: 1,
-            exchange_id: 14,
-            action: 'request_created',
-            actor_name: 'hOUR Timebank',
-            created_at: '2026-03-13T21:24:39Z',
-          },
-          {
-            id: 2,
-            exchange_id: 14,
-            action: 'status_changed',
-            actor_name: 'Nikita',
-            notes: 'Provider accepted request',
-            created_at: '2026-03-14T07:58:55Z',
-          },
-        ],
-        risk_tag: null,
-      },
-    });
+    mockShowExchange.mockResolvedValue({ success: true, data: DETAIL });
 
     render(<ExchangeDetailPage />);
 
@@ -104,5 +113,19 @@ describe('ExchangeDetailPage', () => {
     expect(screen.queryByText('request_created')).not.toBeInTheDocument();
     expect(screen.queryByText('status_changed')).not.toBeInTheDocument();
     expect(screen.getByText('Provider accepted request')).toBeInTheDocument();
+  });
+
+  it('renders the pipeline without a highlighted stage for statuses outside the linear lifecycle', async () => {
+    mockShowExchange.mockResolvedValue({ success: true, data: DETAIL });
+
+    render(<ExchangeDetailPage />);
+
+    await waitFor(() => expect(screen.getByText('Kate Liddell')).toBeInTheDocument());
+
+    // in_progress is not one of the linear pipeline stages nor a terminal
+    // state — no step is marked current, but the status chip still names it.
+    expect(document.querySelector('[aria-current="step"]')).toBeNull();
+    expect(screen.getByText('In progress')).toBeInTheDocument();
+    expect(screen.getByText('Nikita Serkevich')).toBeInTheDocument();
   });
 });

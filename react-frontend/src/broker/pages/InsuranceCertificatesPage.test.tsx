@@ -5,7 +5,8 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { render, screen, waitFor, within } from '@/test/test-utils';
+import userEvent from '@testing-library/user-event';
 import { createMockContexts } from '@/test/mock-contexts';
 
 // ─── Hoisted mocks ───────────────────────────────────────────────────────────
@@ -41,13 +42,15 @@ vi.mock('@/lib/helpers', async (importOriginal) => {
   };
 });
 vi.mock('@/lib/serverTime', () => ({
-  parseServerTimestamp: vi.fn((d: string) => new Date(d)),
+  parseServerTimestamp: vi.fn((d: string | null) => (d ? new Date(d) : null)),
   formatServerDate: vi.fn((d: string) => d),
   formatServerDateTime: vi.fn((d: string) => d),
 }));
 
 // ─── Router with useSearchParams stub ────────────────────────────────────────
+// Holder object so individual tests can deep-link (?status=…) before render.
 const mockSetSearchParams = vi.fn();
+const searchParamsHolder = vi.hoisted(() => ({ current: new URLSearchParams() }));
 
 vi.mock('react-router-dom', async (importOriginal) => {
   const orig = await importOriginal<typeof import('react-router-dom')>();
@@ -55,7 +58,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
     ...orig,
     useNavigate: () => vi.fn(),
     useParams: () => ({}),
-    useSearchParams: () => [new URLSearchParams(), mockSetSearchParams],
+    useSearchParams: () => [searchParamsHolder.current, mockSetSearchParams],
   };
 });
 
@@ -77,11 +80,35 @@ vi.mock('@/contexts', () =>
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 // ─── Admin component stubs ───────────────────────────────────────────────────
+// DataTable stub renders each column's cell so status / expiry-countdown chips
+// are assertable, plus the row-count marker the older tests relied on and the
+// emptyContent slot when there are no rows.
+type StubColumn = { key: string; render?: (item: never) => React.ReactNode };
+
 const makeAdminComponentMocks = () => ({
-  DataTable: ({ data, isLoading }: { data?: unknown[]; isLoading?: boolean }) => (
+  DataTable: ({
+    data,
+    columns,
+    isLoading,
+    emptyContent,
+  }: {
+    data?: Record<string, unknown>[];
+    columns?: StubColumn[];
+    isLoading?: boolean;
+    emptyContent?: React.ReactNode;
+  }) => (
     <div data-testid="data-table" aria-busy={isLoading ? 'true' : undefined}>
       {isLoading ? <div role="status" aria-busy="true" /> : null}
-      {Array.isArray(data) && data.length === 0 ? '0 rows' : `${(data ?? []).length} rows`}
+      <span>{`${(data ?? []).length} rows`}</span>
+      {Array.isArray(data) && data.length === 0
+        ? emptyContent
+        : (data ?? []).map((item, i) => (
+            <div key={i} data-testid="data-row">
+              {(columns ?? []).map((col) => (
+                <span key={col.key}>{col.render ? col.render(item as never) : String(item[col.key] ?? '')}</span>
+              ))}
+            </div>
+          ))}
     </div>
   ),
   StatCard: ({ label, value }: { label: string; value?: unknown }) => (
@@ -103,8 +130,11 @@ vi.mock('../../admin/components', () => makeAdminComponentMocks());
 vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
+const daysFromNow = (days: number) => new Date(Date.now() + days * 86400000).toISOString();
+
 const makeStats = () => ({
   total: 45,
+  pending: 5,
   pending_review: 8,
   verified: 30,
   rejected: 3,
@@ -114,14 +144,27 @@ const makeStats = () => ({
 
 const makeCertificate = (overrides = {}) => ({
   id: 1,
-  status: 'pending_review',
+  user_id: 10,
+  first_name: 'Carol',
+  last_name: 'Cert',
+  email: 'carol@example.com',
+  avatar_url: null,
+  insurance_type: 'public_liability',
+  status: 'pending',
+  provider_name: 'Test Insurance Ltd',
   policy_number: 'POL-001',
-  insurer: 'Test Insurance Ltd',
-  effective_date: '2025-01-01',
-  expiry_date: '2026-01-01',
   coverage_amount: 1000000,
+  start_date: '2025-01-01',
+  // Far enough out that no urgency chip renders by default.
+  expiry_date: daysFromNow(300),
+  certificate_file_path: null,
+  verified_by: null,
+  verifier_first_name: null,
+  verifier_last_name: null,
+  verified_at: null,
+  notes: null,
   created_at: '2025-01-01T00:00:00Z',
-  user: { id: 10, name: 'Carol Cert', email: 'carol@example.com', avatar_url: null },
+  updated_at: null,
   ...overrides,
 });
 
@@ -135,6 +178,7 @@ const makeConfig = () => ({
 describe('InsuranceCertificatesPage', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    searchParamsHolder.current = new URLSearchParams();
     mockAdminInsurance.list.mockResolvedValue({
       success: true,
       data: [makeCertificate()],
@@ -149,27 +193,43 @@ describe('InsuranceCertificatesPage', () => {
     mockAdminBroker.getConfiguration.mockResolvedValue({ success: true, data: makeConfig() });
   });
 
-  it('shows loading state while fetching', async () => {
+  it('shows a shaped skeleton (not the table) while first fetching', async () => {
     mockAdminInsurance.list.mockImplementationOnce(() => new Promise(() => {}));
     mockAdminInsurance.stats.mockImplementationOnce(() => new Promise(() => {}));
     const { InsuranceCertificates } = await import('./InsuranceCertificatesPage');
     render(<InsuranceCertificates />);
 
-    // Component uses DataTable with isLoading prop or StatCard with loading prop;
-    // our DataTable stub renders aria-busy="true" when loading
-    const table = screen.getByTestId('data-table');
-    expect(table).toBeInTheDocument();
-    // The table should be in a loading / no-data state initially
-    const bodyText = document.body.textContent ?? '';
-    expect(bodyText).toBeTruthy();
+    // First load renders BrokerSkeleton instead of the DataTable; the stat
+    // cards also expose loading skeletons. Both use role="status".
+    expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('status').length).toBeGreaterThan(0);
   });
 
-  it('renders stat cards after load', async () => {
+  it('renders KPI stat cards with real values after load', async () => {
     const { InsuranceCertificates } = await import('./InsuranceCertificatesPage');
     render(<InsuranceCertificates />);
 
     await waitFor(() => {
-      expect(screen.getAllByTestId('stat-card').length).toBeGreaterThan(0);
+      expect(screen.getByText('Total')).toBeInTheDocument();
+      // 45 = total from the stats fixture (count-up is instant in test mode)
+      expect(screen.getByText('45')).toBeInTheDocument();
+      // Appears on the stat card and the tab
+      expect(screen.getAllByText('Pending Review').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Expiring Soon').length).toBeGreaterThan(0);
+    });
+  });
+
+  it('deep-links KPI cards into the matching filtered view', async () => {
+    const { InsuranceCertificates } = await import('./InsuranceCertificatesPage');
+    render(<InsuranceCertificates />);
+
+    await waitFor(() => {
+      const pendingCard = screen.getByRole('link', { name: 'Pending Review' });
+      expect(pendingCard.getAttribute('href')).toContain('status=pending_review');
+      const expiringCard = screen.getByRole('link', { name: 'Expiring Soon' });
+      expect(expiringCard.getAttribute('href')).toContain('status=expiring_soon');
+      const verifiedCard = screen.getByRole('link', { name: 'Verified' });
+      expect(verifiedCard.getAttribute('href')).toContain('status=verified');
     });
   });
 
@@ -180,8 +240,55 @@ describe('InsuranceCertificatesPage', () => {
     await waitFor(() => {
       const table = screen.getByTestId('data-table');
       expect(table).toBeInTheDocument();
-      // "1 rows" because we returned 1 certificate
-      expect(table.textContent).toContain('1');
+      expect(table.textContent).toContain('1 rows');
+      expect(within(table).getByText('Carol Cert')).toBeInTheDocument();
+      expect(within(table).getByText('POL-001')).toBeInTheDocument();
+    });
+  });
+
+  it('renders the panel-wide status chip and translated insurance type in rows', async () => {
+    const { InsuranceCertificates } = await import('./InsuranceCertificatesPage');
+    render(<InsuranceCertificates />);
+
+    await waitFor(() => {
+      const table = screen.getByTestId('data-table');
+      // BrokerStatusChip label for status 'pending'
+      expect(within(table).getByText('Pending')).toBeInTheDocument();
+      // Insurance type chip
+      expect(within(table).getByText('Public Liability')).toBeInTheDocument();
+      // Far-future expiry: no urgency chip
+      expect(within(table).queryByText(/d left/)).not.toBeInTheDocument();
+      expect(within(table).queryByText(/Expired/)).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows a danger countdown chip on expired certificates', async () => {
+    mockAdminInsurance.list.mockResolvedValue({
+      success: true,
+      data: [makeCertificate({ status: 'expired', expiry_date: daysFromNow(-4.5) })],
+      meta: { total: 1 },
+    });
+    const { InsuranceCertificates } = await import('./InsuranceCertificatesPage');
+    render(<InsuranceCertificates />);
+
+    await waitFor(() => {
+      const table = screen.getByTestId('data-table');
+      expect(within(table).getByText(/Expired \d+d ago/)).toBeInTheDocument();
+    });
+  });
+
+  it('shows a warning countdown chip on certificates expiring soon', async () => {
+    mockAdminInsurance.list.mockResolvedValue({
+      success: true,
+      data: [makeCertificate({ status: 'verified', expiry_date: daysFromNow(9.5) })],
+      meta: { total: 1 },
+    });
+    const { InsuranceCertificates } = await import('./InsuranceCertificatesPage');
+    render(<InsuranceCertificates />);
+
+    await waitFor(() => {
+      const table = screen.getByTestId('data-table');
+      expect(within(table).getByText(/\d+d left/)).toBeInTheDocument();
     });
   });
 
@@ -209,13 +316,25 @@ describe('InsuranceCertificatesPage', () => {
     render(<InsuranceCertificates />);
 
     await waitFor(() => {
-      const text = document.body.textContent?.toLowerCase() || '';
-      const hasWarning =
-        text.includes('error') ||
-        text.includes('fail') ||
-        text.includes('unavailable') ||
-        mockToast.error.mock.calls.length > 0;
-      expect(hasWarning).toBe(true);
+      expect(screen.getByText("Insurance stats couldn't be loaded")).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
+    });
+  });
+
+  it('shows an honest error state with a retry button when the list fails', async () => {
+    mockAdminInsurance.list.mockRejectedValueOnce(new Error('boom'));
+    const user = userEvent.setup();
+    const { InsuranceCertificates } = await import('./InsuranceCertificatesPage');
+    render(<InsuranceCertificates />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Failed to load insurance certificates.')).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    await waitFor(() => {
+      expect(mockAdminInsurance.list).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -262,7 +381,7 @@ describe('InsuranceCertificatesPage', () => {
     });
   });
 
-  it('shows empty rows in data table when no certificates match filter', async () => {
+  it('shows the neutral empty state with an add CTA when there are no certificates at all', async () => {
     mockAdminInsurance.list.mockResolvedValue({
       success: true,
       data: [],
@@ -273,8 +392,29 @@ describe('InsuranceCertificatesPage', () => {
 
     await waitFor(() => {
       const table = screen.getByTestId('data-table');
-      // Stub renders "0 rows" for empty arrays
       expect(table.textContent).toMatch(/0\s*rows/);
+      expect(within(table).getByText('No insurance certificates')).toBeInTheDocument();
+      expect(within(table).getByText('Add a certificate to get started.')).toBeInTheDocument();
+    });
+  });
+
+  it('shows the all-caught-up empty state on an empty review queue', async () => {
+    searchParamsHolder.current = new URLSearchParams('status=pending_review');
+    mockAdminInsurance.list.mockResolvedValue({
+      success: true,
+      data: [],
+      meta: { total: 0, per_page: 25, current_page: 1, last_page: 1 },
+    });
+    const { InsuranceCertificates } = await import('./InsuranceCertificatesPage');
+    render(<InsuranceCertificates />);
+
+    await waitFor(() => {
+      expect(mockAdminInsurance.list).toHaveBeenCalledWith(
+        expect.objectContaining({ status: 'pending_review' })
+      );
+      const table = screen.getByTestId('data-table');
+      expect(within(table).getByText('All caught up')).toBeInTheDocument();
+      expect(within(table).getByText('No certificates are waiting for review.')).toBeInTheDocument();
     });
   });
 });

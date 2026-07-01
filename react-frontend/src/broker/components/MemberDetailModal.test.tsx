@@ -21,6 +21,10 @@ const { api } = vi.hoisted(() => ({
     adjustBalance: vi.fn(),
     getUserRecords: vi.fn(),
     getUserCertificates: vi.fn(),
+    getNotes: vi.fn(),
+    createNote: vi.fn(),
+    updateNote: vi.fn(),
+    deleteNote: vi.fn(),
   },
 }));
 
@@ -39,6 +43,12 @@ vi.mock('@/admin/api/adminApi', () => ({
   adminTimebanking: { adjustBalance: api.adjustBalance },
   adminVetting: { getUserRecords: api.getUserRecords },
   adminInsurance: { getUserCertificates: api.getUserCertificates },
+  adminCrm: {
+    getNotes: api.getNotes,
+    createNote: api.createNote,
+    updateNote: api.updateNote,
+    deleteNote: api.deleteNote,
+  },
 }));
 
 const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() };
@@ -79,6 +89,12 @@ const activeMember = {
   last_name: 'Member',
 };
 
+/** The modal is organised into tabs — switch to one by its accessible name. */
+async function openTab(name: string | RegExp) {
+  const tab = await screen.findByRole('tab', { name });
+  fireEvent.click(tab);
+}
+
 describe('MemberDetailModal', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -86,8 +102,10 @@ describe('MemberDetailModal', () => {
     api.getUserRecords.mockResolvedValue({ success: true, data: [] });
     api.getUserCertificates.mockResolvedValue({ success: true, data: [] });
     api.getConsents.mockResolvedValue({ success: true, data: [] });
+    api.getNotes.mockResolvedValue({ success: true, data: [] });
     api.adjustBalance.mockResolvedValue({ success: true });
     api.sendVerificationEmail.mockResolvedValue({ success: true });
+    api.createNote.mockResolvedValue({ success: true });
   });
 
   it('does not fetch when userId is null (modal closed)', () => {
@@ -95,33 +113,116 @@ describe('MemberDetailModal', () => {
     expect(api.get).not.toHaveBeenCalled();
   });
 
-  it('loads the member and shows the operational action set', async () => {
+  it('shows the membership timeline on the default overview tab', async () => {
     render(<MemberDetailModal userId={5} onClose={vi.fn()} onChanged={vi.fn()} />);
 
     await waitFor(() => expect(api.get).toHaveBeenCalledWith(5));
     await waitFor(() => expect(screen.getByText('Dana Member')).toBeInTheDocument());
 
+    // Timeline steps derived from fields the modal already loads.
+    expect(screen.getByText('member_detail.timeline_registered')).toBeInTheDocument();
+    expect(screen.getByText('member_detail.timeline_email_verified')).toBeInTheDocument();
+    expect(screen.getByText('member_detail.timeline_approved')).toBeInTheDocument();
+    // Overview facts
+    expect(screen.getByText('member_detail.label_balance')).toBeInTheDocument();
+    expect(screen.getByText('member_detail.label_onboarding')).toBeInTheDocument();
+  });
+
+  it('loads the member and shows the operational action set on the actions tab', async () => {
+    render(<MemberDetailModal userId={5} onClose={vi.fn()} onChanged={vi.fn()} />);
+
+    await waitFor(() => expect(api.get).toHaveBeenCalledWith(5));
+    await waitFor(() => expect(screen.getByText('Dana Member')).toBeInTheDocument());
+
+    await openTab('member_detail.section_actions');
+
     // Sensitive/operational actions the broker should have.
-    expect(screen.getByText('member_detail.action_resend_verification')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('member_detail.action_resend_verification')).toBeInTheDocument();
+    });
     expect(screen.getByText('member_detail.action_send_password_reset')).toBeInTheDocument();
     expect(screen.getByText('member_detail.action_reset_2fa')).toBeInTheDocument();
     expect(screen.getByText('member_detail.action_adjust_balance')).toBeInTheDocument();
     // Active member → Suspend offered, not Approve/Reactivate.
     expect(screen.getByText('members.suspend')).toBeInTheDocument();
+    // Safe profile edit lives here too.
+    expect(screen.getByText('member_detail.edit_toggle')).toBeInTheDocument();
   });
 
   it('never exposes privileged actions (ban / delete / role change)', async () => {
     render(<MemberDetailModal userId={5} onClose={vi.fn()} onChanged={vi.fn()} />);
     await waitFor(() => expect(screen.getByText('Dana Member')).toBeInTheDocument());
 
+    await openTab('member_detail.section_actions');
+    await waitFor(() => {
+      expect(screen.getByText('member_detail.action_resend_verification')).toBeInTheDocument();
+    });
+
     expect(screen.queryByText(/\bban\b/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/\bdelete\b/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/impersonate/i)).not.toBeInTheDocument();
   });
 
+  it('shows compliance records on the compliance tab', async () => {
+    api.getUserRecords.mockResolvedValue({
+      success: true,
+      data: [{ id: 1, vetting_type: 'garda', status: 'verified', expiry_date: null }],
+    });
+
+    render(<MemberDetailModal userId={5} onClose={vi.fn()} onChanged={vi.fn()} />);
+    await waitFor(() => expect(screen.getByText('Dana Member')).toBeInTheDocument());
+
+    await openTab('member_detail.tab_compliance');
+
+    await waitFor(() => {
+      expect(screen.getByText('member_detail.vetting_title')).toBeInTheDocument();
+    });
+    // Record label falls back to the raw vetting type; status renders through
+    // the shared BrokerStatusChip (prettified fallback label).
+    expect(screen.getByText('garda')).toBeInTheDocument();
+    expect(screen.getByText('Verified')).toBeInTheDocument();
+    expect(screen.getByText('member_detail.consents_title')).toBeInTheDocument();
+  });
+
+  it('lists notes and adds a new one from the notes tab', async () => {
+    api.getNotes.mockResolvedValue({
+      success: true,
+      data: [{ id: 9, content: 'Existing broker note', category: 'general', is_pinned: false, created_at: '2025-05-01T09:00:00Z', author_name: 'Broker One' }],
+    });
+
+    render(<MemberDetailModal userId={5} onClose={vi.fn()} onChanged={vi.fn()} />);
+    await waitFor(() => expect(screen.getByText('Dana Member')).toBeInTheDocument());
+    await waitFor(() => expect(api.getNotes).toHaveBeenCalledWith({ user_id: 5, limit: 20 }));
+
+    await openTab(/members\.notes/);
+
+    await waitFor(() => {
+      expect(screen.getByText('Existing broker note')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Broker One')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText('members.note_placeholder'), {
+      target: { value: 'A fresh note' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'members.send_note' }));
+
+    await waitFor(() => {
+      expect(api.createNote).toHaveBeenCalledWith({
+        user_id: 5,
+        content: 'A fresh note',
+        category: 'general',
+      });
+    });
+  });
+
   it('adjusts the balance through the sub-modal', async () => {
     render(<MemberDetailModal userId={5} onClose={vi.fn()} onChanged={vi.fn()} />);
     await waitFor(() => expect(screen.getByText('Dana Member')).toBeInTheDocument());
+
+    await openTab('member_detail.section_actions');
+    await waitFor(() => {
+      expect(screen.getByText('member_detail.action_adjust_balance')).toBeInTheDocument();
+    });
 
     fireEvent.click(screen.getByText('member_detail.action_adjust_balance'));
     await waitFor(() => expect(screen.getByText('member_detail.balance_modal_title')).toBeInTheDocument());

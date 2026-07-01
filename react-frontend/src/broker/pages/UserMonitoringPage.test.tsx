@@ -44,24 +44,31 @@ vi.mock('@/contexts', () =>
 );
 
 // ─── Stub admin components ────────────────────────────────────────────────────
+// The DataTable stub executes each column's render() so cell content
+// (avatars, chips, countdowns, row actions) is exercised by the tests.
+type StubColumn = { key: string; render?: (item: unknown) => React.ReactNode };
+
 vi.mock('@/admin/components', () => ({
-  DataTable: ({ data, isLoading }: { data: object[]; isLoading: boolean }) => (
+  DataTable: ({
+    data,
+    columns,
+    isLoading,
+  }: {
+    data: Array<Record<string, unknown>>;
+    columns: StubColumn[];
+    isLoading: boolean;
+  }) => (
     <div data-testid="data-table" data-loading={String(isLoading)}>
       {data.map((item) => (
-        <div key={String((item as { user_id: number }).user_id)} data-testid="data-table-row">
-          {(item as { user_name: string }).user_name}
+        <div key={String(item.user_id)} data-testid="data-table-row">
+          {columns.map((col) => (
+            <div key={col.key} data-testid={`cell-${col.key}`}>
+              {col.render ? col.render(item) : String(item[col.key] ?? '')}
+            </div>
+          ))}
         </div>
       ))}
     </div>
-  ),
-  PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
-    <div>
-      <h1>{title}</h1>
-      {actions}
-    </div>
-  ),
-  EmptyState: ({ title }: { title: string }) => (
-    <div data-testid="empty-state">{title}</div>
   ),
   ConfirmModal: ({
     isOpen,
@@ -96,6 +103,8 @@ vi.mock('@/lib/serverTime', () => ({
 }));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
+const DAY_MS = 86_400_000;
+
 const makeMonitoredUser = (overrides = {}) => ({
   user_id: 10,
   user_name: 'Bob Suspect',
@@ -104,16 +113,6 @@ const makeMonitoredUser = (overrides = {}) => ({
   monitoring_reason: 'Suspicious activity',
   monitoring_started_at: '2025-01-01T00:00:00Z',
   monitoring_expires_at: null,
-  ...overrides,
-});
-
-const makeAdminUser = (overrides = {}) => ({
-  id: 20,
-  name: 'Charlie User',
-  email: 'charlie@test.ie',
-  status: 'active',
-  avatar_url: null,
-  avatar: null,
   ...overrides,
 });
 
@@ -126,24 +125,35 @@ describe('UserMonitoring', () => {
     mockAdminUsers.list.mockResolvedValue({ success: true, data: [] });
   });
 
-  it('shows loading state while fetching monitored users', async () => {
+  it('shows a loading skeleton while fetching monitored users', async () => {
     mockBroker.getMonitoring.mockImplementationOnce(() => new Promise(() => {}));
     const { UserMonitoring } = await import('./UserMonitoringPage');
     render(<UserMonitoring />);
 
-    // DataTable renders with loading=true
     await waitFor(() => {
-      const table = screen.getByTestId('data-table');
-      expect(table.getAttribute('data-loading')).toBe('true');
+      const statusEls = screen.getAllByRole('status');
+      const busy = statusEls.find((el) => el.getAttribute('aria-busy') === 'true');
+      expect(busy).toBeTruthy();
     });
+    // The table itself only renders once data has arrived
+    expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();
   });
 
-  it('shows empty state when no monitored users are returned', async () => {
+  it('renders the page header title', async () => {
+    const { UserMonitoring } = await import('./UserMonitoringPage');
+    render(<UserMonitoring />);
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'User Monitoring' })
+    ).toBeInTheDocument();
+  });
+
+  it('shows the reassuring all-clear state when nobody is monitored', async () => {
     const { UserMonitoring } = await import('./UserMonitoringPage');
     render(<UserMonitoring />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+      expect(screen.getByText('Nobody is under monitoring')).toBeInTheDocument();
     });
   });
 
@@ -154,6 +164,25 @@ describe('UserMonitoring', () => {
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled();
+    });
+  });
+
+  it('shows an honest error state with a retry button on load failure', async () => {
+    mockBroker.getMonitoring.mockRejectedValue(new Error('network'));
+    const { UserMonitoring } = await import('./UserMonitoringPage');
+    render(<UserMonitoring />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Couldn't load monitored members")).toBeInTheDocument();
+    });
+    // A failed load must never render as an all-clear queue
+    expect(screen.queryByText('Nobody is under monitoring')).not.toBeInTheDocument();
+
+    const retryBtn = screen.getByRole('button', { name: 'Try again' });
+    fireEvent.click(retryBtn);
+
+    await waitFor(() => {
+      expect(mockBroker.getMonitoring).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -168,13 +197,82 @@ describe('UserMonitoring', () => {
     await waitFor(() => {
       expect(screen.getByText('Bob Suspect')).toBeInTheDocument();
     });
+    // Reason is readable in the row, not hidden behind a tooltip
+    expect(screen.getByText('Suspicious activity')).toBeInTheDocument();
   });
 
-  it('renders Add to Monitoring button', async () => {
+  it('derives the KPI header from the loaded list', async () => {
+    mockBroker.getMonitoring.mockResolvedValue({
+      success: true,
+      data: [
+        makeMonitoredUser({ user_id: 1, user_name: 'User One' }),
+        makeMonitoredUser({
+          user_id: 2,
+          user_name: 'User Two',
+          messaging_disabled: true,
+        }),
+        makeMonitoredUser({
+          user_id: 3,
+          user_name: 'User Three',
+          monitoring_expires_at: new Date(Date.now() + 3 * DAY_MS).toISOString(),
+        }),
+      ],
+    });
     const { UserMonitoring } = await import('./UserMonitoringPage');
     render(<UserMonitoring />);
 
-    await waitFor(() => screen.getByTestId('empty-state'));
+    await waitFor(() => {
+      expect(screen.getByText('User One')).toBeInTheDocument();
+    });
+
+    const totalLabel = screen.getByText('Under monitoring');
+    expect(totalLabel.parentElement?.textContent).toContain('3');
+
+    // KPI label + the row chip both use the shared "Messaging disabled" string
+    const disabledLabels = screen.getAllByText('Messaging disabled');
+    expect(disabledLabels.length).toBeGreaterThanOrEqual(2);
+    expect(disabledLabels[0].parentElement?.textContent).toContain('1');
+
+    const expiringLabel = screen.getByText('Expiring within 7 days');
+    expect(expiringLabel.parentElement?.textContent).toContain('1');
+  });
+
+  it('renders expiry countdown chips: expired, days-left, and no expiry', async () => {
+    mockBroker.getMonitoring.mockResolvedValue({
+      success: true,
+      data: [
+        makeMonitoredUser({
+          user_id: 1,
+          user_name: 'Expired Eddie',
+          monitoring_expires_at: new Date(Date.now() - DAY_MS).toISOString(),
+        }),
+        makeMonitoredUser({
+          user_id: 2,
+          user_name: 'Soon Sally',
+          monitoring_expires_at: new Date(Date.now() + 3 * DAY_MS).toISOString(),
+        }),
+        makeMonitoredUser({
+          user_id: 3,
+          user_name: 'Open Olive',
+          monitoring_expires_at: null,
+        }),
+      ],
+    });
+    const { UserMonitoring } = await import('./UserMonitoringPage');
+    render(<UserMonitoring />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Expired')).toBeInTheDocument();
+      expect(screen.getByText('3 days left')).toBeInTheDocument();
+      expect(screen.getByText('No expiry')).toBeInTheDocument();
+    });
+  });
+
+  it('renders Add User button', async () => {
+    const { UserMonitoring } = await import('./UserMonitoringPage');
+    render(<UserMonitoring />);
+
+    await waitFor(() => screen.getByText('Nobody is under monitoring'));
 
     // monitoring.add_button resolves to "Add User"
     const addBtn = screen.getAllByRole('button').find((b) =>
@@ -187,7 +285,7 @@ describe('UserMonitoring', () => {
     const { UserMonitoring } = await import('./UserMonitoringPage');
     render(<UserMonitoring />);
 
-    await waitFor(() => screen.getByTestId('empty-state'));
+    await waitFor(() => screen.getByText('Nobody is under monitoring'));
 
     const addBtn = screen.getAllByRole('button').find((b) =>
       b.textContent?.includes('Add User')
@@ -204,7 +302,7 @@ describe('UserMonitoring', () => {
     const { UserMonitoring } = await import('./UserMonitoringPage');
     render(<UserMonitoring />);
 
-    await waitFor(() => screen.getByTestId('empty-state'));
+    await waitFor(() => screen.getByText('Nobody is under monitoring'));
 
     // Open modal
     const addBtn = screen.getAllByRole('button').find((b) =>
@@ -230,7 +328,32 @@ describe('UserMonitoring', () => {
     expect(isDisabled).toBe(true);
   });
 
-  it('calls setMonitoring remove when remove confirm is accepted', async () => {
+  it('opens the edit modal prefilled from the row action', async () => {
+    mockBroker.getMonitoring.mockResolvedValue({
+      success: true,
+      data: [
+        makeMonitoredUser({
+          user_id: 42,
+          monitoring_expires_at: new Date(Date.now() + 10 * DAY_MS).toISOString(),
+        }),
+      ],
+    });
+    const { UserMonitoring } = await import('./UserMonitoringPage');
+    render(<UserMonitoring />);
+
+    await waitFor(() => screen.getByText('Bob Suspect'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit monitoring' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Edit Monitoring')).toBeInTheDocument();
+      // The record's existing expiry is surfaced so a reason-only edit
+      // visibly preserves it
+      expect(screen.getByText(/Current expiry:/)).toBeInTheDocument();
+    });
+  });
+
+  it('calls setMonitoring remove when the row action is confirmed', async () => {
     mockBroker.getMonitoring.mockResolvedValue({
       success: true,
       data: [makeMonitoredUser({ user_id: 42 })],
@@ -240,12 +363,16 @@ describe('UserMonitoring', () => {
 
     await waitFor(() => screen.getByText('Bob Suspect'));
 
-    // The DataTable stub renders remove button in columns — but since DataTable is stubbed,
-    // we can't click the inner column button. Instead we verify the row is rendered.
-    expect(screen.getByText('Bob Suspect')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Remove from monitoring' }));
 
-    // Confirm that getMonitoring was called
-    expect(mockBroker.getMonitoring).toHaveBeenCalled();
+    // ConfirmModal stub renders a Confirm button
+    const confirmDialog = await screen.findByRole('dialog', { name: 'Remove from Monitoring' });
+    expect(confirmDialog).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Confirm'));
+
+    await waitFor(() => {
+      expect(mockBroker.setMonitoring).toHaveBeenCalledWith(42, { under_monitoring: false });
+    });
   });
 
   it('renders multiple monitored users', async () => {

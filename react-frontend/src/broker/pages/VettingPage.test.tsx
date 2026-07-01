@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { render, screen, waitFor } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
@@ -51,7 +51,7 @@ vi.mock('@/lib/serverTime', () => ({
   formatServerDateTime: (s: string | null | undefined) => (s ? s : '—'),
 }));
 
-// ─── Stub DataTable / StatCard / PageHeader / ConfirmModal / EmptyState ────
+// ─── Stub DataTable / ConfirmModal ───────────────────────────────────────────
 vi.mock('@/admin/components', async (importOriginal) => {
   const orig = await importOriginal<Record<string, unknown>>();
   return {
@@ -104,12 +104,6 @@ vi.mock('@/admin/components', async (importOriginal) => {
         </table>
       );
     },
-    StatCard: ({ label, value }: { label?: string; value?: unknown }) => (
-      <div data-testid="stat-card">{label}: {String(value ?? 0)}</div>
-    ),
-    PageHeader: ({ title, actions }: { title?: string; actions?: React.ReactNode }) => (
-      <div><h1>{title}</h1>{actions}</div>
-    ),
     ConfirmModal: ({
       isOpen,
       onConfirm,
@@ -128,13 +122,10 @@ vi.mock('@/admin/components', async (importOriginal) => {
           <button onClick={onClose}>Cancel</button>
         </div>
       ) : null,
-    EmptyState: ({ title }: { title?: string }) => (
-      <div data-testid="empty-state">{title}</div>
-    ),
   };
 });
 
-// Stub HeroUI Select/Switch to avoid infinite-loops
+// Stub HeroUI Select to avoid infinite-loops
 vi.mock('@/components/ui', async (importOriginal) => {
   const orig = await importOriginal<typeof import('@/components/ui')>();
   return {
@@ -151,11 +142,17 @@ vi.mock('@/components/ui', async (importOriginal) => {
 });
 
 // ─── Mock react-router-dom ───────────────────────────────────────────────────
+// searchParams is swappable per-test so ?status= deep links can be exercised.
+const routerMocks = vi.hoisted(() => ({
+  searchParams: new URLSearchParams(),
+  setSearchParams: vi.fn(),
+}));
+
 vi.mock('react-router-dom', async (importOriginal) => {
   const orig = await importOriginal<typeof import('react-router-dom')>();
   return {
     ...orig,
-    useSearchParams: () => [new URLSearchParams(), vi.fn()],
+    useSearchParams: () => [routerMocks.searchParams, routerMocks.setSearchParams],
     Link: ({ children, to }: { children?: React.ReactNode; to?: string }) => <a href={to}>{children}</a>,
   };
 });
@@ -218,10 +215,13 @@ const makeListResponse = (data: Record<string, unknown>[] = [], total = data.len
   meta: { total, page: 1, per_page: 25 },
 });
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 // ─────────────────────────────────────────────────────────────────────────────
 describe('VettingPage (VettingRecords)', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    routerMocks.searchParams = new URLSearchParams();
     mockAdminVetting.stats.mockResolvedValue({ success: true, data: makeStats() });
     mockAdminVetting.list.mockResolvedValue(makeListResponse([makeRecord()]));
     mockAdminVetting.verify.mockResolvedValue({ success: true });
@@ -233,7 +233,7 @@ describe('VettingPage (VettingRecords)', () => {
     mockAdminUsers.list.mockResolvedValue({ success: true, data: [] });
   });
 
-  it('shows loading spinner while list loads', async () => {
+  it('shows a loading skeleton while list loads', async () => {
     mockAdminVetting.list.mockImplementationOnce(() => new Promise(() => {}));
     const { VettingRecords } = await import('./VettingPage');
     render(<VettingRecords />);
@@ -243,13 +243,41 @@ describe('VettingPage (VettingRecords)', () => {
     expect(busy).toBeDefined();
   });
 
-  it('renders stat cards after loading stats', async () => {
+  it('renders the page shell heading', async () => {
+    const { VettingRecords } = await import('./VettingPage');
+    render(<VettingRecords />);
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Vetting & DBS' })).toBeInTheDocument();
+    await waitFor(() => expect(mockAdminVetting.list).toHaveBeenCalled());
+  });
+
+  it('renders KPI stat cards after loading stats', async () => {
     const { VettingRecords } = await import('./VettingPage');
     render(<VettingRecords />);
 
     await waitFor(() => {
-      const cards = screen.getAllByTestId('stat-card');
-      expect(cards.length).toBeGreaterThanOrEqual(1);
+      // Stat card label + status tab both say "Pending Review"
+      expect(screen.getAllByText('Pending Review').length).toBeGreaterThanOrEqual(2);
+      // Verified card value (verified=8) and its total-records description
+      expect(screen.getByText('8')).toBeInTheDocument();
+      expect(screen.getByText('of 15 total records')).toBeInTheDocument();
+      // Expiring Soon card carries the already-expired hint (expired=1)
+      expect(screen.getByText('1 already expired')).toBeInTheDocument();
+      // Rejected card label + tab
+      expect(screen.getAllByText('Rejected').length).toBeGreaterThanOrEqual(2);
+    });
+  });
+
+  it('deep-links the stat cards into filtered views', async () => {
+    const { VettingRecords } = await import('./VettingPage');
+    render(<VettingRecords />);
+
+    await waitFor(() => {
+      for (const status of ['pending_review', 'verified', 'expiring_soon', 'rejected']) {
+        expect(
+          document.querySelector(`a[href="/test/broker/vetting?status=${status}"]`)
+        ).toBeTruthy();
+      }
     });
   });
 
@@ -263,13 +291,65 @@ describe('VettingPage (VettingRecords)', () => {
     });
   });
 
+  it('renders expiry countdown chips (warning inside 30 days, danger when expired)', async () => {
+    const inTenDays = new Date(Date.now() + 10 * DAY_MS).toISOString();
+    const fiveDaysAgo = new Date(Date.now() - 5 * DAY_MS).toISOString();
+    mockAdminVetting.list.mockResolvedValueOnce(makeListResponse([
+      makeRecord({ id: 1, expiry_date: inTenDays }),
+      makeRecord({
+        id: 2,
+        first_name: 'Bob',
+        last_name: 'Jones',
+        email: 'bob@example.com',
+        status: 'verified',
+        expiry_date: fiveDaysAgo,
+      }),
+    ]));
+    const { VettingRecords } = await import('./VettingPage');
+    render(<VettingRecords />);
+
+    await waitFor(() => {
+      expect(screen.getByText('10d left')).toBeInTheDocument();
+      // "Expired" appears on the status tab plus the countdown chip for Bob
+      expect(screen.getAllByText('Expired').length).toBeGreaterThanOrEqual(2);
+    });
+  });
+
   it('shows empty state when no records', async () => {
     mockAdminVetting.list.mockResolvedValueOnce(makeListResponse([]));
     const { VettingRecords } = await import('./VettingPage');
     render(<VettingRecords />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+      expect(screen.getByText('No vetting records')).toBeInTheDocument();
+      expect(screen.getByText('Add a vetting record to get started.')).toBeInTheDocument();
+    });
+  });
+
+  it('shows the all-caught-up empty state for an empty review queue', async () => {
+    routerMocks.searchParams = new URLSearchParams('status=pending_review');
+    mockAdminVetting.list.mockResolvedValueOnce(makeListResponse([]));
+    const { VettingRecords } = await import('./VettingPage');
+    render(<VettingRecords />);
+
+    await waitFor(() => {
+      expect(screen.getByText('No records awaiting review')).toBeInTheDocument();
+    });
+    // Deep-linked ?status= param is preserved on the API call
+    expect(mockAdminVetting.list).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'pending_review' })
+    );
+  });
+
+  it('maps the ?status=expiring_soon deep link to the expiring_soon param', async () => {
+    routerMocks.searchParams = new URLSearchParams('status=expiring_soon');
+    const { VettingRecords } = await import('./VettingPage');
+    render(<VettingRecords />);
+
+    await waitFor(() => {
+      expect(mockAdminVetting.list).toHaveBeenCalledWith(
+        expect.objectContaining({ expiring_soon: true })
+      );
     });
   });
 
@@ -434,13 +514,32 @@ describe('VettingPage (VettingRecords)', () => {
     }
   });
 
-  it('shows error toast when list fails', async () => {
+  it('shows an honest error panel with retry when the list fails', async () => {
     mockAdminVetting.list.mockRejectedValue(new Error('network'));
     const { VettingRecords } = await import('./VettingPage');
     render(<VettingRecords />);
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled();
+      expect(screen.getByText("Vetting records couldn't be loaded")).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
+    });
+  });
+
+  it('recovers after clicking Retry on a failed load', async () => {
+    mockAdminVetting.list.mockRejectedValueOnce(new Error('network'));
+    const user = userEvent.setup();
+    const { VettingRecords } = await import('./VettingPage');
+    render(<VettingRecords />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Vetting records couldn't be loaded")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Alice Smith')).toBeInTheDocument();
     });
   });
 

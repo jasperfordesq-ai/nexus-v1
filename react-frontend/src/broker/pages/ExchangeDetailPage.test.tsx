@@ -5,12 +5,17 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@/test/test-utils';
+import userEvent from '@testing-library/user-event';
 import { createMockContexts } from '@/test/mock-contexts';
 import React from 'react';
 
 // ─── Mock adminApi ────────────────────────────────────────────────────────────
 const { mockAdminBroker } = vi.hoisted(() => ({
-  mockAdminBroker: { showExchange: vi.fn() },
+  mockAdminBroker: {
+    showExchange: vi.fn(),
+    approveExchange: vi.fn(),
+    rejectExchange: vi.fn(),
+  },
 }));
 
 vi.mock('@/admin/api/adminApi', () => ({
@@ -45,16 +50,6 @@ vi.mock('@/contexts', () =>
 );
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
-
-// ─── Stub admin components ────────────────────────────────────────────────────
-vi.mock('@/admin/components/PageHeader', () => ({
-  PageHeader: ({ title, description }: { title: string; description?: string }) => (
-    <div data-testid="page-header">
-      <h1>{title}</h1>
-      {description && <p>{description}</p>}
-    </div>
-  ),
-}));
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 const makeExchange = (overrides = {}) => ({
@@ -101,12 +96,12 @@ describe('ExchangeDetailPage (ExchangeDetail)', () => {
     });
   });
 
-  it('shows loading spinner initially', async () => {
+  it('shows detail skeleton initially', async () => {
     mockAdminBroker.showExchange.mockImplementationOnce(() => new Promise(() => {}));
     const { default: ExchangeDetail } = await import('./ExchangeDetailPage');
     render(<ExchangeDetail />);
-    const spinner = document.querySelector('[aria-busy="true"]');
-    expect(spinner).toBeTruthy();
+    const skeleton = document.querySelector('[aria-busy="true"]');
+    expect(skeleton).toBeTruthy();
   });
 
   it('calls showExchange with the numeric id from useParams', async () => {
@@ -131,7 +126,7 @@ describe('ExchangeDetailPage (ExchangeDetail)', () => {
     });
   });
 
-  it('renders listing title in page header', async () => {
+  it('renders listing title in the page shell description', async () => {
     const { default: ExchangeDetail } = await import('./ExchangeDetailPage');
     render(<ExchangeDetail />);
     await waitFor(() => {
@@ -139,21 +134,55 @@ describe('ExchangeDetailPage (ExchangeDetail)', () => {
     });
   });
 
-  it('shows history timeline entry with actor name', async () => {
+  it('highlights the current stage in the lifecycle pipeline', async () => {
     const { default: ExchangeDetail } = await import('./ExchangeDetailPage');
     render(<ExchangeDetail />);
     await waitFor(() => {
-      // The component renders "by {name}" via the translation key exchanges.detail_history_by
-      expect(screen.getByText(/Admin User/)).toBeInTheDocument();
+      const current = document.querySelector('[aria-current="step"]');
+      expect(current).toBeTruthy();
+      expect(current?.textContent).toContain('Pending Broker Approval');
     });
   });
 
-  it('renders error message when API returns failure', async () => {
+  it('marks a cancelled exchange as a terminal pipeline stage and hides actions', async () => {
+    mockAdminBroker.showExchange.mockResolvedValue({
+      success: true,
+      data: makeDetail({ status: 'cancelled' }),
+    });
+    const { default: ExchangeDetail } = await import('./ExchangeDetailPage');
+    render(<ExchangeDetail />);
+    await waitFor(() => {
+      const current = document.querySelector('[aria-current="step"]');
+      expect(current?.textContent).toContain('Cancelled');
+    });
+    expect(screen.queryByRole('button', { name: 'Approve' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Reject' })).not.toBeInTheDocument();
+  });
+
+  it('approves a pending_broker exchange through the action modal', async () => {
+    mockAdminBroker.approveExchange.mockResolvedValue({ success: true });
+    const user = userEvent.setup();
+    const { default: ExchangeDetail } = await import('./ExchangeDetailPage');
+    render(<ExchangeDetail />);
+    await waitFor(() => expect(screen.getByText('Alice Requester')).toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: 'Approve' }));
+    await waitFor(() => expect(screen.getByText('Approve Exchange')).toBeInTheDocument());
+
+    const approveButtons = screen.getAllByRole('button', { name: 'Approve' });
+    await user.click(approveButtons[approveButtons.length - 1]);
+
+    await waitFor(() => {
+      expect(mockAdminBroker.approveExchange).toHaveBeenCalledWith(42, undefined);
+    });
+  });
+
+  it('renders a not-found state when API returns failure', async () => {
     mockAdminBroker.showExchange.mockResolvedValue({ success: false, data: null });
     const { default: ExchangeDetail } = await import('./ExchangeDetailPage');
     render(<ExchangeDetail />);
     await waitFor(() => {
-      // Error state shows a "back to exchanges" link and an error paragraph
+      expect(screen.getByText('Exchange not found.')).toBeInTheDocument();
       const backLink = screen.getAllByRole('link').find((el) =>
         el.getAttribute('href')?.includes('exchanges')
       );
@@ -161,16 +190,34 @@ describe('ExchangeDetailPage (ExchangeDetail)', () => {
     });
   });
 
-  it('renders error state when API throws', async () => {
+  it('renders an honest error state with a retry button when the API throws', async () => {
     mockAdminBroker.showExchange.mockRejectedValue(new Error('network'));
     const { default: ExchangeDetail } = await import('./ExchangeDetailPage');
     render(<ExchangeDetail />);
     await waitFor(() => {
-      // back to exchanges button rendered in error state
+      expect(screen.getByText('Failed to load this exchange')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
       const backLink = screen.getAllByRole('link').find((el) =>
         el.getAttribute('href')?.includes('exchanges')
       );
       expect(backLink).toBeDefined();
+    });
+  });
+
+  it('refetches the exchange when retry is pressed after a failure', async () => {
+    mockAdminBroker.showExchange
+      .mockRejectedValueOnce(new Error('network'))
+      .mockResolvedValueOnce({ success: true, data: makeDetail() });
+    const user = userEvent.setup();
+    const { default: ExchangeDetail } = await import('./ExchangeDetailPage');
+    render(<ExchangeDetail />);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+
+    await waitFor(() => {
+      expect(mockAdminBroker.showExchange).toHaveBeenCalledTimes(2);
+      expect(screen.getByText('Alice Requester')).toBeInTheDocument();
     });
   });
 
@@ -194,6 +241,7 @@ describe('ExchangeDetailPage (ExchangeDetail)', () => {
     render(<ExchangeDetail />);
     await waitFor(() => {
       expect(screen.getByText('Requires PPE')).toBeInTheDocument();
+      expect(screen.getByText('Broker approval required')).toBeInTheDocument();
     });
   });
 
@@ -209,7 +257,16 @@ describe('ExchangeDetailPage (ExchangeDetail)', () => {
     });
   });
 
-  it('shows "no history" message when history array is empty', async () => {
+  it('shows history timeline entry with actor name', async () => {
+    const { default: ExchangeDetail } = await import('./ExchangeDetailPage');
+    render(<ExchangeDetail />);
+    await waitFor(() => {
+      // The component renders "by {name}" via the translation key exchanges.detail_history_by
+      expect(screen.getByText(/Admin User/)).toBeInTheDocument();
+    });
+  });
+
+  it('shows the "no history" empty state when history array is empty', async () => {
     mockAdminBroker.showExchange.mockResolvedValue({
       success: true,
       data: makeDetail({}, []),
@@ -217,10 +274,7 @@ describe('ExchangeDetailPage (ExchangeDetail)', () => {
     const { default: ExchangeDetail } = await import('./ExchangeDetailPage');
     render(<ExchangeDetail />);
     await waitFor(() => {
-      // The "no history" translation key falls back to something — look for the element
-      // by its test-friendly position: within the history card
-      const bodyEl = document.querySelector('.space-y-6');
-      expect(bodyEl).toBeTruthy();
+      expect(screen.getByText('No history available.')).toBeInTheDocument();
     });
   });
 });

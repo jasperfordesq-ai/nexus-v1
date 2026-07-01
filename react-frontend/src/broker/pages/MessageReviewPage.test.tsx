@@ -12,6 +12,7 @@ import { createMockContexts } from '@/test/mock-contexts';
 const { mockAdminBroker } = vi.hoisted(() => ({
   mockAdminBroker: {
     getMessages: vi.fn(),
+    getUnreviewedCount: vi.fn(),
     reviewMessage: vi.fn(),
     flagMessage: vi.fn(),
     showMessage: vi.fn(),
@@ -25,15 +26,21 @@ vi.mock('@/admin/api/adminApi', () => ({
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-// ─── Toast / Tenant ───────────────────────────────────────────────────────────
+// ─── Toast / Tenant / Router ─────────────────────────────────────────────────
 const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() };
+
+// Mutable search params so individual tests can exercise ?status= deep links.
+const routerState = vi.hoisted(() => ({
+  params: new URLSearchParams(),
+  setParams: vi.fn(),
+}));
 
 vi.mock('react-router-dom', async (importOriginal) => {
   const orig = await importOriginal<typeof import('react-router-dom')>();
   return {
     ...orig,
     useNavigate: () => vi.fn(),
-    useSearchParams: () => [new URLSearchParams(), vi.fn()],
+    useSearchParams: () => [routerState.params, routerState.setParams],
     Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
       <a href={to}>{children}</a>
     ),
@@ -62,15 +69,19 @@ vi.mock('@/admin/components', () => ({
     columns,
     data,
     isLoading,
+    emptyContent,
   }: {
     columns: { key: string; label: string; render?: (item: unknown) => React.ReactNode }[];
     data: unknown[];
     isLoading?: boolean;
+    emptyContent?: React.ReactNode;
     [key: string]: unknown;
   }) => (
     <div data-testid="data-table">
       {isLoading && <div role="status" aria-busy="true" aria-label="loading">Loading…</div>}
-      {!isLoading && data.length === 0 && <div data-testid="empty-table">No items</div>}
+      {!isLoading && data.length === 0 && (
+        <div data-testid="empty-table">{emptyContent ?? 'No items'}</div>
+      )}
       {!isLoading &&
         data.map((row) => (
           <div key={String((row as Record<string, unknown>).id)} data-testid="table-row">
@@ -117,27 +128,66 @@ const makeListRes = (items: unknown[] = [], total = 0) => ({
 describe('MessageReview (broker)', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    routerState.params = new URLSearchParams();
+    routerState.setParams = vi.fn();
     mockAdminBroker.getMessages.mockResolvedValue(makeListRes());
+    mockAdminBroker.getUnreviewedCount.mockResolvedValue({ success: true, data: { count: 0 } });
     mockAdminBroker.reviewMessage.mockResolvedValue({ success: true });
     mockAdminBroker.flagMessage.mockResolvedValue({ success: true });
     mockAdminBroker.showMessage.mockResolvedValue({ success: true, data: null });
   });
 
-  it('shows loading state while fetching messages', async () => {
+  it('shows a shaped skeleton while first loading messages', async () => {
     mockAdminBroker.getMessages.mockImplementationOnce(() => new Promise(() => {}));
     const { MessageReview } = await import('./MessageReviewPage');
     render(<MessageReview />);
 
-    const table = screen.getByTestId('data-table');
-    expect(table.querySelector('[aria-busy="true"]')).toBeTruthy();
+    // Initial load renders BrokerSkeleton (role=status), not the data table.
+    expect(screen.queryByTestId('data-table')).toBeNull();
+    expect(screen.getAllByRole('status').length).toBeGreaterThan(0);
   });
 
-  it('renders empty table when no messages returned', async () => {
+  it('renders the all-caught-up empty state when the unreviewed queue is empty', async () => {
     const { MessageReview } = await import('./MessageReviewPage');
     render(<MessageReview />);
 
     await waitFor(() => {
       expect(screen.getByTestId('empty-table')).toBeInTheDocument();
+    });
+    expect(screen.getByText('All caught up')).toBeInTheDocument();
+  });
+
+  it('renders a filter-specific empty state for the flagged queue', async () => {
+    routerState.params = new URLSearchParams('status=flagged');
+    const { MessageReview } = await import('./MessageReviewPage');
+    render(<MessageReview />);
+
+    await waitFor(() => {
+      expect(screen.getByText('No flagged messages')).toBeInTheDocument();
+    });
+  });
+
+  it('renders the KPI header with the global unreviewed count', async () => {
+    mockAdminBroker.getUnreviewedCount.mockResolvedValue({ success: true, data: { count: 7 } });
+    const { MessageReview } = await import('./MessageReviewPage');
+    render(<MessageReview />);
+
+    expect(await screen.findByText('Unreviewed messages')).toBeInTheDocument();
+    expect(screen.getByText('Flagged in view')).toBeInTheDocument();
+    expect(screen.getByText('Reviewed in view')).toBeInTheDocument();
+    expect(screen.getByText('In current filter')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getAllByText('7').length).toBeGreaterThan(0);
+    });
+  });
+
+  it('honours a deep-linked ?status=flagged filter', async () => {
+    routerState.params = new URLSearchParams('status=flagged');
+    const { MessageReview } = await import('./MessageReviewPage');
+    render(<MessageReview />);
+
+    await waitFor(() => {
+      expect(mockAdminBroker.getMessages).toHaveBeenCalledWith({ page: 1, filter: 'flagged' });
     });
   });
 
@@ -168,17 +218,10 @@ describe('MessageReview (broker)', () => {
 
     await waitFor(() => screen.getByText('Alice'));
 
-    const buttons = screen.getAllByRole('button');
-    const reviewBtn = buttons.find((b) =>
-      b.getAttribute('aria-label')?.toLowerCase().includes('review') ||
-      b.textContent?.toLowerCase().includes('review')
-    );
-    if (reviewBtn) {
-      fireEvent.click(reviewBtn);
-      await waitFor(() => {
-        expect(mockAdminBroker.reviewMessage).toHaveBeenCalledWith(1);
-      });
-    }
+    fireEvent.click(screen.getByRole('button', { name: 'Mark message as reviewed' }));
+    await waitFor(() => {
+      expect(mockAdminBroker.reviewMessage).toHaveBeenCalledWith(1);
+    });
   });
 
   it('shows success toast after marking reviewed', async () => {
@@ -188,17 +231,10 @@ describe('MessageReview (broker)', () => {
 
     await waitFor(() => screen.getByText('Alice'));
 
-    const buttons = screen.getAllByRole('button');
-    const reviewBtn = buttons.find((b) =>
-      b.getAttribute('aria-label')?.toLowerCase().includes('review') ||
-      b.textContent?.toLowerCase().includes('review')
-    );
-    if (reviewBtn) {
-      fireEvent.click(reviewBtn);
-      await waitFor(() => {
-        expect(mockToast.success).toHaveBeenCalled();
-      });
-    }
+    fireEvent.click(screen.getByRole('button', { name: 'Mark message as reviewed' }));
+    await waitFor(() => {
+      expect(mockToast.success).toHaveBeenCalled();
+    });
   });
 
   it('shows error toast when reviewMessage fails', async () => {
@@ -209,17 +245,10 @@ describe('MessageReview (broker)', () => {
 
     await waitFor(() => screen.getByText('Alice'));
 
-    const buttons = screen.getAllByRole('button');
-    const reviewBtn = buttons.find((b) =>
-      b.getAttribute('aria-label')?.toLowerCase().includes('review') ||
-      b.textContent?.toLowerCase().includes('review')
-    );
-    if (reviewBtn) {
-      fireEvent.click(reviewBtn);
-      await waitFor(() => {
-        expect(mockToast.error).toHaveBeenCalled();
-      });
-    }
+    fireEvent.click(screen.getByRole('button', { name: 'Mark message as reviewed' }));
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalled();
+    });
   });
 
   it('opens flag modal when Flag button is clicked', async () => {
@@ -229,17 +258,10 @@ describe('MessageReview (broker)', () => {
 
     await waitFor(() => screen.getByText('Alice'));
 
-    const buttons = screen.getAllByRole('button');
-    const flagBtn = buttons.find((b) =>
-      b.getAttribute('aria-label')?.toLowerCase().includes('flag') ||
-      b.textContent?.toLowerCase().includes('flag')
-    );
-    if (flagBtn) {
-      fireEvent.click(flagBtn);
-      await waitFor(() => {
-        expect(document.querySelector('[role="dialog"]')).toBeTruthy();
-      });
-    }
+    fireEvent.click(screen.getByRole('button', { name: 'Flag message' }));
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+    });
   });
 
   it('shows error toast when flag submitted with empty reason', async () => {
@@ -250,26 +272,19 @@ describe('MessageReview (broker)', () => {
     await waitFor(() => screen.getByText('Alice'));
 
     // Open flag modal
-    const buttons = screen.getAllByRole('button');
-    const flagBtn = buttons.find((b) =>
-      b.getAttribute('aria-label')?.toLowerCase().includes('flag') ||
+    fireEvent.click(screen.getByRole('button', { name: 'Flag message' }));
+    await waitFor(() => document.querySelector('[role="dialog"]'));
+
+    // Click flag confirm button without filling reason
+    const dialogBtns = document.querySelectorAll('[role="dialog"] button');
+    const confirmBtn = Array.from(dialogBtns).find((b) =>
       b.textContent?.toLowerCase().includes('flag')
     );
-    if (flagBtn) {
-      fireEvent.click(flagBtn);
-      await waitFor(() => document.querySelector('[role="dialog"]'));
-
-      // Click flag confirm button without filling reason
-      const dialogBtns = document.querySelectorAll('[role="dialog"] button');
-      const confirmBtn = Array.from(dialogBtns).find((b) =>
-        b.textContent?.toLowerCase().includes('flag')
-      );
-      if (confirmBtn) {
-        fireEvent.click(confirmBtn);
-        await waitFor(() => {
-          expect(mockToast.error).toHaveBeenCalled();
-        });
-      }
+    if (confirmBtn) {
+      fireEvent.click(confirmBtn);
+      await waitFor(() => {
+        expect(mockToast.error).toHaveBeenCalled();
+      });
     }
   });
 
@@ -280,39 +295,32 @@ describe('MessageReview (broker)', () => {
 
     await waitFor(() => screen.getByText('Alice'));
 
-    const buttons = screen.getAllByRole('button');
-    const flagBtn = buttons.find((b) =>
-      b.getAttribute('aria-label')?.toLowerCase().includes('flag') ||
+    fireEvent.click(screen.getByRole('button', { name: 'Flag message' }));
+    await waitFor(() => document.querySelector('[role="dialog"]'));
+
+    // Fill in the reason textarea
+    const textareas = document.querySelectorAll('[role="dialog"] textarea');
+    if (textareas.length > 0) {
+      fireEvent.change(textareas[0], { target: { value: 'Suspicious content' } });
+    }
+
+    const dialogBtns = document.querySelectorAll('[role="dialog"] button');
+    const confirmBtn = Array.from(dialogBtns).find((b) =>
       b.textContent?.toLowerCase().includes('flag')
     );
-    if (flagBtn) {
-      fireEvent.click(flagBtn);
-      await waitFor(() => document.querySelector('[role="dialog"]'));
-
-      // Fill in the reason textarea
-      const textareas = document.querySelectorAll('[role="dialog"] textarea');
-      if (textareas.length > 0) {
-        fireEvent.change(textareas[0], { target: { value: 'Suspicious content' } });
-      }
-
-      const dialogBtns = document.querySelectorAll('[role="dialog"] button');
-      const confirmBtn = Array.from(dialogBtns).find((b) =>
-        b.textContent?.toLowerCase().includes('flag')
-      );
-      if (confirmBtn) {
-        fireEvent.click(confirmBtn);
-        await waitFor(() => {
-          expect(mockAdminBroker.flagMessage).toHaveBeenCalledWith(
-            1,
-            'Suspicious content',
-            expect.any(String)
-          );
-        });
-      }
+    if (confirmBtn) {
+      fireEvent.click(confirmBtn);
+      await waitFor(() => {
+        expect(mockAdminBroker.flagMessage).toHaveBeenCalledWith(
+          1,
+          'Suspicious content',
+          expect.any(String)
+        );
+      });
     }
   });
 
-  it('opens quick-view detail modal when Eye button is clicked', async () => {
+  it('fetches the message detail when the quick-view button is clicked', async () => {
     mockAdminBroker.getMessages.mockResolvedValue(makeListRes([makeMessage()], 1));
     mockAdminBroker.showMessage.mockResolvedValue({
       success: true,
@@ -323,34 +331,10 @@ describe('MessageReview (broker)', () => {
 
     await waitFor(() => screen.getByText('Alice'));
 
-    // The quick-view button is an icon-only button with aria-label from t('messages.quick_view_aria')
-    // Translation fallback in test = key string 'messages.quick_view_aria'
-    // Try all buttons until one opens a dialog
-    const buttons = screen.getAllByRole('button');
-    // Try clicking each non-flag, non-review button (the eye icon is the last one per row)
-    let opened = false;
-    for (const btn of buttons) {
-      const lbl = (btn.getAttribute('aria-label') ?? '').toLowerCase();
-      const txt = (btn.textContent ?? '').toLowerCase();
-      if (lbl.includes('view') || lbl.includes('quick') || lbl.includes('aria') || txt === '') {
-        fireEvent.click(btn);
-        await new Promise((r) => setTimeout(r, 50));
-        if (document.querySelector('[role="dialog"]')) {
-          opened = true;
-          break;
-        }
-      }
-    }
-    // If modal opened we're good; if not, the icon button's aria-label key didn't match
-    // — the behavior (openDetail called) is already tested via callsreviewMessage tests;
-    // modal presence is a HeroUI jsdom constraint. Skip assertion when no dialog found.
-    if (opened) {
-      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
-    } else {
-      // Verify at minimum that showMessage was NOT called yet (modal requires button click)
-      // The test's goal is button discovery; count as pass if dialog didn't surface in jsdom
-      expect(true).toBe(true); // dialog not available in this jsdom/HeroUI context
-    }
+    fireEvent.click(screen.getByRole('button', { name: 'Quick view message' }));
+    await waitFor(() => {
+      expect(mockAdminBroker.showMessage).toHaveBeenCalledWith(1);
+    });
   });
 
   it('shows error toast when getMessages fails', async () => {
@@ -360,6 +344,21 @@ describe('MessageReview (broker)', () => {
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled();
+    });
+  });
+
+  it('renders an honest error state with retry when loading fails', async () => {
+    mockAdminBroker.getMessages
+      .mockRejectedValueOnce(new Error('network'))
+      .mockResolvedValueOnce(makeListRes([makeMessage()], 1));
+    const { MessageReview } = await import('./MessageReviewPage');
+    render(<MessageReview />);
+
+    expect(await screen.findByText("Couldn't load messages")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    await waitFor(() => {
+      expect(screen.getByText('Alice')).toBeInTheDocument();
     });
   });
 
@@ -381,16 +380,9 @@ describe('MessageReview (broker)', () => {
 
     await waitFor(() => screen.getByText('Alice'));
 
-    // reviewed_at is set → no "mark reviewed" button in the row
-    const buttons = screen.getAllByRole('button');
-    const reviewBtn = buttons.find((b) =>
-      b.textContent?.toLowerCase() === 'review'
-    );
-    // Should be undefined (no review action for already-reviewed messages)
-    // Note: exact text depends on translation; check aria-label instead
-    const reviewAriaBtn = buttons.find((b) =>
-      b.getAttribute('aria-label')?.toLowerCase().includes('mark_reviewed')
-    );
-    expect(reviewAriaBtn).toBeUndefined();
+    // reviewed_at is set → no "mark reviewed" action in the row, but the
+    // quick-view action remains available.
+    expect(screen.queryByRole('button', { name: 'Mark message as reviewed' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Quick view message' })).toBeInTheDocument();
   });
 });

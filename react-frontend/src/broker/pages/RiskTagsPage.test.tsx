@@ -5,7 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent, within } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 
 // ─── Mock adminApi ─────────────────────────────────────────────────────────────
@@ -56,13 +56,18 @@ vi.mock('@/admin/components', () => ({
     data,
     columns,
     isLoading,
+    emptyContent,
   }: {
     data: Record<string, unknown>[];
     columns: { key: string; label: string; render?: (item: Record<string, unknown>) => React.ReactNode }[];
     isLoading?: boolean;
+    emptyContent?: React.ReactNode;
   }) => {
     if (isLoading) {
       return <div role="status" aria-busy="true" data-testid="datatable-loading">Loading…</div>;
+    }
+    if (data.length === 0 && emptyContent) {
+      return <div data-testid="datatable-empty">{emptyContent}</div>;
     }
     return (
       <table>
@@ -171,7 +176,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
         {children}
       </div>
     ),
-    Tab: ({ key: _key, title }: { key?: string; title: string }) => (
+    Tab: ({ key: _key, title }: { key?: string; title: React.ReactNode }) => (
       <div role="tab">{title}</div>
     ),
   };
@@ -208,12 +213,14 @@ describe('RiskTagsPage', () => {
     mockAdminListings.list.mockResolvedValue({ success: true, data: [] });
   });
 
-  it('shows loading state initially', async () => {
+  it('shows skeleton loading state initially', async () => {
     mockAdminBroker.getRiskTags.mockImplementationOnce(() => new Promise(() => {}));
     const { RiskTagsPage } = await import('./RiskTagsPage');
     render(<RiskTagsPage />);
 
-    expect(screen.getByTestId('datatable-loading')).toBeInTheDocument();
+    // First load renders the shaped BrokerSkeleton, not the table spinner.
+    expect(screen.getAllByRole('status').length).toBeGreaterThan(0);
+    expect(screen.queryByTestId('datatable-loading')).not.toBeInTheDocument();
   });
 
   it('renders listing title after data loads', async () => {
@@ -244,6 +251,21 @@ describe('RiskTagsPage', () => {
     });
   });
 
+  it('renders an all-clear empty state when the register is empty', async () => {
+    mockAdminBroker.getRiskTags.mockResolvedValue({ success: true, data: [] });
+    const { RiskTagsPage } = await import('./RiskTagsPage');
+    render(<RiskTagsPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('No risk tags yet')).toBeInTheDocument();
+    });
+    expect(
+      screen.getByText(
+        'No listings are currently flagged. Tag a listing to apply controls like broker approval, insurance or vetting.'
+      )
+    ).toBeInTheDocument();
+  });
+
   it('shows error toast when API fails', async () => {
     mockAdminBroker.getRiskTags.mockRejectedValue(new Error('server error'));
     const { RiskTagsPage } = await import('./RiskTagsPage');
@@ -252,6 +274,86 @@ describe('RiskTagsPage', () => {
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled();
     });
+  });
+
+  it('renders an honest error state with a retry button when loading fails', async () => {
+    mockAdminBroker.getRiskTags.mockRejectedValue(new Error('server error'));
+    const { RiskTagsPage } = await import('./RiskTagsPage');
+    render(<RiskTagsPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Couldn't load risk tags")).toBeInTheDocument();
+    });
+
+    // Retry re-fetches and recovers.
+    mockAdminBroker.getRiskTags.mockResolvedValue({ success: true, data: [makeTag()] });
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Dog Walking Service')).toBeInTheDocument();
+    });
+    expect(mockAdminBroker.getRiskTags).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders KPI stat cards with per-level counts and deep links', async () => {
+    mockAdminBroker.getRiskTags.mockResolvedValue({
+      success: true,
+      data: [
+        makeTag(),
+        makeTag({ id: 2, listing_id: 11, listing_title: 'Gardening Help', risk_level: 'critical' }),
+      ],
+    });
+    const { RiskTagsPage } = await import('./RiskTagsPage');
+    render(<RiskTagsPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Dog Walking Service')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Critical tags')).toBeInTheDocument();
+    expect(screen.getByText('High risk')).toBeInTheDocument();
+    expect(screen.getByText('Medium risk')).toBeInTheDocument();
+    expect(screen.getByText('Low risk')).toBeInTheDocument();
+
+    const criticalCard = screen.getByLabelText('View Critical risk tags');
+    expect(criticalCard).toHaveAttribute('href', '/test/broker/risk-tags?level=critical');
+    expect(within(criticalCard).getByText('1')).toBeInTheDocument();
+  });
+
+  it('renders the risk level as a severity status chip in the table', async () => {
+    const { RiskTagsPage } = await import('./RiskTagsPage');
+    render(<RiskTagsPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Dog Walking Service')).toBeInTheDocument();
+    });
+
+    const table = screen.getByRole('table');
+    expect(within(table).getByText('High')).toBeInTheDocument();
+  });
+
+  it('renders the category label in the table', async () => {
+    const { RiskTagsPage } = await import('./RiskTagsPage');
+    render(<RiskTagsPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Health & Safety')).toBeInTheDocument();
+    });
+  });
+
+  it('renders requirement chips only for the flags a row carries', async () => {
+    const { RiskTagsPage } = await import('./RiskTagsPage');
+    render(<RiskTagsPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Dog Walking Service')).toBeInTheDocument();
+    });
+
+    const table = screen.getByRole('table');
+    expect(within(table).getByText('Approval')).toBeInTheDocument();
+    expect(within(table).getByText('Insurance')).toBeInTheDocument();
+    // dbs_required is false on the fixture — no DBS chip.
+    expect(within(table).queryByText('DBS')).not.toBeInTheDocument();
   });
 
   it('opens create modal when Tag Listing button pressed', async () => {

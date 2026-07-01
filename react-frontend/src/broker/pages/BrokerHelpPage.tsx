@@ -1,4 +1,3 @@
-import { Card, CardBody, CardHeader, Accordion, AccordionItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,13 +12,29 @@ import { Card, CardBody, CardHeader, Accordion, AccordionItem } from '@/componen
  *
  * The presentational `BrokerControlsHelp` component does NOT call usePageTitle —
  * if it did, embedding it on the dashboard would clobber the dashboard's title.
- * The standalone wrapper `BrokerHelpPage` owns the title for the /broker/help route.
+ * The standalone wrapper `BrokerHelpPage` owns the title for the /broker/help
+ * route and adds a searchable, on-brand help-center frame around the same
+ * section content (client-side filter over the translated section text).
+ *
+ * All section content is data-driven from HELP_SECTIONS so the embedded panel,
+ * the standalone page, and the search index can never drift apart.
  */
 
-
-import { Separator } from '@/components/ui';
+import { useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Accordion,
+  AccordionItem,
+  Button,
+  Input,
+  Separator,
+} from '@/components/ui';
 import { usePageTitle } from '@/hooks';
+import type { LucideIcon } from 'lucide-react';
 import BookOpen from 'lucide-react/icons/book-open';
 import Workflow from 'lucide-react/icons/workflow';
 import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
@@ -30,6 +45,9 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Scale from 'lucide-react/icons/scale';
 import Phone from 'lucide-react/icons/phone';
 import Database from 'lucide-react/icons/database';
+import Search from 'lucide-react/icons/search';
+import SearchX from 'lucide-react/icons/search-x';
+import { BrokerPageShell, BrokerEmptyState, type BrokerStatColor } from '../components';
 
 const richComponents = {
   b: <strong />,
@@ -37,289 +55,441 @@ const richComponents = {
   code: <code />,
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Section content model — every block references the existing broker.json
+// help.* keys, so restructuring the presentation never touches the copy.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type HelpBlock =
+  | { type: 'p'; key: string; rich?: boolean; italic?: boolean }
+  | { type: 'heading'; key: string }
+  | { type: 'list'; ordered?: boolean; items: ReadonlyArray<{ key: string; rich?: boolean }> };
+
+interface HelpSectionDef {
+  key: string;
+  icon: LucideIcon;
+  tone: BrokerStatColor;
+  blocks: ReadonlyArray<HelpBlock>;
+}
+
+const HELP_SECTIONS: ReadonlyArray<HelpSectionDef> = [
+  {
+    key: 'overview',
+    icon: BookOpen,
+    tone: 'accent',
+    blocks: [
+      { type: 'p', key: 'help.overview.intro' },
+      {
+        type: 'list',
+        items: [
+          { key: 'help.overview.bullet_exchange', rich: true },
+          { key: 'help.overview.bullet_risk_tags', rich: true },
+          { key: 'help.overview.bullet_message_review', rich: true },
+          { key: 'help.overview.bullet_user_monitoring', rich: true },
+          { key: 'help.overview.bullet_vetting', rich: true },
+          { key: 'help.overview.bullet_configuration', rich: true },
+        ],
+      },
+      { type: 'p', key: 'help.overview.access_note', rich: true },
+    ],
+  },
+  {
+    key: 'workflow',
+    icon: Workflow,
+    tone: 'accent',
+    blocks: [
+      { type: 'p', key: 'help.workflow.intro' },
+      {
+        type: 'list',
+        ordered: true,
+        items: [
+          { key: 'help.workflow.step_unreviewed', rich: true },
+          { key: 'help.workflow.step_pending', rich: true },
+          { key: 'help.workflow.step_alerts', rich: true },
+          { key: 'help.workflow.step_vetting', rich: true },
+          { key: 'help.workflow.step_activity', rich: true },
+        ],
+      },
+      { type: 'p', key: 'help.workflow.tip', italic: true },
+    ],
+  },
+  {
+    key: 'messages',
+    icon: MessageSquareWarning,
+    tone: 'warning',
+    blocks: [
+      { type: 'p', key: 'help.messages.intro' },
+      { type: 'heading', key: 'help.messages.severity_heading' },
+      {
+        type: 'list',
+        items: [
+          { key: 'help.messages.severity_high', rich: true },
+          { key: 'help.messages.severity_medium', rich: true },
+          { key: 'help.messages.severity_low', rich: true },
+        ],
+      },
+      { type: 'heading', key: 'help.messages.action_heading' },
+      {
+        type: 'list',
+        ordered: true,
+        items: [
+          { key: 'help.messages.action_open' },
+          { key: 'help.messages.action_read' },
+          { key: 'help.messages.action_mark', rich: true },
+          { key: 'help.messages.action_escalate' },
+        ],
+      },
+      { type: 'p', key: 'help.messages.retention' },
+    ],
+  },
+  {
+    key: 'monitoring',
+    icon: Eye,
+    tone: 'accent',
+    blocks: [
+      { type: 'p', key: 'help.monitoring.intro' },
+      {
+        type: 'list',
+        items: [
+          { key: 'help.monitoring.automatic', rich: true },
+          { key: 'help.monitoring.manual', rich: true },
+        ],
+      },
+      { type: 'p', key: 'help.monitoring.expiry', rich: true },
+      { type: 'p', key: 'help.monitoring.risk_tags', rich: true },
+    ],
+  },
+  {
+    key: 'vetting',
+    icon: ShieldCheck,
+    tone: 'success',
+    blocks: [
+      { type: 'p', key: 'help.vetting.intro' },
+      {
+        type: 'list',
+        items: [
+          { key: 'help.vetting.type_garda', rich: true },
+          { key: 'help.vetting.type_dbs', rich: true },
+          { key: 'help.vetting.type_pvg', rich: true },
+          { key: 'help.vetting.type_access_ni', rich: true },
+          { key: 'help.vetting.type_international', rich: true },
+          { key: 'help.vetting.type_other', rich: true },
+        ],
+      },
+      { type: 'heading', key: 'help.vetting.lifecycle_heading' },
+      {
+        type: 'list',
+        ordered: true,
+        items: [
+          { key: 'help.vetting.lifecycle_pending', rich: true },
+          { key: 'help.vetting.lifecycle_verified', rich: true },
+          { key: 'help.vetting.lifecycle_reminder', rich: true },
+          { key: 'help.vetting.lifecycle_expired', rich: true },
+          { key: 'help.vetting.lifecycle_rejected', rich: true },
+        ],
+      },
+      { type: 'p', key: 'help.vetting.match_note', rich: true, italic: true },
+    ],
+  },
+  {
+    key: 'alerts',
+    icon: AlertTriangle,
+    tone: 'danger',
+    blocks: [
+      { type: 'p', key: 'help.alerts.intro' },
+      {
+        type: 'list',
+        items: [{ key: 'help.alerts.counts_messages' }, { key: 'help.alerts.counts_incidents' }],
+      },
+      { type: 'heading', key: 'help.alerts.escalate_heading' },
+      {
+        type: 'list',
+        items: [
+          { key: 'help.alerts.escalate_abuse', rich: true },
+          { key: 'help.alerts.escalate_child', rich: true },
+          { key: 'help.alerts.escalate_vetting', rich: true },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'legal',
+    icon: Scale,
+    tone: 'neutral',
+    blocks: [
+      { type: 'p', key: 'help.legal.disclaimer' },
+      {
+        type: 'list',
+        items: [
+          { key: 'help.legal.law_nvb', rich: true },
+          { key: 'help.legal.law_children_first', rich: true },
+          { key: 'help.legal.law_svga', rich: true },
+          { key: 'help.legal.law_pvg', rich: true },
+          { key: 'help.legal.law_svgni', rich: true },
+          { key: 'help.legal.law_gdpr', rich: true },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'data',
+    icon: Database,
+    tone: 'neutral',
+    blocks: [
+      {
+        type: 'list',
+        items: [
+          { key: 'help.data.monitoring_status', rich: true },
+          { key: 'help.data.message_copies', rich: true },
+          { key: 'help.data.vetting_records', rich: true },
+          { key: 'help.data.user_prefs', rich: true },
+          { key: 'help.data.guardian_assignments', rich: true },
+          { key: 'help.data.audit_trail', rich: true },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'contacts',
+    icon: Phone,
+    tone: 'accent',
+    blocks: [
+      {
+        type: 'list',
+        items: [
+          { key: 'help.contacts.technical', rich: true },
+          { key: 'help.contacts.safeguarding', rich: true },
+          { key: 'help.contacts.criminality', rich: true },
+          { key: 'help.contacts.policy', rich: true },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'troubleshooting',
+    icon: ShieldAlert,
+    tone: 'warning',
+    blocks: [
+      {
+        type: 'list',
+        items: [
+          { key: 'help.troubleshooting.cant_message', rich: true },
+          { key: 'help.troubleshooting.wrong_member', rich: true },
+          { key: 'help.troubleshooting.vetting_stuck', rich: true },
+          { key: 'help.troubleshooting.no_copies', rich: true },
+        ],
+      },
+    ],
+  },
+];
+
+/** i18n keys whose translated text makes up a section's search haystack. */
+function sectionSearchKeys(section: HelpSectionDef): string[] {
+  const keys = [`help.${section.key}.title`, `help.${section.key}.aria`];
+  for (const block of section.blocks) {
+    if (block.type === 'list') {
+      keys.push(...block.items.map((item) => item.key));
+    } else {
+      keys.push(block.key);
+    }
+  }
+  return keys;
+}
+
+// Tailwind JIT needs full class names at build time — no dynamic `bg-${tone}/10`.
+const toneTileClass: Record<BrokerStatColor, string> = {
+  accent: 'text-accent bg-accent/10',
+  success: 'text-success bg-success/10',
+  warning: 'text-warning bg-warning/10',
+  danger: 'text-danger bg-danger/10',
+  neutral: 'text-muted bg-surface-tertiary',
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Renderers shared by the embedded panel and the standalone page
+// ─────────────────────────────────────────────────────────────────────────────
+
+function HelpBlocks({ blocks }: { blocks: ReadonlyArray<HelpBlock> }) {
+  const { t } = useTranslation('broker');
+
+  return (
+    <div className="space-y-3 text-sm leading-relaxed text-muted">
+      {blocks.map((block) => {
+        if (block.type === 'heading') {
+          return (
+            <p key={block.key} className="font-medium text-foreground">
+              {t(block.key)}
+            </p>
+          );
+        }
+        if (block.type === 'p') {
+          return (
+            <p key={block.key} className={block.italic ? 'italic text-muted' : undefined}>
+              {block.rich ? <Trans t={t} i18nKey={block.key} components={richComponents} /> : t(block.key)}
+            </p>
+          );
+        }
+        const ListTag = block.ordered ? 'ol' : 'ul';
+        return (
+          <ListTag
+            key={block.items.map((item) => item.key).join('|')}
+            className={`${block.ordered ? 'list-decimal' : 'list-disc'} space-y-1.5 pl-5`}
+          >
+            {block.items.map((item) => (
+              <li key={item.key}>
+                {item.rich ? <Trans t={t} i18nKey={item.key} components={richComponents} /> : t(item.key)}
+              </li>
+            ))}
+          </ListTag>
+        );
+      })}
+    </div>
+  );
+}
+
+function HelpAccordion({ sections }: { sections: ReadonlyArray<HelpSectionDef> }) {
+  const { t } = useTranslation('broker');
+
+  return (
+    <Accordion variant="splitted" selectionMode="multiple">
+      {sections.map((section) => {
+        const Icon = section.icon;
+        return (
+          <AccordionItem
+            key={section.key}
+            id={section.key}
+            aria-label={t(`help.${section.key}.aria`)}
+            startContent={
+              <span
+                aria-hidden="true"
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ring-1 ring-inset ring-current/10 ${toneTileClass[section.tone]}`}
+              >
+                <Icon size={15} />
+              </span>
+            }
+            title={<span className="font-medium text-foreground">{t(`help.${section.key}.title`)}</span>}
+          >
+            <HelpBlocks blocks={section.blocks} />
+          </AccordionItem>
+        );
+      })}
+    </Accordion>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Embedded guidance panel (dashboard) — export name and collapsible behaviour
+// are load-bearing: BrokerDashboardPage imports { BrokerControlsHelp }.
+// ─────────────────────────────────────────────────────────────────────────────
+
 export function BrokerControlsHelp() {
   const { t } = useTranslation('broker');
 
   return (
     <section className="mt-10">
-      <Card className="border border-border">
+      <Card className="rounded-2xl border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
         <CardHeader className="flex items-center gap-3 pb-2">
-          <div className="p-2 rounded-lg bg-accent/10">
-            <BookOpen className="w-5 h-5 text-accent" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent ring-1 ring-inset ring-current/10">
+            <BookOpen size={20} aria-hidden="true" />
           </div>
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">
-              {t('help.title')}
-            </h2>
-            <p className="text-xs text-muted">
-              {t('help.subtitle')}
-            </p>
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">{t('help.title')}</h2>
+            <p className="text-xs text-muted">{t('help.subtitle')}</p>
           </div>
         </CardHeader>
         <Separator />
         <CardBody className="pt-4">
-          <Accordion variant="splitted" selectionMode="multiple">
-            {/* Overview */}
-            <AccordionItem
-              key="overview" id="overview"
-              aria-label={t('help.overview.aria')}
-              title={
-                <div className="flex items-center gap-2">
-                  <Workflow className="w-4 h-4 text-accent" />
-                  <span className="font-medium">{t('help.overview.title')}</span>
-                </div>
-              }
-            >
-              <div className="text-sm leading-relaxed text-muted space-y-3">
-                <p>{t('help.overview.intro')}</p>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li><Trans t={t} i18nKey="help.overview.bullet_exchange" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.overview.bullet_risk_tags" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.overview.bullet_message_review" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.overview.bullet_user_monitoring" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.overview.bullet_vetting" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.overview.bullet_configuration" components={richComponents} /></li>
-                </ul>
-                <p><Trans t={t} i18nKey="help.overview.access_note" components={richComponents} /></p>
-              </div>
-            </AccordionItem>
-
-            {/* Workflow */}
-            <AccordionItem
-              key="workflow" id="workflow"
-              aria-label={t('help.workflow.aria')}
-              title={
-                <div className="flex items-center gap-2">
-                  <Workflow className="w-4 h-4 text-accent" />
-                  <span className="font-medium">{t('help.workflow.title')}</span>
-                </div>
-              }
-            >
-              <div className="text-sm leading-relaxed text-muted space-y-3">
-                <p>{t('help.workflow.intro')}</p>
-                <ol className="list-decimal pl-5 space-y-2">
-                  <li><Trans t={t} i18nKey="help.workflow.step_unreviewed" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.workflow.step_pending" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.workflow.step_alerts" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.workflow.step_vetting" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.workflow.step_activity" components={richComponents} /></li>
-                </ol>
-                <p className="italic text-muted">{t('help.workflow.tip')}</p>
-              </div>
-            </AccordionItem>
-
-            {/* Messages */}
-            <AccordionItem
-              key="messages" id="messages"
-              aria-label={t('help.messages.aria')}
-              title={
-                <div className="flex items-center gap-2">
-                  <MessageSquareWarning className="w-4 h-4 text-warning" />
-                  <span className="font-medium">{t('help.messages.title')}</span>
-                </div>
-              }
-            >
-              <div className="text-sm leading-relaxed text-muted space-y-3">
-                <p>{t('help.messages.intro')}</p>
-                <p className="font-medium text-foreground">{t('help.messages.severity_heading')}</p>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li><Trans t={t} i18nKey="help.messages.severity_high" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.messages.severity_medium" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.messages.severity_low" components={richComponents} /></li>
-                </ul>
-                <p className="font-medium text-foreground">{t('help.messages.action_heading')}</p>
-                <ol className="list-decimal pl-5 space-y-1">
-                  <li>{t('help.messages.action_open')}</li>
-                  <li>{t('help.messages.action_read')}</li>
-                  <li><Trans t={t} i18nKey="help.messages.action_mark" components={richComponents} /></li>
-                  <li>{t('help.messages.action_escalate')}</li>
-                </ol>
-                <p>{t('help.messages.retention')}</p>
-              </div>
-            </AccordionItem>
-
-            {/* Monitoring */}
-            <AccordionItem
-              key="monitoring" id="monitoring"
-              aria-label={t('help.monitoring.aria')}
-              title={
-                <div className="flex items-center gap-2">
-                  <Eye className="w-4 h-4 text-accent" />
-                  <span className="font-medium">{t('help.monitoring.title')}</span>
-                </div>
-              }
-            >
-              <div className="text-sm leading-relaxed text-muted space-y-3">
-                <p>{t('help.monitoring.intro')}</p>
-                <ul className="list-disc pl-5 space-y-2">
-                  <li><Trans t={t} i18nKey="help.monitoring.automatic" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.monitoring.manual" components={richComponents} /></li>
-                </ul>
-                <p><Trans t={t} i18nKey="help.monitoring.expiry" components={richComponents} /></p>
-                <p><Trans t={t} i18nKey="help.monitoring.risk_tags" components={richComponents} /></p>
-              </div>
-            </AccordionItem>
-
-            {/* Vetting */}
-            <AccordionItem
-              key="vetting" id="vetting"
-              aria-label={t('help.vetting.aria')}
-              title={
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-success" />
-                  <span className="font-medium">{t('help.vetting.title')}</span>
-                </div>
-              }
-            >
-              <div className="text-sm leading-relaxed text-muted space-y-3">
-                <p>{t('help.vetting.intro')}</p>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li><Trans t={t} i18nKey="help.vetting.type_garda" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.vetting.type_dbs" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.vetting.type_pvg" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.vetting.type_access_ni" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.vetting.type_international" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.vetting.type_other" components={richComponents} /></li>
-                </ul>
-                <p className="font-medium text-foreground">{t('help.vetting.lifecycle_heading')}</p>
-                <ol className="list-decimal pl-5 space-y-1">
-                  <li><Trans t={t} i18nKey="help.vetting.lifecycle_pending" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.vetting.lifecycle_verified" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.vetting.lifecycle_reminder" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.vetting.lifecycle_expired" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.vetting.lifecycle_rejected" components={richComponents} /></li>
-                </ol>
-                <p className="italic text-muted"><Trans t={t} i18nKey="help.vetting.match_note" components={richComponents} /></p>
-              </div>
-            </AccordionItem>
-
-            {/* Alerts */}
-            <AccordionItem
-              key="alerts" id="alerts"
-              aria-label={t('help.alerts.aria')}
-              title={
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-danger" />
-                  <span className="font-medium">{t('help.alerts.title')}</span>
-                </div>
-              }
-            >
-              <div className="text-sm leading-relaxed text-muted space-y-3">
-                <p>{t('help.alerts.intro')}</p>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>{t('help.alerts.counts_messages')}</li>
-                  <li>{t('help.alerts.counts_incidents')}</li>
-                </ul>
-                <p className="font-medium text-foreground">{t('help.alerts.escalate_heading')}</p>
-                <ul className="list-disc pl-5 space-y-2">
-                  <li><Trans t={t} i18nKey="help.alerts.escalate_abuse" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.alerts.escalate_child" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.alerts.escalate_vetting" components={richComponents} /></li>
-                </ul>
-              </div>
-            </AccordionItem>
-
-            {/* Legal */}
-            <AccordionItem
-              key="legal" id="legal"
-              aria-label={t('help.legal.aria')}
-              title={
-                <div className="flex items-center gap-2">
-                  <Scale className="w-4 h-4 text-muted" />
-                  <span className="font-medium">{t('help.legal.title')}</span>
-                </div>
-              }
-            >
-              <div className="text-sm leading-relaxed text-muted space-y-3">
-                <p>{t('help.legal.disclaimer')}</p>
-                <ul className="list-disc pl-5 space-y-2">
-                  <li><Trans t={t} i18nKey="help.legal.law_nvb" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.legal.law_children_first" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.legal.law_svga" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.legal.law_pvg" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.legal.law_svgni" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.legal.law_gdpr" components={richComponents} /></li>
-                </ul>
-              </div>
-            </AccordionItem>
-
-            {/* Data */}
-            <AccordionItem
-              key="data" id="data"
-              aria-label={t('help.data.aria')}
-              title={
-                <div className="flex items-center gap-2">
-                  <Database className="w-4 h-4 text-muted" />
-                  <span className="font-medium">{t('help.data.title')}</span>
-                </div>
-              }
-            >
-              <div className="text-sm leading-relaxed text-muted space-y-3">
-                <ul className="list-disc pl-5 space-y-2">
-                  <li><Trans t={t} i18nKey="help.data.monitoring_status" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.data.message_copies" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.data.vetting_records" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.data.user_prefs" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.data.guardian_assignments" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.data.audit_trail" components={richComponents} /></li>
-                </ul>
-              </div>
-            </AccordionItem>
-
-            {/* Contacts */}
-            <AccordionItem
-              key="contacts" id="contacts"
-              aria-label={t('help.contacts.aria')}
-              title={
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-accent" />
-                  <span className="font-medium">{t('help.contacts.title')}</span>
-                </div>
-              }
-            >
-              <div className="text-sm leading-relaxed text-muted space-y-3">
-                <ul className="list-disc pl-5 space-y-2">
-                  <li><Trans t={t} i18nKey="help.contacts.technical" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.contacts.safeguarding" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.contacts.criminality" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.contacts.policy" components={richComponents} /></li>
-                </ul>
-              </div>
-            </AccordionItem>
-
-            {/* Troubleshooting */}
-            <AccordionItem
-              key="troubleshooting" id="troubleshooting"
-              aria-label={t('help.troubleshooting.aria')}
-              title={
-                <div className="flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 text-warning" />
-                  <span className="font-medium">{t('help.troubleshooting.title')}</span>
-                </div>
-              }
-            >
-              <div className="text-sm leading-relaxed text-muted space-y-3">
-                <ul className="list-disc pl-5 space-y-2">
-                  <li><Trans t={t} i18nKey="help.troubleshooting.cant_message" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.troubleshooting.wrong_member" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.troubleshooting.vetting_stuck" components={richComponents} /></li>
-                  <li><Trans t={t} i18nKey="help.troubleshooting.no_copies" components={richComponents} /></li>
-                </ul>
-              </div>
-            </AccordionItem>
-          </Accordion>
+          <HelpAccordion sections={HELP_SECTIONS} />
         </CardBody>
       </Card>
     </section>
   );
 }
 
-/**
- * Standalone /broker/help route wrapper. Owns the page title; the embedded
- * usage on the dashboard renders the bare `BrokerControlsHelp` component.
- */
+// ─────────────────────────────────────────────────────────────────────────────
+// Standalone /broker/help route — searchable help center
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function BrokerHelpPage() {
   const { t } = useTranslation('broker');
   usePageTitle(t('help.page_title'));
-  return <BrokerControlsHelp />;
+
+  // Deep-linkable search (?q=…) so a filtered help view can be shared/bookmarked.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get('q') ?? '';
+  const setQuery = (next: string) => {
+    setSearchParams(next ? { q: next } : {}, { replace: true });
+  };
+
+  // Full-text haystack per section, built from the same i18n keys the panel
+  // renders — the search can never drift from the visible copy. Tags from
+  // rich strings (<b>/<code>…) are stripped before matching.
+  const haystacks = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const section of HELP_SECTIONS) {
+      const text = sectionSearchKeys(section)
+        .map((key) => t(key))
+        .join(' ')
+        .replace(/<[^>]+>/g, ' ')
+        .toLowerCase();
+      map.set(section.key, text);
+    }
+    return map;
+  }, [t]);
+
+  const normalized = query.trim().toLowerCase();
+  const visibleSections = normalized
+    ? HELP_SECTIONS.filter((section) => (haystacks.get(section.key) ?? '').includes(normalized))
+    : HELP_SECTIONS;
+
+  return (
+    <BrokerPageShell
+      title={t('help.title')}
+      description={t('help.subtitle')}
+      icon={BookOpen}
+      color="neutral"
+      toolbar={
+        <div className="flex flex-col gap-2 p-1 sm:flex-row sm:items-center sm:justify-between">
+          <Input
+            className="w-full sm:max-w-sm"
+            placeholder={t('help.search_placeholder')}
+            aria-label={t('help.search_aria')}
+            startContent={<Search size={16} className="text-muted" aria-hidden="true" />}
+            value={query}
+            onValueChange={setQuery}
+            size="sm"
+            variant="secondary"
+            isClearable
+            onClear={() => setQuery('')}
+          />
+          <p className="px-1 text-xs tabular-nums text-muted" aria-live="polite">
+            {t('help.search_count', {
+              shown: visibleSections.length,
+              total: HELP_SECTIONS.length,
+            })}
+          </p>
+        </div>
+      }
+    >
+      {visibleSections.length === 0 ? (
+        <BrokerEmptyState
+          icon={SearchX}
+          color="neutral"
+          title={t('help.search_empty_title')}
+          hint={t('help.search_empty_hint')}
+          action={
+            <Button size="sm" variant="tertiary" onPress={() => setQuery('')}>
+              {t('help.search_clear')}
+            </Button>
+          }
+        />
+      ) : (
+        <Card className="rounded-2xl border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
+          <CardBody className="p-3 sm:p-4">
+            <HelpAccordion sections={visibleSections} />
+          </CardBody>
+        </Card>
+      )}
+    </BrokerPageShell>
+  );
 }

@@ -1,4 +1,3 @@
-import { Select, SelectItem, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Checkbox } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,17 +7,44 @@ import { Select, SelectItem, Button, Spinner, Input, Textarea, Modal, ModalConte
  * Vetting Records Management
  * Manage DBS/Garda vetting records for safeguarding compliance (TOL2).
  * Parity: PHP AdminVettingApiController
+ *
+ * Restyled to the broker design language: BrokerPageShell frame (compliance =
+ * success), deep-linked BrokerStatCard KPI header, expiry countdown chips
+ * (danger when expired, warning inside 30 days), BrokerStatusChip for the
+ * panel-wide statuses, BrokerSkeleton first load and BrokerEmptyState with an
+ * all-caught-up flavour when a review queue is clear. All API calls, filters
+ * (?status= / ?user_id=), bulk actions, upload and record modals are
+ * behaviour-identical to the previous version.
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 
-import { Chip } from '@/components/ui';
+import {
+  Select,
+  SelectItem,
+  Button,
+  Spinner,
+  Input,
+  Textarea,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Avatar,
+  Tabs,
+  Tab,
+  Checkbox,
+  Chip,
+} from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
+import ShieldX from 'lucide-react/icons/shield-x';
 import Clock from 'lucide-react/icons/clock';
+import CalendarClock from 'lucide-react/icons/calendar-clock';
 import Plus from 'lucide-react/icons/plus';
 import Check from 'lucide-react/icons/check';
 import X from 'lucide-react/icons/x';
@@ -31,13 +57,21 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import Eye from 'lucide-react/icons/eye';
 import Pencil from 'lucide-react/icons/pencil';
 import Upload from 'lucide-react/icons/upload';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { parseServerTimestamp, formatServerDate, formatServerDateTime } from '@/lib/serverTime';
 import { adminVetting, adminUsers } from '@/admin/api/adminApi';
-import { DataTable, StatCard, PageHeader, ConfirmModal, EmptyState, type Column } from '@/admin/components';
+import { DataTable, ConfirmModal, type Column } from '@/admin/components';
 import type { VettingRecord, VettingStats } from '@/admin/api/types';
+import {
+  BrokerPageShell,
+  BrokerStatCard,
+  BrokerEmptyState,
+  BrokerSkeleton,
+  BrokerStatusChip,
+} from '../components';
 
 const VETTING_TYPE_KEYS: Record<string, string> = {
   dbs_basic: 'type_dbs_basic',
@@ -50,16 +84,10 @@ const VETTING_TYPE_KEYS: Record<string, string> = {
   other: 'type_other',
 };
 
-const STATUS_COLOR_MAP: Record<string, 'warning' | 'success' | 'danger' | 'accent' | 'default'> = {
-  pending: 'warning',
-  submitted: 'accent',
-  verified: 'success',
-  expired: 'danger',
-  rejected: 'danger',
-  revoked: 'default',
-};
-
 const SEARCH_DEBOUNCE_MS = 300;
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+/** Records expiring inside this window get the warning countdown chip. */
+const EXPIRY_WARNING_DAYS = 30;
 
 // Status filter is mirrored to the `?status=` URL param so the broker
 // dashboard stat cards can deep-link straight into a filtered view and
@@ -73,6 +101,11 @@ const VETTING_STATUSES = [
   'all', 'pending_review', 'pending', 'submitted', 'verified', 'expired', 'expiring_soon', 'rejected',
 ] as const;
 
+/** Pre-verification states the broker still owns — empty here means "all caught up". */
+const QUEUE_STATUSES: ReadonlyArray<(typeof VETTING_STATUSES)[number]> = [
+  'pending_review', 'pending', 'submitted',
+];
+
 interface UserSearchResult {
   id: number;
   first_name: string;
@@ -80,11 +113,38 @@ interface UserSearchResult {
   email: string;
 }
 
+/**
+ * Countdown chip for an expiry date — danger once expired, warning inside the
+ * 30-day window, neutral otherwise. Renders nothing when there is no expiry.
+ */
+function ExpiryCountdownChip({ expiryDate }: { expiryDate: string | null | undefined }) {
+  const { t } = useTranslation('broker');
+  const expiry = parseServerTimestamp(expiryDate);
+  if (!expiry) return null;
+  const days = Math.ceil((expiry.getTime() - Date.now()) / MS_PER_DAY);
+  const color: 'danger' | 'warning' | 'default' =
+    days <= 0 ? 'danger' : days <= EXPIRY_WARNING_DAYS ? 'warning' : 'default';
+  const label = days <= 0 ? t('status.expired') : t('vetting.expiry_days_left', { count: days });
+  return (
+    <Chip size="sm" variant="soft" color={color} className="shrink-0 tabular-nums">
+      {label}
+    </Chip>
+  );
+}
+
 export function VettingRecords() {
   const { t } = useTranslation('broker');
   usePageTitle(t('vetting.title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
+
+  // Stash the latest `t` and `toast` in refs so loadItems' identity is keyed
+  // on the fetch params only — a language switch or toast-context re-render
+  // must never refetch the list (see BrokerDashboardPage for the pattern).
+  const tRef = useRef(t);
+  const toastRef = useRef(toast);
+  tRef.current = t;
+  toastRef.current = toast;
 
   const getTypeLabel = (key: string): string => {
     const tKey = VETTING_TYPE_KEYS[key];
@@ -122,6 +182,8 @@ export function VettingRecords() {
   const [items, setItems] = useState<VettingRecord[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [listError, setListError] = useState(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   // Debounce the search input so we don't fire a network request on every
@@ -257,6 +319,7 @@ export function VettingRecords() {
 
   const loadItems = useCallback(async () => {
     setLoading(true);
+    setListError(false);
     try {
       const params: Record<string, unknown> = { page, per_page: 25 };
       if (statusFilter === 'expiring_soon') {
@@ -276,14 +339,19 @@ export function VettingRecords() {
         setItems(res.data as VettingRecord[]);
         const meta = res.meta as Record<string, unknown> | undefined;
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
+      } else {
+        // Honest failure — never let a failed load render as an empty,
+        // ok-looking compliance list.
+        setListError(true);
       }
     } catch {
-      toast.error(t('vetting.toast_load_failed'));
+      setListError(true);
+      toastRef.current.error(tRef.current('vetting.toast_load_failed'));
     } finally {
       setLoading(false);
+      setHasLoadedOnce(true);
     }
-  }, [page, statusFilter, debouncedSearch, userIdFilter, toast, t])
-
+  }, [page, statusFilter, debouncedSearch, userIdFilter]);
 
   useEffect(() => {
     loadStats();
@@ -292,6 +360,12 @@ export function VettingRecords() {
   useEffect(() => {
     loadItems();
   }, [loadItems]);
+
+  // Reset pagination whenever the status filter changes via URL — stat cards
+  // and dashboard tiles navigate by deep link, bypassing the tab handler.
+  useEffect(() => {
+    setPage(1);
+  }, [statusFilter]);
 
   const handleVerify = async (item: VettingRecord) => {
     setVerifyingId(item.id);
@@ -561,10 +635,10 @@ export function VettingRecords() {
             className="shrink-0"
           />
           <div className="min-w-0">
-            <p className="font-medium text-foreground truncate">
+            <p className="truncate font-medium text-foreground">
               {item.first_name} {item.last_name}
             </p>
-            <p className="text-xs text-muted truncate">{item.email}</p>
+            <p className="truncate text-xs text-muted">{item.email}</p>
           </div>
         </div>
       ),
@@ -583,22 +657,13 @@ export function VettingRecords() {
       key: 'status',
       label: t('vetting.col_status'),
       sortable: true,
-      render: (item) => (
-        <Chip
-          size="sm"
-          variant="soft"
-          color={STATUS_COLOR_MAP[item.status] || 'default'}
-          className="capitalize"
-        >
-          {t(`status.${item.status}`)}
-        </Chip>
-      ),
+      render: (item) => <BrokerStatusChip status={item.status} />,
     },
     {
       key: 'reference_number',
       label: t('vetting.col_reference'),
       render: (item) => (
-        <span className="text-sm text-muted font-mono">
+        <span className="font-mono text-sm text-muted">
           {item.reference_number || '—'}
         </span>
       ),
@@ -608,7 +673,7 @@ export function VettingRecords() {
       label: t('vetting.col_issue_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-muted">
+        <span className="text-sm tabular-nums text-muted">
           {formatServerDate(item.issue_date)}
         </span>
       ),
@@ -620,15 +685,11 @@ export function VettingRecords() {
       render: (item) => {
         const expiry = parseServerTimestamp(item.expiry_date);
         if (!expiry) return <span className="text-sm text-muted">{'—'}</span>;
-        const now = new Date();
-        const daysUntilExpiry = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-        const isExpiringSoon = daysUntilExpiry > 0 && daysUntilExpiry <= 30;
-        const isExpired = daysUntilExpiry <= 0;
-
         return (
-          <span className={`text-sm ${isExpired ? 'text-danger font-medium' : isExpiringSoon ? 'text-warning font-medium' : 'text-muted'}`}>
-            {expiry.toLocaleDateString()}
-          </span>
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="text-sm tabular-nums text-muted">{expiry.toLocaleDateString()}</span>
+            <ExpiryCountdownChip expiryDate={item.expiry_date} />
+          </div>
         );
       },
     },
@@ -639,15 +700,13 @@ export function VettingRecords() {
         <div className="flex gap-1">
           {item.works_with_children && (
             <Chip size="sm" variant="soft" color="warning">
-              <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
-              <Baby size={10} />
+              <Baby size={10} aria-hidden="true" />
               <Chip.Label>{t('vetting.works_with_children')}</Chip.Label>
             </Chip>
           )}
           {item.works_with_vulnerable_adults && (
             <Chip size="sm" variant="soft" color="warning">
-              <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
-              <HeartHandshake size={10} />
+              <HeartHandshake size={10} aria-hidden="true" />
               <Chip.Label>{t('vetting.works_with_vulnerable_adults')}</Chip.Label>
             </Chip>
           )}
@@ -718,122 +777,194 @@ export function VettingRecords() {
     },
   ];
 
-  return (
-    <div>
-      <PageHeader
-        title={t('vetting.page_title')}
-        description={t('vetting.page_description')}
-        actions={
-          <div className="flex gap-2">
-            <Button
-              variant="primary"
-              startContent={<Plus size={16} />}
-              size="sm"
-              onPress={() => { resetCreateForm(); setCreateOpen(true); }}
-            >
-              {t('vetting.add_record')}
-            </Button>
-            <Button
-              as={Link}
-              to={tenantPath('/broker')}
-              variant="secondary"
-              startContent={<ArrowLeft size={16} />}
-              size="sm"
-            >
-              {t('vetting.back')}
-            </Button>
-          </div>
-        }
-      />
+  const pendingReviewCount = stats?.pending_review ?? stats?.pending ?? 0;
+  const hasSearch = debouncedSearch.trim().length > 0;
+  const isQueueFilter = QUEUE_STATUSES.includes(statusFilter);
 
+  const emptyState = isQueueFilter && !hasSearch ? (
+    <BrokerEmptyState
+      bare
+      icon={ShieldCheck}
+      color="success"
+      title={t('vetting.empty_queue_title')}
+      hint={t('vetting.empty_queue_hint')}
+    />
+  ) : statusFilter === 'all' && !hasSearch && !userIdFilter ? (
+    <BrokerEmptyState
+      bare
+      icon={Users}
+      color="neutral"
+      title={t('vetting.empty_title')}
+      hint={t('vetting.empty_add_to_start')}
+      action={
+        <Button
+          size="sm"
+          variant="primary"
+          startContent={<Plus size={14} />}
+          onPress={() => { resetCreateForm(); setCreateOpen(true); }}
+        >
+          {t('vetting.add_record')}
+        </Button>
+      }
+    />
+  ) : (
+    <BrokerEmptyState
+      bare
+      icon={Search}
+      color="neutral"
+      title={t('vetting.empty_title')}
+      hint={t('vetting.empty_try_filter')}
+    />
+  );
+
+  return (
+    <BrokerPageShell
+      title={t('vetting.page_title')}
+      description={t('vetting.page_description')}
+      icon={ShieldCheck}
+      color="success"
+      actions={
+        <>
+          <Button
+            variant="primary"
+            startContent={<Plus size={16} />}
+            size="sm"
+            onPress={() => { resetCreateForm(); setCreateOpen(true); }}
+          >
+            {t('vetting.add_record')}
+          </Button>
+          <Button
+            as={Link}
+            to={tenantPath('/broker')}
+            variant="tertiary"
+            startContent={<ArrowLeft size={16} />}
+            size="sm"
+          >
+            {t('vetting.back')}
+          </Button>
+        </>
+      }
+    >
       {statsError && (
-        <div className="rounded-lg border border-warning-200 bg-warning-50/50 p-3 flex items-start gap-3 mb-4">
-          <ShieldAlert size={20} className="text-warning shrink-0 mt-0.5" />
+        <div className="mb-4 flex items-start gap-3 rounded-2xl border border-warning/30 bg-warning/10 p-3">
+          <ShieldAlert size={20} className="mt-0.5 shrink-0 text-warning" aria-hidden="true" />
           <div className="flex-1 text-sm">
-            <p className="font-medium text-warning-700">{t('vetting.stats_error_title')}</p>
+            <p className="font-medium text-warning">{t('vetting.stats_error_title')}</p>
             <p className="text-muted">{t('vetting.stats_error_body')}</p>
           </div>
-          <Button size="sm" variant="secondary" className="text-warning" onPress={loadStats}>
+          <Button size="sm" variant="tertiary" onPress={loadStats}>
             {t('vetting.retry')}
           </Button>
         </div>
       )}
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard
-          label={t('vetting.stat_total_records')}
-          value={stats?.total ?? 0}
-          icon={FileText}
-          color="default"
-          loading={statsLoading}
-        />
-        <StatCard
+      {/* KPI header — deep-linked into the matching filtered views */}
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <BrokerStatCard
           label={t('vetting.stat_pending_review')}
           // pending_review = pending + submitted (pre-verification states
           // the broker still owns). Falls back to legacy `pending` for
           // backwards-compat with API responses that pre-date the field.
-          value={stats?.pending_review ?? stats?.pending ?? 0}
+          value={pendingReviewCount}
           icon={Clock}
           color="warning"
           loading={statsLoading}
+          to={tenantPath('/broker/vetting?status=pending_review')}
         />
-        <StatCard
+        <BrokerStatCard
           label={t('vetting.stat_verified')}
           value={stats?.verified ?? 0}
           icon={ShieldCheck}
           color="success"
           loading={statsLoading}
+          to={tenantPath('/broker/vetting?status=verified')}
+          description={stats ? t('vetting.stat_of_total', { count: stats.total }) : undefined}
         />
-        <StatCard
+        <BrokerStatCard
           label={t('vetting.stat_expiring_soon')}
           value={stats?.expiring_soon ?? 0}
-          icon={ShieldAlert}
+          icon={CalendarClock}
+          color="warning"
+          loading={statsLoading}
+          to={tenantPath('/broker/vetting?status=expiring_soon')}
+          description={
+            stats && (stats.expired ?? 0) > 0
+              ? t('vetting.stat_expired_hint', { count: stats.expired })
+              : undefined
+          }
+        />
+        <BrokerStatCard
+          label={t('vetting.stat_rejected')}
+          value={stats?.rejected ?? 0}
+          icon={ShieldX}
           color="danger"
           loading={statsLoading}
+          to={tenantPath('/broker/vetting?status=rejected')}
         />
       </div>
 
-      {/* Search */}
-      <div className="mb-4">
-        <Input
-          placeholder={t('vetting.search_full_placeholder')}
-          aria-label={t('vetting.search_aria')}
-          value={searchQuery}
-          onValueChange={(val) => { setSearchQuery(val); setPage(1); }}
-          startContent={<Search size={16} className="text-muted" />}
-          variant="secondary"
-          size="sm"
-          className="max-w-md"
-          isClearable
-          onClear={() => { setSearchQuery(''); setPage(1); }}
-        />
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="mb-4">
-        <Tabs
-          aria-label={t('vetting.tabs_aria')}
-          selectedKey={statusFilter}
-          onSelectionChange={(key) => { setStatusFilter(key as VettingStatus); setPage(1); }}
-          variant="underlined"
-          size="sm"
-        >
-          <Tab key="all" title={t('vetting.tab_all')} />
-          <Tab key="pending_review" title={t('vetting.tab_pending_review')} />
-          <Tab key="pending" title={t('vetting.tab_pending')} />
-          <Tab key="submitted" title={t('vetting.tab_submitted')} />
-          <Tab key="verified" title={t('vetting.tab_verified')} />
-          <Tab key="expired" title={t('vetting.tab_expired')} />
-          <Tab key="expiring_soon" title={t('vetting.tab_expiring')} />
-          <Tab key="rejected" title={t('vetting.tab_rejected')} />
-        </Tabs>
+      {/* Toolbar — search + deep-linkable status tabs */}
+      <div className="mb-4 rounded-2xl border border-divider/70 bg-surface p-2 shadow-sm shadow-black/[0.03]">
+        <div className="flex flex-col gap-2">
+          <Input
+            placeholder={t('vetting.search_full_placeholder')}
+            aria-label={t('vetting.search_aria')}
+            value={searchQuery}
+            onValueChange={(val) => { setSearchQuery(val); setPage(1); }}
+            startContent={<Search size={16} className="text-muted" aria-hidden="true" />}
+            variant="secondary"
+            size="sm"
+            className="max-w-md"
+            isClearable
+            onClear={() => { setSearchQuery(''); setPage(1); }}
+          />
+          <Tabs
+            aria-label={t('vetting.tabs_aria')}
+            selectedKey={statusFilter}
+            onSelectionChange={(key) => { setStatusFilter(key as VettingStatus); setPage(1); }}
+            variant="underlined"
+            size="sm"
+          >
+            <Tab key="all" title={t('vetting.tab_all')} />
+            <Tab
+              key="pending_review"
+              title={
+                <div className="flex items-center gap-2">
+                  <span>{t('vetting.tab_pending_review')}</span>
+                  {pendingReviewCount > 0 && (
+                    <Chip size="sm" variant="soft" color="warning" className="tabular-nums">
+                      {pendingReviewCount}
+                    </Chip>
+                  )}
+                </div>
+              }
+            />
+            <Tab key="pending" title={t('vetting.tab_pending')} />
+            <Tab key="submitted" title={t('vetting.tab_submitted')} />
+            <Tab key="verified" title={t('vetting.tab_verified')} />
+            <Tab key="expired" title={t('vetting.tab_expired')} />
+            <Tab
+              key="expiring_soon"
+              title={
+                <div className="flex items-center gap-2">
+                  <span>{t('vetting.tab_expiring')}</span>
+                  {(stats?.expiring_soon ?? 0) > 0 && (
+                    <Chip size="sm" variant="soft" color="warning" className="tabular-nums">
+                      {stats?.expiring_soon}
+                    </Chip>
+                  )}
+                </div>
+              }
+            />
+            <Tab key="rejected" title={t('vetting.tab_rejected')} />
+          </Tabs>
+        </div>
       </div>
 
       {/* Bulk Action Bar */}
       {selectedIds.size > 0 && (
-        <div className="mb-4 flex items-center gap-3 p-3 rounded-lg bg-accent-soft border border-accent">
-          <span className="text-sm font-medium text-accent">
+        <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-accent/30 bg-accent/10 p-3">
+          <span className="text-sm font-medium text-accent tabular-nums">
             {t('vetting.records_selected', { count: selectedIds.size })}
           </span>
           <div className="flex gap-2">
@@ -873,28 +1004,43 @@ export function VettingRecords() {
         </div>
       )}
 
-      {/* Data Table */}
-      <DataTable
-        columns={columns}
-        data={items}
-        isLoading={loading}
-        searchable={false}
-        onRefresh={loadItems}
-        totalItems={total}
-        page={page}
-        pageSize={25}
-        onPageChange={setPage}
-        selectable
-        selectedKeys={selectedIds}
-        onSelectionChange={setSelectedIds}
-        emptyContent={
-          <EmptyState
-            icon={Users}
-            title={t('vetting.empty_title')}
-            description={statusFilter !== 'all' ? t('vetting.empty_try_filter') : t('vetting.empty_add_to_start')}
-          />
-        }
-      />
+      {/* Data Table — honest error panel, shaped first-load skeleton */}
+      {listError ? (
+        <BrokerEmptyState
+          icon={ShieldAlert}
+          color="danger"
+          title={t('vetting.list_error_title')}
+          hint={t('vetting.list_error_body')}
+          action={
+            <Button
+              size="sm"
+              variant="tertiary"
+              startContent={<RefreshCw size={14} />}
+              onPress={loadItems}
+            >
+              {t('vetting.retry')}
+            </Button>
+          }
+        />
+      ) : !hasLoadedOnce ? (
+        <BrokerSkeleton variant="table" count={8} />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={items}
+          isLoading={loading}
+          searchable={false}
+          onRefresh={loadItems}
+          totalItems={total}
+          page={page}
+          pageSize={25}
+          onPageChange={setPage}
+          selectable
+          selectedKeys={selectedIds}
+          onSelectionChange={setSelectedIds}
+          emptyContent={emptyState}
+        />
+      )}
 
       {/* File pickers are spawned on demand via openFilePickerForRecord —
           the recordId is captured in the click closure so there's no
@@ -911,13 +1057,13 @@ export function VettingRecords() {
       >
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Plus size={20} className="text-accent" />
+            <Plus size={20} className="text-accent" aria-hidden="true" />
             {t('vetting.modal_add_title')}
           </ModalHeader>
           <ModalBody className="gap-4">
             {/* Member search instead of raw User ID */}
             {selectedUser ? (
-              <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-surface-secondary">
+              <div className="flex items-center justify-between rounded-lg border border-border bg-surface-secondary p-3">
                 <div className="flex items-center gap-2">
                   <Avatar name={`${selectedUser.first_name} ${selectedUser.last_name}`} size="sm" />
                   <div>
@@ -946,16 +1092,16 @@ export function VettingRecords() {
                   onValueChange={setUserSearchQuery}
                   variant="secondary"
                   isRequired
-                  startContent={<Search size={14} className="text-muted" />}
+                  startContent={<Search size={14} className="text-muted" aria-hidden="true" />}
                   endContent={userSearchLoading ? <Spinner size="sm" /> : undefined}
                 />
                 {userSearchResults.length > 0 && (
-                  <div className="mt-1 border border-border rounded-lg overflow-hidden max-h-48 overflow-y-auto">
+                  <div className="mt-1 max-h-48 overflow-hidden overflow-y-auto rounded-lg border border-border">
                     {userSearchResults.map((u) => (
                       <Button
                         key={u.id}
                         variant="tertiary"
-                        className="w-full min-h-12 flex items-center gap-2 p-2 justify-start rounded-none"
+                        className="flex min-h-12 w-full items-center justify-start gap-2 rounded-none p-2"
                         onPress={() => {
                           setSelectedUser(u);
                           setCreateForm(prev => ({ ...prev, user_id: String(u.id) }));
@@ -965,15 +1111,15 @@ export function VettingRecords() {
                       >
                         <Avatar name={`${u.first_name} ${u.last_name}`} size="sm" className="shrink-0" />
                         <div className="min-w-0 text-left">
-                          <p className="text-sm font-medium truncate">{u.first_name} {u.last_name}</p>
-                          <p className="text-xs text-muted truncate">{u.email}</p>
+                          <p className="truncate text-sm font-medium">{u.first_name} {u.last_name}</p>
+                          <p className="truncate text-xs text-muted">{u.email}</p>
                         </div>
                       </Button>
                     ))}
                   </div>
                 )}
                 {userSearchQuery.trim().length >= 2 && !userSearchLoading && userSearchResults.length === 0 && (
-                  <p className="text-xs text-muted mt-1">{t('vetting.no_members_found')}</p>
+                  <p className="mt-1 text-xs text-muted">{t('vetting.no_members_found')}</p>
                 )}
               </div>
             )}
@@ -1072,11 +1218,11 @@ export function VettingRecords() {
         >
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
-              <Pencil size={20} className="text-accent" />
+              <Pencil size={20} className="text-accent" aria-hidden="true" />
               {t('vetting.modal_edit_title')}
             </ModalHeader>
             <ModalBody className="gap-4">
-              <div className="flex items-center gap-2 p-3 rounded-lg border border-border bg-surface-secondary">
+              <div className="flex items-center gap-2 rounded-lg border border-border bg-surface-secondary p-3">
                 <Avatar
                   src={resolveAvatarUrl(editItem.avatar_url) || undefined}
                   name={`${editItem.first_name} ${editItem.last_name}`}
@@ -1182,11 +1328,11 @@ export function VettingRecords() {
         >
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
-              <X size={20} className="text-danger" />
+              <X size={20} className="text-danger" aria-hidden="true" />
               {t('vetting.modal_reject_title')}
             </ModalHeader>
             <ModalBody>
-              <p className="text-muted mb-3">
+              <p className="mb-3 text-muted">
                 {t('vetting.reject_confirm_prefix')}{' '}
                 <strong>{rejectModal.first_name} {rejectModal.last_name}</strong>{t('vetting.reject_confirm_suffix')}
               </p>
@@ -1229,18 +1375,18 @@ export function VettingRecords() {
         >
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
-              <FileText size={20} className="text-accent" />
+              <FileText size={20} className="text-accent" aria-hidden="true" />
               {t('vetting.modal_view_title')}
             </ModalHeader>
             <ModalBody>
-              <div className="flex items-center gap-3 mb-4">
+              <div className="mb-4 flex items-center gap-3">
                 <Avatar
                   src={resolveAvatarUrl(viewItem.avatar_url) || undefined}
                   name={`${viewItem.first_name} ${viewItem.last_name}`}
                   size="lg"
                 />
                 <div>
-                  <p className="text-lg font-semibold">{viewItem.first_name} {viewItem.last_name}</p>
+                  <p className="text-lg font-semibold tracking-tight">{viewItem.first_name} {viewItem.last_name}</p>
                   <p className="text-sm text-muted">{viewItem.email}</p>
                 </div>
               </div>
@@ -1251,9 +1397,7 @@ export function VettingRecords() {
                 </div>
                 <div>
                   <p className="text-muted">{t('vetting.col_status')}</p>
-                  <Chip size="sm" variant="soft" color={STATUS_COLOR_MAP[viewItem.status] || 'default'} className="capitalize">
-                    {t(`status.${viewItem.status}`)}
-                  </Chip>
+                  <BrokerStatusChip status={viewItem.status} />
                 </div>
                 <div>
                   <p className="text-muted">{t('vetting.field_reference_number')}</p>
@@ -1261,11 +1405,14 @@ export function VettingRecords() {
                 </div>
                 <div>
                   <p className="text-muted">{t('vetting.field_issue_date')}</p>
-                  <p className="font-medium">{formatServerDate(viewItem.issue_date)}</p>
+                  <p className="font-medium tabular-nums">{formatServerDate(viewItem.issue_date)}</p>
                 </div>
                 <div>
                   <p className="text-muted">{t('vetting.field_expiry_date')}</p>
-                  <p className="font-medium">{formatServerDate(viewItem.expiry_date)}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium tabular-nums">{formatServerDate(viewItem.expiry_date)}</p>
+                    <ExpiryCountdownChip expiryDate={viewItem.expiry_date} />
+                  </div>
                 </div>
                 <div>
                   <p className="text-muted">{t('vetting.verified_by')}</p>
@@ -1277,18 +1424,18 @@ export function VettingRecords() {
                 </div>
                 <div>
                   <p className="text-muted">{t('vetting.verified_at')}</p>
-                  <p className="font-medium">{formatServerDateTime(viewItem.verified_at)}</p>
+                  <p className="font-medium tabular-nums">{formatServerDateTime(viewItem.verified_at)}</p>
                 </div>
                 <div>
                   <p className="text-muted">{t('vetting.created')}</p>
-                  <p className="font-medium">{formatServerDateTime(viewItem.created_at)}</p>
+                  <p className="font-medium tabular-nums">{formatServerDateTime(viewItem.created_at)}</p>
                 </div>
               </div>
 
               {/* #11-12: Rejection details */}
               {viewItem.status === 'rejected' && (
-                <div className="mt-4 p-3 rounded-lg bg-danger-50 border border-danger-200">
-                  <p className="text-sm font-medium text-danger mb-1">{t('vetting.rejection_details')}</p>
+                <div className="mt-4 rounded-2xl border border-danger/30 bg-danger/10 p-3">
+                  <p className="mb-1 text-sm font-medium text-danger">{t('vetting.rejection_details')}</p>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                     <div>
                       <p className="text-muted">{t('vetting.rejected_by')}</p>
@@ -1300,57 +1447,57 @@ export function VettingRecords() {
                     </div>
                     <div>
                       <p className="text-muted">{t('vetting.rejected_at')}</p>
-                      <p className="font-medium">{formatServerDateTime(viewItem.rejected_at)}</p>
+                      <p className="font-medium tabular-nums">{formatServerDateTime(viewItem.rejected_at)}</p>
                     </div>
                   </div>
                   {viewItem.rejection_reason && (
                     <div className="mt-2">
-                      <p className="text-muted text-sm">{t('vetting.reason')}</p>
+                      <p className="text-sm text-muted">{t('vetting.reason')}</p>
                       <p className="text-sm">{viewItem.rejection_reason}</p>
                     </div>
                   )}
                 </div>
               )}
 
-              <div className="mt-4 flex gap-2 flex-wrap">
+              <div className="mt-4 flex flex-wrap gap-2">
                 {viewItem.works_with_children && (
                   <Chip size="sm" variant="soft" color="warning">
-                    <Baby size={12} />
+                    <Baby size={12} aria-hidden="true" />
                     <Chip.Label>{t('vetting.works_with_children')}</Chip.Label>
                   </Chip>
                 )}
                 {viewItem.works_with_vulnerable_adults && (
                   <Chip size="sm" variant="soft" color="warning">
-                    <HeartHandshake size={12} />
+                    <HeartHandshake size={12} aria-hidden="true" />
                     <Chip.Label>{t('vetting.works_with_vulnerable_adults')}</Chip.Label>
                   </Chip>
                 )}
                 {viewItem.requires_enhanced_check && (
                   <Chip size="sm" variant="soft" color="danger">
-                    <ShieldAlert size={12} />
+                    <ShieldAlert size={12} aria-hidden="true" />
                     <Chip.Label>{t('vetting.requires_enhanced_check')}</Chip.Label>
                   </Chip>
                 )}
               </div>
               {viewItem.notes && (
                 <div className="mt-4">
-                  <p className="text-muted text-sm mb-1">{t('vetting.field_notes')}</p>
-                  <p className="text-sm bg-surface-secondary p-3 rounded-lg whitespace-pre-wrap">{viewItem.notes}</p>
+                  <p className="mb-1 text-sm text-muted">{t('vetting.field_notes')}</p>
+                  <p className="whitespace-pre-wrap rounded-lg bg-surface-secondary p-3 text-sm">{viewItem.notes}</p>
                 </div>
               )}
 
               {/* #10: Document section */}
               <div className="mt-4">
-                <p className="text-muted text-sm mb-2">{t('vetting.document')}</p>
+                <p className="mb-2 text-sm text-muted">{t('vetting.document')}</p>
                 {viewItem.document_url ? (
                   <div className="flex items-center gap-2">
                     <a
                       href={viewItem.document_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-accent hover:underline flex items-center gap-1"
+                      className="flex items-center gap-1 text-sm text-accent hover:underline"
                     >
-                      <FileText size={14} />
+                      <FileText size={14} aria-hidden="true" />
                       {t('vetting.view_document')}
                     </a>
                     <Button
@@ -1373,7 +1520,7 @@ export function VettingRecords() {
                     {t('vetting.upload_document')}
                   </Button>
                 )}
-                <p className="text-xs text-muted mt-1">{t('vetting.document_types_hint')}</p>
+                <p className="mt-1 text-xs text-muted">{t('vetting.document_types_hint')}</p>
               </div>
             </ModalBody>
             <ModalFooter>
@@ -1422,11 +1569,11 @@ export function VettingRecords() {
         >
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
-              <X size={20} className="text-danger" />
+              <X size={20} className="text-danger" aria-hidden="true" />
               {t('vetting.modal_bulk_reject_title')}
             </ModalHeader>
             <ModalBody>
-              <p className="text-muted mb-3">
+              <p className="mb-3 text-muted">
                 {t('vetting.bulk_reject_confirm', { count: selectedIds.size })}
               </p>
               <Textarea
@@ -1458,7 +1605,7 @@ export function VettingRecords() {
           </ModalContent>
         </Modal>
       )}
-    </div>
+    </BrokerPageShell>
   );
 }
 

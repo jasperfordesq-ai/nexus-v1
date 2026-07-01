@@ -3,8 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import type { ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, within } from '@/test/test-utils';
 import userEvent from '@testing-library/user-event';
 import { createMockContexts } from '@/test/mock-contexts';
 
@@ -12,10 +13,28 @@ import { createMockContexts } from '@/test/mock-contexts';
 
 const MOCK_FUNNEL = vi.hoisted(() => ({
   stages: [
-    { name: 'Registered', count: 100 },
-    { name: 'Email Verified', count: 80 },
-    { name: 'Profile Complete', count: 50 },
-    { name: 'First Exchange', count: 20 },
+    { name: 'Registered', count: 100, color: '#3b82f6' },
+    { name: 'Email Verified', count: 80, color: '#8b5cf6' },
+    { name: 'Profile Complete', count: 50, color: '#f59e0b' },
+    { name: 'First Exchange', count: 20, color: '#10b981' },
+  ],
+  monthly_registrations: [
+    { month: '2026-01', count: 4 },
+    { month: '2026-02', count: 6 },
+    { month: '2026-03', count: 8 },
+    { month: '2026-04', count: 7 },
+    { month: '2026-05', count: 9 },
+    { month: '2026-06', count: 12 },
+  ],
+}));
+
+// Older API shape — no monthly_registrations field at all.
+const MOCK_FUNNEL_LEGACY = vi.hoisted(() => ({
+  stages: [
+    { name: 'Registered', count: 100, color: '#3b82f6' },
+    { name: 'Email Verified', count: 80, color: '#8b5cf6' },
+    { name: 'Profile Complete', count: 50, color: '#f59e0b' },
+    { name: 'First Exchange', count: 20, color: '#10b981' },
   ],
 }));
 
@@ -71,6 +90,18 @@ vi.mock('@/lib/serverTime', () => ({
   formatServerDate: (d: string) => new Date(d).toLocaleDateString(),
 }));
 
+// ── mock recharts (jsdom has no layout — standard project pattern) ────────────
+
+vi.mock('recharts', () => ({
+  ResponsiveContainer: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  AreaChart: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  Area: () => null,
+  XAxis: () => null,
+  YAxis: () => null,
+  CartesianGrid: () => null,
+  Tooltip: () => null,
+}));
+
 // ── component import (after mocks) ────────────────────────────────────────────
 
 import { adminCrm, adminUsers } from '@/admin/api/adminApi';
@@ -94,7 +125,7 @@ describe('OnboardingPage', () => {
     vi.mocked(adminUsers.approve).mockResolvedValue({ success: true });
   });
 
-  it('shows loading spinners while fetching', () => {
+  it('shows loading skeletons while fetching', () => {
     // Never-resolving promises keep loading state alive
     vi.mocked(adminCrm.getFunnel).mockReturnValue(new Promise(() => {}));
     vi.mocked(adminUsers.list).mockReturnValue(new Promise(() => {}));
@@ -107,16 +138,35 @@ describe('OnboardingPage', () => {
     expect(busyEls.length).toBeGreaterThan(0);
   });
 
+  it('renders the page shell title and KPI stat cards', async () => {
+    render(<OnboardingPage />);
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Onboarding' })).toBeInTheDocument();
+
+    await waitFor(() => {
+      // KPI label — also reused as the funnel-footer label, hence getAllByText
+      expect(screen.getAllByText('Overall conversion').length).toBeGreaterThan(0);
+    });
+    expect(screen.getByText('Pending approvals')).toBeInTheDocument();
+    expect(screen.getByText('Biggest drop-off')).toBeInTheDocument();
+    // 'Registered' appears as the KPI label AND as a funnel stage label
+    expect(screen.getAllByText('Registered').length).toBeGreaterThan(0);
+    // Overall conversion 20/100 → 20.0% (KPI card + funnel footer)
+    expect(screen.getAllByText('20.0%').length).toBeGreaterThan(0);
+  });
+
   it('renders funnel stage names after loading', async () => {
     render(<OnboardingPage />);
 
     await waitFor(() => {
-      // Stage labels come from translation keys — i18n fallback returns the key
-      // so we check for the count values which are rendered numerically. The
-      // first-stage count (100) also appears in the "Registered" KPI card, so
-      // there can be more than one match.
-      expect(screen.getAllByText('100').length).toBeGreaterThan(0);
+      expect(screen.getByText('Email Verified')).toBeInTheDocument();
     });
+    expect(screen.getByText('Profile Complete')).toBeInTheDocument();
+    // 'First Exchange' also appears in the drop-off KPI description and the
+    // funnel footer, so multiple matches are expected.
+    expect(screen.getAllByText('First Exchange').length).toBeGreaterThan(0);
+    // Stage counts render numerically (100 also appears in the Registered KPI)
+    expect(screen.getAllByText('100').length).toBeGreaterThan(0);
   });
 
   it('renders progress bars for funnel stages', async () => {
@@ -128,7 +178,27 @@ describe('OnboardingPage', () => {
     });
   });
 
-  it('shows no_data message when funnel has no stages', async () => {
+  it('renders the registrations trend section when monthly data is present', async () => {
+    render(<OnboardingPage />);
+
+    expect(await screen.findByText('Registrations Trend')).toBeInTheDocument();
+  });
+
+  it('hides the trend section when monthly_registrations is absent (older API)', async () => {
+    vi.mocked(adminCrm.getFunnel).mockResolvedValue({
+      success: true,
+      data: MOCK_FUNNEL_LEGACY,
+    });
+
+    render(<OnboardingPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Email Verified')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Registrations Trend')).not.toBeInTheDocument();
+  });
+
+  it('shows no-data message when funnel has no stages', async () => {
     vi.mocked(adminCrm.getFunnel).mockResolvedValue({
       success: true,
       data: { stages: [] },
@@ -136,14 +206,9 @@ describe('OnboardingPage', () => {
 
     render(<OnboardingPage />);
 
-    // Wait for funnel loading to finish
-    await waitFor(() => {
-      const busyEls = screen.queryAllByRole('status').filter(
-        (el) => el.getAttribute('aria-busy') === 'true',
-      );
-      // Funnel spinner should be gone
-      expect(busyEls.length).toBeLessThanOrEqual(1); // members may still be loading
-    });
+    expect(await screen.findByText('No data available.')).toBeInTheDocument();
+    // No stages → no trend chart either
+    expect(screen.queryByText('Registrations Trend')).not.toBeInTheDocument();
   });
 
   it('renders pending member names in the table', async () => {
@@ -155,7 +220,7 @@ describe('OnboardingPage', () => {
     expect(screen.getByText('Jane Roe')).toBeInTheDocument();
   });
 
-  it('shows no_pending message when members list is empty', async () => {
+  it('shows the all-caught-up empty state when no members are pending', async () => {
     vi.mocked(adminUsers.list).mockResolvedValue({
       success: true,
       data: [],
@@ -163,11 +228,9 @@ describe('OnboardingPage', () => {
 
     render(<OnboardingPage />);
 
-    await waitFor(() => {
-      // The emptyContent div renders when data is empty
-      // It contains a "no pending" translation key string
-      expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
-    });
+    expect(await screen.findByText('All caught up')).toBeInTheDocument();
+    expect(screen.getByText('No pending members to approve.')).toBeInTheDocument();
+    expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
   });
 
   it('opens approve confirmation modal when Approve action is triggered', async () => {
@@ -177,13 +240,11 @@ describe('OnboardingPage', () => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
 
-    // Actions column: icon-only DropdownTrigger buttons (no text content)
-    const iconBtns = screen.getAllByRole('button').filter(
-      (b) => !b.textContent?.trim(),
-    );
-    expect(iconBtns.length).toBeGreaterThan(0);
+    // Row actions: icon-only dropdown triggers labelled with the Actions column label
+    const actionBtns = screen.getAllByRole('button', { name: 'Actions' });
+    expect(actionBtns.length).toBeGreaterThan(0);
 
-    await userEvent.click(iconBtns[0]);
+    await userEvent.click(actionBtns[0]);
 
     // HeroUI Dropdown portals into document.body; look for the approve item
     const approveItem = document.body.querySelector('[id="approve"]') as HTMLElement | null;
@@ -193,6 +254,7 @@ describe('OnboardingPage', () => {
       await waitFor(() => {
         expect(screen.getByRole('dialog')).toBeInTheDocument();
       });
+      expect(within(screen.getByRole('dialog')).getByText('Approve Member')).toBeInTheDocument();
     } else {
       // Portal not available in jsdom — just assert table rendered
       expect(screen.getByText('John Doe')).toBeInTheDocument();
@@ -206,10 +268,8 @@ describe('OnboardingPage', () => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
 
-    const iconBtns = screen.getAllByRole('button').filter(
-      (b) => !b.textContent?.trim(),
-    );
-    await userEvent.click(iconBtns[0]);
+    const actionBtns = screen.getAllByRole('button', { name: 'Actions' });
+    await userEvent.click(actionBtns[0]);
 
     const approveItem = document.body.querySelector('[id="approve"]') as HTMLElement | null;
     if (approveItem) {
@@ -219,26 +279,22 @@ describe('OnboardingPage', () => {
         expect(screen.getByRole('dialog')).toBeInTheDocument();
       });
 
-      // Click the confirm button in the modal
+      // Click the confirm button in the modal (labelled 'Approve')
       const dialog = screen.getByRole('dialog');
-      const confirmBtns = Array.from(dialog.querySelectorAll('button')).filter(
-        (b) => b.textContent && !/cancel/i.test(b.textContent) && b.textContent.trim().length > 0,
-      );
-      if (confirmBtns.length > 0) {
-        await userEvent.click(confirmBtns[0]);
+      const confirmBtn = within(dialog).getByRole('button', { name: 'Approve' });
+      await userEvent.click(confirmBtn);
 
-        await waitFor(() => {
-          expect(adminUsers.approve).toHaveBeenCalledWith(1);
-          expect(mockToast.success).toHaveBeenCalled();
-        });
-      }
+      await waitFor(() => {
+        expect(adminUsers.approve).toHaveBeenCalledWith(1);
+        expect(mockToast.success).toHaveBeenCalled();
+      });
     } else {
       // Portal not available — test passes trivially
       expect(true).toBe(true);
     }
   });
 
-  it('shows error toast when members list fetch fails', async () => {
+  it('shows error toast and an honest retry state when members list fetch fails', async () => {
     vi.mocked(adminUsers.list).mockRejectedValue(new Error('Network error'));
 
     render(<OnboardingPage />);
@@ -246,18 +302,30 @@ describe('OnboardingPage', () => {
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled();
     });
+    expect(
+      await screen.findByText("Pending members couldn't be loaded"),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
   });
 
-  it('handles funnel API failure silently (non-critical)', async () => {
+  it('handles funnel API failure without a toast and offers a retry', async () => {
     vi.mocked(adminCrm.getFunnel).mockRejectedValue(new Error('Funnel fetch failed'));
 
     render(<OnboardingPage />);
 
-    // Funnel silently fails; members should still load
+    // Funnel fails silently (no toast); members should still load
     await waitFor(() => {
       expect(screen.getByText('John Doe')).toBeInTheDocument();
     });
-    // No error toast for funnel (it's handled silently)
     expect(mockToast.error).not.toHaveBeenCalled();
+
+    // Honest inline error state with a retry button — never a fake "all clear"
+    expect(await screen.findByText("The funnel couldn't be loaded")).toBeInTheDocument();
+    const retryBtn = screen.getByRole('button', { name: 'Retry' });
+    await userEvent.click(retryBtn);
+
+    await waitFor(() => {
+      expect(adminCrm.getFunnel).toHaveBeenCalledTimes(2);
+    });
   });
 });

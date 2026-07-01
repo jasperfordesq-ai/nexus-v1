@@ -5,12 +5,17 @@
 
 /**
  * Broker Members Page
- * Rich member management with avatar, balance, last activity, onboarding
- * status, notes drawer, and contextual actions for brokers.
+ *
+ * Rich member management restyled to the broker design language: a KPI stat
+ * header (totals derived from the same list endpoint the page already uses),
+ * deep-linkable status tabs (?status=…), enriched member cells, a polished
+ * bulk-action bar, per-tab empty states, and the notes / detail workflows.
  */
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import type { LucideIcon } from 'lucide-react';
 import { Chip } from '@/components/ui';
 import { Badge } from '@/components/ui';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
@@ -31,6 +36,13 @@ import Pin from 'lucide-react/icons/pin';
 import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Check from 'lucide-react/icons/check';
+import Users from 'lucide-react/icons/users';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Moon from 'lucide-react/icons/moon';
+import Hourglass from 'lucide-react/icons/hourglass';
+import Sparkles from 'lucide-react/icons/sparkles';
+import SearchX from 'lucide-react/icons/search-x';
+import BadgeCheck from 'lucide-react/icons/badge-check';
 import MemberDetailModal from '@/broker/components/MemberDetailModal';
 import { usePageTitle } from '@/hooks';
 import { useToast,
@@ -39,7 +51,6 @@ import { adminUsers,
   adminCrm } from '@/admin/api/adminApi';
 import type { AdminUser } from '@/admin/api/types';
 import { DataTable,
-  PageHeader,
   ConfirmModal } from '@/admin/components';
 import type { Column } from '@/admin/components';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -48,6 +59,14 @@ import { parseServerTimestamp,
   formatServerDateTime } from '@/lib/serverTime';
 
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip, Select, SelectItem } from '@/components/ui';
+import {
+  BrokerPageShell,
+  BrokerStatCard,
+  BrokerSkeleton,
+  BrokerEmptyState,
+  BrokerStatusChip,
+  type BrokerStatColor,
+} from '../components';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types & Constants
 // ─────────────────────────────────────────────────────────────────────────────
@@ -64,17 +83,34 @@ interface MemberNote {
   author?: { name: string };
 }
 
-const STATUS_COLOR: Record<string, 'warning' | 'success' | 'danger' | 'default'> = {
-  pending: 'warning',
-  active: 'success',
-  suspended: 'danger',
-  banned: 'danger',
-};
+/** KPI counts derived from the list endpoint (meta.total with limit=1). */
+interface MemberStats {
+  total: number | null;
+  pending: number | null;
+  active: number | null;
+  suspended: number | null;
+}
 
 const PAGE_SIZE = 20;
 
 // CRM note categories — mirrors the admin MemberNotes module.
 const NOTE_CATEGORIES = ['general', 'outreach', 'support', 'onboarding', 'concern', 'follow_up'] as const;
+
+// Deep-linkable tab keys — anything else in ?status falls back to 'all'.
+const VALID_TABS: ReadonlySet<string> = new Set([
+  'all', 'pending', 'active', 'suspended', 'never_logged_in', 'onboarding_incomplete',
+]);
+
+// Per-tab empty states. Empty review queues read as good news (success);
+// the catch-all tab stays neutral.
+const EMPTY_BY_TAB: Record<StatusTab, { icon: LucideIcon; color: BrokerStatColor; titleKey: string; hintKey: string }> = {
+  all: { icon: Users, color: 'neutral', titleKey: 'members.empty_all_title', hintKey: 'members.empty_all_hint' },
+  pending: { icon: Sparkles, color: 'success', titleKey: 'members.empty_pending_title', hintKey: 'members.empty_pending_hint' },
+  active: { icon: UserCheck, color: 'neutral', titleKey: 'members.empty_active_title', hintKey: 'members.empty_active_hint' },
+  suspended: { icon: ShieldCheck, color: 'success', titleKey: 'members.empty_suspended_title', hintKey: 'members.empty_suspended_hint' },
+  never_logged_in: { icon: Moon, color: 'success', titleKey: 'members.empty_never_logged_in_title', hintKey: 'members.empty_never_logged_in_hint' },
+  onboarding_incomplete: { icon: Hourglass, color: 'success', titleKey: 'members.empty_onboarding_incomplete_title', hintKey: 'members.empty_onboarding_incomplete_hint' },
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -99,6 +135,29 @@ function useTimeAgo() {
   };
 }
 
+/**
+ * Count members in a given status via the SAME list endpoint the table uses
+ * (limit=1, read meta.total). No new endpoints — just a cheap count query.
+ */
+async function fetchStatusTotal(status?: 'pending' | 'active' | 'suspended'): Promise<number | null> {
+  try {
+    const params: Record<string, unknown> = { page: 1, limit: 1 };
+    if (status) params.status = status;
+    const res = await adminUsers.list(params as Parameters<typeof adminUsers.list>[0]);
+    if (res.success && res.data) {
+      const payload = res.data as unknown;
+      if (Array.isArray(payload)) return payload.length;
+      if (payload && typeof payload === 'object') {
+        const meta = (payload as { meta?: { total?: number } }).meta;
+        if (typeof meta?.total === 'number') return meta.total;
+      }
+    }
+  } catch {
+    // Stats are supplementary — a failed count renders as "—", never a toast.
+  }
+  return null;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -110,13 +169,31 @@ export default function MembersPage() {
   const { tenantPath } = useTenant();
   usePageTitle(t('members.page_title'));
 
+  // Stash the latest `t`/`toast` in refs so the fetch effect is keyed on the
+  // real query params only (see BrokerDashboardPage for the rationale).
+  const tRef = useRef(t);
+  const toastRef = useRef(toast);
+  tRef.current = t;
+  toastRef.current = toast;
+
   // Data state
   const [members, setMembers] = useState<AdminUser[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  // First page load renders a shaped skeleton; later refreshes use the
+  // table's own isLoading so the layout never jumps.
+  const [initialLoaded, setInitialLoaded] = useState(false);
 
-  // Filter / pagination state
-  const [activeTab, setActiveTab] = useState<StatusTab>('all');
+  // KPI stats
+  const [stats, setStats] = useState<MemberStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  // Filter / pagination state — the status tab lives in the URL (?status=…)
+  // so dashboard tiles and stat cards can deep-link into a filtered view.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const statusParam = searchParams.get('status') ?? 'all';
+  const activeTab: StatusTab = (VALID_TABS.has(statusParam) ? statusParam : 'all') as StatusTab;
+
   const [search, setSearch] = useState('');
   // Debounce search so typing doesn't fire a network request on every keystroke.
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -179,15 +256,38 @@ export default function MembersPage() {
         }
       }
     } catch {
-      toast.error(t('members.action_failed'));
+      toastRef.current.error(tRef.current('members.action_failed'));
     } finally {
       setLoading(false);
+      setInitialLoaded(true);
     }
-  }, [page, activeTab, debouncedSearch, toast, t]);
+    // Fetch is keyed on the real query params only — t/toast live in refs.
+  }, [page, activeTab, debouncedSearch]);
 
   useEffect(() => {
     fetchMembers();
   }, [fetchMembers]);
+
+  const loadStats = useCallback(async () => {
+    setStatsLoading(true);
+    const [totalCount, pending, active, suspended] = await Promise.all([
+      fetchStatusTotal(),
+      fetchStatusTotal('pending'),
+      fetchStatusTotal('active'),
+      fetchStatusTotal('suspended'),
+    ]);
+    setStats({ total: totalCount, pending, active, suspended });
+    setStatsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
+
+  const refreshAll = useCallback(() => {
+    fetchMembers();
+    loadStats();
+  }, [fetchMembers, loadStats]);
 
   // ─── Notes ────────────────────────────────────────────────────────────────
 
@@ -308,10 +408,12 @@ export default function MembersPage() {
   // ─── Tab change / search ──────────────────────────────────────────────────
 
   const handleTabChange = useCallback((key: React.Key) => {
-    setActiveTab(key as StatusTab);
+    const next = String(key);
     setPage(1);
     setSelectedIds(new Set());
-  }, []);
+    // Deep-linkable filter: ?status=<tab>, omitted for the default tab.
+    setSearchParams(next === 'all' ? {} : { status: next }, { replace: true });
+  }, [setSearchParams]);
 
   const handleSearch = useCallback((query: string) => {
     setSearch(query);
@@ -336,7 +438,7 @@ export default function MembersPage() {
         if (res?.success) {
           toast.success(t(successKey, { count: ids.length }));
           clearSelection();
-          fetchMembers();
+          refreshAll();
         } else {
           toast.error(res?.error || t('members.action_failed'));
         }
@@ -346,7 +448,7 @@ export default function MembersPage() {
         setBulkLoading(false);
       }
     },
-    [selectedIds, toast, t, clearSelection, fetchMembers],
+    [selectedIds, toast, t, clearSelection, refreshAll],
   );
 
   const handleBulkApprove = useCallback(
@@ -368,7 +470,7 @@ export default function MembersPage() {
       if (res.success) {
         toast.success(t('members.approved_success'));
         setConfirmAction(null);
-        fetchMembers();
+        refreshAll();
       } else {
         toast.error(t('members.action_failed'));
       }
@@ -377,7 +479,7 @@ export default function MembersPage() {
     } finally {
       setActionLoading(false);
     }
-  }, [confirmAction, toast, t, fetchMembers]);
+  }, [confirmAction, toast, t, refreshAll]);
 
   const handleSuspend = useCallback(async () => {
     if (!confirmAction || confirmAction.type !== 'suspend') return;
@@ -387,7 +489,7 @@ export default function MembersPage() {
       if (res.success) {
         toast.success(t('members.suspended_success'));
         setConfirmAction(null);
-        fetchMembers();
+        refreshAll();
       } else {
         toast.error(t('members.action_failed'));
       }
@@ -396,7 +498,7 @@ export default function MembersPage() {
     } finally {
       setActionLoading(false);
     }
-  }, [confirmAction, toast, t, fetchMembers]);
+  }, [confirmAction, toast, t, refreshAll]);
 
   // Per-id loading flag prevents double-click from spamming the
   // reactivate endpoint (which fires welcome-back emails + bell
@@ -410,7 +512,7 @@ export default function MembersPage() {
         const res = await adminUsers.reactivate(user.id);
         if (res.success) {
           toast.success(t('members.reactivated_success'));
-          fetchMembers();
+          refreshAll();
         } else {
           toast.error(t('members.action_failed'));
         }
@@ -420,7 +522,7 @@ export default function MembersPage() {
         setReactivatingId(null);
       }
     },
-    [reactivatingId, toast, t, fetchMembers],
+    [reactivatingId, toast, t, refreshAll],
   );
 
   // ─── Columns ──────────────────────────────────────────────────────────────
@@ -431,7 +533,7 @@ export default function MembersPage() {
         key: 'member',
         label: t('members.col_name'),
         render: (user: AdminUser) => (
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <Badge
               content=""
               color={user.status === 'active' ? 'success' : user.status === 'suspended' ? 'danger' : 'warning'}
@@ -448,8 +550,20 @@ export default function MembersPage() {
               />
             </Badge>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
-              <p className="text-xs text-muted truncate">{user.email}</p>
+              <div className="flex min-w-0 items-center gap-1.5">
+                <p className="truncate text-sm font-medium text-foreground">{user.name}</p>
+                {user.email_verified_at && (
+                  <Tooltip content={t('members.email_verified')}>
+                    <BadgeCheck
+                      size={14}
+                      className="shrink-0 text-success"
+                      aria-label={t('members.email_verified')}
+                      role="img"
+                    />
+                  </Tooltip>
+                )}
+              </div>
+              <p className="truncate text-xs text-muted">{user.email}</p>
             </div>
           </div>
         ),
@@ -459,14 +573,7 @@ export default function MembersPage() {
         label: t('members.col_status'),
         render: (user: AdminUser) => (
           <div className="flex flex-col gap-1">
-            <Chip
-              size="sm"
-              variant="tertiary"
-              color={STATUS_COLOR[user.status] ?? 'default'}
-              className="capitalize"
-            >
-              {t(`status.${user.status}`)}
-            </Chip>
+            <BrokerStatusChip status={user.status} />
             {user.onboarding_completed === false && user.status !== 'pending' && (
               <Chip size="sm" variant="soft" color="warning" className="text-xs">
                 <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
@@ -495,12 +602,12 @@ export default function MembersPage() {
         render: (user: AdminUser) => (
           user.email_verified_at ? (
             <Chip size="sm" variant="tertiary" color="success">
-              <MailCheck size={12} />
+              <MailCheck size={12} aria-hidden="true" />
               <Chip.Label>{t('members.email_verified')}</Chip.Label>
             </Chip>
           ) : (
             <Chip size="sm" variant="tertiary" color="warning">
-              <MailX size={12} />
+              <MailX size={12} aria-hidden="true" />
               <Chip.Label>{t('members.email_unverified')}</Chip.Label>
             </Chip>
           )
@@ -511,8 +618,8 @@ export default function MembersPage() {
         label: t('members.col_balance'),
         render: (user: AdminUser) => (
           <div className="flex items-center gap-1.5">
-            <Coins size={14} className="text-muted" />
-            <span className="text-sm font-medium">
+            <Coins size={14} className="text-muted" aria-hidden="true" />
+            <span className="text-sm font-medium tabular-nums">
               {typeof user.balance === 'number' ? user.balance.toLocaleString() : '0'}
             </span>
             <span className="text-xs text-muted">{t('members.hours_short')}</span>
@@ -524,8 +631,8 @@ export default function MembersPage() {
         label: t('members.col_last_active'),
         render: (user: AdminUser) => (
           <Tooltip content={user.last_active_at ? formatServerDateTime(user.last_active_at) : t('members.time_never')}>
-            <div className="flex items-center gap-1.5 text-sm text-muted">
-              <Clock size={14} />
+            <div className="flex items-center gap-1.5 text-sm tabular-nums text-muted">
+              <Clock size={14} aria-hidden="true" />
               <span>{timeAgo(user.last_active_at)}</span>
             </div>
           </Tooltip>
@@ -536,7 +643,7 @@ export default function MembersPage() {
         label: t('members.col_joined'),
         sortable: true,
         render: (user: AdminUser) => (
-          <span className="text-sm text-muted">
+          <span className="text-sm tabular-nums text-muted">
             {formatServerDate(user.created_at)}
           </span>
         ),
@@ -638,31 +745,142 @@ export default function MembersPage() {
 
   // ─── Render ───────────────────────────────────────────────────────────────
 
+  const emptyDef = EMPTY_BY_TAB[activeTab];
+
   return (
-    <div className="max-w-7xl mx-auto space-y-4">
-      <PageHeader
-        title={t('members.title')}
-        description={t('members.description')}
-      />
+    <BrokerPageShell
+      title={t('members.title')}
+      description={t('members.description')}
+      icon={Users}
+      color="accent"
+      actions={
+        <Button
+          variant="tertiary"
+          size="sm"
+          startContent={<RefreshCw size={16} />}
+          onPress={refreshAll}
+          isLoading={loading && statsLoading}
+        >
+          {t('common.refresh')}
+        </Button>
+      }
+    >
+      {/* ── KPI header — counts come from the same list endpoint, deep-linked ── */}
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <BrokerStatCard
+          label={t('members.stat_total')}
+          value={stats?.total ?? null}
+          icon={Users}
+          color="accent"
+          loading={statsLoading}
+          to={tenantPath('/broker/members')}
+        />
+        <BrokerStatCard
+          label={t('members.stat_pending')}
+          value={stats?.pending ?? null}
+          icon={Clock}
+          color="warning"
+          loading={statsLoading}
+          to={tenantPath('/broker/members?status=pending')}
+        />
+        <BrokerStatCard
+          label={t('members.stat_active')}
+          value={stats?.active ?? null}
+          icon={UserCheck}
+          color="success"
+          loading={statsLoading}
+          to={tenantPath('/broker/members?status=active')}
+        />
+        <BrokerStatCard
+          label={t('members.stat_suspended')}
+          value={stats?.suspended ?? null}
+          icon={UserX}
+          color="danger"
+          loading={statsLoading}
+          to={tenantPath('/broker/members?status=suspended')}
+        />
+      </div>
 
-      <Tabs
-        aria-label={t('members.tabs_aria')}
-        selectedKey={activeTab}
-        onSelectionChange={handleTabChange}
-        variant="underlined"
-        classNames={{ tabList: 'mb-4' }}
-      >
-        <Tab key="all" title={t('members.tab_all')} />
-        <Tab key="pending" title={t('members.tab_pending')} />
-        <Tab key="active" title={t('members.tab_active')} />
-        <Tab key="suspended" title={t('members.tab_suspended')} />
-        <Tab key="never_logged_in" title={t('members.tab_never_logged_in')} />
-        <Tab key="onboarding_incomplete" title={t('members.tab_onboarding_incomplete')} />
-      </Tabs>
+      {/* ── Status tabs — deep-linkable (?status=…) ──────────────────────────── */}
+      <div className="mb-4 rounded-2xl border border-divider/70 bg-surface p-2 shadow-sm shadow-black/[0.03]">
+        <Tabs
+          aria-label={t('members.tabs_aria')}
+          selectedKey={activeTab}
+          onSelectionChange={handleTabChange}
+          variant="underlined"
+          size="sm"
+        >
+          <Tab
+            key="all"
+            title={
+              <div className="flex items-center gap-2">
+                <Users size={14} aria-hidden="true" />
+                <span>{t('members.tab_all')}</span>
+              </div>
+            }
+          />
+          <Tab
+            key="pending"
+            title={
+              <div className="flex items-center gap-2">
+                <Clock size={14} aria-hidden="true" />
+                <span>{t('members.tab_pending')}</span>
+                {typeof stats?.pending === 'number' && stats.pending > 0 && (
+                  <Chip size="sm" variant="soft" color="warning" className="tabular-nums">
+                    {stats.pending}
+                  </Chip>
+                )}
+              </div>
+            }
+          />
+          <Tab
+            key="active"
+            title={
+              <div className="flex items-center gap-2">
+                <UserCheck size={14} aria-hidden="true" />
+                <span>{t('members.tab_active')}</span>
+              </div>
+            }
+          />
+          <Tab
+            key="suspended"
+            title={
+              <div className="flex items-center gap-2">
+                <UserX size={14} aria-hidden="true" />
+                <span>{t('members.tab_suspended')}</span>
+                {typeof stats?.suspended === 'number' && stats.suspended > 0 && (
+                  <Chip size="sm" variant="soft" color="danger" className="tabular-nums">
+                    {stats.suspended}
+                  </Chip>
+                )}
+              </div>
+            }
+          />
+          <Tab
+            key="never_logged_in"
+            title={
+              <div className="flex items-center gap-2">
+                <Moon size={14} aria-hidden="true" />
+                <span>{t('members.tab_never_logged_in')}</span>
+              </div>
+            }
+          />
+          <Tab
+            key="onboarding_incomplete"
+            title={
+              <div className="flex items-center gap-2">
+                <Hourglass size={14} aria-hidden="true" />
+                <span>{t('members.tab_onboarding_incomplete')}</span>
+              </div>
+            }
+          />
+        </Tabs>
+      </div>
 
+      {/* ── Bulk-action bar ──────────────────────────────────────────────────── */}
       {selectedIds.size > 0 && (
-        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-divider bg-surface-secondary px-3 py-2">
-          <span className="text-sm font-medium text-foreground">
+        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-2xl border border-accent/30 bg-accent/10 px-4 py-2.5 shadow-sm shadow-black/[0.03]">
+          <span className="text-sm font-medium tabular-nums text-foreground">
             {t('members.bulk_selected', { count: selectedIds.size })}
           </span>
           <div className="flex-1" />
@@ -698,28 +916,47 @@ export default function MembersPage() {
         </div>
       )}
 
-      <DataTable<AdminUser>
-        columns={columns}
-        data={members}
-        keyField="id"
-        isLoading={loading}
-        selectable
-        selectedKeys={selectedIds}
-        onSelectionChange={setSelectedIds}
-        searchable
-        searchPlaceholder={t('members.search_placeholder')}
-        totalItems={total}
-        page={page}
-        pageSize={PAGE_SIZE}
-        onPageChange={setPage}
-        onSearch={handleSearch}
-        onRefresh={fetchMembers}
-        emptyContent={
-          <div className="flex flex-col items-center py-8">
-            <p className="text-muted">{t('common.no_data')}</p>
-          </div>
-        }
-      />
+      {/* ── Table — shaped skeleton on first load, in-table spinner after ────── */}
+      {!initialLoaded ? (
+        <BrokerSkeleton variant="table" count={8} />
+      ) : (
+        <DataTable<AdminUser>
+          columns={columns}
+          data={members}
+          keyField="id"
+          isLoading={loading}
+          selectable
+          selectedKeys={selectedIds}
+          onSelectionChange={setSelectedIds}
+          searchable
+          searchPlaceholder={t('members.search_placeholder')}
+          totalItems={total}
+          page={page}
+          pageSize={PAGE_SIZE}
+          onPageChange={setPage}
+          onSearch={handleSearch}
+          onRefresh={refreshAll}
+          emptyContent={
+            debouncedSearch.trim() ? (
+              <BrokerEmptyState
+                bare
+                icon={SearchX}
+                color="neutral"
+                title={t('members.empty_search_title')}
+                hint={t('members.empty_search_hint')}
+              />
+            ) : (
+              <BrokerEmptyState
+                bare
+                icon={emptyDef.icon}
+                color={emptyDef.color}
+                title={t(emptyDef.titleKey)}
+                hint={t(emptyDef.hintKey)}
+              />
+            )
+          }
+        />
+      )}
 
       {/* Approve confirmation */}
       <ConfirmModal
@@ -810,14 +1047,16 @@ export default function MembersPage() {
                 {notesLoading ? (
                   <div className="py-8 text-center text-muted">{t('common.loading')}</div>
                 ) : notes.length === 0 ? (
-                  <div className="py-8 text-center text-muted">
-                    <StickyNote size={32} className="mx-auto mb-2 opacity-30" />
-                    <p>{t('members.no_notes')}</p>
-                  </div>
+                  <BrokerEmptyState
+                    bare
+                    icon={StickyNote}
+                    color="neutral"
+                    title={t('members.no_notes')}
+                  />
                 ) : (
                   <div className="space-y-3 mt-2">
                     {[...notes].sort((a, b) => Number(b.is_pinned ?? false) - Number(a.is_pinned ?? false)).map((note) => (
-                      <div key={note.id} className={`rounded-lg p-3 ${note.is_pinned ? 'border border-accent/20 bg-accent/10' : 'bg-surface-secondary'}`}>
+                      <div key={note.id} className={`rounded-xl p-3 ${note.is_pinned ? 'border border-accent/20 bg-accent/10' : 'bg-surface-secondary'}`}>
                         {editingNoteId === note.id ? (
                           <div className="space-y-2">
                             <Select
@@ -867,7 +1106,7 @@ export default function MembersPage() {
                             <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted">
                               <span>{note.author_name || note.author?.name || t('members.note_system_author')}</span>
                               <span>&middot;</span>
-                              <span>{formatServerDateTime(note.created_at)}</span>
+                              <span className="tabular-nums">{formatServerDateTime(note.created_at)}</span>
                               {note.category && (
                                 <Chip size="sm" variant="tertiary" className="text-xs">{t(`members.note_category_${note.category}`, { defaultValue: note.category })}</Chip>
                               )}
@@ -893,8 +1132,8 @@ export default function MembersPage() {
       <MemberDetailModal
         userId={detailUserId}
         onClose={() => setDetailUserId(null)}
-        onChanged={fetchMembers}
+        onChanged={refreshAll}
       />
-    </div>
+    </BrokerPageShell>
   );
 }

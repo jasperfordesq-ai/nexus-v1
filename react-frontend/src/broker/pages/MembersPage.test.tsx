@@ -4,10 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
-import userEvent from '@testing-library/user-event';
 
 // ─── Hoisted mocks ────────────────────────────────────────────────────────────
 const { mockAdminUsers, mockAdminCrm } = vi.hoisted(() => ({
@@ -45,16 +43,18 @@ vi.mock('@/lib/helpers', async (importOriginal) => {
   };
 });
 
-// Stub DataTable — renders simple rows by user.name
+// Stub DataTable — renders simple rows by user.name plus the emptyContent slot
 vi.mock('@/admin/components', () => ({
   DataTable: ({
     data,
     isLoading,
     onSearch,
+    emptyContent,
   }: {
     data: { id: number; name: string; email: string; status: string }[];
     isLoading?: boolean;
     onSearch?: (q: string) => void;
+    emptyContent?: React.ReactNode;
   }) =>
     isLoading ? (
       <div role="status" aria-busy="true" aria-label="loading" />
@@ -72,7 +72,7 @@ vi.mock('@/admin/components', () => ({
             {u.name} — {u.email} — {u.status}
           </div>
         ))}
-        {data.length === 0 && <div data-testid="no-data">No members</div>}
+        {data.length === 0 && <div data-testid="no-data">{emptyContent ?? 'No members'}</div>}
       </div>
     ),
   PageHeader: ({ title }: { title: string }) => <div data-testid="page-header">{title}</div>,
@@ -140,15 +140,22 @@ const makeNote = (overrides = {}) => ({
   ...overrides,
 });
 
+// The page fetches KPI counts through the SAME list endpoint using limit=1;
+// table fetches use limit=20. This helper tells the two apart in assertions.
+const TABLE_LIMIT = 20;
+
 // ─────────────────────────────────────────────────────────────────────────────
 describe('MembersPage (broker)', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    // The status tab lives in the URL — reset it so ?status from a previous
+    // test never leaks into the next render (test-utils uses BrowserRouter).
+    window.history.replaceState({}, '', '/');
     mockAdminUsers.list.mockResolvedValue(makeListResponse([]));
     mockAdminCrm.getNotes.mockResolvedValue({ success: true, data: [] });
   });
 
-  it('shows a loading spinner initially', async () => {
+  it('shows a loading skeleton initially', async () => {
     mockAdminUsers.list.mockImplementation(() => new Promise(() => {}));
     const MembersPage = (await import('./MembersPage')).default;
     render(<MembersPage />);
@@ -175,6 +182,16 @@ describe('MembersPage (broker)', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('no-data')).toBeInTheDocument();
+    });
+  });
+
+  it('shows the per-tab empty state for the pending queue', async () => {
+    window.history.replaceState({}, '', '/?status=pending');
+    const MembersPage = (await import('./MembersPage')).default;
+    render(<MembersPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('No members awaiting approval')).toBeInTheDocument();
     });
   });
 
@@ -206,15 +223,40 @@ describe('MembersPage (broker)', () => {
     expect(mockAdminUsers.list).toHaveBeenCalled();
   });
 
-  it('renders status tabs', async () => {
+  it('renders status tabs including never-logged-in and onboarding-incomplete', async () => {
     const MembersPage = (await import('./MembersPage')).default;
     render(<MembersPage />);
 
     await waitFor(() => {
-      // Tabs render via HeroUI Tabs component — check tab roles
-      // The broker:members.tab_* translation keys fall back to key strings
       const tabs = screen.getAllByRole('tab');
-      expect(tabs.length).toBeGreaterThanOrEqual(4); // all, pending, active, suspended
+      expect(tabs.length).toBeGreaterThanOrEqual(6); // all, pending, active, suspended, never logged in, onboarding incomplete
+    });
+    expect(screen.getByRole('tab', { name: /Never logged in/ })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Onboarding incomplete/ })).toBeInTheDocument();
+  });
+
+  it('renders the KPI stat header from list totals', async () => {
+    mockAdminUsers.list.mockImplementation((params: { limit?: number; status?: string } = {}) => {
+      if (params.limit === 1) {
+        const totals: Record<string, number> = { pending: 3, active: 30, suspended: 2 };
+        const total = params.status ? (totals[params.status] ?? 0) : 40;
+        return Promise.resolve({ success: true, data: { data: [], meta: { total } } });
+      }
+      return Promise.resolve(makeListResponse([makeMember()]));
+    });
+
+    const MembersPage = (await import('./MembersPage')).default;
+    render(<MembersPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Total members')).toBeInTheDocument();
+      expect(screen.getByText('Pending approval')).toBeInTheDocument();
+      expect(screen.getByText('Active members')).toBeInTheDocument();
+      expect(screen.getByText('Suspended members')).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(screen.getByText('40')).toBeInTheDocument();
+      expect(screen.getByText('30')).toBeInTheDocument();
     });
   });
 
@@ -234,21 +276,58 @@ describe('MembersPage (broker)', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('calls adminUsers.list with status param when tab changes to pending', async () => {
+  it('calls adminUsers.list with status param and updates the URL when tab changes to pending', async () => {
     const MembersPage = (await import('./MembersPage')).default;
     render(<MembersPage />);
 
     await waitFor(() => screen.getAllByRole('tab'));
 
-    const pendingTab = screen.getAllByRole('tab').find((t) =>
-      t.textContent?.toLowerCase().includes('pending')
+    const pendingTab = screen.getAllByRole('tab').find((el) =>
+      el.textContent?.toLowerCase().includes('pending')
     );
+    expect(pendingTab).toBeDefined();
     if (pendingTab) fireEvent.click(pendingTab);
 
     await waitFor(() => {
-      // Should have been called a second time (initial + tab change)
-      expect(mockAdminUsers.list).toHaveBeenCalledTimes(2);
+      expect(mockAdminUsers.list).toHaveBeenCalledWith(
+        expect.objectContaining({ status: 'pending', limit: TABLE_LIMIT })
+      );
     });
+    await waitFor(() => {
+      expect(window.location.search).toBe('?status=pending');
+    });
+  });
+
+  it('honours a deep-linked ?status=suspended filter', async () => {
+    window.history.replaceState({}, '', '/?status=suspended');
+    const MembersPage = (await import('./MembersPage')).default;
+    render(<MembersPage />);
+
+    await waitFor(() => {
+      expect(mockAdminUsers.list).toHaveBeenCalledWith(
+        expect.objectContaining({ status: 'suspended', limit: TABLE_LIMIT })
+      );
+    });
+  });
+
+  it('falls back to the All tab for an unknown ?status value', async () => {
+    window.history.replaceState({}, '', '/?status=banana');
+    const MembersPage = (await import('./MembersPage')).default;
+    render(<MembersPage />);
+
+    await waitFor(() => {
+      expect(mockAdminUsers.list).toHaveBeenCalledWith(
+        expect.objectContaining({ limit: TABLE_LIMIT })
+      );
+    });
+    // The table fetch must NOT forward the junk status to the API.
+    const tableCalls = mockAdminUsers.list.mock.calls.filter(
+      (c: [{ limit?: number }?]) => c[0]?.limit === TABLE_LIMIT
+    );
+    expect(tableCalls.length).toBeGreaterThan(0);
+    for (const call of tableCalls) {
+      expect((call[0] as { status?: string }).status).toBeUndefined();
+    }
   });
 
   it('re-fetches when search input changes', async () => {

@@ -12,13 +12,18 @@
  * fields, and review vetting / insurance / consent status. Privileged actions
  * (role/status change, ban, delete) are intentionally absent — the backend also
  * rejects them for brokers (see AdminUsersController@update).
+ *
+ * Organised into tabs: Overview (identity + membership timeline), Compliance
+ * (vetting / insurance / consents), Notes (the CRM notes workflow), and
+ * Actions (operational buttons + safe profile edit + balance adjustment).
  */
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Avatar, Button, Chip, Spinner, Separator, Input, Textarea,
+  Avatar, Button, Chip, Separator, Input, Textarea,
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
+  Tabs, Tab, Tooltip, Select, SelectItem,
 } from '@/components/ui';
 import UserCheck from 'lucide-react/icons/user-check';
 import UserX from 'lucide-react/icons/user-x';
@@ -26,13 +31,25 @@ import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import MailCheck from 'lucide-react/icons/mail-check';
 import KeyRound from 'lucide-react/icons/key-round';
 import ShieldOff from 'lucide-react/icons/shield-off';
+import ShieldCheck from 'lucide-react/icons/shield-check';
 import Coins from 'lucide-react/icons/coins';
 import Pencil from 'lucide-react/icons/pencil';
+import IdCard from 'lucide-react/icons/id-card';
+import StickyNote from 'lucide-react/icons/sticky-note';
+import Wrench from 'lucide-react/icons/wrench';
+import Pin from 'lucide-react/icons/pin';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Check from 'lucide-react/icons/check';
+import Send from 'lucide-react/icons/send';
+import CheckCircle2 from 'lucide-react/icons/circle-check-big';
+import Circle from 'lucide-react/icons/circle';
 import { useToast } from '@/contexts';
-import { adminUsers, adminTimebanking, adminVetting, adminInsurance } from '@/admin/api/adminApi';
+import { adminUsers, adminTimebanking, adminVetting, adminInsurance, adminCrm } from '@/admin/api/adminApi';
 import type { AdminUserDetail, VettingRecord, InsuranceCertificate } from '@/admin/api/types';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { formatServerDate, formatServerDateTime } from '@/lib/serverTime';
+import { BrokerStatusChip } from './BrokerStatusChip';
+import { BrokerSkeleton } from './BrokerSkeleton';
 
 type MemberDetail = AdminUserDetail;
 
@@ -45,6 +62,16 @@ interface ConsentRow {
   status?: string;
 }
 
+interface MemberNote {
+  id: number;
+  content: string;
+  category?: string;
+  is_pinned?: boolean;
+  created_at: string;
+  author_name?: string;
+  author?: { name: string };
+}
+
 interface EditForm {
   first_name: string;
   last_name: string;
@@ -54,9 +81,8 @@ interface EditForm {
   location: string;
 }
 
-const STATUS_COLOR: Record<string, 'warning' | 'success' | 'danger' | 'default'> = {
-  pending: 'warning', active: 'success', suspended: 'danger', banned: 'danger',
-};
+// CRM note categories — mirrors the admin MemberNotes module.
+const NOTE_CATEGORIES = ['general', 'outreach', 'support', 'onboarding', 'concern', 'follow_up'] as const;
 
 interface MemberDetailModalProps {
   userId: number | null;
@@ -86,6 +112,18 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
   const [balanceAmount, setBalanceAmount] = useState('');
   const [balanceReason, setBalanceReason] = useState('');
 
+  // Notes workflow (categories / edit / delete / pin)
+  const [notes, setNotes] = useState<MemberNote[]>([]);
+  const [notesLoading, setNotesLoading] = useState(false);
+  const [newNote, setNewNote] = useState('');
+  const [noteCategory, setNoteCategory] = useState('general');
+  const [addingNote, setAddingNote] = useState(false);
+  const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
+  const [editingContent, setEditingContent] = useState('');
+  const [editingCategory, setEditingCategory] = useState('general');
+  const [savingNote, setSavingNote] = useState(false);
+  const [noteBusyId, setNoteBusyId] = useState<number | null>(null);
+
   const asArray = <T,>(payload: unknown): T[] => {
     if (Array.isArray(payload)) return payload as T[];
     if (payload && typeof payload === 'object' && Array.isArray((payload as { data?: unknown }).data)) {
@@ -94,6 +132,18 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
     return [];
   };
 
+  const loadNotes = useCallback(async (id: number) => {
+    setNotesLoading(true);
+    try {
+      const res = await adminCrm.getNotes({ user_id: id, limit: 20 });
+      if (res?.success) setNotes(asArray<MemberNote>(res.data));
+    } catch {
+      // Notes are best-effort — failures shouldn't block the modal.
+    } finally {
+      setNotesLoading(false);
+    }
+  }, []);
+
   const load = useCallback(async (id: number) => {
     setLoading(true);
     setEditing(false);
@@ -101,6 +151,10 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
     setVetting([]);
     setInsurance([]);
     setConsents([]);
+    setNotes([]);
+    setNewNote('');
+    setNoteCategory('general');
+    setEditingNoteId(null);
     try {
       const res = await adminUsers.get(id);
       if (res.success && res.data) {
@@ -122,7 +176,7 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
     } finally {
       setLoading(false);
     }
-    // Compliance data is best-effort — failures shouldn't block the modal.
+    // Compliance + notes data is best-effort — failures shouldn't block the modal.
     try {
       const [v, i, c] = await Promise.all([
         adminVetting.getUserRecords(id).catch(() => null),
@@ -133,7 +187,8 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
       if (i?.success) setInsurance(asArray<InsuranceCertificate>(i.data));
       if (c?.success) setConsents(asArray<ConsentRow>(c.data));
     } catch { /* ignore */ }
-  }, [toast, t]);
+    loadNotes(id);
+  }, [toast, t, loadNotes]);
 
   useEffect(() => {
     if (userId != null) load(userId);
@@ -227,6 +282,100 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
     }
   }, [detail, balanceAmount, balanceReason, toast, t, onChanged, load]);
 
+  // ─── Notes workflow ─────────────────────────────────────────────────────────
+
+  const handleAddNote = useCallback(async () => {
+    if (!detail || !newNote.trim()) return;
+    setAddingNote(true);
+    try {
+      const res = await adminCrm.createNote({
+        user_id: detail.id,
+        content: newNote.trim(),
+        category: noteCategory,
+      });
+      if (res.success) {
+        toast.success(t('members.note_added'));
+        setNewNote('');
+        setNoteCategory('general');
+        loadNotes(detail.id);
+      } else {
+        toast.error(t('members.action_failed'));
+      }
+    } catch {
+      toast.error(t('members.action_failed'));
+    } finally {
+      setAddingNote(false);
+    }
+  }, [detail, newNote, noteCategory, toast, t, loadNotes]);
+
+  const startEditNote = useCallback((note: MemberNote) => {
+    setEditingNoteId(note.id);
+    setEditingContent(note.content);
+    setEditingCategory(note.category || 'general');
+  }, []);
+
+  const cancelEditNote = useCallback(() => {
+    setEditingNoteId(null);
+    setEditingContent('');
+  }, []);
+
+  const handleUpdateNote = useCallback(async () => {
+    if (editingNoteId == null || !editingContent.trim() || !detail) return;
+    setSavingNote(true);
+    try {
+      const res = await adminCrm.updateNote(editingNoteId, {
+        content: editingContent.trim(),
+        category: editingCategory,
+      });
+      if (res.success) {
+        toast.success(t('members.note_updated'));
+        setEditingNoteId(null);
+        loadNotes(detail.id);
+      } else {
+        toast.error(t('members.action_failed'));
+      }
+    } catch {
+      toast.error(t('members.action_failed'));
+    } finally {
+      setSavingNote(false);
+    }
+  }, [editingNoteId, editingContent, editingCategory, detail, toast, t, loadNotes]);
+
+  const handleDeleteNote = useCallback(async (noteId: number) => {
+    if (!detail) return;
+    setNoteBusyId(noteId);
+    try {
+      const res = await adminCrm.deleteNote(noteId);
+      if (res.success) {
+        toast.success(t('members.note_deleted'));
+        loadNotes(detail.id);
+      } else {
+        toast.error(t('members.action_failed'));
+      }
+    } catch {
+      toast.error(t('members.action_failed'));
+    } finally {
+      setNoteBusyId(null);
+    }
+  }, [detail, toast, t, loadNotes]);
+
+  const handleTogglePin = useCallback(async (note: MemberNote) => {
+    if (!detail) return;
+    setNoteBusyId(note.id);
+    try {
+      const res = await adminCrm.updateNote(note.id, { is_pinned: !note.is_pinned });
+      if (res.success) {
+        loadNotes(detail.id);
+      } else {
+        toast.error(t('members.action_failed'));
+      }
+    } catch {
+      toast.error(t('members.action_failed'));
+    } finally {
+      setNoteBusyId(null);
+    }
+  }, [detail, toast, t, loadNotes]);
+
   const consentLabel = (c: ConsentRow) => c.consent_type || c.type || c.name || '';
   const consentGranted = (c: ConsentRow) => c.granted ?? c.is_granted ?? (c.status === 'granted' || c.status === 'active');
 
@@ -236,9 +385,7 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
         <ModalContent>
           {loading || !detail ? (
             <ModalBody>
-              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-12">
-                <Spinner size="lg" />
-              </div>
+              <BrokerSkeleton variant="detail" className="py-2" />
             </ModalBody>
           ) : (
             <>
@@ -249,13 +396,11 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
                   size="md"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="text-base font-semibold truncate">{detail.name}</p>
-                  <p className="text-xs text-muted font-normal truncate">{detail.email}</p>
+                  <p className="truncate text-base font-semibold tracking-tight">{detail.name}</p>
+                  <p className="truncate text-xs font-normal text-muted">{detail.email}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-1">
-                  <Chip size="sm" variant="tertiary" color={STATUS_COLOR[detail.status] ?? 'default'}>
-                    {t(`status.${detail.status}`)}
-                  </Chip>
+                  <BrokerStatusChip status={detail.status} />
                   <Chip size="sm" variant="tertiary" color={detail.role === 'member' ? 'default' : 'accent'}>
                     {t(`members.role_${detail.role}`, { defaultValue: detail.role })}
                   </Chip>
@@ -265,129 +410,307 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
                 </div>
               </ModalHeader>
 
-              <ModalBody className="gap-4">
-                {/* Overview */}
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  <Overview label={t('member_detail.label_balance')} value={`${typeof detail.balance === 'number' ? detail.balance.toLocaleString() : '0'} ${t('members.hours_short')}`} />
-                  <Overview label={t('member_detail.label_joined')} value={formatServerDate(detail.created_at)} />
-                  <Overview label={t('member_detail.label_last_active')} value={detail.last_active_at ? formatServerDate(detail.last_active_at) : t('members.time_never')} />
-                  <Overview label={t('member_detail.label_onboarding')} value={detail.onboarding_completed ? t('member_detail.onboarding_complete') : t('member_detail.onboarding_incomplete')} />
-                  <Overview label={t('member_detail.label_vetting')} value={t(`member_detail.compliance_${detail.vetting_status ?? 'none'}`, { defaultValue: detail.vetting_status ?? '—' })} />
-                  <Overview label={t('member_detail.label_insurance')} value={t(`member_detail.compliance_${detail.insurance_status ?? 'none'}`, { defaultValue: detail.insurance_status ?? '—' })} />
-                </div>
+              <ModalBody className="gap-3">
+                <Tabs
+                  aria-label={t('member_detail.tabs_aria')}
+                  variant="underlined"
+                  size="sm"
+                  defaultSelectedKey="overview"
+                >
+                  {/* ── Overview ──────────────────────────────────────────── */}
+                  <Tab
+                    key="overview"
+                    title={
+                      <div className="flex items-center gap-2">
+                        <IdCard size={14} aria-hidden="true" />
+                        <span>{t('member_detail.tab_overview')}</span>
+                      </div>
+                    }
+                  >
+                    <div className="space-y-4 pt-3">
+                      <StatusTimeline detail={detail} />
 
-                <Separator />
+                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        <Overview label={t('member_detail.label_balance')} value={`${typeof detail.balance === 'number' ? detail.balance.toLocaleString() : '0'} ${t('members.hours_short')}`} />
+                        <Overview label={t('member_detail.label_joined')} value={formatServerDate(detail.created_at)} />
+                        <Overview label={t('member_detail.label_last_active')} value={detail.last_active_at ? formatServerDate(detail.last_active_at) : t('members.time_never')} />
+                        <Overview label={t('member_detail.label_onboarding')} value={detail.onboarding_completed ? t('member_detail.onboarding_complete') : t('member_detail.onboarding_incomplete')} />
+                      </div>
 
-                {/* Actions */}
-                <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">{t('member_detail.section_actions')}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {detail.status === 'pending' && (
-                      <Button size="sm" color="success" variant="flat" startContent={<UserCheck size={14} />} isLoading={busy === 'approve'}
-                        onPress={() => run('approve', () => adminUsers.approve(detail.id), 'member_detail.approve_success')}>
-                        {t('members.approve')}
-                      </Button>
-                    )}
-                    {detail.status === 'active' && (
-                      <Button size="sm" color="danger" variant="flat" startContent={<UserX size={14} />} isLoading={busy === 'suspend'}
-                        onPress={() => run('suspend', () => adminUsers.suspend(detail.id), 'member_detail.suspend_success')}>
-                        {t('members.suspend')}
-                      </Button>
-                    )}
-                    {detail.status === 'suspended' && (
-                      <Button size="sm" variant="flat" startContent={<RotateCcw size={14} />} isLoading={busy === 'reactivate'}
-                        onPress={() => run('reactivate', () => adminUsers.reactivate(detail.id), 'member_detail.reactivate_success')}>
-                        {t('members.reactivate')}
-                      </Button>
-                    )}
-                    <Button size="sm" variant="flat" startContent={<MailCheck size={14} />} isLoading={busy === 'verify'}
-                      onPress={() => run('verify', () => adminUsers.sendVerificationEmail(detail.id), 'member_detail.verification_sent', false)}>
-                      {t('member_detail.action_resend_verification')}
-                    </Button>
-                    <Button size="sm" variant="flat" startContent={<KeyRound size={14} />} isLoading={busy === 'pwd'}
-                      onPress={() => run('pwd', () => adminUsers.sendPasswordReset(detail.id), 'member_detail.password_reset_sent', false)}>
-                      {t('member_detail.action_send_password_reset')}
-                    </Button>
-                    <Button size="sm" variant="flat" startContent={<ShieldOff size={14} />} isLoading={busy === '2fa'}
-                      onPress={() => run('2fa', () => adminUsers.reset2fa(detail.id, t('member_detail.reset_2fa_reason')), 'member_detail.reset_2fa_success', false)}>
-                      {t('member_detail.action_reset_2fa')}
-                    </Button>
-                    <Button size="sm" color="primary" variant="flat" startContent={<Coins size={14} />}
-                      onPress={() => { setBalanceAmount(''); setBalanceReason(''); setBalanceOpen(true); }}>
-                      {t('member_detail.action_adjust_balance')}
-                    </Button>
-                  </div>
-                </div>
+                      {(detail.tagline || detail.bio || detail.location) && (
+                        <p className="text-sm leading-6 text-muted">
+                          {detail.tagline || detail.bio || detail.location}
+                        </p>
+                      )}
+                    </div>
+                  </Tab>
 
-                <Separator />
+                  {/* ── Compliance ────────────────────────────────────────── */}
+                  <Tab
+                    key="compliance"
+                    title={
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck size={14} aria-hidden="true" />
+                        <span>{t('member_detail.tab_compliance')}</span>
+                      </div>
+                    }
+                  >
+                    <div className="space-y-4 pt-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <Overview label={t('member_detail.label_vetting')} value={t(`member_detail.compliance_${detail.vetting_status ?? 'none'}`, { defaultValue: detail.vetting_status ?? '—' })} />
+                        <Overview label={t('member_detail.label_insurance')} value={t(`member_detail.compliance_${detail.insurance_status ?? 'none'}`, { defaultValue: detail.insurance_status ?? '—' })} />
+                      </div>
 
-                {/* Edit profile */}
-                <div>
-                  <div className="mb-2 flex items-center justify-between">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-muted">{t('member_detail.section_edit')}</p>
-                    {!editing && (
-                      <Button size="sm" variant="light" startContent={<Pencil size={14} />} onPress={() => setEditing(true)}>
-                        {t('member_detail.edit_toggle')}
-                      </Button>
-                    )}
-                  </div>
-                  {editing ? (
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <Input size="sm" variant="bordered" label={t('member_detail.edit_first_name')} value={form.first_name} onValueChange={(v) => setForm((f) => ({ ...f, first_name: v }))} />
-                      <Input size="sm" variant="bordered" label={t('member_detail.edit_last_name')} value={form.last_name} onValueChange={(v) => setForm((f) => ({ ...f, last_name: v }))} />
-                      <Input size="sm" variant="bordered" label={t('member_detail.edit_phone')} value={form.phone} onValueChange={(v) => setForm((f) => ({ ...f, phone: v }))} placeholder="+1 555 123 4567" />
-                      <Input size="sm" variant="bordered" label={t('member_detail.edit_location')} value={form.location} onValueChange={(v) => setForm((f) => ({ ...f, location: v }))} />
-                      <Input size="sm" variant="bordered" label={t('member_detail.edit_tagline')} value={form.tagline} onValueChange={(v) => setForm((f) => ({ ...f, tagline: v }))} className="sm:col-span-2" />
-                      <Textarea size="sm" variant="bordered" label={t('member_detail.edit_bio')} value={form.bio} onValueChange={(v) => setForm((f) => ({ ...f, bio: v }))} minRows={2} className="sm:col-span-2" />
-                      <div className="flex gap-2 sm:col-span-2">
-                        <Button size="sm" color="primary" isLoading={busy === 'edit'} onPress={handleSaveEdit}>{t('member_detail.edit_save')}</Button>
-                        <Button size="sm" variant="flat" isDisabled={busy === 'edit'} onPress={() => setEditing(false)}>{t('common.cancel')}</Button>
+                      <ComplianceList
+                        title={t('member_detail.vetting_title')}
+                        empty={t('member_detail.vetting_none')}
+                        items={vetting.map((v) => ({
+                          key: `v-${v.id}`,
+                          label: t(`vetting.type_${v.vetting_type}`, { defaultValue: v.vetting_type }),
+                          status: v.status,
+                          expiry: v.expiry_date ?? null,
+                        }))}
+                      />
+                      <ComplianceList
+                        title={t('member_detail.insurance_title')}
+                        empty={t('member_detail.insurance_none')}
+                        items={insurance.map((i) => ({
+                          key: `i-${i.id}`,
+                          label: t(`insurance.type_${i.insurance_type}`, { defaultValue: i.insurance_type }),
+                          status: i.status,
+                          expiry: i.expiry_date ?? null,
+                        }))}
+                      />
+                      <div>
+                        <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted">{t('member_detail.consents_title')}</p>
+                        {consents.length === 0 ? (
+                          <p className="text-sm text-muted">{t('member_detail.consents_none')}</p>
+                        ) : (
+                          <div className="flex flex-wrap gap-1.5">
+                            {consents.map((c, idx) => (
+                              <Chip key={`c-${idx}`} size="sm" variant="tertiary" color={consentGranted(c) ? 'success' : 'default'}>
+                                {consentLabel(c) || t('member_detail.consent_generic')}
+                              </Chip>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
-                  ) : (
-                    <p className="text-sm text-muted">{detail.tagline || detail.bio || detail.location || '—'}</p>
-                  )}
-                </div>
+                  </Tab>
 
-                <Separator />
-
-                {/* Compliance */}
-                <div className="space-y-3">
-                  <ComplianceList
-                    title={t('member_detail.vetting_title')}
-                    empty={t('member_detail.vetting_none')}
-                    items={vetting.map((v) => ({
-                      key: `v-${v.id}`,
-                      label: t(`vetting.type_${v.vetting_type}`, { defaultValue: v.vetting_type }),
-                      status: v.status,
-                      expiry: v.expiry_date ?? null,
-                    }))}
-                  />
-                  <ComplianceList
-                    title={t('member_detail.insurance_title')}
-                    empty={t('member_detail.insurance_none')}
-                    items={insurance.map((i) => ({
-                      key: `i-${i.id}`,
-                      label: t(`insurance.type_${i.insurance_type}`, { defaultValue: i.insurance_type }),
-                      status: i.status,
-                      expiry: i.expiry_date ?? null,
-                    }))}
-                  />
-                  <div>
-                    <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted">{t('member_detail.consents_title')}</p>
-                    {consents.length === 0 ? (
-                      <p className="text-sm text-muted">{t('member_detail.consents_none')}</p>
-                    ) : (
-                      <div className="flex flex-wrap gap-1.5">
-                        {consents.map((c, idx) => (
-                          <Chip key={`c-${idx}`} size="sm" variant="tertiary" color={consentGranted(c) ? 'success' : 'default'}>
-                            {consentLabel(c) || t('member_detail.consent_generic')}
+                  {/* ── Notes ─────────────────────────────────────────────── */}
+                  <Tab
+                    key="notes"
+                    title={
+                      <div className="flex items-center gap-2">
+                        <StickyNote size={14} aria-hidden="true" />
+                        <span>{t('members.notes')}</span>
+                        {notes.length > 0 && (
+                          <Chip size="sm" variant="soft" color="accent" className="tabular-nums">
+                            {notes.length}
                           </Chip>
-                        ))}
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
+                    }
+                  >
+                    <div className="space-y-3 pt-3">
+                      {/* Add note */}
+                      <div className="space-y-2">
+                        <Select
+                          aria-label={t('members.note_category_label')}
+                          size="sm"
+                          variant="bordered"
+                          selectedKeys={[noteCategory]}
+                          onSelectionChange={(keys) => setNoteCategory((Array.from(keys)[0] as string) ?? 'general')}
+                          className="max-w-[220px]"
+                        >
+                          {NOTE_CATEGORIES.map((cat) => (
+                            <SelectItem key={cat} id={cat}>{t(`members.note_category_${cat}`)}</SelectItem>
+                          ))}
+                        </Select>
+                        <div className="flex gap-2">
+                          <Textarea
+                            placeholder={t('members.note_placeholder')}
+                            value={newNote}
+                            onValueChange={setNewNote}
+                            minRows={2}
+                            maxRows={4}
+                            className="flex-1"
+                          />
+                          <Button
+                            color="primary"
+                            isIconOnly
+                            isLoading={addingNote}
+                            isDisabled={!newNote.trim()}
+                            onPress={handleAddNote}
+                            className="self-end"
+                            aria-label={t('members.send_note')}
+                          >
+                            <Send size={16} />
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Notes list — pinned first */}
+                      {notesLoading ? (
+                        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="py-6 text-center text-sm text-muted">
+                          {t('common.loading')}
+                        </div>
+                      ) : notes.length === 0 ? (
+                        <div className="py-6 text-center text-muted">
+                          <StickyNote size={28} className="mx-auto mb-2 opacity-30" aria-hidden="true" />
+                          <p className="text-sm">{t('members.no_notes')}</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {[...notes].sort((a, b) => Number(b.is_pinned ?? false) - Number(a.is_pinned ?? false)).map((note) => (
+                            <div key={note.id} className={`rounded-xl p-3 ${note.is_pinned ? 'border border-accent/20 bg-accent/10' : 'bg-surface-secondary'}`}>
+                              {editingNoteId === note.id ? (
+                                <div className="space-y-2">
+                                  <Select
+                                    aria-label={t('members.note_category_label')}
+                                    size="sm"
+                                    variant="bordered"
+                                    selectedKeys={[editingCategory]}
+                                    onSelectionChange={(keys) => setEditingCategory((Array.from(keys)[0] as string) ?? 'general')}
+                                    className="max-w-[220px]"
+                                  >
+                                    {NOTE_CATEGORIES.map((cat) => (
+                                      <SelectItem key={cat} id={cat}>{t(`members.note_category_${cat}`)}</SelectItem>
+                                    ))}
+                                  </Select>
+                                  <Textarea value={editingContent} onValueChange={setEditingContent} minRows={2} maxRows={5} variant="bordered" />
+                                  <div className="flex gap-2">
+                                    <Button size="sm" color="primary" isLoading={savingNote} isDisabled={!editingContent.trim()} startContent={<Check size={14} />} onPress={handleUpdateNote}>
+                                      {t('members.note_save')}
+                                    </Button>
+                                    <Button size="sm" variant="flat" isDisabled={savingNote} onPress={cancelEditNote}>
+                                      {t('common.cancel')}
+                                    </Button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <div className="flex items-start justify-between gap-2">
+                                    <p className="flex-1 whitespace-pre-wrap text-sm text-foreground">{note.content}</p>
+                                    <div className="flex shrink-0 items-center gap-0.5">
+                                      <Tooltip content={note.is_pinned ? t('members.note_unpin') : t('members.note_pin')}>
+                                        <Button isIconOnly size="sm" variant="light" isLoading={noteBusyId === note.id} onPress={() => handleTogglePin(note)} aria-label={note.is_pinned ? t('members.note_unpin') : t('members.note_pin')}>
+                                          <Pin size={13} className={note.is_pinned ? 'fill-current text-accent' : 'text-muted'} />
+                                        </Button>
+                                      </Tooltip>
+                                      <Tooltip content={t('members.note_edit')}>
+                                        <Button isIconOnly size="sm" variant="light" onPress={() => startEditNote(note)} aria-label={t('members.note_edit')}>
+                                          <Pencil size={13} className="text-muted" />
+                                        </Button>
+                                      </Tooltip>
+                                      <Tooltip content={t('members.note_delete')}>
+                                        <Button isIconOnly size="sm" variant="light" color="danger" isLoading={noteBusyId === note.id} onPress={() => handleDeleteNote(note.id)} aria-label={t('members.note_delete')}>
+                                          <Trash2 size={13} />
+                                        </Button>
+                                      </Tooltip>
+                                    </div>
+                                  </div>
+                                  <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted">
+                                    <span>{note.author_name || note.author?.name || t('members.note_system_author')}</span>
+                                    <span>&middot;</span>
+                                    <span className="tabular-nums">{formatServerDateTime(note.created_at)}</span>
+                                    {note.category && (
+                                      <Chip size="sm" variant="tertiary" className="text-xs">{t(`members.note_category_${note.category}`, { defaultValue: note.category })}</Chip>
+                                    )}
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </Tab>
+
+                  {/* ── Actions ───────────────────────────────────────────── */}
+                  <Tab
+                    key="actions"
+                    title={
+                      <div className="flex items-center gap-2">
+                        <Wrench size={14} aria-hidden="true" />
+                        <span>{t('member_detail.section_actions')}</span>
+                      </div>
+                    }
+                  >
+                    <div className="space-y-4 pt-3">
+                      <div>
+                        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">{t('member_detail.section_actions')}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {detail.status === 'pending' && (
+                            <Button size="sm" color="success" variant="flat" startContent={<UserCheck size={14} />} isLoading={busy === 'approve'}
+                              onPress={() => run('approve', () => adminUsers.approve(detail.id), 'member_detail.approve_success')}>
+                              {t('members.approve')}
+                            </Button>
+                          )}
+                          {detail.status === 'active' && (
+                            <Button size="sm" color="danger" variant="flat" startContent={<UserX size={14} />} isLoading={busy === 'suspend'}
+                              onPress={() => run('suspend', () => adminUsers.suspend(detail.id), 'member_detail.suspend_success')}>
+                              {t('members.suspend')}
+                            </Button>
+                          )}
+                          {detail.status === 'suspended' && (
+                            <Button size="sm" variant="tertiary" startContent={<RotateCcw size={14} />} isLoading={busy === 'reactivate'}
+                              onPress={() => run('reactivate', () => adminUsers.reactivate(detail.id), 'member_detail.reactivate_success')}>
+                              {t('members.reactivate')}
+                            </Button>
+                          )}
+                          <Button size="sm" variant="tertiary" startContent={<MailCheck size={14} />} isLoading={busy === 'verify'}
+                            onPress={() => run('verify', () => adminUsers.sendVerificationEmail(detail.id), 'member_detail.verification_sent', false)}>
+                            {t('member_detail.action_resend_verification')}
+                          </Button>
+                          <Button size="sm" variant="tertiary" startContent={<KeyRound size={14} />} isLoading={busy === 'pwd'}
+                            onPress={() => run('pwd', () => adminUsers.sendPasswordReset(detail.id), 'member_detail.password_reset_sent', false)}>
+                            {t('member_detail.action_send_password_reset')}
+                          </Button>
+                          <Button size="sm" variant="tertiary" startContent={<ShieldOff size={14} />} isLoading={busy === '2fa'}
+                            onPress={() => run('2fa', () => adminUsers.reset2fa(detail.id, t('member_detail.reset_2fa_reason')), 'member_detail.reset_2fa_success', false)}>
+                            {t('member_detail.action_reset_2fa')}
+                          </Button>
+                          <Button size="sm" color="primary" variant="flat" startContent={<Coins size={14} />}
+                            onPress={() => { setBalanceAmount(''); setBalanceReason(''); setBalanceOpen(true); }}>
+                            {t('member_detail.action_adjust_balance')}
+                          </Button>
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      {/* Edit profile */}
+                      <div>
+                        <div className="mb-2 flex items-center justify-between">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-muted">{t('member_detail.section_edit')}</p>
+                          {!editing && (
+                            <Button size="sm" variant="light" startContent={<Pencil size={14} />} onPress={() => setEditing(true)}>
+                              {t('member_detail.edit_toggle')}
+                            </Button>
+                          )}
+                        </div>
+                        {editing ? (
+                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <Input size="sm" variant="bordered" label={t('member_detail.edit_first_name')} value={form.first_name} onValueChange={(v) => setForm((f) => ({ ...f, first_name: v }))} />
+                            <Input size="sm" variant="bordered" label={t('member_detail.edit_last_name')} value={form.last_name} onValueChange={(v) => setForm((f) => ({ ...f, last_name: v }))} />
+                            <Input size="sm" variant="bordered" label={t('member_detail.edit_phone')} value={form.phone} onValueChange={(v) => setForm((f) => ({ ...f, phone: v }))} placeholder="+1 555 123 4567" />
+                            <Input size="sm" variant="bordered" label={t('member_detail.edit_location')} value={form.location} onValueChange={(v) => setForm((f) => ({ ...f, location: v }))} />
+                            <Input size="sm" variant="bordered" label={t('member_detail.edit_tagline')} value={form.tagline} onValueChange={(v) => setForm((f) => ({ ...f, tagline: v }))} className="sm:col-span-2" />
+                            <Textarea size="sm" variant="bordered" label={t('member_detail.edit_bio')} value={form.bio} onValueChange={(v) => setForm((f) => ({ ...f, bio: v }))} minRows={2} className="sm:col-span-2" />
+                            <div className="flex gap-2 sm:col-span-2">
+                              <Button size="sm" color="primary" isLoading={busy === 'edit'} onPress={handleSaveEdit}>{t('member_detail.edit_save')}</Button>
+                              <Button size="sm" variant="flat" isDisabled={busy === 'edit'} onPress={() => setEditing(false)}>{t('common.cancel')}</Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted">{detail.tagline || detail.bio || detail.location || '—'}</p>
+                        )}
+                      </div>
+                    </div>
+                  </Tab>
+                </Tabs>
               </ModalBody>
 
               <ModalFooter>
@@ -435,11 +758,59 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
   );
 }
 
+/**
+ * Membership journey strip: registered → email verified → approved.
+ * Built purely from fields the modal already loads — no extra requests.
+ */
+function StatusTimeline({ detail }: { detail: MemberDetail }) {
+  const { t } = useTranslation('broker');
+  const steps: { key: string; label: string; done: boolean; date: string | null }[] = [
+    { key: 'registered', label: t('member_detail.timeline_registered'), done: true, date: detail.created_at ?? null },
+    { key: 'email_verified', label: t('member_detail.timeline_email_verified'), done: !!detail.email_verified_at, date: detail.email_verified_at ?? null },
+    // Suspended/banned members were approved at some point — only a literal
+    // 'pending' status means the approval step hasn't happened yet.
+    { key: 'approved', label: t('member_detail.timeline_approved'), done: detail.status !== 'pending', date: null },
+  ];
+
+  return (
+    <ol
+      aria-label={t('member_detail.timeline_title')}
+      className="flex items-center rounded-xl bg-surface-secondary px-3 py-2.5"
+    >
+      {steps.map((step, i) => (
+        <li key={step.key} className={`flex min-w-0 items-center ${i > 0 ? 'flex-1' : ''}`}>
+          {i > 0 && (
+            <span
+              aria-hidden="true"
+              className={`mx-2 h-px flex-1 ${step.done ? 'bg-success/50' : 'bg-divider'}`}
+            />
+          )}
+          <span className="flex shrink-0 items-center gap-1.5">
+            {step.done ? (
+              <CheckCircle2 size={15} className="text-success" aria-hidden="true" />
+            ) : (
+              <Circle size={15} className="text-muted/60" aria-hidden="true" />
+            )}
+            <span className={`text-xs font-medium ${step.done ? 'text-foreground' : 'text-muted'}`}>
+              {step.label}
+            </span>
+            {step.done && step.date && (
+              <span className="hidden text-xs tabular-nums text-muted sm:inline">
+                {formatServerDate(step.date)}
+              </span>
+            )}
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function Overview({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg bg-surface-secondary p-2.5">
       <p className="text-xs text-muted">{label}</p>
-      <p className="mt-0.5 text-sm font-medium text-foreground">{value}</p>
+      <p className="mt-0.5 text-sm font-medium tabular-nums text-foreground">{value}</p>
     </div>
   );
 }
@@ -447,7 +818,6 @@ function Overview({ label, value }: { label: string; value: string }) {
 interface ComplianceItem { key: string; label: string; status?: string; expiry: string | null }
 
 function ComplianceList({ title, empty, items }: { title: string; empty: string; items: ComplianceItem[] }) {
-  const { t } = useTranslation('broker');
   return (
     <div>
       <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted">{title}</p>
@@ -459,12 +829,8 @@ function ComplianceList({ title, empty, items }: { title: string; empty: string;
             <div key={it.key} className="flex items-center justify-between rounded-md bg-surface-secondary px-2.5 py-1.5 text-sm">
               <span className="truncate">{it.label}</span>
               <span className="flex items-center gap-2">
-                {it.status && (
-                  <Chip size="sm" variant="tertiary" color={it.status === 'verified' ? 'success' : it.status === 'expired' || it.status === 'rejected' ? 'danger' : 'warning'}>
-                    {t(`vetting.status_${it.status}`, { defaultValue: it.status })}
-                  </Chip>
-                )}
-                {it.expiry && <span className="text-xs text-muted">{formatServerDateTime(it.expiry)}</span>}
+                {it.status && <BrokerStatusChip status={it.status} />}
+                {it.expiry && <span className="text-xs tabular-nums text-muted">{formatServerDateTime(it.expiry)}</span>}
               </span>
             </div>
           ))}

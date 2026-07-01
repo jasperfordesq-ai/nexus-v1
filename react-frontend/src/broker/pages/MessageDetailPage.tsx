@@ -1,24 +1,3 @@
-import { Card, CardBody, CardHeader, Button, Textarea, Spinner, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ScrollShadow } from '@/components/ui';
-import { Chip, Separator } from '@/components/ui';
-import ArrowLeft from 'lucide-react/icons/arrow-left';
-import CheckCircle from 'lucide-react/icons/circle-check-big';
-import Flag from 'lucide-react/icons/flag';
-import Archive from 'lucide-react/icons/archive';
-import Shield from 'lucide-react/icons/shield';
-import MessageCircle from 'lucide-react/icons/message-circle';
-import User from 'lucide-react/icons/user';
-import Calendar from 'lucide-react/icons/calendar';
-import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
-import { useTenant, useToast } from '@/contexts';
-import { formatServerDateTime } from '@/lib/serverTime';
-import { adminBroker } from '@/admin/api/adminApi';
-import { PageHeader } from '@/admin/components';
-import type { BrokerMessageDetail, ConversationMessage } from '@/admin/api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -26,10 +5,61 @@ import type { BrokerMessageDetail, ConversationMessage } from '@/admin/api/types
 
 /**
  * Message Detail
- * Broker message copy detail view with full conversation thread and moderation actions.
+ * Broker message copy detail view with full conversation thread and moderation
+ * actions, restyled to the broker design language: severity banner, metadata
+ * card with party avatars, chat-style thread bubbles, and a decision bar.
  * Parity: PHP BrokerControlsController::showMessage()
  */
 
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Flag from 'lucide-react/icons/flag';
+import Archive from 'lucide-react/icons/archive';
+import Shield from 'lucide-react/icons/shield';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
+import Calendar from 'lucide-react/icons/calendar';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import FileText from 'lucide-react/icons/file-text';
+
+import { usePageTitle } from '@/hooks';
+import { useTenant, useToast } from '@/contexts';
+import { formatServerDateTime } from '@/lib/serverTime';
+import { adminBroker } from '@/admin/api/adminApi';
+import type { BrokerMessageDetail, ConversationMessage } from '@/admin/api/types';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Chip,
+  Textarea,
+  Select,
+  SelectItem,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Avatar,
+  Separator,
+  ScrollShadow,
+} from '@/components/ui';
+import {
+  BrokerPageShell,
+  BrokerSkeleton,
+  BrokerEmptyState,
+  BrokerStatusChip,
+} from '../components';
+
+const cardClass = 'rounded-2xl border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]';
 
 // ─── Copy reason chip colors ──────────────────────────────────────────────────
 
@@ -42,6 +72,37 @@ const COPY_REASON_COLORS: Record<string, 'accent' | 'danger' | 'success' | 'warn
   random_sample: 'default',
 };
 
+// ─── Flag severity presentation ───────────────────────────────────────────────
+// Chip colors mirror MessageReviewPage's severity mapping; banner tints follow
+// the dashboard's gradient hero pattern. Tailwind JIT needs literal classes.
+
+type FlagSeverity = 'info' | 'warning' | 'concern' | 'urgent';
+
+const SEVERITY_CHIP_COLORS: Record<FlagSeverity, 'default' | 'warning' | 'danger'> = {
+  info: 'default',
+  warning: 'warning',
+  concern: 'danger',
+  urgent: 'danger',
+};
+
+const SEVERITY_BANNER_CLASSES: Record<FlagSeverity, string> = {
+  info: 'border-divider/70 bg-gradient-to-br from-surface-secondary via-surface to-surface',
+  warning: 'border-warning/30 bg-gradient-to-br from-warning/10 via-surface to-surface',
+  concern: 'border-danger/30 bg-gradient-to-br from-danger/10 via-surface to-surface',
+  urgent: 'border-danger/30 bg-gradient-to-br from-danger/10 via-surface to-surface',
+};
+
+const SEVERITY_MEDALLION_CLASSES: Record<FlagSeverity, string> = {
+  info: 'bg-surface-tertiary text-muted',
+  warning: 'bg-warning/10 text-warning',
+  concern: 'bg-danger/10 text-danger',
+  urgent: 'bg-danger/10 text-danger',
+};
+
+function normalizeSeverity(severity?: string | null): FlagSeverity {
+  const s = (severity || '').toLowerCase();
+  return s === 'info' || s === 'warning' || s === 'concern' || s === 'urgent' ? s : 'concern';
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -65,7 +126,7 @@ export function MessageDetail() {
   // Flag modal state
   const [flagModalOpen, setFlagModalOpen] = useState(false);
   const [flagReason, setFlagReason] = useState('');
-  const [flagSeverity, setFlagSeverity] = useState<'info' | 'warning' | 'concern' | 'urgent'>('concern');
+  const [flagSeverity, setFlagSeverity] = useState<FlagSeverity>('concern');
   const [flagLoading, setFlagLoading] = useState(false);
 
   // Approve modal state
@@ -96,8 +157,9 @@ export function MessageDetail() {
     } finally {
       setLoading(false);
     }
-  }, [id, t])
-
+    // Fetch is keyed on the record id only — `t` lives in render scope.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   useEffect(() => {
     loadDetail();
@@ -167,32 +229,73 @@ export function MessageDetail() {
     }
   };
 
+  // ── Shared header action ──────────────────────────────────────────────────
+
+  const backButton = (
+    <Button
+      variant="tertiary"
+      size="sm"
+      startContent={<ArrowLeft size={16} />}
+      onPress={() => navigate(tenantPath('/broker/messages'))}
+    >
+      {t('messages.back')}
+    </Button>
+  );
+
   // ── Loading state ─────────────────────────────────────────────────────────
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[300px]">
-        <div role="status" aria-busy="true" aria-label={t('common:loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
-      </div>
+      <BrokerPageShell
+        title={t('messages.detail_page_title')}
+        description={t('messages.detail_page_description')}
+        icon={MessageSquareWarning}
+        color="warning"
+        actions={backButton}
+      >
+        <BrokerSkeleton variant="detail" />
+      </BrokerPageShell>
     );
   }
 
-  // ── Error state ───────────────────────────────────────────────────────────
+  // ── Error state (honest — never renders an ok-looking page on failure) ────
 
   if (error || !detail) {
     return (
-      <div className="text-center py-12">
-        <p className="text-danger">{error || t('messages.detail_not_found')}</p>
-        <Button
-          as={Link}
-          to={tenantPath('/broker/messages')}
-          variant="flat"
-          className="mt-4"
-          startContent={<ArrowLeft className="w-4 h-4" />}
-        >
-          {t('messages.detail_back_to_messages')}
-        </Button>
-      </div>
+      <BrokerPageShell
+        title={t('messages.detail_page_title')}
+        description={t('messages.detail_page_description')}
+        icon={MessageSquareWarning}
+        color="warning"
+        actions={backButton}
+      >
+        <BrokerEmptyState
+          icon={XCircle}
+          color="danger"
+          title={error || t('messages.detail_not_found')}
+          hint={t('messages.detail_not_found_hint')}
+          action={
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <Button
+                variant="danger-soft"
+                size="sm"
+                startContent={<RefreshCw size={16} />}
+                onPress={loadDetail}
+              >
+                {t('messages.retry')}
+              </Button>
+              <Button
+                variant="tertiary"
+                size="sm"
+                startContent={<ArrowLeft size={16} />}
+                onPress={() => navigate(tenantPath('/broker/messages'))}
+              >
+                {t('messages.detail_back_to_messages')}
+              </Button>
+            </div>
+          }
+        />
+      </BrokerPageShell>
     );
   }
 
@@ -200,206 +303,202 @@ export function MessageDetail() {
   const isArchived = archive !== null;
   const isReviewed = !!copy.reviewed_at;
   const isFlagged = copy.flagged;
+  const severity = normalizeSeverity(copy.flag_severity);
+  const severityLabel = copy.flag_severity
+    ? t(`messages.severity_${severity}`, { defaultValue: copy.flag_severity })
+    : t('messages.flagged_label');
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <PageHeader
-        title={t('messages.detail_page_title')}
-        description={t('messages.detail_page_description')}
-        actions={
-          <Button
-            as={Link}
-            to={tenantPath('/broker/messages')}
-            variant="flat"
-            startContent={<ArrowLeft className="w-4 h-4" />}
-            size="sm"
-          >
-            {t('messages.back')}
-          </Button>
-        }
-      />
+    <BrokerPageShell
+      title={t('messages.detail_page_title')}
+      description={t('messages.detail_page_description')}
+      icon={MessageSquareWarning}
+      color="warning"
+      actions={backButton}
+    >
+      {/* ── Flag severity banner ───────────────────────────────────────────── */}
+      {isFlagged && (
+        <Card
+          className={`mb-6 rounded-2xl border shadow-sm shadow-black/[0.03] ${SEVERITY_BANNER_CLASSES[severity]}`}
+        >
+          <CardBody className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:gap-4 sm:p-5">
+            <span
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ring-current/10 ${SEVERITY_MEDALLION_CLASSES[severity]}`}
+              aria-hidden="true"
+            >
+              <Flag size={20} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="font-semibold tracking-tight text-foreground">
+                  {t('messages.detail_flag_banner_title')}
+                </h3>
+                <Chip size="sm" variant="soft" color={SEVERITY_CHIP_COLORS[severity]}>
+                  {severityLabel}
+                </Chip>
+              </div>
+              {copy.flag_reason ? (
+                <p className="mt-1 whitespace-pre-wrap text-sm text-foreground/80">{copy.flag_reason}</p>
+              ) : (
+                <p className="mt-1 text-sm italic text-muted">{t('messages.detail_none')}</p>
+              )}
+            </div>
+          </CardBody>
+        </Card>
+      )}
 
-      {/* ── Metadata Card ──────────────────────────────────────────────────── */}
-      <Card shadow="sm">
-        <CardHeader className="flex items-center gap-2">
-          <Shield className="w-4 h-4" />
-          <span className="font-semibold">{t('messages.detail_metadata')}</span>
+      {/* ── Metadata card ──────────────────────────────────────────────────── */}
+      <Card className={`${cardClass} mb-6`}>
+        <CardHeader className="flex flex-wrap items-center gap-2 pb-0">
+          <Shield size={18} className="text-warning" aria-hidden="true" />
+          <h3 className="font-semibold tracking-tight">{t('messages.detail_metadata')}</h3>
+          <div className="ml-auto flex flex-wrap items-center gap-1.5">
+            {isFlagged && (
+              <Chip size="sm" variant="soft" color="danger">
+                <Flag size={12} aria-hidden="true" />
+                <Chip.Label>
+                  {t('messages.flagged_label')}
+                  {copy.flag_severity ? ` (${severityLabel})` : ''}
+                </Chip.Label>
+              </Chip>
+            )}
+            {isReviewed && <BrokerStatusChip status="reviewed" />}
+            {isArchived && (
+              <Chip size="sm" variant="soft" color="default">
+                <Archive size={12} aria-hidden="true" />
+                <Chip.Label>{t('messages.detail_archived')}</Chip.Label>
+              </Chip>
+            )}
+            {!isFlagged && !isReviewed && !isArchived && <BrokerStatusChip status="unreviewed" />}
+          </div>
         </CardHeader>
-        <Separator />
         <CardBody>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Sender */}
-            <div className="space-y-1">
-              <p className="text-sm text-muted flex items-center gap-1">
-                <User className="w-3 h-3" /> {t('messages.col_sender')}
-              </p>
-              <p className="text-sm font-medium text-foreground">{copy.sender_name}</p>
+          {/* Parties */}
+          <div className="flex flex-col gap-3 rounded-xl bg-surface-secondary p-4 sm:flex-row sm:items-center sm:gap-4">
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <span aria-hidden="true" className="shrink-0">
+                <Avatar name={copy.sender_name} size="md" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-xs text-muted">{t('messages.col_sender')}</p>
+                <p className="truncate text-sm font-semibold text-foreground">{copy.sender_name}</p>
+              </div>
             </div>
-
-            {/* Receiver */}
-            <div className="space-y-1">
-              <p className="text-sm text-muted flex items-center gap-1">
-                <User className="w-3 h-3" /> {t('messages.col_receiver')}
-              </p>
-              <p className="text-sm font-medium text-foreground">{copy.receiver_name}</p>
+            <ArrowRight size={18} className="hidden shrink-0 text-muted sm:block" aria-hidden="true" />
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <span aria-hidden="true" className="shrink-0">
+                <Avatar name={copy.receiver_name} size="md" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-xs text-muted">{t('messages.col_receiver')}</p>
+                <p className="truncate text-sm font-semibold text-foreground">{copy.receiver_name}</p>
+              </div>
             </div>
+          </div>
 
+          <Separator className="my-4" />
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {/* Listing */}
-            <div className="space-y-1">
-              <p className="text-sm text-muted">{t('messages.detail_listing')}</p>
-              <p className="text-sm text-foreground">
+            <div className="min-w-0 space-y-1">
+              <p className="flex items-center gap-1 text-xs text-muted">
+                <FileText size={12} aria-hidden="true" /> {t('messages.detail_listing')}
+              </p>
+              <p className="truncate text-sm text-foreground">
                 {copy.listing_title || <span className="text-muted">{t('messages.detail_none')}</span>}
               </p>
             </div>
 
             {/* Copy Reason */}
             <div className="space-y-1">
-              <p className="text-sm text-muted">{t('messages.detail_copy_reason')}</p>
-              <Chip
-                size="sm"
-                variant="tertiary"
-                color={COPY_REASON_COLORS[copy.copy_reason] ?? 'default'}
-              >
+              <p className="text-xs text-muted">{t('messages.detail_copy_reason')}</p>
+              <Chip size="sm" variant="soft" color={COPY_REASON_COLORS[copy.copy_reason] ?? 'default'}>
                 {t(`messages.copy_reason_${copy.copy_reason}`)}
               </Chip>
             </div>
 
             {/* Sent At */}
             <div className="space-y-1">
-              <p className="text-sm text-muted flex items-center gap-1">
-                <Calendar className="w-3 h-3" /> {t('messages.detail_sent')}
+              <p className="flex items-center gap-1 text-xs text-muted">
+                <Calendar size={12} aria-hidden="true" /> {t('messages.detail_sent')}
               </p>
-              <p className="text-sm text-foreground">
-                {formatServerDateTime(copy.sent_at)}
-              </p>
-            </div>
-
-            {/* Status Chips */}
-            <div className="space-y-1">
-              <p className="text-sm text-muted">{t('messages.col_status')}</p>
-              <div className="flex flex-wrap gap-1">
-                {isFlagged && (
-                  <Chip
-                    size="sm"
-                    variant="tertiary"
-                    color="danger"
-                  >
-                    <Flag className="w-3 h-3" />
-                    <Chip.Label>
-                      {t('messages.flagged_label')}{copy.flag_severity ? ` (${copy.flag_severity})` : ''}
-                    </Chip.Label>
-                  </Chip>
-                )}
-                {isReviewed && (
-                  <Chip
-                    size="sm"
-                    variant="tertiary"
-                    color="success"
-                  >
-                    <CheckCircle className="w-3 h-3" />
-                    <Chip.Label>{t('messages.status_reviewed')}</Chip.Label>
-                  </Chip>
-                )}
-                {isArchived && (
-                  <Chip
-                    size="sm"
-                    variant="tertiary"
-                    color="default"
-                  >
-                    <Archive className="w-3 h-3" />
-                    <Chip.Label>{t('messages.detail_archived')}</Chip.Label>
-                  </Chip>
-                )}
-                {!isFlagged && !isReviewed && !isArchived && (
-                  <Chip size="sm" variant="tertiary" color="warning">
-                    {t('messages.status_unreviewed')}
-                  </Chip>
-                )}
-              </div>
+              <p className="text-sm tabular-nums text-foreground">{formatServerDateTime(copy.sent_at)}</p>
             </div>
           </div>
-
-          {/* Flag reason details */}
-          {isFlagged && copy.flag_reason && (
-            <>
-              <Separator className="my-3" />
-              <div className="space-y-1">
-                <p className="text-sm text-muted">{t('messages.detail_flag_reason')}</p>
-                <p className="text-sm text-foreground">{copy.flag_reason}</p>
-              </div>
-            </>
-          )}
         </CardBody>
       </Card>
 
-      {/* ── Conversation Thread ────────────────────────────────────────────── */}
-      <Card shadow="sm">
-        <CardHeader className="flex items-center gap-2">
-          <MessageCircle className="w-4 h-4" />
-          <span className="font-semibold">{t('messages.detail_conversation_thread')}</span>
-          <Chip size="sm" variant="tertiary" className="ml-auto">
+      {/* ── Conversation thread (chat bubbles) ─────────────────────────────── */}
+      <Card className={`${cardClass} mb-6`}>
+        <CardHeader className="flex items-center gap-2 pb-0">
+          <MessageCircle size={18} className="text-warning" aria-hidden="true" />
+          <h3 className="font-semibold tracking-tight">{t('messages.detail_conversation_thread')}</h3>
+          <Chip size="sm" variant="soft" color="default" className="ml-auto tabular-nums">
             {t('messages.detail_message_count', { count: thread.length })}
           </Chip>
         </CardHeader>
-        <Separator />
-        <CardBody className="p-0">
+        <CardBody>
           {thread.length === 0 ? (
-            <div className="p-6 text-center">
-              <p className="text-sm text-muted">{t('messages.detail_no_thread_messages')}</p>
-            </div>
+            <BrokerEmptyState
+              bare
+              icon={MessageCircle}
+              color="neutral"
+              title={t('messages.detail_no_thread_messages')}
+            />
           ) : (
             <ScrollShadow className="max-h-[500px]">
-              <div className="divide-y divide-default-200">
+              <div className="space-y-4 pr-1">
                 {thread.map((msg: ConversationMessage) => {
                   const isTarget = msg.id === copy.original_message_id;
+                  const isFromSender = msg.sender_id === copy.sender_id;
                   return (
                     <div
                       key={msg.id}
-                      className={`p-4 ${
-                        isTarget
-                          ? 'border-l-4 border-warning bg-warning-50/50 dark:bg-warning-50/10'
-                          : ''
-                      }`}
+                      className={`flex items-start gap-3 ${isFromSender ? '' : 'flex-row-reverse'}`}
                     >
-                      {/* Message header */}
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-foreground">
-                            {msg.sender_name}
+                      <span aria-hidden="true" className="mt-0.5 shrink-0">
+                        <Avatar name={msg.sender_name} size="sm" />
+                      </span>
+                      <div className={`flex min-w-0 max-w-[85%] flex-col ${isFromSender ? 'items-start' : 'items-end'}`}>
+                        {/* Bubble header: name · timestamp · badges */}
+                        <div
+                          className={`mb-1 flex flex-wrap items-center gap-x-2 gap-y-1 ${
+                            isFromSender ? '' : 'flex-row-reverse'
+                          }`}
+                        >
+                          <span className="text-sm font-semibold text-foreground">{msg.sender_name}</span>
+                          <span className="text-xs tabular-nums text-muted">
+                            {formatServerDateTime(msg.created_at)}
                           </span>
                           {isTarget && (
-                            <Chip size="sm" variant="tertiary" color="warning">
-                              <AlertTriangle className="w-3 h-3" />
+                            <Chip size="sm" variant="soft" color="warning">
+                              <AlertTriangle size={12} aria-hidden="true" />
                               <Chip.Label>{t('messages.detail_copied')}</Chip.Label>
                             </Chip>
                           )}
                           {msg.is_edited && (
-                            <span className="text-xs text-muted">{t('messages.detail_edited')}</span>
+                            <span className="text-xs italic text-muted">{t('messages.detail_edited')}</span>
                           )}
                         </div>
-                        <span className="text-xs text-muted">
-                          {formatServerDateTime(msg.created_at)}
-                        </span>
+
+                        {/* Bubble */}
+                        <div
+                          className={`rounded-2xl px-4 py-2.5 ${
+                            isFromSender ? 'rounded-tl-md bg-surface-secondary' : 'rounded-tr-md bg-accent/10'
+                          } ${isTarget ? 'ring-1 ring-inset ring-warning/60' : ''}`}
+                        >
+                          {msg.subject && (
+                            <p className="mb-1 text-xs font-medium text-muted">
+                              {t('messages.detail_subject')}: {msg.subject}
+                            </p>
+                          )}
+                          {msg.is_deleted ? (
+                            <p className="text-sm italic text-muted">{t('messages.detail_message_deleted')}</p>
+                          ) : (
+                            <p className="whitespace-pre-wrap break-words text-sm text-foreground">{msg.body}</p>
+                          )}
+                        </div>
                       </div>
-
-                      {/* Subject line */}
-                      {msg.subject && (
-                        <p className="text-xs text-muted mb-1">
-                          {t('messages.detail_subject')}: {msg.subject}
-                        </p>
-                      )}
-
-                      {/* Message body */}
-                      {msg.is_deleted ? (
-                        <p className="text-sm italic text-muted">
-                          {t('messages.detail_message_deleted')}
-                        </p>
-                      ) : (
-                        <p className="text-sm text-foreground whitespace-pre-wrap">
-                          {msg.body}
-                        </p>
-                      )}
                     </div>
                   );
                 })}
@@ -409,34 +508,36 @@ export function MessageDetail() {
         </CardBody>
       </Card>
 
-      {/* ── Archive Info (if archived) ─────────────────────────────────────── */}
+      {/* ── Archive record (if archived) ───────────────────────────────────── */}
       {isArchived && archive && (
-        <Card shadow="sm">
-          <CardHeader className="flex items-center gap-2">
-            <Archive className="w-4 h-4 text-accent" />
-            <span className="font-semibold">{t('messages.detail_archive_record')}</span>
+        <Card className={`${cardClass} mb-6`}>
+          <CardHeader className="flex items-center gap-2 pb-0">
+            <Archive size={18} className="text-accent" aria-hidden="true" />
+            <h3 className="font-semibold tracking-tight">{t('messages.detail_archive_record')}</h3>
           </CardHeader>
-          <Separator />
           <CardBody>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-1">
-                <p className="text-sm text-muted">{t('messages.detail_decision')}</p>
+                <p className="text-xs text-muted">{t('messages.detail_decision')}</p>
                 <Chip
                   size="sm"
-                  variant="tertiary"
+                  variant="soft"
                   color={archive.decision === 'approved' ? 'success' : 'danger'}
-                  className="capitalize"
                 >
-                  {archive.decision}
+                  {archive.decision === 'approved'
+                    ? t('status.approved')
+                    : t('messages.flagged_label')}
                 </Chip>
               </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted">{t('messages.detail_decided_by')}</p>
-                <p className="text-sm font-medium text-foreground">{archive.decided_by_name}</p>
+              <div className="min-w-0 space-y-1">
+                <p className="text-xs text-muted">{t('messages.detail_decided_by')}</p>
+                <p className="truncate text-sm font-medium text-foreground">{archive.decided_by_name}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-muted">{t('messages.detail_date')}</p>
-                <p className="text-sm text-foreground">
+                <p className="flex items-center gap-1 text-xs text-muted">
+                  <Calendar size={12} aria-hidden="true" /> {t('messages.detail_date')}
+                </p>
+                <p className="text-sm tabular-nums text-foreground">
                   {formatServerDateTime(archive.decided_at)}
                 </p>
               </div>
@@ -445,8 +546,10 @@ export function MessageDetail() {
               <>
                 <Separator className="my-3" />
                 <div className="space-y-1">
-                  <p className="text-sm text-muted">{t('messages.detail_notes')}</p>
-                  <p className="text-sm text-foreground">{archive.decision_notes}</p>
+                  <p className="text-xs text-muted">{t('messages.detail_notes')}</p>
+                  <p className="rounded-lg bg-surface-secondary p-3 text-sm text-foreground">
+                    {archive.decision_notes}
+                  </p>
                 </div>
               </>
             )}
@@ -454,74 +557,72 @@ export function MessageDetail() {
         </Card>
       )}
 
-      {/* ── Actions ────────────────────────────────────────────────────────── */}
-      <Card shadow="sm">
-        <CardHeader className="flex items-center gap-2">
-          <Shield className="w-4 h-4" />
-          <span className="font-semibold">{t('messages.detail_actions')}</span>
-        </CardHeader>
-        <Separator />
-        <CardBody>
+      {/* ── Decision bar ───────────────────────────────────────────────────── */}
+      <Card className={cardClass}>
+        <CardBody className="p-4 sm:p-5">
           {isArchived ? (
-            <p className="text-sm text-muted">
+            <p className="flex items-center gap-2 text-sm text-muted">
+              <Archive size={16} aria-hidden="true" />
               {t('messages.detail_archived_no_actions')}
             </p>
           ) : (
-            <div className="flex flex-wrap gap-3">
-              {/* Mark Reviewed */}
-              {!isReviewed && (
-                <Button
-                  color="success"
-                  variant="flat"
-                  startContent={!reviewLoading && <CheckCircle className="w-4 h-4" />}
-                  onPress={handleReview}
-                  isLoading={reviewLoading}
-                >
-                  {t('messages.detail_mark_reviewed')}
-                </Button>
-              )}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="flex items-center gap-2 text-sm text-muted">
+                <Shield size={16} aria-hidden="true" />
+                {t('messages.detail_decision_prompt')}
+              </p>
+              <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+                {/* Mark Reviewed */}
+                {!isReviewed && (
+                  <Button
+                    color="success"
+                    variant="flat"
+                    startContent={!reviewLoading && <CheckCircle size={16} />}
+                    onPress={handleReview}
+                    isLoading={reviewLoading}
+                  >
+                    {t('messages.detail_mark_reviewed')}
+                  </Button>
+                )}
 
-              {/* Flag */}
-              {!isFlagged && (
+                {/* Flag */}
+                {!isFlagged && (
+                  <Button
+                    color="warning"
+                    variant="flat"
+                    startContent={<Flag size={16} />}
+                    onPress={() => {
+                      setFlagReason('');
+                      setFlagSeverity('concern');
+                      setFlagModalOpen(true);
+                    }}
+                  >
+                    {t('messages.flag_action')}
+                  </Button>
+                )}
+
+                {/* Approve & Archive */}
                 <Button
-                  color="warning"
-                  variant="flat"
-                  startContent={<Flag className="w-4 h-4" />}
+                  color="primary"
+                  startContent={<Archive size={16} />}
                   onPress={() => {
-                    setFlagReason('');
-                    setFlagSeverity('concern');
-                    setFlagModalOpen(true);
+                    setApproveNotes('');
+                    setApproveModalOpen(true);
                   }}
                 >
-                  {t('messages.flag_action')}
+                  {t('messages.detail_approve_archive')}
                 </Button>
-              )}
-
-              {/* Approve & Archive */}
-              <Button
-                color="primary"
-                startContent={<Archive className="w-4 h-4" />}
-                onPress={() => {
-                  setApproveNotes('');
-                  setApproveModalOpen(true);
-                }}
-              >
-                {t('messages.detail_approve_archive')}
-              </Button>
+              </div>
             </div>
           )}
         </CardBody>
       </Card>
 
       {/* ── Flag Modal ─────────────────────────────────────────────────────── */}
-      <Modal
-        isOpen={flagModalOpen}
-        onClose={() => setFlagModalOpen(false)}
-        size="md"
-      >
+      <Modal isOpen={flagModalOpen} onClose={() => setFlagModalOpen(false)} size="md">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Flag className="w-5 h-5 text-warning" />
+            <Flag size={20} className="text-warning" aria-hidden="true" />
             {t('messages.flag_modal_title')}
           </ModalHeader>
           <ModalBody>
@@ -538,7 +639,7 @@ export function MessageDetail() {
               label={t('messages.severity_label')}
               selectedKeys={[flagSeverity]}
               onSelectionChange={(keys) => {
-                const val = Array.from(keys)[0] as 'info' | 'warning' | 'concern' | 'urgent';
+                const val = Array.from(keys)[0] as FlagSeverity;
                 if (val) setFlagSeverity(val);
               }}
               variant="bordered"
@@ -551,7 +652,7 @@ export function MessageDetail() {
           </ModalBody>
           <ModalFooter>
             <Button
-              variant="flat"
+              variant="tertiary"
               onPress={() => setFlagModalOpen(false)}
               isDisabled={flagLoading}
             >
@@ -561,7 +662,7 @@ export function MessageDetail() {
               color="warning"
               onPress={handleFlag}
               isLoading={flagLoading}
-              startContent={!flagLoading && <Flag className="w-4 h-4" />}
+              startContent={!flagLoading && <Flag size={16} />}
             >
               {t('messages.flag_action')}
             </Button>
@@ -570,20 +671,15 @@ export function MessageDetail() {
       </Modal>
 
       {/* ── Approve & Archive Modal ────────────────────────────────────────── */}
-      <Modal
-        isOpen={approveModalOpen}
-        onClose={() => setApproveModalOpen(false)}
-        size="md"
-      >
+      <Modal isOpen={approveModalOpen} onClose={() => setApproveModalOpen(false)} size="md">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Archive className="w-5 h-5 text-accent" />
+            <Archive size={20} className="text-accent" aria-hidden="true" />
             {t('messages.detail_approve_archive')}
           </ModalHeader>
           <ModalBody>
-            <p className="text-sm text-foreground/70">
-              {t('messages.detail_approve_warning')}
-            </p>
+            <p className="text-sm text-foreground">{t('messages.detail_approve_confirm')}</p>
+            <p className="text-sm text-muted">{t('messages.detail_approve_warning')}</p>
             <Textarea
               label={t('messages.detail_decision_notes_label')}
               placeholder={t('messages.detail_decision_notes_placeholder')}
@@ -595,7 +691,7 @@ export function MessageDetail() {
           </ModalBody>
           <ModalFooter>
             <Button
-              variant="flat"
+              variant="tertiary"
               onPress={() => setApproveModalOpen(false)}
               isDisabled={approveLoading}
             >
@@ -605,14 +701,14 @@ export function MessageDetail() {
               color="primary"
               onPress={handleApprove}
               isLoading={approveLoading}
-              startContent={!approveLoading && <Archive className="w-4 h-4" />}
+              startContent={!approveLoading && <Archive size={16} />}
             >
-              {t('messages.detail_approve_confirm')}
+              {t('messages.detail_approve_archive')}
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </div>
+    </BrokerPageShell>
   );
 }
 

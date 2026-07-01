@@ -29,4 +29,31 @@ describe('SafeguardingPage (broker)', () => {
     );
     expect(mockSafeguardingDashboard).toHaveBeenCalledTimes(1);
   });
+
+  it('frames the shared dashboard in the broker shell with broker-namespace copy', async () => {
+    const mod = await import('./SafeguardingPage');
+    const Component = mod.default;
+
+    render(<Component />);
+
+    // Broker-branded header from BrokerPageShell (danger domain, shield icon)
+    expect(screen.getByRole('heading', { level: 1, name: 'Safeguarding' })).toBeInTheDocument();
+    expect(
+      screen.getByText('Monitor safeguarding alerts, guardian assignments, and member preferences.')
+    ).toBeInTheDocument();
+  });
+
+  it('scopes the duplicate-header suppression styles around the embedded dashboard', async () => {
+    const mod = await import('./SafeguardingPage');
+    const Component = mod.default;
+
+    render(<Component />);
+
+    // The wrapper hides the admin PageHeader's duplicate title block via
+    // scoped CSS instead of forking the admin module — assert the wrapper is
+    // the dashboard's direct parent so the child selectors keep matching.
+    const dashboard = screen.getByTestId('shared-safeguarding-dashboard');
+    const wrapper = dashboard.parentElement;
+    expect(wrapper?.className).toContain(':first-child]:hidden');
+  });
 });

@@ -6,6 +6,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
+import userEvent from '@testing-library/user-event';
 
 // ── stable mock refs (vi.hoisted so they're available in vi.mock factories) ───
 const { mockAdminBroker } = vi.hoisted(() => ({
@@ -31,15 +32,6 @@ vi.mock('@/admin/api/adminApi', () => ({
 
 vi.mock('@/hooks', () => ({
   usePageTitle: vi.fn(),
-}));
-
-vi.mock('@/admin/components', () => ({
-  PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
-    <div data-testid="page-header">
-      <h1>{title}</h1>
-      {actions}
-    </div>
-  ),
 }));
 
 vi.mock('@/lib/serverTime', () => ({
@@ -98,7 +90,7 @@ describe('ArchiveDetail', () => {
     mockId = '1';
   });
 
-  it('shows loading spinner while fetching', () => {
+  it('shows a shaped skeleton while fetching', () => {
     mockAdminBroker.showArchive.mockReturnValue(new Promise(() => {}));
     render(<ArchiveDetail />);
 
@@ -122,6 +114,20 @@ describe('ArchiveDetail', () => {
     expect(screen.getByText('Looks fine')).toBeInTheDocument();
   });
 
+  it('renders the archival banner with the read-only badge and frozen note', async () => {
+    mockAdminBroker.showArchive.mockResolvedValue({ success: true, data: mockArchive });
+
+    render(<ArchiveDetail />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Read-only')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Record #1')).toBeInTheDocument();
+    expect(
+      screen.getByText('This record is preserved exactly as it was reviewed and cannot be modified.')
+    ).toBeInTheDocument();
+  });
+
   it('renders conversation snapshot messages', async () => {
     mockAdminBroker.showArchive.mockResolvedValue({ success: true, data: mockArchive });
 
@@ -140,7 +146,7 @@ describe('ArchiveDetail', () => {
     render(<ArchiveDetail />);
 
     await waitFor(() => {
-      // t('archives.edited') returns key string in test env
+      // t('archives.edited') = "edited"
       expect(screen.getByText(/edited/i)).toBeInTheDocument();
     });
   });
@@ -164,7 +170,7 @@ describe('ArchiveDetail', () => {
     render(<ArchiveDetail />);
 
     await waitFor(() => {
-      // t('archives.deleted') returns key in test env — look for italic element
+      // t('archives.deleted') = "deleted"
       expect(screen.getByText(/deleted/i)).toBeInTheDocument();
     });
   });
@@ -187,9 +193,11 @@ describe('ArchiveDetail', () => {
     render(<ArchiveDetail />);
 
     await waitFor(() => {
-      // back_to_archives button or error message rendered
-      expect(screen.getByRole('link', { name: /back/i })).toBeInTheDocument();
+      expect(screen.getByText('Record unavailable')).toBeInTheDocument();
     });
+    // Shell back action remains available for recovery
+    expect(screen.getByRole('link', { name: /back/i })).toBeInTheDocument();
+    expect(screen.getByText('Archive record not found.')).toBeInTheDocument();
   });
 
   it('shows error state when API call throws', async () => {
@@ -200,6 +208,25 @@ describe('ArchiveDetail', () => {
     await waitFor(() => {
       expect(screen.getByRole('link', { name: /back/i })).toBeInTheDocument();
     });
+    expect(screen.getByText('Failed to load archive record.')).toBeInTheDocument();
+  });
+
+  it('retries loading from the error state', async () => {
+    mockAdminBroker.showArchive
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValueOnce({ success: true, data: mockArchive });
+    const user = userEvent.setup();
+
+    render(<ArchiveDetail />);
+
+    expect(await screen.findByText('Record unavailable')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Hello there!')).toBeInTheDocument();
+    });
+    expect(mockAdminBroker.showArchive).toHaveBeenCalledTimes(2);
   });
 
   it('shows invalid_id error for non-numeric id', async () => {
@@ -208,9 +235,12 @@ describe('ArchiveDetail', () => {
     render(<ArchiveDetail />);
 
     await waitFor(() => {
-      // invalid id error renders back link
+      // invalid id error renders the shell back link
       expect(screen.getByRole('link', { name: /back/i })).toBeInTheDocument();
     });
+    expect(screen.getByText('Invalid archive ID.')).toBeInTheDocument();
+    // No retry offered for an unloadable id
+    expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
 
     // showArchive must NOT be called for invalid id
     expect(mockAdminBroker.showArchive).not.toHaveBeenCalled();
@@ -230,6 +260,8 @@ describe('ArchiveDetail', () => {
     await waitFor(() => {
       expect(screen.getByText('Inappropriate content')).toBeInTheDocument();
     });
+    // Panel-wide severity chip
+    expect(screen.getByText('High')).toBeInTheDocument();
   });
 
   it('shows listing_title when present', async () => {

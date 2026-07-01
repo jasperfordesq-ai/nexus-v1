@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import React from 'react';
 import { render, screen, waitFor } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 import userEvent from '@testing-library/user-event';
@@ -41,36 +42,41 @@ vi.mock('@/hooks', () => ({
   usePageTitle: vi.fn(),
 }));
 
-// ── DataTable mock (renders a simple table-like div) ─────────────────────────
+// ── serverTime stub ──────────────────────────────────────────────────────────
+vi.mock('@/lib/serverTime', () => ({
+  formatServerDate: (v: string) => v,
+  formatServerDateTime: (v: string) => v,
+}));
+
+// ── DataTable mock (renders rows through the page's column renderers) ────────
 vi.mock('@/admin/components', () => ({
-  DataTable: ({ data, isLoading, emptyContent }: {
+  DataTable: ({
+    columns,
+    data,
+    isLoading,
+    emptyContent,
+  }: {
+    columns: { key: string; label: string; render?: (item: unknown) => React.ReactNode }[];
     data: unknown[];
-    isLoading: boolean;
-    emptyContent: string;
-  }) => {
-    if (isLoading) {
-      return <div role="status" aria-busy="true" aria-label="Loading">Loading...</div>;
-    }
-    if (data.length === 0) {
-      return <div data-testid="empty">{emptyContent}</div>;
-    }
-    return (
-      <table role="table">
-        <tbody>
-          {(data as Array<{ id: number; sender_name: string; receiver_name: string }>).map((row) => (
-            <tr key={row.id}>
-              <td>{row.sender_name}</td>
-              <td>{row.receiver_name}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
-  },
-  PageHeader: ({ title, description }: { title: string; description: string }) => (
-    <div>
-      <h1>{title}</h1>
-      <p>{description}</p>
+    isLoading?: boolean;
+    emptyContent?: React.ReactNode;
+    [key: string]: unknown;
+  }) => (
+    <div data-testid="data-table">
+      {isLoading && (
+        <div role="status" aria-busy="true" aria-label="Loading">
+          Loading...
+        </div>
+      )}
+      {!isLoading && data.length === 0 && <div data-testid="empty">{emptyContent}</div>}
+      {!isLoading &&
+        data.map((row) => (
+          <div key={String((row as Record<string, unknown>).id)} data-testid="table-row">
+            {columns.map((col) => (
+              <div key={col.key}>{col.render ? col.render(row) : null}</div>
+            ))}
+          </div>
+        ))}
     </div>
   ),
 }));
@@ -104,24 +110,25 @@ import { ReviewArchive } from './ReviewArchivePage';
 describe('ReviewArchivePage — loading', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.history.replaceState({}, '', '/');
     mockGetArchives.mockReturnValue(new Promise(() => {})); // pending
   });
 
-  it('shows loading spinner while fetching', () => {
+  it('shows a shaped skeleton while first loading', () => {
     render(<ReviewArchive />);
-    const spinner = getAllByRoleStatus();
-    expect(spinner).toBeTruthy();
+    // Initial load renders BrokerSkeleton (role=status), not the data table.
+    expect(screen.queryByTestId('data-table')).toBeNull();
+    const busy = screen
+      .getAllByRole('status')
+      .find((el) => el.getAttribute('aria-busy') === 'true');
+    expect(busy).toBeTruthy();
   });
-
-  function getAllByRoleStatus() {
-    const items = screen.getAllByRole('status');
-    return items.find((el) => el.getAttribute('aria-busy') === 'true');
-  }
 });
 
 describe('ReviewArchivePage — populated', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.history.replaceState({}, '', '/');
     mockGetArchives.mockResolvedValue({
       success: true,
       data: ARCHIVE_ROWS,
@@ -137,12 +144,12 @@ describe('ReviewArchivePage — populated', () => {
     });
   });
 
-  it('loading spinner gone after data arrives', async () => {
+  it('loading skeleton gone after data arrives', async () => {
     render(<ReviewArchive />);
     await waitFor(() => {
-      const spinner = screen.queryAllByRole('status').find(
-        (el) => el.getAttribute('aria-busy') === 'true',
-      );
+      const spinner = screen
+        .queryAllByRole('status')
+        .find((el) => el.getAttribute('aria-busy') === 'true');
       expect(spinner).toBeUndefined();
     });
   });
@@ -155,11 +162,41 @@ describe('ReviewArchivePage — populated', () => {
       );
     });
   });
+
+  it('renders the KPI header derived from the fetched rows', async () => {
+    render(<ReviewArchive />);
+    await waitFor(() => {
+      expect(screen.getByText('Archived records')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Approved in view')).toBeInTheDocument();
+    expect(screen.getByText('Flagged in view')).toBeInTheDocument();
+    expect(screen.getByText('Reviewers in view')).toBeInTheDocument();
+  });
+
+  it('renders decision chips for approved and flagged records', async () => {
+    render(<ReviewArchive />);
+    await waitFor(() => {
+      expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+    });
+    // The chip text appears in the row plus the matching filter tab.
+    expect(screen.getAllByText('Approved').length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText('Flagged').length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('renders reviewer and date cells', async () => {
+    render(<ReviewArchive />);
+    await waitFor(() => {
+      expect(screen.getByText('Admin')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Broker')).toBeInTheDocument();
+    expect(screen.getByText('2026-06-01T10:00:00Z')).toBeInTheDocument();
+  });
 });
 
 describe('ReviewArchivePage — empty', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.history.replaceState({}, '', '/');
     mockGetArchives.mockResolvedValue({ success: true, data: [], meta: { total: 0 } });
   });
 
@@ -168,12 +205,22 @@ describe('ReviewArchivePage — empty', () => {
     await waitFor(() => {
       expect(screen.getByTestId('empty')).toBeInTheDocument();
     });
+    expect(screen.getByText('No archived records found.')).toBeInTheDocument();
+  });
+
+  it('shows a filter-aware empty state on a filtered view', async () => {
+    window.history.replaceState({}, '', '/?decision=approved');
+    render(<ReviewArchive />);
+    await waitFor(() => {
+      expect(screen.getByText('No matching records')).toBeInTheDocument();
+    });
   });
 });
 
 describe('ReviewArchivePage — error', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.history.replaceState({}, '', '/');
     mockGetArchives.mockRejectedValue(new Error('Network error'));
   });
 
@@ -183,11 +230,27 @@ describe('ReviewArchivePage — error', () => {
       expect(mockToast.error).toHaveBeenCalled();
     });
   });
+
+  it('renders an honest error state with retry when loading fails', async () => {
+    mockGetArchives
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValueOnce({ success: true, data: ARCHIVE_ROWS, meta: { total: 2 } });
+    const user = userEvent.setup();
+    render(<ReviewArchive />);
+
+    expect(await screen.findByText("Couldn't load the archive")).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    await waitFor(() => {
+      expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+    });
+  });
 });
 
 describe('ReviewArchivePage — filter tabs', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.history.replaceState({}, '', '/');
     mockGetArchives.mockResolvedValue({ success: true, data: ARCHIVE_ROWS, meta: { total: 2 } });
   });
 
@@ -196,13 +259,23 @@ describe('ReviewArchivePage — filter tabs', () => {
     render(<ReviewArchive />);
     await waitFor(() => expect(screen.getByText('Alice Smith')).toBeInTheDocument());
 
-    // Find the Approved tab (HeroUI Tabs renders tab items as buttons or with role=tab)
+    // Find the Approved tab (HeroUI Tabs renders tab items with role=tab)
     const approvedTab = screen.getByRole('tab', { name: /approved/i });
     await user.click(approvedTab);
 
     await waitFor(() => {
       expect(mockGetArchives).toHaveBeenCalledWith(
         expect.objectContaining({ decision: 'approved' }),
+      );
+    });
+  });
+
+  it('honours a deep-linked ?decision=flagged filter', async () => {
+    window.history.replaceState({}, '', '/?decision=flagged');
+    render(<ReviewArchive />);
+    await waitFor(() => {
+      expect(mockGetArchives).toHaveBeenCalledWith(
+        expect.objectContaining({ decision: 'flagged' }),
       );
     });
   });

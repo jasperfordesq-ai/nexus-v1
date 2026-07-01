@@ -1,4 +1,3 @@
-import { Select, SelectItem, Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,24 +11,63 @@ import { Select, SelectItem, Button, Textarea, Modal, ModalContent, ModalHeader,
  * Broker port retains the row-level "Quick view" detail modal that lets
  * brokers triage messages without leaving the list page, on top of the
  * admin's Review / Flag actions and navigation to the detail page.
+ *
+ * Restyled to the broker design language: BrokerPageShell frame, KPI header
+ * (global unreviewed count from the existing unreviewed-count endpoint plus
+ * in-view flagged/reviewed tallies), deep-linkable status tabs (?status=),
+ * avatar sender → recipient cells, severity chips, shaped skeleton loading,
+ * per-filter empty states and an honest error state with retry.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-
-import { Chip, Separator } from '@/components/ui';
-import ArrowLeft from 'lucide-react/icons/arrow-left';
-import CheckCircle from 'lucide-react/icons/circle-check-big';
-import Flag from 'lucide-react/icons/flag';
-import Eye from 'lucide-react/icons/eye';
-import MessageSquare from 'lucide-react/icons/message-square';
 import { useTranslation } from 'react-i18next';
+
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import ArrowRight from 'lucide-react/icons/arrow-right';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Clock from 'lucide-react/icons/clock';
+import Eye from 'lucide-react/icons/eye';
+import Flag from 'lucide-react/icons/flag';
+import Inbox from 'lucide-react/icons/inbox';
+import MessageSquare from 'lucide-react/icons/message-square';
+import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import Sparkles from 'lucide-react/icons/sparkles';
+import type { LucideIcon } from 'lucide-react';
+
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { formatServerDate, formatServerDateTime } from '@/lib/serverTime';
 import { adminBroker } from '@/admin/api/adminApi';
-import { DataTable, PageHeader, type Column } from '@/admin/components';
+import { DataTable, type Column } from '@/admin/components';
 import type { BrokerMessage, BrokerMessageDetail } from '@/admin/api/types';
+import {
+  Avatar,
+  Button,
+  Chip,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Select,
+  SelectItem,
+  Separator,
+  Tabs,
+  Tab,
+  Textarea,
+} from '@/components/ui';
+import {
+  BrokerPageShell,
+  BrokerStatCard,
+  BrokerEmptyState,
+  BrokerSkeleton,
+  BrokerStatusChip,
+  type BrokerStatColor,
+} from '../components';
 
 type SeverityChipColor = 'default' | 'warning' | 'danger';
 type SeverityChipVariant = 'tertiary' | 'primary';
@@ -50,10 +88,27 @@ function severityColor(severity?: string): { color: SeverityChipColor; variant: 
   }
 }
 
+// Severities that map onto the panel-wide status vocabulary render through
+// BrokerStatusChip so their colors match every other broker page; the
+// message-specific scale (info/warning/concern/urgent) keeps its own chips.
+const PANEL_SEVERITIES = new Set(['low', 'medium', 'high', 'critical']);
+
 // The active tab is driven by the URL so deep-links from the broker
 // dashboard stat cards land on the right filter.
 const ALLOWED_FILTERS = ['unreviewed', 'flagged', 'reviewed', 'all'] as const;
 type MessageFilter = (typeof ALLOWED_FILTERS)[number];
+
+// Per-filter empty states — an empty review queue is good news (success),
+// an empty history filter is just neutral.
+const EMPTY_META: Record<
+  MessageFilter,
+  { icon: LucideIcon; color: BrokerStatColor; titleKey: string; hintKey: string }
+> = {
+  unreviewed: { icon: Sparkles, color: 'success', titleKey: 'messages.empty_unreviewed_title', hintKey: 'messages.empty_unreviewed_hint' },
+  flagged: { icon: ShieldCheck, color: 'success', titleKey: 'messages.empty_flagged_title', hintKey: 'messages.empty_flagged_hint' },
+  reviewed: { icon: CheckCircle, color: 'neutral', titleKey: 'messages.empty_reviewed_title', hintKey: 'messages.empty_reviewed_hint' },
+  all: { icon: MessageSquare, color: 'neutral', titleKey: 'messages.empty_all_title', hintKey: 'messages.empty_all_hint' },
+};
 
 export function MessageReview() {
   const { t } = useTranslation('broker');
@@ -87,8 +142,14 @@ export function MessageReview() {
   const [items, setItems] = useState<BrokerMessage[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const [page, setPage] = useState(1);
   const [reviewingId, setReviewingId] = useState<number | null>(null);
+
+  // Global unreviewed KPI — from the existing broker messages stats endpoint.
+  const [unreviewedCount, setUnreviewedCount] = useState<number | null>(null);
+  const [countLoading, setCountLoading] = useState(true);
 
   // Flag modal state
   const [flagModalOpen, setFlagModalOpen] = useState(false);
@@ -104,8 +165,17 @@ export function MessageReview() {
   const [detailReviewNotes, setDetailReviewNotes] = useState('');
   const [detailReviewLoading, setDetailReviewLoading] = useState(false);
 
+  // Stash the latest `t`/`toast` in refs so the fetch effect is keyed on the
+  // page/filter params only — keeping them in the dep array re-fetches on
+  // every language switch and risks a render loop with unstable toast refs.
+  const tRef = useRef(t);
+  const toastRef = useRef(toast);
+  tRef.current = t;
+  toastRef.current = toast;
+
   const loadItems = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await adminBroker.getMessages({
         page,
@@ -117,16 +187,41 @@ export function MessageReview() {
         setTotal(Number(meta?.total ?? meta?.total_items ?? res.data.length));
       }
     } catch {
-      toast.error(t('messages.load_failed'));
+      setLoadError(true);
+      toastRef.current.error(tRef.current('messages.load_failed'));
     } finally {
       setLoading(false);
+      setHasLoaded(true);
     }
-  }, [page, filter, toast, t])
+  }, [page, filter]);
 
+  const loadUnreviewedCount = useCallback(async () => {
+    setCountLoading(true);
+    try {
+      const res = await adminBroker.getUnreviewedCount();
+      if (res.success && res.data) {
+        const count = Number((res.data as { count?: unknown }).count);
+        if (Number.isFinite(count)) setUnreviewedCount(count);
+      }
+    } catch {
+      // Decorative KPI — the list load surfaces real failures.
+    } finally {
+      setCountLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     loadItems();
   }, [loadItems]);
+
+  useEffect(() => {
+    loadUnreviewedCount();
+  }, [loadUnreviewedCount]);
+
+  const refreshAll = () => {
+    loadItems();
+    loadUnreviewedCount();
+  };
 
   const handleReview = async (id: number) => {
     setReviewingId(id);
@@ -135,6 +230,7 @@ export function MessageReview() {
       if (res?.success) {
         toast.success(t('messages.reviewed_success'));
         loadItems();
+        loadUnreviewedCount();
       } else {
         toast.error(res?.error || t('messages.review_failed'));
       }
@@ -209,6 +305,7 @@ export function MessageReview() {
         toast.success(t('messages.reviewed_success'));
         closeDetail();
         loadItems();
+        loadUnreviewedCount();
       } else {
         toast.error(res?.error || t('messages.review_failed'));
       }
@@ -217,37 +314,62 @@ export function MessageReview() {
     } finally {
       setDetailReviewLoading(false);
     }
-  }, [detailItem, detailReviewNotes, closeDetail, loadItems, toast, t]);
+  }, [detailItem, detailReviewNotes, closeDetail, loadItems, loadUnreviewedCount, toast, t]);
 
   const isDetailReviewed = !!(detailItem?.reviewed_at);
+
+  // Severity chip — panel-wide values route through BrokerStatusChip so the
+  // colors match every other broker page; the message-domain scale keeps a
+  // flag-badged chip with its translated label.
+  const renderSeverity = (severityRaw: string) => {
+    const severity = severityRaw.toLowerCase();
+    if (PANEL_SEVERITIES.has(severity)) {
+      return <BrokerStatusChip status={severity} />;
+    }
+    const { color, variant } = severityColor(severity);
+    return (
+      <Chip size="sm" variant={variant} color={color} className="capitalize">
+        <Flag size={12} aria-hidden="true" />
+        <Chip.Label>
+          {t(`messages.severity_${severity}`, { defaultValue: severity.replace(/_/g, ' ') })}
+        </Chip.Label>
+      </Chip>
+    );
+  };
+
+  // In-view KPI tallies — derived from the rows the page already fetched.
+  const flaggedInView = items.filter((i) => i.flagged).length;
+  const reviewedInView = items.filter((i) => !!i.reviewed_at).length;
+
+  const emptyMeta = EMPTY_META[filter];
 
   const columns: Column<BrokerMessage>[] = [
     {
       key: 'sender_name',
-      label: t('messages.col_sender'),
+      label: t('messages.col_participants'),
       sortable: true,
       render: (item) => (
-        <Link
-          to={tenantPath(`/broker/messages/${item.id}`)}
-          className="font-medium text-accent hover:underline"
-        >
-          {item.sender_name}
-        </Link>
-      ),
-    },
-    {
-      key: 'receiver_name',
-      label: t('messages.col_receiver'),
-      sortable: true,
-      render: (item) => (
-        <span className="font-medium text-foreground">{item.receiver_name}</span>
+        <div className="flex min-w-0 items-center gap-2">
+          <Avatar name={item.sender_name} size="sm" className="shrink-0" />
+          <Link
+            to={tenantPath(`/broker/messages/${item.id}`)}
+            className="min-w-0 truncate text-sm font-medium text-accent hover:underline"
+          >
+            {item.sender_name}
+          </Link>
+          <ArrowRight size={14} className="shrink-0 text-muted" aria-hidden="true" />
+          <Avatar name={item.receiver_name} size="sm" className="shrink-0" />
+          <span className="min-w-0 truncate text-sm font-medium text-foreground">
+            {item.receiver_name}
+          </span>
+        </div>
       ),
     },
     {
       key: 'message_body',
       label: t('messages.col_preview'),
       render: (item) => (
-        <span className="text-sm text-muted line-clamp-1 max-w-[200px]">
+        <span className="line-clamp-1 min-w-0 max-w-[240px] text-sm text-muted">
           {item.message_body ? item.message_body.substring(0, 80) + (item.message_body.length > 80 ? '…' : '') : '—'}
         </span>
       ),
@@ -258,7 +380,9 @@ export function MessageReview() {
       render: (item) => (
         item.copy_reason ? (
           <Chip size="sm" variant="tertiary" color="default">
-            {item.copy_reason.replace(/_/g, ' ')}
+            {t(`messages.copy_reason_${item.copy_reason}`, {
+              defaultValue: item.copy_reason.replace(/_/g, ' '),
+            })}
           </Chip>
         ) : <span className="text-sm text-muted">—</span>
       ),
@@ -267,38 +391,17 @@ export function MessageReview() {
       key: 'flagged',
       label: t('messages.col_flagged'),
       render: (item) => {
-        if (!item.flagged) return <span className="text-sm text-muted">{t('messages.flagged_no')}</span>;
-        const severityChipColor = {
-          info: 'default' as const,
-          warning: 'warning' as const,
-          concern: 'danger' as const,
-          urgent: 'danger' as const,
-        }[item.flag_severity || 'concern'] ?? 'danger' as const;
-        return (
-          <Chip
-            size="sm"
-            variant="tertiary"
-            color={severityChipColor}
-          >
-            <Flag size={12} />
-            <Chip.Label>{item.flag_severity || t('messages.flagged_label')}</Chip.Label>
-          </Chip>
-        );
+        if (!item.flagged) {
+          return <span className="text-sm text-muted">{t('messages.flagged_no')}</span>;
+        }
+        return renderSeverity(item.flag_severity || 'concern');
       },
     },
     {
       key: 'reviewed_at',
       label: t('messages.col_status'),
       render: (item) => (
-        item.reviewed_at ? (
-          <Chip size="sm" variant="tertiary" color="success">
-            {t('messages.status_reviewed')}
-          </Chip>
-        ) : (
-          <Chip size="sm" variant="tertiary" color="warning">
-            {t('messages.status_unreviewed')}
-          </Chip>
-        )
+        <BrokerStatusChip status={item.reviewed_at ? 'reviewed' : 'unreviewed'} />
       ),
     },
     {
@@ -306,7 +409,7 @@ export function MessageReview() {
       label: t('messages.col_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-muted">
+        <span className="text-sm tabular-nums text-muted">
           {formatServerDate(item.created_at)}
         </span>
       ),
@@ -319,7 +422,7 @@ export function MessageReview() {
           {!item.reviewed_at && (
             <Button
               size="sm"
-              variant="flat"
+              variant="tertiary"
               color="success"
               startContent={<CheckCircle size={14} />}
               onPress={() => handleReview(item.id)}
@@ -332,8 +435,7 @@ export function MessageReview() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="default"
+            variant="tertiary"
             onPress={() => openDetail(item)}
             aria-label={t('messages.quick_view_aria')}
           >
@@ -342,7 +444,7 @@ export function MessageReview() {
           {!item.flagged && (
             <Button
               size="sm"
-              variant="flat"
+              variant="tertiary"
               color="warning"
               startContent={<Flag size={14} />}
               onPress={() => openFlagModal(item.id)}
@@ -357,24 +459,75 @@ export function MessageReview() {
   ];
 
   return (
-    <div>
-      <PageHeader
-        title={t('messages.title')}
-        description={t('messages.page_description')}
-        actions={
+    <BrokerPageShell
+      title={t('messages.title')}
+      description={t('messages.page_description')}
+      icon={MessageSquareWarning}
+      color="warning"
+      actions={
+        <>
           <Button
             as={Link}
             to={tenantPath('/broker')}
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
             {t('messages.back')}
           </Button>
-        }
-      />
+          <Button
+            variant="tertiary"
+            size="sm"
+            startContent={<RefreshCw size={16} />}
+            onPress={refreshAll}
+            isLoading={loading && countLoading}
+          >
+            {t('common.refresh')}
+          </Button>
+        </>
+      }
+    >
+      {/* KPI header — global unreviewed queue + in-view tallies */}
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <BrokerStatCard
+          label={t('messages.stat_unreviewed')}
+          value={unreviewedCount}
+          icon={MessageSquareWarning}
+          color="warning"
+          loading={countLoading}
+          to={tenantPath('/broker/messages?status=unreviewed')}
+          description={t('messages.stat_unreviewed_hint')}
+        />
+        <BrokerStatCard
+          label={t('messages.stat_flagged')}
+          value={flaggedInView}
+          icon={Flag}
+          color="danger"
+          loading={!hasLoaded}
+          to={tenantPath('/broker/messages?status=flagged')}
+          description={t('messages.stat_flagged_hint')}
+        />
+        <BrokerStatCard
+          label={t('messages.stat_reviewed')}
+          value={reviewedInView}
+          icon={CheckCircle}
+          color="success"
+          loading={!hasLoaded}
+          to={tenantPath('/broker/messages?status=reviewed')}
+          description={t('messages.stat_reviewed_hint')}
+        />
+        <BrokerStatCard
+          label={t('messages.stat_filtered')}
+          value={total}
+          icon={Inbox}
+          color="accent"
+          loading={!hasLoaded}
+          description={t('messages.stat_filtered_hint')}
+        />
+      </div>
 
-      <div className="mb-4">
+      {/* Status tabs — deep-linkable via ?status= */}
+      <div className="mb-4 rounded-2xl border border-divider/70 bg-surface p-2 shadow-sm shadow-black/[0.03]">
         <Tabs
           aria-label={t('messages.review_tabs_aria')}
           selectedKey={filter}
@@ -382,24 +535,88 @@ export function MessageReview() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="unreviewed" title={t('messages.tab_unreviewed')} />
-          <Tab key="flagged" title={t('messages.tab_flagged')} />
-          <Tab key="reviewed" title={t('messages.tab_reviewed')} />
-          <Tab key="all" title={t('messages.tab_all')} />
+          <Tab
+            key="unreviewed"
+            title={
+              <div className="flex items-center gap-2">
+                <Clock size={14} />
+                <span>{t('messages.tab_unreviewed')}</span>
+                {unreviewedCount !== null && unreviewedCount > 0 && (
+                  <Chip size="sm" variant="soft" color="warning" className="tabular-nums">
+                    {unreviewedCount}
+                  </Chip>
+                )}
+              </div>
+            }
+          />
+          <Tab
+            key="flagged"
+            title={
+              <div className="flex items-center gap-2">
+                <Flag size={14} />
+                <span>{t('messages.tab_flagged')}</span>
+              </div>
+            }
+          />
+          <Tab
+            key="reviewed"
+            title={
+              <div className="flex items-center gap-2">
+                <CheckCircle size={14} />
+                <span>{t('messages.tab_reviewed')}</span>
+              </div>
+            }
+          />
+          <Tab
+            key="all"
+            title={
+              <div className="flex items-center gap-2">
+                <MessageSquare size={14} />
+                <span>{t('messages.tab_all')}</span>
+              </div>
+            }
+          />
         </Tabs>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={items}
-        isLoading={loading}
-        searchable={false}
-        onRefresh={loadItems}
-        totalItems={total}
-        page={page}
-        pageSize={20}
-        onPageChange={setPage}
-      />
+      {!hasLoaded ? (
+        <BrokerSkeleton variant="table" />
+      ) : loadError && items.length === 0 ? (
+        // Honest error state — a failed load must never masquerade as an
+        // empty (all-clear) review queue.
+        <BrokerEmptyState
+          icon={AlertCircle}
+          color="danger"
+          title={t('messages.error_title')}
+          hint={t('messages.error_hint')}
+          action={
+            <Button size="sm" variant="danger-soft" onPress={refreshAll}>
+              {t('messages.retry')}
+            </Button>
+          }
+        />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={items}
+          isLoading={loading}
+          searchable={false}
+          onRefresh={refreshAll}
+          totalItems={total}
+          page={page}
+          pageSize={20}
+          onPageChange={setPage}
+          emptyContent={
+            <BrokerEmptyState
+              bare
+              icon={emptyMeta.icon}
+              color={emptyMeta.color}
+              title={t(emptyMeta.titleKey)}
+              hint={t(emptyMeta.hintKey)}
+            />
+          }
+        />
+      )}
 
       {/* Flag Message Modal */}
       <Modal
@@ -409,7 +626,7 @@ export function MessageReview() {
       >
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Flag size={20} className="text-warning" />
+            <Flag size={20} className="text-warning" aria-hidden="true" />
             {t('messages.flag_modal_title')}
           </ModalHeader>
           <ModalBody>
@@ -439,7 +656,7 @@ export function MessageReview() {
           </ModalBody>
           <ModalFooter>
             <Button
-              variant="flat"
+              variant="tertiary"
               onPress={() => setFlagModalOpen(false)}
               isDisabled={flagLoading}
             >
@@ -466,35 +683,41 @@ export function MessageReview() {
       >
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <MessageSquare size={18} className="text-accent shrink-0" />
+            <MessageSquare size={18} className="shrink-0 text-accent" aria-hidden="true" />
             <span>{t('messages.quick_view_title')}</span>
           </ModalHeader>
 
           <ModalBody className="gap-4">
             {detailLoading && (
-              <p className="text-sm text-muted text-center py-8">{t('messages.loading')}</p>
+              <p className="py-8 text-center text-sm text-muted">{t('messages.loading')}</p>
             )}
 
             {!detailLoading && detailItem && (
               <>
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <p className="text-xs text-muted uppercase font-medium mb-0.5">{t('messages.detail_from')}</p>
-                    <p className="font-medium text-foreground">{detailItem.sender_name}</p>
+                  <div className="min-w-0">
+                    <p className="mb-1 text-xs font-medium uppercase text-muted">{t('messages.detail_from')}</p>
+                    <div className="flex min-w-0 items-center gap-2">
+                      <Avatar name={detailItem.sender_name} size="sm" className="shrink-0" />
+                      <p className="truncate font-medium text-foreground">{detailItem.sender_name}</p>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="mb-1 text-xs font-medium uppercase text-muted">{t('messages.detail_to')}</p>
+                    <div className="flex min-w-0 items-center gap-2">
+                      <Avatar name={detailItem.receiver_name} size="sm" className="shrink-0" />
+                      <p className="truncate font-medium text-foreground">{detailItem.receiver_name}</p>
+                    </div>
                   </div>
                   <div>
-                    <p className="text-xs text-muted uppercase font-medium mb-0.5">{t('messages.detail_to')}</p>
-                    <p className="font-medium text-foreground">{detailItem.receiver_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted uppercase font-medium mb-0.5">{t('messages.detail_date')}</p>
-                    <p className="text-foreground">
+                    <p className="mb-0.5 text-xs font-medium uppercase text-muted">{t('messages.detail_date')}</p>
+                    <p className="tabular-nums text-foreground">
                       {formatServerDateTime(detailItem.sent_at ?? detailItem.created_at)}
                     </p>
                   </div>
                   {(detailItem.flag_reason || detailItem.copy_reason) && (
                     <div>
-                      <p className="text-xs text-muted uppercase font-medium mb-0.5">{t('messages.detail_reason')}</p>
+                      <p className="mb-0.5 text-xs font-medium uppercase text-muted">{t('messages.detail_reason')}</p>
                       <p className="text-foreground">
                         {detailItem.flag_reason || detailItem.copy_reason}
                       </p>
@@ -502,15 +725,8 @@ export function MessageReview() {
                   )}
                   {detailItem.flag_severity && (
                     <div>
-                      <p className="text-xs text-muted uppercase font-medium mb-0.5">{t('messages.detail_severity')}</p>
-                      {(() => {
-                        const { color, variant } = severityColor(detailItem.flag_severity);
-                        return (
-                          <Chip size="sm" variant={variant} color={color} className="capitalize">
-                            {detailItem.flag_severity}
-                          </Chip>
-                        );
-                      })()}
+                      <p className="mb-0.5 text-xs font-medium uppercase text-muted">{t('messages.detail_severity')}</p>
+                      {renderSeverity(detailItem.flag_severity)}
                     </div>
                   )}
                 </div>
@@ -518,8 +734,8 @@ export function MessageReview() {
                 <Separator />
 
                 <div>
-                  <p className="text-xs text-muted uppercase font-medium mb-2">{t('messages.content_label')}</p>
-                  <div className="rounded-lg bg-surface-secondary p-4 text-sm text-foreground whitespace-pre-wrap leading-relaxed min-h-[80px]">
+                  <p className="mb-2 text-xs font-medium uppercase text-muted">{t('messages.content_label')}</p>
+                  <div className="min-h-[80px] whitespace-pre-wrap rounded-lg bg-surface-secondary p-4 text-sm leading-relaxed text-foreground">
                     {detail?.copy?.message_body || detailItem.message_body || '--'}
                   </div>
                 </div>
@@ -528,20 +744,20 @@ export function MessageReview() {
                   <>
                     <Separator />
                     <div>
-                      <p className="text-xs text-muted uppercase font-medium mb-2">
+                      <p className="mb-2 text-xs font-medium uppercase text-muted">
                         {t('messages.conversation_label')} ({detail.thread.length})
                       </p>
-                      <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                      <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
                         {detail.thread.map((msg) => (
                           <div
                             key={msg.id}
                             className="rounded-md bg-surface-secondary px-3 py-2 text-sm"
                           >
-                            <span className="font-medium text-foreground mr-2">{msg.sender_name}</span>
-                            <span className="text-muted text-xs">
+                            <span className="mr-2 font-medium text-foreground">{msg.sender_name}</span>
+                            <span className="text-xs tabular-nums text-muted">
                               {formatServerDateTime(msg.created_at)}
                             </span>
-                            <p className="mt-1 text-foreground whitespace-pre-wrap">{msg.body}</p>
+                            <p className="mt-1 whitespace-pre-wrap text-foreground">{msg.body}</p>
                           </div>
                         ))}
                       </div>
@@ -552,9 +768,9 @@ export function MessageReview() {
                 {isDetailReviewed ? (
                   <>
                     <Separator />
-                    <div className="flex items-center gap-2 text-sm text-success">
-                      <Chip size="sm" color="success" variant="tertiary">{t('messages.status_reviewed')}</Chip>
-                      <span className="text-muted">
+                    <div className="flex items-center gap-2 text-sm">
+                      <BrokerStatusChip status="reviewed" />
+                      <span className="tabular-nums text-muted">
                         {formatServerDateTime(detailItem.reviewed_at!)}
                       </span>
                     </div>
@@ -577,7 +793,7 @@ export function MessageReview() {
           </ModalBody>
 
           <ModalFooter>
-            <Button variant="flat" onPress={closeDetail} isDisabled={detailReviewLoading}>
+            <Button variant="tertiary" onPress={closeDetail} isDisabled={detailReviewLoading}>
               {t('messages.cancel')}
             </Button>
             {!isDetailReviewed && detailItem && (
@@ -594,7 +810,7 @@ export function MessageReview() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </div>
+    </BrokerPageShell>
   );
 }
 

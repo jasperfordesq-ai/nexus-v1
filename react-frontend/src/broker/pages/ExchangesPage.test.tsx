@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { render, screen, waitFor } from '@/test/test-utils';
 import userEvent from '@testing-library/user-event';
 import { createMockContexts } from '@/test/mock-contexts';
 
@@ -60,23 +60,39 @@ const POPULATED_RESPONSE = {
 
 import { ExchangeManagement } from './ExchangesPage';
 
+// test-utils renders inside a BrowserRouter, which reads window.location —
+// push the deep-link path before rendering to exercise ?status= handling.
+function renderAt(path = '/broker/exchanges') {
+  window.history.pushState({}, '', path);
+  return render(<ExchangeManagement />);
+}
+
 describe('ExchangeManagement — loading state', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.history.pushState({}, '', '/broker/exchanges');
     // Never resolve — keeps component in loading state
     mockAdminBroker.getExchanges.mockReturnValue(new Promise(() => {}));
   });
 
-  it('renders the page header', () => {
+  it('renders the shell header with the page title', () => {
     render(<ExchangeManagement />);
-    // Page title rendered by PageHeader (via i18n key broker:exchanges.title)
-    expect(document.body).toBeTruthy();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Exchange Management' })
+    ).toBeInTheDocument();
+  });
+
+  it('shows skeleton placeholders instead of a bare spinner while loading', () => {
+    render(<ExchangeManagement />);
+    // BrokerSkeleton (table) + BrokerStatCard loading skeletons expose role="status"
+    expect(screen.getAllByRole('status').length).toBeGreaterThan(0);
   });
 });
 
 describe('ExchangeManagement — empty state', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.history.pushState({}, '', '/broker/exchanges');
     mockAdminBroker.getExchanges.mockResolvedValue(EMPTY_RESPONSE);
   });
 
@@ -89,21 +105,61 @@ describe('ExchangeManagement — empty state', () => {
     const tabList = screen.queryAllByRole('tab');
     expect(tabList.length).toBeGreaterThan(0);
   });
+
+  it('shows the neutral empty state on the default (all) filter', async () => {
+    render(<ExchangeManagement />);
+    await waitFor(() => {
+      expect(screen.getByText('No exchanges found.')).toBeInTheDocument();
+    });
+  });
+
+  it('shows the all-caught-up empty state on the pending queue', async () => {
+    renderAt('/broker/exchanges?status=pending_broker');
+    await waitFor(() => {
+      expect(screen.getByText('No exchanges waiting')).toBeInTheDocument();
+    });
+  });
 });
 
 describe('ExchangeManagement — populated state', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.history.pushState({}, '', '/broker/exchanges');
     mockAdminBroker.getExchanges.mockResolvedValue(POPULATED_RESPONSE);
   });
 
-  it('loads exchanges on mount and shows requester names', async () => {
+  it('loads exchanges on mount and shows both parties of each exchange', async () => {
     render(<ExchangeManagement />);
     await waitFor(() => {
       expect(screen.getByText('Alice Smith')).toBeInTheDocument();
     });
     expect(screen.getByText('Bob Jones')).toBeInTheDocument();
     expect(screen.getByText('Carol White')).toBeInTheDocument();
+    expect(screen.getByText('Dave Brown')).toBeInTheDocument();
+  });
+
+  it('renders the KPI stat cards for total and pending exchanges', async () => {
+    render(<ExchangeManagement />);
+    await waitFor(() => {
+      expect(screen.getByText('Total exchanges')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Pending broker review')).toBeInTheDocument();
+  });
+
+  it('renders panel-wide status chips for exchange statuses', async () => {
+    render(<ExchangeManagement />);
+    await waitFor(() => {
+      expect(screen.getByText('Pending Broker Approval')).toBeInTheDocument();
+    });
+  });
+
+  it('honours a deep-linked ?status= filter', async () => {
+    renderAt('/broker/exchanges?status=completed');
+    await waitFor(() => {
+      expect(mockAdminBroker.getExchanges).toHaveBeenCalledWith(
+        expect.objectContaining({ status: 'completed' })
+      );
+    });
   });
 
   it('shows approve and reject action buttons only for pending_broker rows', async () => {
@@ -193,6 +249,7 @@ describe('ExchangeManagement — populated state', () => {
 describe('ExchangeManagement — error state', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    window.history.pushState({}, '', '/broker/exchanges');
     mockAdminBroker.getExchanges.mockRejectedValue(new Error('Network error'));
   });
 
@@ -201,5 +258,14 @@ describe('ExchangeManagement — error state', () => {
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled();
     });
+  });
+
+  it('renders an honest error state with a retry action instead of an empty table', async () => {
+    render(<ExchangeManagement />);
+    await waitFor(() => {
+      expect(screen.getByText("Couldn't load exchanges")).toBeInTheDocument();
+    });
+    // Retry buttons (header refresh + error-state retry) share the Refresh label
+    expect(screen.getAllByRole('button', { name: 'Refresh' }).length).toBeGreaterThan(0);
   });
 });
