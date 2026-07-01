@@ -242,7 +242,12 @@
     "stage_profile_complete": "Profil vollständig",
     "stage_first_exchange": "Erster Austausch",
     "pending_approvals": "Ausstehende Genehmigungen",
-    "no_pending": "Keine ausstehenden Mitglieder zur Genehmigung."
+    "no_pending": "Keine ausstehenden Mitglieder zur Genehmigung.",
+    "kpi_registered": "Registered",
+    "kpi_conversion": "Overall conversion",
+    "kpi_pending": "Pending approvals",
+    "kpi_dropoff": "Biggest drop-off",
+    "kpi_none": "No drop-off"
   },
   "safeguarding": {
     "title": "Schutzmaßnahmen",

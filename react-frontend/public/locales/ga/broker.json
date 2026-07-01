@@ -242,7 +242,12 @@
     "stage_profile_complete": "Próifíl Críochnaithe",
     "stage_first_exchange": "Céad Mhalartú",
     "pending_approvals": "Ceaduithe ar Feitheamh",
-    "no_pending": "Níl aon bhaill ar feitheamh le ceadú."
+    "no_pending": "Níl aon bhaill ar feitheamh le ceadú.",
+    "kpi_registered": "Registered",
+    "kpi_conversion": "Overall conversion",
+    "kpi_pending": "Pending approvals",
+    "kpi_dropoff": "Biggest drop-off",
+    "kpi_none": "No drop-off"
   },
   "safeguarding": {
     "title": "Cosaint",

@@ -158,6 +158,26 @@ export default function OnboardingPage() {
     'First Exchange': t('onboarding.stage_first_exchange'),
   };
 
+  // ─── KPI metrics (derived from the funnel + pending count) ──────────────────
+  const firstStage = stages[0];
+  const lastStage = stages[stages.length - 1];
+  const overallConversion =
+    firstStage && firstStage.count > 0 && lastStage
+      ? ((lastStage.count / firstStage.count) * 100).toFixed(1)
+      : null;
+  // The stage transition with the lowest conversion — where members drop off most.
+  let biggestDropoff: { name: string; rate: number } | null = null;
+  for (let i = 1; i < stages.length; i++) {
+    const prev = stages[i - 1];
+    const cur = stages[i];
+    if (prev && prev.count > 0 && cur) {
+      const rate = Math.round((cur.count / prev.count) * 1000) / 10;
+      if (biggestDropoff === null || rate < biggestDropoff.rate) {
+        biggestDropoff = { name: stageLabels[cur.name] || cur.name, rate };
+      }
+    }
+  }
+
   // ─── Table columns ────────────────────────────────────────────────────────
 
   const columns: Column<AdminUser>[] = useMemo(
@@ -223,6 +243,20 @@ export default function OnboardingPage() {
         title={t('onboarding.title')}
         description={t('onboarding.description')}
       />
+
+      {/* ── KPI metric cards ─────────────────────────────────────────────── */}
+      {!funnelLoading && stages.length > 0 && (
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <KpiCard label={t('onboarding.kpi_registered')} value={(firstStage?.count ?? 0).toLocaleString()} />
+          <KpiCard label={t('onboarding.kpi_conversion')} value={overallConversion !== null ? `${overallConversion}%` : '—'} />
+          <KpiCard label={t('onboarding.kpi_pending')} value={total.toLocaleString()} />
+          <KpiCard
+            label={t('onboarding.kpi_dropoff')}
+            value={biggestDropoff ? `${biggestDropoff.rate}%` : '—'}
+            sub={biggestDropoff ? biggestDropoff.name : t('onboarding.kpi_none')}
+          />
+        </div>
+      )}
 
       {/* ── Onboarding Funnel ──────────────────────────────────────────── */}
       <Card>
@@ -366,5 +400,17 @@ export default function OnboardingPage() {
         isLoading={actionLoading}
       />
     </div>
+  );
+}
+
+function KpiCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  return (
+    <Card shadow="sm">
+      <CardBody className="gap-0.5">
+        <p className="text-xs text-muted">{label}</p>
+        <p className="text-2xl font-bold text-foreground">{value}</p>
+        {sub && <p className="truncate text-xs text-muted">{sub}</p>}
+      </CardBody>
+    </Card>
   );
 }

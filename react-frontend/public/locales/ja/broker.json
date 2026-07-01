@@ -242,7 +242,12 @@
     "stage_profile_complete": "プロフィール完了",
     "stage_first_exchange": "初回交換",
     "pending_approvals": "保留中の承認",
-    "no_pending": "承認待ちのメンバーはいません。"
+    "no_pending": "承認待ちのメンバーはいません。",
+    "kpi_registered": "Registered",
+    "kpi_conversion": "Overall conversion",
+    "kpi_pending": "Pending approvals",
+    "kpi_dropoff": "Biggest drop-off",
+    "kpi_none": "No drop-off"
   },
   "safeguarding": {
     "title": "セーフガーディング",

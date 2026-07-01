@@ -242,7 +242,12 @@
     "stage_profile_complete": "الملف الشخصي مكتمل",
     "stage_first_exchange": "أول تبادل",
     "pending_approvals": "الموافقات المعلقة",
-    "no_pending": "لا توجد أعضاء معلقة للموافقة عليها."
+    "no_pending": "لا توجد أعضاء معلقة للموافقة عليها.",
+    "kpi_registered": "Registered",
+    "kpi_conversion": "Overall conversion",
+    "kpi_pending": "Pending approvals",
+    "kpi_dropoff": "Biggest drop-off",
+    "kpi_none": "No drop-off"
   },
   "safeguarding": {
     "title": "الحماية",

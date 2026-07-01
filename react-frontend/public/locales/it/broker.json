@@ -242,7 +242,12 @@
     "stage_profile_complete": "Profilo completo",
     "stage_first_exchange": "Primo scambio",
     "pending_approvals": "Approvazioni in sospeso",
-    "no_pending": "Nessun membro in sospeso da approvare."
+    "no_pending": "Nessun membro in sospeso da approvare.",
+    "kpi_registered": "Registered",
+    "kpi_conversion": "Overall conversion",
+    "kpi_pending": "Pending approvals",
+    "kpi_dropoff": "Biggest drop-off",
+    "kpi_none": "No drop-off"
   },
   "safeguarding": {
     "title": "Tutela",

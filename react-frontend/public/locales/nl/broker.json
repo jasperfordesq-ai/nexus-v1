@@ -242,7 +242,12 @@
     "stage_profile_complete": "Profiel Compleet",
     "stage_first_exchange": "Eerste Uitwisseling",
     "pending_approvals": "Wachtende Goedkeuringen",
-    "no_pending": "Geen wachtende leden om goed te keuren."
+    "no_pending": "Geen wachtende leden om goed te keuren.",
+    "kpi_registered": "Registered",
+    "kpi_conversion": "Overall conversion",
+    "kpi_pending": "Pending approvals",
+    "kpi_dropoff": "Biggest drop-off",
+    "kpi_none": "No drop-off"
   },
   "safeguarding": {
     "title": "Bescherming",

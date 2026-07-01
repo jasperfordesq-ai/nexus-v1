@@ -112,8 +112,10 @@ describe('OnboardingPage', () => {
 
     await waitFor(() => {
       // Stage labels come from translation keys — i18n fallback returns the key
-      // so we check for the count values which are rendered numerically
-      expect(screen.getByText('100')).toBeInTheDocument();
+      // so we check for the count values which are rendered numerically. The
+      // first-stage count (100) also appears in the "Registered" KPI card, so
+      // there can be more than one match.
+      expect(screen.getAllByText('100').length).toBeGreaterThan(0);
     });
   });
 

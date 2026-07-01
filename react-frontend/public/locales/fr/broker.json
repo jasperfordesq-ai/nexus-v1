@@ -242,7 +242,12 @@
     "stage_profile_complete": "Profil complet",
     "stage_first_exchange": "Premier échange",
     "pending_approvals": "Approbations en attente",
-    "no_pending": "Aucun membre en attente à approuver."
+    "no_pending": "Aucun membre en attente à approuver.",
+    "kpi_registered": "Registered",
+    "kpi_conversion": "Overall conversion",
+    "kpi_pending": "Pending approvals",
+    "kpi_dropoff": "Biggest drop-off",
+    "kpi_none": "No drop-off"
   },
   "safeguarding": {
     "title": "Protection",

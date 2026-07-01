@@ -242,7 +242,12 @@
     "stage_profile_complete": "Profil ukończony",
     "stage_first_exchange": "Pierwsza wymiana",
     "pending_approvals": "Oczekujące zatwierdzenia",
-    "no_pending": "Brak oczekujących członków do zatwierdzenia."
+    "no_pending": "Brak oczekujących członków do zatwierdzenia.",
+    "kpi_registered": "Registered",
+    "kpi_conversion": "Overall conversion",
+    "kpi_pending": "Pending approvals",
+    "kpi_dropoff": "Biggest drop-off",
+    "kpi_none": "No drop-off"
   },
   "safeguarding": {
     "title": "Ochrona",
