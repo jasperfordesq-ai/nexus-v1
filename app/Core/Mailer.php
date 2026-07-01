@@ -72,6 +72,17 @@ class Mailer
      */
     private bool $isPlatformSendGrid = false;
 
+    // -------------------------------------------------------------------------
+    // Postmark settings (custom Email API path; active when the platform
+    // provider is 'postmark'). Postmark separates transactional and bulk mail
+    // into independent message streams, each with its own IP reputation.
+    // -------------------------------------------------------------------------
+    private ?string $postmarkToken = null;
+    private bool $isPlatformPostmark = false;
+    private string $postmarkFromDomain = 'project-nexus.net';
+    private string $postmarkStreamTransactional = 'outbound';
+    private string $postmarkStreamBroadcast = 'broadcast';
+
     // Redis cache key suffixes (tenant-scoped via cacheKey())
     private const CACHE_KEY_ACCESS_TOKEN = 'gmail_oauth_access_token';
     private const CACHE_KEY_TOKEN_EXPIRY = 'gmail_oauth_token_expiry';
@@ -145,6 +156,37 @@ class Mailer
             }
             $this->driver = 'sendgrid';
             $this->isPlatformSendGrid = true;
+        }
+
+        // Platform-wide Postmark config — only when explicitly selected as the
+        // platform provider (MAIL_PLATFORM_PROVIDER=postmark). This runs after
+        // the SendGrid block on purpose: it flips the active driver to Postmark
+        // while leaving $this->sendgridApiKey intact so a Postmark failure can
+        // fall back to the platform SendGrid account.
+        $platformProvider = strtolower(trim((string) ($envValues['MAIL_PLATFORM_PROVIDER'] ?? 'sendgrid')));
+        $envPostmarkToken = $envValues['POSTMARK_SERVER_TOKEN'] ?? '';
+        if ($platformProvider === 'postmark' && !empty($envPostmarkToken) && !$this->useGmailApi) {
+            $this->postmarkToken = $envPostmarkToken;
+            if (!empty($envValues['POSTMARK_FROM_DOMAIN'])) {
+                $this->postmarkFromDomain = $envValues['POSTMARK_FROM_DOMAIN'];
+            }
+            if (!empty($envValues['POSTMARK_STREAM_TRANSACTIONAL'])) {
+                $this->postmarkStreamTransactional = $envValues['POSTMARK_STREAM_TRANSACTIONAL'];
+            }
+            if (!empty($envValues['POSTMARK_STREAM_BROADCAST'])) {
+                $this->postmarkStreamBroadcast = $envValues['POSTMARK_STREAM_BROADCAST'];
+            }
+            if (!empty($envValues['POSTMARK_FROM_EMAIL'])) {
+                $this->fromEmail = $envValues['POSTMARK_FROM_EMAIL'];
+            }
+            if (!empty($envValues['POSTMARK_FROM_NAME'])) {
+                $this->fromName = $envValues['POSTMARK_FROM_NAME'];
+            }
+            if (!empty($envValues['POSTMARK_REPLY_TO'])) {
+                $this->platformReplyTo = $envValues['POSTMARK_REPLY_TO'];
+            }
+            $this->driver = 'postmark';
+            $this->isPlatformPostmark = true;
         }
 
         // Per-tenant override
@@ -328,6 +370,14 @@ class Mailer
             'SENDGRID_FROM_EMAIL' => (string) (config('mail.sendgrid.from_email') ?? ''),
             'SENDGRID_FROM_NAME'  => (string) (config('mail.sendgrid.from_name') ?? ''),
             'SENDGRID_REPLY_TO'   => (string) (config('mail.sendgrid.reply_to') ?? ''),
+            'MAIL_PLATFORM_PROVIDER'        => (string) (config('mail.platform_provider') ?? 'sendgrid'),
+            'POSTMARK_SERVER_TOKEN'         => (string) (config('mail.postmark.server_token') ?? ''),
+            'POSTMARK_FROM_EMAIL'           => (string) (config('mail.postmark.from_email') ?? ''),
+            'POSTMARK_FROM_NAME'            => (string) (config('mail.postmark.from_name') ?? ''),
+            'POSTMARK_REPLY_TO'             => (string) (config('mail.postmark.reply_to') ?? ''),
+            'POSTMARK_FROM_DOMAIN'          => (string) (config('mail.postmark.from_domain') ?? 'project-nexus.net'),
+            'POSTMARK_STREAM_TRANSACTIONAL' => (string) (config('mail.postmark.stream_transactional') ?? 'outbound'),
+            'POSTMARK_STREAM_BROADCAST'     => (string) (config('mail.postmark.stream_broadcast') ?? 'broadcast'),
         ];
     }
 
@@ -537,6 +587,15 @@ class Mailer
             }
         }
 
+        // Same category-based From address when routing via platform Postmark,
+        // on the verified Postmark sending domain (project-nexus.net by default).
+        if ($this->isPlatformPostmark && $this->driver === 'postmark') {
+            $this->fromEmail = $this->resolveSendGridFromPrefix($category) . '@' . $this->postmarkFromDomain;
+            if ($replyTo === null && $this->platformReplyTo !== null) {
+                $replyTo = $this->platformReplyTo;
+            }
+        }
+
         // Sanitize header-injectable values — strip CR/LF to prevent email header injection
         $to = self::sanitizeHeaderValue($to);
         $subject = self::sanitizeHeaderValue($subject);
@@ -586,6 +645,44 @@ class Mailer
         }
 
         // Route based on configured driver
+        if ($this->driver === 'postmark') {
+            $result = $this->sendViaPostmark($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $category, $metadata);
+            if ($result) {
+                self::logEmail($to, $subject, 'sent', $this->lastMessageId, null, $this->tenantId, $category, 'postmark', $metadata);
+                return true;
+            }
+
+            // Fallback 1: platform SendGrid account (if a key is configured).
+            if (!empty($this->sendgridApiKey)) {
+                \Illuminate\Support\Facades\Log::warning("Mailer: Postmark failed, falling back to SendGrid for: " . self::maskEmail($to));
+                // Re-derive a SendGrid From on the verified project-nexus.net domain.
+                $this->fromEmail = $this->resolveSendGridFromPrefix($category) . '@' . self::SENDGRID_DOMAIN;
+                if ($replyTo === null && $this->platformReplyTo !== null) {
+                    $replyTo = $this->platformReplyTo;
+                }
+                $sgOk = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $category, $metadata);
+                if (class_exists(\App\Services\EmailMonitorService::class)) {
+                    \App\Services\EmailMonitorService::recordFallbackToSmtpStatic('postmark_failed_sendgrid', $this->tenantId);
+                }
+                self::logEmail($to, $subject, $sgOk ? 'sent' : 'failed', $sgOk ? $this->lastMessageId : null, $sgOk ? null : 'Postmark + SendGrid both failed', $this->tenantId, $category, 'sendgrid', $metadata);
+                if ($sgOk) {
+                    return true;
+                }
+            }
+
+            // Fallback 2: SMTP (if configured).
+            if (!empty($this->host) && !empty($this->username)) {
+                \Illuminate\Support\Facades\Log::warning("Mailer: Postmark failed, falling back to SMTP for: " . self::maskEmail($to));
+                $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'Postmark + SMTP both failed', $this->tenantId, $category, 'smtp', $metadata);
+                return $smtpOk;
+            }
+
+            \Illuminate\Support\Facades\Log::warning("Mailer: Postmark failed and no fallback configured. Email not sent to: " . self::maskEmail($to));
+            self::logEmail($to, $subject, 'failed', null, 'Postmark failed, no fallback', $this->tenantId, $category, 'postmark', $metadata);
+            return false;
+        }
+
         if ($this->driver === 'sendgrid') {
             $result = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $category, $metadata);
             if ($result) {
@@ -774,6 +871,129 @@ class Mailer
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("SendGrid Error: " . $e->getMessage());
             if (class_exists(\App\Services\EmailMonitorService::class)) { \App\Services\EmailMonitorService::recordEmailSendStatic('sendgrid', false, $this->tenantId); }
+            $this->lastMessageId = null;
+            return false;
+        }
+    }
+
+    /**
+     * Choose the Postmark message stream for a category. Newsletter/digest
+     * (bulk) categories use the broadcast stream; everything else uses the
+     * transactional stream. Reuses the same category buckets as the From
+     * address resolver so streams and From prefixes stay in lockstep.
+     */
+    private function resolvePostmarkStream(?string $category): string
+    {
+        return $this->resolveSendGridFromPrefix($category) === self::CATEGORY_NEWSLETTERS
+            ? $this->postmarkStreamBroadcast
+            : $this->postmarkStreamTransactional;
+    }
+
+    /**
+     * Send email via the Postmark Email API (raw HTTP, no SDK dependency —
+     * mirrors the Gmail API cURL path already used in this class).
+     */
+    private function sendViaPostmark($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $category = null, ?array $metadata = null): bool
+    {
+        try {
+            $plainText = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $body));
+            $plainText = html_entity_decode($plainText, ENT_QUOTES, 'UTF-8');
+            $plainText = preg_replace('/\n\s+/', "\n", (string) $plainText);
+
+            $stream = $this->resolvePostmarkStream($category);
+
+            $payload = [
+                'From'          => $this->fromName !== '' ? sprintf('%s <%s>', $this->fromName, $this->fromEmail) : $this->fromEmail,
+                'To'            => $to,
+                'Subject'       => $subject,
+                'HtmlBody'      => $body,
+                'TextBody'      => trim((string) $plainText),
+                'MessageStream' => $stream,
+                'TrackOpens'    => false,
+                'TrackLinks'    => 'None',
+            ];
+
+            if ($cc) {
+                $payload['Cc'] = $cc;
+            }
+            if ($replyTo) {
+                $payload['ReplyTo'] = $replyTo;
+            }
+
+            // Postmark manages one-click unsubscribe natively on broadcast
+            // streams; on the transactional stream we still forward the
+            // platform's signed List-Unsubscribe URL when one is present.
+            if ($unsubscribeUrl && $stream === $this->postmarkStreamTransactional) {
+                $payload['Headers'] = [
+                    ['Name' => 'List-Unsubscribe', 'Value' => '<' . $unsubscribeUrl . '>'],
+                    ['Name' => 'List-Unsubscribe-Post', 'Value' => 'List-Unsubscribe=One-Click'],
+                ];
+            }
+
+            // Postmark Metadata is a flat map of string values — mirror the
+            // custom args attached on the SendGrid path (tenant, category, ids).
+            $meta = [];
+            if ($this->tenantId) {
+                $meta['tenant_id'] = (string) $this->tenantId;
+            }
+            if ($category !== null && $category !== '') {
+                $meta['category'] = mb_substr($category, 0, 64);
+            }
+            foreach (self::normalizeEmailMetadata($metadata) as $k => $v) {
+                if ($v !== null) {
+                    $meta[$k] = (string) $v;
+                }
+            }
+            if ($meta) {
+                $payload['Metadata'] = $meta;
+            }
+
+            $ch = curl_init('https://api.postmarkapp.com/email');
+            curl_setopt_array($ch, [
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => [
+                    'Accept: application/json',
+                    'Content-Type: application/json',
+                    'X-Postmark-Server-Token: ' . $this->postmarkToken,
+                ],
+                CURLOPT_POSTFIELDS => json_encode($payload),
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_TIMEOUT => 15,
+                CURLOPT_CONNECTTIMEOUT => 5,
+            ]);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($curlError) {
+                throw new \Exception("cURL error: $curlError");
+            }
+
+            $data = json_decode((string) $response, true);
+            $errorCode = is_array($data) ? ($data['ErrorCode'] ?? -1) : -1;
+
+            if ($httpCode >= 200 && $httpCode < 300 && $errorCode === 0) {
+                $this->lastMessageId = is_array($data) ? ($data['MessageID'] ?? null) : null;
+                if (class_exists(\App\Services\EmailMonitorService::class)) {
+                    \App\Services\EmailMonitorService::recordEmailSendStatic('postmark', true, $this->tenantId);
+                }
+                return true;
+            }
+
+            $msg = is_array($data) ? ($data['Message'] ?? $response) : $response;
+            \Illuminate\Support\Facades\Log::warning("Postmark error (HTTP {$httpCode}, code {$errorCode}): " . mb_substr((string) $msg, 0, 300));
+            if (class_exists(\App\Services\EmailMonitorService::class)) {
+                \App\Services\EmailMonitorService::recordEmailSendStatic('postmark', false, $this->tenantId);
+            }
+            $this->lastMessageId = null;
+            return false;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning("Postmark Error: " . $e->getMessage());
+            if (class_exists(\App\Services\EmailMonitorService::class)) {
+                \App\Services\EmailMonitorService::recordEmailSendStatic('postmark', false, $this->tenantId);
+            }
             $this->lastMessageId = null;
             return false;
         }

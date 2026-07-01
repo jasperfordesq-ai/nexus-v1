@@ -22,6 +22,21 @@ return [
 
     'default' => env('MAIL_MAILER', 'smtp'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Platform Email Provider (custom App\Core\Mailer path)
+    |--------------------------------------------------------------------------
+    |
+    | Selects which provider the platform Mailer uses for tenants that have no
+    | per-tenant email override. 'sendgrid' (default) preserves existing
+    | behaviour; set to 'postmark' (with POSTMARK_SERVER_TOKEN configured) to
+    | route platform mail through Postmark's message streams instead. SendGrid
+    | remains wired as an automatic fallback when Postmark is the active driver.
+    |
+    */
+
+    'platform_provider' => env('MAIL_PLATFORM_PROVIDER', 'sendgrid'),
+
     'mailers' => [
 
         'smtp' => [
@@ -119,6 +134,35 @@ return [
         // Event Webhook authentication is read by SendGridWebhookController
         // directly from env('SENDGRID_WEBHOOK_VERIFICATION_KEY') — kept here
         // as a reference for ops without proxying through config().
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Postmark Configuration (custom App\Core\Mailer path)
+    |--------------------------------------------------------------------------
+    |
+    | Platform-wide Postmark credentials, used when mail.platform_provider is
+    | 'postmark'. Sending is via the Postmark Email API (raw HTTP, no SDK
+    | dependency). Postmark separates transactional and bulk mail into distinct
+    | message streams with independent IP reputation, so the Mailer routes
+    | newsletter/digest categories to the broadcast stream and everything else
+    | to the transactional stream. From addresses use the same verified
+    | project-nexus.net domain as SendGrid (category prefixes), so no per-address
+    | sender signatures are required once the domain is verified in Postmark.
+    |
+    */
+
+    'postmark' => [
+        'server_token'         => env('POSTMARK_SERVER_TOKEN'),
+        'from_email'           => env('POSTMARK_FROM_EMAIL'),
+        'from_name'            => env('POSTMARK_FROM_NAME'),
+        'reply_to'             => env('POSTMARK_REPLY_TO'),
+        'from_domain'          => env('POSTMARK_FROM_DOMAIN', 'project-nexus.net'),
+        'stream_transactional' => env('POSTMARK_STREAM_TRANSACTIONAL', 'outbound'),
+        'stream_broadcast'     => env('POSTMARK_STREAM_BROADCAST', 'broadcast'),
+        // Webhook auth (Delivery/Bounce/SpamComplaint/Open) is read by the
+        // PostmarkWebhookController from env('POSTMARK_WEBHOOK_SECRET') — kept
+        // here as an ops reference without proxying through config().
     ],
 
     /*
