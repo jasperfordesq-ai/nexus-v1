@@ -52,6 +52,7 @@ import { PrivacyTab } from './tabs/PrivacyTab';
 import type { PrivacySettings, UserInsuranceCert } from './tabs/PrivacyTab';
 import { SecurityTab } from './tabs/SecurityTab';
 import type { SessionInfo, TwoFactorSetup } from './tabs/SecurityTab';
+import { isDeleteConfirmed } from './deleteConfirmation';
 import { SkillsTab } from './tabs/SkillsTab';
 import { LinkedAccountsTab } from './tabs/LinkedAccountsTab';
 import { ConnectedAccountsTab } from './tabs/ConnectedAccountsTab';
@@ -651,7 +652,9 @@ export function SettingsPage() {
 
   // Delete account handler
   async function handleDeleteAccount() {
-    if (deleteConfirmation !== 'DELETE') {
+    // Accept the localized keyword the UI told the user to type (or canonical
+    // "DELETE"); case-insensitive + trimmed. See deleteConfirmation.ts.
+    if (!isDeleteConfirmed(deleteConfirmation, t('delete_modal.placeholder'))) {
       toast.error(t('toasts.confirmation_required'), t('toasts.type_delete_to_confirm'));
       return;
     }
@@ -1360,6 +1363,16 @@ export function SettingsPage() {
                   onChange={(e) => setDeleteConfirmation(e.target.value)}
                   placeholder={t('delete_modal.placeholder')}
                   aria-label={t('delete_modal.aria_label')}
+                  // Suppress browser / password-manager autofill. Without this,
+                  // Chrome treats this text field (it sits above the password
+                  // input below) as the "username" slot and injects the account
+                  // email, which never matches the keyword and leaves the delete
+                  // button permanently disabled. Non-credential name + off hints.
+                  name="delete-account-confirmation"
+                  autoComplete="off"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  spellCheck={false}
                   classNames={{
                     input: 'bg-transparent text-theme-primary font-mono',
                     inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -1390,7 +1403,7 @@ export function SettingsPage() {
               variant="danger"
               onPress={handleDeleteAccount}
               isLoading={isDeleting}
-              isDisabled={deleteConfirmation !== 'DELETE' || !deletePassword}
+              isDisabled={!isDeleteConfirmed(deleteConfirmation, t('delete_modal.placeholder')) || !deletePassword}
             >
               {t('delete_modal.submit')}
             </Button>
