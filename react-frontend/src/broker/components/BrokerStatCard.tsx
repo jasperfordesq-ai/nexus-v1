@@ -100,7 +100,7 @@ export function BrokerStatCard({
         {iconNode}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-muted">{label}</p>
+        <p className="line-clamp-2 text-sm font-medium leading-tight text-muted">{label}</p>
         {loading ? (
           <Skeleton
             role="status"
