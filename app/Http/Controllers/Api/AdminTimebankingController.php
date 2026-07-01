@@ -155,7 +155,9 @@ class AdminTimebankingController extends BaseApiController
     /** POST /api/v2/admin/timebanking/adjust-balance */
     public function adjustBalance(): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        // broker-or-admin: brokers may credit/debit a member's time balance
+        // (with a reason). The action is audited below with the actor id.
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $userId = $this->inputInt('user_id');

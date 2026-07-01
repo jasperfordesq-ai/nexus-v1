@@ -4,7 +4,6 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-// Auto-filled missing keys from lang/en/api.php — see MEMORY.md i18n rules.
 return [
     'auth_required' => 'Authentication required',
     'auth_required_detail' => 'You must be logged in to access this resource.',
@@ -166,11 +165,11 @@ return [
     'hour_value_range' => 'Hour value must be between 0 and 10,000',
     'social_multiplier_range' => 'Social multiplier must be between 0 and 100',
     'invalid_reporting_period' => 'Invalid reporting period',
-    'sroi_investment_range'                => 'Caithfidh méid na hinfheistíochta a bheith idir 0 agus 100,000,000',
-    'sroi_percentage_range'                => 'Caithfidh céatadáin asbhainte a bheith idir 0 agus 100',
-    'sroi_discount_range'                  => 'Caithfidh an ráta lascaine a bheith idir 0 agus 20',
-    'sroi_projection_years_range'          => 'Caithfidh blianta réamh-mheasta a bheith idir 1 agus 10',
-    'sroi_outcomes_invalid'                => 'Teastaíonn ainm, cainníocht neamhdhiúltach agus luach seachfhreastalaí neamhdhiúltach ó gach toradh (uasmhéid 25 toradh)',
+    'sroi_investment_range' => 'Caithfidh méid na hinfheistíochta a bheith idir 0 agus 100,000,000',
+    'sroi_percentage_range' => 'Caithfidh céatadáin asbhainte a bheith idir 0 agus 100',
+    'sroi_discount_range' => 'Caithfidh an ráta lascaine a bheith idir 0 agus 20',
+    'sroi_projection_years_range' => 'Caithfidh blianta réamh-mheasta a bheith idir 1 agus 10',
+    'sroi_outcomes_invalid' => 'Teastaíonn ainm, cainníocht neamhdhiúltach agus luach seachfhreastalaí neamhdhiúltach ó gach toradh (uasmhéid 25 toradh)',
     'social_value_config_updated' => 'Social value configuration updated',
     'moderation_settings_updated' => 'Moderation settings updated',
     'decision_required' => 'Decision is required (approved or rejected)',
@@ -793,9 +792,9 @@ return [
     'vol_feature_disabled' => 'Volunteering module is not enabled for this community',
     'vol_waitlist_not_found' => 'Waitlist entry not found',
     'vol_waitlist_own_only' => 'You can only claim your own waitlist spot',
-    'vol_waitlist_not_notified'            => 'Your turn has not come up yet — you will be notified when a spot opens up.',
-    'vol_waitlist_spot_gone'               => 'That spot is no longer available.',
-    'vol_waitlist_claim_failed'            => 'Could not claim the spot. Please try again.',
+    'vol_waitlist_not_notified' => 'Your turn has not come up yet — you will be notified when a spot opens up.',
+    'vol_waitlist_spot_gone' => 'That spot is no longer available.',
+    'vol_waitlist_claim_failed' => 'Could not claim the spot. Please try again.',
     'vol_action_accept_reject' => 'Action must be accept or reject',
     'vol_action_approve_reject' => 'Action must be approve or reject',
     'vol_group_id_required' => 'Group ID is required',
@@ -1428,8 +1427,8 @@ return [
     'job_status_invalid' => 'Invalid job status',
     'job_application_terminal_status' => 'Cannot change status from :status because it is a terminal state',
     'job_application_update_failed' => 'Failed to update application',
-    'job_update_failed'                    => 'Failed to update job vacancy',
-    'job_renew_not_owner'                  => 'You can only renew your own job vacancies',
+    'job_update_failed' => 'Failed to update job vacancy',
+    'job_renew_not_owner' => 'You can only renew your own job vacancies',
     'listing_ai_generate_failed' => 'Could not generate description. Please try again.',
     'job_resume_searchable_enabled' => 'Your profile is now searchable by employers',
     'job_resume_searchable_disabled' => 'Your profile is no longer searchable by employers',
@@ -1895,8 +1894,6 @@ return [
     'email_domain_invalid' => 'The email address is not deliverable — the domain has no mail servers. Check for typos and try again.',
     'registration_daily_limit' => 'Too many accounts have been created from this location in the last 24 hours. Please try again tomorrow.',
     'registration_tenant_paused' => 'Account creation is temporarily paused for this community due to unusually high signup activity. Please try again later or contact a community administrator.',
-
-    // Service messages (i18n sweep 2026-06-11)
     'volunteer_opportunity_manage_forbidden' => 'Níl cead agat an deis seo a bhainistiú',
     'volunteer_opportunity_update_failed' => 'Theip ar an deis a nuashonrú',
     'volunteer_opportunity_delete_failed' => 'Theip ar an deis a scriosadh',
@@ -2091,4 +2088,5 @@ return [
     'member_premium_tier_not_found' => 'N?or aims?odh an leibh?al taca?ochta.',
     'member_premium_invalid_slug' => '?s?id litreacha beaga, uimhreacha, fleisc?n? n? fo-l?nte do shlug an leibh?il taca?ochta.',
     'member_premium_features_array' => 'Caithfear n?ta? aitheantais a sheoladh mar eagar teaghr?n.',
+    'broker_cannot_edit_field' => 'Brokers cannot change this field. Only an administrator can.',
 ];

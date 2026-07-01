@@ -289,7 +289,7 @@ class AdminUsersController extends BaseApiController
     /** PUT /api/v2/admin/users/{id} */
     public function update(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $user = User::findById($id, true);
@@ -298,6 +298,22 @@ class AdminUsersController extends BaseApiController
         }
 
         $input = $this->getAllInput();
+
+        // SECURITY: brokers/coordinators may edit only non-privileged profile
+        // fields. Role, status, email, profile type and organisation identity
+        // stay admin-only so a broker can never escalate privileges, ban a
+        // member, or change an identity via this endpoint. Admin-tier callers
+        // retain full access. See tests/Laravel/Feature/Controllers/
+        // BrokerUserActionsAuthorizationTest.php.
+        if (!$this->callerIsAdminTier()) {
+            $brokerReservedFields = ['role', 'status', 'email', 'profile_type', 'organization_name'];
+            foreach ($brokerReservedFields as $reserved) {
+                if (array_key_exists($reserved, $input)) {
+                    return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.broker_cannot_edit_field'), $reserved, 403);
+                }
+            }
+        }
+
         $updates = [];
         $params = [];
         $statusForNotification = null;
@@ -837,7 +853,8 @@ class AdminUsersController extends BaseApiController
     /** POST /api/v2/admin/users/{id}/reset-2fa */
     public function reset2fa($id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        // broker-or-admin: brokers help members who are locked out of 2FA.
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
         $id = (int) $id;
 
@@ -1040,7 +1057,8 @@ class AdminUsersController extends BaseApiController
     /** GET /api/v2/admin/users/{id}/consents */
     public function getConsents($id): JsonResponse
     {
-        $this->requireAdmin();
+        // broker-or-admin: read-only view of a member's GDPR consents.
+        $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
         $id = (int) $id;
 
@@ -1369,7 +1387,8 @@ class AdminUsersController extends BaseApiController
     /** POST /api/v2/admin/users/{id}/send-password-reset */
     public function sendPasswordReset($id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        // broker-or-admin: emails the member a self-service reset link.
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
         $id = (int) $id;
 
@@ -1471,7 +1490,8 @@ class AdminUsersController extends BaseApiController
     /** POST /api/v2/admin/users/{id}/send-welcome-email */
     public function sendWelcomeEmail($id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        // broker-or-admin: (re)sends the onboarding welcome email.
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
         $id = (int) $id;
 
@@ -1789,8 +1809,14 @@ class AdminUsersController extends BaseApiController
         if (in_array($role, ['admin', 'tenant_admin'], true) || !empty($user['is_tenant_super_admin'])) {
             return 2;
         }
+        // Brokers/coordinators outrank ordinary members (so they can reset a
+        // member's 2FA or trigger a password reset) but never each other or any
+        // admin — canManageSecurityTarget() requires a strictly-higher tier.
+        if (in_array($role, ['broker', 'coordinator'], true)) {
+            return 1;
+        }
 
-        return 1;
+        return 0;
     }
 
     /**
@@ -2209,7 +2235,8 @@ class AdminUsersController extends BaseApiController
     /** POST /api/v2/admin/users/bulk-approve */
     public function bulkApprove(): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        // broker-or-admin: brokers clear the pending-approval queue in bulk.
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
         $this->rateLimit('admin_users_bulk', 10, 60);
 
@@ -2288,7 +2315,8 @@ class AdminUsersController extends BaseApiController
     /** POST /api/v2/admin/users/bulk-suspend */
     public function bulkSuspend(): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        // broker-or-admin: suspension is reversible; ban/delete stay admin-only.
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
         $this->rateLimit('admin_users_bulk', 10, 60);
 

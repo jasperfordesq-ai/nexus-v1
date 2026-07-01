@@ -1210,36 +1210,41 @@ Route::get('/v2/admin/retention/runs', [\App\Http\Controllers\Api\AdminRetention
 Route::get('/v2/admin/dashboard/stats', [\App\Http\Controllers\Api\AdminDashboardController::class, 'stats']);
 Route::get('/v2/admin/dashboard/trends', [\App\Http\Controllers\Api\AdminDashboardController::class, 'trends']);
 Route::get('/v2/admin/dashboard/activity', [\App\Http\Controllers\Api\AdminDashboardController::class, 'activity']);
-// Broker-or-admin: list/show/approve/suspend/reactivate are used by the broker
-// panel's Members & Onboarding pages (and the badge fetch on the broker
-// sidebar). Other user-management endpoints (store, update, destroy, ban,
-// 2fa reset, badges, password) remain admin-only.
+// Broker-or-admin: the broker panel's Members, Onboarding and member-detail
+// drawer drive these. Brokers get list/show, approval + suspension (incl.
+// bulk), safe profile edits, 2FA reset, verification / password-reset / welcome
+// emails, a read-only GDPR-consent view, and (audited) balance adjustment.
+// Privileged actions stay admin-only (store/import, destroy, ban, badges,
+// direct password set) or super-admin-only (impersonate, super-admin
+// promotion). AdminUsersController@update additionally rejects broker attempts
+// to change role/status/email/profile_type/organization_name. See
+// tests/Laravel/Feature/Controllers/BrokerUserActionsAuthorizationTest.php.
 Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
     Route::get('/v2/admin/users', [\App\Http\Controllers\Api\AdminUsersController::class, 'index']);
     Route::get('/v2/admin/users/{id}', [\App\Http\Controllers\Api\AdminUsersController::class, 'show'])->whereNumber('id');
     Route::post('/v2/admin/users/{id}/approve', [\App\Http\Controllers\Api\AdminUsersController::class, 'approve']);
     Route::post('/v2/admin/users/{id}/suspend', [\App\Http\Controllers\Api\AdminUsersController::class, 'suspend']);
     Route::post('/v2/admin/users/{id}/reactivate', [\App\Http\Controllers\Api\AdminUsersController::class, 'reactivate']);
+    Route::put('/v2/admin/users/{id}', [\App\Http\Controllers\Api\AdminUsersController::class, 'update'])->whereNumber('id');
+    Route::post('/v2/admin/users/bulk-approve', [\App\Http\Controllers\Api\AdminUsersController::class, 'bulkApprove']);
+    Route::post('/v2/admin/users/bulk-suspend', [\App\Http\Controllers\Api\AdminUsersController::class, 'bulkSuspend']);
+    Route::post('/v2/admin/users/{id}/reset-2fa', [\App\Http\Controllers\Api\AdminUsersController::class, 'reset2fa'])->whereNumber('id');
+    Route::get('/v2/admin/users/{id}/consents', [\App\Http\Controllers\Api\AdminUsersController::class, 'getConsents'])->whereNumber('id');
+    Route::post('/v2/admin/users/{id}/send-password-reset', [\App\Http\Controllers\Api\AdminUsersController::class, 'sendPasswordReset'])->whereNumber('id');
+    Route::post('/v2/admin/users/{id}/send-verification-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'adminResendVerification'])->whereNumber('id');
+    Route::post('/v2/admin/users/{id}/send-welcome-email', [\App\Http\Controllers\Api\AdminUsersController::class, 'sendWelcomeEmail'])->whereNumber('id');
 });
 Route::post('/v2/admin/users', [\App\Http\Controllers\Api\AdminUsersController::class, 'store']);
 Route::post('/v2/admin/users/import', [\App\Http\Controllers\Api\AdminUsersController::class, 'import']);
 Route::get('/v2/admin/users/import/template', [\App\Http\Controllers\Api\AdminUsersController::class, 'importTemplate']);
-Route::put('/v2/admin/users/{id}', [\App\Http\Controllers\Api\AdminUsersController::class, 'update']);
 Route::delete('/v2/admin/users/{id}', [\App\Http\Controllers\Api\AdminUsersController::class, 'destroy']);
-Route::post('/v2/admin/users/bulk-approve', [\App\Http\Controllers\Api\AdminUsersController::class, 'bulkApprove']);
-Route::post('/v2/admin/users/bulk-suspend', [\App\Http\Controllers\Api\AdminUsersController::class, 'bulkSuspend']);
 Route::post('/v2/admin/users/{id}/ban', [\App\Http\Controllers\Api\AdminUsersController::class, 'ban']);
-Route::post('/v2/admin/users/{id}/reset-2fa', [\App\Http\Controllers\Api\AdminUsersController::class, 'reset2fa']);
 Route::post('/v2/admin/users/badges/recheck-all', [\App\Http\Controllers\Api\AdminGamificationController::class, 'recheckAll']);
 Route::post('/v2/admin/users/{id}/badges', [\App\Http\Controllers\Api\AdminUsersController::class, 'addBadge']);
 Route::delete('/v2/admin/users/{id}/badges/{badgeId}', [\App\Http\Controllers\Api\AdminUsersController::class, 'removeBadge']);
 // impersonate, super-admin promotion — moved to super-admin middleware group (see below)
 Route::post('/v2/admin/users/{id}/badges/recheck', [\App\Http\Controllers\Api\AdminUsersController::class, 'recheckBadges'])->whereNumber('id');
-Route::get('/v2/admin/users/{id}/consents', [\App\Http\Controllers\Api\AdminUsersController::class, 'getConsents'])->whereNumber('id');
 Route::post('/v2/admin/users/{id}/password', [\App\Http\Controllers\Api\AdminUsersController::class, 'setPassword'])->whereNumber('id');
-Route::post('/v2/admin/users/{id}/send-password-reset', [\App\Http\Controllers\Api\AdminUsersController::class, 'sendPasswordReset'])->whereNumber('id');
-Route::post('/v2/admin/users/{id}/send-verification-email', [\App\Http\Controllers\Api\EmailVerificationController::class, 'adminResendVerification'])->whereNumber('id');
-Route::post('/v2/admin/users/{id}/send-welcome-email', [\App\Http\Controllers\Api\AdminUsersController::class, 'sendWelcomeEmail']);
 // Listings index is used by the broker panel's Risk Tags create-modal
 // autocomplete. Other listing-management endpoints stay admin-only.
 Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
@@ -1884,7 +1889,11 @@ Route::delete('/v2/admin/group-auto-assign-rules/{id}', [\App\Http\Controllers\A
 Route::get('/v2/admin/timebanking/stats', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'stats']);
 Route::get('/v2/admin/timebanking/alerts', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'alerts']);
 Route::put('/v2/admin/timebanking/alerts/{id}', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'updateAlert']);
-Route::post('/v2/admin/timebanking/adjust-balance', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'adjustBalance']);
+// Broker-or-admin: brokers may adjust a member's time balance from the broker
+// panel's member-detail drawer (audited; controller enforces broker-or-admin).
+Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
+    Route::post('/v2/admin/timebanking/adjust-balance', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'adjustBalance']);
+});
 Route::get('/v2/admin/timebanking/org-wallets', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'orgWallets']);
 Route::get('/v2/admin/timebanking/user-report', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'userReport']);
 Route::get('/v2/admin/timebanking/user-statement', [\App\Http\Controllers\Api\AdminTimebankingController::class, 'userStatement']);

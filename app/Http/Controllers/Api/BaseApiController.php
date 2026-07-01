@@ -658,6 +658,35 @@ abstract class BaseApiController extends Controller
     }
 
     /**
+     * Non-throwing check: is the current caller an admin-tier user (as opposed
+     * to an operational broker/coordinator)?
+     *
+     * Mirrors the frontend `hasAdminPanelAccess`: the 'broker' and 'coordinator'
+     * roles are NEVER admin-tier even if a stale is_admin flag is set, while any
+     * admin role or admin boolean flag is. Endpoints shared by brokers and
+     * admins use this to withhold privileged operations (role/status/identity
+     * changes) from brokers while granting them to admins.
+     */
+    protected function callerIsAdminTier(): bool
+    {
+        $user = $this->resolveUser();
+        if (!$user) {
+            return false;
+        }
+
+        $role = $user->role ?? 'member';
+        if (in_array($role, ['broker', 'coordinator'], true)) {
+            return false;
+        }
+
+        return in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+            || ($user->is_admin ?? false)
+            || ($user->is_super_admin ?? false)
+            || ($user->is_tenant_super_admin ?? false)
+            || ($user->is_god ?? false);
+    }
+
+    /**
      * Require super-admin role (tenant-scoped or platform-wide).
      *
      * Accepts both platform super-admins (is_super_admin, role=super_admin|god)

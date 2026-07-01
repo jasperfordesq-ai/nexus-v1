@@ -245,7 +245,8 @@ class EmailVerificationController extends BaseApiController
     /** POST /api/v2/admin/users/{id}/send-verification-email */
     public function adminResendVerification($id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        // broker-or-admin: brokers resend a member's verification email.
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = TenantContext::getId();
         $userId = (int) $id;
 

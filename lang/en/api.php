@@ -12,6 +12,7 @@ return [
     'auth_required_detail'         => 'You must be logged in to access this resource.',
     'admin_access_required'        => 'Admin access required',
     'broker_or_admin_access_required' => 'Broker or admin access required',
+    'broker_cannot_edit_field'     => 'Brokers cannot change this field. Only an administrator can.',
     'super_admin_required'         => 'Super admin access required',
     'insufficient_permissions'     => 'Insufficient permissions',
 
