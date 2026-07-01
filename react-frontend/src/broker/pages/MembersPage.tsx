@@ -23,6 +23,9 @@ import UserX from 'lucide-react/icons/user-x';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Send from 'lucide-react/icons/send';
+import MailCheck from 'lucide-react/icons/mail-check';
+import MailX from 'lucide-react/icons/mail-x';
+import X from 'lucide-react/icons/x';
 import { usePageTitle } from '@/hooks';
 import { useToast,
   useTenant } from '@/contexts';
@@ -43,7 +46,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Textarea
 // Types & Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-type StatusTab = 'all' | 'pending' | 'active' | 'suspended';
+type StatusTab = 'all' | 'pending' | 'active' | 'suspended' | 'never_logged_in' | 'onboarding_incomplete';
 
 interface MemberNote {
   id: number;
@@ -120,6 +123,10 @@ export default function MembersPage() {
     user: AdminUser;
   } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Bulk selection state — powers the "approve/suspend selected" bar.
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   // Notes drawer state
   const [notesUser, setNotesUser] = useState<AdminUser | null>(null);
@@ -215,12 +222,53 @@ export default function MembersPage() {
   const handleTabChange = useCallback((key: React.Key) => {
     setActiveTab(key as StatusTab);
     setPage(1);
+    setSelectedIds(new Set());
   }, []);
 
   const handleSearch = useCallback((query: string) => {
     setSearch(query);
     setPage(1);
+    setSelectedIds(new Set());
   }, []);
+
+  // ─── Bulk actions ───────────────────────────────────────────────────────────
+
+  const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
+
+  const runBulk = useCallback(
+    async (
+      fn: (ids: number[]) => Promise<{ success?: boolean; error?: string }>,
+      successKey: string,
+    ) => {
+      const ids = Array.from(selectedIds).map(Number).filter((n) => Number.isFinite(n) && n > 0);
+      if (ids.length === 0) return;
+      setBulkLoading(true);
+      try {
+        const res = await fn(ids);
+        if (res?.success) {
+          toast.success(t(successKey, { count: ids.length }));
+          clearSelection();
+          fetchMembers();
+        } else {
+          toast.error(res?.error || t('members.action_failed'));
+        }
+      } catch {
+        toast.error(t('members.action_failed'));
+      } finally {
+        setBulkLoading(false);
+      }
+    },
+    [selectedIds, toast, t, clearSelection, fetchMembers],
+  );
+
+  const handleBulkApprove = useCallback(
+    () => runBulk((ids) => adminUsers.bulkApprove(ids), 'members.bulk_approved_success'),
+    [runBulk],
+  );
+  const handleBulkSuspend = useCallback(
+    () => runBulk((ids) => adminUsers.bulkSuspend(ids), 'members.bulk_suspended_success'),
+    [runBulk],
+  );
 
   // ─── Actions ──────────────────────────────────────────────────────────────
 
@@ -338,6 +386,36 @@ export default function MembersPage() {
               </Chip>
             )}
           </div>
+        ),
+      },
+      {
+        key: 'role',
+        label: t('members.col_role'),
+        render: (user: AdminUser) => (
+          <Chip
+            size="sm"
+            variant="tertiary"
+            color={user.role === 'member' ? 'default' : 'accent'}
+          >
+            {t(`members.role_${user.role}`, { defaultValue: user.role })}
+          </Chip>
+        ),
+      },
+      {
+        key: 'verified',
+        label: t('members.col_verified'),
+        render: (user: AdminUser) => (
+          user.email_verified_at ? (
+            <Chip size="sm" variant="tertiary" color="success">
+              <MailCheck size={12} />
+              <Chip.Label>{t('members.email_verified')}</Chip.Label>
+            </Chip>
+          ) : (
+            <Chip size="sm" variant="tertiary" color="warning">
+              <MailX size={12} />
+              <Chip.Label>{t('members.email_unverified')}</Chip.Label>
+            </Chip>
+          )
         ),
       },
       {
@@ -483,13 +561,56 @@ export default function MembersPage() {
         <Tab key="pending" title={t('members.tab_pending')} />
         <Tab key="active" title={t('members.tab_active')} />
         <Tab key="suspended" title={t('members.tab_suspended')} />
+        <Tab key="never_logged_in" title={t('members.tab_never_logged_in')} />
+        <Tab key="onboarding_incomplete" title={t('members.tab_onboarding_incomplete')} />
       </Tabs>
+
+      {selectedIds.size > 0 && (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-divider bg-surface-secondary px-3 py-2">
+          <span className="text-sm font-medium text-foreground">
+            {t('members.bulk_selected', { count: selectedIds.size })}
+          </span>
+          <div className="flex-1" />
+          <Button
+            size="sm"
+            color="success"
+            variant="flat"
+            startContent={<UserCheck size={14} />}
+            onPress={handleBulkApprove}
+            isLoading={bulkLoading}
+          >
+            {t('members.bulk_approve')}
+          </Button>
+          <Button
+            size="sm"
+            color="danger"
+            variant="flat"
+            startContent={<UserX size={14} />}
+            onPress={handleBulkSuspend}
+            isLoading={bulkLoading}
+          >
+            {t('members.bulk_suspend')}
+          </Button>
+          <Button
+            size="sm"
+            variant="light"
+            isIconOnly
+            onPress={clearSelection}
+            aria-label={t('members.bulk_clear')}
+          >
+            <X size={16} />
+          </Button>
+        </div>
+      )}
 
       <DataTable<AdminUser>
         columns={columns}
         data={members}
         keyField="id"
         isLoading={loading}
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
         searchable
         searchPlaceholder={t('members.search_placeholder')}
         totalItems={total}
