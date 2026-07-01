@@ -91,6 +91,8 @@
   "toggle_sidebar": "تبديل الشريط الجانبي",
   "close_sidebar": "Close sidebar",
   "notifications": "الإشعارات",
+  "support_requests": "طلبات الدعم",
+  "support_requests_count": "{{count}} طلبات دعم مفتوحة",
   "admin_menu": "قائمة المشرف",
   "my_profile": "ملفي الشخصي",
   "sign_out": "تسجيل الخروج",

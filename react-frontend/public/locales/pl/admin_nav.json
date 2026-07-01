@@ -91,6 +91,8 @@
   "toggle_sidebar": "Przełącz pasek boczny",
   "close_sidebar": "Close sidebar",
   "notifications": "Powiadomienia",
+  "support_requests": "Zgłoszenia do pomocy",
+  "support_requests_count": "{{count}} otwartych zgłoszeń do pomocy",
   "admin_menu": "Menu administracyjne",
   "my_profile": "Mój profil",
   "sign_out": "Wyloguj się",

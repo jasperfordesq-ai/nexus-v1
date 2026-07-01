@@ -91,6 +91,8 @@
   "toggle_sidebar": "Seitenleiste umschalten",
   "close_sidebar": "Close sidebar",
   "notifications": "Benachrichtigungen",
+  "support_requests": "Support-Anfragen",
+  "support_requests_count": "{{count}} offene Support-Anfragen",
   "admin_menu": "Admin-Menü",
   "my_profile": "Mein Profil",
   "sign_out": "Abmelden",

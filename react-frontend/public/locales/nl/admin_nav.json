@@ -91,6 +91,8 @@
   "toggle_sidebar": "Zijbalk wisselen",
   "close_sidebar": "Close sidebar",
   "notifications": "Meldingen",
+  "support_requests": "Ondersteuningsverzoeken",
+  "support_requests_count": "{{count}} openstaande ondersteuningsverzoeken",
   "admin_menu": "Beheermenu",
   "my_profile": "Mijn profiel",
   "sign_out": "Afmelden",

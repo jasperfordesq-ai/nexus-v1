@@ -91,6 +91,8 @@
   "toggle_sidebar": "Toggle sidebar",
   "close_sidebar": "Close sidebar",
   "notifications": "Notifications",
+  "support_requests": "Support requests",
+  "support_requests_count": "{{count}} open support requests",
   "admin_menu": "Admin menu",
   "my_profile": "My Profile",
   "sign_out": "Sign Out",

@@ -91,6 +91,8 @@
   "toggle_sidebar": "Alternar barra lateral",
   "close_sidebar": "Close sidebar",
   "notifications": "Notificaciones",
+  "support_requests": "Solicitudes de soporte",
+  "support_requests_count": "{{count}} solicitudes de soporte abiertas",
   "admin_menu": "Menú de administración",
   "my_profile": "Mi perfil",
   "sign_out": "Cerrar sesión",

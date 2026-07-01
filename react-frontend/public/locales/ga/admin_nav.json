@@ -91,6 +91,8 @@
   "toggle_sidebar": "Scoránaigh an barra taoibh",
   "close_sidebar": "Close sidebar",
   "notifications": "Fógraí",
+  "support_requests": "Iarratais tacaíochta",
+  "support_requests_count": "{{count}} iarratas tacaíochta oscailte",
   "admin_menu": "Roghchlár riaracháin",
   "my_profile": "Mo phróifíl",
   "sign_out": "Sínigh amach",

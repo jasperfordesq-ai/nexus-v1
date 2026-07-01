@@ -91,6 +91,8 @@
   "toggle_sidebar": "サイドバーを切り替え",
   "close_sidebar": "Close sidebar",
   "notifications": "通知",
+  "support_requests": "サポートリクエスト",
+  "support_requests_count": "未対応のサポートリクエスト {{count}} 件",
   "admin_menu": "管理メニュー",
   "my_profile": "マイプロフィール",
   "sign_out": "サインアウト",

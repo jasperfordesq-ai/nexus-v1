@@ -8,16 +8,19 @@
  * Top bar with breadcrumbs, search, and user menu
  */
 
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Bell from 'lucide-react/icons/bell';
+import LifeBuoy from 'lucide-react/icons/life-buoy';
 import LogOut from 'lucide-react/icons/log-out';
 import Menu from 'lucide-react/icons/menu';
 import User from 'lucide-react/icons/user';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { adminSupportReports } from '@/admin/api/adminApi';
 
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Avatar } from '@/components/ui';
 interface AdminHeaderProps {
@@ -31,6 +34,27 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
   const { tenantPath, tenant } = useTenant();
   const navigate = useNavigate();
   const adminLabel = t('admin');
+
+  // Open support-request count for the header indicator. Best-effort: if the
+  // stats endpoint is unavailable for this admin, the badge simply stays hidden.
+  const [openSupportCount, setOpenSupportCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    adminSupportReports
+      .stats()
+      .then((response) => {
+        if (active && response?.success && response.data) {
+          setOpenSupportCount(response.data.open ?? 0);
+        }
+      })
+      .catch(() => {
+        /* indicator is non-critical — ignore failures */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <header
@@ -72,6 +96,29 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
 
       {/* Right: User menu */}
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <Button
+          isIconOnly
+          variant="tertiary"
+          size="sm"
+          onPress={() => navigate(tenantPath('/admin/support-reports'))}
+          aria-label={
+            openSupportCount > 0
+              ? t('support_requests_count', { count: openSupportCount })
+              : t('support_requests')
+          }
+          className="relative bg-surface-secondary/70 text-muted hover:bg-surface-tertiary/70"
+        >
+          <LifeBuoy size={18} />
+          {openSupportCount > 0 && (
+            <span
+              className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold leading-none text-white"
+              aria-hidden="true"
+            >
+              {openSupportCount > 99 ? '99+' : openSupportCount}
+            </span>
+          )}
+        </Button>
+
         <Button
           isIconOnly
           variant="tertiary"

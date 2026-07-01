@@ -91,6 +91,8 @@
   "toggle_sidebar": "Afficher/masquer la barre latérale",
   "close_sidebar": "Close sidebar",
   "notifications": "Notifications",
+  "support_requests": "Demandes d'assistance",
+  "support_requests_count": "{{count}} demandes d'assistance ouvertes",
   "admin_menu": "Menu d'administration",
   "my_profile": "Mon profil",
   "sign_out": "Se déconnecter",

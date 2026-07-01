@@ -138,6 +138,9 @@ vi.mock('@/components/ui', async (importOriginal) => {
 describe('AdminHeader', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    // The header fetches open support-request stats on mount; default to a
+    // resolved empty payload so the indicator effect never throws.
+    mockApi.get.mockResolvedValue({ success: true, data: { open: 0 } });
   });
 
   it('renders as a header element', async () => {
@@ -245,6 +248,42 @@ describe('AdminHeader', () => {
       await user.click(notifBtn);
       expect(mockNavigate).toHaveBeenCalledWith('/hour-timebank/notifications');
     }
+  });
+
+  it('renders a support-requests button that navigates to the support reports area', async () => {
+    const user = userEvent.setup();
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} />);
+
+    const supportBtn = screen.getAllByRole('button').find(
+      (btn) => btn.getAttribute('aria-label')?.toLowerCase().includes('support')
+    );
+    expect(supportBtn).toBeDefined();
+
+    if (supportBtn) {
+      await user.click(supportBtn);
+      expect(mockNavigate).toHaveBeenCalledWith('/hour-timebank/admin/support-reports');
+    }
+  });
+
+  it('shows the open support-request count as a red indicator', async () => {
+    mockApi.get.mockResolvedValue({ success: true, data: { open: 3 } });
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} />);
+
+    expect(await screen.findByText('3')).toBeInTheDocument();
+  });
+
+  it('hides the indicator when there are no open support requests', async () => {
+    mockApi.get.mockResolvedValue({ success: true, data: { open: 0 } });
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} />);
+
+    const supportBtn = screen.getAllByRole('button').find(
+      (btn) => btn.getAttribute('aria-label')?.toLowerCase().includes('support')
+    );
+    expect(supportBtn).toBeDefined();
+    expect(supportBtn?.textContent).not.toMatch(/\d/);
   });
 
   it('renders dropdown menu items for profile and sign-out', async () => {
