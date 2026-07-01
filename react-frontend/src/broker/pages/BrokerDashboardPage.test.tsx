@@ -68,32 +68,6 @@ vi.mock('@/contexts/ToastContext', () => ({
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
-// ── admin components ──────────────────────────────────────────────────────────
-
-vi.mock('@/admin/components', () => ({
-  StatCard: ({ label, value }: { label: string; value: unknown }) => (
-    <div data-testid="stat-card">
-      <span>{label}</span>
-      <span>{String(value)}</span>
-    </div>
-  ),
-  PageHeader: ({
-    title,
-    description,
-    actions,
-  }: {
-    title: string;
-    description?: string;
-    actions?: React.ReactNode;
-  }) => (
-    <div>
-      <h1>{title}</h1>
-      {description && <p>{description}</p>}
-      {actions && <div data-testid="page-header-actions">{actions}</div>}
-    </div>
-  ),
-}));
-
 // ── BrokerControlsHelp mock ───────────────────────────────────────────────────
 
 vi.mock('./BrokerHelpPage', () => ({
@@ -131,8 +105,9 @@ describe('BrokerDashboard', () => {
     mockGetDashboard.mockResolvedValueOnce({ success: true, data: MOCK_STATS });
     render(<BrokerDashboard />);
     await waitFor(() => {
-      const statCards = screen.getAllByTestId('stat-card');
-      expect(statCards.length).toBeGreaterThan(0);
+      // Real BrokerStatCards render the translated metric labels.
+      expect(screen.getAllByText('Unreviewed Messages').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Monitored Users').length).toBeGreaterThan(0);
     });
   });
 
@@ -140,7 +115,38 @@ describe('BrokerDashboard', () => {
     mockGetDashboard.mockResolvedValueOnce({ success: true, data: MOCK_STATS });
     render(<BrokerDashboard />);
     await waitFor(() => {
-      expect(screen.getByText('5')).toBeInTheDocument();
+      // 5 appears on the KPI card (and possibly the triage hero pill).
+      expect(screen.getAllByText('5').length).toBeGreaterThan(0);
+    });
+  });
+
+  it('renders the triage hero with the total of open items', async () => {
+    mockGetDashboard.mockResolvedValueOnce({ success: true, data: MOCK_STATS });
+    render(<BrokerDashboard />);
+    await waitFor(() => {
+      expect(screen.getByText('What needs you now')).toBeInTheDocument();
+    });
+    // 5+3+2+4+1+2 = 17 open items across the non-zero queues
+    expect(screen.getByText('17')).toBeInTheDocument();
+  });
+
+  it('renders the all-clear hero when every queue is empty', async () => {
+    mockGetDashboard.mockResolvedValueOnce({
+      success: true,
+      data: {
+        ...MOCK_STATS,
+        pending_exchanges: 0,
+        unreviewed_messages: 0,
+        high_risk_listings: 0,
+        vetting_pending: 0,
+        vetting_expiring: 0,
+        safeguarding_alerts: 0,
+        onboarding_safeguarding_flags: 0,
+      },
+    });
+    render(<BrokerDashboard />);
+    await waitFor(() => {
+      expect(screen.getByText('All clear')).toBeInTheDocument();
     });
   });
 
@@ -184,9 +190,9 @@ describe('BrokerDashboard', () => {
       data: { ...MOCK_STATS, _partial: true },
     });
     render(<BrokerDashboard />);
-    // Wait for data to load (stat cards appear)
+    // Wait for data to load (stat labels appear)
     await waitFor(() => {
-      expect(screen.getAllByTestId('stat-card').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Unreviewed Messages').length).toBeGreaterThan(0);
     });
     // The partial banner renders — find the Card with warning border
     // The i18n key dashboard.partial_title/body may translate to any text;
@@ -202,12 +208,13 @@ describe('BrokerDashboard', () => {
     });
     render(<BrokerDashboard />);
     await waitFor(() => {
-      expect(screen.getAllByTestId('stat-card').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Unreviewed Messages').length).toBeGreaterThan(0);
     });
     // When recent_activity=[], the component renders the empty-state card
     // (an icon + translated text). Assert no activity list items are present.
     const listItems = document.querySelectorAll('ul > li');
     expect(listItems.length).toBe(0);
+    expect(screen.getByText('No recent broker activity')).toBeInTheDocument();
   });
 
   it('renders quick links section', async () => {
@@ -225,9 +232,9 @@ describe('BrokerDashboard', () => {
       .mockResolvedValueOnce({ success: true, data: MOCK_STATS });
     render(<BrokerDashboard />);
     await waitFor(() => {
-      expect(screen.getAllByTestId('stat-card').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Unreviewed Messages').length).toBeGreaterThan(0);
     });
-    // The Refresh button is in PageHeader actions — now rendered via our mock
+    // The Refresh button is in the page shell actions
     const refreshBtn = screen.getAllByRole('button').find(
       (b) => /refresh/i.test(b.textContent ?? ''),
     );

@@ -1,8 +1,23 @@
-import { Card, CardBody, CardHeader, Button, Spinner } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Broker Command Center
+ *
+ * The flagship broker page: a "what needs you now" triage hero ranking the
+ * open review queues by severity, a deep-linked KPI grid, a quick-action
+ * launcher, and the broker activity timeline. Every tile drills into the
+ * relevant management page with the filter already applied.
+ *
+ * Parity: PHP BrokerControlsController::dashboard()
+ */
+
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Chip, Separator } from '@/components/ui';
+import { Card, CardBody, Button, Chip } from '@/components/ui';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
@@ -15,65 +30,90 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Activity from 'lucide-react/icons/activity';
 import Settings from 'lucide-react/icons/settings';
 import AlertCircle from 'lucide-react/icons/circle-alert';
+import CheckCircle2 from 'lucide-react/icons/circle-check-big';
+import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
+import Zap from 'lucide-react/icons/zap';
+import UserCheck from 'lucide-react/icons/user-check';
+import type { LucideIcon } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBroker } from '@/admin/api/adminApi';
-import { StatCard, PageHeader } from '@/admin/components';
+import {
+  BrokerPageShell,
+  BrokerStatCard,
+  BrokerSkeleton,
+  BrokerEmptyState,
+  useCountUp,
+  type BrokerStatColor,
+} from '../components';
 import type { BrokerDashboardStats, BrokerActivityEntry } from '@/admin/api/types';
 import { parseServerTimestamp } from '@/lib/serverTime';
 import { BrokerControlsHelp } from './BrokerHelpPage';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
-/**
- * Broker Controls Dashboard
- * Overview with key metrics and quick links to sub-pages.
- * Parity: PHP BrokerControlsController::dashboard()
- */
+// ─────────────────────────────────────────────────────────────────────────────
+// Triage queues — severity-weighted so the hero always surfaces the most
+// urgent work first. Labels reuse the stat-card keys; paths carry the filter.
+// ─────────────────────────────────────────────────────────────────────────────
 
+interface QueueDef {
+  key: keyof BrokerDashboardStats;
+  labelKey: string;
+  icon: LucideIcon;
+  color: BrokerStatColor;
+  path: string;
+  /** Higher = more urgent; ties broken by count. */
+  weight: number;
+}
+
+const QUEUES: QueueDef[] = [
+  { key: 'safeguarding_alerts', labelKey: 'dashboard.safeguarding_alerts', icon: AlertTriangle, color: 'danger', path: '/broker/safeguarding?filter=critical', weight: 6 },
+  { key: 'high_risk_listings', labelKey: 'dashboard.high_risk_listings', icon: ShieldAlert, color: 'danger', path: '/broker/risk-tags?level=high', weight: 5 },
+  { key: 'unreviewed_messages', labelKey: 'dashboard.unreviewed_messages', icon: MessageSquareWarning, color: 'warning', path: '/broker/messages?status=unreviewed', weight: 4 },
+  { key: 'pending_exchanges', labelKey: 'dashboard.pending_exchanges', icon: ArrowLeftRight, color: 'accent', path: '/broker/exchanges?status=pending_broker', weight: 4 },
+  { key: 'onboarding_safeguarding_flags', labelKey: 'dashboard.safeguarding_flags', icon: ShieldAlert, color: 'warning', path: '/broker/safeguarding?tab=preferences', weight: 3 },
+  { key: 'vetting_expiring', labelKey: 'dashboard.vetting_expiring', icon: Clock, color: 'warning', path: '/broker/vetting?status=expiring_soon', weight: 3 },
+  { key: 'vetting_pending', labelKey: 'dashboard.vetting_pending', icon: ShieldCheck, color: 'success', path: '/broker/vetting?status=pending_review', weight: 2 },
+];
+
+const queuePillClass: Record<BrokerStatColor, string> = {
+  danger: 'border-danger/30 bg-danger/10 text-danger hover:bg-danger/15',
+  warning: 'border-warning/30 bg-warning/10 text-warning hover:bg-warning/15',
+  success: 'border-success/30 bg-success/10 text-success hover:bg-success/15',
+  accent: 'border-accent/30 bg-accent/10 text-accent hover:bg-accent/15',
+  neutral: 'border-divider bg-surface-secondary text-muted hover:bg-surface-tertiary',
+};
 
 // Quick-link metadata. Title + description are translated at render time
-// using the broker.dashboard.links.* namespace so the dashboard respects
-// the user's preferred language. Path/icon/color are presentation-only
-// and stay defined here.
+// using the broker.dashboard.links.* namespace. Path/icon/color are
+// presentation-only and stay defined here.
 const QUICK_LINKS = [
-  { key: 'exchanges',     icon: ArrowLeftRight,        color: 'primary'   as const, path: '/broker/exchanges' },
-  { key: 'risk_tags',     icon: ShieldAlert,           color: 'danger'    as const, path: '/broker/risk-tags' },
-  { key: 'messages',      icon: MessageSquareWarning,  color: 'warning'   as const, path: '/broker/messages' },
-  { key: 'monitoring',    icon: Eye,                   color: 'secondary' as const, path: '/broker/monitoring' },
-  { key: 'vetting',       icon: ShieldCheck,           color: 'success'   as const, path: '/broker/vetting' },
-  { key: 'configuration', icon: Settings,              color: 'default'   as const, path: '/broker/configuration' },
+  { key: 'exchanges',       icon: ArrowLeftRight,       color: 'accent'  as const, path: '/broker/exchanges',       feature: 'exchange_workflow' as const },
+  { key: 'match_approvals', icon: UserCheck,            color: 'accent'  as const, path: '/broker/match-approvals', feature: 'exchange_workflow' as const },
+  { key: 'risk_tags',       icon: ShieldAlert,          color: 'danger'  as const, path: '/broker/risk-tags' },
+  { key: 'messages',        icon: MessageSquareWarning, color: 'warning' as const, path: '/broker/messages' },
+  { key: 'monitoring',      icon: Eye,                  color: 'warning' as const, path: '/broker/monitoring' },
+  { key: 'vetting',         icon: ShieldCheck,          color: 'success' as const, path: '/broker/vetting' },
+  { key: 'configuration',   icon: Settings,             color: 'neutral' as const, path: '/broker/configuration' },
 ];
 
 // Tailwind JIT needs full class names at build time — dynamic `bg-${color}/10` won't work
-const quickLinkBgClass: Record<string, string> = {
-  primary: 'bg-accent/10',
-  danger: 'bg-danger/10',
-  warning: 'bg-warning/10',
-  secondary: 'bg-accent-soft',
-  success: 'bg-success/10',
-  default: 'bg-surface-secondary',
-};
-const quickLinkTextClass: Record<string, string> = {
-  primary: 'text-accent',
-  danger: 'text-danger',
-  warning: 'text-warning',
-  secondary: 'text-accent',
-  success: 'text-success',
-  default: 'text-muted',
+const tileBgClass: Record<BrokerStatColor, string> = {
+  accent: 'bg-accent/10 text-accent',
+  danger: 'bg-danger/10 text-danger',
+  warning: 'bg-warning/10 text-warning',
+  success: 'bg-success/10 text-success',
+  neutral: 'bg-surface-secondary text-muted',
 };
 
-// A dash for null (load failed) and a dash for missing data both render
-// identically — but the partial-load banner makes the difference visible.
-const renderMetric = (value: number | null | undefined): number | string =>
-  typeof value === 'number' ? value : '—';
+function HeroTotal({ value }: { value: number }) {
+  const display = useCountUp(value);
+  return <>{display.toLocaleString()}</>;
+}
 
 export function BrokerDashboard() {
   const { t } = useTranslation('broker');
   usePageTitle(t('dashboard.title'));
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
   const toast = useToast();
 
   const [stats, setStats] = useState<BrokerDashboardStats | null>(null);
@@ -107,35 +147,50 @@ export function BrokerDashboard() {
     }
   }, []);
 
-
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
 
-  return (
-    <div>
-      <PageHeader
-        title={t('dashboard.title')}
-        description={t('dashboard.description')}
-        actions={
-          <Button
-            variant="tertiary"
-            startContent={<RefreshCw size={16} />}
-            onPress={loadDashboard}
-            isLoading={loading}
-            size="sm"
-          >
-            {t('dashboard.refresh')}
-          </Button>
-        }
-      />
+  const showExchanges = hasFeature('exchange_workflow');
 
+  // Rank the non-empty queues: severity first, then volume. `_partial` loads
+  // can leave some counters null — those are excluded rather than treated as 0
+  // so a failed query never silently reads as "all clear".
+  const activeQueues = QUEUES
+    .filter((q) => (showExchanges || q.key !== 'pending_exchanges'))
+    .map((q) => ({ ...q, count: stats ? Number(stats[q.key] ?? 0) : 0 }))
+    .filter((q) => Number.isFinite(q.count) && q.count > 0)
+    .sort((a, b) => b.weight - a.weight || b.count - a.count);
+
+  const totalOpen = activeQueues.reduce((sum, q) => sum + q.count, 0);
+  const hasDanger = activeQueues.some((q) => q.color === 'danger');
+
+  const quickLinks = QUICK_LINKS.filter((l) => !l.feature || hasFeature(l.feature));
+
+  return (
+    <BrokerPageShell
+      title={t('dashboard.title')}
+      description={t('dashboard.description')}
+      icon={LayoutDashboard}
+      color="accent"
+      actions={
+        <Button
+          variant="tertiary"
+          startContent={<RefreshCw size={16} />}
+          onPress={loadDashboard}
+          isLoading={loading}
+          size="sm"
+        >
+          {t('dashboard.refresh')}
+        </Button>
+      }
+    >
       {/* Partial-load banner — surfaces when the controller's per-query
           try/catch swallowed at least one error. Hiding this would mask
           a DB hiccup as a clean dashboard, exactly the wrong direction
           for a risk-surfacing UI. */}
       {stats?._partial && (
-        <Card className="mb-4 border border-warning/30 bg-warning/10">
+        <Card className="mb-4 rounded-2xl border border-warning/30 bg-warning/10">
           <CardBody className="flex flex-row items-start gap-3 py-3">
             <AlertCircle size={20} className="text-warning shrink-0 mt-0.5" />
             <div className="flex-1 text-sm">
@@ -149,180 +204,289 @@ export function BrokerDashboard() {
         </Card>
       )}
 
-      {/* Stats Grid — each tile deep-links into the relevant management page
-          with the filter already applied, so admins triage in one click. */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        <StatCard
-          label={t('dashboard.pending_exchanges')}
-          value={renderMetric(stats?.pending_exchanges)}
-          icon={ArrowLeftRight}
-          color="primary"
-          loading={loading}
-          to={tenantPath('/broker/exchanges?status=pending_broker')}
-        />
-        <StatCard
-          label={t('dashboard.unreviewed_messages')}
-          value={renderMetric(stats?.unreviewed_messages)}
-          icon={MessageSquareWarning}
-          color="warning"
-          loading={loading}
-          to={tenantPath('/broker/messages?status=unreviewed')}
-        />
-        <StatCard
-          label={t('dashboard.high_risk_listings')}
-          value={renderMetric(stats?.high_risk_listings)}
-          icon={ShieldAlert}
-          color="danger"
-          loading={loading}
-          to={tenantPath('/broker/risk-tags?level=high')}
-        />
-        <StatCard
-          label={t('dashboard.monitored_users')}
-          value={renderMetric(stats?.monitored_users)}
-          icon={Eye}
-          color="secondary"
-          loading={loading}
-          to={tenantPath('/broker/monitoring')}
-        />
-        <StatCard
-          label={t('dashboard.vetting_pending')}
-          value={renderMetric(stats?.vetting_pending)}
-          icon={ShieldCheck}
-          color="success"
-          loading={loading}
-          // Tile counts pending+submitted (pre-verification states); link
-          // must match. ?status=pending alone showed only the literal-
-          // pending subset, hiding submitted records that the user
-          // expected to see when clicking through from the count.
-          to={tenantPath('/broker/vetting?status=pending_review')}
-        />
-        <StatCard
-          label={t('dashboard.vetting_expiring')}
-          value={renderMetric(stats?.vetting_expiring)}
-          icon={Clock}
-          color="warning"
-          loading={loading}
-          to={tenantPath('/broker/vetting?status=expiring_soon')}
-        />
-        <StatCard
-          label={t('dashboard.safeguarding_alerts')}
-          value={renderMetric(stats?.safeguarding_alerts)}
-          icon={AlertTriangle}
-          color="danger"
-          loading={loading}
-          to={tenantPath('/broker/safeguarding?filter=critical')}
-        />
-        <StatCard
-          label={t('dashboard.safeguarding_flags')}
-          value={renderMetric(stats?.onboarding_safeguarding_flags)}
-          icon={ShieldAlert}
-          color="warning"
-          loading={loading}
-          to={tenantPath('/broker/safeguarding?tab=preferences')}
-        />
-      </div>
-
-      {/* Quick Links */}
-      <h2 className="text-lg font-semibold text-foreground mb-4">{t('dashboard.quick_access')}</h2>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {QUICK_LINKS.map((link) => {
-          const Icon = link.icon;
-          return (
-            <Card key={link.path} isPressable as={Link} to={tenantPath(link.path)}>
-              <CardBody className="flex flex-row items-center gap-4 p-4">
-                <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${quickLinkBgClass[link.color]}`}>
-                  <Icon size={24} className={quickLinkTextClass[link.color]} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-foreground">{t(`dashboard.links.${link.key}_title`)}</p>
-                  <p className="text-sm text-muted">{t(`dashboard.links.${link.key}_desc`)}</p>
-                </div>
-                <ChevronRight size={20} className="text-muted shrink-0" />
-              </CardBody>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Recent Activity */}
-      <h2 className="text-lg font-semibold text-foreground mb-4 mt-8">{t('dashboard.recent_activity')}</h2>
       {loading && !stats ? (
-        <div className="flex items-center justify-center py-12">
-          <div role="status" aria-busy="true" aria-label={t('common:loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
+        <div className="space-y-6">
+          <BrokerSkeleton variant="cards" count={1} />
+          <BrokerSkeleton variant="stats" count={8} />
         </div>
       ) : loadError && !stats ? (
-        // Distinct error state — without this, a load failure rendered as
-        // the friendly "no recent activity yet" empty state, which lies
-        // about what happened.
-        <Card>
-          <CardBody className="flex flex-col items-center justify-center py-10 text-center">
-            <AlertCircle size={40} className="text-danger mb-3" />
-            <p className="text-danger font-medium">{t('dashboard.load_error_title')}</p>
-            <p className="text-sm text-muted mt-1 mb-3">
-              {t('dashboard.load_error_hint')}
-            </p>
+        // Distinct error state — a load failure must never render as a
+        // friendly "all clear" hero, which would lie about what happened.
+        <BrokerEmptyState
+          icon={AlertCircle}
+          color="danger"
+          title={t('dashboard.load_error_title')}
+          hint={t('dashboard.load_error_hint')}
+          action={
             <Button size="sm" variant="danger-soft" onPress={loadDashboard}>
               {t('dashboard.refresh')}
             </Button>
-          </CardBody>
-        </Card>
-      ) : stats?.recent_activity && stats.recent_activity.length > 0 ? (
-        <Card>
-          <CardHeader className="flex items-center gap-2 pb-0">
-            <Activity size={18} className="text-muted" />
-            <span className="text-sm font-semibold text-foreground">{t('dashboard.broker_actions_heading')}</span>
-          </CardHeader>
-          <Separator className="my-2" />
-          <CardBody className="p-0">
-            <ul className="divide-y divide-divider">
-              {stats.recent_activity.map((entry: BrokerActivityEntry) => {
-                // Composite key: ids collide between activity_log and
-                // org_audit_log, so the source tag from the controller is
-                // load-bearing here. Falling back to action_type+id keeps
-                // older API responses (pre-source) from breaking.
-                const rowKey = `${entry.source ?? entry.action_type}-${entry.id}`;
-                const fullName = `${entry.first_name ?? ''} ${entry.last_name ?? ''}`.trim();
-                const actorName = fullName || t('dashboard.deleted_user');
-                return (
-                  <li key={rowKey} className="flex items-center gap-3 px-4 py-3">
-                    <ActivityChip actionType={entry.action_type} />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm text-foreground">
-                        <span className="font-medium">{actorName}</span>
-                        {' '}{formatActionLabel(entry.action_type, t)}
-                      </p>
-                      {entry.details && (
-                        <p className="text-xs text-muted truncate">{entry.details}</p>
-                      )}
-                    </div>
-                    <span className="shrink-0 text-xs text-muted">
-                      {formatTimeAgo(entry.created_at, t)}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          </CardBody>
-        </Card>
+          }
+        />
       ) : (
-        <Card>
-          <CardBody className="flex flex-col items-center justify-center py-10 text-center">
-            <Activity size={40} className="text-muted/60 mb-3" />
-            <p className="text-muted font-medium">{t('dashboard.no_recent_activity')}</p>
-            <p className="text-sm text-muted mt-1">
-              {t('dashboard.no_recent_activity_hint')}
-            </p>
-          </CardBody>
-        </Card>
-      )}
+        <>
+          {/* ── "What needs you now" triage hero ─────────────────────────── */}
+          <Card
+            className={`mb-6 rounded-2xl border shadow-sm shadow-black/[0.03] ${
+              totalOpen === 0
+                ? 'border-success/30 bg-gradient-to-br from-success/10 via-surface to-surface'
+                : hasDanger
+                  ? 'border-danger/30 bg-gradient-to-br from-danger/10 via-surface to-surface'
+                  : 'border-accent/30 bg-gradient-to-br from-accent/10 via-surface to-surface'
+            }`}
+          >
+            <CardBody className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+              {totalOpen === 0 ? (
+                <div className="flex items-center gap-4">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-success/15 text-success ring-1 ring-inset ring-success/20">
+                    <CheckCircle2 size={26} />
+                  </span>
+                  <div>
+                    <p className="text-xl font-semibold tracking-tight text-foreground">
+                      {t('dashboard.all_clear')}
+                    </p>
+                    <p className="text-sm text-muted">{t('dashboard.all_clear_hint')}</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-4">
+                    <span
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ring-1 ring-inset ring-current/20 ${
+                        hasDanger ? 'bg-danger/15 text-danger' : 'bg-accent/15 text-accent'
+                      }`}
+                    >
+                      <Zap size={26} />
+                    </span>
+                    <div>
+                      <p className="text-xl font-semibold tracking-tight text-foreground">
+                        {t('dashboard.needs_attention')}
+                      </p>
+                      <p className="text-sm text-muted">
+                        <span className="font-semibold tabular-nums text-foreground">
+                          <HeroTotal value={totalOpen} />
+                        </span>{' '}
+                        {t('dashboard.open_items', { count: totalOpen })}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {activeQueues.slice(0, 4).map((q) => {
+                      const QIcon = q.icon;
+                      return (
+                        <Link
+                          key={q.key}
+                          to={tenantPath(q.path)}
+                          className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors motion-reduce:transition-none ${queuePillClass[q.color]}`}
+                        >
+                          <QIcon size={15} aria-hidden="true" />
+                          <span className="text-foreground">{t(q.labelKey)}</span>
+                          <span className="rounded-full bg-surface px-1.5 text-xs font-semibold tabular-nums">
+                            {q.count}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </CardBody>
+          </Card>
 
-      {/* Collapsible guidance panel — title visible, body tucked into accordion sections */}
-      <BrokerControlsHelp />
-    </div>
+          {/* ── KPI grid — each tile deep-links with the filter applied ──── */}
+          <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {showExchanges && (
+              <BrokerStatCard
+                label={t('dashboard.pending_exchanges')}
+                value={stats?.pending_exchanges ?? null}
+                icon={ArrowLeftRight}
+                color="accent"
+                loading={loading}
+                to={tenantPath('/broker/exchanges?status=pending_broker')}
+              />
+            )}
+            <BrokerStatCard
+              label={t('dashboard.unreviewed_messages')}
+              value={stats?.unreviewed_messages ?? null}
+              icon={MessageSquareWarning}
+              color="warning"
+              loading={loading}
+              to={tenantPath('/broker/messages?status=unreviewed')}
+            />
+            <BrokerStatCard
+              label={t('dashboard.high_risk_listings')}
+              value={stats?.high_risk_listings ?? null}
+              icon={ShieldAlert}
+              color="danger"
+              loading={loading}
+              to={tenantPath('/broker/risk-tags?level=high')}
+            />
+            <BrokerStatCard
+              label={t('dashboard.monitored_users')}
+              value={stats?.monitored_users ?? null}
+              icon={Eye}
+              color="warning"
+              loading={loading}
+              to={tenantPath('/broker/monitoring')}
+            />
+            <BrokerStatCard
+              label={t('dashboard.vetting_pending')}
+              value={stats?.vetting_pending ?? null}
+              icon={ShieldCheck}
+              color="success"
+              loading={loading}
+              // Tile counts pending+submitted (pre-verification states); link
+              // must match. ?status=pending alone showed only the literal-
+              // pending subset, hiding submitted records that the user
+              // expected to see when clicking through from the count.
+              to={tenantPath('/broker/vetting?status=pending_review')}
+            />
+            <BrokerStatCard
+              label={t('dashboard.vetting_expiring')}
+              value={stats?.vetting_expiring ?? null}
+              icon={Clock}
+              color="warning"
+              loading={loading}
+              to={tenantPath('/broker/vetting?status=expiring_soon')}
+            />
+            <BrokerStatCard
+              label={t('dashboard.safeguarding_alerts')}
+              value={stats?.safeguarding_alerts ?? null}
+              icon={AlertTriangle}
+              color="danger"
+              loading={loading}
+              to={tenantPath('/broker/safeguarding?filter=critical')}
+            />
+            <BrokerStatCard
+              label={t('dashboard.safeguarding_flags')}
+              value={stats?.onboarding_safeguarding_flags ?? null}
+              icon={ShieldAlert}
+              color="warning"
+              loading={loading}
+              to={tenantPath('/broker/safeguarding?tab=preferences')}
+            />
+          </div>
+
+          {/* ── Quick-action launcher ────────────────────────────────────── */}
+          <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
+            {t('dashboard.quick_access')}
+          </h2>
+          <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {quickLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Card
+                  key={link.path}
+                  isPressable
+                  as={Link}
+                  to={tenantPath(link.path)}
+                  className="group rounded-2xl border border-divider/70 bg-surface text-left shadow-sm shadow-black/[0.03] transition-all hover:-translate-y-0.5 hover:border-divider hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+                >
+                  <CardBody className="flex flex-row items-center gap-4 p-4">
+                    <div
+                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ring-current/10 ${tileBgClass[link.color]}`}
+                    >
+                      <Icon size={22} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-foreground">
+                        {t(`dashboard.links.${link.key}_title`)}
+                      </p>
+                      <p className="line-clamp-2 text-sm text-muted">
+                        {t(`dashboard.links.${link.key}_desc`)}
+                      </p>
+                    </div>
+                    <ChevronRight
+                      size={18}
+                      className="shrink-0 text-muted/60 transition-transform group-hover:translate-x-0.5 group-hover:text-muted motion-reduce:transition-none"
+                      aria-hidden="true"
+                    />
+                  </CardBody>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* ── Activity timeline ────────────────────────────────────────── */}
+          <h2 className="mb-4 text-lg font-semibold tracking-tight text-foreground">
+            {t('dashboard.recent_activity')}
+          </h2>
+          {stats?.recent_activity && stats.recent_activity.length > 0 ? (
+            <Card className="rounded-2xl border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
+              <CardBody className="p-0">
+                <div className="flex items-center gap-2 border-b border-divider px-4 py-3">
+                  <Activity size={16} className="text-muted" aria-hidden="true" />
+                  <span className="text-sm font-semibold text-foreground">
+                    {t('dashboard.broker_actions_heading')}
+                  </span>
+                </div>
+                <ul className="px-4 py-2">
+                  {stats.recent_activity.map((entry: BrokerActivityEntry, idx) => {
+                    // Composite key: ids collide between activity_log and
+                    // org_audit_log, so the source tag from the controller is
+                    // load-bearing here. Falling back to action_type+id keeps
+                    // older API responses (pre-source) from breaking.
+                    const rowKey = `${entry.source ?? entry.action_type}-${entry.id}`;
+                    const fullName = `${entry.first_name ?? ''} ${entry.last_name ?? ''}`.trim();
+                    const actorName = fullName || t('dashboard.deleted_user');
+                    const isLast = idx === (stats.recent_activity?.length ?? 0) - 1;
+                    const dotColor = actionChipColorMap[entry.action_type] ?? 'default';
+                    return (
+                      <li key={rowKey} className="relative flex gap-3 pb-0">
+                        {/* timeline rail */}
+                        <div className="flex flex-col items-center">
+                          <span
+                            aria-hidden="true"
+                            className={`mt-4 h-2.5 w-2.5 shrink-0 rounded-full ring-2 ring-surface ${timelineDotClass[dotColor]}`}
+                          />
+                          {!isLast && <span aria-hidden="true" className="w-px flex-1 bg-divider" />}
+                        </div>
+                        <div className="flex min-w-0 flex-1 items-center gap-3 py-3">
+                          <ActivityChip actionType={entry.action_type} />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm text-foreground">
+                              <span className="font-medium">{actorName}</span>{' '}
+                              {formatActionLabel(entry.action_type, t)}
+                            </p>
+                            {entry.details && (
+                              <p className="truncate text-xs text-muted">{entry.details}</p>
+                            )}
+                          </div>
+                          <span className="shrink-0 text-xs tabular-nums text-muted">
+                            {formatTimeAgo(entry.created_at, t)}
+                          </span>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </CardBody>
+            </Card>
+          ) : (
+            <BrokerEmptyState
+              icon={Activity}
+              title={t('dashboard.no_recent_activity')}
+              hint={t('dashboard.no_recent_activity_hint')}
+            />
+          )}
+
+          {/* Collapsible guidance panel — title visible, body tucked into accordion sections */}
+          <BrokerControlsHelp />
+        </>
+      )}
+    </BrokerPageShell>
   );
 }
 
 type ChipColor = 'success' | 'danger' | 'accent' | 'warning' | 'default';
+
+const timelineDotClass: Record<ChipColor, string> = {
+  success: 'bg-success',
+  danger: 'bg-danger',
+  accent: 'bg-accent',
+  warning: 'bg-warning',
+  default: 'bg-muted/60',
+};
 
 // Action keys MUST match the action strings emitted by the backend dashboard
 // query in AdminBrokerController::dashboard (UNION of activity_log +
@@ -332,6 +496,8 @@ const actionChipColorMap: Record<string, ChipColor> = {
   // org_audit_log entries (broker controller writes via AuditLogService::log)
   exchange_approved: 'success',
   exchange_rejected: 'danger',
+  match_approved: 'success',
+  match_rejected: 'danger',
   broker_message_reviewed: 'accent',
   broker_message_approved: 'success',
   broker_message_flagged: 'warning',
@@ -365,6 +531,8 @@ const actionChipColorMap: Record<string, ChipColor> = {
 const actionI18nKeySuffix: Record<string, string> = {
   exchange_approved: 'exchange_approved',
   exchange_rejected: 'exchange_rejected',
+  match_approved: 'match_approved',
+  match_rejected: 'match_rejected',
   broker_message_reviewed: 'message_reviewed',
   broker_message_approved: 'message_approved',
   broker_message_flagged: 'message_flagged',
