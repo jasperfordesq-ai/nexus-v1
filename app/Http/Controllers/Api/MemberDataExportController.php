@@ -75,6 +75,22 @@ class MemberDataExportController extends BaseApiController
         $size    = strlen($content);
         $this->exporter->markCompleted($exportId, $size);
 
+        // Notify tenant admins that a member downloaded a copy of their personal
+        // data (GDPR right of access). Best-effort — never block the download.
+        try {
+            \App\Events\GdprActionOccurred::dispatch(
+                $userId,
+                (int) $this->getTenantId(),
+                \App\Events\GdprActionOccurred::ACTION_DATA_EXPORT,
+                $format,
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('[MemberDataExport] admin-notification dispatch failed', [
+                'user_id' => $userId,
+                'error'   => $e->getMessage(),
+            ]);
+        }
+
         $contentType = $format === 'zip' ? 'application/zip' : 'application/json';
 
         $response = new StreamedResponse(function () use ($content) {

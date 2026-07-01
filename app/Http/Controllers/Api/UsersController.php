@@ -630,6 +630,27 @@ class UsersController extends BaseApiController
             return $this->respondWithError('DELETE_FAILED', __('api.user_delete_failed'), null, 500);
         }
 
+        // Notify tenant admins that a member exercised their right to erasure.
+        // Dispatched AFTER a successful erasure and carries the pre-anonymisation
+        // display name — the users row is now anonymised, so a queued listener
+        // could no longer look it up. Best-effort: never fail the response.
+        try {
+            \App\Events\GdprActionOccurred::dispatch(
+                $userId,
+                (int) $tenantId,
+                \App\Events\GdprActionOccurred::ACTION_ACCOUNT_DELETION,
+                null,
+                null,
+                null,
+                $userRow->first_name ?? $userRow->name ?? null,
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[UsersController] deleteAccount admin-notification dispatch failed', [
+                'user_id' => $userId,
+                'error'   => $e->getMessage(),
+            ]);
+        }
+
         // Send farewell confirmation to the now-anonymized account's original email
         // (render in the user's pre-deletion preferred locale, since the account is
         // anonymized by this point and has no locale we can query).

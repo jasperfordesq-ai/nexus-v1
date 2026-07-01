@@ -189,6 +189,10 @@ return [
     'push_new_message' => 'New Message',
     'push_connection_request' => 'New Connection Request',
     'push_connection_accepted' => 'Connection Accepted',
+    'push_gdpr_request' => 'New GDPR request',
+    'push_gdpr_account_deletion' => 'Account deleted',
+    'push_gdpr_data_export' => 'Data export',
+    'push_gdpr_consent' => 'Consent updated',
     // =========================================================================
     // NotificationDispatcher — Match notifications
     // =========================================================================

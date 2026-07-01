@@ -117,6 +117,26 @@ class GdprService
             'type' => $type,
         ]);
 
+        // Alert tenant admins (bell + push + email) that a member submitted a
+        // data-rights request — best-effort: notification wiring must never fail
+        // the request itself. Admin-created requests use a different code path
+        // (AdminEnterpriseController) and deliberately do not reach here.
+        try {
+            \App\Events\GdprActionOccurred::dispatch(
+                $userId,
+                $this->tenantId,
+                \App\Events\GdprActionOccurred::ACTION_REQUEST,
+                $type,
+                null,
+                $requestId,
+            );
+        } catch (\Throwable $e) {
+            $this->logger->warning('GDPR request admin-notification dispatch failed', [
+                'user_id' => $userId,
+                'error'   => $e->getMessage(),
+            ]);
+        }
+
         return [
             'id' => $requestId,
             'type' => $type,
@@ -1944,13 +1964,34 @@ class GdprService
         }
 
         // Record consent with effective version
-        return $this->recordConsent(
+        $result = $this->recordConsent(
             $userId,
             $slug,
             $given,
             $consentType['current_text'] ?? '',
             $consentType['current_version'] ?? '1.0'
         );
+
+        // Alert tenant admins that a member changed a consent preference.
+        // Best-effort — dispatched from the explicit settings-change entry
+        // point (updateUserConsent), NOT recordConsent, so bulk registration /
+        // onboarding consent capture does not fan out to admins.
+        try {
+            \App\Events\GdprActionOccurred::dispatch(
+                $userId,
+                $this->tenantId,
+                \App\Events\GdprActionOccurred::ACTION_CONSENT,
+                $slug,
+                $given,
+            );
+        } catch (\Throwable $e) {
+            $this->logger->warning('GDPR consent admin-notification dispatch failed', [
+                'user_id' => $userId,
+                'error'   => $e->getMessage(),
+            ]);
+        }
+
+        return $result;
     }
 
     // =========================================================================

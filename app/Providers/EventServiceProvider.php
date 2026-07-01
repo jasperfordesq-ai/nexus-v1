@@ -17,6 +17,7 @@ use App\Events\FederatedListingReceived;
 use App\Events\FederatedMemberUpdated;
 use App\Events\FederatedReviewReceived;
 use App\Events\FederatedVolunteeringReceived;
+use App\Events\GdprActionOccurred;
 use App\Events\GroupChatroomMessagePosted;
 use App\Events\GroupCreated;
 use App\Events\GroupDeleted;
@@ -57,6 +58,7 @@ use App\Listeners\PushGroupRetractionToFederatedPartners;
 use App\Listeners\NotifyAdminOfNewListing;
 use App\Listeners\NotifyAdminOfNewRegistration;
 use App\Listeners\NotifyAdminOfNewVolunteerOpportunity;
+use App\Listeners\NotifyAdminOfGdprAction;
 use App\Listeners\NotifyConnectionAccepted;
 use App\Listeners\NotifyConnectionRequest;
 use App\Listeners\NotifyJobAlertSubscribers;
@@ -144,6 +146,13 @@ class EventServiceProvider extends ServiceProvider
 
         SafeguardingFlaggedEvent::class => [
             NotifySafeguardingStaff::class,
+        ],
+
+        // Member-initiated GDPR data-rights actions → alert tenant admins
+        // (bell + push + email) the moment they happen, instead of a silent
+        // pending row that only the overdue-request cron eventually surfaces.
+        GdprActionOccurred::class => [
+            NotifyAdminOfGdprAction::class,
         ],
 
         SafeguardingContactAttemptBlocked::class => [
