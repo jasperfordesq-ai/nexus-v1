@@ -26,6 +26,8 @@ import Send from 'lucide-react/icons/send';
 import MailCheck from 'lucide-react/icons/mail-check';
 import MailX from 'lucide-react/icons/mail-x';
 import X from 'lucide-react/icons/x';
+import IdCard from 'lucide-react/icons/id-card';
+import MemberDetailModal from '@/broker/components/MemberDetailModal';
 import { usePageTitle } from '@/hooks';
 import { useToast,
   useTenant } from '@/contexts';
@@ -127,6 +129,9 @@ export default function MembersPage() {
   // Bulk selection state — powers the "approve/suspend selected" bar.
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+
+  // Member detail modal state (holds the id of the member being viewed).
+  const [detailUserId, setDetailUserId] = useState<number | null>(null);
 
   // Notes drawer state
   const [notesUser, setNotesUser] = useState<AdminUser | null>(null);
@@ -480,6 +485,13 @@ export default function MembersPage() {
               </DropdownTrigger>
               <DropdownMenu aria-label={t('members.col_actions')}>
                 <DropdownItem
+                  key="details" id="details"
+                  startContent={<IdCard size={14} />}
+                  onPress={() => setDetailUserId(user.id)}
+                >
+                  {t('members.view_details')}
+                </DropdownItem>
+                <DropdownItem
                   key="view" id="view"
                   startContent={<ExternalLink size={14} />}
                   onPress={() => window.open(tenantPath(`/profile/${user.id}`), '_blank')}
@@ -735,6 +747,13 @@ export default function MembersPage() {
           )}
         </ModalContent>
       </Modal>
+
+      {/* Member detail modal — operational actions, safe edits, compliance view */}
+      <MemberDetailModal
+        userId={detailUserId}
+        onClose={() => setDetailUserId(null)}
+        onChanged={fetchMembers}
+      />
     </div>
   );
 }
