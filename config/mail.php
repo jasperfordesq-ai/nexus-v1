@@ -160,9 +160,9 @@ return [
         'from_domain'          => env('POSTMARK_FROM_DOMAIN', 'project-nexus.net'),
         'stream_transactional' => env('POSTMARK_STREAM_TRANSACTIONAL', 'outbound'),
         'stream_broadcast'     => env('POSTMARK_STREAM_BROADCAST', 'broadcast'),
-        // Webhook auth (Delivery/Bounce/SpamComplaint/Open) is read by the
-        // PostmarkWebhookController from env('POSTMARK_WEBHOOK_SECRET') — kept
-        // here as an ops reference without proxying through config().
+        // Shared secret authenticating Postmark's event webhook
+        // (Delivery/Bounce/SpamComplaint/Open), verified by PostmarkWebhookController.
+        'webhook_secret'       => env('POSTMARK_WEBHOOK_SECRET'),
     ],
 
     /*

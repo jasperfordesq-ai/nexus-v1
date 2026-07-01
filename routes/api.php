@@ -3133,6 +3133,12 @@ Route::middleware('auth:sanctum')->group(function () {
 // ============================================
 Route::post('/webhooks/sendgrid/events', [\App\Http\Controllers\Api\SendGridWebhookController::class, 'events'])->middleware('throttle:120,1');
 
+// Postmark event webhook (Delivery/Bounce/SpamComplaint/Open/SubscriptionChange).
+// Public — Postmark cannot present a Sanctum token; authenticated in the
+// controller via HTTP Basic auth (or X-Postmark-Webhook-Secret) against
+// POSTMARK_WEBHOOK_SECRET.
+Route::post('/v2/webhooks/postmark', [\App\Http\Controllers\Api\PostmarkWebhookController::class, 'events'])->middleware('throttle:120,1');
+
 // Identity verification provider webhooks (e.g., Onfido, Jumio)
 // Must be public — providers send callbacks without Sanctum tokens.
 Route::post('/v2/webhooks/identity/{provider_slug}', [\App\Http\Controllers\Api\IdentityWebhookController::class, 'handleWebhook'])->middleware('throttle:60,1');
