@@ -24,6 +24,20 @@ function BrokerNotFoundRedirect() {
   return <Navigate to={tenantPath('/broker')} replace />;
 }
 
+/**
+ * Exchange pages depend on the `exchange_workflow` tenant feature. The rest of
+ * the broker panel does not, so only these routes are feature-gated (the nav
+ * item is hidden too — see BrokerSidebar). A broker on a tenant without the
+ * feature who deep-links here is bounced back to the broker dashboard.
+ */
+function ExchangeFeatureRoute({ children }: { children: React.ReactNode }) {
+  const { tenantPath, hasFeature } = useTenant();
+  if (!hasFeature('exchange_workflow')) {
+    return <Navigate to={tenantPath('/broker')} replace />;
+  }
+  return <>{children}</>;
+}
+
 // Core daily-workflow pages
 const BrokerDashboardPage = lazy(() => import('./pages/BrokerDashboardPage'));
 const MembersPage = lazy(() => import('./pages/MembersPage'));
@@ -62,9 +76,9 @@ export function BrokerRoutes() {
       <Route path="onboarding" element={<Lazy><OnboardingPage /></Lazy>} />
       <Route path="safeguarding" element={<Lazy><SafeguardingPage /></Lazy>} />
 
-      {/* Exchanges */}
-      <Route path="exchanges" element={<Lazy><ExchangesPage /></Lazy>} />
-      <Route path="exchanges/:id" element={<Lazy><ExchangeDetailPage /></Lazy>} />
+      {/* Exchanges — gated on the exchange_workflow feature */}
+      <Route path="exchanges" element={<ExchangeFeatureRoute><Lazy><ExchangesPage /></Lazy></ExchangeFeatureRoute>} />
+      <Route path="exchanges/:id" element={<ExchangeFeatureRoute><Lazy><ExchangeDetailPage /></Lazy></ExchangeFeatureRoute>} />
 
       {/* Messages */}
       <Route path="messages" element={<Lazy><MessageReviewPage /></Lazy>} />

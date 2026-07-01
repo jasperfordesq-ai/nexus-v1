@@ -104,14 +104,17 @@ describe('BrokerRoute', () => {
     expect(redirect.getAttribute('data-to')).toBe('/test/dashboard');
   });
 
-  it('redirects broker user when exchange_workflow feature is disabled', async () => {
+  it('grants a broker access even when the exchange_workflow feature is disabled', async () => {
+    // The broker panel spans safeguarding/vetting/insurance/members which are
+    // unrelated to exchanges, so access must NOT depend on exchange_workflow.
+    // Only the Exchanges surfaces are feature-gated (elsewhere).
     mockAuth.isAuthenticated = true;
     mockAuth.user = { id: 1, role: 'broker' };
     mockTenant.hasFeature = vi.fn((f: string) => f !== 'exchange_workflow');
     const { BrokerRoute } = await import('./BrokerRoute');
     render(<BrokerRoute />);
-    const redirect = screen.getByTestId('redirect');
-    expect(redirect.getAttribute('data-to')).toBe('/test/dashboard');
+    expect(screen.getByTestId('outlet')).toBeInTheDocument();
+    expect(screen.queryByTestId('redirect')).not.toBeInTheDocument();
   });
 
   it('renders Outlet for user with broker role and feature enabled', async () => {

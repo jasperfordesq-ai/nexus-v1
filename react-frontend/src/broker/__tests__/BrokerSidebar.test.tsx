@@ -82,6 +82,7 @@ describe('BrokerSidebar', () => {
     mockUseTenant.mockReturnValue({
       tenant: { id: 2, slug: 'test-tenant', name: 'Test Tenant' },
       tenantPath: (path: string) => path,
+      hasFeature: () => true,
     });
   });
 
@@ -103,5 +104,28 @@ describe('BrokerSidebar', () => {
     render(<BrokerSidebar collapsed={false} onToggle={vi.fn()} badges={EMPTY_BADGES} />);
 
     expect(screen.getByText('Full Admin')).toBeInTheDocument();
+  });
+
+  it('shows the Exchanges nav item when exchange_workflow is enabled', () => {
+    mockUseAuth.mockReturnValue({ user: { id: 1, role: 'broker' } });
+
+    render(<BrokerSidebar collapsed={false} onToggle={vi.fn()} badges={EMPTY_BADGES} />);
+
+    expect(screen.getByText('Exchanges')).toBeInTheDocument();
+  });
+
+  it('hides the Exchanges nav item when exchange_workflow is disabled', () => {
+    mockUseAuth.mockReturnValue({ user: { id: 1, role: 'broker' } });
+    mockUseTenant.mockReturnValue({
+      tenant: { id: 2, slug: 'test-tenant', name: 'Test Tenant' },
+      tenantPath: (path: string) => path,
+      hasFeature: (f: string) => f !== 'exchange_workflow',
+    });
+
+    render(<BrokerSidebar collapsed={false} onToggle={vi.fn()} badges={EMPTY_BADGES} />);
+
+    expect(screen.queryByText('Exchanges')).not.toBeInTheDocument();
+    // Non-exchange items remain available regardless of the feature.
+    expect(screen.getByText('Members')).toBeInTheDocument();
   });
 });

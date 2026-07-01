@@ -43,7 +43,7 @@ const ADMIN_ONLY_CONFIG_KEYS = [
 export default function BrokerConfiguration() {
   const { t } = useTranslation('broker');
   usePageTitle(t('configuration.page_title'));
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
   const { user } = useAuth();
   const toast = useToast();
   const [loading, setLoading] = useState(true);
@@ -329,7 +329,8 @@ export default function BrokerConfiguration() {
         </CardBody>
       </Card>
 
-      {/* Exchange Workflow Settings */}
+      {/* Exchange Workflow Settings — only shown when the tenant has the exchange_workflow feature */}
+      {hasFeature('exchange_workflow') && (
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold">{t('configuration.section_exchange_workflow')}</h3>
@@ -463,6 +464,7 @@ export default function BrokerConfiguration() {
           )}
         </CardBody>
       </Card>
+      )}
 
       {/* Broker Visibility Settings */}
       <Card>

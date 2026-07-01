@@ -68,8 +68,13 @@ interface NavSection {
 export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProps) {
   const { t } = useTranslation('broker');
   const location = useLocation();
-  const { tenantPath, tenant } = useTenant();
+  const { tenantPath, tenant, hasFeature } = useTenant();
   const { user } = useAuth();
+
+  // Exchanges is the only broker surface that depends on the exchange_workflow
+  // feature; the rest of the panel (compliance, members, monitoring) is always
+  // available to brokers. Hide the nav item on tenants without the feature.
+  const showExchanges = hasFeature('exchange_workflow');
 
   // Check if user also has admin access for the "Full Admin" link.
   const hasAdminAccess = hasAdminPanelAccess(user);
@@ -88,7 +93,9 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
       items: [
         { key: 'members', label: t('nav.members'), icon: Users, path: '/broker/members', badgeKey: 'pending_members' },
         { key: 'onboarding', label: t('nav.onboarding'), icon: UserPlus, path: '/broker/onboarding' },
-        { key: 'exchanges', label: t('nav.exchanges'), icon: ArrowLeftRight, path: '/broker/exchanges', badgeKey: 'pending_exchanges' },
+        ...(showExchanges
+          ? ([{ key: 'exchanges', label: t('nav.exchanges'), icon: ArrowLeftRight, path: '/broker/exchanges', badgeKey: 'pending_exchanges' }] as NavItem[])
+          : []),
         { key: 'messages', label: t('nav.messages'), icon: MessageSquareWarning, path: '/broker/messages', badgeKey: 'unreviewed_messages' },
       ],
     },

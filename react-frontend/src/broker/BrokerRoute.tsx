@@ -18,7 +18,7 @@ import { hasBrokerPanelAccess } from '@/lib/access';
 export function BrokerRoute() {
   const { t } = useTranslation('broker');
   const { user, isAuthenticated, isLoading, status } = useAuth();
-  const { tenantPath, hasFeature } = useTenant();
+  const { tenantPath } = useTenant();
   const location = useLocation();
 
   if (isLoading || status === 'loading') {
@@ -29,7 +29,13 @@ export function BrokerRoute() {
     return <Navigate to={tenantPath('/login')} state={{ from: tenantPath(location.pathname) }} replace />;
   }
 
-  if (!hasBrokerPanelAccess(user) || !hasFeature('exchange_workflow')) {
+  // Access is role-based only. The panel spans safeguarding, vetting,
+  // insurance, member and monitoring tools that are unrelated to exchanges, so
+  // it must NOT be gated on the `exchange_workflow` feature. Exchange-specific
+  // surfaces (the Exchanges nav item, routes, and the exchange-workflow config
+  // card) are individually feature-gated instead — see BrokerSidebar,
+  // BrokerRoutes (ExchangeFeatureRoute), and BrokerConfigurationPage.
+  if (!hasBrokerPanelAccess(user)) {
     return <Navigate to={tenantPath('/dashboard')} replace />;
   }
 
