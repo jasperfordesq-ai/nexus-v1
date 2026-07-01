@@ -587,6 +587,8 @@
     "add_button": "Añadir usuario",
     "cancel_button": "Cancelar",
     "modal_title": "Monitorizar usuario",
+    "edit_aria": "Editar seguimiento",
+    "edit_success": "Monitoreo actualizado.",
     "load_failed": "No se pudieron cargar los usuarios monitorizados.",
     "add_failed": "No se pudo añadir el usuario monitorizado.",
     "add_success": "Usuario añadido a la monitorización.",
@@ -622,7 +624,11 @@
     "duration_90_days": "90 días",
     "disable_messaging": "Desactivar la mensajería mientras esté monitorizado",
     "status_monitored": "Monitorizado",
-    "status_messaging_off": "Mensajería desactivada"
+    "status_messaging_off": "Mensajería desactivada",
+    "modal_edit_title": "Edit Monitoring",
+    "save_button": "Save Changes",
+    "member_label": "Member",
+    "current_expiry": "Current expiry: {{date}}"
   },
   "risk_tags": {
     "title": "Etiquetas de riesgo",

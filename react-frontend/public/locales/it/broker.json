@@ -587,6 +587,8 @@
     "add_button": "Aggiungi utente",
     "cancel_button": "Annulla",
     "modal_title": "Monitora utente",
+    "edit_aria": "Modifica monitoraggio",
+    "edit_success": "Monitoraggio aggiornato.",
     "load_failed": "Impossibile caricare gli utenti monitorati.",
     "add_failed": "Impossibile aggiungere l'utente monitorato.",
     "add_success": "Utente aggiunto al monitoraggio.",
@@ -622,7 +624,11 @@
     "duration_90_days": "90 giorni",
     "disable_messaging": "Disattiva la messaggistica durante il monitoraggio",
     "status_monitored": "Monitorato",
-    "status_messaging_off": "Messaggistica disattivata"
+    "status_messaging_off": "Messaggistica disattivata",
+    "modal_edit_title": "Edit Monitoring",
+    "save_button": "Save Changes",
+    "member_label": "Member",
+    "current_expiry": "Current expiry: {{date}}"
   },
   "risk_tags": {
     "title": "Tag di rischio",

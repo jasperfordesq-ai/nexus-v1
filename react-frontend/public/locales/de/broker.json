@@ -587,6 +587,8 @@
     "add_button": "Nutzer hinzufügen",
     "cancel_button": "Abbrechen",
     "modal_title": "Nutzer überwachen",
+    "edit_aria": "Überwachung bearbeiten",
+    "edit_success": "Überwachung aktualisiert.",
     "load_failed": "Laden der überwachten Nutzer fehlgeschlagen.",
     "add_failed": "Hinzufügen des überwachten Nutzers fehlgeschlagen.",
     "add_success": "Nutzer zur Überwachung hinzugefügt.",
@@ -622,7 +624,11 @@
     "duration_90_days": "90 Tage",
     "disable_messaging": "Nachrichten während der Überwachung deaktivieren",
     "status_monitored": "Überwacht",
-    "status_messaging_off": "Nachrichten deaktiviert"
+    "status_messaging_off": "Nachrichten deaktiviert",
+    "modal_edit_title": "Edit Monitoring",
+    "save_button": "Save Changes",
+    "member_label": "Member",
+    "current_expiry": "Current expiry: {{date}}"
   },
   "risk_tags": {
     "title": "Risiko-Tags",

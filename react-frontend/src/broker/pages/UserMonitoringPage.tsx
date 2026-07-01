@@ -19,6 +19,7 @@ import Eye from 'lucide-react/icons/eye';
 import MessageCircleOff from 'lucide-react/icons/message-circle-off';
 import UserPlus from 'lucide-react/icons/user-plus';
 import UserMinus from 'lucide-react/icons/user-minus';
+import Pencil from 'lucide-react/icons/pencil';
 import X from 'lucide-react/icons/x';
 import Search from 'lucide-react/icons/search';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +30,10 @@ import { parseServerTimestamp, formatServerDate } from '@/lib/serverTime';
 import { adminBroker, adminUsers } from '@/admin/api/adminApi';
 import { DataTable, PageHeader, EmptyState, ConfirmModal, type Column } from '@/admin/components';
 import type { MonitoredUser, AdminUser } from '@/admin/api/types';
+
+// Duration options offered by the modal's Select (in days). Prefilling the
+// Select on edit only reflects a record whose remaining days match one of these.
+const DURATION_OPTIONS = ['7', '14', '30', '60', '90'];
 
 export function UserMonitoring() {
   const { t } = useTranslation('broker');
@@ -47,6 +52,13 @@ export function UserMonitoring() {
   const [monitoringLoading, setMonitoringLoading] = useState(false);
   const [removingId, setRemovingId] = useState<number | null>(null);
   const [confirmRemoveUserId, setConfirmRemoveUserId] = useState<number | null>(null);
+
+  // Edit state — when set, the modal edits an existing monitoring record rather
+  // than adding a new one. `setMonitoring` upserts server-side, so an edit is
+  // the same call with the existing user_id. originalExpiresDays preserves the
+  // record's remaining expiry when the broker doesn't pick a new duration.
+  const [editingItem, setEditingItem] = useState<MonitoredUser | null>(null);
+  const [originalExpiresDays, setOriginalExpiresDays] = useState<number | null>(null);
 
   // User search state
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
@@ -163,6 +175,8 @@ export function UserMonitoring() {
   const resetModalState = useCallback(() => {
     setMonitoringModalOpen(false);
     setSelectedUser(null);
+    setEditingItem(null);
+    setOriginalExpiresDays(null);
     setUserSearchQuery('');
     setUserSearchResults([]);
     setMonitoringReason('');
@@ -172,8 +186,26 @@ export function UserMonitoring() {
     setHighlightedIndex(-1);
   }, []);
 
-  const handleAddMonitoring = async () => {
-    if (!selectedUser) {
+  const openEditModal = useCallback((item: MonitoredUser) => {
+    setEditingItem(item);
+    setMonitoringReason(item.monitoring_reason || '');
+    setMessagingDisabled(!!item.messaging_disabled);
+    const expiresAt = parseServerTimestamp(item.monitoring_expires_at);
+    if (expiresAt) {
+      const remaining = Math.max(1, Math.ceil((expiresAt.getTime() - Date.now()) / 86_400_000));
+      setOriginalExpiresDays(remaining);
+      // Only reflect it in the Select when it maps to a preset option.
+      setExpiresDays(DURATION_OPTIONS.includes(String(remaining)) ? String(remaining) : '');
+    } else {
+      setOriginalExpiresDays(null);
+      setExpiresDays('');
+    }
+    setMonitoringModalOpen(true);
+  }, []);
+
+  const handleSubmitMonitoring = async () => {
+    const targetUserId = editingItem ? editingItem.user_id : selectedUser?.id;
+    if (!targetUserId) {
       toast.error(t('monitoring.select_user_required'));
       return;
     }
@@ -181,16 +213,24 @@ export function UserMonitoring() {
       toast.error(t('monitoring.reason_required'));
       return;
     }
+    // On edit, if the broker didn't pick a preset duration, preserve the
+    // record's existing remaining expiry (or leave it open if it had none) so
+    // a reason-only edit never silently clears the expiry.
+    const effectiveExpiresDays = expiresDays
+      ? Number(expiresDays)
+      : editingItem
+        ? originalExpiresDays
+        : null;
     setMonitoringLoading(true);
     try {
-      const res = await adminBroker.setMonitoring(selectedUser.id, {
+      const res = await adminBroker.setMonitoring(targetUserId, {
         under_monitoring: true,
         reason: monitoringReason,
         messaging_disabled: messagingDisabled,
-        ...(expiresDays ? { expires_days: Number(expiresDays) } : {}),
+        ...(effectiveExpiresDays ? { expires_days: effectiveExpiresDays } : {}),
       });
       if (res?.success) {
-        toast.success(t('monitoring.add_success'));
+        toast.success(editingItem ? t('monitoring.edit_success') : t('monitoring.add_success'));
         resetModalState();
         loadItems();
       } else {
@@ -302,17 +342,28 @@ export function UserMonitoring() {
       key: 'actions',
       label: t('monitoring.col_actions'),
       render: (item) => (
-        <Button
-          isIconOnly
-          size="sm"
-          variant="flat"
-          color="danger"
-          onPress={() => setConfirmRemoveUserId(item.user_id)}
-          isLoading={removingId === item.user_id}
-          aria-label={t('monitoring.remove_aria')}
-        >
-          <UserMinus size={14} />
-        </Button>
+        <div className="flex gap-1">
+          <Button
+            isIconOnly
+            size="sm"
+            variant="flat"
+            onPress={() => openEditModal(item)}
+            aria-label={t('monitoring.edit_aria')}
+          >
+            <Pencil size={14} />
+          </Button>
+          <Button
+            isIconOnly
+            size="sm"
+            variant="flat"
+            color="danger"
+            onPress={() => setConfirmRemoveUserId(item.user_id)}
+            isLoading={removingId === item.user_id}
+            aria-label={t('monitoring.remove_aria')}
+          >
+            <UserMinus size={14} />
+          </Button>
+        </div>
       ),
     },
   ];
@@ -369,12 +420,20 @@ export function UserMonitoring() {
       >
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <UserPlus size={20} className="text-accent" />
-            {t('monitoring.modal_title')}
+            {editingItem ? <Pencil size={20} className="text-accent" /> : <UserPlus size={20} className="text-accent" />}
+            {editingItem ? t('monitoring.modal_edit_title') : t('monitoring.modal_title')}
           </ModalHeader>
           <ModalBody>
-            {/* User search / selection */}
-            {selectedUser ? (
+            {/* Member selection — locked when editing an existing record */}
+            {editingItem ? (
+              <div className="flex items-center gap-3 rounded-lg border border-divider bg-surface-secondary p-3">
+                <Eye size={18} className="shrink-0 text-warning" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-foreground truncate">{editingItem.user_name}</p>
+                  <p className="text-xs text-muted">{t('monitoring.member_label')}</p>
+                </div>
+              </div>
+            ) : selectedUser ? (
               <div className="flex items-center gap-3 rounded-lg border border-divider p-3">
                 <Avatar
                   src={resolveAvatarUrl(selectedUser.avatar_url ?? selectedUser.avatar) || undefined}
@@ -493,6 +552,11 @@ export function UserMonitoring() {
               <SelectItem key="60" id="60">{t('monitoring.duration_60_days')}</SelectItem>
               <SelectItem key="90" id="90">{t('monitoring.duration_90_days')}</SelectItem>
             </Select>
+            {editingItem && editingItem.monitoring_expires_at && (
+              <p className="text-xs text-muted">
+                {t('monitoring.current_expiry', { date: formatServerDate(editingItem.monitoring_expires_at) })}
+              </p>
+            )}
           </ModalBody>
           <ModalFooter>
             <Button
@@ -504,12 +568,12 @@ export function UserMonitoring() {
             </Button>
             <Button
               color="primary"
-              onPress={handleAddMonitoring}
+              onPress={handleSubmitMonitoring}
               isLoading={monitoringLoading}
-              isDisabled={!selectedUser}
-              startContent={!monitoringLoading && <UserPlus size={14} />}
+              isDisabled={!editingItem && !selectedUser}
+              startContent={!monitoringLoading && (editingItem ? <Pencil size={14} /> : <UserPlus size={14} />)}
             >
-              {t('monitoring.add_button')}
+              {editingItem ? t('monitoring.save_button') : t('monitoring.add_button')}
             </Button>
           </ModalFooter>
         </ModalContent>

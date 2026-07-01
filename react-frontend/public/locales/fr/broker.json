@@ -587,6 +587,8 @@
     "add_button": "Ajouter un utilisateur",
     "cancel_button": "Annuler",
     "modal_title": "Surveiller l'utilisateur",
+    "edit_aria": "Modifier la surveillance",
+    "edit_success": "Surveillance mise à jour.",
     "load_failed": "Échec du chargement des utilisateurs surveillés.",
     "add_failed": "Échec de l'ajout de l'utilisateur surveillé.",
     "add_success": "Utilisateur ajouté à la surveillance.",
@@ -622,7 +624,11 @@
     "duration_90_days": "90 jours",
     "disable_messaging": "Désactiver la messagerie pendant la surveillance",
     "status_monitored": "Surveillé",
-    "status_messaging_off": "Messagerie désactivée"
+    "status_messaging_off": "Messagerie désactivée",
+    "modal_edit_title": "Edit Monitoring",
+    "save_button": "Save Changes",
+    "member_label": "Member",
+    "current_expiry": "Current expiry: {{date}}"
   },
   "risk_tags": {
     "title": "Étiquettes de risque",

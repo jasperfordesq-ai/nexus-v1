@@ -2,16 +2,18 @@ import { Card, CardBody, CardHeader, Button, Spinner } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Chip, Separator } from '@/components/ui';
+import { Chip, Separator, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import User from 'lucide-react/icons/user';
 import Shield from 'lucide-react/icons/shield';
 import Clock from 'lucide-react/icons/clock';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
 import { usePageTitle } from '@/hooks';
 import { adminBroker } from '@/admin/api/adminApi';
 import type { ExchangeDetail as ExchangeDetailType } from '@/admin/api/types';
 import { PageHeader } from '@/admin/components/PageHeader';
-import { useTenant } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { formatServerDateTime } from '@/lib/serverTime';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -39,9 +41,16 @@ export default function ExchangeDetail() {
   usePageTitle(t('exchanges.detail_title'));
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
+  const toast = useToast();
   const [data, setData] = useState<ExchangeDetailType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Approve / reject actions — available on the detail page for pending_broker
+  // exchanges so brokers don't have to return to the list to act.
+  const [actionModal, setActionModal] = useState<'approve' | 'reject' | null>(null);
+  const [actionText, setActionText] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
 
   const loadExchange = useCallback(async (exchangeId: number) => {
     setLoading(true);
@@ -69,6 +78,32 @@ export default function ExchangeDetail() {
     }
     loadExchange(numericId);
   }, [id, loadExchange, t]);
+
+  const handleAction = useCallback(async () => {
+    if (!data || actionModal === null) return;
+    if (actionModal === 'reject' && !actionText.trim()) {
+      toast.error(t('exchanges.reason_required_error'));
+      return;
+    }
+    setActionLoading(true);
+    try {
+      const res = actionModal === 'approve'
+        ? await adminBroker.approveExchange(data.exchange.id, actionText || undefined)
+        : await adminBroker.rejectExchange(data.exchange.id, actionText);
+      if (res?.success) {
+        toast.success(t('exchanges.action_succeeded'));
+        setActionModal(null);
+        setActionText('');
+        loadExchange(data.exchange.id);
+      } else {
+        toast.error(res?.error || t('exchanges.action_failed'));
+      }
+    } catch {
+      toast.error(t('exchanges.action_failed'));
+    } finally {
+      setActionLoading(false);
+    }
+  }, [data, actionModal, actionText, toast, t, loadExchange]);
 
   if (loading) {
     return (
@@ -104,15 +139,39 @@ export default function ExchangeDetail() {
         title={t('exchanges.detail_header_title', { id: exchange.id })}
         description={exchange.listing_title ?? t('exchanges.detail_default_description')}
         actions={
-          <Button
-            as={Link}
-            to={tenantPath('/broker/exchanges')}
-            variant="flat"
-            startContent={<ArrowLeft aria-hidden="true" className="w-4 h-4" />}
-            size="sm"
-          >
-            {t('exchanges.back')}
-          </Button>
+          <div className="flex gap-2">
+            {exchange.status === 'pending_broker' && (
+              <>
+                <Button
+                  color="success"
+                  variant="flat"
+                  size="sm"
+                  startContent={<CheckCircle aria-hidden="true" className="w-4 h-4" />}
+                  onPress={() => { setActionModal('approve'); setActionText(''); }}
+                >
+                  {t('exchanges.approve')}
+                </Button>
+                <Button
+                  color="danger"
+                  variant="flat"
+                  size="sm"
+                  startContent={<XCircle aria-hidden="true" className="w-4 h-4" />}
+                  onPress={() => { setActionModal('reject'); setActionText(''); }}
+                >
+                  {t('exchanges.reject')}
+                </Button>
+              </>
+            )}
+            <Button
+              as={Link}
+              to={tenantPath('/broker/exchanges')}
+              variant="flat"
+              startContent={<ArrowLeft aria-hidden="true" className="w-4 h-4" />}
+              size="sm"
+            >
+              {t('exchanges.back')}
+            </Button>
+          </div>
         }
       />
 
@@ -269,6 +328,57 @@ export default function ExchangeDetail() {
           )}
         </CardBody>
       </Card>
+
+      {/* Approve/Reject Modal — mirrors the list page's action modal */}
+      {actionModal && (
+        <Modal isOpen={!!actionModal} onClose={() => { setActionModal(null); setActionText(''); }} size="md">
+          <ModalContent>
+            <ModalHeader className="flex items-center gap-2">
+              {actionModal === 'approve' ? (
+                <>
+                  <CheckCircle size={20} className="text-success" />
+                  {t('exchanges.approve_modal_title')}
+                </>
+              ) : (
+                <>
+                  <XCircle size={20} className="text-danger" />
+                  {t('exchanges.reject_modal_title')}
+                </>
+              )}
+            </ModalHeader>
+            <ModalBody>
+              <p className="text-foreground/70 mb-3">
+                {actionModal === 'approve'
+                  ? t('exchanges.approve_confirm_text')
+                  : t('exchanges.reject_confirm_text')}
+              </p>
+              <Textarea
+                label={actionModal === 'approve' ? t('exchanges.notes_optional_label') : t('exchanges.reason_required_label')}
+                placeholder={actionModal === 'approve'
+                  ? t('exchanges.approval_notes_placeholder')
+                  : t('exchanges.rejection_reason_placeholder')}
+                value={actionText}
+                onValueChange={setActionText}
+                minRows={3}
+                variant="bordered"
+                isRequired={actionModal === 'reject'}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button variant="flat" onPress={() => { setActionModal(null); setActionText(''); }} isDisabled={actionLoading}>
+                {t('common.cancel')}
+              </Button>
+              <Button
+                color={actionModal === 'approve' ? 'success' : 'danger'}
+                onPress={handleAction}
+                isLoading={actionLoading}
+              >
+                {actionModal === 'approve' ? t('exchanges.approve') : t('exchanges.reject')}
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
     </div>
   );
 }

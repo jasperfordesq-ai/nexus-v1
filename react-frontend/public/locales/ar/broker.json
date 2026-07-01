@@ -587,6 +587,8 @@
     "add_button": "إضافة مستخدم",
     "cancel_button": "إلغاء",
     "modal_title": "مراقبة المستخدم",
+    "edit_aria": "تحرير المراقبة",
+    "edit_success": "تم تحديث الرصد.",
     "load_failed": "فشل تحميل المستخدمين قيد المراقبة.",
     "add_failed": "فشل إضافة المستخدم إلى المراقبة.",
     "add_success": "تمت إضافة المستخدم إلى المراقبة.",
@@ -622,7 +624,11 @@
     "duration_90_days": "90 يومًا",
     "disable_messaging": "تعطيل الرسائل أثناء المراقبة",
     "status_monitored": "قيد المراقبة",
-    "status_messaging_off": "الرسائل معطلة"
+    "status_messaging_off": "الرسائل معطلة",
+    "modal_edit_title": "Edit Monitoring",
+    "save_button": "Save Changes",
+    "member_label": "Member",
+    "current_expiry": "Current expiry: {{date}}"
   },
   "risk_tags": {
     "title": "علامات المخاطر",

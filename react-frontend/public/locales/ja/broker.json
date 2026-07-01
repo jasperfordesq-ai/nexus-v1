@@ -587,6 +587,8 @@
     "add_button": "ユーザーを追加",
     "cancel_button": "キャンセル",
     "modal_title": "ユーザーを監視",
+    "edit_aria": "編集監視",
+    "edit_success": "モニタリングが更新されました。",
     "load_failed": "監視対象ユーザーの読み込みに失敗しました。",
     "add_failed": "監視対象ユーザーの追加に失敗しました。",
     "add_success": "ユーザーを監視対象に追加しました。",
@@ -622,7 +624,11 @@
     "duration_90_days": "90日間",
     "disable_messaging": "監視中はメッセージを無効化",
     "status_monitored": "監視中",
-    "status_messaging_off": "メッセージ無効"
+    "status_messaging_off": "メッセージ無効",
+    "modal_edit_title": "Edit Monitoring",
+    "save_button": "Save Changes",
+    "member_label": "Member",
+    "current_expiry": "Current expiry: {{date}}"
   },
   "risk_tags": {
     "title": "リスクタグ",

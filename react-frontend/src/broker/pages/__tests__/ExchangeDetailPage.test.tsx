@@ -18,6 +18,7 @@ vi.mock('@/contexts', () => ({
   useTenant: () => ({
     tenantPath: (path: string) => path,
   }),
+  useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
 vi.mock('react-router-dom', async () => {
