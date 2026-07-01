@@ -53,6 +53,7 @@ import type { PrivacySettings, UserInsuranceCert } from './tabs/PrivacyTab';
 import { SecurityTab } from './tabs/SecurityTab';
 import type { SessionInfo, TwoFactorSetup } from './tabs/SecurityTab';
 import { isDeleteConfirmed } from './deleteConfirmation';
+import { DeleteConfirmationField } from './DeleteConfirmationField';
 import { SkillsTab } from './tabs/SkillsTab';
 import { LinkedAccountsTab } from './tabs/LinkedAccountsTab';
 import { ConnectedAccountsTab } from './tabs/ConnectedAccountsTab';
@@ -1358,25 +1359,12 @@ export function SettingsPage() {
                 <p className="text-theme-muted mb-2">
                   {t('delete_modal.type_confirm')}
                 </p>
-                <Input
+                <DeleteConfirmationField
                   value={deleteConfirmation}
-                  onChange={(e) => setDeleteConfirmation(e.target.value)}
+                  onValueChange={setDeleteConfirmation}
                   placeholder={t('delete_modal.placeholder')}
-                  aria-label={t('delete_modal.aria_label')}
-                  // Suppress browser / password-manager autofill. Without this,
-                  // Chrome treats this text field (it sits above the password
-                  // input below) as the "username" slot and injects the account
-                  // email, which never matches the keyword and leaves the delete
-                  // button permanently disabled. Non-credential name + off hints.
-                  name="delete-account-confirmation"
-                  autoComplete="off"
-                  autoCapitalize="off"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  classNames={{
-                    input: 'bg-transparent text-theme-primary font-mono',
-                    inputWrapper: 'bg-theme-elevated border-theme-default',
-                  }}
+                  ariaLabel={t('delete_modal.aria_label')}
+                  armKey={deleteModal.isOpen}
                 />
               </div>
               {/* Password re-authentication — required by the backend before erasure. */}
