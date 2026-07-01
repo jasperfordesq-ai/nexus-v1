@@ -12,6 +12,11 @@ on:
     paths:
       - 'react-frontend/**'
 
+# Cancel superseded Lighthouse runs on the same ref.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lighthouse:
     runs-on: ubuntu-latest

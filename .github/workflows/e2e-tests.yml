@@ -30,6 +30,12 @@ env:
   E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
   E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
 
+# Cancel superseded runs on the same ref so rapid pushes during a fix session
+# don't stack full E2E matrices in the runner queue.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 # ─────────────────────────────────────────────────────────────────────────────
 # A green check on this workflow must MEAN something. Previously, when no E2E
 # environment was configured, the test jobs exited 0 (GREEN) having run ZERO

@@ -28,6 +28,11 @@ on:
 permissions:
   contents: read
 
+# Cancel superseded docs-lint runs on the same ref.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   markdownlint:
     name: Markdown structure

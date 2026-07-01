@@ -9,6 +9,11 @@ permissions:
   contents: read
   pull-requests: read
 
+# Cancel superseded runs on the same PR (rapid description edits / pushes).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   translation-review-check:
     name: Translation Review Check

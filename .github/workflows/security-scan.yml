@@ -17,6 +17,14 @@ permissions:
   contents: read
   security-events: write
 
+# Cancel a superseded scan on the same ref (e.g. a new push to main lands while
+# the previous push's scan is still running). The nightly scheduled scan and
+# each push scan share the main ref, so a push supersedes an in-flight scan —
+# which is fine, the push runs its own full scan.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   security-scan:
     name: Security Vulnerability Scan
