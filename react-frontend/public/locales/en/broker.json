@@ -20,7 +20,14 @@
     "my_profile": "My Profile",
     "sign_out": "Sign Out",
     "user_fallback": "Broker",
-    "help": "Help Center"
+    "help": "Help Center",
+    "search": "Search"
+  },
+  "palette": {
+    "aria_label": "Jump to a broker page",
+    "placeholder": "Jump to… (members, vetting, messages)",
+    "results_label": "Broker destinations",
+    "no_results": "Nothing matches \"{{query}}\""
   },
   "nav": {
     "dashboard": "Dashboard",

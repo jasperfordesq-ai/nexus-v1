@@ -21,6 +21,7 @@ import type { MatchApprovalStats } from '@/admin/api/types';
 import { BrokerSidebar, type BrokerBadgeCounts } from './components/BrokerSidebar';
 import { BrokerHeader } from './components/BrokerHeader';
 import { BrokerBreadcrumbs } from './components/BrokerBreadcrumbs';
+import { BrokerCommandPalette } from './components/BrokerCommandPalette';
 
 const EMPTY_BADGES: BrokerBadgeCounts = {
   pending_members: 0,
@@ -39,6 +40,7 @@ export function BrokerLayout() {
   const showMatches = hasFeature('exchange_workflow');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const [badges, setBadges] = useState<BrokerBadgeCounts>(EMPTY_BADGES);
   const { pathname } = useLocation();
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -106,6 +108,18 @@ export function BrokerLayout() {
     const interval = setInterval(() => void fetchBadges(), 60_000);
     return () => clearInterval(interval);
   }, [fetchBadges]);
+
+  // ⌘K / Ctrl+K opens the command palette from anywhere in the panel.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   // Focus management for mobile drawer
   const openMobileDrawer = useCallback(() => {
@@ -177,7 +191,10 @@ export function BrokerLayout() {
       <BrokerHeader
         sidebarCollapsed={sidebarCollapsed}
         onSidebarToggle={() => mobileDrawerOpen ? closeMobileDrawer() : openMobileDrawer()}
+        onOpenSearch={() => setPaletteOpen(true)}
       />
+
+      <BrokerCommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} />
 
       {mobileDrawerOpen && (
         <button

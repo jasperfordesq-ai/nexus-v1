@@ -15,18 +15,21 @@ import { useAuth, useTenant } from '@/contexts';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Bell from 'lucide-react/icons/bell';
 import HelpCircle from 'lucide-react/icons/circle-help';
+import Search from 'lucide-react/icons/search';
 import LogOut from 'lucide-react/icons/log-out';
 import Menu from 'lucide-react/icons/menu';
 import User from 'lucide-react/icons/user';
 import { resolveAvatarUrl } from '@/lib/helpers';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Avatar } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Avatar, Kbd } from '@/components/ui';
 interface BrokerHeaderProps {
   sidebarCollapsed: boolean;
   onSidebarToggle?: () => void;
+  /** Opens the ⌘K command palette. */
+  onOpenSearch?: () => void;
 }
 
-export function BrokerHeader({ sidebarCollapsed, onSidebarToggle }: BrokerHeaderProps) {
+export function BrokerHeader({ sidebarCollapsed, onSidebarToggle, onOpenSearch }: BrokerHeaderProps) {
   const { t } = useTranslation('broker');
   const { user, logout } = useAuth();
   const { tenantPath, tenant } = useTenant();
@@ -68,8 +71,33 @@ export function BrokerHeader({ sidebarCollapsed, onSidebarToggle }: BrokerHeader
         )}
       </div>
 
-      {/* Right: Help + notifications + user menu */}
+      {/* Right: Search + help + notifications + user menu */}
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        {onOpenSearch && (
+          <>
+            {/* Wide screens get an affordance with the shortcut hint… */}
+            <button
+              type="button"
+              onClick={onOpenSearch}
+              className="hidden items-center gap-2 rounded-xl border border-divider bg-surface-secondary px-3 py-1.5 text-sm text-muted transition-colors hover:border-divider hover:text-foreground motion-reduce:transition-none lg:flex"
+            >
+              <Search size={14} aria-hidden="true" />
+              <span>{t('header.search')}</span>
+              <Kbd className="ml-1">⌘K</Kbd>
+            </button>
+            {/* …small screens get an icon button. */}
+            <Button
+              isIconOnly
+              variant="tertiary"
+              size="sm"
+              onPress={onOpenSearch}
+              aria-label={t('header.search')}
+              className="lg:hidden"
+            >
+              <Search size={18} />
+            </Button>
+          </>
+        )}
         <Button
           isIconOnly
           variant="tertiary"
