@@ -1373,11 +1373,21 @@ Route::get('/v2/admin/matching/config', [\App\Http\Controllers\Api\AdminMatching
 Route::put('/v2/admin/matching/config', [\App\Http\Controllers\Api\AdminMatchingController::class, 'updateConfig']);
 Route::post('/v2/admin/matching/cache/clear', [\App\Http\Controllers\Api\AdminMatchingController::class, 'clearCache']);
 Route::get('/v2/admin/matching/stats', [\App\Http\Controllers\Api\AdminMatchingController::class, 'getStats']);
-Route::get('/v2/admin/matching/approvals', [\App\Http\Controllers\Api\AdminMatchingController::class, 'index']);
-Route::get('/v2/admin/matching/approvals/stats', [\App\Http\Controllers\Api\AdminMatchingController::class, 'approvalStats']);
-Route::get('/v2/admin/matching/approvals/{id}', [\App\Http\Controllers\Api\AdminMatchingController::class, 'show']);
-Route::post('/v2/admin/matching/approvals/{id}/approve', [\App\Http\Controllers\Api\AdminMatchingController::class, 'approve']);
-Route::post('/v2/admin/matching/approvals/{id}/reject', [\App\Http\Controllers\Api\AdminMatchingController::class, 'reject']);
+// Broker-or-admin: reviewing smart-match proposals is a core broker duty, so
+// the five approval endpoints are shared with the broker panel's Match
+// Approvals pages. Matching config/analytics/cache stay admin-only above.
+// The controller adds a self-guard: a broker must not approve/reject a match
+// they are a party to (mirrors the adjust-balance self-dealing guard). See
+// tests/Laravel/Feature/Controllers/BrokerMatchApprovalAuthorizationTest.php.
+Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
+    Route::get('/v2/admin/matching/approvals', [\App\Http\Controllers\Api\AdminMatchingController::class, 'index']);
+    Route::get('/v2/admin/matching/approvals/stats', [\App\Http\Controllers\Api\AdminMatchingController::class, 'approvalStats']);
+    Route::get('/v2/admin/matching/approvals/{id}', [\App\Http\Controllers\Api\AdminMatchingController::class, 'show']);
+    // Mutations throttled to 60/min/user like the other broker decision
+    // endpoints — far above interactive speed, blocks scripted abuse.
+    Route::post('/v2/admin/matching/approvals/{id}/approve', [\App\Http\Controllers\Api\AdminMatchingController::class, 'approve'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/matching/approvals/{id}/reject', [\App\Http\Controllers\Api\AdminMatchingController::class, 'reject'])->middleware('throttle:60,1');
+});
 Route::get('/v2/admin/help/faqs', [\App\Http\Controllers\Api\HelpController::class, 'adminGetFaqs']);
 Route::post('/v2/admin/help/faqs', [\App\Http\Controllers\Api\HelpController::class, 'adminCreateFaq']);
 Route::put('/v2/admin/help/faqs/{id}', [\App\Http\Controllers\Api\HelpController::class, 'adminUpdateFaq']);

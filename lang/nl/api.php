@@ -2090,4 +2090,5 @@ return [
     'member_premium_features_array' => 'Erkenningsnotities moeten als een array met tekenreeksen worden verzonden.',
     'broker_cannot_edit_field' => 'Brokers cannot change this field. Only an administrator can.',
     'broker_cannot_adjust_own_balance' => 'Brokers cannot adjust their own balance.',
+    'broker_cannot_review_own_match' => 'Brokers cannot review a match they are a party to.',
 ];

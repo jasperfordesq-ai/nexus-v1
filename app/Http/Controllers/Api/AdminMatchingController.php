@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\AuditLogService;
 use App\Services\SmartMatchingAnalyticsService;
 use App\Services\SmartMatchingEngine;
 use Illuminate\Http\JsonResponse;
@@ -16,7 +17,10 @@ use App\Services\MatchApprovalWorkflowService;
 /**
  * AdminMatchingController -- Admin matching approval, configuration, cache, and statistics.
  *
- * All methods require admin authentication.
+ * The five approval endpoints (index/approvalStats/show/approve/reject) are
+ * broker-or-admin — reviewing proposed matches is a core broker duty and the
+ * broker panel surfaces them at /broker/match-approvals. Configuration, cache
+ * and analytics stay admin-only.
  */
 class AdminMatchingController extends BaseApiController
 {
@@ -26,12 +30,40 @@ class AdminMatchingController extends BaseApiController
         private readonly SmartMatchingEngine $smartMatchingEngine,
         private readonly SmartMatchingAnalyticsService $smartMatchingAnalyticsService,
         private readonly MatchApprovalWorkflowService $matchApprovalWorkflowService,
+        private readonly AuditLogService $auditLogService,
     ) {}
+
+    /**
+     * Self-dealing guard for approve/reject: a broker must not review a match
+     * they are a party to (either as the matched member or as the listing
+     * owner) — they could otherwise wave through matches that benefit
+     * themselves. Admin-tier callers retain full latitude, mirroring the
+     * adjust-balance guard in AdminTimebankingController.
+     *
+     * Returns an error response to short-circuit with, or null when allowed.
+     */
+    private function guardBrokerNotParty(int $approvalId, int $callerId): ?JsonResponse
+    {
+        if ($this->callerIsAdminTier()) {
+            return null;
+        }
+
+        $row = DB::selectOne(
+            "SELECT user_id, listing_owner_id FROM match_approvals WHERE id = ? AND tenant_id = ?",
+            [$approvalId, $this->getTenantId()]
+        );
+
+        if ($row && ($callerId === (int) $row->user_id || $callerId === (int) $row->listing_owner_id)) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.broker_cannot_review_own_match'), null, 403);
+        }
+
+        return null;
+    }
 
     /** GET /api/v2/admin/matching */
     public function index(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $page = $this->queryInt('page', 1, 1);
@@ -100,7 +132,7 @@ class AdminMatchingController extends BaseApiController
     /** GET /api/v2/admin/matching/approval-stats */
     public function approvalStats(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $days = $this->queryInt('days', 30, 1);
         return $this->respondWithData($this->matchApprovalWorkflowService->getStatistics($days));
     }
@@ -108,7 +140,7 @@ class AdminMatchingController extends BaseApiController
     /** GET /api/v2/admin/matching/{id} */
     public function show(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = $this->getTenantId();
 
         $rowObj = DB::selectOne(
@@ -163,22 +195,32 @@ class AdminMatchingController extends BaseApiController
     /** POST /api/v2/admin/matching/{id}/approve */
     public function approve(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $reviewerId = $this->requireBrokerOrAdmin();
+        if ($guard = $this->guardBrokerNotParty($id, $reviewerId)) return $guard;
+
         $notes = trim($this->input('notes', ''));
-        $success = $this->matchApprovalWorkflowService->approveMatch($id, $adminId, $notes);
+        $success = $this->matchApprovalWorkflowService->approveMatch($id, $reviewerId, $notes);
         if (!$success) return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Match approval or already reviewed']), null, 404);
+
+        $this->auditLogService->log('match_approved', null, $reviewerId, ['approval_id' => $id]);
+
         return $this->respondWithData(['approved' => true, 'id' => $id]);
     }
 
     /** POST /api/v2/admin/matching/{id}/reject */
     public function reject(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $reviewerId = $this->requireBrokerOrAdmin();
+        if ($guard = $this->guardBrokerNotParty($id, $reviewerId)) return $guard;
+
         $reason = trim($this->input('reason', ''));
         if (empty($reason)) return $this->respondWithError('VALIDATION_ERROR', __('api.reason_required'), 'reason', 422);
 
-        $success = $this->matchApprovalWorkflowService->rejectMatch($id, $adminId, $reason);
+        $success = $this->matchApprovalWorkflowService->rejectMatch($id, $reviewerId, $reason);
         if (!$success) return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Match approval or already reviewed']), null, 404);
+
+        $this->auditLogService->log('match_rejected', null, $reviewerId, ['approval_id' => $id, 'reason' => $reason]);
+
         return $this->respondWithData(['rejected' => true, 'id' => $id]);
     }
 
