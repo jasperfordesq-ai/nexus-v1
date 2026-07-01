@@ -600,6 +600,16 @@ class MatchApprovalWorkflowService
                 $counts[$row->status] = (int) $row->cnt;
             }
 
+            // Pending is a live review queue, not activity history — count it
+            // WITHOUT the time window. A match submitted 40 days ago that
+            // nobody reviewed must still light up the stat card, the tab
+            // chip, and the broker sidebar badge; the windowed query silently
+            // dropped exactly the items that most need attention.
+            $counts['pending'] = (int) DB::selectOne(
+                "SELECT COUNT(*) as cnt FROM match_approvals WHERE tenant_id = ? AND status = 'pending'",
+                [$tenantId]
+            )->cnt;
+
             $total = array_sum($counts);
             $reviewed = $counts['approved'] + $counts['rejected'];
             $approvalRate = $reviewed > 0
@@ -646,6 +656,13 @@ class MatchApprovalWorkflowService
                 'pending' => $counts['pending'],
                 'approved' => $counts['approved'],
                 'rejected' => $counts['rejected'],
+                // *_count aliases — the admin and broker MatchApprovals UIs
+                // (MatchApprovalStats type) read these names; without them the
+                // stat cards / pending badges rendered 0 forever.
+                'pending_count' => $counts['pending'],
+                'approved_count' => $counts['approved'],
+                'rejected_count' => $counts['rejected'],
+                'avg_approval_time' => $avgReviewHours,
                 'approval_rate' => $approvalRate,
                 'avg_review_hours' => $avgReviewHours,
                 'days' => $days,
@@ -660,6 +677,10 @@ class MatchApprovalWorkflowService
                 'pending' => 0,
                 'approved' => 0,
                 'rejected' => 0,
+                'pending_count' => 0,
+                'approved_count' => 0,
+                'rejected_count' => 0,
+                'avg_approval_time' => 0.0,
                 'approval_rate' => 0.0,
                 'avg_review_hours' => 0.0,
                 'days' => $days,

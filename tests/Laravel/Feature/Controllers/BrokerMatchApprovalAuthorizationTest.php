@@ -98,6 +98,30 @@ class BrokerMatchApprovalAuthorizationTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_approval_stats_count_old_pending_matches_and_use_ui_field_names(): void
+    {
+        // Regression: getStatistics() windowed the pending count by
+        // submitted_at >= N days AND returned keys the UIs never read
+        // (pending vs pending_count) — so a match pending for 40 days
+        // vanished from the stat cards, tab chips, and sidebar badge while
+        // still sitting in the review queue.
+        [$id] = $this->pendingApproval();
+        DB::table('match_approvals')->where('id', $id)->update([
+            'submitted_at' => now()->subDays(60),
+        ]);
+        Sanctum::actingAs($this->broker());
+
+        $response = $this->apiGet('/v2/admin/matching/approvals/stats');
+
+        $response->assertStatus(200);
+        $stats = $response->json('data');
+        $this->assertArrayHasKey('pending_count', $stats, 'UI field alias must exist.');
+        $this->assertArrayHasKey('approved_count', $stats);
+        $this->assertArrayHasKey('rejected_count', $stats);
+        $this->assertArrayHasKey('avg_approval_time', $stats);
+        $this->assertGreaterThanOrEqual(1, $stats['pending_count'], 'Old pending matches must still be counted.');
+    }
+
     public function test_broker_can_view_a_match_approval(): void
     {
         [$id] = $this->pendingApproval();
