@@ -27,6 +27,10 @@ import MailCheck from 'lucide-react/icons/mail-check';
 import MailX from 'lucide-react/icons/mail-x';
 import X from 'lucide-react/icons/x';
 import IdCard from 'lucide-react/icons/id-card';
+import Pin from 'lucide-react/icons/pin';
+import Pencil from 'lucide-react/icons/pencil';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Check from 'lucide-react/icons/check';
 import MemberDetailModal from '@/broker/components/MemberDetailModal';
 import { usePageTitle } from '@/hooks';
 import { useToast,
@@ -43,7 +47,7 @@ import { parseServerTimestamp,
   formatServerDate,
   formatServerDateTime } from '@/lib/serverTime';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip, Select, SelectItem } from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types & Constants
 // ─────────────────────────────────────────────────────────────────────────────
@@ -68,6 +72,9 @@ const STATUS_COLOR: Record<string, 'warning' | 'success' | 'danger' | 'default'>
 };
 
 const PAGE_SIZE = 20;
+
+// CRM note categories — mirrors the admin MemberNotes module.
+const NOTE_CATEGORIES = ['general', 'outreach', 'support', 'onboarding', 'concern', 'follow_up'] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -138,7 +145,14 @@ export default function MembersPage() {
   const [notes, setNotes] = useState<MemberNote[]>([]);
   const [notesLoading, setNotesLoading] = useState(false);
   const [newNote, setNewNote] = useState('');
+  const [noteCategory, setNoteCategory] = useState('general');
   const [addingNote, setAddingNote] = useState(false);
+  // Inline note editing
+  const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
+  const [editingContent, setEditingContent] = useState('');
+  const [editingCategory, setEditingCategory] = useState('general');
+  const [savingNote, setSavingNote] = useState(false);
+  const [noteBusyId, setNoteBusyId] = useState<number | null>(null);
 
   // ─── Fetch members ────────────────────────────────────────────────────────
 
@@ -207,11 +221,12 @@ export default function MembersPage() {
       const res = await adminCrm.createNote({
         user_id: notesUser.id,
         content: newNote.trim(),
-        category: 'broker',
+        category: noteCategory,
       });
       if (res.success) {
         toast.success(t('members.note_added'));
         setNewNote('');
+        setNoteCategory('general');
         // Refresh notes
         openNotes(notesUser);
       }
@@ -220,7 +235,75 @@ export default function MembersPage() {
     } finally {
       setAddingNote(false);
     }
-  }, [notesUser, newNote, toast, t, openNotes]);
+  }, [notesUser, newNote, noteCategory, toast, t, openNotes]);
+
+  const startEditNote = useCallback((note: MemberNote) => {
+    setEditingNoteId(note.id);
+    setEditingContent(note.content);
+    setEditingCategory(note.category || 'general');
+  }, []);
+
+  const cancelEditNote = useCallback(() => {
+    setEditingNoteId(null);
+    setEditingContent('');
+  }, []);
+
+  const handleUpdateNote = useCallback(async () => {
+    if (editingNoteId == null || !editingContent.trim() || !notesUser) return;
+    setSavingNote(true);
+    try {
+      const res = await adminCrm.updateNote(editingNoteId, {
+        content: editingContent.trim(),
+        category: editingCategory,
+      });
+      if (res.success) {
+        toast.success(t('members.note_updated'));
+        setEditingNoteId(null);
+        openNotes(notesUser);
+      } else {
+        toast.error(t('members.action_failed'));
+      }
+    } catch {
+      toast.error(t('members.action_failed'));
+    } finally {
+      setSavingNote(false);
+    }
+  }, [editingNoteId, editingContent, editingCategory, notesUser, toast, t, openNotes]);
+
+  const handleDeleteNote = useCallback(async (noteId: number) => {
+    if (!notesUser) return;
+    setNoteBusyId(noteId);
+    try {
+      const res = await adminCrm.deleteNote(noteId);
+      if (res.success) {
+        toast.success(t('members.note_deleted'));
+        openNotes(notesUser);
+      } else {
+        toast.error(t('members.action_failed'));
+      }
+    } catch {
+      toast.error(t('members.action_failed'));
+    } finally {
+      setNoteBusyId(null);
+    }
+  }, [notesUser, toast, t, openNotes]);
+
+  const handleTogglePin = useCallback(async (note: MemberNote) => {
+    if (!notesUser) return;
+    setNoteBusyId(note.id);
+    try {
+      const res = await adminCrm.updateNote(note.id, { is_pinned: !note.is_pinned });
+      if (res.success) {
+        openNotes(notesUser);
+      } else {
+        toast.error(t('members.action_failed'));
+      }
+    } catch {
+      toast.error(t('members.action_failed'));
+    } finally {
+      setNoteBusyId(null);
+    }
+  }, [notesUser, toast, t, openNotes]);
 
   // ─── Tab change / search ──────────────────────────────────────────────────
 
@@ -687,29 +770,43 @@ export default function MembersPage() {
               </ModalHeader>
               <ModalBody>
                 {/* Add note */}
-                <div className="flex gap-2">
-                  <Textarea
-                    placeholder={t('members.note_placeholder')}
-                    value={newNote}
-                    onValueChange={setNewNote}
-                    minRows={2}
-                    maxRows={4}
-                    className="flex-1"
-                  />
-                  <Button
-                    color="primary"
-                    isIconOnly
-                    isLoading={addingNote}
-                    isDisabled={!newNote.trim()}
-                    onPress={handleAddNote}
-                    className="self-end"
-                    aria-label={t('members.send_note')}
+                <div className="space-y-2">
+                  <Select
+                    aria-label={t('members.note_category_label')}
+                    size="sm"
+                    variant="bordered"
+                    selectedKeys={[noteCategory]}
+                    onSelectionChange={(keys) => setNoteCategory((Array.from(keys)[0] as string) ?? 'general')}
+                    className="max-w-[220px]"
                   >
-                    <Send size={16} />
-                  </Button>
+                    {NOTE_CATEGORIES.map((cat) => (
+                      <SelectItem key={cat} id={cat}>{t(`members.note_category_${cat}`)}</SelectItem>
+                    ))}
+                  </Select>
+                  <div className="flex gap-2">
+                    <Textarea
+                      placeholder={t('members.note_placeholder')}
+                      value={newNote}
+                      onValueChange={setNewNote}
+                      minRows={2}
+                      maxRows={4}
+                      className="flex-1"
+                    />
+                    <Button
+                      color="primary"
+                      isIconOnly
+                      isLoading={addingNote}
+                      isDisabled={!newNote.trim()}
+                      onPress={handleAddNote}
+                      className="self-end"
+                      aria-label={t('members.send_note')}
+                    >
+                      <Send size={16} />
+                    </Button>
+                  </div>
                 </div>
 
-                {/* Notes list */}
+                {/* Notes list — pinned first */}
                 {notesLoading ? (
                   <div className="py-8 text-center text-muted">{t('common.loading')}</div>
                 ) : notes.length === 0 ? (
@@ -719,20 +816,64 @@ export default function MembersPage() {
                   </div>
                 ) : (
                   <div className="space-y-3 mt-2">
-                    {notes.map((note) => (
-                      <div key={note.id} className="rounded-lg bg-surface-secondary p-3">
-                        <p className="text-sm text-foreground whitespace-pre-wrap">{note.content}</p>
-                        <div className="mt-2 flex items-center gap-2 text-xs text-muted">
-                          <span>{note.author_name || note.author?.name || t('members.note_system_author')}</span>
-                          <span>&middot;</span>
-                          <span>{formatServerDateTime(note.created_at)}</span>
-                          {note.category && (
-                            <>
+                    {[...notes].sort((a, b) => Number(b.is_pinned ?? false) - Number(a.is_pinned ?? false)).map((note) => (
+                      <div key={note.id} className={`rounded-lg p-3 ${note.is_pinned ? 'border border-accent/20 bg-accent/10' : 'bg-surface-secondary'}`}>
+                        {editingNoteId === note.id ? (
+                          <div className="space-y-2">
+                            <Select
+                              aria-label={t('members.note_category_label')}
+                              size="sm"
+                              variant="bordered"
+                              selectedKeys={[editingCategory]}
+                              onSelectionChange={(keys) => setEditingCategory((Array.from(keys)[0] as string) ?? 'general')}
+                              className="max-w-[220px]"
+                            >
+                              {NOTE_CATEGORIES.map((cat) => (
+                                <SelectItem key={cat} id={cat}>{t(`members.note_category_${cat}`)}</SelectItem>
+                              ))}
+                            </Select>
+                            <Textarea value={editingContent} onValueChange={setEditingContent} minRows={2} maxRows={5} variant="bordered" />
+                            <div className="flex gap-2">
+                              <Button size="sm" color="primary" isLoading={savingNote} isDisabled={!editingContent.trim()} startContent={<Check size={14} />} onPress={handleUpdateNote}>
+                                {t('members.note_save')}
+                              </Button>
+                              <Button size="sm" variant="flat" isDisabled={savingNote} onPress={cancelEditNote}>
+                                {t('common.cancel')}
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="flex-1 whitespace-pre-wrap text-sm text-foreground">{note.content}</p>
+                              <div className="flex shrink-0 items-center gap-0.5">
+                                <Tooltip content={note.is_pinned ? t('members.note_unpin') : t('members.note_pin')}>
+                                  <Button isIconOnly size="sm" variant="light" isLoading={noteBusyId === note.id} onPress={() => handleTogglePin(note)} aria-label={note.is_pinned ? t('members.note_unpin') : t('members.note_pin')}>
+                                    <Pin size={13} className={note.is_pinned ? 'fill-current text-accent' : 'text-muted'} />
+                                  </Button>
+                                </Tooltip>
+                                <Tooltip content={t('members.note_edit')}>
+                                  <Button isIconOnly size="sm" variant="light" onPress={() => startEditNote(note)} aria-label={t('members.note_edit')}>
+                                    <Pencil size={13} className="text-muted" />
+                                  </Button>
+                                </Tooltip>
+                                <Tooltip content={t('members.note_delete')}>
+                                  <Button isIconOnly size="sm" variant="light" color="danger" isLoading={noteBusyId === note.id} onPress={() => handleDeleteNote(note.id)} aria-label={t('members.note_delete')}>
+                                    <Trash2 size={13} />
+                                  </Button>
+                                </Tooltip>
+                              </div>
+                            </div>
+                            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted">
+                              <span>{note.author_name || note.author?.name || t('members.note_system_author')}</span>
                               <span>&middot;</span>
-                              <Chip size="sm" variant="tertiary" className="text-xs capitalize">{note.category}</Chip>
-                            </>
-                          )}
-                        </div>
+                              <span>{formatServerDateTime(note.created_at)}</span>
+                              {note.category && (
+                                <Chip size="sm" variant="tertiary" className="text-xs">{t(`members.note_category_${note.category}`, { defaultValue: note.category })}</Chip>
+                              )}
+                            </div>
+                          </>
+                        )}
                       </div>
                     ))}
                   </div>

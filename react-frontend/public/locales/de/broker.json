@@ -216,7 +216,21 @@
     "role_broker": "Broker",
     "role_coordinator": "Coordinator",
     "bulk_selected": "{{count}} selected",
-    "view_details": "View details"
+    "view_details": "View details",
+    "note_updated": "Note updated.",
+    "note_deleted": "Note deleted.",
+    "note_save": "Save",
+    "note_edit": "Edit note",
+    "note_delete": "Delete note",
+    "note_pin": "Pin note",
+    "note_unpin": "Unpin note",
+    "note_category_label": "Category",
+    "note_category_general": "General",
+    "note_category_outreach": "Outreach",
+    "note_category_support": "Support",
+    "note_category_onboarding": "Onboarding",
+    "note_category_concern": "Concern",
+    "note_category_follow_up": "Follow up"
   },
   "onboarding": {
     "title": "Onboarding",
