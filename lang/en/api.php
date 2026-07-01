@@ -13,6 +13,7 @@ return [
     'admin_access_required'        => 'Admin access required',
     'broker_or_admin_access_required' => 'Broker or admin access required',
     'broker_cannot_edit_field'     => 'Brokers cannot change this field. Only an administrator can.',
+    'broker_cannot_adjust_own_balance' => 'Brokers cannot adjust their own balance.',
     'super_admin_required'         => 'Super admin access required',
     'insufficient_permissions'     => 'Insufficient permissions',
 

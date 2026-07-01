@@ -2089,4 +2089,5 @@ return [
     'member_premium_invalid_slug' => 'Usa letras min?sculas, n?meros, guiones o guiones bajos para el slug del nivel de apoyo.',
     'member_premium_features_array' => 'Las notas de reconocimiento deben enviarse como una matriz de textos.',
     'broker_cannot_edit_field' => 'Brokers cannot change this field. Only an administrator can.',
+    'broker_cannot_adjust_own_balance' => 'Brokers cannot adjust their own balance.',
 ];

@@ -2089,4 +2089,5 @@ return [
     'member_premium_invalid_slug' => 'U?yj ma?ych liter, cyfr, my?lnik?w lub podkre?le? w slugu poziomu wsparcia.',
     'member_premium_features_array' => 'Notatki o uznaniu musz? by? wys?ane jako tablica ci?g?w tekstowych.',
     'broker_cannot_edit_field' => 'Brokers cannot change this field. Only an administrator can.',
+    'broker_cannot_adjust_own_balance' => 'Brokers cannot adjust their own balance.',
 ];

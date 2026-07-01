@@ -2089,4 +2089,5 @@ return [
     'member_premium_invalid_slug' => 'Gebruik kleine letters, cijfers, koppeltekens of underscores voor de slug van het steunniveau.',
     'member_premium_features_array' => 'Erkenningsnotities moeten als een array met tekenreeksen worden verzonden.',
     'broker_cannot_edit_field' => 'Brokers cannot change this field. Only an administrator can.',
+    'broker_cannot_adjust_own_balance' => 'Brokers cannot adjust their own balance.',
 ];

@@ -2089,4 +2089,5 @@ return [
     'member_premium_invalid_slug' => 'Utilisez des lettres minuscules, des chiffres, des traits d?union ou des underscores pour le slug du niveau de soutien.',
     'member_premium_features_array' => 'Les notes de reconnaissance doivent ?tre envoy?es sous forme de tableau de cha?nes.',
     'broker_cannot_edit_field' => 'Brokers cannot change this field. Only an administrator can.',
+    'broker_cannot_adjust_own_balance' => 'Brokers cannot adjust their own balance.',
 ];

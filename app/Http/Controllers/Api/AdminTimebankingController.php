@@ -166,6 +166,12 @@ class AdminTimebankingController extends BaseApiController
         $reason = trim($this->input('reason', ''));
 
         if (!$userId) return $this->respondWithError('VALIDATION_ERROR', __('api.user_id_required'), 'user_id', 400);
+        // Self-dealing guard: a broker/coordinator must not adjust their OWN
+        // balance (they could otherwise mint themselves time credits). Admins
+        // retain full latitude. See BrokerUserActionsAuthorizationTest.
+        if ($userId === $adminId && !$this->callerIsAdminTier()) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.broker_cannot_adjust_own_balance'), null, 403);
+        }
         if ($amount == 0) return $this->respondWithError('VALIDATION_ERROR', __('api.amount_must_be_nonzero'), 'amount', 400);
         // Reject NaN / infinity / scientific-notation silliness, and cap the
         // adjustment at a sane hour-credit ceiling so a typo can't inflate a

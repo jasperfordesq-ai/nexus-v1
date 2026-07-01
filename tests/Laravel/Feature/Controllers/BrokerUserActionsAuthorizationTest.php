@@ -125,6 +125,21 @@ class BrokerUserActionsAuthorizationTest extends TestCase
         $this->assertNotSame(403, $response->getStatusCode(), 'Broker must be allowed to adjust a member balance.');
     }
 
+    public function test_broker_cannot_adjust_their_own_balance(): void
+    {
+        $broker = $this->broker();
+        Sanctum::actingAs($broker);
+
+        // Self-dealing guard — a broker minting themselves time credits is blocked.
+        $response = $this->apiPost('/v2/admin/timebanking/adjust-balance', [
+            'user_id' => $broker->id,
+            'amount' => 10,
+            'reason' => 'Trying to credit myself',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
     // ================================================================
     // Brokers CANNOT — privilege escalation / identity / destructive
     // ================================================================

@@ -2089,4 +2089,5 @@ return [
     'member_premium_invalid_slug' => '?s?id litreacha beaga, uimhreacha, fleisc?n? n? fo-l?nte do shlug an leibh?il taca?ochta.',
     'member_premium_features_array' => 'Caithfear n?ta? aitheantais a sheoladh mar eagar teaghr?n.',
     'broker_cannot_edit_field' => 'Brokers cannot change this field. Only an administrator can.',
+    'broker_cannot_adjust_own_balance' => 'Brokers cannot adjust their own balance.',
 ];
