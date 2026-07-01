@@ -22,6 +22,7 @@ import UserPlus from 'lucide-react/icons/user-plus';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import UserCheck from 'lucide-react/icons/user-check';
 import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
 import Eye from 'lucide-react/icons/eye';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -43,6 +44,7 @@ export interface BrokerBadgeCounts {
   unreviewed_messages: number;
   monitored_users: number;
   high_risk_listings: number;
+  pending_matches: number;
 }
 
 interface BrokerSidebarProps {
@@ -94,7 +96,10 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
         { key: 'members', label: t('nav.members'), icon: Users, path: '/broker/members', badgeKey: 'pending_members' },
         { key: 'onboarding', label: t('nav.onboarding'), icon: UserPlus, path: '/broker/onboarding' },
         ...(showExchanges
-          ? ([{ key: 'exchanges', label: t('nav.exchanges'), icon: ArrowLeftRight, path: '/broker/exchanges', badgeKey: 'pending_exchanges' }] as NavItem[])
+          ? ([
+              { key: 'exchanges', label: t('nav.exchanges'), icon: ArrowLeftRight, path: '/broker/exchanges', badgeKey: 'pending_exchanges' },
+              { key: 'match-approvals', label: t('nav.match_approvals'), icon: UserCheck, path: '/broker/match-approvals', badgeKey: 'pending_matches' },
+            ] as NavItem[])
           : []),
         { key: 'messages', label: t('nav.messages'), icon: MessageSquareWarning, path: '/broker/messages', badgeKey: 'unreviewed_messages' },
       ],
@@ -144,18 +149,29 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
       <li key={item.key}>
         <Link
           to={tenantPath(item.path)}
-          className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+          aria-current={active ? 'page' : undefined}
+          className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors motion-reduce:transition-none ${
             active
               ? 'bg-accent/10 text-accent'
               : 'text-muted hover:bg-surface-secondary hover:text-foreground'
           } ${collapsed ? 'justify-center px-2' : ''}`}
         >
-          <Icon size={20} className={active ? 'text-accent' : 'text-muted'} />
+          {/* Active rail — anchors the eye to the current section */}
+          {active && (
+            <span
+              aria-hidden="true"
+              className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-accent"
+            />
+          )}
+          <Icon
+            size={20}
+            className={`shrink-0 transition-transform group-hover:scale-105 motion-reduce:transition-none ${active ? 'text-accent' : 'text-muted group-hover:text-foreground'}`}
+          />
           {!collapsed && (
             <>
               <span className="flex-1 truncate">{item.label}</span>
               {badgeCount > 0 && (
-                <Chip size="sm" color={active ? 'accent' : 'danger'} variant="tertiary" className="min-w-[24px] h-5 text-xs">
+                <Chip size="sm" color={active ? 'accent' : 'danger'} variant="tertiary" className="min-w-[24px] h-5 text-xs tabular-nums">
                   {badgeCount > 99 ? '99+' : badgeCount}
                 </Chip>
               )}
@@ -186,9 +202,11 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
       {/* Header */}
       <div className="flex h-16 items-center justify-between border-b border-divider px-3">
         {!collapsed && (
-          <Link to={tenantPath('/broker')} className="flex items-center gap-2">
-            <ShieldCheck size={22} className="text-accent" />
-            <span className="text-base font-semibold text-foreground">
+          <Link to={tenantPath('/broker')} className="flex min-w-0 items-center gap-2.5">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent ring-1 ring-inset ring-accent/20">
+              <ShieldCheck size={18} />
+            </span>
+            <span className="truncate text-base font-semibold tracking-tight text-foreground">
               {t('sidebar.title')}
             </span>
           </Link>

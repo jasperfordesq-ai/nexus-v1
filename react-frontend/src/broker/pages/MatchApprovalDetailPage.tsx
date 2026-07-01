@@ -1,0 +1,461 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Broker Match Approval Detail
+ *
+ * Full view of one smart-match proposal: score gauge with quality label,
+ * match type / distance / category, the algorithm's match reasons, both
+ * party cards, the associated listing, review details once decided, and
+ * approve / reject actions while pending. Ported from the admin matching
+ * module and restyled to the broker design language.
+ */
+
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import MapPin from 'lucide-react/icons/map-pin';
+import User from 'lucide-react/icons/user';
+import FileText from 'lucide-react/icons/file-text';
+import Clock from 'lucide-react/icons/clock';
+import UserCheck from 'lucide-react/icons/user-check';
+import Sparkles from 'lucide-react/icons/sparkles';
+
+import { usePageTitle } from '@/hooks';
+import { useTenant, useToast } from '@/contexts';
+import { adminMatching } from '@/admin/api/adminApi';
+import type { MatchApprovalDetail } from '@/admin/api/types';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Chip,
+  Textarea,
+  Progress,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Avatar,
+  Separator,
+} from '@/components/ui';
+import {
+  BrokerPageShell,
+  BrokerSkeleton,
+  BrokerEmptyState,
+  BrokerStatusChip,
+} from '../components';
+
+function scoreColor(score: number): 'danger' | 'warning' | 'success' {
+  if (score < 50) return 'danger';
+  if (score < 75) return 'warning';
+  return 'success';
+}
+
+function scoreLabelKey(score: number): string {
+  if (score >= 90) return 'matching.score_excellent';
+  if (score >= 75) return 'matching.score_good';
+  if (score >= 50) return 'matching.score_fair';
+  return 'matching.score_low';
+}
+
+const cardClass = 'rounded-2xl border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]';
+
+export function MatchApprovalDetailPage() {
+  const { t } = useTranslation('broker');
+  usePageTitle(t('matching.detail_title'));
+  const toast = useToast();
+  const { tenantPath } = useTenant();
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+
+  const [item, setItem] = useState<MatchApprovalDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [approveLoading, setApproveLoading] = useState(false);
+  const [rejectModal, setRejectModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejectLoading, setRejectLoading] = useState(false);
+
+  const loadItem = useCallback(async () => {
+    if (!id) return;
+    setLoading(true);
+    setError(null);
+    const res = await adminMatching.getApproval(Number(id));
+    if (res.success && res.data) {
+      const data = res.data as unknown;
+      if (data && typeof data === 'object' && 'data' in data) {
+        setItem((data as { data: MatchApprovalDetail }).data);
+      } else {
+        setItem(data as MatchApprovalDetail);
+      }
+    } else {
+      setError(res.error || t('matching.load_failed'));
+    }
+    setLoading(false);
+    // Fetch is keyed on the record id only — `t` lives in render scope.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  useEffect(() => {
+    loadItem();
+  }, [loadItem]);
+
+  const handleApprove = async () => {
+    if (!item) return;
+    setApproveLoading(true);
+    const res = await adminMatching.approveMatch(item.id);
+    if (res.success) {
+      toast.success(t('matching.approved_toast'));
+      loadItem();
+    } else {
+      toast.error(res.error || t('matching.approve_failed'));
+    }
+    setApproveLoading(false);
+  };
+
+  const handleReject = async () => {
+    if (!item) return;
+    if (!rejectReason.trim()) {
+      toast.error(t('matching.reject_reason_required'));
+      return;
+    }
+    setRejectLoading(true);
+    const res = await adminMatching.rejectMatch(item.id, rejectReason.trim());
+    if (res.success) {
+      toast.success(t('matching.rejected_toast'));
+      setRejectModal(false);
+      setRejectReason('');
+      loadItem();
+    } else {
+      toast.error(res.error || t('matching.reject_failed'));
+    }
+    setRejectLoading(false);
+  };
+
+  const backButton = (
+    <Button
+      variant="tertiary"
+      size="sm"
+      startContent={<ArrowLeft size={16} />}
+      onPress={() => navigate(tenantPath('/broker/match-approvals'))}
+    >
+      {t('matching.back')}
+    </Button>
+  );
+
+  if (loading) {
+    return (
+      <BrokerPageShell title={t('matching.detail_title')} icon={UserCheck} color="accent" actions={backButton}>
+        <BrokerSkeleton variant="detail" />
+      </BrokerPageShell>
+    );
+  }
+
+  if (error || !item) {
+    return (
+      <BrokerPageShell title={t('matching.detail_title')} icon={UserCheck} color="accent" actions={backButton}>
+        <BrokerEmptyState
+          icon={XCircle}
+          color="danger"
+          title={t('matching.not_found_title')}
+          hint={error || t('matching.not_found_hint')}
+          action={backButton}
+        />
+      </BrokerPageShell>
+    );
+  }
+
+  const isPending = item.status === 'pending';
+  const matchTypeKey = `matching.type_${item.match_type || 'one_way'}`;
+  const matchTypeLabel = t(matchTypeKey, {
+    defaultValue: (item.match_type || 'one_way').replace(/_/g, ' '),
+  });
+
+  return (
+    <BrokerPageShell
+      title={t('matching.detail_title')}
+      icon={UserCheck}
+      color="accent"
+      actions={backButton}
+    >
+      {/* Match score hero */}
+      <Card className={`${cardClass} mb-6`}>
+        <CardHeader className="flex items-center gap-3 pb-0">
+          <Sparkles size={20} className="text-accent" aria-hidden="true" />
+          <h3 className="text-lg font-semibold tracking-tight">{t('matching.match_information')}</h3>
+          <div className="ml-auto">
+            <BrokerStatusChip status={item.status} />
+          </div>
+        </CardHeader>
+        <CardBody>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {/* Score gauge */}
+            <div className="flex flex-col items-center justify-center rounded-xl bg-surface-secondary p-6">
+              <p className="mb-2 text-sm text-muted">{t('matching.score_label')}</p>
+              <Progress
+                size="lg"
+                value={item.match_score}
+                color={scoreColor(item.match_score)}
+                className="mb-2 w-32"
+                aria-label={t('matching.match_score_aria', { score: Math.round(item.match_score) })}
+              />
+              <p className="text-3xl font-bold tabular-nums tracking-tight text-foreground">
+                {Math.round(item.match_score)}%
+              </p>
+              <Chip size="sm" variant="soft" color={scoreColor(item.match_score)} className="mt-1">
+                {t(scoreLabelKey(item.match_score))}
+              </Chip>
+            </div>
+
+            {/* Details */}
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs text-muted">{t('matching.match_type')}</p>
+                <Chip size="sm" variant="soft" className="mt-1 capitalize">
+                  {matchTypeLabel}
+                </Chip>
+              </div>
+              {item.distance_km !== null && item.distance_km !== undefined && (
+                <div>
+                  <p className="text-xs text-muted">{t('matching.distance')}</p>
+                  <p className="flex items-center gap-1 text-sm tabular-nums text-foreground">
+                    <MapPin size={14} className="text-muted" aria-hidden="true" />
+                    {t('matching.distance_km', { km: item.distance_km.toFixed(1) })}
+                  </p>
+                </div>
+              )}
+              {item.category_name && (
+                <div>
+                  <p className="text-xs text-muted">{t('matching.category')}</p>
+                  <p className="text-sm text-foreground">{item.category_name}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Match reasons */}
+            <div>
+              <p className="mb-2 text-xs text-muted">{t('matching.match_reasons')}</p>
+              {item.match_reasons && item.match_reasons.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {item.match_reasons.map((reason, i) => (
+                    <Chip key={i} size="sm" variant="soft" color="accent">
+                      {reason}
+                    </Chip>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm italic text-muted">{t('matching.no_reasons')}</p>
+              )}
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Parties */}
+      <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <Card className={cardClass}>
+          <CardHeader className="flex items-center gap-3 pb-0">
+            <User size={18} className="text-accent" aria-hidden="true" />
+            <h3 className="font-semibold">{t('matching.matched_member')}</h3>
+          </CardHeader>
+          <CardBody>
+            <div className="flex items-start gap-4">
+              <Avatar src={item.user_1_avatar || undefined} name={item.user_1_name} size="lg" className="shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-lg font-semibold text-foreground">{item.user_1_name}</p>
+                {item.user_1_email && <p className="text-sm text-muted">{item.user_1_email}</p>}
+                {item.user_1_location && (
+                  <p className="mt-1 flex items-center gap-1 text-sm text-muted">
+                    <MapPin size={12} aria-hidden="true" />
+                    {item.user_1_location}
+                  </p>
+                )}
+                {item.user_1_bio && <p className="mt-2 line-clamp-3 text-sm text-muted">{item.user_1_bio}</p>}
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className={cardClass}>
+          <CardHeader className="flex items-center gap-3 pb-0">
+            <User size={18} className="text-success" aria-hidden="true" />
+            <h3 className="font-semibold">{t('matching.listing_owner')}</h3>
+          </CardHeader>
+          <CardBody>
+            <div className="flex items-start gap-4">
+              <Avatar src={item.user_2_avatar || undefined} name={item.user_2_name} size="lg" className="shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="text-lg font-semibold text-foreground">{item.user_2_name}</p>
+                {item.user_2_email && <p className="text-sm text-muted">{item.user_2_email}</p>}
+                {item.user_2_location && (
+                  <p className="mt-1 flex items-center gap-1 text-sm text-muted">
+                    <MapPin size={12} aria-hidden="true" />
+                    {item.user_2_location}
+                  </p>
+                )}
+                {item.user_2_bio && <p className="mt-2 line-clamp-3 text-sm text-muted">{item.user_2_bio}</p>}
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Listing */}
+      {item.listing_title && (
+        <Card className={`${cardClass} mb-6`}>
+          <CardHeader className="flex items-center gap-3 pb-0">
+            <FileText size={18} className="text-accent" aria-hidden="true" />
+            <h3 className="font-semibold">{t('matching.associated_listing')}</h3>
+          </CardHeader>
+          <CardBody>
+            <div className="space-y-2">
+              <p className="text-lg font-medium text-foreground">{item.listing_title}</p>
+              <div className="flex gap-2">
+                {item.listing_type && (
+                  <Chip size="sm" variant="soft" className="capitalize">
+                    {item.listing_type}
+                  </Chip>
+                )}
+                {item.listing_status && <BrokerStatusChip status={item.listing_status} />}
+              </div>
+              {item.listing_description && (
+                <p className="line-clamp-3 text-sm text-muted">{item.listing_description}</p>
+              )}
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Review details (once decided) */}
+      {item.reviewed_at && (
+        <Card className={`${cardClass} mb-6`}>
+          <CardHeader className="flex items-center gap-3 pb-0">
+            <Clock size={18} className="text-muted" aria-hidden="true" />
+            <h3 className="font-semibold">{t('matching.review_details')}</h3>
+          </CardHeader>
+          <CardBody>
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <p className="text-sm text-muted">{t('matching.reviewed_by')}</p>
+                <p className="text-sm font-medium text-foreground">
+                  {item.reviewer_name || t('matching.unknown')}
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <p className="text-sm text-muted">{t('matching.reviewed_at')}</p>
+                <p className="text-sm tabular-nums text-foreground">
+                  {new Date(item.reviewed_at).toLocaleString()}
+                </p>
+              </div>
+              {item.notes && (
+                <>
+                  <Separator className="my-2" />
+                  <div>
+                    <p className="mb-1 text-sm text-muted">
+                      {item.status === 'rejected'
+                        ? t('matching.reject_reason_label')
+                        : t('matching.notes_label')}
+                    </p>
+                    <p className="rounded-lg bg-surface-secondary p-3 text-sm text-foreground">{item.notes}</p>
+                  </div>
+                </>
+              )}
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Decision bar for pending items */}
+      {isPending && (
+        <Card className={cardClass}>
+          <CardBody className="flex flex-row items-center justify-end gap-3 p-4">
+            <Button
+              variant="danger-soft"
+              startContent={<XCircle size={16} />}
+              onPress={() => {
+                setRejectModal(true);
+                setRejectReason('');
+              }}
+            >
+              {t('matching.reject')}
+            </Button>
+            <Button
+              color="success"
+              startContent={<CheckCircle size={16} />}
+              onPress={handleApprove}
+              isLoading={approveLoading}
+            >
+              {t('matching.approve')}
+            </Button>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Reject modal */}
+      <Modal
+        isOpen={rejectModal}
+        onClose={() => {
+          setRejectModal(false);
+          setRejectReason('');
+        }}
+        size="md"
+      >
+        <ModalContent>
+          <ModalHeader className="flex items-center gap-2">
+            <XCircle size={20} className="text-danger" />
+            {t('matching.reject')}
+          </ModalHeader>
+          <ModalBody>
+            <p className="mb-3 text-sm text-muted">
+              {t('matching.rejecting_between', {
+                user1: item.user_1_name,
+                user2: item.user_2_name,
+              })}
+            </p>
+            <Textarea
+              label={t('matching.reject_reason_label')}
+              placeholder={t('matching.reject_reason_placeholder')}
+              value={rejectReason}
+              onValueChange={setRejectReason}
+              variant="secondary"
+              minRows={3}
+              isRequired
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="tertiary"
+              onPress={() => {
+                setRejectModal(false);
+                setRejectReason('');
+              }}
+              isDisabled={rejectLoading}
+            >
+              {t('matching.cancel')}
+            </Button>
+            <Button
+              variant="danger"
+              onPress={handleReject}
+              isLoading={rejectLoading}
+              isDisabled={!rejectReason.trim()}
+            >
+              {t('matching.reject')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </BrokerPageShell>
+  );
+}
+
+export default MatchApprovalDetailPage;

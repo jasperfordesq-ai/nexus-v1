@@ -13,6 +13,7 @@ import userEvent from '@testing-library/user-event';
 // ---------------------------------------------------------------------------
 const mockGetDashboard = vi.hoisted(() => vi.fn());
 const mockUsersList = vi.hoisted(() => vi.fn());
+const mockApprovalStats = vi.hoisted(() => vi.fn());
 
 vi.mock('@/admin/api/adminApi', () => ({
   adminBroker: {
@@ -20,6 +21,9 @@ vi.mock('@/admin/api/adminApi', () => ({
   },
   adminUsers: {
     list: mockUsersList,
+  },
+  adminMatching: {
+    getApprovalStats: mockApprovalStats,
   },
 }));
 
@@ -83,6 +87,10 @@ describe('BrokerLayout', () => {
       success: true,
       data: { data: [], meta: { total: 4 } },
     });
+    mockApprovalStats.mockResolvedValue({
+      success: true,
+      data: { pending_count: 2, approved_count: 1, rejected_count: 0, avg_approval_time: 0, approval_rate: 100 },
+    });
   });
 
   it('renders the layout shell (main element with id main-content)', () => {
@@ -107,6 +115,7 @@ describe('BrokerLayout', () => {
     await waitFor(() => {
       expect(mockGetDashboard).toHaveBeenCalledTimes(1);
       expect(mockUsersList).toHaveBeenCalledTimes(1);
+      expect(mockApprovalStats).toHaveBeenCalledTimes(1);
     });
   });
 

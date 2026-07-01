@@ -14,6 +14,7 @@ import { useAuth, useTenant } from '@/contexts';
 
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Bell from 'lucide-react/icons/bell';
+import HelpCircle from 'lucide-react/icons/circle-help';
 import LogOut from 'lucide-react/icons/log-out';
 import Menu from 'lucide-react/icons/menu';
 import User from 'lucide-react/icons/user';
@@ -67,8 +68,18 @@ export function BrokerHeader({ sidebarCollapsed, onSidebarToggle }: BrokerHeader
         )}
       </div>
 
-      {/* Right: User menu */}
+      {/* Right: Help + notifications + user menu */}
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <Button
+          isIconOnly
+          variant="tertiary"
+          size="sm"
+          onPress={() => navigate(tenantPath('/broker/help'))}
+          aria-label={t('header.help')}
+          className="hidden sm:inline-flex"
+        >
+          <HelpCircle size={18} />
+        </Button>
         <Button
           isIconOnly
           variant="tertiary"

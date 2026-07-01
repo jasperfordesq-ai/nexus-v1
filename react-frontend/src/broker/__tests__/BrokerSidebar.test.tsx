@@ -50,6 +50,7 @@ vi.mock('react-i18next', () => ({
       'nav.members': 'Members',
       'nav.onboarding': 'Onboarding',
       'nav.exchanges': 'Exchanges',
+      'nav.match_approvals': 'Match Approvals',
       'nav.messages': 'Messages',
       'nav.safeguarding': 'Safeguarding',
       'nav.vetting': 'Vetting',
@@ -74,6 +75,7 @@ const EMPTY_BADGES: BrokerBadgeCounts = {
   unreviewed_messages: 0,
   monitored_users: 0,
   high_risk_listings: 0,
+  pending_matches: 0,
 };
 
 describe('BrokerSidebar', () => {
@@ -127,5 +129,33 @@ describe('BrokerSidebar', () => {
     expect(screen.queryByText('Exchanges')).not.toBeInTheDocument();
     // Non-exchange items remain available regardless of the feature.
     expect(screen.getByText('Members')).toBeInTheDocument();
+  });
+
+  it('shows the Match Approvals nav item with its pending badge when the feature is on', () => {
+    mockUseAuth.mockReturnValue({ user: { id: 1, role: 'broker' } });
+
+    render(
+      <BrokerSidebar
+        collapsed={false}
+        onToggle={vi.fn()}
+        badges={{ ...EMPTY_BADGES, pending_matches: 7 }}
+      />
+    );
+
+    expect(screen.getByText('Match Approvals')).toBeInTheDocument();
+    expect(screen.getByText('7')).toBeInTheDocument();
+  });
+
+  it('hides the Match Approvals nav item when exchange_workflow is disabled', () => {
+    mockUseAuth.mockReturnValue({ user: { id: 1, role: 'broker' } });
+    mockUseTenant.mockReturnValue({
+      tenant: { id: 2, slug: 'test-tenant', name: 'Test Tenant' },
+      tenantPath: (path: string) => path,
+      hasFeature: (f: string) => f !== 'exchange_workflow',
+    });
+
+    render(<BrokerSidebar collapsed={false} onToggle={vi.fn()} badges={EMPTY_BADGES} />);
+
+    expect(screen.queryByText('Match Approvals')).not.toBeInTheDocument();
   });
 });

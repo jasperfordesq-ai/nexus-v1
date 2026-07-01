@@ -47,6 +47,10 @@ const VettingPage = lazy(() => import('./pages/VettingPage'));
 const ExchangesPage = lazy(() => import('./pages/ExchangesPage'));
 const MessageReviewPage = lazy(() => import('./pages/MessageReviewPage'));
 
+// Matching (gated on exchange_workflow like Exchanges)
+const MatchApprovalsPage = lazy(() => import('./pages/MatchApprovalsPage'));
+const MatchApprovalDetailPage = lazy(() => import('./pages/MatchApprovalDetailPage'));
+
 // Detail / drill-down pages
 const ExchangeDetailPage = lazy(() => import('./pages/ExchangeDetailPage'));
 const MessageDetailPage = lazy(() => import('./pages/MessageDetailPage'));
@@ -79,6 +83,11 @@ export function BrokerRoutes() {
       {/* Exchanges — gated on the exchange_workflow feature */}
       <Route path="exchanges" element={<ExchangeFeatureRoute><Lazy><ExchangesPage /></Lazy></ExchangeFeatureRoute>} />
       <Route path="exchanges/:id" element={<ExchangeFeatureRoute><Lazy><ExchangeDetailPage /></Lazy></ExchangeFeatureRoute>} />
+
+      {/* Match approvals — same feature gate as Exchanges (smart matching
+          feeds the exchange workflow; the admin sidebar gates it the same way). */}
+      <Route path="match-approvals" element={<ExchangeFeatureRoute><Lazy><MatchApprovalsPage /></Lazy></ExchangeFeatureRoute>} />
+      <Route path="match-approvals/:id" element={<ExchangeFeatureRoute><Lazy><MatchApprovalDetailPage /></Lazy></ExchangeFeatureRoute>} />
 
       {/* Messages */}
       <Route path="messages" element={<Lazy><MessageReviewPage /></Lazy>} />

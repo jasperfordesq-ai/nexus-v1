@@ -21,6 +21,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   safeguarding: 'breadcrumbs.safeguarding',
   vetting: 'breadcrumbs.vetting',
   exchanges: 'breadcrumbs.exchanges',
+  'match-approvals': 'breadcrumbs.match_approvals',
   messages: 'breadcrumbs.messages',
   monitoring: 'breadcrumbs.monitoring',
   'risk-tags': 'breadcrumbs.risk_tags',

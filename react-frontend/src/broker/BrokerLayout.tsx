@@ -15,7 +15,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { adminBroker, adminUsers } from '@/admin/api/adminApi';
+import { adminBroker, adminUsers, adminMatching } from '@/admin/api/adminApi';
+import { useTenant } from '@/contexts';
+import type { MatchApprovalStats } from '@/admin/api/types';
 import { BrokerSidebar, type BrokerBadgeCounts } from './components/BrokerSidebar';
 import { BrokerHeader } from './components/BrokerHeader';
 import { BrokerBreadcrumbs } from './components/BrokerBreadcrumbs';
@@ -28,10 +30,13 @@ const EMPTY_BADGES: BrokerBadgeCounts = {
   unreviewed_messages: 0,
   monitored_users: 0,
   high_risk_listings: 0,
+  pending_matches: 0,
 };
 
 export function BrokerLayout() {
   const { t } = useTranslation('broker');
+  const { hasFeature } = useTenant();
+  const showMatches = hasFeature('exchange_workflow');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [badges, setBadges] = useState<BrokerBadgeCounts>(EMPTY_BADGES);
@@ -47,9 +52,14 @@ export function BrokerLayout() {
 
   const fetchBadges = useCallback(async () => {
     try {
-      const [dashRes, usersRes] = await Promise.all([
+      const [dashRes, usersRes, matchRes] = await Promise.all([
         adminBroker.getDashboard(),
         adminUsers.list({ status: 'pending', limit: 1 }),
+        // Match approvals only exist on exchange_workflow tenants; a null
+        // placeholder keeps Promise.all's shape stable without the request.
+        showMatches
+          ? adminMatching.getApprovalStats(30).catch(() => null)
+          : Promise.resolve(null),
       ]);
 
       let pendingMembers = 0;
@@ -63,6 +73,16 @@ export function BrokerLayout() {
         }
       }
 
+      let pendingMatches = 0;
+      if (matchRes?.success && matchRes.data) {
+        const payload = matchRes.data as unknown;
+        const stats =
+          payload && typeof payload === 'object' && 'data' in (payload as Record<string, unknown>)
+            ? (payload as { data: MatchApprovalStats }).data
+            : (payload as MatchApprovalStats);
+        pendingMatches = Number(stats?.pending_count ?? 0);
+      }
+
       if (dashRes.success && dashRes.data) {
         const d = dashRes.data as unknown as Record<string, unknown>;
         setBadges({
@@ -73,12 +93,13 @@ export function BrokerLayout() {
           unreviewed_messages: Number(d.unreviewed_messages ?? 0),
           monitored_users: Number(d.monitored_users ?? 0),
           high_risk_listings: Number(d.high_risk_listings ?? 0),
+          pending_matches: pendingMatches,
         });
       }
     } catch {
       // Badges are non-critical — silently fail (e.g. on 401/403/network).
     }
-  }, []);
+  }, [showMatches]);
 
   useEffect(() => {
     void fetchBadges();
