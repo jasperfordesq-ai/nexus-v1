@@ -181,10 +181,13 @@ export interface FeedComment {
 
 /** Normalize author fields from API (supports both flat and nested) */
 export function getAuthor(item: FeedItem, fallbackName = '') {
+  // `||` (not `??`) on name/avatar: the API can serve an empty string for
+  // users whose name column is '' — `??` would accept it and render a
+  // nameless post with an initials-less avatar.
   return {
     id: item.author_id ?? item.author?.id ?? 0,
-    name: item.author_name ?? item.author?.name ?? fallbackName,
-    avatar: item.author_avatar ?? item.author?.avatar_url ?? null,
+    name: item.author_name || item.author?.name || fallbackName,
+    avatar: item.author_avatar || item.author?.avatar_url || null,
   };
 }
 

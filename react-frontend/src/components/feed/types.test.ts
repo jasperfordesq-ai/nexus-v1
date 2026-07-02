@@ -84,6 +84,44 @@ describe('getAuthor', () => {
     expect(author.avatar).toBeNull();
   });
 
+  it('treats empty-string name/avatar as missing (nameless gamification card regression)', () => {
+    // The API can serve author_name: '' for users whose NOT NULL name column
+    // is empty — the card must fall back instead of rendering nameless with
+    // an initials-less avatar.
+    const item: FeedItem = {
+      id: 42,
+      content: 'Reached Level 2!',
+      author_id: 42,
+      author_name: '',
+      author_avatar: '',
+      author: { id: 42, name: '', avatar_url: '' },
+      created_at: '2026-01-01',
+      type: 'level_up',
+      likes_count: 0,
+      comments_count: 0,
+      is_liked: false,
+    };
+    const author = getAuthor(item, 'Unknown member');
+    expect(author.name).toBe('Unknown member');
+    expect(author.avatar).toBeNull();
+  });
+
+  it('falls back to nested name when flat name is empty', () => {
+    const item: FeedItem = {
+      id: 1,
+      content: 'test',
+      author_id: 10,
+      author_name: '',
+      author: { id: 10, name: 'Nested Name', avatar_url: null },
+      created_at: '2026-01-01',
+      type: 'post',
+      likes_count: 0,
+      comments_count: 0,
+      is_liked: false,
+    };
+    expect(getAuthor(item).name).toBe('Nested Name');
+  });
+
   it('handles null avatar gracefully', () => {
     const item: FeedItem = {
       id: 1,

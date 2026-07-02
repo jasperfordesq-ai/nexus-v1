@@ -134,7 +134,11 @@ class FeedService
                 'feed_activity.metadata',
                 'feed_activity.group_id',
                 'feed_activity.created_at',
-                DB::raw("COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name"),
+                // NULLIF guards: users.name is NOT NULL, so a plain COALESCE
+                // never reaches the first/last fallback and an empty name ('')
+                // renders as a nameless post. Same expression as the admin
+                // moderation list in AdminFeedController::index.
+                DB::raw("COALESCE(NULLIF(u.name, ''), NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), '')) as author_name"),
                 'u.avatar_url as author_avatar',
                 'u.location as user_location',
             ]);

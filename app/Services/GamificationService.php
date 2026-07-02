@@ -533,12 +533,17 @@ class GamificationService
             ]);
         }
 
-        // Create feed activity post for badge earned
+        // Create feed activity post for badge earned. source_id = user id: the
+        // uq_tenant_source unique key then collapses to ONE card per user
+        // (their latest badge) instead of one per tenant. A literal 0 here
+        // collapsed every member's badge into a single shared row whose author
+        // was silently rewritten by each award, and the feed served it with
+        // id=0, which no UI action (admin delete included) could address.
         try {
             $tenantId = TenantContext::getId();
             /** @var FeedActivityService $feedActivityService */
             $feedActivityService = app(FeedActivityService::class);
-            $feedActivityService->recordActivity($tenantId, $userId, 'badge_earned', 0, [
+            $feedActivityService->recordActivity($tenantId, $userId, 'badge_earned', $userId, [
                 'title' => $badge['name'],
                 'content' => "Earned the \"{$badge['name']}\" badge!",
                 'metadata' => [
@@ -692,12 +697,14 @@ class GamificationService
                     ]);
                 }
 
-                // Create feed activity post for level up
+                // Create feed activity post for level up. source_id = user id
+                // so each user has their own card (latest level) — see the
+                // matching comment in awardBadge() for why 0 was a bug.
                 try {
                     $tenantId = TenantContext::getId();
                     /** @var FeedActivityService $feedActivityService */
                     $feedActivityService = app(FeedActivityService::class);
-                    $feedActivityService->recordActivity($tenantId, $userId, 'level_up', 0, [
+                    $feedActivityService->recordActivity($tenantId, $userId, 'level_up', $userId, [
                         'title' => "Level $newLevel",
                         'content' => "Reached Level $newLevel!",
                         'metadata' => [
