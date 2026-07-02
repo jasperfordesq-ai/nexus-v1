@@ -113,8 +113,24 @@ class MatchingService
             if (isset($preferences['notify_mutual_matches'])) {
                 $data['notify_mutual_matches'] = $preferences['notify_mutual_matches'] ? 1 : 0;
             }
+            if (isset($preferences['matching_paused'])) {
+                $data['matching_paused'] = $preferences['matching_paused'] ? 1 : 0;
+            }
+            if (isset($preferences['availability']) && is_array($preferences['availability'])) {
+                $data['availability'] = json_encode(array_values($preferences['availability']), JSON_UNESCAPED_UNICODE);
+            }
 
             $categories = $preferences['categories'] ?? null;
+
+            // The engine reads the canonical `categories` JSON column — the
+            // side table below is legacy-only. (Previously the JSON column was
+            // never written, so saved category preferences never reached the
+            // matching engine.)
+            if (is_array($categories)) {
+                $data['categories'] = count($categories) > 0
+                    ? json_encode(array_values(array_map('intval', $categories)))
+                    : null;
+            }
 
             DB::table('match_preferences')->updateOrInsert(
                 ['user_id' => $userId, 'tenant_id' => $tenantId],
@@ -165,16 +181,33 @@ class MatchingService
                 return self::DEFAULT_PREFERENCES;
             }
 
-            // Isolated try/catch: the table may not exist — a failed categories
-            // read must not discard the saved preferences row already loaded.
-            try {
-                $categories = DB::table('match_preference_categories')
-                    ->where('user_id', $userId)
-                    ->pluck('category_id')
-                    ->map(fn ($id) => (int) $id)
-                    ->all();
-            } catch (\Throwable $e) {
-                $categories = [];
+            // Canonical source is the `categories` JSON column (what the
+            // engine reads); the legacy side table is the fallback.
+            $categories = [];
+            if (!empty($row->categories)) {
+                $decoded = json_decode((string) $row->categories, true);
+                if (is_array($decoded)) {
+                    $categories = array_values(array_map('intval', $decoded));
+                }
+            }
+            if (empty($categories)) {
+                try {
+                    $categories = DB::table('match_preference_categories')
+                        ->where('user_id', $userId)
+                        ->pluck('category_id')
+                        ->map(fn ($id) => (int) $id)
+                        ->all();
+                } catch (\Throwable $e) {
+                    $categories = [];
+                }
+            }
+
+            $availability = [];
+            if (!empty($row->availability)) {
+                $decoded = json_decode((string) $row->availability, true);
+                if (is_array($decoded)) {
+                    $availability = array_values(array_filter($decoded, 'is_string'));
+                }
             }
 
             return [
@@ -183,7 +216,9 @@ class MatchingService
                 'notification_frequency' => $row->notification_frequency ?? self::DEFAULT_PREFERENCES['notification_frequency'],
                 'notify_hot_matches'     => (bool) ($row->notify_hot_matches ?? self::DEFAULT_PREFERENCES['notify_hot_matches']),
                 'notify_mutual_matches'  => (bool) ($row->notify_mutual_matches ?? self::DEFAULT_PREFERENCES['notify_mutual_matches']),
+                'matching_paused'        => (bool) ($row->matching_paused ?? false),
                 'categories'             => $categories,
+                'availability'           => $availability,
             ];
         } catch (\Throwable $e) {
             return self::DEFAULT_PREFERENCES;

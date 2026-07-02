@@ -5,13 +5,13 @@
   "heading": "I Tuoi Abbinamenti",
   "subtitle": "Scopri connessioni tra annunci, lavori, volontariato e gruppi",
   "refresh": "Aggiorna",
+  "preferences_link": "Abbina le preferenze",
   "stats_total_matches": "Abbinamenti Totali",
   "stats_avg_score": "Punteggio Medio",
   "stats_hot_matches": "Abbinamenti Top",
-  "stats_source_types": "Tipi di Fonte",
   "filter_all": "Tutti",
+  "filter_mutual_only": "Solo partite reciproche",
   "source_listing": "Annuncio",
-  "source_job": "Lavoro",
   "source_volunteering": "Volontariato",
   "source_group": "Gruppo",
   "empty_title_all": "Nessun abbinamento ancora",
@@ -29,5 +29,112 @@
     "title": "Corrispondenze"
   },
   "filter_tabs_aria": "Corrispondenza filtro di origine",
-  "loading": "Caricamento partite..."
+  "loading": "Caricamento partite...",
+  "banner": {
+    "no_coords_title": "Aggiungi la tua posizione per vedere le corrispondenze nelle vicinanze",
+    "no_coords_desc": "Non possiamo calcolare corrispondenze basate sulla distanza finché il tuo profilo non ha una posizione. Puoi ancora vedere le corrispondenze di seguito in base ad altri segnali.",
+    "paused_title": "La corrispondenza è in pausa",
+    "paused_desc": "Non riceverai nuovi suggerimenti o notifiche di abbinamento finché non riprenderai l'abbinamento nelle tue preferenze.",
+    "mutual_title": "Mostra corrispondenze reciproche",
+    "mutual_desc": "Queste partite vanno in entrambe le direzioni: tu sei perfetto per loro e loro sono perfetti per te.",
+    "show_all": "Mostra tutte le corrispondenze"
+  },
+  "card": {
+    "mutual": "Corrispondenza reciproca",
+    "save": "Salva partita",
+    "dismiss": "Non interessato",
+    "view_group": "Visualizza gruppo",
+    "distance_km": "{{value}} km",
+    "remote": "Remote",
+    "message": "Message",
+    "join": "Join",
+    "joined": "Joined"
+  },
+  "explanation": {
+    "ai_caption": "Spiegazione generata dall'intelligenza artificiale in base al tuo profilo e alla tua attività"
+  },
+  "breakdown": {
+    "title": "Perché questo punteggio?",
+    "signals": {
+      "category": "Corrispondenza di categoria",
+      "skill": "Partita di abilità",
+      "semantic": "Somiglianza nella descrizione",
+      "activity": "Livello di attività",
+      "trust_tier": "Livello di fiducia",
+      "completion": "Tasso di completamento",
+      "proximity": "Proximity",
+      "availability": "Availability",
+      "reviews": "Reviews"
+    },
+    "pillars": {
+      "relevance": "Relevance",
+      "feasibility": "Feasibility",
+      "trust": "Trust"
+    }
+  },
+  "dismiss_reasons": {
+    "not_relevant": "Non rilevante",
+    "too_far": "Troppo lontano",
+    "already_done": "Già fatto",
+    "not_my_skills": "Non le mie capacità",
+    "not_interested": "Non interessato",
+    "other": "Other"
+  },
+  "empty": {
+    "no_coordinates_title": "Abbiamo bisogno della tua posizione per trovare corrispondenze",
+    "no_coordinates_description": "Aggiungi una località al tuo profilo in modo che possiamo trovare elenchi, gruppi e opportunità vicino a te.",
+    "set_location_cta": "Imposta la tua posizione",
+    "no_listings_title": "La corrispondenza funziona dalle tue inserzioni",
+    "no_listings_description": "Crea un elenco per iniziare a trovare persone, gruppi e opportunità che corrispondono a ciò che offri o di cui hai bisogno.",
+    "create_listing_cta": "Crea un elenco",
+    "adjust_preferences_cta": "Modifica le preferenze di corrispondenza"
+  },
+  "preferences": {
+    "subtitle": "Controlla il modo in cui Smart Matching trova e ti avvisa sulle connessioni.",
+    "load_failed": "Impossibile caricare le tue preferenze di corrispondenza",
+    "save": "Salva le preferenze",
+    "save_success": "Preferenze di corrispondenza salvate",
+    "save_failed": "Impossibile salvare le preferenze di corrispondenza",
+    "unsaved_changes": "Sono presenti modifiche non salvate",
+    "pause": {
+      "title": "Metti in pausa la corrispondenza",
+      "description": "Quando è in pausa, non riceverai nuovi suggerimenti o notifiche sulle corrispondenze.",
+      "active_description": "La corrispondenza è sospesa: non riceverai nuovi suggerimenti o notifiche finché non riprenderai."
+    },
+    "thresholds": {
+      "title": "Distanza e qualità",
+      "no_location_title": "Aggiungi una posizione per utilizzare la corrispondenza basata sulla distanza",
+      "no_location_desc": "Imposta la tua posizione nel tuo profilo per ottenere partite classificate in base a quanto sono vicine a te.",
+      "distance_label": "Distanza massima",
+      "quality_label": "Qualità di corrispondenza minima",
+      "distance_value": "{{value}} km",
+      "quality_value": "{{value}}%"
+    },
+    "categories": {
+      "title": "Interessi di categoria",
+      "description": "Scegli le categorie in cui desideri essere abbinato. Lascia tutto deselezionato per corrispondere a tutte le categorie.",
+      "empty": "Nessuna categoria è ancora disponibile."
+    },
+    "notifications": {
+      "frequency_label": "Abbina la frequenza digest",
+      "hot_matches": "Avvisi di partite calde",
+      "hot_matches_desc": "Ricevi subito notifiche su partite eccezionalmente forti.",
+      "mutual_matches": "Avvisi di corrispondenza reciproca",
+      "mutual_matches_desc": "Ricevi una notifica quando una partita va in entrambe le direzioni.",
+      "title": "Notifications",
+      "daily": "Daily",
+      "fortnightly": "Fortnightly",
+      "monthly": "Monthly",
+      "never": "Never"
+    },
+    "page_title": "Match Preferences",
+    "page_meta_title": "Match Preferences",
+    "breadcrumb": "Preferences",
+    "heading": "Match Preferences"
+  },
+  "stats_source_types": "Tipi di Fonte",
+  "source_job": "Lavoro",
+  "stats_mutual_matches": "Mutual Matches",
+  "filter_people_listings": "Listings",
+  "source_event": "Event"
 }

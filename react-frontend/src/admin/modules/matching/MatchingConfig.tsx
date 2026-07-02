@@ -1,4 +1,4 @@
-import { Card, CardBody, CardHeader, Input, Button, Spinner, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Switch, Select, SelectItem, Tooltip, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Slider } from '@/components/ui';
@@ -7,12 +7,13 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Trash2 from 'lucide-react/icons/trash-2';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
+import Lock from 'lucide-react/icons/lock';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import { ConfirmModal } from '../../components/ConfirmModal';
-import type { SmartMatchingConfig } from '../../api/types';
+import type { SmartMatchingConfig, MatchingGatesConfig, MatchingAiConfig } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -101,6 +102,44 @@ export function MatchingConfig() {
         bands[index] = { distance_km: 0, score: 0, ...bands[index], [field]: value };
         return { ...prev, proximity_bands: bands };
       });
+      setDirty(true);
+    },
+    []
+  );
+
+  /** Update a field within gates config */
+  const updateGate = useCallback(
+    <K extends keyof MatchingGatesConfig>(key: K, value: MatchingGatesConfig[K]) => {
+      setConfig((prev) => ({
+        ...prev,
+        gates: {
+          geo_hard_gate: true,
+          missing_coords_mode: 'remote_only',
+          dormancy_days: 0,
+          owner_dismissal_threshold: 0,
+          ...prev.gates,
+          [key]: value,
+        },
+      }));
+      setDirty(true);
+    },
+    []
+  );
+
+  /** Update a field within AI config */
+  const updateAi = useCallback(
+    <K extends keyof MatchingAiConfig>(key: K, value: MatchingAiConfig[K]) => {
+      setConfig((prev) => ({
+        ...prev,
+        ai: {
+          semantic_signal: false,
+          llm_explanations: false,
+          explanation_top_n: 3,
+          available: prev.ai?.available ?? false,
+          ...prev.ai,
+          [key]: value,
+        },
+      }));
       setDirty(true);
     },
     []
@@ -357,6 +396,136 @@ export function MatchingConfig() {
             </div>
           </CardBody>
         </Card>
+
+        {/* Gates & Intelligence */}
+        {config.gates && (
+          <Card>
+            <CardHeader className="px-4 pt-4 pb-0">
+              <h3 className="font-semibold">{t('matching.gates_intelligence')}</h3>
+            </CardHeader>
+            <CardBody className="px-4 pb-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">{t('matching.hard_distance_gate')}</p>
+                    <p className="text-xs text-muted">
+                      {t('matching.hard_distance_gate_desc')}
+                    </p>
+                  </div>
+                  <Switch
+                    isSelected={config.gates.geo_hard_gate}
+                    onValueChange={(val) => updateGate('geo_hard_gate', val)}
+                    aria-label={t('matching.hard_distance_gate')}
+                  />
+                </div>
+                <Separator />
+                <div>
+                  <Select
+                    label={t('matching.missing_coords_mode_label')}
+                    description={t('matching.missing_coords_mode_desc')}
+                    selectedKeys={[config.gates.missing_coords_mode]}
+                    onSelectionChange={(keys) => {
+                      const val = Array.from(keys)[0] as MatchingGatesConfig['missing_coords_mode'];
+                      if (val) updateGate('missing_coords_mode', val);
+                    }}
+                    variant="secondary"
+                  >
+                    <SelectItem key="remote_only" id="remote_only">
+                      {t('matching.missing_coords_mode_remote_only')}
+                    </SelectItem>
+                    <SelectItem key="tenant_wide" id="tenant_wide">
+                      {t('matching.missing_coords_mode_tenant_wide')}
+                    </SelectItem>
+                  </Select>
+                </div>
+                <Separator />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Input
+                    type="number"
+                    label={t('matching.label_dormancy_days')}
+                    description={t('matching.dormancy_days_desc')}
+                    value={String(config.gates.dormancy_days)}
+                    onValueChange={(val) => updateGate('dormancy_days', parseInt(val) || 0)}
+                    variant="secondary"
+                    size="sm"
+                    min={0}
+                  />
+                  <Input
+                    type="number"
+                    label={t('matching.label_owner_dismissal_threshold')}
+                    description={t('matching.owner_dismissal_threshold_desc')}
+                    value={String(config.gates.owner_dismissal_threshold)}
+                    onValueChange={(val) => updateGate('owner_dismissal_threshold', parseInt(val) || 0)}
+                    variant="secondary"
+                    size="sm"
+                    min={0}
+                  />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <p className="text-sm font-medium">{t('matching.ai_semantic_matching')}</p>
+                      <p className="text-xs text-muted">{t('matching.ai_semantic_matching_desc')}</p>
+                    </div>
+                    {config.ai?.available === false && (
+                      <Tooltip content={t('matching.ai_configure_provider_first')}>
+                        <Chip size="sm" color="warning" variant="soft" startContent={<Lock size={10} />}>
+                          {t('matching.ai_unavailable')}
+                        </Chip>
+                      </Tooltip>
+                    )}
+                  </div>
+                  <Switch
+                    isSelected={config.ai?.semantic_signal ?? false}
+                    onValueChange={(val) => updateAi('semantic_signal', val)}
+                    isDisabled={config.ai?.available === false}
+                    aria-label={t('matching.ai_semantic_matching')}
+                  />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <p className="text-sm font-medium">{t('matching.ai_match_explanations')}</p>
+                      <p className="text-xs text-muted">{t('matching.ai_match_explanations_desc')}</p>
+                    </div>
+                    {config.ai?.available === false && (
+                      <Tooltip content={t('matching.ai_configure_provider_first')}>
+                        <Chip size="sm" color="warning" variant="soft" startContent={<Lock size={10} />}>
+                          {t('matching.ai_unavailable')}
+                        </Chip>
+                      </Tooltip>
+                    )}
+                  </div>
+                  <Switch
+                    isSelected={config.ai?.llm_explanations ?? false}
+                    onValueChange={(val) => updateAi('llm_explanations', val)}
+                    isDisabled={config.ai?.available === false}
+                    aria-label={t('matching.ai_match_explanations')}
+                  />
+                </div>
+                <Separator />
+                <Input
+                  type="number"
+                  label={t('matching.label_explanation_top_n')}
+                  description={t('matching.explanation_top_n_desc')}
+                  value={String(config.ai?.explanation_top_n ?? 3)}
+                  onValueChange={(val) => {
+                    const parsed = parseInt(val) || 1;
+                    updateAi('explanation_top_n', Math.min(10, Math.max(1, parsed)));
+                  }}
+                  variant="secondary"
+                  size="sm"
+                  min={1}
+                  max={10}
+                  isDisabled={config.ai?.available === false}
+                  className="sm:max-w-xs"
+                />
+              </div>
+            </CardBody>
+          </Card>
+        )}
 
         {/* Proximity Bands */}
         <Card >

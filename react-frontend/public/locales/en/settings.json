@@ -341,7 +341,8 @@
     "daily": "Daily",
     "monthly": "Monthly",
     "fortnightly": "Fortnightly",
-    "never": "Never"
+    "never": "Never",
+    "manage_in_preferences": "Match notifications are managed in Match Preferences"
   },
   "activity_digest": {
     "off": "Off",

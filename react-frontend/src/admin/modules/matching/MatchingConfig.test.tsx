@@ -47,32 +47,41 @@ vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 // ─── Stub heavy admin components ──────────────────────────────────────────────
-vi.mock('../../components', () => ({
-  PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
-    <div data-testid="page-header">
+// The real component imports PageHeader/ConfirmModal from their own files
+// ('../../components/PageHeader', '../../components/ConfirmModal'), not the
+// barrel ('../../components'), so both specifiers must be mocked.
+const mockPageHeader = ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
+  <div data-testid="page-header">
+    <span>{title}</span>
+    {actions}
+  </div>
+);
+
+const mockConfirmModal = ({
+  isOpen,
+  onConfirm,
+  onClose,
+  title,
+}: {
+  isOpen: boolean;
+  onConfirm: () => void;
+  onClose: () => void;
+  title: string;
+}) =>
+  isOpen ? (
+    <div role="dialog" aria-label="Dialog" data-testid="confirm-modal">
       <span>{title}</span>
-      {actions}
+      <button onClick={onConfirm}>Confirm</button>
+      <button onClick={onClose}>Cancel</button>
     </div>
-  ),
-  ConfirmModal: ({
-    isOpen,
-    onConfirm,
-    onClose,
-    title,
-  }: {
-    isOpen: boolean;
-    onConfirm: () => void;
-    onClose: () => void;
-    title: string;
-  }) =>
-    isOpen ? (
-      <div role="dialog" aria-label="Dialog" data-testid="confirm-modal">
-        <span>{title}</span>
-        <button onClick={onConfirm}>Confirm</button>
-        <button onClick={onClose}>Cancel</button>
-      </div>
-    ) : null,
+  ) : null;
+
+vi.mock('../../components', () => ({
+  PageHeader: mockPageHeader,
+  ConfirmModal: mockConfirmModal,
 }));
+vi.mock('../../components/PageHeader', () => ({ PageHeader: mockPageHeader }));
+vi.mock('../../components/ConfirmModal', () => ({ ConfirmModal: mockConfirmModal }));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 const makeConfig = (overrides = {}) => ({

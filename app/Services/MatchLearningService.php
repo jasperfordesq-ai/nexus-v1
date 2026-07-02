@@ -84,6 +84,58 @@ class MatchLearningService
     }
 
     /**
+     * Batched owner-interaction boosts for a set of candidate owners — one
+     * grouped query instead of getHistoricalBoost()'s per-candidate lookups.
+     * Same weights/decay/clamp semantics as getOwnerInteractionBoost().
+     *
+     * @param int[] $ownerIds
+     * @return array<int, float> ownerId => boost (clamped ±10)
+     */
+    public function getOwnerInteractionBoosts(int $userId, array $ownerIds): array
+    {
+        $tenantId = TenantContext::getId();
+        $ownerIds = array_values(array_unique(array_filter(array_map('intval', $ownerIds))));
+        if (empty($ownerIds)) {
+            return [];
+        }
+
+        try {
+            $placeholders = implode(',', array_fill(0, count($ownerIds), '?'));
+            $rows = DB::select(
+                "SELECT l.user_id as owner_id, mh.action, COUNT(*) as cnt, MAX(mh.created_at) as latest_at
+                 FROM match_history mh
+                 JOIN listings l ON mh.listing_id = l.id
+                 WHERE mh.user_id = ? AND mh.tenant_id = ? AND l.user_id IN ($placeholders)
+                 GROUP BY l.user_id, mh.action",
+                array_merge([$userId, $tenantId], $ownerIds)
+            );
+
+            $boosts = [];
+            foreach ($rows as $row) {
+                $ownerId = (int) $row->owner_id;
+                $weight = self::ACTION_WEIGHTS[$row->action] ?? 0.0;
+                $count = min((int) $row->cnt, 10);
+
+                $decay = 1.0;
+                if ($row->latest_at) {
+                    $ageDays = max(0, (time() - strtotime($row->latest_at)) / 86400);
+                    $decay = pow(0.5, $ageDays / self::DECAY_HALF_LIFE_DAYS);
+                }
+
+                $boosts[$ownerId] = ($boosts[$ownerId] ?? 0.0) + $weight * $count * $decay;
+            }
+
+            return array_map(fn ($b) => max(-10.0, min(10.0, $b)), $boosts);
+        } catch (\Throwable $e) {
+            Log::warning('[MatchLearningService] getOwnerInteractionBoosts failed', [
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+            return [];
+        }
+    }
+
+    /**
      * Record a user interaction with a listing for future learning.
      *
      * @param int    $userId    User who interacted

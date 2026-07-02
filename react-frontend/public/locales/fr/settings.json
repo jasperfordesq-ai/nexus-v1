@@ -341,7 +341,8 @@
     "daily": "Quotidien",
     "monthly": "Mensuel",
     "fortnightly": "Bimensuel",
-    "never": "Jamais"
+    "never": "Jamais",
+    "manage_in_preferences": "Les notifications de match sont gérées dans les préférences de match"
   },
   "activity_digest": {
     "off": "Désactivé",

@@ -81,7 +81,10 @@
   },
   "suggestions": {
     "empty": "Brak sugestii na razie",
-    "empty_description": "Dopasowania poprawiają się w miarę dodawania kolejnych ogłoszeń i szczegółów profilu."
+    "empty_description": "Dopasowania poprawiają się w miarę dodawania kolejnych ogłoszeń i szczegółów profilu.",
+    "see_all_matches": "Zobacz wszystkie mecze",
+    "score_chip": "{{score}}%",
+    "distance_chip": "{{value}} km"
   },
   "groups": {
     "members_count": "{{count}} członków",

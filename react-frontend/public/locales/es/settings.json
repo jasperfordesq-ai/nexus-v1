@@ -341,7 +341,8 @@
     "daily": "Diario",
     "monthly": "Mensual",
     "fortnightly": "Quincenal",
-    "never": "Nunca"
+    "never": "Nunca",
+    "manage_in_preferences": "Las notificaciones de partidos se gestionan en Preferencias de partidos."
   },
   "activity_digest": {
     "off": "Desactivado",

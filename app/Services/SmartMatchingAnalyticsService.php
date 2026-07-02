@@ -214,6 +214,134 @@ class SmartMatchingAnalyticsService
     }
 
     /**
+     * Gate impact + data-readiness metrics for the hard-gate era: how many
+     * members/listings the geo gates can actually work with, how many members
+     * sit in degraded (no-coordinates) mode, feedback-reason mix, and the
+     * engine-version mix of the current cache.
+     */
+    public function getGateImpact(): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $result = [
+            'degraded_users_count' => 0,
+            'active_users_count' => 0,
+            'listings_without_coords' => 0,
+            'remote_listings_count' => 0,
+            'active_listings_count' => 0,
+            'dismiss_reasons' => [],
+            'algorithm_version_mix' => [],
+        ];
+
+        try {
+            $result['degraded_users_count'] = (int) (DB::selectOne(
+                "SELECT COUNT(*) as cnt FROM users
+                 WHERE tenant_id = ? AND status = 'active'
+                   AND (latitude IS NULL OR latitude = 0 OR longitude IS NULL OR longitude = 0)",
+                [$tenantId]
+            )->cnt ?? 0);
+            $result['active_users_count'] = (int) (DB::selectOne(
+                "SELECT COUNT(*) as cnt FROM users WHERE tenant_id = ? AND status = 'active'",
+                [$tenantId]
+            )->cnt ?? 0);
+
+            $result['listings_without_coords'] = (int) (DB::selectOne(
+                "SELECT COUNT(*) as cnt FROM listings l
+                 JOIN users u ON l.user_id = u.id
+                 WHERE l.tenant_id = ? AND l.status = 'active'
+                   AND l.service_type IN ('physical_only', 'location_dependent')
+                   AND COALESCE(l.latitude, NULLIF(u.latitude, 0)) IS NULL",
+                [$tenantId]
+            )->cnt ?? 0);
+            $result['remote_listings_count'] = (int) (DB::selectOne(
+                "SELECT COUNT(*) as cnt FROM listings
+                 WHERE tenant_id = ? AND status = 'active' AND service_type IN ('remote_only', 'hybrid')",
+                [$tenantId]
+            )->cnt ?? 0);
+            $result['active_listings_count'] = (int) (DB::selectOne(
+                "SELECT COUNT(*) as cnt FROM listings WHERE tenant_id = ? AND status = 'active'",
+                [$tenantId]
+            )->cnt ?? 0);
+        } catch (\Exception $e) {
+            Log::error('[MatchingAnalytics] getGateImpact user/listing counts failed', ['error' => $e->getMessage()]);
+        }
+
+        try {
+            $reasons = DB::select(
+                "SELECT COALESCE(reason, 'other') as reason, COUNT(*) as cnt
+                 FROM match_dismissals WHERE tenant_id = ?
+                 GROUP BY COALESCE(reason, 'other') ORDER BY cnt DESC",
+                [$tenantId]
+            );
+            foreach ($reasons as $row) {
+                $result['dismiss_reasons'][(string) $row->reason] = (int) $row->cnt;
+            }
+        } catch (\Exception $e) {
+            // match_dismissals may not exist — non-fatal.
+        }
+
+        try {
+            $versions = DB::select(
+                "SELECT algorithm_version, COUNT(*) as cnt FROM match_cache
+                 WHERE tenant_id = ? GROUP BY algorithm_version",
+                [$tenantId]
+            );
+            foreach ($versions as $row) {
+                $result['algorithm_version_mix'][(string) $row->algorithm_version] = (int) $row->cnt;
+            }
+        } catch (\Exception $e) {
+            // algorithm_version column may pre-date the v2 migration — non-fatal.
+        }
+
+        return $result;
+    }
+
+    /**
+     * Average pillar values across the cached v2 matches (parsed from
+     * score_breakdown JSON). Sampled at up to 2000 recent rows to bound cost.
+     */
+    public function getPillarAverages(): array
+    {
+        $tenantId = TenantContext::getId();
+        $sums = ['relevance' => 0.0, 'feasibility' => 0.0, 'trust' => 0.0];
+        $count = 0;
+
+        try {
+            $rows = DB::select(
+                "SELECT score_breakdown FROM match_cache
+                 WHERE tenant_id = ? AND score_breakdown IS NOT NULL
+                 ORDER BY created_at DESC LIMIT 2000",
+                [$tenantId]
+            );
+
+            foreach ($rows as $row) {
+                $decoded = json_decode((string) $row->score_breakdown, true);
+                if (!is_array($decoded) || !isset($decoded['pillars'])) {
+                    continue;
+                }
+                foreach ($sums as $pillar => $_) {
+                    if (isset($decoded['pillars'][$pillar]) && is_numeric($decoded['pillars'][$pillar])) {
+                        $sums[$pillar] += (float) $decoded['pillars'][$pillar];
+                    }
+                }
+                $count++;
+            }
+        } catch (\Exception $e) {
+            // Column may not exist yet — return empty averages.
+            return ['sample_size' => 0, 'pillars' => []];
+        }
+
+        if ($count === 0) {
+            return ['sample_size' => 0, 'pillars' => []];
+        }
+
+        return [
+            'sample_size' => $count,
+            'pillars' => array_map(fn ($sum) => round($sum / $count, 3), $sums),
+        ];
+    }
+
+    /**
      * Get the match conversion funnel (generated -> viewed -> contacted -> completed).
      */
     public function getConversionFunnel(): array

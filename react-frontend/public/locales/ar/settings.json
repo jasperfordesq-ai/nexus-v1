@@ -341,7 +341,8 @@
     "daily": "يومياً",
     "monthly": "شهريًا",
     "fortnightly": "كل أسبوعين",
-    "never": "أبداً"
+    "never": "أبداً",
+    "manage_in_preferences": "تتم إدارة إشعارات المطابقة في تفضيلات المطابقة"
   },
   "activity_digest": {
     "off": "إيقاف",

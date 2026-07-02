@@ -495,11 +495,11 @@ class GroupRecommendationEngine
                         COUNT(DISTINCT gm2.id) as member_count
                  FROM connections c
                  JOIN group_members gm ON gm.user_id = CASE
-                     WHEN c.requester_id = ? THEN c.addressee_id ELSE c.requester_id END
+                     WHEN c.requester_id = ? THEN c.receiver_id ELSE c.requester_id END
                  JOIN `groups` g ON g.id = gm.group_id
                  LEFT JOIN group_types gt ON g.type_id = gt.id
                  LEFT JOIN group_members gm2 ON gm2.group_id = g.id AND gm2.status = 'active'
-                 WHERE (c.requester_id = ? OR c.addressee_id = ?)
+                 WHERE (c.requester_id = ? OR c.receiver_id = ?)
                    AND c.status = 'accepted' AND c.tenant_id = ?
                    AND g.tenant_id = ? AND g.status = 'active'
                    AND (g.visibility IS NULL OR g.visibility = 'public')

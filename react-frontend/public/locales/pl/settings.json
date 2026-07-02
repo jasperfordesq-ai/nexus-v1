@@ -341,7 +341,8 @@
     "daily": "Codziennie",
     "monthly": "Miesięcznie",
     "fortnightly": "Co dwa tygodnie",
-    "never": "Nigdy"
+    "never": "Nigdy",
+    "manage_in_preferences": "Powiadomieniami o meczach zarządza się w Preferencjach meczu"
   },
   "activity_digest": {
     "off": "Wyłączone",

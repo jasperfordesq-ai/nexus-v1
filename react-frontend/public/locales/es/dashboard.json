@@ -81,7 +81,10 @@
   },
   "suggestions": {
     "empty": "Aún no hay sugerencias",
-    "empty_description": "Las coincidencias mejoran a medida que se añaden más anuncios y detalles del perfil."
+    "empty_description": "Las coincidencias mejoran a medida que se añaden más anuncios y detalles del perfil.",
+    "see_all_matches": "Ver todos los partidos",
+    "score_chip": "{{score}}%",
+    "distance_chip": "{{value}} km"
   },
   "groups": {
     "members_count": "{{count}} miembros",

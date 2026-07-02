@@ -38,6 +38,13 @@
   "member_status": "Lid",
   "private_title": "Privé groep",
   "public_title": "Openbare groep",
+  "recommended": {
+    "title": "Aanbevolen voor jou",
+    "joined": "Aangesloten bij groep",
+    "view": "View",
+    "join": "Join",
+    "score_chip": "{{score}}% match"
+  },
   "welcome": {
     "title": "Welkomstbericht",
     "toggle_label": "Welkomstbericht inschakelen",

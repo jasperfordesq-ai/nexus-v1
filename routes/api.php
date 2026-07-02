@@ -3019,7 +3019,10 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 // Matching routes — auth:sanctum required (controller uses $this->requireAuth())
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/v2/matches/all', [\App\Http\Controllers\Api\MatchingController::class, 'allMatches']);
-    Route::post('/v2/matches/{id}/dismiss', [\App\Http\Controllers\Api\MatchingController::class, 'dismiss']);
+    Route::post('/v2/matches/{id}/dismiss', [\App\Http\Controllers\Api\MatchingController::class, 'dismiss'])->whereNumber('id');
+    // Typed variant — supports non-listing sources (groups etc.)
+    Route::post('/v2/matches/{sourceType}/{sourceId}/dismiss', [\App\Http\Controllers\Api\MatchingController::class, 'dismissTyped'])
+        ->whereAlpha('sourceType')->whereNumber('sourceId');
 });
 
 // ============================================

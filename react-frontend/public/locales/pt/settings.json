@@ -341,7 +341,8 @@
     "daily": "Diário",
     "monthly": "Mensal",
     "fortnightly": "Quinzenal",
-    "never": "Nunca"
+    "never": "Nunca",
+    "manage_in_preferences": "As notificações de partidas são gerenciadas nas Preferências de Partidas"
   },
   "activity_digest": {
     "off": "Desativado",

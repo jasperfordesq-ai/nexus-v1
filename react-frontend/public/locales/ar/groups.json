@@ -38,6 +38,13 @@
   "member_status": "عضو",
   "private_title": "مجموعة خاصة",
   "public_title": "مجموعة عامة",
+  "recommended": {
+    "title": "موصى به لك",
+    "joined": "انضمت للمجموعة",
+    "view": "View",
+    "join": "Join",
+    "score_chip": "{{score}}% match"
+  },
   "welcome": {
     "title": "رسالة ترحيب",
     "toggle_label": "تفعيل رسالة الترحيب",

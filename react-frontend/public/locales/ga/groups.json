@@ -38,6 +38,13 @@
   "member_status": "Comhalta",
   "private_title": "Grúpa príobháideach",
   "public_title": "Grúpa poiblí",
+  "recommended": {
+    "title": "Molta duit",
+    "joined": "Glacadh leis an ngrúpa",
+    "view": "View",
+    "join": "Join",
+    "score_chip": "{{score}}% match"
+  },
   "welcome": {
     "title": "Teachtaireacht failte",
     "toggle_label": "Cumasaigh teachtaireacht failte",

@@ -5,13 +5,13 @@
   "heading": "Do Mheaitseanna",
   "subtitle": "Aimsigh ceangail trasna liostuithe, poist, obair dheonach, agus grúpaí",
   "refresh": "Athnuaigh",
+  "preferences_link": "Meaitseáil sainroghanna",
   "stats_total_matches": "Meaitseanna Iomlána",
   "stats_avg_score": "Meánscór",
   "stats_hot_matches": "Meaitseanna Teo",
-  "stats_source_types": "Cineálacha Foinse",
   "filter_all": "Gach",
+  "filter_mutual_only": "Cluichí frithpháirteacha amháin",
   "source_listing": "Liostú",
-  "source_job": "Post",
   "source_volunteering": "Obair Dheonach",
   "source_group": "Grúpa",
   "empty_title_all": "Níl meaitseanna ann fós",
@@ -29,5 +29,112 @@
     "title": "Meaitseálacha"
   },
   "filter_tabs_aria": "Comhoiriúnaigh an scagaire foinse",
-  "loading": "Meaitseálacha á lódáil..."
+  "loading": "Meaitseálacha á lódáil...",
+  "banner": {
+    "no_coords_title": "Cuir do shuíomh leis chun cluichí in aice láimhe a fheiceáil",
+    "no_coords_desc": "Ní féidir linn meaitseálacha faidbhunaithe a ríomh go dtí go bhfuil suíomh ag do phróifíl. Is féidir leat cluichí a fheiceáil thíos fós bunaithe ar chomharthaí eile.",
+    "paused_title": "Cuirtear an meaitseáil ar sos",
+    "paused_desc": "Ní bhfaighidh tú moltaí nó fógraí meaitseála nua go dtí go dtosóidh tú ag meaitseáil i do shainroghanna.",
+    "mutual_title": "Meaitseálacha frithpháirteacha á dtaispeáint",
+    "mutual_desc": "Téann na cluichí seo ar an dá bhealach - tá tú iontach oiriúnach dóibh, agus tá siad iontach oiriúnach duit.",
+    "show_all": "Taispeáin gach cluiche"
+  },
+  "card": {
+    "mutual": "Cluiche frithpháirteach",
+    "save": "Sábháil cluiche",
+    "dismiss": "Níl suim acu ann",
+    "view_group": "Féach ar ghrúpa",
+    "distance_km": "{{value}} km",
+    "remote": "Remote",
+    "message": "Message",
+    "join": "Join",
+    "joined": "Joined"
+  },
+  "explanation": {
+    "ai_caption": "Míniú a ghintear le AI bunaithe ar do phróifíl agus ar do ghníomhaíocht"
+  },
+  "breakdown": {
+    "title": "Cén fáth an scór seo?",
+    "signals": {
+      "category": "Meaitseáil chatagóir",
+      "skill": "Cluiche scile",
+      "semantic": "Cosúlacht cur síos",
+      "activity": "Leibhéal gníomhaíochta",
+      "trust_tier": "Sraith iontaobhais",
+      "completion": "Ráta críochnaithe",
+      "proximity": "Proximity",
+      "availability": "Availability",
+      "reviews": "Reviews"
+    },
+    "pillars": {
+      "relevance": "Relevance",
+      "feasibility": "Feasibility",
+      "trust": "Trust"
+    }
+  },
+  "dismiss_reasons": {
+    "not_relevant": "Ní bhaineann",
+    "too_far": "I bhfad ar shiúl",
+    "already_done": "Déanta cheana féin",
+    "not_my_skills": "Ní mo scileanna",
+    "not_interested": "Níl suim acu ann",
+    "other": "Other"
+  },
+  "empty": {
+    "no_coordinates_title": "Teastaíonn do shuíomh uainn chun meaitseanna a aimsiú",
+    "no_coordinates_description": "Cuir suíomh le do phróifíl ionas gur féidir linn liostaí, grúpaí agus deiseanna a aimsiú gar duit.",
+    "set_location_cta": "Socraigh do shuíomh",
+    "no_listings_title": "Oibreacha meaitseála ó do liostaí",
+    "no_listings_description": "Cruthaigh liosta le tosú ag aimsiú daoine, grúpaí, agus deiseanna a thagann leis an méid a thairgeann tú nó a theastaíonn uait.",
+    "create_listing_cta": "Cruthaigh liostú",
+    "adjust_preferences_cta": "Coigeartaigh sainroghanna meaitseála"
+  },
+  "preferences": {
+    "subtitle": "Rialú ar an gcaoi a aimsíonn Meaitseáil Chliste agus a thugann sé fógra duit faoi naisc.",
+    "load_failed": "Theip ar do shainroghanna meaitseála a lódáil",
+    "save": "Sábháil sainroghanna",
+    "save_success": "Sábháladh na sainroghanna meaitseála",
+    "save_failed": "Theip ar shábháil roghanna meaitseála",
+    "unsaved_changes": "Tá athruithe gan sábháil agat",
+    "pause": {
+      "title": "Cuir meaitseáil ar sos",
+      "description": "Nuair a bheidh tú ar sos, ní bhfaighidh tú moltaí nó fógraí meaitseála nua.",
+      "active_description": "Tá an meaitseáil curtha ar sos - ní bhfaighidh tú moltaí nó fógraí nua go dtí go n-atosóidh tú."
+    },
+    "thresholds": {
+      "title": "Fad agus cáilíocht",
+      "no_location_title": "Cuir suíomh leis chun meaitseáil chianbhunaithe a úsáid",
+      "no_location_desc": "Socraigh do shuíomh i do phróifíl chun cluichí a rangú de réir cé chomh gar duit agus atá siad.",
+      "distance_label": "Fad uasta",
+      "quality_label": "Íoschaighdeán cluiche",
+      "distance_value": "{{value}} km",
+      "quality_value": "{{value}}%"
+    },
+    "categories": {
+      "title": "Leasanna catagóir",
+      "description": "Roghnaigh na catagóirí ar mhaith leat a bheith meaitseáilte orthu. Fág gach rud gan ticeáil le bheith ag meaitseáil ar gach catagóir.",
+      "empty": "Níl aon chatagóir ar fáil go fóill."
+    },
+    "notifications": {
+      "frequency_label": "Meaitseáil minicíocht díolama",
+      "hot_matches": "Foláirimh te cluiche",
+      "hot_matches_desc": "Faigh fógra láithreach faoi chluichí thar a bheith láidir.",
+      "mutual_matches": "Foláirimh maidir le cluiche frithpháirteach",
+      "mutual_matches_desc": "Faigh fógra nuair a théann cluiche ar an dá bhealach.",
+      "title": "Notifications",
+      "daily": "Daily",
+      "fortnightly": "Fortnightly",
+      "monthly": "Monthly",
+      "never": "Never"
+    },
+    "page_title": "Match Preferences",
+    "page_meta_title": "Match Preferences",
+    "breadcrumb": "Preferences",
+    "heading": "Match Preferences"
+  },
+  "stats_source_types": "Cineálacha Foinse",
+  "source_job": "Post",
+  "stats_mutual_matches": "Mutual Matches",
+  "filter_people_listings": "Listings",
+  "source_event": "Event"
 }

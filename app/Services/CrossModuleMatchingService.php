@@ -21,7 +21,7 @@ class CrossModuleMatchingService
 {
     public function __construct(
         private readonly SmartMatchingEngine $smartMatchingEngine,
-        private readonly MatchLearningService $matchLearningService,
+        private readonly GroupMatchingService $groupMatchingService,
     ) {}
 
     /**
@@ -44,10 +44,11 @@ class CrossModuleMatchingService
         $modules = $options['modules'] ?? ['listings', 'groups', 'volunteering', 'events'];
 
         $allMatches = [];
+        $engineMeta = null;
 
         try {
             if (in_array('listings', $modules, true)) {
-                $listingMatches = $this->getListingMatches($userId, $tenantId, $minScore, $limit, $debug);
+                $listingMatches = $this->getListingMatches($userId, $tenantId, $minScore, $limit, $debug, $engineMeta);
                 $allMatches = array_merge($allMatches, $listingMatches);
             }
 
@@ -72,23 +73,9 @@ class CrossModuleMatchingService
             ]);
         }
 
-        // Apply learning boosts/penalties from historical interactions
-        foreach ($allMatches as &$match) {
-            if (($match['module'] ?? '') === 'listing' && isset($match['listing_id'])) {
-                $boost = $this->matchLearningService->getHistoricalBoost($userId, $match);
-                $match['match_score'] = max(0, min(100, $match['match_score'] + $boost));
-            }
-        }
-        unset($match);
-
-        // Filter dismissed matches
-        $dismissedIds = $this->getDismissedListingIds($userId, $tenantId);
-        $allMatches = array_filter($allMatches, function ($m) use ($dismissedIds) {
-            if (($m['module'] ?? '') === 'listing' && isset($m['listing_id'])) {
-                return !in_array((int) $m['listing_id'], $dismissedIds, true);
-            }
-            return true;
-        });
+        // Learning boosts and dismissal filtering for listing matches now live
+        // INSIDE SmartMatchingEngine (batched, and included in the warmed
+        // cache) — applying them again here would double-count.
 
         // Sort by score descending
         usort($allMatches, fn($a, $b) => ($b['match_score'] ?? 0) <=> ($a['match_score'] ?? 0));
@@ -110,6 +97,13 @@ class CrossModuleMatchingService
                 'total' => count($allMatches),
                 'modules' => $modules,
                 'min_score' => $minScore,
+                // Degraded-mode signals from the matching engine — the frontend
+                // uses these to prompt users without a location / without listings.
+                'needs_location' => (bool) ($engineMeta['needs_location'] ?? false),
+                'degraded' => (bool) ($engineMeta['degraded'] ?? false),
+                'degraded_reason' => $engineMeta['degraded_reason'] ?? null,
+                'has_active_listings' => $engineMeta['has_active_listings'] ?? null,
+                'paused' => (bool) ($engineMeta['paused'] ?? false),
             ],
         ];
     }
@@ -117,15 +111,41 @@ class CrossModuleMatchingService
     /**
      * Get listing-based matches from SmartMatchingEngine.
      */
-    private function getListingMatches(int $userId, int $tenantId, int $minScore, int $limit, bool $debug): array
+    private function getListingMatches(int $userId, int $tenantId, int $minScore, int $limit, bool $debug, ?array &$engineMeta = null): array
     {
         try {
             $raw = $this->smartMatchingEngine->findMatchesForUser($userId, [
                 'min_score' => $minScore,
                 'limit' => $limit,
-            ]);
+            ], $engineMeta);
 
-            return array_map(function ($match) use ($debug) {
+            // Cached LLM explanations (AI tenants): matches are computed live,
+            // but explanations are generated asynchronously into match_cache —
+            // join them in by listing id (one query, silently absent when the
+            // column/rows don't exist).
+            $explanations = [];
+            try {
+                $listingIds = array_values(array_filter(array_map(
+                    fn ($m) => (int) ($m['id'] ?? 0),
+                    $raw
+                )));
+                if (!empty($listingIds)) {
+                    $placeholders = implode(',', array_fill(0, count($listingIds), '?'));
+                    $rows = DB::select(
+                        "SELECT listing_id, explanation FROM match_cache
+                         WHERE tenant_id = ? AND user_id = ? AND explanation IS NOT NULL
+                           AND listing_id IN ($placeholders)",
+                        array_merge([$tenantId, $userId], $listingIds)
+                    );
+                    foreach ($rows as $row) {
+                        $explanations[(int) $row->listing_id] = (string) $row->explanation;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Pre-migration schema or cold cache — algorithmic reasons remain.
+            }
+
+            return array_map(function ($match) use ($debug, $explanations) {
                 $result = [
                     'module' => 'listing',
                     'listing_id' => (int) ($match['id'] ?? 0),
@@ -139,7 +159,15 @@ class CrossModuleMatchingService
                     'match_score' => (float) ($match['match_score'] ?? 0),
                     'match_type' => $match['match_type'] ?? 'one_way',
                     'match_reasons' => $match['match_reasons'] ?? [],
-                    'distance_km' => isset($match['distance_km']) ? (float) $match['distance_km'] : null,
+                    'distance_km' => isset($match['distance_km']) && is_numeric($match['distance_km'])
+                        ? (float) $match['distance_km'] : null,
+                    'is_remote' => ($match['service_type'] ?? 'physical_only') === 'remote_only',
+                    'is_mutual' => ($match['match_type'] ?? '') === 'mutual',
+                    'explanation' => $explanations[(int) ($match['id'] ?? 0)] ?? null,
+                    'explanation_source' => isset($explanations[(int) ($match['id'] ?? 0)]) ? 'ai' : 'algorithmic',
+                    // Pillar/signal breakdown feeds the member "why this score"
+                    // panel (v2 engine only; null on the v1 rollback path).
+                    'score_breakdown' => $match['score_breakdown'] ?? null,
                     'matched_listing' => $match['matched_listing'] ?? null,
                     'created_at' => $match['created_at'] ?? null,
                 ];
@@ -160,53 +188,15 @@ class CrossModuleMatchingService
     }
 
     /**
-     * Get group recommendations based on user's skills and categories.
+     * Get group matches — delegates to GroupMatchingService, which serves the
+     * cron-warmed group_match_cache backed by GroupRecommendationEngine
+     * (CF + content + location + activity fusion). The old implementation here
+     * was keyword-Jaccard against the newest groups.
      */
     private function getGroupMatches(int $userId, int $tenantId, int $minScore, int $limit): array
     {
         try {
-            // Get user's skills and category interests from their listings
-            $userSkills = $this->getUserSkillKeywords($userId, $tenantId);
-            $userCategoryIds = $this->getUserCategoryIds($userId, $tenantId);
-
-            // Get groups the user is NOT already a member of
-            $groups = DB::select(
-                "SELECT g.id, g.name, g.description, g.image_url, g.visibility,
-                        g.location, g.latitude, g.longitude,
-                        g.created_at,
-                        (SELECT COUNT(*) FROM group_members gm WHERE gm.group_id = g.id) as member_count
-                 FROM `groups` g
-                 WHERE g.tenant_id = ?
-                   AND g.id NOT IN (
-                       SELECT gm2.group_id FROM group_members gm2 WHERE gm2.user_id = ?
-                   )
-                 ORDER BY g.created_at DESC
-                 LIMIT ?",
-                [$tenantId, $userId, $limit * 2]
-            );
-
-            $matches = [];
-            foreach ($groups as $group) {
-                $score = $this->scoreGroupMatch($group, $userSkills, $userCategoryIds);
-                if ($score >= $minScore) {
-                    $matches[] = [
-                        'module' => 'group',
-                        'group_id' => (int) $group->id,
-                        'title' => $group->name,
-                        'description' => mb_substr($group->description ?? '', 0, 200),
-                        'image_url' => $group->image_url ?? null,
-                        'member_count' => (int) $group->member_count,
-                        'visibility' => $group->visibility ?? 'public',
-                        'match_score' => $score,
-                        'match_type' => 'group_recommendation',
-                        'match_reasons' => ['Group matches your interests'],
-                        'distance_km' => null,
-                        'created_at' => $group->created_at ?? null,
-                    ];
-                }
-            }
-
-            return array_slice($matches, 0, $limit);
+            return $this->groupMatchingService->getMatchesForUser($userId, $minScore, $limit);
         } catch (\Throwable $e) {
             Log::warning('[CrossModuleMatchingService] Group matches failed', [
                 'user_id' => $userId,
@@ -351,24 +341,6 @@ class CrossModuleMatchingService
     // =========================================================================
 
     /**
-     * Get listing IDs the user has dismissed.
-     */
-    private function getDismissedListingIds(int $userId, int $tenantId): array
-    {
-        try {
-            return DB::table('match_dismissals')
-                ->where('tenant_id', $tenantId)
-                ->where('user_id', $userId)
-                ->pluck('listing_id')
-                ->map(fn($id) => (int) $id)
-                ->all();
-        } catch (\Throwable $e) {
-            Log::debug('[CrossModuleMatching] getDismissedListingIds failed: ' . $e->getMessage());
-            return [];
-        }
-    }
-
-    /**
      * Get the user's skill keywords extracted from their profile.
      */
     private function getUserSkillKeywords(int $userId, int $tenantId): array
@@ -412,31 +384,6 @@ class CrossModuleMatchingService
             Log::debug('[CrossModuleMatching] getUserCategoryIds failed: ' . $e->getMessage());
             return [];
         }
-    }
-
-    /**
-     * Score a group match based on text similarity to user skills.
-     */
-    private function scoreGroupMatch(object $group, array $userSkills, array $userCategoryIds): float
-    {
-        $score = 25; // Base score for any group
-
-        // Text relevance
-        $textScore = $this->scoreTextRelevance(
-            $userSkills,
-            ($group->name ?? '') . ' ' . ($group->description ?? '')
-        );
-        $score += $textScore * 0.5;
-
-        // Popularity boost
-        $memberCount = (int) ($group->member_count ?? 0);
-        if ($memberCount >= 10) {
-            $score += 10;
-        } elseif ($memberCount >= 5) {
-            $score += 5;
-        }
-
-        return min(90, $score);
     }
 
     /**
