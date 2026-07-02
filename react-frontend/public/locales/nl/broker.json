@@ -10,7 +10,8 @@
     "section_compliance": "Compliance en toezicht",
     "section_records": "Dossiers",
     "section_settings": "Instellingen",
-    "nav_label": "Makelaar navigatie"
+    "nav_label": "Makelaar navigatie",
+    "section_moderation": "Moderation"
   },
   "header": {
     "toggle_sidebar": "Zijbalk in- of uitschakelen",
@@ -38,7 +39,13 @@
     "archives": "Beoordelingsarchief",
     "configuration": "Configuratie",
     "help": "Hulp",
-    "match_approvals": "Matchgoedkeuringen"
+    "match_approvals": "Matchgoedkeuringen",
+    "moderation_queue": "Content Queue",
+    "moderation_feed": "Feed Posts",
+    "moderation_comments": "Comments",
+    "moderation_reviews": "Reviews",
+    "moderation_reports": "Reports",
+    "safeguarding_options": "Safeguarding Options"
   },
   "breadcrumbs": {
     "aria_label": "Broodkruimelnavigatie",
@@ -55,7 +62,14 @@
     "archives": "Beoordelingsarchief",
     "configuration": "Configuratie",
     "help": "Hulp",
-    "match_approvals": "Matchgoedkeuringen"
+    "match_approvals": "Matchgoedkeuringen",
+    "moderation": "Moderation",
+    "moderation_queue": "Content Queue",
+    "moderation_feed": "Feed Posts",
+    "moderation_comments": "Comments",
+    "moderation_reviews": "Reviews",
+    "moderation_reports": "Reports",
+    "safeguarding_options": "Safeguarding Options"
   },
   "dashboard": {
     "title": "Makelaardashboard",
@@ -1443,5 +1457,29 @@
     "unknown": "Onbekend",
     "not_found_title": "Match niet gevonden",
     "not_found_hint": "Deze matchgoedkeuring is mogelijk verwijderd, of de link is onjuist."
+  },
+  "moderation_queue": {
+    "title": "Content Queue",
+    "description": "Review content awaiting moderation before it goes live."
+  },
+  "moderation_feed": {
+    "title": "Feed Moderation",
+    "description": "Review and moderate posts, listings, events, and other feed content."
+  },
+  "moderation_comments": {
+    "title": "Comments Moderation",
+    "description": "Review and moderate member comments across the community."
+  },
+  "moderation_reviews": {
+    "title": "Reviews Moderation",
+    "description": "Review, flag, and moderate member reviews."
+  },
+  "moderation_reports": {
+    "title": "Reports",
+    "description": "Triage and resolve member reports about content and other members."
+  },
+  "safeguarding_options": {
+    "title": "Safeguarding Options",
+    "description": "Configure the safeguarding declaration options members can select."
   }
 }

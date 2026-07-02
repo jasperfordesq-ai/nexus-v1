@@ -10,7 +10,8 @@
     "section_compliance": "コンプライアンスと監督",
     "section_records": "記録",
     "section_settings": "設定",
-    "nav_label": "ブローカーのナビゲーション"
+    "nav_label": "ブローカーのナビゲーション",
+    "section_moderation": "Moderation"
   },
   "header": {
     "toggle_sidebar": "サイドバーを切り替え",
@@ -38,7 +39,13 @@
     "archives": "レビューアーカイブ",
     "configuration": "設定",
     "help": "ヘルプ",
-    "match_approvals": "マッチ承認"
+    "match_approvals": "マッチ承認",
+    "moderation_queue": "Content Queue",
+    "moderation_feed": "Feed Posts",
+    "moderation_comments": "Comments",
+    "moderation_reviews": "Reviews",
+    "moderation_reports": "Reports",
+    "safeguarding_options": "Safeguarding Options"
   },
   "breadcrumbs": {
     "aria_label": "パンくずナビゲーション",
@@ -55,7 +62,14 @@
     "archives": "レビューアーカイブ",
     "configuration": "設定",
     "help": "ヘルプ",
-    "match_approvals": "マッチ承認"
+    "match_approvals": "マッチ承認",
+    "moderation": "Moderation",
+    "moderation_queue": "Content Queue",
+    "moderation_feed": "Feed Posts",
+    "moderation_comments": "Comments",
+    "moderation_reviews": "Reviews",
+    "moderation_reports": "Reports",
+    "safeguarding_options": "Safeguarding Options"
   },
   "dashboard": {
     "title": "ブローカーダッシュボード",
@@ -1443,5 +1457,29 @@
     "unknown": "不明",
     "not_found_title": "マッチが見つかりません",
     "not_found_hint": "このマッチ承認は削除されたか、リンクが間違っている可能性があります。"
+  },
+  "moderation_queue": {
+    "title": "Content Queue",
+    "description": "Review content awaiting moderation before it goes live."
+  },
+  "moderation_feed": {
+    "title": "Feed Moderation",
+    "description": "Review and moderate posts, listings, events, and other feed content."
+  },
+  "moderation_comments": {
+    "title": "Comments Moderation",
+    "description": "Review and moderate member comments across the community."
+  },
+  "moderation_reviews": {
+    "title": "Reviews Moderation",
+    "description": "Review, flag, and moderate member reviews."
+  },
+  "moderation_reports": {
+    "title": "Reports",
+    "description": "Triage and resolve member reports about content and other members."
+  },
+  "safeguarding_options": {
+    "title": "Safeguarding Options",
+    "description": "Configure the safeguarding declaration options members can select."
   }
 }

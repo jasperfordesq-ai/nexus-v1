@@ -24,6 +24,11 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import UserCheck from 'lucide-react/icons/user-check';
 import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
+import ShieldPlus from 'lucide-react/icons/shield-plus';
+import MessageSquare from 'lucide-react/icons/message-square';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import Star from 'lucide-react/icons/star';
+import Flag from 'lucide-react/icons/flag';
 import Eye from 'lucide-react/icons/eye';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import FileText from 'lucide-react/icons/file-text';
@@ -70,13 +75,15 @@ interface NavSection {
 export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProps) {
   const { t } = useTranslation('broker');
   const location = useLocation();
-  const { tenantPath, tenant, hasFeature } = useTenant();
+  const { tenantPath, tenant, hasFeature, hasModule } = useTenant();
   const { user } = useAuth();
 
   // Exchanges is the only broker surface that depends on the exchange_workflow
   // feature; the rest of the panel (compliance, members, monitoring) is always
   // available to brokers. Hide the nav item on tenants without the feature.
   const showExchanges = hasFeature('exchange_workflow');
+  const showFeedModeration = hasModule('feed');
+  const showReviewsModeration = hasFeature('reviews');
 
   // Check if user also has admin access for the "Full Admin" link.
   const hasAdminAccess = hasAdminPanelAccess(user);
@@ -105,10 +112,26 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
       ],
     },
     {
+      key: 'moderation',
+      title: t('sidebar.section_moderation'),
+      items: [
+        { key: 'moderation-queue', label: t('nav.moderation_queue'), icon: ShieldPlus, path: '/broker/moderation/queue' },
+        ...(showFeedModeration
+          ? ([{ key: 'moderation-feed', label: t('nav.moderation_feed'), icon: MessageSquare, path: '/broker/moderation/feed' }] as NavItem[])
+          : []),
+        { key: 'moderation-comments', label: t('nav.moderation_comments'), icon: MessageCircle, path: '/broker/moderation/comments' },
+        ...(showReviewsModeration
+          ? ([{ key: 'moderation-reviews', label: t('nav.moderation_reviews'), icon: Star, path: '/broker/moderation/reviews' }] as NavItem[])
+          : []),
+        { key: 'moderation-reports', label: t('nav.moderation_reports'), icon: Flag, path: '/broker/moderation/reports' },
+      ],
+    },
+    {
       key: 'compliance',
       title: t('sidebar.section_compliance'),
       items: [
         { key: 'safeguarding', label: t('nav.safeguarding'), icon: ShieldAlert, path: '/broker/safeguarding', badgeKey: 'safeguarding_alerts' },
+        { key: 'safeguarding-options', label: t('nav.safeguarding_options'), icon: SlidersHorizontal, path: '/broker/safeguarding-options' },
         { key: 'vetting', label: t('nav.vetting'), icon: ShieldCheck, path: '/broker/vetting', badgeKey: 'vetting_expiring' },
         { key: 'monitoring', label: t('nav.monitoring'), icon: Eye, path: '/broker/monitoring', badgeKey: 'monitored_users' },
         { key: 'risk-tags', label: t('nav.risk_tags'), icon: AlertTriangle, path: '/broker/risk-tags', badgeKey: 'high_risk_listings' },
@@ -137,7 +160,11 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
     if (path === '/broker' || path === `${tenant?.slug ? `/${tenant.slug}` : ''}/broker`) {
       return current === tenantPath('/broker') || current === tenantPath('/broker/');
     }
-    return current.startsWith(tenantPath(path));
+    // Exact match or a `/`-delimited descendant only — a bare prefix match
+    // would light "/broker/safeguarding" for "/broker/safeguarding-options"
+    // (and any other sibling whose path is a string prefix of another).
+    const target = tenantPath(path);
+    return current === target || current.startsWith(target + '/');
   };
 
   const renderItem = (item: NavItem) => {

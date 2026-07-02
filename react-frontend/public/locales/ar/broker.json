@@ -10,7 +10,8 @@
     "section_compliance": "الامتثال والإشراف",
     "section_records": "السجلات",
     "section_settings": "الإعدادات",
-    "nav_label": "الملاحة وسيط"
+    "nav_label": "الملاحة وسيط",
+    "section_moderation": "Moderation"
   },
   "header": {
     "toggle_sidebar": "تبديل الشريط الجانبي",
@@ -38,7 +39,13 @@
     "archives": "أرشيف المراجعات",
     "configuration": "الإعدادات",
     "help": "المساعدة",
-    "match_approvals": "موافقات التطابق"
+    "match_approvals": "موافقات التطابق",
+    "moderation_queue": "Content Queue",
+    "moderation_feed": "Feed Posts",
+    "moderation_comments": "Comments",
+    "moderation_reviews": "Reviews",
+    "moderation_reports": "Reports",
+    "safeguarding_options": "Safeguarding Options"
   },
   "breadcrumbs": {
     "aria_label": "تنقل فتات الخبز",
@@ -55,7 +62,14 @@
     "archives": "أرشيف المراجعة",
     "configuration": "الإعدادات",
     "help": "المساعدة",
-    "match_approvals": "موافقات التطابق"
+    "match_approvals": "موافقات التطابق",
+    "moderation": "Moderation",
+    "moderation_queue": "Content Queue",
+    "moderation_feed": "Feed Posts",
+    "moderation_comments": "Comments",
+    "moderation_reviews": "Reviews",
+    "moderation_reports": "Reports",
+    "safeguarding_options": "Safeguarding Options"
   },
   "dashboard": {
     "title": "لوحة تحكم الوسيط",
@@ -1443,5 +1457,29 @@
     "unknown": "غير معروف",
     "not_found_title": "التطابق غير موجود",
     "not_found_hint": "ربما تمت إزالة موافقة التطابق هذه، أو أن الرابط خاطئ."
+  },
+  "moderation_queue": {
+    "title": "Content Queue",
+    "description": "Review content awaiting moderation before it goes live."
+  },
+  "moderation_feed": {
+    "title": "Feed Moderation",
+    "description": "Review and moderate posts, listings, events, and other feed content."
+  },
+  "moderation_comments": {
+    "title": "Comments Moderation",
+    "description": "Review and moderate member comments across the community."
+  },
+  "moderation_reviews": {
+    "title": "Reviews Moderation",
+    "description": "Review, flag, and moderate member reviews."
+  },
+  "moderation_reports": {
+    "title": "Reports",
+    "description": "Triage and resolve member reports about content and other members."
+  },
+  "safeguarding_options": {
+    "title": "Safeguarding Options",
+    "description": "Configure the safeguarding declaration options members can select."
   }
 }

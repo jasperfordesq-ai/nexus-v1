@@ -10,7 +10,8 @@
     "section_compliance": "Zgodność i nadzór",
     "section_records": "Rekordy",
     "section_settings": "Ustawienia",
-    "nav_label": "Nawigacja brokera"
+    "nav_label": "Nawigacja brokera",
+    "section_moderation": "Moderation"
   },
   "header": {
     "toggle_sidebar": "Przełącz pasek boczny",
@@ -38,7 +39,13 @@
     "archives": "Archiwum przeglądów",
     "configuration": "Konfiguracja",
     "help": "Pomoc",
-    "match_approvals": "Zatwierdzenia dopasowań"
+    "match_approvals": "Zatwierdzenia dopasowań",
+    "moderation_queue": "Content Queue",
+    "moderation_feed": "Feed Posts",
+    "moderation_comments": "Comments",
+    "moderation_reviews": "Reviews",
+    "moderation_reports": "Reports",
+    "safeguarding_options": "Safeguarding Options"
   },
   "breadcrumbs": {
     "aria_label": "Nawigacja okruszkowa",
@@ -55,7 +62,14 @@
     "archives": "Archiwum przeglądu",
     "configuration": "Konfiguracja",
     "help": "Pomoc",
-    "match_approvals": "Zatwierdzenia dopasowań"
+    "match_approvals": "Zatwierdzenia dopasowań",
+    "moderation": "Moderation",
+    "moderation_queue": "Content Queue",
+    "moderation_feed": "Feed Posts",
+    "moderation_comments": "Comments",
+    "moderation_reviews": "Reviews",
+    "moderation_reports": "Reports",
+    "safeguarding_options": "Safeguarding Options"
   },
   "dashboard": {
     "title": "Panel brokera",
@@ -1443,5 +1457,29 @@
     "unknown": "Nieznane",
     "not_found_title": "Nie znaleziono dopasowania",
     "not_found_hint": "To zatwierdzenie dopasowania mogło zostać usunięte, albo link jest nieprawidłowy."
+  },
+  "moderation_queue": {
+    "title": "Content Queue",
+    "description": "Review content awaiting moderation before it goes live."
+  },
+  "moderation_feed": {
+    "title": "Feed Moderation",
+    "description": "Review and moderate posts, listings, events, and other feed content."
+  },
+  "moderation_comments": {
+    "title": "Comments Moderation",
+    "description": "Review and moderate member comments across the community."
+  },
+  "moderation_reviews": {
+    "title": "Reviews Moderation",
+    "description": "Review, flag, and moderate member reviews."
+  },
+  "moderation_reports": {
+    "title": "Reports",
+    "description": "Triage and resolve member reports about content and other members."
+  },
+  "safeguarding_options": {
+    "title": "Safeguarding Options",
+    "description": "Configure the safeguarding declaration options members can select."
   }
 }

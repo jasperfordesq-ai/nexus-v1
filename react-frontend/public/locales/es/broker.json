@@ -10,7 +10,8 @@
     "section_compliance": "Cumplimiento y supervisión",
     "section_records": "Registros",
     "section_settings": "Ajustes",
-    "nav_label": "Navegación del corredor"
+    "nav_label": "Navegación del corredor",
+    "section_moderation": "Moderation"
   },
   "header": {
     "toggle_sidebar": "Alternar barra lateral",
@@ -38,7 +39,13 @@
     "archives": "Archivo de revisiones",
     "configuration": "Configuración",
     "help": "Ayuda",
-    "match_approvals": "Aprobaciones de coincidencias"
+    "match_approvals": "Aprobaciones de coincidencias",
+    "moderation_queue": "Content Queue",
+    "moderation_feed": "Feed Posts",
+    "moderation_comments": "Comments",
+    "moderation_reviews": "Reviews",
+    "moderation_reports": "Reports",
+    "safeguarding_options": "Safeguarding Options"
   },
   "breadcrumbs": {
     "aria_label": "Navegación de migas de pan",
@@ -55,7 +62,14 @@
     "archives": "Archivo de revisión",
     "configuration": "Configuración",
     "help": "Ayuda",
-    "match_approvals": "Aprobaciones de coincidencias"
+    "match_approvals": "Aprobaciones de coincidencias",
+    "moderation": "Moderation",
+    "moderation_queue": "Content Queue",
+    "moderation_feed": "Feed Posts",
+    "moderation_comments": "Comments",
+    "moderation_reviews": "Reviews",
+    "moderation_reports": "Reports",
+    "safeguarding_options": "Safeguarding Options"
   },
   "dashboard": {
     "title": "Tablero del Corredor",
@@ -1443,5 +1457,29 @@
     "unknown": "Desconocido",
     "not_found_title": "Coincidencia no encontrada",
     "not_found_hint": "Es posible que esta aprobación de coincidencia se haya eliminado, o que el enlace sea incorrecto."
+  },
+  "moderation_queue": {
+    "title": "Content Queue",
+    "description": "Review content awaiting moderation before it goes live."
+  },
+  "moderation_feed": {
+    "title": "Feed Moderation",
+    "description": "Review and moderate posts, listings, events, and other feed content."
+  },
+  "moderation_comments": {
+    "title": "Comments Moderation",
+    "description": "Review and moderate member comments across the community."
+  },
+  "moderation_reviews": {
+    "title": "Reviews Moderation",
+    "description": "Review, flag, and moderate member reviews."
+  },
+  "moderation_reports": {
+    "title": "Reports",
+    "description": "Triage and resolve member reports about content and other members."
+  },
+  "safeguarding_options": {
+    "title": "Safeguarding Options",
+    "description": "Configure the safeguarding declaration options members can select."
   }
 }

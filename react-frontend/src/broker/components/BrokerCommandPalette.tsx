@@ -28,6 +28,11 @@ import ShieldAlert from 'lucide-react/icons/shield-alert';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
+import ShieldPlus from 'lucide-react/icons/shield-plus';
+import MessageSquare from 'lucide-react/icons/message-square';
+import MessageCircle from 'lucide-react/icons/message-circle';
+import Star from 'lucide-react/icons/star';
+import Flag from 'lucide-react/icons/flag';
 import Eye from 'lucide-react/icons/eye';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import FileText from 'lucide-react/icons/file-text';
@@ -46,7 +51,9 @@ export interface BrokerDestination {
   icon: LucideIcon;
   path: string;
   /** Tenant feature that must be enabled for this destination. */
-  feature?: 'exchange_workflow';
+  feature?: 'exchange_workflow' | 'reviews';
+  /** Tenant module that must be enabled for this destination. */
+  module?: 'feed';
 }
 
 export const BROKER_DESTINATIONS: BrokerDestination[] = [
@@ -56,7 +63,13 @@ export const BROKER_DESTINATIONS: BrokerDestination[] = [
   { key: 'exchanges', labelKey: 'nav.exchanges', icon: ArrowLeftRight, path: '/broker/exchanges', feature: 'exchange_workflow' },
   { key: 'match-approvals', labelKey: 'nav.match_approvals', icon: UserCheck, path: '/broker/match-approvals', feature: 'exchange_workflow' },
   { key: 'messages', labelKey: 'nav.messages', icon: MessageSquareWarning, path: '/broker/messages' },
+  { key: 'moderation-queue', labelKey: 'nav.moderation_queue', icon: ShieldPlus, path: '/broker/moderation/queue' },
+  { key: 'moderation-feed', labelKey: 'nav.moderation_feed', icon: MessageSquare, path: '/broker/moderation/feed', module: 'feed' },
+  { key: 'moderation-comments', labelKey: 'nav.moderation_comments', icon: MessageCircle, path: '/broker/moderation/comments' },
+  { key: 'moderation-reviews', labelKey: 'nav.moderation_reviews', icon: Star, path: '/broker/moderation/reviews', feature: 'reviews' },
+  { key: 'moderation-reports', labelKey: 'nav.moderation_reports', icon: Flag, path: '/broker/moderation/reports' },
   { key: 'safeguarding', labelKey: 'nav.safeguarding', icon: ShieldAlert, path: '/broker/safeguarding' },
+  { key: 'safeguarding-options', labelKey: 'nav.safeguarding_options', icon: SlidersHorizontal, path: '/broker/safeguarding-options' },
   { key: 'vetting', labelKey: 'nav.vetting', icon: ShieldCheck, path: '/broker/vetting' },
   { key: 'monitoring', labelKey: 'nav.monitoring', icon: Eye, path: '/broker/monitoring' },
   { key: 'risk-tags', labelKey: 'nav.risk_tags', icon: AlertTriangle, path: '/broker/risk-tags' },
@@ -73,7 +86,7 @@ interface BrokerCommandPaletteProps {
 
 export function BrokerCommandPalette({ isOpen, onClose }: BrokerCommandPaletteProps) {
   const { t } = useTranslation('broker');
-  const { tenantPath, hasFeature } = useTenant();
+  const { tenantPath, hasFeature, hasModule } = useTenant();
   const navigate = useNavigate();
 
   const [query, setQuery] = useState('');
@@ -81,8 +94,10 @@ export function BrokerCommandPalette({ isOpen, onClose }: BrokerCommandPalettePr
   const inputRef = useRef<HTMLInputElement>(null);
 
   const destinations = useMemo(
-    () => BROKER_DESTINATIONS.filter((d) => !d.feature || hasFeature(d.feature)),
-    [hasFeature]
+    () => BROKER_DESTINATIONS.filter(
+      (d) => (!d.feature || hasFeature(d.feature)) && (!d.module || hasModule(d.module))
+    ),
+    [hasFeature, hasModule]
   );
 
   const filtered = useMemo(() => {
