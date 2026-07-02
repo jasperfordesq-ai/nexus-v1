@@ -15,15 +15,15 @@
     "user_fallback": "Account"
   },
   "sidebar": {
-    "title": "Partner Timebanks",
+    "title": "Bainc Ama Comhpháirtithe",
     "nav_label": "Rannóga Bainc Ama Comhpháirtithe",
     "expand": "Leathnaigh barra taoibh",
     "collapse": "Laghdaigh an barra taoibh",
-    "full_admin": "Full Admin Panel",
+    "full_admin": "Painéal Riaracháin Iomlán",
     "section_overview": "Overview",
     "section_network": "Líonra comhpháirtithe",
     "section_external": "Naisc sheachtracha",
-    "section_caring": "Caring Community",
+    "section_caring": "Pobal Cúramach",
     "section_access": "Rochtain & slándáil",
     "section_data": "Gníomhaíocht & sonraí",
     "section_settings": "Settings"
@@ -49,7 +49,7 @@
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumbs",
-    "overview": "Partner Timebanks",
+    "overview": "Bainc Ama Comhpháirtithe",
     "partnerships": "Partnerships",
     "directory": "Eolaire comhpháirtithe",
     "profile": "Ár liostú",
@@ -58,7 +58,7 @@
     "external_partners": "Ardáin sheachtracha",
     "credit_commons": "Credit Commons",
     "inbound_api": "Comhpháirtithe API isteach",
-    "caring": "Caring Community",
+    "caring": "Pobal Cúramach",
     "caring_peers": "Comharchumainn chomhpháirtíochta",
     "api_keys": "Eochracha API",
     "create": "Create",
@@ -71,8 +71,8 @@
     "settings": "Socruithe líonra"
   },
   "overview": {
-    "page_title": "Partner Timebanks",
-    "title": "Partner Timebanks",
+    "page_title": "Bainc Ama Comhpháirtithe",
+    "title": "Bainc Ama Comhpháirtithe",
     "description": "Ceangail do bhanc ama le pobail eile ionas gur féidir le baill am agus scileanna a mhalartú thar teorainneacha. Níl an réimse seo le feiceáil ach ag sár-riarthóirí.",
     "open": "Open",
     "disabled_banner": {
@@ -110,8 +110,8 @@
       "hint": "Cá háit a tharla na malartuithe le 30 lá anuas.",
       "empty_title": "Níl aon ghníomhaíocht comhpháirtíochta fós",
       "empty_hint": "Nuair a nascann tú le banc ama comhpháirtíochta, taispeántar a ngníomhaíocht anseo.",
-      "activity_one": "{{count}} exchange",
-      "activity_other": "{{count}} exchanges"
+      "activity_one": "{{count}} malartú",
+      "activity_other": "{{count}} malartuithe"
     },
     "federation_off": {
       "title": "Tá comhpháirtíocht le bainc ama eile múchta",

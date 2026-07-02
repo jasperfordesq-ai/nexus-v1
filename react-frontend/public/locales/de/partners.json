@@ -15,15 +15,15 @@
     "user_fallback": "Account"
   },
   "sidebar": {
-    "title": "Partner Timebanks",
+    "title": "Partner-Zeitbanken",
     "nav_label": "Abschnitte zu Partner-Zeitbanken",
     "expand": "Seitenleiste erweitern",
     "collapse": "Seitenleiste einklappen",
-    "full_admin": "Full Admin Panel",
+    "full_admin": "Vollständiges Admin-Panel",
     "section_overview": "Overview",
     "section_network": "Partnernetzwerk",
     "section_external": "Externe Verbindungen",
-    "section_caring": "Caring Community",
+    "section_caring": "Fürsorgliche Gemeinschaft",
     "section_access": "Zugang und Sicherheit",
     "section_data": "Aktivität und Daten",
     "section_settings": "Settings"
@@ -49,7 +49,7 @@
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumbs",
-    "overview": "Partner Timebanks",
+    "overview": "Partner-Zeitbanken",
     "partnerships": "Partnerships",
     "directory": "Partnerverzeichnis",
     "profile": "Unser Eintrag",
@@ -58,7 +58,7 @@
     "external_partners": "Externe Plattformen",
     "credit_commons": "Credit Commons",
     "inbound_api": "Inbound-API-Partner",
-    "caring": "Caring Community",
+    "caring": "Fürsorgliche Gemeinschaft",
     "caring_peers": "Partnergenossenschaften",
     "api_keys": "API-Schlüssel",
     "create": "Create",
@@ -71,8 +71,8 @@
     "settings": "Netzwerkeinstellungen"
   },
   "overview": {
-    "page_title": "Partner Timebanks",
-    "title": "Partner Timebanks",
+    "page_title": "Partner-Zeitbanken",
+    "title": "Partner-Zeitbanken",
     "description": "Verbinden Sie Ihre Zeitbank mit anderen Communities, damit Mitglieder grenzüberschreitend Zeit und Fähigkeiten austauschen können. Dieser Bereich ist nur für Superadministratoren sichtbar.",
     "open": "Open",
     "disabled_banner": {
@@ -110,8 +110,8 @@
       "hint": "Wo der Austausch in den letzten 30 Tagen stattgefunden hat.",
       "empty_title": "Noch keine Partneraktivität",
       "empty_hint": "Sobald Sie sich mit einer Partner-Zeitbank verbinden, wird deren Aktivität hier angezeigt.",
-      "activity_one": "{{count}} exchange",
-      "activity_other": "{{count}} exchanges"
+      "activity_one": "{{count}} Umtausch",
+      "activity_other": "{{count}} Umtausche"
     },
     "federation_off": {
       "title": "Die Partnerschaft mit anderen Zeitbanken ist ausgeschaltet",

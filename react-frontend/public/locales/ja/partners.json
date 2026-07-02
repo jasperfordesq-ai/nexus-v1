@@ -15,15 +15,15 @@
     "user_fallback": "Account"
   },
   "sidebar": {
-    "title": "Partner Timebanks",
+    "title": "パートナータイムバンク",
     "nav_label": "パートナータイムバンクセクション",
     "expand": "サイドバーを展開する",
     "collapse": "サイドバーを折りたたむ",
-    "full_admin": "Full Admin Panel",
+    "full_admin": "完全な管理パネル",
     "section_overview": "Overview",
     "section_network": "パートナーネットワーク",
     "section_external": "外部接続",
-    "section_caring": "Caring Community",
+    "section_caring": "思いやりのあるコミュニティ",
     "section_access": "アクセスとセキュリティ",
     "section_data": "アクティビティとデータ",
     "section_settings": "Settings"
@@ -49,7 +49,7 @@
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumbs",
-    "overview": "Partner Timebanks",
+    "overview": "パートナータイムバンク",
     "partnerships": "Partnerships",
     "directory": "パートナーディレクトリ",
     "profile": "私たちのリスト",
@@ -58,7 +58,7 @@
     "external_partners": "外部プラットフォーム",
     "credit_commons": "Credit Commons",
     "inbound_api": "インバウンドAPIパートナー",
-    "caring": "Caring Community",
+    "caring": "思いやりのあるコミュニティ",
     "caring_peers": "パートナー協同組合",
     "api_keys": "APIキー",
     "create": "Create",
@@ -71,8 +71,8 @@
     "settings": "ネットワーク設定"
   },
   "overview": {
-    "page_title": "Partner Timebanks",
-    "title": "Partner Timebanks",
+    "page_title": "パートナータイムバンク",
+    "title": "パートナータイムバンク",
     "description": "タイムバンクを他のコミュニティと接続すると、メンバーは国境を越えて時間やスキルを交換できます。この領域はスーパー管理者のみに表示されます。",
     "open": "Open",
     "disabled_banner": {
@@ -110,8 +110,8 @@
       "hint": "過去 30 日間に交換が行われた場所。",
       "empty_title": "パートナーアクティビティはまだありません",
       "empty_hint": "パートナーのタイムバンクに接続すると、そのアクティビティがここに表示されます。",
-      "activity_one": "{{count}} exchange",
-      "activity_other": "{{count}} exchanges"
+      "activity_one": "{{count}}件の交換",
+      "activity_other": "{{count}}件の交換"
     },
     "federation_off": {
       "title": "他のタイムバンクとの連携はオフになっています",

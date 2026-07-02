@@ -15,15 +15,15 @@
     "user_fallback": "Account"
   },
   "sidebar": {
-    "title": "Partner Timebanks",
+    "title": "Bancos de tiempo de socios",
     "nav_label": "Secciones de bancos de tiempo de socios",
     "expand": "Expandir barra lateral",
     "collapse": "Contraer barra lateral",
-    "full_admin": "Full Admin Panel",
+    "full_admin": "Panel de administración completo",
     "section_overview": "Overview",
     "section_network": "Red de socios",
     "section_external": "Conexiones externas",
-    "section_caring": "Caring Community",
+    "section_caring": "Comunidad solidaria",
     "section_access": "Acceso y seguridad",
     "section_data": "Actividad y datos",
     "section_settings": "Settings"
@@ -49,7 +49,7 @@
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumbs",
-    "overview": "Partner Timebanks",
+    "overview": "Bancos de tiempo de socios",
     "partnerships": "Partnerships",
     "directory": "Directorio de socios",
     "profile": "Nuestro listado",
@@ -58,7 +58,7 @@
     "external_partners": "Plataformas externas",
     "credit_commons": "Credit Commons",
     "inbound_api": "Socios de API entrantes",
-    "caring": "Caring Community",
+    "caring": "Comunidad solidaria",
     "caring_peers": "Cooperativas asociadas",
     "api_keys": "Claves API",
     "create": "Create",
@@ -71,8 +71,8 @@
     "settings": "Configuración de red"
   },
   "overview": {
-    "page_title": "Partner Timebanks",
-    "title": "Partner Timebanks",
+    "page_title": "Bancos de tiempo de socios",
+    "title": "Bancos de tiempo de socios",
     "description": "Conecte su banco de tiempo con otras comunidades para que los miembros puedan intercambiar tiempo y habilidades a través de fronteras. Esta área solo es visible para superadministradores.",
     "open": "Open",
     "disabled_banner": {
@@ -110,8 +110,8 @@
       "hint": "Dónde ocurrieron los intercambios en los últimos 30 días.",
       "empty_title": "Aún no hay actividad de socios",
       "empty_hint": "Una vez que se conecta con un banco de tiempo asociado, su actividad aparece aquí.",
-      "activity_one": "{{count}} exchange",
-      "activity_other": "{{count}} exchanges"
+      "activity_one": "{{count}} intercambio",
+      "activity_other": "{{count}} intercambios"
     },
     "federation_off": {
       "title": "La asociación con otros bancos de tiempo está desactivada",

@@ -15,15 +15,15 @@
     "user_fallback": "Account"
   },
   "sidebar": {
-    "title": "Partner Timebanks",
+    "title": "Banques de temps partenaires",
     "nav_label": "Sections Banques de temps partenaires",
     "expand": "Développer la barre latérale",
     "collapse": "Réduire la barre latérale",
-    "full_admin": "Full Admin Panel",
+    "full_admin": "Panneau d'administration complet",
     "section_overview": "Overview",
     "section_network": "Réseau de partenaires",
     "section_external": "Connexions externes",
-    "section_caring": "Caring Community",
+    "section_caring": "Communauté bienveillante",
     "section_access": "Accès et sécurité",
     "section_data": "Activité et données",
     "section_settings": "Settings"
@@ -49,7 +49,7 @@
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumbs",
-    "overview": "Partner Timebanks",
+    "overview": "Banques de temps partenaires",
     "partnerships": "Partnerships",
     "directory": "Annuaire des partenaires",
     "profile": "Notre annonce",
@@ -58,7 +58,7 @@
     "external_partners": "Plateformes externes",
     "credit_commons": "Credit Commons",
     "inbound_api": "Partenaires API entrants",
-    "caring": "Caring Community",
+    "caring": "Communauté bienveillante",
     "caring_peers": "Coopératives partenaires",
     "api_keys": "Clés API",
     "create": "Create",
@@ -71,8 +71,8 @@
     "settings": "Paramètres réseau"
   },
   "overview": {
-    "page_title": "Partner Timebanks",
-    "title": "Partner Timebanks",
+    "page_title": "Banques de temps partenaires",
+    "title": "Banques de temps partenaires",
     "description": "Connectez votre banque de temps à d'autres communautés afin que les membres puissent échanger du temps et des compétences au-delà des frontières. Cette zone n'est visible que par les super administrateurs.",
     "open": "Open",
     "disabled_banner": {
@@ -110,8 +110,8 @@
       "hint": "Où les échanges ont eu lieu au cours des 30 derniers jours.",
       "empty_title": "Aucune activité de partenaire pour l'instant",
       "empty_hint": "Une fois que vous vous connectez à une banque de temps partenaire, son activité apparaît ici.",
-      "activity_one": "{{count}} exchange",
-      "activity_other": "{{count}} exchanges"
+      "activity_one": "{{count}} échange",
+      "activity_other": "{{count}} échanges"
     },
     "federation_off": {
       "title": "Le partenariat avec d'autres banques de temps est désactivé",

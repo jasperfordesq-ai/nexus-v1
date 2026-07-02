@@ -15,15 +15,15 @@
     "user_fallback": "Account"
   },
   "sidebar": {
-    "title": "Partner Timebanks",
+    "title": "Partnertijdbanken",
     "nav_label": "Partnertijdbankensecties",
     "expand": "Zijbalk uitvouwen",
     "collapse": "Zijbalk samenvouwen",
-    "full_admin": "Full Admin Panel",
+    "full_admin": "Volledig beheerpaneel",
     "section_overview": "Overview",
     "section_network": "Partnernetwerk",
     "section_external": "Externe aansluitingen",
-    "section_caring": "Caring Community",
+    "section_caring": "Zorgzame gemeenschap",
     "section_access": "Toegang & beveiliging",
     "section_data": "Activiteit en gegevens",
     "section_settings": "Settings"
@@ -49,7 +49,7 @@
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumbs",
-    "overview": "Partner Timebanks",
+    "overview": "Partnertijdbanken",
     "partnerships": "Partnerships",
     "directory": "Partnerlijst",
     "profile": "Onze vermelding",
@@ -58,7 +58,7 @@
     "external_partners": "Externe platforms",
     "credit_commons": "Credit Commons",
     "inbound_api": "Inkomende API-partners",
-    "caring": "Caring Community",
+    "caring": "Zorgzame gemeenschap",
     "caring_peers": "Partnercoöperaties",
     "api_keys": "API-sleutels",
     "create": "Create",
@@ -71,8 +71,8 @@
     "settings": "Netwerkinstellingen"
   },
   "overview": {
-    "page_title": "Partner Timebanks",
-    "title": "Partner Timebanks",
+    "page_title": "Partnertijdbanken",
+    "title": "Partnertijdbanken",
     "description": "Verbind uw tijdbank met andere communities, zodat leden tijd en vaardigheden over de grenzen heen kunnen uitwisselen. Dit gebied is alleen zichtbaar voor superbeheerders.",
     "open": "Open",
     "disabled_banner": {
@@ -110,8 +110,8 @@
       "hint": "Waar de uitwisselingen in de afgelopen 30 dagen hebben plaatsgevonden.",
       "empty_title": "Nog geen partneractiviteit",
       "empty_hint": "Zodra u verbinding maakt met een tijdbank van een partner, wordt hun activiteit hier weergegeven.",
-      "activity_one": "{{count}} exchange",
-      "activity_other": "{{count}} exchanges"
+      "activity_one": "{{count}} ruil",
+      "activity_other": "{{count}} ruilen"
     },
     "federation_off": {
       "title": "Samenwerken met andere tijdbanken is uitgeschakeld",

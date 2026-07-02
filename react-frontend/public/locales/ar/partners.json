@@ -15,15 +15,15 @@
     "user_fallback": "Account"
   },
   "sidebar": {
-    "title": "Partner Timebanks",
+    "title": "بنوك الوقت الشريكة",
     "nav_label": "أقسام Timebanks الشريكة",
     "expand": "قم بتوسيع الشريط الجانبي",
     "collapse": "طي الشريط الجانبي",
-    "full_admin": "Full Admin Panel",
+    "full_admin": "لوحة الإدارة الكاملة",
     "section_overview": "Overview",
     "section_network": "شبكة الشركاء",
     "section_external": "اتصالات خارجية",
-    "section_caring": "Caring Community",
+    "section_caring": "مجتمع الرعاية",
     "section_access": "الوصول والأمن",
     "section_data": "النشاط والبيانات",
     "section_settings": "Settings"
@@ -49,7 +49,7 @@
   },
   "breadcrumbs": {
     "aria_label": "Breadcrumbs",
-    "overview": "Partner Timebanks",
+    "overview": "بنوك الوقت الشريكة",
     "partnerships": "Partnerships",
     "directory": "دليل الشركاء",
     "profile": "قائمتنا",
@@ -58,7 +58,7 @@
     "external_partners": "المنصات الخارجية",
     "credit_commons": "Credit Commons",
     "inbound_api": "شركاء واجهة برمجة التطبيقات الواردة",
-    "caring": "Caring Community",
+    "caring": "مجتمع الرعاية",
     "caring_peers": "التعاونيات الشريكة",
     "api_keys": "مفاتيح واجهة برمجة التطبيقات",
     "create": "Create",
@@ -71,8 +71,8 @@
     "settings": "إعدادات الشبكة"
   },
   "overview": {
-    "page_title": "Partner Timebanks",
-    "title": "Partner Timebanks",
+    "page_title": "بنوك الوقت الشريكة",
+    "title": "بنوك الوقت الشريكة",
     "description": "قم بتوصيل بنك الوقت الخاص بك بالمجتمعات الأخرى حتى يتمكن الأعضاء من تبادل الوقت والمهارات عبر الحدود. هذه المنطقة مرئية فقط للمشرفين المتميزين.",
     "open": "Open",
     "disabled_banner": {
@@ -110,8 +110,8 @@
       "hint": "حيث حدثت التبادلات في آخر 30 يومًا.",
       "empty_title": "لا يوجد نشاط شريك حتى الآن",
       "empty_hint": "بمجرد الاتصال ببنك الوقت الشريك، يظهر نشاطه هنا.",
-      "activity_one": "{{count}} exchange",
-      "activity_other": "{{count}} exchanges"
+      "activity_one": "{{count}} تبادل",
+      "activity_other": "{{count}} تبادلات"
     },
     "federation_off": {
       "title": "تم إيقاف الشراكة مع بنوك الوقت الأخرى",
