@@ -10,7 +10,7 @@
  * - one globally open accordion section
  * - active route and active parent highlighting
  * - scroll-to-open behaviour for long sidebars
- * - recent pages and synonym-aware search
+ * - synonym-aware search
  * - attention strip for operational items that need review
  */
 
@@ -21,7 +21,6 @@ import { ScrollShadow } from '@/components/ui';
 import { useAuth,
   useTenant } from '@/contexts';
 import { api } from '@/lib/api';
-import { safeLocalStorageGet, safeLocalStorageSetJSON } from '@/lib/safeStorage';
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 import Users from 'lucide-react/icons/users';
 import ListChecks from 'lucide-react/icons/list-checks';
@@ -129,18 +128,9 @@ interface NavZone {
   sectionKeys: string[];
 }
 
-interface RecentPage {
-  label: string;
-  href: string;
-  visitedAt: number;
-}
-
 interface FilteredNavItem extends NavItem {
   sectionLabel: string;
 }
-
-const RECENT_PAGES_KEY = 'admin_recent_pages';
-const RECENT_PAGES_MAX = 5;
 
 const ZONES: NavZone[] = [
   { key: 'overview', label: 'zone_overview', sectionKeys: ['dashboard', 'broker-panel', 'super-admin'] },
@@ -152,31 +142,6 @@ const ZONES: NavZone[] = [
   { key: 'platform', label: 'zone_platform', sectionKeys: ['system', 'enterprise', 'federation', 'integrations'] },
   { key: 'diagnostics', label: 'zone_diagnostics', sectionKeys: ['intelligence'] },
 ];
-
-function readRecentPages(): RecentPage[] {
-  try {
-    const raw = safeLocalStorageGet(RECENT_PAGES_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    return (parsed as RecentPage[]).filter(
-      (p) =>
-        p !== null &&
-        typeof p === 'object' &&
-        typeof (p as RecentPage).label === 'string' &&
-        typeof (p as RecentPage).href === 'string',
-    );
-  } catch {
-    return [];
-  }
-}
-
-function saveRecentPage(page: RecentPage): RecentPage[] {
-  const existing = readRecentPages();
-  const updated = [page, ...existing.filter((p) => p.href !== page.href)].slice(0, RECENT_PAGES_MAX);
-  safeLocalStorageSetJSON(RECENT_PAGES_KEY, updated);
-  return updated;
-}
 
 function fuzzyMatch(query: string, target: string): boolean {
   if (!query) return true;
@@ -564,7 +529,6 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
   const { pathname, search } = useLocation();
   const { tenantPath } = useTenant();
   const [searchQuery, setSearchQuery] = useState('');
-  const [recentPages, setRecentPages] = useState<RecentPage[]>(() => readRecentPages());
   const sections = useAdminNav();
   const sectionRefs = useRef(new Map<string, HTMLDivElement>());
 
@@ -637,19 +601,6 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
   // rest of the safeguarding surfaces (2026-07-02) — the admin sidebar no
   // longer polls /v2/admin/safeguarding/dashboard.
 
-  const hrefToLabel = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const section of sections) {
-      if (section.href) map.set(section.href, section.label);
-      for (const item of section.items ?? []) {
-        map.set(item.href, item.label);
-        const base = item.href.split('?')[0];
-        if (base && !map.has(base)) map.set(base, item.label);
-      }
-    }
-    return map;
-  }, [sections]);
-
   const filteredResults = useMemo((): FilteredNavItem[] => {
     const query = searchQuery.trim();
     if (!query) return [];
@@ -670,10 +621,6 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
       .slice(0, 4);
   }, [sections]);
 
-  const trackVisit = (label: string, href: string) => {
-    setRecentPages(saveRecentPage({ label, href, visitedAt: Date.now() }));
-  };
-
   const isActive = (href: string) => href === activeHref;
 
   const renderNavLink = (item: NavItem, compact = false) => {
@@ -683,10 +630,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
     return (
       <Link
         to={tenantPath(item.href)}
-        onClick={() => {
-          setSearchQuery('');
-          trackVisit(item.label, item.href);
-        }}
+        onClick={() => setSearchQuery('')}
         aria-current={active ? 'page' : undefined}
         className={`group relative flex min-h-9 items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
           active
@@ -797,7 +741,6 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
     );
   };
 
-  const showRecent = !collapsed && recentPages.length >= 2 && !searchQuery.trim();
   const groupedSections = ZONES.map((zone) => ({
     ...zone,
     sections: zone.sectionKeys
@@ -874,10 +817,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
                   <li key={item.href}>
                     <Link
                       to={tenantPath(item.href)}
-                      onClick={() => {
-                        setSearchQuery('');
-                        trackVisit(item.label, item.href);
-                      }}
+                      onClick={() => setSearchQuery('')}
                       className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
                         isActive(item.href)
                           ? 'bg-accent/10 text-accent font-semibold'
@@ -913,30 +853,6 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
               </>
             )}
 
-            {showRecent && (
-              <>
-                <li className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted">
-                  {t('recent')}
-                </li>
-                {recentPages.map((page) => (
-                  <li key={page.href}>
-                    <Link
-                      to={tenantPath(page.href)}
-                      className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
-                        isActive(page.href)
-                          ? 'bg-accent/10 text-accent font-semibold'
-                          : 'text-muted hover:bg-surface-secondary hover:text-foreground'
-                      }`}
-                    >
-                      <Clock size={14} className="shrink-0 text-muted" />
-                      <span className="truncate">{hrefToLabel.get(page.href) ?? hrefToLabel.get(page.href.split('?')[0] ?? page.href) ?? page.label}</span>
-                    </Link>
-                  </li>
-                ))}
-                <li><div className="mx-3 mb-1 mt-1 border-b border-divider/50" /></li>
-              </>
-            )}
-
             {groupedSections.map((zone, zoneIdx) => (
               <li key={zone.key}>
                 <div className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wider text-muted">
@@ -956,9 +872,6 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
           <Tooltip content={caringCommunity.label} placement="right" isDisabled={!collapsed}>
             <Link
               to={tenantPath(caringCommunity.href ?? '/caring')}
-              onClick={() => {
-                if (caringCommunity.href) trackVisit(caringCommunity.label, caringCommunity.href);
-              }}
               aria-current={isActive(caringCommunity.href ?? '/caring') ? 'page' : undefined}
               className={`mb-1 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
                 isActive(caringCommunity.href ?? '/caring')
