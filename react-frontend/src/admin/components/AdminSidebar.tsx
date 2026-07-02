@@ -300,17 +300,21 @@ function useAdminNav(): NavSection[] {
       // /broker/safeguarding, /broker/safeguarding-options) on 2026-07-02.
       // Smart Matching is the only remaining item here — it now lives in the
       // Intelligence & Diagnostics section below.
-      {
+      // Email settings / deliverability are restricted to super admins
+      // (2026-07-02). When this is the only surviving section in the
+      // communications zone, hiding it also removes the zone header for
+      // non-super-admins (the zone-empty filter drops it).
+      ...(isSuperAdmin ? [{
         key: 'communications',
         label: t('communications'),
         icon: Mail,
-        zone: 'communications',
+        zone: 'communications' as const,
         items: [
           { label: t('email_settings'), href: '/admin/email-settings', icon: Mail, keywords: keyword('smtp', 'mail', 'sendgrid', 'from address') },
           { label: t('email_deliverability'), href: '/admin/email-deliverability', icon: Mail, keywords: keyword('mail failed', 'smtp health', 'delivery') },
           { label: t('deliverability'), href: '/admin/deliverability', icon: Mail, keywords: keyword('deliverables', 'scheduled email') },
         ],
-      },
+      }] : []),
       {
         key: 'marketing',
         label: t('marketing'),
