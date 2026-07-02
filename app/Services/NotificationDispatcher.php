@@ -529,7 +529,9 @@ class NotificationDispatcher
                 ? ' (' . __('emails_notifications.hot_match.km_away', ['distance' => $distance]) . ')'
                 : '';
             $content = __('notifications.hot_match_content', ['name' => $userName, 'title' => $listingTitle, 'score' => $matchScore, 'distance' => $distanceText]);
-            $link = "/listings/{$listingId}";
+            // Land on the matches page with this match highlighted (the page
+            // scrolls to and pulses the card).
+            $link = "/matches?highlight=listing-{$listingId}";
 
             Notification::createNotification((int) $userId, $content, $link, 'hot_match');
             // Device push (curated push_hot_match title). Independent of the
@@ -579,7 +581,8 @@ class NotificationDispatcher
             $listingId = $match['id'] ?? 0;
 
             $content = __('notifications.mutual_match_content', ['name' => $userName, 'they_offer' => $theyOffer, 'you_offer' => $youOffer]);
-            $link = "/listings/{$listingId}";
+            // Mutual matches land on the matches page pre-filtered to mutual.
+            $link = "/matches?type=mutual&highlight=listing-{$listingId}";
 
             Notification::createNotification((int) $userId, $content, $link, 'mutual_match');
             // Device push (curated push_mutual_match title).

@@ -282,6 +282,60 @@ class EmbeddingService
         }
     }
 
+    /**
+     * Like findSimilar(), but returns the cosine scores — the matching
+     * engine's semantic SIGNAL needs per-candidate similarity values, not
+     * just a boolean membership set.
+     *
+     * @return array<int, float> content_id => cosine similarity (desc)
+     */
+    public function findSimilarWithScores(int $contentId, string $contentType, int $tenantId, int $limit = 100): array
+    {
+        try {
+            $sourceRow = DB::table('content_embeddings')
+                ->where('tenant_id', $tenantId)
+                ->where('content_type', $contentType)
+                ->where('content_id', $contentId)
+                ->first();
+
+            if (!$sourceRow || empty($sourceRow->embedding)) {
+                return [];
+            }
+
+            $sourceVec = json_decode($sourceRow->embedding, true);
+            if (!is_array($sourceVec) || empty($sourceVec)) {
+                return [];
+            }
+
+            $rows = DB::table('content_embeddings')
+                ->where('tenant_id', $tenantId)
+                ->where('content_type', $contentType)
+                ->where('content_id', '!=', $contentId)
+                ->orderByDesc('updated_at')
+                ->limit(500)
+                ->get();
+
+            $similarities = [];
+            foreach ($rows as $row) {
+                $vec = json_decode($row->embedding, true);
+                if (!is_array($vec) || empty($vec)) {
+                    continue;
+                }
+                $sim = $this->cosineSimilarity($sourceVec, $vec);
+                if ($sim > 0.0) {
+                    $similarities[(int) $row->content_id] = (float) $sim;
+                }
+            }
+
+            arsort($similarities);
+
+            return array_slice($similarities, 0, $limit, true);
+        } catch (\Exception $e) {
+            Log::error('EmbeddingService::findSimilarWithScores error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
     // =========================================================================
     // CORE MATH
     // =========================================================================

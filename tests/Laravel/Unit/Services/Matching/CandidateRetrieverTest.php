@@ -71,8 +71,10 @@ class CandidateRetrieverTest extends TestCase
 
         // Regression: this exact state used to fall back to newest-listings
         // tenant-wide, producing the cross-country "nearby" matches.
+        // (NB: 'HAVING (' is the distance gate; the owner-dismissal subquery
+        // legitimately contains 'HAVING COUNT'.)
         $this->assertStringContainsString("AND l.service_type IN ('remote_only','hybrid')", $c['sql']);
-        $this->assertStringNotContainsString('HAVING', $c['sql']);
+        $this->assertStringNotContainsString('HAVING (', $c['sql']);
         $this->assertStringNotContainsString('distance_km', $c['sql']);
         $this->assertStringContainsString('ORDER BY l.created_at DESC', $c['sql']);
     }
@@ -85,7 +87,7 @@ class CandidateRetrieverTest extends TestCase
         ));
 
         $this->assertStringNotContainsString('service_type', $c['sql']);
-        $this->assertStringNotContainsString('HAVING', $c['sql']);
+        $this->assertStringNotContainsString('HAVING (', $c['sql']);
     }
 
     public function test_gate_disabled_with_coords_falls_back_to_plain_distance_ceiling(): void
@@ -149,6 +151,6 @@ class CandidateRetrieverTest extends TestCase
         ));
 
         $this->assertStringContainsString("AND l.service_type IN ('remote_only','hybrid')", $c['sql']);
-        $this->assertStringNotContainsString('HAVING', $c['sql']);
+        $this->assertStringNotContainsString('HAVING (', $c['sql']);
     }
 }

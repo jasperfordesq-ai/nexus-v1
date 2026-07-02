@@ -160,6 +160,20 @@ class CandidateRetriever
             $sql .= "
                   AND l.id NOT IN (SELECT listing_id FROM match_dismissals WHERE tenant_id = ? AND user_id = ?)";
             array_push($params, $tenantId, $excludeUserId);
+
+            // Owner-level suppression: repeatedly dismissing one member's
+            // listings (>= threshold in 90 days) hides ALL of that member's
+            // listings from this searcher.
+            $dismissalThreshold = max(1, (int) ($gates['owner_dismissal_threshold'] ?? 3));
+            $sql .= "
+                  AND l.user_id NOT IN (
+                      SELECT l2.user_id FROM match_dismissals md
+                      JOIN listings l2 ON md.listing_id = l2.id AND l2.tenant_id = md.tenant_id
+                      WHERE md.tenant_id = ? AND md.user_id = ?
+                        AND md.created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
+                      GROUP BY l2.user_id
+                      HAVING COUNT(*) >= {$dismissalThreshold})";
+            array_push($params, $tenantId, $excludeUserId);
         }
 
         if (!empty($categoryIds)) {

@@ -8,6 +8,7 @@ namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
 use App\Services\Matching\CandidateRetriever;
+use App\Services\MatchLearningService;
 use App\Services\SmartMatchingEngine;
 use App\Services\EmbeddingService;
 use App\Services\VettingService;
@@ -20,6 +21,7 @@ class SmartMatchingEngineTest extends TestCase
     private $mockEmbedding;
     private $mockVetting;
     private $mockRetriever;
+    private $mockLearning;
 
     protected function setUp(): void
     {
@@ -27,19 +29,25 @@ class SmartMatchingEngineTest extends TestCase
         $this->mockEmbedding = Mockery::mock(EmbeddingService::class);
         $this->mockVetting = Mockery::mock(VettingService::class);
         $this->mockRetriever = Mockery::mock(CandidateRetriever::class);
+        $this->mockLearning = Mockery::mock(MatchLearningService::class);
         // Default: no candidates unless a test says otherwise.
         $this->mockRetriever->shouldReceive('retrieveBatch')->andReturn([])->byDefault();
         $this->mockRetriever->shouldReceive('retrieveColdStart')->andReturn([])->byDefault();
+        // Default: no learning history.
+        $this->mockLearning->shouldReceive('getOwnerInteractionBoosts')->andReturn([])->byDefault();
+        $this->mockLearning->shouldReceive('getCategoryAffinities')->andReturn([])->byDefault();
         // Default: searcher is not staff, has all vettings — keeps existing tests passing
         $this->mockVetting->shouldReceive('isSafeguardingStaff')->andReturn(false)->byDefault();
         $this->mockVetting->shouldReceive('userHasAllValidVettings')->andReturn(true)->byDefault();
-        $this->engine = new SmartMatchingEngine($this->mockEmbedding, $this->mockVetting, $this->mockRetriever);
+        $this->engine = new SmartMatchingEngine(
+            $this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $this->mockLearning
+        );
     }
 
     /** Build an engine with the shared default mocks but a custom vetting mock. */
     private function makeEngine($mockVetting): SmartMatchingEngine
     {
-        return new SmartMatchingEngine($this->mockEmbedding, $mockVetting, $this->mockRetriever);
+        return new SmartMatchingEngine($this->mockEmbedding, $mockVetting, $this->mockRetriever, $this->mockLearning);
     }
 
     // ── getConfig ──
@@ -129,10 +137,10 @@ class SmartMatchingEngineTest extends TestCase
         // Partial mock: real warmUpCache(), stubbed findMatchesForUser().
         $engine = Mockery::mock(
             SmartMatchingEngine::class . '[findMatchesForUser]',
-            [$this->mockEmbedding, $this->mockVetting, $this->mockRetriever]
+            [$this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $this->mockLearning]
         );
         $engine->shouldReceive('findMatchesForUser')
-            ->once()->with(1, ['limit' => 20])
+            ->once()->withArgs(fn ($id, $opts) => $id === 1 && $opts === ['limit' => 20])
             ->andReturn([[
                 'id' => 123,
                 'match_score' => 85.0,   // engine scores are 0–100
@@ -168,7 +176,7 @@ class SmartMatchingEngineTest extends TestCase
 
         $engine = Mockery::mock(
             SmartMatchingEngine::class . '[findMatchesForUser]',
-            [$this->mockEmbedding, $this->mockVetting, $this->mockRetriever]
+            [$this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $this->mockLearning]
         );
         $engine->shouldReceive('findMatchesForUser')->once()->andReturn([
             ['id' => 1, 'match_score' => 130.0, 'distance_km' => 1.0, 'match_type' => 'one_way', 'match_reasons' => []],
@@ -207,7 +215,7 @@ class SmartMatchingEngineTest extends TestCase
 
         $engine = Mockery::mock(
             SmartMatchingEngine::class . '[findMatchesForUser]',
-            [$this->mockEmbedding, $this->mockVetting, $this->mockRetriever]
+            [$this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $this->mockLearning]
         );
         $engine->shouldReceive('findMatchesForUser')->once()->andReturn([[
             'id' => 55,
@@ -477,6 +485,103 @@ class SmartMatchingEngineTest extends TestCase
         $this->assertGreaterThan(40, $matches[0]['match_score']);
         $this->assertLessThanOrEqual(100, $matches[0]['match_score']);
         $this->assertContains('Similar to your listing', $matches[0]['match_reasons']);
+    }
+
+    public function test_findMatchesForUser_caps_listings_per_owner_per_page(): void
+    {
+        $this->setTenantId(7);
+        DB::shouldReceive('table->where->value')->andReturnNull();
+
+        DB::shouldReceive('select')->andReturn(
+            [],
+            [(object) [
+                'id' => 1, 'tenant_id' => 7, 'latitude' => 0.0, 'longitude' => 0.0,
+                'skills' => '', 'avg_rating' => null, 'transaction_count' => 0,
+            ]],
+            [(object) [
+                'id' => 11, 'user_id' => 1, 'type' => 'offer', 'category_id' => 3,
+                'title' => 'Gardening help offered', 'description' => '', 'category_name' => 'Gardening',
+            ]],
+            []
+        );
+
+        // THREE strong candidates, all owned by the same member.
+        $candidate = static fn (int $id) => [
+            'id' => $id, 'user_id' => 2, 'type' => 'request', 'category_id' => 3,
+            'title' => "Remote garden planning wanted {$id}",
+            'description' => 'Help me plan my vegetable garden over a video call this spring',
+            'service_type' => 'remote_only', 'created_at' => now()->toDateTimeString(),
+            'category_name' => 'Gardening',
+        ];
+        $this->mockRetriever->shouldReceive('retrieveBatch')->once()->andReturn([
+            $candidate(101), $candidate(102), $candidate(103),
+        ]);
+
+        $this->mockEmbedding->shouldReceive('findSimilar')->andReturn([]);
+        \Illuminate\Support\Facades\Cache::shouldReceive('get')->andReturn(null);
+
+        $matches = $this->engine->findMatchesForUser(1);
+
+        // Anti-monopoly: max 2 listings per owner per result page.
+        $this->assertCount(2, $matches);
+    }
+
+    public function test_findMatchesForUser_applies_learning_penalty_from_owner_history(): void
+    {
+        $this->setTenantId(7);
+        DB::shouldReceive('table->where->value')->andReturnNull();
+
+        // SQL-aware DB mock (robust across BOTH engine runs, unlike a
+        // sequential andReturn chain which the first run consumes).
+        DB::shouldReceive('select')->andReturnUsing(function ($sql) {
+            if (str_contains($sql, 'transaction_count')) {
+                return [(object) [
+                    'id' => 1, 'tenant_id' => 7, 'latitude' => 0.0, 'longitude' => 0.0,
+                    'skills' => '', 'avg_rating' => null, 'transaction_count' => 0,
+                ]];
+            }
+            if (str_contains($sql, 'category_name') && str_contains($sql, 'LIMIT 10')) {
+                return [(object) [
+                    'id' => 11, 'user_id' => 1, 'type' => 'offer', 'category_id' => 3,
+                    'title' => 'Gardening help offered', 'description' => '', 'category_name' => 'Gardening',
+                ]];
+            }
+            return [];
+        });
+
+        $candidate = [
+            'id' => 99, 'user_id' => 2, 'type' => 'request', 'category_id' => 3,
+            'title' => 'Remote garden planning wanted',
+            'description' => 'Help me plan my vegetable garden over a video call this spring',
+            'service_type' => 'remote_only', 'created_at' => now()->toDateTimeString(),
+            'category_name' => 'Gardening',
+        ];
+        $this->mockRetriever->shouldReceive('retrieveBatch')->twice()->andReturn([$candidate]);
+
+        $this->mockEmbedding->shouldReceive('findSimilar')->andReturn([]);
+        \Illuminate\Support\Facades\Cache::shouldReceive('get')->andReturn(null);
+
+        // Baseline run (default mocks: no history).
+        $baseline = $this->engine->findMatchesForUser(1);
+
+        // Second engine whose learning history says "this searcher keeps
+        // dismissing owner 2" — the same candidate must now score lower.
+        $penalisingLearning = Mockery::mock(MatchLearningService::class);
+        $penalisingLearning->shouldReceive('getOwnerInteractionBoosts')->andReturn([2 => -10.0]);
+        $penalisingLearning->shouldReceive('getCategoryAffinities')->andReturn([]);
+        $engine2 = new SmartMatchingEngine(
+            $this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $penalisingLearning
+        );
+        $penalised = $engine2->findMatchesForUser(1);
+
+        $this->assertNotEmpty($baseline);
+        $this->assertNotEmpty($penalised);
+        $this->assertEqualsWithDelta(
+            $baseline[0]['match_score'] - 10.0,
+            $penalised[0]['match_score'],
+            0.2,
+            'owner-history penalty must reduce the score by the learning boost'
+        );
     }
 
     // ── filterCandidatesByVettingRequirements ──

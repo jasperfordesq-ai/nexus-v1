@@ -40,12 +40,17 @@ class MatchPreferencesController extends BaseApiController
     /**
      * PUT /api/v2/users/me/match-preferences
      *
-     * Update match notification preferences.
+     * Update match preferences.
      *
      * Request body (JSON, all optional):
      * - notification_frequency: 'daily' | 'monthly' | 'fortnightly' | 'never'
      * - notify_hot_matches: bool
      * - notify_mutual_matches: bool
+     * - matching_paused: bool
+     * - max_distance_km: int (1..tenant max)
+     * - min_match_score: int (0..100)
+     * - categories: int[] (empty = all categories)
+     * - availability: array (e.g. ["weekends", "weekday_evenings"])
      */
     public function update(): JsonResponse
     {
@@ -79,6 +84,41 @@ class MatchPreferencesController extends BaseApiController
         $notifyMutual = $this->input('notify_mutual_matches');
         if ($notifyMutual !== null) {
             $updated['notify_mutual_matches'] = (bool) $notifyMutual;
+        }
+
+        $paused = $this->input('matching_paused');
+        if ($paused !== null) {
+            $updated['matching_paused'] = (bool) $paused;
+        }
+
+        // Distance preference can tighten but never exceed the tenant ceiling.
+        $maxDistance = $this->input('max_distance_km');
+        if ($maxDistance !== null) {
+            $tenantMax = 100;
+            try {
+                $config = app(\App\Services\SmartMatchingEngine::class)->getConfig();
+                $tenantMax = (int) ($config['max_distance_km'] ?? 100);
+            } catch (\Throwable $e) {
+                // Keep the conservative fallback ceiling.
+            }
+            $updated['max_distance_km'] = max(1, min($tenantMax, (int) $maxDistance));
+        }
+
+        $minScore = $this->input('min_match_score');
+        if ($minScore !== null) {
+            $updated['min_match_score'] = max(0, min(100, (int) $minScore));
+        }
+
+        $categories = $this->input('categories');
+        if ($categories !== null && is_array($categories)) {
+            $updated['categories'] = array_values(array_filter(array_map('intval', $categories)));
+        }
+
+        $availability = $this->input('availability');
+        if ($availability !== null && is_array($availability)) {
+            $updated['availability'] = array_values(array_filter(array_map(
+                fn ($slot) => is_string($slot) ? mb_substr(trim($slot), 0, 50) : null
+            , $availability)));
         }
 
         $success = $this->matchingService->savePreferences($userId, $updated);

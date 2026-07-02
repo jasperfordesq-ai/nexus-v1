@@ -673,7 +673,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(CrossModuleMatchingService::class, function ($app) {
             return new CrossModuleMatchingService(
                 $app->make(SmartMatchingEngine::class),
-                $app->make(MatchLearningService::class),
+                $app->make(\App\Services\GroupMatchingService::class),
             );
         });
 
