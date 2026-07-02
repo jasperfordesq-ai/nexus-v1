@@ -1,0 +1,195 @@
+{
+  "checking_permissions": "Ceadanna á seiceáil...",
+  "layout": {
+    "skip_to_main": "Téigh ar aghaidh chuig an bpríomhábhar",
+    "close_navigation": "Dún nascleanúint",
+    "navigation": "Nascleanúint Bainc Ama Comhpháirtithe"
+  },
+  "header": {
+    "toggle_sidebar": "Scoránaigh an nascleanúint",
+    "back_to_admin": "Ar ais go dtí an riarachán",
+    "notifications": "Notifications",
+    "user_menu": "Roghchlár úsáideora",
+    "my_profile": "Mo phróifíl",
+    "sign_out": "Sínigh amach",
+    "user_fallback": "Account"
+  },
+  "sidebar": {
+    "title": "Partner Timebanks",
+    "nav_label": "Rannóga Bainc Ama Comhpháirtithe",
+    "expand": "Leathnaigh barra taoibh",
+    "collapse": "Laghdaigh an barra taoibh",
+    "full_admin": "Full Admin Panel",
+    "section_overview": "Overview",
+    "section_network": "Líonra comhpháirtithe",
+    "section_external": "Naisc sheachtracha",
+    "section_caring": "Caring Community",
+    "section_access": "Rochtain & slándáil",
+    "section_data": "Gníomhaíocht & sonraí",
+    "section_settings": "Settings"
+  },
+  "nav": {
+    "overview": "Overview",
+    "partnerships": "Partnerships",
+    "directory": "Eolaire comhpháirtithe",
+    "neighborhoods": "Neighbourhoods",
+    "credit_agreements": "Comhaontuithe creidmheasa",
+    "external_partners": "Ardáin sheachtracha",
+    "credit_commons": "Credit Commons",
+    "inbound_api": "Comhpháirtithe API isteach",
+    "caring_peers": "Comharchumainn chomhpháirtíochta",
+    "api_keys": "Eochracha API",
+    "webhooks": "Greamáin gréasáin imeachtaí",
+    "api_docs": "Treoir forbróir",
+    "activity": "Fotha gníomhaíochta",
+    "analytics": "Analytics",
+    "aggregates": "Staitisticí roinnte",
+    "data": "Bainistíocht sonraí",
+    "settings": "Socruithe líonra"
+  },
+  "breadcrumbs": {
+    "aria_label": "Breadcrumbs",
+    "overview": "Partner Timebanks",
+    "partnerships": "Partnerships",
+    "directory": "Eolaire comhpháirtithe",
+    "profile": "Ár liostú",
+    "neighborhoods": "Neighbourhoods",
+    "credit_agreements": "Comhaontuithe creidmheasa",
+    "external_partners": "Ardáin sheachtracha",
+    "credit_commons": "Credit Commons",
+    "inbound_api": "Comhpháirtithe API isteach",
+    "caring": "Caring Community",
+    "caring_peers": "Comharchumainn chomhpháirtíochta",
+    "api_keys": "Eochracha API",
+    "create": "Create",
+    "webhooks": "Greamáin gréasáin imeachtaí",
+    "api_docs": "Treoir forbróir",
+    "activity": "Fotha gníomhaíochta",
+    "analytics": "Analytics",
+    "aggregates": "Staitisticí roinnte",
+    "data": "Bainistíocht sonraí",
+    "settings": "Socruithe líonra"
+  },
+  "overview": {
+    "page_title": "Partner Timebanks",
+    "title": "Partner Timebanks",
+    "description": "Ceangail do bhanc ama le pobail eile ionas gur féidir le baill am agus scileanna a mhalartú thar teorainneacha. Níl an réimse seo le feiceáil ach ag sár-riarthóirí.",
+    "open": "Open",
+    "disabled_banner": {
+      "title": "Tá an chomhpháirtíocht múchta",
+      "hint": "Ní roinntear aon rud le bainc ama eile go dtí go gcuirfidh tú ar siúl é i socruithe Líonra.",
+      "cta": "Oscail socruithe"
+    },
+    "errors_banner": {
+      "title": "Bhí fadhbanna ag roinnt nasc le déanaí",
+      "hint_one": "{{count}} theip ar ghlao ó chóras comhpháirtíochta le 30 lá anuas.",
+      "hint_other": "{{count}} ar theip ar ghlaonna ó chórais chomhpháirtíochta le 30 lá anuas.",
+      "cta": "Féach ar ghníomhaíocht"
+    },
+    "stats": {
+      "active_partners": "Comhpháirtithe gníomhacha",
+      "active_partners_hint": "Bainc ama a mhalartaíonn tú leo inniu",
+      "pending_requests": "Iarratais ar feitheamh",
+      "pending_requests_hint": "Iarratais comhpháirtíochta ag fanacht le cinneadh",
+      "external_platforms": "Ardáin sheachtracha",
+      "external_platforms_hint": "Naisc lasmuigh de líonra NEXUS",
+      "exchanges_30d": "Malartuithe (30 lá)",
+      "exchanges_30d_hint": "Creidmheasanna ama seolta nó faighte thar na comhpháirtithe"
+    },
+    "checklist": {
+      "title": "Dul ar bun",
+      "hint": "Oibrigh trí na céimeanna seo le tosú ar mhalartú le bainc ama comhpháirtíochta.",
+      "enable": "Cuir comhpháirtíocht ar siúl i socruithe Líonra",
+      "profile": "Foilsigh liostú do phobail san eolaire comhpháirtithe",
+      "connect": "Déan teagmháil le do chéad bhanc ama comhpháirtíochta",
+      "credit": "Teorainneacha creidmheasa a chomhaontú le do chomhpháirtithe",
+      "optional": "Optional"
+    },
+    "top_partners": {
+      "title": "Comhpháirtithe is gníomhaí",
+      "hint": "Cá háit a tharla na malartuithe le 30 lá anuas.",
+      "empty_title": "Níl aon ghníomhaíocht comhpháirtíochta fós",
+      "empty_hint": "Nuair a nascann tú le banc ama comhpháirtíochta, taispeántar a ngníomhaíocht anseo.",
+      "activity_one": "{{count}} exchange",
+      "activity_other": "{{count}} exchanges"
+    },
+    "federation_off": {
+      "title": "Tá comhpháirtíocht le bainc ama eile múchta",
+      "hint": "Níl an ghné chónaidhmithe cumasaithe don phobal seo. Taispeántar taobh leis na réimsí atá ar fáil duit."
+    }
+  },
+  "pages": {
+    "partnerships": {
+      "title": "Partnerships",
+      "description": "Do chomhaontuithe le bainc ama eile ar líonra NEXUS - cé leis a bhfuil tú ceangailte, cad a roinneann tú, agus iarratais ag fanacht le cinneadh."
+    },
+    "directory": {
+      "title": "Eolaire comhpháirtithe",
+      "description": "Brabhsáil bainc ama eile ar an líonra agus iarr dul i gcomhpháirtíocht leo."
+    },
+    "directory_profile": {
+      "title": "Ár liostú",
+      "description": "An chuma ar do phobal ar bhainc ama eile san eolaire comhpháirtithe."
+    },
+    "neighborhoods": {
+      "title": "Neighbourhoods",
+      "description": "Limistéir gheografacha de do phobal is féidir a roinnt le bainc ama comhpháirtithe in aice láimhe."
+    },
+    "credit_agreements": {
+      "title": "Comhaontuithe creidmheasa",
+      "description": "Na teorainneacha atá comhaontaithe agat le gach comhpháirtí ar cé mhéad creidmheasanna ama is féidir a shreabhadh idir do phobail."
+    },
+    "external_partners": {
+      "title": "Ardáin sheachtracha",
+      "description": "Naisc le bainc ama a ritheann ar bhogearraí eile - Komunitin, TimeOverflow nó Credit Commons - lena n-áirítear seiceálacha sláinte agus logaí glaonna."
+    },
+    "credit_commons": {
+      "title": "Credit Commons",
+      "description": "Áit do phobail i líonra cuntasaíochta Credit Commons — a aitheantas nód, nód tuismitheora agus ráta malairte."
+    },
+    "inbound_api": {
+      "title": "Comhpháirtithe API isteach",
+      "description": "Córais sheachtracha — bainc, próiseálaithe íocaíochta, bogearraí bardasach — a cheadaítear chun sonraí do phobail a chur isteach."
+    },
+    "caring_peers": {
+      "title": "Comharchumainn chomhpháirtíochta",
+      "description": "Ardáin chomhbhácha eile a mhalartaíonn an comharchumann seo aistrithe uair an chloig le. Tá a rún comhroinnte féin ag gach nasc."
+    },
+    "api_keys": {
+      "title": "Eochracha API",
+      "description": "Úsáideann na hardáin chomhpháirtíochta eochracha chun labhairt go slán le do phobal. Eisigh, rothlaigh nó cúlghair iad anseo."
+    },
+    "create_api_key": {
+      "title": "Cruthaigh eochair API",
+      "description": "Eochair nua a eisiúint le haghaidh ardán comhpháirtíochta, ag roghnú go díreach cad a cheadaítear dó a dhéanamh."
+    },
+    "webhooks": {
+      "title": "Greamáin gréasáin imeachtaí",
+      "description": "Fógraí uathoibríocha seolta chuig córais chomhpháirtíochta nuair a tharlaíonn rud éigin anseo - le logaí seachadta agus cnaipe tástála."
+    },
+    "api_docs": {
+      "title": "Treoir forbróir",
+      "description": "Tagairt theicniúil don API comhpháirtíochta — roinn é seo le forbróir comhpháirtí nuair a bhunaíonn siad nasc."
+    },
+    "activity": {
+      "title": "Fotha gníomhaíochta",
+      "description": "Loga reatha de gach rud a mhalartaítear le bainc ama comhpháirtíochta — aistrithe, teachtaireachtaí agus athruithe comhpháirtíochta."
+    },
+    "analytics": {
+      "title": "Analytics",
+      "description": "Cairteacha agus uimhreacha do ghníomhaíocht do chomhpháirtí — cad a mhalartaíodh, cé leis, agus conas atá sé ag treochtáil."
+    },
+    "aggregates": {
+      "title": "Staitisticí roinnte",
+      "description": "Do thoiliú le staitisticí comhiomlánaithe gan ainm a roinnt leis an líonra níos leithne - ní fhágann aon rud pearsanta do phobal riamh."
+    },
+    "data": {
+      "title": "Bainistíocht sonraí",
+      "description": "Easpórtáil, iompórtáil nó glan suas do shonraí comhpháirtíochta."
+    },
+    "settings": {
+      "title": "Socruithe líonra",
+      "description": "Aistríonn an máistir do chomhpháirtíocht - cas air nó as é, agus roghnaigh cad a roinneann do phobal le comhpháirtithe."
+    }
+  }
+}

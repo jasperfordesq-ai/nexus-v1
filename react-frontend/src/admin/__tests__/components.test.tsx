@@ -130,12 +130,14 @@ describe('AdminSidebar', () => {
     expect(screen.getByText('Super Admin Panel')).toBeInTheDocument();
   });
 
-  it('shows federation section when feature enabled', () => {
+  it('shows the Partner Timebanks panel entry for super admins with federation enabled', () => {
     render(
       <Wrapper>
         <AdminSidebar collapsed={false} onToggle={vi.fn()} />
       </Wrapper>
     );
+    // Single entry to /partner-timebanks — the old 15-link federation and
+    // integrations sections were retired on 2026-07-02.
     expect(screen.getByText('Partner Timebanks')).toBeInTheDocument();
   });
 });

@@ -23,7 +23,9 @@ const LoyaltyAdminPage = lazy(() => import('@/admin/modules/caring-community/Loy
 const HourTransferAdminPage = lazy(() => import('@/admin/modules/caring-community/HourTransferAdminPage'));
 const RegionalPointsAdminPage = lazy(() => import('@/admin/modules/caring-community/RegionalPointsAdminPage'));
 const SubRegionsAdminPage = lazy(() => import('@/admin/modules/caring-community/SubRegionsAdminPage'));
-const FederationPeersAdminPage = lazy(() => import('@/admin/modules/caring-community/FederationPeersAdminPage'));
+// Federation peers moved to the super-admin-only Partner Timebanks panel
+// (/partner-timebanks/caring/peers) on 2026-07-02 — external-partner setup
+// is no longer visible to regular caring-hub admins.
 const HelpRequestSlaAdminPage = lazy(() => import('@/admin/modules/caring-community/HelpRequestSlaAdminPage'));
 const CareProviderAdminPage = lazy(() => import('@/admin/modules/caring-community/CareProviderAdminPage'));
 const WarmthPassAdminPage = lazy(() => import('@/admin/modules/caring-community/WarmthPassAdminPage'));
@@ -83,7 +85,6 @@ export function CaringRoutes() {
       <Route path="hour-transfers" element={<Lazy><HourTransferAdminPage /></Lazy>} />
       <Route path="regional-points" element={<Lazy><RegionalPointsAdminPage /></Lazy>} />
       <Route path="sub-regions" element={<Lazy><SubRegionsAdminPage /></Lazy>} />
-      <Route path="federation-peers" element={<Lazy><FederationPeersAdminPage /></Lazy>} />
       <Route path="sla-dashboard" element={<Lazy><HelpRequestSlaAdminPage /></Lazy>} />
       <Route path="providers" element={<Lazy><CareProviderAdminPage /></Lazy>} />
       <Route path="warmth-pass" element={<Lazy><WarmthPassAdminPage /></Lazy>} />

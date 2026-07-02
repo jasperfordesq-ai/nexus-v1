@@ -1,0 +1,195 @@
+{
+  "checking_permissions": "Rechten controleren...",
+  "layout": {
+    "skip_to_main": "Ga naar de hoofdinhoud",
+    "close_navigation": "Navigatie sluiten",
+    "navigation": "Partner Tijdbanken-navigatie"
+  },
+  "header": {
+    "toggle_sidebar": "Schakel navigatie in",
+    "back_to_admin": "Terug naar beheerder",
+    "notifications": "Notifications",
+    "user_menu": "Gebruikersmenu",
+    "my_profile": "Mijn profiel",
+    "sign_out": "Meld u af",
+    "user_fallback": "Account"
+  },
+  "sidebar": {
+    "title": "Partner Timebanks",
+    "nav_label": "Partnertijdbankensecties",
+    "expand": "Zijbalk uitvouwen",
+    "collapse": "Zijbalk samenvouwen",
+    "full_admin": "Full Admin Panel",
+    "section_overview": "Overview",
+    "section_network": "Partnernetwerk",
+    "section_external": "Externe aansluitingen",
+    "section_caring": "Caring Community",
+    "section_access": "Toegang & beveiliging",
+    "section_data": "Activiteit en gegevens",
+    "section_settings": "Settings"
+  },
+  "nav": {
+    "overview": "Overview",
+    "partnerships": "Partnerships",
+    "directory": "Partnerlijst",
+    "neighborhoods": "Neighbourhoods",
+    "credit_agreements": "Kredietovereenkomsten",
+    "external_partners": "Externe platforms",
+    "credit_commons": "Credit Commons",
+    "inbound_api": "Inkomende API-partners",
+    "caring_peers": "Partnercoöperaties",
+    "api_keys": "API-sleutels",
+    "webhooks": "Webhooks voor evenementen",
+    "api_docs": "Handleiding voor ontwikkelaars",
+    "activity": "Activiteitenfeed",
+    "analytics": "Analytics",
+    "aggregates": "Gedeelde statistieken",
+    "data": "Gegevensbeheer",
+    "settings": "Netwerkinstellingen"
+  },
+  "breadcrumbs": {
+    "aria_label": "Breadcrumbs",
+    "overview": "Partner Timebanks",
+    "partnerships": "Partnerships",
+    "directory": "Partnerlijst",
+    "profile": "Onze vermelding",
+    "neighborhoods": "Neighbourhoods",
+    "credit_agreements": "Kredietovereenkomsten",
+    "external_partners": "Externe platforms",
+    "credit_commons": "Credit Commons",
+    "inbound_api": "Inkomende API-partners",
+    "caring": "Caring Community",
+    "caring_peers": "Partnercoöperaties",
+    "api_keys": "API-sleutels",
+    "create": "Create",
+    "webhooks": "Webhooks voor evenementen",
+    "api_docs": "Handleiding voor ontwikkelaars",
+    "activity": "Activiteitenfeed",
+    "analytics": "Analytics",
+    "aggregates": "Gedeelde statistieken",
+    "data": "Gegevensbeheer",
+    "settings": "Netwerkinstellingen"
+  },
+  "overview": {
+    "page_title": "Partner Timebanks",
+    "title": "Partner Timebanks",
+    "description": "Verbind uw tijdbank met andere communities, zodat leden tijd en vaardigheden over de grenzen heen kunnen uitwisselen. Dit gebied is alleen zichtbaar voor superbeheerders.",
+    "open": "Open",
+    "disabled_banner": {
+      "title": "Partnerschap is uitgeschakeld",
+      "hint": "Er wordt niets gedeeld met andere tijdbanken totdat u dit inschakelt in Netwerkinstellingen.",
+      "cta": "Instellingen openen"
+    },
+    "errors_banner": {
+      "title": "Sommige verbindingen hadden onlangs problemen",
+      "hint_one": "{{count}} mislukte oproep van een partnersysteem in de afgelopen 30 dagen.",
+      "hint_other": "{{count}} mislukte oproepen van partnersystemen in de afgelopen 30 dagen.",
+      "cta": "Activiteit bekijken"
+    },
+    "stats": {
+      "active_partners": "Actieve partners",
+      "active_partners_hint": "Tijdbanken waarmee u vandaag wisselt",
+      "pending_requests": "In behandeling zijnde verzoeken",
+      "pending_requests_hint": "Partnerschapsverzoeken wachten op een beslissing",
+      "external_platforms": "Externe platforms",
+      "external_platforms_hint": "Verbindingen buiten het NEXUS-netwerk",
+      "exchanges_30d": "Ruilen (30 dagen)",
+      "exchanges_30d_hint": "Tijdskredieten verzonden of ontvangen via partners"
+    },
+    "checklist": {
+      "title": "Aan de slag",
+      "hint": "Doorloop deze stappen om te beginnen met uitwisselen met tijdbanken van partners.",
+      "enable": "Schakel partnering in Netwerkinstellingen in",
+      "profile": "Publiceer de vermelding van uw community in de partnerlijst",
+      "connect": "Maak verbinding met uw eerste partnertijdbank",
+      "credit": "Spreek kredietlimieten af ​​met uw partners",
+      "optional": "Optional"
+    },
+    "top_partners": {
+      "title": "Meest actieve partners",
+      "hint": "Waar de uitwisselingen in de afgelopen 30 dagen hebben plaatsgevonden.",
+      "empty_title": "Nog geen partneractiviteit",
+      "empty_hint": "Zodra u verbinding maakt met een tijdbank van een partner, wordt hun activiteit hier weergegeven.",
+      "activity_one": "{{count}} exchange",
+      "activity_other": "{{count}} exchanges"
+    },
+    "federation_off": {
+      "title": "Samenwerken met andere tijdbanken is uitgeschakeld",
+      "hint": "De federatiefunctie is niet ingeschakeld voor deze community. Hiernaast worden de gebieden weergegeven die voor u beschikbaar zijn."
+    }
+  },
+  "pages": {
+    "partnerships": {
+      "title": "Partnerships",
+      "description": "Uw overeenkomsten met andere tijdbanken op het NEXUS-netwerk: met wie u bent verbonden, wat u deelt en verzoeken die wachten op een beslissing."
+    },
+    "directory": {
+      "title": "Partnerlijst",
+      "description": "Blader door andere tijdbanken op het netwerk en vraag om met hen samen te werken."
+    },
+    "directory_profile": {
+      "title": "Onze vermelding",
+      "description": "Hoe uw community wordt weergegeven voor andere tijdbanken in de partnerlijst."
+    },
+    "neighborhoods": {
+      "title": "Neighbourhoods",
+      "description": "Geografische gebieden van uw gemeenschap die kunnen worden gedeeld met tijdbanken van partners in de buurt."
+    },
+    "credit_agreements": {
+      "title": "Kredietovereenkomsten",
+      "description": "De limieten die u met elke partner bent overeengekomen over het aantal tijdskredieten dat tussen uw community's kan stromen."
+    },
+    "external_partners": {
+      "title": "Externe platforms",
+      "description": "Verbindingen met tijdbanken die op andere software draaien – Komunitin, TimeOverflow of Credit Commons – inclusief gezondheidscontroles en oproeplogboeken."
+    },
+    "credit_commons": {
+      "title": "Credit Commons",
+      "description": "De plaats van uw community in het Credit Commons-accountingnetwerk: de knooppuntidentiteit, het bovenliggende knooppunt en de wisselkoers."
+    },
+    "inbound_api": {
+      "title": "Inkomende API-partners",
+      "description": "Externe systemen – banken, betalingsverwerkers, gemeentelijke software – die toegang mogen krijgen tot de gegevens van uw gemeenschap."
+    },
+    "caring_peers": {
+      "title": "Partnercoöperaties",
+      "description": "Andere zorgzame gemeenschapsplatformen waarmee deze coöperatie urenoverdrachten uitwisselt. Elke verbinding heeft zijn eigen gedeelde geheim."
+    },
+    "api_keys": {
+      "title": "API-sleutels",
+      "description": "De sleutels die partnerplatforms gebruiken om veilig met uw community te praten. U kunt ze hier uitgeven, roteren of intrekken."
+    },
+    "create_api_key": {
+      "title": "Maak een API-sleutel",
+      "description": "Geef een nieuwe sleutel uit voor een partnerplatform en kies precies wat het mag doen."
+    },
+    "webhooks": {
+      "title": "Webhooks voor evenementen",
+      "description": "Automatische meldingen die naar partnersystemen worden verzonden wanneer hier iets gebeurt – met leveringslogboeken en een testknop."
+    },
+    "api_docs": {
+      "title": "Handleiding voor ontwikkelaars",
+      "description": "Technische referentie voor de partner-API: deel deze met de ontwikkelaar van een partner wanneer deze een verbinding tot stand brengt."
+    },
+    "activity": {
+      "title": "Activiteitenfeed",
+      "description": "Een doorlopend logboek van alles wat wordt uitgewisseld met tijdbanken van partners: overdrachten, berichten en partnerschapswijzigingen."
+    },
+    "analytics": {
+      "title": "Analytics",
+      "description": "Grafieken en cijfers voor uw partneractiviteit: wat er is uitgewisseld, met wie en hoe deze trend is."
+    },
+    "aggregates": {
+      "title": "Gedeelde statistieken",
+      "description": "Uw toestemming voor het delen van anonieme, geaggregeerde statistieken met het bredere netwerk; niets persoonlijks verlaat ooit uw community."
+    },
+    "data": {
+      "title": "Gegevensbeheer",
+      "description": "Exporteer, importeer of ruim uw partnergegevens op."
+    },
+    "settings": {
+      "title": "Netwerkinstellingen",
+      "description": "De hoofdschakelaars voor partnering: schakel deze in of uit en kies wat uw community deelt met partners."
+    }
+  }
+}

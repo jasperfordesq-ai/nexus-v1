@@ -116,6 +116,9 @@ const SuperAdminApp = lazyWithRetry(() => import('@/super-admin/SuperAdminApp'))
 // Broker Panel (lazy-loaded — simplified admin interface for brokers)
 const BrokerApp = lazyWithRetry(() => import('@/broker/BrokerApp'));
 
+// Partner Timebanks Panel (lazy-loaded — super-admin-only federation/partner hub)
+const PartnersApp = lazyWithRetry(() => import('@/partners/PartnersApp'));
+
 // Community Caring Panel (lazy-loaded — dedicated hub for caring_community module)
 const CaringApp = lazyWithRetry(() => import('@/caring/CaringApp'));
 
@@ -1786,6 +1789,9 @@ function AppRoutes() {
 
       {/* Broker Panel (simplified admin for brokers) — fully lazy-loaded */}
       <Route path="broker/*" element={<BrokerApp />} />
+
+      {/* Partner Timebanks Panel (super admins only) — fully lazy-loaded */}
+      <Route path="partner-timebanks/*" element={<PartnersApp />} />
 
       {/* Community Caring Panel — fully lazy-loaded, gated by caring_community feature */}
       <Route path="caring/*" element={<CaringApp />} />

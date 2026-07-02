@@ -1,0 +1,195 @@
+{
+  "checking_permissions": "Berechtigungen werden überprüft...",
+  "layout": {
+    "skip_to_main": "Zum Hauptinhalt springen",
+    "close_navigation": "Navigation schließen",
+    "navigation": "Navigation in Partner-Zeitbanken"
+  },
+  "header": {
+    "toggle_sidebar": "Navigation umschalten",
+    "back_to_admin": "Zurück zum Admin",
+    "notifications": "Notifications",
+    "user_menu": "Benutzermenü",
+    "my_profile": "Mein Profil",
+    "sign_out": "Abmelden",
+    "user_fallback": "Account"
+  },
+  "sidebar": {
+    "title": "Partner Timebanks",
+    "nav_label": "Abschnitte zu Partner-Zeitbanken",
+    "expand": "Seitenleiste erweitern",
+    "collapse": "Seitenleiste einklappen",
+    "full_admin": "Full Admin Panel",
+    "section_overview": "Overview",
+    "section_network": "Partnernetzwerk",
+    "section_external": "Externe Verbindungen",
+    "section_caring": "Caring Community",
+    "section_access": "Zugang und Sicherheit",
+    "section_data": "Aktivität und Daten",
+    "section_settings": "Settings"
+  },
+  "nav": {
+    "overview": "Overview",
+    "partnerships": "Partnerships",
+    "directory": "Partnerverzeichnis",
+    "neighborhoods": "Neighbourhoods",
+    "credit_agreements": "Kreditverträge",
+    "external_partners": "Externe Plattformen",
+    "credit_commons": "Credit Commons",
+    "inbound_api": "Inbound-API-Partner",
+    "caring_peers": "Partnergenossenschaften",
+    "api_keys": "API-Schlüssel",
+    "webhooks": "Event-Webhooks",
+    "api_docs": "Entwicklerhandbuch",
+    "activity": "Aktivitätsfeed",
+    "analytics": "Analytics",
+    "aggregates": "Geteilte Statistiken",
+    "data": "Datenmanagement",
+    "settings": "Netzwerkeinstellungen"
+  },
+  "breadcrumbs": {
+    "aria_label": "Breadcrumbs",
+    "overview": "Partner Timebanks",
+    "partnerships": "Partnerships",
+    "directory": "Partnerverzeichnis",
+    "profile": "Unser Eintrag",
+    "neighborhoods": "Neighbourhoods",
+    "credit_agreements": "Kreditverträge",
+    "external_partners": "Externe Plattformen",
+    "credit_commons": "Credit Commons",
+    "inbound_api": "Inbound-API-Partner",
+    "caring": "Caring Community",
+    "caring_peers": "Partnergenossenschaften",
+    "api_keys": "API-Schlüssel",
+    "create": "Create",
+    "webhooks": "Event-Webhooks",
+    "api_docs": "Entwicklerhandbuch",
+    "activity": "Aktivitätsfeed",
+    "analytics": "Analytics",
+    "aggregates": "Geteilte Statistiken",
+    "data": "Datenmanagement",
+    "settings": "Netzwerkeinstellungen"
+  },
+  "overview": {
+    "page_title": "Partner Timebanks",
+    "title": "Partner Timebanks",
+    "description": "Verbinden Sie Ihre Zeitbank mit anderen Communities, damit Mitglieder grenzüberschreitend Zeit und Fähigkeiten austauschen können. Dieser Bereich ist nur für Superadministratoren sichtbar.",
+    "open": "Open",
+    "disabled_banner": {
+      "title": "Die Partnerschaft ist ausgeschaltet",
+      "hint": "Es wird nichts mit anderen Zeitbanken geteilt, bis Sie es in den Netzwerkeinstellungen aktivieren.",
+      "cta": "Einstellungen öffnen"
+    },
+    "errors_banner": {
+      "title": "Einige Verbindungen hatten kürzlich Probleme",
+      "hint_one": "{{count}} fehlgeschlagener Aufruf von einem Partnersystem in den letzten 30 Tagen.",
+      "hint_other": "{{count}} fehlgeschlagene Aufrufe von Partnersystemen in den letzten 30 Tagen.",
+      "cta": "Aktivität anzeigen"
+    },
+    "stats": {
+      "active_partners": "Aktive Partner",
+      "active_partners_hint": "Zeitbanken, mit denen Sie heute tauschen",
+      "pending_requests": "Ausstehende Anfragen",
+      "pending_requests_hint": "Partnerschaftsanträge warten auf eine Entscheidung",
+      "external_platforms": "Externe Plattformen",
+      "external_platforms_hint": "Verbindungen außerhalb des NEXUS-Netzwerks",
+      "exchanges_30d": "Umtausch (30 Tage)",
+      "exchanges_30d_hint": "Zeitgutschriften, die zwischen Partnern gesendet oder empfangen werden"
+    },
+    "checklist": {
+      "title": "Einrichten",
+      "hint": "Gehen Sie diese Schritte durch, um mit dem Austausch mit Partner-Zeitbanken zu beginnen.",
+      "enable": "Aktivieren Sie die Partnerschaft in den Netzwerkeinstellungen",
+      "profile": "Veröffentlichen Sie den Eintrag Ihrer Community im Partnerverzeichnis",
+      "connect": "Verbinden Sie sich mit Ihrer ersten Partnerzeitbank",
+      "credit": "Vereinbaren Sie Kreditlimits mit Ihren Partnern",
+      "optional": "Optional"
+    },
+    "top_partners": {
+      "title": "Die aktivsten Partner",
+      "hint": "Wo der Austausch in den letzten 30 Tagen stattgefunden hat.",
+      "empty_title": "Noch keine Partneraktivität",
+      "empty_hint": "Sobald Sie sich mit einer Partner-Zeitbank verbinden, wird deren Aktivität hier angezeigt.",
+      "activity_one": "{{count}} exchange",
+      "activity_other": "{{count}} exchanges"
+    },
+    "federation_off": {
+      "title": "Die Partnerschaft mit anderen Zeitbanken ist ausgeschaltet",
+      "hint": "Die Föderationsfunktion ist für diese Community nicht aktiviert. Die Bereiche, die Ihnen zur Verfügung stehen, werden unten angezeigt."
+    }
+  },
+  "pages": {
+    "partnerships": {
+      "title": "Partnerships",
+      "description": "Ihre Vereinbarungen mit anderen Zeitbanken im NEXUS-Netzwerk – mit wem Sie verbunden sind, was Sie teilen und Anfragen, die auf eine Entscheidung warten."
+    },
+    "directory": {
+      "title": "Partnerverzeichnis",
+      "description": "Durchsuchen Sie andere Zeitbanken im Netzwerk und bitten Sie um eine Partnerschaft mit ihnen."
+    },
+    "directory_profile": {
+      "title": "Unser Eintrag",
+      "description": "Wie Ihre Community anderen Zeitbanken im Partnerverzeichnis angezeigt wird."
+    },
+    "neighborhoods": {
+      "title": "Neighbourhoods",
+      "description": "Geografische Bereiche Ihrer Community, die mit Partnerzeitbanken in der Nähe geteilt werden können."
+    },
+    "credit_agreements": {
+      "title": "Kreditverträge",
+      "description": "Die Grenzen, die Sie mit jedem Partner vereinbart haben, wie viele Zeitguthaben zwischen Ihren Communities fließen können."
+    },
+    "external_partners": {
+      "title": "Externe Plattformen",
+      "description": "Verbindungen zu Zeitbanken, die auf anderer Software laufen – Komunitin, TimeOverflow oder Credit Commons – einschließlich Gesundheitsprüfungen und Anrufprotokollen."
+    },
+    "credit_commons": {
+      "title": "Credit Commons",
+      "description": "Der Platz Ihrer Community im Credit Commons-Buchhaltungsnetzwerk – ihre Knotenidentität, ihr übergeordneter Knoten und ihr Wechselkurs."
+    },
+    "inbound_api": {
+      "title": "Inbound-API-Partner",
+      "description": "Externe Systeme – Banken, Zahlungsabwickler, kommunale Software – die auf die Daten Ihrer Gemeinde zugreifen dürfen."
+    },
+    "caring_peers": {
+      "title": "Partnergenossenschaften",
+      "description": "Mit anderen Caring-Community-Plattformen tauscht diese Genossenschaft Stundentransfers aus. Jede Verbindung hat ihr eigenes gemeinsames Geheimnis."
+    },
+    "api_keys": {
+      "title": "API-Schlüssel",
+      "description": "Die Schlüssel, die Partnerplattformen verwenden, um sicher mit Ihrer Community zu kommunizieren. Hier können Sie sie erteilen, rotieren oder widerrufen."
+    },
+    "create_api_key": {
+      "title": "API-Schlüssel erstellen",
+      "description": "Geben Sie einen neuen Schlüssel für eine Partnerplattform aus und wählen Sie dabei genau aus, was diese tun darf."
+    },
+    "webhooks": {
+      "title": "Event-Webhooks",
+      "description": "Automatische Benachrichtigungen an Partnersysteme, wenn hier etwas passiert – mit Zustellungsprotokollen und einem Test-Button."
+    },
+    "api_docs": {
+      "title": "Entwicklerhandbuch",
+      "description": "Technische Referenz für die Partner-API – teilen Sie diese dem Entwickler eines Partners mit, wenn dieser eine Verbindung einrichtet."
+    },
+    "activity": {
+      "title": "Aktivitätsfeed",
+      "description": "Ein laufendes Protokoll aller mit Partnerzeitbanken ausgetauschten Daten – Überweisungen, Nachrichten und Partnerschaftsänderungen."
+    },
+    "analytics": {
+      "title": "Analytics",
+      "description": "Diagramme und Zahlen für Ihre Partneraktivität – was wurde mit wem ausgetauscht und wie ist der Trend."
+    },
+    "aggregates": {
+      "title": "Geteilte Statistiken",
+      "description": "Ihre Zustimmung zur Weitergabe anonymer, aggregierter Statistiken an das gesamte Netzwerk – Ihre Community wird niemals von persönlichen Daten verlassen."
+    },
+    "data": {
+      "title": "Datenmanagement",
+      "description": "Exportieren, importieren oder bereinigen Sie Ihre Partnerdaten."
+    },
+    "settings": {
+      "title": "Netzwerkeinstellungen",
+      "description": "Die Hauptschalter für die Partnerschaft – schalten Sie sie ein oder aus und wählen Sie aus, was Ihre Community mit Partnern teilt."
+    }
+  }
+}

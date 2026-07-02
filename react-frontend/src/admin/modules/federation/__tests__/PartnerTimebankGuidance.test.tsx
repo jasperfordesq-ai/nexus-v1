@@ -30,13 +30,15 @@ describe('PartnerTimebankGuidance', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Related pages' }));
 
+    // Related links point into the Partner Timebanks panel (2026-07-02) —
+    // the old /admin/federation/* routes were retired without redirects.
     expect(screen.getByRole('link', { name: 'External Protocol Partners' })).toHaveAttribute(
       'href',
-      '/test/admin/federation/external-partners',
+      '/test/partner-timebanks/external-partners',
     );
     expect(screen.getByRole('link', { name: 'Inbound API Partners' })).toHaveAttribute(
       'href',
-      '/test/admin/api-partners',
+      '/test/partner-timebanks/inbound-api',
     );
   });
 });

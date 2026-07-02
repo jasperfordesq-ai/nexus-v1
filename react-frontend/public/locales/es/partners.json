@@ -1,0 +1,195 @@
+{
+  "checking_permissions": "Comprobando permisos...",
+  "layout": {
+    "skip_to_main": "Saltar al contenido principal",
+    "close_navigation": "Cerrar navegación",
+    "navigation": "Navegación de bancos de tiempo de socios"
+  },
+  "header": {
+    "toggle_sidebar": "Alternar navegación",
+    "back_to_admin": "Volver al administrador",
+    "notifications": "Notifications",
+    "user_menu": "Menú de usuario",
+    "my_profile": "mi perfil",
+    "sign_out": "desconectar",
+    "user_fallback": "Account"
+  },
+  "sidebar": {
+    "title": "Partner Timebanks",
+    "nav_label": "Secciones de bancos de tiempo de socios",
+    "expand": "Expandir barra lateral",
+    "collapse": "Contraer barra lateral",
+    "full_admin": "Full Admin Panel",
+    "section_overview": "Overview",
+    "section_network": "Red de socios",
+    "section_external": "Conexiones externas",
+    "section_caring": "Caring Community",
+    "section_access": "Acceso y seguridad",
+    "section_data": "Actividad y datos",
+    "section_settings": "Settings"
+  },
+  "nav": {
+    "overview": "Overview",
+    "partnerships": "Partnerships",
+    "directory": "Directorio de socios",
+    "neighborhoods": "Neighbourhoods",
+    "credit_agreements": "Contratos de crédito",
+    "external_partners": "Plataformas externas",
+    "credit_commons": "Credit Commons",
+    "inbound_api": "Socios de API entrantes",
+    "caring_peers": "Cooperativas asociadas",
+    "api_keys": "Claves API",
+    "webhooks": "Webhooks de eventos",
+    "api_docs": "guía para desarrolladores",
+    "activity": "Feed de actividades",
+    "analytics": "Analytics",
+    "aggregates": "Estadísticas compartidas",
+    "data": "Gestión de datos",
+    "settings": "Configuración de red"
+  },
+  "breadcrumbs": {
+    "aria_label": "Breadcrumbs",
+    "overview": "Partner Timebanks",
+    "partnerships": "Partnerships",
+    "directory": "Directorio de socios",
+    "profile": "Nuestro listado",
+    "neighborhoods": "Neighbourhoods",
+    "credit_agreements": "Contratos de crédito",
+    "external_partners": "Plataformas externas",
+    "credit_commons": "Credit Commons",
+    "inbound_api": "Socios de API entrantes",
+    "caring": "Caring Community",
+    "caring_peers": "Cooperativas asociadas",
+    "api_keys": "Claves API",
+    "create": "Create",
+    "webhooks": "Webhooks de eventos",
+    "api_docs": "guía para desarrolladores",
+    "activity": "Feed de actividades",
+    "analytics": "Analytics",
+    "aggregates": "Estadísticas compartidas",
+    "data": "Gestión de datos",
+    "settings": "Configuración de red"
+  },
+  "overview": {
+    "page_title": "Partner Timebanks",
+    "title": "Partner Timebanks",
+    "description": "Conecte su banco de tiempo con otras comunidades para que los miembros puedan intercambiar tiempo y habilidades a través de fronteras. Esta área solo es visible para superadministradores.",
+    "open": "Open",
+    "disabled_banner": {
+      "title": "La asociación está desactivada",
+      "hint": "No se comparte nada con otros bancos de tiempo hasta que lo actives en la configuración de red.",
+      "cta": "Abrir configuración"
+    },
+    "errors_banner": {
+      "title": "Algunas conexiones tuvieron problemas recientemente",
+      "hint_one": "{{count}} llamada fallida desde un sistema asociado en los últimos 30 días.",
+      "hint_other": "{{count}} llamadas fallidas desde sistemas asociados en los últimos 30 días.",
+      "cta": "Ver actividad"
+    },
+    "stats": {
+      "active_partners": "Socios activos",
+      "active_partners_hint": "Bancos de tiempo con los que intercambias hoy",
+      "pending_requests": "Solicitudes pendientes",
+      "pending_requests_hint": "Solicitudes de asociación a la espera de una decisión",
+      "external_platforms": "Plataformas externas",
+      "external_platforms_hint": "Conexiones fuera de la red NEXUS",
+      "exchanges_30d": "Intercambios (30 días)",
+      "exchanges_30d_hint": "Créditos de tiempo enviados o recibidos entre socios"
+    },
+    "checklist": {
+      "title": "Preparándose",
+      "hint": "Siga estos pasos para comenzar a intercambiar con bancos de tiempo asociados.",
+      "enable": "Activar la asociación en la configuración de red",
+      "profile": "Publica el listado de tu comunidad en el directorio de socios",
+      "connect": "Conéctate con tu primer banco de tiempo asociado",
+      "credit": "Acuerda límites de crédito con tus socios",
+      "optional": "Optional"
+    },
+    "top_partners": {
+      "title": "Socios más activos",
+      "hint": "Dónde ocurrieron los intercambios en los últimos 30 días.",
+      "empty_title": "Aún no hay actividad de socios",
+      "empty_hint": "Una vez que se conecta con un banco de tiempo asociado, su actividad aparece aquí.",
+      "activity_one": "{{count}} exchange",
+      "activity_other": "{{count}} exchanges"
+    },
+    "federation_off": {
+      "title": "La asociación con otros bancos de tiempo está desactivada",
+      "hint": "La función de federación no está habilitada para esta comunidad. Las áreas que están disponibles para usted se muestran al lado."
+    }
+  },
+  "pages": {
+    "partnerships": {
+      "title": "Partnerships",
+      "description": "Tus acuerdos con otros bancos de tiempo en la red NEXUS: con quién estás conectado, qué compartes y solicitudes en espera de una decisión."
+    },
+    "directory": {
+      "title": "Directorio de socios",
+      "description": "Explore otros bancos de tiempo en la red y solicite asociarse con ellos."
+    },
+    "directory_profile": {
+      "title": "Nuestro listado",
+      "description": "Cómo aparece su comunidad ante otros bancos de tiempo en el directorio de socios."
+    },
+    "neighborhoods": {
+      "title": "Neighbourhoods",
+      "description": "Áreas geográficas de su comunidad que se pueden compartir con bancos de tiempo asociados cercanos."
+    },
+    "credit_agreements": {
+      "title": "Contratos de crédito",
+      "description": "Los límites que has acordado con cada socio sobre cuántos créditos de tiempo pueden fluir entre tus comunidades."
+    },
+    "external_partners": {
+      "title": "Plataformas externas",
+      "description": "Conexiones a bancos de tiempo que se ejecutan en otro software (Komunitin, TimeOverflow o Credit Commons), incluidos controles de estado y registros de llamadas."
+    },
+    "credit_commons": {
+      "title": "Credit Commons",
+      "description": "El lugar de su comunidad en la red contable de Credit Commons: su identidad de nodo, su nodo principal y su tipo de cambio."
+    },
+    "inbound_api": {
+      "title": "Socios de API entrantes",
+      "description": "Sistemas externos (bancos, procesadores de pagos, software municipal) que pueden acceder a los datos de su comunidad."
+    },
+    "caring_peers": {
+      "title": "Cooperativas asociadas",
+      "description": "Otras plataformas comunitarias solidarias con las que esta cooperativa intercambia transferencias de horas. Cada conexión tiene su propio secreto compartido."
+    },
+    "api_keys": {
+      "title": "Claves API",
+      "description": "Las claves que utilizan las plataformas de socios para hablar con su comunidad de forma segura. Emitirlos, rotarlos o revocarlos aquí."
+    },
+    "create_api_key": {
+      "title": "Crear clave API",
+      "description": "Emita una nueva clave para una plataforma asociada y elija exactamente lo que se le permite hacer."
+    },
+    "webhooks": {
+      "title": "Webhooks de eventos",
+      "description": "Notificaciones automáticas enviadas a los sistemas asociados cuando sucede algo aquí, con registros de entrega y un botón de prueba."
+    },
+    "api_docs": {
+      "title": "guía para desarrolladores",
+      "description": "Referencia técnica para la API de socio: compártala con el desarrollador de un socio cuando configure una conexión."
+    },
+    "activity": {
+      "title": "Feed de actividades",
+      "description": "Un registro actualizado de todo lo intercambiado con los bancos de tiempo de los socios: transferencias, mensajes y cambios de asociación."
+    },
+    "analytics": {
+      "title": "Analytics",
+      "description": "Gráficos y números de la actividad de su socio: qué se intercambió, con quién y cuáles son las tendencias."
+    },
+    "aggregates": {
+      "title": "Estadísticas compartidas",
+      "description": "Su consentimiento para compartir estadísticas agregadas y anónimas con la red más amplia: nada personal sale nunca de su comunidad."
+    },
+    "data": {
+      "title": "Gestión de datos",
+      "description": "Exporte, importe o limpie sus datos de asociación."
+    },
+    "settings": {
+      "title": "Configuración de red",
+      "description": "El interruptor principal para asociarse: actívelo o desactívelo y elija lo que su comunidad comparte con los socios."
+    }
+  }
+}

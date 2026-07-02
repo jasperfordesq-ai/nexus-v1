@@ -151,10 +151,10 @@ export function ApiKeys() {
         <PageHeader
           title={t('federation.api_keys_title')}
           description={t('federation.api_keys_desc')}
-          actions={<Button startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys/create'))}>{t('federation.create_key')}</Button>}
+          actions={<Button startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/partner-timebanks/api-keys/create'))}>{t('federation.create_key')}</Button>}
         />
         <PartnerTimebankGuidance page="apiKeys" />
-        <EmptyState icon={Key} title={t('federation.no_api_keys')} description={t('federation.no_api_keys_desc')} actionLabel={t('federation.create_api_key_action')} onAction={() => navigate(tenantPath('/admin/federation/api-keys/create'))} />
+        <EmptyState icon={Key} title={t('federation.no_api_keys')} description={t('federation.no_api_keys_desc')} actionLabel={t('federation.create_api_key_action')} onAction={() => navigate(tenantPath('/partner-timebanks/api-keys/create'))} />
       </div>
     );
   }
@@ -167,7 +167,7 @@ export function ApiKeys() {
         actions={
           <div className="flex gap-2">
             <Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('common.refresh')}</Button>
-            <Button startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys/create'))}>{t('federation.create_key')}</Button>
+            <Button startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/partner-timebanks/api-keys/create'))}>{t('federation.create_key')}</Button>
           </div>
         }
       />

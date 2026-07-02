@@ -1,0 +1,195 @@
+{
+  "checking_permissions": "جارٍ التحقق من الأذونات...",
+  "layout": {
+    "skip_to_main": "انتقل إلى المحتوى الرئيسي",
+    "close_navigation": "إغلاق التنقل",
+    "navigation": "الملاحة شريك Timebanks"
+  },
+  "header": {
+    "toggle_sidebar": "تبديل التنقل",
+    "back_to_admin": "العودة إلى المشرف",
+    "notifications": "Notifications",
+    "user_menu": "قائمة المستخدم",
+    "my_profile": "ملفي الشخصي",
+    "sign_out": "تسجيل الخروج",
+    "user_fallback": "Account"
+  },
+  "sidebar": {
+    "title": "Partner Timebanks",
+    "nav_label": "أقسام Timebanks الشريكة",
+    "expand": "قم بتوسيع الشريط الجانبي",
+    "collapse": "طي الشريط الجانبي",
+    "full_admin": "Full Admin Panel",
+    "section_overview": "Overview",
+    "section_network": "شبكة الشركاء",
+    "section_external": "اتصالات خارجية",
+    "section_caring": "Caring Community",
+    "section_access": "الوصول والأمن",
+    "section_data": "النشاط والبيانات",
+    "section_settings": "Settings"
+  },
+  "nav": {
+    "overview": "Overview",
+    "partnerships": "Partnerships",
+    "directory": "دليل الشركاء",
+    "neighborhoods": "Neighbourhoods",
+    "credit_agreements": "اتفاقيات الائتمان",
+    "external_partners": "المنصات الخارجية",
+    "credit_commons": "Credit Commons",
+    "inbound_api": "شركاء واجهة برمجة التطبيقات الواردة",
+    "caring_peers": "التعاونيات الشريكة",
+    "api_keys": "مفاتيح واجهة برمجة التطبيقات",
+    "webhooks": "خطافات الويب للحدث",
+    "api_docs": "دليل المطور",
+    "activity": "خلاصة النشاط",
+    "analytics": "Analytics",
+    "aggregates": "إحصائيات مشتركة",
+    "data": "إدارة البيانات",
+    "settings": "إعدادات الشبكة"
+  },
+  "breadcrumbs": {
+    "aria_label": "Breadcrumbs",
+    "overview": "Partner Timebanks",
+    "partnerships": "Partnerships",
+    "directory": "دليل الشركاء",
+    "profile": "قائمتنا",
+    "neighborhoods": "Neighbourhoods",
+    "credit_agreements": "اتفاقيات الائتمان",
+    "external_partners": "المنصات الخارجية",
+    "credit_commons": "Credit Commons",
+    "inbound_api": "شركاء واجهة برمجة التطبيقات الواردة",
+    "caring": "Caring Community",
+    "caring_peers": "التعاونيات الشريكة",
+    "api_keys": "مفاتيح واجهة برمجة التطبيقات",
+    "create": "Create",
+    "webhooks": "خطافات الويب للحدث",
+    "api_docs": "دليل المطور",
+    "activity": "خلاصة النشاط",
+    "analytics": "Analytics",
+    "aggregates": "إحصائيات مشتركة",
+    "data": "إدارة البيانات",
+    "settings": "إعدادات الشبكة"
+  },
+  "overview": {
+    "page_title": "Partner Timebanks",
+    "title": "Partner Timebanks",
+    "description": "قم بتوصيل بنك الوقت الخاص بك بالمجتمعات الأخرى حتى يتمكن الأعضاء من تبادل الوقت والمهارات عبر الحدود. هذه المنطقة مرئية فقط للمشرفين المتميزين.",
+    "open": "Open",
+    "disabled_banner": {
+      "title": "تم إيقاف الشراكة",
+      "hint": "لا تتم مشاركة أي شيء مع بنوك الوقت الأخرى حتى تقوم بتشغيله في إعدادات الشبكة.",
+      "cta": "افتح الإعدادات"
+    },
+    "errors_banner": {
+      "title": "واجهت بعض الاتصالات مشاكل مؤخرًا",
+      "hint_one": "{{count}} فشل الاتصال من نظام شريك في آخر 30 يومًا.",
+      "hint_other": "{{count}} مكالمات فاشلة من الأنظمة الشريكة في آخر 30 يومًا.",
+      "cta": "عرض النشاط"
+    },
+    "stats": {
+      "active_partners": "الشركاء النشطين",
+      "active_partners_hint": "Timebanks التي تتبادل معها اليوم",
+      "pending_requests": "الطلبات المعلقة",
+      "pending_requests_hint": "طلبات الشراكة في انتظار القرار",
+      "external_platforms": "المنصات الخارجية",
+      "external_platforms_hint": "اتصالات خارج شبكة NEXUS",
+      "exchanges_30d": "التبادلات (30 يومًا)",
+      "exchanges_30d_hint": "أرصدة الوقت المرسلة أو المستلمة عبر الشركاء"
+    },
+    "checklist": {
+      "title": "جارٍ الإعداد",
+      "hint": "اتبع هذه الخطوات لبدء التبادل مع بنوك الوقت الشريكة.",
+      "enable": "قم بتشغيل الشراكة في إعدادات الشبكة",
+      "profile": "انشر قائمة مجتمعك في دليل الشركاء",
+      "connect": "تواصل مع شريكك الأول timebank",
+      "credit": "وافق على حدود الائتمان مع شركائك",
+      "optional": "Optional"
+    },
+    "top_partners": {
+      "title": "الشركاء الأكثر نشاطا",
+      "hint": "حيث حدثت التبادلات في آخر 30 يومًا.",
+      "empty_title": "لا يوجد نشاط شريك حتى الآن",
+      "empty_hint": "بمجرد الاتصال ببنك الوقت الشريك، يظهر نشاطه هنا.",
+      "activity_one": "{{count}} exchange",
+      "activity_other": "{{count}} exchanges"
+    },
+    "federation_off": {
+      "title": "تم إيقاف الشراكة مع بنوك الوقت الأخرى",
+      "hint": "لم يتم تمكين ميزة الاتحاد لهذا المجتمع. يتم عرض المناطق المتاحة لك جنبًا إلى جنب."
+    }
+  },
+  "pages": {
+    "partnerships": {
+      "title": "Partnerships",
+      "description": "اتفاقياتك مع بنوك الوقت الأخرى على شبكة NEXUS - الأشخاص الذين تتصل بهم، وما تشاركه، والطلبات التي تنتظر القرار."
+    },
+    "directory": {
+      "title": "دليل الشركاء",
+      "description": "تصفح بنوك الوقت الأخرى على الشبكة واطلب الشراكة معهم."
+    },
+    "directory_profile": {
+      "title": "قائمتنا",
+      "description": "كيف يظهر مجتمعك لبنوك الوقت الأخرى في دليل الشركاء."
+    },
+    "neighborhoods": {
+      "title": "Neighbourhoods",
+      "description": "المناطق الجغرافية لمجتمعك التي يمكن مشاركتها مع بنوك الوقت الشريكة القريبة."
+    },
+    "credit_agreements": {
+      "title": "اتفاقيات الائتمان",
+      "description": "الحدود التي اتفقت عليها مع كل شريك بشأن عدد الاعتمادات الزمنية التي يمكن أن تتدفق بين مجتمعاتك."
+    },
+    "external_partners": {
+      "title": "المنصات الخارجية",
+      "description": "اتصالات لبنوك الوقت التي تعمل على برامج أخرى - Komunitin أو TimeOverflow أو Credit Commons - بما في ذلك فحوصات السلامة وسجلات المكالمات."
+    },
+    "credit_commons": {
+      "title": "Credit Commons",
+      "description": "مكان مجتمعك في شبكة محاسبة Credit Commons - هوية العقدة والعقدة الأصلية وسعر الصرف."
+    },
+    "inbound_api": {
+      "title": "شركاء واجهة برمجة التطبيقات الواردة",
+      "description": "الأنظمة الخارجية - البنوك، ومعالجات الدفع، والبرامج البلدية - المسموح لها بالاتصال ببيانات مجتمعك."
+    },
+    "caring_peers": {
+      "title": "التعاونيات الشريكة",
+      "description": "منصات مجتمع الرعاية الأخرى التي تتبادل معها هذه التعاونية عمليات النقل على مدار الساعة. كل اتصال له سر مشترك خاص به."
+    },
+    "api_keys": {
+      "title": "مفاتيح واجهة برمجة التطبيقات",
+      "description": "تستخدم المنصات الشريكة الرئيسية للتحدث مع مجتمعك بشكل آمن. قم بإصدارها أو تدويرها أو إلغائها هنا."
+    },
+    "create_api_key": {
+      "title": "إنشاء مفتاح API",
+      "description": "قم بإصدار مفتاح جديد لمنصة شريكة، مع اختيار ما يُسمح لها بالقيام به بالضبط."
+    },
+    "webhooks": {
+      "title": "خطافات الويب للحدث",
+      "description": "يتم إرسال إشعارات تلقائية إلى الأنظمة الشريكة عند حدوث شيء ما هنا - مع سجلات التسليم وزر الاختبار."
+    },
+    "api_docs": {
+      "title": "دليل المطور",
+      "description": "المرجع الفني لواجهة برمجة تطبيقات الشريك - شارك هذا مع مطور الشريك عند إعداد الاتصال."
+    },
+    "activity": {
+      "title": "خلاصة النشاط",
+      "description": "سجل قيد التشغيل لكل شيء يتم تبادله مع بنوك الوقت الشريكة - التحويلات والرسائل وتغييرات الشراكة."
+    },
+    "analytics": {
+      "title": "Analytics",
+      "description": "الرسوم البيانية والأرقام لنشاط الشريك الخاص بك - ما الذي تم تبادله ومع من وكيف يتجه."
+    },
+    "aggregates": {
+      "title": "إحصائيات مشتركة",
+      "description": "موافقتك على مشاركة إحصائيات مجهولة المصدر ومجمعة مع الشبكة الأوسع - لا شيء شخصي يغادر مجتمعك على الإطلاق."
+    },
+    "data": {
+      "title": "إدارة البيانات",
+      "description": "تصدير أو استيراد أو تنظيف بيانات الشراكة الخاصة بك."
+    },
+    "settings": {
+      "title": "إعدادات الشبكة",
+      "description": "المفاتيح الرئيسية للشراكة - قم بتشغيلها أو إيقاف تشغيلها، واختر ما يشاركه مجتمعك مع الشركاء."
+    }
+  }
+}

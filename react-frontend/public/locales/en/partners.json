@@ -1,0 +1,195 @@
+{
+  "checking_permissions": "Checking permissions...",
+  "layout": {
+    "skip_to_main": "Skip to main content",
+    "close_navigation": "Close navigation",
+    "navigation": "Partner Timebanks navigation"
+  },
+  "header": {
+    "toggle_sidebar": "Toggle navigation",
+    "back_to_admin": "Back to admin",
+    "notifications": "Notifications",
+    "user_menu": "User menu",
+    "my_profile": "My profile",
+    "sign_out": "Sign out",
+    "user_fallback": "Account"
+  },
+  "sidebar": {
+    "title": "Partner Timebanks",
+    "nav_label": "Partner Timebanks sections",
+    "expand": "Expand sidebar",
+    "collapse": "Collapse sidebar",
+    "full_admin": "Full Admin Panel",
+    "section_overview": "Overview",
+    "section_network": "Partner network",
+    "section_external": "External connections",
+    "section_caring": "Caring Community",
+    "section_access": "Access & security",
+    "section_data": "Activity & data",
+    "section_settings": "Settings"
+  },
+  "nav": {
+    "overview": "Overview",
+    "partnerships": "Partnerships",
+    "directory": "Partner directory",
+    "neighborhoods": "Neighbourhoods",
+    "credit_agreements": "Credit agreements",
+    "external_partners": "External platforms",
+    "credit_commons": "Credit Commons",
+    "inbound_api": "Inbound API partners",
+    "caring_peers": "Partner cooperatives",
+    "api_keys": "API keys",
+    "webhooks": "Event webhooks",
+    "api_docs": "Developer guide",
+    "activity": "Activity feed",
+    "analytics": "Analytics",
+    "aggregates": "Shared statistics",
+    "data": "Data management",
+    "settings": "Network settings"
+  },
+  "breadcrumbs": {
+    "aria_label": "Breadcrumbs",
+    "overview": "Partner Timebanks",
+    "partnerships": "Partnerships",
+    "directory": "Partner directory",
+    "profile": "Our listing",
+    "neighborhoods": "Neighbourhoods",
+    "credit_agreements": "Credit agreements",
+    "external_partners": "External platforms",
+    "credit_commons": "Credit Commons",
+    "inbound_api": "Inbound API partners",
+    "caring": "Caring Community",
+    "caring_peers": "Partner cooperatives",
+    "api_keys": "API keys",
+    "create": "Create",
+    "webhooks": "Event webhooks",
+    "api_docs": "Developer guide",
+    "activity": "Activity feed",
+    "analytics": "Analytics",
+    "aggregates": "Shared statistics",
+    "data": "Data management",
+    "settings": "Network settings"
+  },
+  "overview": {
+    "page_title": "Partner Timebanks",
+    "title": "Partner Timebanks",
+    "description": "Connect your timebank with other communities so members can exchange time and skills across borders. This area is only visible to super admins.",
+    "open": "Open",
+    "disabled_banner": {
+      "title": "Partnering is switched off",
+      "hint": "Nothing is shared with other timebanks until you turn it on in Network settings.",
+      "cta": "Open settings"
+    },
+    "errors_banner": {
+      "title": "Some connections had problems recently",
+      "hint_one": "{{count}} failed call from a partner system in the last 30 days.",
+      "hint_other": "{{count}} failed calls from partner systems in the last 30 days.",
+      "cta": "View activity"
+    },
+    "stats": {
+      "active_partners": "Active partners",
+      "active_partners_hint": "Timebanks you exchange with today",
+      "pending_requests": "Pending requests",
+      "pending_requests_hint": "Partnership requests waiting on a decision",
+      "external_platforms": "External platforms",
+      "external_platforms_hint": "Connections outside the NEXUS network",
+      "exchanges_30d": "Exchanges (30 days)",
+      "exchanges_30d_hint": "Time credits sent or received across partners"
+    },
+    "checklist": {
+      "title": "Getting set up",
+      "hint": "Work through these steps to start exchanging with partner timebanks.",
+      "enable": "Turn on partnering in Network settings",
+      "profile": "Publish your community's listing in the partner directory",
+      "connect": "Connect with your first partner timebank",
+      "credit": "Agree credit limits with your partners",
+      "optional": "Optional"
+    },
+    "top_partners": {
+      "title": "Most active partners",
+      "hint": "Where the exchanges happened in the last 30 days.",
+      "empty_title": "No partner activity yet",
+      "empty_hint": "Once you connect with a partner timebank, their activity shows up here.",
+      "activity_one": "{{count}} exchange",
+      "activity_other": "{{count}} exchanges"
+    },
+    "federation_off": {
+      "title": "Partnering with other timebanks is switched off",
+      "hint": "The federation feature is not enabled for this community. The areas that are available to you are shown alongside."
+    }
+  },
+  "pages": {
+    "partnerships": {
+      "title": "Partnerships",
+      "description": "Your agreements with other timebanks on the NEXUS network — who you're connected to, what you share, and requests waiting on a decision."
+    },
+    "directory": {
+      "title": "Partner directory",
+      "description": "Browse other timebanks on the network and ask to partner with them."
+    },
+    "directory_profile": {
+      "title": "Our listing",
+      "description": "How your community appears to other timebanks in the partner directory."
+    },
+    "neighborhoods": {
+      "title": "Neighbourhoods",
+      "description": "Geographic areas of your community that can be shared with nearby partner timebanks."
+    },
+    "credit_agreements": {
+      "title": "Credit agreements",
+      "description": "The limits you've agreed with each partner on how many time credits can flow between your communities."
+    },
+    "external_partners": {
+      "title": "External platforms",
+      "description": "Connections to timebanks that run on other software — Komunitin, TimeOverflow or Credit Commons — including health checks and call logs."
+    },
+    "credit_commons": {
+      "title": "Credit Commons",
+      "description": "Your community's place in the Credit Commons accounting network — its node identity, parent node and exchange rate."
+    },
+    "inbound_api": {
+      "title": "Inbound API partners",
+      "description": "External systems — banks, payment processors, municipal software — that are allowed to call into your community's data."
+    },
+    "caring_peers": {
+      "title": "Partner cooperatives",
+      "description": "Other caring-community platforms this cooperative exchanges hour transfers with. Each connection has its own shared secret."
+    },
+    "api_keys": {
+      "title": "API keys",
+      "description": "The keys partner platforms use to talk to your community securely. Issue, rotate or revoke them here."
+    },
+    "create_api_key": {
+      "title": "Create API key",
+      "description": "Issue a new key for a partner platform, choosing exactly what it is allowed to do."
+    },
+    "webhooks": {
+      "title": "Event webhooks",
+      "description": "Automatic notifications sent to partner systems when something happens here — with delivery logs and a test button."
+    },
+    "api_docs": {
+      "title": "Developer guide",
+      "description": "Technical reference for the partner API — share this with a partner's developer when they set up a connection."
+    },
+    "activity": {
+      "title": "Activity feed",
+      "description": "A running log of everything exchanged with partner timebanks — transfers, messages and partnership changes."
+    },
+    "analytics": {
+      "title": "Analytics",
+      "description": "Charts and numbers for your partner activity — what was exchanged, with whom, and how it's trending."
+    },
+    "aggregates": {
+      "title": "Shared statistics",
+      "description": "Your consent for sharing anonymous, aggregated statistics with the wider network — nothing personal ever leaves your community."
+    },
+    "data": {
+      "title": "Data management",
+      "description": "Export, import or clean up your partnering data."
+    },
+    "settings": {
+      "title": "Network settings",
+      "description": "The master switches for partnering — turn it on or off, and choose what your community shares with partners."
+    }
+  }
+}

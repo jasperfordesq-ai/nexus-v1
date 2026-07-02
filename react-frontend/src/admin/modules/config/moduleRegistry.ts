@@ -475,7 +475,7 @@ const FEATURE_MODULES: ModuleDefinition[] = [
     icon: Globe,
     type: 'feature',
     configSource: 'tenant_features',
-    detailPageUrl: '/admin/federation/settings',
+    detailPageUrl: '/partner-timebanks/settings',
     configOptions: [
       { key: 'federation.auto_accept_partners', label: 'Auto-Accept Partners', description: 'Automatically accept federation partnership requests', type: 'boolean', defaultValue: false, category: 'Partnerships', comingSoon: true },
       { key: 'federation.share_listings', label: 'Share Listings', description: 'Share listings across federated communities', type: 'boolean', defaultValue: true, category: 'Sharing', comingSoon: true },

@@ -227,23 +227,8 @@ const AdminCouponsPage = lazy(() => import('./modules/marketplace/AdminCouponsPa
 // Ideation / Challenges module
 const IdeationAdmin = lazy(() => import('./modules/ideation/IdeationAdmin'));
 
-// Federation module
-const FederationSettings = lazy(() => import('./modules/federation/FederationSettings'));
-const FederationAggregatesPage = lazy(() => import('./modules/federation/FederationAggregatesPage'));
-const Partnerships = lazy(() => import('./modules/federation/Partnerships'));
-const PartnerDirectory = lazy(() => import('./modules/federation/PartnerDirectory'));
-const MyProfile = lazy(() => import('./modules/federation/MyProfile'));
-const FederationAnalytics = lazy(() => import('./modules/federation/FederationAnalytics'));
-const ApiKeys = lazy(() => import('./modules/federation/ApiKeys'));
-const CreateApiKey = lazy(() => import('./modules/federation/CreateApiKey'));
-const DataManagement = lazy(() => import('./modules/federation/DataManagement'));
-const CreditAgreements = lazy(() => import('./modules/federation/CreditAgreements'));
-const Neighborhoods = lazy(() => import('./modules/federation/Neighborhoods'));
-const ExternalPartners = lazy(() => import('./modules/federation/ExternalPartners'));
-const Webhooks = lazy(() => import('./modules/federation/Webhooks'));
-const ApiDocumentation = lazy(() => import('./modules/federation/ApiDocumentation'));
-const FederationActivityFeed = lazy(() => import('./modules/federation/ActivityFeed'));
-const CreditCommonsConfig = lazy(() => import('./modules/federation/CreditCommonsConfig'));
+// Federation module — retired from the admin panel 2026-07-02; all pages
+// now live in the super-admin-only Partner Timebanks panel (/partner-timebanks/*).
 
 // Safeguarding module — the dashboard + options pages moved to the broker
 // panel (/broker/safeguarding, /broker/safeguarding-options) on 2026-07-02.
@@ -343,8 +328,7 @@ const PlansAdmin = lazy(() => import('./modules/content/PlansAdmin'));
 const PlanForm = lazy(() => import('./modules/content/PlanForm'));
 const SubscriptionsAdmin = lazy(() => import('./modules/content/Subscriptions'));
 const LandingPageBuilder = lazy(() => import('./modules/content/LandingPageBuilder'));
-// AG60 — API Partners admin (Partner API integration management)
-const ApiPartnersAdminPage = lazy(() => import('./modules/api-partners/ApiPartnersAdminPage'));
+// AG60 — API Partners admin retired 2026-07-02 → /partner-timebanks/inbound-api
 // AG59 — Paid Regional Analytics admin (super-admin only)
 
 // Wrap lazy components in Suspense
@@ -521,28 +505,10 @@ export function AdminRoutes() {
       <Route path="legal-documents/:id/versions" element={<Lazy><LegalDocVersionList /></Lazy>} />
 
       {/* ─── FEDERATION ─── */}
-      <Route element={
-        <FeatureGatedElement feature="federation">
-          <Outlet />
-        </FeatureGatedElement>
-      }>
-      <Route path="federation" element={<Lazy><FederationSettings /></Lazy>} />
-      <Route path="federation/partnerships" element={<Lazy><Partnerships /></Lazy>} />
-      <Route path="federation/directory" element={<Lazy><PartnerDirectory /></Lazy>} />
-      <Route path="federation/directory/profile" element={<Lazy><MyProfile /></Lazy>} />
-      <Route path="federation/analytics" element={<Lazy><FederationAnalytics /></Lazy>} />
-      <Route path="federation/api-keys" element={<Lazy><ApiKeys /></Lazy>} />
-      <Route path="federation/api-keys/create" element={<Lazy><CreateApiKey /></Lazy>} />
-      <Route path="federation/data" element={<Lazy><DataManagement /></Lazy>} />
-      <Route path="federation/credit-agreements" element={<Lazy><CreditAgreements /></Lazy>} />
-      <Route path="federation/neighborhoods" element={<Lazy><Neighborhoods /></Lazy>} />
-      <Route path="federation/external-partners" element={<Lazy><ExternalPartners /></Lazy>} />
-      <Route path="federation/webhooks" element={<Lazy><Webhooks /></Lazy>} />
-      <Route path="federation/api-docs" element={<Lazy><ApiDocumentation /></Lazy>} />
-      <Route path="federation/activity" element={<Lazy><FederationActivityFeed /></Lazy>} />
-      <Route path="federation/cc-config" element={<Lazy><CreditCommonsConfig /></Lazy>} />
-      <Route path="federation/aggregates" element={<Lazy><FederationAggregatesPage /></Lazy>} />
-      </Route>
+      {/* Partner Timebanks (all /admin/federation/* pages) + Inbound API
+          Partners are fully retired from the admin panel (owner-approved
+          2026-07-02, no redirects) — they live in the super-admin-only
+          Partner Timebanks panel at /partner-timebanks/*. */}
 
       {/* ─── SAFEGUARDING ─── */}
       {/* Safeguarding dashboard + options are fully retired from the admin
@@ -612,7 +578,7 @@ export function AdminRoutes() {
       <Route path="caring-community/hour-transfers" element={<TenantRedirect to="/caring/hour-transfers" />} />
       <Route path="caring-community/sub-regions" element={<TenantRedirect to="/caring/sub-regions" />} />
       <Route path="caring-community/regional-points" element={<TenantRedirect to="/caring/regional-points" />} />
-      <Route path="caring-community/federation-peers" element={<TenantRedirect to="/caring/federation-peers" />} />
+      <Route path="caring-community/federation-peers" element={<TenantRedirect to="/partner-timebanks/caring/peers" />} />
       <Route path="caring-community/sla-dashboard" element={<TenantRedirect to="/caring/sla-dashboard" />} />
       <Route path="caring-community/providers" element={<TenantRedirect to="/caring/providers" />} />
       <Route path="caring-community/warmth-pass" element={<TenantRedirect to="/caring/warmth-pass" />} />
@@ -752,14 +718,8 @@ export function AdminRoutes() {
       <Route path="regional-analytics/subscriptions" element={<TenantRedirect to="/super-admin/regional-analytics/subscriptions" />} />
 
       {/* ─── INTEGRATIONS — API Partners (AG60) ─── */}
-      <Route
-        path="api-partners"
-        element={
-          <FeatureGatedElement feature="partner_api">
-            <Lazy><ApiPartnersAdminPage /></Lazy>
-          </FeatureGatedElement>
-        }
-      />
+      {/* Retired from the admin panel 2026-07-02 (no redirects) — now at
+          /partner-timebanks/inbound-api in the Partner Timebanks panel. */}
 
       {/* ─── REDIRECT: /admin/login → main login page ─── */}
       <Route path="login" element={<TenantRedirect to="/login" />} />

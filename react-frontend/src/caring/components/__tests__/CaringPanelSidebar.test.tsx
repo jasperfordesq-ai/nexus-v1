@@ -47,9 +47,9 @@ describe('CaringPanelSidebar', () => {
     });
   });
 
-  it('keeps partner timebank links in the partnerships section rather than routine operations', () => {
+  it('no longer offers federation peers here — external-partner setup moved to the super-admin Partner Timebanks panel', () => {
     const { container } = render(
-      <Wrapper path="/test/caring/federation-peers">
+      <Wrapper path="/test/caring">
         <CaringPanelSidebar collapsed={false} onToggle={vi.fn()} />
       </Wrapper>,
     );
@@ -59,8 +59,13 @@ describe('CaringPanelSidebar', () => {
     const operationsBlock = operationsHeading.closest('div')?.textContent ?? '';
     const partnershipsBlock = partnershipsHeading.closest('div')?.textContent ?? '';
 
+    // Partner Cooperatives moved to /partner-timebanks/caring/peers (2026-07-02);
+    // the caring hub must not link regular admins to external-partner setup.
     expect(operationsBlock).not.toContain('Partner Cooperatives');
-    expect(partnershipsBlock).toContain('Partner Cooperatives');
+    expect(partnershipsBlock).not.toContain('Partner Cooperatives');
+    expect(container.querySelector('a[href="/test/caring/federation-peers"]')).toBeNull();
+
+    // The rest of the partnerships section is unchanged.
     expect(partnershipsBlock).toContain('Partner Integration Tracker');
     expect(partnershipsBlock).toContain('Developer Integration Reference');
 

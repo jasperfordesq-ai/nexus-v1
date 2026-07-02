@@ -255,7 +255,7 @@ const RELATED_ADMIN_PAGES: RelatedAdminPage[] = [
   {
     labelKey: 'enterprise.related_federation',
     descriptionKey: 'enterprise.related_federation_desc',
-    href: '/admin/federation',
+    href: '/partner-timebanks',
     destLabelKey: 'enterprise.related_federation',
   },
   {

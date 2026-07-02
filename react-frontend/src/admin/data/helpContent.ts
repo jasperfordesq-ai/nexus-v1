@@ -133,7 +133,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       'Do not issue passes to members with any unresolved safeguarding reports, even if their tier technically qualifies them.',
     relatedPaths: [
       { label: 'Trust Tiers', path: '/caring/trust-tier' },
-      { label: 'Partner Cooperatives', path: '/caring/federation-peers' },
+      { label: 'Partner Cooperatives', path: '/partner-timebanks/caring/peers' },
     ],
   },
 
@@ -226,7 +226,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     relatedPaths: [
       { label: 'Commercial Boundary', path: '/caring/commercial-boundary' },
       { label: 'Disclosure Pack', path: '/caring/disclosure-pack' },
-      { label: 'Partner Cooperatives', path: '/caring/federation-peers' },
+      { label: 'Partner Cooperatives', path: '/partner-timebanks/caring/peers' },
     ],
   },
 
@@ -710,7 +710,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     ],
   },
 
-  '/caring/federation-peers': {
+  '/partner-timebanks/caring/peers': {
     title: 'Partner Cooperatives - Caring Community Federation',
     summary:
       'Manage the partner timebank connections between your cooperative and other Caring Community cooperatives. This page is for trusted cooperative-to-cooperative links, not generic API clients or third-party integrations.',

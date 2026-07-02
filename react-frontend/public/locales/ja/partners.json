@@ -1,0 +1,195 @@
+{
+  "checking_permissions": "権限を確認しています...",
+  "layout": {
+    "skip_to_main": "メインコンテンツにスキップ",
+    "close_navigation": "ナビゲーションを閉じる",
+    "navigation": "パートナータイムバンクのナビゲーション"
+  },
+  "header": {
+    "toggle_sidebar": "ナビゲーションを切り替え",
+    "back_to_admin": "管理者に戻る",
+    "notifications": "Notifications",
+    "user_menu": "ユーザーメニュー",
+    "my_profile": "私のプロフィール",
+    "sign_out": "サインアウト",
+    "user_fallback": "Account"
+  },
+  "sidebar": {
+    "title": "Partner Timebanks",
+    "nav_label": "パートナータイムバンクセクション",
+    "expand": "サイドバーを展開する",
+    "collapse": "サイドバーを折りたたむ",
+    "full_admin": "Full Admin Panel",
+    "section_overview": "Overview",
+    "section_network": "パートナーネットワーク",
+    "section_external": "外部接続",
+    "section_caring": "Caring Community",
+    "section_access": "アクセスとセキュリティ",
+    "section_data": "アクティビティとデータ",
+    "section_settings": "Settings"
+  },
+  "nav": {
+    "overview": "Overview",
+    "partnerships": "Partnerships",
+    "directory": "パートナーディレクトリ",
+    "neighborhoods": "Neighbourhoods",
+    "credit_agreements": "クレジット契約",
+    "external_partners": "外部プラットフォーム",
+    "credit_commons": "Credit Commons",
+    "inbound_api": "インバウンドAPIパートナー",
+    "caring_peers": "パートナー協同組合",
+    "api_keys": "APIキー",
+    "webhooks": "イベントWebhook",
+    "api_docs": "開発者ガイド",
+    "activity": "アクティビティフィード",
+    "analytics": "Analytics",
+    "aggregates": "共有統計",
+    "data": "データ管理",
+    "settings": "ネットワーク設定"
+  },
+  "breadcrumbs": {
+    "aria_label": "Breadcrumbs",
+    "overview": "Partner Timebanks",
+    "partnerships": "Partnerships",
+    "directory": "パートナーディレクトリ",
+    "profile": "私たちのリスト",
+    "neighborhoods": "Neighbourhoods",
+    "credit_agreements": "クレジット契約",
+    "external_partners": "外部プラットフォーム",
+    "credit_commons": "Credit Commons",
+    "inbound_api": "インバウンドAPIパートナー",
+    "caring": "Caring Community",
+    "caring_peers": "パートナー協同組合",
+    "api_keys": "APIキー",
+    "create": "Create",
+    "webhooks": "イベントWebhook",
+    "api_docs": "開発者ガイド",
+    "activity": "アクティビティフィード",
+    "analytics": "Analytics",
+    "aggregates": "共有統計",
+    "data": "データ管理",
+    "settings": "ネットワーク設定"
+  },
+  "overview": {
+    "page_title": "Partner Timebanks",
+    "title": "Partner Timebanks",
+    "description": "タイムバンクを他のコミュニティと接続すると、メンバーは国境を越えて時間やスキルを交換できます。この領域はスーパー管理者のみに表示されます。",
+    "open": "Open",
+    "disabled_banner": {
+      "title": "パートナーシップがオフになっています",
+      "hint": "ネットワーク設定でオンにするまで、他のタイムバンクと何も共有されません。",
+      "cta": "設定を開く"
+    },
+    "errors_banner": {
+      "title": "最近一部の接続に問題が発生しました",
+      "hint_one": "{{count}} は、過去 30 日間にパートナー システムからの呼び出しに失敗しました。",
+      "hint_other": "過去 30 日間にパートナー システムからの {{count}} コールが失敗しました。",
+      "cta": "アクティビティの表示"
+    },
+    "stats": {
+      "active_partners": "アクティブなパートナー",
+      "active_partners_hint": "今日交換するタイムバンク",
+      "pending_requests": "保留中のリクエスト",
+      "pending_requests_hint": "決定を待っているパートナーシップのリクエスト",
+      "external_platforms": "外部プラットフォーム",
+      "external_platforms_hint": "NEXUS ネットワーク外の接続",
+      "exchanges_30d": "交換（30日間）",
+      "exchanges_30d_hint": "パートナー間で送受信されるタイム クレジット"
+    },
+    "checklist": {
+      "title": "セットアップする",
+      "hint": "パートナー タイムバンクとの交換を開始するには、次の手順を実行します。",
+      "enable": "ネットワーク設定でパートナーシップをオンにする",
+      "profile": "コミュニティのリストをパートナー ディレクトリに公開します",
+      "connect": "最初のパートナーのタイムバンクと接続する",
+      "credit": "パートナーと与信限度額に同意する",
+      "optional": "Optional"
+    },
+    "top_partners": {
+      "title": "最もアクティブなパートナー",
+      "hint": "過去 30 日間に交換が行われた場所。",
+      "empty_title": "パートナーアクティビティはまだありません",
+      "empty_hint": "パートナーのタイムバンクに接続すると、そのアクティビティがここに表示されます。",
+      "activity_one": "{{count}} exchange",
+      "activity_other": "{{count}} exchanges"
+    },
+    "federation_off": {
+      "title": "他のタイムバンクとの連携はオフになっています",
+      "hint": "このコミュニティではフェデレーション機能が有効になっていません。利用可能なエリアが横に表示されます。"
+    }
+  },
+  "pages": {
+    "partnerships": {
+      "title": "Partnerships",
+      "description": "NEXUS ネットワーク上の他のタイムバンクとの合意 - 誰と接続しているか、何を共有しているか、決定を待っているリクエスト。"
+    },
+    "directory": {
+      "title": "パートナーディレクトリ",
+      "description": "ネットワーク上の他のタイムバンクを参照し、提携を依頼してください。"
+    },
+    "directory_profile": {
+      "title": "私たちのリスト",
+      "description": "パートナー ディレクトリ内の他のタイムバンクにコミュニティがどのように表示されるか。"
+    },
+    "neighborhoods": {
+      "title": "Neighbourhoods",
+      "description": "近くのパートナーのタイムバンクと共有できるコミュニティの地理的エリア。"
+    },
+    "credit_agreements": {
+      "title": "クレジット契約",
+      "description": "コミュニティ間でクレジットをやり取りできる時間について、各パートナーと合意した制限。"
+    },
+    "external_partners": {
+      "title": "外部プラットフォーム",
+      "description": "他のソフトウェア (Komunitin、TimeOverflow、Credit Commons) で実行されるタイムバンクへの接続 (ヘルス チェックや通話ログなど)。"
+    },
+    "credit_commons": {
+      "title": "Credit Commons",
+      "description": "Credit Commons 会計ネットワークにおけるコミュニティの位置、つまりノード ID、親ノード、為替レート。"
+    },
+    "inbound_api": {
+      "title": "インバウンドAPIパートナー",
+      "description": "コミュニティのデータへの呼び出しが許可されている外部システム (銀行、決済処理業者、地方自治体のソフトウェア)。"
+    },
+    "caring_peers": {
+      "title": "パートナー協同組合",
+      "description": "この協同組合は他の思いやりのあるコミュニティ プラットフォームと時間移動を交換します。各接続には独自の共有秘密があります。"
+    },
+    "api_keys": {
+      "title": "APIキー",
+      "description": "パートナー プラットフォームがコミュニティと安全に通信するために使用するキー。ここで発行、回転、取り消しを行います。"
+    },
+    "create_api_key": {
+      "title": "APIキーの作成",
+      "description": "パートナー プラットフォームに許可される内容を正確に選択して、パートナー プラットフォーム用の新しいキーを発行します。"
+    },
+    "webhooks": {
+      "title": "イベントWebhook",
+      "description": "ここで何かが発生した場合、配信ログとテスト ボタンを使用して、パートナー システムに自動通知が送信されます。"
+    },
+    "api_docs": {
+      "title": "開発者ガイド",
+      "description": "パートナー API のテクニカル リファレンス — パートナーの開発者が接続を設定するときに、これを共有します。"
+    },
+    "activity": {
+      "title": "アクティビティフィード",
+      "description": "転送、メッセージ、パートナーシップの変更など、パートナーのタイムバンクと交換されたすべての実行ログ。"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "description": "パートナーのアクティビティに関するグラフと数値 — 何が、誰と、どのように交換されたか、そしてそれがどのようにトレンドになっているか。"
+    },
+    "aggregates": {
+      "title": "共有統計",
+      "description": "匿名で集計された統計をより広範なネットワークと共有することに同意します。個人的なものはコミュニティから離れることはありません。"
+    },
+    "data": {
+      "title": "データ管理",
+      "description": "提携データをエクスポート、インポート、またはクリーンアップします。"
+    },
+    "settings": {
+      "title": "ネットワーク設定",
+      "description": "パートナーシップのマスター スイッチ - オンまたはオフにして、コミュニティがパートナーと共有するものを選択します。"
+    }
+  }
+}

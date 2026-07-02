@@ -47,7 +47,6 @@ import Target from 'lucide-react/icons/target';
 import Brain from 'lucide-react/icons/brain';
 import Bot from 'lucide-react/icons/bot';
 import Search from 'lucide-react/icons/search';
-import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Clock from 'lucide-react/icons/clock';
 import Wallet from 'lucide-react/icons/wallet';
@@ -63,7 +62,6 @@ import Filter from 'lucide-react/icons/filter';
 import Activity from 'lucide-react/icons/activity';
 import Crown from 'lucide-react/icons/crown';
 import HandHeart from 'lucide-react/icons/hand-heart';
-import Network from 'lucide-react/icons/network';
 import Mail from 'lucide-react/icons/mail';
 import Wrench from 'lucide-react/icons/wrench';
 import Stethoscope from 'lucide-react/icons/stethoscope';
@@ -75,9 +73,7 @@ import Briefcase from 'lucide-react/icons/briefcase';
 import BookOpen from 'lucide-react/icons/book-open';
 import Cpu from 'lucide-react/icons/cpu';
 import Handshake from 'lucide-react/icons/handshake';
-import Database from 'lucide-react/icons/database';
 import MapPin from 'lucide-react/icons/map-pin';
-import Webhook from 'lucide-react/icons/webhook';
 import Puzzle from 'lucide-react/icons/puzzle';
 import Podcast from 'lucide-react/icons/podcast';
 import Palette from 'lucide-react/icons/palette';
@@ -133,13 +129,13 @@ interface FilteredNavItem extends NavItem {
 }
 
 const ZONES: NavZone[] = [
-  { key: 'overview', label: 'zone_overview', sectionKeys: ['dashboard', 'broker-panel', 'super-admin'] },
+  { key: 'overview', label: 'zone_overview', sectionKeys: ['dashboard', 'broker-panel', 'super-admin', 'partner-timebanks-panel'] },
   { key: 'people', label: 'zone_people', sectionKeys: ['users', 'crm'] },
   { key: 'community', label: 'zone_community', sectionKeys: ['community', 'listings', 'content', 'jobs'] },
   { key: 'communications', label: 'zone_communications', sectionKeys: ['communications', 'marketing', 'advertising'] },
   { key: 'growth', label: 'zone_growth', sectionKeys: ['engagement', 'analytics', 'discovery'] },
   { key: 'commerce', label: 'zone_commerce', sectionKeys: ['financial', 'marketplace'] },
-  { key: 'platform', label: 'zone_platform', sectionKeys: ['system', 'enterprise', 'federation', 'integrations'] },
+  { key: 'platform', label: 'zone_platform', sectionKeys: ['system', 'enterprise'] },
   { key: 'diagnostics', label: 'zone_diagnostics', sectionKeys: ['intelligence'] },
 ];
 
@@ -218,6 +214,17 @@ function useAdminNav(): NavSection[] {
         label: t('super_admin_panel'),
         icon: Crown,
         href: '/super-admin',
+        zone: 'overview' as const,
+      }] : []),
+      // External-partner setup is super-admin-only (2026-07-02) — one entry
+      // to the dedicated Partner Timebanks panel replaces the old 15-link
+      // federation + integrations sections. Hidden when no partnering
+      // surface is enabled on the tenant.
+      ...(isSuperAdmin && (hasFeature('federation') || hasFeature('partner_api') || hasFeature('caring_community')) ? [{
+        key: 'partner-timebanks-panel',
+        label: t('partner_timebanks'),
+        icon: Globe,
+        href: '/partner-timebanks',
         zone: 'overview' as const,
       }] : []),
       {
@@ -398,7 +405,7 @@ function useAdminNav(): NavSection[] {
             { label: t('plans_pricing'), href: '/admin/plans', icon: CreditCard },
             { label: t('billing'), href: '/admin/billing', icon: CreditCard },
           ] : []),
-          ...(isGod && hasFeature('member_premium') ? [
+          ...(hasFeature('member_premium') ? [
             { label: t('member_premium'), href: '/admin/member-premium', icon: HandHeart },
             { label: t('premium_subscribers'), href: '/admin/member-premium/subscribers', icon: Users },
           ] : []),
@@ -478,40 +485,10 @@ function useAdminNav(): NavSection[] {
       },
     ];
 
-    if (hasFeature('federation')) {
-      sections.push({
-        key: 'federation',
-        label: t('partner_timebanks'),
-        icon: Globe,
-        zone: 'platform',
-        items: [
-          { label: t('federation_settings'), href: '/admin/federation', icon: Settings, group: t('federation_group_core_network') },
-          { label: t('federation_partnerships'), href: '/admin/federation/partnerships', icon: ArrowLeftRight },
-          { label: t('federation_directory'), href: '/admin/federation/directory', icon: Globe },
-          { label: t('federation_credit_agreements'), href: '/admin/federation/credit-agreements', icon: Handshake, group: t('federation_group_trust_settlement') },
-          { label: t('federation_neighborhoods'), href: '/admin/federation/neighborhoods', icon: MapPin },
-          { label: t('federation_cc_config'), href: '/admin/federation/cc-config', icon: Network },
-          { label: t('federation_external_partners'), href: '/admin/federation/external-partners', icon: Globe, group: t('federation_group_partner_protocols') },
-          { label: t('federation_api_keys'), href: '/admin/federation/api-keys', icon: KeyIcon },
-          { label: t('federation_api_docs'), href: '/admin/federation/api-docs', icon: BookOpen },
-          { label: t('federation_webhooks'), href: '/admin/federation/webhooks', icon: Webhook },
-          { label: t('federation_analytics'), href: '/admin/federation/analytics', icon: BarChart3, group: t('federation_group_monitoring_data') },
-          { label: t('federation_activity'), href: '/admin/federation/activity', icon: Activity },
-          { label: t('federation_data_management'), href: '/admin/federation/data', icon: Database },
-          { label: t('federation_aggregates'), href: '/admin/federation/aggregates', icon: ShieldCheck },
-        ],
-      });
-    }
-
-    if (hasFeature('partner_api')) {
-      sections.push({
-        key: 'integrations',
-        label: t('partner_api_integrations'),
-        icon: Webhook,
-        zone: 'platform',
-        items: [{ label: t('api_partners'), href: '/admin/api-partners', icon: KeyIcon }],
-      });
-    }
+    // Partner Timebanks + Partner APIs sections retired 2026-07-02 — all
+    // federation/external-partner surfaces moved to the super-admin-only
+    // Partner Timebanks panel (/partner-timebanks), linked from the
+    // overview zone entry above.
 
     return sections.filter((section) => section.href || (section.items?.length ?? 0) > 0);
   }, [hasFeature, hasModule, isGod, isPlatformSuperAdmin, isSuperAdmin, t]);

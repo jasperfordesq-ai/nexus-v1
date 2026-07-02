@@ -79,7 +79,7 @@ export function CreateApiKey() {
         if (d.api_key) {
           setCreatedKey(d.api_key);
         } else {
-          navigate(tenantPath('/admin/federation/api-keys'));
+          navigate(tenantPath('/partner-timebanks/api-keys'));
         }
       }
     } catch (err) {
@@ -109,7 +109,7 @@ export function CreateApiKey() {
             </div>
             <div className="flex gap-2">
               <Button variant="tertiary" startContent={<Copy size={16} />} onPress={handleCopy}>{copied ? t('federation.copied') : t('federation.copy_key')}</Button>
-              <Button onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>{t('federation.done')}</Button>
+              <Button onPress={() => navigate(tenantPath('/partner-timebanks/api-keys'))}>{t('federation.done')}</Button>
             </div>
           </CardBody>
         </Card>
@@ -122,7 +122,7 @@ export function CreateApiKey() {
       <PageHeader
         title={t('federation.create_api_key_title')}
         description={t('federation.create_api_key_desc')}
-        actions={<Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>{t('federation.back')}</Button>}
+        actions={<Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/partner-timebanks/api-keys'))}>{t('federation.back')}</Button>}
       />
       <div className="mb-6">
         <PartnerTimebankGuidance page="apiKeys" />
@@ -161,7 +161,7 @@ export function CreateApiKey() {
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="tertiary" onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>{t('common.cancel')}</Button>
+            <Button variant="tertiary" onPress={() => navigate(tenantPath('/partner-timebanks/api-keys'))}>{t('common.cancel')}</Button>
             <Button onPress={handleSubmit} isLoading={saving} isDisabled={!name.trim()}>{t('federation.create_key')}</Button>
           </div>
         </CardBody>

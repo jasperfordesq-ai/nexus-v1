@@ -152,30 +152,46 @@ describe('AdminSidebar', () => {
     expect(screen.getByText('Dashboard')).toBeTruthy();
   });
 
-  it('groups Partner Timebanks into core network and protocol operations when federation is enabled', () => {
+  it('replaces the federation/integrations sections with a single super-admin Partner Timebanks entry', () => {
     mockHasFeature.mockImplementation((feature: string) =>
       feature === 'federation' || feature === 'partner_api',
     );
 
-    const { container } = render(
-      <W path="/test/admin/federation/api-docs"><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
     );
 
-    const partnerSection = Array.from(container.querySelectorAll('li')).find((item) =>
-      item.textContent?.includes('Partner Timebanks') &&
-      item.textContent.includes('Core network') &&
-      item.textContent.includes('Partner protocols') &&
-      item.textContent.includes('Monitoring & data'),
-    );
-    const text = partnerSection?.textContent ?? '';
+    // The old 15-link sections are gone (retired 2026-07-02) …
+    expect(screen.queryByText('Partner APIs & integrations')).toBeNull();
+    expect(screen.queryByText('Federation Settings')).toBeNull();
+    expect(screen.queryByText('Inbound API Partners')).toBeNull();
 
-    expect(partnerSection).toBeTruthy();
-    expect(text.indexOf('Federation Settings')).toBeLessThan(text.indexOf('Trust & settlement'));
-    expect(text.indexOf('Trust & settlement')).toBeLessThan(text.indexOf('Partner protocols'));
-    expect(text.indexOf('Partner protocols')).toBeLessThan(text.indexOf('Monitoring & data'));
-    expect(screen.getByText('Partner APIs & integrations')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Partner APIs & integrations' }));
-    expect(screen.getByRole('link', { name: 'Inbound API Partners' })).toHaveAttribute('href', '/test/admin/api-partners');
+    // …replaced by one pinned entry into the dedicated panel.
+    expect(screen.getByRole('link', { name: 'Partner Timebanks' })).toHaveAttribute(
+      'href',
+      '/test/partner-timebanks',
+    );
+  });
+
+  it('hides the Partner Timebanks entry from non-super-admins', () => {
+    mockHasFeature.mockImplementation((feature: string) => feature === 'federation');
+    Object.assign(mockUser, { role: 'admin', is_super_admin: undefined });
+
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    expect(screen.queryByRole('link', { name: 'Partner Timebanks' })).toBeNull();
+  });
+
+  it('hides the Partner Timebanks entry when no partnering feature is enabled', () => {
+    mockHasFeature.mockImplementation(() => false);
+
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    expect(screen.queryByRole('link', { name: 'Partner Timebanks' })).toBeNull();
   });
 
   it('keeps Broker Panel visible as a pinned admin link', () => {
@@ -248,7 +264,11 @@ describe('AdminSidebar', () => {
     expect(screen.getByRole('link', { name: 'Super Admin Panel' })).toHaveAttribute('href', '/test/super-admin');
   });
 
-  it('hides commercial financial links from non-god super admins', () => {
+  it('hides god-only Plans & Billing but shows Donations & Support to non-god super admins', () => {
+    // Donations & Support (member_premium) is a tenant-level feature — its route
+    // is only feature-gated, so a non-god super admin who has the feature must
+    // also see the sidebar links. Plans & Pricing / Billing stay god-only.
+    // Regression guard: an isGod gate on this block once hid the link entirely.
     mockHasFeature.mockImplementation((feature: string) =>
       feature === 'caring_community' || feature === 'member_premium',
     );
@@ -261,8 +281,8 @@ describe('AdminSidebar', () => {
 
     expect(screen.queryByRole('link', { name: 'Plans & Pricing' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Billing' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Member Premium' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Premium Subscribers' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Donations & Support' })).toHaveAttribute('href', '/test/admin/member-premium');
+    expect(screen.getByRole('link', { name: 'Recurring Supporters' })).toHaveAttribute('href', '/test/admin/member-premium/subscribers');
   });
 
   it('shows commercial financial links to god users', () => {
@@ -284,8 +304,8 @@ describe('AdminSidebar', () => {
 
     expect(screen.getByRole('link', { name: 'Plans & Pricing' })).toHaveAttribute('href', '/test/admin/plans');
     expect(screen.getByRole('link', { name: 'Billing' })).toHaveAttribute('href', '/test/admin/billing');
-    expect(screen.getByRole('link', { name: 'Member Premium' })).toHaveAttribute('href', '/test/admin/member-premium');
-    expect(screen.getByRole('link', { name: 'Premium Subscribers' })).toHaveAttribute('href', '/test/admin/member-premium/subscribers');
+    expect(screen.getByRole('link', { name: 'Donations & Support' })).toHaveAttribute('href', '/test/admin/member-premium');
+    expect(screen.getByRole('link', { name: 'Recurring Supporters' })).toHaveAttribute('href', '/test/admin/member-premium/subscribers');
   });
 
   it('hides diagnostic debug links from non-god super admins', () => {

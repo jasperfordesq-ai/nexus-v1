@@ -213,9 +213,9 @@ describe('AdminSidebar', () => {
     expect(expandBtn).toBeInTheDocument();
   });
 
-  it('renders platform zone navigation links (enterprise, federation) when features enabled', async () => {
-    // beforeEach sets mockHasFeature.mockReturnValue(true) — all features including federation are on
-    // The platform zone includes enterprise and federation sections
+  it('renders platform zone navigation links (enterprise) when features enabled', async () => {
+    // beforeEach sets mockHasFeature.mockReturnValue(true) — all features are on.
+    // Federation moved out of the platform zone to /partner-timebanks (2026-07-02).
     const { AdminSidebar } = await import('./AdminSidebar');
     render(<AdminSidebar collapsed={false} />);
     await waitFor(() => {

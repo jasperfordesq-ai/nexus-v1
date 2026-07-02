@@ -16,7 +16,6 @@ import Megaphone from 'lucide-react/icons/megaphone';
 import Coins from 'lucide-react/icons/coins';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import MapPin from 'lucide-react/icons/map-pin';
-import Network from 'lucide-react/icons/network';
 import Timer from 'lucide-react/icons/timer';
 import Users2 from 'lucide-react/icons/users-2';
 import Star from 'lucide-react/icons/star';
@@ -131,7 +130,8 @@ const SECTIONS: NavSection[] = [
     key: 'partnerships',
     titleKey: 'panel.sidebar.sections.partnerships',
     items: [
-      { key: 'federation-peers', labelKey: 'panel.sidebar.items.federation_peers', icon: Network, path: '/caring/federation-peers' },
+      // federation-peers moved to /partner-timebanks/caring/peers (super
+      // admins only, 2026-07-02) — external-partner setup is hidden here.
       { key: 'research', labelKey: 'panel.sidebar.items.research', icon: FlaskConical, path: '/caring/research' },
       { key: 'external-integrations', labelKey: 'panel.sidebar.items.external_integrations', icon: PlugZap, path: '/caring/external-integrations' },
       { key: 'integration-showcase', labelKey: 'panel.sidebar.items.integration_showcase', icon: Layers, path: '/caring/integration-showcase' },

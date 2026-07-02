@@ -147,7 +147,7 @@ i18n
       'emails', 'emails_listings', 'emails_misc', 'emails_notifications',
       'errors', 'goals', 'ideation', 'jobs', 'kb',
       'listings', 'marketplace', 'matches', 'messages', 'polls', 'settings',
-      'social', 'volunteering', 'explore', 'broker', 'caring_community',
+      'social', 'volunteering', 'explore', 'broker', 'partners', 'caring_community',
       'municipality_survey', 'civic_digest', 'municipality_feedback',
       'success_stories', 'pilot_inquiry', 'project_announcements', 'project_announcements_admin',
       'api_controllers_1', 'api_controllers_2', 'api_controllers_3',

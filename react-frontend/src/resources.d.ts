@@ -34835,6 +34835,201 @@ export default interface Resources {
     "welcome_description": "Let's set up your profile so you can start connecting with your community and exchanging time credits.",
     "welcome_title": "Welcome to {{name}}!"
   },
+  "partners": {
+    "breadcrumbs": {
+      "activity": "Activity feed",
+      "aggregates": "Shared statistics",
+      "analytics": "Analytics",
+      "api_docs": "Developer guide",
+      "api_keys": "API keys",
+      "aria_label": "Breadcrumbs",
+      "caring": "Caring Community",
+      "caring_peers": "Partner cooperatives",
+      "create": "Create",
+      "credit_agreements": "Credit agreements",
+      "credit_commons": "Credit Commons",
+      "data": "Data management",
+      "directory": "Partner directory",
+      "external_partners": "External platforms",
+      "inbound_api": "Inbound API partners",
+      "neighborhoods": "Neighbourhoods",
+      "overview": "Partner Timebanks",
+      "partnerships": "Partnerships",
+      "profile": "Our listing",
+      "settings": "Network settings",
+      "webhooks": "Event webhooks"
+    },
+    "checking_permissions": "Checking permissions...",
+    "header": {
+      "back_to_admin": "Back to admin",
+      "my_profile": "My profile",
+      "notifications": "Notifications",
+      "sign_out": "Sign out",
+      "toggle_sidebar": "Toggle navigation",
+      "user_fallback": "Account",
+      "user_menu": "User menu"
+    },
+    "layout": {
+      "close_navigation": "Close navigation",
+      "navigation": "Partner Timebanks navigation",
+      "skip_to_main": "Skip to main content"
+    },
+    "nav": {
+      "activity": "Activity feed",
+      "aggregates": "Shared statistics",
+      "analytics": "Analytics",
+      "api_docs": "Developer guide",
+      "api_keys": "API keys",
+      "caring_peers": "Partner cooperatives",
+      "credit_agreements": "Credit agreements",
+      "credit_commons": "Credit Commons",
+      "data": "Data management",
+      "directory": "Partner directory",
+      "external_partners": "External platforms",
+      "inbound_api": "Inbound API partners",
+      "neighborhoods": "Neighbourhoods",
+      "overview": "Overview",
+      "partnerships": "Partnerships",
+      "settings": "Network settings",
+      "webhooks": "Event webhooks"
+    },
+    "overview": {
+      "checklist": {
+        "connect": "Connect with your first partner timebank",
+        "credit": "Agree credit limits with your partners",
+        "enable": "Turn on partnering in Network settings",
+        "hint": "Work through these steps to start exchanging with partner timebanks.",
+        "optional": "Optional",
+        "profile": "Publish your community's listing in the partner directory",
+        "title": "Getting set up"
+      },
+      "description": "Connect your timebank with other communities so members can exchange time and skills across borders. This area is only visible to super admins.",
+      "disabled_banner": {
+        "cta": "Open settings",
+        "hint": "Nothing is shared with other timebanks until you turn it on in Network settings.",
+        "title": "Partnering is switched off"
+      },
+      "errors_banner": {
+        "cta": "View activity",
+        "hint_one": "{{count}} failed call from a partner system in the last 30 days.",
+        "hint_other": "{{count}} failed calls from partner systems in the last 30 days.",
+        "title": "Some connections had problems recently"
+      },
+      "federation_off": {
+        "hint": "The federation feature is not enabled for this community. The areas that are available to you are shown alongside.",
+        "title": "Partnering with other timebanks is switched off"
+      },
+      "open": "Open",
+      "page_title": "Partner Timebanks",
+      "stats": {
+        "active_partners": "Active partners",
+        "active_partners_hint": "Timebanks you exchange with today",
+        "exchanges_30d": "Exchanges (30 days)",
+        "exchanges_30d_hint": "Time credits sent or received across partners",
+        "external_platforms": "External platforms",
+        "external_platforms_hint": "Connections outside the NEXUS network",
+        "pending_requests": "Pending requests",
+        "pending_requests_hint": "Partnership requests waiting on a decision"
+      },
+      "title": "Partner Timebanks",
+      "top_partners": {
+        "activity_one": "{{count}} exchange",
+        "activity_other": "{{count}} exchanges",
+        "empty_hint": "Once you connect with a partner timebank, their activity shows up here.",
+        "empty_title": "No partner activity yet",
+        "hint": "Where the exchanges happened in the last 30 days.",
+        "title": "Most active partners"
+      }
+    },
+    "pages": {
+      "activity": {
+        "description": "A running log of everything exchanged with partner timebanks — transfers, messages and partnership changes.",
+        "title": "Activity feed"
+      },
+      "aggregates": {
+        "description": "Your consent for sharing anonymous, aggregated statistics with the wider network — nothing personal ever leaves your community.",
+        "title": "Shared statistics"
+      },
+      "analytics": {
+        "description": "Charts and numbers for your partner activity — what was exchanged, with whom, and how it's trending.",
+        "title": "Analytics"
+      },
+      "api_docs": {
+        "description": "Technical reference for the partner API — share this with a partner's developer when they set up a connection.",
+        "title": "Developer guide"
+      },
+      "api_keys": {
+        "description": "The keys partner platforms use to talk to your community securely. Issue, rotate or revoke them here.",
+        "title": "API keys"
+      },
+      "caring_peers": {
+        "description": "Other caring-community platforms this cooperative exchanges hour transfers with. Each connection has its own shared secret.",
+        "title": "Partner cooperatives"
+      },
+      "create_api_key": {
+        "description": "Issue a new key for a partner platform, choosing exactly what it is allowed to do.",
+        "title": "Create API key"
+      },
+      "credit_agreements": {
+        "description": "The limits you've agreed with each partner on how many time credits can flow between your communities.",
+        "title": "Credit agreements"
+      },
+      "credit_commons": {
+        "description": "Your community's place in the Credit Commons accounting network — its node identity, parent node and exchange rate.",
+        "title": "Credit Commons"
+      },
+      "data": {
+        "description": "Export, import or clean up your partnering data.",
+        "title": "Data management"
+      },
+      "directory": {
+        "description": "Browse other timebanks on the network and ask to partner with them.",
+        "title": "Partner directory"
+      },
+      "directory_profile": {
+        "description": "How your community appears to other timebanks in the partner directory.",
+        "title": "Our listing"
+      },
+      "external_partners": {
+        "description": "Connections to timebanks that run on other software — Komunitin, TimeOverflow or Credit Commons — including health checks and call logs.",
+        "title": "External platforms"
+      },
+      "inbound_api": {
+        "description": "External systems — banks, payment processors, municipal software — that are allowed to call into your community's data.",
+        "title": "Inbound API partners"
+      },
+      "neighborhoods": {
+        "description": "Geographic areas of your community that can be shared with nearby partner timebanks.",
+        "title": "Neighbourhoods"
+      },
+      "partnerships": {
+        "description": "Your agreements with other timebanks on the NEXUS network — who you're connected to, what you share, and requests waiting on a decision.",
+        "title": "Partnerships"
+      },
+      "settings": {
+        "description": "The master switches for partnering — turn it on or off, and choose what your community shares with partners.",
+        "title": "Network settings"
+      },
+      "webhooks": {
+        "description": "Automatic notifications sent to partner systems when something happens here — with delivery logs and a test button.",
+        "title": "Event webhooks"
+      }
+    },
+    "sidebar": {
+      "collapse": "Collapse sidebar",
+      "expand": "Expand sidebar",
+      "full_admin": "Full Admin Panel",
+      "nav_label": "Partner Timebanks sections",
+      "section_access": "Access & security",
+      "section_caring": "Caring Community",
+      "section_data": "Activity & data",
+      "section_external": "External connections",
+      "section_network": "Partner network",
+      "section_overview": "Overview",
+      "section_settings": "Settings",
+      "title": "Partner Timebanks"
+    }
+  },
   "pilot_inquiry": {
     "back": "Back",
     "budget_options": {
