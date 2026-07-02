@@ -31,7 +31,7 @@ class AdminSafeguardingOptionsController extends BaseApiController
     /** GET /v2/admin/safeguarding/options */
     public function index(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = TenantContext::getId();
 
         return $this->respondWithData(
@@ -42,7 +42,7 @@ class AdminSafeguardingOptionsController extends BaseApiController
     /** POST /v2/admin/safeguarding/options */
     public function store(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = TenantContext::getId();
 
         $optionKey = trim($this->input('option_key', ''));
@@ -139,7 +139,7 @@ class AdminSafeguardingOptionsController extends BaseApiController
     /** PUT /v2/admin/safeguarding/options/{id} */
     public function update(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = TenantContext::getId();
 
         $option = TenantSafeguardingOption::where('tenant_id', $tenantId)
@@ -217,7 +217,7 @@ class AdminSafeguardingOptionsController extends BaseApiController
     /** DELETE /v2/admin/safeguarding/options/{id} */
     public function destroy(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
 
         $success = SafeguardingPreferenceService::deleteOption($id);
 
@@ -231,7 +231,7 @@ class AdminSafeguardingOptionsController extends BaseApiController
     /** PUT /v2/admin/safeguarding/options/reorder */
     public function reorder(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = TenantContext::getId();
 
         $order = $this->input('order', []);

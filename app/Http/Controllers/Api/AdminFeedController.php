@@ -67,9 +67,27 @@ class AdminFeedController extends BaseApiController
      *
      * Query params: page, limit, type, user_id, search, is_hidden
      */
+    /**
+     * Self-dealing guard: a broker/coordinator must not hide/delete a feed
+     * item they authored themselves (moderation must not double as
+     * self-service content management, and the inverse — scrubbing their own
+     * record — is the abuse vector). Admin tiers retain full latitude.
+     * See BrokerModerationAuthorizationTest.
+     */
+    private function guardBrokerNotAuthor(int $authorId, int $callerId): ?JsonResponse
+    {
+        if ($this->callerIsAdminTier()) {
+            return null;
+        }
+        if ($authorId === $callerId) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.broker_cannot_moderate_own_content'), null, 403);
+        }
+        return null;
+    }
+
     public function index(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 
@@ -176,7 +194,7 @@ class AdminFeedController extends BaseApiController
      */
     public function show(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
         $sourceType = $this->query('type', 'post');
@@ -240,7 +258,7 @@ class AdminFeedController extends BaseApiController
      */
     public function hide(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
         $sourceType = $this->input('type') ?? $this->query('type', 'post');
@@ -250,7 +268,7 @@ class AdminFeedController extends BaseApiController
         $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         $row = DB::selectOne(
-            "SELECT id, tenant_id FROM feed_activity WHERE source_type = ? AND source_id = ? AND {$tenantWhere}",
+            "SELECT id, tenant_id, user_id FROM feed_activity WHERE source_type = ? AND source_id = ? AND {$tenantWhere}",
             array_merge([$sourceType, $id], $tenantParams)
         );
 
@@ -261,6 +279,8 @@ class AdminFeedController extends BaseApiController
         if ($effectiveTenantId !== null && (int)$row->tenant_id !== $effectiveTenantId) {
             return $this->respondWithError('FORBIDDEN', __('api.scope_violation'), null, 403);
         }
+
+        if ($guard = $this->guardBrokerNotAuthor((int) $row->user_id, $adminId)) return $guard;
 
         $itemTenantId = (int) $row->tenant_id;
 
@@ -320,7 +340,7 @@ class AdminFeedController extends BaseApiController
      */
     public function destroy(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
         $sourceType = $this->query('type', 'post');
@@ -330,7 +350,7 @@ class AdminFeedController extends BaseApiController
         $tenantParams = $effectiveTenantId !== null ? [$effectiveTenantId] : [];
 
         $row = DB::selectOne(
-            "SELECT id, tenant_id FROM feed_activity WHERE source_type = ? AND source_id = ? AND {$tenantWhere}",
+            "SELECT id, tenant_id, user_id FROM feed_activity WHERE source_type = ? AND source_id = ? AND {$tenantWhere}",
             array_merge([$sourceType, $id], $tenantParams)
         );
 
@@ -341,6 +361,8 @@ class AdminFeedController extends BaseApiController
         if ($effectiveTenantId !== null && (int)$row->tenant_id !== $effectiveTenantId) {
             return $this->respondWithError('FORBIDDEN', __('api.scope_violation'), null, 403);
         }
+
+        if ($guard = $this->guardBrokerNotAuthor((int) $row->user_id, $adminId)) return $guard;
 
         $itemTenantId = (int) $row->tenant_id;
 
@@ -492,7 +514,7 @@ class AdminFeedController extends BaseApiController
      */
     public function stats(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 

@@ -58,9 +58,31 @@ class AdminReportsController extends BaseApiController
      *
      * Query params: page, limit, type, status, search
      */
+    /**
+     * Self-dealing guard: a broker/coordinator must not close a report they
+     * filed themselves, nor one that directly targets them — they could
+     * otherwise bury complaints about their own conduct. For content targets
+     * (listing/post/message/…) the owner is not resolved here (polymorphic
+     * target; per-type joins are out of scope), so only direct user targets
+     * are guarded. Admin tiers retain full latitude.
+     * See BrokerModerationAuthorizationTest.
+     */
+    private function guardBrokerNotParty(object $report, int $callerId): ?JsonResponse
+    {
+        if ($this->callerIsAdminTier()) {
+            return null;
+        }
+        $isReporter = $callerId === (int) $report->reporter_id;
+        $isReportedUser = ($report->target_type ?? null) === 'user' && $callerId === (int) ($report->target_id ?? 0);
+        if ($isReporter || $isReportedUser) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.broker_cannot_moderate_own_content'), null, 403);
+        }
+        return null;
+    }
+
     public function index(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 
@@ -146,7 +168,7 @@ class AdminReportsController extends BaseApiController
      */
     public function show(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 
@@ -196,7 +218,7 @@ class AdminReportsController extends BaseApiController
      */
     public function resolve(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 
@@ -209,6 +231,8 @@ class AdminReportsController extends BaseApiController
         if (!$report) {
             return $this->respondWithError('NOT_FOUND', __('api.report_not_found'), null, 404);
         }
+
+        if ($guard = $this->guardBrokerNotParty($report, $adminId)) return $guard;
 
         if (!in_array($report->status, ['open', 'pending'], true)) {
             return $this->respondWithError('ALREADY_PROCESSED', __('api.report_already_status', ['status' => $report->status]), null, 400);
@@ -257,19 +281,21 @@ class AdminReportsController extends BaseApiController
      */
     public function dismiss(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 
         if ($superAdmin) {
-            $report = DB::selectOne("SELECT id, status, tenant_id, reporter_id FROM reports WHERE id = ?", [$id]);
+            $report = DB::selectOne("SELECT id, status, tenant_id, reporter_id, target_type, target_id FROM reports WHERE id = ?", [$id]);
         } else {
-            $report = DB::selectOne("SELECT id, status, tenant_id, reporter_id FROM reports WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            $report = DB::selectOne("SELECT id, status, tenant_id, reporter_id, target_type, target_id FROM reports WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         }
 
         if (!$report) {
             return $this->respondWithError('NOT_FOUND', __('api.report_not_found'), null, 404);
         }
+
+        if ($guard = $this->guardBrokerNotParty($report, $adminId)) return $guard;
 
         if (!in_array($report->status, ['open', 'pending'], true)) {
             return $this->respondWithError('ALREADY_PROCESSED', __('api.report_already_status', ['status' => $report->status]), null, 400);
@@ -314,7 +340,7 @@ class AdminReportsController extends BaseApiController
      */
     public function stats(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 

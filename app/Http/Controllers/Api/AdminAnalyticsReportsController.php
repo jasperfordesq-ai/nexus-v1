@@ -14,6 +14,7 @@ use App\Services\MunicipalImpactReportService;
 use App\Services\MunicipalReportTemplateService;
 use App\Services\MunicipalVerificationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Services\MemberReportService;
 use App\Services\ContentModerationService;
@@ -644,7 +645,7 @@ class AdminAnalyticsReportsController extends BaseApiController
     /** GET /v2/admin/moderation/queue */
     public function moderationQueue(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = TenantContext::getId();
 
         $filters = [
@@ -665,8 +666,22 @@ class AdminAnalyticsReportsController extends BaseApiController
     /** POST /v2/admin/moderation/{id}/review */
     public function moderationReview(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $tenantId = TenantContext::getId();
+
+        // Self-dealing guard: a broker/coordinator must not approve/reject
+        // their OWN queued content — moderation must never double as
+        // self-approval. Admin tiers retain full latitude. Mirrors the
+        // match-approval guard. See BrokerModerationAuthorizationTest.
+        if (!$this->callerIsAdminTier()) {
+            $authorId = DB::table('content_moderation_queue')
+                ->where('id', $id)
+                ->where('tenant_id', $tenantId)
+                ->value('author_id');
+            if ($authorId !== null && (int) $authorId === $adminId) {
+                return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.broker_cannot_moderate_own_content'), null, 403);
+            }
+        }
 
         $decision = $this->input('decision');
         $rejectionReason = $this->input('rejection_reason');
@@ -696,7 +711,7 @@ class AdminAnalyticsReportsController extends BaseApiController
     /** GET /v2/admin/moderation/stats */
     public function moderationStats(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $tenantId = TenantContext::getId();
 
         $stats = $this->contentModerationService->getStats($tenantId);

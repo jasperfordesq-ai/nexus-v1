@@ -1346,11 +1346,16 @@ Route::get('/v2/admin/config/onboarding/presets', [\App\Http\Controllers\Api\Adm
 Route::post('/v2/admin/config/onboarding/apply-preset', [\App\Http\Controllers\Api\AdminOnboardingConfigController::class, 'applyPreset']);
 
 // ── Admin: Safeguarding Options CRUD ────────────────────────────────────────
-Route::get('/v2/admin/safeguarding/options', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'index']);
-Route::post('/v2/admin/safeguarding/options', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'store']);
-Route::put('/v2/admin/safeguarding/options/reorder', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'reorder']);
-Route::put('/v2/admin/safeguarding/options/{id}', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'update']);
-Route::delete('/v2/admin/safeguarding/options/{id}', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'destroy']);
+// Broker-or-admin: safeguarding options management lives in the broker panel
+// (/broker/safeguarding-options) since 2026-07-02. Mutations throttled like
+// the other broker decision endpoints. See BrokerModerationAuthorizationTest.
+Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
+    Route::get('/v2/admin/safeguarding/options', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'index']);
+    Route::post('/v2/admin/safeguarding/options', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'store'])->middleware('throttle:60,1');
+    Route::put('/v2/admin/safeguarding/options/reorder', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'reorder'])->middleware('throttle:60,1');
+    Route::put('/v2/admin/safeguarding/options/{id}', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'update'])->middleware('throttle:60,1');
+    Route::delete('/v2/admin/safeguarding/options/{id}', [\App\Http\Controllers\Api\AdminSafeguardingOptionsController::class, 'destroy'])->middleware('throttle:60,1');
+});
 
 Route::get('/v2/admin/system/cron-jobs', [\App\Http\Controllers\Api\AdminConfigController::class, 'getCronJobs']);
 Route::post('/v2/admin/system/cron-jobs/{id}/run', [\App\Http\Controllers\Api\AdminConfigController::class, 'runCronJob']);
@@ -1400,23 +1405,30 @@ Route::get('/v2/admin/blog/{id}', [\App\Http\Controllers\Api\AdminBlogController
 Route::put('/v2/admin/blog/{id}', [\App\Http\Controllers\Api\AdminBlogController::class, 'update']);
 Route::delete('/v2/admin/blog/{id}', [\App\Http\Controllers\Api\AdminBlogController::class, 'destroy']);
 Route::post('/v2/admin/blog/{id}/toggle-status', [\App\Http\Controllers\Api\AdminBlogController::class, 'toggleStatus']);
-Route::get('/v2/admin/feed/posts', [\App\Http\Controllers\Api\AdminFeedController::class, 'index']);
-Route::get('/v2/admin/feed/posts/{id}', [\App\Http\Controllers\Api\AdminFeedController::class, 'show']);
-Route::post('/v2/admin/feed/posts/{id}/hide', [\App\Http\Controllers\Api\AdminFeedController::class, 'hide']);
-Route::delete('/v2/admin/feed/posts/{id}', [\App\Http\Controllers\Api\AdminFeedController::class, 'destroy']);
-Route::get('/v2/admin/feed/stats', [\App\Http\Controllers\Api\AdminFeedController::class, 'stats']);
-// AG14: Municipal Announcer role management
+// Broker-or-admin: feed/comments/reviews moderation lives in the broker
+// panel (/broker/moderation/*) since 2026-07-02. Controllers add self-dealing
+// guards (a broker cannot moderate content they are a party to); announcer
+// grant/revoke is privilege management and stays admin-only below.
+// See BrokerModerationAuthorizationTest.
+Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
+    Route::get('/v2/admin/feed/posts', [\App\Http\Controllers\Api\AdminFeedController::class, 'index']);
+    Route::get('/v2/admin/feed/posts/{id}', [\App\Http\Controllers\Api\AdminFeedController::class, 'show']);
+    Route::post('/v2/admin/feed/posts/{id}/hide', [\App\Http\Controllers\Api\AdminFeedController::class, 'hide'])->middleware('throttle:60,1');
+    Route::delete('/v2/admin/feed/posts/{id}', [\App\Http\Controllers\Api\AdminFeedController::class, 'destroy'])->middleware('throttle:60,1');
+    Route::get('/v2/admin/feed/stats', [\App\Http\Controllers\Api\AdminFeedController::class, 'stats']);
+    Route::get('/v2/admin/comments', [\App\Http\Controllers\Api\AdminCommentsController::class, 'index']);
+    Route::get('/v2/admin/comments/{id}', [\App\Http\Controllers\Api\AdminCommentsController::class, 'show']);
+    Route::post('/v2/admin/comments/{id}/hide', [\App\Http\Controllers\Api\AdminCommentsController::class, 'hide'])->middleware('throttle:60,1');
+    Route::delete('/v2/admin/comments/{id}', [\App\Http\Controllers\Api\AdminCommentsController::class, 'destroy'])->middleware('throttle:60,1');
+    Route::get('/v2/admin/reviews', [\App\Http\Controllers\Api\AdminReviewsController::class, 'index']);
+    Route::get('/v2/admin/reviews/{id}', [\App\Http\Controllers\Api\AdminReviewsController::class, 'show']);
+    Route::post('/v2/admin/reviews/{id}/flag', [\App\Http\Controllers\Api\AdminReviewsController::class, 'flag'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/reviews/{id}/hide', [\App\Http\Controllers\Api\AdminReviewsController::class, 'hide'])->middleware('throttle:60,1');
+    Route::delete('/v2/admin/reviews/{id}', [\App\Http\Controllers\Api\AdminReviewsController::class, 'destroy'])->middleware('throttle:60,1');
+});
+// AG14: Municipal Announcer role management — admin-only (privilege mgmt).
 Route::post('/v2/admin/feed/grant-announcer', [\App\Http\Controllers\Api\AdminFeedController::class, 'grantAnnouncer']);
 Route::delete('/v2/admin/feed/revoke-announcer/{id}', [\App\Http\Controllers\Api\AdminFeedController::class, 'revokeAnnouncer']);
-Route::get('/v2/admin/comments', [\App\Http\Controllers\Api\AdminCommentsController::class, 'index']);
-Route::get('/v2/admin/comments/{id}', [\App\Http\Controllers\Api\AdminCommentsController::class, 'show']);
-Route::post('/v2/admin/comments/{id}/hide', [\App\Http\Controllers\Api\AdminCommentsController::class, 'hide']);
-Route::delete('/v2/admin/comments/{id}', [\App\Http\Controllers\Api\AdminCommentsController::class, 'destroy']);
-Route::get('/v2/admin/reviews', [\App\Http\Controllers\Api\AdminReviewsController::class, 'index']);
-Route::get('/v2/admin/reviews/{id}', [\App\Http\Controllers\Api\AdminReviewsController::class, 'show']);
-Route::post('/v2/admin/reviews/{id}/flag', [\App\Http\Controllers\Api\AdminReviewsController::class, 'flag']);
-Route::post('/v2/admin/reviews/{id}/hide', [\App\Http\Controllers\Api\AdminReviewsController::class, 'hide']);
-Route::delete('/v2/admin/reviews/{id}', [\App\Http\Controllers\Api\AdminReviewsController::class, 'destroy']);
 Route::get('/v2/admin/support-reports', [\App\Http\Controllers\Api\AdminSupportReportController::class, 'index']);
 Route::get('/v2/admin/support-reports/stats', [\App\Http\Controllers\Api\AdminSupportReportController::class, 'stats']);
 Route::get('/v2/admin/support-reports/assignees', [\App\Http\Controllers\Api\AdminSupportReportController::class, 'assignees']);
@@ -1818,8 +1830,9 @@ Route::post('/v2/admin/caring-community/projects/{id}/publish', [\App\Http\Contr
 Route::post('/v2/admin/caring-community/projects/{id}/updates', [\App\Http\Controllers\Api\ProjectAnnouncementController::class, 'adminCreateUpdate']);
 Route::post('/v2/admin/caring-community/project-updates/{id}/publish', [\App\Http\Controllers\Api\ProjectAnnouncementController::class, 'adminPublishUpdate']);
 
-Route::get('/v2/admin/reports', [\App\Http\Controllers\Api\AdminReportsController::class, 'index']);
-Route::get('/v2/admin/reports/stats', [\App\Http\Controllers\Api\AdminReportsController::class, 'stats']);
+// NOTE: the AdminReportsController member-report routes (index/stats/{id}/
+// resolve/dismiss) are broker-or-admin — they live in the group BELOW the
+// literal /reports/* analytics routes so `{id}` cannot shadow them.
 Route::get('/v2/admin/reports/social-value', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'socialValue']);
 Route::put('/v2/admin/reports/social-value/config', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'updateSocialValueConfig']);
 Route::get('/v2/admin/reports/members', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'memberReports']);
@@ -1835,9 +1848,19 @@ Route::put('/v2/admin/reports/municipal-impact/templates/{id}', [\App\Http\Contr
 Route::delete('/v2/admin/reports/municipal-impact/templates/{id}', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'deleteMunicipalImpactTemplate']);
 Route::get('/v2/admin/reports/export-types', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'exportTypes']);
 Route::get('/v2/admin/reports/{type}/export', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'exportReport']);
-Route::get('/v2/admin/reports/{id}', [\App\Http\Controllers\Api\AdminReportsController::class, 'show']);
-Route::post('/v2/admin/reports/{id}/resolve', [\App\Http\Controllers\Api\AdminReportsController::class, 'resolve']);
-Route::post('/v2/admin/reports/{id}/dismiss', [\App\Http\Controllers\Api\AdminReportsController::class, 'dismiss']);
+// Broker-or-admin: member-content reports triage lives in the broker panel
+// (/broker/moderation/reports) since 2026-07-02. The controller adds a
+// self-dealing guard (a broker cannot resolve/dismiss a report they filed or
+// that targets them). Registered AFTER the literal /reports/* analytics
+// routes above so {id} does not shadow them. See
+// BrokerModerationAuthorizationTest.
+Route::withoutMiddleware('admin')->middleware('broker-or-admin')->group(function () {
+    Route::get('/v2/admin/reports', [\App\Http\Controllers\Api\AdminReportsController::class, 'index']);
+    Route::get('/v2/admin/reports/stats', [\App\Http\Controllers\Api\AdminReportsController::class, 'stats']);
+    Route::get('/v2/admin/reports/{id}', [\App\Http\Controllers\Api\AdminReportsController::class, 'show']);
+    Route::post('/v2/admin/reports/{id}/resolve', [\App\Http\Controllers\Api\AdminReportsController::class, 'resolve'])->middleware('throttle:60,1');
+    Route::post('/v2/admin/reports/{id}/dismiss', [\App\Http\Controllers\Api\AdminReportsController::class, 'dismiss'])->middleware('throttle:60,1');
+});
 Route::get('/v2/admin/gamification/stats', [\App\Http\Controllers\Api\AdminGamificationController::class, 'stats']);
 Route::get('/v2/admin/gamification/badges', [\App\Http\Controllers\Api\AdminGamificationController::class, 'badges']);
 Route::post('/v2/admin/gamification/badges', [\App\Http\Controllers\Api\AdminGamificationController::class, 'createBadge']);
@@ -2968,11 +2991,19 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/v2/admin/members/inactive', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'inactiveMembers']);
     Route::post('/v2/admin/members/inactive/detect', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'detectInactive']);
     Route::post('/v2/admin/members/inactive/notify', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'markInactiveNotified']);
-    Route::get('/v2/admin/moderation/queue', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationQueue']);
-    Route::post('/v2/admin/moderation/{id}/review', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationReview']);
-    Route::get('/v2/admin/moderation/stats', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationStats']);
+    // Moderation SETTINGS stay admin-only — tenant moderation policy, same
+    // precedent as matching configuration.
     Route::get('/v2/admin/moderation/settings', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationSettings']);
     Route::put('/v2/admin/moderation/settings', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'updateModerationSettings']);
+});
+// Broker-or-admin: the content moderation queue lives in the broker panel
+// (/broker/moderation/queue) since 2026-07-02. The controller adds a
+// self-dealing guard (a broker cannot review their own queued content).
+// See BrokerModerationAuthorizationTest.
+Route::middleware(['auth:sanctum', 'broker-or-admin'])->group(function () {
+    Route::get('/v2/admin/moderation/queue', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationQueue']);
+    Route::post('/v2/admin/moderation/{id}/review', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationReview'])->middleware('throttle:60,1');
+    Route::get('/v2/admin/moderation/stats', [\App\Http\Controllers\Api\AdminAnalyticsReportsController::class, 'moderationStats']);
 });
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/v2/admin/listings/{id}/feature', [\App\Http\Controllers\Api\AdminListingsController::class, 'feature']);
