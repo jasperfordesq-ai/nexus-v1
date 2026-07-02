@@ -637,7 +637,7 @@
     "status_unreviewed": "Non examiné",
     "detail_title": "Détail du message",
     "detail_page_title": "Détail du message",
-    "detail_page_description": "Examinez la copie broker d'un message signalé.",
+    "detail_page_description": "Examinez la copie transmise au courtier d'un message signalé.",
     "detail_from": "De",
     "detail_to": "À",
     "detail_date": "Date",
@@ -709,7 +709,7 @@
     "retry": "Réessayer",
     "detail_not_found_hint": "La copie du message a peut-être été archivée ou supprimée, ou le lien est peut-être incorrect.",
     "detail_flag_banner_title": "Signalé pour examen",
-    "detail_decision_prompt": "Enregistrez une décision d'examen pour cette copie de message."
+    "detail_decision_prompt": "Enregistrez une décision d'examen pour ce message."
   },
   "monitoring": {
     "title": "Surveillance des utilisateurs",
@@ -1035,7 +1035,7 @@
     "error_title": "Impossible de charger l'archive",
     "error_hint": "Une erreur s'est produite lors de la récupération des dossiers archivés. Réessayez.",
     "retry": "Réessayer",
-    "detail_description": "Un instantané figé, en lecture seule, d'une copie de message examinée.",
+    "detail_description": "Un instantané figé, en lecture seule, d'un message examiné.",
     "frozen_note": "Ce dossier est conservé exactement tel qu'il a été examiné et ne peut pas être modifié.",
     "record_id": "Dossier n° {{id}}",
     "record_unavailable": "Dossier indisponible"

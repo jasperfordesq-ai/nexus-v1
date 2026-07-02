@@ -256,7 +256,7 @@
     "empty_all_title": "Aún no hay miembros",
     "empty_all_hint": "Los nuevos registros aparecerán aquí a medida que se unan personas.",
     "empty_pending_title": "No hay miembros pendientes de aprobación",
-    "empty_pending_hint": "Todo al día — los nuevos registros llegarán aquí para su revisión.",
+    "empty_pending_hint": "Estás al día — los nuevos registros llegarán aquí para su revisión.",
     "empty_active_title": "No hay miembros activos",
     "empty_active_hint": "Los miembros aprobados aparecerán aquí en cuanto estén activos.",
     "empty_suspended_title": "No hay miembros suspendidos",
@@ -475,7 +475,7 @@
     "stat_rejected": "Rechazados",
     "stat_of_total": "de {{count}} registros totales",
     "stat_expired_hint": "{{count}} ya caducados",
-    "expiry_days_left": "quedan {{count}} d",
+    "expiry_days_left": "quedan {{count}} días",
     "empty_queue_title": "No hay registros pendientes de revisión",
     "empty_queue_hint": "Todo al día — las nuevas solicitudes aparecerán aquí para su revisión.",
     "list_error_title": "No se pudieron cargar los registros de verificación",
@@ -709,7 +709,7 @@
     "retry": "Intentar de nuevo",
     "detail_not_found_hint": "Es posible que la copia del mensaje se haya archivado o eliminado, o que el enlace sea incorrecto.",
     "detail_flag_banner_title": "Marcado para revisión",
-    "detail_decision_prompt": "Registra una decisión de revisión para esta copia de mensaje."
+    "detail_decision_prompt": "Registra una decisión de revisión para esta copia del mensaje."
   },
   "monitoring": {
     "title": "Monitorización de usuarios",
@@ -957,8 +957,8 @@
     "type_personal_accident": "Accidentes personales",
     "type_other": "Otro",
     "expiry_expired_today": "Caducado hoy",
-    "expiry_expired_days_ago": "Caducado hace {{days}} d",
-    "expiry_days_left": "quedan {{days}} d",
+    "expiry_expired_days_ago": "Caducado hace {{days}} días",
+    "expiry_days_left": "quedan {{days}} días",
     "empty_queue_title": "Todo al día",
     "empty_queue_hint": "No hay certificados esperando revisión.",
     "load_error_hint": "Inténtalo de nuevo — si sigue fallando, es posible que la API no esté disponible."
@@ -1035,7 +1035,7 @@
     "error_title": "No se pudo cargar el archivo",
     "error_hint": "Algo salió mal al obtener los registros archivados. Inténtalo de nuevo.",
     "retry": "Intentar de nuevo",
-    "detail_description": "Una instantánea congelada y de solo lectura de una copia de mensaje revisada.",
+    "detail_description": "Una instantánea congelada y de solo lectura de una copia del mensaje revisado.",
     "frozen_note": "Este registro se conserva exactamente como fue revisado y no se puede modificar.",
     "record_id": "Registro #{{id}}",
     "record_unavailable": "Registro no disponible"
