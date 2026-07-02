@@ -92,55 +92,65 @@ export function BrokerStatCard({
   const IconAsComponent = Icon as LucideIcon;
   const iconNode = isValidElement(Icon) ? Icon : <IconAsComponent size={22} />;
 
+  const showTrendRow = !loading && (delta !== undefined || (trend && trend.length >= 2));
+
   const body = (
-    <div className="flex w-full flex-row items-center gap-4 p-4 sm:p-5">
-      <div
-        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ring-current/10 ${tileClass[color]}`}
-      >
-        {iconNode}
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="line-clamp-2 text-sm font-medium leading-tight text-muted">{label}</p>
-        {loading ? (
-          <Skeleton
-            role="status"
-            aria-busy="true"
-            aria-label={t('common.loading')}
-            className="mt-1.5 h-7 w-16 rounded-md bg-surface-tertiary"
-          />
-        ) : (
-          <p className="mt-0.5 text-2xl font-semibold tracking-tight text-foreground tabular-nums">
-            {typeof value === 'number' ? <AnimatedNumber value={value} /> : (value ?? '—')}
-          </p>
-        )}
-        {description && !loading && <p className="mt-0.5 truncate text-xs text-muted">{description}</p>}
-        {delta !== undefined && !loading && (
-          <span className="mt-0.5 flex items-center gap-1">
-            {delta >= 0 ? (
-              <TrendingUp size={13} className="text-success" aria-hidden="true" />
-            ) : (
-              <TrendingDown size={13} className="text-danger" aria-hidden="true" />
-            )}
-            <span className={`text-xs font-medium tabular-nums ${delta >= 0 ? 'text-success' : 'text-danger'}`}>
-              {delta > 0 ? '+' : ''}
-              {delta}%
-            </span>
-            {deltaLabel && <span className="truncate text-xs text-muted">{deltaLabel}</span>}
-          </span>
-        )}
-      </div>
-      <div className="flex shrink-0 flex-col items-end gap-1.5">
-        {trend && trend.length >= 2 && !loading && (
-          <BrokerSparkline points={trend} className={sparkClass[color]} />
-        )}
+    <div className="w-full p-4 sm:p-5">
+      <div className="flex flex-row items-center gap-4">
+        <div
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ring-current/10 ${tileClass[color]}`}
+        >
+          {iconNode}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="line-clamp-2 text-sm font-medium leading-tight text-muted">{label}</p>
+          {loading ? (
+            <Skeleton
+              role="status"
+              aria-busy="true"
+              aria-label={t('common.loading')}
+              className="mt-1.5 h-7 w-16 rounded-md bg-surface-tertiary"
+            />
+          ) : (
+            <p className="mt-0.5 text-2xl font-semibold tracking-tight text-foreground tabular-nums">
+              {typeof value === 'number' ? <AnimatedNumber value={value} /> : (value ?? '—')}
+            </p>
+          )}
+          {description && !loading && <p className="mt-0.5 truncate text-xs text-muted">{description}</p>}
+        </div>
         {to && (
           <ChevronRight
             size={16}
-            className="text-muted/60 transition-transform group-hover:translate-x-0.5 group-hover:text-muted motion-reduce:transition-none"
+            className="shrink-0 text-muted/60 transition-transform group-hover:translate-x-0.5 group-hover:text-muted motion-reduce:transition-none"
             aria-hidden="true"
           />
         )}
       </div>
+      {/* Delta + sparkline live on their own row — sharing the main row
+          squeezed the label/delta into character-level wrapping on 4-up grids. */}
+      {showTrendRow && (
+        <div className="mt-3 flex items-center justify-between gap-3 border-t border-divider/60 pt-2.5">
+          {delta !== undefined ? (
+            <span className="flex min-w-0 items-center gap-1">
+              {delta >= 0 ? (
+                <TrendingUp size={13} className="shrink-0 text-success" aria-hidden="true" />
+              ) : (
+                <TrendingDown size={13} className="shrink-0 text-danger" aria-hidden="true" />
+              )}
+              <span className={`shrink-0 text-xs font-medium tabular-nums ${delta >= 0 ? 'text-success' : 'text-danger'}`}>
+                {delta > 0 ? '+' : ''}
+                {delta}%
+              </span>
+              {deltaLabel && <span className="truncate text-xs text-muted">{deltaLabel}</span>}
+            </span>
+          ) : (
+            <span />
+          )}
+          {trend && trend.length >= 2 && (
+            <BrokerSparkline points={trend} className={`shrink-0 ${sparkClass[color]}`} />
+          )}
+        </div>
+      )}
     </div>
   );
 
