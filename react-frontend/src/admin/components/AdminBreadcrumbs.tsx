@@ -67,13 +67,12 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
   archives: 'breadcrumbs.archives',
   'match-debug': 'breadcrumbs.match_debug',
 
-  // Moderation
+  // Moderation — content moderation (queue/feed/comments/reviews) moved to
+  // the broker panel 2026-07-02; `moderation` and `reports` labels stay
+  // because /admin/jobs|groups|marketplace/moderation and /admin/reports/*
+  // still use them.
   moderation: 'breadcrumbs.moderation',
-  feed: 'breadcrumbs.feed',
-  comments: 'breadcrumbs.comments',
-  reviews: 'breadcrumbs.reviews',
   reports: 'breadcrumbs.reports',
-  queue: 'breadcrumbs.queue',
 
   // Newsletters / Marketing
   newsletters: 'breadcrumbs.newsletters',
@@ -140,9 +139,9 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
   whitelist: 'breadcrumbs.whitelist',
   features: 'breadcrumbs.features',
 
-  // Safeguarding
+  // Safeguarding — the dashboard + options moved to the broker panel
+  // 2026-07-02; the `safeguarding` label stays for /admin/volunteering/safeguarding.
   safeguarding: 'breadcrumbs.safeguarding',
-  'safeguarding-options': 'breadcrumbs.safeguarding_options',
 
   // System
   settings: 'breadcrumbs.settings',

@@ -267,7 +267,7 @@ const RELATED_ADMIN_PAGES: RelatedAdminPage[] = [
   {
     labelKey: 'enterprise.related_safeguarding_options',
     descriptionKey: 'enterprise.related_safeguarding_options_desc',
-    href: '/admin/safeguarding-options',
+    href: '/broker/safeguarding-options',
     destLabelKey: 'enterprise.related_safeguarding',
   },
 ];

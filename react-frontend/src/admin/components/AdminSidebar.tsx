@@ -14,7 +14,7 @@
  * - attention strip for operational items that need review
  */
 
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ScrollShadow } from '@/components/ui';
@@ -53,7 +53,6 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Clock from 'lucide-react/icons/clock';
 import Wallet from 'lucide-react/icons/wallet';
 import CreditCard from 'lucide-react/icons/credit-card';
-import Shield from 'lucide-react/icons/shield';
 import KeyIcon from 'lucide-react/icons/key';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Heart from 'lucide-react/icons/heart';
@@ -69,10 +68,6 @@ import Network from 'lucide-react/icons/network';
 import Mail from 'lucide-react/icons/mail';
 import Wrench from 'lucide-react/icons/wrench';
 import Stethoscope from 'lucide-react/icons/stethoscope';
-import MessageSquare from 'lucide-react/icons/message-square';
-import MessageCircle from 'lucide-react/icons/message-circle';
-import Star from 'lucide-react/icons/star';
-import Flag from 'lucide-react/icons/flag';
 import UserX from 'lucide-react/icons/user-x';
 import Calendar from 'lucide-react/icons/calendar';
 import BarChart2 from 'lucide-react/icons/chart-no-axes-column';
@@ -151,7 +146,6 @@ const ZONES: NavZone[] = [
   { key: 'overview', label: 'zone_overview', sectionKeys: ['dashboard', 'broker-panel', 'super-admin'] },
   { key: 'people', label: 'zone_people', sectionKeys: ['users', 'crm'] },
   { key: 'community', label: 'zone_community', sectionKeys: ['community', 'listings', 'content', 'jobs'] },
-  { key: 'safety', label: 'zone_safety', sectionKeys: ['moderation', 'matching'] },
   { key: 'communications', label: 'zone_communications', sectionKeys: ['communications', 'marketing', 'advertising'] },
   { key: 'growth', label: 'zone_growth', sectionKeys: ['engagement', 'analytics', 'discovery'] },
   { key: 'commerce', label: 'zone_commerce', sectionKeys: ['financial', 'marketplace'] },
@@ -205,7 +199,7 @@ function keyword(...words: string[]): string[] {
   return words;
 }
 
-function useAdminNav(safeguardingFlagCount: number): NavSection[] {
+function useAdminNav(): NavSection[] {
   const { t } = useTranslation('admin_nav');
   const { hasFeature, hasModule } = useTenant();
   const { user } = useAuth();
@@ -336,41 +330,11 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
           { label: t('job_templates'), href: '/admin/jobs/templates', icon: FileText },
         ],
       }] : []),
-      {
-        key: 'moderation',
-        label: t('moderation'),
-        icon: Shield,
-        zone: 'safety',
-        items: [
-          { label: t('content_queue'), href: '/admin/moderation/queue', icon: Shield, badge: t('badge_new'), attention: 'info' },
-          ...(hasModule('feed') ? [{ label: t('feed_posts'), href: '/admin/moderation/feed', icon: MessageSquare }] : []),
-          { label: t('comments'), href: '/admin/moderation/comments', icon: MessageCircle },
-          ...(hasFeature('reviews') ? [{ label: t('reviews'), href: '/admin/moderation/reviews', icon: Star }] : []),
-          { label: t('reports'), href: '/admin/moderation/reports', icon: Flag },
-        ],
-      },
-      {
-        key: 'matching',
-        label: t('matching'),
-        icon: Zap,
-        zone: 'safety',
-        items: [
-          ...(hasFeature('exchange_workflow') ? [
-            { label: t('smart_matching'), href: '/admin/smart-matching', icon: Brain },
-            // Match approvals live in the broker panel (/broker/match-approvals),
-            // which admins can open via the Broker Panel link above.
-          ] : []),
-          {
-            label: t('safeguarding'),
-            href: '/admin/safeguarding',
-            icon: ShieldCheck,
-            badge: safeguardingFlagCount > 0 ? String(safeguardingFlagCount) : undefined,
-            attention: safeguardingFlagCount > 0 ? 'danger' : undefined,
-          },
-          { label: t('member_safeguarding'), href: '/admin/safeguarding?tab=preferences', icon: Users },
-          { label: t('safeguarding_options'), href: '/admin/safeguarding-options', icon: Shield },
-        ],
-      },
+      // Content moderation (queue/feed/comments/reviews/reports) and the
+      // safeguarding trio moved to the broker panel (/broker/moderation/*,
+      // /broker/safeguarding, /broker/safeguarding-options) on 2026-07-02.
+      // Smart Matching is the only remaining item here — it now lives in the
+      // Intelligence & Diagnostics section below.
       {
         key: 'communications',
         label: t('communications'),
@@ -523,6 +487,9 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
         icon: Brain,
         zone: 'diagnostics',
         items: [
+          ...(hasFeature('exchange_workflow') ? [
+            { label: t('smart_matching'), href: '/admin/smart-matching', icon: Zap },
+          ] : []),
           ...(hasFeature('ai_chat') ? [
             { label: t('ai_settings'), href: '/admin/ai-settings', icon: Brain },
             { label: t('ai_module_docs'), href: '/admin/ai/module-docs', icon: Brain },
@@ -578,7 +545,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
     }
 
     return sections.filter((section) => section.href || (section.items?.length ?? 0) > 0);
-  }, [hasFeature, hasModule, isGod, isPlatformSuperAdmin, isSuperAdmin, safeguardingFlagCount, t]);
+  }, [hasFeature, hasModule, isGod, isPlatformSuperAdmin, isSuperAdmin, t]);
 }
 
 interface AdminSidebarProps {
@@ -598,8 +565,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
   const { tenantPath } = useTenant();
   const [searchQuery, setSearchQuery] = useState('');
   const [recentPages, setRecentPages] = useState<RecentPage[]>(() => readRecentPages());
-  const [safeguardingFlagCount, setSafeguardingFlagCount] = useState(0);
-  const sections = useAdminNav(safeguardingFlagCount);
+  const sections = useAdminNav();
   const sectionRefs = useRef(new Map<string, HTMLDivElement>());
 
   const allItems = useMemo(() => {
@@ -667,25 +633,9 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
     }, 80);
   }, [collapsed, openSection]);
 
-  const fetchSafeguardingFlags = useCallback(async () => {
-    try {
-      const res = await api.get<{ unreviewed_flags?: number } | { data: { unreviewed_flags?: number } }>(
-        '/v2/admin/safeguarding/dashboard',
-      );
-      if (res.success && res.data) {
-        const payload = 'data' in res.data ? res.data.data : res.data;
-        setSafeguardingFlagCount(Number(payload?.unreviewed_flags ?? 0));
-      }
-    } catch {
-      // Tenants without safeguarding enabled can 404 here.
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchSafeguardingFlags();
-    const interval = window.setInterval(fetchSafeguardingFlags, 60000);
-    return () => window.clearInterval(interval);
-  }, [fetchSafeguardingFlags]);
+  // The safeguarding flag-count badge moved to the broker panel with the
+  // rest of the safeguarding surfaces (2026-07-02) — the admin sidebar no
+  // longer polls /v2/admin/safeguarding/dashboard.
 
   const hrefToLabel = useMemo(() => {
     const map = new Map<string, string>();

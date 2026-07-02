@@ -441,7 +441,7 @@ export function OnboardingSettings() {
               ) : (
                 <p className="text-sm text-theme-muted">{t('system.onboarding.no_options_configured')}</p>
               )}
-              <Button size="sm" variant="secondary" className="mt-3" onPress={() => { navigate(tenantPath('/admin/safeguarding-options')); }}>
+              <Button size="sm" variant="secondary" className="mt-3" onPress={() => { navigate(tenantPath('/broker/safeguarding-options')); }}>
                 {t('system.onboarding.manage_options')}
               </Button>
             </div>

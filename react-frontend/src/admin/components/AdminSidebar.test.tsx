@@ -213,14 +213,6 @@ describe('AdminSidebar', () => {
     expect(expandBtn).toBeInTheDocument();
   });
 
-  it('fetches safeguarding flag count on mount', async () => {
-    const { AdminSidebar } = await import('./AdminSidebar');
-    render(<AdminSidebar />);
-    await waitFor(() => {
-      expect(mockApi.get).toHaveBeenCalledWith('/v2/admin/safeguarding/dashboard');
-    });
-  });
-
   it('renders platform zone navigation links (enterprise, federation) when features enabled', async () => {
     // beforeEach sets mockHasFeature.mockReturnValue(true) — all features including federation are on
     // The platform zone includes enterprise and federation sections
