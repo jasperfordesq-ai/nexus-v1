@@ -76,41 +76,43 @@ vi.mock('@/admin/modules/federation/PartnerTimebankGuidance', () => ({
   default: () => null,
 }));
 
-vi.mock('@/admin/components', async (importOriginal) => {
-  const orig = await importOriginal<typeof import('@/admin/components')>();
-  return {
-    ...orig,
-    PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
-      <div>
-        <h1>{title}</h1>
-        {actions}
+// CreditAgreements imports these from direct file paths, so each mock must
+// target the file — mocking the '@/admin/components' barrel never intercepts.
+vi.mock('@/admin/components/PageHeader', () => ({
+  PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
+    <div>
+      <h1>{title}</h1>
+      {actions}
+    </div>
+  ),
+}));
+vi.mock('@/admin/components/StatCard', () => ({
+  StatCard: ({ label, value }: { label: string; value: unknown }) => (
+    <div data-testid="stat-card">{label}: {String(value)}</div>
+  ),
+}));
+vi.mock('@/admin/components/ConfirmModal', () => ({
+  ConfirmModal: ({
+    isOpen,
+    onClose,
+    onConfirm,
+    title,
+    confirmLabel,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    title: string;
+    confirmLabel?: string;
+  }) =>
+    isOpen ? (
+      <div role="dialog" aria-label={title}>
+        <span>{title}</span>
+        <button onClick={onConfirm}>{confirmLabel ?? 'Confirm'}</button>
+        <button onClick={onClose}>Cancel</button>
       </div>
-    ),
-    StatCard: ({ label, value }: { label: string; value: unknown }) => (
-      <div data-testid="stat-card">{label}: {String(value)}</div>
-    ),
-    ConfirmModal: ({
-      isOpen,
-      onClose,
-      onConfirm,
-      title,
-      confirmLabel,
-    }: {
-      isOpen: boolean;
-      onClose: () => void;
-      onConfirm: () => void;
-      title: string;
-      confirmLabel?: string;
-    }) =>
-      isOpen ? (
-        <div role="dialog" aria-label={title}>
-          <span>{title}</span>
-          <button onClick={onConfirm}>{confirmLabel ?? 'Confirm'}</button>
-          <button onClick={onClose}>Cancel</button>
-        </div>
-      ) : null,
-  };
-});
+    ) : null,
+}));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 function makeAgreement(overrides: Record<string, unknown> = {}) {

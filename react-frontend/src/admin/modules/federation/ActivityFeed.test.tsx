@@ -81,10 +81,14 @@ vi.mock('@/components/ui', async (importOriginal) => {
 });
 
 // ─── Admin shared components ──────────────────────────────────────────────────
-vi.mock('../../components', () => ({
+// ActivityFeed imports these from direct file paths, so each mock must target
+// the file — mocking the '../../components' barrel never intercepts.
+vi.mock('../../components/StatCard', () => ({
   StatCard: ({ label, value }: { label: string; value: string | number }) => (
     <div data-testid="stat-card">{label}: {value}</div>
   ),
+}));
+vi.mock('../../components/PageHeader', () => ({
   PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
     <div data-testid="page-header">
       <h1>{title}</h1>

@@ -9,14 +9,35 @@ import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 import userEvent from '@testing-library/user-event';
 
-// ─── Mock @/components/ui via uiMock proxy ───────────────────────────────────
-vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+// ─── UI mock ──────────────────────────────────────────────────────────────────
+// Stub only Switch (React Aria infinite-update loops in jsdom) and useConfirm
+// (auto-confirm without dialog interaction). Do NOT mock the whole module with
+// the '@/test/uiMock' proxy here — combined with a top-level '@/test/test-utils'
+// import it crashes the vitest fork worker on this machine (collect-phase hang,
+// worker IPC 'Channel closed').
+vi.mock('@/components/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/components/ui')>();
+  return {
+    ...actual,
+    Switch: ({ isSelected, onValueChange, children }: {
+      isSelected?: boolean; onValueChange?: (v: boolean) => void; children?: React.ReactNode;
+    }) => (
+      <label>
+        <input type="checkbox" checked={!!isSelected} onChange={(e) => onValueChange?.(e.target.checked)} />
+        {children}
+      </label>
+    ),
+    useConfirm: () => () => Promise.resolve(true),
+  };
+});
 
 // ─── Heavy admin children ─────────────────────────────────────────────────────
 vi.mock('@/admin/modules/federation/PartnerTimebankGuidance', () => ({
   PartnerTimebankGuidance: () => null,
 }));
-vi.mock('../../components', () => ({
+// ApiPartnersAdminPage imports PageHeader from the direct file path, so the
+// mock must target the file — mocking the '../../components' barrel never intercepts.
+vi.mock('../../components/PageHeader', () => ({
   PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
 }));
 

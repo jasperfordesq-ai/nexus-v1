@@ -53,13 +53,18 @@ vi.mock('../../api/adminApi', () => ({
 }));
 
 // Stub DataTable, EmptyState, ConfirmModal, StatusBadge, etc.
-vi.mock('../../components', () => ({
+// Partnerships imports these from direct file paths ('../../components/PageHeader',
+// '../../components/DataTable', …), so each mock must target the file — mocking
+// the '../../components' barrel never intercepts.
+vi.mock('../../components/PageHeader', () => ({
   PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
     <div>
       <h1>{title}</h1>
       {actions}
     </div>
   ),
+}));
+vi.mock('../../components/DataTable', () => ({
   DataTable: ({ data, items, columns, emptyContent, isLoading }: {
     data?: Array<Record<string, unknown>>;
     items?: Array<Record<string, unknown>>;
@@ -92,7 +97,14 @@ vi.mock('../../components', () => ({
       </table>
     );
   },
+  StatusBadge: ({ status }: { status: string }) => (
+    <span data-testid="status-badge">{status}</span>
+  ),
+}));
+vi.mock('../../components/EmptyState', () => ({
   EmptyState: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
+}));
+vi.mock('../../components/ConfirmModal', () => ({
   ConfirmModal: ({ isOpen, onClose, onConfirm, title }: {
     isOpen: boolean; onClose: () => void; onConfirm: () => void; title: string;
     message?: string; confirmLabel?: string; confirmColor?: string; isLoading?: boolean;
@@ -103,9 +115,6 @@ vi.mock('../../components', () => ({
         <button onClick={onClose}>close-modal</button>
       </div>
     ) : null,
-  StatusBadge: ({ status }: { status: string }) => (
-    <span data-testid="status-badge">{status}</span>
-  ),
 }));
 
 // Stub PartnerTimebankGuidance

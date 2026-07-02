@@ -43,14 +43,18 @@ vi.mock('@/contexts', () =>
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
-// Stub heavy child components used inside ExternalPartners
-vi.mock('../../components', () => ({
+// Stub heavy child components used inside ExternalPartners.
+// The component imports these from direct file paths, so the mocks must
+// target those paths — mocking the '../../components' barrel never intercepts.
+vi.mock('../../components/PageHeader', () => ({
   PageHeader: ({ title, actions }: { title?: string; actions?: React.ReactNode }) => (
     <div data-testid="page-header">
       <span>{title}</span>
       {actions}
     </div>
   ),
+}));
+vi.mock('../../components/ConfirmModal', () => ({
   ConfirmModal: ({
     isOpen, onClose, onConfirm, title: modalTitle, isLoading,
   }: {

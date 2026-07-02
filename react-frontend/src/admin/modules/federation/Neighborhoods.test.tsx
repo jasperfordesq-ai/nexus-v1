@@ -29,13 +29,19 @@ vi.mock('@/contexts/ToastContext', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 // ─── Stub admin sub-components ────────────────────────────────────────────────
-vi.mock('../../components', () => ({
+// Neighborhoods imports these from direct file paths, so each mock must target
+// the file — mocking the '../../components' barrel never intercepts.
+vi.mock('../../components/PageHeader', () => ({
   PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
     <div data-testid="page-header">{title}{actions}</div>
   ),
+}));
+vi.mock('../../components/StatCard', () => ({
   StatCard: ({ label, value }: { label: string; value: unknown }) => (
     <div data-testid="stat-card">{label}: {String(value)}</div>
   ),
+}));
+vi.mock('../../components/ConfirmModal', () => ({
   ConfirmModal: ({
     isOpen, onClose, onConfirm, title,
   }: { isOpen: boolean; onClose: () => void; onConfirm: () => void; title: string }) => (

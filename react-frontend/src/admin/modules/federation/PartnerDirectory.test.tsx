@@ -10,7 +10,31 @@ import { createMockContexts } from '@/test/mock-contexts';
 import userEvent from '@testing-library/user-event';
 
 // ─── UI mock ──────────────────────────────────────────────────────────────────
-vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+// Stub only Select/SelectItem (React Aria infinite-update loops in jsdom).
+// Do NOT mock the whole module with the '@/test/uiMock' proxy here — combined
+// with a top-level '@/test/test-utils' import it crashes the vitest fork
+// worker on this machine (collect-phase hang, worker IPC 'Channel closed').
+vi.mock('@/components/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/components/ui')>();
+  return {
+    ...actual,
+    Select: ({ children, label, 'aria-label': ariaLabel, selectedKeys, onSelectionChange }: {
+      children?: React.ReactNode; label?: string; 'aria-label'?: string;
+      selectedKeys?: string[]; onSelectionChange?: (keys: Set<string>) => void;
+    }) => (
+      <select
+        aria-label={ariaLabel ?? label ?? 'select'}
+        value={selectedKeys?.[0] ?? ''}
+        onChange={(e) => onSelectionChange?.(new Set([e.target.value]))}
+      >
+        {children}
+      </select>
+    ),
+    SelectItem: ({ children, id }: { children?: React.ReactNode; id?: string }) => (
+      <option value={id}>{children}</option>
+    ),
+  };
+});
 
 // ─── Admin API mock ───────────────────────────────────────────────────────────
 const { mockAdminFederation } = vi.hoisted(() => ({
@@ -25,10 +49,14 @@ vi.mock('@/admin/api/adminApi', () => ({
 }));
 
 // ─── Admin components ─────────────────────────────────────────────────────────
-vi.mock('../../components', () => ({
+// PartnerDirectory imports these from direct file paths, so each mock must
+// target the file — mocking the '../../components' barrel never intercepts.
+vi.mock('../../components/PageHeader', () => ({
   PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
     <div><h1>{title}</h1><div data-testid="page-header-actions">{actions}</div></div>
   ),
+}));
+vi.mock('../../components/EmptyState', () => ({
   EmptyState: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
 }));
 
@@ -281,20 +309,31 @@ describe('PartnerDirectory', () => {
     const { PartnerDirectory } = await import('./PartnerDirectory');
     render(<PartnerDirectory />);
 
+    // Initial load is debounced 300ms and renders skeletons (no aria-busy
+    // spinner); the Refresh button is isLoading-disabled until it completes.
     await waitFor(() => {
-      const busy = screen.queryAllByRole('status').find((el) => el.getAttribute('aria-busy') === 'true');
-      expect(busy).toBeUndefined();
-    });
+      expect(mockAdminFederation.getDirectory).toHaveBeenCalled();
+    }, { timeout: 2000 });
 
-    const refreshBtn = screen.queryAllByRole('button').find((b) =>
-      b.textContent?.toLowerCase().includes('refresh'),
-    );
-    expect(refreshBtn).toBeDefined();
+    let refreshBtn: HTMLElement | undefined;
+    await waitFor(() => {
+      refreshBtn = screen.queryAllByRole('button').find((b) =>
+        b.textContent?.toLowerCase().includes('refresh'),
+      );
+      expect(refreshBtn).toBeDefined();
+      const stillDisabled =
+        refreshBtn!.hasAttribute('disabled') ||
+        refreshBtn!.getAttribute('aria-disabled') === 'true' ||
+        refreshBtn!.getAttribute('data-disabled') === 'true' ||
+        refreshBtn!.getAttribute('data-loading') === 'true';
+      expect(stillDisabled).toBe(false);
+    }, { timeout: 2000 });
+
     fireEvent.click(refreshBtn!);
 
     // getDirectory should be called again (second call)
     await waitFor(() => {
       expect(mockAdminFederation.getDirectory.mock.calls.length).toBeGreaterThanOrEqual(2);
-    });
+    }, { timeout: 2000 });
   });
 });
