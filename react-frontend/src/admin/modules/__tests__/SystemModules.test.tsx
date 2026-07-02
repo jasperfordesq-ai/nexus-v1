@@ -7,7 +7,7 @@
  * Batch render tests for System/cross-cutting admin modules:
  * - AdminDashboard, CommunityAnalytics, ImpactReport,
  *   CategoriesAdmin, ListingsAdmin, TenantFeatures,
- *   MatchingConfig, SmartMatchingOverview, MatchApprovals
+ *   MatchingConfig, SmartMatchingOverview
  *
  * Smoke tests only — verify each component renders without crashing.
  */
@@ -297,13 +297,3 @@ describe('SmartMatchingOverview', () => {
   });
 });
 
-// ─── MatchApprovals ──────────────────────────────────────────────────────────
-
-import { MatchApprovals } from '../matching/MatchApprovals';
-
-describe('MatchApprovals', () => {
-  it('renders without crashing', () => {
-    const { container } = render(<W><MatchApprovals /></W>);
-    expect(container.querySelector('div')).toBeTruthy();
-  });
-});

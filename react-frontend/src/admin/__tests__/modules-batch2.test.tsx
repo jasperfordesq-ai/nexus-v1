@@ -7,7 +7,7 @@
  * Tests for admin modules batch 2:
  * - BrokerDashboard, BrokerConfiguration, ExchangeManagement, ExchangeDetail
  * - MessageReview, UserMonitoring, RiskTags, VettingRecords
- * - MatchApprovals, MatchDetail, MatchingConfig, MatchingAnalytics, SmartMatchingOverview
+ * - MatchingConfig, MatchingAnalytics, SmartMatchingOverview
  * - TimebankingDashboard, FraudAlerts, OrgWallets, UserReport
  * - GamificationHub, GamificationAnalytics, CampaignList, CampaignForm, CustomBadges, CreateBadge
  */
@@ -195,15 +195,6 @@ describe('MatchingConfig', () => {
   it('renders without crashing', () => {
     render(<W><MatchingConfig /></W>);
     expect(screen.getByText('Matching Config')).toBeInTheDocument();
-  });
-});
-
-import { MatchApprovals } from '../modules/matching/MatchApprovals';
-
-describe('MatchApprovals', () => {
-  it('renders without crashing', () => {
-    render(<W><MatchApprovals /></W>);
-    expect(screen.getByText('Match Approvals')).toBeInTheDocument();
   });
 });
 

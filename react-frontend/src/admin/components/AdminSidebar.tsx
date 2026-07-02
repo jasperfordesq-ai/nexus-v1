@@ -357,7 +357,8 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
         items: [
           ...(hasFeature('exchange_workflow') ? [
             { label: t('smart_matching'), href: '/admin/smart-matching', icon: Brain },
-            { label: t('match_approvals'), href: '/admin/match-approvals', icon: UserCheck, badge: t('badge_new'), attention: 'info' },
+            // Match approvals live in the broker panel (/broker/match-approvals),
+            // which admins can open via the Broker Panel link above.
           ] : []),
           {
             label: t('safeguarding'),

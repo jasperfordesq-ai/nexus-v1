@@ -83,17 +83,15 @@ const BlogPostForm = lazy(() => import('./modules/blog/BlogPostForm'));
 const SmartMatchingOverview = lazy(() => import('./modules/matching/SmartMatchingOverview'));
 const MatchingConfig = lazy(() => import('./modules/matching/MatchingConfig'));
 const MatchingAnalytics = lazy(() => import('./modules/matching/MatchingAnalytics'));
-const MatchApprovals = lazy(() => import('./modules/matching/MatchApprovals'));
-const MatchDetail = lazy(() => import('./modules/matching/MatchDetail'));
 const TimebankingDashboard = lazy(() => import('./modules/timebanking/TimebankingDashboard'));
 const FraudAlerts = lazy(() => import('./modules/timebanking/FraudAlerts'));
 const OrgWallets = lazy(() => import('./modules/timebanking/OrgWallets'));
 const UserReport = lazy(() => import('./modules/timebanking/UserReport'));
 const StartingBalances = lazy(() => import('./modules/timebanking/StartingBalances'));
 const CommunityFund = lazy(() => import('./modules/timebanking/CommunityFund'));
-// admin/modules/broker/* retired — broker control panel lives at /broker/*
-// (see react-frontend/src/broker/pages/). Legacy /admin/broker-controls/*
-// URLs redirect via the TenantRedirect Route below.
+// admin/modules/broker/* and the admin match-approvals pages are retired —
+// the broker control panel (incl. match approvals) lives at /broker/*
+// (see react-frontend/src/broker/pages/).
 const GamificationHub = lazy(() => import('./modules/gamification/GamificationHub'));
 const CampaignList = lazy(() => import('./modules/gamification/CampaignList'));
 const CampaignForm = lazy(() => import('./modules/gamification/CampaignForm'));
@@ -411,14 +409,9 @@ export function AdminRoutes() {
       <Route path="smart-matching" element={<Lazy><SmartMatchingOverview /></Lazy>} />
       <Route path="smart-matching/analytics" element={<Lazy><MatchingAnalytics /></Lazy>} />
       <Route path="smart-matching/configuration" element={<Lazy><MatchingConfig /></Lazy>} />
-      <Route path="match-approvals" element={<Lazy><MatchApprovals /></Lazy>} />
-      <Route path="match-approvals/:id" element={<Lazy><MatchDetail /></Lazy>} />
-      {/* /admin/broker-controls/* retired — broker control panel lives at
-          /broker/* (see react-frontend/src/broker/). Anyone landing on a
-          legacy bookmark is redirected to the new home, preserving the
-          tenant slug via TenantRedirect. */}
-      <Route path="broker-controls" element={<TenantRedirect to="/broker" />} />
-      <Route path="broker-controls/*" element={<TenantRedirect to="/broker" />} />
+      {/* /admin/match-approvals and /admin/broker-controls/* are fully
+          retired (owner-approved 2026-07-02, no redirects) — match approvals
+          and all broker duties live at /broker/*. */}
 
       {/* ─── MODERATION ─── */}
       <Route path="moderation/feed" element={<Lazy><FeedModeration /></Lazy>} />

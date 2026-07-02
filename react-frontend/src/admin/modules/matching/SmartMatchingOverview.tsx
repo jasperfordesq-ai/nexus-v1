@@ -271,7 +271,7 @@ export function SmartMatchingOverview() {
               <Separator className="my-2" />
               <Button
                 as={Link}
-                to={tenantPath('/admin/match-approvals')}
+                to={tenantPath('/broker/match-approvals')}
                 fullWidth
                 variant="tertiary"
                 startContent={<ShieldCheck aria-hidden="true" size={16} />}
