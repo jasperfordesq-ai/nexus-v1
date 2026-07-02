@@ -5,6 +5,12 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Manual trigger — forces every job to run regardless of changed paths
+  # (the per-job `github.event_name == 'workflow_dispatch'` conditions below
+  # already opt in). Use this to run the full suite on the current HEAD when
+  # the last push only touched paths the changes-preflight skips (e.g. a
+  # CHANGELOG- or .github-only commit).
+  workflow_dispatch:
 
 permissions:
   contents: read
