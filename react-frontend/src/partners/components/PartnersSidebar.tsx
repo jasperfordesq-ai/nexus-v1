@@ -20,7 +20,8 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { useTenant } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
+import { isSuperAdminUser } from '@/lib/access';
 import Globe from 'lucide-react/icons/globe';
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 import Handshake from 'lucide-react/icons/handshake';
@@ -64,10 +65,14 @@ export function PartnersSidebar({ collapsed, onToggle }: PartnersSidebarProps) {
   const { t } = useTranslation('partners');
   const location = useLocation();
   const { tenantPath, hasFeature } = useTenant();
+  const { user } = useAuth();
 
+  // Setup/plumbing surfaces are super-admin-only; ordinary admins get the
+  // read-mostly panel. Must mirror the SuperRoute gates in routes.tsx.
+  const isSuper = isSuperAdminUser(user);
   const showFederation = hasFeature('federation');
-  const showInboundApi = hasFeature('partner_api');
-  const showCaring = hasFeature('caring_community');
+  const showInboundApi = hasFeature('partner_api') && isSuper;
+  const showCaring = hasFeature('caring_community') && isSuper;
 
   const sections: NavSection[] = [
     {
@@ -91,13 +96,13 @@ export function PartnersSidebar({ collapsed, onToggle }: PartnersSidebarProps) {
           },
         ] as NavSection[])
       : []),
-    ...(showFederation || showInboundApi
+    ...((showFederation && isSuper) || showInboundApi
       ? ([
           {
             key: 'external',
             title: t('sidebar.section_external'),
             items: [
-              ...(showFederation
+              ...(showFederation && isSuper
                 ? ([
                     { key: 'external-partners', label: t('nav.external_partners'), icon: Globe, path: '/partner-timebanks/external-partners' },
                     { key: 'credit-commons', label: t('nav.credit_commons'), icon: Landmark, path: '/partner-timebanks/credit-commons' },
@@ -121,7 +126,7 @@ export function PartnersSidebar({ collapsed, onToggle }: PartnersSidebarProps) {
           },
         ] as NavSection[])
       : []),
-    ...(showFederation
+    ...(showFederation && isSuper
       ? ([
           {
             key: 'access',
@@ -132,16 +137,28 @@ export function PartnersSidebar({ collapsed, onToggle }: PartnersSidebarProps) {
               { key: 'api-docs', label: t('nav.api_docs'), icon: BookOpen, path: '/partner-timebanks/api-docs' },
             ],
           },
+        ] as NavSection[])
+      : []),
+    ...(showFederation
+      ? ([
           {
             key: 'data',
             title: t('sidebar.section_data'),
             items: [
               { key: 'activity', label: t('nav.activity'), icon: Activity, path: '/partner-timebanks/activity' },
               { key: 'analytics', label: t('nav.analytics'), icon: BarChart3, path: '/partner-timebanks/analytics' },
-              { key: 'aggregates', label: t('nav.aggregates'), icon: ShieldCheck, path: '/partner-timebanks/aggregates' },
-              { key: 'data', label: t('nav.data'), icon: Database, path: '/partner-timebanks/data' },
+              ...(isSuper
+                ? ([
+                    { key: 'aggregates', label: t('nav.aggregates'), icon: ShieldCheck, path: '/partner-timebanks/aggregates' },
+                    { key: 'data', label: t('nav.data'), icon: Database, path: '/partner-timebanks/data' },
+                  ] as NavItem[])
+                : []),
             ],
           },
+        ] as NavSection[])
+      : []),
+    ...(showFederation && isSuper
+      ? ([
           {
             key: 'settings',
             title: t('sidebar.section_settings'),

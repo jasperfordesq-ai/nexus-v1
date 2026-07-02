@@ -65,23 +65,40 @@ describe('hasAdminPanelAccess', () => {
   });
 });
 
-describe('isSuperAdminUser / hasPartnerPanelAccess', () => {
-  it('grants access for super_admin and god role strings', () => {
+describe('isSuperAdminUser', () => {
+  it('grants for super_admin and god role strings', () => {
     expect(isSuperAdminUser({ role: 'super_admin' })).toBe(true);
     expect(isSuperAdminUser({ role: 'god' })).toBe(true);
-    expect(hasPartnerPanelAccess({ role: 'super_admin' })).toBe(true);
   });
 
-  it('grants access for each super-admin boolean flag', () => {
+  it('grants for each super-admin boolean flag', () => {
     expect(isSuperAdminUser({ is_super_admin: true })).toBe(true);
     expect(isSuperAdminUser({ is_tenant_super_admin: true })).toBe(true);
     expect(isSuperAdminUser({ is_god: true })).toBe(true);
   });
 
-  it('denies regular admins and tenant admins', () => {
-    expect(hasPartnerPanelAccess({ role: 'admin' })).toBe(false);
-    expect(hasPartnerPanelAccess({ role: 'tenant_admin' })).toBe(false);
-    expect(hasPartnerPanelAccess({ role: 'admin', is_admin: true })).toBe(false);
+  it('denies regular admins, tenant admins, brokers, members and null users', () => {
+    expect(isSuperAdminUser({ role: 'admin' })).toBe(false);
+    expect(isSuperAdminUser({ role: 'tenant_admin' })).toBe(false);
+    expect(isSuperAdminUser({ role: 'admin', is_admin: true })).toBe(false);
+    expect(isSuperAdminUser({ role: 'broker' })).toBe(false);
+    expect(isSuperAdminUser({ role: 'member' })).toBe(false);
+    expect(isSuperAdminUser(null)).toBe(false);
+    expect(isSuperAdminUser(undefined)).toBe(false);
+  });
+
+  it('requires boolean flags to be strictly true', () => {
+    expect(isSuperAdminUser({ is_super_admin: 1 })).toBe(false);
+    expect(isSuperAdminUser({ is_tenant_super_admin: 'yes' })).toBe(false);
+  });
+});
+
+describe('hasPartnerPanelAccess', () => {
+  it('admits every admin tier (panel is read-mostly; plumbing gates on isSuperAdminUser)', () => {
+    expect(hasPartnerPanelAccess({ role: 'admin' })).toBe(true);
+    expect(hasPartnerPanelAccess({ role: 'tenant_admin' })).toBe(true);
+    expect(hasPartnerPanelAccess({ role: 'super_admin' })).toBe(true);
+    expect(hasPartnerPanelAccess({ is_tenant_super_admin: true })).toBe(true);
   });
 
   it('denies brokers, members and null users', () => {
@@ -89,11 +106,6 @@ describe('isSuperAdminUser / hasPartnerPanelAccess', () => {
     expect(hasPartnerPanelAccess({ role: 'member' })).toBe(false);
     expect(hasPartnerPanelAccess(null)).toBe(false);
     expect(hasPartnerPanelAccess(undefined)).toBe(false);
-  });
-
-  it('requires boolean flags to be strictly true', () => {
-    expect(isSuperAdminUser({ is_super_admin: 1 })).toBe(false);
-    expect(isSuperAdminUser({ is_tenant_super_admin: 'yes' })).toBe(false);
   });
 });
 

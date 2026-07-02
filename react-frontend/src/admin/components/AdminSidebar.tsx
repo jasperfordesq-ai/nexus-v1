@@ -216,11 +216,13 @@ function useAdminNav(): NavSection[] {
         href: '/super-admin',
         zone: 'overview' as const,
       }] : []),
-      // External-partner setup is super-admin-only (2026-07-02) — one entry
-      // to the dedicated Partner Timebanks panel replaces the old 15-link
-      // federation + integrations sections. Hidden when no partnering
-      // surface is enabled on the tenant.
-      ...(isSuperAdmin && (hasFeature('federation') || hasFeature('partner_api') || hasFeature('caring_community')) ? [{
+      // One entry to the dedicated Partner Timebanks panel replaces the old
+      // 15-link federation + integrations sections (2026-07-02). Every admin
+      // gets the read-mostly panel when federation is on; the setup/plumbing
+      // pages inside are super-admin-only. On tenants where only the
+      // partner_api / caring_community surfaces exist, the panel holds
+      // super-admin-only content, so the entry hides for ordinary admins.
+      ...(hasFeature('federation') || (isSuperAdmin && (hasFeature('partner_api') || hasFeature('caring_community'))) ? [{
         key: 'partner-timebanks-panel',
         label: t('partner_timebanks'),
         icon: Globe,

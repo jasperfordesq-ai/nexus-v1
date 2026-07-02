@@ -82,37 +82,37 @@ describe('PartnersRoute', () => {
     expect(screen.getByTestId('redirect').getAttribute('data-to')).toBe('/test/login');
   });
 
-  it('redirects plain members to the admin dashboard', async () => {
+  it('redirects plain members to the member dashboard', async () => {
     mockAuth.isAuthenticated = true;
     mockAuth.user = { id: 1, role: 'member' };
     const { PartnersRoute } = await import('./PartnersRoute');
     render(<PartnersRoute />);
-    expect(screen.getByTestId('redirect').getAttribute('data-to')).toBe('/test/admin');
+    expect(screen.getByTestId('redirect').getAttribute('data-to')).toBe('/test/dashboard');
   });
 
-  it('redirects a NORMAL admin — external-partner setup is super-admin-only', async () => {
+  it('admits a NORMAL admin — the read-mostly panel is for every admin', async () => {
     mockAuth.isAuthenticated = true;
     mockAuth.user = { id: 2, role: 'admin', is_admin: true };
     const { PartnersRoute } = await import('./PartnersRoute');
     render(<PartnersRoute />);
-    expect(screen.getByTestId('redirect').getAttribute('data-to')).toBe('/test/admin');
-    expect(screen.queryByTestId('outlet')).not.toBeInTheDocument();
+    expect(screen.getByTestId('outlet')).toBeInTheDocument();
+    expect(screen.queryByTestId('redirect')).not.toBeInTheDocument();
   });
 
-  it('redirects a tenant_admin role', async () => {
+  it('admits a tenant_admin role', async () => {
     mockAuth.isAuthenticated = true;
     mockAuth.user = { id: 3, role: 'tenant_admin' };
     const { PartnersRoute } = await import('./PartnersRoute');
     render(<PartnersRoute />);
-    expect(screen.getByTestId('redirect')).toBeInTheDocument();
+    expect(screen.getByTestId('outlet')).toBeInTheDocument();
   });
 
-  it('redirects brokers', async () => {
+  it('redirects brokers to the member dashboard', async () => {
     mockAuth.isAuthenticated = true;
     mockAuth.user = { id: 4, role: 'broker' };
     const { PartnersRoute } = await import('./PartnersRoute');
     render(<PartnersRoute />);
-    expect(screen.getByTestId('redirect')).toBeInTheDocument();
+    expect(screen.getByTestId('redirect').getAttribute('data-to')).toBe('/test/dashboard');
   });
 
   it('renders Outlet for super_admin role', async () => {
@@ -149,12 +149,21 @@ describe('PartnersRoute', () => {
     expect(screen.getByTestId('redirect').getAttribute('data-to')).toBe('/test/admin');
   });
 
-  it('grants access when only the caring_community feature is enabled', async () => {
+  it('grants a super admin access when only the caring_community feature is enabled', async () => {
     mockAuth.isAuthenticated = true;
     mockAuth.user = { id: 9, role: 'super_admin' };
     mockTenant.hasFeature = vi.fn((f: string) => f === 'caring_community');
     const { PartnersRoute } = await import('./PartnersRoute');
     render(<PartnersRoute />);
     expect(screen.getByTestId('outlet')).toBeInTheDocument();
+  });
+
+  it('redirects a NORMAL admin when only super-admin-only surfaces exist (caring/partner_api, no federation)', async () => {
+    mockAuth.isAuthenticated = true;
+    mockAuth.user = { id: 10, role: 'admin', is_admin: true };
+    mockTenant.hasFeature = vi.fn((f: string) => f === 'caring_community' || f === 'partner_api');
+    const { PartnersRoute } = await import('./PartnersRoute');
+    render(<PartnersRoute />);
+    expect(screen.getByTestId('redirect').getAttribute('data-to')).toBe('/test/admin');
   });
 });

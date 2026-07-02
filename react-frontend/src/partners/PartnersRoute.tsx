@@ -5,16 +5,17 @@
 
 /**
  * Partner Timebanks Route Guard
- * Restricts access to super admins only (the same gate as the admin
- * Communications sections). Normal admins and tenant admins are bounced
- * to the admin dashboard; unauthenticated users go to login.
+ * Any admin can open the panel (overview, partnerships, directory,
+ * activity). The sensitive setup surfaces are individually gated to
+ * super admins in routes.tsx/PartnersSidebar. Members are bounced to
+ * the member dashboard; unauthenticated users go to login.
  */
 
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
-import { hasPartnerPanelAccess } from '@/lib/access';
+import { hasPartnerPanelAccess, isSuperAdminUser } from '@/lib/access';
 
 export function PartnersRoute() {
   const { t } = useTranslation('partners');
@@ -30,15 +31,19 @@ export function PartnersRoute() {
     return <Navigate to={tenantPath('/login')} state={{ from: tenantPath(location.pathname) }} replace />;
   }
 
-  // Super admins only — external-partner setup is deliberately hidden from
-  // normal admins and tenant admins (see hasPartnerPanelAccess).
+  // Any admin may enter; the setup/plumbing pages inside are gated to
+  // super admins individually (see hasPartnerPanelAccess for the rule).
   if (!hasPartnerPanelAccess(user)) {
-    return <Navigate to={tenantPath('/admin')} replace />;
+    return <Navigate to={tenantPath('/dashboard')} replace />;
   }
 
-  // The panel is pointless on a tenant with none of the partnering surfaces
-  // enabled; bounce back to admin rather than showing an empty shell.
-  if (!hasFeature('federation') && !hasFeature('partner_api') && !hasFeature('caring_community')) {
+  // The panel is pointless when it would render empty: no partnering surface
+  // at all, or — for ordinary admins — a tenant whose only surfaces
+  // (partner_api / caring_community) are super-admin-only plumbing.
+  const anyVisibleSurface =
+    hasFeature('federation') ||
+    (isSuperAdminUser(user) && (hasFeature('partner_api') || hasFeature('caring_community')));
+  if (!anyVisibleSurface) {
     return <Navigate to={tenantPath('/admin')} replace />;
   }
 

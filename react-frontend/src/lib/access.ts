@@ -56,9 +56,13 @@ export function isSuperAdminUser(user: UserLike): boolean {
 }
 
 /**
- * Partner Timebanks panel — super admins only (same gate as the
- * Communications sidebar sections and SuperAdminRoute).
+ * Partner Timebanks panel — any admin can open the panel (overview,
+ * partnerships, directory, activity), like the broker panel entry.
+ * The sensitive setup surfaces INSIDE the panel (external protocols,
+ * API keys, webhooks, aggregates, data management, network settings,
+ * caring peers) are gated on isSuperAdminUser — see PartnersSidebar
+ * and partners/routes.tsx (owner decision 2026-07-02).
  */
 export function hasPartnerPanelAccess(user: UserLike): boolean {
-  return isSuperAdminUser(user);
+  return hasAdminPanelAccess(user);
 }

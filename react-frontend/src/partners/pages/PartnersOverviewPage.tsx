@@ -27,7 +27,8 @@ import Circle from 'lucide-react/icons/circle';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import Network from 'lucide-react/icons/network';
 import Power from 'lucide-react/icons/power';
-import { useTenant } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
+import { isSuperAdminUser } from '@/lib/access';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { adminFederation } from '@/admin/api/adminApi';
 import type { FederationSystemControls } from '@/admin/api/types';
@@ -63,11 +64,15 @@ function unwrap<T>(payload: unknown): T {
 export default function PartnersOverviewPage() {
   const { t } = useTranslation('partners');
   const { tenantPath, hasFeature } = useTenant();
+  const { user } = useAuth();
   usePageTitle(t('overview.page_title'));
 
+  // Setup surfaces (checklist, settings CTA, caring/inbound shortcuts) are
+  // super-admin-only — ordinary admins get status + activity only.
+  const isSuper = isSuperAdminUser(user);
   const showFederation = hasFeature('federation');
-  const showCaring = hasFeature('caring_community');
-  const showInboundApi = hasFeature('partner_api');
+  const showCaring = hasFeature('caring_community') && isSuper;
+  const showInboundApi = hasFeature('partner_api') && isSuper;
 
   const [loading, setLoading] = useState(showFederation);
   const [overview, setOverview] = useState<OverviewData | null>(null);
@@ -153,12 +158,14 @@ export default function PartnersOverviewPage() {
                 <p className="font-medium text-foreground">{t('overview.disabled_banner.title')}</p>
                 <p className="text-sm text-muted">{t('overview.disabled_banner.hint')}</p>
               </div>
-              <Link
-                to={tenantPath('/partner-timebanks/settings')}
-                className="shrink-0 text-sm font-medium text-warning hover:underline"
-              >
-                {t('overview.disabled_banner.cta')}
-              </Link>
+              {isSuper && (
+                <Link
+                  to={tenantPath('/partner-timebanks/settings')}
+                  className="shrink-0 text-sm font-medium text-warning hover:underline"
+                >
+                  {t('overview.disabled_banner.cta')}
+                </Link>
+              )}
             </CardBody>
           </Card>
         )}
@@ -213,7 +220,7 @@ export default function PartnersOverviewPage() {
               icon={Globe}
               color="accent"
               loading={loading}
-              to={tenantPath('/partner-timebanks/external-partners')}
+              to={isSuper ? tenantPath('/partner-timebanks/external-partners') : undefined}
               description={t('overview.stats.external_platforms_hint')}
             />
             <BrokerStatCard
@@ -230,8 +237,8 @@ export default function PartnersOverviewPage() {
         )}
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {/* Setup checklist */}
-          {showFederation && (
+          {/* Setup checklist — setup is a super-admin job */}
+          {showFederation && isSuper && (
             <Card className="rounded-2xl border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
               <CardBody className="p-5">
                 <h2 className="text-base font-semibold text-foreground">{t('overview.checklist.title')}</h2>

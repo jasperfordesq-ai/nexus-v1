@@ -173,8 +173,29 @@ describe('AdminSidebar', () => {
     );
   });
 
-  it('hides the Partner Timebanks entry from non-super-admins', () => {
+  it('shows the Partner Timebanks entry to normal admins when federation is enabled', () => {
+    // Every admin gets the read-mostly panel; the plumbing inside is
+    // super-admin-only (owner decision 2026-07-02).
     mockHasFeature.mockImplementation((feature: string) => feature === 'federation');
+    Object.assign(mockUser, { role: 'admin', is_super_admin: undefined });
+
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    expect(screen.getByRole('link', { name: 'Partner Timebanks' })).toHaveAttribute(
+      'href',
+      '/test/partner-timebanks',
+    );
+  });
+
+  it('hides the entry from normal admins when only super-admin-only surfaces exist', () => {
+    // caring_community / partner_api content inside the panel is all
+    // super-admin-only, so without federation the panel would be empty
+    // for an ordinary admin.
+    mockHasFeature.mockImplementation((feature: string) =>
+      feature === 'caring_community' || feature === 'partner_api',
+    );
     Object.assign(mockUser, { role: 'admin', is_super_admin: undefined });
 
     render(

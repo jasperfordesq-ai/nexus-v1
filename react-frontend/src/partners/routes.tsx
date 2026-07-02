@@ -13,7 +13,8 @@
 import { Suspense, lazy } from 'react';
 import { Route, Navigate } from 'react-router-dom';
 import { LoadingScreen } from '@/components/feedback';
-import { useTenant } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
+import { isSuperAdminUser } from '@/lib/access';
 import type { TenantFeatures } from '@/types';
 
 /**
@@ -34,6 +35,22 @@ function PartnersNotFoundRedirect() {
 function FeatureRoute({ feature, children }: { feature: keyof TenantFeatures; children: React.ReactNode }) {
   const { tenantPath, hasFeature } = useTenant();
   if (!hasFeature(feature)) {
+    return <Navigate to={tenantPath('/partner-timebanks')} replace />;
+  }
+  return <>{children}</>;
+}
+
+/**
+ * Setup/plumbing pages (external protocols, keys, webhooks, aggregates,
+ * data management, settings, caring peers) are super-admin-only; ordinary
+ * admins get the read-mostly panel (overview, partnerships, directory,
+ * activity, analytics) and bounce back to the overview from deep links.
+ * Mirrors the section/item visibility rules in PartnersSidebar.
+ */
+function SuperRoute({ children }: { children: React.ReactNode }) {
+  const { tenantPath } = useTenant();
+  const { user } = useAuth();
+  if (!isSuperAdminUser(user)) {
     return <Navigate to={tenantPath('/partner-timebanks')} replace />;
   }
   return <>{children}</>;
@@ -91,34 +108,36 @@ export function PartnersRoutes() {
       <Route path="neighborhoods" element={<Fed><Lazy><NeighborhoodsPage /></Lazy></Fed>} />
       <Route path="credit-agreements" element={<Fed><Lazy><CreditAgreementsPage /></Lazy></Fed>} />
 
-      {/* External connections */}
-      <Route path="external-partners" element={<Fed><Lazy><ExternalPartnersPage /></Lazy></Fed>} />
-      <Route path="credit-commons" element={<Fed><Lazy><CreditCommonsPage /></Lazy></Fed>} />
+      {/* External connections — super admins only (protocol plumbing) */}
+      <Route path="external-partners" element={<SuperRoute><Fed><Lazy><ExternalPartnersPage /></Lazy></Fed></SuperRoute>} />
+      <Route path="credit-commons" element={<SuperRoute><Fed><Lazy><CreditCommonsPage /></Lazy></Fed></SuperRoute>} />
       <Route
         path="inbound-api"
-        element={<FeatureRoute feature="partner_api"><Lazy><InboundApiPartnersPage /></Lazy></FeatureRoute>}
+        element={<SuperRoute><FeatureRoute feature="partner_api"><Lazy><InboundApiPartnersPage /></Lazy></FeatureRoute></SuperRoute>}
       />
 
-      {/* Caring Community protocols — hidden entirely when the module is off */}
+      {/* Caring Community protocols — super admins only, hidden entirely
+          when the module is off */}
       <Route
         path="caring/peers"
-        element={<FeatureRoute feature="caring_community"><Lazy><CaringPeersPage /></Lazy></FeatureRoute>}
+        element={<SuperRoute><FeatureRoute feature="caring_community"><Lazy><CaringPeersPage /></Lazy></FeatureRoute></SuperRoute>}
       />
 
-      {/* Access & security */}
-      <Route path="api-keys" element={<Fed><Lazy><ApiKeysPage /></Lazy></Fed>} />
-      <Route path="api-keys/create" element={<Fed><Lazy><CreateApiKeyPage /></Lazy></Fed>} />
-      <Route path="webhooks" element={<Fed><Lazy><WebhooksPage /></Lazy></Fed>} />
-      <Route path="api-docs" element={<Fed><Lazy><ApiDocsPage /></Lazy></Fed>} />
+      {/* Access & security — super admins only */}
+      <Route path="api-keys" element={<SuperRoute><Fed><Lazy><ApiKeysPage /></Lazy></Fed></SuperRoute>} />
+      <Route path="api-keys/create" element={<SuperRoute><Fed><Lazy><CreateApiKeyPage /></Lazy></Fed></SuperRoute>} />
+      <Route path="webhooks" element={<SuperRoute><Fed><Lazy><WebhooksPage /></Lazy></Fed></SuperRoute>} />
+      <Route path="api-docs" element={<SuperRoute><Fed><Lazy><ApiDocsPage /></Lazy></Fed></SuperRoute>} />
 
-      {/* Activity & data */}
+      {/* Activity & data — aggregates (secret rotation) and data
+          management (export/import/purge) are super-admin-only */}
       <Route path="activity" element={<Fed><Lazy><ActivityFeedPage /></Lazy></Fed>} />
       <Route path="analytics" element={<Fed><Lazy><AnalyticsPage /></Lazy></Fed>} />
-      <Route path="aggregates" element={<Fed><Lazy><AggregatesPage /></Lazy></Fed>} />
-      <Route path="data" element={<Fed><Lazy><DataManagementPage /></Lazy></Fed>} />
+      <Route path="aggregates" element={<SuperRoute><Fed><Lazy><AggregatesPage /></Lazy></Fed></SuperRoute>} />
+      <Route path="data" element={<SuperRoute><Fed><Lazy><DataManagementPage /></Lazy></Fed></SuperRoute>} />
 
-      {/* Settings */}
-      <Route path="settings" element={<Fed><Lazy><NetworkSettingsPage /></Lazy></Fed>} />
+      {/* Settings — super admins only */}
+      <Route path="settings" element={<SuperRoute><Fed><Lazy><NetworkSettingsPage /></Lazy></Fed></SuperRoute>} />
 
       {/* Unknown sub-route → bounce back to the panel overview. */}
       <Route path="*" element={<PartnersNotFoundRedirect />} />

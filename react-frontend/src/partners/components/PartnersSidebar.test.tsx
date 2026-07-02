@@ -7,8 +7,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 
-// ─── Mutable tenant state (read by the factory each render) ──────────────────
-const { mockTenant } = vi.hoisted(() => ({
+// ─── Mutable auth / tenant state (read by the factory each render) ───────────
+const { mockAuth, mockTenant } = vi.hoisted(() => ({
+  mockAuth: {
+    user: { id: 1, role: 'super_admin' } as Record<string, unknown>,
+    isAuthenticated: true,
+    login: vi.fn(),
+    logout: vi.fn(),
+    register: vi.fn(),
+    updateUser: vi.fn(),
+    refreshUser: vi.fn(),
+    status: 'idle' as const,
+    error: null,
+  },
   mockTenant: {
     tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
     tenantPath: (p: string) => `/test${p}`,
@@ -19,17 +30,7 @@ const { mockTenant } = vi.hoisted(() => ({
 
 vi.mock('@/contexts', () =>
   createMockContexts({
-    useAuth: () => ({
-      user: { id: 1, role: 'super_admin' },
-      isAuthenticated: true,
-      login: vi.fn(),
-      logout: vi.fn(),
-      register: vi.fn(),
-      updateUser: vi.fn(),
-      refreshUser: vi.fn(),
-      status: 'idle' as const,
-      error: null,
-    }),
+    useAuth: () => ({ ...mockAuth }),
     useTenant: () => ({ ...mockTenant }),
   })
 );
@@ -42,6 +43,7 @@ describe('PartnersSidebar', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockTenant.hasFeature = vi.fn(() => true);
+    mockAuth.user = { id: 1, role: 'super_admin' };
   });
 
   it('renders the sidebar navigation landmark', () => {
@@ -86,6 +88,25 @@ describe('PartnersSidebar', () => {
     expect(screen.getByText('External connections')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Inbound API partners/i })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /Credit Commons/i })).not.toBeInTheDocument();
+  });
+
+  it('shows a NORMAL admin only the read-mostly sections — the plumbing is super-admin-only', () => {
+    mockAuth.user = { id: 2, role: 'admin', is_admin: true };
+    render(<PartnersSidebar collapsed={false} onToggle={mockOnToggle} />);
+
+    // Visible: network + activity basics
+    expect(screen.getByText('Partner network')).toBeInTheDocument();
+    expect(screen.getByText('Activity & data')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Activity feed/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Analytics/i })).toBeInTheDocument();
+
+    // Hidden: setup/plumbing
+    expect(screen.queryByText('External connections')).not.toBeInTheDocument();
+    expect(screen.queryByText('Caring Community')).not.toBeInTheDocument();
+    expect(screen.queryByText('Access & security')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Network settings/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Shared statistics/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Data management/i })).not.toBeInTheDocument();
   });
 
   it('renders the Full Admin Panel footer link', () => {
