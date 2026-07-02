@@ -83,7 +83,7 @@ export function BrokerHeader({ sidebarCollapsed, onSidebarToggle, onOpenSearch }
             >
               <Search size={14} aria-hidden="true" />
               <span>{t('header.search')}</span>
-              <Kbd className="ml-1">⌘K</Kbd>
+              <Kbd className="ml-1">{t('header.search_shortcut')}</Kbd>
             </button>
             {/* …small screens get an icon button. */}
             <Button

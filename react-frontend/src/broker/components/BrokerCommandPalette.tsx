@@ -147,7 +147,7 @@ export function BrokerCommandPalette({ isOpen, onClose }: BrokerCommandPalettePr
             }}
             onKeyDown={onKeyDown}
           />
-          <Kbd className="hidden shrink-0 sm:inline-flex">esc</Kbd>
+          <Kbd className="hidden shrink-0 sm:inline-flex">{t('palette.close_key')}</Kbd>
         </div>
         <ul id="broker-palette-list" role="listbox" aria-label={t('palette.results_label')} className="max-h-80 overflow-y-auto p-2">
           {filtered.length === 0 ? (

@@ -21,7 +21,8 @@
     "sign_out": "Wyloguj",
     "user_fallback": "Pośrednik",
     "help": "Help Center",
-    "search": "Search"
+    "search": "Search",
+    "search_shortcut": "⌘K"
   },
   "nav": {
     "dashboard": "Panel",
@@ -1375,7 +1376,8 @@
     "aria_label": "Jump to a broker page",
     "placeholder": "Jump to… (members, vetting, messages)",
     "results_label": "Broker destinations",
-    "no_results": "Nothing matches \"{{query}}\""
+    "no_results": "Nothing matches \"{{query}}\"",
+    "close_key": "esc"
   },
   "matching": {
     "title": "Match Approvals",
