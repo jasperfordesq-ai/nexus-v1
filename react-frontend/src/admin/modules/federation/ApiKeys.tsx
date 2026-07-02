@@ -42,12 +42,24 @@ const getStatusColor = (item: ApiKey): 'success' | 'danger' | 'warning' => {
   return 'success';
 };
 
-export function ApiKeys() {
+interface ApiKeysProps {
+  /**
+   * Embedded mode (e.g. the Partner Timebanks panel): open the create
+   * flow in the host's drawer instead of navigating to the create route.
+   */
+  onCreateClick?: () => void;
+  /** Bumped by the host after a drawer-based create to refresh the list. */
+  refreshToken?: number;
+}
+
+export function ApiKeys({ onCreateClick, refreshToken }: ApiKeysProps = {}) {
   const { t } = useTranslation('admin');
   usePageTitle(t('federation.page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
+
+  const openCreate = onCreateClick ?? (() => navigate(tenantPath('/partner-timebanks/api-keys/create')));
   const [items, setItems] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [revokingId, setRevokingId] = useState<number | null>(null);
@@ -89,7 +101,7 @@ export function ApiKeys() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => { loadData(); }, [loadData, refreshToken]);
 
   const getStatusLabel = (item: ApiKey): string => {
     if (item.status === 'revoked') return t('federation.status_revoked');
@@ -151,10 +163,10 @@ export function ApiKeys() {
         <PageHeader
           title={t('federation.api_keys_title')}
           description={t('federation.api_keys_desc')}
-          actions={<Button startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/partner-timebanks/api-keys/create'))}>{t('federation.create_key')}</Button>}
+          actions={<Button startContent={<Plus size={16} />} onPress={openCreate}>{t('federation.create_key')}</Button>}
         />
         <PartnerTimebankGuidance page="apiKeys" />
-        <EmptyState icon={Key} title={t('federation.no_api_keys')} description={t('federation.no_api_keys_desc')} actionLabel={t('federation.create_api_key_action')} onAction={() => navigate(tenantPath('/partner-timebanks/api-keys/create'))} />
+        <EmptyState icon={Key} title={t('federation.no_api_keys')} description={t('federation.no_api_keys_desc')} actionLabel={t('federation.create_api_key_action')} onAction={openCreate} />
       </div>
     );
   }
@@ -167,7 +179,7 @@ export function ApiKeys() {
         actions={
           <div className="flex gap-2">
             <Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('common.refresh')}</Button>
-            <Button startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/partner-timebanks/api-keys/create'))}>{t('federation.create_key')}</Button>
+            <Button startContent={<Plus size={16} />} onPress={openCreate}>{t('federation.create_key')}</Button>
           </div>
         }
       />

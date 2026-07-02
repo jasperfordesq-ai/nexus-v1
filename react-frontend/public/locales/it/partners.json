@@ -125,7 +125,10 @@
     },
     "directory": {
       "title": "Elenco dei partner",
-      "description": "Sfoglia altre banche del tempo sulla rete e chiedi di collaborare con loro."
+      "description": "Sfoglia altre banche del tempo sulla rete, chiedi di collaborare con loro e gestisci il modo in cui la tua comunità appare agli altri.",
+      "tabs_aria": "Sezioni della directory",
+      "tab_browse": "Sfoglia i partner",
+      "tab_profile": "Il nostro elenco"
     },
     "directory_profile": {
       "title": "Il nostro elenco",

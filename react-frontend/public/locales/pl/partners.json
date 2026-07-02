@@ -125,7 +125,10 @@
     },
     "directory": {
       "title": "Katalog partnerów",
-      "description": "Przeglądaj inne banki czasu w sieci i poproś o współpracę z nimi."
+      "description": "Przeglądaj inne banki czasu w sieci, poproś o nawiązanie współpracy i zarządzaj sposobem, w jaki Twoja społeczność będzie widoczna dla innych.",
+      "tabs_aria": "Sekcje katalogów",
+      "tab_browse": "Przeglądaj partnerów",
+      "tab_profile": "Nasze zestawienie"
     },
     "directory_profile": {
       "title": "Nasze zestawienie",

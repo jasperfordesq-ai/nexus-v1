@@ -125,7 +125,10 @@
     },
     "directory": {
       "title": "Eolaire comhpháirtithe",
-      "description": "Brabhsáil bainc ama eile ar an líonra agus iarr dul i gcomhpháirtíocht leo."
+      "description": "Brabhsáil bainc ama eile ar an líonra, iarr ort dul i gcomhpháirtíocht leo, agus bainistigh conas a fheictear do phobal féin do dhaoine eile.",
+      "tabs_aria": "Ailt eolaire",
+      "tab_browse": "Brabhsáil comhpháirtithe",
+      "tab_profile": "Ár liostú"
     },
     "directory_profile": {
       "title": "Ár liostú",

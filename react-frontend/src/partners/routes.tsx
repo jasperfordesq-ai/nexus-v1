@@ -45,7 +45,6 @@ const PartnersOverviewPage = lazy(() => import('./pages/PartnersOverviewPage'));
 // Partner network
 const PartnershipsPage = lazy(() => import('./pages/PartnershipsPage'));
 const PartnerDirectoryPage = lazy(() => import('./pages/PartnerDirectoryPage'));
-const DirectoryProfilePage = lazy(() => import('./pages/DirectoryProfilePage'));
 const NeighborhoodsPage = lazy(() => import('./pages/NeighborhoodsPage'));
 const CreditAgreementsPage = lazy(() => import('./pages/CreditAgreementsPage'));
 
@@ -87,8 +86,8 @@ export function PartnersRoutes() {
 
       {/* Partner network */}
       <Route path="partnerships" element={<Fed><Lazy><PartnershipsPage /></Lazy></Fed>} />
+      {/* Our-listing editing lives on the directory page's "profile" tab. */}
       <Route path="directory" element={<Fed><Lazy><PartnerDirectoryPage /></Lazy></Fed>} />
-      <Route path="directory/profile" element={<Fed><Lazy><DirectoryProfilePage /></Lazy></Fed>} />
       <Route path="neighborhoods" element={<Fed><Lazy><NeighborhoodsPage /></Lazy></Fed>} />
       <Route path="credit-agreements" element={<Fed><Lazy><CreditAgreementsPage /></Lazy></Fed>} />
 

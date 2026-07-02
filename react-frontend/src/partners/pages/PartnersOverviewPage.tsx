@@ -118,7 +118,7 @@ export default function PartnersOverviewPage() {
       key: 'profile',
       done: profilePublished === true,
       label: t('overview.checklist.profile'),
-      to: '/partner-timebanks/directory/profile',
+      to: '/partner-timebanks/directory?tab=profile',
     },
     {
       key: 'connect',

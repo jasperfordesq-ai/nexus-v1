@@ -34983,7 +34983,10 @@ export default interface Resources {
         "title": "Data management"
       },
       "directory": {
-        "description": "Browse other timebanks on the network and ask to partner with them.",
+        "description": "Browse other timebanks on the network, ask to partner with them, and manage how your own community appears to others.",
+        "tab_browse": "Browse partners",
+        "tab_profile": "Our listing",
+        "tabs_aria": "Directory sections",
         "title": "Partner directory"
       },
       "directory_profile": {

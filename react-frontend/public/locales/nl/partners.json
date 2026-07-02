@@ -125,7 +125,10 @@
     },
     "directory": {
       "title": "Partnerlijst",
-      "description": "Blader door andere tijdbanken op het netwerk en vraag om met hen samen te werken."
+      "description": "Blader door andere tijdbanken op het netwerk, vraag om met hen samen te werken en beheer hoe uw eigen gemeenschap er voor anderen uitziet.",
+      "tabs_aria": "Directory-secties",
+      "tab_browse": "Blader door partners",
+      "tab_profile": "Onze vermelding"
     },
     "directory_profile": {
       "title": "Onze vermelding",

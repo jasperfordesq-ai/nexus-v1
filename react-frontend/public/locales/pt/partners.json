@@ -125,7 +125,10 @@
     },
     "directory": {
       "title": "Diretório de parceiros",
-      "description": "Navegue por outros bancos de tempo na rede e peça para fazer parceria com eles."
+      "description": "Navegue por outros bancos de tempo na rede, peça para fazer parceria com eles e gerencie como sua própria comunidade aparece para outras pessoas.",
+      "tabs_aria": "Seções do diretório",
+      "tab_browse": "Procure parceiros",
+      "tab_profile": "Nossa listagem"
     },
     "directory_profile": {
       "title": "Nossa listagem",

@@ -125,7 +125,10 @@
     },
     "directory": {
       "title": "Partnerverzeichnis",
-      "description": "Durchsuchen Sie andere Zeitbanken im Netzwerk und bitten Sie um eine Partnerschaft mit ihnen."
+      "description": "Durchsuchen Sie andere Zeitbanken im Netzwerk, bitten Sie sie um eine Partnerschaft und verwalten Sie, wie Ihre eigene Community anderen angezeigt wird.",
+      "tabs_aria": "Verzeichnisabschnitte",
+      "tab_browse": "Suchen Sie nach Partnern",
+      "tab_profile": "Unser Eintrag"
     },
     "directory_profile": {
       "title": "Unser Eintrag",

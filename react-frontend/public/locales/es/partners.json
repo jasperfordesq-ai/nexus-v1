@@ -125,7 +125,10 @@
     },
     "directory": {
       "title": "Directorio de socios",
-      "description": "Explore otros bancos de tiempo en la red y solicite asociarse con ellos."
+      "description": "Explore otros bancos de tiempo en la red, solicite asociarse con ellos y administre cómo los demás ven su propia comunidad.",
+      "tabs_aria": "Secciones del directorio",
+      "tab_browse": "Buscar socios",
+      "tab_profile": "Nuestro listado"
     },
     "directory_profile": {
       "title": "Nuestro listado",

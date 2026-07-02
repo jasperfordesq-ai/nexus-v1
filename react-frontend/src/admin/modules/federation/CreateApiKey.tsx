@@ -37,12 +37,30 @@ const SCOPE_KEYS = [
   'reviews:write',
 ] as const;
 
-export function CreateApiKey() {
+interface CreateApiKeyProps {
+  /**
+   * Embedded mode (e.g. inside the Partner Timebanks panel's create
+   * drawer): called instead of navigating back to the api-keys list,
+   * and the standalone PageHeader/guidance chrome is suppressed.
+   */
+  onDone?: () => void;
+}
+
+export function CreateApiKey({ onDone }: CreateApiKeyProps = {}) {
   const { t } = useTranslation('admin');
   usePageTitle(t('federation.page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const embedded = Boolean(onDone);
+
+  const finish = () => {
+    if (onDone) {
+      onDone();
+    } else {
+      navigate(tenantPath('/partner-timebanks/api-keys'));
+    }
+  };
 
   const AVAILABLE_SCOPES = SCOPE_KEYS.map((key) => ({
     key,
@@ -79,7 +97,7 @@ export function CreateApiKey() {
         if (d.api_key) {
           setCreatedKey(d.api_key);
         } else {
-          navigate(tenantPath('/partner-timebanks/api-keys'));
+          finish();
         }
       }
     } catch (err) {
@@ -100,7 +118,9 @@ export function CreateApiKey() {
   if (createdKey) {
     return (
       <div>
-        <PageHeader title={t('federation.create_api_key_title')} description={t('federation.create_api_key_desc')} />
+        {!embedded && (
+          <PageHeader title={t('federation.create_api_key_title')} description={t('federation.create_api_key_desc')} />
+        )}
         <Card >
           <CardBody className="gap-4">
             <div className="rounded-lg bg-success-50 border border-success-200 p-4">
@@ -109,7 +129,7 @@ export function CreateApiKey() {
             </div>
             <div className="flex gap-2">
               <Button variant="tertiary" startContent={<Copy size={16} />} onPress={handleCopy}>{copied ? t('federation.copied') : t('federation.copy_key')}</Button>
-              <Button onPress={() => navigate(tenantPath('/partner-timebanks/api-keys'))}>{t('federation.done')}</Button>
+              <Button onPress={finish}>{t('federation.done')}</Button>
             </div>
           </CardBody>
         </Card>
@@ -119,14 +139,18 @@ export function CreateApiKey() {
 
   return (
     <div>
-      <PageHeader
-        title={t('federation.create_api_key_title')}
-        description={t('federation.create_api_key_desc')}
-        actions={<Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/partner-timebanks/api-keys'))}>{t('federation.back')}</Button>}
-      />
-      <div className="mb-6">
-        <PartnerTimebankGuidance page="apiKeys" />
-      </div>
+      {!embedded && (
+        <>
+          <PageHeader
+            title={t('federation.create_api_key_title')}
+            description={t('federation.create_api_key_desc')}
+            actions={<Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={finish}>{t('federation.back')}</Button>}
+          />
+          <div className="mb-6">
+            <PartnerTimebankGuidance page="apiKeys" />
+          </div>
+        </>
+      )}
       <Card >
         <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Key size={20} /> {t('federation.new_api_key')}</h3></CardHeader>
         <CardBody className="gap-4">
@@ -161,7 +185,7 @@ export function CreateApiKey() {
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="tertiary" onPress={() => navigate(tenantPath('/partner-timebanks/api-keys'))}>{t('common.cancel')}</Button>
+            <Button variant="tertiary" onPress={finish}>{t('common.cancel')}</Button>
             <Button onPress={handleSubmit} isLoading={saving} isDisabled={!name.trim()}>{t('federation.create_key')}</Button>
           </div>
         </CardBody>

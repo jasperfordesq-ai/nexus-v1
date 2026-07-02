@@ -125,7 +125,10 @@
     },
     "directory": {
       "title": "Annuaire des partenaires",
-      "description": "Parcourez d'autres banques de temps sur le réseau et demandez à vous associer à elles."
+      "description": "Parcourez d'autres banques de temps sur le réseau, demandez à vous associer à elles et gérez la façon dont votre propre communauté apparaît aux autres.",
+      "tabs_aria": "Sections du répertoire",
+      "tab_browse": "Parcourir les partenaires",
+      "tab_profile": "Notre annonce"
     },
     "directory_profile": {
       "title": "Notre annonce",

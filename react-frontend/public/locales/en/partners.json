@@ -125,7 +125,10 @@
     },
     "directory": {
       "title": "Partner directory",
-      "description": "Browse other timebanks on the network and ask to partner with them."
+      "description": "Browse other timebanks on the network, ask to partner with them, and manage how your own community appears to others.",
+      "tabs_aria": "Directory sections",
+      "tab_browse": "Browse partners",
+      "tab_profile": "Our listing"
     },
     "directory_profile": {
       "title": "Our listing",
