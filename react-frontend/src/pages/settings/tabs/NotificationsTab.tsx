@@ -5,6 +5,7 @@ import { Select, SelectItem, GlassCard, Button, Switch } from '@/components/ui';
 // See NOTICE file for attribution and acknowledgements.
 
 
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Save from 'lucide-react/icons/save';
 import Mail from 'lucide-react/icons/mail';
@@ -14,7 +15,9 @@ import CreditCard from 'lucide-react/icons/credit-card';
 import Trophy from 'lucide-react/icons/trophy';
 import Building2 from 'lucide-react/icons/building-2';
 import Search from 'lucide-react/icons/search';
+import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useWebPush } from '@/hooks/useWebPush';
+import { useTenant } from '@/contexts';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -124,6 +127,7 @@ export function NotificationsTab({
 }: NotificationsTabProps) {
   const { t } = useTranslation('settings');
   const webPush = useWebPush();
+  const { tenantPath } = useTenant();
 
   // The push_enabled toggle is the source of truth for *consent*. The actual
   // browser subscription is managed by useWebPush. When the user flips the
@@ -388,6 +392,14 @@ export function NotificationsTab({
               checked={notifyMutualMatches}
               onChange={onNotifyMutualMatchesChange}
             />
+
+            <Link
+              to={tenantPath('/matches/preferences')}
+              className="flex items-center justify-between gap-2 p-4 rounded-lg bg-theme-elevated text-sm text-theme-secondary hover:text-theme-primary hover:bg-theme-hover transition-colors"
+            >
+              {t('match_digest.manage_in_preferences')}
+              <ArrowRight className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+            </Link>
           </div>
 
           {/* Push Notifications */}

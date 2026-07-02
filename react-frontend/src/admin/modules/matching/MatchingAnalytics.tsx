@@ -14,6 +14,9 @@ import Users from 'lucide-react/icons/users';
 import Zap from 'lucide-react/icons/zap';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ThumbsDown from 'lucide-react/icons/thumbs-down';
+import Compass from 'lucide-react/icons/compass';
+import Gauge from 'lucide-react/icons/gauge';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
@@ -62,6 +65,23 @@ const DIST_LABEL_KEYS: Record<string, string> = {
   city: 'matching.dist_city',
   regional: 'matching.dist_regional',
   distant: 'matching.dist_distant',
+};
+
+/** Label map for known dismiss/feedback reasons — unknown keys render raw */
+const REASON_LABEL_KEYS: Record<string, string> = {
+  not_interested: 'matching.reason_not_interested',
+  too_far: 'matching.reason_too_far',
+  wrong_category: 'matching.reason_wrong_category',
+  already_connected: 'matching.reason_already_connected',
+  inappropriate: 'matching.reason_inappropriate',
+  other: 'matching.reason_other',
+};
+
+/** Label map for matching pillars */
+const PILLAR_LABEL_KEYS: Record<string, string> = {
+  relevance: 'matching.pillar_relevance',
+  feasibility: 'matching.pillar_feasibility',
+  trust: 'matching.pillar_trust',
 };
 
 export function MatchingAnalytics() {
@@ -389,6 +409,124 @@ export function MatchingAnalytics() {
                 )}
               </CardBody>
             </Card>
+          </div>
+
+          {/* Location Data Readiness / Gate Impact */}
+          {stats?.gate_impact && (
+            <div className="mt-6">
+              <h3 className="mb-3 flex items-center gap-2 font-semibold">
+                <Compass size={18} className="text-accent" />
+                {t('matching.gate_impact')}
+              </h3>
+              <p className="mb-4 text-sm text-muted">{t('matching.gate_impact_desc')}</p>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <StatCard
+                  label={t('matching.label_degraded_members')}
+                  value={stats.gate_impact.degraded_users_count}
+                  description={t('matching.of_active_users', { total: stats.gate_impact.active_users_count })}
+                  icon={Users}
+                  color="warning"
+                />
+                <StatCard
+                  label={t('matching.label_listings_without_coords')}
+                  value={stats.gate_impact.listings_without_coords}
+                  icon={MapPin}
+                  color="danger"
+                />
+                <StatCard
+                  label={t('matching.label_remote_listings_share')}
+                  value={stats.gate_impact.remote_listings_count}
+                  description={t('matching.of_active_listings', { total: stats.gate_impact.active_listings_count })}
+                  icon={Compass}
+                  color="secondary"
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {/* Feedback Reasons */}
+            {stats?.gate_impact?.dismiss_reasons && (
+              <Card>
+                <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
+                  <ThumbsDown size={18} className="text-accent" />
+                  <h3 className="font-semibold">{t('matching.feedback_reasons')}</h3>
+                </CardHeader>
+                <CardBody className="px-4 pb-4">
+                  <p className="mb-4 text-sm text-muted">{t('matching.feedback_reasons_desc')}</p>
+                  {Object.keys(stats.gate_impact.dismiss_reasons).length > 0 ? (
+                    <div className="space-y-4">
+                      {Object.entries(stats.gate_impact.dismiss_reasons).map(([reason, count]) => {
+                        const total = Object.values(stats.gate_impact!.dismiss_reasons).reduce(
+                          (a, b) => a + b,
+                          0
+                        );
+                        const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                        const label = REASON_LABEL_KEYS[reason] ? t(REASON_LABEL_KEYS[reason]) : reason;
+                        return (
+                          <div key={reason}>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-sm text-muted">{label}</span>
+                              <span className="text-sm font-medium tabular-nums">
+                                {count} ({pct}%)
+                              </span>
+                            </div>
+                            <Progress
+                              value={pct}
+                              color="secondary"
+                              size="sm"
+                              aria-label={t('matching.feedback_reason_aria', { label, count, percent: pct })}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="py-8 text-center text-sm text-muted">
+                      {t('matching.no_feedback_reasons_data')}
+                    </p>
+                  )}
+                </CardBody>
+              </Card>
+            )}
+
+            {/* Pillar Averages */}
+            {stats?.pillar_averages && stats.pillar_averages.sample_size > 0 && (
+              <Card>
+                <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
+                  <Gauge size={18} className="text-accent" />
+                  <h3 className="font-semibold">{t('matching.pillar_averages')}</h3>
+                </CardHeader>
+                <CardBody className="px-4 pb-4">
+                  <p className="mb-4 text-sm text-muted">{t('matching.pillar_averages_desc')}</p>
+                  <div className="space-y-4">
+                    {(['relevance', 'feasibility', 'trust'] as const).map((pillar) => {
+                      const value = stats.pillar_averages?.pillars?.[pillar];
+                      if (value === undefined) return null;
+                      const pct = Math.round(value * 100);
+                      const label = t(PILLAR_LABEL_KEYS[pillar] ?? pillar);
+                      return (
+                        <div key={pillar}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm text-muted">{label}</span>
+                            <span className="text-sm font-medium tabular-nums">{pct}%</span>
+                          </div>
+                          <Progress
+                            value={pct}
+                            color="primary"
+                            size="sm"
+                            aria-label={t('matching.pillar_aria', { label, percent: pct })}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <p className="mt-4 text-xs text-muted">
+                    {t('matching.pillar_averages_sample_size', { count: stats.pillar_averages.sample_size })}
+                  </p>
+                </CardBody>
+              </Card>
+            )}
           </div>
         </>
       )}

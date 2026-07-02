@@ -58,6 +58,13 @@ vi.mock('@/lib/helpers', () => ({
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
 }));
+// RecommendedGroups makes its own independent api.get('/v2/matches/all...') call in a
+// useEffect that fires before GroupsPage's own loadGroups effect (child effects commit
+// before the parent's). Left unmocked, it silently consumes any mockResolvedValueOnce()
+// queued for the groups list call below. It has its own dedicated test coverage.
+vi.mock('./components/RecommendedGroups', () => ({
+  RecommendedGroups: () => null,
+}));
 vi.mock('@/lib/motion', () => {  const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport']);  const filterMotion = (props: Record<string, unknown>) => {    const filtered: Record<string, unknown> = {};    for (const [k, v] of Object.entries(props)) {      if (!motionProps.has(k)) filtered[k] = v;    }    return filtered;  };  return {    motion: {      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children}</div>,    },    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,  };});
 
 import { GroupsPage } from './GroupsPage';

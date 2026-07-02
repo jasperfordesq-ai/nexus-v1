@@ -81,7 +81,10 @@
   },
   "suggestions": {
     "empty": "まだ提案はありません",
-    "empty_description": "リスティングやプロフィールの詳細が増えるほど、マッチングの精度が向上します。"
+    "empty_description": "リスティングやプロフィールの詳細が増えるほど、マッチングの精度が向上します。",
+    "see_all_matches": "すべての試合を見る",
+    "score_chip": "{{score}}%",
+    "distance_chip": "{{value}} km"
   },
   "groups": {
     "members_count": "{{count}} メンバー",

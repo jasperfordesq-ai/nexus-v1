@@ -341,7 +341,8 @@
     "daily": "Dagelijks",
     "monthly": "Maandelijks",
     "fortnightly": "Tweewekelijks",
-    "never": "Nooit"
+    "never": "Nooit",
+    "manage_in_preferences": "Wedstrijdmeldingen worden beheerd in Wedstrijdvoorkeuren"
   },
   "activity_digest": {
     "off": "Uit",

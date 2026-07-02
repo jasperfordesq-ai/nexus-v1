@@ -24,6 +24,7 @@ import { GlassCard, GroupCardSkeleton, Button, ToggleButton, ToggleButtonGroup, 
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
+import { RecommendedGroups } from './components/RecommendedGroups';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -304,6 +305,9 @@ export function GroupsPage() {
           )}
         </div>
       </GlassCard>
+
+      {/* Smart Matching group recommendations */}
+      <RecommendedGroups />
 
       {/* Error State */}
       {error && !isLoading && (

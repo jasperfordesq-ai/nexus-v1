@@ -81,7 +81,10 @@
   },
   "suggestions": {
     "empty": "Nog geen suggesties",
-    "empty_description": "De matching verbetert naarmate er meer advertenties en profielgegevens worden toegevoegd."
+    "empty_description": "De matching verbetert naarmate er meer advertenties en profielgegevens worden toegevoegd.",
+    "see_all_matches": "Bekijk alle wedstrijden",
+    "score_chip": "{{score}}%",
+    "distance_chip": "{{value}} km"
   },
   "groups": {
     "members_count": "{{count}} leden",

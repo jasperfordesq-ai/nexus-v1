@@ -81,7 +81,10 @@
   },
   "suggestions": {
     "empty": "Aucune suggestion pour l'instant",
-    "empty_description": "Les correspondances s'améliorent à mesure que davantage d'annonces et de détails de profil sont ajoutés."
+    "empty_description": "Les correspondances s'améliorent à mesure que davantage d'annonces et de détails de profil sont ajoutés.",
+    "see_all_matches": "Voir tous les matchs",
+    "score_chip": "{{score}}%",
+    "distance_chip": "{{value}} km"
   },
   "groups": {
     "members_count": "{{count}} membres",

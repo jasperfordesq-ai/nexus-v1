@@ -341,7 +341,8 @@
     "daily": "Täglich",
     "monthly": "Monatlich",
     "fortnightly": "Zweiwöchentlich",
-    "never": "Nie"
+    "never": "Nie",
+    "manage_in_preferences": "Spielbenachrichtigungen werden in den Spieleinstellungen verwaltet"
   },
   "activity_digest": {
     "off": "Aus",

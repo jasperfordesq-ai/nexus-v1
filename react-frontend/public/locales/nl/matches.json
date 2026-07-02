@@ -29,5 +29,112 @@
     "title": "Overeenkomsten"
   },
   "filter_tabs_aria": "Match bronfilter",
-  "loading": "Wedstrijden laden..."
+  "loading": "Wedstrijden laden...",
+  "preferences_link": "Match preferences",
+  "stats_mutual_matches": "Mutual Matches",
+  "filter_mutual_only": "Mutual matches only",
+  "filter_people_listings": "Listings",
+  "source_event": "Event",
+  "banner": {
+    "no_coords_title": "Add your location to see nearby matches",
+    "no_coords_desc": "We can't calculate distance-based matches until your profile has a location. You can still see matches below based on other signals.",
+    "paused_title": "Matching is paused",
+    "paused_desc": "You won't receive new match suggestions or notifications until you resume matching in your preferences.",
+    "mutual_title": "Showing mutual matches",
+    "mutual_desc": "These matches go both ways — you're a great fit for them, and they're a great fit for you.",
+    "show_all": "Show all matches"
+  },
+  "card": {
+    "distance_km": "{{value}} km",
+    "remote": "Remote",
+    "mutual": "Mutual match",
+    "message": "Message",
+    "save": "Save match",
+    "dismiss": "Not interested",
+    "view_group": "View group",
+    "join": "Join",
+    "joined": "Joined"
+  },
+  "explanation": {
+    "ai_caption": "AI-generated explanation based on your profile and activity"
+  },
+  "breakdown": {
+    "title": "Why this score?",
+    "pillars": {
+      "relevance": "Relevance",
+      "feasibility": "Feasibility",
+      "trust": "Trust"
+    },
+    "signals": {
+      "category": "Category match",
+      "skill": "Skill match",
+      "semantic": "Description similarity",
+      "proximity": "Proximity",
+      "availability": "Availability",
+      "activity": "Activity level",
+      "reviews": "Reviews",
+      "trust_tier": "Trust tier",
+      "completion": "Completion rate"
+    }
+  },
+  "dismiss_reasons": {
+    "not_relevant": "Not relevant",
+    "too_far": "Too far away",
+    "already_done": "Already done",
+    "not_my_skills": "Not my skills",
+    "not_interested": "Not interested",
+    "other": "Other"
+  },
+  "empty": {
+    "no_coordinates_title": "We need your location to find matches",
+    "no_coordinates_description": "Add a location to your profile so we can find listings, groups, and opportunities near you.",
+    "set_location_cta": "Set your location",
+    "no_listings_title": "Matching works from your listings",
+    "no_listings_description": "Create a listing to start finding people, groups, and opportunities that match what you offer or need.",
+    "create_listing_cta": "Create a listing",
+    "adjust_preferences_cta": "Adjust match preferences"
+  },
+  "preferences": {
+    "page_title": "Match Preferences",
+    "page_meta_title": "Match Preferences",
+    "breadcrumb": "Preferences",
+    "heading": "Match Preferences",
+    "subtitle": "Control how Smart Matching finds and notifies you about connections.",
+    "load_failed": "Failed to load your match preferences",
+    "save": "Save preferences",
+    "save_success": "Match preferences saved",
+    "save_failed": "Failed to save match preferences",
+    "unsaved_changes": "You have unsaved changes",
+    "pause": {
+      "title": "Pause matching",
+      "description": "When paused, you won't get new match suggestions or notifications.",
+      "active_description": "Matching is paused — you won't get new suggestions or notifications until you resume."
+    },
+    "thresholds": {
+      "title": "Distance & quality",
+      "no_location_title": "Add a location to use distance-based matching",
+      "no_location_desc": "Set your location in your profile to get matches ranked by how close they are to you.",
+      "distance_label": "Maximum distance",
+      "distance_value": "{{value}} km",
+      "quality_label": "Minimum match quality",
+      "quality_value": "{{value}}%"
+    },
+    "categories": {
+      "title": "Category interests",
+      "description": "Choose the categories you'd like to be matched on. Leave everything unchecked to match on all categories.",
+      "empty": "No categories are available yet."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "frequency_label": "Match digest frequency",
+      "daily": "Daily",
+      "fortnightly": "Fortnightly",
+      "monthly": "Monthly",
+      "never": "Never",
+      "hot_matches": "Hot match alerts",
+      "hot_matches_desc": "Get notified right away about exceptionally strong matches.",
+      "mutual_matches": "Mutual match alerts",
+      "mutual_matches_desc": "Get notified when a match goes both ways."
+    }
+  }
 }

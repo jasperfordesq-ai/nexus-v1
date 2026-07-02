@@ -5,13 +5,13 @@
   "heading": "مطابقاتك",
   "subtitle": "اكتشف الروابط عبر القوائم، الوظائف، التطوع، والمجموعات",
   "refresh": "تحديث",
+  "preferences_link": "مطابقة التفضيلات",
   "stats_total_matches": "إجمالي المطابقات",
   "stats_avg_score": "متوسط الدرجة",
   "stats_hot_matches": "مطابقات ساخنة",
-  "stats_source_types": "أنواع المصادر",
   "filter_all": "الكل",
+  "filter_mutual_only": "المباريات المتبادلة فقط",
   "source_listing": "إعلان",
-  "source_job": "وظيفة",
   "source_volunteering": "تطوع",
   "source_group": "مجموعة",
   "empty_title_all": "لا توجد مطابقة حتى الآن",
@@ -29,5 +29,112 @@
     "title": "المطابقات"
   },
   "filter_tabs_aria": "مطابقة مرشح المصدر",
-  "loading": "جارٍ تحميل المباريات..."
+  "loading": "جارٍ تحميل المباريات...",
+  "banner": {
+    "no_coords_title": "أضف موقعك لرؤية التطابقات القريبة",
+    "no_coords_desc": "لا يمكننا حساب المطابقات على أساس المسافة حتى يحتوي ملفك الشخصي على موقع. لا يزال بإمكانك رؤية التطابقات أدناه بناءً على إشارات أخرى.",
+    "paused_title": "تم إيقاف المطابقة مؤقتًا",
+    "paused_desc": "لن تتلقى اقتراحات أو إشعارات مطابقة جديدة حتى تستأنف المطابقة في تفضيلاتك.",
+    "mutual_title": "عرض التطابقات المتبادلة",
+    "mutual_desc": "تسير هذه المباريات في كلا الاتجاهين - فأنت مناسب تمامًا لها، وهي مناسبة تمامًا لك.",
+    "show_all": "عرض كافة المباريات"
+  },
+  "card": {
+    "mutual": "المباراة المتبادلة",
+    "save": "حفظ المباراة",
+    "dismiss": "غير مهتم",
+    "view_group": "عرض المجموعة",
+    "distance_km": "{{value}} km",
+    "remote": "Remote",
+    "message": "Message",
+    "join": "Join",
+    "joined": "Joined"
+  },
+  "explanation": {
+    "ai_caption": "شرح تم إنشاؤه بواسطة الذكاء الاصطناعي بناءً على ملفك الشخصي ونشاطك"
+  },
+  "breakdown": {
+    "title": "لماذا هذه النتيجة؟",
+    "signals": {
+      "category": "مطابقة الفئة",
+      "skill": "مباراة المهارة",
+      "semantic": "تشابه الوصف",
+      "activity": "مستوى النشاط",
+      "trust_tier": "طبقة الثقة",
+      "completion": "معدل الإنجاز",
+      "proximity": "Proximity",
+      "availability": "Availability",
+      "reviews": "Reviews"
+    },
+    "pillars": {
+      "relevance": "Relevance",
+      "feasibility": "Feasibility",
+      "trust": "Trust"
+    }
+  },
+  "dismiss_reasons": {
+    "not_relevant": "غير ذات صلة",
+    "too_far": "بعيدا جدا",
+    "already_done": "تم بالفعل",
+    "not_my_skills": "ليست مهاراتي",
+    "not_interested": "غير مهتم",
+    "other": "Other"
+  },
+  "empty": {
+    "no_coordinates_title": "نحن بحاجة إلى موقعك للعثور على التطابقات",
+    "no_coordinates_description": "أضف موقعًا إلى ملفك الشخصي حتى نتمكن من العثور على القوائم والمجموعات والفرص القريبة منك.",
+    "set_location_cta": "حدد موقعك",
+    "no_listings_title": "مطابقة الأعمال من القوائم الخاصة بك",
+    "no_listings_description": "قم بإنشاء قائمة لبدء البحث عن الأشخاص والمجموعات والفرص التي تتوافق مع ما تقدمه أو تحتاجه.",
+    "create_listing_cta": "إنشاء قائمة",
+    "adjust_preferences_cta": "ضبط تفضيلات المطابقة"
+  },
+  "preferences": {
+    "subtitle": "التحكم في كيفية عثور Smart Matching على الاتصالات وإعلامك بها.",
+    "load_failed": "فشل تحميل تفضيلات المطابقة الخاصة بك",
+    "save": "حفظ التفضيلات",
+    "save_success": "تم حفظ تفضيلات المطابقة",
+    "save_failed": "فشل في حفظ تفضيلات المطابقة",
+    "unsaved_changes": "لديك تغييرات غير محفوظة",
+    "pause": {
+      "title": "إيقاف المطابقة مؤقتًا",
+      "description": "عند الإيقاف المؤقت، لن تحصل على اقتراحات أو إشعارات جديدة للمطابقة.",
+      "active_description": "تم إيقاف المطابقة مؤقتًا — لن تحصل على اقتراحات أو إشعارات جديدة حتى تستأنفها."
+    },
+    "thresholds": {
+      "title": "المسافة والجودة",
+      "no_location_title": "أضف موقعًا لاستخدام المطابقة المستندة إلى المسافة",
+      "no_location_desc": "قم بتعيين موقعك في ملفك الشخصي لترتيب المطابقات حسب مدى قربها منك.",
+      "distance_label": "المسافة القصوى",
+      "quality_label": "الحد الأدنى من جودة المطابقة",
+      "distance_value": "{{value}} km",
+      "quality_value": "{{value}}%"
+    },
+    "categories": {
+      "title": "اهتمامات الفئة",
+      "description": "اختر الفئات التي ترغب في المطابقة معها. اترك كل شيء بدون تحديد ليتناسب مع جميع الفئات.",
+      "empty": "لا توجد فئات متاحة حتى الآن."
+    },
+    "notifications": {
+      "frequency_label": "مطابقة تردد الملخص",
+      "hot_matches": "تنبيهات المباريات الساخنة",
+      "hot_matches_desc": "احصل على إشعار على الفور بشأن المباريات القوية بشكل استثنائي.",
+      "mutual_matches": "تنبيهات المباراة المتبادلة",
+      "mutual_matches_desc": "احصل على إشعار عندما تسير المباراة في كلا الاتجاهين.",
+      "title": "Notifications",
+      "daily": "Daily",
+      "fortnightly": "Fortnightly",
+      "monthly": "Monthly",
+      "never": "Never"
+    },
+    "page_title": "Match Preferences",
+    "page_meta_title": "Match Preferences",
+    "breadcrumb": "Preferences",
+    "heading": "Match Preferences"
+  },
+  "stats_source_types": "أنواع المصادر",
+  "source_job": "وظيفة",
+  "stats_mutual_matches": "Mutual Matches",
+  "filter_people_listings": "Listings",
+  "source_event": "Event"
 }

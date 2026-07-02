@@ -38,6 +38,13 @@
   "member_status": "メンバー",
   "private_title": "非公開グループ",
   "public_title": "公開グループ",
+  "recommended": {
+    "title": "あなたにおすすめ",
+    "joined": "参加したグループ",
+    "view": "View",
+    "join": "Join",
+    "score_chip": "{{score}}% match"
+  },
   "welcome": {
     "title": "ウェルカムメッセージ",
     "toggle_label": "ウェルカムメッセージを有効にする",

@@ -341,7 +341,8 @@
     "daily": "毎日",
     "monthly": "毎月",
     "fortnightly": "2週間ごと",
-    "never": "なし"
+    "never": "なし",
+    "manage_in_preferences": "試合通知は試合設定で管理されます"
   },
   "activity_digest": {
     "off": "オフ",

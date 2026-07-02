@@ -38,6 +38,13 @@
   "member_status": "Membre",
   "private_title": "Groupe privé",
   "public_title": "Groupe public",
+  "recommended": {
+    "title": "Recommandé pour vous",
+    "joined": "Groupe rejoint",
+    "view": "View",
+    "join": "Join",
+    "score_chip": "{{score}}% match"
+  },
   "welcome": {
     "title": "Message de bienvenue",
     "toggle_label": "Activer le message de bienvenue",

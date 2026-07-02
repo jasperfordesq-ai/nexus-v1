@@ -38,6 +38,13 @@
   "member_status": "Członek",
   "private_title": "Grupa prywatna",
   "public_title": "Grupa publiczna",
+  "recommended": {
+    "title": "Polecane dla Ciebie",
+    "joined": "Dołączyła do grupy",
+    "view": "View",
+    "join": "Join",
+    "score_chip": "{{score}}% match"
+  },
   "welcome": {
     "title": "Wiadomosc powitalna",
     "toggle_label": "Wlacz wiadomosc powitalna",

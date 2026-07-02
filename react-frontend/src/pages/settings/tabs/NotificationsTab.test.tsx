@@ -28,6 +28,11 @@ vi.mock('@/lib/motion', () => ({
   AnimatePresence: ({ children }: React.PropsWithChildren) => children,
 }));
 
+// NotificationsTab links out to /matches/preferences via useTenant().tenantPath.
+vi.mock('@/contexts', () => ({
+  useTenant: () => ({ tenantPath: (p: string) => `/test${p}` }),
+}));
+
 const defaultNotifications: NotificationSettings = {
   email_messages: true,
   email_listings: false,

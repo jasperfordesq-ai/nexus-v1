@@ -472,6 +472,34 @@ export interface MatchApprovalStats {
   approval_rate: number;
 }
 
+export interface MatchingGatesConfig {
+  geo_hard_gate: boolean;
+  missing_coords_mode: 'remote_only' | 'tenant_wide';
+  dormancy_days: number;
+  owner_dismissal_threshold: number;
+}
+
+export interface MatchingPillarWeights {
+  relevance: number;
+  feasibility: number;
+  trust: number;
+}
+
+export interface MatchingAdjustments {
+  mutual_bonus: number;
+  freshness_max: number;
+  semantic_boost: number;
+  knn_boost: number;
+}
+
+export interface MatchingAiConfig {
+  semantic_signal: boolean;
+  llm_explanations: boolean;
+  explanation_top_n: number;
+  /** Read-only — whether the tenant's AI keys/limits allow the AI layer */
+  available: boolean;
+}
+
 export interface SmartMatchingConfig {
   category_weight: number;
   skill_weight: number;
@@ -485,6 +513,11 @@ export interface SmartMatchingConfig {
   max_distance_km?: number;
   min_match_score?: number;
   hot_match_threshold?: number;
+  gates?: MatchingGatesConfig;
+  engine_version?: 1 | 2;
+  pillars?: MatchingPillarWeights;
+  adjustments?: MatchingAdjustments;
+  ai?: MatchingAiConfig;
 }
 
 export interface MatchingOverviewStats {
@@ -500,6 +533,25 @@ export interface MatchingOverviewStats {
   active_users_matching: number;
 }
 
+export interface MatchingGateImpactStats {
+  degraded_users_count: number;
+  active_users_count: number;
+  listings_without_coords: number;
+  remote_listings_count: number;
+  active_listings_count: number;
+  dismiss_reasons: Record<string, number>;
+  algorithm_version_mix: Record<string, number>;
+}
+
+export interface MatchingPillarAverages {
+  sample_size: number;
+  pillars: {
+    relevance?: number;
+    feasibility?: number;
+    trust?: number;
+  };
+}
+
 export interface MatchingStatsResponse {
   overview: MatchingOverviewStats;
   score_distribution: Record<string, number>;
@@ -509,6 +561,8 @@ export interface MatchingStatsResponse {
   approved_count: number;
   rejected_count: number;
   approval_rate: number;
+  gate_impact?: MatchingGateImpactStats;
+  pillar_averages?: MatchingPillarAverages;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

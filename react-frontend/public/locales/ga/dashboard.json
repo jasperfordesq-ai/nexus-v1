@@ -81,7 +81,10 @@
   },
   "suggestions": {
     "empty": "Gan moltaí fós",
-    "empty_description": "Feabhsaíonn an mheaitseáil de réir mar a chuirtear níos mó liostaí agus sonraí próifíle leis."
+    "empty_description": "Feabhsaíonn an mheaitseáil de réir mar a chuirtear níos mó liostaí agus sonraí próifíle leis.",
+    "see_all_matches": "Féach ar na cluichí go léir",
+    "score_chip": "{{score}}%",
+    "distance_chip": "{{value}} km"
   },
   "groups": {
     "members_count": "{{count}} comhalta",

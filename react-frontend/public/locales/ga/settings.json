@@ -341,7 +341,8 @@
     "daily": "Laethúil",
     "monthly": "Míosúil",
     "fortnightly": "Coicísiúil",
-    "never": "Riamh"
+    "never": "Riamh",
+    "manage_in_preferences": "Déantar fógraí meaitseála a bhainistiú in Match Preferences"
   },
   "activity_digest": {
     "off": "As",

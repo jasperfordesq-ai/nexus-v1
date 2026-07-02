@@ -81,7 +81,10 @@
   },
   "suggestions": {
     "empty": "Noch keine Empfehlungen",
-    "empty_description": "Die Übereinstimmung verbessert sich, je mehr Anzeigen und Profildaten hinzugefügt werden."
+    "empty_description": "Die Übereinstimmung verbessert sich, je mehr Anzeigen und Profildaten hinzugefügt werden.",
+    "see_all_matches": "Alle Spiele anzeigen",
+    "score_chip": "{{score}}%",
+    "distance_chip": "{{value}} km"
   },
   "groups": {
     "members_count": "{{count}} Mitglieder",
