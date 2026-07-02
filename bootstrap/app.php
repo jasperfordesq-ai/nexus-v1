@@ -260,23 +260,6 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('listings-process-search-alerts');
 
-        // Hourly: pull SendGrid suppression lists (bounces, blocks, invalid
-        // emails, spam reports) into the local email_suppression cache so
-        // the Mailer can refuse to send to dead addresses.
-        $schedule->command('sendgrid:sync-suppressions')
-            ->hourly()
-            ->withoutOverlapping()
-            ->name('sendgrid-sync-suppressions');
-
-        // Every 15 min: reconcile recent email_log `failed` rows against
-        // SendGrid's activity feed so transient false-failures (5xx blips,
-        // network glitches) get repaired to `delivered` once SendGrid
-        // confirms acceptance.
-        $schedule->command('emails:reconcile-transient-failures')
-            ->everyFifteenMinutes()
-            ->withoutOverlapping()
-            ->name('emails-reconcile-transient-failures');
-
         $schedule->command('caring:nudges-dispatch')
             ->dailyAt('07:30')
             ->withoutOverlapping()

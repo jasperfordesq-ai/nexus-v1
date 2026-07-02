@@ -3181,11 +3181,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // ============================================
 // PUBLIC WEBHOOK ROUTES — No auth required
-// SendGrid sends event notifications directly to this endpoint;
-// it cannot authenticate via Sanctum tokens.
 // ============================================
-Route::post('/webhooks/sendgrid/events', [\App\Http\Controllers\Api\SendGridWebhookController::class, 'events'])->middleware('throttle:120,1');
-
 // Postmark event webhook (Delivery/Bounce/SpamComplaint/Open/SubscriptionChange).
 // Public — Postmark cannot present a Sanctum token; authenticated in the
 // controller via HTTP Basic auth (or X-Postmark-Webhook-Secret) against
