@@ -10,7 +10,7 @@ use App\Models\EmailSettings;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * Email sending with multi-provider support (SMTP, Gmail API, SendGrid).
+ * Email sending with multi-provider support (SMTP, Gmail API, Postmark).
  */
 class Mailer
 {
@@ -29,18 +29,15 @@ class Mailer
     private $gmailClientSecret;
     private $gmailRefreshToken;
 
-    // SendGrid settings
-    private ?string $sendgridApiKey = null;
-
     /**
-     * Most recent provider message id (X-Message-Id from SendGrid). Captured
-     * inside sendViaSendGrid() on success and read by send() so that the
-     * email_log row records the id — the event webhook later updates the
-     * same row when SendGrid reports delivery / bounce / open.
+     * Most recent provider message id (Postmark MessageID). Captured inside
+     * sendViaPostmark() on success and read by send() so the email_log row
+     * records the id — the Postmark webhook later updates the same row when
+     * it reports delivery / bounce / open.
      */
     private ?string $lastMessageId = null;
 
-    // Driver: 'smtp', 'gmail_api', or 'sendgrid'
+    // Driver: 'smtp', 'gmail_api', or 'postmark'
     private string $driver = 'smtp';
 
     // Tenant context
@@ -48,8 +45,8 @@ class Mailer
 
     // -------------------------------------------------------------------------
     // Email category constants — used as From-address prefixes on the verified
-    // project-nexus.net SendGrid domain (e.g. notifications@project-nexus.net).
-    // These match the audit category strings used by EmailDispatchService.
+    // project-nexus.net sending domain (e.g. notifications@project-nexus.net),
+    // via Postmark. These match the audit category strings from EmailDispatchService.
     // -------------------------------------------------------------------------
     public const CATEGORY_NOTIFICATIONS = 'notifications';
     public const CATEGORY_NEWSLETTERS   = 'newsletters';
@@ -60,17 +57,8 @@ class Mailer
     public const CATEGORY_SAFEGUARDING  = 'safeguarding';
     public const CATEGORY_BILLING       = 'billing';
 
-    /** Verified SendGrid domain for category From addresses. */
-    private const SENDGRID_DOMAIN   = 'project-nexus.net';
-
-    /** Optional Reply-To for platform SendGrid emails. */
+    /** Optional platform Reply-To (Postmark). */
     private ?string $platformReplyTo = null;
-
-    /**
-     * True when the platform's SENDGRID_API_KEY is the active driver
-     * (not a tenant-specific key). Used to apply category-based From addresses.
-     */
-    private bool $isPlatformSendGrid = false;
 
     // -------------------------------------------------------------------------
     // Postmark settings (custom Email API path; active when the platform
@@ -141,29 +129,9 @@ class Mailer
             $this->fromName = $envValues['SMTP_FROM_NAME'] ?? 'Project NEXUS';
         }
 
-        // Load platform-wide SendGrid config from .env (if set)
-        $envSendGridKey = $envValues['SENDGRID_API_KEY'] ?? '';
-        if (!empty($envSendGridKey) && !$this->useGmailApi) {
-            $this->sendgridApiKey = $envSendGridKey;
-            if (!empty($envValues['SENDGRID_FROM_EMAIL'])) {
-                $this->fromEmail = $envValues['SENDGRID_FROM_EMAIL'];
-            }
-            if (!empty($envValues['SENDGRID_FROM_NAME'])) {
-                $this->fromName = $envValues['SENDGRID_FROM_NAME'];
-            }
-            if (!empty($envValues['SENDGRID_REPLY_TO'])) {
-                $this->platformReplyTo = $envValues['SENDGRID_REPLY_TO'];
-            }
-            $this->driver = 'sendgrid';
-            $this->isPlatformSendGrid = true;
-        }
-
-        // Platform-wide Postmark config — only when explicitly selected as the
-        // platform provider (MAIL_PLATFORM_PROVIDER=postmark). This runs after
-        // the SendGrid block on purpose: it flips the active driver to Postmark
-        // while leaving $this->sendgridApiKey intact so a Postmark failure can
-        // fall back to the platform SendGrid account.
-        $platformProvider = strtolower(trim((string) ($envValues['MAIL_PLATFORM_PROVIDER'] ?? 'sendgrid')));
+        // Platform-wide Postmark config — active when the platform provider is
+        // 'postmark' (the default). A Postmark send failure falls back to SMTP.
+        $platformProvider = strtolower(trim((string) ($envValues['MAIL_PLATFORM_PROVIDER'] ?? 'postmark')));
         $envPostmarkToken = $envValues['POSTMARK_SERVER_TOKEN'] ?? '';
         if ($platformProvider === 'postmark' && !empty($envPostmarkToken) && !$this->useGmailApi) {
             $this->postmarkToken = $envPostmarkToken;
@@ -211,13 +179,13 @@ class Mailer
 
     /**
      * Resolve the From-address prefix for a given audit category string when
-     * routing via the platform SendGrid domain (project-nexus.net).
+     * routing via the platform sending domain (project-nexus.net, Postmark).
      *
      * Maps the fine-grained EmailDispatchService audit categories (e.g.
      * 'newsletter', 'password_reset', 'marketplace_payment') to one of the
      * eight recognised From-address buckets.
      */
-    private function resolveSendGridFromPrefix(?string $category): string
+    private function resolveFromPrefix(?string $category): string
     {
         if ($category === null || $category === '') {
             return self::CATEGORY_NOTIFICATIONS;
@@ -289,20 +257,9 @@ class Mailer
             }
 
             switch ($provider) {
-                case 'sendgrid':
-                    $apiKey = EmailSettings::get($tenantId, 'sendgrid_api_key');
-                    if (!empty($apiKey)) {
-                        $this->sendgridApiKey = $apiKey;
-                        $this->driver = 'sendgrid';
-                        $this->isPlatformSendGrid = false; // tenant's own key, not platform's
-                        $this->platformReplyTo = null;
-                        $fromEmail = EmailSettings::get($tenantId, 'sendgrid_from_email');
-                        $fromName = EmailSettings::get($tenantId, 'sendgrid_from_name');
-                        if (!empty($fromEmail)) $this->fromEmail = $fromEmail;
-                        if (!empty($fromName)) $this->fromName = $fromName;
-                    }
-                    break;
-
+                // A legacy tenant setting of 'sendgrid' intentionally has no case:
+                // SendGrid has been retired, so it falls through to the platform
+                // provider (Postmark/SMTP) rather than activating a dead driver.
                 case 'gmail_api':
                     $clientId = EmailSettings::get($tenantId, 'gmail_client_id');
                     $clientSecret = EmailSettings::get($tenantId, 'gmail_client_secret');
@@ -345,7 +302,7 @@ class Mailer
     /**
      * Load mail configuration values via Laravel's config() helper.
      *
-     * Credentials are pulled from config/mail.php (smtp + gmail_api + sendgrid)
+     * Credentials are pulled from config/mail.php (smtp + gmail_api + postmark)
      * at call time rather than read directly from the environment. This keeps
      * secrets out of long-lived object properties in downstream callers and
      * routes all mail credential access through a single auditable surface.
@@ -366,11 +323,7 @@ class Mailer
             'SMTP_ENCRYPTION'     => (string) (config('mail.mailers.smtp.encryption') ?? 'tls'),
             'SMTP_FROM_EMAIL'     => (string) (config('mail.from.address') ?? ''),
             'SMTP_FROM_NAME'      => (string) (config('mail.from.name') ?? 'Project NEXUS'),
-            'SENDGRID_API_KEY'    => (string) (config('mail.sendgrid.api_key') ?? ''),
-            'SENDGRID_FROM_EMAIL' => (string) (config('mail.sendgrid.from_email') ?? ''),
-            'SENDGRID_FROM_NAME'  => (string) (config('mail.sendgrid.from_name') ?? ''),
-            'SENDGRID_REPLY_TO'   => (string) (config('mail.sendgrid.reply_to') ?? ''),
-            'MAIL_PLATFORM_PROVIDER'        => (string) (config('mail.platform_provider') ?? 'sendgrid'),
+            'MAIL_PLATFORM_PROVIDER'        => (string) (config('mail.platform_provider') ?? 'postmark'),
             'POSTMARK_SERVER_TOKEN'         => (string) (config('mail.postmark.server_token') ?? ''),
             'POSTMARK_FROM_EMAIL'           => (string) (config('mail.postmark.from_email') ?? ''),
             'POSTMARK_FROM_NAME'            => (string) (config('mail.postmark.from_name') ?? ''),
@@ -424,8 +377,8 @@ class Mailer
     }
 
     /**
-     * Check if an address is on the local suppression cache. Hydrated from
-     * SendGrid's /v3/suppression/* endpoints via the webhook + periodic sync.
+     * Check if an address is on the local suppression cache. Hydrated from the
+     * provider event webhook (Postmark) that records bounces / spam complaints.
      * Safe to call before the table exists (defaults to "not suppressed").
      *
      * Public so retrying senders (e.g. VolunteerReminderService) can treat a
@@ -576,21 +529,10 @@ class Mailer
      */
     public function send($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $category = null, ?array $metadata = null): bool
     {
-        // When using the platform's SendGrid account, set a category-specific
-        // From address (e.g. newsletters@project-nexus.net) and the configured
-        // platform Reply-To when one exists.
-        // Has no effect for tenant-specific SMTP, Gmail API, or SendGrid.
-        if ($this->isPlatformSendGrid && $this->driver === 'sendgrid') {
-            $this->fromEmail = $this->resolveSendGridFromPrefix($category) . '@' . self::SENDGRID_DOMAIN;
-            if ($replyTo === null && $this->platformReplyTo !== null) {
-                $replyTo = $this->platformReplyTo;
-            }
-        }
-
-        // Same category-based From address when routing via platform Postmark,
-        // on the verified Postmark sending domain (project-nexus.net by default).
+        // Category-based From address when routing via platform Postmark, on the
+        // verified sending domain (project-nexus.net by default).
         if ($this->isPlatformPostmark && $this->driver === 'postmark') {
-            $this->fromEmail = $this->resolveSendGridFromPrefix($category) . '@' . $this->postmarkFromDomain;
+            $this->fromEmail = $this->resolveFromPrefix($category) . '@' . $this->postmarkFromDomain;
             if ($replyTo === null && $this->platformReplyTo !== null) {
                 $replyTo = $this->platformReplyTo;
             }
@@ -615,12 +557,11 @@ class Mailer
             $unsubscribeUrl = $this->autoDetectUnsubscribeUrl($to);
         }
 
-        // Suppression check — refuse to send to an address SendGrid has
+        // Suppression check — refuse to send to an address the provider has
         // already told us bounces / spam-reports / is invalid. Saves quota,
         // protects sender reputation, and avoids confusion when an admin
         // wonders "why didn't this email arrive?". The suppression table is
-        // hydrated by the SendGrid event webhook and by periodic sync from
-        // /v3/suppression/* in the Mailer's housekeeping cron.
+        // hydrated by the Postmark event webhook.
         if (self::isSuppressed($to)) {
             self::logEmail($to, $subject, 'suppressed', null, 'recipient on local suppression list', $this->tenantId, $category, $this->driver, $metadata);
             \Illuminate\Support\Facades\Log::info('Mailer: refusing to send to suppressed address', [
@@ -652,25 +593,7 @@ class Mailer
                 return true;
             }
 
-            // Fallback 1: platform SendGrid account (if a key is configured).
-            if (!empty($this->sendgridApiKey)) {
-                \Illuminate\Support\Facades\Log::warning("Mailer: Postmark failed, falling back to SendGrid for: " . self::maskEmail($to));
-                // Re-derive a SendGrid From on the verified project-nexus.net domain.
-                $this->fromEmail = $this->resolveSendGridFromPrefix($category) . '@' . self::SENDGRID_DOMAIN;
-                if ($replyTo === null && $this->platformReplyTo !== null) {
-                    $replyTo = $this->platformReplyTo;
-                }
-                $sgOk = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $category, $metadata);
-                if (class_exists(\App\Services\EmailMonitorService::class)) {
-                    \App\Services\EmailMonitorService::recordFallbackToSmtpStatic('postmark_failed_sendgrid', $this->tenantId);
-                }
-                self::logEmail($to, $subject, $sgOk ? 'sent' : 'failed', $sgOk ? $this->lastMessageId : null, $sgOk ? null : 'Postmark + SendGrid both failed', $this->tenantId, $category, 'sendgrid', $metadata);
-                if ($sgOk) {
-                    return true;
-                }
-            }
-
-            // Fallback 2: SMTP (if configured).
+            // Fallback: SMTP (if configured).
             if (!empty($this->host) && !empty($this->username)) {
                 \Illuminate\Support\Facades\Log::warning("Mailer: Postmark failed, falling back to SMTP for: " . self::maskEmail($to));
                 $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
@@ -680,29 +603,6 @@ class Mailer
 
             \Illuminate\Support\Facades\Log::warning("Mailer: Postmark failed and no fallback configured. Email not sent to: " . self::maskEmail($to));
             self::logEmail($to, $subject, 'failed', null, 'Postmark failed, no fallback', $this->tenantId, $category, 'postmark', $metadata);
-            return false;
-        }
-
-        if ($this->driver === 'sendgrid') {
-            $result = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $category, $metadata);
-            if ($result) {
-                self::logEmail($to, $subject, 'sent', $this->lastMessageId, null, $this->tenantId, $category, 'sendgrid', $metadata);
-                return true;
-            }
-
-            if (!empty($this->host) && !empty($this->username)) {
-                \Illuminate\Support\Facades\Log::warning("Mailer: SendGrid failed, falling back to SMTP for: " . self::maskEmail($to));
-                $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
-                if (class_exists(\App\Services\EmailMonitorService::class)) {
-                    \App\Services\EmailMonitorService::recordFallbackToSmtpStatic('sendgrid_failed', $this->tenantId);
-                    \App\Services\EmailMonitorService::recordEmailSendStatic('smtp', $smtpOk, $this->tenantId);
-                }
-                self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'SendGrid + SMTP both failed', $this->tenantId, $category, 'smtp', $metadata);
-                return $smtpOk;
-            }
-
-            \Illuminate\Support\Facades\Log::warning("Mailer: SendGrid failed and no SMTP fallback configured. Email not sent to: " . self::maskEmail($to));
-            self::logEmail($to, $subject, 'failed', null, 'SendGrid failed, no SMTP fallback', $this->tenantId, $category, 'sendgrid', $metadata);
             return false;
         }
 
@@ -742,138 +642,8 @@ class Mailer
             \App\Services\EmailMonitorService::recordEmailSendStatic('smtp', false, $this->tenantId);
         }
 
-        if ($this->usePlatformSendGridFallback($category)) {
-            \Illuminate\Support\Facades\Log::warning("Mailer: SMTP failed, falling back to platform SendGrid for: " . self::maskEmail($to));
-            if ($replyTo === null && $this->platformReplyTo !== null) {
-                $replyTo = $this->platformReplyTo;
-            }
-            $sendGridOk = $this->sendViaSendGrid($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $category, $metadata);
-            if (class_exists(\App\Services\EmailMonitorService::class)) {
-                \App\Services\EmailMonitorService::recordFallbackToSmtpStatic('smtp_failed_platform_sendgrid', $this->tenantId);
-            }
-            self::logEmail($to, $subject, $sendGridOk ? 'sent' : 'failed', $this->lastMessageId, $sendGridOk ? null : 'SMTP + platform SendGrid both failed', $this->tenantId, $category, 'sendgrid', $metadata);
-            return $sendGridOk;
-        }
-
-        self::logEmail($to, $subject, 'failed', null, 'SMTP failed, no platform SendGrid fallback', $this->tenantId, $category, 'smtp', $metadata);
+        self::logEmail($to, $subject, 'failed', null, 'SMTP failed', $this->tenantId, $category, 'smtp', $metadata);
         return false;
-    }
-
-    /**
-     * Use the platform SendGrid account as the final fallback for tenants with
-     * stale or broken SMTP overrides. This preserves tenant-specific SendGrid
-     * credentials when present and only switches a failed non-SendGrid path.
-     */
-    private function usePlatformSendGridFallback(?string $category = null): bool
-    {
-        $apiKey = (string) (config('mail.sendgrid.api_key') ?? '');
-        if ($apiKey === '') {
-            return false;
-        }
-
-        $this->sendgridApiKey = $apiKey;
-        $this->isPlatformSendGrid = true;
-
-        $fromName = (string) (config('mail.sendgrid.from_name') ?? '');
-
-        if ($fromName !== '') {
-            $this->fromName = $fromName;
-        }
-        $replyTo = (string) (config('mail.sendgrid.reply_to') ?? '');
-        $this->platformReplyTo = $replyTo !== '' ? $replyTo : null;
-
-        $this->fromEmail = $this->resolveSendGridFromPrefix($category) . '@' . self::SENDGRID_DOMAIN;
-
-        return true;
-    }
-
-    /**
-     * Send email via SendGrid Web API v3.
-     */
-    private function sendViaSendGrid($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $category = null, ?array $metadata = null): bool
-    {
-        try {
-            $email = new \SendGrid\Mail\Mail();
-            $email->setFrom($this->fromEmail, $this->fromName);
-            $email->setSubject($subject);
-            $email->addTo($to);
-
-            if ($cc) {
-                $email->addCc($cc);
-            }
-            if ($replyTo) {
-                // Parse RFC 5322 format "Name <email>" into separate parts for SendGrid
-                if (preg_match('/^(.+?)\s*<([^>]+)>$/', $replyTo, $matches)) {
-                    $email->setReplyTo(trim($matches[2]), trim($matches[1]));
-                } else {
-                    $email->setReplyTo($replyTo);
-                }
-            }
-
-            $plainText = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $body));
-            $plainText = html_entity_decode($plainText, ENT_QUOTES, 'UTF-8');
-            $plainText = preg_replace('/\n\s+/', "\n", $plainText);
-            $email->addContent("text/plain", trim($plainText));
-            $email->addContent("text/html", $body);
-
-            $email->setClickTracking(false, false);
-            $email->setOpenTracking(false);
-            $email->setSubscriptionTracking(false);
-
-            if ($this->tenantId) {
-                $email->addCustomArg('tenant_id', (string) $this->tenantId);
-                $email->addHeader('X-Nexus-Tenant', (string) $this->tenantId);
-            }
-            if ($category !== null && $category !== '') {
-                $email->addCustomArg('category', mb_substr($category, 0, 64));
-            }
-            foreach (self::normalizeEmailMetadata($metadata) as $key => $value) {
-                if ($value !== null) {
-                    $email->addCustomArg($key, $value);
-                }
-            }
-
-            if ($unsubscribeUrl) {
-                $email->addHeader('List-Unsubscribe', '<' . $unsubscribeUrl . '>');
-                $email->addHeader('List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
-            }
-
-            $sendgrid = new \SendGrid($this->sendgridApiKey);
-            $response = $sendgrid->send($email);
-
-            $statusCode = $response->statusCode();
-            if ($statusCode >= 200 && $statusCode < 300) {
-                if (class_exists(\App\Services\EmailMonitorService::class)) { \App\Services\EmailMonitorService::recordEmailSendStatic('sendgrid', true, $this->tenantId); }
-
-                // Capture SendGrid's X-Message-Id so the event webhook can match
-                // future delivered/bounced/opened events back to this email_log
-                // row. SendGrid returns the message id in a response header on
-                // 202 Accepted. Some PHP SDK versions parse it case-sensitively;
-                // try both common spellings.
-                $headers = $response->headers();
-                $messageId = null;
-                if (is_array($headers)) {
-                    foreach ($headers as $h) {
-                        if (is_string($h) && stripos($h, 'X-Message-Id:') === 0) {
-                            $messageId = trim(substr($h, strlen('X-Message-Id:')));
-                            break;
-                        }
-                    }
-                }
-                $this->lastMessageId = $messageId;
-                return true;
-            }
-
-            \Illuminate\Support\Facades\Log::warning("SendGrid error ({$statusCode}): " . $response->body());
-            if (class_exists(\App\Services\EmailMonitorService::class)) { \App\Services\EmailMonitorService::recordEmailSendStatic('sendgrid', false, $this->tenantId); }
-            $this->lastMessageId = null;
-            return false;
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning("SendGrid Error: " . $e->getMessage());
-            if (class_exists(\App\Services\EmailMonitorService::class)) { \App\Services\EmailMonitorService::recordEmailSendStatic('sendgrid', false, $this->tenantId); }
-            $this->lastMessageId = null;
-            return false;
-        }
     }
 
     /**
@@ -884,7 +654,7 @@ class Mailer
      */
     private function resolvePostmarkStream(?string $category): string
     {
-        return $this->resolveSendGridFromPrefix($category) === self::CATEGORY_NEWSLETTERS
+        return $this->resolveFromPrefix($category) === self::CATEGORY_NEWSLETTERS
             ? $this->postmarkStreamBroadcast
             : $this->postmarkStreamTransactional;
     }
@@ -930,8 +700,8 @@ class Mailer
                 ];
             }
 
-            // Postmark Metadata is a flat map of string values — mirror the
-            // custom args attached on the SendGrid path (tenant, category, ids).
+            // Postmark Metadata is a flat map of string values — the per-message
+            // metadata attached to each send (tenant, category, dispatch ids).
             $meta = [];
             if ($this->tenantId) {
                 $meta['tenant_id'] = (string) $this->tenantId;
@@ -1428,7 +1198,7 @@ class Mailer
     }
 
     /**
-     * Get current email provider type ('smtp', 'gmail_api', or 'sendgrid').
+     * Get current email provider type ('smtp', 'gmail_api', or 'postmark').
      */
     public function getProviderType(): string
     {

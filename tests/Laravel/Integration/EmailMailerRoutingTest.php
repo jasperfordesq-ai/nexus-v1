@@ -21,7 +21,7 @@ use Tests\Laravel\TestCase;
  * the custom Mailer class (not Laravel's built-in Mail facade).
  *
  * After the production incident where EmailService used Mail::raw()
- * (Gmail SMTP) instead of Mailer::forCurrentTenant() (SendGrid),
+ * (Gmail SMTP) instead of Mailer::forCurrentTenant() (the provider),
  * these tests ensure the correct routing is preserved.
  */
 class EmailMailerRoutingTest extends TestCase
@@ -76,13 +76,13 @@ class EmailMailerRoutingTest extends TestCase
         $this->assertStringNotContainsString(
             'Mail::raw(',
             $source,
-            'EmailDispatchService must NOT use Mail::raw() - that bypasses SendGrid'
+            'EmailDispatchService must NOT use Mail::raw() - that bypasses the provider'
         );
 
         $this->assertStringNotContainsString(
             'Mail::send(',
             $source,
-            'EmailDispatchService must NOT use Mail::send() - that bypasses SendGrid'
+            'EmailDispatchService must NOT use Mail::send() - that bypasses the provider'
         );
     }
 
@@ -127,14 +127,13 @@ class EmailMailerRoutingTest extends TestCase
         $this->assertSame('dispatch-test-123', $row->dispatch_id);
     }
 
-    public function test_sendgrid_payload_includes_dispatch_custom_args(): void
+    public function test_postmark_payload_includes_dispatch_metadata(): void
     {
         $source = file_get_contents(app_path('Core/Mailer.php'));
 
-        $this->assertStringContainsString("\$email->addCustomArg('tenant_id'", $source);
-        $this->assertStringContainsString("\$email->addCustomArg('category'", $source);
+        $this->assertStringContainsString("\$meta['tenant_id']", $source);
+        $this->assertStringContainsString("\$meta['category']", $source);
         $this->assertStringContainsString('normalizeEmailMetadata($metadata)', $source);
-        $this->assertStringContainsString("\$email->addCustomArg(\$key, \$value)", $source);
     }
 
     public function test_email_dispatch_service_refuses_missing_tenant_without_explicit_allowance(): void
@@ -195,20 +194,20 @@ class EmailMailerRoutingTest extends TestCase
         $this->assertStringNotContainsString(
             'Mail::raw(',
             $source,
-            'EmailService must NOT use Mail::raw() — that bypasses SendGrid'
+            'EmailService must NOT use Mail::raw() — that bypasses the provider'
         );
 
         $this->assertStringNotContainsString(
             'Mail::send(',
             $source,
-            'EmailService must NOT use Mail::send() — that bypasses SendGrid'
+            'EmailService must NOT use Mail::send() — that bypasses the provider'
         );
     }
 
     /**
      * Scan the entire app/ tree for direct Laravel Mail facade usage.
      * Every email must route through Mailer::forCurrentTenant() because
-     * the platform .env has SendGrid configured but intentionally NO SMTP
+     * the platform .env has the provider configured but intentionally NO SMTP
      * credentials — any Mail::raw / Mail::to / Mail::send call would
      * attempt SMTP and silently fail in production.
      *

@@ -28,14 +28,12 @@ return [
     |--------------------------------------------------------------------------
     |
     | Selects which provider the platform Mailer uses for tenants that have no
-    | per-tenant email override. 'sendgrid' (default) preserves existing
-    | behaviour; set to 'postmark' (with POSTMARK_SERVER_TOKEN configured) to
-    | route platform mail through Postmark's message streams instead. SendGrid
-    | remains wired as an automatic fallback when Postmark is the active driver.
+    | per-tenant email override. 'postmark' (default, with POSTMARK_SERVER_TOKEN
+    | configured) routes platform mail through Postmark's message streams.
     |
     */
 
-    'platform_provider' => env('MAIL_PLATFORM_PROVIDER', 'sendgrid'),
+    'platform_provider' => env('MAIL_PLATFORM_PROVIDER', 'postmark'),
 
     'mailers' => [
 
@@ -118,26 +116,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | SendGrid Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Platform-wide SendGrid credentials. Per-tenant overrides live in the
-    | email_settings table and are loaded by App\Core\Mailer.
-    |
-    */
-
-    'sendgrid' => [
-        'api_key' => env('SENDGRID_API_KEY'),
-        'from_email' => env('SENDGRID_FROM_EMAIL'),
-        'from_name' => env('SENDGRID_FROM_NAME'),
-        'reply_to' => env('SENDGRID_REPLY_TO'),
-        // Event Webhook authentication is read by SendGridWebhookController
-        // directly from env('SENDGRID_WEBHOOK_VERIFICATION_KEY') — kept here
-        // as a reference for ops without proxying through config().
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Postmark Configuration (custom App\Core\Mailer path)
     |--------------------------------------------------------------------------
     |
@@ -146,8 +124,8 @@ return [
     | dependency). Postmark separates transactional and bulk mail into distinct
     | message streams with independent IP reputation, so the Mailer routes
     | newsletter/digest categories to the broadcast stream and everything else
-    | to the transactional stream. From addresses use the same verified
-    | project-nexus.net domain as SendGrid (category prefixes), so no per-address
+    | to the transactional stream. From addresses use the verified
+    | project-nexus.net domain (category prefixes), so no per-address
     | sender signatures are required once the domain is verified in Postmark.
     |
     */

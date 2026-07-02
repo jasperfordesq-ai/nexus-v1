@@ -247,7 +247,7 @@ class AdminBillingController extends BaseApiController
                 ]);
                 $subject = __('emails.billing_upgrade_request.subject', ['tenant' => $tenant]);
 
-                // Route through the platform Mailer (SendGrid via .env) instead
+                // Route through the platform Mailer (Postmark via .env) instead
                 // of Laravel's Mail facade — the default Mail mailer is SMTP
                 // and MAIL_USERNAME/PASSWORD are intentionally not set in prod,
                 // so Mail::raw silently failed for this notification.

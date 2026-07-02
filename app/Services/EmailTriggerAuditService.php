@@ -1113,7 +1113,7 @@ class EmailTriggerAuditService
 
         $unconfirmed = DB::table('email_log')
             ->select('tenant_id', DB::raw('COUNT(*) as count'))
-            ->where('provider', 'sendgrid')
+            ->where('provider', 'postmark')
             ->where('status', 'sent')
             ->whereNotNull('provider_message_id')
             ->where('created_at', '<', now()->subHours(6))
@@ -1121,7 +1121,7 @@ class EmailTriggerAuditService
             ->when($tenantId !== null, fn ($q) => $q->where('tenant_id', $tenantId))
             ->groupBy('tenant_id')
             ->get();
-        $issues = array_merge($issues, $this->rowsToIssues($unconfirmed, 'sendgrid_events_not_confirming_delivery', 'warning', 'deliverability', 'provider_webhook', ['hours' => 6]));
+        $issues = array_merge($issues, $this->rowsToIssues($unconfirmed, 'postmark_events_not_confirming_delivery', 'warning', 'deliverability', 'provider_webhook', ['hours' => 6]));
 
         return $issues;
     }
@@ -1146,9 +1146,6 @@ class EmailTriggerAuditService
         foreach ($tenantIds as $id) {
             try {
                 $provider = EmailSettings::get($id, 'email_provider') ?: 'platform_default';
-                if ($provider === 'sendgrid' && !EmailSettings::get($id, 'sendgrid_api_key')) {
-                    $issues[] = $this->issue('tenant_sendgrid_override_missing_api_key', 'info', $id, 'deliverability', 'provider_config', ['provider' => 'sendgrid']);
-                }
                 if ($provider === 'gmail_api') {
                     $missing = [];
                     foreach (['gmail_client_id', 'gmail_client_secret', 'gmail_refresh_token'] as $key) {

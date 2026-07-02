@@ -124,12 +124,6 @@ class AdminEmailController extends BaseApiController
 
         $response = [
             'provider' => $settings['email_provider'] ?? 'platform_default',
-            'sendgrid' => [
-                'api_key_set' => EmailSettings::has($tenantId, 'sendgrid_api_key'),
-                'api_key_masked' => EmailSettings::getMasked($tenantId, 'sendgrid_api_key'),
-                'from_email' => $settings['sendgrid_from_email'] ?? '',
-                'from_name' => $settings['sendgrid_from_name'] ?? '',
-            ],
             'smtp' => [
                 'host' => $settings['smtp_host'] ?? '',
                 'port' => $settings['smtp_port'] ?? '587',
@@ -147,7 +141,7 @@ class AdminEmailController extends BaseApiController
                 'sender_name' => $settings['gmail_sender_name'] ?? '',
             ],
             'platform_default' => ['provider' => $platformProvider, 'description' => 'Uses platform-wide environment configuration'],
-            'webhook_url' => rtrim($_ENV['APP_URL'] ?? 'https://api.project-nexus.ie', '/') . '/api/webhooks/sendgrid/events',
+            'webhook_url' => rtrim($_ENV['APP_URL'] ?? 'https://api.project-nexus.ie', '/') . '/api/v2/webhooks/postmark',
         ];
 
         return $this->respondWithData($response);
@@ -167,14 +161,14 @@ class AdminEmailController extends BaseApiController
         }
 
         if (isset($input['email_provider'])) {
-            $validProviders = ['platform_default', 'sendgrid', 'gmail_api', 'smtp'];
+            $validProviders = ['platform_default', 'gmail_api', 'smtp'];
             if (!in_array($input['email_provider'], $validProviders, true)) {
                 return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_email_provider'), null, 422);
             }
         }
 
         $allowedKeys = [
-            'email_provider', 'sendgrid_api_key', 'sendgrid_from_email', 'sendgrid_from_name', 'sendgrid_webhook_signing_key',
+            'email_provider',
             'smtp_host', 'smtp_port', 'smtp_user', 'smtp_password', 'smtp_encryption', 'smtp_from_email', 'smtp_from_name',
             'gmail_client_id', 'gmail_client_secret', 'gmail_refresh_token', 'gmail_sender_email', 'gmail_sender_name',
         ];
@@ -214,7 +208,7 @@ class AdminEmailController extends BaseApiController
         // email_settings (matches testProvider() below). The previous
         // `new Mailer()` ignored per-tenant overrides and only loaded the
         // platform .env — fine for platform admins, misleading for tenant
-        // admins on tenants with their own SendGrid/SMTP config.
+        // admins on tenants with their own SMTP config.
         $mailer = Mailer::forCurrentTenant();
         $provider = $mailer->getProviderType();
 

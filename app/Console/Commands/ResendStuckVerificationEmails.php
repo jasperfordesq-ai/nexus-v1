@@ -33,7 +33,7 @@ use Illuminate\Support\Facades\Log;
  * the same oldest `--limit` users forever.
  *
  * Re-uses the canonical Mailer path so:
- *   - SendGrid is used (the default driver in prod)
+ *   - Postmark is used (the default platform provider in prod)
  *   - the email_log audit trail records every send
  *   - the suppression cache skips known-bad addresses
  *   - the unsubscribe header is auto-attached

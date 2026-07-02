@@ -13,13 +13,13 @@ use Illuminate\Support\Facades\Log;
  * EmailService — Laravel DI-based service for email operations.
  *
  * Manages email sending, template configuration, and delivery settings.
- * Uses the custom Mailer class which supports SendGrid, Gmail API, and SMTP
+ * Uses the custom Mailer class which supports Postmark, Gmail API, and SMTP
  * with per-tenant configuration.
  */
 class EmailService
 {
     /**
-     * Send an email using the tenant-aware Mailer (SendGrid/Gmail API/SMTP).
+     * Send an email using the tenant-aware Mailer (Postmark/Gmail API/SMTP).
      */
     public function send(string $to, string $subject, string $body, array $options = []): bool
     {

@@ -789,7 +789,7 @@ class SafeguardingService
                     // dropped every critical safeguarding alert.
                     //
                     // Render the Mailable to HTML and dispatch via the platform
-                    // Mailer (SendGrid via .env or per-tenant config). All other
+                    // Mailer (Postmark via .env or per-tenant config). All other
                     // outgoing email in the platform routes this way.
                     $mailable = new SafeguardingCriticalMail($reportPayload, $reporterName);
                     $subject  = (string) ($mailable->envelope()->subject ?? __('safeguarding.critical.subject'));

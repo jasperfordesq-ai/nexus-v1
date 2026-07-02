@@ -217,7 +217,7 @@ class EmailMonitorService
     {
         try {
             $scope = $tenantId ? "tenant:{$tenantId}" : 'global';
-            $providers = ['gmail_api', 'sendgrid', 'smtp'];
+            $providers = ['gmail_api', 'postmark', 'smtp'];
 
             $totalSuccess = (int) Cache::get(self::CACHE_PREFIX . "{$scope}:total:success", 0);
             $totalFailure = (int) Cache::get(self::CACHE_PREFIX . "{$scope}:total:failure", 0);

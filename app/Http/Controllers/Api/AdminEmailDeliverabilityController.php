@@ -2624,7 +2624,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
      * GET /api/v2/admin/email-deliverability/suppressions
      *
      * Returns the current suppression cache (filtered by reason / email).
-     * Suppressions are platform-wide because SendGrid scopes them to
+     * Suppressions are platform-wide because the provider scopes them to
      * the account, not the tenant — so a bounce on tenant A's send to
      * jane@example.com blocks every tenant from sending to that address.
      */
@@ -2663,9 +2663,10 @@ class AdminEmailDeliverabilityController extends BaseApiController
      * DELETE /api/v2/admin/email-deliverability/suppressions/{id}
      *
      * Remove an address from the suppression cache (e.g. after the member
-     * tells us they fixed their inbox). Also calls SendGrid's API to clear
-     * it on their side so the next send isn't immediately re-suppressed.
-     * Platform super-admin only.
+     * tells us they fixed their inbox). Removes the local suppression row so
+     * the next send isn't immediately re-suppressed. Local cache will refill
+     * on the next hourly sync if the address is still bad upstream at the
+     * provider. Platform super-admin only.
      */
     public function removeSuppression(int $id): JsonResponse
     {
@@ -2674,34 +2675,6 @@ class AdminEmailDeliverabilityController extends BaseApiController
         $row = DB::table('email_suppression')->where('id', $id)->first();
         if (!$row) {
             return $this->respondWithError('NOT_FOUND', 'Suppression entry not found.', null, 404);
-        }
-
-        // Try SendGrid first; on failure, log but still remove locally so
-        // the admin sees their change reflected. Local cache will refill
-        // on the next hourly sync if the address is still bad upstream.
-        $sgKey = config('mail.sendgrid.api_key');
-        if (!empty($sgKey)) {
-            try {
-                $endpointFor = [
-                    'bounce'      => 'bounces',
-                    'block'       => 'blocks',
-                    'invalid'     => 'invalid_emails',
-                    'spam_report' => 'spam_reports',
-                    'unsubscribe' => 'asm/suppressions/global',
-                ];
-                $endpoint = $endpointFor[$row->reason] ?? null;
-                if ($endpoint) {
-                    \Illuminate\Support\Facades\Http::withToken($sgKey)
-                        ->acceptJson()
-                        ->timeout(15)
-                        ->delete("https://api.sendgrid.com/v3/suppression/{$endpoint}/" . urlencode($row->email));
-                }
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning('Failed to clear suppression on SendGrid', [
-                    'email' => $row->email,
-                    'error' => $e->getMessage(),
-                ]);
-            }
         }
 
         DB::table('email_suppression')->where('id', $id)->delete();
