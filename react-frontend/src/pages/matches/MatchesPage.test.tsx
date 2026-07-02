@@ -12,11 +12,12 @@ import { render, screen, waitFor } from '@/test/test-utils';
 import React from 'react';
 
 const mockApiGet = vi.fn();
+const mockApiPost = vi.fn().mockResolvedValue({ success: true });
 
 vi.mock('@/lib/api', () => ({
   api: {
     get: (...args: unknown[]) => mockApiGet(...args),
-    post: vi.fn().mockResolvedValue({ success: true }),
+    post: (...args: unknown[]) => mockApiPost(...args),
     put: vi.fn().mockResolvedValue({ success: true }),
   },
   tokenManager: { getTenantId: vi.fn() },
@@ -54,7 +55,7 @@ vi.mock('@/contexts', () => ({
   useModule: vi.fn(() => true),
 }));
 
-vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
+vi.mock('@/hooks', () => ({ usePageTitle: vi.fn(), useMediaQuery: vi.fn(() => true) }));
 vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
 vi.mock('@/components/navigation', () => ({
   Breadcrumbs: () => <nav aria-label="breadcrumb" />,
@@ -86,24 +87,23 @@ vi.mock('@/lib/motion', () => {
 
 import { MatchesPage } from './MatchesPage';
 
+const emptyResponse = { success: true, data: { matches: [], meta: { total: 0, modules: [], min_score: 0, needs_location: false, degraded: false, degraded_reason: null, has_active_listings: null, paused: false } } };
+
 describe('MatchesPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('renders without crashing and shows content after loading', async () => {
-    mockApiGet.mockResolvedValue({ success: true, data: [] });
+    mockApiGet.mockResolvedValue(emptyResponse);
     render(<MatchesPage />);
-    // The page renders heading via t('heading') — with mock i18n, the raw key 'heading' is returned
-    // However, the heading text is rendered inside nested elements (icon div + text)
-    // Instead, check for the stats and empty state which appear after loading completes
     await waitFor(() => {
       expect(screen.getByTestId('empty-state')).toBeInTheDocument();
     });
   });
 
   it('renders stats glass cards', async () => {
-    mockApiGet.mockResolvedValue({ success: true, data: [] });
+    mockApiGet.mockResolvedValue(emptyResponse);
     render(<MatchesPage />);
     await waitFor(() => {
       const glassCards = screen.getAllByTestId('glass-card');
@@ -115,17 +115,21 @@ describe('MatchesPage', () => {
   it('renders match items when API returns data', async () => {
     mockApiGet.mockResolvedValue({
       success: true,
-      data: [
-        {
-          id: 1,
-          source_type: 'listing',
-          source_id: 10,
-          match_score: 85,
-          title: 'Gardening Help',
-          reasons: ['Skill match'],
-          matched_at: '2026-01-01',
-        },
-      ],
+      data: {
+        matches: [
+          {
+            module: 'listing',
+            listing_id: 10,
+            match_score: 85,
+            title: 'Gardening Help',
+            match_reasons: ['Skill match'],
+            created_at: '2026-01-01',
+            user_id: 5,
+            user_name: 'Jane Doe',
+          },
+        ],
+        meta: { total: 1, modules: ['listing'], min_score: 0, needs_location: false, degraded: false, degraded_reason: null, has_active_listings: true, paused: false },
+      },
     });
     render(<MatchesPage />);
     await waitFor(() => {
@@ -134,8 +138,36 @@ describe('MatchesPage', () => {
   });
 
   it('renders breadcrumb navigation', async () => {
-    mockApiGet.mockResolvedValue({ success: true, data: [] });
+    mockApiGet.mockResolvedValue(emptyResponse);
     render(<MatchesPage />);
     expect(screen.getByRole('navigation', { name: /breadcrumb/i })).toBeInTheDocument();
+  });
+
+  it('shows the no-coordinates degraded banner when the backend reports it', async () => {
+    mockApiGet.mockResolvedValue({
+      success: true,
+      data: {
+        matches: [],
+        meta: { total: 0, modules: [], min_score: 0, needs_location: true, degraded: true, degraded_reason: 'no_coordinates', has_active_listings: null, paused: false },
+      },
+    });
+    render(<MatchesPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Add your location to see nearby matches')).toBeInTheDocument();
+    });
+  });
+
+  it('shows the paused banner when matching is paused', async () => {
+    mockApiGet.mockResolvedValue({
+      success: true,
+      data: {
+        matches: [],
+        meta: { total: 0, modules: [], min_score: 0, needs_location: false, degraded: false, degraded_reason: null, has_active_listings: null, paused: true },
+      },
+    });
+    render(<MatchesPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Matching is paused')).toBeInTheDocument();
+    });
   });
 });

@@ -81,7 +81,10 @@
   },
   "suggestions": {
     "empty": "No suggestions yet",
-    "empty_description": "Matching improves as more listings and profile details are added."
+    "empty_description": "Matching improves as more listings and profile details are added.",
+    "see_all_matches": "See all matches",
+    "score_chip": "{{score}}%",
+    "distance_chip": "{{value}} km"
   },
   "groups": {
     "members_count": "{{count}} members",

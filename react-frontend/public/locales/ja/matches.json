@@ -5,13 +5,13 @@
   "heading": "あなたのマッチ",
   "subtitle": "リスティング、仕事、ボランティア、グループを通じてつながりを発見しましょう",
   "refresh": "更新",
+  "preferences_link": "好みの一致",
   "stats_total_matches": "合計マッチ",
   "stats_avg_score": "平均スコア",
   "stats_hot_matches": "ホットマッチ",
-  "stats_source_types": "ソースタイプ",
   "filter_all": "すべて",
+  "filter_mutual_only": "相互対戦のみ",
   "source_listing": "リスト",
-  "source_job": "求人",
   "source_volunteering": "ボランティア",
   "source_group": "グループ",
   "empty_title_all": "まだマッチはありません",
@@ -29,5 +29,112 @@
     "title": "マッチ"
   },
   "filter_tabs_aria": "一致ソースフィルター",
-  "loading": "試合をロード中..."
+  "loading": "試合をロード中...",
+  "banner": {
+    "no_coords_title": "現在地を追加すると近くの試合が表示されます",
+    "no_coords_desc": "プロフィールに位置情報が含まれるまで、距離に基づく一致を計算することはできません。他のシグナルに基づいて、以下の一致を引き続き確認できます。",
+    "paused_title": "マッチングは一時停止中です",
+    "paused_desc": "設定でマッチングを再開するまで、新しいマッチングの提案や通知は受信されません。",
+    "mutual_title": "相互一致を表示する",
+    "mutual_desc": "これらのマッチングは双方向で行われます。あなたは彼らにぴったりであり、彼らもあなたにぴったりです。",
+    "show_all": "すべての一致を表示"
+  },
+  "card": {
+    "mutual": "相互対戦",
+    "save": "試合を保存する",
+    "dismiss": "興味がない",
+    "view_group": "グループを表示する",
+    "distance_km": "{{value}} km",
+    "remote": "Remote",
+    "message": "Message",
+    "join": "Join",
+    "joined": "Joined"
+  },
+  "explanation": {
+    "ai_caption": "プロフィールやアクティビティに基づいてAIが生成した説明"
+  },
+  "breakdown": {
+    "title": "なぜこのスコアなのでしょうか？",
+    "signals": {
+      "category": "カテゴリマッチ",
+      "skill": "スキルマッチ",
+      "semantic": "説明の類似性",
+      "activity": "活動レベル",
+      "trust_tier": "信頼層",
+      "completion": "完了率",
+      "proximity": "Proximity",
+      "availability": "Availability",
+      "reviews": "Reviews"
+    },
+    "pillars": {
+      "relevance": "Relevance",
+      "feasibility": "Feasibility",
+      "trust": "Trust"
+    }
+  },
+  "dismiss_reasons": {
+    "not_relevant": "関係ありません",
+    "too_far": "遠すぎる",
+    "already_done": "すでに完了しました",
+    "not_my_skills": "私のスキルではありません",
+    "not_interested": "興味がない",
+    "other": "Other"
+  },
+  "empty": {
+    "no_coordinates_title": "一致するものを見つけるためにあなたの位置情報が必要です",
+    "no_coordinates_description": "あなたのプロフィールに場所を追加すると、あなたの近くのリスト、グループ、機会を見つけることができます。",
+    "set_location_cta": "場所を設定する",
+    "no_listings_title": "あなたのリストから一致する作品",
+    "no_listings_description": "リストを作成して、提供するものやニーズに一致する人、グループ、機会を探し始めます。",
+    "create_listing_cta": "リストを作成する",
+    "adjust_preferences_cta": "一致設定を調整する"
+  },
+  "preferences": {
+    "subtitle": "スマート マッチングが接続を検索して通知する方法を制御します。",
+    "load_failed": "一致設定を読み込めませんでした",
+    "save": "設定を保存する",
+    "save_success": "一致設定が保存されました",
+    "save_failed": "一致設定の保存に失敗しました",
+    "unsaved_changes": "未保存の変更があります",
+    "pause": {
+      "title": "マッチングを一時停止する",
+      "description": "一時停止すると、新しい一致の提案や通知は表示されなくなります。",
+      "active_description": "マッチングは一時停止されています。再開するまで、新しい提案や通知は表示されません。"
+    },
+    "thresholds": {
+      "title": "距離と品質",
+      "no_location_title": "距離ベースのマッチングを使用する場所を追加する",
+      "no_location_desc": "プロフィールで所在地を設定すると、あなたにどれだけ近いかによってマッチングがランク付けされます。",
+      "distance_label": "最大距離",
+      "quality_label": "最低限の一致品質",
+      "distance_value": "{{value}} km",
+      "quality_value": "{{value}}%"
+    },
+    "categories": {
+      "title": "興味のあるカテゴリー",
+      "description": "一致させたいカテゴリを選択してください。すべてのカテゴリに一致させるには、すべてのチェックを外したままにしておきます。",
+      "empty": "カテゴリはまだありません。"
+    },
+    "notifications": {
+      "frequency_label": "一致ダイジェストの頻度",
+      "hot_matches": "ホットマッチアラート",
+      "hot_matches_desc": "非常に強力な試合についてすぐに通知を受け取ります。",
+      "mutual_matches": "相互一致アラート",
+      "mutual_matches_desc": "試合が双方向で行われた場合に通知を受け取ります。",
+      "title": "Notifications",
+      "daily": "Daily",
+      "fortnightly": "Fortnightly",
+      "monthly": "Monthly",
+      "never": "Never"
+    },
+    "page_title": "Match Preferences",
+    "page_meta_title": "Match Preferences",
+    "breadcrumb": "Preferences",
+    "heading": "Match Preferences"
+  },
+  "stats_source_types": "ソースタイプ",
+  "source_job": "求人",
+  "stats_mutual_matches": "Mutual Matches",
+  "filter_people_listings": "Listings",
+  "source_event": "Event"
 }

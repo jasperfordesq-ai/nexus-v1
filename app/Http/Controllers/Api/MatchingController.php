@@ -70,6 +70,11 @@ class MatchingController extends BaseApiController
         return $this->respondWithData($matches);
     }
 
+    /** Dismiss reasons accepted by both dismiss endpoints (feed the learning loop). */
+    private const DISMISS_REASONS = [
+        'not_relevant', 'too_far', 'already_done', 'not_my_skills', 'not_interested', 'other',
+    ];
+
     /**
      * POST /api/v2/matches/{id}/dismiss
      *
@@ -80,7 +85,8 @@ class MatchingController extends BaseApiController
      * - id: int (listing_id)
      *
      * Request body (JSON, all optional):
-     * - reason: string ('not_relevant' | 'too_far' | 'already_done' | 'other')
+     * - reason: string ('not_relevant' | 'too_far' | 'already_done' |
+     *   'not_my_skills' | 'not_interested' | 'other')
      */
     public function dismiss(int $listingId): JsonResponse
     {
@@ -93,12 +99,64 @@ class MatchingController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_id', ['resource' => 'listing']), 'id', 400);
         }
 
-        $reason = $this->input('reason');
-        $validReasons = ['not_relevant', 'too_far', 'already_done', 'other', null];
-        if (!in_array($reason, $validReasons, true)) {
-            $reason = 'other';
+        $this->dismissListing($userId, $tenantId, $listingId, $this->normaliseReason($this->input('reason')));
+
+        return $this->respondWithData(['dismissed' => true, 'listing_id' => $listingId]);
+    }
+
+    /**
+     * POST /api/v2/matches/{sourceType}/{sourceId}/dismiss
+     *
+     * Typed dismissal for cross-module matches. Currently supported:
+     * - listing: same behaviour as the legacy /matches/{id}/dismiss
+     * - group: marks the group_match_cache row dismissed (suppressed on
+     *   read and on re-warm)
+     */
+    public function dismissTyped(string $sourceType, int $sourceId): JsonResponse
+    {
+        $userId = $this->requireAuth();
+        $tenantId = $this->getTenantId();
+
+        $this->rateLimit('match_dismiss', 200, 60);
+
+        if ($sourceId <= 0) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_id', ['resource' => $sourceType]), 'sourceId', 400);
         }
 
+        $reason = $this->normaliseReason($this->input('reason'));
+
+        switch ($sourceType) {
+            case 'listing':
+                $this->dismissListing($userId, $tenantId, $sourceId, $reason);
+                break;
+
+            case 'group':
+                try {
+                    DB::statement(
+                        "UPDATE group_match_cache SET status = 'dismissed'
+                         WHERE tenant_id = ? AND user_id = ? AND group_id = ?",
+                        [$tenantId, $userId, $sourceId]
+                    );
+                } catch (\Throwable $e) {
+                    // Table may not exist yet — degrade gracefully.
+                    \Log::warning('MatchingController::dismissTyped group DB error — ' . $e->getMessage());
+                }
+                break;
+
+            default:
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_id', ['resource' => 'source type']), 'sourceType', 400);
+        }
+
+        return $this->respondWithData(['dismissed' => true, 'source_type' => $sourceType, 'source_id' => $sourceId]);
+    }
+
+    private function normaliseReason(mixed $reason): string
+    {
+        return in_array($reason, self::DISMISS_REASONS, true) ? $reason : 'other';
+    }
+
+    private function dismissListing(int $userId, int $tenantId, int $listingId, string $reason): void
+    {
         try {
             // Upsert — ignore duplicate (user may re-dismiss)
             DB::statement(
@@ -112,8 +170,6 @@ class MatchingController extends BaseApiController
 
         // Record negative signal in MatchLearningService
         $this->matchLearningService->recordInteraction($userId, $listingId, 'dismissed', []);
-
-        return $this->respondWithData(['dismissed' => true, 'listing_id' => $listingId]);
     }
 
     /**

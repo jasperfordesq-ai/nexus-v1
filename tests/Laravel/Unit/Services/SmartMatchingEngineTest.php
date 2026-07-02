@@ -7,6 +7,8 @@
 namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
+use App\Services\Matching\CandidateRetriever;
+use App\Services\MatchLearningService;
 use App\Services\SmartMatchingEngine;
 use App\Services\EmbeddingService;
 use App\Services\VettingService;
@@ -18,16 +20,34 @@ class SmartMatchingEngineTest extends TestCase
     private SmartMatchingEngine $engine;
     private $mockEmbedding;
     private $mockVetting;
+    private $mockRetriever;
+    private $mockLearning;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->mockEmbedding = Mockery::mock(EmbeddingService::class);
         $this->mockVetting = Mockery::mock(VettingService::class);
+        $this->mockRetriever = Mockery::mock(CandidateRetriever::class);
+        $this->mockLearning = Mockery::mock(MatchLearningService::class);
+        // Default: no candidates unless a test says otherwise.
+        $this->mockRetriever->shouldReceive('retrieveBatch')->andReturn([])->byDefault();
+        $this->mockRetriever->shouldReceive('retrieveColdStart')->andReturn([])->byDefault();
+        // Default: no learning history.
+        $this->mockLearning->shouldReceive('getOwnerInteractionBoosts')->andReturn([])->byDefault();
+        $this->mockLearning->shouldReceive('getCategoryAffinities')->andReturn([])->byDefault();
         // Default: searcher is not staff, has all vettings — keeps existing tests passing
         $this->mockVetting->shouldReceive('isSafeguardingStaff')->andReturn(false)->byDefault();
         $this->mockVetting->shouldReceive('userHasAllValidVettings')->andReturn(true)->byDefault();
-        $this->engine = new SmartMatchingEngine($this->mockEmbedding, $this->mockVetting);
+        $this->engine = new SmartMatchingEngine(
+            $this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $this->mockLearning
+        );
+    }
+
+    /** Build an engine with the shared default mocks but a custom vetting mock. */
+    private function makeEngine($mockVetting): SmartMatchingEngine
+    {
+        return new SmartMatchingEngine($this->mockEmbedding, $mockVetting, $this->mockRetriever, $this->mockLearning);
     }
 
     // ── getConfig ──
@@ -43,6 +63,25 @@ class SmartMatchingEngineTest extends TestCase
         $this->assertEquals(80, $config['hot_match_threshold']);
         $this->assertArrayHasKey('weights', $config);
         $this->assertArrayHasKey('proximity', $config);
+        // Hard-gate defaults (Phase 1 geo fix)
+        $this->assertTrue($config['gates']['geo_hard_gate']);
+        $this->assertSame('remote_only', $config['gates']['missing_coords_mode']);
+        $this->assertSame(90, $config['gates']['dormancy_days']);
+    }
+
+    public function test_getConfig_partial_tenant_gates_keep_defaults_for_missing_keys(): void
+    {
+        // Tenant saved only one gate key — the others must fall back to defaults,
+        // not vanish (array_merge on the top level used to wipe nested blocks).
+        DB::shouldReceive('table->where->value')->andReturn(json_encode([
+            'algorithms' => ['smart_matching' => ['gates' => ['dormancy_days' => 30]]],
+        ]));
+
+        $config = $this->engine->getConfig();
+        $this->assertSame(30, $config['gates']['dormancy_days']);
+        $this->assertTrue($config['gates']['geo_hard_gate']);
+        $this->assertSame('remote_only', $config['gates']['missing_coords_mode']);
+        $this->assertArrayHasKey('category', $config['weights']);
     }
 
     public function test_getConfig_caches_result(): void
@@ -91,20 +130,20 @@ class SmartMatchingEngineTest extends TestCase
     // (commit 7bc2a1629), so the 30-min "warm-match-cache" cron called an
     // undefined method every run and the match_cache table had no writer at all.
 
-    public function test_warmUpCache_writes_matches_to_match_cache_scaling_score_to_0_100(): void
+    public function test_warmUpCache_writes_scores_unscaled_on_the_0_100_scale(): void
     {
         $this->setTenantId(7);
 
         // Partial mock: real warmUpCache(), stubbed findMatchesForUser().
         $engine = Mockery::mock(
             SmartMatchingEngine::class . '[findMatchesForUser]',
-            [$this->mockEmbedding, $this->mockVetting]
+            [$this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $this->mockLearning]
         );
         $engine->shouldReceive('findMatchesForUser')
-            ->once()->with(1, ['limit' => 20])
+            ->once()->withArgs(fn ($id, $opts) => $id === 1 && $opts === ['limit' => 20])
             ->andReturn([[
                 'id' => 123,
-                'match_score' => 0.85,   // engine emits a 0–1.0 score
+                'match_score' => 85.0,   // engine scores are 0–100
                 'distance_km' => 3.2,
                 'match_type' => 'mutual',
                 'match_reasons' => ['Same category'],
@@ -113,21 +152,49 @@ class SmartMatchingEngineTest extends TestCase
         // One candidate user returned by the warm-up SELECT.
         DB::shouldReceive('select')->once()->andReturn([(object) ['id' => 1]]);
 
-        // The cache upsert: assert it targets match_cache, carries the listing id,
-        // and scales the 0.85 engine score to 85.00 for the 0–100 column.
+        // Regression (score-scale corruption): warmUpCache used to clamp the
+        // 0–100 engine score with min(1.0, …) * 100, writing every row as
+        // exactly 100.00. It must now pass 85.0 through unchanged.
         DB::shouldReceive('insert')->once()->withArgs(function ($sql, $bindings) {
             return is_string($sql)
                 && str_contains($sql, 'match_cache')
                 && $bindings[0] === 1                          // user_id
                 && $bindings[1] === 123                        // listing_id
                 && (int) $bindings[2] === 7                    // tenant_id
-                && abs(((float) $bindings[3]) - 85.0) < 0.01   // score scaled to 0–100
+                && abs(((float) $bindings[3]) - 85.0) < 0.01   // score NOT rescaled
                 && $bindings[5] === 'mutual';                  // match_type
         })->andReturn(true);
 
         $result = $engine->warmUpCache(20);
 
         $this->assertSame(['processed' => 1, 'cached' => 1], $result);
+    }
+
+    public function test_warmUpCache_clamps_out_of_range_scores_to_0_100(): void
+    {
+        $this->setTenantId(7);
+
+        $engine = Mockery::mock(
+            SmartMatchingEngine::class . '[findMatchesForUser]',
+            [$this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $this->mockLearning]
+        );
+        $engine->shouldReceive('findMatchesForUser')->once()->andReturn([
+            ['id' => 1, 'match_score' => 130.0, 'distance_km' => 1.0, 'match_type' => 'one_way', 'match_reasons' => []],
+            ['id' => 2, 'match_score' => -5.0, 'distance_km' => 1.0, 'match_type' => 'one_way', 'match_reasons' => []],
+        ]);
+
+        DB::shouldReceive('select')->once()->andReturn([(object) ['id' => 1]]);
+
+        $written = [];
+        DB::shouldReceive('insert')->twice()->withArgs(function ($sql, $bindings) use (&$written) {
+            $written[$bindings[1]] = (float) $bindings[3];
+            return true;
+        })->andReturn(true);
+
+        $engine->warmUpCache(20);
+
+        $this->assertEqualsWithDelta(100.0, $written[1], 0.01);
+        $this->assertEqualsWithDelta(0.0, $written[2], 0.01);
     }
 
     public function test_warmUpCache_with_no_eligible_users_caches_nothing(): void
@@ -148,11 +215,11 @@ class SmartMatchingEngineTest extends TestCase
 
         $engine = Mockery::mock(
             SmartMatchingEngine::class . '[findMatchesForUser]',
-            [$this->mockEmbedding, $this->mockVetting]
+            [$this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $this->mockLearning]
         );
         $engine->shouldReceive('findMatchesForUser')->once()->andReturn([[
             'id' => 55,
-            'match_score' => 0.5,
+            'match_score' => 50.0,
             'distance_km' => 1.0,
             // match_type intentionally absent — must fall back to 'one_way', not null.
             'match_reasons' => [],
@@ -251,6 +318,69 @@ class SmartMatchingEngineTest extends TestCase
         $this->assertIsArray($result['reasons']);
     }
 
+    // ── calculateMatchScore: service_type awareness (Phase 1 geo fix) ──
+
+    public function test_calculateMatchScore_remote_only_is_distance_exempt(): void
+    {
+        DB::shouldReceive('table->where->value')->andReturnNull();
+        DB::shouldReceive('select')->andReturn([]); // reciprocity lookup
+
+        $userData = ['latitude' => 0, 'longitude' => 0, 'skills' => ''];
+        $userListings = [['type' => 'offer', 'category_id' => 1, 'title' => 'Gardening', 'description' => '']];
+        $candidate = [
+            'id' => 10, 'user_id' => 2, 'category_id' => 1,
+            'title' => 'Remote garden planning', 'description' => 'Plan your garden over video call',
+            'service_type' => 'remote_only', 'created_at' => now()->toDateTimeString(),
+        ];
+
+        $result = $this->engine->calculateMatchScore($userData, $userListings, $userListings[0], $candidate);
+
+        $this->assertEqualsWithDelta(0.9, $result['breakdown']['proximity'], 0.001);
+        $this->assertNull($result['distance'], 'remote match with unknown coords must not leak a distance');
+        $this->assertContains('Can be done remotely', $result['reasons']);
+        $this->assertSame('remote_only', $result['service_type']);
+    }
+
+    public function test_calculateMatchScore_physical_with_unknown_distance_is_heavily_penalised(): void
+    {
+        DB::shouldReceive('table->where->value')->andReturnNull();
+        DB::shouldReceive('select')->andReturn([]);
+
+        // Neither party has coordinates; candidate is physical (default service_type).
+        $userData = ['latitude' => 0, 'longitude' => 0, 'skills' => ''];
+        $userListings = [['type' => 'offer', 'category_id' => 1, 'title' => 'Gardening', 'description' => '']];
+        $candidate = [
+            'id' => 10, 'user_id' => 2, 'category_id' => 1,
+            'title' => 'Need gardening help', 'description' => 'Hedges and lawn',
+            'created_at' => now()->toDateTimeString(),
+        ];
+
+        $result = $this->engine->calculateMatchScore($userData, $userListings, $userListings[0], $candidate);
+
+        $this->assertEqualsWithDelta(0.05, $result['breakdown']['proximity'], 0.001);
+        // Regression: the old code returned round(PHP_FLOAT_MAX, 1) here.
+        $this->assertNull($result['distance']);
+    }
+
+    public function test_calculateMatchScore_hybrid_with_unknown_distance_is_neutral(): void
+    {
+        DB::shouldReceive('table->where->value')->andReturnNull();
+        DB::shouldReceive('select')->andReturn([]);
+
+        $userData = ['latitude' => 0, 'longitude' => 0, 'skills' => ''];
+        $userListings = [['type' => 'offer', 'category_id' => 1, 'title' => 'Tutoring', 'description' => '']];
+        $candidate = [
+            'id' => 10, 'user_id' => 2, 'category_id' => 1,
+            'title' => 'Maths tutoring wanted', 'description' => 'Online or in person',
+            'service_type' => 'hybrid', 'created_at' => now()->toDateTimeString(),
+        ];
+
+        $result = $this->engine->calculateMatchScore($userData, $userListings, $userListings[0], $candidate);
+
+        $this->assertEqualsWithDelta(0.5, $result['breakdown']['proximity'], 0.001);
+        $this->assertNull($result['distance']);
+    }
+
     // ── findMatchesForUser ──
 
     public function test_findMatchesForUser_returns_empty_for_nonexistent_user(): void
@@ -258,8 +388,200 @@ class SmartMatchingEngineTest extends TestCase
         DB::shouldReceive('table->where->value')->andReturnNull();
         DB::shouldReceive('select')->andReturn([]);
 
-        $result = $this->engine->findMatchesForUser(0);
+        $meta = null;
+        $result = $this->engine->findMatchesForUser(0, [], $meta);
         $this->assertIsArray($result);
+        $this->assertFalse($meta['has_active_listings']);
+    }
+
+    public function test_findMatchesForUser_without_coords_sets_degraded_meta_and_scores_remote_candidates(): void
+    {
+        $this->setTenantId(7);
+        DB::shouldReceive('table->where->value')->andReturnNull(); // tenant config → defaults
+
+        // Sequential DB::select returns:
+        //   match_preferences → user row → own listings → candidate owner listings (reciprocity)
+        DB::shouldReceive('select')->andReturn(
+            [], // no saved preferences
+            [(object) [
+                'id' => 1, 'tenant_id' => 7, 'latitude' => 0.0, 'longitude' => 0.0,
+                'skills' => '', 'avg_rating' => null, 'transaction_count' => 0,
+            ]],
+            [(object) [
+                'id' => 11, 'user_id' => 1, 'type' => 'offer', 'category_id' => 3,
+                'title' => 'Gardening help offered', 'description' => '', 'category_name' => 'Gardening',
+            ]],
+            [] // reciprocity: candidate owner has no listings
+        );
+
+        // Degraded mode: the retriever must be called with NULL coords so it can
+        // restrict candidates to remote/hybrid.
+        $this->mockRetriever->shouldReceive('retrieveBatch')
+            ->once()
+            ->withArgs(function ($tenantId, $userId, $targetType, $catIds, $catFilter, $lat, $lon, $maxDist, $gates) {
+                return $tenantId === 7 && $userId === 1 && $targetType === 'request'
+                    && $lat === null && $lon === null
+                    && ($gates['missing_coords_mode'] ?? null) === 'remote_only';
+            })
+            ->andReturn([[
+                'id' => 99, 'user_id' => 2, 'type' => 'request', 'category_id' => 3,
+                'title' => 'Remote garden planning wanted',
+                'description' => 'Help me plan my vegetable garden over a video call this spring',
+                'service_type' => 'remote_only', 'created_at' => now()->toDateTimeString(),
+                'category_name' => 'Gardening',
+            ]]);
+
+        $this->mockEmbedding->shouldReceive('findSimilar')->andReturn([]);
+        \Illuminate\Support\Facades\Cache::shouldReceive('get')->andReturn(null);
+
+        $meta = null;
+        $matches = $this->engine->findMatchesForUser(1, [], $meta);
+
+        $this->assertTrue($meta['needs_location']);
+        $this->assertTrue($meta['degraded']);
+        $this->assertSame('no_coordinates', $meta['degraded_reason']);
+        $this->assertTrue($meta['has_active_listings']);
+
+        $this->assertCount(1, $matches);
+        $this->assertSame(99, $matches[0]['id']);
+        $this->assertNull($matches[0]['distance_km'], 'no-coords match must not fabricate a distance');
+    }
+
+    public function test_findMatchesForUser_semantic_boost_raises_score_instead_of_collapsing_it(): void
+    {
+        $this->setTenantId(7);
+        DB::shouldReceive('table->where->value')->andReturnNull();
+
+        DB::shouldReceive('select')->andReturn(
+            [],
+            [(object) [
+                'id' => 1, 'tenant_id' => 7, 'latitude' => 0.0, 'longitude' => 0.0,
+                'skills' => '', 'avg_rating' => null, 'transaction_count' => 0,
+            ]],
+            [(object) [
+                'id' => 11, 'user_id' => 1, 'type' => 'offer', 'category_id' => 3,
+                'title' => 'Gardening help offered', 'description' => '', 'category_name' => 'Gardening',
+            ]],
+            []
+        );
+
+        $this->mockRetriever->shouldReceive('retrieveBatch')->once()->andReturn([[
+            'id' => 99, 'user_id' => 2, 'type' => 'request', 'category_id' => 3,
+            'title' => 'Remote garden planning wanted',
+            'description' => 'Help me plan my vegetable garden over a video call this spring',
+            'service_type' => 'remote_only', 'created_at' => now()->toDateTimeString(),
+            'category_name' => 'Gardening',
+        ]]);
+
+        // Listing 99 is semantically similar → boost applies.
+        $this->mockEmbedding->shouldReceive('findSimilar')->andReturn([99]);
+        \Illuminate\Support\Facades\Cache::shouldReceive('get')->andReturn(null);
+
+        $matches = $this->engine->findMatchesForUser(1);
+
+        // Regression (score-scale corruption): the old ×1.3 boost clamped with
+        // min(1.0, …), collapsing every boosted match to a score of 1/100.
+        $this->assertCount(1, $matches);
+        $this->assertGreaterThan(40, $matches[0]['match_score']);
+        $this->assertLessThanOrEqual(100, $matches[0]['match_score']);
+        $this->assertContains('Similar to your listing', $matches[0]['match_reasons']);
+    }
+
+    public function test_findMatchesForUser_caps_listings_per_owner_per_page(): void
+    {
+        $this->setTenantId(7);
+        DB::shouldReceive('table->where->value')->andReturnNull();
+
+        DB::shouldReceive('select')->andReturn(
+            [],
+            [(object) [
+                'id' => 1, 'tenant_id' => 7, 'latitude' => 0.0, 'longitude' => 0.0,
+                'skills' => '', 'avg_rating' => null, 'transaction_count' => 0,
+            ]],
+            [(object) [
+                'id' => 11, 'user_id' => 1, 'type' => 'offer', 'category_id' => 3,
+                'title' => 'Gardening help offered', 'description' => '', 'category_name' => 'Gardening',
+            ]],
+            []
+        );
+
+        // THREE strong candidates, all owned by the same member.
+        $candidate = static fn (int $id) => [
+            'id' => $id, 'user_id' => 2, 'type' => 'request', 'category_id' => 3,
+            'title' => "Remote garden planning wanted {$id}",
+            'description' => 'Help me plan my vegetable garden over a video call this spring',
+            'service_type' => 'remote_only', 'created_at' => now()->toDateTimeString(),
+            'category_name' => 'Gardening',
+        ];
+        $this->mockRetriever->shouldReceive('retrieveBatch')->once()->andReturn([
+            $candidate(101), $candidate(102), $candidate(103),
+        ]);
+
+        $this->mockEmbedding->shouldReceive('findSimilar')->andReturn([]);
+        \Illuminate\Support\Facades\Cache::shouldReceive('get')->andReturn(null);
+
+        $matches = $this->engine->findMatchesForUser(1);
+
+        // Anti-monopoly: max 2 listings per owner per result page.
+        $this->assertCount(2, $matches);
+    }
+
+    public function test_findMatchesForUser_applies_learning_penalty_from_owner_history(): void
+    {
+        $this->setTenantId(7);
+        DB::shouldReceive('table->where->value')->andReturnNull();
+
+        // SQL-aware DB mock (robust across BOTH engine runs, unlike a
+        // sequential andReturn chain which the first run consumes).
+        DB::shouldReceive('select')->andReturnUsing(function ($sql) {
+            if (str_contains($sql, 'transaction_count')) {
+                return [(object) [
+                    'id' => 1, 'tenant_id' => 7, 'latitude' => 0.0, 'longitude' => 0.0,
+                    'skills' => '', 'avg_rating' => null, 'transaction_count' => 0,
+                ]];
+            }
+            if (str_contains($sql, 'category_name') && str_contains($sql, 'LIMIT 10')) {
+                return [(object) [
+                    'id' => 11, 'user_id' => 1, 'type' => 'offer', 'category_id' => 3,
+                    'title' => 'Gardening help offered', 'description' => '', 'category_name' => 'Gardening',
+                ]];
+            }
+            return [];
+        });
+
+        $candidate = [
+            'id' => 99, 'user_id' => 2, 'type' => 'request', 'category_id' => 3,
+            'title' => 'Remote garden planning wanted',
+            'description' => 'Help me plan my vegetable garden over a video call this spring',
+            'service_type' => 'remote_only', 'created_at' => now()->toDateTimeString(),
+            'category_name' => 'Gardening',
+        ];
+        $this->mockRetriever->shouldReceive('retrieveBatch')->twice()->andReturn([$candidate]);
+
+        $this->mockEmbedding->shouldReceive('findSimilar')->andReturn([]);
+        \Illuminate\Support\Facades\Cache::shouldReceive('get')->andReturn(null);
+
+        // Baseline run (default mocks: no history).
+        $baseline = $this->engine->findMatchesForUser(1);
+
+        // Second engine whose learning history says "this searcher keeps
+        // dismissing owner 2" — the same candidate must now score lower.
+        $penalisingLearning = Mockery::mock(MatchLearningService::class);
+        $penalisingLearning->shouldReceive('getOwnerInteractionBoosts')->andReturn([2 => -10.0]);
+        $penalisingLearning->shouldReceive('getCategoryAffinities')->andReturn([]);
+        $engine2 = new SmartMatchingEngine(
+            $this->mockEmbedding, $this->mockVetting, $this->mockRetriever, $penalisingLearning
+        );
+        $penalised = $engine2->findMatchesForUser(1);
+
+        $this->assertNotEmpty($baseline);
+        $this->assertNotEmpty($penalised);
+        $this->assertEqualsWithDelta(
+            $baseline[0]['match_score'] - 10.0,
+            $penalised[0]['match_score'],
+            0.2,
+            'owner-history penalty must reduce the score by the learning boost'
+        );
     }
 
     // ── filterCandidatesByVettingRequirements ──
@@ -287,7 +609,7 @@ class SmartMatchingEngineTest extends TestCase
         $mockVetting->shouldReceive('isSafeguardingStaff')->once()->with(42)->andReturn(true);
         // If staff bypass works, userHasAllValidVettings should NEVER be called
         $mockVetting->shouldNotReceive('userHasAllValidVettings');
-        $engine = new SmartMatchingEngine($this->mockEmbedding, $mockVetting);
+        $engine = $this->makeEngine($mockVetting);
 
         $candidates = [
             ['id' => 1, 'user_id' => 10],
@@ -344,7 +666,7 @@ class SmartMatchingEngineTest extends TestCase
             ->with(42, ['garda_vetting'])
             ->andReturn(true);
 
-        $engine = new SmartMatchingEngine($this->mockEmbedding, $mockVetting);
+        $engine = $this->makeEngine($mockVetting);
 
         $result = $engine->filterCandidatesByVettingRequirements($candidates, 42);
         $this->assertCount(1, $result);
@@ -373,7 +695,7 @@ class SmartMatchingEngineTest extends TestCase
             ->with(42, ['garda_vetting'])
             ->andReturn(false);
 
-        $engine = new SmartMatchingEngine($this->mockEmbedding, $mockVetting);
+        $engine = $this->makeEngine($mockVetting);
 
         $result = $engine->filterCandidatesByVettingRequirements($candidates, 42);
         $this->assertEmpty($result);
@@ -409,7 +731,7 @@ class SmartMatchingEngineTest extends TestCase
             ->with(42, ['garda_vetting'])
             ->andReturn(true);
 
-        $engine = new SmartMatchingEngine($this->mockEmbedding, $mockVetting);
+        $engine = $this->makeEngine($mockVetting);
 
         $result = $engine->filterCandidatesByVettingRequirements($candidates, 42);
         $this->assertCount(3, $result);
@@ -442,7 +764,7 @@ class SmartMatchingEngineTest extends TestCase
         $mockVetting->shouldReceive('userHasAllValidVettings')
             ->with(42, ['dbs_enhanced'])->andReturn(true);
 
-        $engine = new SmartMatchingEngine($this->mockEmbedding, $mockVetting);
+        $engine = $this->makeEngine($mockVetting);
 
         $result = $engine->filterCandidatesByVettingRequirements($candidates, 42);
 

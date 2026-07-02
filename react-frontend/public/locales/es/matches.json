@@ -5,13 +5,13 @@
   "heading": "Tus Coincidencias",
   "subtitle": "Descubre conexiones en anuncios, empleos, voluntariado y grupos",
   "refresh": "Actualizar",
+  "preferences_link": "Preferencias de coincidencia",
   "stats_total_matches": "Total de Coincidencias",
   "stats_avg_score": "Puntuación Media",
   "stats_hot_matches": "Coincidencias Destacadas",
-  "stats_source_types": "Tipos de Fuente",
   "filter_all": "Todos",
+  "filter_mutual_only": "Solo partidos mutuos",
   "source_listing": "Anuncio",
-  "source_job": "Empleo",
   "source_volunteering": "Voluntariado",
   "source_group": "Grupo",
   "empty_title_all": "Sin coincidencias aún",
@@ -29,5 +29,112 @@
     "title": "Coincidencias"
   },
   "filter_tabs_aria": "Filtro de fuente coincidente",
-  "loading": "Cargando coincidencias..."
+  "loading": "Cargando coincidencias...",
+  "banner": {
+    "no_coords_title": "Añade tu ubicación para ver coincidencias cercanas",
+    "no_coords_desc": "No podemos calcular coincidencias basadas en la distancia hasta que su perfil tenga una ubicación. Aún puedes ver coincidencias a continuación según otras señales.",
+    "paused_title": "El emparejamiento está en pausa",
+    "paused_desc": "No recibirás nuevas sugerencias ni notificaciones de coincidencias hasta que reanudes las coincidencias en tus preferencias.",
+    "mutual_title": "Mostrando coincidencias mutuas",
+    "mutual_desc": "Estas coincidencias son en ambos sentidos: tú encajas perfectamente con ellos y ellos encajan perfectamente contigo.",
+    "show_all": "Mostrar todos los partidos"
+  },
+  "card": {
+    "mutual": "partido mutuo",
+    "save": "Guardar partido",
+    "dismiss": "No interesado",
+    "view_group": "Ver grupo",
+    "distance_km": "{{value}} km",
+    "remote": "Remote",
+    "message": "Message",
+    "join": "Join",
+    "joined": "Joined"
+  },
+  "explanation": {
+    "ai_caption": "Explicación generada por IA basada en su perfil y actividad"
+  },
+  "breakdown": {
+    "title": "¿Por qué esta puntuación?",
+    "signals": {
+      "category": "Coincidencia de categoría",
+      "skill": "partido de habilidad",
+      "semantic": "Descripción similitud",
+      "activity": "Nivel de actividad",
+      "trust_tier": "Nivel de confianza",
+      "completion": "Tasa de finalización",
+      "proximity": "Proximity",
+      "availability": "Availability",
+      "reviews": "Reviews"
+    },
+    "pillars": {
+      "relevance": "Relevance",
+      "feasibility": "Feasibility",
+      "trust": "Trust"
+    }
+  },
+  "dismiss_reasons": {
+    "not_relevant": "No relevante",
+    "too_far": "demasiado lejos",
+    "already_done": "Ya hecho",
+    "not_my_skills": "No mis habilidades",
+    "not_interested": "No interesado",
+    "other": "Other"
+  },
+  "empty": {
+    "no_coordinates_title": "Necesitamos su ubicación para encontrar coincidencias",
+    "no_coordinates_description": "Agregue una ubicación a su perfil para que podamos encontrar listados, grupos y oportunidades cerca de usted.",
+    "set_location_cta": "Establece tu ubicación",
+    "no_listings_title": "Trabajos coincidentes de tus listados",
+    "no_listings_description": "Crea una lista para comenzar a encontrar personas, grupos y oportunidades que coincidan con lo que ofreces o necesitas.",
+    "create_listing_cta": "Crear un listado",
+    "adjust_preferences_cta": "Ajustar las preferencias de coincidencia"
+  },
+  "preferences": {
+    "subtitle": "Controle cómo Smart Matching encuentra conexiones y le notifica sobre ellas.",
+    "load_failed": "No se pudieron cargar tus preferencias de coincidencia",
+    "save": "Guardar preferencias",
+    "save_success": "Preferencias de partido guardadas",
+    "save_failed": "No se pudieron guardar las preferencias de coincidencia",
+    "unsaved_changes": "Tienes cambios sin guardar",
+    "pause": {
+      "title": "Pausar coincidencia",
+      "description": "Cuando esté en pausa, no recibirás sugerencias ni notificaciones de nuevas coincidencias.",
+      "active_description": "La coincidencia está en pausa: no recibirás nuevas sugerencias ni notificaciones hasta que la reanudes."
+    },
+    "thresholds": {
+      "title": "Distancia y calidad",
+      "no_location_title": "Agregue una ubicación para usar la coincidencia basada en la distancia",
+      "no_location_desc": "Establece tu ubicación en tu perfil para clasificar las coincidencias según lo cerca que estén de ti.",
+      "distance_label": "Distancia máxima",
+      "quality_label": "Calidad mínima de coincidencia",
+      "distance_value": "{{value}} km",
+      "quality_value": "{{value}}%"
+    },
+    "categories": {
+      "title": "Intereses de categoría",
+      "description": "Elija las categorías en las que le gustaría que lo emparejen. Deje todo sin marcar para que coincida en todas las categorías.",
+      "empty": "Aún no hay categorías disponibles."
+    },
+    "notifications": {
+      "frequency_label": "Frecuencia de resumen de coincidencias",
+      "hot_matches": "Alertas de partidos calientes",
+      "hot_matches_desc": "Reciba notificaciones de inmediato sobre coincidencias excepcionalmente fuertes.",
+      "mutual_matches": "Alertas de partidos mutuos",
+      "mutual_matches_desc": "Recibe notificaciones cuando una coincidencia sea en ambos sentidos.",
+      "title": "Notifications",
+      "daily": "Daily",
+      "fortnightly": "Fortnightly",
+      "monthly": "Monthly",
+      "never": "Never"
+    },
+    "page_title": "Match Preferences",
+    "page_meta_title": "Match Preferences",
+    "breadcrumb": "Preferences",
+    "heading": "Match Preferences"
+  },
+  "stats_source_types": "Tipos de Fuente",
+  "source_job": "Empleo",
+  "stats_mutual_matches": "Mutual Matches",
+  "filter_people_listings": "Listings",
+  "source_event": "Event"
 }

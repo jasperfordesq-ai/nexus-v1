@@ -38,6 +38,13 @@
   "member_status": "Membro",
   "private_title": "Gruppo privato",
   "public_title": "Gruppo pubblico",
+  "recommended": {
+    "title": "Consigliato per te",
+    "joined": "Gruppo unito",
+    "view": "View",
+    "join": "Join",
+    "score_chip": "{{score}}% match"
+  },
   "welcome": {
     "title": "Messaggio di benvenuto",
     "toggle_label": "Attiva il messaggio di benvenuto",

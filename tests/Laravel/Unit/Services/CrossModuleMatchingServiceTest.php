@@ -8,8 +8,8 @@ namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
 use App\Services\CrossModuleMatchingService;
+use App\Services\GroupMatchingService;
 use App\Services\SmartMatchingEngine;
-use App\Services\MatchLearningService;
 use Illuminate\Support\Facades\DB;
 use Mockery;
 
@@ -17,16 +17,18 @@ class CrossModuleMatchingServiceTest extends TestCase
 {
     private CrossModuleMatchingService $service;
     private $mockSmartMatching;
-    private $mockMatchLearning;
+    private $mockGroupMatching;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->mockSmartMatching = Mockery::mock(SmartMatchingEngine::class);
-        $this->mockMatchLearning = Mockery::mock(MatchLearningService::class);
+        $this->mockGroupMatching = Mockery::mock(GroupMatchingService::class);
+        // Default: no group matches unless a test overrides.
+        $this->mockGroupMatching->shouldReceive('getMatchesForUser')->andReturn([])->byDefault();
         $this->service = new CrossModuleMatchingService(
             $this->mockSmartMatching,
-            $this->mockMatchLearning
+            $this->mockGroupMatching
         );
     }
 
@@ -78,8 +80,9 @@ class CrossModuleMatchingServiceTest extends TestCase
                 'match_breakdown' => ['skills' => 40, 'location' => 40],
             ],
         ]);
-        $this->mockMatchLearning->shouldReceive('getHistoricalBoost')->andReturn(0);
 
+        // Explanation join query (match_cache) — none cached.
+        DB::shouldReceive('select')->andReturn([]);
         DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('pluck')->andReturn(collect([]));

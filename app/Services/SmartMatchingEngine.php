@@ -7,6 +7,10 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Services\Matching\CandidateRetriever;
+use App\Services\Matching\KeywordExtractor;
+use App\Services\Matching\MatchScorer;
+use App\Services\Matching\TenantMatchingContext;
 use App\Services\SafeguardingTriggerService;
 use App\Services\VettingService;
 use Illuminate\Support\Facades\Cache;
@@ -16,15 +20,23 @@ use Illuminate\Support\Facades\Log;
 /**
  * SmartMatchingEngine — Multi-dimensional matching algorithm.
  *
- * 6-signal scoring pipeline:
+ * Candidate retrieval goes through {@see CandidateRetriever}, which enforces
+ * the HARD gates (geo/service_type, missing-coords degraded mode, dormancy,
+ * dismissals) before any scoring happens. Physical listings beyond the
+ * effective max distance are never scored; remote_only/hybrid listings are
+ * distance-exempt.
+ *
+ * 6-signal scoring pipeline (weighted sum, 0–100):
  *   1. Category Match (25%) — same/related category
  *   2. Skill Complementarity (20%) — Jaccard + proficiency weighting
- *   3. Proximity (25%) — Haversine with piecewise linear decay
+ *   3. Proximity (25%) — Haversine with piecewise linear decay,
+ *      service_type-aware (remote_only fixed 0.9)
  *   4. Temporal Relevance (10%) — exponential freshness decay
  *   5. Reciprocity Potential (15%) — mutual exchange opportunity
  *   6. Quality Signals (5%) — description, images, ratings
  *
- * Post-scoring boosts: semantic embedding, KNN member recs, ML feedback.
+ * Post-scoring boosts (bounded additive on the 0–100 scale): semantic
+ * embedding +8, KNN member recs +6.
  */
 class SmartMatchingEngine
 {
@@ -52,15 +64,19 @@ class SmartMatchingEngine
     private const QUALITY_MIN_DESCRIPTION = 50;
     private const QUALITY_RATING_THRESHOLD = 4.0;
 
+    // Cache warming: per-tenant wall-clock budget per cron slot (seconds)
+    private const WARM_TIME_BUDGET_SECONDS = 60;
+
     // In-process caches
     private array $userDataCache = [];
     private ?array $configCache = null;
-    private ?bool $userBlocksTableExistsCache = null;
     private array $categoryCache = [];
 
     public function __construct(
         private readonly EmbeddingService $embeddingService,
         private readonly VettingService $vettingService,
+        private readonly CandidateRetriever $candidateRetriever,
+        private readonly MatchLearningService $matchLearningService,
     ) {}
 
     /**
@@ -92,6 +108,47 @@ class SmartMatchingEngine
                 'regional_km' => self::PROXIMITY_REGIONAL,
                 'max_km' => self::PROXIMITY_MAX,
             ],
+            'gates' => [
+                // Hard exclusion of physical listings beyond the effective max
+                // distance (remote_only/hybrid are always exempt).
+                'geo_hard_gate' => true,
+                // Searcher without coordinates: 'remote_only' (default) limits
+                // them to distance-independent listings + a set-location prompt;
+                // 'tenant_wide' restores legacy nationwide reach.
+                'missing_coords_mode' => 'remote_only',
+                // Exclude listings whose owner hasn't been active in N days.
+                'dormancy_days' => 90,
+                // Reserved for the owner-level dismissal suppression gate.
+                'owner_dismissal_threshold' => 3,
+            ],
+            // v2 = three-pillar geometric-mean scorer (MatchScorer);
+            // 1 = legacy weighted-sum path, kept for one release as rollback.
+            'engine_version' => 2,
+            'pillars' => [
+                'relevance' => 0.45,
+                'feasibility' => 0.35,
+                'trust' => 0.20,
+            ],
+            'signals' => [
+                'relevance' => ['category' => 0.30, 'skill' => 0.35, 'semantic' => 0.35],
+                'feasibility' => ['proximity' => 0.45, 'availability' => 0.20, 'activity' => 0.35],
+                'trust' => ['reviews' => 0.45, 'trust_tier' => 0.25, 'completion' => 0.30],
+            ],
+            'adjustments' => [
+                'mutual_bonus' => 8,
+                'freshness_max' => 4,
+                'semantic_boost' => 8,
+                'knn_boost' => 6,
+                'owner_cap_per_page' => 2,
+            ],
+            // Tenant-admin intent for the AI layer. Execution is additionally
+            // gated by AIServiceFactory::isEnabled() (per-tenant keys + cost
+            // limits), so these being true costs nothing on AI-less tenants.
+            'ai' => [
+                'semantic_signal' => true,
+                'llm_explanations' => true,
+                'explanation_top_n' => 5,
+            ],
         ];
 
         $tenantId = TenantContext::getId();
@@ -101,7 +158,19 @@ class SmartMatchingEngine
             if ($configJson) {
                 $configArr = json_decode($configJson, true);
                 if (is_array($configArr) && isset($configArr['algorithms']['smart_matching'])) {
-                    $this->configCache = array_merge($defaults, $configArr['algorithms']['smart_matching']);
+                    $tenantCfg = $configArr['algorithms']['smart_matching'];
+                    $merged = array_merge($defaults, $tenantCfg);
+                    // Nested blocks merge key-by-key so a tenant that has only
+                    // saved e.g. weights doesn't wipe the gates defaults (and a
+                    // partial gates block keeps default values for missing keys).
+                    // ('signals' merges per-pillar inside MatchScorer itself.)
+                    foreach (['weights', 'proximity', 'gates', 'pillars', 'adjustments', 'ai'] as $block) {
+                        $merged[$block] = array_merge(
+                            $defaults[$block],
+                            is_array($tenantCfg[$block] ?? null) ? $tenantCfg[$block] : []
+                        );
+                    }
+                    $this->configCache = $merged;
                     return $this->configCache;
                 }
             }
@@ -120,7 +189,6 @@ class SmartMatchingEngine
     {
         $this->configCache = null;
         $this->userDataCache = [];
-        $this->userBlocksTableExistsCache = null;
         $this->categoryCache = [];
     }
 
@@ -174,12 +242,30 @@ class SmartMatchingEngine
             [$tenantId, $tenantId]
         );
 
+        $hasV2Columns = $this->matchCacheHasV2Columns();
+
+        // Per-tenant wall-clock budget: a heavy tenant must not starve the
+        // rest of the 30-min cron tick. Users not reached stay uncached and
+        // are picked up by the next slot (the warm query orders by recency
+        // and skips fresh cache entries).
+        $startedAt = microtime(true);
+
         foreach ($users as $row) {
+            if ((microtime(true) - $startedAt) > self::WARM_TIME_BUDGET_SECONDS) {
+                Log::info('SmartMatchingEngine::warmUpCache time budget reached — carrying over', [
+                    'tenant_id' => $tenantId,
+                    'processed' => $results['processed'],
+                    'remaining' => count($users) - $results['processed'],
+                ]);
+                break;
+            }
+
             $userId = (int) $row->id;
             $results['processed']++;
 
             try {
-                $matches = $this->findMatchesForUser($userId, ['limit' => 20]);
+                $runMeta = null;
+                $matches = $this->findMatchesForUser($userId, ['limit' => 20], $runMeta);
             } catch (\Throwable $e) {
                 Log::warning('SmartMatchingEngine::warmUpCache findMatches failed', [
                     'user_id' => $userId, 'tenant_id' => $tenantId, 'error' => $e->getMessage(),
@@ -192,9 +278,11 @@ class SmartMatchingEngine
                 if ($listingId <= 0) {
                     continue;
                 }
-                // findMatchesForUser scores are 0–1.0; match_cache.match_score is
-                // 0–100 (per the column comment and the analytics' "score >= 80").
-                $score = round(min(1.0, max(0.0, (float) ($match['match_score'] ?? 0))) * 100, 2);
+                // findMatchesForUser scores are 0–100, same scale as
+                // match_cache.match_score. (A former min(1.0, …) * 100 clamp
+                // here wrote every cached entry as exactly 100.00, feeding
+                // garbage to analytics and hot-match notifications.)
+                $score = round(min(100.0, max(0.0, (float) ($match['match_score'] ?? 0))), 2);
                 $distance = (isset($match['distance_km']) && is_numeric($match['distance_km'])
                     && $match['distance_km'] >= 0 && $match['distance_km'] < 999999)
                     ? round((float) $match['distance_km'], 2)
@@ -207,18 +295,52 @@ class SmartMatchingEngine
                 try {
                     // ON DUPLICATE KEY UPDATE deliberately leaves `status` untouched
                     // so a user's interaction state (viewed/contacted/…) survives a re-warm.
-                    DB::insert(
-                        "INSERT INTO match_cache
-                            (user_id, listing_id, tenant_id, match_score, distance_km, match_type, match_reasons, status, created_at, expires_at)
-                         VALUES (?, ?, ?, ?, ?, ?, ?, 'new', NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))
-                         ON DUPLICATE KEY UPDATE
-                            match_score = VALUES(match_score),
-                            distance_km = VALUES(distance_km),
-                            match_type = VALUES(match_type),
-                            match_reasons = VALUES(match_reasons),
-                            expires_at = DATE_ADD(NOW(), INTERVAL 7 DAY)",
-                        [$userId, $listingId, $tenantId, $score, $distance, $type, $reasons]
-                    );
+                    if ($hasV2Columns) {
+                        $breakdown = isset($match['score_breakdown']) && is_array($match['score_breakdown'])
+                            ? (json_encode($match['score_breakdown'], JSON_UNESCAPED_UNICODE) ?: null)
+                            : null;
+                        $gateFlags = [];
+                        if (($match['service_type'] ?? '') === 'remote_only') {
+                            $gateFlags[] = 'remote_exempt';
+                        }
+                        if (!empty($runMeta['degraded'])) {
+                            $gateFlags[] = 'degraded_mode';
+                        }
+                        $algorithmVersion = (string) ($match['algorithm_version'] ?? 'v1');
+
+                        DB::insert(
+                            "INSERT INTO match_cache
+                                (user_id, listing_id, tenant_id, match_score, distance_km, match_type, match_reasons,
+                                 score_breakdown, gate_flags, algorithm_version, status, created_at, expires_at)
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))
+                             ON DUPLICATE KEY UPDATE
+                                match_score = VALUES(match_score),
+                                distance_km = VALUES(distance_km),
+                                match_type = VALUES(match_type),
+                                match_reasons = VALUES(match_reasons),
+                                score_breakdown = VALUES(score_breakdown),
+                                gate_flags = VALUES(gate_flags),
+                                algorithm_version = VALUES(algorithm_version),
+                                expires_at = DATE_ADD(NOW(), INTERVAL 7 DAY)",
+                            [
+                                $userId, $listingId, $tenantId, $score, $distance, $type, $reasons,
+                                $breakdown, $gateFlags !== [] ? implode(',', $gateFlags) : null, $algorithmVersion,
+                            ]
+                        );
+                    } else {
+                        DB::insert(
+                            "INSERT INTO match_cache
+                                (user_id, listing_id, tenant_id, match_score, distance_km, match_type, match_reasons, status, created_at, expires_at)
+                             VALUES (?, ?, ?, ?, ?, ?, ?, 'new', NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY))
+                             ON DUPLICATE KEY UPDATE
+                                match_score = VALUES(match_score),
+                                distance_km = VALUES(distance_km),
+                                match_type = VALUES(match_type),
+                                match_reasons = VALUES(match_reasons),
+                                expires_at = DATE_ADD(NOW(), INTERVAL 7 DAY)",
+                            [$userId, $listingId, $tenantId, $score, $distance, $type, $reasons]
+                        );
+                    }
                     $results['cached']++;
                 } catch (\Throwable $e) {
                     Log::warning('SmartMatchingEngine::warmUpCache cache write failed', [
@@ -237,25 +359,70 @@ class SmartMatchingEngine
 
     /**
      * Find matches for a user based on their listings.
+     *
+     * @param array|null $meta Filled with run metadata for the API layer:
+     *   needs_location (searcher has no coords), degraded (+reason — remote-only
+     *   degraded mode active), has_active_listings (false → cold-start path).
      */
-    public function findMatchesForUser(int $userId, array $options = []): array
+    public function findMatchesForUser(int $userId, array $options = [], ?array &$meta = null): array
     {
         $tenantId = TenantContext::getId();
         $config = $this->getConfig();
 
         $preferences = $this->getUserPreferences($userId);
-        $maxDistance = $options['max_distance'] ?? $preferences['max_distance_km'] ?? $config['max_distance_km'];
+        // Effective ceiling: the user's preference can tighten the tenant max
+        // but never exceed it.
+        $tenantMax = (float) $config['max_distance_km'];
+        $userMax = isset($preferences['max_distance_km']) ? (float) $preferences['max_distance_km'] : null;
+        $maxDistance = (float) ($options['max_distance'] ?? ($userMax !== null && $userMax > 0 ? min($userMax, $tenantMax) : $tenantMax));
         $minScore = $options['min_score'] ?? $preferences['min_match_score'] ?? $config['min_match_score'];
         $limit = $options['limit'] ?? 20;
         $categoryFilter = $options['categories'] ?? $preferences['categories'] ?? null;
 
-        $userData = $this->getUserData($userId);
-        if (!$userData) {
+        // Member opt-out: paused matching returns nothing (and the cron warm
+        // therefore caches nothing new for them).
+        if (!empty($preferences['matching_paused']) && empty($options['ignore_paused'])) {
+            $meta = [
+                'needs_location' => false,
+                'degraded' => false,
+                'degraded_reason' => null,
+                'has_active_listings' => true,
+                'paused' => true,
+            ];
             return [];
         }
 
+        $userData = $this->getUserData($userId);
+        if (!$userData) {
+            $meta = [
+                'needs_location' => false,
+                'degraded' => false,
+                'degraded_reason' => null,
+                'has_active_listings' => false,
+                'paused' => false,
+            ];
+            return [];
+        }
+
+        $userLat = $this->coordOrNull($userData['latitude'] ?? null);
+        $userLon = $this->coordOrNull($userData['longitude'] ?? null);
+        $hasCoords = $userLat !== null && $userLon !== null;
+        $gates = $config['gates'];
+        $degraded = !$hasCoords
+            && (bool) ($gates['geo_hard_gate'] ?? true)
+            && (($gates['missing_coords_mode'] ?? 'remote_only') !== 'tenant_wide');
+
+        $meta = [
+            'needs_location' => !$hasCoords,
+            'degraded' => $degraded,
+            'degraded_reason' => !$hasCoords ? 'no_coordinates' : null,
+            'has_active_listings' => true,
+            'paused' => false,
+        ];
+
         $userListings = $this->getUserListings($userId);
         if (empty($userListings)) {
+            $meta['has_active_listings'] = false;
             return $this->getColdStartMatches($userId, $userData, $maxDistance, $limit);
         }
 
@@ -283,9 +450,9 @@ class SmartMatchingEngine
                 continue;
             }
             $uniqueCatIds = array_values(array_unique($categoryIds));
-            $candidatesByTargetType[$targetType] = $this->getCandidateListingsBatch(
+            $candidatesByTargetType[$targetType] = $this->candidateRetriever->retrieveBatch(
                 $tenantId, $userId, $targetType, $uniqueCatIds,
-                $categoryFilter, $userData['latitude'], $userData['longitude'], $maxDistance
+                $categoryFilter, $userLat, $userLon, $maxDistance, $gates
             );
         }
 
@@ -301,6 +468,74 @@ class SmartMatchingEngine
                 );
             }
         }
+
+        // v2 (default): three-pillar geometric-mean scorer fed by ONE batched
+        // context load — the v1 path fired a reciprocity query per candidate.
+        // engine_version=1 keeps the legacy weighted-sum path as a rollback.
+        $engineVersion = (int) ($config['engine_version'] ?? 2);
+        $scorer = null;
+        $context = null;
+        if ($engineVersion >= 2) {
+            try {
+                $ownerIds = [];
+                foreach ($candidatesByTargetType as $list) {
+                    foreach ($list as $cand) {
+                        $ownerIds[] = (int) ($cand['user_id'] ?? 0);
+                    }
+                }
+                $context = TenantMatchingContext::load(
+                    $tenantId, $userId, $ownerIds, $userListings, $preferences, $userData
+                );
+                $scorer = new MatchScorer($config, $context->categories);
+            } catch (\Throwable $e) {
+                Log::warning('[SmartMatchingEngine] v2 context load failed — falling back to v1 scorer', [
+                    'user_id' => $userId, 'error' => $e->getMessage(),
+                ]);
+                $scorer = null;
+            }
+        }
+
+        // AI semantic signal (v2): embedding cosine per candidate becomes a
+        // true relevance-pillar signal instead of the old blunt ×-boost.
+        // listing↔listing similarity, blended with 0.8 × profile↔profile
+        // similarity (helps members with rich bios and few listings).
+        // Every step degrades to the keyword fallback inside MatchScorer.
+        $semanticByListing = [];
+        $profileSimByOwner = [];
+        if ($scorer !== null && (bool) ($config['ai']['semantic_signal'] ?? true)) {
+            try {
+                // The enable check itself queries ai_settings — a hiccup there
+                // must degrade to the keyword fallback, never break matching.
+                if (\App\Services\AI\AIServiceFactory::isEnabled()) {
+                    $firstListingId = (int) ($userListings[0]['id'] ?? 0);
+                    if ($firstListingId > 0) {
+                        $semanticByListing = $this->embeddingService->findSimilarWithScores(
+                            $firstListingId, 'listing', $tenantId, 200
+                        );
+                    }
+                    $profileSimByOwner = $this->embeddingService->findSimilarWithScores(
+                        $userId, 'user', $tenantId, 200
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::debug('[SmartMatchingEngine] semantic signal unavailable: ' . $e->getMessage());
+            }
+        }
+
+        $listingKeywordCache = [];
+        $extractListingKeywords = function (array $listing) use (&$listingKeywordCache): array {
+            $key = (int) ($listing['id'] ?? 0);
+            if ($key > 0 && isset($listingKeywordCache[$key])) {
+                return $listingKeywordCache[$key];
+            }
+            $keywords = KeywordExtractor::extract(
+                ($listing['title'] ?? '') . ' ' . ($listing['description'] ?? '')
+            );
+            if ($key > 0) {
+                $listingKeywordCache[$key] = $keywords;
+            }
+            return $keywords;
+        };
 
         foreach ($userListings as $myListing) {
             $targetType = ($myListing['type'] === 'offer') ? 'request' : 'offer';
@@ -319,7 +554,31 @@ class SmartMatchingEngine
                     continue;
                 }
 
-                $matchResult = $this->calculateMatchScore($userData, $userListings, $myListing, $candidate);
+                if ($scorer !== null && $context !== null) {
+                    $myPrepared = $myListing;
+                    $myPrepared['keywords'] = $extractListingKeywords($myListing);
+                    $candPrepared = $candidate;
+                    $candPrepared['keywords'] = $extractListingKeywords($candidate);
+
+                    $cosine = null;
+                    $listingSim = $semanticByListing[(int) $candidate['id']] ?? null;
+                    $ownerSim = $profileSimByOwner[(int) ($candidate['user_id'] ?? 0)] ?? null;
+                    if ($listingSim !== null || $ownerSim !== null) {
+                        $cosine = max((float) ($listingSim ?? 0.0), 0.8 * (float) ($ownerSim ?? 0.0));
+                    }
+
+                    $scoreResult = $scorer->score(
+                        $context->searcher,
+                        $myPrepared,
+                        $candPrepared,
+                        $context->owner((int) ($candidate['user_id'] ?? 0)),
+                        $cosine
+                    );
+                    $matchResult = $scoreResult->toLegacyArray();
+                    $candidate['score_breakdown'] = $scoreResult->toBreakdownArray();
+                } else {
+                    $matchResult = $this->calculateMatchScore($userData, $userListings, $myListing, $candidate);
+                }
 
                 if ($matchResult['score'] >= $minScore) {
                     $candidate['match_score'] = $matchResult['score'];
@@ -328,6 +587,7 @@ class SmartMatchingEngine
                     $candidate['distance_km'] = $matchResult['distance'];
                     $candidate['matched_listing'] = $myListing['title'];
                     $candidate['match_type'] = $matchResult['type'];
+                    $candidate['algorithm_version'] = $scorer !== null ? 'v2' : 'v1';
 
                     $matches[] = $candidate;
                     $seenIds[] = $candidate['id'];
@@ -335,8 +595,20 @@ class SmartMatchingEngine
             }
         }
 
-        // Semantic embedding boost
+        // Learning + diversity adjustments — moved INSIDE the engine so warmed
+        // cache entries include them (they used to be applied after the cache
+        // in CrossModuleMatchingService, so notifications/analytics never saw
+        // them). Batched: three queries total, not per-candidate.
         if (!empty($matches)) {
+            $matches = $this->applyLearningAndDiversityAdjustments($matches, $userId, $tenantId, $config);
+        }
+
+        // Semantic embedding boost — bounded additive on the 0–100 scale.
+        // (The former min(1.0, score × 1.3) treated the score as 0–1 and
+        // collapsed every boosted match to 1/100, sinking the BEST matches.)
+        // Skipped when the semantic PILLAR signal already consumed the
+        // embeddings — that would double-count the same evidence.
+        if (!empty($matches) && empty($semanticByListing)) {
             $userListingIds = array_column($userListings, 'id');
             $firstListingId = $userListingIds[0] ?? null;
 
@@ -346,23 +618,28 @@ class SmartMatchingEngine
                 );
                 $semanticSet = array_flip($semanticSimilar);
 
+                $semanticBoost = (float) ($config['adjustments']['semantic_boost'] ?? 8);
                 foreach ($matches as &$match) {
                     if (isset($semanticSet[$match['id'] ?? 0])) {
-                        $match['match_score'] = min(1.0, $match['match_score'] * 1.3);
+                        $match['match_score'] = min(100.0, (float) $match['match_score'] + $semanticBoost);
+                        $match['match_reasons'][] = 'Similar to your listing';
                     }
                 }
                 unset($match);
             }
         }
 
-        // KNN member recommendation boost
+        // KNN member recommendation boost — bounded additive (same scale fix).
+        // recs_members_* holds recommended MEMBER ids, so key on the listing's
+        // owner (the old code compared listing ids against member ids).
         $knnKey = "recs_members_{$tenantId}_{$userId}";
         $knnRecs = Cache::get($knnKey);
         if ($knnRecs !== null && !empty($knnRecs)) {
             $knnSet = array_flip($knnRecs);
+            $knnBoost = (float) ($config['adjustments']['knn_boost'] ?? 6);
             foreach ($matches as &$match) {
-                if (isset($knnSet[$match['id'] ?? 0])) {
-                    $match['match_score'] = min(1.0, ($match['match_score'] ?? 0) * 1.4);
+                if (isset($knnSet[$match['user_id'] ?? 0])) {
+                    $match['match_score'] = min(100.0, (float) ($match['match_score'] ?? 0) + $knnBoost);
                 }
             }
             unset($match);
@@ -370,7 +647,126 @@ class SmartMatchingEngine
 
         usort($matches, fn ($a, $b) => $b['match_score'] <=> $a['match_score']);
 
-        return array_slice($matches, 0, $limit);
+        // Anti-popularity page cap: no owner monopolises a result page. The
+        // score penalty (applyLearningAndDiversityAdjustments) handles rank;
+        // this handles raw slots.
+        $ownerCap = max(1, (int) ($config['adjustments']['owner_cap_per_page'] ?? 2));
+        $capped = [];
+        $perOwner = [];
+        foreach ($matches as $match) {
+            $owner = (int) ($match['user_id'] ?? 0);
+            if ($owner > 0 && ($perOwner[$owner] ?? 0) >= $ownerCap) {
+                continue;
+            }
+            $perOwner[$owner] = ($perOwner[$owner] ?? 0) + 1;
+            $capped[] = $match;
+        }
+
+        return array_slice($capped, 0, $limit);
+    }
+
+    /**
+     * Bounded additive adjustments computed from the searcher's history and
+     * tenant-wide exposure counts (three batched queries, no per-candidate
+     * lookups):
+     *
+     *  - learning: past interactions with the owner (±10) + category affinity
+     *    (±5), clamped ±15 — the MatchLearningService signals
+     *  - dismissed-similar: −8 when the searcher previously dismissed a
+     *    listing by the same owner in the same category
+     *  - anti-popularity: −min(6, 2·ln(1+n)) where n = times this owner
+     *    appeared in the tenant's match_cache in the last 7 days
+     */
+    private function applyLearningAndDiversityAdjustments(array $matches, int $userId, int $tenantId, array $config): array
+    {
+        $ownerIds = array_values(array_filter(array_unique(array_map(
+            fn ($m) => (int) ($m['user_id'] ?? 0),
+            $matches
+        ))));
+        if (empty($ownerIds)) {
+            return $matches;
+        }
+
+        $ownerBoosts = [];
+        $affinities = [];
+        try {
+            $ownerBoosts = $this->matchLearningService->getOwnerInteractionBoosts($userId, $ownerIds);
+            $affinities = $this->matchLearningService->getCategoryAffinities($userId);
+        } catch (\Throwable $e) {
+            // Learning signals are best-effort.
+        }
+
+        // Owner+category pairs the searcher dismissed in the last 90 days.
+        $dismissedPairs = [];
+        try {
+            $placeholders = implode(',', array_fill(0, count($ownerIds), '?'));
+            $rows = DB::select(
+                "SELECT DISTINCT l.user_id as owner_id, l.category_id
+                 FROM match_dismissals md
+                 JOIN listings l ON md.listing_id = l.id AND l.tenant_id = md.tenant_id
+                 WHERE md.tenant_id = ? AND md.user_id = ?
+                   AND md.created_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)
+                   AND l.user_id IN ($placeholders)",
+                array_merge([$tenantId, $userId], $ownerIds)
+            );
+            foreach ($rows as $row) {
+                $dismissedPairs[((int) $row->owner_id) . ':' . ((int) ($row->category_id ?? 0))] = true;
+            }
+        } catch (\Throwable $e) {
+            // Table may not exist — non-fatal.
+        }
+
+        // Tenant-wide owner exposure over the last 7 days (popularity bias guard).
+        $popularity = [];
+        try {
+            $placeholders = implode(',', array_fill(0, count($ownerIds), '?'));
+            $rows = DB::select(
+                "SELECT l.user_id as owner_id, COUNT(*) as cnt
+                 FROM match_cache mc
+                 JOIN listings l ON mc.listing_id = l.id
+                 WHERE mc.tenant_id = ? AND mc.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                   AND l.user_id IN ($placeholders)
+                 GROUP BY l.user_id",
+                array_merge([$tenantId], $ownerIds)
+            );
+            foreach ($rows as $row) {
+                $popularity[(int) $row->owner_id] = (int) $row->cnt;
+            }
+        } catch (\Throwable $e) {
+            // Non-fatal.
+        }
+
+        foreach ($matches as &$match) {
+            $owner = (int) ($match['user_id'] ?? 0);
+            $categoryId = (int) ($match['category_id'] ?? 0);
+            $applied = [];
+
+            $learning = ($ownerBoosts[$owner] ?? 0.0) + (($affinities[$categoryId] ?? 0.0) * 5.0);
+            $learning = max(-15.0, min(15.0, $learning));
+            if ($learning != 0.0) {
+                $applied['learning'] = round($learning, 2);
+            }
+
+            if (isset($dismissedPairs[$owner . ':' . $categoryId])) {
+                $applied['dismissed_similar'] = -8.0;
+            }
+
+            $exposure = $popularity[$owner] ?? 0;
+            if ($exposure > 0) {
+                $penalty = -min(6.0, 2.0 * log(1 + $exposure));
+                $applied['popularity'] = round($penalty, 2);
+            }
+
+            if ($applied !== []) {
+                $match['match_score'] = max(0.0, min(100.0, (float) $match['match_score'] + array_sum($applied)));
+                if (isset($match['score_breakdown']['adjustments']) && is_array($match['score_breakdown']['adjustments'])) {
+                    $match['score_breakdown']['adjustments'] += $applied;
+                }
+            }
+        }
+        unset($match);
+
+        return $matches;
     }
 
     /**
@@ -436,17 +832,29 @@ class SmartMatchingEngine
             $reasons[] = "Skills match your expertise";
         }
 
-        // 3. Proximity
+        // 3. Proximity — service_type aware. Remote listings score a fixed 0.9
+        // (distance is irrelevant to them); unknown distance is neutral for
+        // hybrid and a heavy penalty for physical listings.
+        $serviceType = $candidateListing['service_type'] ?? 'physical_only';
         $distance = $this->calculateDistance(
             $userData['latitude'] ?? 0, $userData['longitude'] ?? 0,
             $candidateListing['latitude'] ?? $candidateListing['author_latitude'] ?? 0,
             $candidateListing['longitude'] ?? $candidateListing['author_longitude'] ?? 0
         );
-        $scores['proximity'] = $this->calculateProximityScore($distance);
-        if ($distance <= self::PROXIMITY_WALKING) {
-            $reasons[] = sprintf("Very close: %.1f km away", $distance);
-        } elseif ($distance <= self::PROXIMITY_LOCAL) {
-            $reasons[] = sprintf("Nearby: %.1f km away", $distance);
+        $hasDistance = $distance < PHP_FLOAT_MAX;
+
+        if ($serviceType === 'remote_only') {
+            $scores['proximity'] = 0.9;
+            $reasons[] = "Can be done remotely";
+        } elseif (!$hasDistance) {
+            $scores['proximity'] = ($serviceType === 'hybrid') ? 0.5 : 0.05;
+        } else {
+            $scores['proximity'] = $this->calculateProximityScore($distance);
+            if ($distance <= self::PROXIMITY_WALKING) {
+                $reasons[] = sprintf("Very close: %.1f km away", $distance);
+            } elseif ($distance <= self::PROXIMITY_LOCAL) {
+                $reasons[] = sprintf("Nearby: %.1f km away", $distance);
+            }
         }
 
         // 4. Freshness
@@ -480,8 +888,11 @@ class SmartMatchingEngine
             'score' => $finalScore,
             'reasons' => $reasons,
             'breakdown' => $scores,
-            'distance' => round($distance, 1),
+            // NULL when unresolvable — the old PHP_FLOAT_MAX leaked a 1.8e308
+            // "distance" into the API and cache layers.
+            'distance' => $hasDistance ? round($distance, 1) : null,
             'type' => $matchType,
+            'service_type' => $serviceType,
         ];
     }
 
@@ -542,17 +953,6 @@ class SmartMatchingEngine
         }
 
         return 0.15;
-    }
-
-    private function stemWord(string $word): string
-    {
-        $len = strlen($word);
-        if ($len > 6 && substr($word, -3) === 'ing') return substr($word, 0, $len - 3);
-        if ($len > 5 && substr($word, -2) === 'ed') return substr($word, 0, $len - 2);
-        if ($len > 5 && substr($word, -2) === 'er') return substr($word, 0, $len - 2);
-        if ($len > 4 && substr($word, -2) === 'es') return substr($word, 0, $len - 2);
-        if ($len > 4 && substr($word, -1) === 's' && substr($word, -2) !== 'ss') return substr($word, 0, $len - 1);
-        return $word;
     }
 
     private function calculateSkillScore(array $userData, array $myListing, array $candidate): float
@@ -697,58 +1097,19 @@ class SmartMatchingEngine
     }
 
     /**
-     * Extract keywords from text with Porter stemming.
+     * Extract keywords from text with light stemming. Delegates to the shared
+     * {@see KeywordExtractor} so the batch context loader and pure scorer
+     * normalise text identically. Kept public for BC (CrossModuleMatchingService
+     * and others call it).
      */
     public function extractKeywords(string $text): array
     {
-        $text = strtolower($text);
-        $stopWords = [
-            'the','a','an','and','or','but','in','on','at','to','for','of','with','by','from',
-            'is','are','was','were','be','been','being','have','has','had','do','does','did',
-            'will','would','could','should','may','might','must','shall','can','need','i','you',
-            'he','she','it','we','they','my','your','his','her','its','our','their','this',
-            'that','these','those','am','help','looking','need','want','offer','request',
-        ];
-
-        preg_match_all('/\b[a-z]{3,}\b/', $text, $matches);
-        $words = $matches[0] ?? [];
-
-        static $twoCharDomainTerms = [
-            'ai','ml','ux','ui','go','vr','ar','it','hr','pr','qa','db','uk','eu','us','r',
-        ];
-        preg_match_all('/\b[a-z]{1,2}\b/', $text, $shortMatches);
-        foreach ($shortMatches[0] ?? [] as $short) {
-            if (in_array($short, $twoCharDomainTerms, true)) {
-                $words[] = $short;
-            }
-        }
-
-        $keywords = array_diff($words, $stopWords);
-        $keywords = array_map([$this, 'stemWord'], $keywords);
-        $keywords = array_unique($keywords);
-
-        return array_values($keywords);
+        return KeywordExtractor::extract($text);
     }
 
     // =========================================================================
     // DATA LOADING
     // =========================================================================
-
-    private function userBlocksTableExists(): bool
-    {
-        if ($this->userBlocksTableExistsCache !== null) {
-            return $this->userBlocksTableExistsCache;
-        }
-
-        try {
-            DB::selectOne("SELECT 1 FROM user_blocks LIMIT 1");
-            $this->userBlocksTableExistsCache = true;
-        } catch (\Exception $e) {
-            $this->userBlocksTableExistsCache = false;
-        }
-
-        return $this->userBlocksTableExistsCache;
-    }
 
     private function getUserData(int $userId): ?array
     {
@@ -834,194 +1195,30 @@ class SmartMatchingEngine
         ];
     }
 
-    private function getCandidateListings(
-        int $tenantId, int $excludeUserId, string $targetType, ?int $categoryId,
-        ?array $categoryFilter, ?float $userLat, ?float $userLon, float $maxDistance
-    ): array {
-        $params = [$tenantId, $targetType, $excludeUserId];
-
-        $sql = "SELECT l.*,
-                       u.first_name, u.last_name, u.avatar_url, u.location as author_location,
-                       u.latitude as author_latitude, u.longitude as author_longitude,
-                       u.is_verified as author_verified,
-                       TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))) as user_name,
-                       (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id) as author_rating,
-                       c.name as category_name, c.color as category_color";
-
-        if ($userLat && $userLon) {
-            $sql .= ",
-                (6371 * acos(
-                    cos(radians(?)) * cos(radians(COALESCE(l.latitude, u.latitude, 0))) *
-                    cos(radians(COALESCE(l.longitude, u.longitude, 0)) - radians(?)) +
-                    sin(radians(?)) * sin(radians(COALESCE(l.latitude, u.latitude, 0)))
-                )) as distance_km";
-            $params = array_merge([$userLat, $userLon, $userLat], $params);
-        }
-
-        $sql .= " FROM listings l
-                  JOIN users u ON l.user_id = u.id
-                  LEFT JOIN categories c ON l.category_id = c.id
-                  WHERE l.tenant_id = ? AND l.type = ? AND l.status = 'active' AND l.user_id != ?
-                  AND u.status NOT IN ('banned', 'suspended')";
-
-        if ($this->userBlocksTableExists()) {
-            $sql .= "
-                  AND l.user_id NOT IN (SELECT blocked_user_id FROM user_blocks WHERE tenant_id = ? AND user_id = ?)
-                  AND l.user_id NOT IN (SELECT user_id FROM user_blocks WHERE tenant_id = ? AND blocked_user_id = ?)";
-            $params[] = $tenantId;
-            $params[] = $excludeUserId;
-            $params[] = $tenantId;
-            $params[] = $excludeUserId;
-        }
-
-        if ($categoryId) {
-            $sql .= " AND l.category_id = ?";
-            $params[] = $categoryId;
-        } elseif ($categoryFilter && !empty($categoryFilter)) {
-            $placeholders = implode(',', array_fill(0, count($categoryFilter), '?'));
-            $sql .= " AND l.category_id IN ($placeholders)";
-            $params = array_merge($params, $categoryFilter);
-        }
-
-        if ($userLat && $userLon) {
-            $sql .= " HAVING distance_km <= ?";
-            $params[] = $maxDistance;
-            $sql .= " ORDER BY distance_km ASC";
-        } else {
-            $sql .= " ORDER BY l.created_at DESC";
-        }
-
-        $sql .= " LIMIT 50";
-
-        return array_map(fn ($row) => (array) $row, DB::select($sql, $params));
-    }
-
-    /**
-     * Batch variant of getCandidateListings — accepts an array of category_ids and
-     * returns candidates matching ANY of them. Caller groups by category in PHP.
-     * Mirrors getCandidateListings logic but uses IN clause instead of single-id match.
-     */
-    private function getCandidateListingsBatch(
-        int $tenantId, int $excludeUserId, string $targetType, array $categoryIds,
-        ?array $categoryFilter, ?float $userLat, ?float $userLon, float $maxDistance
-    ): array {
-        $params = [$tenantId, $targetType, $excludeUserId];
-
-        $sql = "SELECT l.*,
-                       u.first_name, u.last_name, u.avatar_url, u.location as author_location,
-                       u.latitude as author_latitude, u.longitude as author_longitude,
-                       u.is_verified as author_verified,
-                       TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))) as user_name,
-                       (SELECT AVG(rating) FROM reviews WHERE receiver_id = u.id AND tenant_id = u.tenant_id) as author_rating,
-                       c.name as category_name, c.color as category_color";
-
-        if ($userLat && $userLon) {
-            $sql .= ",
-                (6371 * acos(
-                    cos(radians(?)) * cos(radians(COALESCE(l.latitude, u.latitude, 0))) *
-                    cos(radians(COALESCE(l.longitude, u.longitude, 0)) - radians(?)) +
-                    sin(radians(?)) * sin(radians(COALESCE(l.latitude, u.latitude, 0)))
-                )) as distance_km";
-            $params = array_merge([$userLat, $userLon, $userLat], $params);
-        }
-
-        $sql .= " FROM listings l
-                  JOIN users u ON l.user_id = u.id
-                  LEFT JOIN categories c ON l.category_id = c.id
-                  WHERE l.tenant_id = ? AND l.type = ? AND l.status = 'active' AND l.user_id != ?
-                  AND u.status NOT IN ('banned', 'suspended')";
-
-        if ($this->userBlocksTableExists()) {
-            $sql .= "
-                  AND l.user_id NOT IN (SELECT blocked_user_id FROM user_blocks WHERE tenant_id = ? AND user_id = ?)
-                  AND l.user_id NOT IN (SELECT user_id FROM user_blocks WHERE tenant_id = ? AND blocked_user_id = ?)";
-            $params[] = $tenantId;
-            $params[] = $excludeUserId;
-            $params[] = $tenantId;
-            $params[] = $excludeUserId;
-        }
-
-        if (!empty($categoryIds)) {
-            $placeholders = implode(',', array_fill(0, count($categoryIds), '?'));
-            $sql .= " AND l.category_id IN ($placeholders)";
-            $params = array_merge($params, $categoryIds);
-        } elseif ($categoryFilter && !empty($categoryFilter)) {
-            $placeholders = implode(',', array_fill(0, count($categoryFilter), '?'));
-            $sql .= " AND l.category_id IN ($placeholders)";
-            $params = array_merge($params, $categoryFilter);
-        }
-
-        if ($userLat && $userLon) {
-            $sql .= " HAVING distance_km <= ?";
-            $params[] = $maxDistance;
-            $sql .= " ORDER BY distance_km ASC";
-        } else {
-            $sql .= " ORDER BY l.created_at DESC";
-        }
-
-        // Slightly larger cap since we're servicing multiple source listings.
-        // 400 (not 200) to give the post-scoring safeguarding filter headroom:
-        // in a tenant where 30–50% of members are flagged, 200 would leave too
-        // few viable candidates after filtering to satisfy the user's $limit.
-        $sql .= " LIMIT 400";
-
-        return array_map(fn ($row) => (array) $row, DB::select($sql, $params));
-    }
-
     private function getColdStartMatches(int $userId, array $userData, float $maxDistance, int $limit): array
     {
         $tenantId = TenantContext::getId();
-        $params = [$tenantId, $userId];
+        $config = $this->getConfig();
 
-        $sql = "SELECT l.*,
-                       u.first_name, u.last_name, u.avatar_url, u.location as author_location,
-                       u.latitude as author_latitude, u.longitude as author_longitude,
-                       TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))) as user_name,
-                       c.name as category_name, c.color as category_color";
-
-        if ($userData['latitude'] && $userData['longitude']) {
-            $sql .= ",
-                (6371 * acos(
-                    cos(radians(?)) * cos(radians(COALESCE(l.latitude, u.latitude, 0))) *
-                    cos(radians(COALESCE(l.longitude, u.longitude, 0)) - radians(?)) +
-                    sin(radians(?)) * sin(radians(COALESCE(l.latitude, u.latitude, 0)))
-                )) as distance_km";
-            $params = array_merge([$userData['latitude'], $userData['longitude'], $userData['latitude']], $params);
-        }
-
-        $sql .= " FROM listings l
-                  JOIN users u ON l.user_id = u.id
-                  LEFT JOIN categories c ON l.category_id = c.id
-                  WHERE l.tenant_id = ? AND l.status = 'active' AND l.user_id != ?
-                  AND u.status NOT IN ('banned', 'suspended')";
-
-        if ($this->userBlocksTableExists()) {
-            $sql .= "
-                  AND l.user_id NOT IN (SELECT blocked_user_id FROM user_blocks WHERE tenant_id = ? AND user_id = ?)
-                  AND l.user_id NOT IN (SELECT user_id FROM user_blocks WHERE tenant_id = ? AND blocked_user_id = ?)";
-            $params[] = $tenantId;
-            $params[] = $userId;
-            $params[] = $tenantId;
-            $params[] = $userId;
-        }
-
-        if ($userData['latitude'] && $userData['longitude']) {
-            $sql .= " HAVING distance_km <= ?";
-            $params[] = $maxDistance;
-            $sql .= " ORDER BY distance_km ASC, l.created_at DESC";
-        } else {
-            $sql .= " ORDER BY l.created_at DESC";
-        }
-
-        $sql .= " LIMIT ?";
-        $params[] = $limit;
-
-        $results = array_map(fn ($row) => (array) $row, DB::select($sql, $params));
+        // Same hard gates as the main path — the old cold-start SQL fell back
+        // to newest-listings-tenant-wide for users without coordinates and
+        // labelled every result "nearby".
+        $results = $this->candidateRetriever->retrieveColdStart(
+            $tenantId,
+            $userId,
+            $this->coordOrNull($userData['latitude'] ?? null),
+            $this->coordOrNull($userData['longitude'] ?? null),
+            $maxDistance,
+            $config['gates'],
+            $limit
+        );
 
         // Safeguarding filter — same rule as the main match path. Applied after
         // LIMIT here (cold-start users typically request small result sets, so
         // we accept the occasional short result rather than expanding LIMIT).
         $results = $this->filterCandidatesByVettingRequirements($results, $userId);
+
+        $localKm = (float) ($config['proximity']['local_km'] ?? self::PROXIMITY_LOCAL);
 
         foreach ($results as &$listing) {
             $coldScore = 35;
@@ -1031,13 +1228,57 @@ class SmartMatchingEngine
             if (!empty($listing['image_url'])) $coldScore += 10;
             if (!empty($listing['author_verified']) || !empty($listing['is_verified'])) $coldScore += 5;
 
+            $distance = isset($listing['distance_km']) && is_numeric($listing['distance_km'])
+                ? (float) $listing['distance_km'] : null;
+
+            // Honest reasons: only claim "nearby" when the distance is known.
+            if (($listing['service_type'] ?? 'physical_only') === 'remote_only') {
+                $reason = 'Remote-friendly listing you might like';
+            } elseif ($distance !== null && $distance <= $localKm) {
+                $reason = 'Nearby listing that might interest you';
+            } else {
+                $reason = 'Recently posted in your community';
+            }
+
             $listing['match_score'] = min(65, $coldScore);
-            $listing['match_reasons'] = ['Nearby listing that might interest you'];
+            $listing['match_reasons'] = [$reason];
             $listing['match_type'] = 'cold_start';
-            $listing['distance_km'] = $listing['distance_km'] ?? null;
+            $listing['distance_km'] = $distance;
         }
 
         return $results;
+    }
+
+    /**
+     * Whether match_cache has the v2 columns (score_breakdown etc.). Probed
+     * once per process so the engine works before AND after the migration.
+     */
+    private ?bool $matchCacheV2ColumnsCache = null;
+
+    private function matchCacheHasV2Columns(): bool
+    {
+        if ($this->matchCacheV2ColumnsCache !== null) {
+            return $this->matchCacheV2ColumnsCache;
+        }
+
+        try {
+            DB::selectOne("SELECT score_breakdown FROM match_cache LIMIT 1");
+            $this->matchCacheV2ColumnsCache = true;
+        } catch (\Throwable $e) {
+            $this->matchCacheV2ColumnsCache = false;
+        }
+
+        return $this->matchCacheV2ColumnsCache;
+    }
+
+    /**
+     * Normalise a stored coordinate: NULL/0 (the COALESCE sentinel for missing
+     * coords) becomes null so the retriever can apply the degraded mode.
+     */
+    private function coordOrNull(mixed $value): ?float
+    {
+        $f = (float) ($value ?? 0);
+        return $f != 0.0 ? $f : null;
     }
 
     // =========================================================================

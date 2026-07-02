@@ -251,6 +251,32 @@ class AdminMatchingController extends BaseApiController
             'max_distance_km' => (int) ($config['max_distance_km'] ?? 50),
             'min_match_score' => (int) ($config['min_match_score'] ?? 40),
             'hot_match_threshold' => (int) ($config['hot_match_threshold'] ?? 80),
+            'gates' => [
+                'geo_hard_gate' => (bool) ($config['gates']['geo_hard_gate'] ?? true),
+                'missing_coords_mode' => (string) ($config['gates']['missing_coords_mode'] ?? 'remote_only'),
+                'dormancy_days' => (int) ($config['gates']['dormancy_days'] ?? 90),
+                'owner_dismissal_threshold' => (int) ($config['gates']['owner_dismissal_threshold'] ?? 3),
+            ],
+            'engine_version' => (int) ($config['engine_version'] ?? 2),
+            'pillars' => [
+                'relevance' => (float) ($config['pillars']['relevance'] ?? 0.45),
+                'feasibility' => (float) ($config['pillars']['feasibility'] ?? 0.35),
+                'trust' => (float) ($config['pillars']['trust'] ?? 0.20),
+            ],
+            'adjustments' => [
+                'mutual_bonus' => (float) ($config['adjustments']['mutual_bonus'] ?? 8),
+                'freshness_max' => (float) ($config['adjustments']['freshness_max'] ?? 4),
+                'semantic_boost' => (float) ($config['adjustments']['semantic_boost'] ?? 8),
+                'knn_boost' => (float) ($config['adjustments']['knn_boost'] ?? 6),
+            ],
+            'ai' => [
+                'semantic_signal' => (bool) ($config['ai']['semantic_signal'] ?? true),
+                'llm_explanations' => (bool) ($config['ai']['llm_explanations'] ?? true),
+                'explanation_top_n' => (int) ($config['ai']['explanation_top_n'] ?? 5),
+                // Whether the AI layer can actually run for this tenant
+                // (keys + cost limits) — read-only status for the admin UI.
+                'available' => \App\Services\AI\AIServiceFactory::isEnabled(),
+            ],
         ]);
     }
 
@@ -281,12 +307,40 @@ class AdminMatchingController extends BaseApiController
             ];
         }
 
-        $config['algorithms']['smart_matching'] = [
+        // Hard-gate settings (additive; UI may send a partial gates object).
+        $gatesIn = is_array($input['gates'] ?? null) ? $input['gates'] : [];
+        $gatesExisting = is_array($existing['gates'] ?? null) ? $existing['gates'] : [];
+        $missingCoordsMode = (string) ($gatesIn['missing_coords_mode'] ?? $gatesExisting['missing_coords_mode'] ?? 'remote_only');
+        if (!in_array($missingCoordsMode, ['remote_only', 'tenant_wide'], true)) {
+            $missingCoordsMode = 'remote_only';
+        }
+
+        // Merge over the existing block so keys this endpoint doesn't manage
+        // (e.g. future pillar/AI settings) survive a save from this UI.
+        $config['algorithms']['smart_matching'] = array_merge($existing, [
             'enabled' => (bool) ($input['enabled'] ?? $existing['enabled'] ?? true),
             'broker_approval_enabled' => (bool) ($input['broker_approval_enabled'] ?? $existing['broker_approval_enabled'] ?? true),
             'max_distance_km' => (int) ($input['max_distance_km'] ?? $existing['max_distance_km'] ?? 50),
             'min_match_score' => (int) ($input['min_match_score'] ?? $existing['min_match_score'] ?? 40),
             'hot_match_threshold' => (int) ($input['hot_match_threshold'] ?? $existing['hot_match_threshold'] ?? 80),
+            'gates' => [
+                'geo_hard_gate' => (bool) ($gatesIn['geo_hard_gate'] ?? $gatesExisting['geo_hard_gate'] ?? true),
+                'missing_coords_mode' => $missingCoordsMode,
+                'dormancy_days' => max(0, min(3650, (int) ($gatesIn['dormancy_days'] ?? $gatesExisting['dormancy_days'] ?? 90))),
+                'owner_dismissal_threshold' => max(1, min(100, (int) ($gatesIn['owner_dismissal_threshold'] ?? $gatesExisting['owner_dismissal_threshold'] ?? 3))),
+            ],
+            'engine_version' => in_array((int) ($input['engine_version'] ?? $existing['engine_version'] ?? 2), [1, 2], true)
+                ? (int) ($input['engine_version'] ?? $existing['engine_version'] ?? 2) : 2,
+            'ai' => [
+                'semantic_signal' => (bool) ($input['ai']['semantic_signal'] ?? $existing['ai']['semantic_signal'] ?? true),
+                'llm_explanations' => (bool) ($input['ai']['llm_explanations'] ?? $existing['ai']['llm_explanations'] ?? true),
+                'explanation_top_n' => max(1, min(10, (int) ($input['ai']['explanation_top_n'] ?? $existing['ai']['explanation_top_n'] ?? 5))),
+            ],
+            'pillars' => [
+                'relevance' => max(0.0, min(1.0, (float) ($input['pillars']['relevance'] ?? $existing['pillars']['relevance'] ?? 0.45))),
+                'feasibility' => max(0.0, min(1.0, (float) ($input['pillars']['feasibility'] ?? $existing['pillars']['feasibility'] ?? 0.35))),
+                'trust' => max(0.0, min(1.0, (float) ($input['pillars']['trust'] ?? $existing['pillars']['trust'] ?? 0.20))),
+            ],
             'weights' => [
                 'category' => (float) ($input['category_weight'] ?? $existing['weights']['category'] ?? 0.25),
                 'skill' => (float) ($input['skill_weight'] ?? $existing['weights']['skill'] ?? 0.20),
@@ -296,7 +350,7 @@ class AdminMatchingController extends BaseApiController
                 'quality' => (float) ($input['quality_weight'] ?? $existing['weights']['quality'] ?? 0.05),
             ],
             'proximity' => $proximity,
-        ];
+        ]);
 
         DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
         $this->smartMatchingEngine->clearCache();
@@ -354,6 +408,8 @@ class AdminMatchingController extends BaseApiController
                 'broker_approval_enabled' => $brokerEnabled,
                 'pending_approvals' => $pendingApprovals, 'approved_count' => $approvedCount,
                 'rejected_count' => $rejectedCount, 'approval_rate' => $approvalRate,
+                'gate_impact' => $this->smartMatchingAnalyticsService->getGateImpact(),
+                'pillar_averages' => $this->smartMatchingAnalyticsService->getPillarAverages(),
             ]);
         } catch (\Throwable $e) {
             return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'matching stats']), null, 500);

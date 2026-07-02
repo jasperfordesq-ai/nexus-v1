@@ -230,10 +230,12 @@ class ConnectionsMatchesParityTest extends TestCase
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Match Owner']);
 
         // Seed a listing for the owner and one for the viewer so the engine can
-        // find at least one cross-listing match. Even if the engine returns
-        // nothing, the page must still render with a valid 200.
-        $this->seedActiveListing($owner->id, ['title' => 'Beginner guitar lessons offer', 'description' => 'I can teach guitar', 'type' => 'offer']);
-        $this->seedActiveListing($viewer->id, ['title' => 'Want guitar lessons', 'description' => 'Looking for guitar help', 'type' => 'request']);
+        // find at least one cross-listing match. remote_only is deliberate:
+        // neither factory user has coordinates, and the v2 engine's geo hard
+        // gate correctly excludes PHYSICAL listings for a no-location searcher
+        // (degraded remote-only mode) — a remote pair matches deterministically.
+        $this->seedActiveListing($owner->id, ['title' => 'Beginner guitar lessons offer', 'description' => 'I can teach guitar', 'type' => 'offer', 'service_type' => 'remote_only']);
+        $this->seedActiveListing($viewer->id, ['title' => 'Want guitar lessons', 'description' => 'Looking for guitar help', 'type' => 'request', 'service_type' => 'remote_only']);
 
         $response = $this->get("/{$this->testTenantSlug}/alpha/matches/board");
 

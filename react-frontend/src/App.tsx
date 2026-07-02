@@ -245,6 +245,7 @@ const GroupExchangesPage = lazyWithRetry(() => import('@/pages/group-exchanges/G
 const CreateGroupExchangePage = lazyWithRetry(() => import('@/pages/group-exchanges/CreateGroupExchangePage'));
 const GroupExchangeDetailPage = lazyWithRetry(() => import('@/pages/group-exchanges/GroupExchangeDetailPage'));
 const MatchesPage = lazyWithRetry(() => import('@/pages/matches/MatchesPage'));
+const MatchPreferencesPage = lazyWithRetry(() => import('@/pages/matches/MatchPreferencesPage'));
 const ReviewsPage = lazyWithRetry(() => import('@/pages/reviews/ReviewsPage'));
 const NewsletterUnsubscribePage = lazyWithRetry(() => import('@/pages/newsletter/NewsletterUnsubscribePage'));
 const AiChatPage = lazyWithRetry(() => import('@/pages/chat/AiChatPage'));
@@ -1772,7 +1773,7 @@ function AppRoutes() {
 
           {/* Matches — cross-module matches page (MA1, requires auth) */}
           <Route path="matches" element={<ErrorBoundary><MatchesPage /></ErrorBoundary>} />
-          <Route path="matches/preferences" element={<Navigate to="settings" replace />} />
+          <Route path="matches/preferences" element={<ErrorBoundary><MatchPreferencesPage /></ErrorBoundary>} />
 
           {/* Reviews — user reviews for completed exchanges */}
           <Route path="reviews" element={<ErrorBoundary><ReviewsPage /></ErrorBoundary>} />

@@ -77,13 +77,62 @@ function stripHtml(html: string): string {
 
 interface EndorsementEntry { skill: string; count: number; }
 
+/** Normalized shape the "Suggested for You" card renders — built either from
+ * a Smart Matching /v2/matches/all listing match or a plain Listing fallback. */
+interface SuggestionCard {
+  id: number;
+  title: string;
+  type: 'offer' | 'request';
+  authorName: string;
+  authorAvatar?: string | null;
+  matchScore?: number;
+  distanceKm?: number | null;
+  isRemote?: boolean;
+}
+
+interface MatchApiItem {
+  module: string;
+  listing_id?: number;
+  title: string;
+  type?: 'offer' | 'request';
+  user_name?: string;
+  avatar_url?: string | null;
+  match_score: number;
+  distance_km?: number | null;
+  is_remote?: boolean;
+}
+
+function suggestionFromMatch(match: MatchApiItem): SuggestionCard | null {
+  if (match.listing_id == null) return null;
+  return {
+    id: match.listing_id,
+    title: match.title,
+    type: match.type ?? 'offer',
+    authorName: match.user_name ?? '',
+    authorAvatar: match.avatar_url,
+    matchScore: match.match_score,
+    distanceKm: match.distance_km,
+    isRemote: match.is_remote,
+  };
+}
+
+function suggestionFromListing(listing: Listing): SuggestionCard {
+  return {
+    id: listing.id,
+    title: listing.title,
+    type: listing.type,
+    authorName: listing.author_name ?? listing.user?.name ?? '',
+    authorAvatar: listing.author_avatar ?? listing.user?.avatar,
+  };
+}
+
 interface DashboardStats {
   walletBalance: WalletBalance | null;
   recentListings: Listing[];
   activeListingsCount: number;
   gamification: GamificationProfile | null;
   recentActivity: FeedActivityItem[];
-  suggestedListings: Listing[];
+  suggestedListings: SuggestionCard[];
   myGroups: Group[];
   upcomingEvents: Event[];
   myEndorsements: EndorsementEntry[];
@@ -218,7 +267,13 @@ export function DashboardPage() {
       const optionalRequests: Array<{ key: string; promise: Promise<unknown> }> = [];
       if (hasGamification) optionalRequests.push({ key: 'gamification', promise: api.get<GamificationProfile>('/v2/gamification/profile').catch(() => null) });
       if (hasFeedModule) optionalRequests.push({ key: 'activity', promise: api.get<FeedActivityItem[]>('/v2/feed?per_page=5').catch(() => null) });
-      if (hasListingsModule) optionalRequests.push({ key: 'suggested', promise: api.get<Listing[]>('/v2/listings?per_page=4').catch(() => null) });
+      if (hasListingsModule) {
+        optionalRequests.push({
+          key: 'suggested',
+          promise: api.get<{ matches?: MatchApiItem[] }>('/v2/matches/all?modules=listings&limit=4&min_score=40').catch(() => null),
+        });
+        optionalRequests.push({ key: 'suggestedFallback', promise: api.get<Listing[]>('/v2/listings?per_page=4').catch(() => null) });
+      }
       if (hasGroups) optionalRequests.push({ key: 'groups', promise: api.get<Group[]>(`/v2/groups?user_id=${user?.id}&per_page=3`).catch(() => null) });
       if (hasProfileModule && user?.id) optionalRequests.push({ key: 'endorsements', promise: api.get(`/v2/members/${user.id}/endorsements`).catch(() => null) });
       if (hasEvents) optionalRequests.push({ key: 'events', promise: api.get<Event[]>('/v2/events?when=upcoming&per_page=3').catch(() => null) });
@@ -241,8 +296,19 @@ export function DashboardPage() {
       if (optionalResults.gamification) { const gRes = optionalResults.gamification as { success?: boolean; data?: GamificationProfile }; if (gRes?.success && gRes.data) gamificationData = gRes.data; }
       let activityData: FeedActivityItem[] = [];
       if (optionalResults.activity) { const aRes = optionalResults.activity as { success?: boolean; data?: FeedActivityItem[] }; if (aRes?.success && Array.isArray(aRes.data)) activityData = aRes.data; }
-      let suggestedData: Listing[] = [];
-      if (optionalResults.suggested) { const sRes = optionalResults.suggested as { success?: boolean; data?: Listing[] }; if (sRes?.success && Array.isArray(sRes.data)) suggestedData = sRes.data; }
+      let suggestedData: SuggestionCard[] = [];
+      if (optionalResults.suggested) {
+        const sRes = optionalResults.suggested as { success?: boolean; data?: { matches?: MatchApiItem[] } };
+        if (sRes?.success && Array.isArray(sRes.data?.matches)) {
+          suggestedData = sRes.data.matches
+            .map(suggestionFromMatch)
+            .filter((s): s is SuggestionCard => s != null);
+        }
+      }
+      if (suggestedData.length === 0 && optionalResults.suggestedFallback) {
+        const fRes = optionalResults.suggestedFallback as { success?: boolean; data?: Listing[] };
+        if (fRes?.success && Array.isArray(fRes.data)) suggestedData = fRes.data.map(suggestionFromListing);
+      }
       let groupsData: Group[] = [];
       if (optionalResults.groups) { const gRes = optionalResults.groups as { success?: boolean; data?: Group[] }; if (gRes?.success && Array.isArray(gRes.data)) groupsData = gRes.data; }
       let eventsData: Event[] = [];
@@ -591,7 +657,7 @@ export function DashboardPage() {
               <GlassCard className="relative h-full overflow-hidden p-5 sm:p-6">
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 pointer-events-none" />
                 <div className="relative">
-                  <SectionHeader icon={<Sparkles className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />} iconColor="amber" title={t('sections.suggested_for_you')} linkTo={tenantPath('/listings')} linkText={t('browse_all')} linkAriaLabel={t('aria.browse_all_listings')} />
+                  <SectionHeader icon={<Sparkles className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />} iconColor="amber" title={t('sections.suggested_for_you')} linkTo={tenantPath('/matches')} linkText={t('suggestions.see_all_matches')} linkAriaLabel={t('aria.browse_all_listings')} />
                   {suggestedLoading ? (
                     <div aria-label={t('aria.loading_suggestions')} role="status" aria-busy="true" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {Array.from({ length: 4 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-24 rounded-lg bg-surface-tertiary" /></Skeleton>))}
@@ -600,9 +666,15 @@ export function DashboardPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {stats.suggestedListings.map((listing) => (
                         <Link key={listing.id} to={tenantPath(`/listings/${listing.id}`)} className="block p-3 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors group" aria-label={`${listing.title} - ${listing.type === 'offer' ? t('listings.offer') : t('listings.request')}`}>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Avatar src={resolveAvatarUrl(listing.author_avatar ?? listing.user?.avatar)} name={listing.author_name ?? listing.user?.name ?? t('listings.user_fallback')} size="sm" className="w-6 h-6" />
+                          <div className="flex items-center gap-2 mb-2 flex-wrap">
+                            <Avatar src={resolveAvatarUrl(listing.authorAvatar)} name={listing.authorName || t('listings.user_fallback')} size="sm" className="w-6 h-6" />
                             <Chip size="sm" variant="soft" color={listing.type === 'offer' ? 'success' : 'warning'} className="h-5 text-[10px]">{listing.type === 'offer' ? t('listings.offer') : t('listings.request')}</Chip>
+                            {listing.matchScore != null && (
+                              <Chip size="sm" variant="flat" className="h-5 text-[10px]">{t('suggestions.score_chip', { score: listing.matchScore })}</Chip>
+                            )}
+                            {listing.distanceKm != null && (
+                              <Chip size="sm" variant="flat" className="h-5 text-[10px]">{t('suggestions.distance_chip', { value: listing.distanceKm.toFixed(1) })}</Chip>
+                            )}
                           </div>
                           <h3 className="text-sm font-medium text-theme-primary line-clamp-2 group-hover:text-[var(--color-primary)] transition-colors">{listing.title}</h3>
                         </Link>

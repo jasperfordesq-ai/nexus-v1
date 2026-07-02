@@ -2163,9 +2163,15 @@ class CronJobRunner
 
                     if (empty($userListings)) continue;
 
-                    // Calculate match score using the engine
+                    // Calculate match score using the engine. calculateMatchScore
+                    // is an INSTANCE method — the old static call fataled under
+                    // PHP 8 every time this branch was reached, killing the rest
+                    // of the hot-match scan for the tick.
                     $userData = User::findById($user['user_id']);
-                    $matchResult = \App\Services\SmartMatchingEngine::calculateMatchScore(
+                    if (!$userData) {
+                        continue;
+                    }
+                    $matchResult = app(SmartMatchingEngine::class)->calculateMatchScore(
                         $userData,
                         $userListings,
                         $userListings[0], // Use first listing as reference
@@ -2456,16 +2462,76 @@ class CronJobRunner
     }
 
     /**
-     * Warm match cache for random users (every 30 min at :30)
+     * Warm match cache (every 30 min at :00/:30).
+     *
+     * Adaptive batch size: a fixed 20 users/slot cannot cover a large tenant
+     * inside the 7-day cache TTL (48 slots/day), so the batch scales with the
+     * tenant's eligible-user count, capped at 150. warmUpCache() itself holds
+     * a per-tenant wall-clock budget so a heavy tenant can't starve the rest
+     * of the cron tick — uncovered users carry over to the next slot.
      */
     private function warmMatchCacheInternal(): void
     {
         try {
             $totalCached = 0;
             $this->forEachTenant(function ($tenantId, $slug) use (&$totalCached) {
+                $batch = 20;
+                try {
+                    $eligible = (int) (DB::selectOne(
+                        "SELECT COUNT(DISTINCT u.id) as cnt
+                         FROM users u
+                         INNER JOIN listings l
+                             ON u.id = l.user_id AND l.status = 'active' AND l.tenant_id = u.tenant_id
+                         WHERE u.tenant_id = ? AND u.status = 'active'",
+                        [$tenantId]
+                    )->cnt ?? 0);
+                    $batch = (int) min(150, max(20, ceil($eligible / 48)));
+                } catch (\Throwable $e) {
+                    // Count failed — keep the default batch.
+                }
+
                 // SmartMatchingEngine is a DI service (instance method), not static.
-                $result = app(SmartMatchingEngine::class)->warmUpCache(20);
+                $result = app(SmartMatchingEngine::class)->warmUpCache($batch);
                 $totalCached += $result['cached'] ?? 0;
+
+                // Group matches warm in the same slot (smaller batch — group
+                // recommendations are cheaper and less volatile than listings).
+                try {
+                    $groupResult = app(\App\Services\GroupMatchingService::class)
+                        ->warmUpCache(min(50, $batch));
+                    $totalCached += $groupResult['cached'] ?? 0;
+                } catch (\Throwable $e) {
+                    echo "   [{$slug}] Group match warm error: " . $e->getMessage() . "\n";
+                }
+
+                // LLM "why this match" explanations for AI-enabled tenants —
+                // queued per user (one batched prompt each), only for freshly
+                // warmed rows without an explanation and recently active users.
+                try {
+                    $smConfig = app(SmartMatchingEngine::class)->getConfig();
+                    if ((bool) ($smConfig['ai']['llm_explanations'] ?? true)
+                        && \App\Services\AI\AIServiceFactory::isEnabled()
+                    ) {
+                        $topN = max(1, min(10, (int) ($smConfig['ai']['explanation_top_n'] ?? 5)));
+                        $userRows = DB::select(
+                            "SELECT DISTINCT mc.user_id
+                             FROM match_cache mc
+                             JOIN users u ON u.id = mc.user_id AND u.tenant_id = mc.tenant_id
+                             WHERE mc.tenant_id = ?
+                               AND mc.explanation IS NULL
+                               AND mc.expires_at > NOW()
+                               AND mc.status NOT IN ('dismissed')
+                               AND u.last_active_at >= DATE_SUB(NOW(), INTERVAL 14 DAY)
+                             LIMIT 30",
+                            [$tenantId]
+                        );
+                        foreach ($userRows as $userRow) {
+                            \App\Jobs\GenerateMatchExplanationsJob::dispatch($tenantId, (int) $userRow->user_id, $topN);
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // explanation column may pre-date the v2 migration — non-fatal.
+                }
             });
             echo "   Cached $totalCached matches across all tenants.\n";
         } catch (\Throwable $e) {

@@ -38,6 +38,13 @@
   "member_status": "Mitglied",
   "private_title": "Private Gruppe",
   "public_title": "Öffentliche Gruppe",
+  "recommended": {
+    "title": "Für Sie empfohlen",
+    "joined": "Gruppe beigetreten",
+    "view": "View",
+    "join": "Join",
+    "score_chip": "{{score}}% match"
+  },
   "welcome": {
     "title": "Willkommensnachricht",
     "toggle_label": "Willkommensnachricht aktivieren",

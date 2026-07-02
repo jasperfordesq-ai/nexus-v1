@@ -341,7 +341,8 @@
     "daily": "Giornaliero",
     "monthly": "Mensile",
     "fortnightly": "Quindicinale",
-    "never": "Mai"
+    "never": "Mai",
+    "manage_in_preferences": "Le notifiche delle partite sono gestite nelle Preferenze partita"
   },
   "activity_digest": {
     "off": "Disattivato",

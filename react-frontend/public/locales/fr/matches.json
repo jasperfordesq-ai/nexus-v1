@@ -5,13 +5,13 @@
   "heading": "Vos correspondances",
   "subtitle": "Découvrez des connexions dans les annonces, les emplois, le bénévolat et les groupes",
   "refresh": "Actualiser",
+  "preferences_link": "Préférences de correspondance",
   "stats_total_matches": "Total des correspondances",
   "stats_avg_score": "Score moyen",
   "stats_hot_matches": "Correspondances prioritaires",
-  "stats_source_types": "Types de sources",
   "filter_all": "Toutes",
+  "filter_mutual_only": "Matchs mutuels uniquement",
   "source_listing": "Annonce",
-  "source_job": "Emploi",
   "source_volunteering": "Bénévolat",
   "source_group": "Groupe",
   "empty_title_all": "Aucune correspondance pour le moment",
@@ -29,5 +29,112 @@
     "title": "Correspondances"
   },
   "filter_tabs_aria": "Filtrer la source de correspondance",
-  "loading": "Chargement des matchs..."
+  "loading": "Chargement des matchs...",
+  "banner": {
+    "no_coords_title": "Ajoutez votre emplacement pour voir les correspondances à proximité",
+    "no_coords_desc": "Nous ne pouvons pas calculer les correspondances basées sur la distance tant que votre profil n'a pas de localisation. Vous pouvez toujours voir les correspondances ci-dessous en fonction d'autres signaux.",
+    "paused_title": "La correspondance est suspendue",
+    "paused_desc": "Vous ne recevrez pas de nouvelles suggestions ou notifications de correspondance tant que vous n'aurez pas repris la correspondance dans vos préférences.",
+    "mutual_title": "Afficher les correspondances mutuelles",
+    "mutual_desc": "Ces matchs vont dans les deux sens : vous leur correspondez parfaitement, et ils vous conviennent parfaitement.",
+    "show_all": "Afficher tous les matchs"
+  },
+  "card": {
+    "mutual": "Correspondance mutuelle",
+    "save": "Enregistrer la correspondance",
+    "dismiss": "Pas intéressé",
+    "view_group": "Afficher le groupe",
+    "distance_km": "{{value}} km",
+    "remote": "Remote",
+    "message": "Message",
+    "join": "Join",
+    "joined": "Joined"
+  },
+  "explanation": {
+    "ai_caption": "Explication générée par l'IA en fonction de votre profil et de votre activité"
+  },
+  "breakdown": {
+    "title": "Pourquoi ce score ?",
+    "signals": {
+      "category": "Correspondance de catégorie",
+      "skill": "Correspondance des compétences",
+      "semantic": "Similitude de la description",
+      "activity": "Niveau d'activité",
+      "trust_tier": "Niveau de confiance",
+      "completion": "Taux d'achèvement",
+      "proximity": "Proximity",
+      "availability": "Availability",
+      "reviews": "Reviews"
+    },
+    "pillars": {
+      "relevance": "Relevance",
+      "feasibility": "Feasibility",
+      "trust": "Trust"
+    }
+  },
+  "dismiss_reasons": {
+    "not_relevant": "Pas pertinent",
+    "too_far": "Trop loin",
+    "already_done": "Déjà fait",
+    "not_my_skills": "Pas mes compétences",
+    "not_interested": "Pas intéressé",
+    "other": "Other"
+  },
+  "empty": {
+    "no_coordinates_title": "Nous avons besoin de votre emplacement pour trouver des correspondances",
+    "no_coordinates_description": "Ajoutez un emplacement à votre profil afin que nous puissions trouver des annonces, des groupes et des opportunités près de chez vous.",
+    "set_location_cta": "Définissez votre emplacement",
+    "no_listings_title": "Œuvres correspondantes à vos annonces",
+    "no_listings_description": "Créez une liste pour commencer à trouver des personnes, des groupes et des opportunités qui correspondent à ce que vous proposez ou avez besoin.",
+    "create_listing_cta": "Créer une annonce",
+    "adjust_preferences_cta": "Ajuster les préférences de correspondance"
+  },
+  "preferences": {
+    "subtitle": "Contrôlez la façon dont Smart Matching recherche et vous informe des connexions.",
+    "load_failed": "Échec du chargement de vos préférences de correspondance",
+    "save": "Enregistrer les préférences",
+    "save_success": "Préférences de correspondance enregistrées",
+    "save_failed": "Échec de l'enregistrement des préférences de correspondance",
+    "unsaved_changes": "Vous avez des modifications non enregistrées",
+    "pause": {
+      "title": "Suspendre la correspondance",
+      "description": "En pause, vous ne recevrez pas de nouvelles suggestions ou notifications de match.",
+      "active_description": "La correspondance est suspendue : vous ne recevrez pas de nouvelles suggestions ou notifications tant que vous n'aurez pas repris."
+    },
+    "thresholds": {
+      "title": "Distance et qualité",
+      "no_location_title": "Ajouter un emplacement pour utiliser la correspondance basée sur la distance",
+      "no_location_desc": "Définissez votre emplacement dans votre profil pour obtenir des correspondances classées en fonction de leur proximité avec vous.",
+      "distance_label": "Distance maximale",
+      "quality_label": "Qualité de correspondance minimale",
+      "distance_value": "{{value}} km",
+      "quality_value": "{{value}}%"
+    },
+    "categories": {
+      "title": "Intérêts de la catégorie",
+      "description": "Choisissez les catégories sur lesquelles vous souhaitez être mis en correspondance. Laissez tout décoché pour correspondre à toutes les catégories.",
+      "empty": "Aucune catégorie n'est encore disponible."
+    },
+    "notifications": {
+      "frequency_label": "Fréquence de résumé des correspondances",
+      "hot_matches": "Alertes de matchs chauds",
+      "hot_matches_desc": "Soyez immédiatement informé des matchs exceptionnellement forts.",
+      "mutual_matches": "Alertes de match mutuel",
+      "mutual_matches_desc": "Soyez averti lorsqu'un match se déroule dans les deux sens.",
+      "title": "Notifications",
+      "daily": "Daily",
+      "fortnightly": "Fortnightly",
+      "monthly": "Monthly",
+      "never": "Never"
+    },
+    "page_title": "Match Preferences",
+    "page_meta_title": "Match Preferences",
+    "breadcrumb": "Preferences",
+    "heading": "Match Preferences"
+  },
+  "stats_source_types": "Types de sources",
+  "source_job": "Emploi",
+  "stats_mutual_matches": "Mutual Matches",
+  "filter_people_listings": "Listings",
+  "source_event": "Event"
 }

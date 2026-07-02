@@ -5,13 +5,13 @@
   "heading": "Ihre Treffer",
   "subtitle": "Entdecken Sie Verbindungen über Anzeigen, Stellen, Freiwilligenarbeit und Gruppen",
   "refresh": "Aktualisieren",
+  "preferences_link": "Passen Sie Ihre Präferenzen an",
   "stats_total_matches": "Gesamttreffer",
   "stats_avg_score": "Durchschn. Punktzahl",
   "stats_hot_matches": "Top-Treffer",
-  "stats_source_types": "Quellentypen",
   "filter_all": "Alle",
+  "filter_mutual_only": "Nur gegenseitige Spiele",
   "source_listing": "Anzeige",
-  "source_job": "Stelle",
   "source_volunteering": "Freiwilligenarbeit",
   "source_group": "Gruppe",
   "empty_title_all": "Noch keine Treffer",
@@ -29,5 +29,112 @@
     "title": "Treffer"
   },
   "filter_tabs_aria": "Quellfilter anpassen",
-  "loading": "Spiele werden geladen..."
+  "loading": "Spiele werden geladen...",
+  "banner": {
+    "no_coords_title": "Fügen Sie Ihren Standort hinzu, um Übereinstimmungen in der Nähe anzuzeigen",
+    "no_coords_desc": "Wir können entfernungsbasierte Übereinstimmungen erst dann berechnen, wenn Ihr Profil über einen Standort verfügt. Unten können Sie immer noch Übereinstimmungen sehen, die auf anderen Signalen basieren.",
+    "paused_title": "Der Abgleich ist pausiert",
+    "paused_desc": "Sie erhalten keine neuen Übereinstimmungsvorschläge oder Benachrichtigungen, bis Sie die Zuordnung in Ihren Einstellungen wieder aufnehmen.",
+    "mutual_title": "Gegenseitige Übereinstimmungen werden angezeigt",
+    "mutual_desc": "Diese Matches gehen in beide Richtungen – Sie passen hervorragend zu ihnen und sie passen hervorragend zu Ihnen.",
+    "show_all": "Alle Übereinstimmungen anzeigen"
+  },
+  "card": {
+    "mutual": "Gegenseitige Übereinstimmung",
+    "save": "Spiel speichern",
+    "dismiss": "Kein Interesse",
+    "view_group": "Gruppe anzeigen",
+    "distance_km": "{{value}} km",
+    "remote": "Remote",
+    "message": "Message",
+    "join": "Join",
+    "joined": "Joined"
+  },
+  "explanation": {
+    "ai_caption": "KI-generierte Erklärung basierend auf Ihrem Profil und Ihrer Aktivität"
+  },
+  "breakdown": {
+    "title": "Warum diese Punktzahl?",
+    "signals": {
+      "category": "Kategorieübereinstimmung",
+      "skill": "Skill-Match",
+      "semantic": "Beschreibungsähnlichkeit",
+      "activity": "Aktivitätsniveau",
+      "trust_tier": "Vertrauensstufe",
+      "completion": "Abschlussrate",
+      "proximity": "Proximity",
+      "availability": "Availability",
+      "reviews": "Reviews"
+    },
+    "pillars": {
+      "relevance": "Relevance",
+      "feasibility": "Feasibility",
+      "trust": "Trust"
+    }
+  },
+  "dismiss_reasons": {
+    "not_relevant": "Nicht relevant",
+    "too_far": "Zu weit weg",
+    "already_done": "Schon erledigt",
+    "not_my_skills": "Nicht meine Fähigkeiten",
+    "not_interested": "Kein Interesse",
+    "other": "Other"
+  },
+  "empty": {
+    "no_coordinates_title": "Wir benötigen Ihren Standort, um Übereinstimmungen zu finden",
+    "no_coordinates_description": "Fügen Sie Ihrem Profil einen Standort hinzu, damit wir Einträge, Gruppen und Möglichkeiten in Ihrer Nähe finden können.",
+    "set_location_cta": "Legen Sie Ihren Standort fest",
+    "no_listings_title": "Passende Werke aus Ihren Angeboten",
+    "no_listings_description": "Erstellen Sie einen Eintrag, um Personen, Gruppen und Möglichkeiten zu finden, die Ihrem Angebot oder Bedarf entsprechen.",
+    "create_listing_cta": "Erstellen Sie einen Eintrag",
+    "adjust_preferences_cta": "Passen Sie die Spieleinstellungen an"
+  },
+  "preferences": {
+    "subtitle": "Steuern Sie, wie Smart Matching Verbindungen findet und Sie darüber benachrichtigt.",
+    "load_failed": "Ihre Match-Einstellungen konnten nicht geladen werden",
+    "save": "Einstellungen speichern",
+    "save_success": "Match-Einstellungen gespeichert",
+    "save_failed": "Spieleinstellungen konnten nicht gespeichert werden",
+    "unsaved_changes": "Sie haben nicht gespeicherte Änderungen",
+    "pause": {
+      "title": "Abgleich pausieren",
+      "description": "Im pausierten Zustand erhalten Sie keine neuen Spielvorschläge oder Benachrichtigungen.",
+      "active_description": "Der Abgleich ist pausiert – Sie erhalten keine neuen Vorschläge oder Benachrichtigungen, bis Sie fortfahren."
+    },
+    "thresholds": {
+      "title": "Distanz & Qualität",
+      "no_location_title": "Fügen Sie einen Standort hinzu, um den entfernungsbasierten Abgleich zu verwenden",
+      "no_location_desc": "Legen Sie Ihren Standort in Ihrem Profil fest, um Übereinstimmungen nach ihrer Nähe zu Ihnen zu bewerten.",
+      "distance_label": "Maximale Entfernung",
+      "quality_label": "Minimale Übereinstimmungsqualität",
+      "distance_value": "{{value}} km",
+      "quality_value": "{{value}}%"
+    },
+    "categories": {
+      "title": "Kategorieinteressen",
+      "description": "Wählen Sie die Kategorien aus, denen Sie zugeordnet werden möchten. Lassen Sie alles deaktiviert, damit alle Kategorien übereinstimmen.",
+      "empty": "Es sind noch keine Kategorien verfügbar."
+    },
+    "notifications": {
+      "frequency_label": "Passen Sie die Digest-Häufigkeit an",
+      "hot_matches": "Benachrichtigungen zu heißen Spielen",
+      "hot_matches_desc": "Lassen Sie sich sofort über außergewöhnlich starke Matches benachrichtigen.",
+      "mutual_matches": "Gegenseitige Spielbenachrichtigungen",
+      "mutual_matches_desc": "Lassen Sie sich benachrichtigen, wenn ein Match in beide Richtungen geht.",
+      "title": "Notifications",
+      "daily": "Daily",
+      "fortnightly": "Fortnightly",
+      "monthly": "Monthly",
+      "never": "Never"
+    },
+    "page_title": "Match Preferences",
+    "page_meta_title": "Match Preferences",
+    "breadcrumb": "Preferences",
+    "heading": "Match Preferences"
+  },
+  "stats_source_types": "Quellentypen",
+  "source_job": "Stelle",
+  "stats_mutual_matches": "Mutual Matches",
+  "filter_people_listings": "Listings",
+  "source_event": "Event"
 }
