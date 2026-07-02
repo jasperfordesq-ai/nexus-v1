@@ -64,9 +64,26 @@ class AdminCommentsController extends BaseApiController
      *
      * Query params: page, limit, target_type, search, tenant_id (super admin only)
      */
+    /**
+     * Self-dealing guard: a broker/coordinator must not moderate a comment
+     * they wrote themselves (they could otherwise scrub their own record).
+     * Admin tiers retain full latitude. Mirrors the match-approval and
+     * balance-adjustment guards. See BrokerModerationAuthorizationTest.
+     */
+    private function guardBrokerNotAuthor(int $authorId, int $callerId): ?JsonResponse
+    {
+        if ($this->callerIsAdminTier()) {
+            return null;
+        }
+        if ($authorId === $callerId) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.broker_cannot_moderate_own_content'), null, 403);
+        }
+        return null;
+    }
+
     public function index(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 
@@ -143,7 +160,7 @@ class AdminCommentsController extends BaseApiController
      */
     public function show(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 
@@ -189,7 +206,7 @@ class AdminCommentsController extends BaseApiController
      */
     public function hide(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 
@@ -207,6 +224,8 @@ class AdminCommentsController extends BaseApiController
         if (!$comment) {
             return $this->respondWithError('NOT_FOUND', __('api.comment_not_found'), null, 404);
         }
+
+        if ($guard = $this->guardBrokerNotAuthor((int) $comment->user_id, $adminId)) return $guard;
 
         $commentTenantId = (int) $comment->tenant_id;
 
@@ -252,7 +271,7 @@ class AdminCommentsController extends BaseApiController
      */
     public function destroy(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 
@@ -270,6 +289,8 @@ class AdminCommentsController extends BaseApiController
         if (!$comment) {
             return $this->respondWithError('NOT_FOUND', __('api.comment_not_found'), null, 404);
         }
+
+        if ($guard = $this->guardBrokerNotAuthor((int) $comment->user_id, $adminId)) return $guard;
 
         $commentTenantId = (int) $comment->tenant_id;
 

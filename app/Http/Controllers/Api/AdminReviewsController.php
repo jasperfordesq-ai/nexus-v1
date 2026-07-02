@@ -58,9 +58,26 @@ class AdminReviewsController extends BaseApiController
      *
      * Query params: page, limit, rating, status, search
      */
+    /**
+     * Self-dealing guard: a broker/coordinator must not moderate a review
+     * they wrote (reviewer) or received (subject) — they could otherwise
+     * bury unfavourable reviews about themselves. Admin tiers retain full
+     * latitude. See BrokerModerationAuthorizationTest.
+     */
+    private function guardBrokerNotParty(?int $reviewerId, ?int $receiverId, int $callerId): ?JsonResponse
+    {
+        if ($this->callerIsAdminTier()) {
+            return null;
+        }
+        if ($callerId === (int) $reviewerId || $callerId === (int) $receiverId) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.broker_cannot_moderate_own_content'), null, 403);
+        }
+        return null;
+    }
+
     public function index(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 
@@ -158,7 +175,7 @@ class AdminReviewsController extends BaseApiController
      */
     public function show(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 
@@ -223,14 +240,14 @@ class AdminReviewsController extends BaseApiController
      */
     public function flag(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 
         if ($superAdmin) {
-            $review = DB::selectOne("SELECT id, status, tenant_id, deleted_by_author_at FROM reviews WHERE id = ?", [$id]);
+            $review = DB::selectOne("SELECT id, status, tenant_id, reviewer_id, receiver_id, deleted_by_author_at FROM reviews WHERE id = ?", [$id]);
         } else {
-            $review = DB::selectOne("SELECT id, status, tenant_id, deleted_by_author_at FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            $review = DB::selectOne("SELECT id, status, tenant_id, reviewer_id, receiver_id, deleted_by_author_at FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         }
 
         // Author-deleted reviews must never be resurrected into the moderation
@@ -238,6 +255,8 @@ class AdminReviewsController extends BaseApiController
         if (!$review || $review->deleted_by_author_at !== null) {
             return $this->respondWithError('NOT_FOUND', __('api.review_not_found'), null, 404);
         }
+
+        if ($guard = $this->guardBrokerNotParty((int) $review->reviewer_id, (int) $review->receiver_id, $adminId)) return $guard;
 
         $reviewTenantId = (int) $review->tenant_id;
 
@@ -257,14 +276,14 @@ class AdminReviewsController extends BaseApiController
      */
     public function hide(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 
         if ($superAdmin) {
-            $review = DB::selectOne("SELECT id, status, tenant_id, reviewer_id, deleted_by_author_at FROM reviews WHERE id = ?", [$id]);
+            $review = DB::selectOne("SELECT id, status, tenant_id, reviewer_id, receiver_id, deleted_by_author_at FROM reviews WHERE id = ?", [$id]);
         } else {
-            $review = DB::selectOne("SELECT id, status, tenant_id, reviewer_id, deleted_by_author_at FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            $review = DB::selectOne("SELECT id, status, tenant_id, reviewer_id, receiver_id, deleted_by_author_at FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         }
 
         // Author-deleted reviews are outside the moderation flow — hiding one
@@ -272,6 +291,8 @@ class AdminReviewsController extends BaseApiController
         if (!$review || $review->deleted_by_author_at !== null) {
             return $this->respondWithError('NOT_FOUND', __('api.review_not_found'), null, 404);
         }
+
+        if ($guard = $this->guardBrokerNotParty((int) $review->reviewer_id, (int) $review->receiver_id, $adminId)) return $guard;
 
         $reviewTenantId = (int) $review->tenant_id;
 
@@ -310,19 +331,21 @@ class AdminReviewsController extends BaseApiController
      */
     public function destroy(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireBrokerOrAdmin();
         $superAdmin = $this->isSuperAdmin();
         $tenantId = $this->getTenantId();
 
         if ($superAdmin) {
-            $review = DB::selectOne("SELECT id, tenant_id, reviewer_id FROM reviews WHERE id = ?", [$id]);
+            $review = DB::selectOne("SELECT id, tenant_id, reviewer_id, receiver_id FROM reviews WHERE id = ?", [$id]);
         } else {
-            $review = DB::selectOne("SELECT id, tenant_id, reviewer_id FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            $review = DB::selectOne("SELECT id, tenant_id, reviewer_id, receiver_id FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         }
 
         if (!$review) {
             return $this->respondWithError('NOT_FOUND', __('api.review_not_found'), null, 404);
         }
+
+        if ($guard = $this->guardBrokerNotParty((int) $review->reviewer_id, (int) $review->receiver_id, $adminId)) return $guard;
 
         $reviewTenantId = (int) $review->tenant_id;
         $reviewerId = (int) $review->reviewer_id;

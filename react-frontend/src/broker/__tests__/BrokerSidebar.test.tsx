@@ -51,6 +51,13 @@ vi.mock('react-i18next', () => ({
       'nav.onboarding': 'Onboarding',
       'nav.exchanges': 'Exchanges',
       'nav.match_approvals': 'Match Approvals',
+      'nav.moderation_queue': 'Content Queue',
+      'nav.moderation_feed': 'Feed Posts',
+      'nav.moderation_comments': 'Comments',
+      'nav.moderation_reviews': 'Reviews',
+      'nav.moderation_reports': 'Reports',
+      'nav.safeguarding_options': 'Safeguarding Options',
+      'sidebar.section_moderation': 'Moderation',
       'nav.messages': 'Messages',
       'nav.safeguarding': 'Safeguarding',
       'nav.vetting': 'Vetting',
@@ -85,7 +92,49 @@ describe('BrokerSidebar', () => {
       tenant: { id: 2, slug: 'test-tenant', name: 'Test Tenant' },
       tenantPath: (path: string) => path,
       hasFeature: () => true,
+      hasModule: () => true,
     });
+  });
+
+  it('shows the Moderation section with the content queue and reports items', () => {
+    mockUseAuth.mockReturnValue({ user: { id: 1, role: 'broker' } });
+
+    render(<BrokerSidebar collapsed={false} onToggle={vi.fn()} badges={EMPTY_BADGES} />);
+
+    expect(screen.getByText('Content Queue')).toBeInTheDocument();
+    expect(screen.getByText('Reports')).toBeInTheDocument();
+    expect(screen.getByText('Safeguarding Options')).toBeInTheDocument();
+  });
+
+  it('hides Feed Posts moderation when the feed module is off', () => {
+    mockUseAuth.mockReturnValue({ user: { id: 1, role: 'broker' } });
+    mockUseTenant.mockReturnValue({
+      tenant: { id: 2, slug: 'test-tenant', name: 'Test Tenant' },
+      tenantPath: (path: string) => path,
+      hasFeature: () => true,
+      hasModule: (m: string) => m !== 'feed',
+    });
+
+    render(<BrokerSidebar collapsed={false} onToggle={vi.fn()} badges={EMPTY_BADGES} />);
+
+    expect(screen.queryByText('Feed Posts')).not.toBeInTheDocument();
+    // Non-feed moderation items remain.
+    expect(screen.getByText('Content Queue')).toBeInTheDocument();
+  });
+
+  it('hides Reviews moderation when the reviews feature is off', () => {
+    mockUseAuth.mockReturnValue({ user: { id: 1, role: 'broker' } });
+    mockUseTenant.mockReturnValue({
+      tenant: { id: 2, slug: 'test-tenant', name: 'Test Tenant' },
+      tenantPath: (path: string) => path,
+      hasFeature: (f: string) => f !== 'reviews',
+      hasModule: () => true,
+    });
+
+    render(<BrokerSidebar collapsed={false} onToggle={vi.fn()} badges={EMPTY_BADGES} />);
+
+    expect(screen.queryByText('Reviews')).not.toBeInTheDocument();
+    expect(screen.getByText('Content Queue')).toBeInTheDocument();
   });
 
   it('does not show the Full Admin link for broker users with stale admin flags', () => {
@@ -122,6 +171,7 @@ describe('BrokerSidebar', () => {
       tenant: { id: 2, slug: 'test-tenant', name: 'Test Tenant' },
       tenantPath: (path: string) => path,
       hasFeature: (f: string) => f !== 'exchange_workflow',
+      hasModule: () => true,
     });
 
     render(<BrokerSidebar collapsed={false} onToggle={vi.fn()} badges={EMPTY_BADGES} />);
@@ -152,6 +202,7 @@ describe('BrokerSidebar', () => {
       tenant: { id: 2, slug: 'test-tenant', name: 'Test Tenant' },
       tenantPath: (path: string) => path,
       hasFeature: (f: string) => f !== 'exchange_workflow',
+      hasModule: () => true,
     });
 
     render(<BrokerSidebar collapsed={false} onToggle={vi.fn()} badges={EMPTY_BADGES} />);

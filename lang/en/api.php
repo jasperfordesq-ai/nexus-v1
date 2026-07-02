@@ -15,6 +15,7 @@ return [
     'broker_cannot_edit_field'     => 'Brokers cannot change this field. Only an administrator can.',
     'broker_cannot_adjust_own_balance' => 'Brokers cannot adjust their own balance.',
     'broker_cannot_review_own_match' => 'Brokers cannot review a match they are a party to.',
+    'broker_cannot_moderate_own_content' => 'Brokers cannot moderate content they are a party to.',
     'super_admin_required'         => 'Super admin access required',
     'insufficient_permissions'     => 'Insufficient permissions',
 

@@ -35,7 +35,7 @@ const reportCards = [
   { key: 'verified_hours', icon: Clock, href: '/admin/reports/hours', statKey: 'verified_hours' },
   { key: 'active_members', icon: Users, href: '/admin/reports/members', statKey: 'active_members' },
   { key: 'organisations', icon: Building2, href: '/admin/volunteering/organizations', statKey: 'trusted_organisations' },
-  { key: 'trust_pack', icon: ShieldCheck, href: '/admin/safeguarding', statKey: 'pending_hours' },
+  { key: 'trust_pack', icon: ShieldCheck, href: '/broker/safeguarding', statKey: 'pending_hours' },
 ] as const;
 
 type CantonVariant = {

@@ -24,6 +24,12 @@ function BrokerNotFoundRedirect() {
   return <Navigate to={tenantPath('/broker')} replace />;
 }
 
+/** Bare /broker/moderation → the Content Queue (its landing page). */
+function BrokerModerationIndexRedirect() {
+  const { tenantPath } = useTenant();
+  return <Navigate to={tenantPath('/broker/moderation/queue')} replace />;
+}
+
 /**
  * Exchange pages depend on the `exchange_workflow` tenant feature. The rest of
  * the broker panel does not, so only these routes are feature-gated (the nav
@@ -33,6 +39,28 @@ function BrokerNotFoundRedirect() {
 function ExchangeFeatureRoute({ children }: { children: React.ReactNode }) {
   const { tenantPath, hasFeature } = useTenant();
   if (!hasFeature('exchange_workflow')) {
+    return <Navigate to={tenantPath('/broker')} replace />;
+  }
+  return <>{children}</>;
+}
+
+/**
+ * Generic tenant-feature gate for broker sub-pages (e.g. reviews moderation
+ * on the `reviews` feature). Deep-links on a tenant without the feature bounce
+ * back to the broker dashboard, matching how the admin sidebar hides them.
+ */
+function FeatureRoute({ feature, children }: { feature: 'reviews'; children: React.ReactNode }) {
+  const { tenantPath, hasFeature } = useTenant();
+  if (!hasFeature(feature)) {
+    return <Navigate to={tenantPath('/broker')} replace />;
+  }
+  return <>{children}</>;
+}
+
+/** Generic tenant-module gate (e.g. feed moderation on the `feed` module). */
+function ModuleRoute({ module, children }: { module: 'feed'; children: React.ReactNode }) {
+  const { tenantPath, hasModule } = useTenant();
+  if (!hasModule(module)) {
     return <Navigate to={tenantPath('/broker')} replace />;
   }
   return <>{children}</>;
@@ -61,6 +89,14 @@ const RiskTagsPage = lazy(() => import('./pages/RiskTagsPage'));
 const UserMonitoringPage = lazy(() => import('./pages/UserMonitoringPage'));
 const InsuranceCertificatesPage = lazy(() => import('./pages/InsuranceCertificatesPage'));
 const ReviewArchivePage = lazy(() => import('./pages/ReviewArchivePage'));
+const SafeguardingOptionsPage = lazy(() => import('./pages/SafeguardingOptionsPage'));
+
+// Moderation pages — reuse the admin modules inside the broker shell.
+const ContentQueuePage = lazy(() => import('./pages/ContentQueuePage'));
+const FeedModerationPage = lazy(() => import('./pages/FeedModerationPage'));
+const CommentsModerationPage = lazy(() => import('./pages/CommentsModerationPage'));
+const ReviewsModerationPage = lazy(() => import('./pages/ReviewsModerationPage'));
+const ReportsPage = lazy(() => import('./pages/ReportsPage'));
 
 // Settings & help
 const BrokerConfigurationPage = lazy(() => import('./pages/BrokerConfigurationPage'));
@@ -93,6 +129,15 @@ export function BrokerRoutes() {
       <Route path="messages" element={<Lazy><MessageReviewPage /></Lazy>} />
       <Route path="messages/:id" element={<Lazy><MessageDetailPage /></Lazy>} />
 
+      {/* Moderation — reuses the admin modules; feed gated on the feed module,
+          reviews on the reviews feature (mirrors the old admin sidebar gates). */}
+      <Route path="moderation" element={<BrokerModerationIndexRedirect />} />
+      <Route path="moderation/queue" element={<Lazy><ContentQueuePage /></Lazy>} />
+      <Route path="moderation/feed" element={<ModuleRoute module="feed"><Lazy><FeedModerationPage /></Lazy></ModuleRoute>} />
+      <Route path="moderation/comments" element={<Lazy><CommentsModerationPage /></Lazy>} />
+      <Route path="moderation/reviews" element={<FeatureRoute feature="reviews"><Lazy><ReviewsModerationPage /></Lazy></FeatureRoute>} />
+      <Route path="moderation/reports" element={<Lazy><ReportsPage /></Lazy>} />
+
       {/* Vetting */}
       <Route path="vetting" element={<Lazy><VettingPage /></Lazy>} />
 
@@ -100,6 +145,7 @@ export function BrokerRoutes() {
       <Route path="monitoring" element={<Lazy><UserMonitoringPage /></Lazy>} />
       <Route path="risk-tags" element={<Lazy><RiskTagsPage /></Lazy>} />
       <Route path="insurance" element={<Lazy><InsuranceCertificatesPage /></Lazy>} />
+      <Route path="safeguarding-options" element={<Lazy><SafeguardingOptionsPage /></Lazy>} />
 
       {/* Records */}
       <Route path="archives" element={<Lazy><ReviewArchivePage /></Lazy>} />

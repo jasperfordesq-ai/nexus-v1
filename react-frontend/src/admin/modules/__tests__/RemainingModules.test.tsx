@@ -8,7 +8,7 @@
  * - BlogPostForm, SmartMatchMonitoring, SmartMatchUsers,
  *   MatchingDiagnostic, NexusScoreAnalytics, LegalDocVersionForm,
  *   LegalDocVersionList, CampaignForm, CreateBadge, GamificationHub,
- *   MatchDetail, VolunteerApprovals, VolunteeringOverview, VolunteerOrganizations
+ *   VolunteerApprovals, VolunteeringOverview, VolunteerOrganizations
  *
  * Smoke tests only — verify each component renders without crashing.
  */
@@ -460,21 +460,6 @@ import { GamificationHub } from '../gamification/GamificationHub';
 describe('GamificationHub', () => {
   it('renders without crashing', () => {
     const { container } = render(<W><GamificationHub /></W>);
-    expect(container.querySelector('div')).toBeTruthy();
-  });
-});
-
-// ─── MatchDetail ────────────────────────────────────────────────────────────
-
-import { MatchDetail } from '../matching/MatchDetail';
-
-describe('MatchDetail', () => {
-  it('renders without crashing with route param', () => {
-    const { container } = render(
-      <WRoute path="/admin/match-approvals/:id" entry="/admin/match-approvals/1">
-        <MatchDetail />
-      </WRoute>
-    );
     expect(container.querySelector('div')).toBeTruthy();
   });
 });

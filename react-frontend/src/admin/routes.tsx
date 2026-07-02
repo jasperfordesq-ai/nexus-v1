@@ -83,17 +83,15 @@ const BlogPostForm = lazy(() => import('./modules/blog/BlogPostForm'));
 const SmartMatchingOverview = lazy(() => import('./modules/matching/SmartMatchingOverview'));
 const MatchingConfig = lazy(() => import('./modules/matching/MatchingConfig'));
 const MatchingAnalytics = lazy(() => import('./modules/matching/MatchingAnalytics'));
-const MatchApprovals = lazy(() => import('./modules/matching/MatchApprovals'));
-const MatchDetail = lazy(() => import('./modules/matching/MatchDetail'));
 const TimebankingDashboard = lazy(() => import('./modules/timebanking/TimebankingDashboard'));
 const FraudAlerts = lazy(() => import('./modules/timebanking/FraudAlerts'));
 const OrgWallets = lazy(() => import('./modules/timebanking/OrgWallets'));
 const UserReport = lazy(() => import('./modules/timebanking/UserReport'));
 const StartingBalances = lazy(() => import('./modules/timebanking/StartingBalances'));
 const CommunityFund = lazy(() => import('./modules/timebanking/CommunityFund'));
-// admin/modules/broker/* retired — broker control panel lives at /broker/*
-// (see react-frontend/src/broker/pages/). Legacy /admin/broker-controls/*
-// URLs redirect via the TenantRedirect Route below.
+// admin/modules/broker/* and the admin match-approvals pages are retired —
+// the broker control panel (incl. match approvals) lives at /broker/*
+// (see react-frontend/src/broker/pages/).
 const GamificationHub = lazy(() => import('./modules/gamification/GamificationHub'));
 const CampaignList = lazy(() => import('./modules/gamification/CampaignList'));
 const CampaignForm = lazy(() => import('./modules/gamification/CampaignForm'));
@@ -247,9 +245,9 @@ const ApiDocumentation = lazy(() => import('./modules/federation/ApiDocumentatio
 const FederationActivityFeed = lazy(() => import('./modules/federation/ActivityFeed'));
 const CreditCommonsConfig = lazy(() => import('./modules/federation/CreditCommonsConfig'));
 
-// Safeguarding module
-const SafeguardingDashboard = lazy(() => import('./modules/safeguarding/SafeguardingDashboard'));
-const SafeguardingOptionsAdmin = lazy(() => import('./modules/safeguarding/SafeguardingOptionsAdmin'));
+// Safeguarding module — the dashboard + options pages moved to the broker
+// panel (/broker/safeguarding, /broker/safeguarding-options) on 2026-07-02.
+// The components stay on disk and are reused there via broker wrappers.
 
 // Onboarding module
 const OnboardingSettings = lazy(() => import('./modules/system/OnboardingSettings'));
@@ -308,7 +306,7 @@ const ImpactReport = lazy(() => import('./modules/impact/ImpactReport'));
 const MemberReportsPage = lazy(() => import('./modules/reports/MemberReportsPage'));
 const HoursReportsPage = lazy(() => import('./modules/reports/HoursReportsPage'));
 const InactiveMembersPage = lazy(() => import('./modules/reports/InactiveMembersPage'));
-const ModerationQueuePage = lazy(() => import('./modules/reports/ModerationQueuePage'));
+// Content Queue moved to the broker panel (/broker/moderation/queue) 2026-07-02.
 // National (Caring Community Foundation) module
 
 // Help Centre
@@ -318,11 +316,9 @@ const HelpFaqsAdmin = lazy(() => import('./modules/help/HelpFaqsAdmin'));
 // Admin 404
 const AdminNotFound = lazy(() => import('./modules/AdminNotFound'));
 
-// Moderation module
-const FeedModeration = lazy(() => import('./modules/moderation/FeedModeration'));
-const CommentsModeration = lazy(() => import('./modules/moderation/CommentsModeration'));
-const ReviewsModeration = lazy(() => import('./modules/moderation/ReviewsModeration'));
-const ReportsManagement = lazy(() => import('./modules/moderation/ReportsManagement'));
+// Moderation module — the pages moved to the broker panel
+// (/broker/moderation/*) on 2026-07-02; the components stay on disk and are
+// reused there via thin broker wrappers.
 const SupportReportsPage = lazy(() => import('./modules/support/SupportReportsPage'));
 
 // Super Admin module — all implementations live in modules/super/
@@ -411,20 +407,14 @@ export function AdminRoutes() {
       <Route path="smart-matching" element={<Lazy><SmartMatchingOverview /></Lazy>} />
       <Route path="smart-matching/analytics" element={<Lazy><MatchingAnalytics /></Lazy>} />
       <Route path="smart-matching/configuration" element={<Lazy><MatchingConfig /></Lazy>} />
-      <Route path="match-approvals" element={<Lazy><MatchApprovals /></Lazy>} />
-      <Route path="match-approvals/:id" element={<Lazy><MatchDetail /></Lazy>} />
-      {/* /admin/broker-controls/* retired — broker control panel lives at
-          /broker/* (see react-frontend/src/broker/). Anyone landing on a
-          legacy bookmark is redirected to the new home, preserving the
-          tenant slug via TenantRedirect. */}
-      <Route path="broker-controls" element={<TenantRedirect to="/broker" />} />
-      <Route path="broker-controls/*" element={<TenantRedirect to="/broker" />} />
+      {/* /admin/match-approvals and /admin/broker-controls/* are fully
+          retired (owner-approved 2026-07-02, no redirects) — match approvals
+          and all broker duties live at /broker/*. */}
 
       {/* ─── MODERATION ─── */}
-      <Route path="moderation/feed" element={<Lazy><FeedModeration /></Lazy>} />
-      <Route path="moderation/comments" element={<Lazy><CommentsModeration /></Lazy>} />
-      <Route path="moderation/reviews" element={<Lazy><ReviewsModeration /></Lazy>} />
-      <Route path="moderation/reports" element={<Lazy><ReportsManagement /></Lazy>} />
+      {/* Content moderation (queue, feed, comments, reviews, reports) is fully
+          retired from the admin panel (owner-approved 2026-07-02, no redirects)
+          — it lives in the broker panel at /broker/moderation/*. */}
 
       {/* ─── MARKETING ─── */}
       <Route element={
@@ -555,8 +545,9 @@ export function AdminRoutes() {
       </Route>
 
       {/* ─── SAFEGUARDING ─── */}
-      <Route path="safeguarding" element={<Lazy><SafeguardingDashboard /></Lazy>} />
-      <Route path="safeguarding-options" element={<Lazy><SafeguardingOptionsAdmin /></Lazy>} />
+      {/* Safeguarding dashboard + options are fully retired from the admin
+          panel (owner-approved 2026-07-02, no redirects) — they live in the
+          broker panel at /broker/safeguarding and /broker/safeguarding-options. */}
 
       {/* ─── SYSTEM ─── */}
       <Route path="settings" element={<Lazy><AdminSettings /></Lazy>} />
@@ -755,7 +746,7 @@ export function AdminRoutes() {
       <Route path="reports/hours" element={<Lazy><HoursReportsPage /></Lazy>} />
       <Route path="reports/municipal-impact" element={<TenantRedirect to="/caring/municipal-impact" />} />
       <Route path="reports/inactive-members" element={<Lazy><InactiveMembersPage /></Lazy>} />
-      <Route path="moderation/queue" element={<Lazy><ModerationQueuePage /></Lazy>} />
+      {/* Content Queue (moderation/queue) retired — now at /broker/moderation/queue. */}
 
       {/* ─── SELLABLE PRODUCTS — Regional Analytics (AG59) ─── */}
       <Route path="regional-analytics/subscriptions" element={<TenantRedirect to="/super-admin/regional-analytics/subscriptions" />} />
