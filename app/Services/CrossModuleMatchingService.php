@@ -44,10 +44,11 @@ class CrossModuleMatchingService
         $modules = $options['modules'] ?? ['listings', 'groups', 'volunteering', 'events'];
 
         $allMatches = [];
+        $engineMeta = null;
 
         try {
             if (in_array('listings', $modules, true)) {
-                $listingMatches = $this->getListingMatches($userId, $tenantId, $minScore, $limit, $debug);
+                $listingMatches = $this->getListingMatches($userId, $tenantId, $minScore, $limit, $debug, $engineMeta);
                 $allMatches = array_merge($allMatches, $listingMatches);
             }
 
@@ -110,6 +111,12 @@ class CrossModuleMatchingService
                 'total' => count($allMatches),
                 'modules' => $modules,
                 'min_score' => $minScore,
+                // Degraded-mode signals from the matching engine — the frontend
+                // uses these to prompt users without a location / without listings.
+                'needs_location' => (bool) ($engineMeta['needs_location'] ?? false),
+                'degraded' => (bool) ($engineMeta['degraded'] ?? false),
+                'degraded_reason' => $engineMeta['degraded_reason'] ?? null,
+                'has_active_listings' => $engineMeta['has_active_listings'] ?? null,
             ],
         ];
     }
@@ -117,13 +124,13 @@ class CrossModuleMatchingService
     /**
      * Get listing-based matches from SmartMatchingEngine.
      */
-    private function getListingMatches(int $userId, int $tenantId, int $minScore, int $limit, bool $debug): array
+    private function getListingMatches(int $userId, int $tenantId, int $minScore, int $limit, bool $debug, ?array &$engineMeta = null): array
     {
         try {
             $raw = $this->smartMatchingEngine->findMatchesForUser($userId, [
                 'min_score' => $minScore,
                 'limit' => $limit,
-            ]);
+            ], $engineMeta);
 
             return array_map(function ($match) use ($debug) {
                 $result = [
@@ -139,7 +146,10 @@ class CrossModuleMatchingService
                     'match_score' => (float) ($match['match_score'] ?? 0),
                     'match_type' => $match['match_type'] ?? 'one_way',
                     'match_reasons' => $match['match_reasons'] ?? [],
-                    'distance_km' => isset($match['distance_km']) ? (float) $match['distance_km'] : null,
+                    'distance_km' => isset($match['distance_km']) && is_numeric($match['distance_km'])
+                        ? (float) $match['distance_km'] : null,
+                    'is_remote' => ($match['service_type'] ?? 'physical_only') === 'remote_only',
+                    'is_mutual' => ($match['match_type'] ?? '') === 'mutual',
                     'matched_listing' => $match['matched_listing'] ?? null,
                     'created_at' => $match['created_at'] ?? null,
                 ];

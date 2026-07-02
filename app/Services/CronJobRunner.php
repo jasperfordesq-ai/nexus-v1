@@ -2163,9 +2163,15 @@ class CronJobRunner
 
                     if (empty($userListings)) continue;
 
-                    // Calculate match score using the engine
+                    // Calculate match score using the engine. calculateMatchScore
+                    // is an INSTANCE method — the old static call fataled under
+                    // PHP 8 every time this branch was reached, killing the rest
+                    // of the hot-match scan for the tick.
                     $userData = User::findById($user['user_id']);
-                    $matchResult = \App\Services\SmartMatchingEngine::calculateMatchScore(
+                    if (!$userData) {
+                        continue;
+                    }
+                    $matchResult = app(SmartMatchingEngine::class)->calculateMatchScore(
                         $userData,
                         $userListings,
                         $userListings[0], // Use first listing as reference
