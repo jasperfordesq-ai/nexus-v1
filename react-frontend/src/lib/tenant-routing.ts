@@ -52,7 +52,7 @@ export const RESERVED_PATHS = new Set([
   'features', 'changelog', 'development-status',
   'communities', 'local-groups', 'services',
   // System / admin
-  'admin', 'admin-legacy', 'super-admin', 'broker', 'dev',
+  'admin', 'admin-legacy', 'super-admin', 'broker', 'partner-timebanks', 'dev',
   'api', 'v2', 'assets', 'downloads', 'uploads',
   'cron', 'test-email', 'mobile', 'mobile-download', 'share-target',
   'migrate-messages',

@@ -4,7 +4,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, expect, it } from 'vitest';
-import { hasAdminPanelAccess, hasBrokerPanelAccess, hasBrokerRole } from './access';
+import {
+  hasAdminPanelAccess,
+  hasBrokerPanelAccess,
+  hasBrokerRole,
+  hasPartnerPanelAccess,
+  isSuperAdminUser,
+} from './access';
 
 describe('hasBrokerRole', () => {
   it('returns true only for the broker role string', () => {
@@ -56,6 +62,38 @@ describe('hasAdminPanelAccess', () => {
     expect(hasAdminPanelAccess({ role: 'member' })).toBe(false);
     expect(hasAdminPanelAccess(null)).toBe(false);
     expect(hasAdminPanelAccess(undefined)).toBe(false);
+  });
+});
+
+describe('isSuperAdminUser / hasPartnerPanelAccess', () => {
+  it('grants access for super_admin and god role strings', () => {
+    expect(isSuperAdminUser({ role: 'super_admin' })).toBe(true);
+    expect(isSuperAdminUser({ role: 'god' })).toBe(true);
+    expect(hasPartnerPanelAccess({ role: 'super_admin' })).toBe(true);
+  });
+
+  it('grants access for each super-admin boolean flag', () => {
+    expect(isSuperAdminUser({ is_super_admin: true })).toBe(true);
+    expect(isSuperAdminUser({ is_tenant_super_admin: true })).toBe(true);
+    expect(isSuperAdminUser({ is_god: true })).toBe(true);
+  });
+
+  it('denies regular admins and tenant admins', () => {
+    expect(hasPartnerPanelAccess({ role: 'admin' })).toBe(false);
+    expect(hasPartnerPanelAccess({ role: 'tenant_admin' })).toBe(false);
+    expect(hasPartnerPanelAccess({ role: 'admin', is_admin: true })).toBe(false);
+  });
+
+  it('denies brokers, members and null users', () => {
+    expect(hasPartnerPanelAccess({ role: 'broker' })).toBe(false);
+    expect(hasPartnerPanelAccess({ role: 'member' })).toBe(false);
+    expect(hasPartnerPanelAccess(null)).toBe(false);
+    expect(hasPartnerPanelAccess(undefined)).toBe(false);
+  });
+
+  it('requires boolean flags to be strictly true', () => {
+    expect(isSuperAdminUser({ is_super_admin: 1 })).toBe(false);
+    expect(isSuperAdminUser({ is_tenant_super_admin: 'yes' })).toBe(false);
   });
 });
 

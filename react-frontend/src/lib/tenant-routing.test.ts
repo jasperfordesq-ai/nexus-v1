@@ -59,6 +59,8 @@ describe('tenant-routing', () => {
       expect(RESERVED_PATHS.has('api')).toBe(true);
       expect(RESERVED_PATHS.has('caring')).toBe(true);
       expect(RESERVED_PATHS.has('caring-community')).toBe(true);
+      expect(RESERVED_PATHS.has('broker')).toBe(true);
+      expect(RESERVED_PATHS.has('partner-timebanks')).toBe(true);
     });
 
     it('does not contain tenant slugs', () => {

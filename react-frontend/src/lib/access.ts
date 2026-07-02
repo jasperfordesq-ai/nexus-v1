@@ -43,3 +43,22 @@ export function hasBrokerPanelAccess(user: UserLike): boolean {
     hasAdminPanelAccess(user)
   );
 }
+
+export function isSuperAdminUser(user: UserLike): boolean {
+  const role = userRole(user);
+  return (
+    role === 'super_admin' ||
+    role === 'god' ||
+    user?.is_super_admin === true ||
+    user?.is_tenant_super_admin === true ||
+    user?.is_god === true
+  );
+}
+
+/**
+ * Partner Timebanks panel — super admins only (same gate as the
+ * Communications sidebar sections and SuperAdminRoute).
+ */
+export function hasPartnerPanelAccess(user: UserLike): boolean {
+  return isSuperAdminUser(user);
+}
