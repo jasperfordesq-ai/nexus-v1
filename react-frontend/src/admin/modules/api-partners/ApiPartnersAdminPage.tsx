@@ -28,6 +28,7 @@ import Key from 'lucide-react/icons/key';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { BrokerEmptyState } from '@/broker/components';
 import { PageHeader } from '../../components/PageHeader';
 import { PartnerTimebankGuidance } from '../federation/PartnerTimebankGuidance';
 
@@ -193,9 +194,7 @@ export default function ApiPartnersAdminPage() {
               <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner /></div>
             </div>
           ) : partners.length === 0 ? (
-            <div className="p-10 text-center text-[var(--color-text-muted)]">
-              {t('api_partners.empty.no_partners')}
-            </div>
+            <BrokerEmptyState bare icon={Key} title={t('api_partners.empty.no_partners')} />
           ) : (
             <Table aria-label={t('api_partners.table.aria')} removeWrapper>
               <TableHeader>
@@ -306,9 +305,7 @@ export default function ApiPartnersAdminPage() {
                     <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner /></div>
                   </div>
                 ) : callLog.length === 0 ? (
-                  <div className="p-6 text-center text-[var(--color-text-muted)]">
-                    {t('api_partners.empty.no_calls')}
-                  </div>
+                  <BrokerEmptyState bare icon={Eye} title={t('api_partners.empty.no_calls')} />
                 ) : (
                   <Table aria-label={t('api_partners.call_log.table_aria')} removeWrapper>
                     <TableHeader>

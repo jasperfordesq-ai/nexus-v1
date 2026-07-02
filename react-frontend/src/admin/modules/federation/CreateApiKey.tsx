@@ -1,4 +1,4 @@
-import { Card, CardBody, CardHeader, Input, Button, Checkbox } from '@/components/ui';
+import { Card, CardBody, CardHeader, Input, Button, Checkbox, Snippet } from '@/components/ui';
 import { useState } from 'react';
 
 import Key from 'lucide-react/icons/key';
@@ -125,7 +125,7 @@ export function CreateApiKey({ onDone }: CreateApiKeyProps = {}) {
           <CardBody className="gap-4">
             <div className="rounded-lg bg-success-50 border border-success-200 p-4">
               <p className="text-sm font-medium text-success-700 mb-2">{t('federation.your_new_api_key')}</p>
-              <code className="block break-all text-sm bg-white p-3 rounded border">{createdKey}</code>
+              <Snippet symbol="" variant="soft" color="success" className="w-full">{createdKey}</Snippet>
             </div>
             <div className="flex gap-2">
               <Button variant="tertiary" startContent={<Copy size={16} />} onPress={handleCopy}>{copied ? t('federation.copied') : t('federation.copy_key')}</Button>

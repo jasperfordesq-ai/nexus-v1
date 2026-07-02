@@ -9,6 +9,7 @@
  */
 
 import { useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 
 import { Separator } from '@/components/ui';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -19,6 +20,7 @@ import Shield from 'lucide-react/icons/shield';
 import Webhook from 'lucide-react/icons/webhook';
 import { useTranslation } from 'react-i18next';
 
+import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { Accordion, AccordionItem, Card, CardBody, CardHeader, Chip, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { PageHeader } from '../../components/PageHeader';
@@ -1124,6 +1126,7 @@ const WEBHOOK_EVENTS = [
 
 function WebhooksTab() {
   const { t } = useTranslation('admin');
+  const { tenantPath } = useTenant();
   return (
     <div className="space-y-6">
       <Card>
@@ -1137,7 +1140,7 @@ function WebhooksTab() {
         <CardBody className="space-y-3">
           <p className="text-sm text-muted">
             {t('federation.api_doc_webhook_delivery_intro')}{' '}
-            <a href="../webhooks" className="text-accent underline">{t('federation.api_docs_webhooks')}</a>
+            <RouterLink to={tenantPath('/partner-timebanks/webhooks')} className="text-accent underline">{t('federation.api_docs_webhooks')}</RouterLink>
             {' '}{t('federation.api_doc_webhook_delivery_suffix')}
           </p>
           <Table aria-label={t('federation.api_doc_webhook_events_aria')} removeWrapper>

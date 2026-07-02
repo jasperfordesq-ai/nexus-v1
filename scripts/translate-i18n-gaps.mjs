@@ -87,9 +87,11 @@ const LANG_MAP = {
 
 const SUPPORTED_LANGUAGES = ['de', 'fr', 'it', 'pt', 'es', 'nl', 'pl', 'ja', 'ar', 'ga'];
 
-// Admin-only namespaces — intentionally English-only, skip translation
+// Namespaces skipped by this script. NOTE: admin.json was removed from this
+// list on 2026-07-02 — the old "admin is English-only" policy was voided on
+// 2026-06-06 (admin.json is drift-gated and translated in all 11 locales);
+// the entry here was a stale leftover that silently no-op'd admin fills.
 const SKIP_NAMESPACES = new Set([
-  'admin.json',
   'admin_dashboard.json',
   'admin_nav.json',
   'admin.php',

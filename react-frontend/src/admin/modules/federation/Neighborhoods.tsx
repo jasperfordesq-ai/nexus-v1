@@ -16,6 +16,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { BrokerEmptyState } from '@/broker/components';
 import { PageHeader } from '../../components/PageHeader';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { StatCard } from '../../components/StatCard';
@@ -245,20 +246,16 @@ export function Neighborhoods() {
 
       {/* Neighborhoods grid */}
       {neighborhoods.length === 0 ? (
-        <Card>
-          <CardBody className="flex flex-col items-center py-12 text-muted">
-            <MapPin size={48} className="mb-4" />
-            <p className="text-lg font-medium">{t('federation.no_neighborhoods_yet')}</p>
-            <p className="text-sm">{t('federation.no_neighborhoods_desc')}</p>
-            <Button
-              className="mt-4"
-              startContent={<Plus size={16} />}
-              onPress={createModal.onOpen}
-            >
+        <BrokerEmptyState
+          icon={MapPin}
+          title={t('federation.no_neighborhoods_yet')}
+          hint={t('federation.no_neighborhoods_desc')}
+          action={
+            <Button startContent={<Plus size={16} />} onPress={createModal.onOpen}>
               {t('federation.create_neighborhood')}
             </Button>
-          </CardBody>
-        </Card>
+          }
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {neighborhoods.map((neighborhood) => (
@@ -288,15 +285,15 @@ export function Neighborhoods() {
                 <div className="flex items-center gap-4 text-sm text-muted">
                   <span className="flex items-center gap-1">
                     <Building2 size={14} />
-                    {t('federation.label_communities')}
+                    {neighborhood.tenants.length} {t('federation.label_communities')}
                   </span>
                   <span className="flex items-center gap-1">
                     <Users size={14} />
-                    {t('federation.members_count')}
+                    {t('federation.members_count_value', { count: neighborhood.total_members })}
                   </span>
                   <span className="flex items-center gap-1">
                     <Calendar size={14} />
-                    {t('federation.label_shared_events')}
+                    {neighborhood.shared_events_count} {t('federation.label_shared_events')}
                   </span>
                 </div>
 
@@ -337,7 +334,7 @@ export function Neighborhoods() {
                             <div>
                               <p className="text-sm font-medium">{tenant.name}</p>
                               <p className="text-xs text-muted">
-                                {t('federation.members_count')} · {tenant.slug}
+                                {t('federation.members_count_value', { count: tenant.member_count })} · {tenant.slug}
                               </p>
                             </div>
                           </div>
@@ -357,7 +354,7 @@ export function Neighborhoods() {
                 </div>
 
                 <div className="text-xs text-muted pt-1">
-                  {t('federation.created_time')}
+                  {t('federation.created_date', { date: new Date(neighborhood.created_at).toLocaleDateString() })}
                 </div>
               </CardBody>
             </Card>

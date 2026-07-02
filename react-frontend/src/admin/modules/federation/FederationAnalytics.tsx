@@ -27,6 +27,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts/ToastContext';
 import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { adminFederation } from '../../api/adminApi';
+import { BrokerEmptyState } from '@/broker/components';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
@@ -259,8 +260,12 @@ export function FederationAnalytics() {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex h-full items-center justify-center text-muted">
-                  {t('federation.analytics.no_partner_activity')}
+                <div className="flex h-full items-center justify-center">
+                  <BrokerEmptyState
+                    bare
+                    icon={Users}
+                    title={t('federation.analytics.no_partner_activity')}
+                  />
                 </div>
               )}
             </div>

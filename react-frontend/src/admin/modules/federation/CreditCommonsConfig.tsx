@@ -215,6 +215,9 @@ export function CreditCommonsConfig() {
             <h3 className="text-lg font-semibold">{t('federation.cc_parent_node')}</h3>
           </CardHeader>
           <CardBody className="gap-4">
+            {!parentNodeUrl.trim() && (
+              <p className="text-sm text-muted">{t('federation.cc_standalone_note')}</p>
+            )}
             <Input
               label={t('federation.cc_parent_url')}
               description={t('federation.cc_parent_url_desc')}
@@ -262,9 +265,13 @@ export function CreditCommonsConfig() {
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-muted">{t('federation.cc_last_hash')}</p>
-                <code className="text-xs bg-surface-secondary px-2 py-1 rounded block mt-1 break-all">
-                  {config?.last_hash || t('federation.cc_no_hash')}
-                </code>
+                {config?.last_hash ? (
+                  <code className="text-xs bg-surface-secondary px-2 py-1 rounded block mt-1 break-all">
+                    {config.last_hash}
+                  </code>
+                ) : (
+                  <p className="mt-1 text-sm italic text-muted">{t('federation.cc_no_hash')}</p>
+                )}
               </div>
               <Separator />
               <div className="grid grid-cols-2 gap-4">

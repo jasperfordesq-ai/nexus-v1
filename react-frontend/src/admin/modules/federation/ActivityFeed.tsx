@@ -30,6 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { formatRelativeTime } from '@/lib/helpers';
 import { adminFederation } from '../../api/adminApi';
+import { BrokerEmptyState } from '@/broker/components';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
@@ -466,7 +467,7 @@ export function ActivityFeed() {
             >
               {t('federation.refresh')}
             </Button>
-            <div className="flex flex-col items-end gap-0.5">
+            <Tooltip content={t('federation.export_loaded_only')}>
               <Button
                 variant="tertiary"
                 size="sm"
@@ -476,10 +477,7 @@ export function ActivityFeed() {
               >
                 {t('federation.export_csv')}
               </Button>
-              <span className="text-xs text-muted">
-                {t('federation.export_loaded_only')}
-              </span>
-            </div>
+            </Tooltip>
           </div>
         }
       />
@@ -616,17 +614,11 @@ export function ActivityFeed() {
           </CardBody>
         </Card>
       ) : items.length === 0 ? (
-        <Card>
-          <CardBody className="flex flex-col items-center justify-center py-16 text-center">
-            <Inbox size={48} className="text-muted mb-3" />
-            <p className="text-muted text-lg font-medium mb-1">
-              {t('federation.no_activity_title')}
-            </p>
-            <p className="text-muted text-sm">
-              {t('federation.no_activity_desc')}
-            </p>
-          </CardBody>
-        </Card>
+        <BrokerEmptyState
+          icon={Inbox}
+          title={t('federation.no_activity_title')}
+          hint={t('federation.no_activity_desc')}
+        />
       ) : (
         <Card>
           <CardBody className="p-6">

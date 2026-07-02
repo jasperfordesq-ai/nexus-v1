@@ -31,6 +31,7 @@ import UsersRound from 'lucide-react/icons/users-round';
 import XCircle from 'lucide-react/icons/circle-x';
 import { useTranslation } from 'react-i18next';
 
+import { BrokerEmptyState } from '@/broker/components';
 import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { logError } from '@/lib/logger';
@@ -608,7 +609,7 @@ export function Partnerships() {
       {selectedPendingItems.length > 0 && (
         <div className="flex items-center gap-3 p-3 rounded-lg bg-accent-soft dark:bg-accent-soft border border-accent dark:border-accent">
           <span className="text-sm font-medium">
-            {t('federation.bulk_selected')}
+            {t('federation.bulk_selected', { count: selectedPendingItems.length })}
           </span>
           <Button
             size="sm"
@@ -738,8 +739,11 @@ export function Partnerships() {
                     return (
                       <div key={key} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Icon size={16} className="text-muted" />
-                          <span className="text-sm">{t(`federation.permission_${key}`)}</span>
+                          <Icon size={16} className="text-muted shrink-0" />
+                          <div>
+                            <span className="text-sm">{t(`federation.permission_${key}`)}</span>
+                            <p className="text-xs text-muted">{t(`federation.permission_desc_${key}`)}</p>
+                          </div>
                         </div>
                         <Switch
                           size="sm"
@@ -844,6 +848,9 @@ export function Partnerships() {
                               <Chip size="sm" variant="soft" color="accent">
                                 {t(LEVEL_LABEL_KEYS[detailPartnership.federation_level || 1] || 'federation.level_discovery')}
                               </Chip>
+                              <p className="text-xs text-muted mt-1">
+                                {t(LEVEL_DESCRIPTION_KEYS[detailPartnership.federation_level || 1] || 'federation.level_desc_discovery')}
+                              </p>
                             </div>
                             <div>
                               <p className="text-muted">{t('federation.label_direction')}</p>
@@ -899,7 +906,7 @@ export function Partnerships() {
                                   <div>
                                     <p className="text-sm font-medium">{t(`federation.permission_${key}`)}</p>
                                     <p className="text-xs text-muted">
-                                      {isEnabled ? t('federation.enabled') : t('federation.disabled')}
+                                      {t(`federation.permission_desc_${key}`)}
                                     </p>
                                   </div>
                                 </div>
@@ -933,9 +940,7 @@ export function Partnerships() {
                               <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="sm" /></div>
                             </div>
                           ) : auditLog.length === 0 ? (
-                            <p className="text-sm text-muted text-center py-4">
-                              {t('federation.no_audit_log_entries')}
-                            </p>
+                            <BrokerEmptyState bare icon={Clock} title={t('federation.no_audit_log_entries')} />
                           ) : (
                             <div className="space-y-3">
                               {auditLog.map((entry) => (
@@ -1007,9 +1012,7 @@ export function Partnerships() {
                               </div>
                             </div>
                           ) : (
-                            <p className="text-sm text-muted text-center py-4">
-                              {t('federation.no_stats_available')}
-                            </p>
+                            <BrokerEmptyState bare icon={BarChart3} title={t('federation.no_stats_available')} />
                           )}
                         </CardBody>
                       </Card>

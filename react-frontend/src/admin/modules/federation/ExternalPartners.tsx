@@ -29,6 +29,7 @@ import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { ConfirmModal } from '../../components/ConfirmModal';
+import { BrokerEmptyState } from '@/broker/components';
 
 import { useTranslation } from 'react-i18next';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
@@ -418,7 +419,21 @@ export function ExternalPartners() {
           <TableColumn>{t('federation.col_created')}</TableColumn>
           <TableColumn>{t('federation.col_actions')}</TableColumn>
         </TableHeader>
-        <TableBody emptyContent={t('federation.no_external_partners')}>
+        <TableBody
+          emptyContent={
+            <BrokerEmptyState
+              bare
+              icon={Globe}
+              title={t('federation.no_external_partners')}
+              hint={t('federation.no_external_partners_hint')}
+              action={
+                <Button size="sm" startContent={<Plus size={16} />} onPress={openCreate}>
+                  {t('federation.add_partner')}
+                </Button>
+              }
+            />
+          }
+        >
           {partners.map((partner) => (
             <TableRow key={partner.id}>
               <TableCell>
@@ -450,6 +465,14 @@ export function ExternalPartners() {
                 >
                   {t(`federation.status_${partner.status}`)}
                 </Chip>
+                {partner.error_count > 0 && (
+                  <p
+                    className="mt-1 max-w-[160px] truncate text-xs text-danger"
+                    title={partner.last_error ?? undefined}
+                  >
+                    {t('federation.recent_errors_count', { count: partner.error_count })}
+                  </p>
+                )}
               </TableCell>
               <TableCell>
                 <span className="text-sm text-muted">
@@ -719,9 +742,13 @@ export function ExternalPartners() {
                     <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
                   </div>
                 ) : logs.length === 0 ? (
-                  <div className="flex h-48 items-center justify-center text-muted">
-                    {t('federation.no_logs')}
-                  </div>
+                  <BrokerEmptyState
+                    bare
+                    icon={ScrollText}
+                    title={t('federation.no_logs')}
+                    hint={t('federation.no_logs_hint')}
+                    className="h-48"
+                  />
                 ) : (
                   <Table aria-label={t('federation.api_logs')} removeWrapper>
                     <TableHeader>

@@ -27,6 +27,7 @@ import ChevronRight from 'lucide-react/icons/chevron-right';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { Snippet, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Checkbox, CheckboxGroup } from '@/components/ui';
+import { BrokerEmptyState } from '@/broker/components';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
@@ -415,7 +416,7 @@ export function Webhooks() {
           <TableColumn>{t('federation.webhooks_col_failures')}</TableColumn>
           <TableColumn>{t('federation.col_actions')}</TableColumn>
         </TableHeader>
-        <TableBody emptyContent={t('federation.webhooks_empty')}>
+        <TableBody emptyContent={<BrokerEmptyState bare color="neutral" icon={Webhook} title={t('federation.webhooks_empty')} hint={t('federation.webhooks_empty_hint')} />}>
           {webhooks.map((webhook) => (
             <TableRow key={webhook.id}>
               <TableCell>
@@ -622,9 +623,7 @@ export function Webhooks() {
                     <Spinner size="lg" />
                   </div>
                 ) : logs.length === 0 ? (
-                  <div className="flex h-48 items-center justify-center text-muted">
-                    {t('federation.webhooks_no_logs')}
-                  </div>
+                  <BrokerEmptyState bare color="neutral" icon={ScrollText} title={t('federation.webhooks_no_logs')} hint={t('federation.webhooks_no_logs_hint')} />
                 ) : (
                   <div className="space-y-0">
                     {logs.map((log) => (

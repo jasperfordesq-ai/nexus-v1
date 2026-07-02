@@ -187,6 +187,11 @@ describe('FederationAggregatesPage', () => {
       );
     if (rotateBtn) await user.click(rotateBtn);
 
+    // Rotation is gated behind a confirmation dialog (2026-07-02) —
+    // confirm with the "Replace key" button before the API fires.
+    const confirmBtn = await screen.findByRole('button', { name: /replace key/i });
+    await user.click(confirmBtn);
+
     await waitFor(() => {
       expect(mockAdminFederation.rotateAggregateSecret).toHaveBeenCalled();
     });
@@ -211,6 +216,9 @@ describe('FederationAggregatesPage', () => {
         b.textContent?.toLowerCase().includes('secret')
       );
     if (rotateBtn) await user.click(rotateBtn);
+
+    const confirmBtn = await screen.findByRole('button', { name: /replace key/i });
+    await user.click(confirmBtn);
 
     await waitFor(() => {
       expect(mockToast.success).toHaveBeenCalled();
@@ -278,6 +286,9 @@ describe('FederationAggregatesPage', () => {
         b.textContent?.toLowerCase().includes('secret')
       );
     if (rotateBtn) await user.click(rotateBtn);
+
+    const confirmBtn = await screen.findByRole('button', { name: /replace key/i });
+    await user.click(confirmBtn);
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled();

@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Card, CardBody, CardHeader, Button, Input, Switch, Skeleton } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 
@@ -12,10 +17,7 @@ import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
+import { BrokerEmptyState, BrokerStatusChip } from '@/broker/components';
 
 /**
  * Federation Settings
@@ -155,13 +157,12 @@ export function FederationSettings() {
             </Button>
           }
         />
-        <Card >
-          <CardBody className="flex flex-col items-center py-8 text-muted">
-            <Network aria-hidden="true" size={40} className="mb-2" />
-            <p>{t('not_enabled_for_tenant')}</p>
-            <p className="text-xs">{t('enable_from_tenant_features')}</p>
-          </CardBody>
-        </Card>
+        <BrokerEmptyState
+          icon={Network}
+          title={t('not_enabled_for_tenant')}
+          hint={t('enable_from_tenant_features')}
+          color="neutral"
+        />
       </div>
     );
   }
@@ -173,6 +174,7 @@ export function FederationSettings() {
         description={t('federation_settings_desc')}
         actions={
           <div className="flex items-center gap-2">
+            {dirty && <span className="text-xs text-warning">{t('unsaved_changes')}</span>}
             <Button
               variant="tertiary"
               startContent={<RefreshCw aria-hidden="true" size={16} />}
@@ -219,7 +221,10 @@ export function FederationSettings() {
         </Card>
 
         <Card >
-          <CardHeader><h3 className="text-lg font-semibold">{t('federation_status')}</h3></CardHeader>
+          <CardHeader className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">{t('federation_status')}</h3>
+            <BrokerStatusChip status={data.federation_enabled ? 'active' : 'inactive'} />
+          </CardHeader>
           <CardBody>
             <div className="flex items-center justify-between">
               <div>
@@ -251,13 +256,14 @@ export function FederationSettings() {
             </div>
             <Separator />
             <div className="flex items-center justify-between">
-              <div>
+              <div className={(data.settings?.allow_inbound_partnerships ?? true) ? '' : 'opacity-60'}>
                 <p className="font-medium">{t('auto_approve_partners')}</p>
                 <p className="text-sm text-muted">{t('auto_approve_partners_desc')}</p>
               </div>
               <Switch
                 isSelected={data.settings?.auto_approve_partners ?? false}
                 onValueChange={(val) => updateField('auto_approve_partners', val)}
+                isDisabled={!(data.settings?.allow_inbound_partnerships ?? true)}
                 aria-label={t('auto_approve_partners')}
               />
             </div>
@@ -270,7 +276,7 @@ export function FederationSettings() {
               <Input
                 type="number"
                 value={String(data.settings?.max_partnerships ?? 10)}
-                onValueChange={(val) => updateField('max_partnerships', parseInt(val) || 1)}
+                onValueChange={(val) => updateField('max_partnerships', Math.min(100, Math.max(1, parseInt(val, 10) || 1)))}
                 variant="secondary"
                 size="sm"
                 className="w-24"

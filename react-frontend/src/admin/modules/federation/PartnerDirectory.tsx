@@ -306,7 +306,7 @@ export function PartnerDirectory() {
               )}
             </div>
             <span className="text-sm text-muted">
-              {loading ? t('federation.loading') : t('federation.communities_found')}
+              {loading ? t('federation.loading') : t('federation.directory_results_count', { count: communities.length })}
             </span>
           </div>
         </CardBody>
@@ -404,7 +404,7 @@ export function PartnerDirectory() {
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
                     {community.member_count != null && (
                       <span className="flex items-center gap-1">
-                        <Users size={12} /> {t('federation.members_count')}
+                        <Users size={12} /> {t('federation.directory_member_count', { count: community.member_count ?? 0 })}
                       </span>
                     )}
                     {community.region && (
@@ -434,7 +434,7 @@ export function PartnerDirectory() {
                       ))}
                       {communityTopics.length > 5 && (
                         <Chip size="sm" variant="soft" color="default">
-                          {t('federation.more_count')}
+                          {t('federation.directory_more_topics', { count: communityTopics.length - 5 })}
                         </Chip>
                       )}
                     </div>

@@ -23,7 +23,8 @@ import { EmptyState } from '../../components/EmptyState';
 import { ConfirmModal } from '../../components/ConfirmModal';
 
 import { useTranslation } from 'react-i18next';
-import { Button, Chip } from '@/components/ui';
+import { Button } from '@/components/ui';
+import { BrokerStatusChip } from '@/broker/components';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 interface ApiKey {
   id: number;
@@ -35,12 +36,6 @@ interface ApiKey {
   expires_at: string | null;
   created_at: string;
 }
-
-const getStatusColor = (item: ApiKey): 'success' | 'danger' | 'warning' => {
-  if (item.status === 'revoked') return 'danger';
-  if (item.expires_at && new Date(item.expires_at) < new Date()) return 'warning';
-  return 'success';
-};
 
 interface ApiKeysProps {
   /**
@@ -103,12 +98,6 @@ export function ApiKeys({ onCreateClick, refreshToken }: ApiKeysProps = {}) {
 
   useEffect(() => { loadData(); }, [loadData, refreshToken]);
 
-  const getStatusLabel = (item: ApiKey): string => {
-    if (item.status === 'revoked') return t('federation.status_revoked');
-    if (item.expires_at && new Date(item.expires_at) < new Date()) return t('federation.status_expired');
-    return t('federation.status_active');
-  };
-
   const columns: Column<ApiKey>[] = [
     { key: 'name', label: t('federation.col_key_name'), sortable: true },
     {
@@ -117,9 +106,10 @@ export function ApiKeys({ onCreateClick, refreshToken }: ApiKeysProps = {}) {
     },
     {
       key: 'status', label: t('federation.col_status'),
-      render: (item) => (
-        <Chip size="sm" variant="soft" color={getStatusColor(item)} className="capitalize">{getStatusLabel(item)}</Chip>
-      ),
+      render: (item) => {
+        const s = item.status === 'revoked' ? 'revoked' : (item.expires_at && new Date(item.expires_at) < new Date()) ? 'expired' : 'active';
+        return <BrokerStatusChip status={s} />;
+      },
     },
     {
       key: 'scopes', label: t('federation.col_scopes'),

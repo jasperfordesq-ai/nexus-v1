@@ -10,6 +10,7 @@ import Power from 'lucide-react/icons/power';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Server from 'lucide-react/icons/server';
 import Trash2 from 'lucide-react/icons/trash-2';
+import { BrokerEmptyState } from '@/broker/components';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -280,7 +281,7 @@ export default function FederationPeersAdminPage() {
                 <TableColumn>{t('federation_peers_admin.table.last_handshake')}</TableColumn>
                 <TableColumn>{t('federation_peers_admin.table.actions')}</TableColumn>
               </TableHeader>
-              <TableBody emptyContent={t('federation_peers_admin.peers.empty')}>
+              <TableBody emptyContent={<BrokerEmptyState bare icon={Server} title={t('federation_peers_admin.peers.empty')} />}>
                 {peers.map((peer) => (
                   <TableRow key={peer.id}>
                     <TableCell>

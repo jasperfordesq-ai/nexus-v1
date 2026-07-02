@@ -26,6 +26,7 @@ import { formatRelativeTime } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
 import { ConfirmModal } from '../../components/ConfirmModal';
+import { BrokerEmptyState, BrokerStatusChip } from '@/broker/components';
 import { useTranslation } from 'react-i18next';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 // Copyright © 2024–2026 Jasper Ford
@@ -101,13 +102,6 @@ interface AgreementTransaction {
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
-
-const STATUS_COLORS: Record<string, 'default' | 'primary' | 'success' | 'warning' | 'danger'> = {
-  pending: 'warning',
-  active: 'success',
-  suspended: 'danger',
-  terminated: 'default',
-};
 
 function getPartnerName(agreement: CreditAgreement, unknownLabel: string): string {
   if (agreement.partner_tenant?.name) return agreement.partner_tenant.name;
@@ -402,7 +396,21 @@ export function CreditAgreements() {
                 <TableColumn>{t('federation.label_created')}</TableColumn>
                 <TableColumn>{t('federation.label_actions')}</TableColumn>
               </TableHeader>
-              <TableBody emptyContent={t('federation.no_credit_agreements')}>
+              <TableBody
+                emptyContent={
+                  <BrokerEmptyState
+                    bare
+                    icon={Handshake}
+                    title={t('federation.no_credit_agreements')}
+                    hint={t('federation.no_credit_agreements_hint')}
+                    action={
+                      <Button size="sm" startContent={<Plus size={14} />} onPress={createModal.onOpen}>
+                        {t('federation.new_agreement')}
+                      </Button>
+                    }
+                  />
+                }
+              >
                 {agreements.map((agreement) => (
                   <TableRow key={agreement.id} className="cursor-pointer hover:bg-surface-secondary">
                     <TableCell>
@@ -433,9 +441,7 @@ export function CreditAgreements() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <Chip size="sm" color={STATUS_COLORS[agreement.status]} variant="soft">
-                        {t(`federation.status_${agreement.status}`)}
-                      </Chip>
+                      <BrokerStatusChip status={agreement.status} />
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-muted">{formatRelativeTime(agreement.created_at)}</span>
@@ -536,11 +542,11 @@ export function CreditAgreements() {
               <Spinner size="lg" />
             </div>
           ) : balances.length === 0 ? (
-            <Card>
-              <CardBody className="py-8 text-center">
-                <p className="text-muted">{t('federation.no_balances')}</p>
-              </CardBody>
-            </Card>
+            <BrokerEmptyState
+              icon={Wallet}
+              title={t('federation.no_balances')}
+              hint={t('federation.no_balances_hint')}
+            />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {balances.map((balance) => (
@@ -670,9 +676,7 @@ export function CreditAgreements() {
                           </div>
                           <div>
                             <p className="text-muted">{t('federation.label_status')}</p>
-                            <Chip size="sm" color={STATUS_COLORS[selectedAgreement.status]} variant="soft">
-                              {t(`federation.status_${selectedAgreement.status}`)}
-                            </Chip>
+                            <BrokerStatusChip status={selectedAgreement.status} />
                           </div>
                           <div>
                             <p className="text-muted">{t('federation.label_exchange_rate')}</p>
@@ -779,9 +783,7 @@ export function CreditAgreements() {
                                     </span>
                                   </TableCell>
                                   <TableCell>
-                                    <Chip size="sm" variant="soft" color={tx.status === 'completed' ? 'success' : 'warning'}>
-                                      {t(`federation.status_${tx.status}`)}
-                                    </Chip>
+                                    <BrokerStatusChip status={tx.status} />
                                   </TableCell>
                                 </TableRow>
                               ))}

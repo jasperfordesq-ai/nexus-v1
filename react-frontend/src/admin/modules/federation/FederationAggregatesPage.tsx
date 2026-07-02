@@ -10,6 +10,7 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { PageHeader } from '../../components/PageHeader';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 // Copyright © 2024–2026 Jasper Ford
@@ -62,6 +63,7 @@ export default function FederationAggregatesPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [rotating, setRotating] = useState(false);
+  const [rotateConfirmOpen, setRotateConfirmOpen] = useState(false);
 
   const [auditOpen, setAuditOpen] = useState(false);
   const [auditEntries, setAuditEntries] = useState<AuditEntry[]>([]);
@@ -221,7 +223,7 @@ export default function FederationAggregatesPage() {
                   variant="tertiary"
                   startContent={<KeyRound className="h-4 w-4" aria-hidden="true" />}
                   isLoading={rotating}
-                  onPress={handleRotate}
+                  onPress={() => setRotateConfirmOpen(true)}
                 >
                   {t('federation_aggregates.actions.rotate_secret')}
                 </Button>
@@ -330,6 +332,20 @@ export default function FederationAggregatesPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <ConfirmModal
+        isOpen={rotateConfirmOpen}
+        onClose={() => setRotateConfirmOpen(false)}
+        isLoading={rotating}
+        onConfirm={async () => {
+          await handleRotate();
+          setRotateConfirmOpen(false);
+        }}
+        title={t('federation.rotate_secret_confirm_title')}
+        message={t('federation.rotate_secret_confirm_body')}
+        confirmLabel={t('federation.rotate_secret_confirm_button')}
+        confirmColor="danger"
+      />
     </div>
   );
 }
