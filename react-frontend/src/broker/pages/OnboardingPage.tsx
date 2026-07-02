@@ -203,15 +203,16 @@ export default function OnboardingPage() {
         limit: PAGE_SIZE,
       });
       if (res.success && res.data) {
+        // api client unwrap: res.data is the row array, res.meta the pagination
+        // meta — meta.total is the full collection size (drives pagination).
         const payload = res.data as unknown;
-        if (Array.isArray(payload)) {
-          setMembers(payload as AdminUser[]);
-          setTotal(payload.length);
-        } else if (payload && typeof payload === 'object') {
-          const paged = payload as { data: AdminUser[]; meta?: { total: number } };
-          setMembers(paged.data || []);
-          setTotal(paged.meta?.total ?? 0);
-        }
+        const rows = Array.isArray(payload)
+          ? (payload as AdminUser[])
+          : ((payload as { data?: AdminUser[] }).data ?? []);
+        setMembers(rows);
+        const metaTotal =
+          res.meta?.total ?? (payload as { meta?: { total?: number } })?.meta?.total;
+        setTotal(typeof metaTotal === 'number' ? metaTotal : rows.length);
       }
     } catch {
       setMembersError(true);

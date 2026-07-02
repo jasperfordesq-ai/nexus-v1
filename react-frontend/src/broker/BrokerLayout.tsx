@@ -65,13 +65,20 @@ export function BrokerLayout() {
       ]);
 
       let pendingMembers = 0;
-      if (usersRes.success && usersRes.data) {
-        const payload = usersRes.data as unknown;
-        if (Array.isArray(payload)) {
-          pendingMembers = payload.length;
-        } else if (payload && typeof payload === 'object') {
-          const paged = payload as { data: unknown[]; meta?: { total: number } };
-          pendingMembers = paged.meta?.total ?? paged.data?.length ?? 0;
+      if (usersRes.success) {
+        // api client unwrap: the row array is usersRes.data and the pagination
+        // meta is usersRes.meta — the request uses limit=1 as a cheap count, so
+        // counting rows here would cap the badge at 1.
+        if (typeof usersRes.meta?.total === 'number') {
+          pendingMembers = usersRes.meta.total;
+        } else if (usersRes.data) {
+          const payload = usersRes.data as unknown;
+          if (Array.isArray(payload)) {
+            pendingMembers = payload.length;
+          } else if (payload && typeof payload === 'object') {
+            const paged = payload as { data?: unknown[]; meta?: { total?: number } };
+            pendingMembers = paged.meta?.total ?? paged.data?.length ?? 0;
+          }
         }
       }
 

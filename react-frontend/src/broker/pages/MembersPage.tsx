@@ -96,6 +96,9 @@ const PAGE_SIZE = 20;
 // CRM note categories — mirrors the admin MemberNotes module.
 const NOTE_CATEGORIES = ['general', 'outreach', 'support', 'onboarding', 'concern', 'follow_up'] as const;
 
+// Role filter options — matches the roles the list endpoint understands.
+const ROLE_FILTERS = ['all', 'member', 'broker', 'admin', 'tenant_admin', 'org_admin'] as const;
+
 // Deep-linkable tab keys — anything else in ?status falls back to 'all'.
 const VALID_TABS: ReadonlySet<string> = new Set([
   'all', 'pending', 'active', 'suspended', 'never_logged_in', 'onboarding_incomplete',
@@ -137,14 +140,20 @@ function useTimeAgo() {
 
 /**
  * Count members in a given status via the SAME list endpoint the table uses
- * (limit=1, read meta.total). No new endpoints — just a cheap count query.
+ * (limit=1, read the pagination total). No new endpoints — just a cheap count.
+ *
+ * NOTE: the api client unwraps the `{ data, meta }` envelope — the row array
+ * arrives as `res.data` and the pagination meta as `res.meta`. Reading
+ * `res.data.meta` (which never exists) is what made every card show "1".
  */
 async function fetchStatusTotal(status?: 'pending' | 'active' | 'suspended'): Promise<number | null> {
   try {
     const params: Record<string, unknown> = { page: 1, limit: 1 };
     if (status) params.status = status;
     const res = await adminUsers.list(params as Parameters<typeof adminUsers.list>[0]);
-    if (res.success && res.data) {
+    if (res.success) {
+      if (typeof res.meta?.total === 'number') return res.meta.total;
+      // Defensive fallback for endpoints that return a bare array with no meta.
       const payload = res.data as unknown;
       if (Array.isArray(payload)) return payload.length;
       if (payload && typeof payload === 'object') {
@@ -202,6 +211,18 @@ export default function MembersPage() {
     return () => clearTimeout(handle);
   }, [search]);
   const [page, setPage] = useState(1);
+  const [roleFilter, setRoleFilter] = useState<string>('all');
+
+  // Stat cards and dashboard tiles deep-link into ?status=… without going
+  // through handleTabChange — reset paging + selection when the tab changes
+  // underneath us so a stale page number can't render an empty result set.
+  const prevTabRef = useRef(activeTab);
+  useEffect(() => {
+    if (prevTabRef.current === activeTab) return;
+    prevTabRef.current = activeTab;
+    setPage(1);
+    setSelectedIds(new Set());
+  }, [activeTab]);
 
   // Action modal state
   const [confirmAction, setConfirmAction] = useState<{
@@ -241,19 +262,22 @@ export default function MembersPage() {
         limit: PAGE_SIZE,
       };
       if (activeTab !== 'all') params.status = activeTab;
+      if (roleFilter !== 'all') params.role = roleFilter;
       if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
 
       const res = await adminUsers.list(params as Parameters<typeof adminUsers.list>[0]);
       if (res.success && res.data) {
+        // api client unwrap: res.data is the row array, res.meta the pagination
+        // meta. The full collection size MUST come from meta.total — using the
+        // page's row count here is what hid the pagination controls entirely.
         const payload = res.data as unknown;
-        if (Array.isArray(payload)) {
-          setMembers(payload as AdminUser[]);
-          setTotal(payload.length);
-        } else if (payload && typeof payload === 'object') {
-          const paged = payload as { data: AdminUser[]; meta?: { total: number } };
-          setMembers(paged.data || []);
-          setTotal(paged.meta?.total ?? 0);
-        }
+        const rows = Array.isArray(payload)
+          ? (payload as AdminUser[])
+          : ((payload as { data?: AdminUser[] }).data ?? []);
+        setMembers(rows);
+        const metaTotal =
+          res.meta?.total ?? (payload as { meta?: { total?: number } })?.meta?.total;
+        setTotal(typeof metaTotal === 'number' ? metaTotal : rows.length);
       }
     } catch {
       toastRef.current.error(tRef.current('members.action_failed'));
@@ -262,7 +286,7 @@ export default function MembersPage() {
       setInitialLoaded(true);
     }
     // Fetch is keyed on the real query params only — t/toast live in refs.
-  }, [page, activeTab, debouncedSearch]);
+  }, [page, activeTab, roleFilter, debouncedSearch]);
 
   useEffect(() => {
     fetchMembers();
@@ -759,7 +783,7 @@ export default function MembersPage() {
           size="sm"
           startContent={<RefreshCw size={16} />}
           onPress={refreshAll}
-          isLoading={loading && statsLoading}
+          isLoading={loading || statsLoading}
         >
           {t('common.refresh')}
         </Button>
@@ -801,8 +825,8 @@ export default function MembersPage() {
         />
       </div>
 
-      {/* ── Status tabs — deep-linkable (?status=…) ──────────────────────────── */}
-      <div className="mb-4 rounded-2xl border border-divider/70 bg-surface p-2 shadow-sm shadow-black/[0.03]">
+      {/* ── Status tabs — deep-linkable (?status=…) — plus role filter ───────── */}
+      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-2xl border border-divider/70 bg-surface p-2 shadow-sm shadow-black/[0.03]">
         <Tabs
           aria-label={t('members.tabs_aria')}
           selectedKey={activeTab}
@@ -875,6 +899,31 @@ export default function MembersPage() {
             }
           />
         </Tabs>
+        {/* Role filter — the list endpoint already supports ?role=…, this just
+            exposes it. Resets paging + selection like every other filter. */}
+        <div className="ms-auto">
+          <Select
+            aria-label={t('members.filter_role_label')}
+            size="sm"
+            variant="bordered"
+            selectedKeys={[roleFilter]}
+            onSelectionChange={(keys) => {
+              const next = (Array.from(keys)[0] as string) ?? 'all';
+              setRoleFilter(next);
+              setPage(1);
+              setSelectedIds(new Set());
+            }}
+            className="w-[190px]"
+          >
+            {ROLE_FILTERS.map((r) => (
+              <SelectItem key={r} id={r}>
+                {r === 'all'
+                  ? t('members.filter_role_all')
+                  : t(`members.role_${r}`, { defaultValue: r })}
+              </SelectItem>
+            ))}
+          </Select>
+        </div>
       </div>
 
       {/* ── Bulk-action bar ──────────────────────────────────────────────────── */}
