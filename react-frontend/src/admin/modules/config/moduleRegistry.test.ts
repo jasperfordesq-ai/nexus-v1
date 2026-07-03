@@ -29,7 +29,8 @@ describe('module registry podcast module', () => {
     const podcasts = modules.find(module => module.id === 'podcasts');
 
     expect(podcasts).toBeDefined();
-    expect(podcasts?.stage).toBe('alpha');
+    // Promoted out of alpha (2026-07-03) — absent stage means stable/GA.
+    expect(podcasts?.stage).toBeUndefined();
     expect(podcasts?.configSource).toBe('podcast_config');
     expect(podcasts?.detailPageUrl).toBe('/admin/podcasts');
 

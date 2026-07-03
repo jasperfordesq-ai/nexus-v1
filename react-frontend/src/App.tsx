@@ -297,7 +297,7 @@ const CreateCoursePage = lazyWithRetry(() => import('./pages/courses/CreateCours
 const CourseAnalyticsPage = lazyWithRetry(() => import('./pages/courses/CourseAnalyticsPage'));
 const CourseGradingPage = lazyWithRetry(() => import('./pages/courses/CourseGradingPage'));
 
-// Podcasts Pages (alpha)
+// Podcasts Pages
 const PodcastsPage = lazyWithRetry(() => import('./pages/podcasts/PodcastsPage'));
 const PodcastShowPage = lazyWithRetry(() => import('./pages/podcasts/PodcastShowPage'));
 const PodcastEpisodePage = lazyWithRetry(() => import('./pages/podcasts/PodcastEpisodePage'));
@@ -598,7 +598,7 @@ function AppRoutes() {
           </FeatureGate>
         } />
 
-        {/* Podcasts Module (alpha) — feature-gated */}
+        {/* Podcasts Module — feature-gated */}
         <Route path="podcasts" element={
           <FeatureGate feature="podcasts" redirect="/">
             <FeatureErrorBoundary featureName="Podcasts">

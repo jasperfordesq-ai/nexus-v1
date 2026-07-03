@@ -1113,7 +1113,7 @@ Route::post('/v2/courses/{courseId}/quizzes', [\App\Http\Controllers\Api\CourseQ
 Route::post('/v2/courses/{courseId}/quizzes/{quizId}/questions', [\App\Http\Controllers\Api\CourseQuizController::class, 'storeQuestion'])->where(['courseId' => '[0-9]+', 'quizId' => '[0-9]+']);
 Route::delete('/v2/courses/{courseId}/quizzes/{quizId}/questions/{questionId}', [\App\Http\Controllers\Api\CourseQuizController::class, 'deleteQuestion'])->where(['courseId' => '[0-9]+', 'quizId' => '[0-9]+', 'questionId' => '[0-9]+']);
 
-// Podcasts Module (ALPHA) — member-created shows and episodes.
+// Podcasts Module — member-created shows and episodes.
 Route::get('/v2/podcasts/mine', [\App\Http\Controllers\Api\PodcastController::class, 'authored']);
 Route::get('/v2/podcasts/{id}/validate-feed', [\App\Http\Controllers\Api\PodcastController::class, 'validateFeedForOwner'])->where('id', '[0-9]+');
 Route::get('/v2/podcasts/{id}/stats', [\App\Http\Controllers\Api\PodcastController::class, 'stats'])->where('id', '[0-9]+');
@@ -1142,7 +1142,7 @@ Route::get('/v2/courses/{id}/reviews', [\App\Http\Controllers\Api\CourseControll
 Route::get('/v2/courses/{idOrSlug}', [\App\Http\Controllers\Api\CourseController::class, 'show']);
 
 // ============================================
-// Podcasts Module (ALPHA) — Public routes (no auth required)
+// Podcasts Module — Public routes (no auth required)
 // ============================================
 Route::get('/v2/podcasts', [\App\Http\Controllers\Api\PodcastController::class, 'index']);
 Route::post('/v2/podcasts/episodes/{episodeId}/listen', [\App\Http\Controllers\Api\PodcastController::class, 'listen'])->where('episodeId', '[0-9]+');
@@ -2228,7 +2228,7 @@ Route::put('/v2/admin/courses/categories/{id}', [\App\Http\Controllers\Api\Admin
 Route::delete('/v2/admin/courses/categories/{id}', [\App\Http\Controllers\Api\AdminCourseController::class, 'deleteCategory'])->where('id', '[0-9]+');
 Route::post('/v2/admin/courses/discussions/{id}/hide', [\App\Http\Controllers\Api\CourseDiscussionController::class, 'hide'])->where('id', '[0-9]+');
 
-// Podcasts Module (ALPHA) — Admin moderation and analytics
+// Podcasts Module — Admin moderation and analytics
 Route::get('/v2/admin/podcasts', [\App\Http\Controllers\Api\AdminPodcastController::class, 'index']);
 Route::post('/v2/admin/podcasts/shows/{id}/moderate', [\App\Http\Controllers\Api\AdminPodcastController::class, 'moderateShow'])->where('id', '[0-9]+');
 Route::get('/v2/admin/podcasts/shows/{id}/validate-feed', [\App\Http\Controllers\Api\AdminPodcastController::class, 'validateFeed'])->where('id', '[0-9]+');

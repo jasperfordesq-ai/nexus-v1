@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Podcasts module (alpha) — typed API client.
+ * Podcasts module — typed API client.
  */
 
 import { api, type ApiResponse } from '@/lib/api';

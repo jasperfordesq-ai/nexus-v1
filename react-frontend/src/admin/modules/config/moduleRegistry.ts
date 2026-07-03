@@ -703,7 +703,6 @@ const FEATURE_MODULES: ModuleDefinition[] = [
     type: 'feature',
     configSource: 'podcast_config',
     detailPageUrl: '/admin/podcasts',
-    stage: 'alpha',
     configOptions: [
       { key: 'podcasts.allow_member_show_creation', label: 'Member Show Creation', description: 'Allow ordinary members to create podcast shows. This is on by default.', type: 'boolean', defaultValue: true, category: 'Authoring' },
       { key: 'podcasts.max_shows_per_user', label: 'Max Shows Per Member', description: 'Maximum number of shows one member can own. Set to 0 for no limit.', type: 'number', defaultValue: 5, category: 'Authoring', min: 0, max: 100 },
@@ -716,10 +715,10 @@ const FEATURE_MODULES: ModuleDefinition[] = [
       { key: 'podcasts.enable_listen_analytics', label: 'Listen Analytics', description: 'Record tenant-scoped listens and completion signals.', type: 'boolean', defaultValue: true, category: 'Analytics' },
       { key: 'podcasts.max_audio_size_mb', label: 'Max Audio Size', description: 'Maximum episode audio file size in megabytes for future uploads.', type: 'number', defaultValue: 250, category: 'Publishing', min: 10, max: 2000 },
       { key: 'podcasts.media_storage_driver', label: 'Media Storage', description: 'Choose local private storage or a configured cloud disk for hosted podcast audio.', type: 'select', defaultValue: 'local', category: 'Media', choices: [{ value: 'local', label: 'Local' }, { value: 'cloud', label: 'Cloud' }] },
-      { key: 'podcasts.cloud_storage_disk', label: 'Cloud Storage Disk', description: 'Laravel filesystem disk to use when Media Storage is Cloud.', type: 'select', defaultValue: 's3', category: 'Media', choices: [{ value: 's3', label: 'S3 / R2 compatible' }, { value: 'azure', label: 'Azure Blob' }] },
+      { key: 'podcasts.cloud_storage_disk', label: 'Cloud Storage Disk', description: 'Laravel filesystem disk to use when Media Storage is Cloud. The s3 disk covers all S3-compatible providers (AWS S3, Cloudflare R2, DigitalOcean Spaces, MinIO) via AWS_ENDPOINT.', type: 'select', defaultValue: 's3', category: 'Media', choices: [{ value: 's3', label: 'S3 / R2 compatible' }] },
       { key: 'podcasts.cloud_cdn_base_url', label: 'Cloud CDN Base URL', description: 'Optional public CDN base URL for hosted podcast audio in cloud storage.', type: 'string', defaultValue: '', category: 'Media' },
-      { key: 'podcasts.enable_media_scanning', label: 'Media Security Scan', description: 'Mark uploaded audio for malware/security scanning before operational review.', type: 'boolean', defaultValue: true, category: 'Media' },
-      { key: 'podcasts.enable_media_processing', label: 'Media Processing Queue', description: 'Mark uploaded audio for duration extraction, waveform generation, and normalization jobs.', type: 'boolean', defaultValue: true, category: 'Media' },
+      { key: 'podcasts.enable_media_scanning', label: 'Media Security Scan', description: 'Scan uploaded audio for malware via ClamAV when CLAMAV_ADDRESS is configured on the server; otherwise recorded honestly as scan-unavailable.', type: 'boolean', defaultValue: true, category: 'Media' },
+      { key: 'podcasts.enable_media_processing', label: 'Media Processing Queue', description: 'Verify uploaded files are genuine audio and auto-detect episode duration when the creator leaves it blank.', type: 'boolean', defaultValue: true, category: 'Media' },
     ],
   },
   {
