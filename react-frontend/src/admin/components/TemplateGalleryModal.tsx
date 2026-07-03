@@ -27,7 +27,6 @@ import {
   Tab,
 } from '@/components/ui';
 import { useTranslation } from 'react-i18next';
-import type { ContentFormat } from './contentFormat';
 
 export interface GalleryTemplate {
   id: number;
