@@ -44,6 +44,7 @@ import type { FeedPostEvent } from '@/contexts';
 import { api } from '@/lib/api';
 import { applyFeedSyncToItem, dispatchFeedSync, FEED_SYNC_EVENT, type FeedSyncPayload } from '@/lib/feedSync';
 import { logError } from '@/lib/logger';
+import { isAdminTier } from '@/lib/roles';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage';
 import { usePageTitle } from '@/hooks';
@@ -136,7 +137,10 @@ export function FeedPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { tenantPath, tenant, hasFeature, hasModule } = useTenant();
   const showDesktopSidebar = useMediaQuery('(min-width: 1024px)');
-  const isAdmin = user?.is_admin === true || user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_super_admin === true;
+  // Admin-tier gate aligned with the backend (BaseApiController::callerIsAdminTier):
+  // includes god / is_god / is_tenant_super_admin, which the old inline check omitted
+  // — those users saw no admin-delete option even though the API would allow it.
+  const isAdmin = isAdminTier(user);
   const [items, setItems] = useState<FeedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

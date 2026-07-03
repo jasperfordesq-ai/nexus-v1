@@ -88,6 +88,31 @@ class LinkPreviewService
             return null;
         }
 
+        $domain = preg_replace('/^www\./', '', strtolower($parsed['host']));
+
+        // Known video/media providers (YouTube, Vimeo, Spotify, SoundCloud,
+        // Twitch, TikTok) embed straight from the URL. Build the preview here —
+        // BEFORE any outbound fetch — so the player works even when the provider
+        // blocks server-side scraping. YouTube now blocks datacenter IPs, which
+        // silently killed every video embed on production (0 video previews ever
+        // reached the feed) even though the video id was sitting in the URL.
+        $providerEmbed = $this->videoEmbedFor($url, $domain);
+        if ($providerEmbed !== null) {
+            $preview = array_merge([
+                'title'       => $providerEmbed['site_name'] ?? null,
+                'description' => null,
+                'image_url'   => null,
+                'favicon_url' => null,
+            ], $providerEmbed, [
+                'url'      => $url,
+                'url_hash' => $urlHash,
+                'domain'   => $domain,
+            ]);
+            $this->storePreview($preview);
+
+            return $this->formatPreviewResponse($preview);
+        }
+
         // Fetch the URL with DNS/IP validation pinned into the cURL request.
         try {
             $response = Http::timeout(self::HTTP_TIMEOUT)
@@ -115,10 +140,7 @@ class LinkPreviewService
             return null;
         }
 
-        // Parse OG metadata
-        $domain = $parsed['host'];
-        $domain = preg_replace('/^www\./', '', $domain);
-
+        // Parse OG metadata ($domain already resolved above)
         $preview = $this->parseHtml($body, $url, $domain);
 
         if ($preview === null) {
@@ -615,50 +637,141 @@ class LinkPreviewService
     }
 
     /**
-     * Handle YouTube/Vimeo special video embeds.
+     * Merge a provider media embed into a scraped preview. Defensive: the
+     * provider short-circuit in fetchPreview normally handles these before any
+     * scrape, so this only fires if a provider page was somehow scraped.
      */
     private function handleVideoEmbeds(array $preview, string $url, string $domain): array
     {
-        // YouTube
-        if (preg_match('/(?:youtube\.com|youtu\.be)/i', $domain)) {
-            $videoId = $this->extractYouTubeVideoId($url);
-            if ($videoId) {
-                $preview['content_type'] = 'video';
-                $preview['embed_html'] = 'https://www.youtube-nocookie.com/embed/' . $videoId;
+        $embed = $this->videoEmbedFor($url, $domain);
+        if ($embed === null) {
+            return $preview;
+        }
 
-                // Use YouTube's thumbnail if no OG image
-                if (! $preview['image_url']) {
-                    $preview['image_url'] = 'https://img.youtube.com/vi/' . $videoId . '/hqdefault.jpg';
-                }
+        $preview['content_type'] = 'video';
+        $preview['embed_html']   = $embed['embed_html'];
+        if (empty($preview['image_url']) && ! empty($embed['image_url'])) {
+            $preview['image_url'] = $embed['image_url'];
+        }
+        if (empty($preview['site_name']) && ! empty($embed['site_name'])) {
+            $preview['site_name'] = $embed['site_name'];
+        }
+
+        return $preview;
+    }
+
+    /**
+     * Build an inline-player embed for a known media provider, purely from the
+     * URL — no outbound fetch. Providers: YouTube, Vimeo, Spotify, SoundCloud,
+     * Twitch, TikTok. Returns embed fields, or null if not a known provider or
+     * the URL carries no embeddable id.
+     *
+     * `embed_html` holds the iframe *src* (the frontend builds the <iframe>).
+     * Twitch requires a `&parent=<host>` param appended client-side.
+     *
+     * @return array{content_type:string,embed_html:string,image_url:?string,site_name:string}|null
+     */
+    private function videoEmbedFor(string $url, string $domain): ?array
+    {
+        // YouTube
+        if ($this->domainMatches($domain, ['youtube.com', 'youtu.be', 'youtube-nocookie.com'])) {
+            $id = $this->extractYouTubeVideoId($url);
+            if ($id !== null) {
+                return [
+                    'content_type' => 'video',
+                    'embed_html'   => 'https://www.youtube-nocookie.com/embed/' . $id,
+                    'image_url'    => 'https://img.youtube.com/vi/' . $id . '/hqdefault.jpg',
+                    'site_name'    => 'YouTube',
+                ];
             }
         }
 
         // Vimeo
-        if (preg_match('/vimeo\.com/i', $domain)) {
-            $videoId = $this->extractVimeoVideoId($url);
-            if ($videoId) {
-                $preview['content_type'] = 'video';
-                $preview['embed_html'] = 'https://player.vimeo.com/video/' . $videoId;
-
-                // Fetch Vimeo thumbnail via oEmbed if no OG image
-                if (! $preview['image_url']) {
-                    try {
-                        $oembedResponse = Http::timeout(3)->get('https://vimeo.com/api/oembed.json', [
-                            'url' => $url,
-                            'width' => 640,
-                        ]);
-                        if ($oembedResponse->ok()) {
-                            $oembed = $oembedResponse->json();
-                            $preview['image_url'] = $oembed['thumbnail_url'] ?? null;
-                        }
-                    } catch (\Throwable $e) {
-                        // Non-critical: Vimeo thumbnail fetch failed
-                    }
-                }
+        if ($this->domainMatches($domain, ['vimeo.com'])) {
+            $id = $this->extractVimeoVideoId($url);
+            if ($id !== null) {
+                return [
+                    'content_type' => 'video',
+                    'embed_html'   => 'https://player.vimeo.com/video/' . $id,
+                    'image_url'    => null,
+                    'site_name'    => 'Vimeo',
+                ];
             }
         }
 
-        return $preview;
+        // Spotify (track / album / playlist / episode / show / artist)
+        if ($this->domainMatches($domain, ['spotify.com'])
+            && preg_match('#spotify\.com/(?:embed/)?(track|album|playlist|episode|show|artist)/([A-Za-z0-9]+)#i', $url, $m)) {
+            return [
+                'content_type' => 'video',
+                'embed_html'   => 'https://open.spotify.com/embed/' . strtolower($m[1]) . '/' . $m[2],
+                'image_url'    => null,
+                'site_name'    => 'Spotify',
+            ];
+        }
+
+        // SoundCloud — the player embeds any track/set by its full URL.
+        // (delimiter is ~ because the pattern contains a literal # in [^/?#])
+        if ($this->domainMatches($domain, ['soundcloud.com'])
+            && preg_match('~^https?://[^/]*soundcloud\.com/[^/]+/[^/?#]+~i', $url)) {
+            return [
+                'content_type' => 'video',
+                'embed_html'   => 'https://w.soundcloud.com/player/?url=' . rawurlencode($url) . '&color=%23ff5500',
+                'image_url'    => null,
+                'site_name'    => 'SoundCloud',
+            ];
+        }
+
+        // Twitch (VOD / clip / live channel) — frontend appends &parent=<host>.
+        if ($this->domainMatches($domain, ['twitch.tv'])) {
+            $src = null;
+            if (preg_match('#twitch\.tv/videos/(\d+)#i', $url, $m)) {
+                $src = 'https://player.twitch.tv/?video=' . $m[1];
+            } elseif (preg_match('#clips\.twitch\.tv/([A-Za-z0-9_-]+)#i', $url, $m)
+                   || preg_match('#twitch\.tv/[^/]+/clip/([A-Za-z0-9_-]+)#i', $url, $m)) {
+                $src = 'https://clips.twitch.tv/embed?clip=' . $m[1];
+            } elseif (preg_match('#twitch\.tv/([A-Za-z0-9_]{2,25})/?(?:$|\?)#i', $url, $m)) {
+                $src = 'https://player.twitch.tv/?channel=' . $m[1];
+            }
+            if ($src !== null) {
+                return [
+                    'content_type' => 'video',
+                    'embed_html'   => $src,
+                    'image_url'    => null,
+                    'site_name'    => 'Twitch',
+                ];
+            }
+        }
+
+        // TikTok
+        if ($this->domainMatches($domain, ['tiktok.com'])
+            && preg_match('#tiktok\.com/(?:@[^/]+/video|v|embed/v2)/(\d+)#i', $url, $m)) {
+            return [
+                'content_type' => 'video',
+                'embed_html'   => 'https://www.tiktok.com/embed/v2/' . $m[1],
+                'image_url'    => null,
+                'site_name'    => 'TikTok',
+            ];
+        }
+
+        return null;
+    }
+
+    /**
+     * True if $domain equals one of $suffixes or is a subdomain of it.
+     *
+     * @param string[] $suffixes
+     */
+    private function domainMatches(string $domain, array $suffixes): bool
+    {
+        $domain = strtolower($domain);
+        foreach ($suffixes as $suffix) {
+            if ($domain === $suffix || str_ends_with($domain, '.' . $suffix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

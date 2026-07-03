@@ -197,6 +197,52 @@ class AdminFeedControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    /**
+     * The success path had no coverage — this is the exact scenario the owner
+     * reported failing (admin deleting another member's post). Asserts the
+     * feed_activity row is gone and the moderation action is audit-logged.
+     */
+    public function test_destroy_successfully_deletes_another_members_post(): void
+    {
+        $admin  = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        $postId = DB::table('feed_posts')->insertGetId([
+            'tenant_id'  => $this->testTenantId,
+            'user_id'    => $member->id,
+            'content'    => 'A member post an admin should be able to remove',
+            'is_hidden'  => 0,
+            'created_at' => now(),
+        ]);
+
+        DB::table('feed_activity')->insert([
+            'tenant_id'   => $this->testTenantId,
+            'user_id'     => $member->id,
+            'source_type' => 'post',
+            'source_id'   => $postId,
+            'content'     => 'A member post an admin should be able to remove',
+            'is_hidden'   => 0,
+            'is_visible'  => 1,
+            'created_at'  => now(),
+        ]);
+
+        $response = $this->apiDelete("/v2/admin/feed/posts/{$postId}?type=post");
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseMissing('feed_activity', [
+            'tenant_id'   => $this->testTenantId,
+            'source_type' => 'post',
+            'source_id'   => $postId,
+        ]);
+
+        $this->assertTrue(
+            DB::table('activity_log')->where('action', 'delete_feed_item')->exists(),
+            'Expected a delete_feed_item audit-log row after a successful admin delete'
+        );
+    }
+
     // ================================================================
     // STATS — GET /v2/admin/feed/stats
     // ================================================================

@@ -4,14 +4,16 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * YouTubeEmbed — Click-to-play video embed for YouTube and Vimeo.
+ * YouTubeEmbed — Inline media-player embed for feed link previews.
  *
- * Shows a thumbnail with a play button overlay. Clicking loads the iframe
- * with the actual embed player. Uses privacy-enhanced mode for YouTube
- * (youtube-nocookie.com).
+ * Despite the name (kept for import stability), this renders players for every
+ * supported provider: YouTube, Vimeo, Twitch and TikTok (click-to-play video),
+ * plus Spotify and SoundCloud (direct audio players). The provider is detected
+ * from the embed URL that the backend LinkPreviewService builds from the
+ * original link — no server-side scraping required.
  *
- * Performance: iframe is NOT loaded until the user clicks play, reducing
- * initial page weight significantly for feeds with many video links.
+ * Performance: video iframes are NOT loaded until the user clicks play,
+ * reducing initial page weight for feeds with many video links.
  */
 
 import { useState, useCallback } from 'react';
@@ -23,19 +25,39 @@ import { Button, Card } from '@/components/ui';
 /* ───────────────────────── Types ───────────────────────── */
 
 interface YouTubeEmbedProps {
-  /** The embed URL (e.g., https://www.youtube-nocookie.com/embed/VIDEO_ID) */
+  /** The embed URL (iframe src) built by the backend, e.g. https://www.youtube-nocookie.com/embed/VIDEO_ID */
   embedUrl: string;
-  /** Thumbnail image URL (optional, falls back to YouTube's default) */
+  /** Thumbnail image URL (optional; YouTube derives one from the video id) */
   thumbnailUrl?: string;
-  /** Video title for accessibility */
+  /** Media title for accessibility */
   title?: string;
 }
 
+type Provider = 'youtube' | 'vimeo' | 'spotify' | 'soundcloud' | 'twitch' | 'tiktok' | 'other';
+
 /* ───────────────────────── Helpers ───────────────────────── */
 
-/**
- * Extract YouTube video ID from an embed URL.
- */
+function detectProvider(embedUrl: string): Provider {
+  if (/youtube(?:-nocookie)?\.com|youtu\.be/i.test(embedUrl)) return 'youtube';
+  if (/player\.vimeo\.com/i.test(embedUrl)) return 'vimeo';
+  if (/open\.spotify\.com\/embed/i.test(embedUrl)) return 'spotify';
+  if (/w\.soundcloud\.com\/player/i.test(embedUrl)) return 'soundcloud';
+  if (/player\.twitch\.tv|clips\.twitch\.tv\/embed/i.test(embedUrl)) return 'twitch';
+  if (/tiktok\.com\/embed/i.test(embedUrl)) return 'tiktok';
+  return 'other';
+}
+
+const PROVIDER_LABEL: Record<Provider, string> = {
+  youtube: 'YouTube',
+  vimeo: 'Vimeo',
+  spotify: 'Spotify',
+  soundcloud: 'SoundCloud',
+  twitch: 'Twitch',
+  tiktok: 'TikTok',
+  other: 'Video',
+};
+
+/** Extract a YouTube video ID from an embed URL. */
 function extractVideoId(embedUrl: string): string | null {
   const match = embedUrl.match(
     /(?:youtube(?:-nocookie)?\.com\/embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/
@@ -43,11 +65,18 @@ function extractVideoId(embedUrl: string): string | null {
   return match?.[1] ?? null;
 }
 
-/**
- * Get a YouTube thumbnail URL for a video ID.
- */
 function getYouTubeThumbnail(videoId: string): string {
   return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+}
+
+/** Current host — required as the `parent` param for Twitch embeds to load. */
+function currentHost(): string {
+  return typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+}
+
+/** Spotify tracks/episodes use a compact player; albums/playlists a tall one. */
+function spotifyHeight(embedUrl: string): number {
+  return /\/embed\/(?:track|episode)\//i.test(embedUrl) ? 152 : 352;
 }
 
 /* ───────────────────────── Component ───────────────────────── */
@@ -56,30 +85,64 @@ export function YouTubeEmbed({ embedUrl, thumbnailUrl, title }: YouTubeEmbedProp
   const { t } = useTranslation('feed');
   const [isPlaying, setIsPlaying] = useState(false);
   const videoTitle = title ?? t('video.default_title');
-
-  const videoId = extractVideoId(embedUrl);
-
-  // Determine thumbnail: use provided, or derive from video ID
-  const thumbnail = thumbnailUrl || (videoId ? getYouTubeThumbnail(videoId) : null);
+  const provider = detectProvider(embedUrl);
 
   const handlePlay = useCallback(() => {
     setIsPlaying(true);
   }, []);
 
-  // Build the embed src with autoplay when played.
-  // cc_load_policy=1 forces captions on by default (WCAG 1.2.2).
-  const embedSrc = isPlaying
-    ? `${embedUrl}?autoplay=1&rel=0&cc_load_policy=1`
-    : `${embedUrl}?cc_load_policy=1`;
+  // ── Audio providers: lightweight, render the player directly (no click-to-play).
+  if (provider === 'spotify' || provider === 'soundcloud') {
+    const height = provider === 'spotify' ? spotifyHeight(embedUrl) : 166;
+    return (
+      <Card className="overflow-hidden border border-[var(--border-default)] bg-[var(--surface-elevated)]">
+        <iframe
+          src={embedUrl}
+          title={videoTitle}
+          className="w-full block"
+          style={{ height }}
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+        />
+      </Card>
+    );
+  }
+
+  // ── Video providers: click-to-play to keep the feed light.
+  const videoId = provider === 'youtube' ? extractVideoId(embedUrl) : null;
+  const thumbnail = thumbnailUrl || (videoId ? getYouTubeThumbnail(videoId) : null);
+  // TikTok is a vertical (portrait) player; the rest are 16:9.
+  const aspectClass = provider === 'tiktok'
+    ? 'aspect-[9/16] max-w-[325px] mx-auto'
+    : 'aspect-video';
+
+  // Build the iframe src, adding autoplay when played and the required
+  // per-provider params (Twitch needs &parent=<host> to render at all).
+  const buildSrc = (): string => {
+    switch (provider) {
+      case 'youtube':
+        return isPlaying
+          ? `${embedUrl}?autoplay=1&rel=0&cc_load_policy=1`
+          : `${embedUrl}?cc_load_policy=1`;
+      case 'vimeo':
+        return isPlaying ? `${embedUrl}?autoplay=1` : embedUrl;
+      case 'twitch': {
+        const parent = `&parent=${encodeURIComponent(currentHost())}`;
+        return `${embedUrl}${parent}&autoplay=${isPlaying ? 'true' : 'false'}`;
+      }
+      case 'tiktok':
+        return embedUrl;
+      default:
+        return isPlaying ? `${embedUrl}?autoplay=1` : embedUrl;
+    }
+  };
 
   return (
-    <Card
-      className="overflow-hidden border border-[var(--border-default)] bg-[var(--surface-elevated)]"
-    >
-      <div className="relative w-full aspect-video">
+    <Card className="overflow-hidden border border-[var(--border-default)] bg-[var(--surface-elevated)]">
+      <div className={`relative w-full ${aspectClass}`}>
         {isPlaying ? (
           <iframe
-            src={embedSrc}
+            src={buildSrc()}
             title={videoTitle}
             className="absolute inset-0 w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -113,9 +176,9 @@ export function YouTubeEmbed({ embedUrl, thumbnailUrl, title }: YouTubeEmbedProp
               </div>
             </div>
 
-            {/* Video platform branding in corner */}
+            {/* Provider branding in corner */}
             <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium">
-              {embedUrl.includes('vimeo') ? 'Vimeo' : 'YouTube'}
+              {PROVIDER_LABEL[provider]}
             </div>
           </Button>
         )}
