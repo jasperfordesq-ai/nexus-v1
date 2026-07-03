@@ -20,6 +20,8 @@ const { mockPodcastsApi, mockToast } = vi.hoisted(() => ({
     archiveEpisode: vi.fn(),
     deleteEpisode: vi.fn(),
     createEpisode: vi.fn(),
+    validateShowFeed: vi.fn(),
+    showStats: vi.fn(),
   },
   mockToast: {
     success: vi.fn(),
@@ -49,7 +51,32 @@ vi.mock('@/contexts', () =>
   })
 );
 
-vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+// Partial UI mock (NOT the full uiMock proxy): the proxy + a top-level
+// @/test/test-utils import crashes the vitest fork worker at collect on this
+// machine (see reference-uimock-proxy-fork-worker-hang). Stub only the
+// React-Aria components that misbehave in jsdom; everything else is real.
+vi.mock('@/components/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/components/ui')>();
+  return {
+    ...actual,
+    Select: ({ children, label, 'aria-label': ariaLabel, selectedKeys, onSelectionChange }: {
+      children?: React.ReactNode; label?: string; 'aria-label'?: string;
+      selectedKeys?: string[]; onSelectionChange?: (keys: Set<string>) => void;
+    }) => (
+      <select
+        aria-label={ariaLabel ?? label ?? 'select'}
+        value={selectedKeys?.[0] ?? ''}
+        onChange={(e) => onSelectionChange?.(new Set([e.target.value]))}
+      >
+        {children}
+      </select>
+    ),
+    SelectItem: ({ children, id }: { children?: React.ReactNode; id?: string }) => (
+      <option value={id}>{children}</option>
+    ),
+    useConfirm: () => () => Promise.resolve(true),
+  };
+});
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 const makeShow = (overrides = {}) => ({
@@ -83,6 +110,8 @@ describe('PodcastStudioPage', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     mockPodcastsApi.authored.mockResolvedValue({ success: true, data: [] });
+    // The stats panel loads whenever a show is selected; disabled = renders null.
+    mockPodcastsApi.showStats.mockResolvedValue({ success: true, data: { enabled: false } });
   });
 
   it('shows loading spinner while fetching shows', async () => {
@@ -290,5 +319,130 @@ describe('PodcastStudioPage', () => {
         addEpisodeBtn.getAttribute('disabled') !== null || addEpisodeBtn.getAttribute('data-disabled') !== null
       ).toBe(true);
     }
+  });
+
+  it('rejects an oversized audio file with an inline error before uploading', async () => {
+    mockPodcastsApi.authored.mockResolvedValue({
+      success: true,
+      data: [makeShow()],
+      meta: { max_audio_size_mb: 1, allowed_audio_mimes: ['audio/mpeg'] },
+    });
+
+    const { default: PodcastStudioPage } = await import('./PodcastStudioPage');
+    render(<PodcastStudioPage />);
+    await waitFor(() => expect(screen.getAllByText('Test Podcast Show').length).toBeGreaterThan(0));
+
+    const input = document.getElementById('podcast-audio-file') as HTMLInputElement;
+    const bigFile = new File([new ArrayBuffer(2 * 1024 * 1024)], 'big.mp3', { type: 'audio/mpeg' });
+    fireEvent.change(input, { target: { files: [bigFile] } });
+
+    await waitFor(() => expect(screen.getByText(/larger than the 1 MB limit/i)).toBeInTheDocument());
+    expect(mockPodcastsApi.createEpisode).not.toHaveBeenCalled();
+  });
+
+  it('keeps the form and shows an info toast when an upload is cancelled', async () => {
+    mockPodcastsApi.authored.mockResolvedValue({ success: true, data: [makeShow()] });
+    mockPodcastsApi.createEpisode.mockResolvedValue({ success: false, code: 'UPLOAD_ABORTED', error: 'Upload cancelled' });
+
+    const { default: PodcastStudioPage } = await import('./PodcastStudioPage');
+    render(<PodcastStudioPage />);
+    await waitFor(() => expect(screen.getAllByText('Test Podcast Show').length).toBeGreaterThan(0));
+
+    const titleInput = screen.getByLabelText(/episode title/i);
+    fireEvent.change(titleInput, { target: { value: 'Cancelled Episode' } });
+    const urlInput = screen.getByLabelText(/audio url/i);
+    fireEvent.change(urlInput, { target: { value: 'https://cdn.example.test/a.mp3' } });
+
+    const addEpisodeBtn = screen.getAllByRole('button').find(
+      (b) => b.textContent?.toLowerCase().includes('add') && b.textContent?.toLowerCase().includes('episode')
+    );
+    expect(addEpisodeBtn).toBeDefined();
+    fireEvent.click(addEpisodeBtn!);
+
+    await waitFor(() => expect(mockToast.info).toHaveBeenCalled());
+    // Cancelled — not an error, and the form is preserved for retry.
+    expect(mockToast.error).not.toHaveBeenCalled();
+    expect((screen.getByLabelText(/episode title/i) as HTMLInputElement).value).toBe('Cancelled Episode');
+  });
+
+  it('offers a Retry action after a failed episode save', async () => {
+    mockPodcastsApi.authored.mockResolvedValue({ success: true, data: [makeShow()] });
+    mockPodcastsApi.createEpisode.mockResolvedValue({ success: false, error: 'The audio upload could not be saved.' });
+
+    const { default: PodcastStudioPage } = await import('./PodcastStudioPage');
+    render(<PodcastStudioPage />);
+    await waitFor(() => expect(screen.getAllByText('Test Podcast Show').length).toBeGreaterThan(0));
+
+    fireEvent.change(screen.getByLabelText(/episode title/i), { target: { value: 'Retry Episode' } });
+    fireEvent.change(screen.getByLabelText(/audio url/i), { target: { value: 'https://cdn.example.test/a.mp3' } });
+
+    const addEpisodeBtn = screen.getAllByRole('button').find(
+      (b) => b.textContent?.toLowerCase().includes('add') && b.textContent?.toLowerCase().includes('episode')
+    );
+    fireEvent.click(addEpisodeBtn!);
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+
+    const retryBtn = screen.getByRole('button', { name: /retry upload/i });
+    fireEvent.click(retryBtn);
+    await waitFor(() => expect(mockPodcastsApi.createEpisode).toHaveBeenCalledTimes(2));
+  });
+
+  it('shows a scheduled chip for episodes with a future release', async () => {
+    mockPodcastsApi.authored.mockResolvedValue({
+      success: true,
+      data: [makeShow({ episodes: [makeEpisode({ scheduled_for: '2027-01-01T09:00:00Z' })] })],
+    });
+
+    const { default: PodcastStudioPage } = await import('./PodcastStudioPage');
+    render(<PodcastStudioPage />);
+
+    await waitFor(() => expect(screen.getByText(/Scheduled for/i)).toBeInTheDocument());
+  });
+
+  it('validates the feed from the show card and shows the results modal', async () => {
+    mockPodcastsApi.authored.mockResolvedValue({ success: true, data: [makeShow()] });
+    mockPodcastsApi.validateShowFeed.mockResolvedValue({
+      success: true,
+      data: {
+        valid: false,
+        errors: ['missing_public_episodes', 'episode_12_missing_audio_url'],
+        warnings: ['missing_artwork'],
+        skipped_episode_count: 1,
+      },
+    });
+
+    const { default: PodcastStudioPage } = await import('./PodcastStudioPage');
+    render(<PodcastStudioPage />);
+    await waitFor(() => expect(screen.getAllByText('Test Podcast Show').length).toBeGreaterThan(0));
+
+    fireEvent.click(screen.getByRole('button', { name: /validate feed/i }));
+
+    await waitFor(() => expect(mockPodcastsApi.validateShowFeed).toHaveBeenCalledWith(1));
+    await waitFor(() => expect(screen.getByText(/Blocking issues/i)).toBeInTheDocument());
+    expect(screen.getByText(/Publish at least one approved public episode/i)).toBeInTheDocument();
+    expect(screen.getByText(/An episode is missing a valid HTTP audio URL/i)).toBeInTheDocument();
+  });
+
+  it('renders listener stats for the selected show when analytics are enabled', async () => {
+    mockPodcastsApi.authored.mockResolvedValue({ success: true, data: [makeShow()] });
+    mockPodcastsApi.showStats.mockResolvedValue({
+      success: true,
+      data: {
+        enabled: true,
+        days: 30,
+        totals: { listens: 12, completed_listens: 6, completion_rate: 50, unique_listeners: 9, subscribers: 3, episodes: 2 },
+        listens_over_time: [{ date: '2026-07-01', listens: 12 }],
+        top_episodes: [{ id: 10, show_id: 1, title: 'Episode One', slug: 'ep-1', listen_count: 12 }],
+        retention: [],
+        client_breakdown: [],
+      },
+    });
+
+    const { default: PodcastStudioPage } = await import('./PodcastStudioPage');
+    render(<PodcastStudioPage />);
+
+    await waitFor(() => expect(screen.getByText('Listener stats')).toBeInTheDocument());
+    expect(screen.getByText('Unique listeners')).toBeInTheDocument();
+    expect(screen.getByText('12 listens')).toBeInTheDocument();
   });
 });

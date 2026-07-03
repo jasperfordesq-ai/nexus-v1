@@ -638,3 +638,67 @@ describe('podcastsApi.validateFeed', () => {
     expect(result.data?.warnings).toEqual(['No description']);
   });
 });
+
+// ---------------------------------------------------------------------------
+// podcastsApi creator endpoints — validateShowFeed / showStats / abort signal
+// ---------------------------------------------------------------------------
+
+describe('podcastsApi creator endpoints', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockReset();
+    vi.mocked(api.upload).mockReset();
+  });
+
+  it('GETs the creator feed-validation endpoint', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      success: true,
+      data: { valid: true, errors: [], warnings: [], skipped_episode_count: 0 },
+    });
+    await podcastsApi.validateShowFeed(7);
+    expect(api.get).toHaveBeenCalledWith('/v2/podcasts/7/validate-feed');
+  });
+
+  it('GETs show stats with a clamped days parameter', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: { enabled: true } });
+    await podcastsApi.showStats(7, 14);
+    expect(api.get).toHaveBeenCalledWith('/v2/podcasts/7/stats?days=14');
+  });
+
+  it('defaults show stats to 30 days', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: { enabled: true } });
+    await podcastsApi.showStats(7);
+    expect(api.get).toHaveBeenCalledWith('/v2/podcasts/7/stats?days=30');
+  });
+
+  it('forwards an AbortSignal to api.upload so uploads can be cancelled', async () => {
+    vi.mocked(api.upload).mockResolvedValueOnce({ success: true, data: EPISODE });
+    const fakeFile = new File(['audio'], 'ep.mp3', { type: 'audio/mpeg' });
+    const controller = new AbortController();
+
+    await podcastsApi.createEpisode(1, {
+      title: 'Cancellable upload',
+      audio_url: '',
+      audio_file: fakeFile,
+    }, undefined, controller.signal);
+
+    const options = vi.mocked(api.upload).mock.calls[0][3] as { signal?: AbortSignal } | undefined;
+    expect(options?.signal).toBe(controller.signal);
+  });
+
+  it('forwards progress callback and signal together', async () => {
+    vi.mocked(api.upload).mockResolvedValueOnce({ success: true, data: EPISODE });
+    const fakeFile = new File(['audio'], 'ep.mp3', { type: 'audio/mpeg' });
+    const controller = new AbortController();
+    const onProgress = vi.fn();
+
+    await podcastsApi.createEpisode(1, {
+      title: 'Progress + cancel',
+      audio_url: '',
+      audio_file: fakeFile,
+    }, onProgress, controller.signal);
+
+    const options = vi.mocked(api.upload).mock.calls[0][3] as { signal?: AbortSignal; onUploadProgress?: (p: number) => void };
+    expect(options.signal).toBe(controller.signal);
+    expect(options.onUploadProgress).toBe(onProgress);
+  });
+});

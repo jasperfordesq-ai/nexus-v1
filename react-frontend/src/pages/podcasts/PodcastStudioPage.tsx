@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Button, Card, CardBody, Checkbox, Chip, Input, Progress, Select, SelectItem, Spinner, Textarea, useConfirm } from '@/components/ui';
+import { Button, Card, CardBody, Checkbox, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Progress, Select, SelectItem, Spinner, Textarea, useConfirm } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import {
@@ -15,17 +15,27 @@ import {
   type CreatePodcastShowPayload,
   type PodcastChapter,
   type PodcastEpisode,
+  type PodcastFeedValidation,
   type PodcastShow,
   type PodcastVisibility,
 } from '@/lib/api/podcasts';
+import { feedIssueKey } from '@/lib/podcasts/feedIssues';
+import { PodcastShowStatsPanel } from '@/components/podcasts/PodcastShowStatsPanel';
 import Archive from 'lucide-react/icons/archive';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
+import CalendarClock from 'lucide-react/icons/calendar-clock';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Megaphone from 'lucide-react/icons/megaphone';
 import Plus from 'lucide-react/icons/plus';
 import Radio from 'lucide-react/icons/radio';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Rss from 'lucide-react/icons/rss';
 import Trash2 from 'lucide-react/icons/trash-2';
 import XCircle from 'lucide-react/icons/circle-x';
+
+/** Client-side fallback when /v2/podcasts/mine meta is unavailable. */
+const DEFAULT_MAX_AUDIO_MB = 250;
+const DEFAULT_AUDIO_MIMES = ['audio/mpeg', 'audio/mp3', 'audio/mp4', 'audio/aac', 'audio/x-m4a', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/webm', 'video/webm'];
 
 function parseTimestamp(value: string): number {
   const parts = value.split(':').map((part) => Number.parseInt(part, 10));
@@ -116,7 +126,12 @@ export default function PodcastStudioPage() {
   const [chaptersText, setChaptersText] = useState('');
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [episodeError, setEpisodeError] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [uploadLimits, setUploadLimits] = useState<{ maxMb: number; mimes: string[] }>({ maxMb: DEFAULT_MAX_AUDIO_MB, mimes: DEFAULT_AUDIO_MIMES });
+  const [feedValidation, setFeedValidation] = useState<{ show: PodcastShow; result: PodcastFeedValidation } | null>(null);
+  const [validatingShowId, setValidatingShowId] = useState<number | null>(null);
   const audioInputRef = useRef<HTMLInputElement | null>(null);
+  const uploadAbortRef = useRef<AbortController | null>(null);
 
   const chapterIssues = useMemo(() => countInvalidChapterLines(chaptersText), [chaptersText]);
 
@@ -145,8 +160,43 @@ export default function PodcastStudioPage() {
     if (res.success && res.data) {
       setShows(res.data);
       setSelectedShowId((current) => current || (res.data?.[0] ? String(res.data[0].id) : ''));
+      // Upload constraints ride along in meta so files can be validated
+      // before a multi-hundred-MB upload starts.
+      const meta = res.meta as { max_audio_size_mb?: number; allowed_audio_mimes?: string[] } | undefined;
+      if (meta?.max_audio_size_mb || meta?.allowed_audio_mimes) {
+        setUploadLimits({
+          maxMb: meta.max_audio_size_mb && meta.max_audio_size_mb > 0 ? meta.max_audio_size_mb : DEFAULT_MAX_AUDIO_MB,
+          mimes: meta.allowed_audio_mimes?.length ? meta.allowed_audio_mimes : DEFAULT_AUDIO_MIMES,
+        });
+      }
     }
     setLoading(false);
+  }
+
+  function handleAudioFileSelected(file: File | null): void {
+    setFileError(null);
+    if (!file) {
+      setAudioFile(null);
+      return;
+    }
+
+    if (uploadLimits.maxMb > 0 && file.size > uploadLimits.maxMb * 1024 * 1024) {
+      setAudioFile(null);
+      setFileError(t('studio.file_too_large', { max: uploadLimits.maxMb }));
+      if (audioInputRef.current) audioInputRef.current.value = '';
+      return;
+    }
+
+    // Only block types we know are unsupported — an empty/unknown MIME from
+    // the browser passes through and lets the server content-check decide.
+    if (file.type && !uploadLimits.mimes.includes(file.type)) {
+      setAudioFile(null);
+      setFileError(t('studio.unsupported_file_type'));
+      if (audioInputRef.current) audioInputRef.current.value = '';
+      return;
+    }
+
+    setAudioFile(file);
   }
 
   useEffect(() => {
@@ -266,6 +316,8 @@ export default function PodcastStudioPage() {
     if (!selectedShow || !episodeForm.title.trim() || (!episodeForm.audio_url.trim() && !audioFile)) return;
     setSavingEpisode(true);
     setEpisodeError(null);
+    const abortController = audioFile ? new AbortController() : null;
+    uploadAbortRef.current = abortController;
     if (audioFile) setUploadProgress(0);
     const res = await podcastsApi.createEpisode(
       selectedShow.id,
@@ -278,7 +330,9 @@ export default function PodcastStudioPage() {
         chapters: parseChapters(chaptersText),
       },
       audioFile ? (percent) => setUploadProgress(percent) : undefined,
+      abortController?.signal,
     );
+    uploadAbortRef.current = null;
     setSavingEpisode(false);
     setUploadProgress(null);
 
@@ -288,6 +342,9 @@ export default function PodcastStudioPage() {
       setAudioFile(null);
       setChaptersText('');
       await loadShows();
+    } else if (res.code === 'UPLOAD_ABORTED') {
+      // User-initiated cancel: keep the form and file intact for a retry.
+      toast.info(t('studio.upload_cancelled'));
     } else {
       // The API returns a specific reason (unsupported type, too large, upload
       // failed, invalid URL) — surface it instead of a generic save error.
@@ -295,6 +352,26 @@ export default function PodcastStudioPage() {
       setEpisodeError(message);
       toast.error(message);
     }
+  }
+
+  function handleCancelUpload(): void {
+    uploadAbortRef.current?.abort();
+  }
+
+  async function handleValidateFeed(show: PodcastShow): Promise<void> {
+    setValidatingShowId(show.id);
+    const res = await podcastsApi.validateShowFeed(show.id);
+    setValidatingShowId(null);
+    if (res.success && res.data) {
+      setFeedValidation({ show, result: res.data });
+    } else {
+      toast.error(t('studio.save_failed'));
+    }
+  }
+
+  function formatScheduledDate(value: string): string {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
   }
 
   function clearAudioFile(): void {
@@ -393,11 +470,17 @@ export default function PodcastStudioPage() {
                       className="mt-1 block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-surface-secondary file:px-3 file:py-1 file:text-sm file:font-medium file:text-foreground"
                       type="file"
                       accept="audio/*,.mp3,.m4a,.wav,.ogg,.webm"
-                      aria-describedby="podcast-audio-file-hint"
+                      aria-describedby={fileError ? 'podcast-audio-file-error' : 'podcast-audio-file-hint'}
+                      aria-invalid={Boolean(fileError)}
                       disabled={savingEpisode}
-                      onChange={(event) => setAudioFile(event.currentTarget.files?.[0] ?? null)}
+                      onChange={(event) => handleAudioFileSelected(event.currentTarget.files?.[0] ?? null)}
                     />
-                    <p id="podcast-audio-file-hint" className="mt-1 text-xs text-muted">{t('fields.audio_file_hint')}</p>
+                    <p id="podcast-audio-file-hint" className="mt-1 text-xs text-muted">
+                      {t('fields.audio_file_hint')} {t('studio.max_file_size', { max: uploadLimits.maxMb })}
+                    </p>
+                    {fileError && (
+                      <p id="podcast-audio-file-error" className="mt-1 text-xs text-danger" role="alert">{fileError}</p>
+                    )}
                     {audioFile && (
                       <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-md bg-surface-secondary/70 px-3 py-2 text-xs text-muted">
                         <span className="min-w-0 truncate">{audioFile.name}</span>
@@ -447,17 +530,31 @@ export default function PodcastStudioPage() {
                 )}
                 {uploadProgress !== null && (
                   <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs text-muted">
+                    <div className="flex items-center justify-between gap-2 text-xs text-muted">
                       <span>{t('studio.uploading')}</span>
-                      <span className="tabular-nums">{uploadProgress}%</span>
+                      <div className="flex items-center gap-2">
+                        <span className="tabular-nums">{uploadProgress}%</span>
+                        <Button size="sm" variant="tertiary" onPress={handleCancelUpload}>
+                          {t('studio.cancel_upload')}
+                        </Button>
+                      </div>
                     </div>
                     <Progress aria-label={t('studio.uploading')} value={uploadProgress} />
                   </div>
                 )}
                 {episodeError && (
-                  <div role="alert" className="flex items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
+                  <div role="alert" className="flex flex-wrap items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
                     <XCircle size={16} aria-hidden="true" />
-                    <span>{episodeError}</span>
+                    <span className="min-w-0 flex-1">{episodeError}</span>
+                    <Button
+                      size="sm"
+                      variant="tertiary"
+                      startContent={<RefreshCw size={14} aria-hidden="true" />}
+                      onPress={handleCreateEpisode}
+                      isDisabled={savingEpisode}
+                    >
+                      {t('studio.retry_upload')}
+                    </Button>
                   </div>
                 )}
                 <div className="flex justify-end">
@@ -493,6 +590,8 @@ export default function PodcastStudioPage() {
                 </CardBody>
               </Card>
             )}
+
+            {selectedShow && <PodcastShowStatsPanel showId={selectedShow.id} />}
 
             <div className="flex items-center gap-2">
               <Megaphone size={18} className="text-accent" aria-hidden="true" />
@@ -532,6 +631,15 @@ export default function PodcastStudioPage() {
                           {t('studio.archive_show')}
                         </Button>
                       )}
+                      <Button
+                        size="sm"
+                        variant="tertiary"
+                        startContent={<Rss size={14} aria-hidden="true" />}
+                        onPress={() => handleValidateFeed(show)}
+                        isLoading={validatingShowId === show.id}
+                      >
+                        {t('studio.validate_feed')}
+                      </Button>
                       <Button size="sm" variant="tertiary" color="danger" startContent={<Trash2 size={14} aria-hidden="true" />} onPress={() => handleDeleteShow(show)}>
                         {t('studio.delete_show')}
                       </Button>
@@ -545,6 +653,11 @@ export default function PodcastStudioPage() {
                               <p className="truncate text-sm font-medium">{episode.title}</p>
                               <div className="mt-1 flex flex-wrap gap-1">
                                 <Chip size="sm" variant="soft">{t(`status.${episode.status}`)}</Chip>
+                                {episode.scheduled_for && episode.status !== 'archived' && (
+                                  <Chip size="sm" variant="soft" color="primary" startContent={<CalendarClock size={12} aria-hidden="true" />}>
+                                    {t('studio.scheduled_for_chip', { date: formatScheduledDate(episode.scheduled_for) })}
+                                  </Chip>
+                                )}
                                 <Chip size="sm" variant="soft" color={episode.moderation_status === 'approved' ? 'success' : 'warning'}>
                                   {t(`moderation.${episode.moderation_status}`)}
                                 </Chip>
@@ -586,6 +699,59 @@ export default function PodcastStudioPage() {
           </aside>
         </div>
       )}
+
+      <Modal isOpen={feedValidation !== null} onClose={() => setFeedValidation(null)} size="md">
+        <ModalContent>
+          <ModalHeader>
+            {feedValidation ? t('studio.feed_validation.title', { title: feedValidation.show.title }) : ''}
+          </ModalHeader>
+          <ModalBody className="gap-4">
+            {feedValidation && (
+              <>
+                <div className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${feedValidation.result.valid ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'}`}>
+                  {feedValidation.result.valid
+                    ? <CheckCircle size={16} aria-hidden="true" />
+                    : <XCircle size={16} aria-hidden="true" />}
+                  <span>{feedValidation.result.valid ? t('studio.feed_validation.valid') : t('studio.feed_validation.invalid')}</span>
+                </div>
+
+                {feedValidation.result.errors.length > 0 && (
+                  <div>
+                    <h3 className="mb-1 text-sm font-semibold text-danger">{t('studio.feed_validation.errors')}</h3>
+                    <ul className="list-inside list-disc space-y-1 text-sm text-muted">
+                      {feedValidation.result.errors.map((issue) => (
+                        <li key={issue}>{t(`studio.feed_validation.issues.${feedIssueKey(issue)}`, { defaultValue: issue })}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {feedValidation.result.warnings.length > 0 && (
+                  <div>
+                    <h3 className="mb-1 text-sm font-semibold text-warning">{t('studio.feed_validation.warnings')}</h3>
+                    <ul className="list-inside list-disc space-y-1 text-sm text-muted">
+                      {feedValidation.result.warnings.map((issue) => (
+                        <li key={issue}>{t(`studio.feed_validation.issues.${feedIssueKey(issue)}`, { defaultValue: issue })}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {(feedValidation.result.skipped_episode_count ?? 0) > 0 && (
+                  <p className="text-sm text-muted">
+                    {t('studio.feed_validation.skipped_episodes', { count: feedValidation.result.skipped_episode_count })}
+                  </p>
+                )}
+              </>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="tertiary" onPress={() => setFeedValidation(null)}>
+              {t('actions.close')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

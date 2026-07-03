@@ -95,6 +95,31 @@ export interface PodcastEpisode {
   chapters?: PodcastChapter[];
 }
 
+export interface PodcastFeedValidation {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+  /** Episodes the RSS builder would omit for lacking a resolvable audio URL. */
+  skipped_episode_count?: number;
+}
+
+export interface PodcastShowStats {
+  enabled: boolean;
+  days?: number;
+  totals?: {
+    listens: number;
+    completed_listens: number;
+    completion_rate: number;
+    unique_listeners: number;
+    subscribers: number;
+    episodes: number;
+  };
+  listens_over_time?: { date: string; listens: number }[];
+  top_episodes?: (Pick<PodcastEpisode, 'id' | 'show_id' | 'title' | 'slug' | 'listen_count'> & { show?: { id: number; title: string; slug: string } | null })[];
+  retention?: { bucket: string; listens: number }[];
+  client_breakdown?: { client: string; listens: number }[];
+}
+
 export interface PodcastPage<T> {
   items: T[];
   total: number;
@@ -209,7 +234,7 @@ export const podcastsApi = {
   toggleSubscription: (showId: number, notifyNewEpisodes = true) =>
     api.post<{ subscribed: boolean }>(`/v2/podcasts/${showId}/subscribe`, { notify_new_episodes: notifyNewEpisodes }),
 
-  createEpisode: (showId: number, data: CreatePodcastEpisodePayload, onProgress?: (percent: number) => void) => {
+  createEpisode: (showId: number, data: CreatePodcastEpisodePayload, onProgress?: (percent: number) => void, signal?: AbortSignal) => {
     if (data.audio_file) {
       const formData = new FormData();
       for (const [key, value] of Object.entries(data)) {
@@ -221,11 +246,14 @@ export const podcastsApi = {
         }
       }
       formData.append('audio', data.audio_file);
+      const options = onProgress || signal
+        ? { ...(onProgress ? { onUploadProgress: onProgress } : {}), ...(signal ? { signal } : {}) }
+        : undefined;
       return api.upload<PodcastEpisode>(
         `/v2/podcasts/${showId}/episodes`,
         formData,
         'file',
-        onProgress ? { onUploadProgress: onProgress } : undefined,
+        options,
       );
     }
 
@@ -257,5 +285,13 @@ export const podcastsApi = {
     api.post<{ episode_id: number; open_reports: number }>(`/v2/admin/podcasts/reports/${episodeId}/resolve`, { status }),
 
   validateFeed: (showId: number) =>
-    api.get<{ valid: boolean; errors: string[]; warnings: string[] }>(`/v2/admin/podcasts/shows/${showId}/validate-feed`),
+    api.get<PodcastFeedValidation>(`/v2/admin/podcasts/shows/${showId}/validate-feed`),
+
+  /** Creator-facing feed preflight (owner or admin) — same shape as the admin variant. */
+  validateShowFeed: (showId: number) =>
+    api.get<PodcastFeedValidation>(`/v2/podcasts/${showId}/validate-feed`),
+
+  /** Creator-facing listen analytics for one show (owner or admin). */
+  showStats: (showId: number, days = 30) =>
+    api.get<PodcastShowStats>(`/v2/podcasts/${showId}/stats?days=${days}`),
 };
