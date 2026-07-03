@@ -47,7 +47,9 @@ export function PodcastMiniPlayer({ tabBarMayShow = true }: PodcastMiniPlayerPro
     } else {
       document.documentElement.style.removeProperty('--miniplayer-offset');
     }
-    return () => document.documentElement.style.removeProperty('--miniplayer-offset');
+    return () => {
+      document.documentElement.style.removeProperty('--miniplayer-offset');
+    };
   }, [hasTrack]);
 
   if (!player || !player.track || !hasFeature('podcasts')) return null;
