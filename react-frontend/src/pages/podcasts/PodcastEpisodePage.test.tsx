@@ -35,10 +35,8 @@ vi.mock('@/lib/api/podcasts', () => ({
 }));
 
 vi.mock('@/components/podcasts/PodcastAudioPlayer', () => ({
-  PodcastAudioPlayer: ({ onCompleted }: { onCompleted?: (seconds: number) => void }) => (
-    <button type="button" onClick={() => onCompleted?.(42)}>
-      Complete audio
-    </button>
+  PodcastAudioPlayer: ({ episode, showSlug }: { episode: { id: number }; showSlug?: string }) => (
+    <div data-testid="audio-player" data-episode-id={episode.id} data-show-slug={showSlug} />
   ),
 }));
 
@@ -89,20 +87,15 @@ describe('PodcastEpisodePage', () => {
     });
   });
 
-  it('records completed public listens for anonymous visitors with a stable browser session id', async () => {
+  // Listen-completion analytics are owned by PodcastPlayerContext now (they
+  // must survive this page unmounting) — see PodcastPlayerContext.test.tsx.
+  it('renders the player bound to the loaded episode and route show slug', async () => {
     renderEpisodePage();
 
     expect(await screen.findByRole('heading', { name: 'Public episode' })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Complete audio' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Complete audio' }));
-
-    await waitFor(() => expect(mockRecordListen).toHaveBeenCalledTimes(2));
-
-    expect(mockRecordListen).toHaveBeenNthCalledWith(1, 42, {
-      listened_seconds: 42,
-      completed: true,
-      session_id: expect.any(String),
-    });
-    expect(mockRecordListen.mock.calls[1][1].session_id).toBe(mockRecordListen.mock.calls[0][1].session_id);
+    const player = screen.getByTestId('audio-player');
+    expect(player.getAttribute('data-episode-id')).toBe('42');
+    expect(player.getAttribute('data-show-slug')).toBe('community-show');
+    expect(mockRecordListen).not.toHaveBeenCalled();
   });
 });

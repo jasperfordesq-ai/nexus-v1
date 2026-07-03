@@ -83,7 +83,15 @@
     "skip_back": "Back 15s",
     "skip_forward": "Forward 30s",
     "speed": "{{rate}}x",
-    "jump_to_chapter": "Jump to {{time}} — {{title}}"
+    "jump_to_chapter": "Jump to {{time}} — {{title}}",
+    "play": "Play",
+    "pause": "Pause",
+    "resume_from": "Resume from {{time}}",
+    "start_over": "Start over",
+    "retry": "Retry",
+    "now_playing": "Now playing",
+    "close_player": "Close player",
+    "open_episode": "Open episode page"
   },
   "studio": {
     "title": "Podcast Studio",

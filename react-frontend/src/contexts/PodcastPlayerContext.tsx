@@ -281,10 +281,16 @@ export function PodcastPlayerProvider({ children }: { children: ReactNode }) {
       : (trackRef.current?.durationSeconds ?? 0);
     const upper = dur > 0 ? dur : seconds;
     const next = Math.min(Math.max(seconds, 0), upper);
-    try {
-      audio.currentTime = next;
-    } catch {
+    if (audio.readyState === 0) {
+      // Metadata not loaded yet — queue the seek. Replacing any pending
+      // resume seek is intentional: an explicit user seek wins.
       pendingSeekRef.current = next;
+    } else {
+      try {
+        audio.currentTime = next;
+      } catch {
+        pendingSeekRef.current = next;
+      }
     }
     setCurrentTime(next);
   }, []);
