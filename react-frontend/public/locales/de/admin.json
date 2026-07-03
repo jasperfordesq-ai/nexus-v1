@@ -4015,6 +4015,14 @@
       "report_escalated": "Report escalated.",
       "feed_valid": "RSS feed is ready.",
       "feed_invalid": "RSS feed has {{count}} issue(s)."
+    },
+    "bulk": {
+      "approve_selected": "Ausgewählte freigeben",
+      "reject_selected": "Ausgewählte ablehnen",
+      "done": "{{count}} Element(e) moderiert.",
+      "partial": "{{ok}} Element(e) moderiert; {{failed}} fehlgeschlagen.",
+      "confirm_reject_title": "Ausgewählte Elemente ablehnen",
+      "confirm_reject_message": "{{count}} ausgewählte(s) Element(e) ablehnen? Für die Ersteller werden sie wieder zu Entwürfen."
     }
   },
   "member_premium_admin": {

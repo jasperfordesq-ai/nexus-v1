@@ -4,7 +4,8 @@
   "actions": {
     "back_to_podcasts": "ポッドキャストに戻る",
     "back_to_show": "ショーに戻る",
-    "cancel": "キャンセル"
+    "cancel": "キャンセル",
+    "close": "閉じる"
   },
   "browse": {
     "search_placeholder": "番組を検索する",
@@ -83,7 +84,19 @@
     "skip_back": "バック 15 秒",
     "skip_forward": "30秒前へ",
     "speed": "{{rate}}x",
-    "jump_to_chapter": "Jump to {{time}} — {{title}}"
+    "jump_to_chapter": "Jump to {{time}} — {{title}}",
+    "play": "再生",
+    "pause": "一時停止",
+    "resume_from": "{{time}}から再開",
+    "start_over": "最初から再生",
+    "retry": "再試行",
+    "now_playing": "再生中",
+    "close_player": "プレーヤーを閉じる",
+    "open_episode": "エピソードページを開く",
+    "shortcuts_label": "キーボードショートカット",
+    "shortcut_play_pause": "再生 / 一時停止",
+    "shortcut_seek": "巻き戻し / 早送り",
+    "shortcut_volume": "音量"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -137,7 +150,45 @@
     "confirm_archive_show": "{{title}} をアーカイブしますか?公開ポッドキャスト リストからは非表示になります。",
     "confirm_delete_show": "{{title}} とそのすべてのエピソードを削除しますか?これを元に戻すことはできません。",
     "confirm_archive_episode": "{{title}} をアーカイブしますか?公開ポッドキャスト リストからは非表示になります。",
-    "confirm_delete_episode": "{{title}} を削除しますか?これを元に戻すことはできません。"
+    "confirm_delete_episode": "{{title}} を削除しますか?これを元に戻すことはできません。",
+    "max_file_size": "最大{{max}}MB。",
+    "file_too_large": "このファイルはこのコミュニティの上限（{{max}}MB）を超えています。",
+    "unsupported_file_type": "このファイル形式はサポートされていません。MP3、M4A、AAC、WAV、OGG、またはWebM形式の音声ファイルを選択してください。",
+    "cancel_upload": "アップロードをキャンセル",
+    "upload_cancelled": "アップロードをキャンセルしました。エピソードの入力内容は保持されています。",
+    "retry_upload": "アップロードを再試行",
+    "scheduled_for_chip": "{{date}}に公開予定",
+    "validate_feed": "フィードを検証",
+    "feed_validation": {
+      "title": "フィードチェック — {{title}}",
+      "valid": "RSSフィードはポッドキャストディレクトリへの登録準備ができています。",
+      "invalid": "RSSフィードには、ディレクトリが読み取る前に修正が必要な問題があります。",
+      "errors": "ブロックする問題",
+      "warnings": "推奨される修正",
+      "skipped_episodes": "音声が修正されるまで、{{count}}件のエピソードがフィードから除外されます。",
+      "issues": {
+        "show_not_public": "番組が公開・承認済みでないと、ディレクトリは読み取れません。",
+        "missing_public_episodes": "承認済みの公開エピソードを少なくとも1つ公開してください。",
+        "missing_title": "番組のタイトルを追加してください。",
+        "missing_description": "番組の概要または説明を追加してください。",
+        "missing_language": "番組の言語を設定してください。",
+        "missing_owner_email": "ディレクトリ用のオーナーのメールアドレスを追加してください。",
+        "missing_artwork": "ポッドキャストディレクトリ用に番組のアートワークを追加してください。",
+        "episode_missing_audio_url": "有効なHTTP音声URLがないエピソードがあります。",
+        "episode_missing_audio_length": "音声のファイルサイズがないエピソードがあります。",
+        "episode_missing_audio_mime": "音声のMIMEタイプがないエピソードがあります。"
+      }
+    },
+    "stats": {
+      "title": "リスナー統計",
+      "listens": "再生数",
+      "unique_listeners": "ユニークリスナー",
+      "completion_rate": "完了率",
+      "subscribers": "登録者",
+      "top_episodes": "人気エピソード",
+      "listen_count": "{{count}}回再生",
+      "last_days": "再生アクティビティは過去{{days}}日間が対象です。"
+    }
   },
   "fields": {
     "show": "Show",

@@ -4,7 +4,8 @@
   "actions": {
     "back_to_podcasts": "Ar ais go podchraoltaí",
     "back_to_show": "Ar ais go dtí a thaispeáint",
-    "cancel": "Cealaigh"
+    "cancel": "Cealaigh",
+    "close": "Dún"
   },
   "browse": {
     "search_placeholder": "Léiríonn cuardaigh",
@@ -83,7 +84,19 @@
     "skip_back": "Ar ais 15s",
     "skip_forward": "Ar aghaidh 30s",
     "speed": "{{rate}}x",
-    "jump_to_chapter": "Jump to {{time}} — {{title}}"
+    "jump_to_chapter": "Jump to {{time}} — {{title}}",
+    "play": "Seinn",
+    "pause": "Cuir ar sos",
+    "resume_from": "Lean ar aghaidh ó {{time}}",
+    "start_over": "Tosaigh arís",
+    "retry": "Bain triail eile as",
+    "now_playing": "Á sheinm anois",
+    "close_player": "Dún an seinnteoir",
+    "open_episode": "Oscail leathanach na heipeasóide",
+    "shortcuts_label": "Aicearraí méarchláir",
+    "shortcut_play_pause": "Seinn / sos",
+    "shortcut_seek": "Siar / ar aghaidh",
+    "shortcut_volume": "Airde fuaime"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -137,7 +150,45 @@
     "confirm_archive_show": "Cartlann {{title}}? Beidh sé i bhfolach ó liostaí podchraoltaí poiblí.",
     "confirm_delete_show": "An bhfuil fonn ort {{title}} agus a chuid eipeasóid go léir a scriosadh? Ní féidir é seo a chealú.",
     "confirm_archive_episode": "Cartlann {{title}}? Beidh sé i bhfolach ó liostaí podchraoltaí poiblí.",
-    "confirm_delete_episode": "An bhfuil fonn ort {{title}} a scriosadh? Ní féidir é seo a chealú."
+    "confirm_delete_episode": "An bhfuil fonn ort {{title}} a scriosadh? Ní féidir é seo a chealú.",
+    "max_file_size": "{{max}} MB ar a mhéad.",
+    "file_too_large": "Tá an comhad sin níos mó ná teorainn {{max}} MB an phobail seo.",
+    "unsupported_file_type": "Ní thacaítear leis an gcineál comhaid sin. Roghnaigh comhad fuaime MP3, M4A, AAC, WAV, OGG nó WebM.",
+    "cancel_upload": "Cealaigh an uaslódáil",
+    "upload_cancelled": "Cealaíodh an uaslódáil — tá sonraí d’eipeasóide fós anseo.",
+    "retry_upload": "Bain triail eile as an uaslódáil",
+    "scheduled_for_chip": "Sceidealta le haghaidh {{date}}",
+    "validate_feed": "Bailíochtaigh an fotha",
+    "feed_validation": {
+      "title": "Seiceáil an fhotha — {{title}}",
+      "valid": "Tá d’fhotha RSS réidh d’eolairí podchraoltaí.",
+      "invalid": "Tá fadhbanna le d’fhotha RSS le réiteach sula bhféadfaidh eolairí é a léamh.",
+      "errors": "Fadhbanna bacainneacha",
+      "warnings": "Ceartúcháin mholta",
+      "skipped_episodes": "Fágfar {{count}} eipeasóid(í) as an bhfotha go dtí go ndeiseofar a gcuid fuaime.",
+      "issues": {
+        "show_not_public": "Caithfidh an seó a bheith poiblí, foilsithe agus faofa sula bhféadfaidh eolairí é a léamh.",
+        "missing_public_episodes": "Foilsigh eipeasóid phoiblí fhaofa amháin ar a laghad.",
+        "missing_title": "Cuir teideal seó leis.",
+        "missing_description": "Cuir achoimre nó cur síos ar an seó leis.",
+        "missing_language": "Socraigh teanga an tseó.",
+        "missing_owner_email": "Cuir ríomhphost an úinéara leis do na heolairí.",
+        "missing_artwork": "Cuir saothar ealaíne an tseó leis do na heolairí podchraoltaí.",
+        "episode_missing_audio_url": "Tá URL fuaime HTTP bailí in easnamh ar eipeasóid.",
+        "episode_missing_audio_length": "Tá méid an chomhaid fuaime in easnamh ar eipeasóid.",
+        "episode_missing_audio_mime": "Tá cineál MIME na fuaime in easnamh ar eipeasóid."
+      }
+    },
+    "stats": {
+      "title": "Staitisticí éisteoirí",
+      "listens": "Éisteachtaí",
+      "unique_listeners": "Éisteoirí uathúla",
+      "completion_rate": "Ráta críochnaithe",
+      "subscribers": "Síntiúsóirí",
+      "top_episodes": "Na heipeasóidí is mó éisteachta",
+      "listen_count": "{{count}} éisteacht",
+      "last_days": "Clúdaíonn gníomhaíocht éisteachta na {{days}} lá dheireanacha."
+    }
   },
   "fields": {
     "show": "Show",

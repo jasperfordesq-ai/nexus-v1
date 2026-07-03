@@ -4,7 +4,8 @@
   "actions": {
     "back_to_podcasts": "Zurück zu Podcasts",
     "back_to_show": "Zurück zur Show",
-    "cancel": "Stornieren"
+    "cancel": "Stornieren",
+    "close": "Schließen"
   },
   "browse": {
     "search_placeholder": "Suche zeigt",
@@ -83,7 +84,19 @@
     "skip_back": "Zurück 15s",
     "skip_forward": "Vorwärts 30er",
     "speed": "{{rate}}x",
-    "jump_to_chapter": "Jump to {{time}} — {{title}}"
+    "jump_to_chapter": "Jump to {{time}} — {{title}}",
+    "play": "Abspielen",
+    "pause": "Pause",
+    "resume_from": "Fortsetzen bei {{time}}",
+    "start_over": "Von vorn beginnen",
+    "retry": "Erneut versuchen",
+    "now_playing": "Läuft gerade",
+    "close_player": "Player schließen",
+    "open_episode": "Episodenseite öffnen",
+    "shortcuts_label": "Tastaturkürzel",
+    "shortcut_play_pause": "Abspielen / Pause",
+    "shortcut_seek": "Zurück- / Vorspulen",
+    "shortcut_volume": "Lautstärke"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -137,7 +150,45 @@
     "confirm_archive_show": "Archiv {{title}}? Es wird aus öffentlichen Podcast-Listen ausgeblendet.",
     "confirm_delete_show": "{{title}} und alle seine Episoden löschen? Dies kann nicht rückgängig gemacht werden.",
     "confirm_archive_episode": "Archiv {{title}}? Es wird aus öffentlichen Podcast-Listen ausgeblendet.",
-    "confirm_delete_episode": "{{title}} löschen? Dies kann nicht rückgängig gemacht werden."
+    "confirm_delete_episode": "{{title}} löschen? Dies kann nicht rückgängig gemacht werden.",
+    "max_file_size": "Max. {{max}} MB.",
+    "file_too_large": "Diese Datei überschreitet das Limit von {{max}} MB für diese Community.",
+    "unsupported_file_type": "Dieser Dateityp wird nicht unterstützt. Wähle eine MP3-, M4A-, AAC-, WAV-, OGG- oder WebM-Audiodatei.",
+    "cancel_upload": "Upload abbrechen",
+    "upload_cancelled": "Upload abgebrochen — deine Episodendaten sind noch da.",
+    "retry_upload": "Upload wiederholen",
+    "scheduled_for_chip": "Geplant für {{date}}",
+    "validate_feed": "Feed prüfen",
+    "feed_validation": {
+      "title": "Feed-Prüfung — {{title}}",
+      "valid": "Dein RSS-Feed ist bereit für Podcast-Verzeichnisse.",
+      "invalid": "Dein RSS-Feed hat Probleme, die behoben werden müssen, bevor Verzeichnisse ihn lesen können.",
+      "errors": "Blockierende Probleme",
+      "warnings": "Empfohlene Korrekturen",
+      "skipped_episodes": "{{count}} Episode(n) würden aus dem Feed ausgelassen, bis ihr Audio korrigiert ist.",
+      "issues": {
+        "show_not_public": "Die Show muss öffentlich, veröffentlicht und freigegeben sein, bevor Verzeichnisse sie lesen können.",
+        "missing_public_episodes": "Veröffentliche mindestens eine freigegebene öffentliche Episode.",
+        "missing_title": "Füge einen Show-Titel hinzu.",
+        "missing_description": "Füge eine Kurzbeschreibung oder Beschreibung der Show hinzu.",
+        "missing_language": "Lege die Sprache der Show fest.",
+        "missing_owner_email": "Füge die E-Mail-Adresse für Verzeichnisse hinzu.",
+        "missing_artwork": "Füge Show-Artwork für die Podcast-Verzeichnisse hinzu.",
+        "episode_missing_audio_url": "Einer Episode fehlt eine gültige HTTP-Audio-URL.",
+        "episode_missing_audio_length": "Einer Episode fehlt die Dateigröße des Audios.",
+        "episode_missing_audio_mime": "Einer Episode fehlt der MIME-Typ des Audios."
+      }
+    },
+    "stats": {
+      "title": "Hörer-Statistiken",
+      "listens": "Wiedergaben",
+      "unique_listeners": "Eindeutige Hörer",
+      "completion_rate": "Abschlussquote",
+      "subscribers": "Abonnenten",
+      "top_episodes": "Top-Episoden",
+      "listen_count": "{{count}} Wiedergaben",
+      "last_days": "Die Höraktivität umfasst die letzten {{days}} Tage."
+    }
   },
   "fields": {
     "show": "Show",

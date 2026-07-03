@@ -4015,6 +4015,14 @@
       "report_escalated": "Report escalated.",
       "feed_valid": "RSS feed is ready.",
       "feed_invalid": "RSS feed has {{count}} issue(s)."
+    },
+    "bulk": {
+      "approve_selected": "選択した項目を承認",
+      "reject_selected": "選択した項目を却下",
+      "done": "{{count}}件をモデレートしました。",
+      "partial": "{{ok}}件をモデレートしました。{{failed}}件は失敗しました。",
+      "confirm_reject_title": "選択した項目を却下",
+      "confirm_reject_message": "選択した{{count}}件を却下しますか？作成者側では下書きに戻ります。"
     }
   },
   "member_premium_admin": {

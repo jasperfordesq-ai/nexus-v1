@@ -4015,6 +4015,14 @@
       "report_escalated": "Report escalated.",
       "feed_valid": "RSS feed is ready.",
       "feed_invalid": "RSS feed has {{count}} issue(s)."
+    },
+    "bulk": {
+      "approve_selected": "Faomh a bhfuil roghnaithe",
+      "reject_selected": "Diúltaigh a bhfuil roghnaithe",
+      "done": "Modhnaíodh {{count}} mír(eanna).",
+      "partial": "Modhnaíodh {{ok}}; theip ar {{failed}}.",
+      "confirm_reject_title": "Diúltaigh na míreanna roghnaithe",
+      "confirm_reject_message": "An bhfuil fonn ort {{count}} mír roghnaithe a dhiúltú? Fillfidh siad ar stádas dréachta do na cruthaitheoirí."
     }
   },
   "member_premium_admin": {

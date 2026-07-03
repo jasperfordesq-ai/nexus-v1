@@ -4,7 +4,8 @@
   "actions": {
     "back_to_podcasts": "Wracając do podcastów",
     "back_to_show": "Powrót do pokazania",
-    "cancel": "Anulować"
+    "cancel": "Anulować",
+    "close": "Zamknij"
   },
   "browse": {
     "search_placeholder": "Wyszukaj programy",
@@ -83,7 +84,19 @@
     "skip_back": "Powrót 15s",
     "skip_forward": "Do przodu 30 s",
     "speed": "{{rate}}x",
-    "jump_to_chapter": "Jump to {{time}} — {{title}}"
+    "jump_to_chapter": "Jump to {{time}} — {{title}}",
+    "play": "Odtwórz",
+    "pause": "Wstrzymaj",
+    "resume_from": "Wznów od {{time}}",
+    "start_over": "Zacznij od nowa",
+    "retry": "Spróbuj ponownie",
+    "now_playing": "Teraz odtwarzane",
+    "close_player": "Zamknij odtwarzacz",
+    "open_episode": "Otwórz stronę odcinka",
+    "shortcuts_label": "Skróty klawiszowe",
+    "shortcut_play_pause": "Odtwarzanie / pauza",
+    "shortcut_seek": "Przewiń wstecz / do przodu",
+    "shortcut_volume": "Głośność"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -137,7 +150,45 @@
     "confirm_archive_show": "Zarchiwizować {{title}}? Będzie ukryty na publicznych listach podcastów.",
     "confirm_delete_show": "Usunąć {{title}} i wszystkie jego odcinki? Tego nie można cofnąć.",
     "confirm_archive_episode": "Zarchiwizować {{title}}? Będzie ukryty na publicznych listach podcastów.",
-    "confirm_delete_episode": "Usunąć {{title}}? Tego nie można cofnąć."
+    "confirm_delete_episode": "Usunąć {{title}}? Tego nie można cofnąć.",
+    "max_file_size": "Maks. {{max}} MB.",
+    "file_too_large": "Ten plik przekracza limit {{max}} MB dla tej społeczności.",
+    "unsupported_file_type": "Ten typ pliku nie jest obsługiwany. Wybierz plik audio MP3, M4A, AAC, WAV, OGG lub WebM.",
+    "cancel_upload": "Anuluj przesyłanie",
+    "upload_cancelled": "Przesyłanie anulowane — dane odcinka nadal tu są.",
+    "retry_upload": "Ponów przesyłanie",
+    "scheduled_for_chip": "Zaplanowano na {{date}}",
+    "validate_feed": "Sprawdź kanał",
+    "feed_validation": {
+      "title": "Kontrola kanału — {{title}}",
+      "valid": "Twój kanał RSS jest gotowy dla katalogów podcastów.",
+      "invalid": "Twój kanał RSS ma problemy do naprawienia, zanim katalogi będą mogły go odczytać.",
+      "errors": "Problemy blokujące",
+      "warnings": "Zalecane poprawki",
+      "skipped_episodes": "{{count}} odcinek/odcinki zostaną pominięte w kanale, dopóki ich audio nie zostanie naprawione.",
+      "issues": {
+        "show_not_public": "Program musi być publiczny, opublikowany i zatwierdzony, zanim katalogi będą mogły go odczytać.",
+        "missing_public_episodes": "Opublikuj co najmniej jeden zatwierdzony publiczny odcinek.",
+        "missing_title": "Dodaj tytuł programu.",
+        "missing_description": "Dodaj streszczenie lub opis programu.",
+        "missing_language": "Ustaw język programu.",
+        "missing_owner_email": "Dodaj adres e-mail właściciela dla katalogów.",
+        "missing_artwork": "Dodaj okładkę programu dla katalogów podcastów.",
+        "episode_missing_audio_url": "W odcinku brakuje prawidłowego adresu URL audio HTTP.",
+        "episode_missing_audio_length": "W odcinku brakuje rozmiaru pliku audio.",
+        "episode_missing_audio_mime": "W odcinku brakuje typu MIME audio."
+      }
+    },
+    "stats": {
+      "title": "Statystyki słuchaczy",
+      "listens": "Odsłuchania",
+      "unique_listeners": "Unikalni słuchacze",
+      "completion_rate": "Wskaźnik ukończeń",
+      "subscribers": "Subskrybenci",
+      "top_episodes": "Najpopularniejsze odcinki",
+      "listen_count": "{{count}} odsłuchań",
+      "last_days": "Aktywność słuchaczy obejmuje ostatnie {{days}} dni."
+    }
   },
   "fields": {
     "show": "Show",

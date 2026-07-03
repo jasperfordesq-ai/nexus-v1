@@ -4015,6 +4015,14 @@
       "report_escalated": "Report escalated.",
       "feed_valid": "RSS feed is ready.",
       "feed_invalid": "RSS feed has {{count}} issue(s)."
+    },
+    "bulk": {
+      "approve_selected": "Selectie goedkeuren",
+      "reject_selected": "Selectie afwijzen",
+      "done": "{{count}} item(s) gemodereerd.",
+      "partial": "{{ok}} item(s) gemodereerd; {{failed}} mislukt.",
+      "confirm_reject_title": "Geselecteerde items afwijzen",
+      "confirm_reject_message": "{{count}} geselecteerde item(s) afwijzen? Makers zien ze terugkeren naar concept."
     }
   },
   "member_premium_admin": {

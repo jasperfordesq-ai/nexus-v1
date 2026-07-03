@@ -4,7 +4,8 @@
   "actions": {
     "back_to_podcasts": "Terug naar podcasts",
     "back_to_show": "Terug naar show",
-    "cancel": "Annuleren"
+    "cancel": "Annuleren",
+    "close": "Sluiten"
   },
   "browse": {
     "search_placeholder": "Zoekprogramma's",
@@ -83,7 +84,19 @@
     "skip_back": "Terug 15s",
     "skip_forward": "Voorwaarts jaren '30",
     "speed": "{{rate}}x",
-    "jump_to_chapter": "Jump to {{time}} — {{title}}"
+    "jump_to_chapter": "Jump to {{time}} — {{title}}",
+    "play": "Afspelen",
+    "pause": "Pauze",
+    "resume_from": "Hervatten vanaf {{time}}",
+    "start_over": "Opnieuw beginnen",
+    "retry": "Opnieuw proberen",
+    "now_playing": "Nu aan het afspelen",
+    "close_player": "Speler sluiten",
+    "open_episode": "Afleveringspagina openen",
+    "shortcuts_label": "Sneltoetsen",
+    "shortcut_play_pause": "Afspelen / pauzeren",
+    "shortcut_seek": "Terug- / vooruitspoelen",
+    "shortcut_volume": "Volume"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -137,7 +150,45 @@
     "confirm_archive_show": "{{title}} archiveren? Het wordt verborgen voor openbare podcastlijsten.",
     "confirm_delete_show": "{{title}} en alle afleveringen verwijderen? Dit kan niet ongedaan worden gemaakt.",
     "confirm_archive_episode": "{{title}} archiveren? Het wordt verborgen voor openbare podcastlijsten.",
-    "confirm_delete_episode": "{{title}} verwijderen? Dit kan niet ongedaan worden gemaakt."
+    "confirm_delete_episode": "{{title}} verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "max_file_size": "Max. {{max}} MB.",
+    "file_too_large": "Dat bestand is groter dan de limiet van {{max}} MB voor deze community.",
+    "unsupported_file_type": "Dat bestandstype wordt niet ondersteund. Kies een MP3-, M4A-, AAC-, WAV-, OGG- of WebM-audiobestand.",
+    "cancel_upload": "Upload annuleren",
+    "upload_cancelled": "Upload geannuleerd — je afleveringsgegevens zijn er nog.",
+    "retry_upload": "Upload opnieuw proberen",
+    "scheduled_for_chip": "Gepland voor {{date}}",
+    "validate_feed": "Feed valideren",
+    "feed_validation": {
+      "title": "Feedcontrole — {{title}}",
+      "valid": "Je RSS-feed is klaar voor podcastdirectory’s.",
+      "invalid": "Je RSS-feed heeft problemen die je moet oplossen voordat directory’s hem kunnen lezen.",
+      "errors": "Blokkerende problemen",
+      "warnings": "Aanbevolen verbeteringen",
+      "skipped_episodes": "{{count}} aflevering(en) zouden buiten de feed vallen totdat hun audio is hersteld.",
+      "issues": {
+        "show_not_public": "De show moet openbaar, gepubliceerd en goedgekeurd zijn voordat directory’s hem kunnen lezen.",
+        "missing_public_episodes": "Publiceer ten minste één goedgekeurde openbare aflevering.",
+        "missing_title": "Voeg een showtitel toe.",
+        "missing_description": "Voeg een samenvatting of beschrijving van de show toe.",
+        "missing_language": "Stel de taal van de show in.",
+        "missing_owner_email": "Voeg het e-mailadres van de eigenaar toe voor directory’s.",
+        "missing_artwork": "Voeg show-artwork toe voor podcastdirectory’s.",
+        "episode_missing_audio_url": "Bij een aflevering ontbreekt een geldige HTTP-audio-URL.",
+        "episode_missing_audio_length": "Bij een aflevering ontbreekt de bestandsgrootte van de audio.",
+        "episode_missing_audio_mime": "Bij een aflevering ontbreekt het MIME-type van de audio."
+      }
+    },
+    "stats": {
+      "title": "Luisterstatistieken",
+      "listens": "Weergaven",
+      "unique_listeners": "Unieke luisteraars",
+      "completion_rate": "Voltooiingspercentage",
+      "subscribers": "Abonnees",
+      "top_episodes": "Topafleveringen",
+      "listen_count": "{{count}} weergaven",
+      "last_days": "De luisteractiviteit beslaat de laatste {{days}} dagen."
+    }
   },
   "fields": {
     "show": "Show",

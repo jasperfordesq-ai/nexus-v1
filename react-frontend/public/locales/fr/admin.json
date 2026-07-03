@@ -4015,6 +4015,14 @@
       "report_escalated": "Report escalated.",
       "feed_valid": "RSS feed is ready.",
       "feed_invalid": "RSS feed has {{count}} issue(s)."
+    },
+    "bulk": {
+      "approve_selected": "Approuver la sélection",
+      "reject_selected": "Rejeter la sélection",
+      "done": "{{count}} élément(s) modéré(s).",
+      "partial": "{{ok}} élément(s) modéré(s) ; {{failed}} en échec.",
+      "confirm_reject_title": "Rejeter les éléments sélectionnés",
+      "confirm_reject_message": "Rejeter {{count}} élément(s) sélectionné(s) ? Les créateurs les verront repasser en brouillon."
     }
   },
   "member_premium_admin": {

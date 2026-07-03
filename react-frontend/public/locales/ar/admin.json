@@ -4015,6 +4015,14 @@
       "report_escalated": "Report escalated.",
       "feed_valid": "RSS feed is ready.",
       "feed_invalid": "RSS feed has {{count}} issue(s)."
+    },
+    "bulk": {
+      "approve_selected": "اعتماد المحدد",
+      "reject_selected": "رفض المحدد",
+      "done": "تم الإشراف على {{count}} عنصرًا/عناصر.",
+      "partial": "تم الإشراف على {{ok}}؛ فشل {{failed}}.",
+      "confirm_reject_title": "رفض العناصر المحددة",
+      "confirm_reject_message": "هل تريد رفض {{count}} من العناصر المحددة؟ سيراها المنشئون تعود إلى مسودات."
     }
   },
   "member_premium_admin": {

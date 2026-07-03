@@ -4,7 +4,8 @@
   "actions": {
     "back_to_podcasts": "العودة إلى البودكاست",
     "back_to_show": "العودة للعرض",
-    "cancel": "يلغي"
+    "cancel": "يلغي",
+    "close": "إغلاق"
   },
   "browse": {
     "search_placeholder": "يظهر البحث",
@@ -83,7 +84,19 @@
     "skip_back": "العودة 15 ثانية",
     "skip_forward": "إلى الأمام 30 ثانية",
     "speed": "{{rate}}x",
-    "jump_to_chapter": "Jump to {{time}} — {{title}}"
+    "jump_to_chapter": "Jump to {{time}} — {{title}}",
+    "play": "تشغيل",
+    "pause": "إيقاف مؤقت",
+    "resume_from": "استئناف من {{time}}",
+    "start_over": "البدء من جديد",
+    "retry": "إعادة المحاولة",
+    "now_playing": "قيد التشغيل الآن",
+    "close_player": "إغلاق المشغّل",
+    "open_episode": "فتح صفحة الحلقة",
+    "shortcuts_label": "اختصارات لوحة المفاتيح",
+    "shortcut_play_pause": "تشغيل / إيقاف مؤقت",
+    "shortcut_seek": "الرجوع / التقدم",
+    "shortcut_volume": "مستوى الصوت"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -137,7 +150,45 @@
     "confirm_archive_show": "أرشيف {{title}}؟ سيتم إخفاؤه من قوائم البودكاست العامة.",
     "confirm_delete_show": "هل تريد حذف {{title}} وجميع حلقاته؟ لا يمكن التراجع عن هذا.",
     "confirm_archive_episode": "أرشيف {{title}}؟ سيتم إخفاؤه من قوائم البودكاست العامة.",
-    "confirm_delete_episode": "هل تريد حذف {{title}}؟ لا يمكن التراجع عن هذا."
+    "confirm_delete_episode": "هل تريد حذف {{title}}؟ لا يمكن التراجع عن هذا.",
+    "max_file_size": "الحد الأقصى {{max}} م.ب.",
+    "file_too_large": "هذا الملف يتجاوز حد {{max}} م.ب لهذا المجتمع.",
+    "unsupported_file_type": "نوع الملف هذا غير مدعوم. اختر ملفًا صوتيًا بصيغة MP3 أو M4A أو AAC أو WAV أو OGG أو WebM.",
+    "cancel_upload": "إلغاء الرفع",
+    "upload_cancelled": "تم إلغاء الرفع — بيانات حلقتك ما زالت هنا.",
+    "retry_upload": "إعادة محاولة الرفع",
+    "scheduled_for_chip": "مجدولة في {{date}}",
+    "validate_feed": "التحقق من الخلاصة",
+    "feed_validation": {
+      "title": "فحص الخلاصة — {{title}}",
+      "valid": "خلاصة RSS جاهزة لأدلة البودكاست.",
+      "invalid": "توجد مشكلات في خلاصة RSS يجب إصلاحها قبل أن تتمكن الأدلة من قراءتها.",
+      "errors": "مشكلات مانعة",
+      "warnings": "إصلاحات موصى بها",
+      "skipped_episodes": "سيتم استبعاد {{count}} حلقة/حلقات من الخلاصة حتى يتم إصلاح الصوت.",
+      "issues": {
+        "show_not_public": "يجب أن يكون البرنامج عامًا ومنشورًا ومعتمدًا قبل أن تتمكن الأدلة من قراءته.",
+        "missing_public_episodes": "انشر حلقة عامة معتمدة واحدة على الأقل.",
+        "missing_title": "أضف عنوانًا للبرنامج.",
+        "missing_description": "أضف ملخصًا أو وصفًا للبرنامج.",
+        "missing_language": "حدد لغة البرنامج.",
+        "missing_owner_email": "أضف البريد الإلكتروني للمالك الخاص بالأدلة.",
+        "missing_artwork": "أضف صورة غلاف للبرنامج لأدلة البودكاست.",
+        "episode_missing_audio_url": "توجد حلقة تفتقد رابط صوت HTTP صالحًا.",
+        "episode_missing_audio_length": "توجد حلقة تفتقد حجم الملف الصوتي.",
+        "episode_missing_audio_mime": "توجد حلقة تفتقد نوع MIME للصوت."
+      }
+    },
+    "stats": {
+      "title": "إحصاءات المستمعين",
+      "listens": "مرات الاستماع",
+      "unique_listeners": "مستمعون فريدون",
+      "completion_rate": "معدل الإكمال",
+      "subscribers": "المشتركون",
+      "top_episodes": "أكثر الحلقات استماعًا",
+      "listen_count": "{{count}} استماعًا",
+      "last_days": "يغطي نشاط الاستماع آخر {{days}} يومًا."
+    }
   },
   "fields": {
     "show": "Show",
