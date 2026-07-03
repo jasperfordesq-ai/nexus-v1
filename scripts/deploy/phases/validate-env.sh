@@ -29,9 +29,8 @@ validate_required_env_vars() {
         STRIPE_WEBHOOK_SECRET
         STRIPE_IDENTITY_SECRET_KEY
         STRIPE_IDENTITY_WEBHOOK_SECRET
-        # SendGrid — email delivery + bounce/complaint webhooks
-        SENDGRID_API_KEY
-        SENDGRID_WEBHOOK_VERIFICATION_KEY
+        # Postmark — platform email delivery (SendGrid fully removed 2026-07-01)
+        POSTMARK_SERVER_TOKEN
         # Pusher — real-time WebSockets
         PUSHER_APP_ID
         PUSHER_KEY
