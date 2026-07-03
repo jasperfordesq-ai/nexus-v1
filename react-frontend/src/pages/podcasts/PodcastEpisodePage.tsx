@@ -7,7 +7,8 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { Button, Card, CardBody, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Textarea } from '@/components/ui';
-import { PodcastAudioPlayer } from '@/components/podcasts/PodcastAudioPlayer';
+import { PodcastAudioPlayer, trackFromEpisode } from '@/components/podcasts/PodcastAudioPlayer';
+import { usePodcastPlayer } from '@/contexts/PodcastPlayerContext';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { podcastsApi, type PodcastEpisode } from '@/lib/api/podcasts';
@@ -22,6 +23,7 @@ export default function PodcastEpisodePage() {
   const { tenantPath } = useTenant();
   const { isAuthenticated } = useAuth();
   const toast = useToast();
+  const player = usePodcastPlayer();
   const [episode, setEpisode] = useState<PodcastEpisode | null>(null);
   const [loading, setLoading] = useState(true);
   const [reactionActive, setReactionActive] = useState(false);
@@ -53,6 +55,61 @@ export default function PodcastEpisodePage() {
       cancelled = true;
     };
   }, [showSlug, episodeSlug]);
+
+  // Keyboard shortcuts: space play/pause, arrows seek, up/down volume.
+  // Guarded so typing in the report form (or any focusable control) is
+  // never hijacked. keydown counts as a user gesture, so space can also
+  // start playback for a not-yet-active episode.
+  useEffect(() => {
+    if (!episode) return;
+
+    function onKeyDown(event: KeyboardEvent): void {
+      if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('input, textarea, select, button, a, [contenteditable="true"], [role="slider"], [role="dialog"], [role="listbox"]')) return;
+
+      const isActive = player.track?.episodeId === episode!.id;
+      switch (event.key) {
+        case ' ':
+          event.preventDefault();
+          if (isActive) {
+            player.toggle();
+          } else {
+            player.load(trackFromEpisode(episode!, episode!.show?.slug ?? showSlug), { autoplay: true });
+          }
+          break;
+        case 'ArrowLeft':
+          if (isActive) {
+            event.preventDefault();
+            player.skip(-15);
+          }
+          break;
+        case 'ArrowRight':
+          if (isActive) {
+            event.preventDefault();
+            player.skip(30);
+          }
+          break;
+        case 'ArrowUp':
+          if (isActive) {
+            event.preventDefault();
+            player.setVolume(player.volume + 0.1);
+          }
+          break;
+        case 'ArrowDown':
+          if (isActive) {
+            event.preventDefault();
+            player.setVolume(player.volume - 0.1);
+          }
+          break;
+        default:
+          break;
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [episode, player, showSlug]);
 
   async function handleReaction(): Promise<void> {
     if (!episode || !isAuthenticated || reacting) return;
@@ -145,8 +202,14 @@ export default function PodcastEpisodePage() {
         </header>
 
         <Card>
-          <CardBody>
+          <CardBody className="space-y-3">
             <PodcastAudioPlayer episode={episode} showSlug={showPath} />
+            <p className="hidden flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted md:flex">
+              <span className="sr-only">{t('player.shortcuts_label')}</span>
+              <span><kbd className="rounded border border-border bg-surface-secondary px-1.5 py-0.5 font-sans">Space</kbd> {t('player.shortcut_play_pause')}</span>
+              <span><kbd className="rounded border border-border bg-surface-secondary px-1.5 py-0.5 font-sans">←</kbd> <kbd className="rounded border border-border bg-surface-secondary px-1.5 py-0.5 font-sans">→</kbd> {t('player.shortcut_seek')}</span>
+              <span><kbd className="rounded border border-border bg-surface-secondary px-1.5 py-0.5 font-sans">↑</kbd> <kbd className="rounded border border-border bg-surface-secondary px-1.5 py-0.5 font-sans">↓</kbd> {t('player.shortcut_volume')}</span>
+            </p>
           </CardBody>
         </Card>
 

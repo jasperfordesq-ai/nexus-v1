@@ -92,7 +92,11 @@
     "retry": "Retry",
     "now_playing": "Now playing",
     "close_player": "Close player",
-    "open_episode": "Open episode page"
+    "open_episode": "Open episode page",
+    "shortcuts_label": "Keyboard shortcuts",
+    "shortcut_play_pause": "Play / pause",
+    "shortcut_seek": "Skip back / forward",
+    "shortcut_volume": "Volume"
   },
   "studio": {
     "title": "Podcast Studio",

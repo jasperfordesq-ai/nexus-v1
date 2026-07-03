@@ -38,6 +38,33 @@ vi.mock('@/components/podcasts/PodcastAudioPlayer', () => ({
   PodcastAudioPlayer: ({ episode, showSlug }: { episode: { id: number }; showSlug?: string }) => (
     <div data-testid="audio-player" data-episode-id={episode.id} data-show-slug={showSlug} />
   ),
+  trackFromEpisode: (episode: { id: number }) => ({ episodeId: episode.id }),
+}));
+
+const mockPlayer = {
+  track: null as { episodeId: number } | null,
+  status: 'idle',
+  currentTime: 0,
+  duration: 0,
+  playbackRate: 1,
+  volume: 1,
+  hasError: false,
+  load: vi.fn(),
+  play: vi.fn(),
+  pause: vi.fn(),
+  toggle: vi.fn(),
+  seekTo: vi.fn(),
+  skip: vi.fn(),
+  setRate: vi.fn(),
+  setVolume: vi.fn(),
+  retry: vi.fn(),
+  startOver: vi.fn(),
+  close: vi.fn(),
+  getResumePosition: vi.fn(() => null),
+};
+
+vi.mock('@/contexts/PodcastPlayerContext', () => ({
+  usePodcastPlayer: () => mockPlayer,
 }));
 
 function renderEpisodePage(): void {
@@ -97,5 +124,39 @@ describe('PodcastEpisodePage', () => {
     expect(player.getAttribute('data-episode-id')).toBe('42');
     expect(player.getAttribute('data-show-slug')).toBe('community-show');
     expect(mockRecordListen).not.toHaveBeenCalled();
+  });
+
+  it('space starts playback of the loaded episode via a keyboard gesture', async () => {
+    renderEpisodePage();
+    expect(await screen.findByRole('heading', { name: 'Public episode' })).toBeInTheDocument();
+
+    fireEvent.keyDown(document.body, { key: ' ' });
+    expect(mockPlayer.load).toHaveBeenCalledWith({ episodeId: 42 }, { autoplay: true });
+  });
+
+  it('keyboard shortcuts never hijack typing in form fields', async () => {
+    renderEpisodePage();
+    expect(await screen.findByRole('heading', { name: 'Public episode' })).toBeInTheDocument();
+
+    const input = document.createElement('input');
+    document.body.appendChild(input);
+    fireEvent.keyDown(input, { key: ' ' });
+    expect(mockPlayer.load).not.toHaveBeenCalled();
+    expect(mockPlayer.toggle).not.toHaveBeenCalled();
+    input.remove();
+  });
+
+  it('arrow keys control the active track', async () => {
+    mockPlayer.track = { episodeId: 42 };
+    renderEpisodePage();
+    expect(await screen.findByRole('heading', { name: 'Public episode' })).toBeInTheDocument();
+
+    fireEvent.keyDown(document.body, { key: 'ArrowLeft' });
+    expect(mockPlayer.skip).toHaveBeenCalledWith(-15);
+    fireEvent.keyDown(document.body, { key: 'ArrowRight' });
+    expect(mockPlayer.skip).toHaveBeenCalledWith(30);
+    fireEvent.keyDown(document.body, { key: 'ArrowUp' });
+    expect(mockPlayer.setVolume).toHaveBeenCalledWith(1.1);
+    mockPlayer.track = null;
   });
 });
