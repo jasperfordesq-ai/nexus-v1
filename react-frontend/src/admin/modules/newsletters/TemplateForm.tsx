@@ -84,6 +84,7 @@ export function TemplateForm() {
   const [previewText, setPreviewText] = useState('');
   const [content, setContent] = useState('');
   const [contentFormat, setContentFormat] = useState<ContentFormat>('richtext');
+  const [designJson, setDesignJson] = useState<string | null>(null);
 
   // Validation
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -118,6 +119,7 @@ export function TemplateForm() {
         setPreviewText(data.preview_text || '');
         setContent(data.content || '');
         setContentFormat(((data as { content_format?: ContentFormat }).content_format) || 'richtext');
+        setDesignJson(((data as { design_json?: string }).design_json) || null);
       } else {
         setLoadError(res.error || t('newsletters.failed_to_load_template'));
       }
@@ -163,6 +165,7 @@ export function TemplateForm() {
         preview_text: previewText.trim(),
         content,
         content_format: contentFormat,
+        design_json: contentFormat === 'builder' ? designJson : null,
       };
 
       const res = isEdit
@@ -357,9 +360,11 @@ export function TemplateForm() {
                 <NewsletterContentEditor
                   value={content}
                   format={contentFormat}
-                  onChange={({ content: c, content_format: f }) => {
+                  designJson={designJson}
+                  onChange={({ content: c, content_format: f, design_json: dj }) => {
                     setContent(c);
                     setContentFormat(f);
+                    if (dj !== undefined) setDesignJson(dj);
                   }}
                   placeholder={t('newsletters.placeholder_design_your_email_template_content')}
                   isDisabled={submitting}

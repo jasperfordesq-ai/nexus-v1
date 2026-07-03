@@ -34,7 +34,9 @@ import { PageHeader } from '../../components/PageHeader';
 
 
 import { NewsletterContentEditor } from '../../components/NewsletterContentEditor';
+import { TemplateGalleryModal, type GalleryTemplate } from '../../components/TemplateGalleryModal';
 import type { ContentFormat } from '../../components/contentFormat';
+import LayoutTemplate from 'lucide-react/icons/layout-template';
 
 interface SegmentOption {
   id: number;
@@ -45,11 +47,13 @@ interface SegmentOption {
 interface TemplateOption {
   id: number;
   name: string;
+  description?: string;
+  category?: string;
   subject?: string;
   preview_text?: string;
   content?: string;
   content_format?: string;
-  thumbnail?: string;
+  thumbnail?: string | null;
 }
 
 interface GroupOption {
@@ -108,6 +112,8 @@ export function NewsletterForm() {
   // Legacy rows have no content_format → default 'richtext' (Lexical HTML),
   // preserving their existing editing behavior.
   const [contentFormat, setContentFormat] = useState<ContentFormat>('richtext');
+  // GrapesJS project state for builder mode (null for other formats).
+  const [designJson, setDesignJson] = useState<string | null>(null);
   const [status, setStatus] = useState('draft');
 
   // Targeting
@@ -140,6 +146,7 @@ export function NewsletterForm() {
 
   // Template
   const [templateId, setTemplateId] = useState('');
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
   // Options data
   const [segments, setSegments] = useState<SegmentOption[]>([]);
@@ -202,6 +209,7 @@ export function NewsletterForm() {
             setPreviewText((d.preview_text as string) || '');
             setContent((d.content as string) || '');
             setContentFormat(((d.content_format as ContentFormat) || 'richtext'));
+            setDesignJson((d.design_json as string) || null);
             setStatus((d.status as string) || 'draft');
             setNewsletterStatus((d.status as string) || 'draft');
             setTargetAudience((d.target_audience as string) || 'all_members');
@@ -282,21 +290,19 @@ export function NewsletterForm() {
     fetchRecipientCount();
   }, [fetchRecipientCount]);
 
-  // Load template content when template changes
-  useEffect(() => {
-    if (templateId && !isEdit) {
-      const tpl = templates.find(t => String(t.id) === templateId);
-      if (tpl) {
-        if (tpl.content) setContent(tpl.content);
-        // Starter templates carry their own format — set it so a starter's raw
-        // HTML is never fed to (and mangled by) the Lexical rich-text editor.
-        if (tpl.content_format) setContentFormat(tpl.content_format as ContentFormat);
-        if (tpl.subject && !subject) setSubject(tpl.subject);
-        if (tpl.preview_text && !previewText) setPreviewText(tpl.preview_text);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- apply template defaults on selection change
-  }, [templateId]);
+  // Apply a template picked from the gallery. Sets content + content_format
+  // together so a starter's raw HTML lands in the right editor mode (never fed
+  // to the Lexical rich-text editor). Subject/preview only fill when empty.
+  const applyTemplate = (tpl: GalleryTemplate) => {
+    if (tpl.content !== undefined) setContent(tpl.content);
+    if (tpl.content_format) setContentFormat(tpl.content_format as ContentFormat);
+    setDesignJson(null); // gallery templates are html; clear any builder design
+    if (tpl.subject && !subject) setSubject(tpl.subject);
+    if (tpl.preview_text && !previewText) setPreviewText(tpl.preview_text);
+    setTemplateId(String(tpl.id));
+  };
+
+  const selectedTemplate = templates.find((tpl) => String(tpl.id) === templateId);
 
   const buildPayload = (): Record<string, unknown> => ({
     subject,
@@ -304,6 +310,7 @@ export function NewsletterForm() {
     preview_text: previewText,
     content,
     content_format: contentFormat,
+    design_json: contentFormat === 'builder' ? designJson : null,
     status,
     target_audience: targetAudience,
     segment_id: segmentId ? Number(segmentId) : null,
@@ -568,9 +575,11 @@ export function NewsletterForm() {
               <NewsletterContentEditor
                 value={content}
                 format={contentFormat}
-                onChange={({ content: c, content_format: f }) => {
+                designJson={designJson}
+                onChange={({ content: c, content_format: f, design_json: dj }) => {
                   setContent(c);
                   setContentFormat(f);
+                  if (dj !== undefined) setDesignJson(dj);
                 }}
                 placeholder={t('newsletters.placeholder_write_your_newsletter_content')}
                 isDisabled={saving || isSent}
@@ -864,20 +873,22 @@ export function NewsletterForm() {
                   <h3 className="text-sm font-semibold">{t('newsletter_form.section_template')}</h3>
                 </div>
               </CardHeader>
-              <CardBody className="gap-4">
-                <Select
-                  label={t('newsletter_form.label_load_template')}
-                  selectedKeys={templateId ? [templateId] : []}
-                  onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setTemplateId(String(v)); }}
+              <CardBody className="gap-3">
+                <Button
                   variant="secondary"
                   size="sm"
-                  placeholder={t('newsletters.placeholder_choose_a_template')}
+                  onPress={() => setGalleryOpen(true)}
                   isDisabled={isSent}
+                  startContent={<LayoutTemplate aria-hidden="true" size={16} />}
+                  className="w-full"
                 >
-                  {templates.map((t) => (
-                    <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>
-                  ))}
-                </Select>
+                  {t('newsletter_content_editor.gallery_start_button')}
+                </Button>
+                {selectedTemplate && (
+                  <p className="text-xs text-muted">
+                    {t('newsletter_form.label_load_template')}: <span className="font-medium text-foreground">{selectedTemplate.name}</span>
+                  </p>
+                )}
               </CardBody>
             </Card>
           )}
@@ -930,6 +941,14 @@ export function NewsletterForm() {
           </div>
         </div>
       </div>
+
+      {/* ── Template gallery ── */}
+      <TemplateGalleryModal
+        isOpen={galleryOpen}
+        onClose={() => setGalleryOpen(false)}
+        templates={templates as GalleryTemplate[]}
+        onSelect={applyTemplate}
+      />
 
       {/* ── Confirm Send Modal ── */}
       <Modal isOpen={confirmSendOpen} onClose={() => setConfirmSendOpen(false)} size="md">

@@ -53,6 +53,9 @@ vi.mock('./PlainTextEditor', () => ({
     <textarea aria-label="plaintext" value={value} onChange={(e) => onChange(e.target.value)} />
   ),
 }));
+vi.mock('./NewsletterBuilder', () => ({
+  NewsletterBuilder: () => <div data-testid="builder" />,
+}));
 
 import { NewsletterContentEditor } from './NewsletterContentEditor';
 import type { ContentFormat } from './contentFormat';

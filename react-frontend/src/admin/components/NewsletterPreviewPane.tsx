@@ -9,6 +9,9 @@
  * is what recipients get: merge tokens resolved, CSS inlined, unsubscribe
  * injected. Falls back to an approximate client-only render if the endpoint
  * is unavailable. Always sandboxed (no allow-scripts) + DOMPurify'd.
+ *
+ * The preview renders inside a device "frame" (a browser window for desktop,
+ * a phone shell for mobile) on a neutral canvas so it reads as a real email.
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -36,8 +39,6 @@ interface NewsletterPreviewPaneProps {
   /** Server render (preview == send). Returns rendered HTML. */
   onRequestPreview: (req: PreviewRequest) => Promise<string>;
 }
-
-const DEVICE_WIDTH = { desktop: 640, mobile: 375 };
 
 export function NewsletterPreviewPane({
   content,
@@ -75,7 +76,10 @@ export function NewsletterPreviewPane({
       } catch {
         if (cancelled) return;
         // Client-only fallback — approximate, can't show merge/inlining.
-        const body = format === 'plaintext' ? `<pre style="white-space:pre-wrap;font-family:sans-serif;">${escapePlainToHtml(content)}</pre>` : content;
+        const body =
+          format === 'plaintext'
+            ? `<pre style="white-space:pre-wrap;font-family:sans-serif;padding:24px;">${escapePlainToHtml(content)}</pre>`
+            : content;
         setHtml(DOMPurify.sanitize(body, { WHOLE_DOCUMENT: true }));
         setApproximate(true);
       } finally {
@@ -93,12 +97,23 @@ export function NewsletterPreviewPane({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- nonce forces manual refresh
   }, [content, format, subject, previewText, nonce]);
 
+  const iframe = (
+    <iframe
+      title={t('newsletter_content_editor.preview_title')}
+      srcDoc={html}
+      sandbox="allow-same-origin"
+      className="block w-full bg-white"
+      style={{ height: device === 'mobile' ? 620 : 560, border: 'none' }}
+    />
+  );
+
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-sm font-semibold text-foreground">
           {t('newsletter_content_editor.preview_title')}
         </span>
+        {loading && <Spinner size="sm" />}
         <div className="ml-auto flex items-center gap-2">
           <ToggleButtonGroup
             selectionMode="single"
@@ -107,7 +122,6 @@ export function NewsletterPreviewPane({
               const next = Array.from(keys)[0] as 'desktop' | 'mobile' | undefined;
               if (next) setDevice(next);
             }}
-            size="sm"
           >
             <ToggleButton id="desktop" aria-label={t('newsletter_content_editor.preview_desktop')}>
               <Monitor size={15} />
@@ -122,7 +136,7 @@ export function NewsletterPreviewPane({
             onPress={() => setNonce((n) => n + 1)}
             isLoading={loading}
             startContent={!loading ? <RefreshCw size={15} /> : undefined}
-            className="h-8"
+            aria-label={t('newsletter_content_editor.preview_refresh')}
           >
             {t('newsletter_content_editor.preview_refresh')}
           </Button>
@@ -135,22 +149,38 @@ export function NewsletterPreviewPane({
         </Alert>
       )}
 
-      <div className="rounded-lg border border-border bg-surface-secondary p-4 overflow-auto">
-        <div className="mx-auto bg-white transition-all" style={{ maxWidth: DEVICE_WIDTH[device], width: '100%' }}>
-          {loading && html === '' ? (
-            <div className="flex items-center justify-center py-16">
-              <Spinner size="sm" />
+      {/* Neutral canvas + device frame */}
+      <div className="flex justify-center overflow-auto rounded-xl bg-surface-secondary p-4 sm:p-6">
+        {device === 'desktop' ? (
+          <div
+            className="overflow-hidden rounded-lg bg-white shadow-lg"
+            style={{ width: '100%', maxWidth: 620 }}
+          >
+            {/* Browser chrome */}
+            <div className="flex h-9 items-center gap-2 border-b border-neutral-200 bg-neutral-100 px-3">
+              <span className="h-3 w-3 rounded-full" style={{ backgroundColor: '#f87171' }} />
+              <span className="h-3 w-3 rounded-full" style={{ backgroundColor: '#fbbf24' }} />
+              <span className="h-3 w-3 rounded-full" style={{ backgroundColor: '#34d399' }} />
+              <span className="ml-2 truncate rounded-md bg-white px-3 py-1 text-[11px] text-neutral-400">
+                {t('newsletter_content_editor.preview_inbox')}
+              </span>
             </div>
-          ) : (
-            <iframe
-              title={t('newsletter_content_editor.preview_title')}
-              srcDoc={html}
-              sandbox="allow-same-origin"
-              className="w-full"
-              style={{ height: 600, border: 'none' }}
-            />
-          )}
-        </div>
+            {iframe}
+          </div>
+        ) : (
+          <div
+            className="rounded-[2.25rem] p-2.5 shadow-xl"
+            style={{ width: 340, backgroundColor: '#111827' }}
+          >
+            <div className="overflow-hidden rounded-[1.75rem] bg-white">
+              {/* Phone status notch */}
+              <div className="flex h-6 items-center justify-center" style={{ backgroundColor: '#111827' }}>
+                <span className="h-1.5 w-16 rounded-full" style={{ backgroundColor: '#374151' }} />
+              </div>
+              {iframe}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

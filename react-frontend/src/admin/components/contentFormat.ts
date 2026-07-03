@@ -14,8 +14,8 @@
 
 export type ContentFormat = 'plaintext' | 'richtext' | 'html' | 'builder';
 
-/** Formats selectable in the editor UI (Phase 1 — 'builder' arrives in Phase 2). */
-export const EDITOR_MODES: ContentFormat[] = ['plaintext', 'richtext', 'html'];
+/** Formats selectable in the editor UI. */
+export const EDITOR_MODES: ContentFormat[] = ['plaintext', 'richtext', 'html', 'builder'];
 
 /** Escape raw text into HTML, preserving line breaks as <br>. */
 export function escapePlainToHtml(text: string): string {
