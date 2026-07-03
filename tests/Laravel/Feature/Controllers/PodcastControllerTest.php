@@ -1749,6 +1749,161 @@ class PodcastControllerTest extends TestCase
         $this->assertGreaterThan(0, $showId);
     }
 
+    public function test_owner_can_validate_own_feed_and_sees_skipped_count(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Owner Feed Check',
+            'summary' => 'Validating my own feed.',
+            'visibility' => 'public',
+            'owner_email' => 'owner@example.test',
+        ])->assertStatus(201)->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+
+        $episodeId = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Feedworthy Episode',
+            'audio_url' => 'https://cdn.example.test/audio.mp3',
+        ])->assertStatus(201)->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
+
+        $validation = $this->apiGet("/v2/podcasts/{$showId}/validate-feed");
+        $validation->assertStatus(200);
+        $validation->assertJsonPath('data.valid', true);
+        $validation->assertJsonPath('data.skipped_episode_count', 0);
+
+        // Break one episode's audio URL the way legacy rows can be broken —
+        // validation must surface it as an error AND a skipped-count.
+        DB::table('podcast_episodes')->where('id', $episodeId)->update([
+            'audio_url' => 'podcast-hosted://pending',
+            'audio_storage_path' => null,
+        ]);
+
+        $broken = $this->apiGet("/v2/podcasts/{$showId}/validate-feed");
+        $broken->assertStatus(200);
+        $broken->assertJsonPath('data.valid', false);
+        $broken->assertJsonPath('data.skipped_episode_count', 1);
+    }
+
+    public function test_non_owner_cannot_validate_feed(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Someone Elses Feed',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+
+        // A different (non-admin) member must be refused.
+        $this->actingAsMember();
+        $this->apiGet("/v2/podcasts/{$showId}/validate-feed")->assertStatus(403);
+    }
+
+    public function test_owner_stats_return_totals_and_series(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Stats Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+
+        $episodeId = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Stats Episode',
+            'audio_url' => 'https://cdn.example.test/audio.mp3',
+            'duration_seconds' => 600,
+        ])->assertStatus(201)->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
+
+        $this->apiPost("/v2/podcasts/episodes/{$episodeId}/listen", [
+            'listened_seconds' => 300,
+            'session_id' => 'stats-session-1',
+        ])->assertStatus(200);
+
+        $stats = $this->apiGet("/v2/podcasts/{$showId}/stats?days=7");
+        $stats->assertStatus(200);
+        $stats->assertJsonPath('data.enabled', true);
+        $stats->assertJsonPath('data.days', 7);
+        $stats->assertJsonPath('data.totals.listens', 1);
+        $this->assertNotEmpty($stats->json('data.listens_over_time'));
+        $this->assertSame(1, $stats->json('data.listens_over_time.0.listens'));
+        $this->assertNotEmpty($stats->json('data.top_episodes'));
+    }
+
+    public function test_owner_stats_hidden_when_analytics_disabled(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsAdmin();
+        $this->apiPut('/v2/admin/config/podcasts/bulk', [
+            'settings' => ['podcasts.enable_listen_analytics' => false],
+        ])->assertStatus(200);
+
+        $this->actingAsMember();
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'No Analytics Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+
+        $stats = $this->apiGet("/v2/podcasts/{$showId}/stats");
+        $stats->assertStatus(200);
+        $stats->assertJsonPath('data.enabled', false);
+        $this->assertNull($stats->json('data.totals'));
+    }
+
+    public function test_stats_are_owner_or_admin_only(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Private Stats Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+
+        $this->actingAsMember();
+        $this->apiGet("/v2/podcasts/{$showId}/stats")->assertStatus(403);
+    }
+
+    public function test_authored_response_includes_upload_constraints_meta(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $response = $this->apiGet('/v2/podcasts/mine');
+        $response->assertStatus(200);
+        $this->assertSame(250, $response->json('meta.max_audio_size_mb'));
+        $this->assertContains('audio/mpeg', $response->json('meta.allowed_audio_mimes'));
+    }
+
+    public function test_admin_index_supports_independent_pagination(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+        foreach (['Page Show One', 'Page Show Two', 'Page Show Three'] as $title) {
+            $this->apiPost('/v2/podcasts', ['title' => $title, 'visibility' => 'public'])->assertStatus(201);
+        }
+
+        $this->actingAsAdmin();
+        $response = $this->apiGet('/v2/admin/podcasts?per_page=2&shows_page=2');
+        $response->assertStatus(200);
+
+        $this->assertSame(3, $response->json('meta.shows_total'));
+        $this->assertSame(2, $response->json('meta.shows_page'));
+        $this->assertSame(2, $response->json('meta.per_page'));
+        $this->assertCount(1, $response->json('data.shows'));
+
+        // Default request keeps the historical shape (all rows, page 1).
+        $default = $this->apiGet('/v2/admin/podcasts');
+        $default->assertStatus(200);
+        $this->assertCount(3, $default->json('data.shows'));
+        $this->assertIsArray($default->json('data.stats'));
+        $this->assertIsArray($default->json('data.top_episodes'));
+    }
+
     public function test_infected_media_is_never_served(): void
     {
         Storage::fake('local');

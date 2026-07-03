@@ -138,7 +138,49 @@ class PodcastController extends BaseApiController
         $this->ensurePodcastsFeature();
         $userId = $this->requirePodcastAuthor();
 
-        return $this->respondWithData(PodcastService::authoredBy($userId));
+        // Upload constraints ride along so the studio can validate files
+        // client-side before starting a multi-hundred-MB upload.
+        return $this->respondWithData(PodcastService::authoredBy($userId), [
+            'max_audio_size_mb' => (int) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_MAX_AUDIO_SIZE_MB),
+            'allowed_audio_mimes' => PodcastService::allowedAudioMimes(),
+        ]);
+    }
+
+    /**
+     * GET /v2/podcasts/{id}/validate-feed
+     *
+     * Creator-facing RSS preflight (owner or admin) — the same validation
+     * admins run, so creators can fix feed problems before publishing.
+     */
+    public function validateFeedForOwner(int $id): JsonResponse
+    {
+        $this->ensurePodcastsFeature();
+        $userId = $this->requireAuth();
+        $show = $this->findPodcastShowOrFail($id);
+        $this->ensurePodcastOwnerOrAdmin($show, $userId);
+
+        return $this->respondWithData(PodcastService::validateFeed($show));
+    }
+
+    /**
+     * GET /v2/podcasts/{id}/stats?days=30
+     *
+     * Creator-facing listen analytics for one show (owner or admin).
+     */
+    public function stats(int $id): JsonResponse
+    {
+        $this->ensurePodcastsFeature();
+        $userId = $this->requireAuth();
+        $show = $this->findPodcastShowOrFail($id);
+        $this->ensurePodcastOwnerOrAdmin($show, $userId);
+
+        if (!PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_LISTEN_ANALYTICS)) {
+            return $this->respondWithData(['enabled' => false]);
+        }
+
+        $days = $this->queryInt('days', 30, 1, 365) ?? 30;
+
+        return $this->respondWithData(array_merge(['enabled' => true], PodcastService::showStats($show, $days)));
     }
 
     public function store(): JsonResponse

@@ -22,7 +22,20 @@ class AdminPodcastController extends BaseApiController
         $this->ensurePodcastsFeature();
         $this->requireAdmin();
 
-        return $this->respondWithData(PodcastService::adminIndex($this->query('moderation_status')));
+        $showsPage = $this->queryInt('shows_page', 1, 1) ?? 1;
+        $episodesPage = $this->queryInt('episodes_page', 1, 1) ?? 1;
+        // Default 200 preserves the pre-pagination response shape exactly.
+        $perPage = $this->queryInt('per_page', 200, 1, 200) ?? 200;
+
+        $payload = PodcastService::adminIndex($this->query('moderation_status'), $showsPage, $episodesPage, $perPage);
+
+        return $this->respondWithData($payload, [
+            'shows_page' => $showsPage,
+            'episodes_page' => $episodesPage,
+            'per_page' => $perPage,
+            'shows_total' => (int) ($payload['totals']['shows'] ?? 0),
+            'episodes_total' => (int) ($payload['totals']['episodes'] ?? 0),
+        ]);
     }
 
     public function moderateShow(int $id): JsonResponse

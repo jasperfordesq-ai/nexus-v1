@@ -1115,6 +1115,8 @@ Route::delete('/v2/courses/{courseId}/quizzes/{quizId}/questions/{questionId}', 
 
 // Podcasts Module (ALPHA) — member-created shows and episodes.
 Route::get('/v2/podcasts/mine', [\App\Http\Controllers\Api\PodcastController::class, 'authored']);
+Route::get('/v2/podcasts/{id}/validate-feed', [\App\Http\Controllers\Api\PodcastController::class, 'validateFeedForOwner'])->where('id', '[0-9]+');
+Route::get('/v2/podcasts/{id}/stats', [\App\Http\Controllers\Api\PodcastController::class, 'stats'])->where('id', '[0-9]+');
 Route::post('/v2/podcasts', [\App\Http\Controllers\Api\PodcastController::class, 'store']);
 Route::put('/v2/podcasts/{id}', [\App\Http\Controllers\Api\PodcastController::class, 'update'])->where('id', '[0-9]+');
 Route::post('/v2/podcasts/{id}/publish', [\App\Http\Controllers\Api\PodcastController::class, 'publish'])->where('id', '[0-9]+');

@@ -960,9 +960,9 @@ class PodcastService
     }
 
     /**
-     * @return array{shows:array,episodes:array,stats:array,top_episodes:array,reports:array,client_breakdown:array,retention:array}
+     * @return array{shows:array,episodes:array,totals:array{shows:int,episodes:int},stats:array,top_episodes:array,reports:array,client_breakdown:array,retention:array}
      */
-    public static function adminIndex(?string $moderationStatus = null): array
+    public static function adminIndex(?string $moderationStatus = null, int $showsPage = 1, int $episodesPage = 1, int $perPage = 200): array
     {
         $showQuery = PodcastShow::with('owner:id,name')->orderByDesc('created_at');
         $episodeQuery = PodcastEpisode::with(['show:id,title,slug', 'author:id,name'])->orderByDesc('created_at');
@@ -972,9 +972,17 @@ class PodcastService
             $episodeQuery->where('moderation_status', $moderationStatus);
         }
 
+        $showsPage = max(1, $showsPage);
+        $episodesPage = max(1, $episodesPage);
+        $perPage = max(1, min(200, $perPage));
+
         return [
-            'shows' => $showQuery->limit(200)->get()->toArray(),
-            'episodes' => $episodeQuery->limit(200)->get()->toArray(),
+            'shows' => (clone $showQuery)->forPage($showsPage, $perPage)->get()->toArray(),
+            'episodes' => (clone $episodeQuery)->forPage($episodesPage, $perPage)->get()->toArray(),
+            'totals' => [
+                'shows' => (clone $showQuery)->count(),
+                'episodes' => (clone $episodeQuery)->count(),
+            ],
             'stats' => [
                 'total_shows' => PodcastShow::count(),
                 'published_shows' => PodcastShow::where('status', 'published')->count(),
@@ -1025,10 +1033,12 @@ class PodcastService
         if ($episodes->isEmpty()) {
             $errors[] = 'missing_public_episodes';
         }
+        $skipped = 0;
         foreach ($episodes as $episode) {
             $audioUrl = $episode->audio_storage_path ? self::episodeAudioUrl($episode, false) : (string) $episode->audio_url;
             if (!self::isHttpUrl($audioUrl)) {
                 $errors[] = "episode_{$episode->id}_missing_audio_url";
+                $skipped++;
             }
             if (empty($episode->audio_bytes)) {
                 $warnings[] = "episode_{$episode->id}_missing_audio_length";
@@ -1042,20 +1052,32 @@ class PodcastService
             'valid' => $errors === [],
             'errors' => array_values(array_unique($errors)),
             'warnings' => array_values(array_unique($warnings)),
+            // Episodes buildRss() would silently omit from the feed.
+            'skipped_episode_count' => $skipped,
         ];
     }
 
     /**
      * @return array<int,array<string,mixed>>
      */
-    private static function topEpisodes(): array
+    private static function topEpisodes(?int $showId = null): array
     {
         return PodcastEpisode::with(['show:id,title,slug'])
+            ->when($showId !== null, fn ($q) => $q->where('show_id', $showId))
             ->where('listen_count', '>', 0)
             ->orderByDesc('listen_count')
             ->limit(10)
             ->get(['id', 'show_id', 'title', 'slug', 'listen_count'])
             ->toArray();
+    }
+
+    /** Constrain a listens query to a single show (listens carry no show_id). */
+    private static function scopeListensToShow($query, ?int $showId)
+    {
+        return $query->when(
+            $showId !== null,
+            fn ($q) => $q->whereIn('episode_id', PodcastEpisode::where('show_id', $showId)->select('id'))
+        );
     }
 
     private static function openReports(): array
@@ -1087,9 +1109,10 @@ class PodcastService
             ->all();
     }
 
-    private static function clientBreakdown(): array
+    private static function clientBreakdown(?int $showId = null): array
     {
-        return PodcastEpisodeListen::select('client_family', DB::raw('COUNT(*) as listens'))
+        return self::scopeListensToShow(PodcastEpisodeListen::query(), $showId)
+            ->select('client_family', DB::raw('COUNT(*) as listens'))
             ->whereNotNull('client_family')
             ->groupBy('client_family')
             ->orderByDesc('listens')
@@ -1102,9 +1125,10 @@ class PodcastService
             ->all();
     }
 
-    private static function retentionBreakdown(): array
+    private static function retentionBreakdown(?int $showId = null): array
     {
-        return PodcastEpisodeListen::select('retention_bucket', DB::raw('COUNT(*) as listens'))
+        return self::scopeListensToShow(PodcastEpisodeListen::query(), $showId)
+            ->select('retention_bucket', DB::raw('COUNT(*) as listens'))
             ->whereNotNull('retention_bucket')
             ->groupBy('retention_bucket')
             ->orderByRaw("FIELD(retention_bucket, '0-25', '25-50', '50-75', '75-100', '100+')")
@@ -1116,23 +1140,72 @@ class PodcastService
             ->all();
     }
 
-    private static function uniqueListeners(): int
+    private static function uniqueListeners(?int $showId = null): int
     {
-        $userCount = PodcastEpisodeListen::whereNotNull('user_id')->distinct('user_id')->count('user_id');
-        $anonymousCount = PodcastEpisodeListen::whereNull('user_id')->whereNotNull('session_hash')->distinct('session_hash')->count('session_hash');
+        $userCount = self::scopeListensToShow(PodcastEpisodeListen::whereNotNull('user_id'), $showId)
+            ->distinct('user_id')->count('user_id');
+        $anonymousCount = self::scopeListensToShow(PodcastEpisodeListen::whereNull('user_id')->whereNotNull('session_hash'), $showId)
+            ->distinct('session_hash')->count('session_hash');
 
         return $userCount + $anonymousCount;
     }
 
-    private static function completionRate(): int
+    private static function completionRate(?int $showId = null): int
     {
-        $total = PodcastEpisodeListen::count();
+        $total = self::scopeListensToShow(PodcastEpisodeListen::query(), $showId)->count();
         if ($total === 0) {
             return 0;
         }
 
-        $completed = PodcastEpisodeListen::where('completed', true)->count();
+        $completed = self::scopeListensToShow(PodcastEpisodeListen::where('completed', true), $showId)->count();
         return (int) round(($completed / $total) * 100);
+    }
+
+    /**
+     * Creator-facing analytics for one show — reuses the same aggregates as
+     * the admin dashboard, scoped to the show. All queries remain tenant
+     * scoped via HasTenantScope.
+     *
+     * @return array{days:int,totals:array,listens_over_time:array,top_episodes:array,retention:array,client_breakdown:array}
+     */
+    public static function showStats(PodcastShow $show, int $days = 30): array
+    {
+        $days = max(1, min(365, $days));
+        $showId = (int) $show->id;
+
+        $listensOverTime = self::scopeListensToShow(PodcastEpisodeListen::query(), $showId)
+            ->where('created_at', '>=', now()->subDays($days - 1)->startOfDay())
+            ->selectRaw('DATE(created_at) as listen_date, COUNT(*) as listens')
+            ->groupBy('listen_date')
+            ->orderBy('listen_date')
+            ->get()
+            ->map(fn ($row) => [
+                'date' => (string) $row->listen_date,
+                'listens' => (int) $row->listens,
+            ])
+            ->all();
+
+        return [
+            'days' => $days,
+            'totals' => [
+                'listens' => self::scopeListensToShow(PodcastEpisodeListen::query(), $showId)->count(),
+                'completed_listens' => self::scopeListensToShow(PodcastEpisodeListen::where('completed', true), $showId)->count(),
+                'completion_rate' => self::completionRate($showId),
+                'unique_listeners' => self::uniqueListeners($showId),
+                'subscribers' => (int) $show->subscriber_count,
+                'episodes' => (int) $show->episode_count,
+            ],
+            'listens_over_time' => $listensOverTime,
+            'top_episodes' => self::topEpisodes($showId),
+            'retention' => self::retentionBreakdown($showId),
+            'client_breakdown' => self::clientBreakdown($showId),
+        ];
+    }
+
+    /** @return array<int,string> MIME types accepted for hosted podcast audio uploads. */
+    public static function allowedAudioMimes(): array
+    {
+        return array_keys(self::ALLOWED_AUDIO_TYPES);
     }
 
     public static function buildRss(PodcastShow $show): string
@@ -1178,11 +1251,13 @@ class PodcastService
             $rss[] = '<itunes:image href="' . self::xml($show->artwork_url) . '" />';
         }
 
+        $skipped = 0;
         foreach ($episodes as $episode) {
             $audioUrl = $episode->audio_storage_path
                 ? self::episodeAudioUrl($episode, false)
                 : (string) $episode->audio_url;
             if (!self::isHttpUrl($audioUrl)) {
+                $skipped++;
                 continue;
             }
             $episodeLink = self::frontendUrl('/podcasts/' . $show->slug . '/' . $episode->slug);
@@ -1218,6 +1293,15 @@ class PodcastService
             }
             $rss[] = '<itunes:explicit>' . ($episode->explicit ? 'true' : 'false') . '</itunes:explicit>';
             $rss[] = '</item>';
+        }
+
+        if ($skipped > 0) {
+            // Feeds must stay valid, so unresolvable episodes are omitted —
+            // but never silently: validateFeed() surfaces the same count.
+            Log::info('Podcast RSS build skipped episodes without a valid audio URL', [
+                'show_id' => (int) $show->id,
+                'skipped' => $skipped,
+            ]);
         }
 
         $rss[] = '</channel>';
