@@ -4015,6 +4015,14 @@
       "report_escalated": "Report escalated.",
       "feed_valid": "RSS feed is ready.",
       "feed_invalid": "RSS feed has {{count}} issue(s)."
+    },
+    "bulk": {
+      "approve_selected": "Approve selected",
+      "reject_selected": "Reject selected",
+      "done": "Moderated {{count}} item(s).",
+      "partial": "Moderated {{ok}} item(s); {{failed}} failed.",
+      "confirm_reject_title": "Reject selected items",
+      "confirm_reject_message": "Reject {{count}} selected item(s)? Creators will see them revert to draft."
     }
   },
   "member_premium_admin": {

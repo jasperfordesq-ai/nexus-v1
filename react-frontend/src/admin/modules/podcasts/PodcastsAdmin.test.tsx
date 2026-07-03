@@ -361,4 +361,44 @@ describe('PodcastsAdmin', () => {
       expect(mockPodcastsApi.resolveReport).toHaveBeenCalledWith(10, 'resolved');
     });
   });
+
+  it('requests independently paginated shows and episodes', async () => {
+    const { default: PodcastsAdmin } = await import('./PodcastsAdmin');
+    render(<PodcastsAdmin />);
+
+    await waitFor(() => expect(mockApi.get).toHaveBeenCalled());
+    const url = mockApi.get.mock.calls[0][0] as string;
+    expect(url).toContain('shows_page=1');
+    expect(url).toContain('episodes_page=1');
+    expect(url).toContain('per_page=20');
+  });
+
+  it('bulk-approves selected shows through the confirm modal', async () => {
+    mockApi.post.mockResolvedValue({ success: true });
+    const { default: PodcastsAdmin } = await import('./PodcastsAdmin');
+    render(<PodcastsAdmin />);
+
+    await waitFor(() => expect(screen.getAllByText('Tech Talks').length).toBeGreaterThan(0));
+
+    // Row checkboxes come from the selectable DataTable; index 0 is select-all.
+    const checkboxes = await screen.findAllByRole('checkbox');
+    expect(checkboxes.length).toBeGreaterThan(1);
+    fireEvent.click(checkboxes[1]);
+
+    const approveBtn = await screen.findByRole('button', { name: /approve selected/i });
+    fireEvent.click(approveBtn);
+
+    // Confirmation modal → confirm the action.
+    const dialog = await screen.findByRole('dialog');
+    const confirmBtn = Array.from(dialog.querySelectorAll('button')).find(
+      (b) => b.textContent?.toLowerCase().includes('approve selected')
+    );
+    expect(confirmBtn).toBeDefined();
+    fireEvent.click(confirmBtn!);
+
+    await waitFor(() => expect(mockApi.post).toHaveBeenCalledWith(
+      '/v2/admin/podcasts/shows/1/moderate',
+      { action: 'approve' },
+    ));
+  });
 });

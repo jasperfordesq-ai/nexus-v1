@@ -20,6 +20,7 @@ import Rss from 'lucide-react/icons/rss';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import XCircle from 'lucide-react/icons/circle-x';
 import { usePageTitle } from '@/hooks';
+import { feedIssueKey } from '@/lib/podcasts/feedIssues';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { podcastsApi, type PodcastEpisode, type PodcastModerationStatus, type PodcastShow, type PodcastStatus } from '@/lib/api/podcasts';
@@ -40,9 +41,13 @@ import {
   Tooltip,
 } from '@/components/ui';
 import { PageHeader } from '../../components/PageHeader';
+import { DataTable, type Column } from '../../components/DataTable';
+import { BulkActionToolbar, type BulkAction } from '../../components/BulkActionToolbar';
 
 type ModerationFilter = 'all' | PodcastModerationStatus;
 type ModerationAction = 'approve' | 'reject' | 'flag';
+
+const PAGE_SIZE = 20;
 
 interface PodcastAdminStats {
   total_shows: number;
@@ -119,19 +124,12 @@ const statusColors: Record<PodcastStatus, 'success' | 'warning' | 'default'> = {
 const analyticsTableClassNames = { table: 'min-w-[24rem]' };
 const mediumTableClassNames = { table: 'min-w-[42rem]' };
 const wideTableClassNames = { table: 'min-w-[64rem]' };
-const operationsTableClassNames = { table: 'min-w-[72rem]' };
 
 function formatDate(value?: string | null): string {
   if (!value) return '';
   return new Date(value).toLocaleDateString();
 }
 
-function feedIssueKey(issue: string): string {
-  if (/^episode_\d+_missing_audio_url$/.test(issue)) return 'episode_missing_audio_url';
-  if (/^episode_\d+_missing_audio_length$/.test(issue)) return 'episode_missing_audio_length';
-  if (/^episode_\d+_missing_audio_mime$/.test(issue)) return 'episode_missing_audio_mime';
-  return issue;
-}
 
 export default function PodcastsAdmin() {
   const { t } = useTranslation('admin');
@@ -143,14 +141,31 @@ export default function PodcastsAdmin() {
   const [loading, setLoading] = useState(true);
   const [actionKey, setActionKey] = useState<string | null>(null);
   const [feedValidation, setFeedValidation] = useState<FeedValidationResult | null>(null);
+  const [showsPage, setShowsPage] = useState(1);
+  const [episodesPage, setEpisodesPage] = useState(1);
+  const [totals, setTotals] = useState<{ shows: number; episodes: number }>({ shows: 0, episodes: 0 });
+  const [selectedShowIds, setSelectedShowIds] = useState<Set<string>>(new Set());
+  const [selectedEpisodeIds, setSelectedEpisodeIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const suffix = filter === 'all' ? '' : `?moderation_status=${encodeURIComponent(filter)}`;
-      const res = await api.get<PodcastAdminIndex>(`/v2/admin/podcasts${suffix}`);
+      const params = new URLSearchParams();
+      if (filter !== 'all') params.set('moderation_status', filter);
+      params.set('shows_page', String(showsPage));
+      params.set('episodes_page', String(episodesPage));
+      params.set('per_page', String(PAGE_SIZE));
+      const res = await api.get<PodcastAdminIndex>(`/v2/admin/podcasts?${params.toString()}`);
       if (res.success && res.data) {
         setData(res.data);
+        // Server-side pagination totals; fall back to row counts when the
+        // meta is absent so the tables degrade to single-page mode.
+        const meta = res.meta as { shows_total?: number; episodes_total?: number } | undefined;
+        setTotals({
+          shows: meta?.shows_total ?? res.data.shows.length,
+          episodes: meta?.episodes_total ?? res.data.episodes.length,
+        });
       } else {
         toast.error(t('podcasts_admin.load_failed'));
       }
@@ -159,7 +174,7 @@ export default function PodcastsAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [filter, t, toast]);
+  }, [filter, showsPage, episodesPage, t, toast]);
 
   useEffect(() => {
     load();
@@ -267,6 +282,62 @@ export default function PodcastsAdmin() {
       setActionKey(null);
     }
   };
+
+  const bulkModerate = async (type: 'show' | 'episode', ids: string[], action: 'approve' | 'reject') => {
+    if (ids.length === 0) return;
+    setBulkLoading(true);
+    let ok = 0;
+    let failed = 0;
+    // Fan out per-id moderate calls in small chunks — no bulk endpoint exists
+    // yet, and unbounded parallelism would trip the write rate limiter.
+    const chunkSize = 5;
+    for (let i = 0; i < ids.length; i += chunkSize) {
+      const chunk = ids.slice(i, i + chunkSize);
+      const results = await Promise.allSettled(chunk.map((id) => api.post(
+        type === 'show'
+          ? `/v2/admin/podcasts/shows/${id}/moderate`
+          : `/v2/admin/podcasts/episodes/${id}/moderate`,
+        { action },
+      )));
+      for (const result of results) {
+        if (result.status === 'fulfilled' && result.value.success) {
+          ok++;
+        } else {
+          failed++;
+        }
+      }
+    }
+    setBulkLoading(false);
+    if (failed > 0) {
+      toast.error(t('podcasts_admin.bulk.partial', { ok, failed }));
+    } else {
+      toast.success(t('podcasts_admin.bulk.done', { count: ok }));
+    }
+    if (type === 'show') {
+      setSelectedShowIds(new Set());
+    } else {
+      setSelectedEpisodeIds(new Set());
+    }
+    load();
+  };
+
+  const bulkActionsFor = (type: 'show' | 'episode', selected: Set<string>): BulkAction[] => [
+    {
+      key: 'approve',
+      label: t('podcasts_admin.bulk.approve_selected'),
+      color: 'success',
+      onConfirm: () => bulkModerate(type, Array.from(selected), 'approve'),
+    },
+    {
+      key: 'reject',
+      label: t('podcasts_admin.bulk.reject_selected'),
+      color: 'danger',
+      destructive: true,
+      confirmTitle: t('podcasts_admin.bulk.confirm_reject_title'),
+      confirmMessage: t('podcasts_admin.bulk.confirm_reject_message', { count: selected.size }),
+      onConfirm: () => bulkModerate(type, Array.from(selected), 'reject'),
+    },
+  ];
 
   const validateFeed = async (show: PodcastShow) => {
     const key = `feed:${show.id}`;
@@ -393,6 +464,64 @@ export default function PodcastsAdmin() {
       </Tooltip>
     </div>
   );
+
+  const showColumns: Column<PodcastShow>[] = [
+    {
+      key: 'title',
+      label: t('podcasts_admin.columns.title'),
+      isRowHeader: true,
+      render: (show) => (
+        <div className="min-w-0 max-w-[22rem]">
+          <div className="truncate font-medium text-foreground">{show.title}</div>
+          <div className="truncate text-xs text-muted">{show.summary || t('podcasts_admin.empty_value')}</div>
+        </div>
+      ),
+    },
+    { key: 'owner', label: t('podcasts_admin.columns.owner'), render: (show) => show.owner?.name ?? t('podcasts_admin.empty_value') },
+    { key: 'status', label: t('podcasts_admin.columns.status'), render: (show) => statusChip(show.status) },
+    { key: 'moderation', label: t('podcasts_admin.columns.moderation'), render: (show) => moderationChip(show.moderation_status) },
+    { key: 'updated', label: t('podcasts_admin.columns.updated'), render: (show) => formatDate(show.updated_at) || t('podcasts_admin.empty_value') },
+    {
+      key: 'actions',
+      label: t('podcasts_admin.columns.actions'),
+      render: (show) => (
+        <div className="flex items-center justify-end gap-1">
+          <Tooltip content={t('podcasts_admin.actions.validate_feed')}>
+            <Button
+              isIconOnly
+              size="sm"
+              variant="tertiary"
+              aria-label={t('podcasts_admin.actions.validate_feed')}
+              isLoading={actionKey === `feed:${show.id}`}
+              onPress={() => validateFeed(show)}
+            >
+              <Rss size={16} aria-hidden="true" />
+            </Button>
+          </Tooltip>
+          {actionButtons('show', show.id)}
+        </div>
+      ),
+    },
+  ];
+
+  const episodeColumns: Column<PodcastEpisode>[] = [
+    {
+      key: 'title',
+      label: t('podcasts_admin.columns.title'),
+      isRowHeader: true,
+      render: (episode) => (
+        <div className="min-w-0 max-w-[22rem]">
+          <div className="truncate font-medium text-foreground">{episode.title}</div>
+          <div className="truncate text-xs text-muted">{episode.summary || t('podcasts_admin.empty_value')}</div>
+        </div>
+      ),
+    },
+    { key: 'show', label: t('podcasts_admin.columns.show'), render: (episode) => <div className="max-w-[18rem] truncate">{episode.show?.title ?? t('podcasts_admin.empty_value')}</div> },
+    { key: 'author', label: t('podcasts_admin.columns.author'), render: (episode) => <div className="max-w-[16rem] truncate">{episode.author?.name ?? t('podcasts_admin.empty_value')}</div> },
+    { key: 'status', label: t('podcasts_admin.columns.status'), render: (episode) => statusChip(episode.status) },
+    { key: 'moderation', label: t('podcasts_admin.columns.moderation'), render: (episode) => moderationChip(episode.moderation_status) },
+    { key: 'actions', label: t('podcasts_admin.columns.actions'), render: (episode) => actionButtons('episode', episode.id) },
+  ];
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-8">
@@ -621,7 +750,13 @@ export default function PodcastsAdmin() {
           <Tabs
             aria-label={t('podcasts_admin.filters.label')}
             selectedKey={filter}
-            onSelectionChange={(key) => setFilter(String(key) as ModerationFilter)}
+            onSelectionChange={(key) => {
+              setFilter(String(key) as ModerationFilter);
+              setShowsPage(1);
+              setEpisodesPage(1);
+              setSelectedShowIds(new Set());
+              setSelectedEpisodeIds(new Set());
+            }}
           >
             {FILTERS.map((item) => (
               <Tab key={item} title={t(`podcasts_admin.filters.${item}`)} />
@@ -631,93 +766,53 @@ export default function PodcastsAdmin() {
           <section>
             <div className="mb-3 flex items-center justify-between gap-3">
               <h2 className="text-lg font-semibold">{t('podcasts_admin.sections.shows')}</h2>
-              <span className="text-sm text-muted">{t('podcasts_admin.count', { count: data?.shows.length ?? 0 })}</span>
+              <span className="text-sm text-muted">{t('podcasts_admin.count', { count: totals.shows })}</span>
             </div>
-            {data?.shows.length ? (
-              <Table aria-label={t('podcasts_admin.sections.shows')} classNames={operationsTableClassNames}>
-                <TableHeader>
-                  <TableColumn className="min-w-[22rem]">{t('podcasts_admin.columns.title')}</TableColumn>
-                  <TableColumn className="min-w-[12rem]">{t('podcasts_admin.columns.owner')}</TableColumn>
-                  <TableColumn className="min-w-[8rem]">{t('podcasts_admin.columns.status')}</TableColumn>
-                  <TableColumn className="min-w-[9rem]">{t('podcasts_admin.columns.moderation')}</TableColumn>
-                  <TableColumn className="min-w-[8rem]">{t('podcasts_admin.columns.updated')}</TableColumn>
-                  <TableColumn align="end" className="min-w-[11rem]">{t('podcasts_admin.columns.actions')}</TableColumn>
-                </TableHeader>
-                <TableBody>
-                  {data.shows.map((show) => (
-                    <TableRow key={show.id}>
-                      <TableCell>
-                        <div className="min-w-0">
-                          <div className="truncate font-medium text-foreground">{show.title}</div>
-                          <div className="truncate text-xs text-muted">{show.summary || t('podcasts_admin.empty_value')}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{show.owner?.name ?? t('podcasts_admin.empty_value')}</TableCell>
-                      <TableCell>{statusChip(show.status)}</TableCell>
-                      <TableCell>{moderationChip(show.moderation_status)}</TableCell>
-                      <TableCell>{formatDate(show.updated_at) || t('podcasts_admin.empty_value')}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Tooltip content={t('podcasts_admin.actions.validate_feed')}>
-                            <Button
-                              isIconOnly
-                              size="sm"
-                              variant="tertiary"
-                              aria-label={t('podcasts_admin.actions.validate_feed')}
-                              isLoading={actionKey === `feed:${show.id}`}
-                              onPress={() => validateFeed(show)}
-                            >
-                              <Rss size={16} aria-hidden="true" />
-                            </Button>
-                          </Tooltip>
-                          {actionButtons('show', show.id)}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <p className="py-6 text-sm text-muted">{t('podcasts_admin.empty.shows')}</p>
-            )}
+            <BulkActionToolbar
+              selectedCount={selectedShowIds.size}
+              actions={bulkActionsFor('show', selectedShowIds)}
+              onClearSelection={() => setSelectedShowIds(new Set())}
+              isLoading={bulkLoading}
+            />
+            <DataTable<PodcastShow>
+              columns={showColumns}
+              data={data?.shows ?? []}
+              keyField="id"
+              totalItems={totals.shows}
+              page={showsPage}
+              pageSize={PAGE_SIZE}
+              onPageChange={setShowsPage}
+              selectable
+              selectedKeys={selectedShowIds}
+              onSelectionChange={setSelectedShowIds}
+              emptyContent={t('podcasts_admin.empty.shows')}
+            />
           </section>
 
           <section>
             <div className="mb-3 flex items-center justify-between gap-3">
               <h2 className="text-lg font-semibold">{t('podcasts_admin.sections.episodes')}</h2>
-              <span className="text-sm text-muted">{t('podcasts_admin.count', { count: data?.episodes.length ?? 0 })}</span>
+              <span className="text-sm text-muted">{t('podcasts_admin.count', { count: totals.episodes })}</span>
             </div>
-            {data?.episodes.length ? (
-              <Table aria-label={t('podcasts_admin.sections.episodes')} classNames={operationsTableClassNames}>
-                <TableHeader>
-                  <TableColumn className="min-w-[22rem]">{t('podcasts_admin.columns.title')}</TableColumn>
-                  <TableColumn className="min-w-[14rem]">{t('podcasts_admin.columns.show')}</TableColumn>
-                  <TableColumn className="min-w-[12rem]">{t('podcasts_admin.columns.author')}</TableColumn>
-                  <TableColumn className="min-w-[8rem]">{t('podcasts_admin.columns.status')}</TableColumn>
-                  <TableColumn className="min-w-[9rem]">{t('podcasts_admin.columns.moderation')}</TableColumn>
-                  <TableColumn align="end" className="min-w-[9rem]">{t('podcasts_admin.columns.actions')}</TableColumn>
-                </TableHeader>
-                <TableBody>
-                  {data.episodes.map((episode) => (
-                    <TableRow key={episode.id}>
-                      <TableCell>
-                        <div className="min-w-0">
-                          <div className="truncate font-medium text-foreground">{episode.title}</div>
-                          <div className="truncate text-xs text-muted">{episode.summary || t('podcasts_admin.empty_value')}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell><div className="max-w-[18rem] truncate">{episode.show?.title ?? t('podcasts_admin.empty_value')}</div></TableCell>
-                      <TableCell><div className="max-w-[16rem] truncate">{episode.author?.name ?? t('podcasts_admin.empty_value')}</div></TableCell>
-                      <TableCell>{statusChip(episode.status)}</TableCell>
-                      <TableCell>{moderationChip(episode.moderation_status)}</TableCell>
-                      <TableCell className="text-right">{actionButtons('episode', episode.id)}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <p className="py-6 text-sm text-muted">{t('podcasts_admin.empty.episodes')}</p>
-            )}
+            <BulkActionToolbar
+              selectedCount={selectedEpisodeIds.size}
+              actions={bulkActionsFor('episode', selectedEpisodeIds)}
+              onClearSelection={() => setSelectedEpisodeIds(new Set())}
+              isLoading={bulkLoading}
+            />
+            <DataTable<PodcastEpisode>
+              columns={episodeColumns}
+              data={data?.episodes ?? []}
+              keyField="id"
+              totalItems={totals.episodes}
+              page={episodesPage}
+              pageSize={PAGE_SIZE}
+              onPageChange={setEpisodesPage}
+              selectable
+              selectedKeys={selectedEpisodeIds}
+              onSelectionChange={setSelectedEpisodeIds}
+              emptyContent={t('podcasts_admin.empty.episodes')}
+            />
           </section>
         </div>
       )}
