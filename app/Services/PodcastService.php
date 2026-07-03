@@ -1528,6 +1528,109 @@ class PodcastService
     }
 
     /**
+     * Copy one episode's hosted audio object to another disk and repoint the
+     * row at it, verifying the copy byte-for-byte before the row changes.
+     * Idempotent: episodes already on the target disk are filtered out by the
+     * caller's query and skipped here, so an interrupted
+     * `podcasts:migrate-media` run is resumed by simply re-running it.
+     *
+     * Must run inside the episode's tenant context — regenerating audio_url
+     * reads tenant-scoped podcast configuration (CDN base URL, cloud disk).
+     * The media proxy serves whichever disk the row names, so there is no
+     * window where the episode 404s during migration.
+     */
+    public static function migrateEpisodeMedia(PodcastEpisode $episode, string $targetDisk, bool $deleteSource = false): string
+    {
+        $path = (string) $episode->audio_storage_path;
+        $sourceDisk = (string) ($episode->audio_storage_disk ?: 'local');
+
+        if ($path === '') {
+            return 'skipped_external_audio';
+        }
+        if ($sourceDisk === $targetDisk) {
+            return 'skipped_already_on_target';
+        }
+
+        $source = Storage::disk($sourceDisk);
+        if (!$source->exists($path)) {
+            return 'skipped_missing_source';
+        }
+
+        $target = Storage::disk($targetDisk);
+        $readStream = $source->readStream($path);
+        if (!is_resource($readStream)) {
+            return 'failed_source_unreadable';
+        }
+
+        try {
+            $written = $target->put($path, $readStream);
+        } finally {
+            if (is_resource($readStream)) {
+                fclose($readStream);
+            }
+        }
+        if (!$written) {
+            return 'failed_write';
+        }
+
+        $sourceHash = self::hashDiskObject($source, $path);
+        $targetHash = self::hashDiskObject($target, $path);
+        if ($sourceHash === null || $targetHash === null || !hash_equals($sourceHash, $targetHash)) {
+            try {
+                $target->delete($path);
+            } catch (\Throwable) {
+                // Leave the bad copy for manual inspection if delete fails.
+            }
+
+            return 'failed_checksum';
+        }
+
+        $episode->audio_storage_disk = $targetDisk;
+        // Repoint the public URL so RSS enclosures use the CDN / proxy URL
+        // appropriate for the new disk.
+        $episode->audio_url = self::episodeAudioUrl($episode, false);
+        $episode->save();
+
+        if ($deleteSource) {
+            try {
+                $source->delete($path);
+            } catch (\Throwable $e) {
+                Log::warning('Podcast media migration could not delete source object', [
+                    'episode_id' => (int) $episode->id,
+                    'disk' => $sourceDisk,
+                    'path' => $path,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return 'migrated';
+    }
+
+    private static function hashDiskObject(\Illuminate\Contracts\Filesystem\Filesystem $disk, string $path): ?string
+    {
+        $stream = $disk->readStream($path);
+        if (!is_resource($stream)) {
+            return null;
+        }
+
+        try {
+            $context = hash_init('sha256');
+            while (!feof($stream)) {
+                $chunk = fread($stream, 1024 * 1024);
+                if ($chunk === false) {
+                    return null;
+                }
+                hash_update($context, $chunk);
+            }
+
+            return hash_final($context);
+        } finally {
+            fclose($stream);
+        }
+    }
+
+    /**
      * Verify a filesystem disk end-to-end before podcast media is switched
      * onto it: configuration, driver availability, then a write/read/delete
      * round-trip with a throwaway probe object. Returns a structured report
