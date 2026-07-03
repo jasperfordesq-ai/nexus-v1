@@ -1144,11 +1144,11 @@ Route::get('/v2/courses/{idOrSlug}', [\App\Http\Controllers\Api\CourseController
 // ============================================
 Route::get('/v2/podcasts', [\App\Http\Controllers\Api\PodcastController::class, 'index']);
 Route::post('/v2/podcasts/episodes/{episodeId}/listen', [\App\Http\Controllers\Api\PodcastController::class, 'listen'])->where('episodeId', '[0-9]+');
-Route::get('/v2/podcasts/media/{tenantId}/{episodeId}/audio', [\App\Http\Controllers\Api\PodcastController::class, 'audio'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+']);
-Route::get('/v2/podcasts/transcripts/{tenantId}/{episodeId}.txt', [\App\Http\Controllers\Api\PodcastController::class, 'transcript'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+']);
-Route::get('/v2/podcasts/chapters/{tenantId}/{episodeId}.json', [\App\Http\Controllers\Api\PodcastController::class, 'chapters'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+']);
-Route::get('/v2/podcasts/feed/{tenantId}/{showSlug}.xml', [\App\Http\Controllers\Api\PodcastController::class, 'rssForTenant'])->where(['tenantId' => '[0-9]+', 'showSlug' => '[A-Za-z0-9_-]+']);
-Route::get('/v2/podcasts/{showSlug}/feed.xml', [\App\Http\Controllers\Api\PodcastController::class, 'rss']);
+Route::get('/v2/podcasts/media/{tenantId}/{episodeId}/audio', [\App\Http\Controllers\Api\PodcastController::class, 'audio'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+'])->middleware('throttle:podcast-media');
+Route::get('/v2/podcasts/transcripts/{tenantId}/{episodeId}.txt', [\App\Http\Controllers\Api\PodcastController::class, 'transcript'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+'])->middleware('throttle:60,1');
+Route::get('/v2/podcasts/chapters/{tenantId}/{episodeId}.json', [\App\Http\Controllers\Api\PodcastController::class, 'chapters'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+'])->middleware('throttle:60,1');
+Route::get('/v2/podcasts/feed/{tenantId}/{showSlug}.xml', [\App\Http\Controllers\Api\PodcastController::class, 'rssForTenant'])->where(['tenantId' => '[0-9]+', 'showSlug' => '[A-Za-z0-9_-]+'])->middleware('throttle:30,1');
+Route::get('/v2/podcasts/{showSlug}/feed.xml', [\App\Http\Controllers\Api\PodcastController::class, 'rss'])->middleware('throttle:30,1');
 Route::get('/v2/podcasts/{showSlug}', [\App\Http\Controllers\Api\PodcastController::class, 'show']);
 Route::get('/v2/podcasts/{showSlug}/{episodeSlug}', [\App\Http\Controllers\Api\PodcastController::class, 'episode']);
 

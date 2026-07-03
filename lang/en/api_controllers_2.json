@@ -38,6 +38,8 @@
   "podcasts.invalid_storage_disk": "The selected storage disk is not configured on this server.",
   "podcasts.storage_driver_unavailable": "The cloud storage driver is not installed on this server.",
   "podcasts.invalid_cdn_url": "Use a valid HTTP or HTTPS URL for the CDN base URL.",
+  "podcasts.too_many_chapters": "Episodes can have at most 200 chapters.",
+  "podcasts.private_shows_disabled": "Private and member-only podcast shows are disabled for this community.",
   "help.feedback_recorded": "Feedback recorded",
   "help.missing_article_slug": "Missing article_slug",
   "help.article_not_found": "Article not found",

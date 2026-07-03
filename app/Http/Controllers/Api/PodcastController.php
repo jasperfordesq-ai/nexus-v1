@@ -158,7 +158,11 @@ class PodcastController extends BaseApiController
             return $this->respondWithError('VALIDATION_FAILED', __('api_controllers_2.podcasts.max_shows_reached', ['max' => $maxShows]), null, 422);
         }
 
-        $show = PodcastService::createShow($userId, $input);
+        try {
+            $show = PodcastService::createShow($userId, $input);
+        } catch (\InvalidArgumentException $e) {
+            return $this->podcastValidationError($e);
+        }
 
         return $this->respondWithData($show, null, 201);
     }
@@ -180,7 +184,11 @@ class PodcastController extends BaseApiController
             }
         }
 
-        return $this->respondWithData(PodcastService::updateShow($show, $input));
+        try {
+            return $this->respondWithData(PodcastService::updateShow($show, $input));
+        } catch (\InvalidArgumentException $e) {
+            return $this->podcastValidationError($e);
+        }
     }
 
     public function publish(int $id): JsonResponse
@@ -528,6 +536,8 @@ class PodcastController extends BaseApiController
             str_contains($message, 'too large') => ['VALIDATION_FAILED', 'audio_too_large', 422],
             str_contains($message, 'Unsupported') => ['VALIDATION_FAILED', 'invalid_media_type', 422],
             str_contains($message, 'storage failed') => ['MEDIA_UPLOAD_FAILED', 'media_upload_failed', 500],
+            str_contains($message, 'Private podcast shows') => ['VALIDATION_FAILED', 'private_shows_disabled', 422],
+            str_contains($message, 'Too many podcast chapters') => ['VALIDATION_FAILED', 'too_many_chapters', 422],
             default => ['VALIDATION_FAILED', 'invalid_media_url', 422],
         };
 

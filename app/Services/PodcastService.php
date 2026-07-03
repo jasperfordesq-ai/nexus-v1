@@ -17,8 +17,10 @@ use App\Models\PodcastShow;
 use App\Models\User;
 use App\Jobs\ProcessPodcastEpisodeMedia;
 use Carbon\Carbon;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -32,6 +34,7 @@ class PodcastService
     private const REPORT_AUTO_FLAG_THRESHOLD = 3;
     private const TITLE_MAX_LENGTH = 200;
     private const REACTION_MAX_LENGTH = 30;
+    private const MAX_CHAPTERS = 200;
     private const ALLOWED_AUDIO_TYPES = [
         'audio/mpeg' => 'mp3',
         'audio/mp3' => 'mp3',
@@ -737,38 +740,51 @@ class PodcastService
         }
         $completed = filter_var($data['completed'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
-        DB::transaction(function () use ($episode, $userId, $userAgent, $sessionHash, $userAgentHash, $ipHash, $listenedSeconds, $completed): void {
-            // Serialize concurrent listen pings for this episode so the dedupe
-            // read-modify-write cannot double-insert a row or double-increment.
-            PodcastEpisode::whereKey($episode->id)->lockForUpdate()->first();
+        // Serialize concurrent listen pings per LISTENER (not per episode — a
+        // row lock on the episode made every listener queue behind every
+        // other) so the dedupe read-modify-write cannot double-insert or
+        // double-increment. On lock timeout we record anyway: one duplicate
+        // analytics row beats dropping the listen.
+        $identity = $sessionHash
+            ?? ($userId !== null ? 'u' . $userId : 'a' . md5(($userAgentHash ?? '') . '|' . ($ipHash ?? '')));
+        $lock = Cache::lock('podcast_listen:' . $episode->id . ':' . $identity, 5);
 
-            $existing = self::findRecentListen($episode, $userId, $sessionHash, $userAgentHash, $ipHash);
-            if ($existing) {
-                $existing->listened_seconds = max((int) $existing->listened_seconds, $listenedSeconds);
-                $existing->completed = (bool) $existing->completed || $completed;
-                $existing->client_family = $existing->client_family ?: self::clientFamily($userAgent);
-                $existing->retention_bucket = self::retentionBucket($episode, (int) $existing->listened_seconds);
-                $existing->user_agent_hash = $existing->user_agent_hash ?: $userAgentHash;
-                $existing->ip_hash = $existing->ip_hash ?: $ipHash;
-                $existing->save();
-                return;
-            }
+        $record = static function () use ($episode, $userId, $userAgent, $sessionHash, $userAgentHash, $ipHash, $listenedSeconds, $completed): void {
+            DB::transaction(function () use ($episode, $userId, $userAgent, $sessionHash, $userAgentHash, $ipHash, $listenedSeconds, $completed): void {
+                $existing = self::findRecentListen($episode, $userId, $sessionHash, $userAgentHash, $ipHash);
+                if ($existing) {
+                    $existing->listened_seconds = max((int) $existing->listened_seconds, $listenedSeconds);
+                    $existing->completed = (bool) $existing->completed || $completed;
+                    $existing->client_family = $existing->client_family ?: self::clientFamily($userAgent);
+                    $existing->retention_bucket = self::retentionBucket($episode, (int) $existing->listened_seconds);
+                    $existing->user_agent_hash = $existing->user_agent_hash ?: $userAgentHash;
+                    $existing->ip_hash = $existing->ip_hash ?: $ipHash;
+                    $existing->save();
+                    return;
+                }
 
-            PodcastEpisodeListen::create([
-                'episode_id' => $episode->id,
-                'user_id' => $userId,
-                'session_hash' => $sessionHash,
-                'listened_seconds' => $listenedSeconds,
-                'completed' => $completed,
-                'client_family' => self::clientFamily($userAgent),
-                'retention_bucket' => self::retentionBucket($episode, $listenedSeconds),
-                'user_agent_hash' => $userAgentHash,
-                'ip_hash' => $ipHash,
-                'created_at' => now(),
-            ]);
+                PodcastEpisodeListen::create([
+                    'episode_id' => $episode->id,
+                    'user_id' => $userId,
+                    'session_hash' => $sessionHash,
+                    'listened_seconds' => $listenedSeconds,
+                    'completed' => $completed,
+                    'client_family' => self::clientFamily($userAgent),
+                    'retention_bucket' => self::retentionBucket($episode, $listenedSeconds),
+                    'user_agent_hash' => $userAgentHash,
+                    'ip_hash' => $ipHash,
+                    'created_at' => now(),
+                ]);
 
-            $episode->increment('listen_count');
-        });
+                $episode->increment('listen_count');
+            });
+        };
+
+        try {
+            $lock->block(2, $record);
+        } catch (LockTimeoutException) {
+            $record();
+        }
     }
 
     public static function toggleReaction(PodcastEpisode $episode, int $userId, string $reaction = 'like'): bool
@@ -1358,17 +1374,34 @@ class PodcastService
             return;
         }
 
-        PodcastEpisodeChapter::where('episode_id', $episode->id)->delete();
+        if (count($chapters) > self::MAX_CHAPTERS) {
+            throw new \InvalidArgumentException('Too many podcast chapters');
+        }
 
-        foreach (array_values($chapters) as $position => $chapter) {
+        // Normalize first (drop empty titles, clamp negatives, strip unsafe
+        // URLs), then order by start time so players always get a coherent,
+        // monotonically-sorted chapter list regardless of payload order.
+        $normalized = [];
+        foreach ($chapters as $chapter) {
             if (!is_array($chapter) || trim((string) ($chapter['title'] ?? '')) === '') {
                 continue;
             }
-            PodcastEpisodeChapter::create([
-                'episode_id' => $episode->id,
+            $normalized[] = [
                 'title' => self::nullableText($chapter['title'], 200),
                 'starts_at_seconds' => max(0, (int) ($chapter['starts_at_seconds'] ?? 0)),
                 'url' => self::safePublicUrl($chapter['url'] ?? null),
+            ];
+        }
+        usort($normalized, static fn (array $a, array $b): int => $a['starts_at_seconds'] <=> $b['starts_at_seconds']);
+
+        PodcastEpisodeChapter::where('episode_id', $episode->id)->delete();
+
+        foreach ($normalized as $position => $chapter) {
+            PodcastEpisodeChapter::create([
+                'episode_id' => $episode->id,
+                'title' => $chapter['title'],
+                'starts_at_seconds' => $chapter['starts_at_seconds'],
+                'url' => $chapter['url'],
                 'position' => $position,
             ]);
         }
@@ -1486,8 +1519,12 @@ class PodcastService
 
     private static function normalizeVisibility(string $visibility): string
     {
+        // Callers only reach here with members/private when the client sent
+        // that value explicitly (absent keys default to 'public'/'inherit'),
+        // so rejecting is safe — previously the value was silently downgraded,
+        // which surprised creators expecting a restricted show.
         if (in_array($visibility, ['members', 'private'], true) && !PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_PRIVATE_SHOWS)) {
-            return 'public';
+            throw new \InvalidArgumentException('Private podcast shows are disabled for this community');
         }
 
         return in_array($visibility, ['public', 'members', 'private'], true) ? $visibility : 'public';
@@ -1496,7 +1533,7 @@ class PodcastService
     private static function normalizeEpisodeVisibility(string $visibility): string
     {
         if (in_array($visibility, ['members', 'private'], true) && !PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_PRIVATE_SHOWS)) {
-            return 'inherit';
+            throw new \InvalidArgumentException('Private podcast shows are disabled for this community');
         }
 
         return in_array($visibility, ['inherit', 'public', 'members', 'private'], true) ? $visibility : 'inherit';

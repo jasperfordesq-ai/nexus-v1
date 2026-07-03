@@ -1621,6 +1621,134 @@ class PodcastControllerTest extends TestCase
         ])->assertStatus(200);
     }
 
+    public function test_media_and_feed_routes_are_rate_limited(): void
+    {
+        $middleware = [];
+        foreach (\Illuminate\Support\Facades\Route::getRoutes() as $route) {
+            if (str_starts_with($route->uri(), 'api/v2/podcasts/')) {
+                $middleware[$route->uri()] = $route->gatherMiddleware();
+            }
+        }
+
+        $this->assertContains('throttle:podcast-media', $middleware['api/v2/podcasts/media/{tenantId}/{episodeId}/audio'] ?? []);
+        $this->assertContains('throttle:60,1', $middleware['api/v2/podcasts/transcripts/{tenantId}/{episodeId}.txt'] ?? []);
+        $this->assertContains('throttle:60,1', $middleware['api/v2/podcasts/chapters/{tenantId}/{episodeId}.json'] ?? []);
+        $this->assertContains('throttle:30,1', $middleware['api/v2/podcasts/feed/{tenantId}/{showSlug}.xml'] ?? []);
+        $this->assertContains('throttle:30,1', $middleware['api/v2/podcasts/{showSlug}/feed.xml'] ?? []);
+    }
+
+    public function test_store_episode_rejects_more_than_200_chapters(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Chapter Cap Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+
+        $chapters = [];
+        for ($i = 0; $i <= 200; $i++) {
+            $chapters[] = ['title' => 'Chapter ' . $i, 'starts_at_seconds' => $i * 10];
+        }
+
+        $response = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Overchaptered Episode',
+            'audio_url' => 'https://cdn.example.test/audio.mp3',
+            'chapters' => $chapters,
+        ]);
+        $response->assertStatus(422);
+    }
+
+    public function test_chapters_are_sorted_and_reindexed_by_start_time(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Chapter Order Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+
+        $episodeId = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Out of Order Chapters',
+            'audio_url' => 'https://cdn.example.test/audio.mp3',
+            'chapters' => [
+                ['title' => 'Late Chapter', 'starts_at_seconds' => 120],
+                ['title' => 'Early Chapter', 'starts_at_seconds' => 5],
+                ['title' => 'Middle Chapter', 'starts_at_seconds' => 60],
+            ],
+        ])->assertStatus(201)->json('data.id');
+
+        $rows = DB::table('podcast_episode_chapters')
+            ->where('episode_id', $episodeId)
+            ->orderBy('position')
+            ->get(['title', 'starts_at_seconds', 'position']);
+
+        $this->assertSame(['Early Chapter', 'Middle Chapter', 'Late Chapter'], $rows->pluck('title')->all());
+        $this->assertSame([5, 60, 120], $rows->pluck('starts_at_seconds')->map(fn ($s) => (int) $s)->all());
+        $this->assertSame([0, 1, 2], $rows->pluck('position')->map(fn ($p) => (int) $p)->all());
+    }
+
+    public function test_private_show_creation_rejected_when_private_shows_disabled(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsAdmin();
+        $this->apiPut('/v2/admin/config/podcasts/bulk', [
+            'settings' => ['podcasts.enable_private_shows' => false],
+        ])->assertStatus(200);
+
+        $this->actingAsMember();
+        $response = $this->apiPost('/v2/podcasts', [
+            'title' => 'Secret Show',
+            'visibility' => 'private',
+        ]);
+        $response->assertStatus(422);
+
+        // Explicit public visibility is still fine.
+        $this->apiPost('/v2/podcasts', [
+            'title' => 'Open Show',
+            'visibility' => 'public',
+        ])->assertStatus(201);
+    }
+
+    public function test_private_episode_visibility_rejected_when_private_shows_disabled(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Episode Visibility Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+
+        $this->actingAsAdmin();
+        $this->apiPut('/v2/admin/config/podcasts/bulk', [
+            'settings' => ['podcasts.enable_private_shows' => false],
+        ])->assertStatus(200);
+
+        $this->actingAsMember();
+        // New member context is not the show owner; recreate as this member.
+        $ownShowId = $this->apiPost('/v2/podcasts', [
+            'title' => 'My Own Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+
+        $this->apiPost("/v2/podcasts/{$ownShowId}/episodes", [
+            'title' => 'Members Only Episode',
+            'audio_url' => 'https://cdn.example.test/audio.mp3',
+            'visibility' => 'members',
+        ])->assertStatus(422);
+
+        // Default (inherit) visibility still works with the flag off.
+        $this->apiPost("/v2/podcasts/{$ownShowId}/episodes", [
+            'title' => 'Inherit Episode',
+            'audio_url' => 'https://cdn.example.test/audio.mp3',
+        ])->assertStatus(201);
+
+        $this->assertGreaterThan(0, $showId);
+    }
+
     public function test_infected_media_is_never_served(): void
     {
         Storage::fake('local');

@@ -64,6 +64,15 @@ class RouteServiceProvider extends ServiceProvider
             );
         });
 
+        // Podcast audio streaming — generous because seeking fires bursts of
+        // HTTP Range requests (each is a fresh request), but bounded so a
+        // single client cannot use the media proxy for bandwidth DoS.
+        RateLimiter::for('podcast-media', function (Request $request) {
+            return Limit::perMinute(180)->by(
+                $request->user()?->id ? 'user:' . $request->user()->id : 'ip:' . $request->ip()
+            );
+        });
+
         $this->routes(function () {
             // API routes — prefixed with /api (Apache rewrites /api/* → index.php,
             // so REQUEST_URI keeps the /api prefix that Laravel must match)
