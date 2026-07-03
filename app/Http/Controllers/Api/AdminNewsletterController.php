@@ -24,6 +24,18 @@ class AdminNewsletterController extends BaseApiController
     protected bool $isV2Api = true;
 
     /**
+     * Hard cap on stored newsletter/template content — protects the render
+     * pipeline (CSS inliner) from pathological pastes. ~512 KB is far beyond
+     * any legitimate email body (Gmail clips at ~102 KB).
+     */
+    private const MAX_CONTENT_BYTES = 524288;
+
+    /**
+     * Authoring formats the render pipeline understands.
+     */
+    private const CONTENT_FORMATS = ['plaintext', 'richtext', 'html', 'builder'];
+
+    /**
      * Allowed tables for existence checks — prevents SQL injection via table name.
      */
     private const ALLOWED_TABLES = [
@@ -175,6 +187,8 @@ class AdminNewsletterController extends BaseApiController
         $name = $this->input('name') ?: $subject; // Fall back to subject if name not provided
         $previewText = $this->input('preview_text', '');
         $content = $this->input('content', '');
+        $contentFormat = $this->input('content_format', 'richtext');
+        $designJson = $this->input('design_json') ?: null;
         $status = $this->input('status', 'draft');
         $targetAudience = $this->input('target_audience', 'all_members');
         $segmentId = $this->inputInt('segment_id') ?: null;
@@ -209,21 +223,33 @@ class AdminNewsletterController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_target'), 'target_audience');
         }
 
+        if (!in_array($contentFormat, self::CONTENT_FORMATS, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_content_format'), 'content_format');
+        }
+
+        if (strlen((string) $content) > self::MAX_CONTENT_BYTES) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.newsletter_content_too_large'), 'content');
+        }
+
+        // Email-safe sanitization: strip executable vectors, preserve email markup
+        // (tables/inline styles/<style>/MSO comments). Never the generic HtmlSanitizer.
+        $content = \App\Services\EmailHtmlSanitizer::sanitizeForFormat((string) $content, $contentFormat);
+
         if (!$this->tableExists('newsletters')) {
             return $this->respondWithError('TABLE_MISSING', __('api.newsletter_not_configured'), null, 503);
         }
 
         try {
             DB::insert(
-                "INSERT INTO newsletters (tenant_id, name, subject, preview_text, content, status,
+                "INSERT INTO newsletters (tenant_id, name, subject, preview_text, content, content_format, design_json, status,
                     target_audience, segment_id, scheduled_at, ab_test_enabled, subject_b, template_id,
                     ab_split_percentage, ab_winner_metric, ab_auto_select_winner, ab_auto_select_after_hours,
                     target_counties, target_towns, target_groups,
                     is_recurring, recurring_frequency, recurring_day, recurring_day_of_week, recurring_day_of_month,
                     recurring_time, recurring_end_date,
                     created_by, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
-                [$tenantId, $name, $subject, $previewText, $content, $status,
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                [$tenantId, $name, $subject, $previewText, $content, $contentFormat, $designJson, $status,
                  $targetAudience, $segmentId, $scheduledAt, $abTestEnabled, $subjectB, $templateId,
                  $abSplitPercentage, $abWinnerMetric, $abAutoSelectWinner, $abAutoSelectAfterHours,
                  $targetCounties, $targetTowns, $targetGroups,
@@ -269,8 +295,35 @@ class AdminNewsletterController extends BaseApiController
                 $params[] = $targetAudience;
             }
 
+            $contentFormat = $this->input('content_format');
+            if ($contentFormat !== null) {
+                if (!in_array($contentFormat, self::CONTENT_FORMATS, true)) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_content_format'), 'content_format');
+                }
+                $fields[] = "content_format = ?";
+                $params[] = $contentFormat;
+            }
+
+            $content = $this->input('content');
+            if ($content !== null) {
+                if (strlen((string) $content) > self::MAX_CONTENT_BYTES) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.newsletter_content_too_large'), 'content');
+                }
+                // Sanitize against the incoming format, falling back to the stored one.
+                $effectiveFormat = $contentFormat
+                    ?? (string) (DB::table('newsletters')->where('id', $id)->where('tenant_id', $tenantId)->value('content_format') ?: 'richtext');
+                $fields[] = "content = ?";
+                $params[] = \App\Services\EmailHtmlSanitizer::sanitizeForFormat((string) $content, $effectiveFormat);
+            }
+
+            $designJson = $this->input('design_json');
+            if ($designJson !== null) {
+                $fields[] = "design_json = ?";
+                $params[] = $designJson === '' ? null : $designJson;
+            }
+
             $allowedFields = [
-                'name', 'subject', 'preview_text', 'content',
+                'name', 'subject', 'preview_text',
                 'scheduled_at', 'subject_b',
                 'ab_winner_metric',
                 'recurring_frequency', 'recurring_time', 'recurring_end_date',
@@ -1122,13 +1175,25 @@ class AdminNewsletterController extends BaseApiController
         $subject = $this->input('subject', '');
         $previewText = $this->input('preview_text', '');
         $content = $this->input('content', '');
+        $contentFormat = $this->input('content_format', 'richtext');
+        $designJson = $this->input('design_json') ?: null;
+
+        if (!in_array($contentFormat, self::CONTENT_FORMATS, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_content_format'), 'content_format');
+        }
+
+        if (strlen((string) $content) > self::MAX_CONTENT_BYTES) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.newsletter_content_too_large'), 'content');
+        }
+
+        $content = \App\Services\EmailHtmlSanitizer::sanitizeForFormat((string) $content, $contentFormat);
 
         try {
             DB::insert(
                 "INSERT INTO newsletter_templates
-                    (tenant_id, name, description, category, is_active, subject, preview_text, content, created_by, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
-                [$tenantId, $name, $description, $category, $isActive, $subject, $previewText, $content, $userId]
+                    (tenant_id, name, description, category, is_active, subject, preview_text, content, content_format, design_json, created_by, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+                [$tenantId, $name, $description, $category, $isActive, $subject, $previewText, $content, $contentFormat, $designJson, $userId]
             );
             $id = DB::getPdo()->lastInsertId();
             return $this->respondWithData(['id' => $id, 'name' => $name], null, 201);
@@ -1150,7 +1215,7 @@ class AdminNewsletterController extends BaseApiController
             $fields = [];
             $params = [];
 
-            $allowedFields = ['name', 'description', 'category', 'subject', 'preview_text', 'content'];
+            $allowedFields = ['name', 'description', 'category', 'subject', 'preview_text'];
 
             foreach ($allowedFields as $field) {
                 $val = $this->input($field);
@@ -1158,6 +1223,32 @@ class AdminNewsletterController extends BaseApiController
                     $fields[] = "{$field} = ?";
                     $params[] = $val;
                 }
+            }
+
+            $contentFormat = $this->input('content_format');
+            if ($contentFormat !== null) {
+                if (!in_array($contentFormat, self::CONTENT_FORMATS, true)) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_content_format'), 'content_format');
+                }
+                $fields[] = "content_format = ?";
+                $params[] = $contentFormat;
+            }
+
+            $content = $this->input('content');
+            if ($content !== null) {
+                if (strlen((string) $content) > self::MAX_CONTENT_BYTES) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.newsletter_content_too_large'), 'content');
+                }
+                $effectiveFormat = $contentFormat
+                    ?? (string) (DB::table('newsletter_templates')->where('id', $id)->where('tenant_id', $tenantId)->value('content_format') ?: 'richtext');
+                $fields[] = "content = ?";
+                $params[] = \App\Services\EmailHtmlSanitizer::sanitizeForFormat((string) $content, $effectiveFormat);
+            }
+
+            $designJson = $this->input('design_json');
+            if ($designJson !== null) {
+                $fields[] = "design_json = ?";
+                $params[] = $designJson === '' ? null : $designJson;
             }
 
             // Handle boolean field
@@ -1228,8 +1319,8 @@ class AdminNewsletterController extends BaseApiController
 
             DB::insert(
                 "INSERT INTO newsletter_templates
-                    (tenant_id, name, description, category, is_active, subject, preview_text, content, created_by, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+                    (tenant_id, name, description, category, is_active, subject, preview_text, content_format, design_json, content, created_by, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
                 [
                     $tenantId,
                     $newName,
@@ -1238,6 +1329,8 @@ class AdminNewsletterController extends BaseApiController
                     $original->is_active ?? 1,
                     $original->subject ?? '',
                     $original->preview_text ?? '',
+                    $original->content_format ?? 'richtext',
+                    $original->design_json ?? null,
                     $original->content ?? '',
                     $userId,
                 ]
@@ -2215,7 +2308,8 @@ class AdminNewsletterController extends BaseApiController
 
         try {
             $newsletter = DB::selectOne(
-                "SELECT id, status, target_audience, segment_id FROM newsletters WHERE id = ? AND tenant_id = ?",
+                "SELECT id, status, target_audience, segment_id, target_groups, target_counties, target_towns
+                 FROM newsletters WHERE id = ? AND tenant_id = ?",
                 [$id, $tenantId]
             );
 
@@ -2234,7 +2328,17 @@ class AdminNewsletterController extends BaseApiController
             $targetAudience = $newsletter->target_audience ?? 'all_members';
             $segmentId = $newsletter->segment_id ?? null;
 
-            $queued = NewsletterService::sendNow($id, $targetAudience, $segmentId);
+            // A 'segment' audience without a chosen segment must never fall through
+            // to all_members (targeting fix, 2026-07-03).
+            if ($targetAudience === 'segment' && !$segmentId) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.newsletter_segment_required'), 'segment_id');
+            }
+
+            // Pass stored group/geo targeting so it actually restricts recipients
+            // (previously write-only — see NewsletterService::filterUserIdsByTargeting).
+            $targeting = NewsletterService::extractTargeting($newsletter);
+
+            $queued = NewsletterService::sendNow($id, $targetAudience, $segmentId, $targeting);
 
             return $this->respondWithData([
                 'queued' => $queued,
@@ -2325,10 +2429,18 @@ class AdminNewsletterController extends BaseApiController
             $targetAudience = $this->input('target_audience', 'all_members');
             $segmentId = $this->inputInt('segment_id');
 
+            // Apply the same group/geo targeting as the send path so the
+            // previewed count always matches what would actually be queued.
+            $targeting = NewsletterService::extractTargeting([
+                'target_groups' => $this->normalizeJsonListInput($this->input('target_groups'), true),
+                'target_counties' => $this->normalizeJsonListInput($this->input('target_counties')),
+                'target_towns' => $this->normalizeJsonListInput($this->input('target_towns')),
+            ]);
+
             if ($segmentId) {
-                $count = NewsletterService::getSegmentRecipientCount($segmentId);
+                $count = NewsletterService::getSegmentRecipientCount($segmentId, $targeting);
             } else {
-                $count = NewsletterService::getRecipientCount($targetAudience);
+                $count = NewsletterService::getRecipientCount($targetAudience, $targeting);
             }
 
             return $this->respondWithData(['count' => $count]);
@@ -2351,7 +2463,7 @@ class AdminNewsletterController extends BaseApiController
 
         try {
             $newsletter = DB::selectOne(
-                "SELECT name, subject, preview_text, content, target_audience, segment_id,
+                "SELECT name, subject, preview_text, content, content_format, design_json, target_audience, segment_id,
                         ab_test_enabled, subject_b, ab_split_percentage, ab_winner_metric,
                         ab_auto_select_winner, ab_auto_select_after_hours,
                         target_counties, target_towns, target_groups, template_id,
@@ -2369,15 +2481,16 @@ class AdminNewsletterController extends BaseApiController
             $newName = ($newsletter->name ?? $newSubject) . ' (Copy)';
 
             DB::insert(
-                "INSERT INTO newsletters (tenant_id, name, subject, preview_text, content, status,
+                "INSERT INTO newsletters (tenant_id, name, subject, preview_text, content, content_format, design_json, status,
                     target_audience, segment_id, ab_test_enabled, subject_b, ab_split_percentage,
                     ab_winner_metric, ab_auto_select_winner, ab_auto_select_after_hours,
                     target_counties, target_towns, target_groups, template_id,
                     is_recurring, recurring_frequency, recurring_day, recurring_day_of_week, recurring_day_of_month,
                     recurring_time, recurring_end_date, created_by, created_at)
-                 VALUES (?, ?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                 VALUES (?, ?, ?, ?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
                 [
                     $tenantId, $newName, $newSubject, $newsletter->preview_text, $newsletter->content,
+                    $newsletter->content_format ?? 'richtext', $newsletter->design_json ?? null,
                     $newsletter->target_audience, $newsletter->segment_id,
                     $newsletter->ab_test_enabled, $newsletter->subject_b,
                     $newsletter->ab_split_percentage, $newsletter->ab_winner_metric,

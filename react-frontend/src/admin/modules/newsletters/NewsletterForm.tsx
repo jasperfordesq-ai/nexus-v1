@@ -243,12 +243,26 @@ export function NewsletterForm() {
   const fetchRecipientCount = useCallback(async () => {
     setRecipientLoading(true);
     try {
-      const params: { target_audience: string; segment_id?: number } = {
+      const params: {
+        target_audience: string;
+        segment_id?: number;
+        target_groups?: number[];
+        target_counties?: string[];
+        target_towns?: string[];
+      } = {
         target_audience: targetAudience === 'segment' ? 'all_members' : targetAudience,
       };
       if (targetAudience === 'segment' && segmentId) {
         params.segment_id = Number(segmentId);
       }
+      // Group/geo targeting narrows the send — include it so the previewed
+      // count matches what the backend will actually queue.
+      const groupIds = targetGroups.map(Number).filter((groupId) => groupId > 0);
+      if (groupIds.length > 0) params.target_groups = groupIds;
+      const counties = csvToList(targetCounties);
+      if (counties && counties.length > 0) params.target_counties = counties;
+      const towns = csvToList(targetTowns);
+      if (towns && towns.length > 0) params.target_towns = towns;
       const res = await adminNewsletters.getRecipientCount(params);
       if (res.success && res.data) {
         setRecipientCount((res.data as { count: number }).count);
@@ -257,7 +271,7 @@ export function NewsletterForm() {
       setRecipientCount(null);
     }
     setRecipientLoading(false);
-  }, [targetAudience, segmentId]);
+  }, [targetAudience, segmentId, targetGroups, targetCounties, targetTowns]);
 
   useEffect(() => {
     fetchRecipientCount();

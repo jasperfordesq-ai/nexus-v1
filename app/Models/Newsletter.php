@@ -19,7 +19,7 @@ class Newsletter extends Model
     protected $table = 'newsletters';
 
     protected $fillable = [
-        'tenant_id', 'name', 'subject', 'preview_text', 'content', 'status',
+        'tenant_id', 'name', 'subject', 'preview_text', 'content', 'content_format', 'design_json', 'status',
         'scheduled_at', 'sent_at', 'created_by', 'total_recipients',
         'total_sent', 'total_failed', 'total_opens', 'unique_opens',
         'total_clicks', 'unique_clicks', 'target_audience', 'segment_id',

@@ -1259,7 +1259,13 @@ export const adminNewsletters = {
   sendTest: (id: number) =>
     api.post<{ sent_to: string; message: string }>(`/v2/admin/newsletters/${id}/send-test`, {}),
 
-  getRecipientCount: (params: { target_audience: string; segment_id?: number }) =>
+  getRecipientCount: (params: {
+    target_audience: string;
+    segment_id?: number;
+    target_groups?: number[];
+    target_counties?: string[];
+    target_towns?: string[];
+  }) =>
     api.post<{ count: number }>('/v2/admin/newsletters/recipient-count', params),
 
   // Duplicate

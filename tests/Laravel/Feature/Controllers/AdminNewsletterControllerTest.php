@@ -325,4 +325,74 @@ class AdminNewsletterControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
     }
+
+    // ================================================================
+    // TARGETING — group/geo targeting fix (2026-07-03)
+    // ================================================================
+
+    public function test_recipient_count_reflects_group_targeting(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $inGroup = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => 1,
+        ]);
+        $groupId = (int) DB::table('groups')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_id' => $inGroup->id,
+            'name' => 'Recipient count targeting group',
+            'slug' => 'recipient-count-targeting-' . uniqid('', true),
+            'visibility' => 'public',
+            'created_at' => now(),
+        ]);
+        DB::table('group_members')->insert([
+            'tenant_id' => $this->testTenantId,
+            'group_id' => $groupId,
+            'user_id' => $inGroup->id,
+            'status' => 'active',
+            'role' => 'member',
+            'joined_at' => now(),
+            'created_at' => now(),
+        ]);
+
+        $unfiltered = $this->apiPost('/v2/admin/newsletters/recipient-count', [
+            'target_audience' => 'all_members',
+        ])->assertOk()->json('data.count');
+
+        $filtered = $this->apiPost('/v2/admin/newsletters/recipient-count', [
+            'target_audience' => 'all_members',
+            'target_groups' => [$groupId],
+        ])->assertOk()->json('data.count');
+
+        // Group targeting must narrow the audience, never mirror it.
+        $this->assertSame(1, $filtered);
+        $this->assertGreaterThan($filtered, $unfiltered);
+    }
+
+    public function test_send_rejects_segment_audience_without_segment(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $newsletterId = DB::table('newsletters')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'name' => 'Segment send guard',
+            'subject' => 'Segment send guard',
+            'content' => '<p>Hello</p>',
+            'status' => 'draft',
+            'target_audience' => 'segment',
+            'segment_id' => null,
+            'created_by' => $admin->id,
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiPost("/v2/admin/newsletters/{$newsletterId}/send", []);
+
+        // Must refuse with a validation error — never fall through to all_members.
+        $response->assertStatus(400);
+        $response->assertJsonPath('errors.0.code', 'VALIDATION_ERROR');
+        $this->assertSame('draft', DB::table('newsletters')->where('id', $newsletterId)->value('status'));
+    }
 }

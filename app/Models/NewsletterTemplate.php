@@ -19,8 +19,8 @@ class NewsletterTemplate extends Model
 
     protected $fillable = [
         'tenant_id', 'name', 'description', 'category', 'subject',
-        'preview_text', 'content', 'thumbnail', 'is_active',
-        'use_count', 'created_by',
+        'preview_text', 'content', 'content_format', 'design_json',
+        'thumbnail', 'is_active', 'use_count', 'created_by',
     ];
 
     protected $casts = [

@@ -138,12 +138,15 @@ class NewsletterService
      * processes the queue via App\Core\Mailer.
      *
      * @param int $newsletterId Newsletter ID
-     * @param string $targetAudience 'all_members', 'subscribers_only', or 'both'
+     * @param string $targetAudience 'all_members', 'subscribers_only', 'both', or 'segment'
      * @param int|null $segmentId Optional segment for filtered targeting
+     * @param array $targeting Optional ['groups'=>int[], 'counties'=>string[], 'towns'=>string[]] filter.
+     *                         When empty, self-loaded from the newsletter row's target_groups /
+     *                         target_counties / target_towns columns (so cron paths inherit it).
      * @return int Number of recipients queued
      * @throws \Exception
      */
-    public static function sendNow(int $newsletterId, string $targetAudience = 'all_members', ?int $segmentId = null): int
+    public static function sendNow(int $newsletterId, string $targetAudience = 'all_members', ?int $segmentId = null, array $targeting = []): int
     {
         // Exclusive lock per newsletter — prevents concurrent sendNow() calls
         // (e.g., admin double-click, cron overlap, or processScheduled race).
@@ -180,12 +183,24 @@ class NewsletterService
                 $segmentId = (int) $newsletter->segment_id;
             }
 
-            return TenantContext::runForTenant($tenantId, function () use ($newsletter, $newsletterId, $targetAudience, $segmentId, $tenantId): int {
+            // Load stored group/geo targeting from the newsletter row when not passed —
+            // cron paths (processScheduled/processRecurring) inherit the filter for free.
+            if (empty($targeting)) {
+                $targeting = self::extractTargeting($newsletter);
+            }
+
+            // A 'segment' audience without a segment is a misconfiguration: refuse
+            // rather than silently falling through to all_members (targeting fix, 2026-07-03).
+            if ($targetAudience === 'segment' && !$segmentId) {
+                throw new \Exception("Newsletter {$newsletterId} targets a segment but no segment is selected");
+            }
+
+            return TenantContext::runForTenant($tenantId, function () use ($newsletter, $newsletterId, $targetAudience, $segmentId, $tenantId, $targeting): int {
             // Resolve recipients
             if ($segmentId) {
-                $recipients = self::getSegmentRecipients($segmentId);
+                $recipients = self::getSegmentRecipients($segmentId, $targeting);
             } else {
-                $recipients = self::getRecipientsList($targetAudience);
+                $recipients = self::getRecipientsList($targetAudience, $targeting);
             }
 
             if (empty($recipients)) {
@@ -796,12 +811,18 @@ HTML;
      * Evaluates the segment's rules against the users table using
      * dynamic condition building.
      */
-    public static function getSegmentRecipientCount(int $segmentId): int
+    public static function getSegmentRecipientCount(int $segmentId, array $targeting = []): int
     {
         $segment = NewsletterSegment::find($segmentId);
 
         if (!$segment || empty($segment->rules)) {
             return 0;
+        }
+
+        // With group/geo targeting active, count through the same resolver the
+        // send path uses so the previewed count always matches reality.
+        if (!empty($targeting['groups']) || !empty($targeting['counties']) || !empty($targeting['towns'])) {
+            return count(self::getSegmentRecipients($segmentId, $targeting));
         }
 
         return self::countRecipientsByRules($segment->match_type ?? 'all', $segment->rules);
@@ -811,23 +832,130 @@ HTML;
      * Get the total recipient count for a target audience.
      *
      * @param string $targetAudience 'all_members', 'subscribers_only', or 'both'
+     * @param array $targeting Optional ['groups'=>int[], 'counties'=>string[], 'towns'=>string[]] filter
      * @return int
      */
-    public static function getRecipientCount(string $targetAudience = 'all_members'): int
+    public static function getRecipientCount(string $targetAudience = 'all_members', array $targeting = []): int
     {
-        return count(self::getRecipientsList($targetAudience));
+        return count(self::getRecipientsList($targetAudience, $targeting));
+    }
+
+    /**
+     * Extract the stored group/geo targeting from a newsletter row (object or array).
+     *
+     * target_groups / target_counties / target_towns are stored as JSON-encoded
+     * lists (see AdminNewsletterController::normalizeJsonListInput()). Returns a
+     * normalized ['groups'=>int[], 'counties'=>string[], 'towns'=>string[]] array.
+     */
+    public static function extractTargeting(object|array $newsletter): array
+    {
+        $get = static function (string $key) use ($newsletter) {
+            return is_array($newsletter) ? ($newsletter[$key] ?? null) : ($newsletter->{$key} ?? null);
+        };
+
+        $decode = static function ($raw): array {
+            if (is_array($raw)) {
+                $list = $raw;
+            } elseif (is_string($raw) && trim($raw) !== '') {
+                $decoded = json_decode($raw, true);
+                $list = is_array($decoded) ? $decoded : [];
+            } else {
+                return [];
+            }
+
+            return array_values(array_filter(
+                array_map(static fn ($v) => is_string($v) ? trim($v) : $v, $list),
+                static fn ($v) => $v !== null && $v !== ''
+            ));
+        };
+
+        return [
+            'groups' => array_values(array_filter(array_map('intval', $decode($get('target_groups'))), static fn (int $id) => $id > 0)),
+            'counties' => array_map('strval', $decode($get('target_counties'))),
+            'towns' => array_map('strval', $decode($get('target_towns'))),
+        ];
+    }
+
+    /**
+     * Resolve the set of user IDs matched by group/geo targeting.
+     *
+     * Returns null when no targeting is active (= no filtering), otherwise a
+     * set (id => true) of matching user IDs — possibly empty, which means the
+     * targeting matched nobody and every recipient should be excluded.
+     *
+     * Facets combine with OR (union): a newsletter targeted at "Group A" plus
+     * "Co. Cork" reaches members in the group OR in the county. This mirrors the
+     * independent list-based write path in the admin UI. Swap the implode
+     * operator to ' AND ' if intersection semantics are ever wanted instead.
+     */
+    private static function filterUserIdsByTargeting(array $targeting): ?array
+    {
+        $groups = $targeting['groups'] ?? [];
+        $locations = array_merge($targeting['counties'] ?? [], $targeting['towns'] ?? []);
+
+        if (empty($groups) && empty($locations)) {
+            return null;
+        }
+
+        $tenantId = TenantContext::getId();
+        $conditions = [];
+        $params = [$tenantId];
+
+        if (!empty($groups)) {
+            $clause = self::buildGroupMembershipCondition('member_of', $groups, $params);
+            if ($clause) {
+                $conditions[] = $clause;
+            }
+        }
+
+        if (!empty($locations)) {
+            $clause = self::buildLocationLikeCondition('in', $locations, $params);
+            if ($clause) {
+                $conditions[] = $clause;
+            }
+        }
+
+        if (empty($conditions)) {
+            return null;
+        }
+
+        $sql = "SELECT id FROM users WHERE tenant_id = ? AND (" . implode(' OR ', $conditions) . ")";
+
+        $ids = [];
+        foreach (DB::select($sql, $params) as $row) {
+            $ids[(int) $row->id] = true;
+        }
+
+        return $ids;
+    }
+
+    /**
+     * Whether a recipient's user_id passes the active targeting filter.
+     *
+     * Recipients without a user_id (unregistered subscribers) are excluded while
+     * targeting is active — they cannot belong to a group or have a member location.
+     */
+    private static function passesTargeting(?array $allowedUserIds, mixed $userId): bool
+    {
+        if ($allowedUserIds === null) {
+            return true;
+        }
+
+        return $userId !== null && $userId !== '' && isset($allowedUserIds[(int) $userId]);
     }
 
     /**
      * Get recipients list based on target audience.
      *
+     * @param array $targeting Optional ['groups'=>int[], 'counties'=>string[], 'towns'=>string[]] filter
      * @return array Array of recipient arrays with email, user_id, name, etc.
      */
-    private static function getRecipientsList(string $targetAudience = 'all_members'): array
+    private static function getRecipientsList(string $targetAudience = 'all_members', array $targeting = []): array
     {
         $tenantId = TenantContext::getId();
         $recipients = [];
         $suppressedEmails = self::getSuppressedEmails($tenantId);
+        $allowedUserIds = self::filterUserIdsByTargeting($targeting);
 
         switch ($targetAudience) {
             case 'subscribers_only':
@@ -838,6 +966,9 @@ HTML;
 
                 foreach ($subscribers as $sub) {
                     if (isset($suppressedEmails[strtolower((string) $sub->email)])) {
+                        continue;
+                    }
+                    if (!self::passesTargeting($allowedUserIds, $sub->user_id)) {
                         continue;
                     }
                     $recipients[] = [
@@ -874,6 +1005,9 @@ HTML;
                     if (isset($suppressedEmails[$email])) {
                         continue;
                     }
+                    if (!self::passesTargeting($allowedUserIds, $sub->user_id)) {
+                        continue;
+                    }
                     $seen[$email] = true;
                     $recipients[] = [
                         'email' => $sub->email,
@@ -899,6 +1033,9 @@ HTML;
                 foreach ($users as $user) {
                     $email = strtolower($user->email);
                     if (isset($seen[$email]) || isset($unsubscribedEmails[$email]) || isset($suppressedEmails[$email])) {
+                        continue;
+                    }
+                    if (!self::passesTargeting($allowedUserIds, $user->id)) {
                         continue;
                     }
 
@@ -938,6 +1075,9 @@ HTML;
                     if (isset($unsubscribedEmails[$email]) || isset($suppressedEmails[$email])) {
                         continue;
                     }
+                    if (!self::passesTargeting($allowedUserIds, $user->id)) {
+                        continue;
+                    }
 
                     // Look up subscriber record for unsubscribe token
                     $subscriber = DB::table('newsletter_subscribers')
@@ -963,9 +1103,10 @@ HTML;
     /**
      * Get recipients from a newsletter segment by evaluating its rules.
      *
+     * @param array $targeting Optional ['groups'=>int[], 'counties'=>string[], 'towns'=>string[]] filter
      * @return array Array of recipient arrays
      */
-    public static function getSegmentRecipients(int $segmentId): array
+    public static function getSegmentRecipients(int $segmentId, array $targeting = []): array
     {
         $segment = NewsletterSegment::find($segmentId);
 
@@ -979,6 +1120,7 @@ HTML;
         $tenantId = TenantContext::getId();
         $recipients = [];
         $suppressedEmails = self::getSuppressedEmails($tenantId);
+        $allowedUserIds = self::filterUserIdsByTargeting($targeting);
 
         // Collect unsubscribed emails to exclude from segment sends
         $unsubscribedEmails = DB::table('newsletter_subscribers')
@@ -997,6 +1139,9 @@ HTML;
             // Skip users who have unsubscribed from newsletters
             $email = strtolower((string) $user->email);
             if (isset($unsubscribedEmails[$email]) || isset($suppressedEmails[$email])) {
+                continue;
+            }
+            if (!self::passesTargeting($allowedUserIds, $user->id)) {
                 continue;
             }
 
