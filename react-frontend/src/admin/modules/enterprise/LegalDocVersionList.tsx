@@ -19,7 +19,6 @@ import { useToast } from '@/contexts/ToastContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { adminLegalDocs } from '@/admin/api/adminApi';
 import type { LegalDocumentVersion } from '@/admin/api/types';
-import LegalDocVersionForm from './LegalDocVersionForm';
 import LegalDocVersionComparison from './LegalDocVersionComparison';
 import { sanitizeRichText } from '@/lib/sanitize';
 import { useAdminPageMeta } from '../../AdminMetaContext';
@@ -40,7 +39,6 @@ export default function LegalDocVersionList() {
 
   const [versions, setVersions] = useState<LegalDocumentVersion[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showFormModal, setShowFormModal] = useState(false);
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [showNotifyModal, setShowNotifyModal] = useState(false);
@@ -53,8 +51,6 @@ export default function LegalDocVersionList() {
   const [viewingVersion, setViewingVersion] = useState<LegalDocumentVersion | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<LegalDocumentVersion | null>(null);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editTarget, setEditTarget] = useState<LegalDocumentVersion | null>(null);
 
   const documentId = parseInt(id || '0', 10);
 
@@ -189,7 +185,7 @@ export default function LegalDocVersionList() {
         <div className="flex gap-2">
           <Button
             startContent={<Plus size={18} />}
-            onPress={() => setShowFormModal(true)}
+            onPress={() => navigate(tenantPath(`/admin/legal-documents/${documentId}/versions/new`))}
           >
             {t('enterprise.create_new_version')}
           </Button>
@@ -297,10 +293,7 @@ export default function LegalDocVersionList() {
                           size="sm"
                           variant="tertiary"
                           startContent={<Pencil size={16} />}
-                          onPress={() => {
-                            setEditTarget(version);
-                            setShowEditModal(true);
-                          }}
+                          onPress={() => navigate(tenantPath(`/admin/legal-documents/${documentId}/versions/${version.id}/edit`))}
                         >
                           {t('enterprise.btn_edit')}
                         </Button>
@@ -368,52 +361,6 @@ export default function LegalDocVersionList() {
         )}
       </div>
 
-      {/* Create Version Modal */}
-      <Modal
-        isOpen={showFormModal}
-        onClose={() => setShowFormModal(false)}
-        size="5xl"
-        scrollBehavior="inside"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <LegalDocVersionForm
-              documentId={documentId}
-              onSuccess={() => {
-                onClose();
-                loadVersions();
-              }}
-              onCancel={onClose}
-            />
-          )}
-        </ModalContent>
-      </Modal>
-
-      {/* Edit Draft Version Modal */}
-      {editTarget && (
-        <Modal
-          isOpen={showEditModal}
-          onClose={() => { setShowEditModal(false); setEditTarget(null); }}
-          size="5xl"
-          scrollBehavior="inside"
-        >
-          <ModalContent>
-            {(onClose) => (
-              <LegalDocVersionForm
-                documentId={documentId}
-                editVersion={editTarget}
-                onSuccess={() => {
-                  onClose();
-                  setEditTarget(null);
-                  loadVersions();
-                }}
-                onCancel={onClose}
-              />
-            )}
-          </ModalContent>
-        </Modal>
-      )}
-
       {/* Compare Modal */}
       {compareVersions && (
         <Modal
@@ -436,7 +383,7 @@ export default function LegalDocVersionList() {
       )}
 
       {/* Publish Confirmation Modal */}
-      <Modal isOpen={showPublishModal} onClose={() => setShowPublishModal(false)}>
+      <Modal isOpen={showPublishModal} onClose={() => setShowPublishModal(false)} isDismissable={false}>
         <ModalContent>
           {(onClose) => (
             <>
@@ -533,7 +480,7 @@ export default function LegalDocVersionList() {
       </Modal>
 
       {/* Notify Users Modal */}
-      <Modal isOpen={showNotifyModal} onClose={() => setShowNotifyModal(false)}>
+      <Modal isOpen={showNotifyModal} onClose={() => setShowNotifyModal(false)} isDismissable={false}>
         <ModalContent>
           {(onClose) => (
             <>
@@ -592,7 +539,7 @@ export default function LegalDocVersionList() {
       </Modal>
 
       {/* Delete Draft Confirmation Modal */}
-      <Modal isOpen={showDeleteModal} onClose={() => { setShowDeleteModal(false); setDeleteTarget(null); }}>
+      <Modal isOpen={showDeleteModal} onClose={() => { setShowDeleteModal(false); setDeleteTarget(null); }} isDismissable={false}>
         <ModalContent>
           {(onClose) => (
             <>

@@ -9127,7 +9127,17 @@
     "status_ok": "OK",
     "status_unhealthy": "Ongezond",
     "total_value": "Totaal: {{value}}",
-    "value_separator": " / "
+    "value_separator": " / ",
+    "col_current_version": "Huidige versie",
+    "status_draft_content": "Alleen concept",
+    "status_no_content": "Geen inhoud",
+    "btn_manage_content": "Beheer inhoud",
+    "empty_docs_title": "Stel de juridische documenten van uw community op",
+    "empty_docs_desc": "Voeg uw algemene voorwaarden, privacybeleid en cookiebeleid toe, zodat leden deze kunnen lezen en accepteren.",
+    "empty_docs_cta": "Maak een document",
+    "col_version_count": "Versies",
+    "status_published": "Gepubliceerd",
+    "chip_inactive": "Inactief"
   },
   "events": {
     "an_unexpected_error_occurred": "Er is een onverwachte fout opgetreden",
@@ -16210,7 +16220,22 @@
     "status_published": "Gepubliceerd",
     "title_placeholder": "Voer de openbare titel in...",
     "title_required": "Titel is vereist",
-    "update_document": "Document bijwerken"
+    "update_document": "Document bijwerken",
+    "settings_description": "Beheer de titel van dit document en hoe leden worden gevraagd deze te accepteren. De documenttekst wordt beheerd onder Versies.",
+    "type_locked_hint": "Het documenttype kan na het aanmaken niet meer worden gewijzigd.",
+    "acceptance_settings": "Acceptatie-instellingen",
+    "label_requires_acceptance": "Acceptatie vereisen",
+    "requires_acceptance_desc": "Leden moeten dit document actief aanvaarden.",
+    "label_acceptance_required_for": "Acceptatie vereisen op",
+    "acceptance_for_login": "Volgende login",
+    "acceptance_for_first_use": "Eerste gebruik",
+    "acceptance_for_none": "Geen prompt",
+    "label_notify_on_update": "Informeer bij update",
+    "notify_on_update_desc": "Hiermee kunt u leden op de hoogte stellen wanneer er een nieuwe versie wordt gepubliceerd.",
+    "is_active_desc": "Inactieve documenten zijn verborgen voor leden.",
+    "acceptance_for_registration": "Registratie",
+    "label_is_active": "Actief",
+    "created_next_step_toast": "Document aangemaakt — voeg nu de eerste versie toe."
   },
   "legal_versions": {
     "compliance_dashboard": "Nalevingsdashboard",
@@ -16225,7 +16250,18 @@
     "send_notification": "Melding verzenden",
     "subtitle": "Subtitle",
     "this_will": "This Will",
-    "title": "Title"
+    "title": "Title",
+    "editor_title_create": "Nieuwe versie",
+    "editor_title_edit": "Conceptversie bewerken",
+    "editor_description_create": "Schrijf de inhoud voor een nieuwe versie van dit document.",
+    "editor_description_edit": "Bewerk deze conceptversie voordat u deze publiceert.",
+    "editor_description_for": "Versie-inhoud voor “{{title}}”.",
+    "back_to_versions": "Terug naar versies",
+    "version_not_found": "Die versie kon niet worden gevonden.",
+    "only_drafts_editable": "Alleen conceptversies kunnen worden bewerkt. Gepubliceerde versies zijn vergrendeld.",
+    "unsaved_changes_title": "Niet-opgeslagen wijzigingen verwijderen?",
+    "unsaved_changes_message": "U heeft niet-opgeslagen wijzigingen. Als je nu weggaat, zijn ze verloren.",
+    "discard_changes": "Wijzigingen negeren"
   },
   "load_error": "Fout bij laden",
   "log_files_labels": {

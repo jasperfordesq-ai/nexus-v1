@@ -82,12 +82,13 @@ class LegalDocumentService
     /**
      * Get all active legal documents for a tenant.
      */
-    public static function getAllForTenant(int $tenantId): array
+    public static function getAllForTenant(int $tenantId, bool $includeInactive = false): array
     {
         return DB::table('legal_documents as ld')
             ->leftJoin('legal_document_versions as ldv', 'ld.current_version_id', '=', 'ldv.id')
             ->where('ld.tenant_id', $tenantId)
-            ->where('ld.is_active', true)
+            // Admin management views need deactivated documents too; public callers don't
+            ->when(! $includeInactive, fn ($q) => $q->where('ld.is_active', true))
             ->orderBy('ld.document_type')
             ->select(
                 'ld.*', 'ld.document_type as type', 'ldv.version_number', 'ldv.effective_date',
@@ -108,7 +109,9 @@ class LegalDocumentService
             ->join('legal_documents as ld', 'ldv.document_id', '=', 'ld.id')
             ->where('ldv.document_id', $documentId)
             ->where('ld.tenant_id', TenantContext::getId())
-            ->orderByDesc('ldv.version_number')
+            // version_number is a string ("10.0" sorts before "9.0") — order by recency instead
+            ->orderByDesc('ldv.created_at')
+            ->orderByDesc('ldv.id')
             ->select('ldv.*')
             ->get()
             ->map(fn ($v) => (array) $v)
@@ -250,6 +253,19 @@ class LegalDocumentService
         }
 
         if (empty($updates)) {
+            return false;
+        }
+
+        // Verify the version exists under the current tenant before updating —
+        // MySQL reports affected=changed rows, so the UPDATE result alone can't
+        // distinguish "row not found" from "saved identical content".
+        $exists = DB::table('legal_document_versions as ldv')
+            ->join('legal_documents as ld', 'ldv.document_id', '=', 'ld.id')
+            ->where('ldv.id', $vid)
+            ->where('ld.tenant_id', TenantContext::getId())
+            ->exists();
+
+        if (! $exists) {
             return false;
         }
 

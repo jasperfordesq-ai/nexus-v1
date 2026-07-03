@@ -9127,7 +9127,17 @@
     "status_ok": "ceart go leor",
     "status_unhealthy": "míshláintiúil",
     "total_value": "Iomlán: {{value}}",
-    "value_separator": " / "
+    "value_separator": " / ",
+    "col_current_version": "Leagan reatha",
+    "status_draft_content": "Dréacht amháin",
+    "status_no_content": "Gan ábhar",
+    "btn_manage_content": "Bainistigh ábhar",
+    "empty_docs_title": "Socraigh doiciméid dlí do phobail",
+    "empty_docs_desc": "Cuir do théarmaí & coinníollacha, polasaí príobháideachta, agus polasaí fianán leis ionas gur féidir le baill iad a léamh agus glacadh leo.",
+    "empty_docs_cta": "Cruthaigh doiciméad",
+    "col_version_count": "Leaganacha",
+    "status_published": "Foilsithe",
+    "chip_inactive": "Neamhghníomhach"
   },
   "events": {
     "an_unexpected_error_occurred": "Tharla earráid gan choinne",
@@ -16210,7 +16220,22 @@
     "status_published": "Foilsithe",
     "title_placeholder": "Cuir isteach an teideal poiblí...",
     "title_required": "Tá teideal ag teastáil",
-    "update_document": "Doiciméad Nuashonraithe"
+    "update_document": "Doiciméad Nuashonraithe",
+    "settings_description": "Bainistigh teideal an doiciméid seo agus conas a iarrtar ar chomhaltaí glacadh leis. Déantar téacs an doiciméid a bhainistiú faoi Leaganacha.",
+    "type_locked_hint": "Ní féidir an cineál doiciméid a athrú tar éis cruthú.",
+    "acceptance_settings": "Socruithe glactha",
+    "label_requires_acceptance": "Glacadh a éileamh",
+    "requires_acceptance_desc": "Ní mór do chomhaltaí glacadh leis an doiciméad seo go gníomhach.",
+    "label_acceptance_required_for": "Glacadh ag teastáil ag",
+    "acceptance_for_login": "An chéad logáil isteach eile",
+    "acceptance_for_first_use": "An chéad úsáid",
+    "acceptance_for_none": "Gan leid",
+    "label_notify_on_update": "Fógra ar nuashonrú",
+    "notify_on_update_desc": "Ligeann tú do chomhaltaí a chur ar an eolas nuair a fhoilsítear leagan nua.",
+    "is_active_desc": "Tá doiciméid neamhghníomhacha i bhfolach ó bhaill.",
+    "acceptance_for_registration": "Clárú",
+    "label_is_active": "Gníomhach",
+    "created_next_step_toast": "Cáipéis cruthaithe — cuir a chéad leagan leis anois."
   },
   "legal_versions": {
     "compliance_dashboard": "Painéal na Comhlíonta",
@@ -16225,7 +16250,18 @@
     "send_notification": "Seol Fógra",
     "subtitle": "Subtitle",
     "this_will": "This Will",
-    "title": "Title"
+    "title": "Title",
+    "editor_title_create": "Leagan nua",
+    "editor_title_edit": "Cuir dréacht-leagan in eagar",
+    "editor_description_create": "Scríobh an t-ábhar le haghaidh leagan nua den doiciméad seo.",
+    "editor_description_edit": "Cuir an dréachtleagan seo in eagar roimh é a fhoilsiú.",
+    "editor_description_for": "Ábhar an leagain do “{{title}}”.",
+    "back_to_versions": "Ar ais go leaganacha",
+    "version_not_found": "Níorbh fhéidir an leagan sin a fháil.",
+    "only_drafts_editable": "Ní féidir ach dréachtleaganacha a chur in eagar. Tá leaganacha foilsithe faoi ghlas.",
+    "unsaved_changes_title": "An bhfuil fonn ort na hathruithe gan sábháil a scriosadh?",
+    "unsaved_changes_message": "Tá athruithe gan sábháil agat. Má fhágann tú anois, beidh siad caillte.",
+    "discard_changes": "Scrios na hathruithe"
   },
   "load_error": "Earráid luchtaithe",
   "log_files_labels": {

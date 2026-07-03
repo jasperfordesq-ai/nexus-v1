@@ -2016,13 +2016,16 @@ class AdminEnterpriseController extends BaseApiController
     {
         $this->requireAdmin();
         try {
-            $docs = $this->legalDocumentService->getAllForTenant(TenantContext::getId());
+            $docs = $this->legalDocumentService->getAllForTenant(TenantContext::getId(), includeInactive: true);
             return $this->respondWithData($docs);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: legalDocs query failed: ' . $e->getMessage());
             return $this->respondWithData([]);
         }
     }
+
+    private const LEGAL_DOC_TYPES = ['terms', 'privacy', 'cookies', 'accessibility', 'community_guidelines', 'acceptable_use'];
+    private const LEGAL_ACCEPTANCE_MODES = ['registration', 'login', 'first_use', 'none'];
 
     /** POST /api/v2/admin/legal-documents */
     public function createLegalDoc(): JsonResponse
@@ -2031,15 +2034,30 @@ class AdminEnterpriseController extends BaseApiController
         $data = $this->getAllInput();
         if (empty($data['title'])) { return $this->respondWithError('VALIDATION_ERROR', __('api.title_required'), 'title', 422); }
 
+        $type = $data['type'] ?? $data['document_type'] ?? 'terms';
+        if (!in_array($type, self::LEGAL_DOC_TYPES, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_type'), 'type', 422);
+        }
+        $acceptanceFor = $data['acceptance_required_for'] ?? 'registration';
+        if (!in_array($acceptanceFor, self::LEGAL_ACCEPTANCE_MODES, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_type'), 'acceptance_required_for', 422);
+        }
+
         try {
             $doc = $this->legalDocumentService->createDocument([
-                'title' => $data['title'], 'document_type' => $data['type'] ?? $data['document_type'] ?? 'terms',
+                'title' => $data['title'], 'document_type' => $type,
                 'slug' => $data['slug'] ?? null, 'requires_acceptance' => $data['requires_acceptance'] ?? true,
-                'acceptance_required_for' => $data['acceptance_required_for'] ?? 'registration',
+                'acceptance_required_for' => $acceptanceFor,
                 'notify_on_update' => $data['notify_on_update'] ?? false,
                 'is_active' => $data['is_active'] ?? true, 'created_by' => $this->getUserId(),
             ]);
             return $this->respondWithData($doc, null, 201);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // unique (tenant_id, document_type) — one document per type per tenant
+            if (str_contains($e->getMessage(), 'unique_tenant_document') || (string) $e->getCode() === '23000') {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.legal_doc_type_exists'), 'type', 422);
+            }
+            return $this->respondWithError('CREATE_FAILED', __('api.legal_doc_create_failed'), null, 500);
         } catch (\Exception $e) {
             return $this->respondWithError('CREATE_FAILED', __('api.legal_doc_create_failed'), null, 500);
         }
@@ -2067,17 +2085,37 @@ class AdminEnterpriseController extends BaseApiController
         $this->requireAdmin();
         $data = $this->getAllInput();
         $id = (int) $id;
+        $tenantId = $this->getTenantId();
 
         try {
+            $existing = DB::selectOne(
+                "SELECT document_type FROM legal_documents WHERE id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+            if (!$existing) { return $this->respondWithError('NOT_FOUND', __('api.document_not_found'), null, 404); }
+
+            // Type is immutable after creation — unique (tenant_id, document_type) and every
+            // published version + user acceptance is anchored to the type. Reject any change.
+            $requestedType = $data['type'] ?? $data['document_type'] ?? null;
+            if ($requestedType !== null && $requestedType !== $existing->document_type) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.legal_doc_type_locked'), 'type', 422);
+            }
+            if (isset($data['acceptance_required_for'])
+                && !in_array($data['acceptance_required_for'], self::LEGAL_ACCEPTANCE_MODES, true)) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_type'), 'acceptance_required_for', 422);
+            }
+
             $updateData = [];
             if (isset($data['title'])) $updateData['title'] = $data['title'];
-            if (isset($data['type'])) $updateData['document_type'] = $data['type'];
-            if (isset($data['document_type'])) $updateData['document_type'] = $data['document_type'];
             if (isset($data['slug'])) $updateData['slug'] = $data['slug'];
             if (isset($data['is_active'])) $updateData['is_active'] = $data['is_active'];
             if (isset($data['requires_acceptance'])) $updateData['requires_acceptance'] = $data['requires_acceptance'];
             if (isset($data['acceptance_required_for'])) $updateData['acceptance_required_for'] = $data['acceptance_required_for'];
             if (isset($data['notify_on_update'])) $updateData['notify_on_update'] = $data['notify_on_update'];
+
+            if (empty($updateData)) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.no_valid_fields'), null, 422);
+            }
 
             $doc = $this->legalDocumentService->updateDocument($id, $updateData);
             if (!$doc) { return $this->respondWithError('NOT_FOUND', __('api.document_not_found'), null, 404); }

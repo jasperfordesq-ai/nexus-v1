@@ -9127,7 +9127,17 @@
     "status_ok": "OK",
     "status_unhealthy": "Malsano",
     "total_value": "Totale: {{value}}",
-    "value_separator": " / "
+    "value_separator": " / ",
+    "col_current_version": "Versione attuale",
+    "status_draft_content": "Solo bozza",
+    "status_no_content": "Nessun contenuto",
+    "btn_manage_content": "Gestisci i contenuti",
+    "empty_docs_title": "Configura i documenti legali della tua comunità",
+    "empty_docs_desc": "Aggiungi i tuoi termini e condizioni, la politica sulla privacy e la politica sui cookie in modo che i membri possano leggerli e accettarli.",
+    "empty_docs_cta": "Crea un documento",
+    "col_version_count": "Versioni",
+    "status_published": "Pubblicato",
+    "chip_inactive": "Inattivo"
   },
   "events": {
     "an_unexpected_error_occurred": "Si è verificato un errore imprevisto",
@@ -16210,7 +16220,22 @@
     "status_published": "Pubblicato",
     "title_placeholder": "Inserisci il titolo pubblico...",
     "title_required": "Il titolo è obbligatorio",
-    "update_document": "Aggiorna documento"
+    "update_document": "Aggiorna documento",
+    "settings_description": "Gestisci il titolo di questo documento e il modo in cui ai membri viene chiesto di accettarlo. Il testo del documento è gestito in Versioni.",
+    "type_locked_hint": "Il tipo di documento non può essere modificato dopo la creazione.",
+    "acceptance_settings": "Impostazioni di accettazione",
+    "label_requires_acceptance": "Richiedere l'accettazione",
+    "requires_acceptance_desc": "I membri devono accettare attivamente questo documento.",
+    "label_acceptance_required_for": "Richiedi l'accettazione a",
+    "acceptance_for_login": "Prossimo accesso",
+    "acceptance_for_first_use": "Primo utilizzo",
+    "acceptance_for_none": "Nessun suggerimento",
+    "label_notify_on_update": "Notifica sull'aggiornamento",
+    "notify_on_update_desc": "Ti consente di avvisare i membri quando viene pubblicata una nuova versione.",
+    "is_active_desc": "I documenti inattivi vengono nascosti ai membri.",
+    "acceptance_for_registration": "Registrazione",
+    "label_is_active": "Attivo",
+    "created_next_step_toast": "Documento creato — ora aggiungi la sua prima versione."
   },
   "legal_versions": {
     "compliance_dashboard": "Pannello di conformità",
@@ -16225,7 +16250,18 @@
     "send_notification": "Invia notifica",
     "subtitle": "Subtitle",
     "this_will": "This Will",
-    "title": "Title"
+    "title": "Title",
+    "editor_title_create": "Nuova versione",
+    "editor_title_edit": "Modifica versione bozza",
+    "editor_description_create": "Scrivere il contenuto per una nuova versione di questo documento.",
+    "editor_description_edit": "Modifica questa bozza prima della pubblicazione.",
+    "editor_description_for": "Contenuto della versione per \"{{title}}\".",
+    "back_to_versions": "Torna alle versioni",
+    "version_not_found": "Impossibile trovare quella versione.",
+    "only_drafts_editable": "È possibile modificare solo le versioni bozza. Le versioni pubblicate sono bloccate.",
+    "unsaved_changes_title": "Eliminare le modifiche non salvate?",
+    "unsaved_changes_message": "Sono presenti modifiche non salvate. Se te ne vai adesso, saranno perduti.",
+    "discard_changes": "Annulla modifiche"
   },
   "load_error": "Errore di caricamento",
   "log_files_labels": {

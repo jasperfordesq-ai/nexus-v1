@@ -12,21 +12,31 @@ import { createMockContexts } from '@/test/mock-contexts';
 const MOCK_DOCS = vi.hoisted(() => [
   {
     id: 1,
-    title: 'Terms of Service',
+    title: 'Community Terms 2026',
     type: 'terms',
-    version: '1.0',
-    status: 'published',
-    content: '<p>terms</p>',
+    slug: 'terms',
+    current_version_id: 11,
+    version_number: '1.0',
+    version_count: 2,
+    requires_acceptance: 1,
+    acceptance_required_for: 'registration',
+    notify_on_update: 0,
+    is_active: 1,
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-06-01T00:00:00Z',
   },
   {
     id: 2,
-    title: 'Privacy Policy',
+    title: 'Community Privacy 2026',
     type: 'privacy',
-    version: '2.0',
-    status: 'draft',
-    content: '<p>privacy</p>',
+    slug: 'privacy',
+    current_version_id: null,
+    version_number: null,
+    version_count: 1,
+    requires_acceptance: 1,
+    acceptance_required_for: 'registration',
+    notify_on_update: 0,
+    is_active: 1,
     created_at: '2024-02-01T00:00:00Z',
     updated_at: '2024-06-15T00:00:00Z',
   },
@@ -89,9 +99,9 @@ describe('LegalDocList', () => {
     render(<LegalDocList />);
 
     await waitFor(() => {
-      expect(screen.getByText('Terms of Service')).toBeInTheDocument();
+      expect(screen.getByText('Community Terms 2026')).toBeInTheDocument();
     });
-    expect(screen.getByText('Privacy Policy')).toBeInTheDocument();
+    expect(screen.getByText('Community Privacy 2026')).toBeInTheDocument();
   });
 
   it('shows empty content when no documents returned', async () => {
@@ -101,7 +111,7 @@ describe('LegalDocList', () => {
 
     await waitFor(() => {
       // DataTable emptyContent renders the i18n key result
-      expect(screen.queryByText('Terms of Service')).not.toBeInTheDocument();
+      expect(screen.queryByText('Community Terms 2026')).not.toBeInTheDocument();
     });
   });
 
@@ -124,7 +134,7 @@ describe('LegalDocList', () => {
     render(<LegalDocList />);
 
     await waitFor(() => {
-      expect(screen.getByText('Terms of Service')).toBeInTheDocument();
+      expect(screen.getByText('Community Terms 2026')).toBeInTheDocument();
     });
 
     const deleteBtns = screen.getAllByRole('button', { name: /delete/i });
@@ -150,7 +160,7 @@ describe('LegalDocList', () => {
     render(<LegalDocList />);
 
     await waitFor(() => {
-      expect(screen.getByText('Terms of Service')).toBeInTheDocument();
+      expect(screen.getByText('Community Terms 2026')).toBeInTheDocument();
     });
 
     // Click the first row's delete icon button
@@ -193,7 +203,7 @@ describe('LegalDocList', () => {
     render(<LegalDocList />);
 
     await waitFor(() => {
-      expect(screen.getByText('Terms of Service')).toBeInTheDocument();
+      expect(screen.getByText('Community Terms 2026')).toBeInTheDocument();
     });
 
     // The PageHeader action renders a Button as Link pointing to /create

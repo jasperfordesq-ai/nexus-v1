@@ -782,13 +782,37 @@ export interface GdprRequest {
   completed_at?: string;
 }
 
+export type LegalDocumentType =
+  | 'terms'
+  | 'privacy'
+  | 'cookies'
+  | 'accessibility'
+  | 'community_guidelines'
+  | 'acceptable_use';
+
+export type LegalAcceptanceMode = 'registration' | 'login' | 'first_use' | 'none';
+
+/**
+ * A legal document record. Content is NOT stored here — it lives in
+ * {@link LegalDocumentVersion}. `version_number` / `effective_date` reflect the
+ * current published version (null when nothing is published yet); `version_count`
+ * is the total number of versions (draft + published).
+ * Boolean-like flags arrive from the API as 0/1 integers — coerce with Boolean().
+ */
 export interface LegalDocument {
   id: number;
+  tenant_id?: number;
   title: string;
-  content: string;
   type: string;
-  version?: string;
-  status: 'draft' | 'published' | 'archived';
+  slug?: string;
+  current_version_id: number | null;
+  requires_acceptance: boolean | 0 | 1;
+  acceptance_required_for: LegalAcceptanceMode;
+  notify_on_update: boolean | 0 | 1;
+  is_active: boolean | 0 | 1;
+  version_number?: string | null;
+  effective_date?: string | null;
+  version_count?: number;
   created_at: string;
   updated_at?: string;
 }

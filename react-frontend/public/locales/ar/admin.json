@@ -9127,7 +9127,17 @@
     "status_ok": "نعم",
     "status_unhealthy": "غير صحي",
     "total_value": "الإجمالي: {{value}}",
-    "value_separator": " / "
+    "value_separator": " / ",
+    "col_current_version": "الإصدار الحالي",
+    "status_draft_content": "مسودة فقط",
+    "status_no_content": "لا يوجد محتوى",
+    "btn_manage_content": "إدارة المحتوى",
+    "empty_docs_title": "قم بإعداد المستندات القانونية لمجتمعك",
+    "empty_docs_desc": "أضف الشروط والأحكام وسياسة الخصوصية وسياسة ملفات تعريف الارتباط الخاصة بك حتى يتمكن الأعضاء من قراءتها وقبولها.",
+    "empty_docs_cta": "قم بإنشاء مستند",
+    "col_version_count": "الإصدارات",
+    "status_published": "منشور",
+    "chip_inactive": "غير نشط"
   },
   "events": {
     "an_unexpected_error_occurred": "حدث خطأ غير متوقع",
@@ -16210,7 +16220,22 @@
     "status_published": "تم النشر",
     "title_placeholder": "أدخل العنوان العام...",
     "title_required": "العنوان مطلوب",
-    "update_document": "تحديث الوثيقة"
+    "update_document": "تحديث الوثيقة",
+    "settings_description": "إدارة عنوان هذا المستند وكيفية مطالبة الأعضاء بقبوله. تتم إدارة نص المستند ضمن الإصدارات.",
+    "type_locked_hint": "لا يمكن تغيير نوع المستند بعد إنشائه.",
+    "acceptance_settings": "إعدادات القبول",
+    "label_requires_acceptance": "تتطلب القبول",
+    "requires_acceptance_desc": "يجب على الأعضاء قبول هذه الوثيقة بشكل فعال.",
+    "label_acceptance_required_for": "تتطلب القبول في",
+    "acceptance_for_login": "تسجيل الدخول التالي",
+    "acceptance_for_first_use": "الاستخدام الأول",
+    "acceptance_for_none": "لا يوجد موجه",
+    "label_notify_on_update": "إعلام على التحديث",
+    "notify_on_update_desc": "تتيح لك إعلام الأعضاء عند نشر إصدار جديد.",
+    "is_active_desc": "يتم إخفاء المستندات غير النشطة عن الأعضاء.",
+    "acceptance_for_registration": "التسجيل",
+    "label_is_active": "نشط",
+    "created_next_step_toast": "تم إنشاء المستند — أضف الآن نسخته الأولى."
   },
   "legal_versions": {
     "compliance_dashboard": "لوحة معلومات الامتثال",
@@ -16225,7 +16250,18 @@
     "send_notification": "إرسال الإخطار",
     "subtitle": "Subtitle",
     "this_will": "This Will",
-    "title": "Title"
+    "title": "Title",
+    "editor_title_create": "نسخة جديدة",
+    "editor_title_edit": "تحرير مسودة النسخة",
+    "editor_description_create": "اكتب محتوى النسخة الجديدة من هذه الوثيقة.",
+    "editor_description_edit": "قم بتحرير مسودة الإصدار هذه قبل النشر.",
+    "editor_description_for": "محتوى الإصدار لـ \"{{title}}\".",
+    "back_to_versions": "العودة إلى الإصدارات",
+    "version_not_found": "تعذر العثور على هذا الإصدار.",
+    "only_drafts_editable": "يمكن تحرير إصدارات المسودات فقط. الإصدارات المنشورة مقفلة.",
+    "unsaved_changes_title": "هل تريد تجاهل التغييرات غير المحفوظة؟",
+    "unsaved_changes_message": "لديك تغييرات غير محفوظة. إذا غادرت الآن، فسوف يضيعون.",
+    "discard_changes": "تجاهل التغييرات"
   },
   "load_error": "خطأ في التحميل",
   "log_files_labels": {

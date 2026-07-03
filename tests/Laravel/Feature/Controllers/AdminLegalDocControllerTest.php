@@ -213,4 +213,222 @@ class AdminLegalDocControllerTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    // ================================================================
+    // Helpers
+    // ================================================================
+
+    /** Seed a legal document for a tenant and return its id. */
+    private function seedDocument(int $tenantId, int $createdBy, string $type = 'terms'): int
+    {
+        // Keep the (tenant, type) unique slot clear so seeding is deterministic
+        // regardless of any rows already present in the test database.
+        DB::table('legal_documents')
+            ->where('tenant_id', $tenantId)
+            ->where('document_type', $type)
+            ->delete();
+
+        return DB::table('legal_documents')->insertGetId([
+            'tenant_id' => $tenantId,
+            'document_type' => $type,
+            'title' => ucfirst($type),
+            'slug' => $type . '-' . uniqid(),
+            'requires_acceptance' => 1,
+            'is_active' => 1,
+            'created_by' => $createdBy,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    /** Seed a version (draft by default) and return its id. */
+    private function seedVersion(int $docId, int $createdBy, array $overrides = []): int
+    {
+        return DB::table('legal_document_versions')->insertGetId(array_merge([
+            'document_id' => $docId,
+            'version_number' => '1.0',
+            'content' => '<p>Original</p>',
+            'content_plain' => 'Original',
+            'effective_date' => '2026-04-01',
+            'is_draft' => 1,
+            'is_current' => 0,
+            'created_by' => $createdBy,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $overrides));
+    }
+
+    // ================================================================
+    // UPDATE VERSION — PUT /v2/admin/legal-documents/{docId}/versions/{vid}
+    // ================================================================
+
+    public function test_update_version_persists_content_and_metadata(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $docId = $this->seedDocument($this->testTenantId, $admin->id);
+        $vid = $this->seedVersion($docId, $admin->id);
+
+        $response = $this->apiPut("/v2/admin/legal-documents/{$docId}/versions/{$vid}", [
+            'version_number' => '1.1',
+            'content' => '<p>Updated body</p>',
+            'effective_date' => '2026-05-01',
+            'summary_of_changes' => 'Reworded clause 3',
+        ]);
+
+        $response->assertStatus(200);
+
+        $row = (array) DB::table('legal_document_versions')->where('id', $vid)->first();
+        $this->assertSame('1.1', $row['version_number']);
+        $this->assertStringContainsString('Updated body', (string) $row['content']);
+        $this->assertStringContainsString('Updated body', (string) $row['content_plain']);
+        $this->assertSame('Reworded clause 3', $row['summary_of_changes']);
+    }
+
+    public function test_update_version_cross_tenant_returns_404_and_leaves_row_untouched(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        // Document owned by a DIFFERENT tenant.
+        $otherTenantId = $this->testTenantId + 99;
+        $docId = $this->seedDocument($otherTenantId, $admin->id);
+        $vid = $this->seedVersion($docId, $admin->id, ['content' => '<p>Foreign</p>', 'content_plain' => 'Foreign']);
+
+        $response = $this->apiPut("/v2/admin/legal-documents/{$docId}/versions/{$vid}", [
+            'content' => '<p>Hijacked</p>',
+        ]);
+
+        $response->assertStatus(404);
+
+        $content = (string) DB::table('legal_document_versions')->where('id', $vid)->value('content');
+        $this->assertStringContainsString('Foreign', $content);
+        $this->assertStringNotContainsString('Hijacked', $content);
+    }
+
+    public function test_update_version_on_published_version_returns_400(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $docId = $this->seedDocument($this->testTenantId, $admin->id);
+        $vid = $this->seedVersion($docId, $admin->id, [
+            'is_draft' => 0,
+            'is_current' => 1,
+            'published_at' => now(),
+        ]);
+
+        $response = $this->apiPut("/v2/admin/legal-documents/{$docId}/versions/{$vid}", [
+            'content' => '<p>Cannot change published</p>',
+        ]);
+
+        $response->assertStatus(400);
+    }
+
+    // ================================================================
+    // PUBLISH VERSION — POST /v2/admin/legal-documents/versions/{vid}/publish
+    // ================================================================
+
+    public function test_publish_version_sets_current_pointer_and_flags(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $docId = $this->seedDocument($this->testTenantId, $admin->id);
+        $vid = $this->seedVersion($docId, $admin->id);
+
+        $response = $this->apiPost("/v2/admin/legal-documents/versions/{$vid}/publish", []);
+
+        $response->assertStatus(200);
+
+        $version = (array) DB::table('legal_document_versions')->where('id', $vid)->first();
+        $this->assertSame(1, (int) $version['is_current']);
+        $this->assertSame(0, (int) $version['is_draft']);
+        $this->assertNotNull($version['published_at']);
+
+        $pointer = DB::table('legal_documents')->where('id', $docId)->value('current_version_id');
+        $this->assertSame($vid, (int) $pointer);
+    }
+
+    public function test_publish_version_cross_tenant_returns_404_and_does_not_publish(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $otherTenantId = $this->testTenantId + 99;
+        $docId = $this->seedDocument($otherTenantId, $admin->id);
+        $vid = $this->seedVersion($docId, $admin->id);
+
+        $response = $this->apiPost("/v2/admin/legal-documents/versions/{$vid}/publish", []);
+
+        $response->assertStatus(404);
+
+        $version = (array) DB::table('legal_document_versions')->where('id', $vid)->first();
+        $this->assertSame(1, (int) $version['is_draft']);
+        $this->assertSame(0, (int) $version['is_current']);
+    }
+
+    // ================================================================
+    // ORDERING — versions returned newest-first regardless of string sort
+    // ================================================================
+
+    public function test_versions_ordered_newest_first_not_by_version_string(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $docId = $this->seedDocument($this->testTenantId, $admin->id);
+        // "9.0" created first, "10.0" created second. String sort would put "9.0" on top.
+        $this->seedVersion($docId, $admin->id, ['version_number' => '9.0', 'created_at' => now()->subMinutes(2)]);
+        $this->seedVersion($docId, $admin->id, ['version_number' => '10.0', 'created_at' => now()->subMinute()]);
+
+        $response = $this->apiGet("/v2/admin/legal-documents/{$docId}/versions");
+        $response->assertStatus(200);
+
+        $data = $response->json('data');
+        $this->assertSame('10.0', $data[0]['version_number']);
+        $this->assertSame('9.0', $data[1]['version_number']);
+    }
+
+    // ================================================================
+    // FULL LIFECYCLE — create doc → version → publish → public endpoint
+    // ================================================================
+
+    public function test_full_lifecycle_publishes_content_to_public_endpoint(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $type = 'privacy';
+        // Ensure the (tenant, type) slot is free so the create returns 201, not a duplicate 422.
+        DB::table('legal_documents')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('document_type', $type)
+            ->delete();
+
+        $create = $this->apiPost('/v2/admin/legal-documents', [
+            'title' => 'Privacy Policy',
+            'type' => $type,
+        ]);
+        $create->assertStatus(201);
+        $docId = (int) $create->json('data.id');
+        $this->assertGreaterThan(0, $docId);
+
+        $versionRes = $this->apiPost("/v2/admin/legal-documents/{$docId}/versions", [
+            'version_number' => '1.0',
+            'content' => '<p>Our lawful basis is consent.</p>',
+            'effective_date' => '2026-04-01',
+            'is_draft' => true,
+        ]);
+        $versionRes->assertStatus(201);
+        $vid = (int) $versionRes->json('data.id');
+
+        $this->apiPost("/v2/admin/legal-documents/versions/{$vid}/publish", [])->assertStatus(200);
+
+        // Public endpoint (no auth) must now serve the published content for this tenant.
+        $public = $this->apiGet("/v2/legal/{$type}");
+        $public->assertStatus(200);
+        $this->assertStringContainsString('lawful basis', json_encode($public->json()));
+    }
 }

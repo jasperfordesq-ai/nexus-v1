@@ -9127,7 +9127,17 @@
     "status_ok": "OK",
     "status_unhealthy": "Niezdrowy",
     "total_value": "Razem: {{value}}",
-    "value_separator": " / "
+    "value_separator": " / ",
+    "col_current_version": "Aktualna wersja",
+    "status_draft_content": "Tylko wersja robocza",
+    "status_no_content": "Brak treści",
+    "btn_manage_content": "Zarządzaj treścią",
+    "empty_docs_title": "Skonfiguruj dokumenty prawne swojej społeczności",
+    "empty_docs_desc": "Dodaj warunki korzystania z usługi, politykę prywatności i politykę dotyczącą plików cookie, aby członkowie mogli je przeczytać i zaakceptować.",
+    "empty_docs_cta": "Utwórz dokument",
+    "col_version_count": "Wersje",
+    "status_published": "Opublikowano",
+    "chip_inactive": "Nieaktywny"
   },
   "events": {
     "an_unexpected_error_occurred": "Wystąpił nieoczekiwany błąd",
@@ -16210,7 +16220,22 @@
     "status_published": "Opublikowano",
     "title_placeholder": "Podaj publiczny tytuł...",
     "title_required": "Tytuł jest wymagany",
-    "update_document": "Aktualizuj dokument"
+    "update_document": "Aktualizuj dokument",
+    "settings_description": "Zarządzaj tytułem tego dokumentu i sposobem, w jaki członkowie proszeni są o jego zaakceptowanie. Tekstem dokumentu zarządza się w obszarze Wersje.",
+    "type_locked_hint": "Po utworzeniu nie można zmienić typu dokumentu.",
+    "acceptance_settings": "Ustawienia akceptacji",
+    "label_requires_acceptance": "Wymagaj akceptacji",
+    "requires_acceptance_desc": "Członkowie muszą aktywnie zaakceptować ten dokument.",
+    "label_acceptance_required_for": "Wymagaj akceptacji pod adresem",
+    "acceptance_for_login": "Następne logowanie",
+    "acceptance_for_first_use": "Pierwsze użycie",
+    "acceptance_for_none": "Brak podpowiedzi",
+    "label_notify_on_update": "Powiadom o aktualizacji",
+    "notify_on_update_desc": "Umożliwia powiadamianie członków o opublikowaniu nowej wersji.",
+    "is_active_desc": "Nieaktywne dokumenty są ukryte przed członkami.",
+    "acceptance_for_registration": "Rejestracja",
+    "label_is_active": "Aktywny",
+    "created_next_step_toast": "Dokument utworzony — teraz dodaj jego pierwszą wersję."
   },
   "legal_versions": {
     "compliance_dashboard": "Panel zgodności",
@@ -16225,7 +16250,18 @@
     "send_notification": "Wyślij powiadomienie",
     "subtitle": "Subtitle",
     "this_will": "This Will",
-    "title": "Title"
+    "title": "Title",
+    "editor_title_create": "Nowa wersja",
+    "editor_title_edit": "Edytuj wersję roboczą",
+    "editor_description_create": "Napisz treść nowej wersji tego dokumentu.",
+    "editor_description_edit": "Edytuj tę wersję roboczą przed publikacją.",
+    "editor_description_for": "Treść wersji dla „{{title}}”.",
+    "back_to_versions": "Powrót do wersji",
+    "version_not_found": "Nie udało się znaleźć tej wersji.",
+    "only_drafts_editable": "Można edytować tylko wersje robocze. Opublikowane wersje są zablokowane.",
+    "unsaved_changes_title": "Odrzucić niezapisane zmiany?",
+    "unsaved_changes_message": "Masz niezapisane zmiany. Jeśli teraz odejdziesz, oni będą zgubieni.",
+    "discard_changes": "Odrzuć zmiany"
   },
   "load_error": "Błąd ładowania",
   "log_files_labels": {

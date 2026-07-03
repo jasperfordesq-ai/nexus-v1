@@ -105,6 +105,12 @@ class AdminLegalDocController extends BaseApiController
     {
         $this->requireAdmin();
         try {
+            // getVersion() is tenant-scoped — missing/cross-tenant versions are a 404, not a 500
+            $version = $this->legalDocumentService->getVersion($vid);
+            if (!$version) {
+                return $this->respondWithError('NOT_FOUND', __('api.version_not_found'), null, 404);
+            }
+
             $success = $this->legalDocumentService->publishVersion($vid);
 
             if ($success) {

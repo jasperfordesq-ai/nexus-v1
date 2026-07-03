@@ -9127,7 +9127,17 @@
     "status_ok": "D'ACCORD",
     "status_unhealthy": "Malsain",
     "total_value": "Total:{{value}}",
-    "value_separator": " / "
+    "value_separator": " / ",
+    "col_current_version": "Version actuelle",
+    "status_draft_content": "Brouillon uniquement",
+    "status_no_content": "Aucun contenu",
+    "btn_manage_content": "Gérer le contenu",
+    "empty_docs_title": "Configurer les documents juridiques de votre communauté",
+    "empty_docs_desc": "Ajoutez vos conditions générales, votre politique de confidentialité et votre politique en matière de cookies afin que les membres puissent les lire et les accepter.",
+    "empty_docs_cta": "Créer un document",
+    "col_version_count": "Versions",
+    "status_published": "Publié",
+    "chip_inactive": "Inactif"
   },
   "events": {
     "an_unexpected_error_occurred": "Une erreur inattendue s'est produite",
@@ -16210,7 +16220,22 @@
     "status_published": "Publié",
     "title_placeholder": "Entrez le titre public...",
     "title_required": "Le titre est requis",
-    "update_document": "Mettre à jour le document"
+    "update_document": "Mettre à jour le document",
+    "settings_description": "Gérez le titre de ce document et la manière dont les membres sont invités à l'accepter. Le texte du document est géré sous Versions.",
+    "type_locked_hint": "Le type de document ne peut pas être modifié après la création.",
+    "acceptance_settings": "Paramètres d'acceptation",
+    "label_requires_acceptance": "Exiger l'acceptation",
+    "requires_acceptance_desc": "Les membres doivent accepter activement ce document.",
+    "label_acceptance_required_for": "Exiger l'acceptation à",
+    "acceptance_for_login": "Prochaine connexion",
+    "acceptance_for_first_use": "Première utilisation",
+    "acceptance_for_none": "Aucune invite",
+    "label_notify_on_update": "Notifier lors de la mise à jour",
+    "notify_on_update_desc": "Vous permet d'avertir les membres lorsqu'une nouvelle version est publiée.",
+    "is_active_desc": "Les documents inactifs sont masqués aux membres.",
+    "acceptance_for_registration": "Inscription",
+    "label_is_active": "Actif",
+    "created_next_step_toast": "Document créé — ajoutez maintenant sa première version."
   },
   "legal_versions": {
     "compliance_dashboard": "Tableau de bord de conformité",
@@ -16225,7 +16250,18 @@
     "send_notification": "Envoyer une notification",
     "subtitle": "Subtitle",
     "this_will": "This Will",
-    "title": "Title"
+    "title": "Title",
+    "editor_title_create": "Nouvelle version",
+    "editor_title_edit": "Modifier la version brouillon",
+    "editor_description_create": "Rédigez le contenu d'une nouvelle version de ce document.",
+    "editor_description_edit": "Modifiez cette version brouillon avant de la publier.",
+    "editor_description_for": "Contenu de la version pour « {{title}} ».",
+    "back_to_versions": "Retour aux versions",
+    "version_not_found": "Cette version est introuvable.",
+    "only_drafts_editable": "Seules les versions brouillon peuvent être modifiées. Les versions publiées sont verrouillées.",
+    "unsaved_changes_title": "Supprimer les modifications non enregistrées ?",
+    "unsaved_changes_message": "Vous avez des modifications non enregistrées. Si vous partez maintenant, ils seront perdus.",
+    "discard_changes": "Ignorer les modifications"
   },
   "load_error": "Erreur de chargement",
   "log_files_labels": {

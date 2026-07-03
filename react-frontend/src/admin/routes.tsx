@@ -129,6 +129,7 @@ const ErrorLogs = lazy(() => import('./modules/enterprise/ErrorLogs'));
 const LegalDocList = lazy(() => import('./modules/enterprise/LegalDocList'));
 const LegalDocForm = lazy(() => import('./modules/enterprise/LegalDocForm'));
 const LegalDocVersionList = lazy(() => import('./modules/enterprise/LegalDocVersionList'));
+const LegalDocVersionEditor = lazy(() => import('./modules/enterprise/LegalDocVersionEditor'));
 const LegalDocComplianceDashboard = lazy(() => import('./modules/enterprise/LegalDocComplianceDashboard'));
 const GdprRequestDetail = lazy(() => import('./modules/enterprise/GdprRequestDetail'));
 const GdprRequestCreate = lazy(() => import('./modules/enterprise/GdprRequestCreate'));
@@ -500,9 +501,11 @@ export function AdminRoutes() {
       <Route path="legal-documents" element={<Lazy><LegalDocList /></Lazy>} />
       <Route path="legal-documents/create" element={<Lazy><LegalDocForm /></Lazy>} />
       <Route path="legal-documents/compliance" element={<Lazy><LegalDocComplianceDashboard /></Lazy>} />
-      <Route path="legal-documents/:id" element={<Lazy><LegalDocForm /></Lazy>} />
+      <Route path="legal-documents/:id" element={<TenantParamRedirect to="/admin/legal-documents/:id/edit" />} />
       <Route path="legal-documents/:id/edit" element={<Lazy><LegalDocForm /></Lazy>} />
       <Route path="legal-documents/:id/versions" element={<Lazy><LegalDocVersionList /></Lazy>} />
+      <Route path="legal-documents/:id/versions/new" element={<Lazy><LegalDocVersionEditor /></Lazy>} />
+      <Route path="legal-documents/:id/versions/:versionId/edit" element={<Lazy><LegalDocVersionEditor /></Lazy>} />
 
       {/* ─── FEDERATION ─── */}
       {/* Partner Timebanks (all /admin/federation/* pages) + Inbound API

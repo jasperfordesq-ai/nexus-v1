@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Tests for LegalDocForm admin module
+ * Tests for LegalDocForm admin module (metadata-only settings form).
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -19,10 +19,15 @@ const mockNavigate = vi.hoisted(() => vi.fn());
 const EXISTING_DOC = vi.hoisted(() => ({
   id: 42,
   title: 'Privacy Policy',
-  content: 'We respect your privacy.',
   type: 'privacy',
-  version: '2.0',
-  status: 'published',
+  slug: 'privacy',
+  current_version_id: 5,
+  requires_acceptance: 1,
+  acceptance_required_for: 'registration',
+  notify_on_update: 0,
+  is_active: 1,
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-02-01T00:00:00Z',
 }));
 
 // ── module mocks ──────────────────────────────────────────────────────────────
@@ -83,7 +88,6 @@ describe('LegalDocForm — create mode (no id)', () => {
   it('renders the form immediately (no loading spinner)', () => {
     render(<LegalDocForm />);
 
-    // No spinner because loading=false in create mode
     const busy = screen.queryAllByRole('status').find(
       (el) => el.getAttribute('aria-busy') === 'true',
     );
@@ -92,21 +96,19 @@ describe('LegalDocForm — create mode (no id)', () => {
 
   it('renders title input', () => {
     render(<LegalDocForm />);
-    // Input with label containing "Title"
     expect(screen.getByRole('textbox', { name: /title/i })).toBeInTheDocument();
   });
 
-  it('renders version input with default 1.0', () => {
+  it('does NOT render a free-text content field (content lives in versions)', () => {
     render(<LegalDocForm />);
-    const versionInput = screen.getByRole('textbox', { name: /version/i });
-    expect(versionInput).toHaveValue('1.0');
+    // Only the title textbox should be present — no content/body textarea.
+    expect(screen.getAllByRole('textbox')).toHaveLength(1);
   });
 
   it('shows validation error toast when submitting without a title', async () => {
     const user = userEvent.setup();
     render(<LegalDocForm />);
 
-    // Find Save/Create button
     const saveBtn = screen.getByRole('button', { name: /create document/i });
     await user.click(saveBtn);
 
@@ -116,7 +118,7 @@ describe('LegalDocForm — create mode (no id)', () => {
     expect(adminLegalDocs.create).not.toHaveBeenCalled();
   });
 
-  it('calls adminLegalDocs.create on valid submit and navigates away', async () => {
+  it('submits a metadata-only payload and routes into the version editor', async () => {
     const user = userEvent.setup();
     vi.mocked(adminLegalDocs.create).mockResolvedValue({ success: true, data: { id: 99 } });
 
@@ -129,11 +131,18 @@ describe('LegalDocForm — create mode (no id)', () => {
 
     await waitFor(() => {
       expect(adminLegalDocs.create).toHaveBeenCalledWith(
-        expect.objectContaining({ title: 'Terms of Service' }),
+        expect.objectContaining({ title: 'Terms of Service', type: expect.any(String) }),
       );
     });
+    // Payload must NOT carry a content/version/status field.
+    const payload = vi.mocked(adminLegalDocs.create).mock.calls[0][0] as Record<string, unknown>;
+    expect(payload).not.toHaveProperty('content');
+    expect(payload).not.toHaveProperty('version');
+    expect(payload).not.toHaveProperty('status');
+
     expect(mockToast.success).toHaveBeenCalled();
-    expect(mockNavigate).toHaveBeenCalled();
+    // Lands in the new-version editor for the freshly created doc.
+    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('/legal-documents/99/versions/new'));
   });
 
   it('shows error toast when create API fails', async () => {
@@ -189,7 +198,7 @@ describe('LegalDocForm — edit mode (id=42)', () => {
     expect(busy).toBeInTheDocument();
   });
 
-  it('pre-fills form with fetched document data', async () => {
+  it('pre-fills the title from the fetched document', async () => {
     vi.mocked(adminLegalDocs.get).mockResolvedValue({
       success: true,
       data: EXISTING_DOC,
@@ -200,8 +209,6 @@ describe('LegalDocForm — edit mode (id=42)', () => {
     await waitFor(() => {
       expect(screen.getByRole('textbox', { name: /title/i })).toHaveValue('Privacy Policy');
     });
-
-    expect(screen.getByRole('textbox', { name: /version/i })).toHaveValue('2.0');
   });
 
   it('shows error toast if document fetch fails', async () => {
@@ -213,7 +220,7 @@ describe('LegalDocForm — edit mode (id=42)', () => {
     });
   });
 
-  it('calls adminLegalDocs.update on save with correct id', async () => {
+  it('updates with the id and a metadata payload that omits the type', async () => {
     const user = userEvent.setup();
     vi.mocked(adminLegalDocs.get).mockResolvedValue({
       success: true,
@@ -236,6 +243,8 @@ describe('LegalDocForm — edit mode (id=42)', () => {
         expect.objectContaining({ title: 'Privacy Policy' }),
       );
     });
+    const payload = vi.mocked(adminLegalDocs.update).mock.calls[0][1] as Record<string, unknown>;
+    expect(payload).not.toHaveProperty('type');
     expect(mockToast.success).toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenCalled();
   });

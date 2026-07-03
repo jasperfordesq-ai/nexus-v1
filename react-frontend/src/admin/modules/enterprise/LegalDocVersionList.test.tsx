@@ -31,14 +31,6 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/sanitize', () => ({ sanitizeRichText: (s: string) => s }));
 
 // ─── Heavy child components (avoid rendering rich-text editor etc.) ───────────
-vi.mock('./LegalDocVersionForm', () => ({
-  default: ({ onCancel }: { onCancel: () => void }) => (
-    <div data-testid="version-form">
-      <button onClick={onCancel}>Cancel Form</button>
-    </div>
-  ),
-}));
-
 vi.mock('./LegalDocVersionComparison', () => ({
   default: ({ onClose }: { onClose: () => void }) => (
     <div data-testid="version-comparison">
@@ -173,6 +165,38 @@ describe('LegalDocVersionList', () => {
       );
       expect(btn).toBeInTheDocument();
     });
+  });
+
+  it('navigates to the new-version editor when "Create new version" is clicked', async () => {
+    const LegalDocVersionList = (await import('./LegalDocVersionList')).default;
+    render(<LegalDocVersionList />);
+
+    await waitFor(() => screen.getAllByRole('button'));
+
+    const createBtn = screen.getAllByRole('button').find((b) =>
+      b.textContent?.toLowerCase().includes('new') || b.textContent?.toLowerCase().includes('creat')
+    );
+    expect(createBtn).toBeTruthy();
+    fireEvent.click(createBtn!);
+    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('/legal-documents/5/versions/new'));
+  });
+
+  it('navigates to the draft editor when a draft "Edit" is clicked', async () => {
+    mockAdminLegalDocs.getVersions.mockResolvedValue({
+      success: true,
+      data: [makeDraftVersion()],
+    });
+    const LegalDocVersionList = (await import('./LegalDocVersionList')).default;
+    render(<LegalDocVersionList />);
+
+    await waitFor(() => screen.getAllByRole('button'));
+
+    const editBtn = screen.getAllByRole('button').find((b) =>
+      b.textContent?.toLowerCase().includes('edit')
+    );
+    expect(editBtn).toBeTruthy();
+    fireEvent.click(editBtn!);
+    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('/versions/2/edit'));
   });
 
   it('renders Compliance Dashboard navigation button', async () => {
