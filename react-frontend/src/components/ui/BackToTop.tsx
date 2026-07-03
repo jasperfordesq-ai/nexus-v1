@@ -40,7 +40,7 @@ export function BackToTop() {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
           transition={{ duration: 0.2 }}
-          className="fixed bottom-[calc(var(--safe-area-bottom)+8.75rem)] right-3 z-40 md:bottom-24 md:right-6"
+          className="fixed bottom-[calc(var(--safe-area-bottom)+8.75rem+var(--miniplayer-offset,0rem))] right-3 z-40 md:bottom-[calc(6rem+var(--miniplayer-offset,0rem))] md:right-6"
         >
           <Button
             isIconOnly

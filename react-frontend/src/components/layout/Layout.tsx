@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { Navbar } from './Navbar';
 import { MobileDrawer } from './MobileDrawer';
 import { MobileTabBar } from './MobileTabBar';
+import { PodcastMiniPlayer } from '@/components/podcasts/PodcastMiniPlayer';
 import { Footer } from './Footer';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
 import { BackToTop } from '@/components/ui/BackToTop';
@@ -207,6 +208,9 @@ export function Layout({
 
       {/* Footer */}
       {showFooter && <Footer />}
+
+      {/* Persistent podcast mini-player (renders only while a track is loaded) */}
+      <PodcastMiniPlayer tabBarMayShow={showNavbar} />
 
       {/* Mobile bottom tab bar */}
       {showNavbar && <MobileTabBar onMenuOpen={handleMobileMenuOpen} isMenuOpen={isMobileMenuOpen} />}

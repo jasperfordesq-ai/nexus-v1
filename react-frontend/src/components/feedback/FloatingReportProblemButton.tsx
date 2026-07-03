@@ -16,7 +16,7 @@ export function FloatingReportProblemButton() {
 
   return (
     <div
-      className="fixed bottom-6 right-6 z-280 hidden md:block"
+      className="fixed bottom-[calc(1.5rem+var(--miniplayer-offset,0rem))] right-6 z-280 hidden md:block"
       data-testid="floating-report-problem"
     >
       <ReportProblemButton

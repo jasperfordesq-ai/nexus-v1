@@ -33,11 +33,24 @@ interface MobileTabBarProps {
 /** Routes where the tab bar should be hidden */
 const hiddenRoutes = ['/login', '/register', '/password/forgot', '/password/reset', '/onboarding'];
 
+/**
+ * Whether the mobile tab bar renders on the current route/auth state.
+ * Shared with components that stack above it (e.g. the podcast mini-player)
+ * so their bottom offsets can never drift from the tab bar's own rules.
+ * CSS (`md:hidden`) still controls the desktop case.
+ */
+export function useMobileTabBarVisible(): boolean {
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
+
+  return isAuthenticated && !hiddenRoutes.some((route) => location.pathname.includes(route));
+}
+
 export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
   const { t } = useTranslation('common');
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const visible = useMobileTabBarVisible();
   const { hasModule, tenantPath } = useTenant();
   const { counts } = useNotifications();
 
@@ -46,8 +59,7 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
   const handleCreateClose = useCallback(() => setIsCreateOpen(false), []);
 
   // Don't render for unauthenticated users or on auth/onboarding pages
-  if (!isAuthenticated) return null;
-  if (hiddenRoutes.some((route) => location.pathname.includes(route))) return null;
+  if (!visible) return null;
 
   const currentPath = location.pathname;
 
