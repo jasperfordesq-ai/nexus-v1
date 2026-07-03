@@ -96,7 +96,8 @@
     "shortcuts_label": "Sneltoetsen",
     "shortcut_play_pause": "Afspelen / pauzeren",
     "shortcut_seek": "Terug- / vooruitspoelen",
-    "shortcut_volume": "Volume"
+    "shortcut_volume": "Volume",
+    "key_space": "Spatie"
   },
   "studio": {
     "title": "Podcast Studio",

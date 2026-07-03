@@ -30,7 +30,7 @@ class NewsletterTemplateTest extends TestCase
     {
         $expected = [
             'tenant_id', 'name', 'description', 'category', 'subject',
-            'preview_text', 'content', 'thumbnail', 'is_active',
+            'preview_text', 'content', 'content_format', 'design_json', 'thumbnail', 'is_active',
             'use_count', 'created_by',
         ];
         $this->assertEquals($expected, $this->model->getFillable());

@@ -96,7 +96,8 @@
     "shortcuts_label": "Aicearraí méarchláir",
     "shortcut_play_pause": "Seinn / sos",
     "shortcut_seek": "Siar / ar aghaidh",
-    "shortcut_volume": "Airde fuaime"
+    "shortcut_volume": "Airde fuaime",
+    "key_space": "Spás"
   },
   "studio": {
     "title": "Podcast Studio",

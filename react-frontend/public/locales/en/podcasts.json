@@ -96,7 +96,8 @@
     "shortcuts_label": "Keyboard shortcuts",
     "shortcut_play_pause": "Play / pause",
     "shortcut_seek": "Skip back / forward",
-    "shortcut_volume": "Volume"
+    "shortcut_volume": "Volume",
+    "key_space": "Space"
   },
   "studio": {
     "title": "Podcast Studio",

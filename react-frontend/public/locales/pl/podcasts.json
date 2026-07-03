@@ -96,7 +96,8 @@
     "shortcuts_label": "Skróty klawiszowe",
     "shortcut_play_pause": "Odtwarzanie / pauza",
     "shortcut_seek": "Przewiń wstecz / do przodu",
-    "shortcut_volume": "Głośność"
+    "shortcut_volume": "Głośność",
+    "key_space": "Spacja"
   },
   "studio": {
     "title": "Podcast Studio",

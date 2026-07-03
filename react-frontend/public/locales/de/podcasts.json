@@ -96,7 +96,8 @@
     "shortcuts_label": "Tastaturkürzel",
     "shortcut_play_pause": "Abspielen / Pause",
     "shortcut_seek": "Zurück- / Vorspulen",
-    "shortcut_volume": "Lautstärke"
+    "shortcut_volume": "Lautstärke",
+    "key_space": "Leertaste"
   },
   "studio": {
     "title": "Podcast Studio",

@@ -84,11 +84,16 @@ class LegalDocumentService
      */
     public static function getAllForTenant(int $tenantId, bool $includeInactive = false): array
     {
-        return DB::table('legal_documents as ld')
+        $query = DB::table('legal_documents as ld')
             ->leftJoin('legal_document_versions as ldv', 'ld.current_version_id', '=', 'ldv.id')
-            ->where('ld.tenant_id', $tenantId)
-            // Admin management views need deactivated documents too; public callers don't
-            ->when(! $includeInactive, fn ($q) => $q->where('ld.is_active', true))
+            ->where('ld.tenant_id', $tenantId);
+
+        // Admin management views need deactivated documents too; public callers don't.
+        if (! $includeInactive) {
+            $query->where('ld.is_active', true);
+        }
+
+        return $query
             ->orderBy('ld.document_type')
             ->select(
                 'ld.*', 'ld.document_type as type', 'ldv.version_number', 'ldv.effective_date',

@@ -96,7 +96,8 @@
     "shortcuts_label": "اختصارات لوحة المفاتيح",
     "shortcut_play_pause": "تشغيل / إيقاف مؤقت",
     "shortcut_seek": "الرجوع / التقدم",
-    "shortcut_volume": "مستوى الصوت"
+    "shortcut_volume": "مستوى الصوت",
+    "key_space": "مسافة"
   },
   "studio": {
     "title": "Podcast Studio",

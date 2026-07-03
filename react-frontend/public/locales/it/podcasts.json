@@ -96,7 +96,8 @@
     "shortcuts_label": "Scorciatoie da tastiera",
     "shortcut_play_pause": "Riproduci / pausa",
     "shortcut_seek": "Indietro / avanti",
-    "shortcut_volume": "Volume"
+    "shortcut_volume": "Volume",
+    "key_space": "Spazio"
   },
   "studio": {
     "title": "Podcast Studio",

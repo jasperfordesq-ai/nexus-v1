@@ -206,7 +206,7 @@ export default function PodcastEpisodePage() {
             <PodcastAudioPlayer episode={episode} showSlug={showPath} />
             <p className="hidden flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted md:flex">
               <span className="sr-only">{t('player.shortcuts_label')}</span>
-              <span><kbd className="rounded border border-border bg-surface-secondary px-1.5 py-0.5 font-sans">Space</kbd> {t('player.shortcut_play_pause')}</span>
+              <span><kbd className="rounded border border-border bg-surface-secondary px-1.5 py-0.5 font-sans">{t('player.key_space')}</kbd> {t('player.shortcut_play_pause')}</span>
               <span><kbd className="rounded border border-border bg-surface-secondary px-1.5 py-0.5 font-sans">←</kbd> <kbd className="rounded border border-border bg-surface-secondary px-1.5 py-0.5 font-sans">→</kbd> {t('player.shortcut_seek')}</span>
               <span><kbd className="rounded border border-border bg-surface-secondary px-1.5 py-0.5 font-sans">↑</kbd> <kbd className="rounded border border-border bg-surface-secondary px-1.5 py-0.5 font-sans">↓</kbd> {t('player.shortcut_volume')}</span>
             </p>

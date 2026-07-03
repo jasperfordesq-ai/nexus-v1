@@ -390,4 +390,22 @@
     <vulnerabilityName>GHSA-vxpw-j846-p89q</vulnerabilityName>
   </suppress>
 
+  <!--
+    FALSE POSITIVE: an incidental cygwin1.dll fingerprinted to
+    cpe:2.3:a:redhat:cygwin:1.3.22. OWASP Dependency-Check finds a stray
+    cygwin1.dll in the scanned workspace (NOT tracked in git — it ships inside a
+    dependency's files) and matches it to Red Hat Cygwin 1.3.22, triggering
+    CVE-2008-3323 (7.6) and CVE-2007-6181 (8.5) — both 2007-2008 Cygwin runtime
+    CVEs. This platform is a Laravel/React app and does NOT depend on the Cygwin
+    1.3.22 runtime; this is the same wrong-CPE class as the joomla/string entry
+    above. Suppress by the exact ancient CPE so only Cygwin 1.3.22 is silenced.
+  -->
+  <suppress>
+    <notes><![CDATA[
+      FP: incidental cygwin1.dll matched to cpe:2.3:a:redhat:cygwin:1.3.22.
+      Not a runtime dependency; CVE-2008-3323 / CVE-2007-6181 are 2007-2008 Cygwin CVEs.
+    ]]></notes>
+    <cpe>cpe:2.3:a:redhat:cygwin:1.3.22</cpe>
+  </suppress>
+
 </suppressions>

@@ -96,7 +96,8 @@
     "shortcuts_label": "キーボードショートカット",
     "shortcut_play_pause": "再生 / 一時停止",
     "shortcut_seek": "巻き戻し / 早送り",
-    "shortcut_volume": "音量"
+    "shortcut_volume": "音量",
+    "key_space": "スペース"
   },
   "studio": {
     "title": "Podcast Studio",

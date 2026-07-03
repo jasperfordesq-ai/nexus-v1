@@ -96,7 +96,8 @@
     "shortcuts_label": "Atalhos de teclado",
     "shortcut_play_pause": "Reproduzir / pausar",
     "shortcut_seek": "Recuar / avançar",
-    "shortcut_volume": "Volume"
+    "shortcut_volume": "Volume",
+    "key_space": "Espaço"
   },
   "studio": {
     "title": "Podcast Studio",
