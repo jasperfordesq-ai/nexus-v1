@@ -26,6 +26,10 @@ parameters:
         - app
     excludePaths:
         - vendor
+    # getID3 is a legacy classmap-autoloaded library (no PSR-4 namespace);
+    # PHPStan needs an explicit scan hint to discover the class symbol.
+    scanFiles:
+        - vendor/james-heinrich/getid3/getid3/getid3.php
     parallel:
         processTimeout: 1200.0
         maximumNumberOfProcesses: 2
