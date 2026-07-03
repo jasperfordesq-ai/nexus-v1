@@ -754,4 +754,32 @@ class PodcastServiceTest extends TestCase
             'status' => 'draft',
         ]);
     }
+
+    // ── verifyMediaDisk (storage doctor) ────────────────────────────────────
+
+    public function test_verifyMediaDisk_round_trips_probe_on_faked_disk(): void
+    {
+        Storage::fake('s3');
+
+        $result = PodcastService::verifyMediaDisk('s3');
+
+        $this->assertTrue($result['ok']);
+        $this->assertSame('s3', $result['disk']);
+        $this->assertSame(
+            ['configured' => true, 'driver_installed' => true, 'write' => true, 'read' => true, 'delete' => true],
+            $result['checks']
+        );
+        $this->assertNull($result['error']);
+        // Probe object cleaned up after itself.
+        $this->assertSame([], Storage::disk('s3')->allFiles('podcasts/.doctor'));
+    }
+
+    public function test_verifyMediaDisk_fails_cleanly_for_unconfigured_disk(): void
+    {
+        $result = PodcastService::verifyMediaDisk('nope-not-a-disk');
+
+        $this->assertFalse($result['ok']);
+        $this->assertFalse($result['checks']['configured']);
+        $this->assertSame('disk_not_configured', $result['error']);
+    }
 }

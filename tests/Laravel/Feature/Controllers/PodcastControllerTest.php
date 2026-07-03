@@ -1506,4 +1506,98 @@ class PodcastControllerTest extends TestCase
         $validation->assertStatus(200);
         $this->assertContains('missing_artwork', $validation->json('data.warnings'));
     }
+
+    public function test_admin_storage_verify_round_trips_probe_on_faked_disk(): void
+    {
+        Storage::fake('s3');
+        $this->enablePodcasts(true);
+        $this->actingAsAdmin();
+
+        $response = $this->apiPost('/v2/admin/podcasts/storage/verify', ['disk' => 's3']);
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.ok', true);
+        $response->assertJsonPath('data.disk', 's3');
+        $response->assertJsonPath('data.checks.write', true);
+        $response->assertJsonPath('data.checks.read', true);
+        $response->assertJsonPath('data.checks.delete', true);
+
+        // The probe object must not be left behind.
+        $this->assertSame([], Storage::disk('s3')->allFiles('podcasts/.doctor'));
+    }
+
+    public function test_admin_storage_verify_defaults_to_configured_cloud_disk(): void
+    {
+        Storage::fake('s3');
+        $this->enablePodcasts(true);
+        $this->actingAsAdmin();
+
+        $response = $this->apiPost('/v2/admin/podcasts/storage/verify');
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.disk', 's3');
+    }
+
+    public function test_admin_storage_verify_reports_unknown_disk_as_structured_failure(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsAdmin();
+
+        $response = $this->apiPost('/v2/admin/podcasts/storage/verify', ['disk' => 'does-not-exist']);
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.ok', false);
+        $response->assertJsonPath('data.checks.configured', false);
+        $response->assertJsonPath('data.error', 'disk_not_configured');
+    }
+
+    public function test_storage_verify_is_admin_only(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $this->apiPost('/v2/admin/podcasts/storage/verify', ['disk' => 's3'])->assertStatus(403);
+    }
+
+    public function test_update_podcast_config_rejects_unknown_cloud_disk(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsAdmin();
+
+        $response = $this->apiPut('/v2/admin/config/podcasts/bulk', [
+            'settings' => ['podcasts.cloud_storage_disk' => 'not-a-disk'],
+        ]);
+        $response->assertStatus(422);
+
+        // Nothing may have been persisted by the rejected payload.
+        $config = $this->apiGet('/v2/admin/config/podcasts');
+        $this->assertSame('s3', $config->json('data.config')['podcasts.cloud_storage_disk']);
+    }
+
+    public function test_update_podcast_config_rejects_invalid_storage_driver(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsAdmin();
+
+        $this->apiPut('/v2/admin/config/podcasts/bulk', [
+            'settings' => ['podcasts.media_storage_driver' => 'ftp'],
+        ])->assertStatus(422);
+    }
+
+    public function test_update_podcast_config_rejects_invalid_cdn_url(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsAdmin();
+
+        $this->apiPut('/v2/admin/config/podcasts/bulk', [
+            'settings' => ['podcasts.cloud_cdn_base_url' => 'ftp://cdn.example.test'],
+        ])->assertStatus(422);
+    }
+
+    public function test_update_podcast_config_accepts_clearing_cdn_url(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsAdmin();
+
+        $this->apiPut('/v2/admin/config/podcasts/bulk', [
+            'settings' => ['podcasts.cloud_cdn_base_url' => ''],
+        ])->assertStatus(200);
+    }
 }

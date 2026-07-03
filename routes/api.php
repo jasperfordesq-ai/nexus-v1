@@ -2232,6 +2232,7 @@ Route::post('/v2/admin/podcasts/shows/{id}/moderate', [\App\Http\Controllers\Api
 Route::get('/v2/admin/podcasts/shows/{id}/validate-feed', [\App\Http\Controllers\Api\AdminPodcastController::class, 'validateFeed'])->where('id', '[0-9]+');
 Route::post('/v2/admin/podcasts/episodes/{id}/moderate', [\App\Http\Controllers\Api\AdminPodcastController::class, 'moderateEpisode'])->where('id', '[0-9]+');
 Route::post('/v2/admin/podcasts/reports/{episodeId}/resolve', [\App\Http\Controllers\Api\AdminPodcastController::class, 'resolveReport'])->where('episodeId', '[0-9]+');
+Route::post('/v2/admin/podcasts/storage/verify', [\App\Http\Controllers\Api\AdminPodcastController::class, 'verifyStorage']);
 
 Route::get('/v2/admin/ideation', [\App\Http\Controllers\Api\AdminIdeationController::class, 'index']);
 Route::get('/v2/admin/ideation/{id}', [\App\Http\Controllers\Api\AdminIdeationController::class, 'show']);

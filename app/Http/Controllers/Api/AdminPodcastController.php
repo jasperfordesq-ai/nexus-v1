@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\Concerns\InteractsWithPodcasts;
+use App\Services\PodcastConfigurationService;
 use App\Services\PodcastService;
 use Illuminate\Http\JsonResponse;
 
@@ -71,6 +72,27 @@ class AdminPodcastController extends BaseApiController
         $show = $this->findPodcastShowOrFail($id);
 
         return $this->respondWithData(PodcastService::validateFeed($show));
+    }
+
+    /**
+     * POST /v2/admin/podcasts/storage/verify
+     *
+     * Probe a filesystem disk (write/read/delete round-trip) so an admin can
+     * confirm cloud credentials work BEFORE flipping
+     * podcasts.media_storage_driver to 'cloud'. Defaults to the tenant's
+     * configured cloud disk when no disk is supplied.
+     */
+    public function verifyStorage(): JsonResponse
+    {
+        $this->ensurePodcastsFeature();
+        $this->requireAdmin();
+
+        $disk = trim((string) $this->input('disk', ''));
+        if ($disk === '') {
+            $disk = (string) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_CLOUD_STORAGE_DISK, 's3') ?: 's3';
+        }
+
+        return $this->respondWithData(PodcastService::verifyMediaDisk($disk));
     }
 
     public function resolveReport(int $episodeId): JsonResponse

@@ -2688,6 +2688,14 @@ class AdminConfigController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.podcasts.settings_required'), 'settings', 422);
         }
 
+        // Storage settings are validated up-front against the merged intent
+        // (submitted values overlaid on current config) so a bad payload is
+        // rejected atomically — the write loop below persists per key.
+        $storageError = $this->validatePodcastStorageSettings($settings);
+        if ($storageError !== null) {
+            return $storageError;
+        }
+
         $updated = [];
         foreach ($settings as $key => $value) {
             if (!is_string($key) || !array_key_exists($key, PodcastConfigurationService::DEFAULTS)) {
@@ -2709,6 +2717,49 @@ class AdminConfigController extends BaseApiController
         $this->tenantSettingsService->clearCacheForTenant($tenantId);
 
         return $this->respondWithData(['updated' => $updated]);
+    }
+
+    /**
+     * Reject podcast storage settings that would break media uploads: an
+     * unknown driver, a cloud disk that is not configured on this server, a
+     * cloud switch without the Flysystem adapter installed, or a CDN base
+     * URL that is not http(s). Returns a 422 response or null when valid.
+     */
+    private function validatePodcastStorageSettings(array $settings): ?JsonResponse
+    {
+        $current = PodcastConfigurationService::getAll();
+        $effective = static function (string $key) use ($settings, $current): string {
+            return trim((string) (array_key_exists($key, $settings) ? $settings[$key] : ($current[$key] ?? '')));
+        };
+
+        $driver = $effective(PodcastConfigurationService::CONFIG_MEDIA_STORAGE_DRIVER);
+        if (array_key_exists(PodcastConfigurationService::CONFIG_MEDIA_STORAGE_DRIVER, $settings)
+            && !in_array($driver, ['local', 'cloud'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.podcasts.invalid_storage_driver'), PodcastConfigurationService::CONFIG_MEDIA_STORAGE_DRIVER, 422);
+        }
+
+        $disk = $effective(PodcastConfigurationService::CONFIG_CLOUD_STORAGE_DISK);
+        $diskSubmitted = array_key_exists(PodcastConfigurationService::CONFIG_CLOUD_STORAGE_DISK, $settings);
+        $diskConfig = $disk !== '' ? config("filesystems.disks.{$disk}") : null;
+        if (($diskSubmitted || $driver === 'cloud') && !is_array($diskConfig)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.podcasts.invalid_storage_disk'), PodcastConfigurationService::CONFIG_CLOUD_STORAGE_DISK, 422);
+        }
+
+        if ($driver === 'cloud'
+            && is_array($diskConfig)
+            && ($diskConfig['driver'] ?? '') === 's3'
+            && !class_exists(\League\Flysystem\AwsS3V3\AwsS3V3Adapter::class)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.podcasts.storage_driver_unavailable'), PodcastConfigurationService::CONFIG_MEDIA_STORAGE_DRIVER, 422);
+        }
+
+        $cdn = $effective(PodcastConfigurationService::CONFIG_CLOUD_CDN_BASE_URL);
+        if (array_key_exists(PodcastConfigurationService::CONFIG_CLOUD_CDN_BASE_URL, $settings)
+            && $cdn !== ''
+            && !preg_match('#^https?://#i', $cdn)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.podcasts.invalid_cdn_url'), PodcastConfigurationService::CONFIG_CLOUD_CDN_BASE_URL, 422);
+        }
+
+        return null;
     }
 
     // =========================================================================

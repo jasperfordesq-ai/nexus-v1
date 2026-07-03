@@ -1527,6 +1527,79 @@ class PodcastService
         return Storage::disk((string) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_CLOUD_STORAGE_DISK, 's3'))->url($path);
     }
 
+    /**
+     * Verify a filesystem disk end-to-end before podcast media is switched
+     * onto it: configuration, driver availability, then a write/read/delete
+     * round-trip with a throwaway probe object. Returns a structured report
+     * and never throws — a broken disk must produce a diagnosis, not a 500.
+     */
+    public static function verifyMediaDisk(string $disk): array
+    {
+        $result = [
+            'ok' => false,
+            'disk' => $disk,
+            'driver' => null,
+            'checks' => [
+                'configured' => false,
+                'driver_installed' => false,
+                'write' => false,
+                'read' => false,
+                'delete' => false,
+            ],
+            'error' => null,
+        ];
+
+        $config = config("filesystems.disks.{$disk}");
+        if (!is_array($config)) {
+            $result['error'] = 'disk_not_configured';
+
+            return $result;
+        }
+        $result['checks']['configured'] = true;
+        $result['driver'] = (string) ($config['driver'] ?? '');
+
+        if ($result['driver'] === 's3' && !class_exists(\League\Flysystem\AwsS3V3\AwsS3V3Adapter::class)) {
+            $result['error'] = 'driver_not_installed';
+
+            return $result;
+        }
+        $result['checks']['driver_installed'] = true;
+
+        $probePath = sprintf('podcasts/.doctor/probe_%s.txt', bin2hex(random_bytes(8)));
+        $payload = 'nexus-podcast-storage-probe ' . now()->toIso8601String();
+
+        try {
+            $storage = Storage::disk($disk);
+
+            if (!$storage->put($probePath, $payload)) {
+                $result['error'] = 'write_failed';
+
+                return $result;
+            }
+            $result['checks']['write'] = true;
+
+            if ($storage->get($probePath) !== $payload) {
+                $result['error'] = 'read_mismatch';
+
+                return $result;
+            }
+            $result['checks']['read'] = true;
+
+            $storage->delete($probePath);
+            $result['checks']['delete'] = true;
+            $result['ok'] = true;
+        } catch (\Throwable $e) {
+            $result['error'] = $e->getMessage();
+            try {
+                Storage::disk($disk)->delete($probePath);
+            } catch (\Throwable) {
+                // Probe cleanup is best-effort on an already-failing disk.
+            }
+        }
+
+        return $result;
+    }
+
     private static function clientFamily(?string $userAgent): ?string
     {
         if (!$userAgent) {
