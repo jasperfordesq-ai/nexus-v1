@@ -1,5 +1,5 @@
 import { Card, CardBody, CardHeader, Input, Textarea, Button, Chip, Spinner, Select, SelectItem, Switch } from '@/components/ui';
-import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { Separator } from '@/components/ui';
@@ -26,9 +26,8 @@ import { PageHeader } from '../../components/PageHeader';
  */
 
 
-const RichTextEditor = lazy(() =>
-  import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
-);
+import { NewsletterContentEditor } from '../../components/NewsletterContentEditor';
+import type { ContentFormat } from '../../components/contentFormat';
 
 const MERGE_VARIABLES = [
   '{{first_name}}',
@@ -84,6 +83,7 @@ export function TemplateForm() {
   const [subject, setSubject] = useState('');
   const [previewText, setPreviewText] = useState('');
   const [content, setContent] = useState('');
+  const [contentFormat, setContentFormat] = useState<ContentFormat>('richtext');
 
   // Validation
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -117,6 +117,7 @@ export function TemplateForm() {
         setSubject(data.subject || '');
         setPreviewText(data.preview_text || '');
         setContent(data.content || '');
+        setContentFormat(((data as { content_format?: ContentFormat }).content_format) || 'richtext');
       } else {
         setLoadError(res.error || t('newsletters.failed_to_load_template'));
       }
@@ -161,6 +162,7 @@ export function TemplateForm() {
         subject: subject.trim(),
         preview_text: previewText.trim(),
         content,
+        content_format: contentFormat,
       };
 
       const res = isEdit
@@ -352,15 +354,25 @@ export function TemplateForm() {
                 <h3 className="text-lg font-semibold">{t('newsletters.label_content')}</h3>
               </CardHeader>
               <CardBody className="gap-4">
-                <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner size="sm" className="m-4" /></div>}>
-                  <RichTextEditor
-                    label={t('newsletters.template_content')}
-                    placeholder={t('newsletters.placeholder_design_your_email_template_content')}
-                    value={content}
-                    onChange={setContent}
-                    isDisabled={submitting}
-                  />
-                </Suspense>
+                <NewsletterContentEditor
+                  value={content}
+                  format={contentFormat}
+                  onChange={({ content: c, content_format: f }) => {
+                    setContent(c);
+                    setContentFormat(f);
+                  }}
+                  placeholder={t('newsletters.placeholder_design_your_email_template_content')}
+                  isDisabled={submitting}
+                  subject={subject}
+                  previewText={previewText}
+                  onRequestPreview={async (req) => {
+                    const res = await adminNewsletters.previewContent(req);
+                    if (res.success && res.data) {
+                      return (res.data as { html: string }).html;
+                    }
+                    throw new Error('preview failed');
+                  }}
+                />
 
                 <Separator />
 

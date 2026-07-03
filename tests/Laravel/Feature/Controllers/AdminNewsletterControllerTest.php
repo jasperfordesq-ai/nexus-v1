@@ -395,4 +395,75 @@ class AdminNewsletterControllerTest extends TestCase
         $response->assertJsonPath('errors.0.code', 'VALIDATION_ERROR');
         $this->assertSame('draft', DB::table('newsletters')->where('id', $newsletterId)->value('status'));
     }
+
+    // ================================================================
+    // MULTI-FORMAT — content_format persistence + preview endpoint
+    // ================================================================
+
+    public function test_create_persists_content_format_and_sanitizes_html(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/newsletters', [
+            'subject' => 'Designed send',
+            'content' => '<table><tr><td>Body</td></tr></table><script>alert(1)</script>',
+            'content_format' => 'html',
+            'status' => 'draft',
+            'target_audience' => 'all_members',
+        ]);
+
+        $response->assertStatus(201);
+        $id = $response->json('data.id');
+
+        $row = DB::table('newsletters')->where('id', $id)->first();
+        $this->assertSame('html', $row->content_format);
+        // Table markup preserved, script stripped.
+        $this->assertStringContainsString('<table>', $row->content);
+        $this->assertStringNotContainsString('<script', $row->content);
+    }
+
+    public function test_create_rejects_invalid_content_format(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $this->apiPost('/v2/admin/newsletters', [
+            'subject' => 'Bad format',
+            'content' => 'x',
+            'content_format' => 'wysiwyg',
+            'status' => 'draft',
+            'target_audience' => 'all_members',
+        ])->assertStatus(400)->assertJsonPath('errors.0.code', 'VALIDATION_ERROR');
+    }
+
+    public function test_preview_renders_html_with_unsubscribe_and_no_script(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/newsletters/preview', [
+            'content' => '<p>Hi {{first_name}}</p><script>alert(1)</script>',
+            'content_format' => 'html',
+            'subject' => 'Preview me',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonStructure(['data' => ['html', 'text', 'subject']]);
+
+        $html = $response->json('data.html');
+        $this->assertStringNotContainsString('<script>alert(1)</script>', $html);
+        $this->assertStringContainsString('/newsletter/unsubscribe', $html);
+    }
+
+    public function test_preview_requires_admin(): void
+    {
+        $member = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($member);
+
+        $this->apiPost('/v2/admin/newsletters/preview', [
+            'content' => 'x',
+            'content_format' => 'plaintext',
+        ])->assertStatus(403);
+    }
 }

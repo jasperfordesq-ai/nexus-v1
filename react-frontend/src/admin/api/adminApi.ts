@@ -1088,10 +1088,23 @@ export const adminLegalDocs = {
   get: (id: number) =>
     api.get<LegalDocument>(`/v2/admin/legal-documents/${id}`),
 
-  create: (data: { title: string; content: string; type: string; version?: string; status?: string }) =>
+  create: (data: {
+    title: string;
+    type: string;
+    requires_acceptance?: boolean;
+    acceptance_required_for?: string;
+    notify_on_update?: boolean;
+    is_active?: boolean;
+  }) =>
     api.post<LegalDocument>('/v2/admin/legal-documents', data),
 
-  update: (id: number, data: Record<string, unknown>) =>
+  update: (id: number, data: {
+    title?: string;
+    requires_acceptance?: boolean;
+    acceptance_required_for?: string;
+    notify_on_update?: boolean;
+    is_active?: boolean;
+  }) =>
     api.put<LegalDocument>(`/v2/admin/legal-documents/${id}`, data),
 
   delete: (id: number) =>
@@ -1267,6 +1280,18 @@ export const adminNewsletters = {
     target_towns?: string[];
   }) =>
     api.post<{ count: number }>('/v2/admin/newsletters/recipient-count', params),
+
+  // Multi-format authoring: server-parity preview (preview == send) + image host.
+  previewContent: (data: {
+    content: string;
+    content_format: string;
+    subject?: string;
+    preview_text?: string;
+  }) =>
+    api.post<{ html: string; text: string; subject: string }>('/v2/admin/newsletters/preview', data),
+
+  uploadImage: (file: File) =>
+    api.upload<{ url: string; path: string }>('/v2/upload', file, 'file'),
 
   // Duplicate
   duplicateNewsletter: (id: number) =>

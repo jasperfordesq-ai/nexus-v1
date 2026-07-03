@@ -116,6 +116,7 @@ class EmailDispatchService
 
         try {
             return (bool) $this->runWithResolvedTenant($tenantId, function () use ($to, $subject, $body, $options, $category, $tenantId, $source, $metadata): bool {
+                $textBody = $options['textBody'] ?? null;
                 $sent = Mailer::forCurrentTenant()->send(
                     $to,
                     $subject,
@@ -125,6 +126,7 @@ class EmailDispatchService
                     $options['unsubscribeUrl'] ?? null,
                     $category !== '' ? $category : null,
                     $metadata,
+                    $textBody !== null ? (string) $textBody : null,
                 );
 
                 if (!$sent) {

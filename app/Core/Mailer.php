@@ -527,7 +527,7 @@ class Mailer
      * @param string|null $replyTo Reply-To address (optional)
      * @return bool
      */
-    public function send($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $category = null, ?array $metadata = null): bool
+    public function send($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $category = null, ?array $metadata = null, ?string $textBody = null): bool
     {
         // Category-based From address when routing via platform Postmark, on the
         // verified sending domain (project-nexus.net by default).
@@ -587,7 +587,7 @@ class Mailer
 
         // Route based on configured driver
         if ($this->driver === 'postmark') {
-            $result = $this->sendViaPostmark($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $category, $metadata);
+            $result = $this->sendViaPostmark($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $category, $metadata, $textBody);
             if ($result) {
                 self::logEmail($to, $subject, 'sent', $this->lastMessageId, null, $this->tenantId, $category, 'postmark', $metadata);
                 return true;
@@ -596,7 +596,7 @@ class Mailer
             // Fallback: SMTP (if configured).
             if (!empty($this->host) && !empty($this->username)) {
                 \Illuminate\Support\Facades\Log::warning("Mailer: Postmark failed, falling back to SMTP for: " . self::maskEmail($to));
-                $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+                $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $textBody);
                 self::logEmail($to, $subject, $smtpOk ? 'sent' : 'failed', null, $smtpOk ? null : 'Postmark + SMTP both failed', $this->tenantId, $category, 'smtp', $metadata);
                 return $smtpOk;
             }
@@ -607,7 +607,7 @@ class Mailer
         }
 
         if ($this->driver === 'gmail_api') {
-            $result = $this->sendViaGmailApi($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+            $result = $this->sendViaGmailApi($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $textBody);
             if ($result) {
                 self::logEmail($to, $subject, 'sent', null, null, $this->tenantId, $category, 'gmail_api', $metadata);
                 return true;
@@ -615,7 +615,7 @@ class Mailer
 
             if (!empty($this->host) && !empty($this->username)) {
                 \Illuminate\Support\Facades\Log::warning("Mailer: Gmail API failed, falling back to SMTP for: " . self::maskEmail($to));
-                $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+                $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $textBody);
                 if (class_exists(\App\Services\EmailMonitorService::class)) {
                     \App\Services\EmailMonitorService::recordFallbackToSmtpStatic('gmail_api_failed', $this->tenantId);
                     \App\Services\EmailMonitorService::recordEmailSendStatic('smtp', $smtpOk, $this->tenantId);
@@ -629,7 +629,7 @@ class Mailer
             return false;
         }
 
-        $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+        $smtpOk = $this->sendViaSmtp($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $textBody);
         if ($smtpOk) {
             if (class_exists(\App\Services\EmailMonitorService::class)) {
                 \App\Services\EmailMonitorService::recordEmailSendStatic('smtp', true, $this->tenantId);
@@ -663,12 +663,18 @@ class Mailer
      * Send email via the Postmark Email API (raw HTTP, no SDK dependency —
      * mirrors the Gmail API cURL path already used in this class).
      */
-    private function sendViaPostmark($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $category = null, ?array $metadata = null): bool
+    private function sendViaPostmark($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $category = null, ?array $metadata = null, ?string $textBody = null): bool
     {
         try {
-            $plainText = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $body));
-            $plainText = html_entity_decode($plainText, ENT_QUOTES, 'UTF-8');
-            $plainText = preg_replace('/\n\s+/', "\n", (string) $plainText);
+            // Prefer a caller-supplied text/plain part (proper html→text). Fall
+            // back to the naive strip_tags derivation for callers that omit it.
+            if ($textBody !== null && trim($textBody) !== '') {
+                $plainText = $textBody;
+            } else {
+                $plainText = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $body));
+                $plainText = html_entity_decode($plainText, ENT_QUOTES, 'UTF-8');
+                $plainText = preg_replace('/\n\s+/', "\n", (string) $plainText);
+            }
 
             $stream = $this->resolvePostmarkStream($category);
 
@@ -772,7 +778,7 @@ class Mailer
     /**
      * Send email via Gmail API using OAuth 2.0.
      */
-    private function sendViaGmailApi($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null)
+    private function sendViaGmailApi($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $textBody = null)
     {
         try {
             $accessToken = $this->getGmailAccessToken();
@@ -783,7 +789,7 @@ class Mailer
                 throw new \Exception("Failed to get Gmail API access token");
             }
 
-            $rawEmail = $this->buildRawEmail($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+            $rawEmail = $this->buildRawEmail($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $textBody);
             $encodedEmail = $this->base64urlEncode($rawEmail);
 
             $url = 'https://gmail.googleapis.com/gmail/v1/users/me/messages/send';
@@ -999,14 +1005,18 @@ class Mailer
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
-    private function buildRawEmail($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null)
+    private function buildRawEmail($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $textBody = null)
     {
         $boundary = 'boundary_' . md5(uniqid(time()));
 
-        $plainText = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $body));
-        $plainText = html_entity_decode($plainText, ENT_QUOTES, 'UTF-8');
-        $plainText = preg_replace('/\n\s+/', "\n", $plainText);
-        $plainText = trim($plainText);
+        if ($textBody !== null && trim($textBody) !== '') {
+            $plainText = trim($textBody);
+        } else {
+            $plainText = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $body));
+            $plainText = html_entity_decode($plainText, ENT_QUOTES, 'UTF-8');
+            $plainText = preg_replace('/\n\s+/', "\n", $plainText);
+            $plainText = trim($plainText);
+        }
 
         $headers = [];
         $headers[] = 'From: ' . $this->fromName . ' <' . $this->fromEmail . '>';
@@ -1044,12 +1054,12 @@ class Mailer
         return $message;
     }
 
-    private function sendViaSmtp($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null)
+    private function sendViaSmtp($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $textBody = null)
     {
         try {
             $this->connect();
             $this->auth();
-            $this->sendData($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl);
+            $this->sendData($to, $subject, $body, $cc, $replyTo, $unsubscribeUrl, $textBody);
             $this->quit();
             return true;
         } catch (\Exception $e) {
@@ -1100,7 +1110,7 @@ class Mailer
         $this->read();
     }
 
-    private function sendData($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null)
+    private function sendData($to, $subject, $body, $cc = null, $replyTo = null, ?string $unsubscribeUrl = null, ?string $textBody = null)
     {
         $this->write("MAIL FROM: <{$this->fromEmail}>");
         $this->read();
@@ -1113,8 +1123,13 @@ class Mailer
         $this->write("DATA");
         $this->read();
 
+        $hasText = $textBody !== null && trim($textBody) !== '';
+        $boundary = 'bnd_' . md5(uniqid((string) time(), true));
+
         $headers = "MIME-Version: 1.0\r\n";
-        $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $headers .= $hasText
+            ? "Content-Type: multipart/alternative; boundary=\"$boundary\"\r\n"
+            : "Content-Type: text/html; charset=UTF-8\r\n";
         $headers .= "From: {$this->fromName} <{$this->fromEmail}>\r\n";
         $headers .= "To: $to\r\n";
         if ($cc) {
@@ -1130,7 +1145,22 @@ class Mailer
             $headers .= "List-Unsubscribe-Post: List-Unsubscribe=One-Click\r\n";
         }
 
-        $this->write($headers . "\r\n" . $body . "\r\n.");
+        if ($hasText) {
+            // text/plain first, then text/html — clients render the last part
+            // they can, so HTML wins where supported.
+            $mime = "--$boundary\r\n"
+                . "Content-Type: text/plain; charset=UTF-8\r\n"
+                . "Content-Transfer-Encoding: base64\r\n\r\n"
+                . chunk_split(base64_encode(trim((string) $textBody))) . "\r\n"
+                . "--$boundary\r\n"
+                . "Content-Type: text/html; charset=UTF-8\r\n"
+                . "Content-Transfer-Encoding: base64\r\n\r\n"
+                . chunk_split(base64_encode($body)) . "\r\n"
+                . "--$boundary--";
+            $this->write($headers . "\r\n" . $mime . "\r\n.");
+        } else {
+            $this->write($headers . "\r\n" . $body . "\r\n.");
+        }
         $this->read();
     }
 

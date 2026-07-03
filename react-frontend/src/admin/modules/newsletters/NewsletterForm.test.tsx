@@ -77,12 +77,21 @@ vi.mock('../../components', () => ({
   ),
 }));
 
-vi.mock('../../components/RichTextEditor', () => ({
-  RichTextEditor: ({ value, onChange, label }: { value: string; onChange: (v: string) => void; label?: string }) => (
+vi.mock('../../components/NewsletterContentEditor', () => ({
+  NewsletterContentEditor: ({
+    value,
+    format,
+    onChange,
+  }: {
+    value: string;
+    format: string;
+    onChange: (next: { content: string; content_format: string }) => void;
+  }) => (
     <textarea
-      aria-label={label || 'editor'}
+      aria-label="editor"
+      data-format={format}
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => onChange({ content: e.target.value, content_format: format })}
     />
   ),
 }));

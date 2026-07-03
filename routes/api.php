@@ -2092,6 +2092,7 @@ Route::get('/v2/admin/newsletters/send-time-optimizer', [\App\Http\Controllers\A
 Route::get('/v2/admin/newsletters/diagnostics', [\App\Http\Controllers\Api\AdminNewsletterController::class, 'getDiagnostics']);
 Route::get('/v2/admin/newsletters/bounce-trends', [\App\Http\Controllers\Api\AdminNewsletterController::class, 'getBounceTrends']);
 Route::post('/v2/admin/newsletters/recipient-count', [\App\Http\Controllers\Api\AdminNewsletterController::class, 'recipientCount']);
+Route::post('/v2/admin/newsletters/preview', [\App\Http\Controllers\Api\AdminNewsletterController::class, 'preview']);
 Route::get('/v2/admin/newsletters/{id}', [\App\Http\Controllers\Api\AdminNewsletterController::class, 'show']);
 Route::get('/v2/admin/newsletters/{id}/resend-info', [\App\Http\Controllers\Api\AdminNewsletterController::class, 'getResendInfo']);
 Route::post('/v2/admin/newsletters/{id}/resend', [\App\Http\Controllers\Api\AdminNewsletterController::class, 'resend']);

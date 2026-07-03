@@ -2393,8 +2393,14 @@ class AdminNewsletterController extends BaseApiController
             ];
 
             // Test email is sent to the admin themselves — render in their preferred language.
-            [$html, $subject] = \App\I18n\LocaleContext::withLocale($admin, fn () => [
+            [$html, $textBody, $subject] = \App\I18n\LocaleContext::withLocale($admin, fn () => [
                 NewsletterService::renderEmail(
+                    (array)$newsletter,
+                    $tenantName,
+                    'test-unsubscribe-token',
+                    $sampleRecipient
+                ),
+                NewsletterService::renderPlainTextPart(
                     (array)$newsletter,
                     $tenantName,
                     'test-unsubscribe-token',
@@ -2403,7 +2409,7 @@ class AdminNewsletterController extends BaseApiController
                 __('emails.newsletter.test_prefix') . ' ' . ($newsletter->subject ?? __('emails.newsletter.no_subject')),
             ]);
 
-            $sent = EmailDispatchService::sendRaw($admin->email, $subject, $html, null, null, null, 'newsletter_test', ['tenant_id' => $tenantId]);
+            $sent = EmailDispatchService::sendRaw($admin->email, $subject, $html, null, null, null, 'newsletter_test', ['tenant_id' => $tenantId, 'textBody' => $textBody]);
 
             if ($sent) {
                 return $this->respondWithData([
@@ -2447,6 +2453,69 @@ class AdminNewsletterController extends BaseApiController
         } catch (\Exception $e) {
             return $this->respondWithData(['count' => 0]);
         }
+    }
+
+    /**
+     * Render a live preview of unsaved draft content through the REAL send
+     * pipeline, so the compose-screen preview matches exactly what recipients
+     * receive. Accepts an unsaved body (works before the draft is persisted).
+     */
+    public function preview(): JsonResponse
+    {
+        $userId = $this->requireAdmin();
+        $this->rateLimit('admin_newsletter_preview', 30, 60);
+        $tenantId = TenantContext::getId();
+
+        $content = (string) $this->input('content', '');
+        $contentFormat = $this->input('content_format', 'richtext');
+        $subject = (string) $this->input('subject', '');
+        $previewText = (string) $this->input('preview_text', '');
+
+        if (!in_array($contentFormat, self::CONTENT_FORMATS, true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_content_format'), 'content_format');
+        }
+
+        if (strlen($content) > self::MAX_CONTENT_BYTES) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.newsletter_content_too_large'), 'content');
+        }
+
+        // Sanitize with the SAME email-safe sanitizer as store(), so preview == send.
+        $content = \App\Services\EmailHtmlSanitizer::sanitizeForFormat($content, $contentFormat);
+
+        // Sample recipient defaults to the current admin (mirrors sendTest) so
+        // {{first_name}} etc. resolve to something realistic.
+        $admin = DB::selectOne(
+            "SELECT email, first_name, last_name, preferred_language FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        );
+        $sampleRecipient = [
+            'email' => $admin->email ?? 'preview@example.com',
+            'first_name' => $admin->first_name ?? 'there',
+            'last_name' => $admin->last_name ?? '',
+            'name' => trim(($admin->first_name ?? '') . ' ' . ($admin->last_name ?? '')) ?: 'Member',
+        ];
+
+        $tenantName = TenantContext::get()['name'] ?? 'Community';
+
+        $newsletter = [
+            'content' => $content,
+            'content_format' => $contentFormat,
+            'subject' => $subject,
+            'preview_text' => $previewText,
+        ];
+
+        // trackingToken = null: preview must never write open/click analytics.
+        // Render in the admin's own language for an accurate preview.
+        [$html, $text] = \App\I18n\LocaleContext::withLocale($admin, fn () => [
+            NewsletterService::renderEmail($newsletter, $tenantName, 'preview-token', $sampleRecipient, null),
+            NewsletterService::renderPlainTextPart($newsletter, $tenantName, 'preview-token', $sampleRecipient),
+        ]);
+
+        return $this->respondWithData([
+            'html' => $html,
+            'text' => $text,
+            'subject' => $subject,
+        ]);
     }
 
     /**

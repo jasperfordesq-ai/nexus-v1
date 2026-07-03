@@ -9127,7 +9127,17 @@
     "status_ok": "OK",
     "status_unhealthy": "Unhealthy",
     "total_value": "Total: {{value}}",
-    "value_separator": " / "
+    "value_separator": " / ",
+    "col_current_version": "Current version",
+    "col_version_count": "Versions",
+    "status_published": "Published",
+    "status_draft_content": "Draft only",
+    "status_no_content": "No content",
+    "btn_manage_content": "Manage content",
+    "chip_inactive": "Inactive",
+    "empty_docs_title": "Set up your community’s legal documents",
+    "empty_docs_desc": "Add your terms & conditions, privacy policy, and cookie policy so members can read and accept them.",
+    "empty_docs_cta": "Create a document"
   },
   "events": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -16210,7 +16220,22 @@
     "status_published": "Published",
     "title_placeholder": "Enter the public title...",
     "title_required": "Title is required",
-    "update_document": "Update Document"
+    "update_document": "Update Document",
+    "settings_description": "Manage this document’s title and how members are asked to accept it. The document text is managed under Versions.",
+    "type_locked_hint": "The document type cannot be changed after creation.",
+    "acceptance_settings": "Acceptance settings",
+    "label_requires_acceptance": "Require acceptance",
+    "requires_acceptance_desc": "Members must actively accept this document.",
+    "label_acceptance_required_for": "Require acceptance at",
+    "acceptance_for_registration": "Registration",
+    "acceptance_for_login": "Next login",
+    "acceptance_for_first_use": "First use",
+    "acceptance_for_none": "No prompt",
+    "label_notify_on_update": "Notify on update",
+    "notify_on_update_desc": "Let you notify members when a new version is published.",
+    "label_is_active": "Active",
+    "is_active_desc": "Inactive documents are hidden from members.",
+    "created_next_step_toast": "Document created — now add its first version."
   },
   "legal_versions": {
     "compliance_dashboard": "Compliance Dashboard",
@@ -16225,7 +16250,18 @@
     "send_notification": "Send Notification",
     "subtitle": "Manage legal document versions and member acceptance workflows.",
     "this_will": "This will",
-    "title": "Legal Document Versions"
+    "title": "Legal Document Versions",
+    "editor_title_create": "New version",
+    "editor_title_edit": "Edit draft version",
+    "editor_description_create": "Write the content for a new version of this document.",
+    "editor_description_edit": "Edit this draft version before publishing.",
+    "editor_description_for": "Version content for “{{title}}”.",
+    "back_to_versions": "Back to versions",
+    "version_not_found": "That version could not be found.",
+    "only_drafts_editable": "Only draft versions can be edited. Published versions are locked.",
+    "unsaved_changes_title": "Discard unsaved changes?",
+    "unsaved_changes_message": "You have unsaved changes. If you leave now, they will be lost.",
+    "discard_changes": "Discard changes"
   },
   "load_error": "Load error",
   "log_files_labels": {

@@ -1,5 +1,5 @@
-import { Card, CardBody, CardHeader, Input, Button, Chip, Spinner, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tooltip } from '@/components/ui';
-import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import { Card, CardBody, CardHeader, Input, Button, Chip, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tooltip } from '@/components/ui';
+import { useState, useEffect, useCallback } from 'react';
 
 import { Separator } from '@/components/ui';
 import Save from 'lucide-react/icons/save';
@@ -33,9 +33,8 @@ import { PageHeader } from '../../components/PageHeader';
  */
 
 
-const RichTextEditor = lazy(() =>
-  import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
-);
+import { NewsletterContentEditor } from '../../components/NewsletterContentEditor';
+import type { ContentFormat } from '../../components/contentFormat';
 
 interface SegmentOption {
   id: number;
@@ -49,6 +48,8 @@ interface TemplateOption {
   subject?: string;
   preview_text?: string;
   content?: string;
+  content_format?: string;
+  thumbnail?: string;
 }
 
 interface GroupOption {
@@ -104,6 +105,9 @@ export function NewsletterForm() {
   const [subject, setSubject] = useState('');
   const [previewText, setPreviewText] = useState('');
   const [content, setContent] = useState('');
+  // Legacy rows have no content_format → default 'richtext' (Lexical HTML),
+  // preserving their existing editing behavior.
+  const [contentFormat, setContentFormat] = useState<ContentFormat>('richtext');
   const [status, setStatus] = useState('draft');
 
   // Targeting
@@ -197,6 +201,7 @@ export function NewsletterForm() {
             setSubject((d.subject as string) || '');
             setPreviewText((d.preview_text as string) || '');
             setContent((d.content as string) || '');
+            setContentFormat(((d.content_format as ContentFormat) || 'richtext'));
             setStatus((d.status as string) || 'draft');
             setNewsletterStatus((d.status as string) || 'draft');
             setTargetAudience((d.target_audience as string) || 'all_members');
@@ -283,6 +288,9 @@ export function NewsletterForm() {
       const tpl = templates.find(t => String(t.id) === templateId);
       if (tpl) {
         if (tpl.content) setContent(tpl.content);
+        // Starter templates carry their own format — set it so a starter's raw
+        // HTML is never fed to (and mangled by) the Lexical rich-text editor.
+        if (tpl.content_format) setContentFormat(tpl.content_format as ContentFormat);
         if (tpl.subject && !subject) setSubject(tpl.subject);
         if (tpl.preview_text && !previewText) setPreviewText(tpl.preview_text);
       }
@@ -295,6 +303,7 @@ export function NewsletterForm() {
     name: subject, // PHP requires name; use subject as name
     preview_text: previewText,
     content,
+    content_format: contentFormat,
     status,
     target_audience: targetAudience,
     segment_id: segmentId ? Number(segmentId) : null,
@@ -556,15 +565,25 @@ export function NewsletterForm() {
               )}
 
               <Separator />
-              <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner size="sm" className="m-4" /></div>}>
-                <RichTextEditor
-                  label={t('newsletter_form.label_content')}
-                  placeholder={t('newsletters.placeholder_write_your_newsletter_content')}
-                  value={content}
-                  onChange={setContent}
-                  isDisabled={saving || isSent}
-                />
-              </Suspense>
+              <NewsletterContentEditor
+                value={content}
+                format={contentFormat}
+                onChange={({ content: c, content_format: f }) => {
+                  setContent(c);
+                  setContentFormat(f);
+                }}
+                placeholder={t('newsletters.placeholder_write_your_newsletter_content')}
+                isDisabled={saving || isSent}
+                subject={subject}
+                previewText={previewText}
+                onRequestPreview={async (req) => {
+                  const res = await adminNewsletters.previewContent(req);
+                  if (res.success && res.data) {
+                    return (res.data as { html: string }).html;
+                  }
+                  throw new Error('preview failed');
+                }}
+              />
               <div className="rounded-lg border border-border bg-surface p-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-sm font-semibold text-foreground">

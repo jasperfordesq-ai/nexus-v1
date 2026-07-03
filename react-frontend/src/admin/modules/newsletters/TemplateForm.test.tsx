@@ -54,14 +54,23 @@ vi.mock('@/admin/api/adminApi', () => ({
   adminNewsletters: mockAdminNewsletters,
 }));
 
-// Mock the lazy-loaded RichTextEditor
-vi.mock('../../components/RichTextEditor', () => ({
-  RichTextEditor: ({ value, onChange, label }: { value: string; onChange: (v: string) => void; label?: string }) => (
+// Mock the multi-mode content editor (wraps the lazy RichTextEditor + others)
+vi.mock('../../components/NewsletterContentEditor', () => ({
+  NewsletterContentEditor: ({
+    value,
+    format,
+    onChange,
+  }: {
+    value: string;
+    format: string;
+    onChange: (next: { content: string; content_format: string }) => void;
+  }) => (
     <textarea
       data-testid="rich-text-editor"
-      aria-label={label ?? 'content'}
+      aria-label="content"
+      data-format={format}
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => onChange({ content: e.target.value, content_format: format })}
     />
   ),
 }));

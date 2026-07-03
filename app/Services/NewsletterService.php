@@ -336,18 +336,27 @@ class NewsletterService
                     $unsubscribeToken = $item->unsubscribe_token ?? null;
                     $trackingToken = $item->tracking_token ?? null;
 
-                    // Render email body (footer/unsubscribe links use __()) in the
-                    // subscriber's language. For non-user subscribers, $subscriber_locale
-                    // is NULL — LocaleContext::withLocale treats that as no-op.
-                    $emailHtml = LocaleContext::withLocale(
+                    // Render email body + text/plain part (footer/unsubscribe links
+                    // use __()) in the subscriber's language. For non-user
+                    // subscribers, $subscriber_locale is NULL — LocaleContext
+                    // treats that as a no-op.
+                    [$emailHtml, $textBody] = LocaleContext::withLocale(
                         $item->subscriber_locale ?? null,
-                        fn () => self::renderEmail(
-                            (array) $newsletter->getAttributes(),
-                            $tenantName,
-                            $unsubscribeToken,
-                            $recipientData,
-                            $trackingToken
-                        )
+                        fn () => [
+                            self::renderEmail(
+                                (array) $newsletter->getAttributes(),
+                                $tenantName,
+                                $unsubscribeToken,
+                                $recipientData,
+                                $trackingToken
+                            ),
+                            self::renderPlainTextPart(
+                                (array) $newsletter->getAttributes(),
+                                $tenantName,
+                                $unsubscribeToken,
+                                $recipientData
+                            ),
+                        ]
                     );
 
                     $subject = $item->subject_override
@@ -360,7 +369,7 @@ class NewsletterService
                         ? $apiUrl . '/v2/newsletter/unsubscribe?token=' . rawurlencode($unsubscribeToken)
                         : null;
 
-                    $success = EmailDispatchService::sendRaw($item->email, $subject, $emailHtml, null, null, $unsubscribeUrl, 'newsletter', ['tenant_id' => $tenantId]);
+                    $success = EmailDispatchService::sendRaw($item->email, $subject, $emailHtml, null, null, $unsubscribeUrl, 'newsletter', ['tenant_id' => $tenantId, 'textBody' => $textBody]);
 
                     if ($success) {
                         DB::table('newsletter_queue')
@@ -595,52 +604,47 @@ class NewsletterService
      */
     public static function renderEmail(array $newsletter, string $tenantName, ?string $unsubscribeToken = null, ?array $recipient = null, ?string $trackingToken = null): string
     {
-        $content = $newsletter['content'] ?? '';
-        $subject = $newsletter['subject'] ?? '';
-        $previewText = $newsletter['preview_text'] ?? '';
-        $year = date('Y');
-        $allRightsReserved = __('emails.footer.all_rights_reserved');
-        $subscriberNotice = __('emails.newsletter.subscriber_notice', ['community' => $tenantName]);
+        $format = $newsletter['content_format'] ?? 'richtext';
 
-        // Brand colors
-        $color = '#6366f1';
-        $colorDark = '#4f46e5';
+        $html = match ($format) {
+            'plaintext' => self::renderPlaintextEmail($newsletter, $tenantName, $unsubscribeToken, $recipient, $trackingToken),
+            'html', 'builder' => self::renderFullHtmlEmail($newsletter, $tenantName, $unsubscribeToken, $recipient, $trackingToken),
+            default => self::renderRichtextEmail($newsletter, $tenantName, $unsubscribeToken, $recipient, $trackingToken),
+        };
 
-        // URLs — TenantContext is set per-newsletter by processQueue() before renderEmail() is called
+        // Inline CSS as the final step so every format ships Outlook/Gmail-safe
+        // markup. Fail-open: a malformed body returns unchanged, never blocking a send.
+        return EmailCssInliner::inline($html);
+    }
+
+    /**
+     * Shared email chrome computed once per render, independent of format:
+     * URLs, the inline {{unsubscribe_link}} replacement, the footer links, and
+     * the open-tracking pixel.
+     *
+     * @return array{frontendUrl:string, apiUrl:string, inlineUnsubscribeLink:string, unsubscribeUrl:string, footerLinks:string, pixelHtml:string, year:string, allRightsReserved:string, subscriberNotice:string}
+     */
+    private static function prepareEmailChrome(string $tenantName, ?string $unsubscribeToken, ?string $trackingToken): array
+    {
+        // TenantContext is set per-newsletter by processQueue() before renderEmail() is called
         $frontendUrl = rtrim(TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix(), '/');
         $apiUrl = rtrim(config('app.url', ''), '/');
 
-        // Personalize content if recipient data available
-        if ($recipient) {
-            $content = self::personalizeContent($content, $recipient);
-        }
-
-        // Replace global tokens that are the same for every recipient in this send
-        $unsubscribeLink = $unsubscribeToken
+        $inlineUnsubscribeLink = $unsubscribeToken
             ? '<a href="' . $frontendUrl . '/newsletter/unsubscribe?token=' . rawurlencode($unsubscribeToken) . '" style="color:#6366f1;">' . __('emails.newsletter.unsubscribe') . '</a>'
             : '';
-        $content = str_replace(
-            ['{{tenant_name}}', '{{unsubscribe_link}}'],
-            [$tenantName, $unsubscribeLink],
-            $content
-        );
 
-        // Build unsubscribe URL
         if ($unsubscribeToken) {
             $unsubscribeUrl = $frontendUrl . '/newsletter/unsubscribe?token=' . rawurlencode($unsubscribeToken);
-            $unsubscribeLinks = '<a href="' . $unsubscribeUrl . '" style="color: #6b7280; text-decoration: underline;">' . __('emails.newsletter.unsubscribe') . '</a>'
+            $footerLinks = '<a href="' . $unsubscribeUrl . '" style="color: #6b7280; text-decoration: underline;">' . __('emails.newsletter.unsubscribe') . '</a>'
                 . ' <span style="color: #d1d5db; margin: 0 8px;">|</span> '
                 . '<a href="' . $frontendUrl . '/settings" style="color: #6b7280; text-decoration: underline;">' . __('emails.newsletter.manage_preferences') . '</a>';
         } else {
             $unsubscribeUrl = $frontendUrl . '/settings';
-            $unsubscribeLinks = '<a href="' . $unsubscribeUrl . '" style="color: #6b7280; text-decoration: underline;">' . __('emails.newsletter.manage_email_preferences') . '</a>';
+            $footerLinks = '<a href="' . $unsubscribeUrl . '" style="color: #6b7280; text-decoration: underline;">' . __('emails.newsletter.manage_email_preferences') . '</a>';
         }
 
-        // Tracking pixel (1×1 transparent GIF) — uses unique tracking_token per queue entry
-        if ($trackingToken) {
-            $content = self::wrapTrackedLinks($content, $apiUrl, $trackingToken);
-        }
-
+        // Tracking pixel (1×1 transparent GIF) — unique tracking_token per queue entry
         $pixelHtml = '';
         $pixelToken = $trackingToken ?? $unsubscribeToken;
         if ($pixelToken) {
@@ -652,6 +656,65 @@ class NewsletterService
                 . 'padding-top:0!important;padding-bottom:0!important;'
                 . 'padding-right:0!important;padding-left:0!important;display:block;" />';
         }
+
+        return [
+            'frontendUrl' => $frontendUrl,
+            'apiUrl' => $apiUrl,
+            'inlineUnsubscribeLink' => $inlineUnsubscribeLink,
+            'unsubscribeUrl' => $unsubscribeUrl,
+            'footerLinks' => $footerLinks,
+            'pixelHtml' => $pixelHtml,
+            'year' => date('Y'),
+            'allRightsReserved' => __('emails.footer.all_rights_reserved'),
+            'subscriberNotice' => __('emails.newsletter.subscriber_notice', ['community' => $tenantName]),
+        ];
+    }
+
+    /**
+     * Personalize + token-replace + tracked-link-wrap HTML-bearing content.
+     * Shared by richtext, html and builder formats.
+     */
+    private static function prepareHtmlContent(string $content, string $tenantName, ?array $recipient, ?string $trackingToken, array $chrome): string
+    {
+        if ($recipient) {
+            $content = self::personalizeContent($content, $recipient);
+        }
+
+        // {{unsubscribe_link}} → a full <a> element (drop into body text).
+        // {{unsubscribe_url}}  → the bare URL (drop into an href="" attribute).
+        $content = str_replace(
+            ['{{tenant_name}}', '{{unsubscribe_link}}', '{{unsubscribe_url}}'],
+            [$tenantName, $chrome['inlineUnsubscribeLink'], $chrome['unsubscribeUrl']],
+            $content
+        );
+
+        if ($trackingToken) {
+            $content = self::wrapTrackedLinks($content, $chrome['apiUrl'], $trackingToken);
+        }
+
+        return $content;
+    }
+
+    /**
+     * The classic branded shell — used for `richtext` content (Lexical editor
+     * output). Behavior is byte-identical to the pre-multi-format renderer.
+     */
+    private static function renderRichtextEmail(array $newsletter, string $tenantName, ?string $unsubscribeToken, ?array $recipient, ?string $trackingToken): string
+    {
+        $chrome = self::prepareEmailChrome($tenantName, $unsubscribeToken, $trackingToken);
+        $content = self::prepareHtmlContent($newsletter['content'] ?? '', $tenantName, $recipient, $trackingToken, $chrome);
+
+        $subject = $newsletter['subject'] ?? '';
+        $previewText = $newsletter['preview_text'] ?? '';
+        $year = $chrome['year'];
+        $allRightsReserved = $chrome['allRightsReserved'];
+        $subscriberNotice = $chrome['subscriberNotice'];
+        $unsubscribeLinks = $chrome['footerLinks'];
+        $pixelHtml = $chrome['pixelHtml'];
+
+        // Brand colors
+        $color = '#6366f1';
+        $colorDark = '#4f46e5';
 
         return <<<HTML
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -748,6 +811,151 @@ HTML;
     }
 
     /**
+     * Render `html` / `builder` content: the admin authored (or the builder
+     * exported) the whole email, so we do NOT wrap it in the branded shell.
+     * We still guarantee an unsubscribe mechanism and the open-tracking pixel.
+     */
+    private static function renderFullHtmlEmail(array $newsletter, string $tenantName, ?string $unsubscribeToken, ?array $recipient, ?string $trackingToken): string
+    {
+        $chrome = self::prepareEmailChrome($tenantName, $unsubscribeToken, $trackingToken);
+        $content = self::prepareHtmlContent($newsletter['content'] ?? '', $tenantName, $recipient, $trackingToken, $chrome);
+
+        // Compliance backstop: every bulk email needs a working unsubscribe. If
+        // the author didn't include one (via {{unsubscribe_link}} or a literal
+        // unsubscribe URL), append a minimal footer with it.
+        $footer = '';
+        if (!str_contains($content, '/newsletter/unsubscribe') && !str_contains($content, '/settings')) {
+            $footer = '<div style="text-align:center;padding:24px 16px;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Arial,sans-serif;font-size:12px;color:#9ca3af;line-height:1.6;">'
+                . '<p style="margin:0 0 6px;">' . $chrome['subscriberNotice'] . '</p>'
+                . '<p style="margin:0;">' . $chrome['footerLinks'] . '</p>'
+                . '</div>';
+        }
+
+        $injected = $footer . $chrome['pixelHtml'];
+
+        // Complete document → inject before </body>; otherwise wrap the fragment
+        // in a minimal, email-safe HTML skeleton (NOT the branded shell).
+        if (preg_match('/<html[\s>]/i', $content) || stripos($content, '<!doctype') !== false) {
+            if ($injected !== '' && preg_match('#</body\s*>#i', $content)) {
+                return preg_replace('#</body\s*>#i', $injected . '</body>', $content, 1) ?? ($content . $injected);
+            }
+            return $content . $injected;
+        }
+
+        $subject = htmlspecialchars((string) ($newsletter['subject'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $previewText = $newsletter['preview_text'] ?? '';
+        $preheader = $previewText !== ''
+            ? '<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">' . htmlspecialchars($previewText, ENT_QUOTES, 'UTF-8') . '</div>'
+            : '';
+
+        return <<<HTML
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="x-apple-disable-message-reformatting">
+    <title>{$subject}</title>
+</head>
+<body style="margin:0;padding:0;">
+    {$preheader}
+    {$content}
+    {$injected}
+</body>
+</html>
+HTML;
+    }
+
+    /**
+     * Render `plaintext` content: the admin typed raw text. We produce a bare,
+     * escaped HTML body (so opens still track and unsubscribe is present); the
+     * authoritative text/plain part is produced by renderPlainTextPart().
+     */
+    private static function renderPlaintextEmail(array $newsletter, string $tenantName, ?string $unsubscribeToken, ?array $recipient, ?string $trackingToken): string
+    {
+        $chrome = self::prepareEmailChrome($tenantName, $unsubscribeToken, $trackingToken);
+
+        $text = (string) ($newsletter['content'] ?? '');
+        if ($recipient) {
+            $text = self::personalizeContentRaw($text, $recipient);
+        }
+        $text = str_replace(
+            ['{{tenant_name}}', '{{unsubscribe_link}}', '{{unsubscribe_url}}'],
+            [$tenantName, $chrome['unsubscribeUrl'], $chrome['unsubscribeUrl']],
+            $text
+        );
+
+        $body = nl2br(htmlspecialchars($text, ENT_QUOTES, 'UTF-8'));
+        $previewText = $newsletter['preview_text'] ?? '';
+        $preheader = $previewText !== ''
+            ? '<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">' . htmlspecialchars($previewText, ENT_QUOTES, 'UTF-8') . '</div>'
+            : '';
+        $subscriberNotice = $chrome['subscriberNotice'];
+        $footerLinks = $chrome['footerLinks'];
+        $pixelHtml = $chrome['pixelHtml'];
+
+        return <<<HTML
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background-color:#ffffff;">
+    {$preheader}
+    <div style="max-width:600px;margin:0 auto;padding:24px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;font-size:16px;line-height:1.7;color:#374151;">
+        {$body}
+    </div>
+    <div style="text-align:center;padding:0 16px 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:12px;color:#9ca3af;line-height:1.6;">
+        <p style="margin:0 0 6px;">{$subscriberNotice}</p>
+        <p style="margin:0;">{$footerLinks}</p>
+    </div>
+    {$pixelHtml}
+</body>
+</html>
+HTML;
+    }
+
+    /**
+     * Produce the text/plain alternative part for a newsletter.
+     *
+     * For plaintext format the author's raw text is authoritative (tokens
+     * replaced, unsubscribe URL appended). For HTML-bearing formats we convert
+     * the FINAL rendered HTML so the text part carries the same content and the
+     * unsubscribe URL (deliverability + compliance).
+     */
+    public static function renderPlainTextPart(array $newsletter, string $tenantName, ?string $unsubscribeToken = null, ?array $recipient = null): string
+    {
+        $format = $newsletter['content_format'] ?? 'richtext';
+        $chrome = self::prepareEmailChrome($tenantName, $unsubscribeToken, null);
+
+        if ($format === 'plaintext') {
+            $text = (string) ($newsletter['content'] ?? '');
+            if ($recipient) {
+                $text = self::personalizeContentRaw($text, $recipient);
+            }
+            $text = str_replace(
+                ['{{tenant_name}}', '{{unsubscribe_link}}'],
+                [$tenantName, $chrome['unsubscribeUrl']],
+                $text
+            );
+
+            return rtrim($text) . "\n\n" . __('emails.newsletter.unsubscribe') . ': ' . $chrome['unsubscribeUrl'];
+        }
+
+        // HTML formats — convert the rendered HTML (no tracking token so links
+        // stay human-readable in the text part).
+        $html = match ($format) {
+            'html', 'builder' => self::renderFullHtmlEmail($newsletter, $tenantName, $unsubscribeToken, $recipient, null),
+            default => self::renderRichtextEmail($newsletter, $tenantName, $unsubscribeToken, $recipient, null),
+        };
+
+        try {
+            return \Soundasleep\Html2Text::convert($html, ['ignore_errors' => true, 'drop_links' => false]);
+        } catch (\Throwable $e) {
+            return trim(html_entity_decode(strip_tags($html), ENT_QUOTES, 'UTF-8'));
+        }
+    }
+
+    /**
      * Wrap content links with the public click-tracking endpoint.
      */
     private static function wrapTrackedLinks(string $content, string $apiUrl, string $trackingToken): string
@@ -796,6 +1004,23 @@ HTML;
             '{{last_name}}' => htmlspecialchars($recipient['last_name'] ?? '', ENT_QUOTES, 'UTF-8'),
             '{{name}}' => htmlspecialchars($recipient['name'] ?? '', ENT_QUOTES, 'UTF-8'),
             '{{email}}' => htmlspecialchars($recipient['email'] ?? '', ENT_QUOTES, 'UTF-8'),
+        ];
+
+        return str_replace(array_keys($replacements), array_values($replacements), $content);
+    }
+
+    /**
+     * Personalize plaintext content — same tokens as personalizeContent() but
+     * WITHOUT HTML-escaping, because the caller escapes the whole body afterward
+     * (renderPlaintextEmail) or emits raw text (renderPlainTextPart).
+     */
+    private static function personalizeContentRaw(string $content, array $recipient): string
+    {
+        $replacements = [
+            '{{first_name}}' => (string) ($recipient['first_name'] ?? ''),
+            '{{last_name}}' => (string) ($recipient['last_name'] ?? ''),
+            '{{name}}' => (string) ($recipient['name'] ?? ''),
+            '{{email}}' => (string) ($recipient['email'] ?? ''),
         ];
 
         return str_replace(array_keys($replacements), array_values($replacements), $content);
