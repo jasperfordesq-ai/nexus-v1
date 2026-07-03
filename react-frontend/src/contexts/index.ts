@@ -16,4 +16,6 @@ export { CookieConsentProvider, useCookieConsent, readStoredConsent } from './Co
 export type { CookieConsent } from './CookieConsentContext';
 export { MenuProvider, useMenuContext } from './MenuContext';
 export { PresenceProvider, usePresence, usePresenceOptional } from './PresenceContext';
+export { PodcastPlayerProvider, usePodcastPlayer, usePodcastPlayerOptional } from './PodcastPlayerContext';
+export type { PlayerTrack, PlayerStatus, PodcastPlayerContextValue } from './PodcastPlayerContext';
 export type { PresenceStatus, PresenceState } from './PresenceContext';

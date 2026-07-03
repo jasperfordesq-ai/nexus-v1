@@ -34,6 +34,7 @@ import { NotificationsProvider } from '@/contexts/NotificationsContext';
 import { PusherProvider } from '@/contexts/PusherContext';
 import { MenuProvider } from '@/contexts/MenuContext';
 import { PresenceProvider } from '@/contexts/PresenceContext';
+import { PodcastPlayerProvider } from '@/contexts/PodcastPlayerContext';
 import { detectTenantFromUrl } from '@/lib/tenant-routing';
 import { CookieConsentBanner } from '@/components/feedback/CookieConsentBanner';
 import { IdleLogoutGuard } from '@/components/security/IdleLogoutGuard';
@@ -102,9 +103,11 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
           <PusherProvider>
             <PresenceProvider>
               <MenuProvider>
-                <TenantGuard slugPrefix={effectiveSlug} appRoutes={appRoutes}>
-                  <Outlet />
-                </TenantGuard>
+                <PodcastPlayerProvider>
+                  <TenantGuard slugPrefix={effectiveSlug} appRoutes={appRoutes}>
+                    <Outlet />
+                  </TenantGuard>
+                </PodcastPlayerProvider>
                 <IdleLogoutGuard />
                 <CookieConsentBanner />
               </MenuProvider>
