@@ -31,8 +31,11 @@ return new class extends Migration
 
             Schema::table($tableName, function (Blueprint $table) use ($tableName) {
                 if (!Schema::hasColumn($tableName, 'content_format')) {
-                    $table->enum('content_format', ['plaintext', 'richtext', 'html', 'builder'])
-                        ->default('richtext')
+                    // The default value MUST stay on the same source line as the enum
+                    // column definition below: the blue-green migration-safety linter
+                    // (check-migration-safety.sh) scans line-by-line, so a default on a
+                    // following line reads as a non-nullable add with no default value.
+                    $table->enum('content_format', ['plaintext', 'richtext', 'html', 'builder'])->default('richtext')
                         ->after('content');
                 }
                 if (!Schema::hasColumn($tableName, 'design_json')) {
