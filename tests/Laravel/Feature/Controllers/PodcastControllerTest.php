@@ -113,6 +113,21 @@ class PodcastControllerTest extends TestCase
         return $user;
     }
 
+    /** Minimal valid PCM WAV (8kHz mono 16-bit). getID3 reports it as ~2s of genuine audio. */
+    private static function tinyWavBytes(int $seconds = 2): string
+    {
+        $rate = 8000;
+        $samples = $rate * $seconds;
+        $data = '';
+        for ($i = 0; $i < $samples; $i++) {
+            $data .= pack('v', (($i >> 4) % 2) ? 8000 : 57536);
+        }
+
+        return 'RIFF' . pack('V', 36 + strlen($data)) . 'WAVE'
+            . 'fmt ' . pack('V', 16) . pack('v', 1) . pack('v', 1) . pack('V', $rate) . pack('V', $rate * 2) . pack('v', 2) . pack('v', 16)
+            . 'data' . pack('V', strlen($data)) . $data;
+    }
+
     public function test_browse_returns_403_when_feature_disabled(): void
     {
         $this->enablePodcasts(false);
@@ -1111,9 +1126,10 @@ class PodcastControllerTest extends TestCase
         ]);
         $showId = $show->json('data.id');
 
+        // Real (tiny WAV) audio so getID3 content analysis recognises it.
         $episode = $this->post("/api/v2/podcasts/{$showId}/episodes", [
             'title' => 'Unscanned Audio',
-            'audio' => UploadedFile::fake()->create('unscanned.mp3', 2, 'audio/mpeg'),
+            'audio' => UploadedFile::fake()->createWithContent('unscanned.wav', self::tinyWavBytes()),
         ], $this->withTenantHeader());
         $episode->assertStatus(201);
         $episodeId = $episode->json('data.id');
@@ -1121,8 +1137,12 @@ class PodcastControllerTest extends TestCase
 
         (new ProcessPodcastEpisodeMedia($this->testTenantId, $episodeId))->handle();
 
+        // Without a configured scanner, media is never labelled clean —
+        // but genuine audio still completes processing with detected duration.
         $this->assertSame('scan_unavailable', DB::table('podcast_episodes')->where('id', $episodeId)->value('media_scan_status'));
-        $this->assertSame('ready_for_processing', DB::table('podcast_episodes')->where('id', $episodeId)->value('media_processing_status'));
+        $this->assertSame('complete', DB::table('podcast_episodes')->where('id', $episodeId)->value('media_processing_status'));
+        $this->assertSame(2, (int) DB::table('podcast_episodes')->where('id', $episodeId)->value('duration_seconds'));
+        $this->assertSame('detected', DB::table('podcast_episodes')->where('id', $episodeId)->value('media_duration_source'));
     }
 
     public function test_media_processing_job_restores_missing_tenant_context(): void
@@ -1599,5 +1619,34 @@ class PodcastControllerTest extends TestCase
         $this->apiPut('/v2/admin/config/podcasts/bulk', [
             'settings' => ['podcasts.cloud_cdn_base_url' => ''],
         ])->assertStatus(200);
+    }
+
+    public function test_infected_media_is_never_served(): void
+    {
+        Storage::fake('local');
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Quarantine Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+
+        $episode = $this->post("/api/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Quarantined Audio',
+            'audio' => UploadedFile::fake()->createWithContent('quarantine.wav', self::tinyWavBytes()),
+        ], $this->withTenantHeader());
+        $episode->assertStatus(201);
+        $episodeId = $episode->json('data.id');
+
+        // Media is streamable before quarantine…
+        $this->get("/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio", $this->withTenantHeader())
+            ->assertStatus(200);
+
+        // …and refused outright once flagged infected, even though the file exists.
+        DB::table('podcast_episodes')->where('id', $episodeId)->update(['media_scan_status' => 'infected']);
+
+        $this->get("/api/v2/podcasts/media/{$this->testTenantId}/{$episodeId}/audio", $this->withTenantHeader())
+            ->assertStatus(404);
     }
 }

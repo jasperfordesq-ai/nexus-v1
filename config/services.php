@@ -105,4 +105,11 @@ return [
         'dashboard_url' => env('ADMIN_DASHBOARD_URL', 'https://app.project-nexus.ie'),
     ],
 
+    'clamav' => [
+        // Optional clamd daemon for scanning uploaded podcast audio
+        // (e.g. tcp://127.0.0.1:3310). Empty = scanning reported as
+        // unavailable; uploads are never blocked by a missing scanner.
+        'address' => env('CLAMAV_ADDRESS', ''),
+    ],
+
 ];

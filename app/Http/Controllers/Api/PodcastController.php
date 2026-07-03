@@ -426,6 +426,12 @@ class PodcastController extends BaseApiController
         }
         $episode->setRelation('show', $show);
 
+        // Quarantined media is never servable — belt-and-braces alongside the
+        // object deletion performed by ProcessPodcastEpisodeMedia.
+        if ($episode->media_scan_status === 'infected') {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
+        }
+
         $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
         $isAdmin = $this->callerIsAdmin();
         $canView = PodcastService::canViewEpisode($episode, $show, $userId, $isAdmin)
