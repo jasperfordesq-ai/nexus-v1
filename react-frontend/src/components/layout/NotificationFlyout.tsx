@@ -195,7 +195,7 @@ export function NotificationFlyout() {
                 key={notification.id}
                 variant="light"
                 onPress={() => handleNotificationClick(notification)}
-                className={`w-full flex items-start gap-3 px-4 py-3 text-start transition-colors hover:bg-theme-hover min-h-9 justify-start rounded-none ${
+                className={`w-full flex items-start gap-3 px-4 py-3 text-start transition-colors hover:bg-theme-hover h-auto min-h-14 justify-start rounded-none ${
                   isUnread ? 'bg-indigo-50/50 dark:bg-indigo-500/5' : ''
                 }`}
               >
@@ -223,10 +223,10 @@ export function NotificationFlyout() {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm leading-snug whitespace-normal break-words ${isUnread ? 'font-medium text-theme-primary' : 'text-theme-secondary'}`}>
+                  <p className={`text-sm leading-snug whitespace-normal break-words line-clamp-2 ${isUnread ? 'font-medium text-theme-primary' : 'text-theme-secondary'}`}>
                     {getNotificationDisplayText(notification)}
                   </p>
-                  <div className="flex items-center gap-2 mt-0.5">
+                  <div className="flex items-center gap-2 mt-1">
                     <p className="text-xs text-theme-subtle">
                       {formatRelativeTime(notification.latest_at || notification.created_at)}
                     </p>
