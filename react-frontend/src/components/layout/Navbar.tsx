@@ -73,7 +73,7 @@ import { useAuth,
   useTheme,
   useMenuContext } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { hasAdminPanelAccess, hasBrokerPanelAccess } from '@/lib/access';
+import { hasAdminPanelAccess, hasBrokerPanelAccess, isPlatformSuperAdminUser } from '@/lib/access';
 import { buildAccessibleFrontendUrl } from '@/lib/accessible-frontend';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { DesktopMenuItems } from '@/components/navigation';
@@ -506,10 +506,26 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   );
   const tenantSwitcherItems = tenant?.tenant_switcher?.items ?? [];
   const hasTenantSwitcherItems = tenantSwitcherItems.length > 0;
-  const handleTenantSwitch = useCallback((url: string) => {
+  const handleTenantSwitch = useCallback(async (url: string) => {
     closeAllDropdowns();
+    // Switching to a different community must start a clean session. The access
+    // token is scoped to the current tenant, and the API rejects it with 403
+    // `tenant_mismatch` against any other community (see Authenticate.php), so a
+    // logged-in member who switches would otherwise land in a broken,
+    // half-authenticated state — errors on every tenant-scoped request. Sign out
+    // first so the destination boots logged-out and the user re-authenticates
+    // against the new community. Platform super admins can legitimately cross
+    // tenants with their token, so they keep their session.
+    if (isAuthenticated && !isPlatformSuperAdminUser(user)) {
+      try {
+        await logout();
+      } catch {
+        // logout() already clears local tokens in its own finally path; never
+        // let a failed sign-out block the community switch.
+      }
+    }
     window.open(url, '_self');
-  }, [closeAllDropdowns]);
+  }, [closeAllDropdowns, isAuthenticated, user, logout]);
 
   return (
     <>
@@ -547,7 +563,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                         base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl max-h-[70vh] overflow-y-auto',
                       }}
                       onAction={(key) => {
-                        handleTenantSwitch(String(key));
+                        void handleTenantSwitch(String(key));
                       }}
                     >
                       {tenantSwitcherItems.map((item) => (

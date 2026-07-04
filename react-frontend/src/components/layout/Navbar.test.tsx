@@ -448,6 +448,76 @@ describe('Navbar', () => {
       openSpy.mockRestore();
     });
 
+    it('signs a logged-in member out before switching communities', async () => {
+      const user = userEvent.setup();
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+      const logoutSpy = vi.fn().mockResolvedValue(undefined);
+      setupDefaultMocks({
+        auth: {
+          user: { id: 3, first_name: 'Reg', last_name: 'Member', email: 'reg@example.com', role: 'member' },
+          isAuthenticated: true,
+          logout: logoutSpy,
+        },
+        tenant: {
+          tenant: {
+            id: 990101,
+            name: 'UK Timebank Global',
+            slug: 'uk-timebank-global-test',
+            tenant_switcher: {
+              source: 'children',
+              items: [
+                { id: 990102, name: 'Cardiff Timebank', slug: 'cardiff-timebank-test', url: 'https://uk.timebank.global/cardiff-timebank-test' },
+              ],
+            },
+          },
+        },
+      });
+
+      render(<Navbar />);
+
+      await user.click(screen.getByRole('button', { name: 'Switch community' }));
+      await user.click(await screen.findByText('Cardiff Timebank'));
+
+      await waitFor(() => expect(logoutSpy).toHaveBeenCalledTimes(1));
+      expect(openSpy).toHaveBeenCalledWith('https://uk.timebank.global/cardiff-timebank-test', '_self');
+      openSpy.mockRestore();
+    });
+
+    it('keeps a platform super admin signed in when switching communities', async () => {
+      const user = userEvent.setup();
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+      const logoutSpy = vi.fn().mockResolvedValue(undefined);
+      setupDefaultMocks({
+        auth: {
+          user: { id: 1, first_name: 'Plat', last_name: 'Admin', email: 'god@example.com', role: 'member', is_super_admin: true },
+          isAuthenticated: true,
+          logout: logoutSpy,
+        },
+        tenant: {
+          tenant: {
+            id: 990101,
+            name: 'UK Timebank Global',
+            slug: 'uk-timebank-global-test',
+            tenant_switcher: {
+              source: 'children',
+              items: [
+                { id: 990102, name: 'Cardiff Timebank', slug: 'cardiff-timebank-test', url: 'https://uk.timebank.global/cardiff-timebank-test' },
+              ],
+            },
+          },
+        },
+      });
+
+      render(<Navbar />);
+
+      await user.click(screen.getByRole('button', { name: 'Switch community' }));
+      await user.click(await screen.findByText('Cardiff Timebank'));
+
+      await waitFor(() => expect(openSpy).toHaveBeenCalledWith('https://uk.timebank.global/cardiff-timebank-test', '_self'));
+      expect(logoutSpy).not.toHaveBeenCalled();
+      openSpy.mockRestore();
+    });
+
     it('renders compact controls with transparent styling', () => {
       setupDefaultMocks({
         auth: {

@@ -56,6 +56,28 @@ export function isSuperAdminUser(user: UserLike): boolean {
 }
 
 /**
+ * Platform super admin — the only role permitted to cross tenants with a
+ * single access token. This MUST mirror the server-side cross-tenant rule in
+ * `app/Http/Middleware/Authenticate.php` (both the Sanctum and legacy-JWT
+ * branches): a token whose user's `tenant_id` differs from the resolved
+ * tenant is rejected with 403 `tenant_mismatch` UNLESS the user is
+ * `is_super_admin`, `is_god`, or has role `super_admin`/`god`.
+ *
+ * Deliberately EXCLUDES `is_tenant_super_admin` — a tenant super-admin is
+ * scoped to their own tenant and hits the same 403 on any other community,
+ * so they must be treated like any other user when switching communities.
+ */
+export function isPlatformSuperAdminUser(user: UserLike): boolean {
+  const role = userRole(user);
+  return (
+    role === 'super_admin' ||
+    role === 'god' ||
+    user?.is_super_admin === true ||
+    user?.is_god === true
+  );
+}
+
+/**
  * Partner Timebanks panel — any admin can open the panel (overview,
  * partnerships, directory, activity), like the broker panel entry.
  * The sensitive setup surfaces INSIDE the panel (external protocols,
