@@ -93,7 +93,13 @@ vi.mock('../../components', () => ({
       {actions}
     </div>
   ),
-  StatCard: ({ label, value }: { label: string; value: string }) => (
+}));
+
+// NewsletterStats imports StatCard from the direct path ('../../components/StatCard'),
+// not the barrel above — so the StatCard stub must be registered against that exact
+// specifier or vi.mock never intercepts it and the real (testid-less) StatCard renders.
+vi.mock('../../components/StatCard', () => ({
+  StatCard: ({ label, value }: { label?: string; title?: string; value: string | number }) => (
     <div data-testid="stat-card">
       <span>{label}</span>
       <span>{value}</span>
