@@ -173,4 +173,99 @@ class AdminReportsControllerTest extends TestCase
 
         $response->assertStatus(401);
     }
+
+    // ================================================================
+    // TARGET ENRICHMENT — index()/show() resolve target metadata
+    // ================================================================
+
+    public function test_index_enriches_user_target_with_name(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $reporter = User::factory()->forTenant($this->testTenantId)->create();
+        $reported = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        DB::table('reports')->insert([
+            'tenant_id' => $this->testTenantId,
+            'reporter_id' => $reporter->id,
+            'target_type' => 'user',
+            'target_id' => $reported->id,
+            'reason' => 'Harassment',
+            'status' => 'open',
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiGet('/v2/admin/reports');
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            'content_type' => 'user',
+            'target_id' => (int) $reported->id,
+            'target_label' => $reported->name,
+            'target_author_id' => (int) $reported->id,
+            'target_exists' => true,
+        ]);
+    }
+
+    public function test_show_enriches_listing_target_with_title_and_author(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $reporter = User::factory()->forTenant($this->testTenantId)->create();
+        $author = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        $listingId = DB::table('listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $author->id,
+            'title' => 'Handmade bookshelf',
+            'type' => 'offer',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $reportId = DB::table('reports')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'reporter_id' => $reporter->id,
+            'target_type' => 'listing',
+            'target_id' => $listingId,
+            'reason' => 'Prohibited item',
+            'status' => 'open',
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiGet("/v2/admin/reports/{$reportId}");
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.content_type', 'listing');
+        $response->assertJsonPath('data.target_label', 'Handmade bookshelf');
+        $response->assertJsonPath('data.target_author_name', $author->name);
+        $response->assertJsonPath('data.target_exists', true);
+    }
+
+    public function test_index_marks_deleted_target_as_not_existing(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $reporter = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        DB::table('reports')->insert([
+            'tenant_id' => $this->testTenantId,
+            'reporter_id' => $reporter->id,
+            'target_type' => 'post',
+            'target_id' => 987654, // no such feed_post
+            'reason' => 'Spam',
+            'status' => 'open',
+            'created_at' => now(),
+        ]);
+
+        $response = $this->apiGet('/v2/admin/reports');
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            'content_type' => 'post',
+            'target_id' => 987654,
+            'target_exists' => false,
+            'target_label' => null,
+        ]);
+    }
 }

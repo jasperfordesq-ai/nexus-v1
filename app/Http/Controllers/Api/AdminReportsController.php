@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\ActivityLog;
 use App\Models\Notification;
+use App\Services\ReportTargetResolver;
 
 /**
  * AdminReportsController -- Admin user and content report handling.
@@ -102,7 +103,7 @@ class AdminReportsController extends BaseApiController
             $params[] = $effectiveTenantId;
         }
 
-        if ($type && in_array($type, ['listing', 'user', 'message', 'post', 'feed_post'], true)) {
+        if ($type && in_array($type, ['listing', 'user', 'message', 'post', 'feed_post', 'comment', 'review', 'event'], true)) {
             $conditions[] = 'r.target_type = ?';
             $params[] = $type;
         }
@@ -142,23 +143,8 @@ class AdminReportsController extends BaseApiController
             array_merge($params, [$limit, $offset])
         );
 
-        $formatted = array_map(function ($report) {
-            return [
-                'id' => (int) $report->id,
-                'tenant_id' => (int) $report->tenant_id,
-                'tenant_name' => $report->tenant_name ?? 'Unknown',
-                'reporter_id' => (int) $report->reporter_id,
-                'reporter_name' => $report->reporter_name ?? 'Unknown',
-                'reporter_avatar' => $report->reporter_avatar,
-                'content_type' => $report->target_type,
-                'target_id' => (int) $report->target_id,
-                'reason' => $report->reason,
-                'description' => $report->reason,
-                'status' => $report->status,
-                'created_at' => $report->created_at,
-                'updated_at' => $report->updated_at ?? $report->created_at,
-            ];
-        }, $reports);
+        $targets = ReportTargetResolver::resolveMany($reports);
+        $formatted = array_map(fn ($report) => $this->formatReport($report, $targets), $reports);
 
         return $this->respondWithPaginatedCollection($formatted, $total, $page, $limit);
     }
@@ -196,7 +182,23 @@ class AdminReportsController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api.report_not_found'), null, 404);
         }
 
-        return $this->respondWithData([
+        $targets = ReportTargetResolver::resolveMany([$report]);
+
+        return $this->respondWithData($this->formatReport($report, $targets));
+    }
+
+    /**
+     * Shape a report row for the API, merging resolved target metadata.
+     *
+     * @param array<string,array<string,mixed>> $targets Keyed "{target_type}:{target_id}"
+     * @return array<string,mixed>
+     */
+    private function formatReport(object $report, array $targets): array
+    {
+        $key = "{$report->target_type}:" . (int) $report->target_id;
+        $target = $targets[$key] ?? [];
+
+        return [
             'id' => (int) $report->id,
             'tenant_id' => (int) $report->tenant_id,
             'tenant_name' => $report->tenant_name ?? 'Unknown',
@@ -205,12 +207,17 @@ class AdminReportsController extends BaseApiController
             'reporter_avatar' => $report->reporter_avatar,
             'content_type' => $report->target_type,
             'target_id' => (int) $report->target_id,
+            'target_label' => $target['target_label'] ?? null,
+            'target_preview' => $target['target_preview'] ?? null,
+            'target_avatar' => $target['target_avatar'] ?? null,
+            'target_author_id' => $target['target_author_id'] ?? null,
+            'target_author_name' => $target['target_author_name'] ?? null,
+            'target_exists' => $target['target_exists'] ?? true,
             'reason' => $report->reason,
-            'description' => $report->reason,
             'status' => $report->status,
             'created_at' => $report->created_at,
             'updated_at' => $report->updated_at ?? $report->created_at,
-        ]);
+        ];
     }
 
     /**

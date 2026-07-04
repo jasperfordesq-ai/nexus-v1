@@ -166,11 +166,17 @@ const makeReport = (overrides = {}) => ({
   reporter_name: 'Jane Reporter',
   reporter_avatar: null,
   content_type: 'post' as const,
-  content_id: 55,
+  target_id: 55,
+  target_label: null,
+  target_preview: 'This post is spam',
+  target_avatar: null,
+  target_author_id: 20,
+  target_author_name: 'Bob Author',
+  target_exists: true,
   reason: 'Spam',
-  description: 'This post is spam',
   status: 'pending' as const,
   created_at: '2025-06-01T12:00:00Z',
+  updated_at: '2025-06-01T12:00:00Z',
   resolved_at: null,
   resolved_by: null,
   ...overrides,
@@ -373,6 +379,37 @@ describe('ReportsManagement', () => {
       b.textContent?.toLowerCase().includes('dismiss'),
     );
     expect(dismissBtn).toBeDefined();
+  });
+
+  it('renders the reported target preview and a View details action', async () => {
+    mockUseApi.mockImplementation((endpoint: string) => {
+      if (endpoint?.includes('stats')) {
+        return {
+          data: makeStats(), isLoading: false, error: null,
+          execute: vi.fn(), refetch: vi.fn(), reset: vi.fn(), setData: vi.fn(),
+          loading: false, meta: null,
+        };
+      }
+      return {
+        data: [makeReport()], isLoading: false, error: null,
+        execute: vi.fn(), refetch: vi.fn(), reset: vi.fn(), setData: vi.fn(),
+        loading: false, meta: { total_pages: 1, total: 1 },
+      };
+    });
+
+    const { default: ReportsManagement } = await import('./ReportsManagement');
+    render(<ReportsManagement />);
+
+    await waitFor(() => {
+      // The resolved target preview appears in the new "Reported" column
+      expect(screen.getByText('This post is spam')).toBeInTheDocument();
+    });
+
+    // A View details affordance opens the detail drawer
+    const viewBtn = screen.queryAllByRole('button').find((b) =>
+      b.textContent?.toLowerCase().includes('view'),
+    );
+    expect(viewBtn).toBeDefined();
   });
 
   it('opens confirm modal when Resolve is clicked', async () => {

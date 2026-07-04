@@ -1,4 +1,4 @@
-import { Button, Input, Chip, Spinner, Card, CardBody, Select, SelectItem, Avatar, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from '@/components/ui';
+import { Button, Input, Chip, Spinner, Card, CardBody, Select, SelectItem, Avatar, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,17 +6,20 @@ import { Button, Input, Chip, Spinner, Card, CardBody, Select, SelectItem, Avata
 
 import React, { useState, useEffect } from 'react';
 
+import { Link, useLocation } from 'react-router-dom';
 import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import XCircle from 'lucide-react/icons/circle-x';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import Flag from 'lucide-react/icons/flag';
+import Eye from 'lucide-react/icons/eye';
 import { useTranslation } from 'react-i18next';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts';
 import { useToast } from '@/contexts/ToastContext';
 import PageHeader from '@/admin/components/PageHeader';
 import ConfirmModal from '@/admin/components/ConfirmModal';
@@ -50,6 +53,10 @@ export default function ReportsManagement() {
 
   const toast = useToast();
   const { user } = useAuth();
+  const { tenantPath } = useTenant();
+  const location = useLocation();
+  // Keep navigation inside whichever panel we're rendered in (broker vs admin).
+  const panelBase = location.pathname.includes('/broker/') ? '/broker' : '/admin';
   const userRecord = user as Record<string, unknown> | null;
   const isSuperAdmin =
     (user?.role as string) === 'super_admin' ||
@@ -66,6 +73,7 @@ export default function ReportsManagement() {
   const [activeStatus, setActiveStatus] = useState('');
   const [activeTenant, setActiveTenant] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  const [detailReport, setDetailReport] = useState<AdminReport | null>(null);
   const [confirmAction, setConfirmAction] = useState<{
     type: 'resolve' | 'dismiss';
     report: AdminReport;
@@ -145,6 +153,7 @@ export default function ReportsManagement() {
             : t('moderation.report_dismissed_successfully')
         );
         setConfirmAction(null);
+        setDetailReport(null);
         execute();
         refetchStats();
       } else {
@@ -159,6 +168,69 @@ export default function ReportsManagement() {
 
   const reports = data || [];
   const totalPages = meta?.total_pages || 1;
+
+  // Known content types get a translated label; unknown enum values fall back
+  // to the raw type string.
+  const CONTENT_TYPE_LABELS: Record<string, string> = {
+    post: t('moderation.content_type_post'),
+    comment: t('moderation.content_type_comment'),
+    review: t('moderation.content_type_review'),
+    user: t('moderation.content_type_user'),
+    listing: t('moderation.content_type_listing'),
+    event: t('moderation.content_type_event'),
+  };
+  const typeLabel = (type: string) => CONTENT_TYPE_LABELS[type] ?? type;
+
+  // Compact "Reported" cell: the member or piece of content a report targets.
+  const renderTargetSummary = (report: AdminReport) => {
+    if (report.target_exists === false) {
+      return (
+        <div className="flex flex-col">
+          <span className="text-sm italic text-muted">{t('moderation.target_removed')}</span>
+          <span className="text-xs text-muted">
+            {typeLabel(report.content_type)} · {t('moderation.member_id', { id: report.target_id })}
+          </span>
+        </div>
+      );
+    }
+
+    if (report.content_type === 'user') {
+      return (
+        <div className="flex items-center gap-3">
+          <Avatar
+            src={report.target_avatar || undefined}
+            name={report.target_label || undefined}
+            size="sm"
+            className="flex-shrink-0"
+          />
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">
+              {report.target_label || t('moderation.content_type_user')}
+            </span>
+            <span className="text-xs text-muted">
+              {t('moderation.member_id', { id: report.target_id })}
+            </span>
+          </div>
+        </div>
+      );
+    }
+
+    const primary = report.target_preview || report.target_label;
+    return (
+      <div className="flex max-w-xs flex-col gap-0.5">
+        {primary ? (
+          <span className="text-sm text-foreground line-clamp-2">{primary}</span>
+        ) : (
+          <span className="text-sm text-muted">{typeLabel(report.content_type)} #{report.target_id}</span>
+        )}
+        {report.target_author_name && (
+          <span className="text-xs text-muted">
+            {t('moderation.target_by', { name: report.target_author_name })}
+          </span>
+        )}
+      </div>
+    );
+  };
 
   // Build cell content for a report row
   const renderCells = (report: AdminReport): React.ReactElement<React.ComponentProps<typeof TableCell>>[] => {
@@ -194,14 +266,14 @@ export default function ReportsManagement() {
     cells.push(
       <TableCell key="contentType">
         <Chip size="sm" variant="soft">
-          {report.content_type}
+          {typeLabel(report.content_type)}
         </Chip>
+      </TableCell>,
+      <TableCell key="target">
+        {renderTargetSummary(report)}
       </TableCell>,
       <TableCell key="reason">
         <span className="text-sm font-medium text-foreground">{report.reason}</span>
-      </TableCell>,
-      <TableCell key="description">
-        <p className="max-w-md text-sm text-muted line-clamp-2">{report.description}</p>
       </TableCell>,
       <TableCell key="status">
         {(report.status === 'open' || report.status === 'pending') && (
@@ -220,33 +292,38 @@ export default function ReportsManagement() {
         </span>
       </TableCell>,
       <TableCell key="actions">
-        {(report.status === 'open' || report.status === 'pending') && (
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="tertiary"
-              color="success"
-              startContent={<CheckCircle2 aria-hidden="true" className="w-4 h-4" />}
-              onPress={() => setConfirmAction({ type: 'resolve', report })}
-            >
-              {t('moderation.resolve')}
-            </Button>
-            <Button
-              size="sm"
-              variant="tertiary"
-              color="default"
-              startContent={<XCircle aria-hidden="true" className="w-4 h-4" />}
-              onPress={() => setConfirmAction({ type: 'dismiss', report })}
-            >
-              {t('moderation.dismiss')}
-            </Button>
-          </div>
-        )}
-        {report.status !== 'open' && report.status !== 'pending' && (
-          <div className="text-sm text-muted">
-            {report.resolved_by && t('moderation.resolved_by')}
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="tertiary"
+            startContent={<Eye aria-hidden="true" className="w-4 h-4" />}
+            onPress={() => setDetailReport(report)}
+          >
+            {t('moderation.view_details')}
+          </Button>
+          {(report.status === 'open' || report.status === 'pending') && (
+            <>
+              <Button
+                size="sm"
+                variant="tertiary"
+                color="success"
+                startContent={<CheckCircle2 aria-hidden="true" className="w-4 h-4" />}
+                onPress={() => setConfirmAction({ type: 'resolve', report })}
+              >
+                {t('moderation.resolve')}
+              </Button>
+              <Button
+                size="sm"
+                variant="tertiary"
+                color="default"
+                startContent={<XCircle aria-hidden="true" className="w-4 h-4" />}
+                onPress={() => setConfirmAction({ type: 'dismiss', report })}
+              >
+                {t('moderation.dismiss')}
+              </Button>
+            </>
+          )}
+        </div>
       </TableCell>
     );
 
@@ -259,8 +336,8 @@ export default function ReportsManagement() {
       t('moderation.col_reporter'),
       t('moderation.col_tenant'),
       t('moderation.col_content_type'),
+      t('moderation.col_target'),
       t('moderation.col_reason'),
-      t('moderation.col_description'),
       t('moderation.col_status'),
       t('moderation.col_created'),
       t('moderation.col_actions'),
@@ -268,8 +345,8 @@ export default function ReportsManagement() {
     : [
       t('moderation.col_reporter'),
       t('moderation.col_content_type'),
+      t('moderation.col_target'),
       t('moderation.col_reason'),
-      t('moderation.col_description'),
       t('moderation.col_status'),
       t('moderation.col_created'),
       t('moderation.col_actions'),
@@ -479,6 +556,163 @@ export default function ReportsManagement() {
         confirmColor={confirmAction?.type === 'resolve' ? 'primary' : 'warning'}
         isLoading={actionLoading}
       />
+
+      {/* Report detail drawer */}
+      <Drawer
+        isOpen={!!detailReport}
+        onOpenChange={(open) => { if (!open) setDetailReport(null); }}
+        size="md"
+      >
+        <DrawerContent aria-label={t('moderation.report_details')}>
+          {detailReport && (
+            <>
+              <DrawerHeader className="flex items-center gap-3">
+                <span>{t('moderation.report_details')}</span>
+                {(detailReport.status === 'open' || detailReport.status === 'pending') && (
+                  <Chip size="sm" color="warning" variant="soft">{t('moderation.status_pending')}</Chip>
+                )}
+                {detailReport.status === 'resolved' && (
+                  <Chip size="sm" color="success" variant="soft">{t('moderation.status_resolved')}</Chip>
+                )}
+                {detailReport.status === 'dismissed' && (
+                  <Chip size="sm" color="default" variant="soft">{t('moderation.status_dismissed')}</Chip>
+                )}
+              </DrawerHeader>
+
+              <DrawerBody className="space-y-6">
+                {/* Reported by */}
+                <section className="space-y-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
+                    {t('moderation.drawer_reported_by')}
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <Avatar
+                      src={detailReport.reporter_avatar || undefined}
+                      name={detailReport.reporter_name}
+                      size="sm"
+                      className="flex-shrink-0"
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">{detailReport.reporter_name}</span>
+                      <span className="text-xs text-muted">
+                        {t('moderation.member_id', { id: detailReport.reporter_id })}
+                      </span>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Reported item / member */}
+                <section className="space-y-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
+                    {t('moderation.drawer_reported_item')}
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <Chip size="sm" variant="soft">{typeLabel(detailReport.content_type)}</Chip>
+                    <span className="text-xs text-muted">
+                      {t('moderation.member_id', { id: detailReport.target_id })}
+                    </span>
+                  </div>
+
+                  {detailReport.target_exists === false ? (
+                    <p className="text-sm italic text-muted">{t('moderation.target_removed')}</p>
+                  ) : detailReport.content_type === 'user' ? (
+                    <div className="flex items-center gap-3">
+                      <Avatar
+                        src={detailReport.target_avatar || undefined}
+                        name={detailReport.target_label || undefined}
+                        size="sm"
+                        className="flex-shrink-0"
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">
+                          {detailReport.target_label || t('moderation.content_type_user')}
+                        </span>
+                        <Link
+                          to={tenantPath(`${panelBase}/members?search=${encodeURIComponent(detailReport.target_label || '')}`)}
+                          className="text-xs text-accent hover:underline"
+                        >
+                          {t('moderation.view_member')}
+                        </Link>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {(detailReport.target_preview || detailReport.target_label) && (
+                        <p className="whitespace-pre-line rounded-lg bg-surface-secondary p-3 text-sm text-foreground">
+                          {detailReport.target_preview || detailReport.target_label}
+                        </p>
+                      )}
+                      {detailReport.target_author_name && (
+                        <div className="flex items-center gap-3">
+                          <Avatar
+                            src={detailReport.target_avatar || undefined}
+                            name={detailReport.target_author_name}
+                            size="sm"
+                            className="flex-shrink-0"
+                          />
+                          <div className="flex flex-col">
+                            <span className="text-xs text-muted">{t('moderation.drawer_author')}</span>
+                            <span className="text-sm font-medium">{detailReport.target_author_name}</span>
+                          </div>
+                          {detailReport.target_author_id && (
+                            <Link
+                              to={tenantPath(`${panelBase}/members?search=${encodeURIComponent(detailReport.target_author_name)}`)}
+                              className="ml-auto text-xs text-accent hover:underline"
+                            >
+                              {t('moderation.view_member')}
+                            </Link>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </section>
+
+                {/* Reason */}
+                <section className="space-y-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
+                    {t('moderation.drawer_reason')}
+                  </h3>
+                  <p className="whitespace-pre-line text-sm text-foreground">{detailReport.reason}</p>
+                </section>
+
+                {/* Meta */}
+                <section className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="flex flex-col">
+                    <span className="text-xs text-muted">{t('moderation.col_created')}</span>
+                    <span>{new Date(detailReport.created_at).toLocaleString()}</span>
+                  </div>
+                  {detailReport.updated_at && (
+                    <div className="flex flex-col">
+                      <span className="text-xs text-muted">{t('moderation.label_updated')}</span>
+                      <span>{new Date(detailReport.updated_at).toLocaleString()}</span>
+                    </div>
+                  )}
+                </section>
+              </DrawerBody>
+
+              {(detailReport.status === 'open' || detailReport.status === 'pending') && (
+                <DrawerFooter className="flex items-center gap-2">
+                  <Button
+                    color="success"
+                    startContent={<CheckCircle2 aria-hidden="true" className="w-4 h-4" />}
+                    onPress={() => setConfirmAction({ type: 'resolve', report: detailReport })}
+                  >
+                    {t('moderation.resolve')}
+                  </Button>
+                  <Button
+                    variant="tertiary"
+                    startContent={<XCircle aria-hidden="true" className="w-4 h-4" />}
+                    onPress={() => setConfirmAction({ type: 'dismiss', report: detailReport })}
+                  >
+                    {t('moderation.dismiss')}
+                  </Button>
+                </DrawerFooter>
+              )}
+            </>
+          )}
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 }

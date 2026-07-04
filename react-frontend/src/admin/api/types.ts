@@ -2075,6 +2075,24 @@ export interface AdminReview {
   created_at: string;
 }
 
+export type AdminReportTargetType =
+  | 'listing'
+  | 'user'
+  | 'message'
+  | 'post'
+  | 'comment'
+  | 'story'
+  | 'event'
+  | 'poll'
+  | 'goal'
+  | 'review'
+  | 'resource'
+  | 'volunteer'
+  | 'challenge'
+  | 'job'
+  | 'blog'
+  | 'discussion';
+
 export interface AdminReport {
   id: number;
   reporter_id: number;
@@ -2082,13 +2100,25 @@ export interface AdminReport {
   tenant_name: string;
   reporter_name: string;
   reporter_avatar?: string | null;
-  content_type: 'listing' | 'event' | 'post' | 'comment' | 'review' | 'user';
-  content_id: number;
-  content_preview?: string;
+  /** The type of thing that was reported (reports.target_type). */
+  content_type: AdminReportTargetType;
+  /** The id of the reported item within content_type (reports.target_id). */
+  target_id: number;
+  /** Human-readable name/title of the target (member name, listing/event title). */
+  target_label?: string | null;
+  /** Short content excerpt for post/comment/review targets. */
+  target_preview?: string | null;
+  /** Avatar of the target member, or the content author for content targets. */
+  target_avatar?: string | null;
+  /** Author of the reported content (or the reported member for user targets). */
+  target_author_id?: number | null;
+  target_author_name?: string | null;
+  /** False when the reported row no longer exists (deleted content). */
+  target_exists?: boolean;
   reason: string;
-  description?: string;
   status: 'open' | 'pending' | 'resolved' | 'dismissed';
   created_at: string;
+  updated_at?: string;
   resolved_at?: string | null;
   resolved_by?: string | null;
 }
