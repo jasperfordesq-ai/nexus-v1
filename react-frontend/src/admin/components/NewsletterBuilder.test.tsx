@@ -16,9 +16,11 @@ const { editorMock, initMock } = vi.hoisted(() => {
     off: vi.fn(),
     destroy: vi.fn(),
     loadProjectData: vi.fn(),
+    setComponents: vi.fn(),
     getProjectData: vi.fn(() => ({ pages: [] })),
     runCommand: vi.fn(() => ({ html: '<p>built</p>' })),
     AssetManager: { add: vi.fn() },
+    Panels: { getPanels: vi.fn(() => []) },
   };
   return { editorMock, initMock: vi.fn(() => editorMock) };
 });
@@ -39,6 +41,7 @@ describe('NewsletterBuilder', () => {
     editorMock.off.mockClear();
     editorMock.destroy.mockClear();
     editorMock.loadProjectData.mockClear();
+    editorMock.setComponents.mockClear();
   });
 
   it('initializes GrapesJS on mount and subscribes to update', () => {
@@ -47,9 +50,24 @@ describe('NewsletterBuilder', () => {
     expect(editorMock.on).toHaveBeenCalledWith('update', expect.any(Function));
   });
 
-  it('restores a saved design from design_json', () => {
+  it('seeds a blank MJML document when there is no saved design', () => {
+    render(<NewsletterBuilder html="" onChange={vi.fn()} />);
+    // Without a seed the canvas is a bare "Body" that rejects MJML blocks.
+    expect(editorMock.setComponents).toHaveBeenCalledWith(expect.stringContaining('<mj-body>'));
+    expect(editorMock.loadProjectData).not.toHaveBeenCalled();
+  });
+
+  it('restores a saved design from design_json (and does not re-seed)', () => {
     render(<NewsletterBuilder html="" designJson='{"pages":[1]}' onChange={vi.fn()} />);
     expect(editorMock.loadProjectData).toHaveBeenCalledWith({ pages: [1] });
+    expect(editorMock.setComponents).not.toHaveBeenCalled();
+  });
+
+  it('shows a read-only overlay only when readOnly (sent)', () => {
+    const { container, rerender } = render(<NewsletterBuilder html="" onChange={vi.fn()} />);
+    expect(container.querySelector('.cursor-not-allowed')).toBeNull();
+    rerender(<NewsletterBuilder html="" readOnly onChange={vi.fn()} />);
+    expect(container.querySelector('.cursor-not-allowed')).not.toBeNull();
   });
 
   it('destroys the editor on unmount', () => {

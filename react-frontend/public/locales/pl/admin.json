@@ -16377,7 +16377,18 @@
     "switch_to_design_warning": "Przełączenie na kreator wizualny może nie zachować dokładnie ręcznie napisanego kodu HTML. Kontynuować?",
     "switch_to_plain_warning": "Przełączenie na Zwykły tekst usunie całe formatowanie i HTML z Twojej treści. Tej operacji nie można cofnąć.",
     "switch_to_richtext_warning": "Przełączenie na Tekst sformatowany uprości Twój HTML — tabele, style inline i nieobsługiwane znaczniki zostaną usunięte. Kontynuuj edycję w HTML, aby zachować swój projekt.",
-    "tag_unsubscribe_url": "Adres URL rezygnacji z subskrypcji"
+    "tag_unsubscribe_url": "Adres URL rezygnacji z subskrypcji",
+    "tip_blocks": "Bloki",
+    "tip_borders": "Przełącz obramowania",
+    "tip_clear": "Wyczyść płótno",
+    "tip_code": "Wyświetl kod",
+    "tip_fullscreen": "Pełny ekran",
+    "tip_layers": "Warstwy",
+    "tip_preview": "Podgląd",
+    "tip_redo": "Ponów",
+    "tip_settings": "Ustawienia",
+    "tip_styles": "Style",
+    "tip_undo": "Cofnij"
   },
   "newsletter_form": {
     "ab_test_label": "Test Ab",

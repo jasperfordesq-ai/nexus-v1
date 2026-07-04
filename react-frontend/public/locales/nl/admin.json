@@ -16377,7 +16377,18 @@
     "switch_to_design_warning": "Overschakelen naar de visuele bouwer behoudt handgeschreven HTML mogelijk niet exact. Doorgaan?",
     "switch_to_plain_warning": "Overschakelen naar Platte tekst verwijdert alle opmaak en HTML uit uw inhoud. Dit kan niet ongedaan worden gemaakt.",
     "switch_to_richtext_warning": "Overschakelen naar Opgemaakte tekst vereenvoudigt uw HTML — tabellen, inline stijlen en niet-ondersteunde tags worden verwijderd. Blijf in HTML bewerken om uw ontwerp te behouden.",
-    "tag_unsubscribe_url": "Afmeld-URL"
+    "tag_unsubscribe_url": "Afmeld-URL",
+    "tip_blocks": "Blokken",
+    "tip_borders": "Randen in-/uitschakelen",
+    "tip_clear": "Canvas wissen",
+    "tip_code": "Code bekijken",
+    "tip_fullscreen": "Volledig scherm",
+    "tip_layers": "Lagen",
+    "tip_preview": "Voorbeeld",
+    "tip_redo": "Opnieuw",
+    "tip_settings": "Instellingen",
+    "tip_styles": "Stijlen",
+    "tip_undo": "Ongedaan maken"
   },
   "newsletter_form": {
     "ab_test_label": "Ab-test",

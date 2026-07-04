@@ -583,6 +583,7 @@ export function NewsletterForm() {
                 }}
                 placeholder={t('newsletters.placeholder_write_your_newsletter_content')}
                 isDisabled={saving || isSent}
+                readOnly={isSent}
                 subject={subject}
                 previewText={previewText}
                 onRequestPreview={async (req) => {

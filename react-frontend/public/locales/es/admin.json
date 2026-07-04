@@ -16377,7 +16377,18 @@
     "switch_to_design_warning": "Cambiar al generador visual puede no conservar exactamente el HTML escrito a mano. ¿Continuar?",
     "switch_to_plain_warning": "Cambiar a Texto sin formato eliminará todo el formato y el HTML de su contenido. Esta acción no se puede deshacer.",
     "switch_to_richtext_warning": "Cambiar a Texto enriquecido simplificará su HTML — se eliminarán tablas, estilos en línea y etiquetas no admitidas. Siga editando en HTML para conservar su diseño.",
-    "tag_unsubscribe_url": "URL de cancelación de suscripción"
+    "tag_unsubscribe_url": "URL de cancelación de suscripción",
+    "tip_blocks": "Bloques",
+    "tip_borders": "Alternar bordes",
+    "tip_clear": "Borrar lienzo",
+    "tip_code": "Ver código",
+    "tip_fullscreen": "Pantalla completa",
+    "tip_layers": "Capas",
+    "tip_preview": "Vista previa",
+    "tip_redo": "Rehacer",
+    "tip_settings": "Ajustes",
+    "tip_styles": "Estilos",
+    "tip_undo": "Deshacer"
   },
   "newsletter_form": {
     "ab_test_label": "Prueba abdominal",

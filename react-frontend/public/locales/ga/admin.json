@@ -16377,7 +16377,18 @@
     "switch_to_design_warning": "Seans nach gcoinneofar HTML lámhscríofa go beacht agus tú ag athrú go dtí an tógálaí amhairc. An bhfuil fonn ort leanúint ar aghaidh?",
     "switch_to_plain_warning": "Bainfidh athrú go Gnáth-théacs an fhormáidiú agus an HTML go léir as d'ábhar. Ní féidir é seo a chur ar ceal.",
     "switch_to_richtext_warning": "Simpleoidh athrú go Saibhirthéacs do chuid HTML — bainfear táblaí, stíleanna inlíne agus clibeanna nach dtacaítear leo. Lean ort ag cur in eagar in HTML ina ionad sin chun do dhearadh a chaomhnú.",
-    "tag_unsubscribe_url": "URL díliostála"
+    "tag_unsubscribe_url": "URL díliostála",
+    "tip_blocks": "Bloic",
+    "tip_borders": "Scoránaigh imlínte",
+    "tip_clear": "Glan an chanbhás",
+    "tip_code": "Féach ar an gcód",
+    "tip_fullscreen": "Lánscáileán",
+    "tip_layers": "Sraitheanna",
+    "tip_preview": "Réamhamharc",
+    "tip_redo": "Athdhéan",
+    "tip_settings": "Socruithe",
+    "tip_styles": "Stíleanna",
+    "tip_undo": "Cealaigh"
   },
   "newsletter_form": {
     "ab_test_label": "Tástáil Ab",

@@ -7,6 +7,10 @@ import { StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
+// GrapesJS editor chrome (Design-mode newsletter builder). Loaded here, after
+// Tailwind, and unlayered so it reliably wins the cascade over Tailwind's
+// layered preflight — a component-level lazy import re-injected inconsistently.
+import 'grapesjs/dist/css/grapes.min.css';
 import i18n from './i18n'; // Initialize i18n before App renders
 
 // Log build version to console for deployment verification

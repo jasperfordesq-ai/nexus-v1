@@ -16377,7 +16377,18 @@
     "switch_to_design_warning": "Le passage au générateur visuel risque de ne pas préserver exactement le HTML rédigé manuellement. Continuer ?",
     "switch_to_plain_warning": "Passer en texte brut supprimera toute la mise en forme et le HTML de votre contenu. Cette action est irréversible.",
     "switch_to_richtext_warning": "Passer en texte enrichi simplifiera votre HTML — les tableaux, styles en ligne et balises non prises en charge seront supprimés. Continuez à modifier en HTML pour préserver votre mise en page.",
-    "tag_unsubscribe_url": "URL de désabonnement"
+    "tag_unsubscribe_url": "URL de désabonnement",
+    "tip_blocks": "Blocs",
+    "tip_borders": "Afficher/masquer les bordures",
+    "tip_clear": "Effacer le canevas",
+    "tip_code": "Voir le code",
+    "tip_fullscreen": "Plein écran",
+    "tip_layers": "Calques",
+    "tip_preview": "Aperçu",
+    "tip_redo": "Rétablir",
+    "tip_settings": "Paramètres",
+    "tip_styles": "Styles",
+    "tip_undo": "Annuler"
   },
   "newsletter_form": {
     "ab_test_label": "Test abdominaux",

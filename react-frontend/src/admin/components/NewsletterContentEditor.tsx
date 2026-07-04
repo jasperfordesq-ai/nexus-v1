@@ -59,6 +59,9 @@ interface NewsletterContentEditorProps {
   label?: string;
   placeholder?: string;
   isDisabled?: boolean;
+  /** True only for already-sent newsletters — freezes the visual builder canvas
+   * (the builder stays interactive during background saves, unlike isDisabled). */
+  readOnly?: boolean;
   /** Modes to expose. Defaults to all four. */
   modes?: ContentFormat[];
   /** Enables the live preview pane when provided. */
@@ -82,6 +85,7 @@ export function NewsletterContentEditor({
   designJson,
   placeholder,
   isDisabled,
+  readOnly,
   modes = EDITOR_MODES,
   onRequestPreview,
   subject,
@@ -204,7 +208,7 @@ export function NewsletterContentEditor({
             <NewsletterBuilder
               html={value}
               designJson={designJson}
-              isDisabled={isDisabled}
+              readOnly={readOnly}
               onChange={({ html: h, designJson: dj }) => emit(h, 'builder', dj)}
             />
           </Suspense>

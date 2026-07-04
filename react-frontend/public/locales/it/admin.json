@@ -16377,7 +16377,18 @@
     "switch_to_design_warning": "Passando all'editor visuale, l'HTML scritto manualmente potrebbe non essere preservato esattamente. Continuare?",
     "switch_to_plain_warning": "Passando a Testo semplice verranno rimossi tutta la formattazione e l'HTML dal contenuto. Questa azione non può essere annullata.",
     "switch_to_richtext_warning": "Passando a Testo formattato il tuo HTML verrà semplificato — tabelle, stili inline e tag non supportati verranno rimossi. Continua a modificare in HTML per preservare il tuo design.",
-    "tag_unsubscribe_url": "URL di annullamento iscrizione"
+    "tag_unsubscribe_url": "URL di annullamento iscrizione",
+    "tip_blocks": "Blocchi",
+    "tip_borders": "Attiva/disattiva bordi",
+    "tip_clear": "Svuota la tela",
+    "tip_code": "Visualizza codice",
+    "tip_fullscreen": "Schermo intero",
+    "tip_layers": "Livelli",
+    "tip_preview": "Anteprima",
+    "tip_redo": "Ripeti",
+    "tip_settings": "Impostazioni",
+    "tip_styles": "Stili",
+    "tip_undo": "Annulla"
   },
   "newsletter_form": {
     "ab_test_label": "Prova addominali",

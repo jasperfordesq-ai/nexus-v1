@@ -16377,7 +16377,18 @@
     "switch_to_design_warning": "Beim Wechsel zum visuellen Editor bleibt handgeschriebenes HTML möglicherweise nicht exakt erhalten. Fortfahren?",
     "switch_to_plain_warning": "Beim Wechsel zu Reiner Text werden alle Formatierungen und HTML aus Ihrem Inhalt entfernt. Dies kann nicht rückgängig gemacht werden.",
     "switch_to_richtext_warning": "Beim Wechsel zu Rich Text wird Ihr HTML vereinfacht — Tabellen, Inline-Stile und nicht unterstützte Tags werden entfernt. Bearbeiten Sie stattdessen weiterhin im HTML-Modus, um Ihr Design zu erhalten.",
-    "tag_unsubscribe_url": "Abmelde-URL"
+    "tag_unsubscribe_url": "Abmelde-URL",
+    "tip_blocks": "Blöcke",
+    "tip_borders": "Rahmen umschalten",
+    "tip_clear": "Leinwand leeren",
+    "tip_code": "Code anzeigen",
+    "tip_fullscreen": "Vollbild",
+    "tip_layers": "Ebenen",
+    "tip_preview": "Vorschau",
+    "tip_redo": "Wiederholen",
+    "tip_settings": "Einstellungen",
+    "tip_styles": "Stile",
+    "tip_undo": "Rückgängig"
   },
   "newsletter_form": {
     "ab_test_label": "Ab-Test",

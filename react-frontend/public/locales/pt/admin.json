@@ -16377,7 +16377,18 @@
     "switch_to_design_warning": "Mudar para o construtor visual pode não preservar exatamente o HTML escrito manualmente. Continuar?",
     "switch_to_plain_warning": "Mudar para Texto simples removerá toda a formatação e o HTML do seu conteúdo. Isso não pode ser desfeito.",
     "switch_to_richtext_warning": "Mudar para Texto formatado simplificará seu HTML — tabelas, estilos embutidos e tags não suportadas serão removidos. Continue editando em HTML para preservar seu design.",
-    "tag_unsubscribe_url": "URL de cancelamento de inscrição"
+    "tag_unsubscribe_url": "URL de cancelamento de inscrição",
+    "tip_blocks": "Blocos",
+    "tip_borders": "Alternar bordas",
+    "tip_clear": "Limpar tela",
+    "tip_code": "Ver código",
+    "tip_fullscreen": "Tela cheia",
+    "tip_layers": "Camadas",
+    "tip_preview": "Pré-visualização",
+    "tip_redo": "Refazer",
+    "tip_settings": "Configurações",
+    "tip_styles": "Estilos",
+    "tip_undo": "Desfazer"
   },
   "newsletter_form": {
     "ab_test_label": "Teste Ab",
