@@ -318,7 +318,7 @@ class AdminEnterpriseController extends BaseApiController
         try {
             $updates = ["status = ?", "updated_at = NOW()"]; $params = [$status];
             if ($notes !== null) { $updates[] = "notes = ?"; $params[] = $notes; }
-            if ($status === 'completed') { $updates[] = "completed_at = NOW()"; }
+            if ($status === 'completed') { $updates[] = "processed_at = NOW()"; $updates[] = "processed_by = ?"; $params[] = $this->getUserId(); }
             $params[] = $id; $params[] = $tenantId;
             DB::update("UPDATE gdpr_requests SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
             return $this->respondWithData(['id' => $id, 'status' => $status, 'updated' => true]);
@@ -1515,8 +1515,8 @@ class AdminEnterpriseController extends BaseApiController
 
             // Average processing time
             $avgRow = DB::selectOne(
-                "SELECT AVG(TIMESTAMPDIFF(HOUR, created_at, completed_at)) as avg_hours
-                 FROM gdpr_requests WHERE tenant_id = ? AND status = 'completed' AND completed_at IS NOT NULL",
+                "SELECT AVG(TIMESTAMPDIFF(HOUR, created_at, processed_at)) as avg_hours
+                 FROM gdpr_requests WHERE tenant_id = ? AND status = 'completed' AND processed_at IS NOT NULL",
                 [$tenantId]
             );
             $avgProcessingHours = round((float) ($avgRow->avg_hours ?? 0), 1);
@@ -1553,8 +1553,8 @@ class AdminEnterpriseController extends BaseApiController
             try {
                 $completedOnTime = (int) (DB::selectOne(
                     "SELECT COUNT(*) as cnt FROM gdpr_requests
-                     WHERE tenant_id = ? AND status = 'completed' AND completed_at IS NOT NULL
-                     AND TIMESTAMPDIFF(DAY, created_at, completed_at) <= 30",
+                     WHERE tenant_id = ? AND status = 'completed' AND processed_at IS NOT NULL
+                     AND TIMESTAMPDIFF(DAY, created_at, processed_at) <= 30",
                     [$tenantId]
                 )->cnt ?? 0);
             } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
@@ -1651,8 +1651,8 @@ class AdminEnterpriseController extends BaseApiController
             $thisMonthCompleted = 0;
             $lastMonthCompleted = 0;
             try {
-                $thisMonthCompleted = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND status = 'completed' AND completed_at >= ?", [$tenantId, $thisMonthStart])->cnt ?? 0);
-                $lastMonthCompleted = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND status = 'completed' AND completed_at >= ? AND completed_at <= ?", [$tenantId, $lastMonthStart, $lastMonthEnd . ' 23:59:59'])->cnt ?? 0);
+                $thisMonthCompleted = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND status = 'completed' AND processed_at >= ?", [$tenantId, $thisMonthStart])->cnt ?? 0);
+                $lastMonthCompleted = (int)(DB::selectOne("SELECT COUNT(*) as cnt FROM gdpr_requests WHERE tenant_id = ? AND status = 'completed' AND processed_at >= ? AND processed_at <= ?", [$tenantId, $lastMonthStart, $lastMonthEnd . ' 23:59:59'])->cnt ?? 0);
             } catch (\Exception $e) { \Illuminate\Support\Facades\Log::warning('AdminEnterpriseController: ' . $e->getMessage(), ['context' => __METHOD__]); }
 
             return $this->respondWithData([

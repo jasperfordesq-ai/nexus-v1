@@ -242,6 +242,55 @@ class MemberSelfServiceTest extends TestCase
     }
 
     /**
+     * Regression: the 2FA erasure step targeted non-existent columns
+     * (users.totp_secret / totp_backup_codes), so the statement threw and the
+     * swallowing try/catch hid it — the AES-encrypted TOTP secret in
+     * user_totp_settings, and any trusted-device tokens, survived a
+     * right-to-erasure request. Full erasure must delete both.
+     */
+    public function test_delete_account_erases_two_factor_secrets_and_trusted_devices(): void
+    {
+        $user = $this->makeMember('OldPassword123!');
+
+        DB::table('user_totp_settings')->insert([
+            'user_id'               => $user->id,
+            'tenant_id'             => $this->testTenantId,
+            'totp_secret_encrypted' => 'encrypted-secret-placeholder',
+            'is_enabled'            => 1,
+            'created_at'            => now(),
+            'updated_at'            => now(),
+        ]);
+        DB::table('user_trusted_devices')->insert([
+            'user_id'           => $user->id,
+            'tenant_id'         => $this->testTenantId,
+            'device_token_hash' => hash('sha256', 'device-' . $user->id),
+            'ip_address'        => '203.0.113.7',
+            'expires_at'        => now()->addDays(30),
+            'created_at'        => now(),
+            'updated_at'        => now(),
+        ]);
+
+        $response = $this->apiDelete('/v2/users/me', ['password' => 'OldPassword123!']);
+        $this->assertSame(200, $response->getStatusCode());
+
+        $this->assertSame(
+            0,
+            DB::table('user_totp_settings')->where('user_id', $user->id)->count(),
+            'the encrypted 2FA secret must not survive GDPR erasure'
+        );
+        $this->assertSame(
+            0,
+            DB::table('user_trusted_devices')->where('user_id', $user->id)->count(),
+            'trusted-device tokens must not survive GDPR erasure'
+        );
+        $this->assertSame(
+            0,
+            (int) DB::table('users')->where('id', $user->id)->value('totp_enabled'),
+            'the users.totp_enabled flag must be cleared by erasure'
+        );
+    }
+
+    /**
      * The pre-deletion "legal retention" data export must SUCCEED end-to-end,
      * not silently fall through to the best-effort failure path.
      *

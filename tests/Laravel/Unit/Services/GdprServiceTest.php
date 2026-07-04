@@ -920,4 +920,42 @@ class GdprServiceTest extends \Tests\Laravel\TestCase
             'email_log anonymization must use a unique per-user address, not a shared one'
         );
     }
+
+    /**
+     * Regression guard (2026-07-04): the erasure steps for 2FA and exchange notes
+     * targeted columns that do not exist in the real schema
+     * (users.totp_secret / totp_backup_codes; exchange_requests.provider_notes),
+     * so each UPDATE threw and the swallowing try/catch hid it — the encrypted
+     * TOTP secret and the exchange free-text survived Article 17 erasure. Lock the
+     * corrected column set so the drift cannot silently return.
+     */
+    public function testAccountDeletionUsesRealTotpAndExchangeColumns(): void
+    {
+        $src = file_get_contents(app_path('Services/Enterprise/GdprService.php'));
+        $start = strpos($src, 'function executeAccountDeletion');
+        $this->assertNotFalse($start, 'executeAccountDeletion not found');
+        $deletionSrc = substr($src, $start);
+
+        // TOTP: erase the real store, not the phantom users columns.
+        $this->assertStringContainsString('DELETE FROM user_totp_settings', $deletionSrc);
+        $this->assertStringContainsString('DELETE FROM user_trusted_devices', $deletionSrc);
+        $this->assertStringNotContainsString(
+            'SET totp_secret = NULL',
+            $deletionSrc,
+            'erasure must not write the non-existent users.totp_secret column'
+        );
+        $this->assertStringNotContainsString(
+            'totp_backup_codes',
+            $deletionSrc,
+            'erasure must not reference the non-existent users.totp_backup_codes column'
+        );
+
+        // Exchange notes: clear the columns that exist; provider_notes does not.
+        $this->assertStringContainsString('requester_notes = NULL, broker_notes = NULL', $deletionSrc);
+        $this->assertStringNotContainsString(
+            'provider_notes = NULL',
+            $deletionSrc,
+            'exchange_requests has no provider_notes column — referencing it fails the whole UPDATE'
+        );
+    }
 }

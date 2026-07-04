@@ -135,6 +135,39 @@ class AdminEnterpriseControllerTest extends TestCase
         $response->assertJsonStructure(['data']);
     }
 
+    /**
+     * Regression: marking a GDPR request "completed" wrote to a non-existent
+     * `completed_at` column, so the UPDATE threw and the endpoint returned 500
+     * ("Failed to update GDPR request"). The real column is `processed_at`, and
+     * the admin who completes it is recorded in `processed_by`.
+     */
+    public function test_update_gdpr_request_mark_completed_sets_processed_at(): void
+    {
+        $admin   = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $subject = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        $requestId = DB::table('gdpr_requests')->insertGetId([
+            'user_id'      => $subject->id,
+            'tenant_id'    => $this->testTenantId,
+            'request_type' => 'access',
+            'status'       => 'pending',
+            'created_at'   => now(),
+            'updated_at'   => now(),
+        ]);
+
+        $response = $this->apiPut("/v2/admin/enterprise/gdpr/requests/{$requestId}", [
+            'status' => 'completed',
+        ]);
+
+        $response->assertStatus(200);
+
+        $row = DB::table('gdpr_requests')->where('id', $requestId)->first();
+        $this->assertSame('completed', $row->status);
+        $this->assertNotNull($row->processed_at, 'processed_at must be set when a request is marked completed');
+        $this->assertSame((int) $admin->id, (int) $row->processed_by);
+    }
+
     // ================================================================
     // MONITORING — GET /v2/admin/enterprise/monitoring
     // ================================================================

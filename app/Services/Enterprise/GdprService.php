@@ -271,8 +271,8 @@ class GdprService
                 "UPDATE gdpr_requests
                  SET status = 'completed', processed_at = NOW(),
                      export_file_path = ?, export_expires_at = ?
-                 WHERE id = ?",
-                [$zipPath, $expiresAt, $requestId]
+                 WHERE id = ? AND tenant_id = ?",
+                [$zipPath, $expiresAt, $requestId, $this->tenantId]
             );
         }
 
@@ -919,6 +919,10 @@ class GdprService
         }
 
         try {
+            // Tracks whether a CRITICAL PII-erasure step failed. If so we must NOT
+            // report the request as completed — PII would survive an Article 17 erasure.
+            $criticalErasureFailed = false;
+
             // 1. Generate final data export for legal retention. Best-effort:
             // a failure here must NOT block the Article 17 erasure (the legal
             // duty outweighs the retention copy), so log and continue rather
@@ -1141,14 +1145,27 @@ class GdprService
                 );
             } catch (\Throwable $e) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
-            // 3i. Delete TOTP/2FA secrets
+            // 3i. Delete TOTP/2FA secrets. The AES-encrypted secret lives in
+            // user_totp_settings.totp_secret_encrypted (NOT on the users table), and
+            // "remember this device" tokens in user_trusted_devices are PII too.
+            // Failure here is CRITICAL — the 2FA secret must not survive erasure.
             try {
                 $this->query(
-                    "UPDATE users SET totp_secret = NULL, totp_enabled = 0, totp_backup_codes = NULL
-                     WHERE id = ? AND tenant_id = ?",
+                    "DELETE FROM user_totp_settings WHERE user_id = ? AND tenant_id = ?",
                     [$userId, $this->tenantId]
                 );
-            } catch (\Throwable $e) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+                $this->query(
+                    "DELETE FROM user_trusted_devices WHERE user_id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
+                );
+                $this->query(
+                    "UPDATE users SET totp_enabled = 0, totp_setup_required = 1 WHERE id = ? AND tenant_id = ?",
+                    [$userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) {
+                $criticalErasureFailed = true;
+                $this->logger->error('GDPR CRITICAL erasure step failed (TOTP/2FA secret)', ['user_id' => $userId, 'error' => $e->getMessage()]);
+            }
 
             // 3j. Delete user notification preferences
             try {
@@ -1158,14 +1175,24 @@ class GdprService
                 );
             } catch (\Throwable $e) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
-            // 3k. Anonymize exchange requests (preserve transaction history, remove personal notes)
+            // 3k. Anonymize exchange requests: preserve transaction history/amounts and
+            // numeric ratings for audit, but remove the deleted user's free-text personal
+            // content. NB: exchange_requests has NO provider_notes column — the old SET
+            // list included it, so the whole statement failed and cleared nothing. Clear
+            // only the columns that actually exist. Failure here is CRITICAL.
             try {
                 $this->query(
-                    "UPDATE exchange_requests SET requester_notes = NULL, provider_notes = NULL, broker_notes = NULL
+                    "UPDATE exchange_requests
+                     SET requester_notes = NULL, broker_notes = NULL,
+                         requester_feedback = NULL, provider_feedback = NULL,
+                         cancellation_reason = NULL, decline_reason = NULL
                      WHERE (requester_id = ? OR provider_id = ?) AND tenant_id = ?",
                     [$userId, $userId, $this->tenantId]
                 );
-            } catch (\Throwable $e) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+            } catch (\Throwable $e) {
+                $criticalErasureFailed = true;
+                $this->logger->error('GDPR CRITICAL erasure step failed (exchange notes/feedback)', ['user_id' => $userId, 'error' => $e->getMessage()]);
+            }
 
             // 3l. Delete feed activity entries (user's posts/shares in the feed)
             try {
@@ -1405,14 +1432,27 @@ class GdprService
             // 7. Invalidate all sessions
             $this->query("DELETE FROM sessions WHERE user_id = ?", [$userId]);
 
-            // 8. Update request if provided
+            // 8. Update request if provided. Guard: never report the erasure request as
+            // "completed" if a critical PII step failed — leave it "processing" so an
+            // admin sees it needs a retry rather than a false success.
             if ($requestId) {
-                $this->query(
-                    "UPDATE gdpr_requests
-                     SET status = 'completed', processed_at = NOW(), processed_by = ?
-                     WHERE id = ?",
-                    [$adminId, $requestId]
-                );
+                if ($criticalErasureFailed) {
+                    $this->query(
+                        "UPDATE gdpr_requests SET status = 'processing', updated_at = NOW()
+                         WHERE id = ? AND tenant_id = ?",
+                        [$requestId, $this->tenantId]
+                    );
+                    $this->logger->error('GDPR erasure finished with a critical failure; request left as processing for retry', [
+                        'user_id' => $userId, 'request_id' => $requestId,
+                    ]);
+                } else {
+                    $this->query(
+                        "UPDATE gdpr_requests
+                         SET status = 'completed', processed_at = NOW(), processed_by = ?
+                         WHERE id = ? AND tenant_id = ?",
+                        [$adminId, $requestId, $this->tenantId]
+                    );
+                }
             }
 
             if ($ownsTransaction) {
