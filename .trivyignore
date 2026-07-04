@@ -136,15 +136,3 @@ CVE-2026-44431
 GHSA-v6wh-96g9-6wx3
 GHSA-fx2h-pf6j-xcff
 GHSA-96hv-2xvq-fx4p
-
-# ── underscore CVE-2026-27601 (HIGH, DoS) — react-frontend/package-lock.json ──
-# Newly-disclosed underscore.js DoS (installed 1.13.1, fix 1.13.8). underscore
-# reaches the production bundle ONLY via grapesjs (0.21.13 pins underscore to
-# exactly 1.13.1; also pulled by backbone / backbone-undo) — i.e. the admin-only
-# client-side newsletter email builder. It runs in the admin's own browser over
-# content the admin authors themselves, so there is no untrusted-input path to
-# the DoS in our usage. The real fix (npm override to underscore ^1.13.8) is
-# deferred to a frontend-dep change that can rebuild and re-validate the recently
-# repaired grapesjs builder, rather than forcing a version swap into it here.
-# Tracked for that follow-up. Review quarterly. (added 2026-07-04)
-CVE-2026-27601
