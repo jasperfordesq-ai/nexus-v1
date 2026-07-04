@@ -157,7 +157,11 @@ export function Select<T extends object = object>({
       {description && <Description className={classNames?.description}>{description}</Description>}
       <HeroSelect.Popover
         {...popoverProps}
-        className={cn(classNames?.popoverContent, popoverProps?.className as string | undefined)}
+        className={cn(
+          'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-lg',
+          classNames?.popoverContent,
+          popoverProps?.className as string | undefined,
+        )}
       >
         <ListBox
           {...listboxProps}

@@ -106,10 +106,31 @@
 .bg-theme-card { background-color: var(--card-bg); }
 .bg-theme-solid { background-color: var(--surface-solid); }
 
-/* Modal backgrounds — HeroUI modals need opaque backgrounds, not glassmorphism */
+/* ─────────────────────────────────────────────
+   OPAQUE FLOATING SURFACES (system-wide glass kill-switch)
+   Every HeroUI v3 overlay — modals, popovers, dropdowns,
+   selects, autocomplete, combobox, menus — must be fully
+   opaque with NO backdrop-blur, so page content never
+   bleeds through and text stays readable. This single
+   backstop replaces the old per-component glassmorphism
+   and fixes see-through dropdowns everywhere at once.
+   ───────────────────────────────────────────── */
+
+/* Modals / dialogs → solid panel surface */
 [role="dialog"] > section,
 [data-slot="base"][class*="modal"] {
   background-color: var(--surface-solid) !important;
+}
+
+/* Popovers / dropdown-style floating surfaces → solid dropdown surface */
+.popover,
+.select__popover,
+.autocomplete__popover,
+.combo-box__popover,
+.menu {
+  background-color: var(--surface-dropdown) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
 
 /* Border colors */

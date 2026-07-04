@@ -35,11 +35,10 @@ export function GlassInput({
       variant="bordered"
       classNames={{
         inputWrapper: [
-          'bg-white/10',
-          'backdrop-blur-lg',
-          'border-white/20',
-          'hover:bg-white/15',
-          'focus-within:bg-white/15',
+          'bg-[var(--surface-elevated)]',
+          'border-[var(--border-default)]',
+          'hover:bg-[var(--surface-hover)]',
+          'focus-within:border-[var(--border-focus)]',
           classNames?.inputWrapper ?? '',
         ].filter(Boolean).join(' '),
         input: ['bg-transparent', classNames?.input ?? ''].filter(Boolean).join(' '),

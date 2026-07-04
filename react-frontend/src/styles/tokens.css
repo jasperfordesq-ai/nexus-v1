@@ -54,16 +54,18 @@
   --blob-purple: rgba(168, 85, 247, 0.15);
   --blob-cyan: rgba(6, 182, 212, 0.1);
 
-  /* GLASS SURFACE */
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-bg-hover: rgba(255, 255, 255, 0.10);
-  --glass-bg-active: rgba(255, 255, 255, 0.15);
+  /* GLASS SURFACE — de-glassed: solid opaque surfaces, no blur.
+     Token names kept for backwards-compat with .glass-* classes and
+     the GlassCard/GlassInput components; they now render as plain solid. */
+  --glass-bg: var(--surface-solid);
+  --glass-bg-hover: color-mix(in srgb, #ffffff 6%, var(--surface-solid));
+  --glass-bg-active: color-mix(in srgb, #ffffff 10%, var(--surface-solid));
   --glass-highlight: rgba(255, 255, 255, 0.15);
-  --glass-border: rgba(255, 255, 255, 0.10);
-  --glass-border-hover: rgba(255, 255, 255, 0.20);
-  --glass-border-focus: rgba(255, 255, 255, 0.25);
-  --glass-blur: 16px;
-  --glass-saturate: 180%;
+  --glass-border: var(--border-default);
+  --glass-border-hover: var(--border-hover);
+  --glass-border-focus: var(--border-focus);
+  --glass-blur: 0px;
+  --glass-saturate: 100%;
 
   /* BRAND COLORS (solid) */
   --color-primary: #818cf8;       /* Indigo-400 — ↑ from #6366f1; gives 6.97:1 as link text on dark bg */
@@ -151,16 +153,16 @@
   --blob-purple: rgba(168, 85, 247, 0.06);
   --blob-cyan: rgba(6, 182, 212, 0.05);
 
-  /* GLASS SURFACE (inverted for light mode) */
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-bg-hover: rgba(255, 255, 255, 0.85);
-  --glass-bg-active: rgba(255, 255, 255, 0.95);
+  /* GLASS SURFACE (light) — de-glassed: solid opaque surfaces, no blur. */
+  --glass-bg: var(--surface-solid);
+  --glass-bg-hover: color-mix(in srgb, #000000 4%, var(--surface-solid));
+  --glass-bg-active: color-mix(in srgb, #000000 8%, var(--surface-solid));
   --glass-highlight: rgba(0, 0, 0, 0.05);
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --glass-border-hover: rgba(0, 0, 0, 0.12);
-  --glass-border-focus: rgba(99, 102, 241, 0.3);
-  --glass-blur: 16px;
-  --glass-saturate: 180%;
+  --glass-border: var(--border-default);
+  --glass-border-hover: var(--border-hover);
+  --glass-border-focus: var(--border-focus);
+  --glass-blur: 0px;
+  --glass-saturate: 100%;
 
   /* BRAND COLORS - slightly darker for contrast on light bg */
   --color-primary: #4f46e5;       /* Indigo-600 */
@@ -441,9 +443,9 @@ html[data-reduced-motion="true"] *::after {
 
 /* Accessibility profile: simplify visual treatment without changing navigation structure. */
 html[data-simplified-layout="true"] {
-  --glass-bg: var(--surface-elevated);
-  --glass-bg-hover: var(--surface-hover);
-  --glass-bg-strong: var(--surface-elevated);
+  --glass-bg: var(--surface-solid);
+  --glass-bg-hover: var(--surface-dropdown);
+  --glass-bg-strong: var(--surface-solid);
   --glass-blur: 0px;
   --shadow-glass: none;
   --shadow-card: none;

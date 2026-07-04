@@ -46,7 +46,7 @@ export function GlassCard(
 ) {
     const baseClass = hoverable ? 'glass-card-hover' : 'glass-card';
     const glowClass = glow !== 'none' ? `glow-${glow}` : '';
-    const combinedClassName = ['backdrop-blur-lg', baseClass, glowClass, className].filter(Boolean).join(' ');
+    const combinedClassName = [baseClass, glowClass, className].filter(Boolean).join(' ');
 
     // When the consumer wires up onClick, forward it to HeroUI Card as onPress
     // and mark the card pressable so clicks/keyboard reliably activate it.

@@ -240,7 +240,7 @@ const config = {
 function ToastItem({ toast, onRemove, ref }: ToastItemProps & { ref?: Ref<HTMLDivElement> }) {
   const { t } = useTranslation('common');
 
-  const { icon: Icon, bgColor, borderColor, iconColor } = config[toast.type];
+  const { icon: Icon, borderColor, iconColor } = config[toast.type];
 
   return (
     <motion.div
@@ -250,8 +250,8 @@ function ToastItem({ toast, onRemove, ref }: ToastItemProps & { ref?: Ref<HTMLDi
       exit={{ opacity: 0, x: 100, scale: 0.95 }}
       className={`
         pointer-events-auto
-        ${bgColor} ${borderColor}
-        backdrop-blur-xl border rounded-lg
+        bg-slate-900 ${borderColor}
+        border rounded-lg
         p-4 shadow-lg
       `}
     >

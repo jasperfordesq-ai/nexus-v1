@@ -334,6 +334,7 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
             classNames={{
               trigger: 'bg-[var(--surface-elevated)] border-[var(--border-default)]',
               value: 'text-[var(--text-primary)]',
+              popoverContent: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)]',
             }}
           >
             {categories.map((c) => (
