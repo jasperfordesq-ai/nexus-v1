@@ -21,6 +21,8 @@ import Smartphone from 'lucide-react/icons/smartphone';
 import Scan from 'lucide-react/icons/scan';
 import CodeIcon from 'lucide-react/icons/code';
 import Trash2 from 'lucide-react/icons/trash-2';
+import ImageIcon from 'lucide-react/icons/image';
+import LayoutTemplate from 'lucide-react/icons/layout-template';
 import type { ReactNode } from 'react';
 
 export type BuilderDevice = 'Desktop' | 'Tablet' | 'Mobile portrait';
@@ -34,10 +36,16 @@ interface BuilderToolbarProps {
   showBorders: boolean;
   canUndo: boolean;
   canRedo: boolean;
+  /** Image upload in flight — disables the Insert-image control. */
+  insertingImage?: boolean;
+  /** Show the Templates picker button (off when editing a template itself). */
+  showTemplates?: boolean;
   onUndo: () => void;
   onRedo: () => void;
   onSetDevice: (device: BuilderDevice) => void;
   onToggleBorders: () => void;
+  onInsertImage: () => void;
+  onOpenTemplates: () => void;
   onViewCode: () => void;
   onClear: () => void;
   t: (key: string) => string;
@@ -80,10 +88,14 @@ export function BuilderToolbar({
   showBorders,
   canUndo,
   canRedo,
+  insertingImage,
+  showTemplates,
   onUndo,
   onRedo,
   onSetDevice,
   onToggleBorders,
+  onInsertImage,
+  onOpenTemplates,
   onViewCode,
   onClear,
   t,
@@ -135,6 +147,29 @@ export function BuilderToolbar({
       <ToolButton label={t('newsletter_content_editor.tip_code')} onPress={onViewCode} disabled={!ready}>
         <CodeIcon size={16} />
       </ToolButton>
+
+      <span className="mx-1 h-6 w-px shrink-0 bg-border" aria-hidden="true" />
+
+      <ToolButton
+        label={t('newsletter_builder.insert_image')}
+        onPress={onInsertImage}
+        disabled={frozen || Boolean(insertingImage)}
+      >
+        <ImageIcon size={16} />
+      </ToolButton>
+
+      {showTemplates && (
+        <Button
+          size="sm"
+          variant="light"
+          startContent={<LayoutTemplate size={16} />}
+          isDisabled={frozen}
+          onPress={onOpenTemplates}
+          className="shrink-0"
+        >
+          {t('newsletter_builder.templates')}
+        </Button>
+      )}
 
       <span className="flex-1" />
 

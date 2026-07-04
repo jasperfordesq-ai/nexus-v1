@@ -26,7 +26,12 @@ import {
   Tabs,
   Tab,
 } from '@/components/ui';
+import LayoutTemplate from 'lucide-react/icons/layout-template';
 import { useTranslation } from 'react-i18next';
+
+/** MJML markup can't be previewed in an iframe (it renders raw tags), so we show
+ * a neutral placeholder for builder starters instead of the raw source. */
+const isMjml = (content?: string) => Boolean(content && content.trim().startsWith('<mjml'));
 
 export interface GalleryTemplate {
   id: number;
@@ -34,6 +39,8 @@ export interface GalleryTemplate {
   description?: string;
   content?: string;
   content_format?: string;
+  /** GrapesJS project for builder templates (lossless reopen). */
+  design_json?: string | null;
   thumbnail?: string | null;
   subject?: string;
   preview_text?: string;
@@ -95,13 +102,15 @@ export function TemplateGalleryModal({ isOpen, onClose, templates, onSelect }: T
                 <Card key={tpl.id} className="overflow-hidden">
                   <CardBody className="gap-3 p-0">
                     {/* Preview */}
-                    <div className="relative h-44 w-full overflow-hidden border-b border-border bg-surface-secondary">
+                    <div className="relative flex h-44 w-full items-center justify-center overflow-hidden border-b border-border bg-surface-secondary">
                       {tpl.thumbnail ? (
                         <img
                           src={tpl.thumbnail}
                           alt={t('newsletter_content_editor.gallery_preview_alt')}
                           className="h-full w-full object-cover object-top"
                         />
+                      ) : isMjml(tpl.content) ? (
+                        <LayoutTemplate size={40} className="text-muted" aria-hidden="true" />
                       ) : (
                         <div
                           className="pointer-events-none absolute left-0 top-0 origin-top-left"

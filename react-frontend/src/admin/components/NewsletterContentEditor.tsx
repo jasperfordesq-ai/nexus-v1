@@ -15,8 +15,9 @@
  */
 
 import { lazy, Suspense, useState } from 'react';
-import { Tabs, Tab, Spinner } from '@/components/ui';
+import { Tabs, Tab, Spinner, Button } from '@/components/ui';
 import { useConfirm } from '@/components/ui';
+import Maximize from 'lucide-react/icons/maximize';
 import { useTranslation } from 'react-i18next';
 import Type from 'lucide-react/icons/type';
 import FileText from 'lucide-react/icons/file-text';
@@ -69,6 +70,11 @@ interface NewsletterContentEditorProps {
   /** Subject/preview text for a faithful preview. */
   subject?: string;
   previewText?: string;
+  /** When provided, the Design tab opens the full-screen studio instead of an
+   * inline (cramped) canvas. The host owns saving a draft + navigating there. */
+  onOpenDesigner?: () => void;
+  /** True once the current newsletter has a saved builder design to reopen. */
+  hasDesign?: boolean;
 }
 
 const MODE_ICON: Record<ContentFormat, React.ReactNode> = {
@@ -90,6 +96,8 @@ export function NewsletterContentEditor({
   onRequestPreview,
   subject,
   previewText,
+  onOpenDesigner,
+  hasDesign,
 }: NewsletterContentEditorProps) {
   const { t } = useTranslation('admin');
   const confirm = useConfirm();
@@ -203,12 +211,33 @@ export function NewsletterContentEditor({
             <HtmlSourceEditor value={value} onChange={(htmlValue) => emit(htmlValue, 'html')} isDisabled={isDisabled} />
           </Suspense>
         )}
-        {format === 'builder' && (
+        {format === 'builder' && onOpenDesigner && (
+          <div className="flex flex-col items-center gap-3 rounded-xl border-2 border-dashed border-border bg-surface px-6 py-10 text-center">
+            <div className="flex size-12 items-center justify-center rounded-full bg-accent/10 text-accent">
+              <Maximize size={22} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                {t('newsletter_builder.launch_title')}
+              </p>
+              <p className="mt-1 max-w-md text-xs text-muted">
+                {hasDesign
+                  ? t('newsletter_builder.launch_reopen_desc')
+                  : t('newsletter_builder.launch_desc')}
+              </p>
+            </div>
+            <Button variant="primary" startContent={<Maximize size={16} />} onPress={onOpenDesigner}>
+              {hasDesign ? t('newsletter_builder.launch_reopen_cta') : t('newsletter_builder.launch_cta')}
+            </Button>
+          </div>
+        )}
+        {format === 'builder' && !onOpenDesigner && (
           <Suspense fallback={editorFallback}>
             <NewsletterBuilder
               html={value}
               designJson={designJson}
               readOnly={readOnly}
+              enableTemplates
               onChange={({ html: h, designJson: dj }) => emit(h, 'builder', dj)}
             />
           </Suspense>

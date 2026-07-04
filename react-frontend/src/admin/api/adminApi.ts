@@ -1202,9 +1202,9 @@ export const adminNewsletters = {
 
   getSegmentSuggestions: () => api.get<Array<{ name: string; description: string; match_type: string; rules: Array<{ field: string; operator: string; value: string }>; estimated_count: number }>>('/v2/admin/newsletters/segments/suggestions'),
 
-  getTemplates: () => api.get<Array<{ id: number; name: string; subject: string; content: string; created_at: string }>>('/v2/admin/newsletters/templates'),
+  getTemplates: () => api.get<Array<{ id: number; name: string; subject: string; content: string; content_format?: string; design_json?: string | null; category?: string; description?: string; preview_text?: string; thumbnail?: string | null; created_at: string }>>('/v2/admin/newsletters/templates'),
 
-  getTemplate: (id: number) => api.get<{ id: number; name: string; subject: string; content: string; created_at: string }>(`/v2/admin/newsletters/templates/${id}`),
+  getTemplate: (id: number) => api.get<{ id: number; name: string; subject: string; content: string; content_format?: string; design_json?: string | null; category?: string; description?: string; preview_text?: string; thumbnail?: string | null; created_at: string }>(`/v2/admin/newsletters/templates/${id}`),
 
   createTemplate: (data: Record<string, unknown>) =>
     api.post<{ id: number; name: string }>('/v2/admin/newsletters/templates', data),

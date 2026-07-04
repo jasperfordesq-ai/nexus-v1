@@ -296,10 +296,30 @@ export function NewsletterForm() {
   const applyTemplate = (tpl: GalleryTemplate) => {
     if (tpl.content !== undefined) setContent(tpl.content);
     if (tpl.content_format) setContentFormat(tpl.content_format as ContentFormat);
-    setDesignJson(null); // gallery templates are html; clear any builder design
+    // Builder templates carry a GrapesJS project (design_json) for lossless
+    // reopening; starters ship MJML in `content` (design_json null) and the
+    // Design Studio seeds from that. Non-builder templates clear any design.
+    const dj = (tpl as { design_json?: string | null }).design_json;
+    setDesignJson(tpl.content_format === 'builder' ? (dj ?? null) : null);
     if (tpl.subject && !subject) setSubject(tpl.subject);
     if (tpl.preview_text && !previewText) setPreviewText(tpl.preview_text);
     setTemplateId(String(tpl.id));
+  };
+
+  // Open the full-screen Design Studio. It loads the newsletter by id, so we
+  // must persist the current draft first (create → get an id, or update).
+  const handleOpenDesigner = async () => {
+    setSaving(true);
+    let savedId: number | null = null;
+    try {
+      savedId = await saveNewsletter();
+    } catch {
+      toast.error(t('newsletters.an_unexpected_error_occurred'));
+    }
+    setSaving(false);
+    if (savedId !== null) {
+      navigate(tenantPath(`/admin/newsletters/edit/${savedId}/design`));
+    }
   };
 
   const selectedTemplate = templates.find((tpl) => String(tpl.id) === templateId);
@@ -586,6 +606,8 @@ export function NewsletterForm() {
                 readOnly={isSent}
                 subject={subject}
                 previewText={previewText}
+                onOpenDesigner={isSent ? undefined : handleOpenDesigner}
+                hasDesign={contentFormat === 'builder' && Boolean(designJson)}
                 onRequestPreview={async (req) => {
                   const res = await adminNewsletters.previewContent(req);
                   if (res.success && res.data) {

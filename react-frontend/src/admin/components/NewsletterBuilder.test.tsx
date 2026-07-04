@@ -18,7 +18,9 @@ const { editorMock, initMock } = vi.hoisted(() => {
     loadProjectData: vi.fn(),
     setComponents: vi.fn(),
     getProjectData: vi.fn(() => ({ pages: [] })),
-    runCommand: vi.fn(() => ({ html: '<p>built</p>' })),
+    // grapesjs-mjml compiles to table-based HTML; the restore-validity probe
+    // (exportIsValid) checks for that, so the mock must look like real output.
+    runCommand: vi.fn(() => ({ html: '<body><table><tr><td>built</td></tr></table></body>' })),
     stopCommand: vi.fn(),
     setDevice: vi.fn(),
     getDevice: vi.fn(() => 'Desktop'),

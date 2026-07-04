@@ -12,10 +12,14 @@
  * with `hidden` (display:none), never by conditionally rendering. HeroUI Tabs'
  * own panel content unmounts inactive panels, which would detach a manager's
  * DOM after GrapesJS appended to it; so Tabs here is a pure visibility selector.
+ * The whole panel also collapses to a slim rail to free canvas width — again by
+ * hiding, never unmounting, the manager nodes.
  */
 
 import { Tabs, Tab } from '@/components/ui';
 import type { RefObject } from 'react';
+import PanelRightClose from 'lucide-react/icons/panel-right-close';
+import PanelRightOpen from 'lucide-react/icons/panel-right-open';
 
 export type InspectorTab = 'style' | 'settings' | 'layers';
 
@@ -27,6 +31,10 @@ interface BuilderInspectorProps {
   onTabChange: (tab: InspectorTab) => void;
   /** True when a canvas element is selected (Style/Settings act on selection). */
   hasSelection: boolean;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
+  expandLabel: string;
+  collapseLabel: string;
   labels: {
     ariaLabel: string;
     style: string;
@@ -43,25 +51,41 @@ export function BuilderInspector({
   activeTab,
   onTabChange,
   hasSelection,
+  collapsed,
+  onToggleCollapse,
+  expandLabel,
+  collapseLabel,
   labels,
 }: BuilderInspectorProps) {
   const showEmptyHint = !hasSelection && activeTab !== 'layers';
 
   return (
-    <aside className="flex w-72 shrink-0 flex-col border-l border-border bg-surface">
-      <div className="border-b border-border px-2 py-1.5">
-        <Tabs
-          selectedKey={activeTab}
-          onSelectionChange={(key) => onTabChange(key as InspectorTab)}
-          aria-label={labels.ariaLabel}
-          size="sm"
-        >
-          <Tab key="style" id="style" title={labels.style} />
-          <Tab key="settings" id="settings" title={labels.settings} />
-          <Tab key="layers" id="layers" title={labels.layers} />
-        </Tabs>
+    <aside className={`flex shrink-0 flex-col border-l border-border bg-surface ${collapsed ? 'w-9' : 'w-72'}`}>
+      <div className="flex items-center gap-1 border-b border-border px-2 py-1.5">
+        {onToggleCollapse && (
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            aria-label={collapsed ? expandLabel : collapseLabel}
+            className="rounded p-1 text-muted hover:bg-surface-secondary hover:text-foreground"
+          >
+            {collapsed ? <PanelRightOpen size={16} /> : <PanelRightClose size={16} />}
+          </button>
+        )}
+        {!collapsed && (
+          <Tabs
+            selectedKey={activeTab}
+            onSelectionChange={(key) => onTabChange(key as InspectorTab)}
+            aria-label={labels.ariaLabel}
+            size="sm"
+          >
+            <Tab key="style" id="style" title={labels.style} />
+            <Tab key="settings" id="settings" title={labels.settings} />
+            <Tab key="layers" id="layers" title={labels.layers} />
+          </Tabs>
+        )}
       </div>
-      <div className="relative flex-1 overflow-y-auto">
+      <div className={`relative flex-1 overflow-y-auto ${collapsed ? 'hidden' : ''}`}>
         {showEmptyHint && (
           <p className="px-4 py-6 text-center text-xs text-muted">{labels.empty}</p>
         )}

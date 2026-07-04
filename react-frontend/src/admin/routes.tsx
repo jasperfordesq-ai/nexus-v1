@@ -145,6 +145,7 @@ const PerformanceDashboard = lazy(() => import('./modules/performance/Performanc
 // Newsletter module
 const NewsletterList = lazy(() => import('./modules/newsletters/NewsletterList'));
 const NewsletterForm = lazy(() => import('./modules/newsletters/NewsletterForm'));
+const NewsletterDesignStudio = lazy(() => import('./modules/newsletters/NewsletterDesignStudio'));
 const Subscribers = lazy(() => import('./modules/newsletters/Subscribers'));
 const Segments = lazy(() => import('./modules/newsletters/Segments'));
 const SegmentForm = lazy(() => import('./modules/newsletters/SegmentForm'));
@@ -410,6 +411,7 @@ export function AdminRoutes() {
       <Route path="newsletters" element={<Lazy><NewsletterList /></Lazy>} />
       <Route path="newsletters/create" element={<Lazy><NewsletterForm /></Lazy>} />
       <Route path="newsletters/edit/:id" element={<Lazy><NewsletterForm /></Lazy>} />
+      <Route path="newsletters/edit/:id/design" element={<Lazy><NewsletterDesignStudio /></Lazy>} />
       <Route path="newsletters/subscribers" element={<Lazy><Subscribers /></Lazy>} />
       <Route path="newsletters/segments/create" element={<Lazy><SegmentForm /></Lazy>} />
       <Route path="newsletters/segments/edit/:id" element={<Lazy><SegmentForm /></Lazy>} />

@@ -5,14 +5,18 @@
 
 /**
  * NewsletterBuilder — the enterprise drag-and-drop email builder (GrapesJS +
- * MJML). This is the "Design" mode of NewsletterContentEditor.
+ * MJML). This is the engine behind the full-screen Design Studio
+ * (NewsletterDesignStudio) and the "Design" mode of NewsletterContentEditor.
  *
  * - Blocks are MJML components (grapesjs-mjml), so the exported HTML is
  *   inbox-safe/table-based by construction.
  * - The editable project is serialized to `design_json` (so a design reopens
  *   losslessly); the compiled, ready-to-send HTML is stored in `content`
  *   (content_format='builder', which the backend renders like html).
- * - Image uploads go through our own domain (POST /v2/upload).
+ * - Image uploads go through our own domain (POST /v2/upload) and are applied
+ *   to the target block (or inserted at the selection) — never left stranded.
+ * - Starter/saved templates load straight into the canvas via the Templates
+ *   picker (MJML markup → setComponents, or a saved GrapesJS project → load).
  *
  * WHY THIS OWNS ITS OWN CHROME (learned the hard way): GrapesJS's DEFAULT panel
  * layout is driven by toolbar buttons whose glyphs come from Font Awesome. This
@@ -41,19 +45,29 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useConfirm } from '@/components/ui';
 import Copy from 'lucide-react/icons/copy';
+import Info from 'lucide-react/icons/info';
+import X from 'lucide-react/icons/x';
 import { logError } from '@/lib/logger';
 import { adminNewsletters } from '../api/adminApi';
 import { BuilderToolbar, type BuilderDevice } from './BuilderToolbar';
 import { BuilderBlockPalette } from './BuilderBlockPalette';
 import { BuilderInspector, type InspectorTab } from './BuilderInspector';
+import { TemplateGalleryModal, type GalleryTemplate } from './TemplateGalleryModal';
 
 interface NewsletterBuilderProps {
   /** Current compiled HTML (unused for restore — design_json drives restore). */
   html: string;
   /** Serialized GrapesJS project (JSON string) or null for a blank canvas. */
   designJson?: string | null;
+  /** MJML markup to seed the canvas when there is no design_json (e.g. an MJML
+   * starter template). Ignored once a design_json exists. */
+  initialMjml?: string | null;
   /** True only for already-sent newsletters — freezes the canvas. NOT set while saving. */
   readOnly?: boolean;
+  /** Fill the parent container (full-screen studio) instead of a fixed height. */
+  fill?: boolean;
+  /** Show the in-builder Templates picker (off when editing a template itself). */
+  enableTemplates?: boolean;
   onChange: (payload: { html: string; designJson: string }) => void;
 }
 
@@ -77,7 +91,71 @@ function resolveMjmlPlugin(): MjmlPluginFn | null {
 /** Minimal structural view of grapesjs' UndoManager (avoids depending on its types here). */
 type UndoLike = { hasUndo?: () => boolean; hasRedo?: () => boolean; undo?: () => void; redo?: () => void };
 
-export function NewsletterBuilder({ designJson, readOnly, onChange }: NewsletterBuilderProps) {
+/** Compile the current canvas to HTML; used both to export and to probe validity. */
+function exportHtml(ed: Editor): string {
+  const result = ed.runCommand('mjml-code-to-html') as { html?: string } | undefined;
+  return result?.html ?? '';
+}
+
+/** A restored design is valid only if it still compiles to real MJML/table HTML. */
+function exportIsValid(ed: Editor): boolean {
+  try {
+    const html = exportHtml(ed).trim();
+    return html.length > 0 && /<table|<mj-|<body/i.test(html);
+  } catch {
+    return false;
+  }
+}
+
+/** Minimal structural view of a grapesjs Component (avoids its heavy generics). */
+type GjsComp = {
+  get?: (k: string) => unknown;
+  parent?: () => GjsComp | undefined;
+  append?: (content: string) => unknown;
+  components?: () => { models?: GjsComp[] } | GjsComp[];
+};
+
+/** Walk up from the selection to the enclosing mj-column, if any. */
+function enclosingColumn(ed: Editor): GjsComp | null {
+  let node = ed.getSelected() as unknown as GjsComp | undefined;
+  while (node) {
+    const tag = (node.get?.('tagName') as string) || (node.get?.('type') as string);
+    if (tag === 'mj-column') return node;
+    node = node.parent?.();
+  }
+  return null;
+}
+
+/** Find the mj-body so we can append a fresh section when nothing is selected. */
+function findBody(comp: GjsComp | undefined): GjsComp | null {
+  if (!comp) return null;
+  const tag = (comp.get?.('tagName') as string) || (comp.get?.('type') as string);
+  if (tag === 'mj-body') return comp;
+  const kids = comp.components?.();
+  const list = Array.isArray(kids) ? kids : kids?.models;
+  if (list) {
+    for (const k of list) {
+      const found = findBody(k);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+/** Insert an mj-image at the current selection's column, else append a new section. */
+function insertImageComponent(ed: Editor, src: string) {
+  const safe = src.replace(/"/g, '&quot;');
+  const img = `<mj-image src="${safe}" alt="" />`;
+  const col = enclosingColumn(ed);
+  if (col?.append) {
+    col.append(img);
+    return;
+  }
+  const body = findBody(ed.getWrapper() as unknown as GjsComp);
+  (body ?? (ed.getWrapper() as unknown as GjsComp)).append?.(`<mj-section><mj-column>${img}</mj-column></mj-section>`);
+}
+
+export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, enableTemplates, onChange }: NewsletterBuilderProps) {
   const { t } = useTranslation('admin');
   const toast = useToast();
   const confirm = useConfirm();
@@ -88,6 +166,7 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
   const stylesRef = useRef<HTMLDivElement>(null);
   const traitsRef = useRef<HTMLDivElement>(null);
   const layersRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const editorRef = useRef<Editor | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -95,6 +174,9 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
   onChangeRef.current = onChange;
   // Seed only at mount time — later prop changes shouldn't reset the canvas.
   const seedRef = useRef(designJson);
+  const initialMjmlRef = useRef(initialMjml);
+  // Lets non-init handlers (image insert, template apply) trigger an export.
+  const scheduleEmitRef = useRef<() => void>(() => {});
 
   const [editor, setEditor] = useState<Editor | null>(null);
   const [failed, setFailed] = useState(false);
@@ -106,6 +188,14 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
   const [activeTab, setActiveTab] = useState<InspectorTab>('style');
   const [codeOpen, setCodeOpen] = useState(false);
   const [codeHtml, setCodeHtml] = useState('');
+  const [paletteCollapsed, setPaletteCollapsed] = useState(false);
+  const [inspectorCollapsed, setInspectorCollapsed] = useState(false);
+  const [insertingImage, setInsertingImage] = useState(false);
+  const [templatesOpen, setTemplatesOpen] = useState(false);
+  const [templates, setTemplates] = useState<GalleryTemplate[]>([]);
+  const [templatesLoaded, setTemplatesLoaded] = useState(false);
+  // Set when a restored design_json was built by an older editor and dropped.
+  const [legacyNotice, setLegacyNotice] = useState(false);
 
   // Reads the editor's undo/redo availability into React state. Reads refs +
   // stable setters only, so it's safe to call from the init effect too.
@@ -155,7 +245,8 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
         ],
         assetManager: {
           // Custom upload: /v2/upload returns { url, path }, not GrapesJS's
-          // { data: [...] } shape, so take full control here.
+          // { data: [...] } shape, so take full control here — and, crucially,
+          // APPLY the uploaded image to the open target so it actually appears.
           uploadFile: async (ev: Event) => {
             const target = ev.target as HTMLInputElement | null;
             const dropped = (ev as DragEvent).dataTransfer?.files;
@@ -165,10 +256,19 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
               const res = await adminNewsletters.uploadImage(file);
               const data = res.success && res.data ? (res.data as { url?: string; path?: string }) : null;
               const src = data?.url || data?.path;
-              if (src) {
-                editorRef.current?.AssetManager.add(src);
-              } else {
+              if (!src) {
                 toast.error(t('newsletter_content_editor.image_upload_failed'));
+                return;
+              }
+              const cur = editorRef.current;
+              if (!cur) return;
+              const am = cur.AssetManager;
+              am.add(src);
+              // Apply to whatever image opened the asset manager, then close it.
+              const amTarget = (am as unknown as { getTarget?: () => GjsComp | undefined }).getTarget?.();
+              if (amTarget?.get) {
+                (amTarget as unknown as { set?: (k: string, v: string) => void }).set?.('src', src);
+                (cur.Modal as unknown as { close?: () => void })?.close?.();
               }
             } catch (err) {
               logError('NewsletterBuilder: asset upload failed', err);
@@ -186,18 +286,28 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
     editorRef.current = ed;
 
     // Restore a previously-saved design, otherwise seed a blank MJML document.
+    // A restore only "counts" if it still compiles to valid MJML — older designs
+    // (pre-MJML builder) load as non-MJML junk that exports broken email, so we
+    // drop them and surface a notice rather than rendering garbage.
     let restored = false;
     if (seedRef.current) {
       try {
         const parsed = JSON.parse(seedRef.current) as Record<string, unknown>;
         (ed.loadProjectData as (d: unknown) => void)(parsed);
-        restored = true;
+        if (exportIsValid(ed)) {
+          restored = true;
+        } else {
+          logError('NewsletterBuilder: restored design_json is not valid MJML — dropping it');
+          setLegacyNotice(true);
+        }
       } catch (err) {
         logError('NewsletterBuilder: could not restore design_json', err);
+        setLegacyNotice(true);
       }
     }
     if (!restored) {
-      ed.setComponents(DEFAULT_MJML);
+      const mjml = initialMjmlRef.current;
+      ed.setComponents(mjml && mjml.trim().startsWith('<mjml') ? mjml : DEFAULT_MJML);
     }
 
     const scheduleEmit = () => {
@@ -207,13 +317,13 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
         if (!current) return;
         try {
           const projectData = current.getProjectData();
-          const result = current.runCommand('mjml-code-to-html') as { html?: string } | undefined;
-          onChangeRef.current({ html: result?.html ?? '', designJson: JSON.stringify(projectData) });
+          onChangeRef.current({ html: exportHtml(current), designJson: JSON.stringify(projectData) });
         } catch (err) {
           logError('NewsletterBuilder: export failed', err);
         }
       }, AUTOSAVE_DEBOUNCE_MS);
     };
+    scheduleEmitRef.current = scheduleEmit;
 
     const handleUpdate = () => {
       syncUndoState();
@@ -267,8 +377,7 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
     const ed = editorRef.current;
     if (!ed) return;
     try {
-      const result = ed.runCommand('mjml-code-to-html') as { html?: string } | undefined;
-      setCodeHtml(result?.html ?? '');
+      setCodeHtml(exportHtml(ed));
       setCodeOpen(true);
     } catch (err) {
       logError('NewsletterBuilder: view code failed', err);
@@ -283,6 +392,7 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
     });
     if (!ok) return;
     editorRef.current?.setComponents(DEFAULT_MJML);
+    setLegacyNotice(false);
   };
   const copyCode = async () => {
     try {
@@ -290,6 +400,74 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
       toast.success(t('newsletter_content_editor.code_copied'));
     } catch {
       /* clipboard blocked — no-op */
+    }
+  };
+
+  // Discoverable "Insert image" — upload through our domain, drop an mj-image at
+  // the selection. This is the same pipeline the asset manager uses, surfaced.
+  const handleInsertImageClick = () => fileRef.current?.click();
+  const handleImageFile = async (ev: React.ChangeEvent<HTMLInputElement>) => {
+    const file = ev.target.files?.[0];
+    ev.target.value = ''; // allow re-picking the same file
+    const ed = editorRef.current;
+    if (!file || !ed) return;
+    setInsertingImage(true);
+    try {
+      const res = await adminNewsletters.uploadImage(file);
+      const data = res.success && res.data ? (res.data as { url?: string; path?: string }) : null;
+      const src = data?.url || data?.path;
+      if (!src) {
+        toast.error(t('newsletter_content_editor.image_upload_failed'));
+        return;
+      }
+      insertImageComponent(ed, src);
+      scheduleEmitRef.current();
+    } catch (err) {
+      logError('NewsletterBuilder: insert image failed', err);
+      toast.error(t('newsletter_content_editor.image_upload_failed'));
+    } finally {
+      setInsertingImage(false);
+    }
+  };
+
+  const handleOpenTemplates = async () => {
+    if (!templatesLoaded) {
+      try {
+        const res = await adminNewsletters.getTemplates();
+        const rows = res.success && Array.isArray(res.data) ? (res.data as GalleryTemplate[]) : [];
+        // Only builder-format templates load losslessly into the canvas.
+        setTemplates(rows.filter((r) => (r.content_format ?? 'builder') === 'builder'));
+        setTemplatesLoaded(true);
+      } catch (err) {
+        logError('NewsletterBuilder: could not load templates', err);
+      }
+    }
+    setTemplatesOpen(true);
+  };
+
+  const applyTemplate = async (tpl: GalleryTemplate) => {
+    const ed = editorRef.current;
+    if (!ed) return;
+    const ok = await confirm({
+      title: t('newsletter_builder.apply_template_title'),
+      body: t('newsletter_builder.apply_template_confirm'),
+      status: 'warning',
+      confirmLabel: t('newsletter_builder.apply_template_confirm_cta'),
+    });
+    if (!ok) return;
+    try {
+      const dj = (tpl as { design_json?: string | null }).design_json;
+      if (dj) {
+        (ed.loadProjectData as (d: unknown) => void)(JSON.parse(dj));
+        if (!exportIsValid(ed) && tpl.content) ed.setComponents(tpl.content);
+      } else if (tpl.content) {
+        ed.setComponents(tpl.content); // MJML markup → parsed into mj-* components
+      }
+      setLegacyNotice(false);
+      scheduleEmitRef.current();
+    } catch (err) {
+      logError('NewsletterBuilder: apply template failed', err);
+      toast.error(t('newsletter_builder.apply_template_failed'));
     }
   };
 
@@ -301,58 +479,109 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
     );
   }
 
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-medium text-foreground">
-        {t('newsletter_content_editor.mode_design')}
-      </label>
+  const frame = (
+    <div
+      className={
+        fill
+          ? 'nb-root relative flex min-h-0 flex-1 flex-col overflow-hidden bg-surface'
+          : 'nb-root relative flex flex-col overflow-hidden rounded-lg border-2 border-border bg-surface'
+      }
+      style={fill ? undefined : { height: 720 }}
+    >
+      <BuilderToolbar
+        ready={Boolean(editor)}
+        readOnly={readOnly}
+        device={device}
+        showBorders={showBorders}
+        canUndo={canUndo}
+        canRedo={canRedo}
+        insertingImage={insertingImage}
+        showTemplates={Boolean(enableTemplates)}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        onSetDevice={handleSetDevice}
+        onToggleBorders={handleToggleBorders}
+        onInsertImage={handleInsertImageClick}
+        onOpenTemplates={handleOpenTemplates}
+        onViewCode={handleViewCode}
+        onClear={handleClear}
+        t={t}
+      />
 
-      <div
-        className="nb-root relative flex flex-col overflow-hidden rounded-lg border-2 border-border bg-surface"
-        style={{ height: 720 }}
-      >
-        <BuilderToolbar
-          ready={Boolean(editor)}
-          readOnly={readOnly}
-          device={device}
-          showBorders={showBorders}
-          canUndo={canUndo}
-          canRedo={canRedo}
-          onUndo={handleUndo}
-          onRedo={handleRedo}
-          onSetDevice={handleSetDevice}
-          onToggleBorders={handleToggleBorders}
-          onViewCode={handleViewCode}
-          onClear={handleClear}
-          t={t}
-        />
-
-        <div className="flex min-h-0 flex-1">
-          <BuilderBlockPalette blocksRef={blocksRef} title={t('newsletter_content_editor.palette_title')} />
-          <main className="min-w-0 flex-1 overflow-hidden">
-            <div ref={canvasRef} className="h-full w-full" />
-          </main>
-          <BuilderInspector
-            stylesRef={stylesRef}
-            traitsRef={traitsRef}
-            layersRef={layersRef}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            hasSelection={hasSelection}
-            labels={{
-              ariaLabel: t('newsletter_content_editor.inspector_label'),
-              style: t('newsletter_content_editor.inspector_style'),
-              settings: t('newsletter_content_editor.inspector_settings'),
-              layers: t('newsletter_content_editor.inspector_layers'),
-              empty: t('newsletter_content_editor.empty_inspector'),
-            }}
-          />
+      {legacyNotice && (
+        <div className="flex items-start gap-2 border-b border-warning/40 bg-warning/10 px-3 py-2 text-xs text-foreground">
+          <Info size={14} className="mt-0.5 shrink-0 text-warning" aria-hidden="true" />
+          <span className="flex-1">{t('newsletter_builder.legacy_notice')}</span>
+          <button
+            type="button"
+            onClick={() => setLegacyNotice(false)}
+            aria-label={t('newsletter_builder.dismiss')}
+            className="shrink-0 text-muted hover:text-foreground"
+          >
+            <X size={14} />
+          </button>
         </div>
+      )}
 
-        {readOnly && (
-          <div className="absolute inset-0 z-10 cursor-not-allowed bg-white/40" aria-hidden="true" />
-        )}
+      <div className="flex min-h-0 flex-1">
+        <BuilderBlockPalette
+          blocksRef={blocksRef}
+          title={t('newsletter_content_editor.palette_title')}
+          collapsed={paletteCollapsed}
+          onToggleCollapse={() => setPaletteCollapsed((v) => !v)}
+          expandLabel={t('newsletter_builder.show_blocks')}
+          collapseLabel={t('newsletter_builder.hide_blocks')}
+        />
+        <main className="nb-canvas min-w-0 flex-1 overflow-hidden">
+          <div ref={canvasRef} className="h-full w-full" />
+        </main>
+        <BuilderInspector
+          stylesRef={stylesRef}
+          traitsRef={traitsRef}
+          layersRef={layersRef}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          hasSelection={hasSelection}
+          collapsed={inspectorCollapsed}
+          onToggleCollapse={() => setInspectorCollapsed((v) => !v)}
+          expandLabel={t('newsletter_builder.show_inspector')}
+          collapseLabel={t('newsletter_builder.hide_inspector')}
+          labels={{
+            ariaLabel: t('newsletter_content_editor.inspector_label'),
+            style: t('newsletter_content_editor.inspector_style'),
+            settings: t('newsletter_content_editor.inspector_settings'),
+            layers: t('newsletter_content_editor.inspector_layers'),
+            empty: t('newsletter_content_editor.empty_inspector'),
+          }}
+        />
       </div>
+
+      {readOnly && (
+        <div className="absolute inset-0 z-10 cursor-not-allowed bg-white/40" aria-hidden="true" />
+      )}
+    </div>
+  );
+
+  const overlays = (
+    <>
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleImageFile}
+        aria-hidden="true"
+        tabIndex={-1}
+      />
+
+      {enableTemplates && (
+        <TemplateGalleryModal
+          isOpen={templatesOpen}
+          onClose={() => setTemplatesOpen(false)}
+          templates={templates}
+          onSelect={applyTemplate}
+        />
+      )}
 
       <Modal isOpen={codeOpen} onOpenChange={setCodeOpen} size="3xl" scrollBehavior="inside">
         <ModalContent>
@@ -369,6 +598,25 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
           </ModalFooter>
         </ModalContent>
       </Modal>
+    </>
+  );
+
+  if (fill) {
+    return (
+      <>
+        {frame}
+        {overlays}
+      </>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-sm font-medium text-foreground">
+        {t('newsletter_content_editor.mode_design')}
+      </label>
+      {frame}
+      {overlays}
     </div>
   );
 }
