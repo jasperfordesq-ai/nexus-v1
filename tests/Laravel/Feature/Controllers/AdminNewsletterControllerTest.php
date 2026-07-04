@@ -283,15 +283,20 @@ class AdminNewsletterControllerTest extends TestCase
             ],
         ]);
 
+        // Each list row must carry a stable `id` (= email here) so the admin UI's
+        // dynamic table can key it — mirrors the id guarantee the activity endpoint
+        // makes. A missing id crashes the "Who Opened"/"Who Clicked" tabs.
         $this->apiGet("/v2/admin/newsletters/{$newsletterId}/openers")
             ->assertOk()
             ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.id', 'opened@example.test')
             ->assertJsonPath('data.0.email', 'opened@example.test')
             ->assertJsonPath('data.0.open_count', 2);
 
         $this->apiGet("/v2/admin/newsletters/{$newsletterId}/clickers")
             ->assertOk()
             ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.id', 'clicked@example.test')
             ->assertJsonPath('data.0.email', 'clicked@example.test')
             ->assertJsonPath('data.0.click_count', 1);
     }

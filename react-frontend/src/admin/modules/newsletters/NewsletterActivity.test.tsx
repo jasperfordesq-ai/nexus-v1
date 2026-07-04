@@ -82,11 +82,14 @@ const makeActivityEvent = (overrides = {}) => ({
   ...overrides,
 });
 
-// NOTE: each maker needs an `id` — the HeroUI <TableBody items={...}> collection
-// pattern requires a key per item, else React-Aria throws uncaught "Could not
-// determine key for item" exceptions (which fail the vitest run via exit 1).
+// The list endpoints (openers/clickers/non-openers/opened-no-click) do NOT return an
+// `id` — they are deduplicated by email server-side. These fixtures deliberately omit
+// `id` to mirror the real API: the component must derive a stable row key from `email`
+// itself (see withRowId), otherwise HeroUI's dynamic <TableBody items={...}> throws
+// "Could not determine key for item" and crashes the tab. Reintroducing a fake `id`
+// here would mask that regression (it did once). `activity` rows are the exception —
+// they carry a real numeric id.
 const makeOpener = (overrides: { email?: string } = {}) => ({
-  id: overrides.email ?? 'bob@example.com',
   email: 'bob@example.com',
   first_opened: '2025-05-01T09:00:00Z',
   open_count: 3,
@@ -94,7 +97,6 @@ const makeOpener = (overrides: { email?: string } = {}) => ({
 });
 
 const makeClicker = (overrides: { email?: string } = {}) => ({
-  id: overrides.email ?? 'carol@example.com',
   email: 'carol@example.com',
   first_clicked: '2025-05-01T09:30:00Z',
   click_count: 2,
@@ -103,7 +105,6 @@ const makeClicker = (overrides: { email?: string } = {}) => ({
 });
 
 const makeNonOpener = (overrides: { email?: string } = {}) => ({
-  id: overrides.email ?? 'dave@example.com',
   email: 'dave@example.com',
   name: 'Dave D',
   sent_at: '2025-04-30T08:00:00Z',
@@ -111,7 +112,6 @@ const makeNonOpener = (overrides: { email?: string } = {}) => ({
 });
 
 const makeOpenedNoClick = (overrides: { email?: string } = {}) => ({
-  id: overrides.email ?? 'erin@example.com',
   email: 'erin@example.com',
   name: 'Erin E',
   first_opened: '2025-05-01T10:15:00Z',
@@ -356,5 +356,44 @@ describe('NewsletterActivity', () => {
     await waitFor(() => {
       expect(screen.getByText('alice@example.com')).toBeInTheDocument();
     });
+  });
+
+  // Regression: the per-subscriber list endpoints return rows keyed only by email
+  // (no `id`). HeroUI's dynamic <TableBody items={...}> derives each row key from
+  // `item.id`/`item.key` and throws "Could not determine key for item" otherwise —
+  // which unmounts the tab subtree. The component must supply the key from email.
+  it('switches through every per-subscriber tab with id-less rows without crashing', async () => {
+    mockAdminNewsletters.getOpeners.mockResolvedValue(
+      paginatedOf([makeOpener(), makeOpener({ email: 'b2@example.com' })])
+    );
+    mockAdminNewsletters.getClickers.mockResolvedValue(
+      paginatedOf([makeClicker(), makeClicker({ email: 'c2@example.com' })])
+    );
+    mockAdminNewsletters.getNonOpeners.mockResolvedValue(
+      paginatedOf([makeNonOpener(), makeNonOpener({ email: 'd2@example.com' })])
+    );
+    mockAdminNewsletters.getOpenersNoClick.mockResolvedValue(
+      paginatedOf([makeOpenedNoClick(), makeOpenedNoClick({ email: 'e2@example.com' })])
+    );
+
+    const { NewsletterActivity } = await import('./NewsletterActivity');
+    render(<NewsletterActivity />);
+    await waitFor(() => screen.getByRole('heading', { level: 1 }));
+
+    // Tabs render in declaration order: activity, openers, clickers, non-openers, opened-no-click.
+    const calls = [
+      mockAdminNewsletters.getOpeners,
+      mockAdminNewsletters.getClickers,
+      mockAdminNewsletters.getNonOpeners,
+      mockAdminNewsletters.getOpenersNoClick,
+    ];
+    for (let i = 1; i <= 4; i++) {
+      const tab = screen.getAllByRole('tab')[i];
+      expect(tab).toBeDefined();
+      fireEvent.click(tab);
+      await waitFor(() => expect(calls[i - 1]).toHaveBeenCalled());
+      // Heading still mounted ⇒ this tab rendered its rows without throwing.
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
+    }
   });
 });

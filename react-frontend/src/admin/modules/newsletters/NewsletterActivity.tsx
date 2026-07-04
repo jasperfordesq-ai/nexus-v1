@@ -47,12 +47,14 @@ interface ActivityEvent {
 }
 
 interface OpenerRow {
+  id: string;
   email: string;
   first_opened: string;
   open_count: number;
 }
 
 interface ClickerRow {
+  id: string;
   email: string;
   first_clicked: string;
   click_count: number;
@@ -60,12 +62,14 @@ interface ClickerRow {
 }
 
 interface NonOpenerRow {
+  id: string;
   email: string;
   name: string | null;
   sent_at: string;
 }
 
 interface OpenedNoClickRow {
+  id: string;
   email: string;
   name: string | null;
   first_opened: string;
@@ -105,6 +109,17 @@ function parsePaginated<T>(raw: unknown): PaginatedResponse<T> {
     return { data: raw as T[] };
   }
   return { data: [] };
+}
+
+// The per-subscriber list endpoints (openers/clickers/non-openers/opened-no-click)
+// key their rows by email and do not return an `id`. HeroUI's dynamic
+// <TableBody items={...}> collection derives each row key from `item.id`/`item.key`
+// (the JSX `key` is ignored in dynamic mode) and throws "Could not determine key
+// for item" when neither is present — which crashes the whole tab. Each list is
+// deduplicated by email server-side, so email is a safe stable key. The activity
+// tab is exempt: it already carries a unique numeric id and its emails can repeat.
+function withRowId<T extends { email: string }>(rows: T[]): (T & { id: string })[] {
+  return rows.map((row) => ({ ...row, id: row.email }));
 }
 
 function escapeCsvField(field: string): string {
@@ -169,7 +184,7 @@ export function NewsletterActivity() {
         const res = await adminNewsletters.getOpeners(nid, { page, per_page: perPage });
         if (res.success && res.data) {
           const payload = parsePaginated<OpenerRow>(res.data);
-          setOpeners(payload.data);
+          setOpeners(withRowId(payload.data));
           setTotalPages(payload.meta?.total_pages ?? 1);
           setTotalCount(payload.meta?.total ?? payload.data.length);
         }
@@ -177,7 +192,7 @@ export function NewsletterActivity() {
         const res = await adminNewsletters.getClickers(nid, { page, per_page: perPage });
         if (res.success && res.data) {
           const payload = parsePaginated<ClickerRow>(res.data);
-          setClickers(payload.data);
+          setClickers(withRowId(payload.data));
           setTotalPages(payload.meta?.total_pages ?? 1);
           setTotalCount(payload.meta?.total ?? payload.data.length);
         }
@@ -185,7 +200,7 @@ export function NewsletterActivity() {
         const res = await adminNewsletters.getNonOpeners(nid, { page, per_page: perPage });
         if (res.success && res.data) {
           const payload = parsePaginated<NonOpenerRow>(res.data);
-          setNonOpeners(payload.data);
+          setNonOpeners(withRowId(payload.data));
           setTotalPages(payload.meta?.total_pages ?? 1);
           setTotalCount(payload.meta?.total ?? payload.data.length);
         }
@@ -193,7 +208,7 @@ export function NewsletterActivity() {
         const res = await adminNewsletters.getOpenersNoClick(nid, { page, per_page: perPage });
         if (res.success && res.data) {
           const payload = parsePaginated<OpenedNoClickRow>(res.data);
-          setOpenedNoClick(payload.data);
+          setOpenedNoClick(withRowId(payload.data));
           setTotalPages(payload.meta?.total_pages ?? 1);
           setTotalCount(payload.meta?.total ?? payload.data.length);
         }
@@ -416,7 +431,7 @@ export function NewsletterActivity() {
                 emptyContent={<EmptyState title={t('shared.no_data_available')} message={t('newsletter_activity.no_openers_found')} />}
               >
                 {(row) => (
-                  <TableRow key={row.email}>
+                  <TableRow key={row.id}>
                     <TableCell><span className="font-mono text-sm">{row.email}</span></TableCell>
                     <TableCell>
                       <div className="text-center">
@@ -448,7 +463,7 @@ export function NewsletterActivity() {
                 emptyContent={<EmptyState title={t('shared.no_data_available')} message={t('newsletter_activity.no_clickers_found')} />}
               >
                 {(row) => (
-                  <TableRow key={row.email}>
+                  <TableRow key={row.id}>
                     <TableCell><span className="font-mono text-sm">{row.email}</span></TableCell>
                     <TableCell>
                       <div className="text-center">
@@ -484,7 +499,7 @@ export function NewsletterActivity() {
                 emptyContent={<EmptyState title={t('newsletter_activity.all_recipients_opened_title')} message={t('newsletter_activity.all_recipients_opened')} icon={<Users size={48} className="text-success-300" />} />}
               >
                 {(row) => (
-                  <TableRow key={row.email}>
+                  <TableRow key={row.id}>
                     <TableCell><span className="font-mono text-sm">{row.email}</span></TableCell>
                     <TableCell><span className="text-sm text-foreground">{row.name || '--'}</span></TableCell>
                     <TableCell><span className="text-sm text-foreground">{formatTime(row.sent_at)}</span></TableCell>
@@ -512,7 +527,7 @@ export function NewsletterActivity() {
                 emptyContent={<EmptyState title={t('newsletter_activity.all_openers_clicked_title')} message={t('newsletter_activity.all_openers_clicked')} icon={<MousePointer size={48} className="text-success-300" />} />}
               >
                 {(row) => (
-                  <TableRow key={row.email}>
+                  <TableRow key={row.id}>
                     <TableCell><span className="font-mono text-sm">{row.email}</span></TableCell>
                     <TableCell><span className="text-sm text-foreground">{row.name || '--'}</span></TableCell>
                     <TableCell>

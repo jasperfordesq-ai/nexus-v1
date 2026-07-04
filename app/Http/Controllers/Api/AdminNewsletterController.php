@@ -2701,6 +2701,9 @@ class AdminNewsletterController extends BaseApiController
 
                 $items = array_map(function ($row) {
                     return [
+                        // Deduplicated by email — email is the stable row key the admin
+                        // UI's dynamic table needs (mirrors the id activity() guarantees).
+                        'id' => $row->email ?? '',
                         'email' => $row->email ?? '',
                         'first_opened' => $row->first_opened ?? '',
                         'open_count' => (int) ($row->open_count ?? 0),
@@ -2748,6 +2751,9 @@ class AdminNewsletterController extends BaseApiController
 
                 $items = array_map(function ($row) {
                     return [
+                        // Deduplicated by email — email is the stable row key the admin
+                        // UI's dynamic table needs (mirrors the id activity() guarantees).
+                        'id' => $row->email ?? '',
                         'email' => $row->email ?? '',
                         'first_clicked' => $row->first_clicked ?? '',
                         'click_count' => (int) ($row->click_count ?? 0),
@@ -2807,6 +2813,9 @@ class AdminNewsletterController extends BaseApiController
                 $items = array_map(function ($row) {
                     $name = trim(($row->first_name ?? '') . ' ' . ($row->last_name ?? ''));
                     return [
+                        // Distinct sent emails — email is the stable row key the admin
+                        // UI's dynamic table needs (mirrors the id activity() guarantees).
+                        'id' => $row->email ?? '',
                         'email' => $row->email ?? '',
                         'name' => $name ?: null,
                         'sent_at' => $row->sent_at ?? '',
@@ -2868,6 +2877,9 @@ class AdminNewsletterController extends BaseApiController
                 $items = array_map(function ($row) {
                     $name = trim(($row->first_name ?? '') . ' ' . ($row->last_name ?? ''));
                     return [
+                        // Deduplicated by email — email is the stable row key the admin
+                        // UI's dynamic table needs (mirrors the id activity() guarantees).
+                        'id' => $row->email ?? '',
                         'email' => $row->email ?? '',
                         'name' => $name ?: null,
                         'first_opened' => $row->first_opened ?? '',
