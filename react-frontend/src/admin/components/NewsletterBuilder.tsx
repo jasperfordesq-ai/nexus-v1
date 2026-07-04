@@ -10,23 +10,28 @@
  * - Blocks are MJML components (grapesjs-mjml), so the exported HTML is
  *   inbox-safe/table-based by construction.
  * - The editable project is serialized to `design_json` (so a design reopens
- *   losslessly); the compiled, ready-to-send HTML is what gets stored in
- *   `content` (content_format='builder', which the backend renders like html).
- * - Image uploads go through our own domain (POST /v2/upload) via the same
- *   endpoint the HTML editor uses.
+ *   losslessly); the compiled, ready-to-send HTML is stored in `content`
+ *   (content_format='builder', which the backend renders like html).
+ * - Image uploads go through our own domain (POST /v2/upload).
  *
- * IMPORTANT (integration constraints, learned the hard way):
- *  - grapesjs-mjml@1.0.8 supports grapesjs ^0.21.x ONLY. On 0.22/0.23 the MJML
- *    canvas wiring fails silently (blocks show but won't drop). Keep grapesjs
- *    pinned to 0.21.x.
+ * WHY THIS OWNS ITS OWN CHROME (learned the hard way): GrapesJS's DEFAULT panel
+ * layout is driven by toolbar buttons whose glyphs come from Font Awesome. This
+ * app has no Font Awesome (it uses lucide-react), so those buttons render as
+ * blank squares and the block palette gets stranded behind an invisible toggle.
+ * So we suppress GrapesJS's default panels (`panels: { defaults: [] }`) and pin
+ * each manager into our OWN React layout: a permanent block palette
+ * (BuilderBlockPalette), a labelled lucide toolbar (BuilderToolbar), and a
+ * tabbed Style/Settings/Layers inspector (BuilderInspector).
+ *
+ * INTEGRATION CONSTRAINTS:
+ *  - grapesjs-mjml@1.0.8 supports grapesjs ^0.21.x ONLY. Keep grapesjs pinned.
  *  - The canvas MUST be seeded with an <mjml><mj-body> document or there is no
- *    valid mj-body to drop blocks into (the layer tree shows a bare "Body").
- *  - GrapesJS's UI CSS is imported once in src/main.tsx (before Tailwind), not
- *    here, so Tailwind's preflight can't win the cascade over the editor chrome.
+ *    valid mj-body to drop blocks into.
+ *  - GrapesJS UI CSS is imported once in src/main.tsx (with our theme overrides
+ *    right after), not here, so the cascade order is deterministic.
  *
  * GrapesJS is imperative; it's mounted once in a useEffect, guarded against
- * React StrictMode's mount→cleanup→remount by gating on the editor INSTANCE
- * ref (a boolean guard never re-arms — see src/test/mount-guard-convention).
+ * React StrictMode's mount→cleanup→remount by gating on the editor INSTANCE ref.
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -34,8 +39,13 @@ import grapesjs, { type Editor } from 'grapesjs';
 import mjmlPlugin from 'grapesjs-mjml';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useConfirm } from '@/components/ui';
+import Copy from 'lucide-react/icons/copy';
 import { logError } from '@/lib/logger';
 import { adminNewsletters } from '../api/adminApi';
+import { BuilderToolbar, type BuilderDevice } from './BuilderToolbar';
+import { BuilderBlockPalette } from './BuilderBlockPalette';
+import { BuilderInspector, type InspectorTab } from './BuilderInspector';
 
 interface NewsletterBuilderProps {
   /** Current compiled HTML (unused for restore — design_json drives restore). */
@@ -64,21 +74,52 @@ function resolveMjmlPlugin(): MjmlPluginFn | null {
   return null;
 }
 
+/** Minimal structural view of grapesjs' UndoManager (avoids depending on its types here). */
+type UndoLike = { hasUndo?: () => boolean; hasRedo?: () => boolean; undo?: () => void; redo?: () => void };
+
 export function NewsletterBuilder({ designJson, readOnly, onChange }: NewsletterBuilderProps) {
   const { t } = useTranslation('admin');
   const toast = useToast();
+  const confirm = useConfirm();
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  // One ref per GrapesJS appendTo target — all must be mounted before init runs.
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const blocksRef = useRef<HTMLDivElement>(null);
+  const stylesRef = useRef<HTMLDivElement>(null);
+  const traitsRef = useRef<HTMLDivElement>(null);
+  const layersRef = useRef<HTMLDivElement>(null);
+
   const editorRef = useRef<Editor | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
   // Seed only at mount time — later prop changes shouldn't reset the canvas.
   const seedRef = useRef(designJson);
+
+  const [editor, setEditor] = useState<Editor | null>(null);
   const [failed, setFailed] = useState(false);
+  const [device, setDevice] = useState<BuilderDevice>('Desktop');
+  const [showBorders, setShowBorders] = useState(false);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+  const [hasSelection, setHasSelection] = useState(false);
+  const [activeTab, setActiveTab] = useState<InspectorTab>('style');
+  const [codeOpen, setCodeOpen] = useState(false);
+  const [codeHtml, setCodeHtml] = useState('');
+
+  // Reads the editor's undo/redo availability into React state. Reads refs +
+  // stable setters only, so it's safe to call from the init effect too.
+  const syncUndoState = () => {
+    const um = editorRef.current?.UndoManager as unknown as UndoLike | undefined;
+    setCanUndo(Boolean(um?.hasUndo?.()));
+    setCanRedo(Boolean(um?.hasRedo?.()));
+  };
 
   useEffect(() => {
-    if (!containerRef.current || editorRef.current) return undefined;
+    if (editorRef.current) return undefined;
+    if (!canvasRef.current || !blocksRef.current || !stylesRef.current || !traitsRef.current || !layersRef.current) {
+      return undefined;
+    }
 
     const mjmlFn = resolveMjmlPlugin();
     if (!mjmlFn) {
@@ -87,18 +128,25 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
       return undefined;
     }
 
-    let editor: Editor;
+    let ed: Editor;
     try {
-      editor = grapesjs.init({
-        container: containerRef.current,
-        height: '640px',
+      ed = grapesjs.init({
+        container: canvasRef.current,
+        height: '100%',
         width: '100%',
         fromElement: false,
         storageManager: { type: 'none' },
         undoManager: { trackSelection: false },
+        // Suppress GrapesJS's default (icon-less) panels; we own the chrome.
+        panels: { defaults: [] },
+        // Pin each manager into our own React layout.
+        blockManager: { appendTo: blocksRef.current },
+        styleManager: { appendTo: stylesRef.current },
+        traitManager: { appendTo: traitsRef.current },
+        layerManager: { appendTo: layersRef.current },
         plugins: [
-          (ed: Editor) =>
-            mjmlFn(ed, {
+          (plug: Editor) =>
+            mjmlFn(plug, {
               resetBlocks: true,
               resetStyleManager: true,
               resetDevices: true,
@@ -135,51 +183,59 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
       return undefined;
     }
 
-    editorRef.current = editor;
+    editorRef.current = ed;
 
-    // Restore a previously-saved design, otherwise seed a blank MJML document
-    // so there's a valid mj-body wrapper to drop blocks into.
+    // Restore a previously-saved design, otherwise seed a blank MJML document.
     let restored = false;
     if (seedRef.current) {
       try {
         const parsed = JSON.parse(seedRef.current) as Record<string, unknown>;
-        (editor.loadProjectData as (d: unknown) => void)(parsed);
+        (ed.loadProjectData as (d: unknown) => void)(parsed);
         restored = true;
       } catch (err) {
         logError('NewsletterBuilder: could not restore design_json', err);
       }
     }
     if (!restored) {
-      editor.setComponents(DEFAULT_MJML);
+      ed.setComponents(DEFAULT_MJML);
     }
 
-    // Native tooltips: make sure every top-bar/panel button is labelled.
-    applyButtonTooltips(editor, t);
-
-    const emit = () => {
+    const scheduleEmit = () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => {
-        const ed = editorRef.current;
-        if (!ed) return;
+        const current = editorRef.current;
+        if (!current) return;
         try {
-          const projectData = ed.getProjectData();
-          const result = ed.runCommand('mjml-code-to-html') as { html?: string } | undefined;
-          const compiled = result?.html ?? '';
-          onChangeRef.current({ html: compiled, designJson: JSON.stringify(projectData) });
+          const projectData = current.getProjectData();
+          const result = current.runCommand('mjml-code-to-html') as { html?: string } | undefined;
+          onChangeRef.current({ html: result?.html ?? '', designJson: JSON.stringify(projectData) });
         } catch (err) {
           logError('NewsletterBuilder: export failed', err);
         }
       }, AUTOSAVE_DEBOUNCE_MS);
     };
 
-    // 'update' fires on any project change (components, styles, everything).
-    editor.on('update', emit);
+    const handleUpdate = () => {
+      syncUndoState();
+      scheduleEmit();
+    };
+    const syncSelection = () => setHasSelection(Boolean(editorRef.current?.getSelected()));
+    const syncDevice = () => setDevice((editorRef.current?.getDevice() as BuilderDevice) ?? 'Desktop');
+
+    ed.on('update', handleUpdate);
+    ed.on('component:selected component:deselected', syncSelection);
+    ed.on('change:device', syncDevice);
+
+    setEditor(ed);
+    syncUndoState();
 
     return () => {
-      editor.off('update', emit);
+      ed.off('update', handleUpdate);
+      ed.off('component:selected component:deselected', syncSelection);
+      ed.off('change:device', syncDevice);
       if (debounceRef.current) clearTimeout(debounceRef.current);
       try {
-        editor.destroy();
+        ed.destroy();
       } catch {
         /* already torn down */
       }
@@ -187,6 +243,55 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- init once; seed is a mount-time snapshot
   }, []);
+
+  const handleUndo = () => {
+    (editorRef.current?.UndoManager as unknown as UndoLike | undefined)?.undo?.();
+    syncUndoState();
+  };
+  const handleRedo = () => {
+    (editorRef.current?.UndoManager as unknown as UndoLike | undefined)?.redo?.();
+    syncUndoState();
+  };
+  const handleSetDevice = (next: BuilderDevice) => {
+    editorRef.current?.setDevice(next);
+    setDevice(next);
+  };
+  const handleToggleBorders = () => {
+    const ed = editorRef.current;
+    if (!ed) return;
+    if (showBorders) ed.stopCommand('sw-visibility');
+    else ed.runCommand('sw-visibility');
+    setShowBorders((v) => !v);
+  };
+  const handleViewCode = () => {
+    const ed = editorRef.current;
+    if (!ed) return;
+    try {
+      const result = ed.runCommand('mjml-code-to-html') as { html?: string } | undefined;
+      setCodeHtml(result?.html ?? '');
+      setCodeOpen(true);
+    } catch (err) {
+      logError('NewsletterBuilder: view code failed', err);
+    }
+  };
+  const handleClear = async () => {
+    const ok = await confirm({
+      title: t('newsletter_content_editor.builder_reset'),
+      body: t('newsletter_content_editor.builder_reset_confirm'),
+      status: 'warning',
+      confirmLabel: t('newsletter_content_editor.builder_reset'),
+    });
+    if (!ok) return;
+    editorRef.current?.setComponents(DEFAULT_MJML);
+  };
+  const copyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(codeHtml);
+      toast.success(t('newsletter_content_editor.code_copied'));
+    } catch {
+      /* clipboard blocked — no-op */
+    }
+  };
 
   if (failed) {
     return (
@@ -201,54 +306,71 @@ export function NewsletterBuilder({ designJson, readOnly, onChange }: Newsletter
       <label className="text-sm font-medium text-foreground">
         {t('newsletter_content_editor.mode_design')}
       </label>
-      <div className="relative overflow-hidden rounded-lg border-2 border-border" style={{ height: 700 }}>
-        <div ref={containerRef} className="h-full w-full" />
+
+      <div
+        className="nb-root relative flex flex-col overflow-hidden rounded-lg border-2 border-border bg-surface"
+        style={{ height: 720 }}
+      >
+        <BuilderToolbar
+          ready={Boolean(editor)}
+          readOnly={readOnly}
+          device={device}
+          showBorders={showBorders}
+          canUndo={canUndo}
+          canRedo={canRedo}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          onSetDevice={handleSetDevice}
+          onToggleBorders={handleToggleBorders}
+          onViewCode={handleViewCode}
+          onClear={handleClear}
+          t={t}
+        />
+
+        <div className="flex min-h-0 flex-1">
+          <BuilderBlockPalette blocksRef={blocksRef} title={t('newsletter_content_editor.palette_title')} />
+          <main className="min-w-0 flex-1 overflow-hidden">
+            <div ref={canvasRef} className="h-full w-full" />
+          </main>
+          <BuilderInspector
+            stylesRef={stylesRef}
+            traitsRef={traitsRef}
+            layersRef={layersRef}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            hasSelection={hasSelection}
+            labels={{
+              ariaLabel: t('newsletter_content_editor.inspector_label'),
+              style: t('newsletter_content_editor.inspector_style'),
+              settings: t('newsletter_content_editor.inspector_settings'),
+              layers: t('newsletter_content_editor.inspector_layers'),
+              empty: t('newsletter_content_editor.empty_inspector'),
+            }}
+          />
+        </div>
+
         {readOnly && (
           <div className="absolute inset-0 z-10 cursor-not-allowed bg-white/40" aria-hidden="true" />
         )}
       </div>
+
+      <Modal isOpen={codeOpen} onOpenChange={setCodeOpen} size="3xl" scrollBehavior="inside">
+        <ModalContent>
+          <ModalHeader>{t('newsletter_content_editor.code_modal_title')}</ModalHeader>
+          <ModalBody>
+            <pre className="max-h-[60vh] overflow-auto rounded-lg border border-border bg-surface p-3 text-xs text-foreground">
+              <code>{codeHtml}</code>
+            </pre>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="primary" size="sm" startContent={<Copy size={14} />} onPress={copyCode}>
+              {t('newsletter_content_editor.code_copy')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
-}
-
-/**
- * GrapesJS renders native tooltips from each panel button's `title` attribute.
- * Some plugin reset options drop them, so backfill a friendly title for every
- * button (falling back to a humanized id).
- */
-function applyButtonTooltips(editor: Editor, t: (k: string) => string): void {
-  const labels: Record<string, string> = {
-    'sw-visibility': t('newsletter_content_editor.tip_borders'),
-    preview: t('newsletter_content_editor.tip_preview'),
-    fullscreen: t('newsletter_content_editor.tip_fullscreen'),
-    'export-template': t('newsletter_content_editor.tip_code'),
-    'undo': t('newsletter_content_editor.tip_undo'),
-    'redo': t('newsletter_content_editor.tip_redo'),
-    'canvas-clear': t('newsletter_content_editor.tip_clear'),
-    'open-sm': t('newsletter_content_editor.tip_styles'),
-    'open-tm': t('newsletter_content_editor.tip_settings'),
-    'open-layers': t('newsletter_content_editor.tip_layers'),
-    'open-blocks': t('newsletter_content_editor.tip_blocks'),
-  };
-  type PanelBtn = { get: (k: string) => unknown; set: (k: string, v: unknown) => void; id?: string };
-  type Panel = { get: (k: string) => unknown };
-  // getPanels() returns a Backbone-style `Panels` collection (has forEach at
-  // runtime but isn't array-typed), so cast via unknown to a structural shape.
-  type ForEachOf<T> = { forEach: (cb: (item: T) => void) => void };
-  try {
-    (editor.Panels.getPanels() as unknown as ForEachOf<Panel>).forEach((panel) => {
-      const buttons = panel.get('buttons') as ForEachOf<PanelBtn> | undefined;
-      buttons?.forEach((btn) => {
-        const id = String((btn.get('id') as string) ?? btn.id ?? '');
-        const attrs = (btn.get('attributes') as Record<string, unknown>) || {};
-        if (!attrs.title) {
-          btn.set('attributes', { ...attrs, title: labels[id] ?? id.replace(/[-_]/g, ' ') });
-        }
-      });
-    });
-  } catch (err) {
-    logError('NewsletterBuilder: could not apply button tooltips', err);
-  }
 }
 
 export default NewsletterBuilder;

@@ -11,6 +11,9 @@ import './index.css';
 // Tailwind, and unlayered so it reliably wins the cascade over Tailwind's
 // layered preflight — a component-level lazy import re-injected inconsistently.
 import 'grapesjs/dist/css/grapes.min.css';
+// Our theme overrides for the builder's pinned GrapesJS managers — must load
+// after grapes.min.css so equal-specificity rules win the cascade.
+import './styles/newsletter-builder.css';
 import i18n from './i18n'; // Initialize i18n before App renders
 
 // Log build version to console for deployment verification
