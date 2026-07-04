@@ -599,15 +599,18 @@ class SocialControllerTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        // The polymorphic endpoint reads from feed_activity, so seed an activity row
-        // for the listing the same way FeedActivityService would.
-        \App\Models\FeedActivity::factory()->forTenant($this->testTenantId)->create([
-            'source_type' => 'listing',
-            'source_id'   => $listing->id,
-            'user_id'     => $user->id,
-            'is_visible'  => true,
-            'is_hidden'   => false,
-        ]);
+        // Creating the listing above already fires ListingObserver, which
+        // publishes the feed_activity row. Seed through the same service the
+        // observer uses (INSERT ... ON DUPLICATE KEY UPDATE) so this stays
+        // idempotent instead of colliding with the observer's row
+        // (1062 uq_tenant_source), while still guaranteeing a visible row.
+        app(\App\Services\FeedActivityService::class)->recordActivity(
+            (int) $this->testTenantId,
+            (int) $user->id,
+            'listing',
+            (int) $listing->id,
+            ['title' => $listing->title]
+        );
 
         $response = $this->apiGet('/v2/feed/items/listing/' . $listing->id);
 
