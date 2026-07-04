@@ -40,3 +40,30 @@ export function isAdminTier(user?: Partial<AdminTierUser> | null): boolean {
     user.is_god === true
   );
 }
+
+/**
+ * Client-side gate for the SHARED moderation UI (Feed / Comments / Reviews),
+ * which is mounted in BOTH the admin panel and the broker panel
+ * (`/broker/moderation/*`).
+ *
+ * MUST stay in sync with the backend
+ * `app/Http/Controllers/Api/BaseApiController.php::requireBrokerOrAdmin()` that
+ * guards the underlying `/v2/admin/feed|comments|reviews` endpoints:
+ * admin-tier OR role broker/coordinator. `moderator` is retained for backward
+ * compatibility with the previous inline check; the server remains the
+ * authoritative gate, so being *permissive* here is safe.
+ *
+ * The bug this exists to prevent is the inverse — being STRICTER than the
+ * server. A gate that blocks a legitimate `tenant_admin`/`broker` client-side
+ * means the DELETE/HIDE request is NEVER SENT, producing a silent or
+ * "Unauthorized" failure that looks like a backend bug but never reaches the
+ * backend (0 rows in the server audit log). That was the root cause of the
+ * recurring "admin can't delete a feed post" issue in the broker panel.
+ */
+export function canModerateContent(user?: Partial<AdminTierUser> | null): boolean {
+  if (isAdminTier(user)) return true;
+
+  const role = (user?.role as string | undefined) ?? '';
+
+  return role === 'broker' || role === 'coordinator' || role === 'moderator';
+}

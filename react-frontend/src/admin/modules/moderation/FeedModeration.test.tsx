@@ -255,6 +255,48 @@ describe('FeedModeration', () => {
     }
   });
 
+  // Regression: a tenant_admin (or broker) is broker-or-admin on the server
+  // (requireBrokerOrAdmin), but the old inline client gate accepted only
+  // admin/super_admin/moderator — so the DELETE was blocked CLIENT-SIDE with an
+  // "Unauthorized" toast and never reached the server. This is the recurring
+  // "admin can't delete a feed post" bug in the broker panel.
+  it('allows a tenant_admin without super flags to delete (does not block client-side)', async () => {
+    const originalUser = mockAuthValue.user;
+    mockAuthValue.user = { id: 2, role: 'tenant_admin', is_super_admin: false, is_tenant_super_admin: false };
+    try {
+      mockAdminModeration.deleteFeedPost.mockResolvedValue({ success: true });
+      mockUseApi.mockReturnValue(makeUseApiResult({ execute: vi.fn() }));
+
+      render(<FeedModeration />);
+
+      const deleteBtn = screen.getAllByRole('button').find((b) =>
+        b.textContent?.trim().toLowerCase() === 'delete',
+      );
+      expect(deleteBtn).toBeDefined();
+      fireEvent.click(deleteBtn!);
+
+      await waitFor(() => {
+        expect(screen.queryAllByRole('dialog').length).toBeGreaterThan(0);
+      });
+
+      const confirmBtns = screen.getAllByRole('button').filter((b) =>
+        b.textContent?.toLowerCase().includes('delete') ||
+        b.textContent?.toLowerCase().includes('confirm'),
+      );
+      const confirmBtn = confirmBtns[confirmBtns.length - 1];
+      expect(confirmBtn).toBeDefined();
+      fireEvent.click(confirmBtn);
+
+      await waitFor(() => {
+        expect(mockAdminModeration.deleteFeedPost).toHaveBeenCalled();
+      });
+      // The old gate would have shown an "unauthorized" toast and returned early.
+      expect(mockToast.error).not.toHaveBeenCalled();
+    } finally {
+      mockAuthValue.user = originalUser;
+    }
+  });
+
   it('shows success toast after hide succeeds', async () => {
     mockAdminModeration.hideFeedPost.mockResolvedValue({ success: true });
     mockUseApi.mockReturnValue(makeUseApiResult({ execute: vi.fn() }));

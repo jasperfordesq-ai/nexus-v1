@@ -19,6 +19,7 @@ import PageHeader from '@/admin/components/PageHeader';
 import ConfirmModal from '@/admin/components/ConfirmModal';
 import { adminModeration } from '@/admin/api/adminApi';
 import { adminSuper } from '@/admin/api/adminApi';
+import { canModerateContent } from '@/lib/roles';
 import type { AdminFeedPost } from '@/admin/api/types';
 
 export default function FeedModeration() {
@@ -112,10 +113,15 @@ export default function FeedModeration() {
   const handleAction = async () => {
     if (!confirmAction) return;
 
-    // Re-validate role from auth context before performing any moderation action
-    const isAdmin = user?.role === 'admin' || user?.role === 'super_admin' || user?.is_super_admin === true || user?.is_tenant_super_admin === true;
-    const isModerator = user?.role === 'moderator';
-    if (!isAdmin && !isModerator) {
+    // Re-validate authorization before performing any moderation action.
+    // This MUST mirror the backend `requireBrokerOrAdmin()` guard on the
+    // /v2/admin/feed/* endpoints (admin-tier OR broker/coordinator) — see
+    // canModerateContent(). The previous inline check accepted only
+    // admin/super_admin/moderator, so a `tenant_admin` or `broker` was blocked
+    // CLIENT-SIDE with an "Unauthorized" toast and the DELETE never reached the
+    // server — the root cause of the recurring "admin can't delete a feed post"
+    // bug in the broker panel (this screen is reused at /broker/moderation/feed).
+    if (!canModerateContent(user)) {
       toast.error(t('moderation.unauthorized'));
       setConfirmAction(null);
       return;
