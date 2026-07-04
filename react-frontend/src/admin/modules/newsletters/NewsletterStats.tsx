@@ -536,7 +536,7 @@ export function NewsletterStats() {
             </CardHeader>
             <CardBody className="px-5 pb-5">
               <div className="mx-auto h-48 w-48">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <PieChart>
                     <Pie
                       data={deviceChartData}
@@ -591,7 +591,7 @@ export function NewsletterStats() {
             </CardHeader>
             <CardBody className="px-5 pb-5">
               <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <LineChart data={timeline} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-default-200" />
                     <XAxis
