@@ -22,8 +22,13 @@
  *     await deleteItem();
  *   };
  *
- * Cancelling (Escape, backdrop click, or Cancel button) resolves false.
- * Confirming resolves true and auto-closes via the v3 slot="close" behavior.
+ * Cancelling (Escape, backdrop click, close ✕, or Cancel button) resolves false.
+ * Confirming resolves true via the Confirm button's own onPress; the dialog
+ * closes through the controlled open state (pending → null). Each button has
+ * exactly ONE resolver — the action buttons must NOT carry slot="close", because
+ * in a controlled dialog slot="close" fires onOpenChange(false) → resolveAndClose(false),
+ * which races the Confirm button's resolveAndClose(true) and can make confirm()
+ * wrongly resolve false in a real browser.
  */
 
 import {
@@ -99,10 +104,10 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
               </AlertDialog.Body>
             )}
             <AlertDialog.Footer>
-              <Button slot="close" variant="tertiary" onPress={() => resolveAndClose(false)}>
+              <Button variant="tertiary" onPress={() => resolveAndClose(false)}>
                 {pending?.cancelLabel ?? t('cancel')}
               </Button>
-              <Button slot="close" variant={confirmVariant} onPress={() => resolveAndClose(true)}>
+              <Button variant={confirmVariant} onPress={() => resolveAndClose(true)}>
                 {pending?.confirmLabel ?? t('confirm')}
               </Button>
             </AlertDialog.Footer>

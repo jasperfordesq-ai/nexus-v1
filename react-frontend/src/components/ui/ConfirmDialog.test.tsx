@@ -91,15 +91,12 @@ describe('ConfirmDialogProvider', () => {
     });
   });
 
-  it('resolves the promise and closes the dialog when the confirm button is pressed', async () => {
-    // NOTE: We assert the reliable, environment-independent observables — the
-    // promise settles (onResult fires exactly once) and the dialog closes. We do
-    // NOT assert the boolean value here: the confirm button carries both
-    // slot="close" and onPress, and which handler settles resolveAndClose() first
-    // depends on React-Aria press-event ordering, which differs between jsdom and
-    // a real browser. The confirm-returns-true contract is tracked for browser
-    // verification rather than pinned to jsdom's ordering. The "closes after
-    // confirm" test below covers the DOM teardown.
+  it('resolves TRUE when the confirm button is pressed', async () => {
+    // The Confirm button now carries a single resolver (onPress → resolveAndClose(true))
+    // and closes via the controlled open state — no competing slot="close"/onOpenChange(false)
+    // path. So confirm() deterministically resolves `true`, in both jsdom and a real
+    // browser. Regression guard for the bug where the whole app's confirm-gated
+    // destructive actions silently no-opped because confirm() resolved false.
     const onResult = vi.fn();
     render(<Setup title="Delete?" onResult={onResult} confirmLabel="Delete" />);
     fireEvent.click(screen.getByRole('button', { name: 'Open dialog' }));
@@ -108,6 +105,7 @@ describe('ConfirmDialogProvider', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
 
     await waitFor(() => expect(onResult).toHaveBeenCalledTimes(1));
+    expect(onResult).toHaveBeenCalledWith(true);
     expect(screen.queryByText('Delete?')).toBeNull();
   });
 
