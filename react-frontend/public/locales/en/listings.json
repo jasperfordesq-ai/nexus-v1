@@ -62,6 +62,7 @@
     "title_too_generic_hint": "Try adding a few words about what you'd actually offer — location, frequency, or who it suits. It helps people decide whether to reach out.",
     "description_placeholder": "Describe what you're offering or requesting in detail...",
     "category_placeholder": "Select a category",
+    "category_search": "Search categories",
     "hours_estimated_label": "Estimated Hours",
     "hours_placeholder": "1",
     "location_optional_label": "Location",

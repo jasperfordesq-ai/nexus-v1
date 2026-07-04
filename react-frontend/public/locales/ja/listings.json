@@ -62,6 +62,7 @@
     "title_too_generic_hint": "実際に提供できることについて数語追加してみてください — 場所、頻度、対象者など。人々があなたに連絡するかどうかを判断するのに役立ちます。",
     "description_placeholder": "提供またはリクエストしている内容を詳しく説明してください...",
     "category_placeholder": "カテゴリを選択",
+    "category_search": "カテゴリを検索",
     "hours_estimated_label": "推定時間",
     "hours_placeholder": "1",
     "location_optional_label": "場所（任意）",

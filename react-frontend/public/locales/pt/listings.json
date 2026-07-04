@@ -62,6 +62,7 @@
     "title_too_generic_hint": "Tenta adicionar algumas palavras sobre o que realmente ofereceria — localização, frequência ou para quem é adequado. Ajuda as pessoas a decidir se entram em contacto.",
     "description_placeholder": "Descreva em detalhe o que está a oferecer ou solicitar...",
     "category_placeholder": "Selecione uma categoria",
+    "category_search": "Pesquisar categorias",
     "hours_estimated_label": "Horas Estimadas",
     "hours_placeholder": "1",
     "location_optional_label": "Localização (opcional)",

@@ -62,6 +62,7 @@
     "title_too_generic_hint": "Fügen Sie ein paar Wörter darüber hinzu, was Sie tatsächlich anbieten würden — Ort, Häufigkeit oder für wen es geeignet ist. Das hilft Menschen zu entscheiden, ob sie sich melden.",
     "description_placeholder": "Beschreiben Sie ausführlich, was Sie anbieten oder suchen...",
     "category_placeholder": "Kategorie auswählen",
+    "category_search": "Kategorien suchen",
     "hours_estimated_label": "Geschätzte Stunden",
     "hours_placeholder": "1",
     "location_optional_label": "Standort (optional)",

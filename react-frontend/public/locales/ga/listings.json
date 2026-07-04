@@ -62,6 +62,7 @@
     "title_too_generic_hint": "Bain triail as cúpla focal a chur leis faoin méid a thairgeofá go hiarbhír — suíomh, minicíocht, nó cé dó a oireann sé. Cabhraíonn sé le daoine cinneadh a dhéanamh an dtiocfaidís i dteagmháil leat.",
     "description_placeholder": "Déan cur síos mionchruinn ar an méid atá á thairiscint nó á iarraidh agat...",
     "category_placeholder": "Roghnaigh catagóir",
+    "category_search": "Cuardaigh catagóirí",
     "hours_estimated_label": "Uaireanta Measta",
     "hours_placeholder": "1",
     "location_optional_label": "Suíomh (roghnach)",

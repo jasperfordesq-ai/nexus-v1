@@ -62,6 +62,7 @@
     "title_too_generic_hint": "حاول إضافة بضع كلمات حول ما ستقدمه فعليًا — الموقع أو التكرار أو من يناسبه. يساعد ذلك الناس على تقرير ما إذا كانوا سيتواصلون.",
     "description_placeholder": "صف ما تقدمه أو تطلبه بالتفصيل...",
     "category_placeholder": "اختر فئة",
+    "category_search": "ابحث عن الفئات",
     "hours_estimated_label": "الساعات المقدرة",
     "hours_placeholder": "1",
     "location_optional_label": "الموقع (اختياري)",

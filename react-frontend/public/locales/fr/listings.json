@@ -62,6 +62,7 @@
     "title_too_generic_hint": "Essayez d'ajouter quelques mots sur ce que vous proposeriez réellement — lieu, fréquence ou à qui cela convient. Cela aide les gens à décider de vous contacter.",
     "description_placeholder": "Décrivez en détail ce que vous proposez ou demandez...",
     "category_placeholder": "Sélectionnez une catégorie",
+    "category_search": "Rechercher des catégories",
     "hours_estimated_label": "Heures estimées",
     "hours_placeholder": "1",
     "location_optional_label": "Localisation (facultatif)",

@@ -62,6 +62,7 @@
     "title_too_generic_hint": "Spróbuj dodać kilka słów o tym, co faktycznie oferujesz — lokalizację, częstotliwość lub dla kogo to jest. Pomaga ludziom zdecydować, czy się z tobą skontaktować.",
     "description_placeholder": "Opisz szczegółowo, co oferujesz lub czego potrzebujesz...",
     "category_placeholder": "Wybierz kategorię",
+    "category_search": "Szukaj kategorii",
     "hours_estimated_label": "Szacowane godziny",
     "hours_placeholder": "1",
     "location_optional_label": "Lokalizacja (opcjonalnie)",
