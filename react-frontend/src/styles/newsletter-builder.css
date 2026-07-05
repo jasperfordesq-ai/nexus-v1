@@ -113,3 +113,141 @@
   line-height: 1.3;
   color: var(--color-muted, #6b7280);
 }
+
+/* ── Polished inspector panels (Style / Settings / Layers) ─────────────────────
+ * grapesjs-mjml already exposes the right MJML style properties (typography,
+ * spacing, background incl. background-url, border); this only makes those
+ * managers read as a clean, app-themed panel instead of GrapesJS's default
+ * chrome. PURE PRESENTATION — no property or MJML-mapping changes. */
+
+/* Sector headers (defensive across grapesjs title class variants). */
+.nb-root .gjs-sm-sector .gjs-sm-title,
+.nb-root .gjs-sm-sector-title,
+.nb-root .gjs-sm-title,
+.nb-root .gjs-sm-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 12px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted, #6b7280);
+  background: var(--color-surface-secondary, #f6f6f8);
+  border-top: 1px solid var(--color-border);
+  cursor: pointer;
+}
+.nb-root .gjs-sm-sector.gjs-sm-open .gjs-sm-title,
+.nb-root .gjs-sm-sector .gjs-sm-title:hover {
+  color: var(--color-foreground);
+}
+.nb-root .gjs-sm-properties {
+  padding: 10px 12px 12px;
+  background: var(--color-surface);
+}
+
+/* Property rows + labels. */
+.nb-root .gjs-sm-property {
+  margin-bottom: 11px;
+}
+.nb-root .gjs-sm-label,
+.nb-root .gjs-trt-trait .gjs-label {
+  margin-bottom: 4px;
+  font-size: 10.5px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--color-muted, #6b7280);
+}
+
+/* Fields — inputs / selects / units. The main visual lift. */
+.nb-root .gjs-field {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  color: var(--color-foreground);
+  box-shadow: none;
+  transition: border-color 120ms ease;
+}
+.nb-root .gjs-field:focus-within {
+  border-color: var(--color-accent);
+}
+.nb-root .gjs-field input,
+.nb-root .gjs-field select,
+.nb-root .gjs-sm-input {
+  height: 28px;
+  font-size: 12px;
+  color: var(--color-foreground);
+  background: transparent;
+}
+.nb-root .gjs-field select {
+  cursor: pointer;
+}
+.nb-root .gjs-field-units,
+.nb-root .gjs-field-arrows,
+.nb-root .gjs-field-arrow-u,
+.nb-root .gjs-field-arrow-d,
+.nb-root .gjs-sm-btn {
+  color: var(--color-muted, #6b7280);
+}
+
+/* Segmented radios (e.g. text-align). */
+.nb-root .gjs-radio-items {
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  overflow: hidden;
+}
+.nb-root .gjs-radio-item {
+  border-color: var(--color-border);
+}
+.nb-root .gjs-radio-item-label {
+  color: var(--color-muted, #6b7280);
+}
+.nb-root .gjs-radio-item input:checked + .gjs-radio-item-label {
+  color: var(--color-accent-foreground, #ffffff);
+  background: var(--color-accent);
+}
+
+/* Colour swatch + composite (margin/padding 4-up). */
+.nb-root .gjs-field-color-picker,
+.nb-root .gjs-sm-color-picker {
+  border-radius: 6px;
+}
+.nb-root .gjs-sm-composite {
+  gap: 4px;
+  background: transparent;
+  border: 0;
+}
+
+/* Settings (Trait manager). */
+.nb-root .gjs-trt-traits {
+  padding: 12px;
+}
+.nb-root .gjs-trt-trait {
+  margin-bottom: 11px;
+  padding: 0;
+}
+.nb-root .gjs-trt-header {
+  display: none;
+}
+
+/* Layers. */
+.nb-root .gjs-layer-title,
+.nb-root .gjs-layer-title-inn {
+  background: transparent;
+  border-color: var(--color-border);
+}
+.nb-root .gjs-layer-name {
+  font-size: 12px;
+  color: var(--color-foreground);
+}
+.nb-root .gjs-layer.gjs-selected > .gjs-layer-title-c .gjs-layer-title-inn,
+.nb-root .gjs-layer-title:hover {
+  background: var(--color-surface-secondary, #f1f1f4);
+}
+.nb-root .gjs-layer-vis,
+.nb-root .gjs-layer-caret,
+.nb-root .gjs-layer-move {
+  color: var(--color-muted, #6b7280);
+}
