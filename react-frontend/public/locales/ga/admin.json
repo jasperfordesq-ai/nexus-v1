@@ -13433,7 +13433,22 @@
     "no_hub_tenants_found": "Níor aimsíodh aon thionóntaí moil",
     "impersonate_user_warning": "Logálann pearsanú gach gníomh faoi chéannacht an úsáideora seo. Bain úsáid as ach amháin nuair is gá le haghaidh tacaíochta.",
     "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "tenant_list_tabs_aria": "Tenant status filter",
+    "purge_tenant": "Scrios an tionónta go buan",
+    "purge_requires_deactivation": "Díghníomhachtaigh an tionónta seo sula féidir é a scriosadh go buan.",
+    "purge_warning": "Scriosann sé seo an tionónta seo agus a shonraí go léir go buan. Ní féidir é seo a chur ar ceal.",
+    "purge_preview_failed": "Níorbh fhéidir réamhamharc an scriosta a lódáil.",
+    "purge_started": "Tosaíodh scriosadh an tionónta. Tá an tionónta agus a shonraí go léir á mbaint.",
+    "purge_failed": "Theip ar scriosadh an tionónta.",
+    "purge_tenant_title": "Scrios {{name}} go buan?",
+    "purge_irreversible_warning": "Scriosann sé seo an tionónta agus a shonraí GO LÉIR go buan. Ní féidir é a chur ar ceal.",
+    "purge_summary": "Bainfidh sé seo:",
+    "purge_rows": "{{rows}} taifead thar {{tables}} tábla",
+    "purge_members": "{{n}} cuntas ball",
+    "purge_superadmins": "Aistreofar {{n}} sár-riarthóir(í) ardáin chuig an bpobal tuismitheora, ní scriosfar iad",
+    "purge_manual_followups": "Céimeanna láimhe fós ag teastáil tar éis an scriosta:",
+    "purge_confirm_label": "Clóscríobh slug an tionónta ({{slug}}) le deimhniú",
+    "purge_confirm_button": "Scrios go buan"
   },
   "system": {
     "active": "Gníomhach",

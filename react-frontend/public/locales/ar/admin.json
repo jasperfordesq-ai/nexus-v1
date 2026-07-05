@@ -13433,7 +13433,22 @@
     "no_hub_tenants_found": "لم يتم العثور على مستأجرين للمركز",
     "impersonate_user_warning": "يقوم انتحال الشخصية بتسجيل كل إجراء تحت هوية هذا المستخدم. استخدم فقط عند الضرورة للحصول على الدعم.",
     "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "tenant_list_tabs_aria": "Tenant status filter",
+    "purge_tenant": "حذف المستأجر نهائيًا",
+    "purge_requires_deactivation": "قم بإلغاء تنشيط هذا المستأجر قبل أن يتسنى حذفه نهائيًا.",
+    "purge_warning": "يحذف هذا المستأجر وجميع بياناته نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+    "purge_preview_failed": "تعذّر تحميل معاينة الحذف.",
+    "purge_started": "بدأ حذف المستأجر. تتم إزالة المستأجر وجميع بياناته.",
+    "purge_failed": "فشل حذف المستأجر.",
+    "purge_tenant_title": "حذف {{name}} نهائيًا؟",
+    "purge_irreversible_warning": "يؤدي هذا إلى حذف المستأجر وكل بياناته نهائيًا. لا يمكن التراجع عن ذلك.",
+    "purge_summary": "سيؤدي هذا إلى إزالة:",
+    "purge_rows": "{{rows}} سجل عبر {{tables}} جدولًا",
+    "purge_members": "{{n}} حساب عضو",
+    "purge_superadmins": "سيتم نقل {{n}} من كبار مشرفي المنصة إلى المجتمع الأصلي، ولن يتم حذفهم",
+    "purge_manual_followups": "خطوات يدوية لا تزال مطلوبة بعد الحذف:",
+    "purge_confirm_label": "اكتب مُعرّف المستأجر ({{slug}}) للتأكيد",
+    "purge_confirm_button": "حذف نهائي"
   },
   "system": {
     "active": "نشيط",

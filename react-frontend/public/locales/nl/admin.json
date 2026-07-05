@@ -13433,7 +13433,22 @@
     "no_hub_tenants_found": "Geen hubtenants gevonden",
     "impersonate_user_warning": "Bij imitatie wordt elke actie onder de identiteit van deze gebruiker geregistreerd. Alleen gebruiken wanneer dit nodig is voor ondersteuning.",
     "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "tenant_list_tabs_aria": "Tenant status filter",
+    "purge_tenant": "Huurder permanent verwijderen",
+    "purge_requires_deactivation": "Deactiveer deze huurder voordat deze permanent kan worden verwijderd.",
+    "purge_warning": "Verwijdert deze huurder en alle bijbehorende gegevens permanent. Dit kan niet ongedaan worden gemaakt.",
+    "purge_preview_failed": "Kan het verwijdervoorbeeld niet laden.",
+    "purge_started": "Verwijdering van huurder gestart. De huurder en alle bijbehorende gegevens worden verwijderd.",
+    "purge_failed": "Verwijderen van huurder mislukt.",
+    "purge_tenant_title": "{{name}} permanent verwijderen?",
+    "purge_irreversible_warning": "Hiermee worden de huurder en ALLE bijbehorende gegevens permanent verwijderd. Dit kan niet ongedaan worden gemaakt.",
+    "purge_summary": "Dit verwijdert:",
+    "purge_rows": "{{rows}} records in {{tables}} tabellen",
+    "purge_members": "{{n}} ledenaccounts",
+    "purge_superadmins": "{{n}} platform-superbeheerder(s) worden verplaatst naar de bovenliggende community, niet verwijderd",
+    "purge_manual_followups": "Handmatige stappen die na verwijdering nog nodig zijn:",
+    "purge_confirm_label": "Typ de huurder-slug ({{slug}}) om te bevestigen",
+    "purge_confirm_button": "Permanent verwijderen"
   },
   "system": {
     "active": "Actief",

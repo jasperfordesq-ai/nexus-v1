@@ -13433,7 +13433,22 @@
     "no_hub_tenants_found": "Nessun tenant dell'hub trovato",
     "impersonate_user_warning": "La rappresentazione registra ogni azione con l'identità di questo utente. Utilizzare solo quando necessario per il supporto.",
     "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "tenant_list_tabs_aria": "Tenant status filter",
+    "purge_tenant": "Elimina definitivamente l'inquilino",
+    "purge_requires_deactivation": "Disattiva questo inquilino prima di poterlo eliminare definitivamente.",
+    "purge_warning": "Elimina definitivamente questo inquilino e tutti i suoi dati. Questa azione non può essere annullata.",
+    "purge_preview_failed": "Impossibile caricare l'anteprima dell'eliminazione.",
+    "purge_started": "Eliminazione dell'inquilino avviata. L'inquilino e tutti i suoi dati sono in fase di rimozione.",
+    "purge_failed": "Eliminazione dell'inquilino non riuscita.",
+    "purge_tenant_title": "Eliminare definitivamente {{name}}?",
+    "purge_irreversible_warning": "Questa operazione elimina definitivamente l'inquilino e TUTTI i suoi dati. Non può essere annullata.",
+    "purge_summary": "Questa operazione rimuoverà:",
+    "purge_rows": "{{rows}} record in {{tables}} tabelle",
+    "purge_members": "{{n}} account membri",
+    "purge_superadmins": "{{n}} super amministratore/i della piattaforma verranno spostati nella comunità principale, non eliminati",
+    "purge_manual_followups": "Passaggi manuali ancora necessari dopo l'eliminazione:",
+    "purge_confirm_label": "Digita lo slug dell'inquilino ({{slug}}) per confermare",
+    "purge_confirm_button": "Elimina definitivamente"
   },
   "system": {
     "active": "Attivo",

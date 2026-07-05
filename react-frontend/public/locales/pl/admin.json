@@ -13433,7 +13433,22 @@
     "no_hub_tenants_found": "Nie znaleziono najemców centrum",
     "impersonate_user_warning": "Podszywanie się rejestruje każde działanie w ramach tożsamości tego użytkownika. Używaj tylko wtedy, gdy jest to konieczne do wsparcia.",
     "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "tenant_list_tabs_aria": "Tenant status filter",
+    "purge_tenant": "Trwale usuń najemcę",
+    "purge_requires_deactivation": "Dezaktywuj tego najemcę, zanim będzie można go trwale usunąć.",
+    "purge_warning": "Trwale usuwa tego najemcę i wszystkie jego dane. Tej operacji nie można cofnąć.",
+    "purge_preview_failed": "Nie można załadować podglądu usuwania.",
+    "purge_started": "Rozpoczęto usuwanie najemcy. Najemca i wszystkie jego dane są usuwane.",
+    "purge_failed": "Usuwanie najemcy nie powiodło się.",
+    "purge_tenant_title": "Trwale usunąć {{name}}?",
+    "purge_irreversible_warning": "Spowoduje to trwałe usunięcie najemcy i WSZYSTKICH jego danych. Nie można tego cofnąć.",
+    "purge_summary": "Spowoduje to usunięcie:",
+    "purge_rows": "{{rows}} rekordów w {{tables}} tabelach",
+    "purge_members": "{{n}} kont członków",
+    "purge_superadmins": "{{n}} superadministrator(ów) platformy zostanie przeniesionych do społeczności nadrzędnej, a nie usuniętych",
+    "purge_manual_followups": "Kroki ręczne nadal wymagane po usunięciu:",
+    "purge_confirm_label": "Wpisz slug najemcy ({{slug}}), aby potwierdzić",
+    "purge_confirm_button": "Trwale usuń"
   },
   "system": {
     "active": "Aktywny",

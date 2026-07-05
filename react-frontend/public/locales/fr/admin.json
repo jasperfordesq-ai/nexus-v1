@@ -13433,7 +13433,22 @@
     "no_hub_tenants_found": "Aucun locataire de hub trouvé",
     "impersonate_user_warning": "L'usurpation d'identité enregistre chaque action sous l'identité de cet utilisateur. À utiliser uniquement lorsque cela est nécessaire pour le support.",
     "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "tenant_list_tabs_aria": "Tenant status filter",
+    "purge_tenant": "Supprimer définitivement le locataire",
+    "purge_requires_deactivation": "Désactivez ce locataire avant de pouvoir le supprimer définitivement.",
+    "purge_warning": "Supprime définitivement ce locataire et toutes ses données. Cette action est irréversible.",
+    "purge_preview_failed": "Impossible de charger l'aperçu de la suppression.",
+    "purge_started": "Suppression du locataire démarrée. Le locataire et toutes ses données sont en cours de suppression.",
+    "purge_failed": "Échec de la suppression du locataire.",
+    "purge_tenant_title": "Supprimer définitivement {{name}} ?",
+    "purge_irreversible_warning": "Cette action supprime définitivement le locataire et TOUTES ses données. Elle est irréversible.",
+    "purge_summary": "Ceci supprimera :",
+    "purge_rows": "{{rows}} enregistrements répartis sur {{tables}} tables",
+    "purge_members": "{{n}} comptes membres",
+    "purge_superadmins": "{{n}} super-administrateur(s) de la plateforme seront déplacés vers la communauté parente, et non supprimés",
+    "purge_manual_followups": "Étapes manuelles encore nécessaires après la suppression :",
+    "purge_confirm_label": "Saisissez le slug du locataire ({{slug}}) pour confirmer",
+    "purge_confirm_button": "Supprimer définitivement"
   },
   "system": {
     "active": "Actif",

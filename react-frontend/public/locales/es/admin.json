@@ -13433,7 +13433,22 @@
     "no_hub_tenants_found": "No se encontraron inquilinos del centro",
     "impersonate_user_warning": "La suplantación registra cada acción bajo la identidad de este usuario. Úselo sólo cuando sea necesario como soporte.",
     "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "tenant_list_tabs_aria": "Tenant status filter",
+    "purge_tenant": "Eliminar inquilino de forma permanente",
+    "purge_requires_deactivation": "Desactive este inquilino antes de poder eliminarlo de forma permanente.",
+    "purge_warning": "Elimina de forma permanente este inquilino y todos sus datos. Esta acción no se puede deshacer.",
+    "purge_preview_failed": "No se pudo cargar la vista previa de la eliminación.",
+    "purge_started": "Eliminación del inquilino iniciada. El inquilino y todos sus datos se están eliminando.",
+    "purge_failed": "Error al eliminar el inquilino.",
+    "purge_tenant_title": "¿Eliminar {{name}} de forma permanente?",
+    "purge_irreversible_warning": "Esto elimina de forma permanente el inquilino y TODOS sus datos. No se puede deshacer.",
+    "purge_summary": "Esto eliminará:",
+    "purge_rows": "{{rows}} registros en {{tables}} tablas",
+    "purge_members": "{{n}} cuentas de miembros",
+    "purge_superadmins": "{{n}} superadministrador(es) de la plataforma se trasladarán a la comunidad principal, no se eliminarán",
+    "purge_manual_followups": "Pasos manuales aún necesarios tras la eliminación:",
+    "purge_confirm_label": "Escriba el slug del inquilino ({{slug}}) para confirmar",
+    "purge_confirm_button": "Eliminar de forma permanente"
   },
   "system": {
     "active": "Activo",

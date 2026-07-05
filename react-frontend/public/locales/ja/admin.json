@@ -13433,7 +13433,22 @@
     "no_hub_tenants_found": "ハブテナントが見つかりませんでした",
     "impersonate_user_warning": "偽装は、このユーザーの ID でのすべてのアクションをログに記録します。サポートに必要な場合にのみ使用してください。",
     "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "tenant_list_tabs_aria": "Tenant status filter",
+    "purge_tenant": "テナントを完全に削除",
+    "purge_requires_deactivation": "このテナントを完全に削除する前に、非アクティブ化してください。",
+    "purge_warning": "このテナントとそのすべてのデータを完全に削除します。この操作は元に戻せません。",
+    "purge_preview_failed": "削除プレビューを読み込めませんでした。",
+    "purge_started": "テナントの削除を開始しました。テナントとそのすべてのデータが削除されています。",
+    "purge_failed": "テナントの削除に失敗しました。",
+    "purge_tenant_title": "{{name}} を完全に削除しますか？",
+    "purge_irreversible_warning": "これにより、テナントとそのすべてのデータが完全に削除されます。元に戻すことはできません。",
+    "purge_summary": "以下が削除されます:",
+    "purge_rows": "{{tables}} 個のテーブルにまたがる {{rows}} 件のレコード",
+    "purge_members": "{{n}} 件のメンバーアカウント",
+    "purge_superadmins": "{{n}} 人のプラットフォームスーパー管理者は削除されず、親コミュニティに移動されます",
+    "purge_manual_followups": "削除後もまだ必要な手動手順:",
+    "purge_confirm_label": "確認するにはテナントのスラッグ ({{slug}}) を入力してください",
+    "purge_confirm_button": "完全に削除"
   },
   "system": {
     "active": "アクティブ",

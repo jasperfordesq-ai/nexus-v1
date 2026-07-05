@@ -13433,7 +13433,22 @@
     "no_hub_tenants_found": "Keine Hub-Mieter gefunden",
     "impersonate_user_warning": "Beim Identitätswechsel wird jede Aktion unter der Identität dieses Benutzers protokolliert. Nur bei Bedarf zur Unterstützung verwenden.",
     "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "tenant_list_tabs_aria": "Tenant status filter",
+    "purge_tenant": "Mieter endgültig löschen",
+    "purge_requires_deactivation": "Deaktivieren Sie diesen Mieter, bevor er endgültig gelöscht werden kann.",
+    "purge_warning": "Löscht diesen Mieter und alle zugehörigen Daten endgültig. Dies kann nicht rückgängig gemacht werden.",
+    "purge_preview_failed": "Die Löschvorschau konnte nicht geladen werden.",
+    "purge_started": "Löschung des Mieters gestartet. Der Mieter und alle zugehörigen Daten werden entfernt.",
+    "purge_failed": "Löschung des Mieters fehlgeschlagen.",
+    "purge_tenant_title": "{{name}} endgültig löschen?",
+    "purge_irreversible_warning": "Dadurch werden der Mieter und ALLE zugehörigen Daten endgültig gelöscht. Dies kann nicht rückgängig gemacht werden.",
+    "purge_summary": "Folgendes wird entfernt:",
+    "purge_rows": "{{rows}} Datensätze in {{tables}} Tabellen",
+    "purge_members": "{{n}} Mitgliedskonten",
+    "purge_superadmins": "{{n}} Plattform-Superadministrator(en) werden in die übergeordnete Community verschoben, nicht gelöscht",
+    "purge_manual_followups": "Nach der Löschung sind noch manuelle Schritte erforderlich:",
+    "purge_confirm_label": "Geben Sie den Mieter-Slug ({{slug}}) zur Bestätigung ein",
+    "purge_confirm_button": "Endgültig löschen"
   },
   "system": {
     "active": "Aktiv",
