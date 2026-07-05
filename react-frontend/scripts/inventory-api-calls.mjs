@@ -26,6 +26,7 @@ const repoRoot = path.resolve(frontendRoot, '..');
 const defaultSrcRoot = path.join(frontendRoot, 'src');
 const defaultOutDir = path.join(repoRoot, '.local-docs-archive', 'react-api-inventory', 'latest');
 const defaultOpenApiPath = path.join(repoRoot, 'openapi.json');
+const defaultRoutesDir = path.join(repoRoot, 'routes');
 const apiMethods = new Set(['get', 'post', 'put', 'patch', 'delete', 'download', 'upload']);
 const sourceExtensions = new Set(['.ts', '.tsx']);
 
@@ -34,6 +35,7 @@ function parseArgs(argv) {
     outDir: defaultOutDir,
     srcRoot: defaultSrcRoot,
     openApiPath: fs.existsSync(defaultOpenApiPath) ? defaultOpenApiPath : null,
+    routesDir: fs.existsSync(defaultRoutesDir) ? defaultRoutesDir : null,
     includeTests: false,
   };
 
@@ -54,6 +56,11 @@ function parseArgs(argv) {
       if (!value) throw new Error('--openapi requires a file path');
       options.openApiPath = path.resolve(process.cwd(), value);
       index += 1;
+    } else if (arg === '--routes') {
+      const value = argv[index + 1];
+      if (!value) throw new Error('--routes requires a directory');
+      options.routesDir = path.resolve(process.cwd(), value);
+      index += 1;
     } else if (arg === '--include-tests') {
       options.includeTests = true;
     } else if (arg === '--help' || arg === '-h') {
@@ -68,7 +75,7 @@ function parseArgs(argv) {
 }
 
 function printHelp() {
-  console.log(`Usage: node scripts/inventory-api-calls.mjs [--src <dir>] [--out <dir>] [--openapi <file>] [--include-tests]
+  console.log(`Usage: node scripts/inventory-api-calls.mjs [--src <dir>] [--out <dir>] [--openapi <file>] [--routes <dir>] [--include-tests]
 
 Writes:
   api-calls.json
@@ -348,7 +355,7 @@ function endpointKey(call) {
   return `${call.method} ${call.endpoint}`;
 }
 
-function aggregate(calls, openApiIndex) {
+function aggregate(calls, openApiIndex, routeIndex) {
   const byEndpoint = new Map();
 
   for (const call of calls) {
@@ -387,6 +394,7 @@ function aggregate(calls, openApiIndex) {
   return [...byEndpoint.values()]
     .map((entry) => {
       const laravelOpenApi = matchOpenApi(entry.method, entry.endpoint, openApiIndex);
+      const laravelRoute = matchLaravelRoute(entry.method, entry.endpoint, routeIndex);
       return {
         method: entry.method,
         endpoint: entry.endpoint,
@@ -404,6 +412,9 @@ function aggregate(calls, openApiIndex) {
         laravel_openapi_status: laravelOpenApi.status,
         laravel_openapi_path: laravelOpenApi.path,
         laravel_operation_id: laravelOpenApi.operationId,
+        laravel_route_status: laravelRoute.status,
+        laravel_route_path: laravelRoute.path,
+        laravel_route_source: laravelRoute.source,
         aspnet_status: 'not_checked',
         aspnet_route: null,
         aspnet_notes: 'ASP.NET backend not certified from this frontend inventory.',
@@ -416,6 +427,104 @@ function aggregate(calls, openApiIndex) {
       };
     })
     .sort((a, b) => `${a.endpoint} ${a.method}`.localeCompare(`${b.endpoint} ${b.method}`));
+}
+
+function loadLaravelRouteIndex(routesDir) {
+  if (!routesDir || !fs.existsSync(routesDir)) return null;
+
+  const files = walkRouteFiles(routesDir);
+  const index = new Map();
+
+  for (const filePath of files) {
+    const source = fs.readFileSync(filePath, 'utf8');
+    const relativeSource = toPosix(path.relative(routesDir, filePath));
+    for (const route of extractRoutes(source, relativeSource)) {
+      index.set(`${route.method} ${normalizePathForMatch(route.path)}`, route);
+    }
+  }
+
+  return index;
+}
+
+function walkRouteFiles(dir) {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  const files = [];
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name.startsWith('govuk')) continue;
+      files.push(...walkRouteFiles(fullPath));
+    } else if (entry.isFile() && /\.(php|txt)$/.test(entry.name)) {
+      if (entry.name.startsWith('govuk')) continue;
+      files.push(fullPath);
+    }
+  }
+
+  return files;
+}
+
+function extractRoutes(source, relativeSource) {
+  const routes = [];
+  const routeRegex = /Route::(get|post|put|patch|delete)\s*\(\s*['"]([^'"]+)['"]/gi;
+  let match;
+
+  while ((match = routeRegex.exec(source)) !== null) {
+    routes.push({
+      method: match[1].toUpperCase(),
+      path: normalizeLaravelRoutePath(match[2]),
+      source: relativeSource,
+    });
+  }
+
+  const matchRegex = /Route::match\s*\(\s*\[([^\]]+)\]\s*,\s*['"]([^'"]+)['"]/gi;
+  while ((match = matchRegex.exec(source)) !== null) {
+    const methods = match[1]
+      .split(',')
+      .map((value) => value.replace(/['"\s]/g, '').toUpperCase())
+      .filter(Boolean);
+    for (const method of methods) {
+      routes.push({
+        method,
+        path: normalizeLaravelRoutePath(match[2]),
+        source: relativeSource,
+      });
+    }
+  }
+
+  return routes;
+}
+
+function normalizeLaravelRoutePath(routePath) {
+  const value = routePath.startsWith('/') ? routePath : `/${routePath}`;
+  return value.replace(/\/+$/, '') || '/';
+}
+
+function matchLaravelRoute(method, endpoint, routeIndex) {
+  if (!routeIndex) {
+    return {
+      status: 'not_checked',
+      path: null,
+      source: null,
+    };
+  }
+
+  for (const candidate of candidatePaths(endpoint)) {
+    const match = routeIndex.get(`${method} ${normalizePathForMatch(candidate)}`);
+    if (match) {
+      return {
+        status: 'matched',
+        path: match.path,
+        source: match.source,
+      };
+    }
+  }
+
+  return {
+    status: 'not_found',
+    path: null,
+    source: null,
+  };
 }
 
 function loadOpenApiIndex(openApiPath) {
@@ -542,6 +651,7 @@ function buildSummary(calls, endpoints, scannedFiles, sourceRoot) {
   const byModule = {};
   const byPriority = {};
   const laravelOpenApi = {};
+  const laravelRoutes = {};
   const aspnetStatus = {};
   const dynamicEndpoints = endpoints.filter((endpoint) => endpoint.dynamic).length;
 
@@ -553,6 +663,7 @@ function buildSummary(calls, endpoints, scannedFiles, sourceRoot) {
     byMethod[endpoint.method] = (byMethod[endpoint.method] ?? 0) + 1;
     byPriority[endpoint.priority] = (byPriority[endpoint.priority] ?? 0) + 1;
     laravelOpenApi[endpoint.laravel_openapi_status] = (laravelOpenApi[endpoint.laravel_openapi_status] ?? 0) + 1;
+    laravelRoutes[endpoint.laravel_route_status] = (laravelRoutes[endpoint.laravel_route_status] ?? 0) + 1;
     aspnetStatus[endpoint.aspnet_status] = (aspnetStatus[endpoint.aspnet_status] ?? 0) + 1;
     const bucket = endpointBucket(endpoint.endpoint);
     byBucket[bucket] = (byBucket[bucket] ?? 0) + 1;
@@ -570,6 +681,7 @@ function buildSummary(calls, endpoints, scannedFiles, sourceRoot) {
     by_bucket: Object.fromEntries(Object.entries(byBucket).sort()),
     by_priority: Object.fromEntries(Object.entries(byPriority).sort()),
     laravel_openapi: Object.fromEntries(Object.entries(laravelOpenApi).sort()),
+    laravel_routes: Object.fromEntries(Object.entries(laravelRoutes).sort()),
     aspnet_status: Object.fromEntries(Object.entries(aspnetStatus).sort()),
   };
 }
@@ -616,6 +728,12 @@ function markdownReport(summary, endpoints) {
     '| --- | ---: |',
     ...Object.entries(summary.laravel_openapi).map(([status, count]) => `| ${status} | ${count} |`),
     '',
+    '## Laravel Routes',
+    '',
+    '| Status | Unique endpoints |',
+    '| --- | ---: |',
+    ...Object.entries(summary.laravel_routes).map(([status, count]) => `| ${status} | ${count} |`),
+    '',
     '## ASP.NET Status',
     '',
     '| Status | Unique endpoints |',
@@ -630,8 +748,8 @@ function markdownReport(summary, endpoints) {
     '',
     '## Endpoint Matrix',
     '',
-    '| Priority | Module | Method | Endpoint pattern | Laravel OpenAPI | ASP.NET | Auth | Tenant | Risk | Dynamic | Call sites | Transports | Flags | First locations |',
-    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ---: | --- | --- | --- |',
+    '| Priority | Module | Method | Endpoint pattern | Laravel OpenAPI | Laravel route | ASP.NET | Auth | Tenant | Risk | Dynamic | Call sites | Transports | Flags | First locations |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ---: | --- | --- | --- |',
   ];
 
   for (const endpoint of endpoints) {
@@ -646,6 +764,7 @@ function markdownReport(summary, endpoints) {
       endpoint.method,
       code(endpoint.endpoint),
       openApiLabel(endpoint),
+      routeLabel(endpoint),
       endpoint.aspnet_status,
       requirementLabel(endpoint.auth_required),
       requirementLabel(endpoint.tenant_required),
@@ -660,6 +779,11 @@ function markdownReport(summary, endpoints) {
 
   lines.push('');
   return lines.join('\n');
+}
+
+function routeLabel(endpoint) {
+  if (endpoint.laravel_route_status !== 'matched') return endpoint.laravel_route_status;
+  return `${endpoint.laravel_route_status}: ${endpoint.laravel_route_path} (${endpoint.laravel_route_source})`;
 }
 
 function openApiLabel(endpoint) {
@@ -696,7 +820,8 @@ async function main() {
   const calls = files.flatMap((file) => collectCalls(file, options.srcRoot))
     .sort((a, b) => `${a.file}:${a.line}:${a.column}`.localeCompare(`${b.file}:${b.line}:${b.column}`));
   const openApiIndex = loadOpenApiIndex(options.openApiPath);
-  const endpoints = aggregate(calls, openApiIndex);
+  const routeIndex = loadLaravelRouteIndex(options.routesDir);
+  const endpoints = aggregate(calls, openApiIndex, routeIndex);
   const summary = buildSummary(calls, endpoints, files.length, options.srcRoot);
   const payload = {
     summary,

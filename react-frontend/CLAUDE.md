@@ -33,6 +33,7 @@ npm run dev:laravel  # Explicit local Laravel target
 npm run dev:dotnet   # Explicit local ASP.NET target
 npm run inventory:api-calls  # Local API-call matrix for future ASP.NET parity work
 npm run certification:worksheets  # Local module worksheets from the matrix
+npm run smoke:laravel-manifest  # Local Laravel-mode smoke checklist only
 npm run check:backend-guardrails  # Ensure Laravel remains default and pages stay backend-neutral
 npm run check:dual-backend-prep  # Guardrails + inventory tests + local matrix regeneration
 ```
@@ -45,7 +46,9 @@ validation errors, auth refresh, tenant handling, uploads, and status codes. See
 
 The API-call inventory is preparation only. It writes generated output under
 `../.local-docs-archive/react-api-inventory/` and must not be treated as evidence
-that the ASP.NET backend is ready.
+that the ASP.NET backend is ready. It may match React calls against Laravel
+OpenAPI and Laravel route files, but those matches only confirm the production
+Laravel contract surface.
 
 Use `npm run test:api-inventory` when changing the inventory script. The matrix
 groups calls by module and priority so backend agents can work from P0 auth /
@@ -54,6 +57,10 @@ Use `npm run test:backend-guardrails` when changing the guardrail script.
 Use `npm run test:certification-worksheets` when changing the worksheet generator.
 Generated worksheets live under `../.local-docs-archive/react-api-certification/`
 and are local handoff material only.
+Use `npm run test:laravel-smoke-manifest` when changing the Laravel smoke
+manifest generator. Generated smoke manifests live under
+`../.local-docs-archive/react-laravel-smoke/`, keep ASP.NET marked as
+`not_applicable`, and do not certify dual-backend readiness.
 
 ## 🔴 Mandatory Rules
 

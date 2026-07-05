@@ -136,3 +136,46 @@ test('inventory-api-calls matches compatible Laravel OpenAPI operations and keep
   assert.equal(report.summary.laravel_openapi.not_found, 1);
   assert.equal(report.summary.aspnet_status.not_checked, 3);
 });
+
+test('inventory-api-calls matches Laravel route files when OpenAPI has no entry', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-api-inventory-routes-'));
+  const src = path.join(tmp, 'src');
+  const out = path.join(tmp, 'out');
+  const routes = path.join(tmp, 'routes');
+
+  fs.mkdirSync(path.join(src, 'admin', 'modules', 'reports'), { recursive: true });
+  fs.mkdirSync(routes, { recursive: true });
+
+  fs.writeFileSync(path.join(src, 'admin', 'modules', 'reports', 'ReportsPage.tsx'), `
+    import { api } from '@/lib/api';
+    export function exportMembers() {
+      return api.download('/v2/admin/reports/members/export?format=csv');
+    }
+    export function createNote(id: number) {
+      return api.post(\`/v2/admin/reports/\${id}/notes\`, { body: 'ok' });
+    }
+  `);
+
+  fs.writeFileSync(path.join(routes, 'api.php'), `
+    <?php
+    Route::get('/v2/admin/reports/members/export', [ReportsController::class, 'membersExport']);
+    Route::post('/v2/admin/reports/{id}/notes', [ReportsController::class, 'storeNote']);
+  `);
+
+  execFileSync(process.execPath, [scriptPath, '--src', src, '--out', out, '--routes', routes], { encoding: 'utf8' });
+
+  const report = JSON.parse(fs.readFileSync(path.join(out, 'api-calls.json'), 'utf8'));
+  const byEndpoint = new Map(report.endpoints.map((endpoint) => [endpoint.endpoint, endpoint]));
+
+  const exportMembers = byEndpoint.get('/v2/admin/reports/members/export?format=csv');
+  assert.equal(exportMembers.laravel_route_status, 'matched');
+  assert.equal(exportMembers.laravel_route_path, '/v2/admin/reports/members/export');
+  assert.equal(exportMembers.laravel_route_source, 'api.php');
+
+  const createNote = byEndpoint.get('/v2/admin/reports/{id}/notes');
+  assert.equal(createNote.laravel_route_status, 'matched');
+  assert.equal(createNote.laravel_route_path, '/v2/admin/reports/{id}/notes');
+
+  assert.equal(report.summary.laravel_routes.matched, 2);
+  assert.equal(report.summary.aspnet_status.not_checked, 2);
+});

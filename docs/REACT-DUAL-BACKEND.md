@@ -232,6 +232,8 @@ The inventory matrix includes:
 - upload/download markers, upload field names, response type hints, dynamic path
   markers, and raw-fetch markers;
 - Laravel OpenAPI matching from the repo-root `openapi.json` when present;
+- Laravel route-file matching from `routes/*.php` when OpenAPI does not cover a
+  call yet;
 - ASP.NET status fields that default to `not_checked` and must stay that way
   until the development ASP.NET backend has been audited separately;
 - first source locations so backend agents can inspect the calling screen before
@@ -239,7 +241,9 @@ The inventory matrix includes:
 
 The latest local inventory should be read as a work queue seed. Each row still
 needs Laravel route/OpenAPI matching and, later, ASP.NET route/runtime smoke
-verification before it can be marked compatible.
+verification before it can be marked compatible. A Laravel route-file match only
+means the production Laravel backend appears to expose the called method/path; it
+does not say the ASP.NET backend is ready.
 
 Current local prep check:
 
@@ -249,8 +253,8 @@ npm --prefix react-frontend run check:dual-backend-prep
 
 This command verifies the guardrails, runs the inventory and worksheet fixture
 tests, regenerates the local API-call matrix, and regenerates local module
-certification worksheets. It does not run ASP.NET and does not certify ASP.NET
-compatibility.
+certification worksheets, and writes the Laravel-mode smoke manifest. It does
+not run ASP.NET and does not certify ASP.NET compatibility.
 
 Current guardrail-only check:
 
@@ -284,6 +288,23 @@ These worksheets are local handoff material for ASP.NET backend agents. They
 organize P0/P1/P2 rows by module, show Laravel OpenAPI match status, preserve
 ASP.NET status as `not_checked`, and list the proof required before any future
 row can be marked compatible. Do not commit generated worksheets to public docs.
+
+Current Laravel-mode smoke manifest command:
+
+```text
+npm --prefix react-frontend run smoke:laravel-manifest
+```
+
+The command writes a manual smoke checklist under:
+
+```text
+.local-docs-archive/react-laravel-smoke/latest/
+```
+
+The manifest is deliberately Laravel-only. It records the workflows that must
+remain green in Laravel mode before any future portability claim, keeps every
+workflow at `manual_not_run` until a human or runtime smoke suite supplies
+evidence, and explicitly states that it does not run or certify ASP.NET.
 
 Exit gate:
 
