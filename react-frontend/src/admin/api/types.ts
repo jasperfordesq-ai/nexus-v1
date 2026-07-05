@@ -1528,6 +1528,24 @@ export interface SuperAdminTenantDetail extends SuperAdminTenant {
   breadcrumb: Array<{ id: number; name: string }>;
 }
 
+/**
+ * Dry-run report from GET /v2/admin/super/tenants/{id}/purge-preview — the row
+ * counts and external resources a permanent purge would remove. Powers the
+ * god-only purge confirmation dialog.
+ */
+export interface TenantPurgePreview {
+  success: boolean;
+  dry_run: boolean;
+  tenant: { id: number; name: string; slug: string };
+  tables: Record<string, number>;
+  totals: { tables_touched: number; rows: number };
+  members_to_delete: number;
+  superadmins_reassigned: number;
+  external: Record<string, unknown>;
+  warnings: string[];
+  manual_followups: string[];
+}
+
 export interface CreateTenantPayload {
   parent_id?: number;
   name: string;

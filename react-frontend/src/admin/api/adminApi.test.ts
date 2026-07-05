@@ -1774,16 +1774,22 @@ describe('adminSuper', () => {
     expect(mockPost).toHaveBeenCalledWith('/v2/admin/super/tenants', { name: 'New Tenant', slug: 'new-tenant' });
   });
 
-  it('deleteTenant with hard=true appends query', async () => {
-    mockDelete.mockResolvedValueOnce({ success: true, data: {} });
-    await adminSuper.deleteTenant(5, true);
-    expect(mockDelete).toHaveBeenCalledWith('/v2/admin/super/tenants/5?hard=1');
-  });
-
-  it('deleteTenant without hard has no query string', async () => {
+  it('deleteTenant deactivates (no query string)', async () => {
     mockDelete.mockResolvedValueOnce({ success: true, data: {} });
     await adminSuper.deleteTenant(5);
     expect(mockDelete).toHaveBeenCalledWith('/v2/admin/super/tenants/5');
+  });
+
+  it('purgeTenant posts to the purge endpoint', async () => {
+    mockPost.mockResolvedValueOnce({ success: true, data: {} });
+    await adminSuper.purgeTenant(5);
+    expect(mockPost).toHaveBeenCalledWith('/v2/admin/super/tenants/5/purge', {});
+  });
+
+  it('purgeTenantPreview gets the dry-run report', async () => {
+    mockGet.mockResolvedValueOnce({ success: true, data: {} });
+    await adminSuper.purgeTenantPreview(5);
+    expect(mockGet).toHaveBeenCalledWith('/v2/admin/super/tenants/5/purge-preview');
   });
 
   it('toggleHub posts enable flag', async () => {

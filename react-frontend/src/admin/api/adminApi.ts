@@ -106,6 +106,7 @@ import type {
   SuperAdminDashboardStats,
   SuperAdminTenant,
   SuperAdminTenantDetail,
+  TenantPurgePreview,
   CreateTenantPayload,
   UpdateTenantPayload,
   TenantHierarchyNode,
@@ -2201,8 +2202,19 @@ export const adminSuper = {
   updateTenant: (id: number, data: UpdateTenantPayload) =>
     api.put<{ success: boolean }>(`/v2/admin/super/tenants/${id}`, data),
 
-  deleteTenant: (id: number, hardDelete = false) =>
-    api.delete<{ success: boolean }>(`/v2/admin/super/tenants/${id}${hardDelete ? '?hard=1' : ''}`),
+  // Deactivates a tenant (is_active = 0) — reversible. Permanent removal is the
+  // separate god-only purgeTenant() call below.
+  deleteTenant: (id: number) =>
+    api.delete<{ deleted: boolean }>(`/v2/admin/super/tenants/${id}`),
+
+  // God-only dry run: what a purge would delete (row counts + external systems).
+  purgeTenantPreview: (id: number) =>
+    api.get<TenantPurgePreview>(`/v2/admin/super/tenants/${id}/purge-preview`),
+
+  // God-only, irreversible. Enqueues a full purge of the tenant and all its data.
+  // The tenant must already be deactivated.
+  purgeTenant: (id: number) =>
+    api.post<{ purge_started: boolean; tenant_id: number }>(`/v2/admin/super/tenants/${id}/purge`, {}),
 
   reactivateTenant: (id: number) =>
     api.post<{ success: boolean }>(`/v2/admin/super/tenants/${id}/reactivate`),

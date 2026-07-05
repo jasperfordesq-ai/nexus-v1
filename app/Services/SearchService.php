@@ -53,6 +53,38 @@ class SearchService
         );
     }
 
+    /**
+     * Remove every document belonging to a tenant from the shared indexes.
+     *
+     * 🔴 The Meilisearch indexes are SHARED across all tenants — documents are
+     * scoped by a `tenant_id` filterable attribute, NOT by per-tenant indexes.
+     * We therefore delete by filter and must NEVER drop an index (that would
+     * wipe every other tenant's data). Used by the tenant-purge pipeline.
+     *
+     * Best-effort per index: an unreachable Meilisearch or a missing index is
+     * recorded in the return value rather than thrown, so a search outage can't
+     * strand a tenant purge.
+     *
+     * @return array<string,string> index name => outcome ('queued' | 'error: …')
+     */
+    public static function purgeTenant(int $tenantId): array
+    {
+        $client = static::client();
+        $filter = 'tenant_id = ' . $tenantId;
+        $results = [];
+
+        foreach (array_keys(self::FILTERABLE_ATTRIBUTES) as $index) {
+            try {
+                $client->index($index)->deleteDocuments(['filter' => $filter]);
+                $results[$index] = 'queued';
+            } catch (\Throwable $e) {
+                $results[$index] = 'error: ' . $e->getMessage();
+            }
+        }
+
+        return $results;
+    }
+
     // =========================================================================
     // Filter-string escaping helpers (safe Meilisearch filter construction)
     // =========================================================================

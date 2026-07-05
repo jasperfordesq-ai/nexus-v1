@@ -2461,6 +2461,8 @@ Route::post('/v2/admin/super/tenants', [\App\Http\Controllers\Api\AdminSuperCont
 Route::get('/v2/admin/super/tenants/{id}', [\App\Http\Controllers\Api\AdminSuperController::class, 'tenantShow']);
 Route::put('/v2/admin/super/tenants/{id}', [\App\Http\Controllers\Api\AdminSuperController::class, 'tenantUpdate']);
 Route::delete('/v2/admin/super/tenants/{id}', [\App\Http\Controllers\Api\AdminSuperController::class, 'tenantDelete']);
+Route::get('/v2/admin/super/tenants/{id}/purge-preview', [\App\Http\Controllers\Api\AdminSuperController::class, 'tenantPurgePreview']);
+Route::post('/v2/admin/super/tenants/{id}/purge', [\App\Http\Controllers\Api\AdminSuperController::class, 'tenantPurge']);
 Route::post('/v2/admin/super/tenants/{id}/reactivate', [\App\Http\Controllers\Api\AdminSuperController::class, 'tenantReactivate']);
 Route::post('/v2/admin/super/tenants/{id}/toggle-hub', [\App\Http\Controllers\Api\AdminSuperController::class, 'tenantToggleHub']);
 Route::post('/v2/admin/super/tenants/{id}/move', [\App\Http\Controllers\Api\AdminSuperController::class, 'tenantMove']);
@@ -2683,8 +2685,11 @@ Route::post('/social/delete-comment', [\App\Http\Controllers\Api\SocialControlle
 Route::post('/social/mention-search', [\App\Http\Controllers\Api\SocialController::class, 'mentionSearch']); // deprecated: use V2 GET equivalent
 Route::post('/social/feed', [\App\Http\Controllers\Api\SocialController::class, 'feed']); // deprecated: use GET /v2/feed
 Route::post('/social/create-post', [\App\Http\Controllers\Api\SocialController::class, 'createPost']);
-// /upload is a generic authenticated upload endpoint — throttle to prevent
-// storage DoS via high-frequency small-file uploads.
+// Generic authenticated upload endpoint — throttle to prevent storage DoS via
+// high-frequency small-file uploads. Canonical path is /v2/upload (matches the
+// controller's $isV2Api contract and every frontend caller, e.g. the newsletter
+// builder's asset manager). /upload is kept as a legacy alias.
+Route::middleware('throttle:30,1')->post('/v2/upload', [\App\Http\Controllers\Api\UploadController::class, 'store']);
 Route::middleware('throttle:30,1')->post('/upload', [\App\Http\Controllers\Api\UploadController::class, 'store']);
 Route::post('/push/subscribe', [\App\Http\Controllers\Api\PushController::class, 'subscribe']);
 Route::post('/push/unsubscribe', [\App\Http\Controllers\Api\PushController::class, 'unsubscribe']);

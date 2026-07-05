@@ -394,30 +394,92 @@ class AdminSuperController extends BaseApiController
         return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, $result['error'], null, 422);
     }
 
-    /** DELETE /api/v2/super-admin/tenants/{id} */
+    /**
+     * DELETE /api/v2/super-admin/tenants/{id}
+     *
+     * DEACTIVATES a tenant (is_active = 0) — a reversible action any super-admin
+     * may perform. Permanent, irreversible removal is the separate god-only purge
+     * endpoint below; there is no "hard delete via query param" any more.
+     */
     public function tenantDelete(int $id): JsonResponse
     {
-        $userId = $this->requireSuperAdmin();
+        $this->requireSuperAdmin();
 
         if (!SuperPanelAccess::canAccessTenant($id)) {
             return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_tenant'), null, 403);
         }
 
-        $input = $this->getAllInput();
-        $hardDelete = !empty($input['hard_delete']);
-
-        // Hard delete is destructive and can orphan data — restrict to god-level only
-        if ($hardDelete) {
-            $this->requireGod($userId);
-        }
-
-        $result = $this->tenantHierarchyService->deleteTenant($id, $hardDelete);
+        $result = $this->tenantHierarchyService->deleteTenant($id, false);
 
         if ($result['success']) {
             return $this->respondWithData(['deleted' => true, 'tenant_id' => $id]);
         }
 
         return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, $result['error'], null, 422);
+    }
+
+    /**
+     * GET /api/v2/super-admin/tenants/{id}/purge-preview
+     *
+     * God-only dry run: reports the row counts and external resources a purge
+     * would remove, without deleting anything. Powers the confirmation dialog.
+     */
+    public function tenantPurgePreview(int $id): JsonResponse
+    {
+        $userId = $this->requireSuperAdmin();
+        $this->requireGod($userId);
+
+        if (!SuperPanelAccess::canAccessTenant($id)) {
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_tenant'), null, 403);
+        }
+
+        $report = \App\Services\TenantProvisioning\TenantPurgeService::purge($id, ['dry_run' => true]);
+
+        if (!($report['success'] ?? false)) {
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, $report['error'] ?? __('api.super_purge_failed'), null, 422);
+        }
+
+        return $this->respondWithData($report);
+    }
+
+    /**
+     * POST /api/v2/super-admin/tenants/{id}/purge
+     *
+     * God-only, irreversible. Enqueues a background purge of the tenant and ALL
+     * of its data. The tenant must already be deactivated. Returns 202 — the work
+     * runs on the queue because a full purge can take minutes.
+     */
+    public function tenantPurge(int $id): JsonResponse
+    {
+        $userId = $this->requireSuperAdmin();
+        $this->requireGod($userId);
+
+        if (!SuperPanelAccess::canAccessTenant($id)) {
+            return $this->respondWithError(ApiErrorCodes::SUPER_PANEL_ACCESS_DENIED, __('api.super_no_access_tenant'), null, 403);
+        }
+
+        // Re-check the destructive guards synchronously so the god-admin gets an
+        // immediate, actionable error instead of a silent queue failure.
+        if ($id === 1) {
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.super_purge_master_forbidden'), null, 422);
+        }
+        $tenant = DB::table('tenants')->where('id', $id)->first();
+        if (!$tenant) {
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.super_tenant_not_found'), null, 404);
+        }
+        if ((int) $tenant->is_active === 1) {
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.super_purge_requires_deactivation'), null, 422);
+        }
+        if (DB::table('tenants')->where('parent_id', $id)->count() > 0) {
+            return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.super_purge_has_children'), null, 422);
+        }
+
+        \App\Jobs\PurgeTenantJob::dispatch($id);
+
+        return $this->respondWithData([
+            'purge_started' => true,
+            'tenant_id'     => $id,
+        ], null, 202);
     }
 
     /** POST /api/v2/super-admin/tenants/{id}/reactivate */

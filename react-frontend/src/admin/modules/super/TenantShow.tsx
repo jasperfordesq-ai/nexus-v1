@@ -26,13 +26,14 @@ import UserMinus from 'lucide-react/icons/user-minus';
 import Plus from 'lucide-react/icons/plus';
 import MoveRight from 'lucide-react/icons/move-right';
 import Power from 'lucide-react/icons/power';
+import Trash2 from 'lucide-react/icons/trash-2';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { usePageTitle } from '@/hooks';
-import { useTenant, useToast } from '@/contexts';
+import { useTenant, useToast, useAuth } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import { ConfirmModal } from '../../components/ConfirmModal';
-import type { SuperAdminTenantDetail } from '../../api/types';
+import type { SuperAdminTenantDetail, TenantPurgePreview } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -89,6 +90,10 @@ export function TenantShow() {
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  // Permanent purge is god-only — mirrors requireGod() (is_god flag) on the server.
+  const userRecord = user as { is_god?: boolean; role?: string } | null;
+  const isGod = userRecord?.is_god === true || userRecord?.role === 'god';
 
   const [loading, setLoading] = useState(true);
   const [tenant, setTenant] = useState<SuperAdminTenantDetail | null>(null);
@@ -114,6 +119,13 @@ export function TenantShow() {
   const moveModal = useDisclosure();
   const [moveParentId, setMoveParentId] = useState('');
   const [hubTenants, setHubTenants] = useState<{ id: number; name: string }[]>([]);
+
+  // Permanent purge modal (god-only, irreversible)
+  const purgeModal = useDisclosure();
+  const [purgePreview, setPurgePreview] = useState<TenantPurgePreview | null>(null);
+  const [purgePreviewLoading, setPurgePreviewLoading] = useState(false);
+  const [purgeConfirmText, setPurgeConfirmText] = useState('');
+  const [purging, setPurging] = useState(false);
 
   // Load hub tenants for move dropdown
   const loadHubTenants = useCallback(async () => {
@@ -160,6 +172,39 @@ export function TenantShow() {
       }
     } catch { toast.error(t('super.an_error_occurred')); }
     setActionLoading(false);
+  };
+
+  const openPurgeModal = async () => {
+    if (!tenant) return;
+    setPurgePreview(null);
+    setPurgeConfirmText('');
+    purgeModal.onOpen();
+    setPurgePreviewLoading(true);
+    try {
+      const res = await adminSuper.purgeTenantPreview(tenant.id);
+      if (res.success && res.data) {
+        setPurgePreview(res.data);
+      } else {
+        toast.error(res.error || t('super.purge_preview_failed'));
+      }
+    } catch { toast.error(t('super.an_error_occurred')); }
+    setPurgePreviewLoading(false);
+  };
+
+  const handlePurge = async () => {
+    if (!tenant || purgeConfirmText !== tenant.slug) return;
+    setPurging(true);
+    try {
+      const res = await adminSuper.purgeTenant(tenant.id);
+      if (res.success) {
+        toast.success(t('super.purge_started'));
+        purgeModal.onClose();
+        navigate(tenantPath('/super-admin/tenants'));
+      } else {
+        toast.error(res.error || t('super.purge_failed'));
+      }
+    } catch { toast.error(t('super.an_error_occurred')); }
+    setPurging(false);
   };
 
   const handleToggleHub = async () => {
@@ -905,6 +950,25 @@ export function TenantShow() {
                     {t('super.deactivate_warning')}
                   </p>
                 )}
+
+                {/* Permanent purge — god-only, and only once the tenant is deactivated. */}
+                {isGod && (
+                  <>
+                    <Button
+                      variant="danger"
+                      fullWidth
+                      className="mt-3"
+                      isDisabled={tenant.is_active || actionLoading}
+                      startContent={<Trash2 aria-hidden="true" size={16} />}
+                      onPress={openPurgeModal}
+                    >
+                      {t('super.purge_tenant')}
+                    </Button>
+                    <p className="text-xs text-muted mt-2">
+                      {tenant.is_active ? t('super.purge_requires_deactivation') : t('super.purge_warning')}
+                    </p>
+                  </>
+                )}
               </CardBody>
             </Card>
           )}
@@ -945,6 +1009,67 @@ export function TenantShow() {
               onPress={handleMove}
             >
               {t('super.move')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Permanent Purge Modal (god-only, irreversible) */}
+      <Modal
+        isOpen={purgeModal.isOpen}
+        onClose={() => { if (!purging) purgeModal.onClose(); }}
+        size="lg"
+      >
+        <ModalContent>
+          <ModalHeader className="flex items-center gap-2 text-danger">
+            <AlertTriangle aria-hidden="true" size={20} />
+            {t('super.purge_tenant_title', { name: tenant.name })}
+          </ModalHeader>
+          <ModalBody>
+            <p className="text-sm font-medium text-danger">{t('super.purge_irreversible_warning')}</p>
+
+            {purgePreviewLoading ? (
+              <div className="flex justify-center py-6"><Spinner /></div>
+            ) : purgePreview ? (
+              <div className="mt-2 space-y-2 text-sm">
+                <p className="text-muted">{t('super.purge_summary')}</p>
+                <ul className="list-disc pl-5 text-muted space-y-1">
+                  <li>{t('super.purge_rows', { rows: purgePreview.totals.rows, tables: purgePreview.totals.tables_touched })}</li>
+                  <li>{t('super.purge_members', { n: purgePreview.members_to_delete })}</li>
+                  {purgePreview.superadmins_reassigned > 0 && (
+                    <li>{t('super.purge_superadmins', { n: purgePreview.superadmins_reassigned })}</li>
+                  )}
+                </ul>
+                {purgePreview.manual_followups.length > 0 && (
+                  <div className="rounded-md bg-warning/10 p-2 text-xs text-warning">
+                    <p className="font-medium">{t('super.purge_manual_followups')}</p>
+                    <ul className="list-disc pl-4 mt-1 space-y-1">
+                      {purgePreview.manual_followups.map((f, i) => <li key={i}>{f}</li>)}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            <div className="mt-4">
+              <Input
+                label={t('super.purge_confirm_label', { slug: tenant.slug })}
+                placeholder={tenant.slug}
+                value={purgeConfirmText}
+                onValueChange={setPurgeConfirmText}
+                autoComplete="off"
+              />
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="tertiary" onPress={purgeModal.onClose} isDisabled={purging}>{t('super.cancel')}</Button>
+            <Button
+              variant="danger"
+              isLoading={purging}
+              isDisabled={purging || purgeConfirmText !== tenant.slug}
+              onPress={handlePurge}
+            >
+              {t('super.purge_confirm_button')}
             </Button>
           </ModalFooter>
         </ModalContent>

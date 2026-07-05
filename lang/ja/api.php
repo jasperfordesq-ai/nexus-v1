@@ -2098,4 +2098,9 @@ return [
     'broker_cannot_adjust_own_balance' => 'Brokers cannot adjust their own balance.',
     'broker_cannot_review_own_match' => 'Brokers cannot review a match they are a party to.',
     'broker_cannot_moderate_own_content' => 'Brokers cannot moderate content they are a party to.',
+    'super_purge_failed' => 'Tenant purge failed',
+    'super_purge_master_forbidden' => 'The Master tenant cannot be purged',
+    'super_tenant_not_found' => 'Tenant not found',
+    'super_purge_requires_deactivation' => 'Deactivate the tenant before purging it. Purge is only permitted on a deactivated tenant.',
+    'super_purge_has_children' => 'This tenant has sub-tenants. Move or delete them before purging.',
 ];

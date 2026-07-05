@@ -24,6 +24,59 @@ use Illuminate\Support\Facades\Log;
 class StripeSubscriptionService
 {
     /**
+     * Cancel every active subscription for a Stripe customer and delete the
+     * customer object. Used when a tenant is permanently purged so we don't keep
+     * an orphaned customer billing against a community that no longer exists.
+     *
+     * Best-effort and idempotent: already-cancelled subs and an already-deleted
+     * customer are treated as success. Returns a short human-readable summary.
+     */
+    public static function cancelAllForCustomer(string $customerId): string
+    {
+        $client = StripeService::client();
+        $cancelled = 0;
+
+        $subs = $client->subscriptions->all([
+            'customer' => $customerId,
+            'status'   => 'all',
+            'limit'    => 100,
+        ]);
+
+        foreach ($subs->data as $sub) {
+            if (in_array($sub->status, ['canceled', 'incomplete_expired'], true)) {
+                continue;
+            }
+            try {
+                $client->subscriptions->cancel($sub->id);
+                $cancelled++;
+            } catch (\Throwable $e) {
+                Log::warning('StripeSubscriptionService::cancelAllForCustomer — sub cancel failed', [
+                    'customer_id'     => $customerId,
+                    'subscription_id' => $sub->id,
+                    'error'           => $e->getMessage(),
+                ]);
+            }
+        }
+
+        $customerDeleted = false;
+        try {
+            $client->customers->delete($customerId);
+            $customerDeleted = true;
+        } catch (\Throwable $e) {
+            Log::warning('StripeSubscriptionService::cancelAllForCustomer — customer delete failed', [
+                'customer_id' => $customerId,
+                'error'       => $e->getMessage(),
+            ]);
+        }
+
+        return sprintf(
+            'cancelled %d subscription(s); customer %s',
+            $cancelled,
+            $customerDeleted ? 'deleted' : 'NOT deleted (review in Stripe)'
+        );
+    }
+
+    /**
      * Sync a pay_plan to Stripe (create/update Product + Prices).
      *
      * Idempotent: skips creation if Stripe IDs already exist.

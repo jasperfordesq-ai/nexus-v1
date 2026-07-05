@@ -16,7 +16,6 @@ import Plus from 'lucide-react/icons/plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Edit from 'lucide-react/icons/square-pen';
 import Eye from 'lucide-react/icons/eye';
-import Trash2 from 'lucide-react/icons/trash-2';
 import Shield from 'lucide-react/icons/shield';
 import ToggleLeft from 'lucide-react/icons/toggle-left';
 import ToggleRight from 'lucide-react/icons/toggle-right';
@@ -33,7 +32,7 @@ import type { SuperAdminTenant } from '../../api/types';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Tabs, Tab } from '@/components/ui';
 
 type TenantConfirmAction = {
-  type: 'delete' | 'deactivate' | 'reactivate' | 'toggle-hub';
+  type: 'deactivate' | 'reactivate' | 'toggle-hub';
   tenant: SuperAdminTenant;
 };
 
@@ -46,7 +45,7 @@ interface TenantActionsMenuProps {
 }
 
 function TenantActionsMenu({ tenant, t, navigate, tenantPath, setConfirmAction }: TenantActionsMenuProps) {
-  type ActionKey = 'view' | 'edit' | 'toggle-hub' | 'deactivate' | 'reactivate' | 'delete';
+  type ActionKey = 'view' | 'edit' | 'toggle-hub' | 'deactivate' | 'reactivate';
 
   const handleMenuAction = (key: React.Key) => {
     const action = key as ActionKey;
@@ -55,7 +54,7 @@ function TenantActionsMenu({ tenant, t, navigate, tenantPath, setConfirmAction }
     } else if (action === 'edit') {
       navigate(tenantPath(`/super-admin/tenants/${tenant.id}/edit`));
     } else {
-      setConfirmAction({ type: action as 'delete' | 'deactivate' | 'reactivate' | 'toggle-hub', tenant });
+      setConfirmAction({ type: action as 'deactivate' | 'reactivate' | 'toggle-hub', tenant });
     }
   };
 
@@ -85,9 +84,6 @@ function TenantActionsMenu({ tenant, t, navigate, tenantPath, setConfirmAction }
             {t('super.reactivate')}
           </DropdownItem>
         )}
-        <DropdownItem key="delete" id="delete" startContent={<Trash2 aria-hidden="true" size={14} />} className="text-danger" variant="danger">
-          {t('common.delete')}
-        </DropdownItem>
       </DropdownMenu>
     </Dropdown>
   );
@@ -108,7 +104,7 @@ export function TenantList() {
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
 
   const [confirmAction, setConfirmAction] = useState<{
-    type: 'delete' | 'deactivate' | 'reactivate' | 'toggle-hub';
+    type: 'deactivate' | 'reactivate' | 'toggle-hub';
     tenant: SuperAdminTenant;
   } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -148,9 +144,6 @@ export function TenantList() {
     let res;
 
     switch (type) {
-      case 'delete':
-        res = await adminSuper.deleteTenant(tenant.id);
-        break;
       case 'deactivate':
         res = await adminSuper.updateTenant(tenant.id, { is_active: false });
         break;
@@ -174,11 +167,6 @@ export function TenantList() {
   };
 
   const confirmMessages: Record<string, { title: string; message: string; label: string }> = {
-    delete: {
-      title: t('super.confirm_delete_tenant_title'),
-      message: t('super.confirm_delete_tenant_message'),
-      label: t('super.confirm_delete'),
-    },
     deactivate: {
       title: t('super.confirm_deactivate_tenant_title'),
       message: t('super.confirm_deactivate_tenant_message'),

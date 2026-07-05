@@ -556,14 +556,14 @@ describe('adminApi', () => {
       expect(mockPost).toHaveBeenCalledWith('/v2/admin/super/tenants', expect.objectContaining({ name: 'New Tenant' }));
     });
 
-    it('deleteTenant calls DELETE', async () => {
+    it('deleteTenant calls DELETE (deactivate)', async () => {
       await adminSuper.deleteTenant(5);
       expect(mockDelete).toHaveBeenCalledWith('/v2/admin/super/tenants/5');
     });
 
-    it('deleteTenant with hard delete', async () => {
-      await adminSuper.deleteTenant(5, true);
-      expect(mockDelete).toHaveBeenCalledWith('/v2/admin/super/tenants/5?hard=1');
+    it('purgeTenant calls POST /purge', async () => {
+      await adminSuper.purgeTenant(5);
+      expect(mockPost).toHaveBeenCalledWith('/v2/admin/super/tenants/5/purge', {});
     });
 
     it('emergencyLockdown calls POST', async () => {

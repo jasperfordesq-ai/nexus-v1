@@ -159,32 +159,29 @@ describe('TenantList', () => {
     expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument();
   });
 
-  // ── Confirm delete flow ────────────────────────────────────────────────────
-  it('calls deleteTenant and refreshes on confirm delete', async () => {
+  // ── Deactivate flow ─────────────────────────────────────────────────────────
+  // The standalone "Delete" row action was removed — it only ever deactivated
+  // the tenant (identical to this item). Permanent deletion now lives on the
+  // tenant detail page as a god-only purge.
+  it('exposes Deactivate (and no standalone Delete) in the row actions', async () => {
     mockAdminSuper.listTenants.mockResolvedValue({ success: true, data: [TENANT_A] });
-    mockAdminSuper.deleteTenant.mockResolvedValue({ success: true });
+    mockAdminSuper.updateTenant.mockResolvedValue({ success: true });
 
     render(<TenantList />);
     await waitFor(() => expect(screen.getByText('Alpha Timebank')).toBeInTheDocument());
 
     // Open actions menu
     const menuBtn = screen.getAllByRole('button').find(
-      (b) => b.getAttribute('aria-label')?.includes('actions') || b.getAttribute('aria-label')?.includes('Actions')
+      (b) => b.getAttribute('aria-label')?.toLowerCase().includes('actions')
     );
-    if (menuBtn) {
-      fireEvent.click(menuBtn);
-      // Try to click Delete item in the dropdown
-      await waitFor(() => {
-        const deleteItem = screen.queryByText(/delete/i);
-        if (deleteItem) fireEvent.click(deleteItem);
-      });
-    }
-    // If modal appeared, confirm it
-    const confirmBtn = screen.queryByRole('button', { name: /confirm|delete/i });
-    if (confirmBtn) {
-      fireEvent.click(confirmBtn);
-      await waitFor(() => expect(mockAdminSuper.deleteTenant).toHaveBeenCalled());
-    }
+    expect(menuBtn).toBeTruthy();
+    fireEvent.click(menuBtn!);
+
+    // Deactivate is present; the misleading "Delete" item is gone.
+    await waitFor(() => {
+      expect(screen.getAllByText(/deactivate/i).length).toBeGreaterThan(0);
+    });
+    expect(screen.queryByText(/^delete$/i)).toBeNull();
   });
 });
 
