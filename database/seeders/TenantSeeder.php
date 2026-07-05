@@ -70,12 +70,12 @@ class TenantSeeder extends Seeder
 
         foreach ($settings as $key => $value) {
             DB::table('tenant_settings')->updateOrInsert(
-                ['tenant_id' => $tenantId, 'key' => $key],
+                ['tenant_id' => $tenantId, 'setting_key' => $key],
                 [
-                    'value'      => $value,
-                    'type'       => 'string',
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'setting_value' => $value,
+                    'setting_type'  => 'string',
+                    'created_at'    => now(),
+                    'updated_at'    => now(),
                 ],
             );
         }
