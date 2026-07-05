@@ -31,6 +31,7 @@ npm run dev          # Laravel default
 npm run build        # Laravel/default production path
 npm run dev:laravel  # Explicit local Laravel target
 npm run dev:dotnet   # Explicit local ASP.NET target
+npm run inventory:api-calls  # Local API-call matrix for future ASP.NET parity work
 ```
 
 Do not add ASP.NET conditionals inside pages or ordinary components. If a real
@@ -38,6 +39,10 @@ transport difference is unavoidable, isolate it behind a small adapter. Prefer
 fixing ASP.NET to match Laravel for paths, payloads, response envelopes,
 validation errors, auth refresh, tenant handling, uploads, and status codes. See
 [`../docs/REACT-DUAL-BACKEND.md`](../docs/REACT-DUAL-BACKEND.md).
+
+The API-call inventory is preparation only. It writes generated output under
+`../.local-docs-archive/react-api-inventory/` and must not be treated as evidence
+that the ASP.NET backend is ready.
 
 ## 🔴 Mandatory Rules
 

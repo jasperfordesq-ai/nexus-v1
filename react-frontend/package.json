@@ -11,6 +11,7 @@
     "dev:dotnet": "cross-env VITE_BACKEND_TARGET=dotnet VITE_API_URL=http://localhost:5080 npm run dev -- --mode dotnet",
     "copy-locales": "node scripts/copy-locales.mjs",
     "copy-changelog": "node scripts/copy-changelog.mjs",
+    "inventory:api-calls": "node scripts/inventory-api-calls.mjs",
     "i18n:status": "i18next-cli status",
     "i18n:sync": "i18next-cli sync",
     "i18n:lint": "i18next-cli lint",

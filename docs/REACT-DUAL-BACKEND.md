@@ -9,6 +9,8 @@ protected default.
 The Laravel backend remains the source of truth. The React frontend must keep
 working against Laravel first, and ASP.NET support must be introduced as an
 optional backend target only after each API contract is proven compatible.
+The ASP.NET backend is not assumed to be ready; current frontend preparation is
+limited to guardrails, documentation, and local inventory tooling.
 
 Current production status:
 
@@ -201,6 +203,23 @@ the URL contract expected by existing Laravel screens.
 - Extract all React API calls into a machine-readable matrix.
 - Compare the matrix against Laravel OpenAPI/routes and ASP.NET routes.
 
+Current inventory command:
+
+```text
+npm --prefix react-frontend run inventory:api-calls
+```
+
+The command scans the production Laravel React source and writes generated
+artifacts under:
+
+```text
+.local-docs-archive/react-api-inventory/latest/
+```
+
+Generated inventory artifacts are local working material. Do not commit them to
+public docs. They are input for ASP.NET backend contract work, not proof that
+ASP.NET is ready.
+
 Exit gate:
 
 ```text
@@ -309,3 +328,7 @@ Every implementation task should report:
 - which ASP.NET-mode verification command was run, if available;
 - which endpoints were proven compatible;
 - which endpoints remain blocked by ASP.NET backend parity work.
+
+When the ASP.NET backend is still under active parity development, report the
+ASP.NET verification line as "not ready / not run" rather than implying support
+exists.
