@@ -231,12 +231,35 @@ The inventory matrix includes:
 - auth/tenant hints from API client options such as `skipAuth` and `skipTenant`;
 - upload/download markers, upload field names, response type hints, dynamic path
   markers, and raw-fetch markers;
+- Laravel OpenAPI matching from the repo-root `openapi.json` when present;
+- ASP.NET status fields that default to `not_checked` and must stay that way
+  until the development ASP.NET backend has been audited separately;
 - first source locations so backend agents can inspect the calling screen before
   implementing an ASP.NET endpoint.
 
 The latest local inventory should be read as a work queue seed. Each row still
 needs Laravel route/OpenAPI matching and, later, ASP.NET route/runtime smoke
 verification before it can be marked compatible.
+
+Current local prep check:
+
+```text
+npm --prefix react-frontend run check:dual-backend-prep
+```
+
+This command verifies the guardrails, runs the inventory fixture tests, and
+regenerates the local API-call matrix. It does not run ASP.NET and does not
+certify ASP.NET compatibility.
+
+Current guardrail-only check:
+
+```text
+npm --prefix react-frontend run check:backend-guardrails
+```
+
+This fails if ordinary `dev`/`build` scripts stop being Laravel-safe, if
+`backendTarget` stops defaulting invalid or missing values back to Laravel, or
+if backend-specific conditionals appear in production page/component files.
 
 Exit gate:
 

@@ -32,6 +32,8 @@ npm run build        # Laravel/default production path
 npm run dev:laravel  # Explicit local Laravel target
 npm run dev:dotnet   # Explicit local ASP.NET target
 npm run inventory:api-calls  # Local API-call matrix for future ASP.NET parity work
+npm run check:backend-guardrails  # Ensure Laravel remains default and pages stay backend-neutral
+npm run check:dual-backend-prep  # Guardrails + inventory tests + local matrix regeneration
 ```
 
 Do not add ASP.NET conditionals inside pages or ordinary components. If a real
@@ -47,6 +49,7 @@ that the ASP.NET backend is ready.
 Use `npm run test:api-inventory` when changing the inventory script. The matrix
 groups calls by module and priority so backend agents can work from P0 auth /
 tenant contracts outward without touching production React pages.
+Use `npm run test:backend-guardrails` when changing the guardrail script.
 
 ## 🔴 Mandatory Rules
 

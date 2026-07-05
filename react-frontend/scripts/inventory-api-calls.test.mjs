@@ -79,3 +79,60 @@ test('inventory-api-calls classifies modules and contract hints from runtime sou
   const download = byEndpoint.get('/v2/caring-community/statements/{id}/export');
   assert.match(download.contract_risk, /download/);
 });
+
+test('inventory-api-calls matches compatible Laravel OpenAPI operations and keeps ASP.NET unchecked', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'nexus-api-inventory-openapi-'));
+  const src = path.join(tmp, 'src');
+  const out = path.join(tmp, 'out');
+  const openapi = path.join(tmp, 'openapi.json');
+
+  fs.mkdirSync(path.join(src, 'pages', 'courses'), { recursive: true });
+  fs.writeFileSync(path.join(src, 'pages', 'courses', 'CoursePage.tsx'), `
+    import { api } from '@/lib/api';
+    export function loadCourse(id: number) {
+      return api.get(\`/v2/courses/\${id}\`);
+    }
+    export function createCourse(title: string) {
+      return api.post('/v2/admin/courses', { title });
+    }
+    export function missingRoute() {
+      return api.delete('/v2/admin/courses/archive-all');
+    }
+  `);
+
+  fs.writeFileSync(openapi, JSON.stringify({
+    openapi: '3.0.3',
+    paths: {
+      '/api/v2/courses/{id}': {
+        get: { operationId: 'courses.show' },
+      },
+      '/api/v2/admin/courses': {
+        post: { operationId: 'admin.courses.store' },
+      },
+    },
+  }, null, 2));
+
+  execFileSync(process.execPath, [scriptPath, '--src', src, '--out', out, '--openapi', openapi], { encoding: 'utf8' });
+
+  const report = JSON.parse(fs.readFileSync(path.join(out, 'api-calls.json'), 'utf8'));
+  const byEndpoint = new Map(report.endpoints.map((endpoint) => [endpoint.endpoint, endpoint]));
+
+  const show = byEndpoint.get('/v2/courses/{id}');
+  assert.equal(show.laravel_openapi_status, 'matched');
+  assert.equal(show.laravel_openapi_path, '/api/v2/courses/{id}');
+  assert.equal(show.laravel_operation_id, 'courses.show');
+  assert.equal(show.aspnet_status, 'not_checked');
+  assert.equal(show.aspnet_route, null);
+
+  const create = byEndpoint.get('/v2/admin/courses');
+  assert.equal(create.laravel_openapi_status, 'matched');
+  assert.equal(create.laravel_openapi_path, '/api/v2/admin/courses');
+
+  const missing = byEndpoint.get('/v2/admin/courses/archive-all');
+  assert.equal(missing.laravel_openapi_status, 'not_found');
+  assert.equal(missing.aspnet_status, 'not_checked');
+
+  assert.equal(report.summary.laravel_openapi.matched, 2);
+  assert.equal(report.summary.laravel_openapi.not_found, 1);
+  assert.equal(report.summary.aspnet_status.not_checked, 3);
+});
