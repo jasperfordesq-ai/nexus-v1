@@ -258,6 +258,27 @@ export default defineConfig(({ command, mode }) => {
       },
     },
   },
+  // `vite preview` static server (npm run preview) — serves the built dist on
+  // 4173 with the same API proxy as dev. No HMR / dep-optimizer / self-reload,
+  // so it stays responsive under heavy machine load when the dev server on
+  // 5173 is being starved of CPU/RAM.
+  preview: {
+    port: 4173,
+    strictPort: true,
+    host: '127.0.0.1',
+    proxy: {
+      '/api': {
+        target: apiUrl,
+        changeOrigin: true,
+        secure: false,
+        timeout: 120000,
+        proxyTimeout: 120000,
+      },
+      '/admin-legacy': { target: apiUrl, changeOrigin: true },
+      '/uploads': { target: apiUrl, changeOrigin: true },
+      '/health.php': { target: apiUrl, changeOrigin: true },
+    },
+  },
   build: {
     outDir: 'dist',
     rollupOptions: {
