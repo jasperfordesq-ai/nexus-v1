@@ -129,6 +129,36 @@ class NewsletterRenderFormatsTest extends TestCase
     }
 
     // ================================================================
+    // builder image safety net (send-path)
+    // ================================================================
+
+    public function test_builder_relative_storage_image_is_absolutized_on_send(): void
+    {
+        config(['app.url' => 'https://api.test']);
+
+        $doc = '<!DOCTYPE html><html><body>'
+            . '<table><tr><td><img src="/storage/tenant_1/uploads/a.png" alt="hero"></td></tr></table>'
+            . '<a href="{{unsubscribe_url}}">Unsubscribe</a></body></html>';
+
+        $html = $this->render(['content' => $doc, 'subject' => 'B', 'content_format' => 'builder']);
+
+        $this->assertStringContainsString('https://api.test/storage/tenant_1/uploads/a.png', $html);
+        $this->assertStringNotContainsString('src="/storage', $html);
+    }
+
+    public function test_builder_blob_image_is_dropped_on_send(): void
+    {
+        $doc = '<!DOCTYPE html><html><body>'
+            . '<p>Kept body</p><img src="blob:https://app.test/xyz-uuid">'
+            . '<a href="{{unsubscribe_url}}">Unsubscribe</a></body></html>';
+
+        $html = $this->render(['content' => $doc, 'subject' => 'B', 'content_format' => 'builder']);
+
+        $this->assertStringNotContainsString('blob:', $html);
+        $this->assertStringContainsString('Kept body', $html);
+    }
+
+    // ================================================================
     // plaintext
     // ================================================================
 

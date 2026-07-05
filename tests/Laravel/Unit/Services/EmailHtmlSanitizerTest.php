@@ -166,4 +166,79 @@ class EmailHtmlSanitizerTest extends TestCase
 
         $this->assertStringNotContainsString('<script', EmailHtmlSanitizer::sanitizeForFormat($html, 'html'));
     }
+
+    // ================================================================
+    // normalizeEmailImageSources — send-path image safety net
+    // ================================================================
+
+    public function test_absolutizes_root_relative_storage_image_src(): void
+    {
+        $html = '<mj-column><img src="/storage/tenant_1/uploads/a.png" alt="x"></mj-column>';
+
+        $out = EmailHtmlSanitizer::normalizeEmailImageSources($html, 'https://api.example.com');
+
+        $this->assertStringContainsString('src="https://api.example.com/storage/tenant_1/uploads/a.png"', $out);
+        $this->assertStringNotContainsString('src="/storage', $out);
+    }
+
+    public function test_absolutizes_root_relative_uploads_image_src(): void
+    {
+        $html = '<img src="/uploads/general/x.jpg">';
+
+        $out = EmailHtmlSanitizer::normalizeEmailImageSources($html, 'https://api.example.com/');
+
+        $this->assertStringContainsString('src="https://api.example.com/uploads/general/x.jpg"', $out);
+    }
+
+    public function test_rewrites_protocol_relative_image_src_to_https(): void
+    {
+        $html = '<img src="//cdn.example.com/a.png" alt="">';
+
+        $out = EmailHtmlSanitizer::normalizeEmailImageSources($html, 'https://api.example.com');
+
+        $this->assertStringContainsString('src="https://cdn.example.com/a.png"', $out);
+        $this->assertStringNotContainsString('src="//cdn', $out);
+    }
+
+    public function test_leaves_absolute_https_image_src_untouched(): void
+    {
+        $html = '<img src="https://api.example.com/storage/tenant_1/uploads/a.png" alt="ok">';
+
+        $this->assertSame($html, EmailHtmlSanitizer::normalizeEmailImageSources($html, 'https://api.example.com'));
+    }
+
+    public function test_drops_blob_url_images(): void
+    {
+        $html = '<p>before</p><img src="blob:https://app.example.com/1234-uuid"><p>after</p>';
+
+        $out = EmailHtmlSanitizer::normalizeEmailImageSources($html, 'https://api.example.com');
+
+        $this->assertStringNotContainsString('<img', $out);
+        $this->assertStringNotContainsString('blob:', $out);
+        $this->assertStringContainsString('<p>before</p>', $out);
+        $this->assertStringContainsString('<p>after</p>', $out);
+    }
+
+    public function test_drops_non_image_data_uri_images_but_keeps_data_images(): void
+    {
+        $html = '<img src="data:text/html;base64,PHNjcmlwdD4=">'
+            . '<img src="data:image/png;base64,iVBORw0KGgo=" alt="ok">';
+
+        $out = EmailHtmlSanitizer::normalizeEmailImageSources($html, 'https://api.example.com');
+
+        $this->assertStringNotContainsString('data:text/html', $out);
+        $this->assertStringContainsString('data:image/png;base64,iVBORw0KGgo=', $out);
+    }
+
+    public function test_empty_app_url_leaves_relative_src_but_still_drops_blobs(): void
+    {
+        $html = '<img src="/storage/a.png"><img src="blob:x">';
+
+        $out = EmailHtmlSanitizer::normalizeEmailImageSources($html, '');
+
+        // No base to absolutize against — relative src is left as-is (no crash)…
+        $this->assertStringContainsString('src="/storage/a.png"', $out);
+        // …but blob images are still dropped.
+        $this->assertStringNotContainsString('blob:', $out);
+    }
 }

@@ -16,6 +16,7 @@ import ImagePlus from 'lucide-react/icons/image-plus';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { adminNewsletters } from '../api/adminApi';
+import { resolveUploadedUrl } from './builderImage';
 import { logError } from '@/lib/logger';
 
 interface InsertImageButtonProps {
@@ -39,15 +40,11 @@ export function InsertImageButton({ onInsert, isDisabled }: InsertImageButtonPro
 
     setUploading(true);
     try {
-      const res = await adminNewsletters.uploadImage(file);
-      if (res.success && res.data) {
-        const data = res.data as { url?: string; path?: string };
-        const src = data.url || data.path;
-        if (src) {
-          onInsert(`<img src="${src}" alt="" style="max-width:100%;height:auto;" />`);
-        } else {
-          toast.error(t('newsletter_content_editor.image_upload_failed'));
-        }
+      // Only the absolute url is inserted — a relative /storage path renders in
+      // the editor preview but is a dead reference in a delivered email.
+      const url = resolveUploadedUrl(await adminNewsletters.uploadImage(file));
+      if (url) {
+        onInsert(`<img src="${url}" alt="" style="max-width:100%;height:auto;" />`);
       } else {
         toast.error(t('newsletter_content_editor.image_upload_failed'));
       }

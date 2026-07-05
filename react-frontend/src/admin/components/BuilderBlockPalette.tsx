@@ -56,6 +56,14 @@ export function BuilderBlockPalette({
           </button>
         )}
       </div>
+      {/* When collapsed, the rail still names itself instead of being a mystery bar. */}
+      {collapsed && (
+        <div className="flex flex-1 justify-center pt-3">
+          <span className="pointer-events-none select-none text-[10px] font-semibold uppercase tracking-wide text-muted [writing-mode:vertical-rl] rotate-180">
+            {title}
+          </span>
+        </div>
+      )}
       {/* Keep the blocks host mounted even when collapsed (GrapesJS owns its DOM). */}
       <div ref={blocksRef} className={`flex-1 overflow-y-auto ${collapsed ? 'hidden' : ''}`} />
     </aside>

@@ -47,12 +47,22 @@ import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useCo
 import Copy from 'lucide-react/icons/copy';
 import Info from 'lucide-react/icons/info';
 import X from 'lucide-react/icons/x';
+import LayoutTemplate from 'lucide-react/icons/layout-template';
 import { logError } from '@/lib/logger';
 import { adminNewsletters } from '../api/adminApi';
 import { BuilderToolbar, type BuilderDevice } from './BuilderToolbar';
 import { BuilderBlockPalette } from './BuilderBlockPalette';
 import { BuilderInspector, type InspectorTab } from './BuilderInspector';
 import { TemplateGalleryModal, type GalleryTemplate } from './TemplateGalleryModal';
+import { BuilderPreviewModal } from './BuilderPreviewModal';
+import { customizeBlocks } from './builderBlocks';
+import {
+  resolveUploadedUrl,
+  insertImageComponent,
+  isEphemeralSrc,
+  type GjsComp,
+  type EditorLike,
+} from './builderImage';
 
 interface NewsletterBuilderProps {
   /** Current compiled HTML (unused for restore — design_json drives restore). */
@@ -107,54 +117,6 @@ function exportIsValid(ed: Editor): boolean {
   }
 }
 
-/** Minimal structural view of a grapesjs Component (avoids its heavy generics). */
-type GjsComp = {
-  get?: (k: string) => unknown;
-  parent?: () => GjsComp | undefined;
-  append?: (content: string) => unknown;
-  components?: () => { models?: GjsComp[] } | GjsComp[];
-};
-
-/** Walk up from the selection to the enclosing mj-column, if any. */
-function enclosingColumn(ed: Editor): GjsComp | null {
-  let node = ed.getSelected() as unknown as GjsComp | undefined;
-  while (node) {
-    const tag = (node.get?.('tagName') as string) || (node.get?.('type') as string);
-    if (tag === 'mj-column') return node;
-    node = node.parent?.();
-  }
-  return null;
-}
-
-/** Find the mj-body so we can append a fresh section when nothing is selected. */
-function findBody(comp: GjsComp | undefined): GjsComp | null {
-  if (!comp) return null;
-  const tag = (comp.get?.('tagName') as string) || (comp.get?.('type') as string);
-  if (tag === 'mj-body') return comp;
-  const kids = comp.components?.();
-  const list = Array.isArray(kids) ? kids : kids?.models;
-  if (list) {
-    for (const k of list) {
-      const found = findBody(k);
-      if (found) return found;
-    }
-  }
-  return null;
-}
-
-/** Insert an mj-image at the current selection's column, else append a new section. */
-function insertImageComponent(ed: Editor, src: string) {
-  const safe = src.replace(/"/g, '&quot;');
-  const img = `<mj-image src="${safe}" alt="" />`;
-  const col = enclosingColumn(ed);
-  if (col?.append) {
-    col.append(img);
-    return;
-  }
-  const body = findBody(ed.getWrapper() as unknown as GjsComp);
-  (body ?? (ed.getWrapper() as unknown as GjsComp)).append?.(`<mj-section><mj-column>${img}</mj-column></mj-section>`);
-}
-
 export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, enableTemplates, onChange }: NewsletterBuilderProps) {
   const { t } = useTranslation('admin');
   const toast = useToast();
@@ -177,6 +139,13 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
   const initialMjmlRef = useRef(initialMjml);
   // Lets non-init handlers (image insert, template apply) trigger an export.
   const scheduleEmitRef = useRef<() => void>(() => {});
+  // Most-recent uploaded absolute url — sweeps any stray blob/data image src.
+  const lastUploadRef = useRef<string | null>(null);
+  // Applies an uploaded image to the canvas. Reassigned every render so the
+  // (init-time) asset-manager uploadFile handler always calls the latest closure.
+  const applyImageRef = useRef<(url: string, target?: GjsComp) => void>(() => {});
+  // Gated so seeding the blank canvas doesn't instantly dismiss the first-run card.
+  const firstRunArmedRef = useRef(false);
 
   const [editor, setEditor] = useState<Editor | null>(null);
   const [failed, setFailed] = useState(false);
@@ -196,6 +165,11 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
   const [templatesLoaded, setTemplatesLoaded] = useState(false);
   // Set when a restored design_json was built by an older editor and dropped.
   const [legacyNotice, setLegacyNotice] = useState(false);
+  // First-run helper card over a blank canvas (offers starter templates).
+  const [showFirstRun, setShowFirstRun] = useState(false);
+  // Device-framed preview of the compiled email.
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState('');
 
   // Reads the editor's undo/redo availability into React state. Reads refs +
   // stable setters only, so it's safe to call from the init effect too.
@@ -244,32 +218,23 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
             }),
         ],
         assetManager: {
-          // Custom upload: /v2/upload returns { url, path }, not GrapesJS's
-          // { data: [...] } shape, so take full control here — and, crucially,
-          // APPLY the uploaded image to the open target so it actually appears.
+          // Overriding uploadFile REPLACES GrapesJS's default (which would drop a
+          // base64/blob preview into the model — dead in a delivered email). We
+          // upload to our own domain (/v2/upload → absolute url) and hand the
+          // ABSOLUTE url to applyServerImage, which points the open image at it or
+          // inserts a fresh one. No blob/relative src is ever left behind.
           uploadFile: async (ev: Event) => {
             const target = ev.target as HTMLInputElement | null;
             const dropped = (ev as DragEvent).dataTransfer?.files;
             const file = (dropped && dropped[0]) || target?.files?.[0];
             if (!file) return;
             try {
-              const res = await adminNewsletters.uploadImage(file);
-              const data = res.success && res.data ? (res.data as { url?: string; path?: string }) : null;
-              const src = data?.url || data?.path;
-              if (!src) {
+              const url = resolveUploadedUrl(await adminNewsletters.uploadImage(file));
+              if (!url) {
                 toast.error(t('newsletter_content_editor.image_upload_failed'));
                 return;
               }
-              const cur = editorRef.current;
-              if (!cur) return;
-              const am = cur.AssetManager;
-              am.add(src);
-              // Apply to whatever image opened the asset manager, then close it.
-              const amTarget = (am as unknown as { getTarget?: () => GjsComp | undefined }).getTarget?.();
-              if (amTarget?.get) {
-                (amTarget as unknown as { set?: (k: string, v: string) => void }).set?.('src', src);
-                (cur.Modal as unknown as { close?: () => void })?.close?.();
-              }
+              applyImageRef.current(url);
             } catch (err) {
               logError('NewsletterBuilder: asset upload failed', err);
               toast.error(t('newsletter_content_editor.image_upload_failed'));
@@ -284,6 +249,14 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
     }
 
     editorRef.current = ed;
+
+    // Re-label the MJML blocks (icon-only → titled + described + grouped) so the
+    // palette is legible. Never let a labelling tweak break editor init.
+    try {
+      customizeBlocks(ed as unknown as Parameters<typeof customizeBlocks>[0], t);
+    } catch (err) {
+      logError('NewsletterBuilder: customizeBlocks failed', err);
+    }
 
     // Restore a previously-saved design, otherwise seed a blank MJML document.
     // A restore only "counts" if it still compiles to valid MJML — older designs
@@ -305,9 +278,20 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
         setLegacyNotice(true);
       }
     }
+    let seededBlank = false;
     if (!restored) {
       const mjml = initialMjmlRef.current;
-      ed.setComponents(mjml && mjml.trim().startsWith('<mjml') ? mjml : DEFAULT_MJML);
+      const hasStarterMjml = Boolean(mjml && mjml.trim().startsWith('<mjml'));
+      ed.setComponents(hasStarterMjml ? mjml! : DEFAULT_MJML);
+      seededBlank = !hasStarterMjml;
+    }
+    // Offer starter templates over a genuinely blank canvas. Arm the dismiss
+    // slightly later so the seed's own component:add events don't hide it.
+    if (seededBlank && enableTemplates) {
+      setShowFirstRun(true);
+      setTimeout(() => {
+        firstRunArmedRef.current = true;
+      }, 400);
     }
 
     const scheduleEmit = () => {
@@ -332,9 +316,26 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
     const syncSelection = () => setHasSelection(Boolean(editorRef.current?.getSelected()));
     const syncDevice = () => setDevice((editorRef.current?.getDevice() as BuilderDevice) ?? 'Desktop');
 
+    // Defensive: if any path adds an image with a client-only blob:/data: src,
+    // swap in the last uploaded absolute url so it survives into the email. The
+    // backend send-path net strips anything that still slips through.
+    const handleComponentAdd = (comp: unknown) => {
+      const c = comp as GjsComp | undefined;
+      const tag = c ? ((c.get?.('tagName') as string) || (c.get?.('type') as string)) : '';
+      if ((tag === 'mj-image' || tag === 'image') && c?.get && c.set) {
+        const attrs = c.get('attributes') as { src?: string } | undefined;
+        const src = (c.get('src') as string | undefined) ?? attrs?.src;
+        if (isEphemeralSrc(src) && lastUploadRef.current) {
+          c.set('src', lastUploadRef.current);
+        }
+      }
+      if (firstRunArmedRef.current) setShowFirstRun(false);
+    };
+
     ed.on('update', handleUpdate);
     ed.on('component:selected component:deselected', syncSelection);
     ed.on('change:device', syncDevice);
+    ed.on('component:add', handleComponentAdd);
 
     setEditor(ed);
     syncUndoState();
@@ -343,6 +344,7 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
       ed.off('update', handleUpdate);
       ed.off('component:selected component:deselected', syncSelection);
       ed.off('change:device', syncDevice);
+      ed.off('component:add', handleComponentAdd);
       if (debounceRef.current) clearTimeout(debounceRef.current);
       try {
         ed.destroy();
@@ -403,25 +405,70 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
     }
   };
 
-  // Discoverable "Insert image" — upload through our domain, drop an mj-image at
-  // the selection. This is the same pipeline the asset manager uses, surfaced.
+  // Apply an uploaded ABSOLUTE image url to the canvas: repoint the open/selected
+  // image, else insert a fresh mj-image (and reveal its Settings so alt/link are
+  // editable). Shared by the toolbar button and the asset-manager uploadFile.
+  const applyServerImage = (url: string, target?: GjsComp) => {
+    const ed = editorRef.current;
+    if (!ed) return;
+    lastUploadRef.current = url;
+    const am = ed.AssetManager;
+    try {
+      am?.add?.(url);
+    } catch {
+      /* asset-library add is best-effort */
+    }
+    const amTarget = (am as unknown as { getTarget?: () => GjsComp | undefined }).getTarget?.();
+    const tgt = target ?? amTarget ?? (ed.getSelected() as unknown as GjsComp | undefined);
+    const tag = tgt ? ((tgt.get?.('tagName') as string) || (tgt.get?.('type') as string)) : '';
+    if (tgt?.set && (tag === 'mj-image' || tag === 'image')) {
+      tgt.set('src', url);
+    } else {
+      const added = insertImageComponent(ed as unknown as EditorLike, url);
+      if (added) {
+        try {
+          (ed as unknown as { select?: (c: unknown) => void }).select?.(added);
+        } catch {
+          /* selection is best-effort */
+        }
+        setActiveTab('settings');
+      }
+    }
+    try {
+      (ed.Modal as unknown as { close?: () => void })?.close?.();
+    } catch {
+      /* modal may not be open */
+    }
+    scheduleEmitRef.current();
+  };
+  applyImageRef.current = applyServerImage;
+
+  const handlePreview = () => {
+    const ed = editorRef.current;
+    if (!ed) return;
+    try {
+      setPreviewHtml(exportHtml(ed));
+      setPreviewOpen(true);
+    } catch (err) {
+      logError('NewsletterBuilder: preview failed', err);
+    }
+  };
+
+  // Discoverable "Insert image" — upload through our domain, apply an absolute
+  // url at the selection. Same pipeline the asset manager uses, surfaced.
   const handleInsertImageClick = () => fileRef.current?.click();
   const handleImageFile = async (ev: React.ChangeEvent<HTMLInputElement>) => {
     const file = ev.target.files?.[0];
     ev.target.value = ''; // allow re-picking the same file
-    const ed = editorRef.current;
-    if (!file || !ed) return;
+    if (!file || !editorRef.current) return;
     setInsertingImage(true);
     try {
-      const res = await adminNewsletters.uploadImage(file);
-      const data = res.success && res.data ? (res.data as { url?: string; path?: string }) : null;
-      const src = data?.url || data?.path;
-      if (!src) {
+      const url = resolveUploadedUrl(await adminNewsletters.uploadImage(file));
+      if (!url) {
         toast.error(t('newsletter_content_editor.image_upload_failed'));
         return;
       }
-      insertImageComponent(ed, src);
-      scheduleEmitRef.current();
+      applyServerImage(url);
     } catch (err) {
       logError('NewsletterBuilder: insert image failed', err);
       toast.error(t('newsletter_content_editor.image_upload_failed'));
@@ -464,6 +511,7 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
         ed.setComponents(tpl.content); // MJML markup → parsed into mj-* components
       }
       setLegacyNotice(false);
+      setShowFirstRun(false);
       scheduleEmitRef.current();
     } catch (err) {
       logError('NewsletterBuilder: apply template failed', err);
@@ -503,6 +551,7 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
         onToggleBorders={handleToggleBorders}
         onInsertImage={handleInsertImageClick}
         onOpenTemplates={handleOpenTemplates}
+        onPreview={handlePreview}
         onViewCode={handleViewCode}
         onClear={handleClear}
         t={t}
@@ -532,8 +581,33 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
           expandLabel={t('newsletter_builder.show_blocks')}
           collapseLabel={t('newsletter_builder.hide_blocks')}
         />
-        <main className="nb-canvas min-w-0 flex-1 overflow-hidden">
+        <main className="nb-canvas relative min-w-0 flex-1 overflow-hidden">
           <div ref={canvasRef} className="h-full w-full" />
+          {showFirstRun && !readOnly && (
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
+              <div className="pointer-events-auto max-w-sm rounded-xl border border-border bg-surface p-6 text-center shadow-lg">
+                <LayoutTemplate size={28} className="mx-auto mb-3 text-primary" aria-hidden="true" />
+                <h3 className="text-sm font-semibold text-foreground">{t('newsletter_builder.empty_title')}</h3>
+                <p className="mt-1 text-xs text-muted">{t('newsletter_builder.empty_desc')}</p>
+                <div className="mt-4 flex items-center justify-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    startContent={<LayoutTemplate size={15} />}
+                    onPress={() => {
+                      setShowFirstRun(false);
+                      void handleOpenTemplates();
+                    }}
+                  >
+                    {t('newsletter_builder.empty_start_template')}
+                  </Button>
+                  <Button size="sm" variant="tertiary" onPress={() => setShowFirstRun(false)}>
+                    {t('newsletter_builder.empty_start_blank')}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </main>
         <BuilderInspector
           stylesRef={stylesRef}
@@ -582,6 +656,13 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
           onSelect={applyTemplate}
         />
       )}
+
+      <BuilderPreviewModal
+        isOpen={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        html={previewHtml}
+        t={t}
+      />
 
       <Modal isOpen={codeOpen} onOpenChange={setCodeOpen} size="3xl" scrollBehavior="inside">
         <ModalContent>

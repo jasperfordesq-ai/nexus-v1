@@ -820,6 +820,11 @@ HTML;
         $chrome = self::prepareEmailChrome($tenantName, $unsubscribeToken, $trackingToken);
         $content = self::prepareHtmlContent($newsletter['content'] ?? '', $tenantName, $recipient, $trackingToken, $chrome);
 
+        // Send-path safety net: absolutize root-relative /storage image URLs and
+        // strip blob:/junk-data images so a delivered email never carries an
+        // image the recipient's client can't fetch (builder image pipeline).
+        $content = EmailHtmlSanitizer::normalizeEmailImageSources($content, $chrome['apiUrl']);
+
         // Compliance backstop: every bulk email needs a working unsubscribe. If
         // the author didn't include one (via {{unsubscribe_link}} or a literal
         // unsubscribe URL), append a minimal footer with it.

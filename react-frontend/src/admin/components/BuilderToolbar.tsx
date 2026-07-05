@@ -23,6 +23,7 @@ import CodeIcon from 'lucide-react/icons/code';
 import Trash2 from 'lucide-react/icons/trash-2';
 import ImageIcon from 'lucide-react/icons/image';
 import LayoutTemplate from 'lucide-react/icons/layout-template';
+import Eye from 'lucide-react/icons/eye';
 import type { ReactNode } from 'react';
 
 export type BuilderDevice = 'Desktop' | 'Tablet' | 'Mobile portrait';
@@ -46,6 +47,7 @@ interface BuilderToolbarProps {
   onToggleBorders: () => void;
   onInsertImage: () => void;
   onOpenTemplates: () => void;
+  onPreview: () => void;
   onViewCode: () => void;
   onClear: () => void;
   t: (key: string) => string;
@@ -96,6 +98,7 @@ export function BuilderToolbar({
   onToggleBorders,
   onInsertImage,
   onOpenTemplates,
+  onPreview,
   onViewCode,
   onClear,
   t,
@@ -157,6 +160,17 @@ export function BuilderToolbar({
       >
         <ImageIcon size={16} />
       </ToolButton>
+
+      <Button
+        size="sm"
+        variant="light"
+        startContent={<Eye size={16} />}
+        isDisabled={!ready}
+        onPress={onPreview}
+        className="shrink-0"
+      >
+        {t('newsletter_builder.preview')}
+      </Button>
 
       {showTemplates && (
         <Button

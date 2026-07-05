@@ -137,4 +137,68 @@ class EmailHtmlSanitizer
 
         return self::sanitize($content);
     }
+
+    /**
+     * Normalize <img> sources for delivery so a sent email never carries an
+     * image an inbox client can't fetch. This is the SEND-path safety net for
+     * the newsletter builder: whatever ended up in the stored content, the
+     * delivered HTML gets only absolute, reachable image URLs.
+     *
+     *  1. Root-relative "/storage/..." and "/uploads/..." → absolute {APP_URL}/…
+     *     (the browser preview resolves these against the app origin, but an
+     *     email client has no base URL, so they must be absolutized).
+     *  2. Protocol-relative "//host/…" → "https://host/…".
+     *  3. <img> whose src is a blob: URL or a non-image data: URI is DROPPED —
+     *     blob URLs are meaningless outside the authoring page and a stray
+     *     base64 blob bloats/breaks the email. (Legitimate data:image/* is kept.)
+     *
+     * Regex-based to match the byte-stable philosophy of sanitize(); it only
+     * touches <img src> values, leaving all other email markup untouched.
+     *
+     * @param string $appUrl Absolute app origin (e.g. https://api.example.com);
+     *                        the trailing slash is trimmed.
+     */
+    public static function normalizeEmailImageSources(string $html, string $appUrl): string
+    {
+        if (trim($html) === '') {
+            return $html;
+        }
+
+        $base = rtrim($appUrl, '/');
+
+        // 1. Root-relative /storage/... and /uploads/... → absolute.
+        if ($base !== '') {
+            $html = preg_replace_callback(
+                '#(<img\b[^>]*?\bsrc\s*=\s*)(["\'])(/(?:storage|uploads)/[^"\']*)\2#i',
+                static fn (array $m): string => $m[1] . $m[2] . $base . $m[3] . $m[2],
+                $html
+            ) ?? $html;
+        }
+
+        // 2. Protocol-relative //host/... → https://host/...
+        $html = preg_replace(
+            '#(<img\b[^>]*?\bsrc\s*=\s*["\'])//#i',
+            '$1https://',
+            $html
+        ) ?? $html;
+
+        // 3. Drop <img> with a blob: or non-image data: src entirely.
+        $html = preg_replace_callback(
+            '#<img\b[^>]*?\bsrc\s*=\s*(["\'])([^"\']*)\1[^>]*>#i',
+            static function (array $m): string {
+                $src = strtolower(trim(html_entity_decode($m[2], ENT_QUOTES, 'UTF-8')));
+                if (str_starts_with($src, 'blob:')) {
+                    return '';
+                }
+                if (str_starts_with($src, 'data:') && !preg_match('#^data:image/(png|jpe?g|gif|webp)[;,]#', $src)) {
+                    return '';
+                }
+
+                return $m[0];
+            },
+            $html
+        ) ?? $html;
+
+        return $html;
+    }
 }

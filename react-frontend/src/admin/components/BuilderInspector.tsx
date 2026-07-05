@@ -85,6 +85,13 @@ export function BuilderInspector({
           </Tabs>
         )}
       </div>
+      {collapsed && (
+        <div className="flex flex-1 justify-center pt-3">
+          <span className="pointer-events-none select-none text-[10px] font-semibold uppercase tracking-wide text-muted [writing-mode:vertical-rl] rotate-180">
+            {labels.ariaLabel}
+          </span>
+        </div>
+      )}
       <div className={`relative flex-1 overflow-y-auto ${collapsed ? 'hidden' : ''}`}>
         {showEmptyHint && (
           <p className="px-4 py-6 text-center text-xs text-muted">{labels.empty}</p>
