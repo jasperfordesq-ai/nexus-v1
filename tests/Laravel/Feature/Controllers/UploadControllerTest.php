@@ -49,4 +49,30 @@ class UploadControllerTest extends TestCase
 
         $this->assertContains($response->getStatusCode(), [400, 422]);
     }
+
+    // ------------------------------------------------------------------
+    //  POST /v2/upload  (canonical path — used by the newsletter builder's
+    //  asset manager and every frontend caller). Regression guard: this
+    //  route was previously registered only as /upload, so every uploadImage()
+    //  call 404'd and image uploads silently failed. A missing route returns
+    //  404, so a 401/422 here proves /v2/upload is actually registered.
+    // ------------------------------------------------------------------
+
+    public function test_v2_store_route_is_registered_and_requires_auth(): void
+    {
+        $response = $this->apiPost('/v2/upload', []);
+
+        $response->assertStatus(401);
+        $this->assertNotSame(404, $response->getStatusCode());
+    }
+
+    public function test_v2_store_requires_file(): void
+    {
+        $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/upload', []);
+
+        $this->assertContains($response->getStatusCode(), [400, 422]);
+        $this->assertNotSame(404, $response->getStatusCode());
+    }
 }
