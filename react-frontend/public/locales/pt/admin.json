@@ -16430,7 +16430,15 @@
       "hero_label": "Banner",
       "hero_desc": "Uma imagem de banner com um título",
       "html_label": "HTML",
-      "html_desc": "Cole seu próprio HTML personalizado"
+      "html_desc": "Cole seu próprio HTML personalizado",
+      "wrapper_desc": "Agrupar seções com um plano de fundo compartilhado",
+      "navbar_label": "Barra de navegação",
+      "navbar_desc": "Uma linha de links de menu",
+      "social_icon_label": "Ícone social",
+      "social_icon_desc": "Um único ícone de rede social",
+      "nav_link_label": "Link de navegação",
+      "nav_link_desc": "Um único link de menu",
+      "wrapper_label": "Contentor"
     }
   },
   "newsletter_content_editor": {

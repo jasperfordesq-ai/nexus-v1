@@ -16430,7 +16430,15 @@
       "hero_label": "Banner",
       "hero_desc": "Een bannerafbeelding met een kop",
       "html_label": "HTML",
-      "html_desc": "Plak uw eigen aangepaste HTML"
+      "html_desc": "Plak uw eigen aangepaste HTML",
+      "wrapper_desc": "Groepeer secties met een gedeelde achtergrond",
+      "navbar_label": "Navigatiebalk",
+      "navbar_desc": "Een rij menulinks",
+      "social_icon_label": "Sociaal icoon",
+      "social_icon_desc": "Eén sociaal netwerkpictogram",
+      "nav_link_label": "Navigatielink",
+      "nav_link_desc": "Eén enkele menulink",
+      "wrapper_label": "Container"
     }
   },
   "newsletter_content_editor": {

@@ -16430,7 +16430,15 @@
       "hero_label": "Baner",
       "hero_desc": "Obraz banera z nagłówkiem",
       "html_label": "HTML",
-      "html_desc": "Wklej własny, niestandardowy kod HTML"
+      "html_desc": "Wklej własny, niestandardowy kod HTML",
+      "wrapper_desc": "Sekcje grupowe ze wspólnym tłem",
+      "navbar_label": "Pasek nawigacji",
+      "navbar_desc": "Rząd łączy menu",
+      "social_icon_label": "Ikona społecznościowa",
+      "social_icon_desc": "Pojedyncza ikona sieci społecznościowej",
+      "nav_link_label": "Link nawigacyjny",
+      "nav_link_desc": "Pojedynczy link do menu",
+      "wrapper_label": "Kontener"
     }
   },
   "newsletter_content_editor": {

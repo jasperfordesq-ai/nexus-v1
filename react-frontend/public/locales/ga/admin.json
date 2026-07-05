@@ -16430,7 +16430,15 @@
       "hero_label": "Meirge",
       "hero_desc": "Íomhá bratach le ceannlíne",
       "html_label": "HTML",
-      "html_desc": "Greamaigh do HTML saincheaptha féin"
+      "html_desc": "Greamaigh do HTML saincheaptha féin",
+      "wrapper_desc": "Grúpáil rannóga a bhfuil cúlra comhroinnte acu",
+      "navbar_label": "Barra loingseoireachta",
+      "navbar_desc": "Sraith de naisc roghchláir",
+      "social_icon_label": "Deilbhín sóisialta",
+      "social_icon_desc": "Deilbhín líonra sóisialta amháin",
+      "nav_link_label": "Nasc nascleanúna",
+      "nav_link_desc": "Nasc roghchlár amháin",
+      "wrapper_label": "Coimeádán"
     }
   },
   "newsletter_content_editor": {

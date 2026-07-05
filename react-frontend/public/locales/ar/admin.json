@@ -16430,7 +16430,15 @@
       "hero_label": "لافتة",
       "hero_desc": "صورة بانر مع عنوان",
       "html_label": "HTML",
-      "html_desc": "الصق HTML المخصص الخاص بك"
+      "html_desc": "الصق HTML المخصص الخاص بك",
+      "wrapper_desc": "تجميع الأقسام ذات الخلفية المشتركة",
+      "navbar_label": "شريط التنقل",
+      "navbar_desc": "صف من روابط القائمة",
+      "social_icon_label": "أيقونة الاجتماعية",
+      "social_icon_desc": "أيقونة شبكة اجتماعية واحدة",
+      "nav_link_label": "رابط التنقل",
+      "nav_link_desc": "رابط قائمة واحدة",
+      "wrapper_label": "غلاف"
     }
   },
   "newsletter_content_editor": {

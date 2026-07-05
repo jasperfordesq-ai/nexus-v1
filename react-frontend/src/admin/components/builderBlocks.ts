@@ -43,6 +43,10 @@ const ICONS = {
   social: svg('<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4"/><path d="m15.4 6.5-6.8 4"/>'),
   hero: svg('<rect x="3" y="4" width="18" height="11" rx="1.5"/><path d="M3 11l4-3 4 3 3-2 7 4"/><path d="M6 19h12"/>'),
   html: svg('<path d="m9 8-5 4 5 4"/><path d="m15 8 5 4-5 4"/>'),
+  wrapper: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><rect x="6.5" y="6.5" width="11" height="11" rx="1"/>'),
+  navbar: svg('<rect x="3" y="9" width="18" height="6" rx="1.5"/><path d="M7 12h2.5"/><path d="M12 12h2.5"/><path d="M16.5 12H18"/>'),
+  socialIcon: svg('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>'),
+  navLink: svg('<path d="M10 13a5 5 0 0 0 7 0l1.5-1.5a5 5 0 0 0-7-7L10 6"/><path d="M14 11a5 5 0 0 0-7 0L5.5 12.5a5 5 0 0 0 7 7L14 18"/>'),
 } as const;
 
 type BlockCategory = 'layout' | 'content';
@@ -71,10 +75,15 @@ export const BLOCK_META: Record<string, BlockMeta> = {
   socialGroup: { cat: 'content', titleKey: 'blocks.social_label', descKey: 'blocks.social_desc', icon: ICONS.social },
   hero: { cat: 'content', titleKey: 'blocks.hero_label', descKey: 'blocks.hero_desc', icon: ICONS.hero },
   raw: { cat: 'content', titleKey: 'blocks.html_label', descKey: 'blocks.html_desc', icon: ICONS.html },
+  wrapper: { cat: 'layout', titleKey: 'blocks.wrapper_label', descKey: 'blocks.wrapper_desc', icon: ICONS.wrapper },
+  navBar: { cat: 'content', titleKey: 'blocks.navbar_label', descKey: 'blocks.navbar_desc', icon: ICONS.navbar },
+  socialElement: { cat: 'content', titleKey: 'blocks.social_icon_label', descKey: 'blocks.social_icon_desc', icon: ICONS.socialIcon },
+  navLink: { cat: 'content', titleKey: 'blocks.nav_link_label', descKey: 'blocks.nav_link_desc', icon: ICONS.navLink },
 };
 
-/** grapesjs-mjml sub-element / advanced blocks we hide to keep the palette clean. */
-const REMOVE_BLOCKS = ['socialElement', 'navLink', 'navBar', 'wrapper'];
+/** grapesjs-mjml blocks to hide. Empty — we surface all 15 for full parity with
+ * the MJML newsletter demo; every block is labelled + grouped instead. */
+const REMOVE_BLOCKS: string[] = [];
 
 function escapeHtml(s: string): string {
   return s

@@ -256,12 +256,20 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
     editorRef.current = ed;
 
     // Re-label the MJML blocks (icon-only → titled + described + grouped) so the
-    // palette is legible. Never let a labelling tweak break editor init.
-    try {
-      customizeBlocks(ed as unknown as Parameters<typeof customizeBlocks>[0], t);
-    } catch (err) {
-      logError('NewsletterBuilder: customizeBlocks failed', err);
-    }
+    // palette is legible. CRITICAL: grapesjs-mjml registers/resets its blocks
+    // during the editor's READY cycle, AFTER grapesjs.init() returns — relabelling
+    // synchronously here gets overwritten, leaving the raw default palette. Run it
+    // on `onReady` (idempotent) so the labels + grouping actually stick.
+    const runCustomizeBlocks = () => {
+      try {
+        customizeBlocks(ed as unknown as Parameters<typeof customizeBlocks>[0], t);
+      } catch (err) {
+        logError('NewsletterBuilder: customizeBlocks failed', err);
+      }
+    };
+    const edOnReady = (ed as unknown as { onReady?: (cb: () => void) => void }).onReady;
+    if (typeof edOnReady === 'function') edOnReady.call(ed, runCustomizeBlocks);
+    else runCustomizeBlocks();
 
     // Surface the missing mj-hero / mj-section background traits so the hero
     // image (and section backgrounds) become editable from the Settings tab.

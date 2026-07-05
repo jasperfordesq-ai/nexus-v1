@@ -16430,7 +16430,15 @@
       "hero_label": "Bannière",
       "hero_desc": "Une image de bannière avec un titre",
       "html_label": "HTML",
-      "html_desc": "Collez votre propre code HTML personnalisé"
+      "html_desc": "Collez votre propre code HTML personnalisé",
+      "wrapper_desc": "Sections de groupe avec un arrière-plan partagé",
+      "navbar_label": "Barre de navigation",
+      "navbar_desc": "Une rangée de liens de menu",
+      "social_icon_label": "Icône sociale",
+      "social_icon_desc": "Une seule icône de réseau social",
+      "nav_link_label": "Lien de navigation",
+      "nav_link_desc": "Un seul lien de menu",
+      "wrapper_label": "Conteneur"
     }
   },
   "newsletter_content_editor": {

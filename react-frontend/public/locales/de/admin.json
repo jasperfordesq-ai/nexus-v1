@@ -16430,7 +16430,15 @@
       "hero_label": "Banner",
       "hero_desc": "Ein Bannerbild mit einer Überschrift",
       "html_label": "HTML",
-      "html_desc": "Fügen Sie Ihren eigenen benutzerdefinierten HTML-Code ein"
+      "html_desc": "Fügen Sie Ihren eigenen benutzerdefinierten HTML-Code ein",
+      "wrapper_desc": "Gruppieren Sie Abschnitte mit einem gemeinsamen Hintergrund",
+      "navbar_label": "Navigationsleiste",
+      "navbar_desc": "Eine Reihe von Menülinks",
+      "social_icon_label": "Soziale Ikone",
+      "social_icon_desc": "Ein einzelnes Symbol für ein soziales Netzwerk",
+      "nav_link_label": "Navigationslink",
+      "nav_link_desc": "Ein einzelner Menülink",
+      "wrapper_label": "Container"
     }
   },
   "newsletter_content_editor": {

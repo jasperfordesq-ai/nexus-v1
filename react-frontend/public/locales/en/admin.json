@@ -16430,7 +16430,15 @@
       "hero_label": "Hero",
       "hero_desc": "A banner image with a headline",
       "html_label": "HTML",
-      "html_desc": "Paste your own custom HTML"
+      "html_desc": "Paste your own custom HTML",
+      "wrapper_label": "Wrapper",
+      "wrapper_desc": "Group sections with a shared background",
+      "navbar_label": "Navigation bar",
+      "navbar_desc": "A row of menu links",
+      "social_icon_label": "Social icon",
+      "social_icon_desc": "A single social network icon",
+      "nav_link_label": "Navigation link",
+      "nav_link_desc": "A single menu link"
     }
   },
   "newsletter_content_editor": {

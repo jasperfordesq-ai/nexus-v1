@@ -16430,7 +16430,15 @@
       "hero_label": "ヒーロー",
       "hero_desc": "見出し付きのバナー画像",
       "html_label": "HTML",
-      "html_desc": "独自のカスタム HTML を貼り付けます"
+      "html_desc": "独自のカスタム HTML を貼り付けます",
+      "wrapper_desc": "背景を共有してセクションをグループ化する",
+      "navbar_label": "ナビゲーションバー",
+      "navbar_desc": "メニューリンクの行",
+      "social_icon_label": "ソーシャルアイコン",
+      "social_icon_desc": "単一のソーシャル ネットワーク アイコン",
+      "nav_link_label": "ナビゲーションリンク",
+      "nav_link_desc": "単一のメニューリンク",
+      "wrapper_label": "ラッパー"
     }
   },
   "newsletter_content_editor": {
