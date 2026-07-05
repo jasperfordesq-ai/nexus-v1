@@ -247,9 +247,10 @@ Current local prep check:
 npm --prefix react-frontend run check:dual-backend-prep
 ```
 
-This command verifies the guardrails, runs the inventory fixture tests, and
-regenerates the local API-call matrix. It does not run ASP.NET and does not
-certify ASP.NET compatibility.
+This command verifies the guardrails, runs the inventory and worksheet fixture
+tests, regenerates the local API-call matrix, and regenerates local module
+certification worksheets. It does not run ASP.NET and does not certify ASP.NET
+compatibility.
 
 Current guardrail-only check:
 
@@ -260,6 +261,29 @@ npm --prefix react-frontend run check:backend-guardrails
 This fails if ordinary `dev`/`build` scripts stop being Laravel-safe, if
 `backendTarget` stops defaulting invalid or missing values back to Laravel, or
 if backend-specific conditionals appear in production page/component files.
+
+Current certification worksheet command:
+
+```text
+npm --prefix react-frontend run certification:worksheets
+```
+
+The command reads:
+
+```text
+.local-docs-archive/react-api-inventory/latest/api-calls.json
+```
+
+and writes module worksheets under:
+
+```text
+.local-docs-archive/react-api-certification/latest/
+```
+
+These worksheets are local handoff material for ASP.NET backend agents. They
+organize P0/P1/P2 rows by module, show Laravel OpenAPI match status, preserve
+ASP.NET status as `not_checked`, and list the proof required before any future
+row can be marked compatible. Do not commit generated worksheets to public docs.
 
 Exit gate:
 

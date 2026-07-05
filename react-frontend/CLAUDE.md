@@ -32,6 +32,7 @@ npm run build        # Laravel/default production path
 npm run dev:laravel  # Explicit local Laravel target
 npm run dev:dotnet   # Explicit local ASP.NET target
 npm run inventory:api-calls  # Local API-call matrix for future ASP.NET parity work
+npm run certification:worksheets  # Local module worksheets from the matrix
 npm run check:backend-guardrails  # Ensure Laravel remains default and pages stay backend-neutral
 npm run check:dual-backend-prep  # Guardrails + inventory tests + local matrix regeneration
 ```
@@ -50,6 +51,9 @@ Use `npm run test:api-inventory` when changing the inventory script. The matrix
 groups calls by module and priority so backend agents can work from P0 auth /
 tenant contracts outward without touching production React pages.
 Use `npm run test:backend-guardrails` when changing the guardrail script.
+Use `npm run test:certification-worksheets` when changing the worksheet generator.
+Generated worksheets live under `../.local-docs-archive/react-api-certification/`
+and are local handoff material only.
 
 ## 🔴 Mandatory Rules
 
