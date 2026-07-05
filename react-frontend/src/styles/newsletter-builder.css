@@ -43,49 +43,44 @@
   background-color: var(--color-surface-secondary, #f1f1f4);
 }
 
-/* Block palette: a labelled, grouped LIST. Each card is an icon + bold title +
- * one-line description, grouped under Layout / Content headers — so authors can
- * tell text / button / image / columns apart at a glance (the old cards were
- * icon-only). Native GrapesJS drag-to-canvas is preserved. */
+/* Block palette: a clean 2-column grid of icon+label cards — matches the MJML
+ * newsletter demo's layout, with rounded, themed, hover-lift cards. Icon centred
+ * on top, label below. Native GrapesJS drag-to-canvas is preserved. (Verified
+ * against a rendered harness: 2 cards/row, 24px icons, centred labels.) */
 .nb-palette .gjs-blocks-c {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px;
   align-content: start;
-}
-.nb-palette .gjs-block-category .gjs-title {
-  padding: 8px 6px 4px;
-  background: transparent;
-  border: none;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--color-muted, #6b7280);
 }
 .nb-palette .gjs-block {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: auto;
-  min-height: 44px;
+  min-height: 74px;
   margin: 0;
-  padding: 9px 10px;
+  padding: 12px 6px;
   border: 1px solid var(--color-border);
   border-radius: 10px;
-  background-color: var(--color-surface);
+  background-color: var(--color-surface-secondary, var(--color-surface));
   color: var(--color-foreground);
   box-shadow: none;
-  text-align: left;
-  transition: border-color 120ms ease, background-color 120ms ease;
+  text-align: center;
+  cursor: grab;
+  transition: border-color 120ms ease, background-color 120ms ease, transform 120ms ease;
 }
 .nb-palette .gjs-block:hover {
   border-color: var(--color-accent);
-  background-color: var(--color-surface-secondary, var(--color-surface));
+  transform: translateY(-1px);
+}
+.nb-palette .gjs-block:active {
+  cursor: grabbing;
 }
 .nb-palette .gjs-block__media {
-  flex-shrink: 0;
   margin: 0;
   display: flex;
   align-items: center;
@@ -93,25 +88,17 @@
   color: var(--color-accent);
 }
 .nb-palette .gjs-block__media svg {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
 }
-.nb-palette .nb-b-label {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-}
-.nb-palette .nb-b-title {
-  font-size: 12px;
-  font-weight: 600;
+.nb-palette .gjs-block-label {
+  font-size: 11px;
   line-height: 1.25;
+  font-weight: 500;
   color: var(--color-foreground);
-}
-.nb-palette .nb-b-desc {
-  font-size: 10.5px;
-  line-height: 1.3;
-  color: var(--color-muted, #6b7280);
+  text-align: center;
+  white-space: normal;
+  overflow: visible;
 }
 
 /* ── Polished inspector panels (Style / Settings / Layers) ─────────────────────
