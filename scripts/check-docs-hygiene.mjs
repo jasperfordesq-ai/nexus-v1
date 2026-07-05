@@ -249,6 +249,8 @@ function checkTrackedRootArtifacts(tracked) {
     'RELEASES.md',
     'SECURITY.md',
     'SUPPORT.md',
+    'THIRD_PARTY_LICENSES.md',
+    'THIRD_PARTY_NOTICES.md',
   ]);
 
   for (const relativePath of tracked) {
