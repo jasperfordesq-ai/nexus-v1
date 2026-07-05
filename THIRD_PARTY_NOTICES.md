@@ -18,10 +18,11 @@ condition of their permissive (BSD / MIT / Apache / ISC) licences.
 | Ecosystem | Packages | Licence spread |
 |---|---|---|
 | npm (browser frontend) | ~362 | MIT (302), Apache-2.0 (29), ISC (15), BSD-3 (5), BSD-2 (2), 0BSD/Unlicense, `MIT AND Zlib`; `MPL-2.0 OR Apache-2.0` (DOMPurify → elect Apache-2.0); Hippocratic-2.1 (react-leaflet) |
-| Composer (PHP backend) | 130 | MIT (115), BSD-3 (5), Apache-2.0 (3), BSD-2 (2), ISC (1); plus the dual/tri-licensed and one copyleft item noted below |
+| Composer (PHP backend) | 117 | MIT-dominant, plus BSD-3 / Apache-2.0 / BSD-2 / ISC and the dual/tri-licensed items noted below |
 
-**No pure GPL/AGPL licence appears in the npm (frontend) tree.** The Composer tree
-is permissive except the elections and the single copyleft item noted below.
+**No pure GPL/AGPL licence appears in either tree.** The Composer tree is fully
+permissive after removing `rubix/ml` (an optional, `class_exists`-guarded
+accelerator that transitively pulled `wamania/php-stemmer` → `joomla/string`, GPL-2.0).
 
 ## Highlighted components
 
@@ -59,8 +60,9 @@ permissive option:
   with a "no human-rights violations" field-of-use restriction; it is not copyleft. The
   underlying Leaflet library is BSD-2-Clause.
 
-**One copyleft dependency is tracked for removal:** `joomla/string` (GPL-2.0-or-later)
-is pulled transitively **only** by `wamania/php-stemmer` (search stemming). It does not
-affect the AGPL open-source distribution, but it would need to be removed before any
-fully-proprietary, closed-source redistribution. See `scripts/check-licenses.mjs`
-(`KNOWN_EXCEPTIONS`) and the internal licensing finding.
+**No strong-copyleft (GPL/AGPL) dependency remains.** The previously-tracked
+`joomla/string` (GPL-2.0-or-later) was removed by dropping `rubix/ml` — an optional
+ML accelerator that was only ever used behind a `class_exists()` guard with a
+pure-PHP fallback, so removing it is behaviour-preserving. The audit gate
+(`scripts/check-licenses.mjs`, `KNOWN_EXCEPTIONS = {}`) now fails on any *new*
+strong-copyleft dependency.

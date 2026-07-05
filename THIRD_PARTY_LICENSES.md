@@ -4,18 +4,10 @@
 Regenerate with `node scripts/check-licenses.mjs --write`. Summary and human-facing
 attribution live in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-composer prod: 130 · npm prod: 362
+composer prod: 117 · npm prod: 362
 
 | Package | Version | Licence | Ecosystem | Source |
 |---|---|---|---|---|
-| amphp/amp | v2.6.5 | MIT | composer | https://github.com/amphp/amp.git |
-| amphp/byte-stream | v1.8.2 | MIT | composer | https://github.com/amphp/byte-stream.git |
-| amphp/parallel | v1.4.4 | MIT | composer | https://github.com/amphp/parallel.git |
-| amphp/parser | v1.1.1 | MIT | composer | https://github.com/amphp/parser.git |
-| amphp/process | v1.1.9 | MIT | composer | https://github.com/amphp/process.git |
-| amphp/serialization | v1.0.0 | MIT | composer | https://github.com/amphp/serialization.git |
-| amphp/sync | v1.4.2 | MIT | composer | https://github.com/amphp/sync.git |
-| andrewdalpino/okbloomer | 1.0.0 | MIT | composer | https://github.com/andrewdalpino/OkBloomer.git |
 | aws/aws-crt-php | v1.2.7 | Apache-2.0 | composer | https://github.com/awslabs/aws-crt-php.git |
 | aws/aws-sdk-php | 3.387.2 | Apache-2.0 | composer | https://github.com/aws/aws-sdk-php.git |
 | bacon/bacon-qr-code | v3.0.4 | BSD-2-Clause | composer | https://github.com/Bacon/BaconQrCode.git |
@@ -37,7 +29,6 @@ composer prod: 130 · npm prod: 362
 | guzzlehttp/uri-template | v1.0.6 | MIT | composer | https://github.com/guzzle/uri-template.git |
 | james-heinrich/getid3 | v1.9.25 | GPL-1.0-or-later OR LGPL-3.0-only OR MPL-2.0 | composer | https://github.com/JamesHeinrich/getID3.git |
 | jean85/pretty-package-versions | 2.1.1 | MIT | composer | https://github.com/Jean85/pretty-package-versions.git |
-| joomla/string | 3.0.4 | GPL-2.0-or-later | composer | https://github.com/joomla-framework/string.git |
 | laravel/framework | v12.61.1 | MIT | composer | https://github.com/laravel/framework.git |
 | laravel/horizon | v5.47.2 | MIT | composer | https://github.com/laravel/horizon.git |
 | laravel/prompts | v0.3.18 | MIT | composer | https://github.com/laravel/prompts.git |
@@ -84,8 +75,6 @@ composer prod: 130 · npm prod: 362
 | ralouphie/getallheaders | 3.0.3 | MIT | composer | https://github.com/ralouphie/getallheaders.git |
 | ramsey/collection | 2.1.1 | MIT | composer | https://github.com/ramsey/collection.git |
 | ramsey/uuid | 4.9.2 | MIT | composer | https://github.com/ramsey/uuid.git |
-| rubix/ml | 2.5.3 | MIT | composer | https://github.com/RubixML/ML.git |
-| rubix/tensor | 3.0.5 | MIT | composer | https://github.com/RubixML/Tensor.git |
 | sabberworm/php-css-parser | v9.4.0 | MIT | composer | https://github.com/MyIntervals/PHP-CSS-Parser.git |
 | sendgrid/php-http-client | 4.1.3 | MIT | composer | https://github.com/sendgrid/php-http-client.git |
 | sendgrid/sendgrid | 8.1.11 | MIT | composer | https://github.com/sendgrid/sendgrid-php.git |
@@ -118,7 +107,6 @@ composer prod: 130 · npm prod: 362
 | symfony/polyfill-mbstring | v1.38.1 | MIT | composer | https://github.com/symfony/polyfill-mbstring.git |
 | symfony/polyfill-php80 | v1.37.0 | MIT | composer | https://github.com/symfony/polyfill-php80.git |
 | symfony/polyfill-php81 | v1.38.1 | MIT | composer | https://github.com/symfony/polyfill-php81.git |
-| symfony/polyfill-php82 | v1.33.0 | MIT | composer | https://github.com/symfony/polyfill-php82.git |
 | symfony/polyfill-php83 | v1.38.1 | MIT | composer | https://github.com/symfony/polyfill-php83.git |
 | symfony/polyfill-php84 | v1.38.1 | MIT | composer | https://github.com/symfony/polyfill-php84.git |
 | symfony/polyfill-php85 | v1.38.1 | MIT | composer | https://github.com/symfony/polyfill-php85.git |
@@ -136,7 +124,6 @@ composer prod: 130 · npm prod: 362
 | tijsverkoyen/css-to-inline-styles | v2.4.0 | BSD-3-Clause | composer | https://github.com/tijsverkoyen/CssToInlineStyles.git |
 | vlucas/phpdotenv | v5.6.3 | BSD-3-Clause | composer | https://github.com/vlucas/phpdotenv.git |
 | voku/portable-ascii | 2.1.1 | MIT | composer | https://github.com/voku/portable-ascii.git |
-| wamania/php-stemmer | v4.0.0 | MIT | composer | https://github.com/wamania/php-stemmer.git |
 | web-token/jwt-library | 4.1.7 | MIT | composer | https://github.com/web-token/jwt-library.git |
 | @adobe/react-spectrum-ui@1.2.1 | — | Apache-2.0 | npm |  |
 | @adobe/react-spectrum-workflow@2.3.5 | — | Apache-2.0 | npm |  |

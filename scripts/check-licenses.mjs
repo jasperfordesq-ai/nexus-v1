@@ -48,14 +48,12 @@ const USE_RESTRICTED = /Hippocratic|SSPL-restricted/i;
 const STRONG = /^(GPL|AGPL|SSPL|OSL|EUPL|CeCILL|GNU)/i;
 
 // Strong-copyleft deps we knowingly ship today, with tracking notes. Anything
-// NOT listed here that is a hard blocker fails the gate.
-const KNOWN_EXCEPTIONS = {
-  'joomla/string':
-    'GPL-2.0-or-later, pulled ONLY by wamania/php-stemmer (search stemming). ' +
-    'Blocks a fully-proprietary closed-source sale until removed — remediation: ' +
-    'upgrade/replace wamania/php-stemmer (newer majors drop joomla/string). ' +
-    'See .local-docs-archive licensing finding.',
-};
+// NOT listed here that is a hard blocker fails the gate. Currently EMPTY — the
+// production tree is fully permissive after removing rubix/ml (an optional,
+// class_exists-guarded accelerator) which transitively pulled
+// wamania/php-stemmer → joomla/string (GPL-2.0). Keep it empty so any new
+// strong-copyleft dependency fails CI.
+const KNOWN_EXCEPTIONS = {};
 
 function classifyOption(opt) {
   // Strip SPDX-expression parens/brackets so "(MIT AND Zlib)" classifies as MIT.
