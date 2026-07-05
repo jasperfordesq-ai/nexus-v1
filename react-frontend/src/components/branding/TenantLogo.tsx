@@ -89,6 +89,12 @@ export interface TenantLogoProps {
   showTagline?: boolean;
   /** Compact mode — shrinks logo and hides name. Used when header is scrolled. */
   compact?: boolean;
+  /**
+   * On mobile (< sm) show the compact brand-mark icon (the initials avatar
+   * fallback) instead of the custom logo, so a large uploaded logo can't bleed
+   * past the header row. The full custom logo still renders at sm+. Navbar only.
+   */
+  collapseLogoOnMobile?: boolean;
   /** Extra classes on the outer <Link>. */
   className?: string;
 }
@@ -98,6 +104,7 @@ export function TenantLogo({
   showName = true,
   showTagline = false,
   compact = false,
+  collapseLogoOnMobile = false,
   className = '',
 }: TenantLogoProps) {
   const { branding, tenantPath } = useTenant();
@@ -147,7 +154,8 @@ export function TenantLogo({
   const lightSrc = resolveAssetUrl(branding.logo || branding.logoDark);
   const darkSrc = resolveAssetUrl(branding.logoDark || branding.logo);
 
-  const iconElement = hasLogo ? (
+  // Theme-swapped custom logo: one visible at a time via the dark: variants.
+  const logoImages = (
     <>
       <span className="inline-flex items-center dark:hidden">
         {renderLogoImg(lightSrc)}
@@ -156,7 +164,11 @@ export function TenantLogo({
         {renderLogoImg(darkSrc)}
       </span>
     </>
-  ) : (
+  );
+
+  // Initials brand-mark — the fallback when no logo is set, and (when
+  // collapseLogoOnMobile is on) the compact stand-in for the logo on mobile.
+  const avatarElement = (
     <Avatar
       name={branding.name}
       getInitials={() => getInitials(branding.name)}
@@ -170,6 +182,21 @@ export function TenantLogo({
       }}
       aria-hidden="true"
     />
+  );
+
+  const iconElement = hasLogo ? (
+    collapseLogoOnMobile ? (
+      <>
+        {/* Mobile: compact brand-mark icon instead of the (bleed-prone) logo */}
+        <span className="inline-flex sm:hidden">{avatarElement}</span>
+        {/* sm+ : full custom logo (inner spans do their own light/dark swap) */}
+        <span className="hidden sm:inline-flex items-center">{logoImages}</span>
+      </>
+    ) : (
+      logoImages
+    )
+  ) : (
+    avatarElement
   );
 
   /* ── name text ───────────────────────────────────────────── */
@@ -201,6 +228,7 @@ export function TenantLogo({
   return (
     <Link
       to={tenantPath('/')}
+      aria-label={branding.name}
       className={`flex min-w-0 items-center gap-2 ${className}`.trim()}
     >
       <motion.div

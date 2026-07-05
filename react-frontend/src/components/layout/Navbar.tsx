@@ -685,8 +685,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </Button>
               )}
 
-              {/* Brand — shrinks when scrolled */}
-              <TenantLogo size="md" showName compact={isScrolled} />
+              {/* Brand — shrinks when scrolled; collapses to a compact icon on
+                  mobile so a large custom logo can't bleed past the header. */}
+              <TenantLogo size="md" showName compact={isScrolled} collapseLogoOnMobile />
             </div>
 
             {/* Desktop Navigation — uses ResizeObserver for smart collapsing */}

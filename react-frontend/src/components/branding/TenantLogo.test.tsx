@@ -221,4 +221,38 @@ describe('TenantLogo', () => {
     expect(srcs).toContain('https://example.com/logo-light.png');
     expect(srcs).toContain('https://example.com/logo-dark.png');
   });
+
+  // ─── collapseLogoOnMobile — mobile bleed fix ────────────────────────────────
+  describe('collapseLogoOnMobile', () => {
+    it('renders BOTH the compact avatar (mobile) and the custom logo (sm+)', async () => {
+      mockBranding.logo = 'https://example.com/logo.png';
+      const { TenantLogo } = await import('./TenantLogo');
+      const { container } = render(<TenantLogo collapseLogoOnMobile />);
+
+      // Compact brand-mark shown on mobile…
+      expect(screen.getByTestId('avatar-initials')).toBeInTheDocument();
+      // …and the full custom logo shown at sm+
+      expect(screen.getAllByRole('img').length).toBeGreaterThanOrEqual(1);
+      // jsdom can't evaluate media queries — assert the responsive gate tokens.
+      expect(container.innerHTML).toContain('sm:hidden');      // avatar → mobile only
+      expect(container.innerHTML).toContain('sm:inline-flex'); // logo → sm+
+    });
+
+    it('is opt-in: with a logo but no collapse flag, the avatar stays suppressed', async () => {
+      mockBranding.logo = 'https://example.com/logo.png';
+      const { TenantLogo } = await import('./TenantLogo');
+      render(<TenantLogo />);
+
+      expect(screen.queryByTestId('avatar-initials')).not.toBeInTheDocument();
+      expect(screen.getAllByRole('img').length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('exposes an accessible name on the brand link via aria-label', async () => {
+      mockBranding.logo = 'https://example.com/logo.png';
+      const { TenantLogo } = await import('./TenantLogo');
+      render(<TenantLogo collapseLogoOnMobile />);
+
+      expect(screen.getByRole('link')).toHaveAttribute('aria-label', 'hOUR Timebank');
+    });
+  });
 });
