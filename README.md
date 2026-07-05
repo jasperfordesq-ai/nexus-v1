@@ -243,6 +243,10 @@ This software is informed by and builds upon a social impact study commissioned 
 - **West Cork Development Partnership**
 - **Fergal Conlon**, SICAP Manager
 
+### Third-party open-source components
+
+Project NEXUS builds on many open-source projects — including [GrapesJS](https://grapesjs.com) and [MJML](https://mjml.io) (the drag-and-drop newsletter builder), React, HeroUI, Tailwind CSS, and Laravel. Each retains its own licence and copyright; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) (attribution) and [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) (full inventory). Run `npm run check:licenses` to re-audit the dependency tree.
+
 ## License
 
 This software is licensed under the **GNU Affero General Public License version 3** (AGPL-3.0-or-later).
@@ -251,6 +255,7 @@ The AGPL requires that if you run a modified version of this software on a serve
 
 See the [LICENSE](LICENSE) file for the full license text.
 See the [NOTICE](NOTICE) file for attribution requirements.
+See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for bundled third-party components and their licences.
 
 ## UI Attribution Requirement
 

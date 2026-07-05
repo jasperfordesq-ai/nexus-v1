@@ -42,6 +42,8 @@ CLAUDE.md
 !GOVERNANCE.md
 !SUPPORT.md
 !RELEASES.md
+!THIRD_PARTY_NOTICES.md
+!THIRD_PARTY_LICENSES.md
 
 # ─── Scripts & Migrations (internal, contain credentials/emails) ──────────────
 /scripts/*
@@ -100,6 +102,7 @@ CLAUDE.md
 !/scripts/predeploy-check.sh
 !/scripts/deploy.sh
 !/scripts/translate-i18n-gaps.mjs
+!/scripts/check-licenses.mjs
 !/scripts/prerender-tenants.sh
 !/scripts/prerender-worker.mjs
 !/scripts/prerender-job-processor.sh

@@ -15,6 +15,18 @@ proprietary, support, hosting, warranty, or service terms to customers who
 receive such separate written terms.
 
 ================================================================================
+THIRD-PARTY COMPONENTS
+================================================================================
+
+Project NEXUS bundles third-party open-source components (for example GrapesJS,
+MJML, Laravel, React, Tailwind CSS). Each remains under its own licence and
+copyright and retains its own notices. The bundled components, their licences,
+and the full production dependency inventory are recorded in THIRD_PARTY_NOTICES.md
+and THIRD_PARTY_LICENSES.md at the repository root, as required by their
+permissive (BSD / MIT / Apache / ISC) licences. Those third-party notices must be
+preserved in any redistribution, including any separate proprietary distribution.
+
+================================================================================
 AUTHORSHIP AND CREDITS
 ================================================================================
 
