@@ -16401,6 +16401,11 @@
     "empty_start_blank": "Beginnen Sie leer",
     "trait_background_image": "Hintergrundbild-URL",
     "trait_background_color": "Hintergrundfarbe",
+    "trait_hero_height": "Höhe",
+    "library_title": "Bildbibliothek",
+    "library_upload": "Neu hochladen",
+    "library_empty": "Noch keine Bilder. Laden Sie eines hoch, um loszulegen.",
+    "library_failed": "Ihre Bilder konnten nicht geladen werden.",
     "blocks": {
       "category_layout": "Layout",
       "category_content": "Inhalt",
@@ -16426,8 +16431,7 @@
       "hero_desc": "Ein Bannerbild mit einer Überschrift",
       "html_label": "HTML",
       "html_desc": "Fügen Sie Ihren eigenen benutzerdefinierten HTML-Code ein"
-    },
-    "trait_hero_height": "Höhe"
+    }
   },
   "newsletter_content_editor": {
     "builder_error": "Der visuelle Editor konnte nicht geladen werden. Bitte verwenden Sie stattdessen den HTML-Modus.",

@@ -16401,6 +16401,11 @@
     "empty_start_blank": "Begin blanco",
     "trait_background_image": "Achtergrondafbeelding-URL",
     "trait_background_color": "Achtergrondkleur",
+    "trait_hero_height": "Hoogte",
+    "library_title": "Beeldbibliotheek",
+    "library_upload": "Nieuw uploaden",
+    "library_empty": "Nog geen afbeeldingen. Upload er een om aan de slag te gaan.",
+    "library_failed": "Kan je afbeeldingen niet laden.",
     "blocks": {
       "category_layout": "Lay-out",
       "category_content": "Inhoud",
@@ -16426,8 +16431,7 @@
       "hero_desc": "Een bannerafbeelding met een kop",
       "html_label": "HTML",
       "html_desc": "Plak uw eigen aangepaste HTML"
-    },
-    "trait_hero_height": "Hoogte"
+    }
   },
   "newsletter_content_editor": {
     "builder_error": "De visuele bouwer kon niet worden geladen. Gebruik in plaats daarvan de HTML-modus.",

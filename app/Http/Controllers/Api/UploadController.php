@@ -65,4 +65,18 @@ class UploadController extends BaseApiController
 
         return $this->respondWithData($result, null, 201);
     }
+
+    /**
+     * GET /api/v2/upload/list
+     *
+     * List the current tenant's previously-uploaded images (newest first) so the
+     * newsletter builder's asset library can browse + reuse them, not just upload.
+     */
+    public function index(): JsonResponse
+    {
+        $this->requireAuth();
+        $this->rateLimit('upload_list', 60, 60);
+
+        return $this->respondWithData(['images' => $this->uploadService->listImages()]);
+    }
 }

@@ -16402,6 +16402,10 @@
     "trait_background_image": "Background image URL",
     "trait_background_color": "Background colour",
     "trait_hero_height": "Height",
+    "library_title": "Image library",
+    "library_upload": "Upload new",
+    "library_empty": "No images yet. Upload one to get started.",
+    "library_failed": "Couldn’t load your images.",
     "blocks": {
       "category_layout": "Layout",
       "category_content": "Content",

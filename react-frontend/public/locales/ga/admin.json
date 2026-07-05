@@ -16401,6 +16401,11 @@
     "empty_start_blank": "Tosaigh bán",
     "trait_background_image": "URL íomhá chúlra",
     "trait_background_color": "Dath an chúlra",
+    "trait_hero_height": "Airde",
+    "library_title": "Leabharlann íomhánna",
+    "library_upload": "Uaslódáil nua",
+    "library_empty": "Níl aon íomhánna fós. Íosluchtaigh amháin chun tús a chur.",
+    "library_failed": "Níorbh fhéidir do chuid íomhánna a lódáil.",
     "blocks": {
       "category_layout": "Leagan amach",
       "category_content": "Ábhar",
@@ -16426,8 +16431,7 @@
       "hero_desc": "Íomhá bratach le ceannlíne",
       "html_label": "HTML",
       "html_desc": "Greamaigh do HTML saincheaptha féin"
-    },
-    "trait_hero_height": "Airde"
+    }
   },
   "newsletter_content_editor": {
     "builder_error": "Níorbh fhéidir an tógálaí amhairc a luchtú. Bain úsáid as an mód HTML ina ionad sin, le do thoil.",

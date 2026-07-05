@@ -16401,6 +16401,11 @@
     "empty_start_blank": "Zacznij puste",
     "trait_background_image": "Adres URL obrazu tła",
     "trait_background_color": "Kolor tła",
+    "trait_hero_height": "Wysokość",
+    "library_title": "Biblioteka obrazów",
+    "library_upload": "Prześlij nowe",
+    "library_empty": "Nie ma jeszcze żadnych obrazów. Prześlij jeden, aby rozpocząć.",
+    "library_failed": "Nie udało się wczytać Twoich obrazów.",
     "blocks": {
       "category_layout": "Układ",
       "category_content": "Treść",
@@ -16426,8 +16431,7 @@
       "hero_desc": "Obraz banera z nagłówkiem",
       "html_label": "HTML",
       "html_desc": "Wklej własny, niestandardowy kod HTML"
-    },
-    "trait_hero_height": "Wysokość"
+    }
   },
   "newsletter_content_editor": {
     "builder_error": "Nie udało się załadować kreatora wizualnego. Użyj zamiast tego trybu HTML.",

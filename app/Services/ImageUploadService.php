@@ -72,6 +72,43 @@ class ImageUploadService
     }
 
     /**
+     * List the current tenant's uploaded images, newest first — powers the
+     * newsletter builder's asset library (browse + reuse, not just upload).
+     *
+     * @return array<int, array{path: string, url: string, name: string}>
+     */
+    public function listImages(int $limit = 60): array
+    {
+        $tenantId = \App\Core\TenantContext::getId();
+        $base = $tenantId ? "tenant_{$tenantId}/uploads" : 'uploads';
+        $disk = Storage::disk('public');
+
+        if (! $disk->exists($base)) {
+            return [];
+        }
+
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $files = [];
+        foreach ($disk->allFiles($base) as $path) {
+            if (! in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), $allowed, true)) {
+                continue;
+            }
+            $files[] = ['path' => $path, 'ts' => $disk->lastModified($path)];
+        }
+
+        usort($files, static fn (array $a, array $b): int => $b['ts'] <=> $a['ts']);
+
+        return array_map(
+            fn (array $f): array => [
+                'path' => $f['path'],
+                'url'  => (string) $this->getUrl($f['path']),
+                'name' => basename($f['path']),
+            ],
+            array_slice($files, 0, $limit)
+        );
+    }
+
+    /**
      * Get the public URL for a stored image path.
      */
     public function getUrl(?string $path): ?string

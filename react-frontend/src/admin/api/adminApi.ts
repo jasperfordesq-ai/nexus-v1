@@ -1294,6 +1294,10 @@ export const adminNewsletters = {
   uploadImage: (file: File) =>
     api.upload<{ url: string; path: string }>('/v2/upload', file, 'file'),
 
+  // Asset library — the tenant's previously-uploaded images (browse + reuse).
+  listImages: () =>
+    api.get<{ images: { url: string; path: string; name: string }[] }>('/v2/upload/list'),
+
   // Duplicate
   duplicateNewsletter: (id: number) =>
     api.post<Newsletter>(`/v2/admin/newsletters/${id}/duplicate`, {}),

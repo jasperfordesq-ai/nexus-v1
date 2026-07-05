@@ -2691,6 +2691,8 @@ Route::post('/social/create-post', [\App\Http\Controllers\Api\SocialController::
 // builder's asset manager). /upload is kept as a legacy alias.
 Route::middleware('throttle:30,1')->post('/v2/upload', [\App\Http\Controllers\Api\UploadController::class, 'store']);
 Route::middleware('throttle:30,1')->post('/upload', [\App\Http\Controllers\Api\UploadController::class, 'store']);
+// Asset library — list the tenant's previously-uploaded images (newsletter builder).
+Route::middleware('throttle:60,1')->get('/v2/upload/list', [\App\Http\Controllers\Api\UploadController::class, 'index']);
 Route::post('/push/subscribe', [\App\Http\Controllers\Api\PushController::class, 'subscribe']);
 Route::post('/push/unsubscribe', [\App\Http\Controllers\Api\PushController::class, 'unsubscribe']);
 Route::post('/push/send', [\App\Http\Controllers\Api\PushController::class, 'send']);

@@ -16401,6 +16401,11 @@
     "empty_start_blank": "Comece em branco",
     "trait_background_image": "URL da imagem de fundo",
     "trait_background_color": "Cor de fundo",
+    "trait_hero_height": "Altura",
+    "library_title": "Biblioteca de imagens",
+    "library_upload": "Carregar novo",
+    "library_empty": "Ainda não há imagens. Carregue um para começar.",
+    "library_failed": "Não foi possível carregar suas imagens.",
     "blocks": {
       "category_layout": "Disposição",
       "category_content": "Conteúdo",
@@ -16426,8 +16431,7 @@
       "hero_desc": "Uma imagem de banner com um título",
       "html_label": "HTML",
       "html_desc": "Cole seu próprio HTML personalizado"
-    },
-    "trait_hero_height": "Altura"
+    }
   },
   "newsletter_content_editor": {
     "builder_error": "Não foi possível carregar o construtor visual. Use o modo HTML.",

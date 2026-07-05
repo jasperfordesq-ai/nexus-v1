@@ -16401,6 +16401,11 @@
     "empty_start_blank": "空白で開始",
     "trait_background_image": "背景画像のURL",
     "trait_background_color": "背景色",
+    "trait_hero_height": "高さ",
+    "library_title": "画像ライブラリ",
+    "library_upload": "新規アップロード",
+    "library_empty": "まだ画像がありません。開始するには、1 つアップロードしてください。",
+    "library_failed": "画像を読み込めませんでした。",
     "blocks": {
       "category_layout": "レイアウト",
       "category_content": "コンテンツ",
@@ -16426,8 +16431,7 @@
       "hero_desc": "見出し付きのバナー画像",
       "html_label": "HTML",
       "html_desc": "独自のカスタム HTML を貼り付けます"
-    },
-    "trait_hero_height": "高さ"
+    }
   },
   "newsletter_content_editor": {
     "builder_error": "ビジュアルビルダーを読み込めませんでした。代わりにHTMLモードをご利用ください。",

@@ -55,6 +55,7 @@ import { BuilderBlockPalette } from './BuilderBlockPalette';
 import { BuilderInspector, type InspectorTab } from './BuilderInspector';
 import { TemplateGalleryModal, type GalleryTemplate } from './TemplateGalleryModal';
 import { BuilderPreviewModal } from './BuilderPreviewModal';
+import { AssetLibraryModal } from './AssetLibraryModal';
 import { customizeBlocks } from './builderBlocks';
 import {
   resolveUploadedUrl,
@@ -172,6 +173,8 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
   // Device-framed preview of the compiled email.
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewHtml, setPreviewHtml] = useState('');
+  // Asset library (browse + reuse past uploads).
+  const [libraryOpen, setLibraryOpen] = useState(false);
 
   // Reads the editor's undo/redo availability into React state. Reads refs +
   // stable setters only, so it's safe to call from the init effect too.
@@ -469,6 +472,10 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
     }
   };
 
+  // Picking from the asset library applies to the current target (hero bg / image
+  // src / a fresh mj-image) via the same pipeline as an upload.
+  const handleLibrarySelect = (url: string) => applyServerImage(url);
+
   // Discoverable "Insert image" — upload through our domain, apply an absolute
   // url at the selection. Same pipeline the asset manager uses, surfaced.
   const handleInsertImageClick = () => fileRef.current?.click();
@@ -565,6 +572,7 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
         onSetDevice={handleSetDevice}
         onToggleBorders={handleToggleBorders}
         onInsertImage={handleInsertImageClick}
+        onOpenLibrary={() => setLibraryOpen(true)}
         onOpenTemplates={handleOpenTemplates}
         onPreview={handlePreview}
         onViewCode={handleViewCode}
@@ -676,6 +684,13 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
         isOpen={previewOpen}
         onClose={() => setPreviewOpen(false)}
         html={previewHtml}
+        t={t}
+      />
+
+      <AssetLibraryModal
+        isOpen={libraryOpen}
+        onClose={() => setLibraryOpen(false)}
+        onSelect={handleLibrarySelect}
         t={t}
       />
 

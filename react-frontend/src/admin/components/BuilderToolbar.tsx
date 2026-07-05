@@ -22,6 +22,7 @@ import Scan from 'lucide-react/icons/scan';
 import CodeIcon from 'lucide-react/icons/code';
 import Trash2 from 'lucide-react/icons/trash-2';
 import ImageIcon from 'lucide-react/icons/image';
+import Images from 'lucide-react/icons/images';
 import LayoutTemplate from 'lucide-react/icons/layout-template';
 import Eye from 'lucide-react/icons/eye';
 import type { ReactNode } from 'react';
@@ -46,6 +47,7 @@ interface BuilderToolbarProps {
   onSetDevice: (device: BuilderDevice) => void;
   onToggleBorders: () => void;
   onInsertImage: () => void;
+  onOpenLibrary: () => void;
   onOpenTemplates: () => void;
   onPreview: () => void;
   onViewCode: () => void;
@@ -97,6 +99,7 @@ export function BuilderToolbar({
   onSetDevice,
   onToggleBorders,
   onInsertImage,
+  onOpenLibrary,
   onOpenTemplates,
   onPreview,
   onViewCode,
@@ -159,6 +162,10 @@ export function BuilderToolbar({
         disabled={frozen || Boolean(insertingImage)}
       >
         <ImageIcon size={16} />
+      </ToolButton>
+
+      <ToolButton label={t('newsletter_builder.library_title')} onPress={onOpenLibrary} disabled={frozen}>
+        <Images size={16} />
       </ToolButton>
 
       <Button

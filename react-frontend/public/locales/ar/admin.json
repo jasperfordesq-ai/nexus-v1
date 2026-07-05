@@ -16401,6 +16401,11 @@
     "empty_start_blank": "ابدأ فارغًا",
     "trait_background_image": "عنوان URL لصورة الخلفية",
     "trait_background_color": "لون الخلفية",
+    "trait_hero_height": "الارتفاع",
+    "library_title": "مكتبة الصور",
+    "library_upload": "تحميل جديد",
+    "library_empty": "لا توجد صور بعد. قم بتحميل واحدة للبدء.",
+    "library_failed": "لا يمكن تحميل الصور الخاصة بك.",
     "blocks": {
       "category_layout": "التخطيط",
       "category_content": "المحتوى",
@@ -16426,8 +16431,7 @@
       "hero_desc": "صورة بانر مع عنوان",
       "html_label": "HTML",
       "html_desc": "الصق HTML المخصص الخاص بك"
-    },
-    "trait_hero_height": "الارتفاع"
+    }
   },
   "newsletter_content_editor": {
     "builder_error": "تعذّر تحميل المُنشئ المرئي. يُرجى استخدام وضع HTML بدلاً من ذلك.",
