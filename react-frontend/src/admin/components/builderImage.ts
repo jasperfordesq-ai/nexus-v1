@@ -23,7 +23,31 @@ export type GjsComp = {
   append?: (content: string | Record<string, unknown>) => unknown;
   components?: () => { models?: GjsComp[] } | GjsComp[];
   set?: (k: string, v: unknown) => void;
+  addAttributes?: (attrs: Record<string, unknown>) => unknown;
 };
+
+/** What an uploaded image should DO given the current target component. */
+export type ImageAction = 'hero-background' | 'set-src' | 'insert';
+
+/** The mj-* tag / type of a component, however grapesjs exposes it. */
+export function tagOf(comp: GjsComp | undefined): string {
+  if (!comp) return '';
+  return (comp.get?.('tagName') as string) || (comp.get?.('type') as string) || '';
+}
+
+/**
+ * Decide how an uploaded image applies to the current target:
+ *  - an mj-hero → set its `background-url` (a hero IS a background image)
+ *  - an existing image → replace its `src`
+ *  - anything else → insert a fresh mj-image
+ * Pure + tested so the (GrapesJS-coupled) apply path stays trivial.
+ */
+export function imageActionFor(target: GjsComp | undefined): ImageAction {
+  const tag = tagOf(target);
+  if (tag === 'mj-hero') return 'hero-background';
+  if (tag === 'mj-image' || tag === 'image') return 'set-src';
+  return 'insert';
+}
 
 /** Minimal structural view of the grapesjs Editor bits these helpers touch. */
 export type EditorLike = {

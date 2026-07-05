@@ -8,9 +8,12 @@ import {
   resolveUploadedUrl,
   isEphemeralSrc,
   insertImageComponent,
+  imageActionFor,
   type GjsComp,
   type EditorLike,
 } from '../builderImage';
+
+const compOfTag = (tag: string): GjsComp => ({ get: (k) => (k === 'tagName' ? tag : undefined) });
 
 describe('resolveUploadedUrl', () => {
   it('returns the absolute url when present', () => {
@@ -39,6 +42,20 @@ describe('isEphemeralSrc', () => {
   it('treats absolute https urls as durable', () => {
     expect(isEphemeralSrc('https://api.test/storage/a.png')).toBe(false);
     expect(isEphemeralSrc(undefined)).toBe(false);
+  });
+});
+
+describe('imageActionFor', () => {
+  it('sets the background on a selected mj-hero (the hero image)', () => {
+    expect(imageActionFor(compOfTag('mj-hero'))).toBe('hero-background');
+  });
+  it('replaces the src of a selected image', () => {
+    expect(imageActionFor(compOfTag('mj-image'))).toBe('set-src');
+    expect(imageActionFor(compOfTag('image'))).toBe('set-src');
+  });
+  it('inserts a fresh image for anything else (or nothing selected)', () => {
+    expect(imageActionFor(compOfTag('mj-column'))).toBe('insert');
+    expect(imageActionFor(undefined)).toBe('insert');
   });
 });
 

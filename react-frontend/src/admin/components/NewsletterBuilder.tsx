@@ -60,9 +60,11 @@ import {
   resolveUploadedUrl,
   insertImageComponent,
   isEphemeralSrc,
+  imageActionFor,
   type GjsComp,
   type EditorLike,
 } from './builderImage';
+import { attachBackgroundTraits } from './builderTraits';
 
 interface NewsletterBuilderProps {
   /** Current compiled HTML (unused for restore — design_json drives restore). */
@@ -258,6 +260,13 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
       logError('NewsletterBuilder: customizeBlocks failed', err);
     }
 
+    // Surface the missing mj-hero / mj-section background traits so the hero
+    // image (and section backgrounds) become editable from the Settings tab.
+    const disposeTraits = attachBackgroundTraits(
+      ed as unknown as Parameters<typeof attachBackgroundTraits>[0],
+      t,
+    );
+
     // Restore a previously-saved design, otherwise seed a blank MJML document.
     // A restore only "counts" if it still compiles to valid MJML — older designs
     // (pre-MJML builder) load as non-MJML junk that exports broken email, so we
@@ -345,6 +354,7 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
       ed.off('component:selected component:deselected', syncSelection);
       ed.off('change:device', syncDevice);
       ed.off('component:add', handleComponentAdd);
+      disposeTraits();
       if (debounceRef.current) clearTimeout(debounceRef.current);
       try {
         ed.destroy();
@@ -420,8 +430,13 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
     }
     const amTarget = (am as unknown as { getTarget?: () => GjsComp | undefined }).getTarget?.();
     const tgt = target ?? amTarget ?? (ed.getSelected() as unknown as GjsComp | undefined);
-    const tag = tgt ? ((tgt.get?.('tagName') as string) || (tgt.get?.('type') as string)) : '';
-    if (tgt?.set && (tag === 'mj-image' || tag === 'image')) {
+    const action = imageActionFor(tgt);
+    if (action === 'hero-background' && tgt?.addAttributes) {
+      // A hero IS a background image — set it, and reveal Settings so the other
+      // hero controls (height/overlay/etc.) are to hand.
+      tgt.addAttributes({ 'background-url': url });
+      setActiveTab('settings');
+    } else if (action === 'set-src' && tgt?.set) {
       tgt.set('src', url);
     } else {
       const added = insertImageComponent(ed as unknown as EditorLike, url);
