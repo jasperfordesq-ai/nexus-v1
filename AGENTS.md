@@ -72,6 +72,7 @@ project-nexus/
 | [docs/README.md](docs/README.md) | Public documentation index and publication standards |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Maintained platform architecture map and major runtime boundaries |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deployment guide (public-safe; secrets stay in local env files) |
+| [docs/REACT-DUAL-BACKEND.md](docs/REACT-DUAL-BACKEND.md) | React dual-backend guardrails: Laravel production/default, ASP.NET development-only until contract-compatible |
 | [docs/govuk-alpha/RESEARCH.md](docs/govuk-alpha/RESEARCH.md) | GOV.UK-based accessible frontend architecture, official repos, licensing, and branding limits |
 | [LARAVEL_MIGRATION_PLAN.md](LARAVEL_MIGRATION_PLAN.md) | Historical Laravel migration record and current backend migration guidance |
 | `BACKUP.md` (local-only, gitignored) | Full backup system and private backup-remote workflow for machine transfers |
@@ -291,6 +292,8 @@ This project is **publicly released** under AGPL-3.0-or-later at <https://github
 - Use Tailwind CSS utilities for layout/spacing — **no separate CSS component files**
 - Use CSS tokens in `src/styles/tokens.css` for theme-aware colors
 - **Do NOT** create PHP views
+
+- **Laravel is the production/default backend contract.** ASP.NET compatibility work is development-only and must make ASP.NET conform to the Laravel React API rather than changing production frontend behaviour; see [docs/REACT-DUAL-BACKEND.md](docs/REACT-DUAL-BACKEND.md).
 
 See [react-frontend/CLAUDE.md](react-frontend/CLAUDE.md) for full styling rules, contexts, hooks, and component reference.
 

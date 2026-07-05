@@ -10,6 +10,14 @@ The Laravel backend remains the source of truth. The React frontend must keep
 working against Laravel first, and ASP.NET support must be introduced as an
 optional backend target only after each API contract is proven compatible.
 
+Current production status:
+
+| Surface | Status | Rule |
+| --- | --- | --- |
+| Laravel backend | Production | Canonical API contract. |
+| Laravel React frontend | Production | Must remain Laravel-compatible by default. |
+| ASP.NET backend | Development only | Must conform to the Laravel React API contract before any shared-frontend claim. |
+
 The target architecture is:
 
 ```text
@@ -20,6 +28,11 @@ React frontend
 
 The frontend should not become two separate applications. It should remain one
 codebase with small, well-tested adapters for unavoidable backend differences.
+
+The medium-term repository plan is to move the React frontend into its own
+folder/repository once backend contract work is mature enough. Until then,
+`react-frontend/` remains in this Laravel repo, and Laravel production safety is
+the priority over ASP.NET convenience.
 
 ## Non-Negotiable Guardrails
 
@@ -61,9 +74,7 @@ Future portability work should prefer this shape:
 
 ```text
 react-frontend/
-  .env.example
-  .env.laravel.example
-  .env.dotnet.example
+  package.json
   src/
     config/
       backendTarget.ts
@@ -83,6 +94,26 @@ The exact file names can change if the existing codebase has a better local
 pattern, but the boundary should stay the same: pages call shared application
 services, and backend-specific differences stay inside adapters.
 
+Environment-specific local files remain ignored by git. Prefer committed npm
+scripts and public docs over committed `.env.*` mode files, because this repo
+intentionally ignores environment files.
+
+Future standalone repository shape:
+
+```text
+nexus-react-frontend/
+  package.json
+  src/
+  docs/
+    backend-contract.md
+  contracts/
+    laravel-openapi.json
+    aspnet-openapi.json
+```
+
+The standalone repo should still treat Laravel as the default contract until
+ASP.NET has passed module-by-module certification.
+
 ## Environment Strategy
 
 Laravel mode should remain the implicit default:
@@ -101,7 +132,7 @@ VITE_API_BASE=/api
 VITE_API_URL=http://localhost:5080
 ```
 
-Recommended scripts, once implemented:
+Current explicit local scripts:
 
 ```text
 npm --prefix react-frontend run dev:laravel
@@ -110,8 +141,15 @@ npm --prefix react-frontend run build:laravel
 npm --prefix react-frontend run build:dotnet
 ```
 
-These scripts should load different environment files only. They should not
-change source code or generated files.
+These scripts should select environment/config only. They must not rewrite
+source code or generated files.
+
+The existing scripts remain the Laravel-safe production path:
+
+```text
+npm --prefix react-frontend run dev
+npm --prefix react-frontend run build
+```
 
 ## Adapter Boundaries
 

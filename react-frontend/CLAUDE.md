@@ -17,6 +17,28 @@
 | **Build** | Vite |
 | **Tests** | Vitest |
 
+## Backend Target Guardrail
+
+This frontend is in production against the Laravel backend. Laravel remains the
+default and canonical API contract. ASP.NET support is development-only and must
+be opt-in through environment/config until the ASP.NET backend passes the
+Laravel React API contract.
+
+Safe local commands:
+
+```bash
+npm run dev          # Laravel default
+npm run build        # Laravel/default production path
+npm run dev:laravel  # Explicit local Laravel target
+npm run dev:dotnet   # Explicit local ASP.NET target
+```
+
+Do not add ASP.NET conditionals inside pages or ordinary components. If a real
+transport difference is unavoidable, isolate it behind a small adapter. Prefer
+fixing ASP.NET to match Laravel for paths, payloads, response envelopes,
+validation errors, auth refresh, tenant handling, uploads, and status codes. See
+[`../docs/REACT-DUAL-BACKEND.md`](../docs/REACT-DUAL-BACKEND.md).
+
 ## 🔴 Mandatory Rules
 
 1. **HeroUI components first** — buttons, inputs, modals, cards, tables, dropdowns all come from `@heroui/react`

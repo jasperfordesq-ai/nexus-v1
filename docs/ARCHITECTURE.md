@@ -58,6 +58,8 @@ Feature availability is tenant-configured. User-facing routes, API actions, acce
 
 The React frontend is the primary UI. It uses React 19, TypeScript, HeroUI v3, Tailwind CSS 4, Lucide icons, translation namespaces, CSS tokens, and the local motion shim. New user-facing UI belongs here unless it is specifically part of the accessible frontend.
 
+The production React frontend currently lives in this Laravel repository under `react-frontend/` and speaks the Laravel API contract by default. ASP.NET backend compatibility work must happen by making the ASP.NET API conform to that contract, not by weakening Laravel behaviour in the production frontend. See [REACT-DUAL-BACKEND.md](REACT-DUAL-BACKEND.md) for the switchable-frontend guardrails and the roadmap to move the React frontend into its own repository when contract parity is mature enough.
+
 The accessible frontend is a maintained second surface, not legacy PHP. It uses GOV.UK Frontend markup/classes/Sass/JS with Project NEXUS branding and attribution. Its controller and translation paths must stay isolated from the React app while preserving the same tenant, module, auth, and AGPL attribution rules.
 
 ## Backend Organization

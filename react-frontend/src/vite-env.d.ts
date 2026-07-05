@@ -6,8 +6,14 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
+  readonly VITE_BACKEND_TARGET?: 'laravel' | 'dotnet' | string;
   readonly VITE_API_BASE: string;
+  readonly VITE_API_URL?: string;
   readonly VITE_TENANT_ID: string;
+  readonly VITE_DEFAULT_TENANT_ID?: string;
+  readonly VITE_DEFAULT_TENANT_SLUG?: string;
+  readonly VITE_REALTIME_DRIVER?: 'pusher' | 'signalr' | string;
+  readonly VITE_SIGNALR_HUB_BASE?: string;
   readonly VITE_GIPHY_API_KEY?: string;
   readonly VITE_GOOGLE_MAPS_API_KEY?: string;
   readonly VITE_GOOGLE_MAPS_ENABLED?: string;
