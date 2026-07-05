@@ -220,6 +220,24 @@ Generated inventory artifacts are local working material. Do not commit them to
 public docs. They are input for ASP.NET backend contract work, not proof that
 ASP.NET is ready.
 
+The inventory matrix includes:
+
+- module grouping inferred from the React source path;
+- priority labels:
+  - `P0` for auth, tenant bootstrap, and session-critical calls;
+  - `P1` for member workflows, uploads/downloads, raw fetch calls, and other
+    higher-risk contracts;
+  - `P2` for admin or lower-risk follow-up contracts;
+- auth/tenant hints from API client options such as `skipAuth` and `skipTenant`;
+- upload/download markers, upload field names, response type hints, dynamic path
+  markers, and raw-fetch markers;
+- first source locations so backend agents can inspect the calling screen before
+  implementing an ASP.NET endpoint.
+
+The latest local inventory should be read as a work queue seed. Each row still
+needs Laravel route/OpenAPI matching and, later, ASP.NET route/runtime smoke
+verification before it can be marked compatible.
+
 Exit gate:
 
 ```text

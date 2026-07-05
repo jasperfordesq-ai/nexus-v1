@@ -44,6 +44,10 @@ The API-call inventory is preparation only. It writes generated output under
 `../.local-docs-archive/react-api-inventory/` and must not be treated as evidence
 that the ASP.NET backend is ready.
 
+Use `npm run test:api-inventory` when changing the inventory script. The matrix
+groups calls by module and priority so backend agents can work from P0 auth /
+tenant contracts outward without touching production React pages.
+
 ## 🔴 Mandatory Rules
 
 1. **HeroUI components first** — buttons, inputs, modals, cards, tables, dropdowns all come from `@heroui/react`

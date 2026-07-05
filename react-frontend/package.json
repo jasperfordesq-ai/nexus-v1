@@ -12,6 +12,7 @@
     "copy-locales": "node scripts/copy-locales.mjs",
     "copy-changelog": "node scripts/copy-changelog.mjs",
     "inventory:api-calls": "node scripts/inventory-api-calls.mjs",
+    "test:api-inventory": "node --test scripts/inventory-api-calls.test.mjs",
     "i18n:status": "i18next-cli status",
     "i18n:sync": "i18next-cli sync",
     "i18n:lint": "i18next-cli lint",

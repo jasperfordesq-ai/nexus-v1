@@ -23,7 +23,7 @@ const ts = require('typescript');
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const frontendRoot = path.resolve(__dirname, '..');
 const repoRoot = path.resolve(frontendRoot, '..');
-const srcRoot = path.join(frontendRoot, 'src');
+const defaultSrcRoot = path.join(frontendRoot, 'src');
 const defaultOutDir = path.join(repoRoot, '.local-docs-archive', 'react-api-inventory', 'latest');
 const apiMethods = new Set(['get', 'post', 'put', 'patch', 'delete', 'download', 'upload']);
 const sourceExtensions = new Set(['.ts', '.tsx']);
@@ -31,6 +31,7 @@ const sourceExtensions = new Set(['.ts', '.tsx']);
 function parseArgs(argv) {
   const options = {
     outDir: defaultOutDir,
+    srcRoot: defaultSrcRoot,
     includeTests: false,
   };
 
@@ -40,6 +41,11 @@ function parseArgs(argv) {
       const value = argv[index + 1];
       if (!value) throw new Error('--out requires a directory');
       options.outDir = path.resolve(process.cwd(), value);
+      index += 1;
+    } else if (arg === '--src') {
+      const value = argv[index + 1];
+      if (!value) throw new Error('--src requires a directory');
+      options.srcRoot = path.resolve(process.cwd(), value);
       index += 1;
     } else if (arg === '--include-tests') {
       options.includeTests = true;
@@ -55,7 +61,7 @@ function parseArgs(argv) {
 }
 
 function printHelp() {
-  console.log(`Usage: node scripts/inventory-api-calls.mjs [--out <dir>] [--include-tests]
+  console.log(`Usage: node scripts/inventory-api-calls.mjs [--src <dir>] [--out <dir>] [--include-tests]
 
 Writes:
   api-calls.json
@@ -198,15 +204,21 @@ function maybeApiCall(node, sourceFile, relativeFile) {
   if (!endpoint || !looksLikeEndpoint(endpoint.value)) return null;
 
   const location = lineAndColumn(sourceFile, node);
+  const flags = optionFlagsForApiCall(node.arguments, method);
   return {
     method: httpMethodForApiMethod(method),
     transport: method,
     endpoint: endpoint.value,
     dynamic: endpoint.dynamic,
+    module: moduleFromFile(relativeFile),
     file: relativeFile,
     line: location.line,
     column: location.column,
-    flags: optionFlagsForApiCall(node.arguments, method),
+    flags,
+    auth_required: !flags.includes('skipAuth'),
+    tenant_required: !flags.includes('skipTenant'),
+    upload_field: uploadFieldName(node.arguments, method),
+    response_type: responseType(node.arguments, method),
   };
 }
 
@@ -228,17 +240,76 @@ function maybeFetchCall(node, sourceFile, relativeFile) {
     transport: 'fetch',
     endpoint: endpoint.value,
     dynamic: endpoint.dynamic,
+    module: moduleFromFile(relativeFile),
     file: relativeFile,
     line: location.line,
     column: location.column,
     flags: [],
+    auth_required: null,
+    tenant_required: null,
+    upload_field: null,
+    response_type: null,
   };
 }
 
-function collectCalls(filePath) {
+function uploadFieldName(args, method) {
+  if (method !== 'upload') return null;
+  const fieldArg = args[2];
+  return fieldArg && ts.isStringLiteralLike(fieldArg) ? fieldArg.text : 'file';
+}
+
+function responseType(args, method) {
+  if (method === 'download') return 'blob';
+
+  const optionsArg = method === 'get' || method === 'delete'
+    ? args[1]
+    : args[2];
+
+  if (!optionsArg || !ts.isObjectLiteralExpression(optionsArg)) return 'json';
+
+  for (const property of optionsArg.properties) {
+    if (!ts.isPropertyAssignment(property)) continue;
+    const name = property.name;
+    const isResponseType = (ts.isIdentifier(name) && name.text === 'responseType')
+      || (ts.isStringLiteral(name) && name.text === 'responseType');
+    if (!isResponseType) continue;
+    return ts.isStringLiteralLike(property.initializer) ? property.initializer.text : 'dynamic';
+  }
+
+  return 'json';
+}
+
+function moduleFromFile(relativeFile) {
+  const file = relativeFile.replace(/^src\//, '');
+  if (file.startsWith('admin/')) return 'admin';
+  if (file.startsWith('broker/')) return 'broker';
+  if (file.startsWith('contexts/Auth') || file.startsWith('pages/auth/') || file.includes('webauthn')) return 'auth';
+  if (file.includes('caring-community')) return 'caring-community';
+  if (file.includes('marketplace')) return 'marketplace';
+  if (file.includes('courses') || file.includes('course')) return 'courses';
+  if (file.includes('podcast')) return 'podcasts';
+  if (file.includes('message')) return 'messages';
+  if (file.includes('wallet') || file.includes('exchange')) return 'wallet';
+  if (file.includes('notification')) return 'notifications';
+  if (file.includes('feed')) return 'feed';
+  if (file.includes('listing')) return 'listings';
+  if (file.includes('group')) return 'groups';
+  if (file.includes('event')) return 'events';
+  if (file.includes('job')) return 'jobs';
+  if (file.includes('volunteer')) return 'volunteering';
+  if (file.includes('tenant')) return 'tenant';
+  if (file.startsWith('pages/settings/')) return 'settings';
+  if (file.startsWith('pages/')) return 'member';
+  if (file.startsWith('components/')) return 'shared-components';
+  if (file.startsWith('hooks/')) return 'hooks';
+  if (file.startsWith('lib/')) return 'lib';
+  return 'unclassified';
+}
+
+function collectCalls(filePath, sourceRoot) {
   const sourceText = fs.readFileSync(filePath, 'utf8');
   const sourceFile = ts.createSourceFile(filePath, sourceText, ts.ScriptTarget.Latest, true);
-  const relativeFile = toPosix(path.relative(frontendRoot, filePath));
+  const relativeFile = relativeSourceFile(filePath, sourceRoot);
   const calls = [];
 
   function visit(node) {
@@ -257,6 +328,15 @@ function collectCalls(filePath) {
   return calls;
 }
 
+function relativeSourceFile(filePath, sourceRoot) {
+  const relativeToFrontend = path.relative(frontendRoot, filePath);
+  if (!relativeToFrontend.startsWith('..') && !path.isAbsolute(relativeToFrontend)) {
+    return toPosix(relativeToFrontend);
+  }
+
+  return toPosix(path.relative(sourceRoot, filePath));
+}
+
 function endpointKey(call) {
   return `${call.method} ${call.endpoint}`;
 }
@@ -273,12 +353,22 @@ function aggregate(calls) {
       count: 0,
       transports: new Set(),
       flags: new Set(),
+      modules: new Set(),
+      authValues: new Set(),
+      tenantValues: new Set(),
+      uploadFields: new Set(),
+      responseTypes: new Set(),
       files: new Map(),
     };
 
     current.count += 1;
     current.dynamic = current.dynamic || call.dynamic;
     current.transports.add(call.transport);
+    current.modules.add(call.module);
+    current.authValues.add(String(call.auth_required));
+    current.tenantValues.add(String(call.tenant_required));
+    if (call.upload_field) current.uploadFields.add(call.upload_field);
+    if (call.response_type) current.responseTypes.add(call.response_type);
     for (const flag of call.flags) current.flags.add(flag);
 
     const locations = current.files.get(call.file) ?? [];
@@ -293,8 +383,15 @@ function aggregate(calls) {
       endpoint: entry.endpoint,
       dynamic: entry.dynamic,
       count: entry.count,
+      module: setLabel(entry.modules),
       transports: [...entry.transports].sort(),
       flags: [...entry.flags].sort(),
+      auth_required: requirementValue(entry.authValues),
+      tenant_required: requirementValue(entry.tenantValues),
+      upload_field: setLabel(entry.uploadFields),
+      response_type: setLabel(entry.responseTypes),
+      contract_risk: contractRisk(entry),
+      priority: priorityForEndpoint(entry),
       files: [...entry.files.entries()]
         .map(([file, lines]) => ({
           file,
@@ -303,6 +400,40 @@ function aggregate(calls) {
         .sort((a, b) => a.file.localeCompare(b.file)),
     }))
     .sort((a, b) => `${a.endpoint} ${a.method}`.localeCompare(`${b.endpoint} ${b.method}`));
+}
+
+function setLabel(values) {
+  const items = [...values].filter(Boolean).sort();
+  if (items.length === 0) return null;
+  if (items.length === 1) return items[0];
+  return 'mixed';
+}
+
+function requirementValue(values) {
+  if (values.has('true')) return true;
+  if (values.has('false') && values.size === 1) return false;
+  return null;
+}
+
+function contractRisk(entry) {
+  const risks = new Set();
+  if (entry.dynamic) risks.add('dynamic-path');
+  if (entry.transports.has('fetch')) risks.add('raw-fetch');
+  if (entry.transports.has('upload')) risks.add('upload');
+  if (entry.transports.has('download')) risks.add('download');
+  if (entry.endpoint.startsWith('http://') || entry.endpoint.startsWith('https://')) risks.add('absolute-url');
+  if (entry.endpoint.includes('auth') || entry.modules.has('auth')) risks.add('auth');
+  if (entry.flags.has('skipTenant')) risks.add('tenant-special-case');
+  if (entry.flags.has('responseType')) risks.add('non-json-response');
+  return [...risks].sort().join(', ') || 'standard-json';
+}
+
+function priorityForEndpoint(entry) {
+  const risk = contractRisk(entry);
+  if (entry.modules.has('auth') || entry.endpoint.includes('/csrf-token') || entry.endpoint.includes('/tenant')) return 'P0';
+  if (risk.includes('upload') || risk.includes('download') || risk.includes('raw-fetch') || risk.includes('absolute-url')) return 'P1';
+  if (entry.endpoint.startsWith('/v2/admin')) return 'P2';
+  return 'P1';
 }
 
 function endpointBucket(endpoint) {
@@ -317,26 +448,35 @@ function endpointBucket(endpoint) {
   return 'absolute';
 }
 
-function buildSummary(calls, endpoints, scannedFiles) {
+function buildSummary(calls, endpoints, scannedFiles, sourceRoot) {
   const byMethod = {};
   const byBucket = {};
+  const byModule = {};
+  const byPriority = {};
   const dynamicEndpoints = endpoints.filter((endpoint) => endpoint.dynamic).length;
+
+  for (const call of calls) {
+    byModule[call.module] = (byModule[call.module] ?? 0) + 1;
+  }
 
   for (const endpoint of endpoints) {
     byMethod[endpoint.method] = (byMethod[endpoint.method] ?? 0) + 1;
+    byPriority[endpoint.priority] = (byPriority[endpoint.priority] ?? 0) + 1;
     const bucket = endpointBucket(endpoint.endpoint);
     byBucket[bucket] = (byBucket[bucket] ?? 0) + 1;
   }
 
   return {
     generated_at: new Date().toISOString(),
-    source_root: toPosix(path.relative(repoRoot, srcRoot)),
+    source_root: toPosix(path.relative(repoRoot, sourceRoot)),
     scanned_files: scannedFiles,
     call_sites: calls.length,
     unique_endpoints: endpoints.length,
     dynamic_endpoints: dynamicEndpoints,
     by_method: Object.fromEntries(Object.entries(byMethod).sort()),
+    by_module: Object.fromEntries(Object.entries(byModule).sort()),
     by_bucket: Object.fromEntries(Object.entries(byBucket).sort()),
+    by_priority: Object.fromEntries(Object.entries(byPriority).sort()),
   };
 }
 
@@ -364,6 +504,18 @@ function markdownReport(summary, endpoints) {
     '| --- | ---: |',
     ...Object.entries(summary.by_method).map(([method, count]) => `| ${method} | ${count} |`),
     '',
+    '## Modules',
+    '',
+    '| Module | Call sites |',
+    '| --- | ---: |',
+    ...Object.entries(summary.by_module).map(([module, count]) => `| ${module} | ${count} |`),
+    '',
+    '## Priorities',
+    '',
+    '| Priority | Unique endpoints | Meaning |',
+    '| --- | ---: | --- |',
+    ...Object.entries(summary.by_priority).map(([priority, count]) => `| ${priority} | ${count} | ${priorityMeaning(priority)} |`),
+    '',
     '## Buckets',
     '',
     '| Bucket | Unique endpoints |',
@@ -372,8 +524,8 @@ function markdownReport(summary, endpoints) {
     '',
     '## Endpoint Matrix',
     '',
-    '| Method | Endpoint pattern | Dynamic | Call sites | Transports | Flags | First locations |',
-    '| --- | --- | --- | ---: | --- | --- | --- |',
+    '| Priority | Module | Method | Endpoint pattern | Auth | Tenant | Risk | Dynamic | Call sites | Transports | Flags | First locations |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- | ---: | --- | --- | --- |',
   ];
 
   for (const endpoint of endpoints) {
@@ -383,8 +535,13 @@ function markdownReport(summary, endpoints) {
       .join('<br>');
     const more = endpoint.files.length > 3 ? `<br>+${endpoint.files.length - 3} files` : '';
     lines.push([
+      endpoint.priority,
+      endpoint.module,
       endpoint.method,
       code(endpoint.endpoint),
+      requirementLabel(endpoint.auth_required),
+      requirementLabel(endpoint.tenant_required),
+      endpoint.contract_risk,
       endpoint.dynamic ? 'yes' : 'no',
       String(endpoint.count),
       endpoint.transports.join(', '),
@@ -395,6 +552,19 @@ function markdownReport(summary, endpoints) {
 
   lines.push('');
   return lines.join('\n');
+}
+
+function priorityMeaning(priority) {
+  if (priority === 'P0') return 'auth, tenant bootstrap, or session-critical';
+  if (priority === 'P1') return 'member workflow, upload/download, raw fetch, or higher-risk contract';
+  if (priority === 'P2') return 'admin or lower-risk contract follow-up';
+  return 'unclassified';
+}
+
+function requirementLabel(value) {
+  if (value === true) return 'yes';
+  if (value === false) return 'no';
+  return 'unknown';
 }
 
 function code(value) {
@@ -409,11 +579,11 @@ function tableCell(value) {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
-  const files = walk(srcRoot, options.includeTests);
-  const calls = files.flatMap(collectCalls)
+  const files = walk(options.srcRoot, options.includeTests);
+  const calls = files.flatMap((file) => collectCalls(file, options.srcRoot))
     .sort((a, b) => `${a.file}:${a.line}:${a.column}`.localeCompare(`${b.file}:${b.line}:${b.column}`));
   const endpoints = aggregate(calls);
-  const summary = buildSummary(calls, endpoints, files.length);
+  const summary = buildSummary(calls, endpoints, files.length, options.srcRoot);
   const payload = {
     summary,
     endpoints,
