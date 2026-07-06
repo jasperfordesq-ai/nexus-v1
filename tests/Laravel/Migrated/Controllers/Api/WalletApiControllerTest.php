@@ -34,10 +34,13 @@ class WalletApiControllerTest extends LegacyBridgeTestCase
 
         TenantContext::setById(static::$legacyTestTenantId);
 
+        $senderToken = $this->uniqueWalletToken('sender');
+        $receiverToken = $this->uniqueWalletToken('receiver');
+
         // Create test sender
         $sender = $this->createUser([
-            'email'    => 'test_wallet_sender_' . time() . rand(1000, 9999) . '@test.com',
-            'username' => 'test_wallet_sender_' . time() . rand(1000, 9999),
+            'email'    => $senderToken . '@test.com',
+            'username' => $senderToken,
             'first_name' => 'Wallet',
             'last_name'  => 'Sender',
             'balance'    => $this->initialBalance,
@@ -46,13 +49,24 @@ class WalletApiControllerTest extends LegacyBridgeTestCase
 
         // Create test receiver
         $receiver = $this->createUser([
-            'email'    => 'test_wallet_receiver_' . time() . rand(1000, 9999) . '@test.com',
-            'username' => 'test_wallet_receiver_' . time() . rand(1000, 9999),
+            'email'    => $receiverToken . '@test.com',
+            'username' => $receiverToken,
             'first_name' => 'Wallet',
             'last_name'  => 'Receiver',
             'balance'    => 0,
         ]);
         $this->testReceiverId = $receiver['id'];
+    }
+
+    private function uniqueWalletToken(string $role): string
+    {
+        return sprintf(
+            'test_wallet_%s_%s_%d_%d',
+            $role,
+            getmypid(),
+            (int) (microtime(true) * 1000000),
+            random_int(1000, PHP_INT_MAX)
+        );
     }
 
     protected function tearDown(): void
