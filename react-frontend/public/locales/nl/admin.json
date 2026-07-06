@@ -5947,7 +5947,18 @@
     "placeholder_featured_image": "https://example.com/image.jpg",
     "save_changes": "Wijzigingen opslaan",
     "search_placeholder": "Blogposts zoeken...",
-    "tabs_aria": "Blog post status filter"
+    "tabs_aria": "Blog post status filter",
+    "featured_image_format_hint": "JPEG, PNG, GIF of WebP tot 10 MB",
+    "featured_image_preview_alt": "Voorbeeld van uitgelichte afbeelding",
+    "featured_image_preview_empty": "Geen uitgelichte afbeelding geselecteerd",
+    "featured_image_preview_unavailable": "Het afbeeldingsvoorbeeld is niet beschikbaar. Controleer de URL of upload een andere afbeelding.",
+    "featured_image_remove": "Uitgelichte afbeelding verwijderen",
+    "featured_image_size_error": "De uitgelichte afbeelding moet 10 MB of kleiner zijn.",
+    "featured_image_type_error": "Kies een JPEG-, PNG-, GIF- of WebP-afbeelding.",
+    "featured_image_upload": "Afbeelding uploaden",
+    "featured_image_upload_failed": "Uploaden van uitgelichte afbeelding mislukt.",
+    "featured_image_uploading": "Uitgelichte afbeelding uploaden",
+    "featured_image_uploaded": "Uitgelichte afbeelding ge?pload."
   },
   "breadcrumbs": {
     "community_fund": "Community Fund",

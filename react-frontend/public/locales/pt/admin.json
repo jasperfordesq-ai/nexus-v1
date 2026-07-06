@@ -5947,7 +5947,18 @@
     "placeholder_featured_image": "https://example.com/image.jpg",
     "save_changes": "Salvar alterações",
     "search_placeholder": "Pesquisar postagens do blog...",
-    "tabs_aria": "Blog post status filter"
+    "tabs_aria": "Blog post status filter",
+    "featured_image_format_hint": "JPEG, PNG, GIF ou WebP at? 10 MB",
+    "featured_image_preview_alt": "Pr?-visualiza??o da imagem em destaque",
+    "featured_image_preview_empty": "Nenhuma imagem em destaque selecionada",
+    "featured_image_preview_unavailable": "A pr?-visualiza??o da imagem n?o est? dispon?vel. Verifique o URL ou carregue outra imagem.",
+    "featured_image_remove": "Remover imagem em destaque",
+    "featured_image_size_error": "A imagem em destaque deve ter 10 MB ou menos.",
+    "featured_image_type_error": "Escolha uma imagem JPEG, PNG, GIF ou WebP.",
+    "featured_image_upload": "Carregar imagem",
+    "featured_image_upload_failed": "Falha ao carregar a imagem em destaque.",
+    "featured_image_uploading": "A carregar imagem em destaque",
+    "featured_image_uploaded": "Imagem em destaque carregada."
   },
   "breadcrumbs": {
     "community_fund": "Community Fund",

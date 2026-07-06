@@ -5947,7 +5947,18 @@
     "placeholder_featured_image": "https://example.com/image.jpg",
     "save_changes": "Zapisz zmiany",
     "search_placeholder": "Wyszukaj posty na blogu...",
-    "tabs_aria": "Blog post status filter"
+    "tabs_aria": "Blog post status filter",
+    "featured_image_format_hint": "JPEG, PNG, GIF lub WebP do 10 MB",
+    "featured_image_preview_alt": "Podgl?d obrazu wyr??nionego",
+    "featured_image_preview_empty": "Nie wybrano obrazu wyr??nionego",
+    "featured_image_preview_unavailable": "Podgl?d obrazu jest niedost?pny. Sprawd? adres URL lub prze?lij inny obraz.",
+    "featured_image_remove": "Usu? obraz wyr??niony",
+    "featured_image_size_error": "Obraz wyr??niony musi mie? 10 MB lub mniej.",
+    "featured_image_type_error": "Wybierz obraz JPEG, PNG, GIF lub WebP.",
+    "featured_image_upload": "Prze?lij obraz",
+    "featured_image_upload_failed": "Nie uda?o si? przes?a? obrazu wyr??nionego.",
+    "featured_image_uploading": "Przesy?anie obrazu wyr??nionego",
+    "featured_image_uploaded": "Obraz wyr??niony zosta? przes?any."
   },
   "breadcrumbs": {
     "community_fund": "Community Fund",

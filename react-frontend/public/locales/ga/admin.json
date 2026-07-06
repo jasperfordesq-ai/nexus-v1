@@ -5947,7 +5947,18 @@
     "placeholder_featured_image": "https://example.com/image.jpg",
     "save_changes": "Sábháil athruithe",
     "search_placeholder": "Cuardaigh blogphoist...",
-    "tabs_aria": "Blog post status filter"
+    "tabs_aria": "Blog post status filter",
+    "featured_image_format_hint": "JPEG, PNG, GIF n? WebP suas le 10 MB",
+    "featured_image_preview_alt": "R?amhamharc ar an ?omh? faoi thr?cht",
+    "featured_image_preview_empty": "N?l aon ?omh? faoi thr?cht roghnaithe",
+    "featured_image_preview_unavailable": "N?l r?amhamharc na h?omh? ar f?il. Seice?il an URL n? uasl?d?il ?omh? eile.",
+    "featured_image_remove": "Bain an ?omh? faoi thr?cht",
+    "featured_image_size_error": "N? m?r don ?omh? faoi thr?cht a bheith 10 MB n? n?os l?.",
+    "featured_image_type_error": "Roghnaigh ?omh? JPEG, PNG, GIF n? WebP.",
+    "featured_image_upload": "Uasl?d?il ?omh?",
+    "featured_image_upload_failed": "Theip ar uasl?d?il na h?omh? faoi thr?cht.",
+    "featured_image_uploading": "?omh? faoi thr?cht ? huasl?d?il",
+    "featured_image_uploaded": "Uasl?d?ladh an ?omh? faoi thr?cht."
   },
   "breadcrumbs": {
     "community_fund": "Community Fund",
