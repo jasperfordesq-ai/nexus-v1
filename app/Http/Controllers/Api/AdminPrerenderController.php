@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Services\PrerenderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * AdminPrerenderController — admin endpoints for the prerender engine.
@@ -199,7 +200,13 @@ class AdminPrerenderController extends BaseApiController
                         'VALIDATION_INVALID'
                     );
                 }
-                if ($tenantId === null && PrerenderService::routeRequiresTenantScope($tok)) {
+                if (
+                    $tenantId === null
+                    && (
+                        PrerenderService::routeRequiresTenantScope($tok)
+                        || !PrerenderService::routeCanBeGlobalExplicit($tok)
+                    )
+                ) {
                     return $this->error(
                         "Route requires tenant_slug: $tok",
                         400,
@@ -659,6 +666,13 @@ class AdminPrerenderController extends BaseApiController
         $userId = $this->requirePlatformSuperAdmin();
         if (!$this->checkActionRate($userId, 'reset_queue', 2, 300)) {
             return $this->error('Too many requests — wait a few minutes', 429, 'RATE_LIMITED');
+        }
+        if (!Schema::hasTable('prerender_jobs')) {
+            return $this->error(
+                'Prerender job queue table is not available. Run database migrations before repairing the queue.',
+                503,
+                'PRERENDER_QUEUE_UNAVAILABLE'
+            );
         }
 
         $now = date('Y-m-d H:i:s');

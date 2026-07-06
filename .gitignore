@@ -53,7 +53,6 @@ CLAUDE.md
 !/scripts/check-regression-patterns.sh
 !/scripts/check-dockerfile-drift.sh
 !/scripts/verify-feature.sh
-!/scripts/start-native-dev.ps1
 !/scripts/add-spdx-headers.mjs
 !/scripts/check-spdx.mjs
 !/scripts/check-docs-hygiene.mjs
@@ -222,7 +221,6 @@ tmp_*.txt
 C?temp*
 C?tmp*
 C?Users*
-c?xampp*
 *tempcivicone_dirs.txt
 *tempmodern_dirs.txt
 

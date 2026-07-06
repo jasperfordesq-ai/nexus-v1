@@ -905,7 +905,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     <Chip color={stalenessColor(it.staleness)} variant="soft" size="sm">
-                      {it.staleness}
+                      {t(it.staleness === 'warn' ? 'filters.aging' : `filters.${it.staleness}`)}
                     </Chip>
                     {it.content_stale && (
                       <Tooltip content={it.content_stale_reason ?? t('status.content_drifted')}>
@@ -1918,6 +1918,39 @@ function readableHealthCheckName(t: (key: string, options?: Record<string, unkno
   return name.replace(/_/g, ' ');
 }
 
+function HealthCheckList({
+  health,
+  isSuperAdmin,
+  onResetBreaker,
+  busy,
+  t,
+}: {
+  health: PrerenderHealth;
+  isSuperAdmin: boolean;
+  onResetBreaker: () => void;
+  busy: boolean;
+  t: (key: string, options?: Record<string, unknown>) => string;
+}) {
+  return (
+    <ul className="mt-2 ml-2 space-y-1 list-disc list-inside">
+      {health.checks.map((c) => (
+        <li key={c.name}>
+          <span className={`inline-block w-2 h-2 rounded-full mr-2 align-middle ${HEALTH_DOT_CLASSES[statusToColor(c.status)]}`} />
+          <strong>{readableHealthCheckName(t, c.name)}:</strong> {c.detail}
+          {c.action && <span className="block ml-4 text-xs opacity-80">→ {c.action}</span>}
+        </li>
+      ))}
+      {health.breaker_until && isSuperAdmin && (
+        <li className="pt-1">
+          <Button size="sm" variant="tertiary" onPress={onResetBreaker} isDisabled={busy}>
+            {t('actions.close_breaker_now')}
+          </Button>
+        </li>
+      )}
+    </ul>
+  );
+}
+
 function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number }) {
   const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.health_banner' });
   const [health, setHealth] = useState<PrerenderHealth | null>(null);
@@ -1960,15 +1993,25 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
   };
 
   if (!health) return null;
-  // Hide the banner entirely when everything is green and nothing's actionable.
   if (health.status === 'green') {
     return (
-      <div className="mb-3 flex items-center gap-2 text-sm text-muted">
-        <CheckCircle size={14} className="text-success" />
-        {t('engine_healthy')}
-        <Button size="sm" variant="tertiary" className="ml-auto h-7 text-xs" onPress={() => setExpanded((v) => !v)}>
-          {expanded ? t('actions.hide_details') : t('actions.details')}
-        </Button>
+      <div className="mb-3 rounded-md border border-success-200 bg-success-50 px-3 py-2 text-sm text-success-800 dark:border-success-900/40 dark:bg-success-950/20 dark:text-success-200">
+        <div className="flex items-center gap-2">
+          <CheckCircle size={14} className="text-success" />
+          {t('engine_healthy')}
+          <Button size="sm" variant="tertiary" className="ml-auto h-7 text-xs" onPress={() => setExpanded((v) => !v)}>
+            {expanded ? t('actions.hide_details') : t('actions.details')}
+          </Button>
+        </div>
+        {expanded && (
+          <HealthCheckList
+            health={health}
+            isSuperAdmin={isSuperAdmin}
+            onResetBreaker={resetBreaker}
+            busy={busy}
+            t={t}
+          />
+        )}
       </div>
     );
   }
@@ -1997,22 +2040,13 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
         )}
       </div>
       {expanded && (
-        <ul className="mt-2 ml-2 space-y-1 list-disc list-inside">
-          {health.checks.map((c) => (
-            <li key={c.name}>
-              <span className={`inline-block w-2 h-2 rounded-full mr-2 align-middle ${HEALTH_DOT_CLASSES[statusToColor(c.status)]}`} />
-              <strong>{readableHealthCheckName(t, c.name)}:</strong> {c.detail}
-              {c.action && <span className="block ml-4 text-xs opacity-80">→ {c.action}</span>}
-            </li>
-          ))}
-          {health.breaker_until && isSuperAdmin && (
-            <li className="pt-1">
-              <Button size="sm" variant="tertiary" onPress={resetBreaker} isDisabled={busy}>
-                {t('actions.close_breaker_now')}
-              </Button>
-            </li>
-          )}
-        </ul>
+        <HealthCheckList
+          health={health}
+          isSuperAdmin={isSuperAdmin}
+          onResetBreaker={resetBreaker}
+          busy={busy}
+          t={t}
+        />
       )}
 
       <Modal isOpen={isOpen} onClose={onClose}>

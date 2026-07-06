@@ -499,7 +499,7 @@ Observed status:
 - `npm run type-check` after the ExchangeCard migration: passed.
 - Focused marketplace helper-route, ExchangeCard, and StoryCircles tests after adding coupon edit/redemption redirect coverage: passed, 3 suites and 11 tests.
 - `npm run type-check` after the marketplace helper-route coverage update: passed.
-- `mobile/README.md` was refreshed to document Expo SDK 54, HeroUI Native `^1.0.4`, Uniwind/Tailwind 4 setup, local native API URLs on port 8088, wrapper policy, and verification commands.
+- `mobile/README.md` was refreshed to document Expo SDK 54, HeroUI Native `^1.0.4`, Uniwind/Tailwind 4 setup, local Docker API URLs on port 8090, wrapper policy, and verification commands.
 - `git diff --check -- mobile` after the README refresh and latest code/docs updates: passed with LF-to-CRLF warnings only.
 - `npm run type-check` after the README refresh: passed.
 - Focused marketplace helper-route, ExchangeCard, and StoryCircles tests after the README refresh: passed, 3 suites and 11 tests.

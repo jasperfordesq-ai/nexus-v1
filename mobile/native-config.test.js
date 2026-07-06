@@ -187,8 +187,8 @@ describe('native app configuration', () => {
   it('documents the native local API port consistently', () => {
     const envExample = read('.env.example');
 
-    expect(envExample).toContain('http://10.0.2.2:8088');
-    expect(envExample).toContain('http://localhost:8088');
+    expect(envExample).toContain('http://10.0.2.2:8090');
+    expect(envExample).toContain('http://localhost:8090');
     expect(envExample).not.toContain(':8090');
   });
 

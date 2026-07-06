@@ -36,7 +36,7 @@ const canOptimizeImages = (() => {
 
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_')
-  const apiUrl = env.VITE_API_URL || process.env.VITE_API_URL || 'http://localhost:8090'
+  const apiUrl = process.env.VITE_API_URL || env.VITE_API_URL || 'http://localhost:8090'
 
   return {
   cacheDir: path.resolve(__dirname, 'node_modules/.vite'),

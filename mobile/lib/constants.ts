@@ -24,7 +24,7 @@ function isLoopbackHost(url: string | undefined | null): boolean {
  *
  * SELF-HEAL GUARD (regression 2026-06-12): EXPO_PUBLIC_* values are inlined
  * into the JS bundle by Babel, and Metro's transform cache does NOT invalidate
- * when the env var changes. A stale `.env.local` (e.g. http://10.0.2.2:8088
+ * when the env var changes. A stale `.env.local` (e.g. http://10.0.2.2:8090
  * for emulator testing) therefore poisoned production builds, baking the
  * loopback URL into the bundle so every request timed out on real devices.
  * A real release build can NEVER legitimately target a loopback host, so when

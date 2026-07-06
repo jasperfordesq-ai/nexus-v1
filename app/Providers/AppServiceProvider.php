@@ -1181,7 +1181,6 @@ class AppServiceProvider extends ServiceProvider
                     continue;
                 }
                 if (!empty($lines)) {
-                    $this->preloadPhpGroupsForJsonLines($translator, $basePath, $locale, $lines);
                     $translator->addLines($lines, $locale);
                 }
             }
@@ -1208,30 +1207,6 @@ class AppServiceProvider extends ServiceProvider
         ));
 
         return !in_array($locale, $allowed, true);
-    }
-
-    private function preloadPhpGroupsForJsonLines(object $translator, string $basePath, string $locale, array $lines): void
-    {
-        $loadedGroups = [];
-
-        foreach (array_keys($lines) as $key) {
-            if (!is_string($key) || !str_contains($key, '.')) {
-                continue;
-            }
-
-            [$group] = explode('.', $key, 2);
-            if (isset($loadedGroups[$group])) {
-                continue;
-            }
-
-            $phpGroupPath = $basePath . DIRECTORY_SEPARATOR . $locale . DIRECTORY_SEPARATOR . $group . '.php';
-            if (!is_file($phpGroupPath)) {
-                continue;
-            }
-
-            $translator->load('*', $group, $locale);
-            $loadedGroups[$group] = true;
-        }
     }
 
     private function loadCachedJsonTranslations(string $basePath): array
@@ -1271,7 +1246,7 @@ class AppServiceProvider extends ServiceProvider
             return false;
         }
 
-        foreach (glob($basePath . DIRECTORY_SEPARATOR . '*' . DIRECTORY_SEPARATOR . '*.json') ?: [] as $file) {
+        foreach (glob($basePath . DIRECTORY_SEPARATOR . '*' . DIRECTORY_SEPARATOR . '*.{json,php}', GLOB_BRACE) ?: [] as $file) {
             $fileMtime = filemtime($file);
             if ($fileMtime !== false && $fileMtime > $cacheMtime) {
                 return false;
@@ -1296,6 +1271,16 @@ class AppServiceProvider extends ServiceProvider
 
             foreach (glob($langPath . '/*.json') as $file) {
                 $namespace = pathinfo($file, PATHINFO_FILENAME); // e.g. 'emails_misc'
+                $phpGroupPath = $langPath . DIRECTORY_SEPARATOR . $namespace . '.php';
+                if (is_file($phpGroupPath)) {
+                    $phpLines = require $phpGroupPath;
+                    if (is_array($phpLines)) {
+                        foreach (\Illuminate\Support\Arr::dot($phpLines) as $key => $value) {
+                            $translations[$entry][$namespace . '.' . $key] = $value;
+                        }
+                    }
+                }
+
                 $contents = file_get_contents($file);
                 if ($contents === false) continue;
 

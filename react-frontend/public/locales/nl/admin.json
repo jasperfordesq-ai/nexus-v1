@@ -3001,6 +3001,11 @@
         "cleanup": {
           "title": "Cleanup available",
           "body": "Unexpected snapshots can usually be removed with the cleanup tool in Overview. Preview first, then apply only when the tenant list is correct."
+        },
+        "staleness": {
+          "fresh": "Fresh",
+          "warn": "Aging",
+          "stale": "Stale"
         }
       }
     },

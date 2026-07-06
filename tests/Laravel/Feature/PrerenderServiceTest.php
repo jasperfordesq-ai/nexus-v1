@@ -139,7 +139,7 @@ HTML;
     {
         $service = new PrerenderService();
         $id1 = $service->enqueueJob(null, '/about', false, false, null);
-        $id2 = $service->enqueueJob(null, '/blog', false, false, null);
+        $id2 = $service->enqueueJob(null, '/faq', false, false, null);
 
         $first = $service->claimNextJob('worker-1');
         $this->assertNotNull($first);
@@ -419,9 +419,9 @@ HTML;
     public function test_priority_promotion_on_duplicate_enqueue(): void
     {
         $svc = new PrerenderService();
-        $id1 = $svc->enqueueJob(null, '/foo', false, false, null, PrerenderService::PRIORITY_LOW);
+        $id1 = $svc->enqueueJob(null, '/about', false, false, null, PrerenderService::PRIORITY_LOW);
         // Same args + higher priority → should promote the existing row.
-        $id2 = $svc->enqueueJob(null, '/foo', false, false, null, PrerenderService::PRIORITY_HIGH);
+        $id2 = $svc->enqueueJob(null, '/about', false, false, null, PrerenderService::PRIORITY_HIGH);
         $this->assertSame($id1, $id2);
         $row = DB::table('prerender_jobs')->where('id', $id1)->first();
         $this->assertSame(PrerenderService::PRIORITY_HIGH, (int) $row->priority);
@@ -431,9 +431,9 @@ HTML;
     {
         $svc = new PrerenderService();
         // Older low-priority job comes in first.
-        $oldLow = $svc->enqueueJob(null, '/old', false, false, null, PrerenderService::PRIORITY_LOW);
+        $oldLow = $svc->enqueueJob(null, '/about', false, false, null, PrerenderService::PRIORITY_LOW);
         // Newer high-priority job comes second.
-        $newHigh = $svc->enqueueJob(null, '/new', false, false, null, PrerenderService::PRIORITY_HIGH);
+        $newHigh = $svc->enqueueJob(null, '/faq', false, false, null, PrerenderService::PRIORITY_HIGH);
 
         $claimed = $svc->claimNextJob('test-host:0');
         $this->assertNotNull($claimed);
@@ -473,8 +473,9 @@ HTML;
         $this->assertNull($service->breakerTrippedUntil(), 'breaker should start closed');
 
         // Pump 5 failed finalises inside the window — trips the breaker.
+        $routes = ['/about', '/faq', '/contact', '/help', '/explore'];
         for ($i = 0; $i < PrerenderService::BREAKER_FAILURE_THRESHOLD; $i++) {
-            $id = $service->enqueueJob(null, "/route-{$i}", false, false, 1);
+            $id = $service->enqueueJob(null, $routes[$i], false, false, 1);
             $service->claimNextJob('w');
             $service->markRunning($id);
             $service->finaliseJob($id, 'failed', 0, 0, 0, 1, 5, null, 'boom');
@@ -485,7 +486,7 @@ HTML;
         // claimNextJob must return null while tripped, even with work queued.
         $service->resetBreaker();
         $service->tripBreaker(900);
-        $service->enqueueJob(null, '/after-trip', false, false, 1);
+        $service->enqueueJob(null, '/privacy', false, false, 1);
         $this->assertNull(
             $service->claimNextJob('w-after-trip'),
             'claimNextJob must return null while breaker is tripped'
@@ -495,24 +496,25 @@ HTML;
 
     public function test_per_tenant_concurrency_cap_blocks_second_job(): void
     {
+        [$tenantA, $tenantB] = $this->seedCmsTenantPair('concurrency-a', 'concurrency-b');
         $service = new PrerenderService();
         $service->resetBreaker();
 
         // First job for tenant 99 gets claimed and stays running.
-        $id1 = $service->enqueueJob(99, '/route-a', false, false, 1);
+        $id1 = $service->enqueueJob($tenantA, '/about', false, false, 1);
         $first = $service->claimNextJob('w');
         $this->assertNotNull($first);
         $service->markRunning((int) $first['id']);
 
         // Second job for the SAME tenant: queued, but claimNextJob skips it.
-        $id2 = $service->enqueueJob(99, '/route-b', false, false, 1);
+        $id2 = $service->enqueueJob($tenantA, '/faq', false, false, 1);
 
         // Third job for a DIFFERENT tenant: should be claimable past the cap.
-        $id3 = $service->enqueueJob(100, '/route-c', false, false, 1);
+        $id3 = $service->enqueueJob($tenantB, '/contact', false, false, 1);
 
         $second = $service->claimNextJob('w');
         $this->assertNotNull($second, 'a different tenant must still be claimable');
-        $this->assertSame($id3, (int) $second['id'], 'tenant 100 should be picked over busy tenant 99');
+        $this->assertSame($id3, (int) $second['id'], 'tenant B should be picked over busy tenant A');
 
         // After finishing tenant 99's first job, tenant 99 should be claimable again.
         $service->finaliseJob($id1, 'succeeded', 1, 1, 0, 0, 1, null);
@@ -672,28 +674,42 @@ HTML;
             'created_at'=> date('Y-m-d H:i:s'),
             'updated_at'=> date('Y-m-d H:i:s'),
         ]);
-        // Snapshot must exist so invalidateRoutes counts a delete.
-        $abs = $this->tmpCache . '/burst-test.example/page-0/index.html';
-        @mkdir(dirname($abs), 0777, true);
-        file_put_contents($abs, '<html/>');
-
         // Reset the burst counter just in case a prior test populated it.
         \Illuminate\Support\Facades\Cache::forget("prerender:burst:tenant:{$tenantId}");
 
         // First 50 invocations should keep their per-route precision.
         $service = new PrerenderService();
         for ($i = 0; $i < 50; $i++) {
-            $abs = $this->tmpCache . "/burst-test.example/page-{$i}/index.html";
+            $slug = "burst-page-{$i}";
+            DB::table('pages')->insert([
+                'tenant_id' => $tenantId,
+                'title' => "Burst page {$i}",
+                'slug' => $slug,
+                'content' => '<p>Burst page</p>',
+                'is_published' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+            $abs = $this->tmpCache . "/burst-test.example/page/{$slug}/index.html";
             @mkdir(dirname($abs), 0777, true);
             file_put_contents($abs, '<html/>');
-            $service->invalidateRoutes($tenantId, ["/page-{$i}"]);
+            $service->invalidateRoutes($tenantId, ["/page/{$slug}"]);
         }
 
         // The 51st should flip to a tenant-wide row (routes=null).
-        $abs = $this->tmpCache . '/burst-test.example/page-51/index.html';
+        DB::table('pages')->insert([
+            'tenant_id' => $tenantId,
+            'title' => 'Burst page 51',
+            'slug' => 'burst-page-51',
+            'content' => '<p>Burst page</p>',
+            'is_published' => 1,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+        $abs = $this->tmpCache . '/burst-test.example/page/burst-page-51/index.html';
         @mkdir(dirname($abs), 0777, true);
         file_put_contents($abs, '<html/>');
-        $service->invalidateRoutes($tenantId, ['/page-51']);
+        $service->invalidateRoutes($tenantId, ['/page/burst-page-51']);
 
         $tenantWide = DB::table('prerender_jobs')
             ->where('tenant_id', $tenantId)
@@ -713,6 +729,31 @@ HTML;
         $service->enqueueJob(null, '/page/tenant-only-page', false, false, null);
     }
 
+    public function test_enqueue_rejects_feature_gated_route_without_tenant_scope(): void
+    {
+        $service = new PrerenderService();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Route requires tenant scope');
+
+        $service->enqueueJob(null, '/jobs', false, false, null);
+    }
+
+    public function test_enqueue_rejects_private_or_tool_routes_inside_dynamic_prefixes(): void
+    {
+        [$tenantId] = $this->seedCmsTenantPair('private-route-owner', 'private-route-other');
+        $service = new PrerenderService();
+
+        foreach (['/listings/create', '/profile/settings'] as $route) {
+            try {
+                $service->enqueueJob($tenantId, $route, false, false, null);
+                $this->fail("Route {$route} should not be accepted for prerender.");
+            } catch (\InvalidArgumentException $e) {
+                $this->assertStringContainsString('Route is not available for tenant', $e->getMessage());
+            }
+        }
+    }
+
     public function test_tenant_scoped_cms_page_route_must_belong_to_that_tenant(): void
     {
         [$ownerId, $otherId, , , $pageSlug] = $this->seedCmsTenantPair('enqueue-owner', 'enqueue-other');
@@ -725,6 +766,39 @@ HTML;
         $this->expectExceptionMessage('Route is not available for tenant');
 
         $service->enqueueJob($otherId, "/page/{$pageSlug}", false, false, null);
+    }
+
+    public function test_tenant_scoped_blog_route_must_belong_to_that_tenant(): void
+    {
+        [$ownerId, $otherId] = $this->seedCmsTenantPair('blog-owner', 'blog-other');
+        $slug = $this->seedBlogPost($ownerId);
+
+        $service = new PrerenderService();
+        $jobId = $service->enqueueJob($ownerId, "/blog/{$slug}", false, false, null);
+        $this->assertGreaterThan(0, $jobId);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Route is not available for tenant');
+
+        $service->enqueueJob($otherId, "/blog/{$slug}", false, false, null);
+    }
+
+    public function test_invalidate_routes_ignores_wrong_tenant_blog_route(): void
+    {
+        [$ownerId, $otherId, , $otherSlug] = $this->seedCmsTenantPair('invalidate-blog-owner', 'invalidate-blog-other');
+        $slug = $this->seedBlogPost($ownerId);
+        $host = $this->frontendHost();
+        $wrongPath = $this->writeSnapshot("{$host}/{$otherSlug}/blog/{$slug}/index.html", '<html><body>wrong tenant</body></html>');
+
+        $service = new PrerenderService();
+        $deleted = $service->invalidateRoutes($otherId, ["/blog/{$slug}"]);
+
+        $this->assertSame(0, $deleted);
+        $this->assertFileExists($wrongPath);
+        $this->assertFalse(
+            DB::table('prerender_jobs')->where('tenant_id', $otherId)->where('routes', "/blog/{$slug}")->exists(),
+            'Wrong-tenant invalidation must not enqueue a recache job.'
+        );
     }
 
     public function test_route_planner_lists_cms_page_only_for_owning_tenant(): void
@@ -832,6 +906,27 @@ HTML;
         $this->assertFileDoesNotExist($this->tmpCache . "/{$host}/{$otherSlug}/page/{$pageSlug}/index.html");
     }
 
+    public function test_purge_unexpected_removes_cross_tenant_blog_snapshot(): void
+    {
+        [$ownerId, , $ownerSlug, $otherSlug] = $this->seedCmsTenantPair('blog-clean-owner', 'blog-clean-other');
+        $slug = $this->seedBlogPost($ownerId);
+        $host = $this->frontendHost();
+        $this->writeSnapshot("{$host}/{$ownerSlug}/blog/{$slug}/index.html", '<html><body>owner</body></html>');
+        $this->writeSnapshot("{$host}/{$otherSlug}/blog/{$slug}/index.html", '<html><body>wrong tenant</body></html>');
+
+        $service = new PrerenderService();
+        $dryRun = $service->purgeUnexpectedSnapshots(true);
+
+        $this->assertContains("/{$otherSlug}/blog/{$slug}", $dryRun['by_tenant'][$otherSlug] ?? []);
+        $this->assertNotContains("/{$ownerSlug}/blog/{$slug}", $dryRun['by_tenant'][$ownerSlug] ?? []);
+
+        $result = $service->purgeUnexpectedSnapshots(false);
+
+        $this->assertSame(1, $result['deleted_total']);
+        $this->assertFileExists($this->tmpCache . "/{$host}/{$ownerSlug}/blog/{$slug}/index.html");
+        $this->assertFileDoesNotExist($this->tmpCache . "/{$host}/{$otherSlug}/blog/{$slug}/index.html");
+    }
+
     public function test_tenant_safety_report_flags_unexpected_cross_tenant_cms_page(): void
     {
         [, , $ownerSlug, $otherSlug, $pageSlug] = $this->seedCmsTenantPair('safety-owner', 'safety-other');
@@ -853,6 +948,34 @@ HTML;
     /**
      * @return array{0:int,1:int,2:string,3:string,4:string}
      */
+    private function seedBlogPost(int $tenantId): string
+    {
+        $now = date('Y-m-d H:i:s');
+        $authorId = (int) DB::table('users')->insertGetId([
+            'tenant_id' => $tenantId,
+            'name' => 'Prerender Blog Author',
+            'email' => 'prerender-blog-' . uniqid() . '@example.test',
+            'is_approved' => 1,
+            'status' => 'active',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+        $slug = 'tenant-owned-post-' . uniqid();
+        DB::table('posts')->insert([
+            'tenant_id' => $tenantId,
+            'author_id' => $authorId,
+            'title' => 'Tenant owned post',
+            'slug' => $slug,
+            'excerpt' => 'Only one tenant owns this post.',
+            'content' => 'Only one tenant owns this post.',
+            'status' => 'published',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        return $slug;
+    }
+
     private function seedCmsTenantPair(string $ownerPrefix, string $otherPrefix): array
     {
         $ownerSlug = $ownerPrefix . '-' . uniqid();

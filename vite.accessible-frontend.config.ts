@@ -6,7 +6,7 @@
 import { defineConfig } from 'vite';
 import path from 'path';
 
-const laravelOrigin = (process.env.ACCESSIBLE_FRONTEND_LARAVEL_ORIGIN || process.env.APP_URL || 'http://127.0.0.1:8088')
+const laravelOrigin = (process.env.ACCESSIBLE_FRONTEND_LARAVEL_ORIGIN || process.env.APP_URL || 'http://127.0.0.1:8090')
   .replace(/\/+$/, '');
 
 const pageRoutePattern = /^\/([a-zA-Z0-9_-]+)(\/alpha(?:\/.*)?|\/?)$/;

@@ -174,12 +174,32 @@ if [ -n "$FILTER_TENANT" ] && [[ ! "$FILTER_TENANT" =~ ^[A-Za-z0-9_-]+$ ]]; then
 fi
 
 ROUTE_RE='^/[A-Za-z0-9._~/%:@!$()*+,;=-]*$'
+route_is_global_explicit_safe() {
+    case "$1" in
+        /|/about|/faq|/contact|/help|/explore|/terms|/privacy|/accessibility|/cookies|\
+/community-guidelines|/trust-and-safety|/acceptable-use|/legal|/terms/versions|\
+/privacy/versions|/accessibility/versions|/cookies/versions|/community-guidelines/versions|\
+/acceptable-use/versions|/timebanking-guide|/regional-analytics|/platform/terms|\
+/platform/privacy|/platform/disclaimer|/features|/changelog|/developers|/developers/auth|\
+/developers/endpoints|/developers/webhooks|/development-status|/pilot-inquiry|/pilot-apply|\
+/partner|/social-prescribing|/impact-report|/impact-summary|/strategic-plan)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
 for ROUTE in "${PUBLIC_ROUTES[@]}"; do
     if [[ ! "$ROUTE" =~ $ROUTE_RE ]]; then
         log_err "Invalid route for pre-rendering: $ROUTE"
         exit 1
     fi
     if [ -n "$FILTER_ROUTES" ] && [ -z "$FILTER_TENANT" ]; then
+        if ! route_is_global_explicit_safe "$ROUTE"; then
+            log_err "Explicit --routes without --tenant is limited to always-public routes: $ROUTE"
+            exit 1
+        fi
         if [[ "$ROUTE" =~ ^/page/[^/]+$ ]] \
             || [[ "$ROUTE" =~ ^/blog/[^/]+$ ]] \
             || [[ "$ROUTE" =~ ^/listings/[^/]+$ ]] \

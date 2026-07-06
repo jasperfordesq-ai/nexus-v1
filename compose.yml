@@ -4,7 +4,7 @@
 # Port: 8090 (http://localhost:8090)
 # This is an ISOLATED stack - does not share networks/volumes with other projects.
 #
-# IMPORTANT: Uses .env.docker for configuration (not .env which is for XAMPP)
+# IMPORTANT: Uses .env.docker for Docker-local configuration.
 #
 # Volume / container naming convention:
 #   Local dev (this file):   `nexus-*` prefix (e.g. nexus-mysql-data)
@@ -118,7 +118,7 @@ services:
     networks:
       - nexus-internal
     ports:
-      # Exposed for the native Windows PHP/Apache dev stack.
+      # Exposed to host tools and native Vite during local development.
       - "127.0.0.1:3307:3306"
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
@@ -140,7 +140,7 @@ services:
     networks:
       - nexus-internal
     ports:
-      # Exposed for the native Windows PHP/Apache dev stack.
+      # Exposed to host tools and native Vite during local development.
       - "127.0.0.1:6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -176,8 +176,8 @@ services:
   # React Frontend (Vite Dev Server)
   # ---------------------------------------------------------------------------
   frontend:
-    # Default local frontend is native Windows Vite on port 5173. Docker Vite on
-    # a Windows bind mount is much slower, so keep this service opt-in only:
+    # Default local frontend is native Vite on port 5173. Docker Vite on a
+    # bind mount can be slower, so keep this service opt-in for container checks:
     #   docker compose --profile docker-frontend up -d frontend
     profiles:
       - docker-frontend

@@ -6,41 +6,49 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class TenantSeeder extends Seeder
 {
+    public const MASTER_TENANT_ID = 1;
+    public const DEFAULT_ADMIN_EMAIL = 'admin@project-nexus.local';
+    public const DEFAULT_ADMIN_PASSWORD = 'ChangeMe123!';
+
     /**
-     * Seed the hour-timebank tenant (tenant_id=2) with categories,
-     * settings, and an admin user.
+     * Seed the master tenant and first-run platform administrator.
      */
     public function run(): void
     {
-        $tenantId = 2;
+        $tenantId = self::MASTER_TENANT_ID;
+        $now = now();
 
-        // Ensure the tenant row exists
         DB::table('tenants')->updateOrInsert(
             ['id' => $tenantId],
             [
-                'name'       => 'Hour Timebank',
-                'slug'       => 'hour-timebank',
-                'domain'     => 'hour-timebank.project-nexus.ie',
-                'is_active'  => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'name'              => 'Master Tenant',
+                'slug'              => null,
+                'domain'            => null,
+                'accessible_domain' => null,
+                'tenant_category'   => 'platform',
+                'tagline'           => 'Project NEXUS master tenant',
+                'is_active'         => 1,
+                'depth'             => 0,
+                'allows_subtenants' => true,
+                'max_depth'         => 3,
+                'created_at'        => $now,
+                'updated_at'        => $now,
             ],
         );
 
-        // Seed default categories
         $categories = [
-            'Home & Garden',
-            'Technology',
-            'Education & Tutoring',
-            'Health & Wellness',
+            'Home and Garden',
+            'Technology Support',
+            'Education and Tutoring',
+            'Health and Wellbeing',
             'Transport',
-            'Creative & Arts',
+            'Creative Arts',
             'Professional Services',
             'Community',
         ];
@@ -52,16 +60,16 @@ class TenantSeeder extends Seeder
                     'slug'       => str($name)->slug()->toString(),
                     'sort_order' => $sort,
                     'is_active'  => 1,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'type'       => 'listing',
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ],
             );
         }
 
-        // Seed tenant settings
         $settings = [
-            'site_name'          => 'Hour Timebank',
-            'currency_name'      => 'Hours',
+            'site_name'          => 'Project NEXUS',
+            'currency_name'      => 'Time Credits',
             'currency_symbol'    => 'hr',
             'default_balance'    => '5.00',
             'registration_mode'  => 'open',
@@ -74,28 +82,54 @@ class TenantSeeder extends Seeder
                 [
                     'setting_value' => $value,
                     'setting_type'  => 'string',
-                    'created_at'    => now(),
-                    'updated_at'    => now(),
+                    'created_at'    => $now,
+                    'updated_at'    => $now,
                 ],
             );
         }
 
-        // Create admin user for the test tenant (skip if already exists)
-        $adminExists = DB::table('users')
-            ->where('tenant_id', $tenantId)
-            ->where('email', 'admin@hour-timebank.test')
-            ->exists();
+        $email = (string) env('NEXUS_BOOTSTRAP_ADMIN_EMAIL', self::DEFAULT_ADMIN_EMAIL);
+        $password = (string) env('NEXUS_BOOTSTRAP_ADMIN_PASSWORD', self::DEFAULT_ADMIN_PASSWORD);
 
-        if (!$adminExists) {
-            User::factory()
-                ->admin()
-                ->forTenant($tenantId)
-                ->create([
-                    'first_name'    => 'Admin',
-                    'last_name'     => 'User',
-                    'name'          => 'Admin User',
-                    'email'         => 'admin@hour-timebank.test',
-                ]);
+        if (app()->environment('production') && $password === self::DEFAULT_ADMIN_PASSWORD) {
+            $this->command?->warn(
+                'Skipping bootstrap admin: set NEXUS_BOOTSTRAP_ADMIN_EMAIL and NEXUS_BOOTSTRAP_ADMIN_PASSWORD in production.'
+            );
+
+            return;
         }
+
+        $passwordHash = Hash::make($password);
+
+        DB::table('users')->updateOrInsert(
+            ['tenant_id' => $tenantId, 'email' => $email],
+            [
+                'first_name'              => 'Platform',
+                'last_name'               => 'Admin',
+                'name'                    => 'Platform Admin',
+                'username'                => $email,
+                'password_hash'           => $passwordHash,
+                'password'                => $passwordHash,
+                'role'                    => 'god',
+                'status'                  => 'active',
+                'is_admin'                => 1,
+                'is_super_admin'          => 1,
+                'is_tenant_super_admin'   => 1,
+                'is_god'                  => 1,
+                'is_approved'             => 1,
+                'is_verified'             => 1,
+                'is_active'               => 1,
+                'email_verified_at'       => $now,
+                'onboarding_completed'    => 1,
+                'profile_type'            => 'individual',
+                'preferred_language'      => 'en',
+                'timezone'                => 'UTC',
+                'totp_setup_required'     => 0,
+                'max_permission_level'    => 100,
+                'permissions_last_updated' => $now,
+                'created_at'              => $now,
+                'updated_at'              => $now,
+            ],
+        );
     }
 }

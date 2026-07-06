@@ -26,8 +26,7 @@ All routes are registered under an `/api` prefix (see `app/Providers/RouteServic
 | Environment | Base URL |
 | --- | --- |
 | Production | `https://api.project-nexus.ie` |
-| Local (native Apache) | `http://127.0.0.1:8088` |
-| Local (Docker PHP profile) | `http://127.0.0.1:8090` |
+| Local Docker PHP | `http://127.0.0.1:8090` |
 
 So a v2 endpoint is reached at, for example, `https://api.project-nexus.ie/api/v2/health`.
 
@@ -50,7 +49,7 @@ The API uses **bearer-token authentication** (`Authorization: Bearer <token>`). 
 ```bash
 curl -X POST "https://api.project-nexus.ie/api/v2/auth/login" \
   -H "Content-Type: application/json" \
-  -H "X-Tenant-Slug: hour-timebank" \
+  -H "X-Tenant-ID: 1" \
   -d '{"email": "you@example.com", "password": "your-password"}'
 ```
 
@@ -61,17 +60,17 @@ A successful response includes a `token` field (plus `access_token`, `refresh_to
 ```bash
 curl "https://api.project-nexus.ie/api/v2/<some-endpoint>" \
   -H "Authorization: Bearer <token>" \
-  -H "X-Tenant-Slug: hour-timebank"
+  -H "X-Tenant-ID: 1"
 ```
 
-> Do not embed real credentials in scripts, issues, or documentation. Use a test tenant (`hour-timebank`) and a throwaway account for examples.
+> Do not embed real credentials in scripts, issues, or documentation. Fresh local installs seed the master tenant as `tenant_id=1`; use a throwaway account for examples.
 
 ### CSRF for cookie/session calls
 
 The bearer-token flow above does not require a CSRF token. If you authenticate via the browser session cookie instead of an `Authorization` header, fetch a CSRF token first and send it back with state-changing (`POST`/`PUT`/`DELETE`) requests:
 
 ```bash
-curl "https://api.project-nexus.ie/api/v2/csrf-token" -H "X-Tenant-Slug: hour-timebank"
+curl "https://api.project-nexus.ie/api/v2/csrf-token" -H "X-Tenant-ID: 1"
 # → { "success": true, "data": { "csrf_token": "<token>" } }
 ```
 
@@ -85,7 +84,7 @@ Prefer the `Authorization: Bearer` header for programmatic/server-to-server inte
 
 ```bash
 curl "https://api.project-nexus.ie/api/v2/health" \
-  -H "X-Tenant-Slug: hour-timebank"
+  -H "X-Tenant-ID: 1"
 ```
 
 **Response (`200 OK`):**

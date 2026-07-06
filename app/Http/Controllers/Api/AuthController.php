@@ -134,7 +134,12 @@ class AuthController extends BaseApiController
                  SELECT u.*, t.configuration, 2 AS _match_priority
                  FROM users u LEFT JOIN tenants t ON u.tenant_id = t.id
                  WHERE u.email = ?
-                   AND (u.is_super_admin = 1 OR u.is_tenant_super_admin = 1 OR u.role = 'super_admin')
+                   AND (
+                       u.is_super_admin = 1
+                       OR u.is_tenant_super_admin = 1
+                       OR u.is_god = 1
+                       OR u.role IN ('super_admin', 'god')
+                   )
                  ORDER BY _match_priority ASC
                  LIMIT 1",
                 [$email, $tenantId, $email]

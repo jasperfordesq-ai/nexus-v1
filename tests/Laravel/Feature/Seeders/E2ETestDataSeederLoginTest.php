@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Seeders;
 
 use App\Services\TenantSettingsService;
 use Database\Seeders\E2ETestDataSeeder;
+use Database\Seeders\TenantSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
@@ -29,26 +30,28 @@ class E2ETestDataSeederLoginTest extends TestCase
     {
         parent::setUp();
 
-        // Make the email-verification login gate active for the test tenant so
+        $this->seed(TenantSeeder::class);
+
+        // Make the email-verification login gate active for the master tenant so
         // this test exercises the exact branch that rejected the unverified
         // seeded user (don't rely on the fail-closed default being in effect).
         DB::table('tenant_settings')->updateOrInsert(
-            ['tenant_id' => $this->testTenantId, 'setting_key' => 'email_verification'],
+            ['tenant_id' => TenantSeeder::MASTER_TENANT_ID, 'setting_key' => 'email_verification'],
             ['setting_value' => 'true', 'setting_type' => 'boolean', 'updated_at' => now()]
         );
-        app(TenantSettingsService::class)->clearCacheForTenant($this->testTenantId);
+        app(TenantSettingsService::class)->clearCacheForTenant(TenantSeeder::MASTER_TENANT_ID);
     }
 
     public function test_seeded_members_pass_the_email_verification_login_gate(): void
     {
-        // The seeder reads E2E_TENANT_ID (default 2 == testTenantId).
+        // The seeder reads E2E_TENANT_ID (default 1 == master tenant).
         $this->seed(E2ETestDataSeeder::class);
 
         $gates = app(TenantSettingsService::class);
 
-        foreach (['test@hour-timebank.ie', 'test2@hour-timebank.ie'] as $email) {
+        foreach (['e2e.user.a@project-nexus.local', 'e2e.user.b@project-nexus.local'] as $email) {
             $user = (array) DB::table('users')
-                ->where('tenant_id', $this->testTenantId)
+                ->where('tenant_id', TenantSeeder::MASTER_TENANT_ID)
                 ->where('email', $email)
                 ->first();
 

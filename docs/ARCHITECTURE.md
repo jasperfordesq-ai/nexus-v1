@@ -83,7 +83,7 @@ New schema changes should use Laravel migrations in `database/migrations/`. The 
 
 Production runs on Apache/Plesk/Azure using the blue/green deployment engine under `scripts/deploy/`. Do not deploy without an explicit user instruction. The maintained deployment reference is [DEPLOYMENT.md](DEPLOYMENT.md); incident response and observability references are [RUNBOOK-INCIDENTS.md](RUNBOOK-INCIDENTS.md), [MONITORING.md](MONITORING.md), [SLO.md](SLO.md), and [SENTRY.md](SENTRY.md).
 
-Routine Windows development uses native Laragon Apache/PHP and native Vite, with Docker used primarily for data services. Docker PHP/frontend profiles exist for container testing and production parity.
+Local development is Docker-first: the Laravel/PHP app, MariaDB, Redis, and Meilisearch run from Docker Compose, while the default React workflow uses native Vite for fast HMR and proxies `/api` to the Docker PHP app. The Docker frontend profile exists for container-specific frontend checks.
 
 ## Documentation Sufficiency
 

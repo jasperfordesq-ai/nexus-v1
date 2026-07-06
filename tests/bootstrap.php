@@ -16,8 +16,9 @@ declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Load testing environment variables.
-// Native Windows development should use .env, not .env.docker: the latter points
-// DB_HOST at the Docker service name `db`, which is unreachable from native PHP.
+// Container test runs should prefer .env.docker because DB_HOST can resolve the
+// Docker service name `db`. Host-side PHP test runs prefer .env.testing/.env,
+// where DB_HOST points at the Compose-published localhost port.
 $isContainer = file_exists('/.dockerenv') || getenv('RUNNING_IN_DOCKER') === '1';
 $envFiles = $isContainer
     ? [

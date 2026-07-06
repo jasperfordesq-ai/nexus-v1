@@ -107,29 +107,26 @@ If a change genuinely needs no release note, state that explicitly in the final 
 
 ---
 
-## Local Development (Native Windows PHP + Native Vite)
+## Local Development (Docker-First)
 
 | Service | URL |
 |---------|-----|
 | **React Frontend** | http://127.0.0.1:5173 |
-| **PHP API** | http://127.0.0.1:8088 |
-| **Shared web root** | http://127.0.0.1/ -> `C:\platforms\htdocs` |
+| **PHP API** | http://127.0.0.1:8090 |
 | **React Admin** | http://127.0.0.1:5173/admin |
 | **Docker DB** | 127.0.0.1:3307 -> MariaDB 3306 |
 | **Docker Redis** | 127.0.0.1:6379 |
 | **Meilisearch** | http://127.0.0.1:7700 |
 
 ```bash
-npm run dev:native      # Start Docker data services + native Apache + native Vite
-npm run dev:frontend    # Start only native Windows Vite on http://127.0.0.1:5173
+npm run dev:docker      # Start Docker PHP, database, Redis, Meilisearch, and native Vite
+npm run dev:frontend    # Start only native Vite on http://127.0.0.1:5173
 npm run dev:accessible-frontend  # Start accessible frontend dev server
 ```
 
-**Important:** Routine local development uses native Windows Apache/PHP through Laragon and native Windows Vite. Docker is only for data services by default: MariaDB, Redis, and Meilisearch. Do not use Docker PHP or Docker Vite for routine local work on Windows unless explicitly testing containers; Windows bind mounts made both painfully slow.
+**Important:** Project NEXUS is Docker-first for local development. The Laravel/PHP API runs in the Docker PHP app on `127.0.0.1:8090`; MariaDB, Redis, and Meilisearch run from the same Compose stack. The default frontend workflow uses native Vite on Windows for fast HMR, proxying `/api` to the Docker PHP app. Use the Docker frontend profile only when deliberately testing the frontend container.
 
-The default NEXUS API is served by Laragon Apache on `127.0.0.1:8088`, with document root `C:\platforms\htdocs\staging\httpdocs`. The global website root is `C:\platforms\htdocs`, served on `127.0.0.1:80`, so other sites can live beside `staging`.
-
-Docker PHP, queue, sales, and frontend are opt-in profiles only:
+Docker queue, sales, and frontend are opt-in profiles:
 
 ```bash
 docker compose --profile docker-php up -d app
@@ -495,7 +492,7 @@ Test environment: `APP_ENV=testing`, `DB_DATABASE=nexus_test`, `CACHE_DRIVER=arr
 >   nexus-php-app php vendor/bin/phpunit tests/Laravel/Unit/Listeners/...
 > ```
 >
-> This applies to CI and any local `docker exec` run. The `-e APP_KEY=...` flag is not needed when running phpunit outside the container (e.g. native PHP), where phpunit.xml's `<env>` is authoritative.
+> This applies to CI and any local `docker exec` run. The `-e APP_KEY=...` flag is not needed when running phpunit directly on the host, where phpunit.xml's `<env>` is authoritative.
 
 ---
 

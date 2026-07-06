@@ -169,7 +169,11 @@ export function TenantSafetyTab({
                             <TableCell>
                               <div className="flex flex-wrap gap-1">
                                 {!row.expected && <Chip size="sm" color="warning" variant="soft">{t('badges.unexpected')}</Chip>}
-                                {row.staleness !== 'fresh' && <Chip size="sm" color={stalenessColor(row.staleness)} variant="soft">{row.staleness}</Chip>}
+                                {row.staleness !== 'fresh' && (
+                                  <Chip size="sm" color={stalenessColor(row.staleness)} variant="soft">
+                                    {t(`staleness.${row.staleness}`)}
+                                  </Chip>
+                                )}
                                 {row.asset_issues.length > 0 && <Chip size="sm" color="danger" variant="soft">{t('badges.assets')}</Chip>}
                                 {row.content_stale && <Chip size="sm" color="warning" variant="soft">{t('badges.content')}</Chip>}
                               </div>

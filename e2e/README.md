@@ -6,7 +6,7 @@ End-to-end tests use Playwright and target the React frontend plus the Laravel A
 
 - Node.js 22+ and npm 10+
 - Local frontend at `http://localhost:5173`
-- Local API, either Docker PHP at `http://localhost:8090` or the maintainer native PHP stack at `http://127.0.0.1:8088`
+- Local API at `http://localhost:8090` from the Docker PHP app
 - Test credentials in `e2e/.env.test` or the appropriate CI secrets
 
 The root Playwright config defaults to `E2E_BASE_URL=http://localhost:5173` and tenant `hour-timebank`.

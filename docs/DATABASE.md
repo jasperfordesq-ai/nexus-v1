@@ -43,8 +43,10 @@ When adding foreign keys, check **column-type consistency** (signed vs unsigned 
 
 ```bash
 docker compose up -d
-docker exec nexus-php-app php artisan migrate   # loads the schema dump, then runs any newer migrations
+docker exec nexus-php-app php artisan migrate --seed
 ```
+
+The seed step creates the master tenant (`tenant_id=1`) and a first-run platform administrator. Development installs default to `admin@project-nexus.local` / `ChangeMe123!`; set `NEXUS_BOOTSTRAP_ADMIN_EMAIL` and `NEXUS_BOOTSTRAP_ADMIN_PASSWORD` before seeding to use different credentials.
 
 After running migrations that change the schema, **refresh the dump and commit it**:
 

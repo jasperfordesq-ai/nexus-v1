@@ -66,9 +66,9 @@ The app reads `EXPO_PUBLIC_API_URL` from environment. Set this in `.env.local`:
 | Target | URL |
 |--------|-----|
 | Production | `https://api.project-nexus.ie` |
-| Android emulator -> local native API | `http://10.0.2.2:8088` |
-| iOS simulator -> local native API | `http://localhost:8088` |
-| Local device on LAN | `http://<your-computer-ip>:8088` |
+| Android emulator -> local Docker API | `http://10.0.2.2:8090` |
+| iOS simulator -> local Docker API | `http://localhost:8090` |
+| Local device on LAN | `http://<your-computer-ip>:8090` |
 
 The default tenant (`EXPO_PUBLIC_DEFAULT_TENANT`) is `hour-timebank`; change this to test with a different tenant.
 

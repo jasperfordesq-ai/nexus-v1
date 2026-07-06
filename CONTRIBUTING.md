@@ -71,10 +71,7 @@ Pull requests are checked automatically. A PR cannot pass the Project NEXUS PR q
 
 ## Development Environment Setup
 
-Project NEXUS supports two local development paths:
-
-- **Public Docker path:** use Docker for the PHP app, database, Redis, Meilisearch, and optional frontend container.
-- **Maintainer Windows path:** use Laragon/Apache/PHP natively plus native Vite, with Docker used for data services. This is the fastest path on the maintainer workstation and is documented in `AGENTS.md`.
+Project NEXUS is Docker-first for local development. Use Docker for the PHP app, database, Redis, and Meilisearch. The default frontend workflow runs Vite natively for fast HMR and proxies `/api` to the Docker PHP app.
 
 ### Prerequisites
 
@@ -85,25 +82,21 @@ Project NEXUS supports two local development paths:
 ### Start the platform
 
 ```bash
-# Start database, Redis, and Meilisearch
-docker compose up -d
-
-# Start the Docker PHP app if you are not using a native PHP/Apache stack
+# Start the Docker PHP app, database, Redis, and Meilisearch
 docker compose --profile docker-php up -d app
 
 # Start the React frontend with native Vite
 npm run dev:frontend
 ```
 
-The first Docker run will pull and build images, which may take several minutes. On Windows maintainer machines, routine PHP/API work uses native Apache at `127.0.0.1:8088`; the Docker PHP app remains available on `localhost:8090` for container-specific checks.
+The first Docker run will pull and build images, which may take several minutes. The Laravel API is available through the Docker PHP app at `localhost:8090`.
 
 ### Service URLs
 
 | Service | URL |
 |---------|-----|
 | React Frontend | http://localhost:5173 |
-| PHP API (Docker profile) | http://localhost:8090 |
-| PHP API (maintainer native stack) | http://127.0.0.1:8088 |
+| PHP API | http://localhost:8090 |
 | Sales Site | http://localhost:3001 |
 | React Admin | http://localhost:5173/admin |
 | phpMyAdmin | http://localhost:8091 (start with `--profile tools`) |
@@ -257,7 +250,7 @@ npm run dev
 # Or from the repository root
 npm run dev:frontend
 
-# Docker Vite is available only when deliberately testing the frontend container
+# Docker Vite is available when deliberately testing the frontend container
 docker compose --profile docker-frontend up -d frontend
 ```
 

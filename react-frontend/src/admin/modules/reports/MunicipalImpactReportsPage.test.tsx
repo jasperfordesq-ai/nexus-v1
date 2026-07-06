@@ -23,7 +23,7 @@ const { mockApi } = vi.hoisted(() => ({
 vi.mock('@/lib/api', () => ({
   api: mockApi,
   default: mockApi,
-  API_BASE: 'http://localhost:8088',
+  API_BASE: 'http://localhost:8090',
   tokenManager: { getToken: vi.fn(() => 'test-token') },
 }));
 

@@ -192,6 +192,45 @@ class AuthControllerTest extends TestCase
         $this->assertContains($response->getStatusCode(), [400, 401, 403]);
     }
 
+    public function test_login_finds_god_account_across_tenant_context(): void
+    {
+        \Illuminate\Support\Facades\DB::table('tenants')->updateOrInsert(
+            ['id' => 1],
+            [
+                'name' => 'Master Tenant',
+                'slug' => null,
+                'is_active' => true,
+                'depth' => 0,
+                'allows_subtenants' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+        $email = 'god_' . uniqid() . '@example.com';
+        User::factory()->forTenant(1)->create([
+            'email' => $email,
+            'password_hash' => Hash::make('correct-password'),
+            'role' => 'god',
+            'is_god' => true,
+            'is_super_admin' => false,
+            'is_tenant_super_admin' => false,
+            'status' => 'active',
+            'is_approved' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/auth/login', [
+            'email' => $email,
+            'password' => 'correct-password',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('success', true);
+        $response->assertJsonPath('user.email', $email);
+        $response->assertJsonPath('user.role', 'god');
+    }
+
     // ================================================================
     // LOGOUT
     // ================================================================

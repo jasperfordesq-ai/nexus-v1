@@ -262,7 +262,7 @@ The `[data-alpha-auto-submit]` attribute on a `<form>` causes its `<select>` ele
 # Build assets (required before deploying or when Sass/TS changes)
 npm run build:accessible-frontend
 
-# Dev server (Vite proxy on :5174 → Laravel on :8088)
+# Dev server (Vite proxy on :5174 -> Docker Laravel on :8090)
 npm run dev:accessible-frontend
 
 # PHP tests (GovukAlphaFrontendTest suite)

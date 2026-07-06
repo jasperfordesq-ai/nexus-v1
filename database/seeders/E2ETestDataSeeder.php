@@ -40,13 +40,41 @@ class E2ETestDataSeeder extends Seeder
             return;
         }
 
-        $tenantId = (int) env('E2E_TENANT_ID', 2);
+        $tenantId = (int) env('E2E_TENANT_ID', TenantSeeder::MASTER_TENANT_ID);
+        if ($tenantId === TenantSeeder::MASTER_TENANT_ID) {
+            $this->call(TenantSeeder::class);
+        }
+
         $now = now();
 
         $users = [
-            ['label' => 'A (primary)',   'email' => env('E2E_USER_EMAIL', 'test@hour-timebank.ie'),         'password' => env('E2E_USER_PASSWORD', 'TestPassword123!'),        'first' => 'E2E', 'last' => 'UserA', 'role' => 'member', 'balance' => 100],
-            ['label' => 'B (secondary)', 'email' => env('E2E_SECOND_USER_EMAIL', 'test2@hour-timebank.ie'), 'password' => env('E2E_SECOND_USER_PASSWORD', 'TestPassword123!'), 'first' => 'E2E', 'last' => 'UserB', 'role' => 'member', 'balance' => 25],
-            ['label' => 'Admin',         'email' => env('E2E_ADMIN_EMAIL', 'admin@hour-timebank.ie'),        'password' => env('E2E_ADMIN_PASSWORD', 'AdminPassword123!'),      'first' => 'E2E', 'last' => 'Admin', 'role' => 'admin',  'balance' => 50],
+            [
+                'label' => 'A (primary)',
+                'email' => env('E2E_USER_EMAIL', 'e2e.user.a@project-nexus.local'),
+                'password' => env('E2E_USER_PASSWORD', 'TestPassword123!'),
+                'first' => 'E2E',
+                'last' => 'UserA',
+                'role' => 'member',
+                'balance' => 100,
+            ],
+            [
+                'label' => 'B (secondary)',
+                'email' => env('E2E_SECOND_USER_EMAIL', 'e2e.user.b@project-nexus.local'),
+                'password' => env('E2E_SECOND_USER_PASSWORD', 'TestPassword123!'),
+                'first' => 'E2E',
+                'last' => 'UserB',
+                'role' => 'member',
+                'balance' => 25,
+            ],
+            [
+                'label' => 'Admin',
+                'email' => env('E2E_ADMIN_EMAIL', 'e2e.admin@project-nexus.local'),
+                'password' => env('E2E_ADMIN_PASSWORD', 'AdminPassword123!'),
+                'first' => 'E2E',
+                'last' => 'Admin',
+                'role' => 'admin',
+                'balance' => 50,
+            ],
         ];
 
         $ids = [];

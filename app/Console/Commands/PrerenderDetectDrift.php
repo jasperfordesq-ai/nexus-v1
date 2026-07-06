@@ -12,6 +12,7 @@ use App\Services\PrerenderService;
 use App\Services\SitemapService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Sitemap drift detector — the "the big names do this" layer.
@@ -65,6 +66,11 @@ class PrerenderDetectDrift extends Command
         $includeMissing = (int) $this->option('include-missing') === 1;
         $priority   = max(1, min(9, (int) ($this->option('priority') ?? PrerenderService::PRIORITY_HIGH)));
         $dryRun     = (bool) $this->option('dry-run');
+
+        if (!Schema::hasTable('prerender_jobs')) {
+            $this->error('prerender_jobs table is missing; run migrations before drift detection can enqueue work.');
+            return self::FAILURE;
+        }
 
         // Build a host → tenant lookup and a (host,route) → snapshot mtime map.
         $tenants = $this->prerender->loadTenantTargets();

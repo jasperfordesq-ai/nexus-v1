@@ -32,7 +32,7 @@ vi.mock('@/admin/api/adminApi', () => ({
 vi.mock('@/lib/api', () => ({
   api: mockApi,
   default: mockApi,
-  API_BASE: 'http://localhost:8088/api',
+  API_BASE: 'http://localhost:8090/api',
 }));
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));

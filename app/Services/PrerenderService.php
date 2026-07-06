@@ -844,19 +844,19 @@ class PrerenderService
      */
     public function invalidateRoutes(int $tenantId, array $routes, bool $enqueueRecache = true): int
     {
+        $target = $this->tenantTargetById($tenantId);
+        if (!$target) return 0;
+        $host = $target['host'];
+        $prefix = $target['prefix'];
+
         $routes = array_values(array_unique(array_filter(
             $routes,
             fn($r) => is_string($r)
                 && $r !== ''
                 && $r[0] === '/'
-                && !$this->isUnsupportedPublicRoute($r)
+                && $this->tenantRouteCanBePrerendered($tenantId, $r, $target)
         )));
         if (empty($routes)) return 0;
-
-        $target = $this->tenantTargetById($tenantId);
-        if (!$target) return 0;
-        $host = $target['host'];
-        $prefix = $target['prefix'];
 
         $deleted = 0;
         foreach ($routes as $route) {
@@ -1022,6 +1022,7 @@ class PrerenderService
             '#^/organisations/[^/]+$#',
             '#^/ideation/[^/]+$#',
             '#^/kb/[^/]+$#',
+            '#^/profile/[^/]+$#',
             '#^/volunteering/opportunities/[^/]+$#',
             '#^/marketplace/(?!free$|map$|category/)[^/]+$#',
             '#^/marketplace/category/[^/]+$#',
@@ -1034,6 +1035,11 @@ class PrerenderService
         }
 
         return false;
+    }
+
+    public static function routeCanBeGlobalExplicit(string $route): bool
+    {
+        return in_array($route, self::ALWAYS_PUBLIC_ROUTES, true);
     }
 
     public function enqueueJob(
@@ -1060,10 +1066,13 @@ class PrerenderService
                     if (!preg_match(self::ROUTE_REGEX, $tok)) {
                         throw new \InvalidArgumentException("Invalid route in enqueueJob: {$tok}");
                     }
-                    if ($tenantId === null && self::routeRequiresTenantScope($tok)) {
+                    if (
+                        $tenantId === null
+                        && (self::routeRequiresTenantScope($tok) || !self::routeCanBeGlobalExplicit($tok))
+                    ) {
                         throw new \InvalidArgumentException("Route requires tenant scope in enqueueJob: {$tok}");
                     }
-                    if ($tenantId !== null && !$this->tenantOwnedRouteExistsForTenant($tenantId, $tok)) {
+                    if ($tenantId !== null && !$this->tenantRouteCanBePrerendered($tenantId, $tok)) {
                         throw new \InvalidArgumentException("Route is not available for tenant in enqueueJob: {$tok}");
                     }
                 }
@@ -1350,13 +1359,17 @@ class PrerenderService
         $g('nexus_prerender_failures_recent',    $s['recent_failures'], 'Cache paths inside failure-backoff window');
         $g('nexus_prerender_coverage_ratio',     $s['expected_count'] > 0 ? round($s['total_snapshots'] / $s['expected_count'], 4) : 0,
            'Snapshots present / expected (0..1)');
+        $hasJobsTable = Schema::hasTable('prerender_jobs');
+        $g('nexus_prerender_job_table_available', $hasJobsTable ? 1 : 0, 'prerender_jobs table exists and can be queried');
 
         // Per-status job counts (counters reflect lifetime, not since-reboot).
-        $statusCounts = DB::table('prerender_jobs')
-            ->select('status', DB::raw('COUNT(*) as n'))
-            ->groupBy('status')
-            ->pluck('n', 'status')
-            ->toArray();
+        $statusCounts = $hasJobsTable
+            ? DB::table('prerender_jobs')
+                ->select('status', DB::raw('COUNT(*) as n'))
+                ->groupBy('status')
+                ->pluck('n', 'status')
+                ->toArray()
+            : [];
         $lines[] = '# HELP nexus_prerender_jobs_total Lifetime job counts by status';
         $lines[] = '# TYPE nexus_prerender_jobs_total counter';
         foreach (['queued','claimed','running','succeeded','partial','failed','cancelled'] as $st) {
@@ -1397,7 +1410,9 @@ class PrerenderService
         $g('nexus_prerender_breaker_until_seconds', $breakerUntil ?? 0, 'Unix ts when breaker auto-resumes (0 = closed)');
 
         // Oldest queued job age in seconds — the most useful queue-health number.
-        $oldestQueuedRaw = DB::table('prerender_jobs')->where('status', 'queued')->min('queued_at');
+        $oldestQueuedRaw = $hasJobsTable
+            ? DB::table('prerender_jobs')->where('status', 'queued')->min('queued_at')
+            : null;
         $oldestQueuedAge = $oldestQueuedRaw ? max(0, time() - strtotime($oldestQueuedRaw)) : 0;
         $g('nexus_prerender_queue_oldest_age_seconds', $oldestQueuedAge, 'Age of the oldest queued job (0 if queue empty)');
 
@@ -1672,8 +1687,8 @@ class PrerenderService
             }
 
             if (
-                str_starts_with($tenantLocalRoute, '/page/')
-                && !$this->cmsPageExistsForTenant((int) $snapshotTenantId, $tenantLocalRoute)
+                $this->isDynamicContentRoute($tenantLocalRoute)
+                && !$this->tenantRouteCanBePrerendered((int) $snapshotTenantId, $tenantLocalRoute)
             ) {
                 $byTenant[$snapshotTenantSlug ?? '(unknown)'][] = $row['route'];
                 $deletedTotal++;
@@ -1747,7 +1762,7 @@ class PrerenderService
     {
         static $prefixes = [
             '/blog/', '/listings/', '/events/', '/jobs/', '/marketplace/',
-            '/marketplace/category/', '/groups/', '/volunteering/',
+            '/marketplace/category/', '/groups/', '/profile/', '/volunteering/',
             '/volunteering/opportunities/', '/organisations/',
             '/ideation/', '/kb/', '/page/',
         ];
@@ -1777,7 +1792,153 @@ class PrerenderService
             return $this->cmsPageExistsForTenant($tenantId, $tenantLocalRoute);
         }
 
-        return true;
+        if (preg_match('#^/blog/([^/]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('posts')
+                && DB::table('posts')
+                    ->where('tenant_id', $tenantId)
+                    ->where('slug', $m[1])
+                    ->where('status', 'published')
+                    ->exists();
+        }
+
+        if (preg_match('#^/listings/([0-9]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('listings')
+                && DB::table('listings')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', (int) $m[1])
+                    ->where('status', 'active')
+                    ->where(function ($q) {
+                        $q->whereNull('expires_at')->orWhere('expires_at', '>', DB::raw('NOW()'));
+                    })
+                    ->exists();
+        }
+
+        if (preg_match('#^/events/([0-9]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('events')
+                && DB::table('events')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', (int) $m[1])
+                    ->where(function ($q) {
+                        $q->whereNull('status')->orWhereIn('status', ['active', 'completed']);
+                    })
+                    ->exists();
+        }
+
+        if (preg_match('#^/groups/([0-9]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('groups')
+                && DB::table('groups')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', (int) $m[1])
+                    ->where('visibility', 'public')
+                    ->where('is_active', 1)
+                    ->exists();
+        }
+
+        if (preg_match('#^/jobs/([0-9]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('job_vacancies')
+                && DB::table('job_vacancies')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', (int) $m[1])
+                    ->where('status', 'open')
+                    ->exists();
+        }
+
+        if (preg_match('#^/volunteering/opportunities/([0-9]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('vol_opportunities')
+                && DB::table('vol_opportunities')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', (int) $m[1])
+                    ->where('status', 'open')
+                    ->where('is_active', 1)
+                    ->exists();
+        }
+
+        if (preg_match('#^/ideation/([0-9]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('ideation_challenges')
+                && DB::table('ideation_challenges')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', (int) $m[1])
+                    ->whereIn('status', ['open', 'voting', 'evaluating'])
+                    ->exists();
+        }
+
+        if (preg_match('#^/kb/([0-9]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('knowledge_base_articles')
+                && DB::table('knowledge_base_articles')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', (int) $m[1])
+                    ->where('is_published', 1)
+                    ->exists();
+        }
+
+        if (preg_match('#^/organisations/([0-9]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('organizations')
+                && DB::table('organizations')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', (int) $m[1])
+                    ->where('status', 'active')
+                    ->exists();
+        }
+
+        if (preg_match('#^/profile/([0-9]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('users')
+                && DB::table('users')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', (int) $m[1])
+                    ->where('is_approved', 1)
+                    ->exists();
+        }
+
+        if (preg_match('#^/marketplace/([0-9]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('marketplace_listings')
+                && DB::table('marketplace_listings')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', (int) $m[1])
+                    ->where('status', 'active')
+                    ->where('moderation_status', 'approved')
+                    ->exists();
+        }
+
+        if (preg_match('#^/marketplace/category/([^/]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('marketplace_categories')
+                && DB::table('marketplace_categories')
+                    ->where(function ($q) use ($tenantId) {
+                        $q->where('tenant_id', $tenantId)->orWhereNull('tenant_id');
+                    })
+                    ->where('slug', $m[1])
+                    ->where('is_active', 1)
+                    ->exists();
+        }
+
+        return false;
+    }
+
+    public function tenantRouteCanBePrerendered(int $tenantId, string $tenantLocalRoute, ?array $tenantTarget = null): bool
+    {
+        if ($tenantId <= 0 || $tenantLocalRoute === '' || $tenantLocalRoute[0] !== '/') {
+            return false;
+        }
+        if ($this->isUnsupportedPublicRoute($tenantLocalRoute)) {
+            return false;
+        }
+
+        if (self::routeRequiresTenantScope($tenantLocalRoute)) {
+            return $this->tenantOwnedRouteExistsForTenant($tenantId, $tenantLocalRoute);
+        }
+
+        if ($tenantTarget === null) {
+            $tenantTarget = $this->tenantTargetById($tenantId);
+        }
+        if ($tenantTarget === null) {
+            return false;
+        }
+
+        $tenantObject = (object) [
+            'features' => $tenantTarget['features'] ?? null,
+            'configuration' => $tenantTarget['configuration'] ?? null,
+        ];
+
+        return in_array($tenantLocalRoute, $this->routesForTenant($tenantObject), true);
     }
 
     private function isUnsupportedPublicRoute(string $route): bool

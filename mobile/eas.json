@@ -38,7 +38,7 @@
         "key": "nexus-local-emulator-v1"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://10.0.2.2:8088",
+        "EXPO_PUBLIC_API_URL": "http://10.0.2.2:8090",
         "EXPO_PUBLIC_DEFAULT_TENANT": "hour-timebank",
         "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }

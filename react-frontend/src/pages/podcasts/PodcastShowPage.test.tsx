@@ -24,7 +24,7 @@ vi.mock('@/lib/api', () => ({
     patch: vi.fn(),
     delete: vi.fn(),
   },
-  API_BASE: 'http://localhost:8088',
+  API_BASE: 'http://localhost:8090',
 }));
 
 const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() };

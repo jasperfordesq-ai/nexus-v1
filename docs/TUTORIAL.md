@@ -78,10 +78,17 @@ Next, start the Docker PHP app container (this serves the Laravel API):
 docker compose --profile docker-php up -d app
 ```
 
-Run the database migrations to create the schema:
+Run the database migrations and first-run seed data:
 
 ```bash
-docker exec nexus-php-app php artisan migrate
+docker exec nexus-php-app php artisan migrate --seed
+```
+
+The seeder creates the master tenant (`tenant_id=1`) and a local platform administrator. Unless you changed `NEXUS_BOOTSTRAP_ADMIN_EMAIL` or `NEXUS_BOOTSTRAP_ADMIN_PASSWORD` in your env file, the first login is:
+
+```text
+Email: admin@project-nexus.local
+Password: ChangeMe123!
 ```
 
 Finally, install the frontend dependencies and start the Vite dev server:
@@ -156,7 +163,7 @@ Change the `"beta"` value — for example, to `"Beta (active)"` — so you have 
 
 Save the file.
 
-Now go to your browser and navigate to http://localhost:5173/features. Because Vite watches the file system, the page reloads automatically. You should see the chip label updated. If the page is blank, add a tenant slug prefix that matches your local setup (e.g. `/hour-timebank/features`).
+Now go to your browser and navigate to http://localhost:5173/features. Because Vite watches the file system, the page reloads automatically. You should see the chip label updated.
 
 You have just made a real, traceable change through the translation system — the same system used for every user-facing string across all 11 supported languages.
 

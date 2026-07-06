@@ -45,6 +45,10 @@ class PrerenderAutoRecacheTest extends TestCase
         \App\Core\TenantContext::setById(self::TENANT_ID);
 
         $this->service = Mockery::mock(PrerenderService::class);
+        $this->service
+            ->shouldReceive('tenantRouteCanBePrerendered')
+            ->byDefault()
+            ->andReturn(true);
         $this->app->instance(PrerenderService::class, $this->service);
     }
 

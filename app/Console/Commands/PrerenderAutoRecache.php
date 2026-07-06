@@ -11,6 +11,7 @@ namespace App\Console\Commands;
 use App\Services\PrerenderService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Continuous freshness loop. Walks the deep inventory, identifies snapshots
@@ -47,6 +48,11 @@ class PrerenderAutoRecache extends Command
         $includeContent = (int) $this->option('include-content') === 1;
         $dryRun = (bool) $this->option('dry-run');
 
+        if (!Schema::hasTable('prerender_jobs')) {
+            $this->error('prerender_jobs table is missing; run migrations before auto-recache can enqueue work.');
+            return self::FAILURE;
+        }
+
         // Walk the deep inventory (asset issues + content drift checks).
         $inventory = $this->service->inventory(null, true);
         if (empty($inventory)) {
@@ -80,7 +86,7 @@ class PrerenderAutoRecache extends Command
             );
             if ($slug === null || $tenantLocalRoute === null) continue; // Snapshot for a host we don't recognise.
             $tenantId = (int) ($targetsBySlug[$slug]['tenant_id'] ?? 0);
-            if ($tenantId > 0 && !$this->service->tenantOwnedRouteExistsForTenant($tenantId, $tenantLocalRoute)) {
+            if ($tenantId > 0 && !$this->service->tenantRouteCanBePrerendered($tenantId, $tenantLocalRoute, $targetsBySlug[$slug] ?? null)) {
                 continue;
             }
 
@@ -182,7 +188,7 @@ class PrerenderAutoRecache extends Command
     private function resolveSnapshotTenantRoute(string $host, string $route, array $targets): array
     {
         foreach ($targets as $target) {
-            $prefix = (string) $target['prefix'];
+            $prefix = (string) ($target['prefix'] ?? '');
             if ($prefix === '') {
                 return [(string) $target['slug'], $route];
             }

@@ -58,7 +58,7 @@ body:
       options:
         - Production (project-nexus.ie)
         - Local — Docker setup
-        - Local — native (Laragon/Vite) setup
+        - Local — Docker setup with native Vite
         - Other
     validations:
       required: true

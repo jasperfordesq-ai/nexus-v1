@@ -72,7 +72,7 @@ Time banking is a community-based system where members exchange services using t
 | **Search** | Meilisearch |
 | **CDN** | Cloudflare |
 | **Real-Time** | Pusher (WebSockets) + Firebase Cloud Messaging |
-| **Dev Environment** | Docker data services + native Vite/PHP on Windows; Docker PHP profile available |
+| **Dev Environment** | Docker-first local stack; native Vite proxies to Docker PHP |
 | **Icons** | Lucide React |
 | **Animations** | CSS transitions via a local motion shim (no framer-motion) |
 | **Charts** | Recharts |
@@ -138,34 +138,37 @@ cd nexus-v1
 # Copy the example environment file and fill in your values
 cp .env.docker.example .env.docker
 
-# Start database, Redis, and Meilisearch
-docker compose up -d
-
-# Start Docker PHP if you are using the containerized backend
+# Start the Docker PHP app, database, Redis, and Meilisearch
 docker compose --profile docker-php up -d app
 
-# Start the React frontend with native Vite
+# Start the React frontend with native Vite (proxies /api to Docker PHP)
 npm run dev:frontend
 
-# Run Laravel migrations to set up the database schema
-docker exec nexus-php-app php artisan migrate
+# Run Laravel migrations and first-run seed data
+docker exec nexus-php-app php artisan migrate --seed
 
 # Access the application
 # React Frontend: http://localhost:5173
-# PHP API:        http://localhost:8090 (Docker) or http://127.0.0.1:8088 (maintainer native)
+# PHP API:        http://localhost:8090
 # Sales Site:     http://localhost:3001
-# Accessible UI:  http://localhost:8090/hour-timebank/alpha
+# Accessible UI:  http://localhost:8090/alpha
+#
+# First login, unless you changed NEXUS_BOOTSTRAP_ADMIN_* in your env file:
+# Email:    admin@project-nexus.local
+# Password: ChangeMe123!
 
 # Native app packaging is separate from the default Docker workflow
 ```
 
 ## Database Setup
 
-Run Laravel migrations after starting Docker to create the schema:
+Run Laravel migrations and the first-run seeder after starting Docker:
 
 ```bash
-docker exec nexus-php-app php artisan migrate
+docker exec nexus-php-app php artisan migrate --seed
 ```
+
+The first-run seeder creates the master tenant (`tenant_id=1`) and a local platform administrator. The default development credentials are `admin@project-nexus.local` / `ChangeMe123!`; override them with `NEXUS_BOOTSTRAP_ADMIN_EMAIL` and `NEXUS_BOOTSTRAP_ADMIN_PASSWORD` before seeding.
 
 The full current schema dump is committed at [database/schema/mysql-schema.sql](database/schema/mysql-schema.sql). Zero-downtime deployments use a blue/green container switch (see `scripts/deploy/bluegreen-deploy.sh`).
 

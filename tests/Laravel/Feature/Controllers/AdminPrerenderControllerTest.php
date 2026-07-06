@@ -114,6 +114,9 @@ class AdminPrerenderControllerTest extends TestCase
 
         $this->apiPost('/v2/admin/prerender/jobs', ['routes' => '/page/tenant-only-page'])
             ->assertStatus(400);
+
+        $this->apiPost('/v2/admin/prerender/jobs', ['routes' => '/jobs'])
+            ->assertStatus(400);
     }
 
     public function test_purge_rejects_all_tenant_delete_without_confirmation(): void

@@ -11,7 +11,7 @@ export default defineConfig({
   timeout: 30000,
   reporter: [['list']],
   use: {
-    baseURL: process.env.E2E_ALPHA_BASE_URL || 'http://127.0.0.1:8088',
+    baseURL: process.env.E2E_ALPHA_BASE_URL || 'http://127.0.0.1:8090',
     ignoreHTTPSErrors: true,
   },
   projects: [

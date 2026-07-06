@@ -55,10 +55,43 @@ if [ -z "$CLAIM_OUT" ]; then
 fi
 
 # Validate output before eval — every line must match KEY=VALUE with safe chars.
-if ! echo "$CLAIM_OUT" | grep -Eq "^JOB_ID=[0-9]+$"; then
+if [ "$(printf '%s\n' "$CLAIM_OUT" | sed '/^[[:space:]]*$/d' | wc -l)" -ne 5 ]; then
     log "FATAL: unexpected claim output: $CLAIM_OUT"
     exit 1
 fi
+while IFS= read -r line; do
+    case "$line" in
+        JOB_ID=*)
+            [[ "${line#JOB_ID=}" =~ ^[0-9]+$ ]] || { log "FATAL: unsafe job id in claim output"; exit 1; }
+            ;;
+        JOB_TENANT_SLUG=\'*\')
+            value="${line#JOB_TENANT_SLUG=\'}"
+            value="${value%\'}"
+            [[ "$value" =~ ^[A-Za-z0-9_-]*$ ]] || { log "FATAL: unsafe tenant slug in claim output"; exit 1; }
+            ;;
+        JOB_ROUTES=\'*\')
+            value="${line#JOB_ROUTES=\'}"
+            value="${value%\'}"
+            printf '%s' "$value" | grep -Eq '^[A-Za-z0-9._~/%:@!$()*+,;=-]*$' || { log "FATAL: unsafe routes in claim output"; exit 1; }
+            ;;
+        JOB_FORCE=*)
+            [[ "${line#JOB_FORCE=}" =~ ^[01]$ ]] || { log "FATAL: unsafe force flag in claim output"; exit 1; }
+            ;;
+        JOB_DRY_RUN=*)
+            [[ "${line#JOB_DRY_RUN=}" =~ ^[01]$ ]] || { log "FATAL: unsafe dry-run flag in claim output"; exit 1; }
+            ;;
+        *)
+            log "FATAL: unexpected claim output: $CLAIM_OUT"
+            exit 1
+            ;;
+    esac
+done <<< "$CLAIM_OUT"
+for required_key in JOB_ID JOB_TENANT_SLUG JOB_ROUTES JOB_FORCE JOB_DRY_RUN; do
+    if ! printf '%s\n' "$CLAIM_OUT" | grep -Eq "^${required_key}="; then
+        log "FATAL: missing ${required_key} in claim output"
+        exit 1
+    fi
+done
 # shellcheck disable=SC1090
 eval "$CLAIM_OUT"
 
