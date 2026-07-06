@@ -15,6 +15,9 @@ composer.phar
 .env.*
 !.env.docker.example
 !.env.example
+/env
+/env.docker
+/env.testing
 .cloudflare-api-token
 .build-version
 
