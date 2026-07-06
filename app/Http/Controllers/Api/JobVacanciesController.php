@@ -2314,37 +2314,38 @@ class JobVacanciesController extends BaseApiController
         }
 
         // Build AI prompt
-        $jobDescription = "Title: {$vacancy->title}\n"
-            . "Type: {$vacancy->type}\n"
-            . "Commitment: {$vacancy->commitment}\n"
-            . "Skills Required: " . ($vacancy->skills_required ?? 'Not specified') . "\n"
-            . "Description: " . substr($vacancy->description ?? '', 0, 500);
+        $jobDescription = __('api.job_ai_ranking_job_description', [
+            'title' => $vacancy->title,
+            'type' => $vacancy->type,
+            'commitment' => $vacancy->commitment,
+            'skills' => $vacancy->skills_required ?? __('api.job_ai_not_specified'),
+            'description' => substr($vacancy->description ?? '', 0, 500),
+        ]);
 
         $candidateList = '';
         foreach ($candidateProfiles as $i => $c) {
-            $candidateList .= "\n---\nCandidate " . ($i + 1) . " (Application ID: {$c['application_id']}):\n"
-                . "Name: {$c['name']}\n"
-                . "Skills: {$c['skills']}\n"
-                . "XP: {$c['xp']} | Level: {$c['level']} | Completed Exchanges: {$c['completed_exchanges']}\n"
-                . "Avg Review Rating: " . ($c['avg_review_rating'] ?? 'No reviews') . " | Badges: {$c['badges_earned']}\n"
-                . "Skills Match: " . ($c['match_percentage'] !== null ? "{$c['match_percentage']}%" : 'N/A') . "\n"
-                . "Cover Message: " . substr($c['cover_message'], 0, 200) . "\n"
-                . "Bio: " . substr($c['bio'], 0, 200);
+            $candidateList .= "\n---\n" . __('api.job_ai_ranking_candidate', [
+                'number' => $i + 1,
+                'application_id' => $c['application_id'],
+                'name' => $c['name'],
+                'skills' => $c['skills'],
+                'xp' => $c['xp'],
+                'level' => $c['level'],
+                'completed_exchanges' => $c['completed_exchanges'],
+                'avg_review_rating' => $c['avg_review_rating'] ?? __('api.job_ai_no_reviews'),
+                'badges' => $c['badges_earned'],
+                'match' => $c['match_percentage'] !== null ? "{$c['match_percentage']}%" : __('api.job_ai_not_applicable'),
+                'cover_message' => substr($c['cover_message'], 0, 200),
+                'bio' => substr($c['bio'], 0, 200),
+            ]);
         }
 
-        $systemPrompt = "You are a hiring assistant for a community timebanking platform. "
-            . "Rank candidates for a job vacancy based on skills match, experience, and community trust signals. "
-            . "Community trust signals (XP, completed exchanges, review ratings, badges) are IMPORTANT — "
-            . "they indicate how active and trusted a member is in the community. "
-            . "A candidate with high community engagement and good reviews is more reliable.\n\n"
-            . "Return a JSON array (and NOTHING else) with objects containing:\n"
-            . "- application_id (int)\n"
-            . "- rank (int, 1 = best)\n"
-            . "- score (int, 0-100)\n"
-            . "- reason (string, 1-2 sentences explaining the ranking)\n\n"
-            . "Sort by rank ascending (best first).";
+        $systemPrompt = __('api.job_ai_ranking_system_prompt');
 
-        $userPrompt = "JOB:\n{$jobDescription}\n\nCANDIDATES:{$candidateList}";
+        $userPrompt = __('api.job_ai_ranking_user_prompt', [
+            'job' => $jobDescription,
+            'candidates' => $candidateList,
+        ]);
 
         try {
             $response = \App\Services\AI\AIServiceFactory::chatWithFallback(

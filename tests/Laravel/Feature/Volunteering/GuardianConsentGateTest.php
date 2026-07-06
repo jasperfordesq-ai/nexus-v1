@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Volunteering;
 
 use App\Core\TenantContext;
 use App\Models\User;
+use App\Services\VolunteeringConfigurationService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
@@ -23,12 +24,36 @@ class GuardianConsentGateTest extends TestCase
 {
     use DatabaseTransactions;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        TenantContext::setById($this->testTenantId);
+        VolunteeringConfigurationService::set(
+            VolunteeringConfigurationService::CONFIG_GUARDIAN_CONSENT_REQUIRED,
+            true
+        );
+    }
+
     private function makeOpportunityWithShift(): array
     {
+        $orgOwner = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+
+        $orgId = (int) DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $orgOwner->id,
+            'name' => 'Consent Gate Test Org',
+            'status' => 'approved',
+            'created_at' => now(),
+        ]);
+
         $oppId = (int) DB::table('vol_opportunities')->insertGetId([
             'tenant_id' => $this->testTenantId,
+            'organization_id' => $orgId,
+            'created_by' => $orgOwner->id,
             'title' => 'Consent Gate Test Opportunity',
             'description' => 'x',
+            'status' => 'active',
             'is_active' => 1,
             'created_at' => now(),
         ]);

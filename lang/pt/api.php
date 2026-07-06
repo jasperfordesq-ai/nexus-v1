@@ -2140,4 +2140,11 @@ return [
     'job_prediction_ai_prompt'             => "Given these job posting metrics, write 3 brief, actionable insights (1 sentence each) as a JSON array of strings:\n\nJob: :title (:type)\nDays posted: :days\nApplications: :applications (avg for similar: :avg_applications)\nViews: :views (avg: :avg_views)\nConversion: :conversion% (avg: :avg_conversion%)\n:salary_lineSimilar filled jobs analyzed: :similar_count\n\nReturn ONLY a JSON array of 3 strings. No markdown.",
     'job_time_credits_earned_description'  => 'Time credits earned: :title',
 
+    'job_ai_no_reviews'                   => 'No reviews',
+    'job_ai_not_applicable'                => 'N/A',
+    'job_ai_ranking_job_description'       => "Title: :title\nType: :type\nCommitment: :commitment\nSkills Required: :skills\nDescription: :description",
+    'job_ai_ranking_candidate'             => "Candidate :number (Application ID: :application_id):\nName: :name\nSkills: :skills\nXP: :xp | Level: :level | Completed Exchanges: :completed_exchanges\nAvg Review Rating: :avg_review_rating | Badges: :badges\nSkills Match: :match\nCover Message: :cover_message\nBio: :bio",
+    'job_ai_ranking_system_prompt'         => "You are a hiring assistant for a community timebanking platform. Rank candidates for a job vacancy based on skills match, experience, and community trust signals. Community trust signals (XP, completed exchanges, review ratings, badges) are IMPORTANT - they indicate how active and trusted a member is in the community. A candidate with high community engagement and good reviews is more reliable.\n\nReturn a JSON array (and NOTHING else) with objects containing:\n- application_id (int)\n- rank (int, 1 = best)\n- score (int, 0-100)\n- reason (string, 1-2 sentences explaining the ranking)\n\nSort by rank ascending (best first).",
+    'job_ai_ranking_user_prompt'           => "JOB:\n:job\n\nCANDIDATES::candidates",
+
 ];

@@ -31,7 +31,7 @@ class VolOpportunityTest extends TestCase
     {
         $expected = [
             'tenant_id', 'created_by', 'organization_id', 'title', 'description',
-            'location', 'skills_needed', 'start_date', 'end_date', 'category_id',
+            'location', 'is_remote', 'latitude', 'longitude', 'skills_needed', 'start_date', 'end_date', 'category_id',
             'status', 'is_active', 'federated_visibility',
         ];
         $this->assertEquals($expected, $this->model->getFillable());

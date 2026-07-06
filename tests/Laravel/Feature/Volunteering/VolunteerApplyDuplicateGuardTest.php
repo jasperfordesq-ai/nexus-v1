@@ -51,13 +51,25 @@ class VolunteerApplyDuplicateGuardTest extends TestCase
 
     private function makeOpportunity(int $creatorId): int
     {
+        $orgId = (int) DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => self::TENANT_ID,
+            'user_id' => $creatorId,
+            'name' => 'Apply race test org',
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         return (int) DB::table('vol_opportunities')->insertGetId([
             'tenant_id' => self::TENANT_ID,
+            'organization_id' => $orgId,
             'title' => 'Apply race test opportunity',
             'description' => 'x',
+            'status' => 'active',
             'is_active' => 1,
             'created_by' => $creatorId,
             'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 

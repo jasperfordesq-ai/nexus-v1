@@ -99,6 +99,25 @@ class VolunteerFlowIntegrationTest extends \Tests\Laravel\TestCase
         $user2   = $this->createUser('wl-flow-user2');
         $user3   = $this->createUser('wl-flow-user3');
         [, $shiftId] = $this->createOpportunityAndShift($ownerId);
+        $opportunityId = (int) Database::query(
+            'SELECT opportunity_id FROM vol_shifts WHERE id = ? AND tenant_id = ?',
+            [$shiftId, self::TENANT_ID]
+        )->fetchColumn();
+        $occupant = $this->createUser('wl-flow-occupant');
+        Database::query(
+            'UPDATE vol_shifts SET capacity = 1 WHERE id = ? AND tenant_id = ?',
+            [$shiftId, self::TENANT_ID]
+        );
+        Database::query(
+            "INSERT INTO vol_applications (tenant_id, opportunity_id, user_id, shift_id, status, created_at) VALUES (?, ?, ?, ?, 'approved', NOW())",
+            [self::TENANT_ID, $opportunityId, $occupant, $shiftId]
+        );
+        foreach ([$user1, $user2, $user3] as $waitlistUserId) {
+            Database::query(
+                "INSERT INTO vol_applications (tenant_id, opportunity_id, user_id, shift_id, status, created_at) VALUES (?, ?, ?, NULL, 'approved', NOW())",
+                [self::TENANT_ID, $opportunityId, $waitlistUserId]
+            );
+        }
 
         ShiftWaitlistService::join($shiftId, $user1);
         ShiftWaitlistService::join($shiftId, $user2);

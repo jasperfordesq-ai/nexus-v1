@@ -43,6 +43,8 @@ class WaitlistFlowTest extends TestCase
             'tenant_id' => $this->testTenantId,
             'user_id' => $orgOwner->id,
             'name' => 'Waitlist Test Org',
+            'status' => 'approved',
+            'created_at' => now(),
         ]);
 
         $oppId = (int) DB::table('vol_opportunities')->insertGetId([
@@ -50,6 +52,10 @@ class WaitlistFlowTest extends TestCase
             'organization_id' => $orgId,
             'title' => 'Waitlist Test Opportunity',
             'description' => 'Test',
+            'status' => 'active',
+            'is_active' => 1,
+            'created_by' => $orgOwner->id,
+            'created_at' => now(),
         ]);
 
         $shiftId = (int) DB::table('vol_shifts')->insertGetId([
@@ -242,6 +248,15 @@ class WaitlistFlowTest extends TestCase
         ['shiftId' => $shiftId, 'oppId' => $oppId] = $this->createShift(1);
         $waiter = User::factory()->forTenant($this->testTenantId)->create();
         TenantContext::setById($this->testTenantId);
+        DB::table('vol_applications')->insert([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $oppId,
+            'shift_id' => null,
+            'user_id' => $waiter->id,
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         $entry = $this->addWaitlistEntry($shiftId, (int) $waiter->id, 1, 'notified', now()->toDateTimeString());
 
         $ok = ShiftWaitlistService::promoteUser($entry, $this->testTenantId);

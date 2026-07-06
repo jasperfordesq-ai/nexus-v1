@@ -29,6 +29,7 @@ vi.mock('react-router-dom', () => {
     Link: ({ children, to, ...rest }: { children: ReactNode; to: string; [k: string]: unknown }) =>
       <a href={String(to)} {...rest}>{children}</a>,
     useSearchParams: () => [new URLSearchParams(), vi.fn()],
+    useLocation: () => ({ pathname: '/test/jobs/1', search: '', hash: '', state: null, key: 'test' }),
   };
 });
 
@@ -76,36 +77,28 @@ vi.mock('@/contexts', () => ({
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
+vi.mock('@/components/social', () => ({ SocialInteractionPanel: () => null }));
 
-vi.mock('@/components/ui', () => {
-  const makeStub = (name: string) => ({ children, label, title, description, onPress, onClick, onValueChange, ...props }: Record<string, unknown>) => {
-    const lower = name.toLowerCase();
-    if (lower.includes('button')) {
-      return <button type="button" onClick={(onPress ?? onClick) as (() => void) | undefined}>{(children ?? label ?? title) as ReactNode}</button>;
-    }
-    if (lower.includes('input') || lower.includes('textarea') || lower.includes('field') || lower.includes('select')) {
-      return <input placeholder={props.placeholder as string | undefined} onChange={(event) => typeof onValueChange === 'function' && (onValueChange as (value: string) => void)(event.target.value)} />;
-    }
-    if (lower.includes('switch') || lower.includes('checkbox')) {
-      return <label><input type="checkbox" />{children as ReactNode}</label>;
-    }
-    if (lower.includes('skeleton') || lower.includes('spinner')) {
-      return <div role="status" />;
-    }
-    return <div>{label as ReactNode}{title as ReactNode}{description as ReactNode}{children as ReactNode}</div>;
-  };
-
-  return new Proxy({}, {
-    get(_target, prop) {
-      if (typeof prop === 'symbol') return undefined;
-      if (prop === '__esModule') return true;
-      if (prop === 'default') return undefined;
-      if (prop === 'useConfirm') return () => () => Promise.resolve(true);
-      if (/^use[A-Z]/.test(prop)) return () => ({});
-      return makeStub(String(prop));
-    },
-  });
-});
+vi.mock('@/components/ui', () => ({
+  GlassCard: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+  Button: ({ children, onPress, onClick, 'aria-label': ariaLabel }: Record<string, unknown>) => (
+    <button
+      type="button"
+      aria-label={ariaLabel as string | undefined}
+      onClick={(onPress ?? onClick) as (() => void) | undefined}
+    >
+      {children as ReactNode}
+    </button>
+  ),
+  CardRowsSkeleton: () => <div role="status" />,
+  useDisclosure: () => ({
+    isOpen: false,
+    onOpen: vi.fn(),
+    onClose: vi.fn(),
+    onOpenChange: vi.fn(),
+  }),
+}));
 
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (
@@ -130,6 +123,73 @@ vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
   formatDateValue: vi.fn((value) => String(value ?? '')),
 }));
+
+vi.mock('@/components/jobs/JobDetailHeader', () => ({
+  JobDetailHeader: ({ vacancy, isOwner, isSaved, isPastDeadline, formatSalary }: Record<string, unknown>) => {
+    const job = vacancy as { title?: string; is_featured?: boolean; salary_min?: number };
+    return (
+      <header>
+        <h1>{job.title}</h1>
+        {job.is_featured && <span>featured</span>}
+        {job.salary_min ? <span>{(formatSalary as (v: unknown) => string)(job)}</span> : null}
+        {!isOwner && <button aria-label={isSaved ? 'saved.unsave' : 'saved.save'}>{isSaved ? 'saved.unsave' : 'saved.save'}</button>}
+        {isOwner && <a>detail.edit</a>}
+        {isOwner && <button>detail.delete</button>}
+        {isOwner && isPastDeadline && <button>detail.renew</button>}
+        {isOwner && <a>detail.analytics</a>}
+      </header>
+    );
+  },
+}));
+
+vi.mock('@/components/jobs/JobOwnerBanner', () => ({
+  JobOwnerBanner: () => (
+    <section>
+      <a>detail.edit</a>
+      <button>detail.delete</button>
+      <a>detail.analytics</a>
+    </section>
+  ),
+}));
+
+vi.mock('@/components/jobs/InlineInterviewCard', () => ({ InlineInterviewCard: () => <div>inline_response.interview</div> }));
+vi.mock('@/components/jobs/InlineOfferCard', () => ({ InlineOfferCard: () => <div>inline_response.offer</div> }));
+vi.mock('@/components/jobs/JobDescriptionCard', () => ({
+  JobDescriptionCard: ({ vacancy, isAuthenticated, isOwner, onCheckQualification }: Record<string, unknown>) => {
+    const job = vacancy as { description?: string; skills?: string[] };
+    return (
+      <section>
+        <div>{job.description}</div>
+        {job.skills?.map((skill) => <span key={skill}>{skill}</span>)}
+        {isAuthenticated && !isOwner && <button onClick={onCheckQualification as () => void}>detail.check_qualification</button>}
+      </section>
+    );
+  },
+}));
+vi.mock('@/components/jobs/JobApplicationsList', () => ({ JobApplicationsList: () => <section>applications.title</section> }));
+vi.mock('@/components/jobs/JobPipelineRules', () => ({ JobPipelineRules: () => <section>pipeline_rules.title</section> }));
+vi.mock('@/components/jobs/JobMetadataSidebar', () => ({
+  JobMetadataSidebar: ({ vacancy, formatSalary }: Record<string, unknown>) => {
+    const job = vacancy as { salary_min?: number };
+    return <aside>{job.salary_min ? <span>{(formatSalary as (v: unknown) => string)(job)}</span> : null}</aside>;
+  },
+}));
+vi.mock('@/components/jobs/ApplySection', () => ({
+  ApplySection: ({ vacancy, isOwner, savedProfile }: Record<string, unknown>) => {
+    const job = vacancy as { has_applied?: boolean };
+    if (isOwner || job.has_applied) return null;
+    return <button>{savedProfile ? 'apply.quick_apply' : 'apply.button'}</button>;
+  },
+}));
+vi.mock('@/components/jobs/JobModals', () => ({
+  ApplyModal: () => null,
+  QualificationModal: () => null,
+  RenewModal: () => null,
+  DeleteModal: () => null,
+  DeclineModal: () => null,
+}));
+vi.mock('@/components/jobs/SimilarJobs', () => ({ SimilarJobs: () => null }));
+vi.mock('@/components/jobs/AiChatDrawer', () => ({ AiChatDrawer: () => null }));
 
 import { JobDetailPage } from './JobDetailPage';
 import { api } from '@/lib/api';

@@ -76,69 +76,117 @@ vi.mock('@/contexts', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-vi.mock('@/components/ui', async () => {
-  const React = await import('react');
-  const { uiMock } = await import('@/test/uiMock');
-
-  // The salary fields use HeroUI's NumberField compound API:
-  //   <NumberField value onChange><Label/><NumberField.Group><NumberField.Input aria-label/></NumberField.Group></NumberField>
-  // The generic uiMock collapses this to a leaf input that drops both the
-  // <Label> child (breaks getByText) and the input's aria-label (breaks
-  // getByLabelText). Provide a faithful compound stub: the root supplies
-  // value/onChange via context, renders its children, and NumberField.Input
-  // renders a real labeled <input type="number"> that forwards onChange as a
-  // parsed number — matching the component's `onChange={(n) => ...}` contract.
-  const NumberFieldCtx = React.createContext<{
+vi.mock('@/components/ui', () => {
+  let currentNumberField: {
     value?: number;
     onChange?: (n: number | undefined) => void;
     isDisabled?: boolean;
-  }>({});
+  } = {};
 
-  function NumberFieldRoot(props: Record<string, unknown>) {
-    const { value, onChange, isDisabled, children } = props as {
-      value?: number;
-      onChange?: (n: number | undefined) => void;
-      isDisabled?: boolean;
-      children?: React.ReactNode;
-    };
-    return React.createElement(
-      NumberFieldCtx.Provider,
-      { value: { value, onChange, isDisabled } },
-      React.createElement('div', null, children),
+  const resolveChildren = (children: unknown) =>
+    typeof children === 'function' ? (children as (arg: unknown) => ReactNode)(vi.fn()) : children as ReactNode;
+
+  const Container = ({ children, label, title, description }: Record<string, unknown>) => (
+    <div>
+      {label as ReactNode}
+      {title as ReactNode}
+      {description as ReactNode}
+      {resolveChildren(children)}
+    </div>
+  );
+
+  const Button = ({ children, onPress, onClick, isDisabled }: Record<string, unknown>) => (
+    <button
+      type="button"
+      disabled={isDisabled === true}
+      onClick={(onPress ?? onClick) as (() => void) | undefined}
+    >
+      {children as ReactNode}
+    </button>
+  );
+
+  const Input = ({ label, placeholder, value, onValueChange, onChange }: Record<string, unknown>) => {
+    const input = (
+      <input
+        placeholder={placeholder as string | undefined}
+        value={(value as string | undefined) ?? ''}
+        onChange={(event) => {
+          if (typeof onValueChange === 'function') (onValueChange as (next: string) => void)(event.target.value);
+          if (typeof onChange === 'function') (onChange as (event: unknown) => void)(event);
+        }}
+      />
     );
-  }
-  function NumberFieldGroup(props: Record<string, unknown>) {
-    return React.createElement('div', null, props.children as React.ReactNode);
-  }
-  function NumberFieldInput(props: Record<string, unknown>) {
-    const ctx = React.useContext(NumberFieldCtx);
-    return React.createElement('input', {
-      type: 'number',
-      'aria-label': props['aria-label'] as string | undefined,
-      className: props.className as string | undefined,
-      value: ctx.value ?? '',
-      disabled: ctx.isDisabled || undefined,
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (typeof ctx.onChange === 'function') {
-          const raw = e.target.value;
-          ctx.onChange(raw === '' ? undefined : Number(raw));
-        }
-      },
-    });
-  }
+    return label ? <label>{label as ReactNode}{input}</label> : input;
+  };
+
+  const Textarea = Input;
+
+  const Switch = ({ children, onValueChange }: Record<string, unknown>) => (
+    <label>
+      <input
+        type="checkbox"
+        onChange={(event) => typeof onValueChange === 'function' && (onValueChange as (next: boolean) => void)(event.target.checked)}
+      />
+      {children as ReactNode}
+    </label>
+  );
+
+  const NumberFieldRoot = ({ value, onChange, isDisabled, children }: Record<string, unknown>) => {
+    currentNumberField = {
+      value: value as number | undefined,
+      onChange: onChange as ((n: number | undefined) => void) | undefined,
+      isDisabled: isDisabled as boolean | undefined,
+    };
+    return <div>{children as ReactNode}</div>;
+  };
   const NumberFieldStub = Object.assign(NumberFieldRoot, {
-    Group: NumberFieldGroup,
-    Input: NumberFieldInput,
+    Group: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+    Input: ({ 'aria-label': ariaLabel }: Record<string, unknown>) => (
+      <input
+        type="number"
+        aria-label={ariaLabel as string | undefined}
+        value={currentNumberField.value ?? ''}
+        disabled={currentNumberField.isDisabled || undefined}
+        onChange={(event) => {
+          const raw = event.target.value;
+          currentNumberField.onChange?.(raw === '' ? undefined : Number(raw));
+        }}
+      />
+    ),
     DecrementButton: () => null,
     IncrementButton: () => null,
   });
 
-  return new Proxy(uiMock, {
-    get(target, prop) {
-      if (prop === 'NumberField') return NumberFieldStub;
-      return Reflect.get(target, prop);
-    },
+  const Chip = Object.assign(Container, {
+    Label: ({ children }: { children?: ReactNode }) => <span>{children}</span>,
   });
+
+  return {
+    Chip,
+    CloseButton: Button,
+    Select: Container,
+    SelectItem: Container,
+    GlassCard: Container,
+    Dropdown: Container,
+    DropdownTrigger: Container,
+    DropdownMenu: Container,
+    DropdownItem: Container,
+    Button,
+    Input,
+    Textarea,
+    Modal: Container,
+    ModalContent: Container,
+    ModalHeader: Container,
+    ModalBody: Container,
+    ModalFooter: Container,
+    Avatar: Container,
+    Switch,
+    Tooltip: Container,
+    CardRowsSkeleton: () => <div role="status" />,
+    NumberField: NumberFieldStub,
+    Label: ({ children }: { children?: ReactNode }) => <span>{children}</span>,
+    useConfirm: () => () => Promise.resolve(true),
+  };
 });
 
 vi.mock('@/components/feedback', () => ({
