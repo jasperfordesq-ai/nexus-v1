@@ -63,6 +63,7 @@ interface Application {
   id: number;
   status: string;
   message: string | null;
+  shift_id: number | null;
   created_at: string;
 }
 
@@ -294,6 +295,7 @@ interface ApplicationsPanelProps {
 function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
   const toast = useToast();
   const { t } = useTranslation('volunteering');
+  const { volunteeringConfig } = useTenant();
   const [applications, setApplications] = useState<OppApplicationItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -304,6 +306,10 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
   const [nameSearch, setNameSearch] = useState('');
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [isBulkRunning, setIsBulkRunning] = useState(false);
+  const declineModal = useDisclosure();
+  const [pendingDeclineIds, setPendingDeclineIds] = useState<number[]>([]);
+  const [declineNote, setDeclineNote] = useState('');
+  const declineNoteRequired = Boolean(volunteeringConfig?.['volunteering.require_org_note_on_decline']);
   const tRef = useRef(t);
   tRef.current = t;
   const toastRef = useRef(toast);
@@ -359,10 +365,12 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
     return () => { abortApplicationsRef.current?.abort(); };
   }, [statusFilter]);
 
-  async function handleAction(applicationId: number, action: 'approve' | 'decline') {
+  async function handleAction(applicationId: number, action: 'approve' | 'decline', orgNote = '') {
     setActionLoading((prev) => ({ ...prev, [applicationId]: true }));
     try {
-      const response = await api.put(`/v2/volunteering/applications/${applicationId}`, { action });
+      const body: { action: 'approve' | 'decline'; org_note?: string } = { action };
+      if (orgNote.trim()) body.org_note = orgNote.trim();
+      const response = await api.put(`/v2/volunteering/applications/${applicationId}`, body);
       if (response.success) {
         toast.success(action === 'approve' ? t('applications.approved') : t('applications.declined'));
         setApplications((prev) =>
@@ -419,7 +427,34 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
     }
   }
 
+  function openDeclineModal(ids: number[]) {
+    setPendingDeclineIds(ids);
+    setDeclineNote('');
+    declineModal.onOpen();
+  }
+
+  async function confirmDecline() {
+    if (declineNoteRequired && !declineNote.trim()) return;
+    const ids = pendingDeclineIds;
+    if (ids.length === 0) return;
+
+    setIsBulkRunning(ids.length > 1);
+    try {
+      for (const id of ids) {
+        await handleAction(id, 'decline', declineNote.trim());
+      }
+      setSelected(new Set());
+      declineModal.onClose();
+      setPendingDeclineIds([]);
+      setDeclineNote('');
+      if (ids.length > 1) loadApplications(statusFilter);
+    } finally {
+      setIsBulkRunning(false);
+    }
+  }
+
   return (
+    <>
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
       <GlassCard className="p-6 space-y-4">
         <div className="flex items-center gap-3 flex-wrap">
@@ -504,7 +539,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
               isLoading={isBulkRunning}
               isDisabled={isBulkRunning}
               startContent={!isBulkRunning ? <XCircle className="w-3.5 h-3.5" /> : undefined}
-              onPress={() => handleBulkAction('decline')}
+              onPress={() => openDeclineModal(Array.from(selected))}
             >
               {t('applications.decline_all')}
             </Button>
@@ -603,7 +638,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                       variant="danger-soft"
                       startContent={<XCircle className="w-3.5 h-3.5" aria-hidden="true" />}
                       isLoading={actionLoading[app.id]}
-                      onPress={() => handleAction(app.id, 'decline')}
+                      onPress={() => openDeclineModal([app.id])}
                     >
                       {t('applications.decline')}
                     </Button>
@@ -630,6 +665,45 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
         )}
       </GlassCard>
     </motion.div>
+    <Modal isOpen={declineModal.isOpen} onClose={declineModal.onClose} size="md" classNames={{
+      base: 'bg-overlay border border-theme-default',
+    }}>
+      <ModalContent>
+        <ModalHeader className="text-theme-primary">{t('applications.decline_modal_title')}</ModalHeader>
+        <ModalBody className="space-y-4">
+          <p className="text-sm text-theme-muted">
+            {t('applications.decline_modal_description', { count: pendingDeclineIds.length })}
+          </p>
+          <Textarea
+            label={t('applications.decline_note_label')}
+            placeholder={t('applications.decline_note_placeholder')}
+            value={declineNote}
+            onValueChange={setDeclineNote}
+            minRows={3}
+            isRequired={declineNoteRequired}
+            classNames={{
+              input: 'bg-transparent text-theme-primary',
+              inputWrapper: 'bg-theme-elevated border-theme-default',
+            }}
+          />
+          {declineNoteRequired && !declineNote.trim() && (
+            <p className="text-xs text-danger">{t('applications.decline_note_required')}</p>
+          )}
+        </ModalBody>
+        <ModalFooter>
+          <Button variant="tertiary" onPress={declineModal.onClose}>{t('applications.cancel')}</Button>
+          <Button
+            variant="danger-soft"
+            onPress={confirmDecline}
+            isLoading={isBulkRunning}
+            isDisabled={declineNoteRequired && !declineNote.trim()}
+          >
+            {t('applications.decline_confirm')}
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+    </>
   );
 }
 
@@ -654,6 +728,7 @@ export function OpportunityDetailPage() {
   const [applyMessage, setApplyMessage] = useState('');
   const [isApplying, setIsApplying] = useState(false);
   const [selectedShiftId, setSelectedShiftId] = useState<number | null>(null);
+  const [shiftAction, setShiftAction] = useState<{ id: number; type: 'signup' | 'cancel' | 'waitlist' } | null>(null);
 
   // Guardian consent modal — opened when the API gates a minor with
   // GUARDIAN_CONSENT_REQUIRED (under-18 member without an active consent).
@@ -725,6 +800,32 @@ export function OpportunityDetailPage() {
     }
   }
 
+  async function handleShiftAction(shiftId: number, type: 'signup' | 'cancel' | 'waitlist') {
+    try {
+      setShiftAction({ id: shiftId, type });
+      const endpoint = type === 'waitlist'
+        ? `/v2/volunteering/shifts/${shiftId}/waitlist`
+        : `/v2/volunteering/shifts/${shiftId}/signup`;
+      const response = type === 'cancel'
+        ? await api.delete(endpoint)
+        : await api.post(endpoint, {});
+
+      if (response.success) {
+        toast.success(t(`opportunity.shift_${type}_success`));
+        load();
+      } else if (response.code === 'GUARDIAN_CONSENT_REQUIRED') {
+        guardianModal.onOpen();
+      } else {
+        toast.error(response.error || t(`opportunity.shift_${type}_failed`));
+      }
+    } catch (err) {
+      logError(`Failed to ${type} shift`, err);
+      toast.error(t(`opportunity.shift_${type}_failed`));
+    } finally {
+      setShiftAction(null);
+    }
+  }
+
   async function handleFederatedShareChange(share: boolean) {
     if (!id) return;
     const visibility = share ? 'listed' : 'none';
@@ -778,6 +879,8 @@ export function OpportunityDetailPage() {
 
   const opp = opportunity;
   const upcomingShifts = (opp.shifts || []).filter((s) => new Date(s.start_time) >= new Date());
+  const approvedApplication = opp.application?.status === 'approved' ? opp.application : null;
+  const currentShiftId = approvedApplication?.shift_id ?? null;
   const cleanDescription = opp.description?.replace(/\s+/g, ' ').trim();
   const seoDescription = cleanDescription?.slice(0, 160)
     || t('opportunity.meta_description_fallback', {
@@ -977,7 +1080,11 @@ export function OpportunityDetailPage() {
               {t('opportunity.upcoming_shifts')}
             </h2>
             <div className="space-y-2">
-              {upcomingShifts.map((shift) => (
+              {upcomingShifts.map((shift) => {
+                const isCurrentShift = currentShiftId === shift.id;
+                const isOpenShift = shift.spots_available === null || shift.spots_available > 0;
+                const activeShiftAction = shiftAction?.id === shift.id ? shiftAction.type : null;
+                return (
                 <div
                   key={shift.id}
                   className="flex flex-col gap-3 p-3 rounded-xl bg-theme-elevated border border-theme-default sm:flex-row sm:items-center sm:justify-between"
@@ -993,19 +1100,59 @@ export function OpportunityDetailPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 sm:justify-end">
+                  <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                     <Users className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
                     <span className="text-xs text-theme-muted">
                       {shift.signup_count}{shift.capacity ? `/${shift.capacity}` : ''}
                     </span>
-                    {(shift.spots_available === null || shift.spots_available > 0) ? (
+                    {isCurrentShift ? (
+                      <Chip size="sm" variant="soft" color="success">{t('opportunity.shift_signed_up')}</Chip>
+                    ) : isOpenShift ? (
                       <Chip size="sm" variant="soft" color="success">{t('opportunity.shift_open')}</Chip>
                     ) : (
                       <Chip size="sm" variant="soft" className="bg-danger/10 text-danger">{t('opportunity.shift_full')}</Chip>
                     )}
+                    {isAuthenticated && approvedApplication && (
+                      <>
+                        {isCurrentShift ? (
+                          <Button
+                            size="sm"
+                            variant="tertiary"
+                            className="text-theme-muted"
+                            isLoading={activeShiftAction === 'cancel'}
+                            isDisabled={!!shiftAction}
+                            onPress={() => handleShiftAction(shift.id, 'cancel')}
+                          >
+                            {t('opportunity.cancel_shift_signup')}
+                          </Button>
+                        ) : isOpenShift ? (
+                          <Button
+                            size="sm"
+                            className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+                            isLoading={activeShiftAction === 'signup'}
+                            isDisabled={!!shiftAction}
+                            onPress={() => handleShiftAction(shift.id, 'signup')}
+                          >
+                            {currentShiftId ? t('opportunity.switch_shift') : t('opportunity.sign_up_shift')}
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="bg-theme-elevated text-theme-muted"
+                            isLoading={activeShiftAction === 'waitlist'}
+                            isDisabled={!!shiftAction}
+                            onPress={() => handleShiftAction(shift.id, 'waitlist')}
+                          >
+                            {t('opportunity.join_waitlist')}
+                          </Button>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </GlassCard>
         </motion.div>

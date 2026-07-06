@@ -23,7 +23,8 @@ import Crown from 'lucide-react/icons/crown';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Hourglass from 'lucide-react/icons/hourglass';
 import XCircle from 'lucide-react/icons/circle-x';
-import { GlassCard, useDisclosure, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup, CardRowsSkeleton } from '@/components/ui';
+import Plus from 'lucide-react/icons/plus';
+import { GlassCard, useDisclosure, Button, Chip, Input, Select, SelectItem, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -64,6 +65,28 @@ interface GroupReservation {
   created_at: string;
 }
 
+interface GroupOption {
+  id: number;
+  name: string;
+}
+
+interface OpportunityOption {
+  id: number;
+  title: string;
+  organization?: {
+    name?: string;
+  };
+}
+
+interface ShiftOption {
+  id: number;
+  start_time: string;
+  end_time: string;
+  capacity: number | null;
+  signup_count?: number;
+  spots_available?: number | null;
+}
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
@@ -92,6 +115,19 @@ const memberStatusIcon = (status: string) => {
   }
 };
 
+function extractItems<T>(payload: unknown): T[] {
+  if (Array.isArray(payload)) return payload as T[];
+  if (payload && typeof payload === 'object') {
+    const wrapped = payload as { items?: T[]; data?: T[] | { items?: T[] } };
+    if (Array.isArray(wrapped.items)) return wrapped.items;
+    if (Array.isArray(wrapped.data)) return wrapped.data;
+    if (wrapped.data && typeof wrapped.data === 'object' && Array.isArray(wrapped.data.items)) {
+      return wrapped.data.items;
+    }
+  }
+  return [];
+}
+
 export function GroupSignUpTab() {
   const { t } = useTranslation('volunteering');
   const toast = useToast();
@@ -106,6 +142,21 @@ export function GroupSignUpTab() {
   const [selectedMember, setSelectedMember] = useState<{ id: number; name: string } | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
+
+  // Create reservation modal
+  const reservationModal = useDisclosure();
+  const [groupOptions, setGroupOptions] = useState<GroupOption[]>([]);
+  const [opportunityOptions, setOpportunityOptions] = useState<OpportunityOption[]>([]);
+  const [shiftOptions, setShiftOptions] = useState<ShiftOption[]>([]);
+  const [reserveGroupId, setReserveGroupId] = useState('');
+  const [reserveOpportunityId, setReserveOpportunityId] = useState('');
+  const [reserveShiftId, setReserveShiftId] = useState('');
+  const [reserveSlots, setReserveSlots] = useState('1');
+  const [reserveNotes, setReserveNotes] = useState('');
+  const [isLoadingReservationOptions, setIsLoadingReservationOptions] = useState(false);
+  const [isLoadingShifts, setIsLoadingShifts] = useState(false);
+  const [isReserving, setIsReserving] = useState(false);
+  const [reservationError, setReservationError] = useState<string | null>(null);
 
   // Debounced member search state — /v2/users never returns email, so members
   // are matched by selecting a suggestion (id), not by typing an email.
@@ -208,6 +259,72 @@ export function GroupSignUpTab() {
     onOpen();
   };
 
+  const resetReservationForm = () => {
+    setReserveGroupId(groupOptions.length === 1 ? String(groupOptions[0]?.id ?? '') : '');
+    setReserveOpportunityId('');
+    setReserveShiftId('');
+    setReserveSlots('1');
+    setReserveNotes('');
+    setShiftOptions([]);
+    setReservationError(null);
+  };
+
+  const loadReservationOptions = useCallback(async () => {
+    try {
+      setIsLoadingReservationOptions(true);
+      setReservationError(null);
+      const [groupsRes, opportunitiesRes] = await Promise.all([
+        api.get<GroupOption[]>('/v2/groups?member=me&per_page=100'),
+        api.get<OpportunityOption[]>('/v2/volunteering/opportunities?per_page=100'),
+      ]);
+
+      const groups = groupsRes.success ? extractItems<GroupOption>(groupsRes.data) : [];
+      const opportunities = opportunitiesRes.success ? extractItems<OpportunityOption>(opportunitiesRes.data) : [];
+      setGroupOptions(groups);
+      setOpportunityOptions(opportunities);
+      if (groups.length === 1) {
+        setReserveGroupId(String(groups[0]?.id ?? ''));
+      }
+    } catch (err) {
+      logError('Failed to load group reservation options', err);
+      setReservationError(tRef.current('group_signup.reserve_load_error'));
+    } finally {
+      setIsLoadingReservationOptions(false);
+    }
+  }, []);
+
+  const openReservationModal = () => {
+    resetReservationForm();
+    reservationModal.onOpen();
+    loadReservationOptions();
+  };
+
+  const loadShiftsForOpportunity = async (opportunityId: string) => {
+    setReserveOpportunityId(opportunityId);
+    setReserveShiftId('');
+    setShiftOptions([]);
+    if (!opportunityId) return;
+
+    try {
+      setIsLoadingShifts(true);
+      setReservationError(null);
+      const response = await api.get<ShiftOption[]>(`/v2/volunteering/opportunities/${opportunityId}/shifts`);
+      if (response.success) {
+        const now = Date.now();
+        setShiftOptions(
+          extractItems<ShiftOption>(response.data).filter((shift) => new Date(shift.start_time).getTime() >= now),
+        );
+      } else {
+        setReservationError(response.error || tRef.current('group_signup.reserve_shifts_error'));
+      }
+    } catch (err) {
+      logError('Failed to load shifts for group reservation', err);
+      setReservationError(tRef.current('group_signup.reserve_shifts_error'));
+    } finally {
+      setIsLoadingShifts(false);
+    }
+  };
+
   // Clean up debounce timer and abort controller on unmount
   useEffect(() => {
     return () => {
@@ -246,6 +363,37 @@ export function GroupSignUpTab() {
     }
   };
 
+  const handleCreateReservation = async () => {
+    if (!reserveGroupId || !reserveShiftId || !reserveSlots) {
+      setReservationError(tRef.current('group_signup.reserve_required'));
+      return;
+    }
+
+    try {
+      setIsReserving(true);
+      setReservationError(null);
+      const response = await api.post(`/v2/volunteering/shifts/${reserveShiftId}/group-reserve`, {
+        group_id: parseInt(reserveGroupId, 10),
+        reserved_slots: parseInt(reserveSlots, 10),
+        notes: reserveNotes.trim() || undefined,
+      });
+
+      if (response.success) {
+        toastRef.current.success(tRef.current('group_signup.reserve_success'));
+        reservationModal.onClose();
+        resetReservationForm();
+        load();
+      } else {
+        setReservationError(response.error || tRef.current('group_signup.reserve_error'));
+      }
+    } catch (err) {
+      logError('Failed to create group reservation', err);
+      setReservationError(tRef.current('group_signup.reserve_error'));
+    } finally {
+      setIsReserving(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -254,15 +402,25 @@ export function GroupSignUpTab() {
           <Users className="w-5 h-5 text-violet-400" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary">{t('group_signup.title')}</h2>
         </div>
-        <Button
-          size="sm"
-          variant="tertiary"
-          startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
-          onPress={load}
-          isDisabled={isLoading}
-        >
-          {t('common.refresh')}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            size="sm"
+            className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+            startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+            onPress={openReservationModal}
+          >
+            {t('group_signup.reserve_slots')}
+          </Button>
+          <Button
+            size="sm"
+            variant="tertiary"
+            startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+            onPress={load}
+            isDisabled={isLoading}
+          >
+            {t('common.refresh')}
+          </Button>
+        </div>
       </div>
 
       {/* Error */}
@@ -487,6 +645,108 @@ export function GroupSignUpTab() {
               startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
             >
               {t('group_signup.add_member')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Create Reservation Modal */}
+      <Modal isOpen={reservationModal.isOpen} onClose={reservationModal.onClose} size="lg" classNames={{
+        base: 'bg-overlay border border-theme-default',
+      }}>
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">{t('group_signup.reserve_modal_title')}</ModalHeader>
+          <ModalBody className="space-y-4">
+            {reservationError && (
+              <p className="text-sm text-danger">{reservationError}</p>
+            )}
+            <Select
+              label={t('group_signup.reserve_group')}
+              selectedKeys={reserveGroupId ? [reserveGroupId] : []}
+              onSelectionChange={(keys) => {
+                const value = Array.from(keys)[0] as string | undefined;
+                setReserveGroupId(value ?? '');
+              }}
+              isLoading={isLoadingReservationOptions}
+              isDisabled={isLoadingReservationOptions}
+              variant="secondary"
+              isRequired
+            >
+              {groupOptions.map((group) => (
+                <SelectItem key={group.id.toString()} id={group.id.toString()}>
+                  {group.name}
+                </SelectItem>
+              ))}
+            </Select>
+            <Select
+              label={t('group_signup.reserve_opportunity')}
+              selectedKeys={reserveOpportunityId ? [reserveOpportunityId] : []}
+              onSelectionChange={(keys) => {
+                const value = Array.from(keys)[0] as string | undefined;
+                loadShiftsForOpportunity(value ?? '');
+              }}
+              isLoading={isLoadingReservationOptions}
+              isDisabled={isLoadingReservationOptions}
+              variant="secondary"
+              isRequired
+            >
+              {opportunityOptions.map((opportunity) => (
+                <SelectItem key={opportunity.id.toString()} id={opportunity.id.toString()}>
+                  {opportunity.organization?.name
+                    ? t('group_signup.reserve_opportunity_option', { title: opportunity.title, organization: opportunity.organization.name })
+                    : opportunity.title}
+                </SelectItem>
+              ))}
+            </Select>
+            <Select
+              label={t('group_signup.reserve_shift')}
+              selectedKeys={reserveShiftId ? [reserveShiftId] : []}
+              onSelectionChange={(keys) => {
+                const value = Array.from(keys)[0] as string | undefined;
+                setReserveShiftId(value ?? '');
+              }}
+              isLoading={isLoadingShifts}
+              isDisabled={!reserveOpportunityId || isLoadingShifts}
+              variant="secondary"
+              isRequired
+            >
+              {shiftOptions.map((shift) => (
+                <SelectItem key={shift.id.toString()} id={shift.id.toString()}>
+                  {t('group_signup.reserve_shift_option', {
+                    date: new Date(shift.start_time).toLocaleDateString(),
+                    start: new Date(shift.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    end: new Date(shift.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  })}
+                </SelectItem>
+              ))}
+            </Select>
+            <Input
+              label={t('group_signup.reserve_slots_label')}
+              type="number"
+              min="1"
+              value={reserveSlots}
+              onValueChange={setReserveSlots}
+              variant="secondary"
+              isRequired
+            />
+            <Textarea
+              label={t('group_signup.reserve_notes')}
+              value={reserveNotes}
+              onValueChange={setReserveNotes}
+              variant="secondary"
+              minRows={2}
+              maxRows={4}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="tertiary" onPress={reservationModal.onClose}>{t('common.cancel')}</Button>
+            <Button
+              className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+              onPress={handleCreateReservation}
+              isLoading={isReserving}
+              isDisabled={!reserveGroupId || !reserveShiftId || isLoadingReservationOptions || isLoadingShifts}
+            >
+              {t('group_signup.reserve_submit')}
             </Button>
           </ModalFooter>
         </ModalContent>

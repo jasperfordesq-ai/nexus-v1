@@ -814,6 +814,7 @@ Route::get('/v2/volunteering/organisations/{id}/applications', [\App\Http\Contro
 Route::get('/v2/volunteering/organisations/{id}/hours/pending', [\App\Http\Controllers\Api\VolunteerController::class, 'orgHoursPending']);
 Route::put('/v2/volunteering/organisations/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'updateOrganisation']);
 Route::post('/v2/volunteering/reviews', [\App\Http\Controllers\Api\VolunteerController::class, 'createReview']);
+Route::get('/v2/volunteering/reviews/organization/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'getOrganizationReviews'])->withoutMiddleware('auth:sanctum');
 Route::get('/v2/volunteering/reviews/{type}/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'getReviews']);
 Route::get('/v2/comments', [\App\Http\Controllers\Api\CommentsController::class, 'index']);
 Route::post('/v2/comments', [\App\Http\Controllers\Api\CommentsController::class, 'store']);

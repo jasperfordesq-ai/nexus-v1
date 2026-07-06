@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Services\VolunteerCheckInService;
+use App\Services\VolunteeringConfigurationService;
 use App\Services\WebhookDispatchService;
 use App\Core\TenantContext;
 
@@ -29,6 +30,11 @@ class VolunteerCheckInController extends BaseApiController
         if (!TenantContext::hasFeature('volunteering')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
                 $this->respondWithError('FEATURE_DISABLED', __('api.volunteering_feature_disabled'), null, 403)
+            );
+        }
+        if (! VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_ENABLE_QR_CHECKIN, true)) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                $this->respondWithError('FEATURE_DISABLED', __('api.module_disabled_for_community'), null, 403)
             );
         }
     }

@@ -25,6 +25,9 @@ class VolOpportunity extends Model
         'title',
         'description',
         'location',
+        'is_remote',
+        'latitude',
+        'longitude',
         'skills_needed',
         'start_date',
         'end_date',
@@ -38,6 +41,9 @@ class VolOpportunity extends Model
         'start_date' => 'date',
         'end_date' => 'date',
         'is_active' => 'boolean',
+        'is_remote' => 'boolean',
+        'latitude' => 'float',
+        'longitude' => 'float',
     ];
 
     public function creator(): BelongsTo

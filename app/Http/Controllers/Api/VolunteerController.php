@@ -18,6 +18,7 @@ use App\Http\Requests\Volunteering\VerifyHoursRequest;
 use App\Http\Resources\PublicOrganisationResource;
 use App\Services\VolunteerService;
 use App\Services\VolunteerMatchingService;
+use App\Services\VolunteeringConfigurationService;
 use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\Notification;
@@ -81,6 +82,8 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('volunteering_list', 60, 60);
 
         $filters = ['limit' => $this->queryInt('per_page', 20, 1, 50)];
+        $viewerId = $this->resolveSanctumUserOptionally();
+        if ($viewerId) $filters['viewer_id'] = $viewerId;
         if ($this->query('organization_id')) $filters['organization_id'] = (int) $this->query('organization_id');
         if ($this->query('category_id')) $filters['category_id'] = (int) $this->query('category_id');
         if ($this->query('search')) $filters['search'] = $this->query('search');
@@ -187,7 +190,8 @@ class VolunteerController extends BaseApiController
         // Minors (by date_of_birth) need an active guardian consent before
         // taking part in volunteering. Adults (or users without a recorded
         // date of birth) are unaffected.
-        if (\App\Services\GuardianConsentService::isMinor($userId)
+        if (VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_GUARDIAN_CONSENT_REQUIRED, false)
+            && \App\Services\GuardianConsentService::isMinor($userId)
             && !\App\Services\GuardianConsentService::checkConsent($userId, (int) $id)) {
             return $this->respondWithError('GUARDIAN_CONSENT_REQUIRED', __('api.guardian_consent_required'), null, 403);
         }
@@ -390,7 +394,8 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('volunteering_shift_signup', 20, 60);
 
         // Guardian-consent gate for minors (see apply()).
-        if (\App\Services\GuardianConsentService::isMinor($userId)) {
+        if (VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_GUARDIAN_CONSENT_REQUIRED, false)
+            && \App\Services\GuardianConsentService::isMinor($userId)) {
             $gateOppId = VolShift::where('tenant_id', TenantContext::getId())
                 ->where('id', (int) $id)
                 ->value('opportunity_id');
@@ -610,6 +615,9 @@ class VolunteerController extends BaseApiController
     public function createReview(CreateReviewRequest $request): JsonResponse
     {
         $this->ensureFeature();
+        if (! VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_ENABLE_REVIEWS, true)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.module_disabled_for_community'), null, 403);
+        }
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_review', 10, 60);
 
@@ -629,10 +637,18 @@ class VolunteerController extends BaseApiController
     public function getReviews($type, $id): JsonResponse
     {
         $this->ensureFeature();
+        if (! VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_ENABLE_REVIEWS, true)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.module_disabled_for_community'), null, 403);
+        }
         $this->rateLimit('volunteering_reviews', 60, 60);
         if (!in_array($type, ['organization', 'user'])) return $this->respondWithError('VALIDATION_ERROR', __('api.type_must_be_org_or_user'), 'type', 400);
         $reviews = $this->volunteerService->getReviews($type, (int) $id);
         return $this->respondWithData(['reviews' => $reviews]);
+    }
+
+    public function getOrganizationReviews($id): JsonResponse
+    {
+        return $this->getReviews('organization', (int) $id);
     }
 
     // ========================================
@@ -642,6 +658,9 @@ class VolunteerController extends BaseApiController
     public function recommendedShifts(): JsonResponse
     {
         $this->ensureFeature();
+        if (! VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_ENABLE_MATCHING, true)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.module_disabled_for_community'), null, 403);
+        }
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_recommended', 30, 60);
 

@@ -45,6 +45,9 @@ interface FormData {
   title: string;
   description: string;
   location: string;
+  is_remote: boolean;
+  latitude: number | null;
+  longitude: number | null;
   skills_needed: string;
   start_date: DateInputValue | null;
   end_date: DateInputValue | null;
@@ -55,6 +58,9 @@ const initialFormData: FormData = {
   title: '',
   description: '',
   location: '',
+  is_remote: false,
+  latitude: null,
+  longitude: null,
   skills_needed: '',
   start_date: null,
   end_date: null,
@@ -162,8 +168,14 @@ export default function CreateOpportunityPage() {
         title: formData.title.trim(),
         description: formData.description.trim(),
         location: formData.location.trim(),
+        is_remote: formData.is_remote,
         skills_needed: formData.skills_needed.trim(),
       };
+
+      if (!formData.is_remote && formData.latitude !== null && formData.longitude !== null) {
+        payload.latitude = formData.latitude;
+        payload.longitude = formData.longitude;
+      }
 
       if (formData.start_date) {
         payload.start_date = formData.start_date.toString();
@@ -323,21 +335,58 @@ export default function CreateOpportunityPage() {
           />
 
           {/* Location */}
+          <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-theme-elevated border border-theme-default">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-sky-500/20">
+                <Globe className="w-5 h-5 text-sky-600 dark:text-sky-400" aria-hidden="true" />
+              </div>
+              <div>
+                <p className="font-medium text-theme-primary">{t('form_remote_label')}</p>
+                <p className="text-sm text-theme-subtle">{t('form_remote_description')}</p>
+              </div>
+            </div>
+            <Switch
+              aria-label={t('form_remote_label')}
+              isSelected={formData.is_remote}
+              onValueChange={(checked) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  is_remote: checked,
+                  latitude: checked ? null : prev.latitude,
+                  longitude: checked ? null : prev.longitude,
+                }));
+              }}
+              classNames={{
+                wrapper: 'group-data-[selected=true]:bg-sky-500',
+              }}
+            />
+          </div>
           <PlaceAutocompleteInput
             label={t('form_location_label')}
             placeholder={t('form_location_placeholder')}
             value={formData.location}
-            onChange={(val) => updateField('location', val)}
+            onChange={(val) => {
+              setFormData((prev) => ({
+                ...prev,
+                location: val,
+                latitude: null,
+                longitude: null,
+              }));
+            }}
             onPlaceSelect={(place) => {
               setFormData((prev) => ({
                 ...prev,
                 location: place.formattedAddress,
+                latitude: place.lat,
+                longitude: place.lng,
               }));
             }}
             onClear={() => {
               setFormData((prev) => ({
                 ...prev,
                 location: '',
+                latitude: null,
+                longitude: null,
               }));
             }}
             classNames={{

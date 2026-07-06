@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use App\Http\Requests\Volunteering\SubmitExpenseRequest;
 use App\Services\VolunteerExpenseService;
+use App\Services\VolunteeringConfigurationService;
 use App\Core\TenantContext;
 use App\Support\CsvExportSanitizer;
 
@@ -29,6 +30,11 @@ class VolunteerExpenseController extends BaseApiController
         if (!TenantContext::hasFeature('volunteering')) {
             throw new \Illuminate\Http\Exceptions\HttpResponseException(
                 $this->respondWithError('FEATURE_DISABLED', __('api.volunteering_feature_disabled'), null, 403)
+            );
+        }
+        if (! VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_EXPENSES_ENABLED, true)) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                $this->respondWithError('FEATURE_DISABLED', __('api.module_disabled_for_community'), null, 403)
             );
         }
     }
@@ -84,6 +90,14 @@ class VolunteerExpenseController extends BaseApiController
         $this->rateLimit('vol_expense_submit', 10, 3600);
 
         $data = $this->getAllInput();
+        unset($data['receipt'], $data['receipt_path'], $data['receipt_filename']);
+
+        $receipt = request()->file('receipt');
+        if ($receipt) {
+            $tenantId = TenantContext::getId();
+            $data['receipt_path'] = $receipt->store("volunteer-expenses/{$tenantId}", 'local');
+            $data['receipt_filename'] = basename((string) $receipt->getClientOriginalName());
+        }
 
         try {
             $result = $this->volunteerExpenseService->submitExpense($userId, $data);

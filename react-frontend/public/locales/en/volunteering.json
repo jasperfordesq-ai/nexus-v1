@@ -276,7 +276,13 @@
       "type": "Expense Type",
       "amount": "Amount",
       "currency": "Currency",
-      "description": "Description"
+      "description": "Description",
+      "receipt": "Receipt",
+      "receipt_none": "No receipt attached",
+      "receipt_hint": "Attach a PDF, JPG, PNG, or WebP receipt up to 10 MB.",
+      "receipt_attach": "Attach receipt",
+      "receipt_replace": "Replace",
+      "receipt_remove": "Remove receipt"
     },
     "no_organisation": "No approved volunteer organisations are available for expenses yet.",
     "cancel": "Cancel",
@@ -666,7 +672,18 @@
     "apply_message_placeholder": "Tell the organiser why you'd like to volunteer...",
     "select_shift": "Select a shift (optional)",
     "cancel": "Cancel",
-    "submit_application": "Submit Application"
+    "submit_application": "Submit Application",
+    "shift_signed_up": "Signed up",
+    "sign_up_shift": "Sign up",
+    "switch_shift": "Switch shift",
+    "cancel_shift_signup": "Cancel signup",
+    "join_waitlist": "Join waitlist",
+    "shift_signup_success": "Shift signup confirmed.",
+    "shift_signup_failed": "Unable to sign up for this shift.",
+    "shift_cancel_success": "Shift signup cancelled.",
+    "shift_cancel_failed": "Unable to cancel this shift signup.",
+    "shift_waitlist_success": "You have joined the waitlist.",
+    "shift_waitlist_failed": "Unable to join this waitlist."
   },
   "org_settings": {
     "heading": "Organization Settings",
@@ -713,7 +730,14 @@
     "aria_select_all": "Select all visible pending applications",
     "aria_select_application": "Select application from {{name}}",
     "aria_search_volunteers": "Search volunteers by name",
-    "filter_label": "Filter applications"
+    "filter_label": "Filter applications",
+    "decline_modal_title": "Decline application",
+    "decline_modal_description": "Add a note for {{count}} application before declining.",
+    "decline_note_label": "Decision note",
+    "decline_note_placeholder": "Share the reason or next steps for the volunteer.",
+    "decline_note_required": "A note is required before declining.",
+    "decline_confirm": "Decline application",
+    "cancel": "Cancel"
   },
   "org_wallet_balance": "Wallet balance:",
   "auto_pay_on": "Auto-pay ON",
@@ -759,7 +783,22 @@
     "search_label": "Member name",
     "search_placeholder": "Search members by name…",
     "search_description": "Search for the member you would like to add to this group reservation, then select them from the results. They will receive an invitation to join.",
-    "no_results": "No members match your search."
+    "no_results": "No members match your search.",
+    "reserve_slots": "Reserve slots",
+    "reserve_modal_title": "Reserve shift slots",
+    "reserve_group": "Group",
+    "reserve_opportunity": "Opportunity",
+    "reserve_opportunity_option": "{{title}} - {{organization}}",
+    "reserve_shift": "Shift",
+    "reserve_shift_option": "{{date}}, {{start}}-{{end}}",
+    "reserve_slots_label": "Slots to reserve",
+    "reserve_notes": "Notes",
+    "reserve_submit": "Reserve slots",
+    "reserve_success": "Group reservation created.",
+    "reserve_error": "Unable to create this group reservation.",
+    "reserve_load_error": "Unable to load groups and opportunities.",
+    "reserve_shifts_error": "Unable to load shifts for this opportunity.",
+    "reserve_required": "Choose a group, shift, and number of slots."
   },
   "recommendations": {
     "title": "Recommended for You",
@@ -962,5 +1001,7 @@
     "verify_error_body": "The approval link is invalid, has expired, or was already used. Please ask your young person to send a new request from their volunteering page.",
     "verify_confirm_intro": "Tap the button below to confirm you give consent for your young person to take part in volunteering with this community.",
     "verify_confirm_button": "Confirm my approval"
-  }
+  },
+  "form_remote_label": "Remote opportunity",
+  "form_remote_description": "Volunteers can take part online or by phone."
 }

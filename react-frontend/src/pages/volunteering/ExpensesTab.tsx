@@ -20,6 +20,8 @@ import Package from 'lucide-react/icons/package';
 import Wrench from 'lucide-react/icons/wrench';
 import ParkingCircle from 'lucide-react/icons/circle-parking';
 import MoreHorizontal from 'lucide-react/icons/ellipsis';
+import Upload from 'lucide-react/icons/upload';
+import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/feedback';
 import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CardRowsSkeleton } from '@/components/ui';
@@ -92,6 +94,7 @@ export function ExpensesTab() {
   const [formAmount, setFormAmount] = useState('');
   const [formCurrency, setFormCurrency] = useState('');
   const [formDescription, setFormDescription] = useState('');
+  const [formReceipt, setFormReceipt] = useState<File | null>(null);
   const tRef = useRef(t);
   tRef.current = t;
   const abortRef = useRef<AbortController | null>(null);
@@ -160,6 +163,7 @@ export function ExpensesTab() {
     setFormAmount('');
     setFormCurrency('');
     setFormDescription('');
+    setFormReceipt(null);
     if (organisations.length !== 1) setFormOrgId('');
   };
 
@@ -171,13 +175,15 @@ export function ExpensesTab() {
     }
     try {
       setIsSubmitting(true);
-      const response = await api.post('/v2/volunteering/expenses', {
-        organization_id: parseInt(formOrgId, 10),
-        expense_type: formType,
-        amount: parseFloat(formAmount),
-        currency: formCurrency,
-        description: formDescription,
-      });
+      const payload = new FormData();
+      payload.append('organization_id', formOrgId);
+      payload.append('expense_type', formType);
+      payload.append('amount', String(parseFloat(formAmount)));
+      payload.append('description', formDescription);
+      if (formCurrency.trim()) payload.append('currency', formCurrency.trim());
+      if (formReceipt) payload.append('receipt', formReceipt);
+
+      const response = await api.upload('/v2/volunteering/expenses', payload);
       if (response.success) {
         toast.success(t('expenses.submit_success'));
         resetForm();
@@ -377,6 +383,44 @@ export function ExpensesTab() {
                   maxRows={4}
                   isRequired
                 />
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-theme-muted">{t('expenses.form.receipt')}</p>
+                  <div className="flex flex-col gap-2 rounded-xl border border-dashed border-theme-default bg-theme-elevated p-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm text-theme-primary">
+                        {formReceipt ? formReceipt.name : t('expenses.form.receipt_none')}
+                      </p>
+                      <p className="text-xs text-theme-subtle">{t('expenses.form.receipt_hint')}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="volunteer-expense-receipt"
+                        type="file"
+                        accept=".pdf,image/png,image/jpeg,image/webp"
+                        className="sr-only"
+                        onChange={(event) => setFormReceipt(event.target.files?.[0] ?? null)}
+                      />
+                      <label
+                        htmlFor="volunteer-expense-receipt"
+                        className="inline-flex min-h-9 cursor-pointer items-center justify-center gap-2 rounded-lg bg-theme-surface px-3 text-sm font-medium text-theme-primary transition-colors hover:bg-theme-hover"
+                      >
+                        <Upload className="w-4 h-4" aria-hidden="true" />
+                        {formReceipt ? t('expenses.form.receipt_replace') : t('expenses.form.receipt_attach')}
+                      </label>
+                      {formReceipt && (
+                        <Button
+                          isIconOnly
+                          size="sm"
+                          variant="tertiary"
+                          aria-label={t('expenses.form.receipt_remove')}
+                          onPress={() => setFormReceipt(null)}
+                        >
+                          <X className="w-4 h-4" aria-hidden="true" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </ModalBody>
               <ModalFooter>
                 <Button variant="tertiary" onPress={onClose}>{t('expenses.cancel')}</Button>

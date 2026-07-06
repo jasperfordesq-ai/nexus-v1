@@ -1,10 +1,10 @@
-// Copyright © 2024–2026 Jasper Ford
+﻿// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 vi.mock('react-i18next', () => ({
@@ -14,14 +14,14 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('react-router-dom', async () => {
-  const actual = await import('react-router-dom');
-  const React = await import('react');
+vi.mock('react-router-dom', () => {
   return {
-    ...actual,
+    BrowserRouter: ({ children }: { children?: ReactNode }) => <>{children}</>,
+    MemoryRouter: ({ children }: { children?: ReactNode }) => <>{children}</>,
     Link: ({ children, to, ...rest }: { children: ReactNode; to: string; [k: string]: unknown }) =>
-      React.createElement('a', { href: String(to), ...rest }, children),
+      <a href={String(to)} {...rest}>{children}</a>,
     useSearchParams: () => [new URLSearchParams(), vi.fn()],
+    useLocation: () => ({ pathname: '/test/jobs', search: '', hash: '', state: null, key: 'test' }),
   };
 });
 
@@ -45,7 +45,7 @@ vi.mock('@/contexts', () => ({
   useAuth: (...args: unknown[]) => mockUseAuth(...args),
   useTenant: vi.fn(() => ({
     tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
-    tenantPath: (p: string) => `/test$${p}`,
+    tenantPath: (p: string) => `/test${p}`,
     hasFeature: mockHasFeature,
     hasModule: vi.fn(() => true),
   })),
@@ -70,58 +70,76 @@ vi.mock('@/contexts', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-vi.mock('@/components/ui', async () => {
-  const React = await import('react');
-  const { uiMock } = await import('@/test/uiMock');
+vi.mock('@/components/ui', () => {
+  const passthrough = ({ children, label, title, description, ...props }: Record<string, unknown>) => (
+    <div {...props}>
+      {label as ReactNode}
+      {title as ReactNode}
+      {description as ReactNode}
+      {children as ReactNode}
+    </div>
+  );
 
-  // The filter chips use HeroUI's ToggleButtonGroup compound API:
-  //   <ToggleButtonGroup onSelectionChange={(keys) => ...}>
-  //     <ToggleButton id="paid">…</ToggleButton>
-  //   </ToggleButtonGroup>
-  // The generic uiMock renders each ToggleButton as an independent <button>
-  // with no wiring to the group's onSelectionChange, so clicking a chip never
-  // updates the active filter. Provide a faithful compound stub: the group
-  // shares its onSelectionChange via context; clicking a ToggleButton fires
-  // onSelectionChange(new Set([id])) — matching the real Set-based contract.
-  const ToggleGroupCtx = React.createContext<{
+  const Button = ({ children, onPress, onClick, ...props }: Record<string, unknown>) => (
+    <button type="button" {...props} onClick={(onPress ?? onClick) as (() => void) | undefined}>
+      {children as ReactNode}
+    </button>
+  );
+
+  const SearchField = ({ placeholder, value, onValueChange }: Record<string, unknown>) => (
+    <input
+      placeholder={placeholder as string | undefined}
+      value={(value as string | undefined) ?? ''}
+      onChange={(event) => {
+        if (typeof onValueChange === 'function') {
+          (onValueChange as (next: string) => void)(event.target.value);
+        }
+      }}
+    />
+  );
+
+  const ToggleButtonGroup = ({
+    onSelectionChange,
+    children,
+  }: {
     onSelectionChange?: (keys: Set<unknown>) => void;
-  }>({});
-
-  function ToggleButtonGroupStub(props: Record<string, unknown>) {
-    const { onSelectionChange, children } = props as {
-      onSelectionChange?: (keys: Set<unknown>) => void;
-      children?: React.ReactNode;
-    };
-    return React.createElement(
-      ToggleGroupCtx.Provider,
-      { value: { onSelectionChange } },
-      React.createElement('div', null, children),
+    children?: ReactNode;
+  }) => {
+    return (
+      <div
+        onClick={(event) => {
+          const button = (event.target as HTMLElement).closest('button[data-toggle-id]');
+          const nextId = button?.getAttribute('data-toggle-id');
+          if (nextId) onSelectionChange?.(new Set([nextId]));
+        }}
+      >
+        {children}
+      </div>
     );
-  }
-  function ToggleButtonStub(props: Record<string, unknown>) {
-    const ctx = React.useContext(ToggleGroupCtx);
-    const { id, children } = props as { id?: unknown; children?: React.ReactNode };
-    return React.createElement(
-      'button',
-      {
-        type: 'button',
-        onClick: () => {
-          if (typeof ctx.onSelectionChange === 'function') {
-            ctx.onSelectionChange(new Set([id]));
-          }
-        },
-      },
-      children,
-    );
-  }
+  };
 
-  return new Proxy(uiMock, {
-    get(target, prop) {
-      if (prop === 'ToggleButtonGroup') return ToggleButtonGroupStub;
-      if (prop === 'ToggleButton') return ToggleButtonStub;
-      return Reflect.get(target, prop);
-    },
-  });
+  const ToggleButton = ({ id, children }: { id?: unknown; children?: ReactNode }) => {
+    return (
+      <button type="button" data-toggle-id={String(id ?? '')}>
+        {children}
+      </button>
+    );
+  };
+
+  return {
+    Select: passthrough,
+    SelectItem: passthrough,
+    GlassCard: passthrough,
+    Button,
+    SearchField,
+    Switch: ({ children }: { children?: ReactNode }) => <label><input type="checkbox" />{children}</label>,
+    Tabs: passthrough,
+    Tab: passthrough,
+    CardRowsSkeleton: () => <div role="status" />,
+    Chip: passthrough,
+    ToggleButton,
+    ToggleButtonGroup,
+  };
 });
 
 vi.mock('@/components/feedback', () => ({
@@ -325,7 +343,7 @@ describe('JobsPage', () => {
   });
 
   it('passes type=paid filter to API when paid chip is clicked', async () => {
-    const { userEvent } = await import('@/test/test-utils');
+    const { default: userEvent } = await import('@testing-library/user-event');
     render(<JobsPage />);
     await userEvent.click(screen.getByText('type.paid'));
     await waitFor(() => {

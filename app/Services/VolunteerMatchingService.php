@@ -344,6 +344,8 @@ class VolunteerMatchingService
             })
             ->where('s.tenant_id', $tenantId)
             ->where('opp.is_active', true)
+            ->whereIn('opp.status', ['open', 'active'])
+            ->whereIn('org.status', ['approved', 'active'])
             ->where('s.start_time', '>', now())
             ->select(
                 's.id as shift_id', 's.start_time', 's.end_time', 's.capacity',
@@ -380,10 +382,10 @@ class VolunteerMatchingService
 
         foreach ($shifts as $shift) {
             $currentSignups = (int) ($signupCounts[$shift->shift_id] ?? 0);
-            $capacity = (int) ($shift->capacity ?? 1);
+            $capacity = $shift->capacity !== null ? (int) $shift->capacity : null;
 
             // Skip full shifts
-            if ($currentSignups >= $capacity) {
+            if ($capacity !== null && $currentSignups >= $capacity) {
                 continue;
             }
 

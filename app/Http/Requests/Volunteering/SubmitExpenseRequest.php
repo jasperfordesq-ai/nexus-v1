@@ -26,6 +26,7 @@ class SubmitExpenseRequest extends FormRequest
             'amount' => ['required', 'numeric', 'min:0.01', 'max:100000'],
             'currency' => ['nullable', 'string', 'max:10'],
             'description' => ['required', 'string', 'max:1000'],
+            'receipt' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:10240'],
         ];
     }
 }

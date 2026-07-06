@@ -63,6 +63,7 @@ import { WaitlistTab } from './WaitlistTab';
 import { ShiftSwapsTab } from './ShiftSwapsTab';
 import { GroupSignUpTab } from './GroupSignUpTab';
 import { VolunteeringWelcome } from './VolunteeringWelcome';
+import GuardianConsentModal from '@/components/volunteering/GuardianConsentModal';
 const ExpensesTab = React.lazy(() => import('./ExpensesTab'));
 const SafeguardingTab = React.lazy(() => import('./SafeguardingTab'));
 const CommunityProjectsTab = React.lazy(() => import('./CommunityProjectsTab'));
@@ -589,6 +590,7 @@ function OpportunitiesTab() {
 
   // Apply modal
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const guardianModal = useDisclosure();
   const [selectedOpportunity, setSelectedOpportunity] = useState<Opportunity | null>(null);
   const [applyMessage, setApplyMessage] = useState('');
   const [isApplying, setIsApplying] = useState(false);
@@ -671,6 +673,9 @@ function OpportunitiesTab() {
         setApplyMessage('');
         setSelectedOpportunity(null);
         loadOpportunities();
+      } else if (response.code === 'GUARDIAN_CONSENT_REQUIRED') {
+        onClose();
+        guardianModal.onOpen();
       } else {
         toast.error(response.error || t('apply_error'));
       }
@@ -803,6 +808,13 @@ function OpportunitiesTab() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <GuardianConsentModal
+        isOpen={guardianModal.isOpen}
+        onOpenChange={guardianModal.onOpenChange}
+        onClose={guardianModal.onClose}
+        opportunityId={selectedOpportunity?.id}
+      />
     </>
   );
 }

@@ -220,6 +220,7 @@ describe('OrgApplicationsTab — decline action', () => {
     });
     expect(declineBtn).toBeDefined();
     await user.click(declineBtn!);
+    await user.click(await screen.findByRole('button', { name: /decline application/i }));
 
     await waitFor(() => {
       expect(api.put).toHaveBeenCalledWith(
@@ -243,6 +244,7 @@ describe('OrgApplicationsTab — decline action', () => {
       return text === 'Decline' || text === 'applications.decline' || /^Decline$/i.test(text);
     });
     await user.click(declineBtn!);
+    await user.click(await screen.findByRole('button', { name: /decline application/i }));
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled();

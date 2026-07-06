@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -1649,6 +1649,7 @@ return [
     'volunteer_shift_not_found'            => 'Shift not found',
     'volunteer_shift_started'              => 'This shift has already started',
     'volunteer_shift_at_capacity'          => 'This shift is at capacity',
+    'volunteer_shift_not_full'             => 'This shift still has open places, so you do not need the waitlist yet.',
     'volunteer_approved_application_required' => 'You need an approved application before using this opportunity',
     'volunteer_org_relationship_required'  => 'You need an approved volunteering relationship with this organisation',
     'expense_not_found'                    => 'Expense not found',

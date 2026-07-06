@@ -42,6 +42,7 @@ import { PageMeta } from '@/components/seo/PageMeta';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import GuardianConsentModal from '@/components/volunteering/GuardianConsentModal';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -107,6 +108,13 @@ export function OrganisationDetailPage() {
   const [selectedOpp, setSelectedOpp] = useState<Opportunity | null>(null);
   const [applyMessage, setApplyMessage] = useState('');
   const [isApplying, setIsApplying] = useState(false);
+  const guardianModal = useDisclosure();
+
+  // Review modal
+  const reviewModal = useDisclosure();
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   usePageTitle(organisation?.name ?? t('organisation_detail.page_title'));
 
@@ -194,6 +202,9 @@ export function OrganisationDetailPage() {
         setSelectedOpp(null);
         toast.success(t('applied_success', { ns: 'volunteering' }));
         loadData();
+      } else if (response.code === 'GUARDIAN_CONSENT_REQUIRED') {
+        applyModal.onClose();
+        guardianModal.onOpen();
       } else {
         toast.error(response.error || t('apply_error', { ns: 'volunteering' }));
       }
@@ -202,6 +213,38 @@ export function OrganisationDetailPage() {
       toast.error(t('apply_error', { ns: 'volunteering' }));
     } finally {
       setIsApplying(false);
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (!id || reviewRating < 1) {
+      toast.error(t('organisation_detail.rating_required'));
+      return;
+    }
+
+    try {
+      setIsSubmittingReview(true);
+      const response = await api.post('/v2/volunteering/reviews', {
+        target_type: 'organization',
+        target_id: Number(id),
+        rating: reviewRating,
+        comment: reviewComment.trim() || undefined,
+      });
+
+      if (response.success) {
+        toast.success(t('organisation_detail.review_success'));
+        setReviewRating(0);
+        setReviewComment('');
+        reviewModal.onClose();
+        loadData();
+      } else {
+        toast.error(response.error || t('organisation_detail.review_error'));
+      }
+    } catch (err) {
+      logError('Failed to submit organisation review', err);
+      toast.error(t('organisation_detail.review_error'));
+    } finally {
+      setIsSubmittingReview(false);
     }
   };
 
@@ -478,57 +521,74 @@ export function OrganisationDetailPage() {
       </div>
 
       {/* Reviews */}
-      {reviews.length > 0 && (
-        <div>
-          <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
+      <div>
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
             <Star className="w-5 h-5 text-amber-400" aria-hidden="true" />
             {t('organisation_detail.reviews')}
             <Chip size="sm" variant="soft" className="text-theme-subtle">{reviews.length}</Chip>
           </h2>
+          {isAuthenticated && (
+            <Button
+              size="sm"
+              variant="secondary"
+              className="bg-theme-elevated text-theme-primary"
+              startContent={<Star className="w-4 h-4" aria-hidden="true" />}
+              onPress={reviewModal.onOpen}
+            >
+              {t('organisation_detail.write_review')}
+            </Button>
+          )}
+        </div>
 
+        {reviews.length === 0 ? (
+          <GlassCard className="p-5 text-sm text-theme-muted">
+            {t('organisation_detail.no_reviews')}
+          </GlassCard>
+        ) : (
           <div className="space-y-3">
             {reviews.map((review) => (
-              <GlassCard key={review.id} className="p-4">
-                <div className="flex items-start gap-3">
-                  <Link to={tenantPath(`/profile/${review.author.id}`)}>
-                    <Avatar
-                      name={review.author.name}
-                      src={resolveAvatarUrl(review.author.avatar) || undefined}
-                      size="sm"
-                    />
-                  </Link>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Link
-                        to={tenantPath(`/profile/${review.author.id}`)}
-                        className="font-semibold text-sm text-theme-primary hover:underline"
-                      >
-                        {review.author.name}
-                      </Link>
-                      <div className="flex items-center gap-0.5">
-                        <span className="sr-only">{t('organisation_detail.rating_sr', { n: review.rating })}</span>
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-3 h-3 ${i < review.rating ? 'text-amber-400 fill-amber-400' : 'text-theme-subtle'}`}
-                            aria-hidden="true"
-                          />
-                        ))}
-                      </div>
-                      <span className="text-xs text-theme-subtle">
-                        {new Date(review.created_at).toLocaleDateString()}
-                      </span>
+            <GlassCard key={review.id} className="p-4">
+              <div className="flex items-start gap-3">
+                <Link to={tenantPath(`/profile/${review.author.id}`)}>
+                  <Avatar
+                    name={review.author.name}
+                    src={resolveAvatarUrl(review.author.avatar) || undefined}
+                    size="sm"
+                  />
+                </Link>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Link
+                      to={tenantPath(`/profile/${review.author.id}`)}
+                      className="font-semibold text-sm text-theme-primary hover:underline"
+                    >
+                      {review.author.name}
+                    </Link>
+                    <div className="flex items-center gap-0.5">
+                      <span className="sr-only">{t('organisation_detail.rating_sr', { n: review.rating })}</span>
+                      {Array.from({ length: 5 }, (_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-3 h-3 ${i < review.rating ? 'text-amber-400 fill-amber-400' : 'text-theme-subtle'}`}
+                          aria-hidden="true"
+                        />
+                      ))}
                     </div>
-                    {review.comment && (
-                      <p className="text-sm text-theme-muted">{review.comment}</p>
-                    )}
+                    <span className="text-xs text-theme-subtle">
+                      {new Date(review.created_at).toLocaleDateString()}
+                    </span>
                   </div>
+                  {review.comment && (
+                    <p className="text-sm text-theme-muted">{review.comment}</p>
+                  )}
                 </div>
-              </GlassCard>
+              </div>
+            </GlassCard>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Apply Modal */}
       <Modal isOpen={applyModal.isOpen} onClose={applyModal.onClose} size="lg" classNames={{
@@ -569,6 +629,68 @@ export function OrganisationDetailPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Review Modal */}
+      <Modal isOpen={reviewModal.isOpen} onClose={reviewModal.onClose} size="md" classNames={{
+        base: 'bg-overlay border border-theme-default',
+      }}>
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">{t('organisation_detail.review_modal_title')}</ModalHeader>
+          <ModalBody className="space-y-4">
+            <div>
+              <p className="mb-2 text-sm font-medium text-theme-muted">{t('organisation_detail.rating_label')}</p>
+              <div className="flex gap-1" role="radiogroup" aria-label={t('organisation_detail.rating_label')}>
+                {Array.from({ length: 5 }, (_, i) => {
+                  const rating = i + 1;
+                  return (
+                    <Button
+                      key={rating}
+                      isIconOnly
+                      size="sm"
+                      variant="tertiary"
+                      aria-label={t('organisation_detail.rating_sr', { n: rating })}
+                      onPress={() => setReviewRating(rating)}
+                    >
+                      <Star
+                        className={`w-5 h-5 ${rating <= reviewRating ? 'text-amber-400 fill-amber-400' : 'text-theme-subtle'}`}
+                        aria-hidden="true"
+                      />
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+            <Textarea
+              label={t('organisation_detail.comment_label')}
+              placeholder={t('organisation_detail.comment_placeholder')}
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              minRows={3}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+              }}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="tertiary" onPress={reviewModal.onClose} className="text-theme-muted">{t('organisation_detail.cancel')}</Button>
+            <Button
+              className="bg-gradient-to-r from-amber-500 to-orange-500 text-white"
+              isLoading={isSubmittingReview}
+              onPress={handleSubmitReview}
+            >
+              {t('organisation_detail.submit_review')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <GuardianConsentModal
+        isOpen={guardianModal.isOpen}
+        onOpenChange={guardianModal.onOpenChange}
+        onClose={guardianModal.onClose}
+        opportunityId={selectedOpp?.id}
+      />
     </div>
   );
 }

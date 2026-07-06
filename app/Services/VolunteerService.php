@@ -41,11 +41,14 @@ class VolunteerService
      */
     public static function getOpportunities(array $filters = []): array
     {
+        $tenantId = self::getTenantId();
         $limit = min((int) ($filters['limit'] ?? 20), 50);
         $cursor = $filters['cursor'] ?? null;
 
+        $viewerId = !empty($filters['viewer_id']) ? (int) $filters['viewer_id'] : null;
+
         $query = VolOpportunity::query()
-            ->with(['creator:id,first_name,last_name,avatar_url', 'organization:id,name', 'category:id,name,color'])
+            ->with(['creator:id,first_name,last_name,avatar_url', 'organization:id,name,logo_url', 'category:id,name,color'])
             ->where('is_active', true)
             ->whereIn('status', ['open', 'active'])
             ->whereHas('organization', function (Builder $q) {
@@ -68,7 +71,15 @@ class VolunteerService
             $term = '%' . $filters['search'] . '%';
             $query->where(function (Builder $q) use ($term) {
                 $q->where('title', 'LIKE', $term)
-                  ->orWhere('description', 'LIKE', $term);
+                  ->orWhere('description', 'LIKE', $term)
+                  ->orWhere('location', 'LIKE', $term)
+                  ->orWhere('skills_needed', 'LIKE', $term)
+                  ->orWhereHas('organization', function (Builder $orgQuery) use ($term) {
+                      $orgQuery->where('name', 'LIKE', $term);
+                  })
+                  ->orWhereHas('category', function (Builder $categoryQuery) use ($term) {
+                      $categoryQuery->where('name', 'LIKE', $term);
+                  });
             });
         }
 
@@ -114,9 +125,22 @@ class VolunteerService
             $items->pop();
         }
 
-        $results = $items->map(function ($opp) {
+        $appliedOpportunityIds = [];
+        if ($viewerId && $items->isNotEmpty()) {
+            $appliedOpportunityIds = VolApplication::query()
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $viewerId)
+                ->whereIn('status', ['pending', 'approved'])
+                ->whereIn('opportunity_id', $items->pluck('id')->all())
+                ->pluck('opportunity_id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+        }
+
+        $results = $items->map(function ($opp) use ($appliedOpportunityIds) {
             $data = $opp->toArray();
             $data['is_remote'] = (bool) ($opp->is_remote ?? false);
+            $data['has_applied'] = in_array((int) $opp->id, $appliedOpportunityIds, true);
             if (isset($opp->distance_km)) {
                 $data['distance_km'] = round((float) $opp->distance_km, 2);
             }
@@ -202,6 +226,8 @@ class VolunteerService
             'description'     => trim($data['description'] ?? ''),
             'location'        => trim($data['location'] ?? ''),
             'is_remote'       => !empty($data['is_remote']),
+            'latitude'        => isset($data['latitude']) && is_numeric($data['latitude']) ? (float) $data['latitude'] : null,
+            'longitude'       => isset($data['longitude']) && is_numeric($data['longitude']) ? (float) $data['longitude'] : null,
             'skills_needed'   => trim($data['skills_needed'] ?? ''),
             'start_date'      => $data['start_date'] ?? null,
             'end_date'        => $data['end_date'] ?? null,
@@ -248,6 +274,10 @@ class VolunteerService
         $opportunity = VolOpportunity::where('id', $opportunityId)
             ->where('tenant_id', $tenantId)
             ->where('is_active', true)
+            ->whereIn('status', ['open', 'active'])
+            ->whereHas('organization', function (Builder $q) {
+                $q->whereIn('status', ['approved', 'active']);
+            })
             ->first();
 
         if (!$opportunity) {
@@ -309,6 +339,11 @@ class VolunteerService
                 }
             }
 
+            $initialStatus = VolunteeringConfigurationService::get(
+                VolunteeringConfigurationService::CONFIG_AUTO_APPROVE_APPLICATIONS,
+                false
+            ) ? 'approved' : 'pending';
+
             $application = VolApplication::create([
                 'opportunity_id' => $opportunityId,
                 'user_id'        => $userId,
@@ -316,6 +351,7 @@ class VolunteerService
                 'shift_id'       => $shiftId,
             ]);
 
+            $application->forceFill(['status' => $initialStatus]);
             $application->save();
 
             return $application->fresh(['user', 'opportunity']);
@@ -893,10 +929,16 @@ class VolunteerService
         try {
             $fields = [];
             $params = [];
-            foreach (['title', 'description', 'location', 'skills_needed', 'start_date', 'end_date', 'category_id', 'is_remote'] as $field) {
+            foreach (['title', 'description', 'location', 'skills_needed', 'start_date', 'end_date', 'category_id', 'is_remote', 'latitude', 'longitude'] as $field) {
                 if (array_key_exists($field, $data)) {
                     $fields[] = "{$field} = ?";
-                    $params[] = $field === 'is_remote' ? (!empty($data[$field]) ? 1 : 0) : $data[$field];
+                    if ($field === 'is_remote') {
+                        $params[] = !empty($data[$field]) ? 1 : 0;
+                    } elseif (in_array($field, ['latitude', 'longitude'], true)) {
+                        $params[] = $data[$field] !== null && $data[$field] !== '' ? (float) $data[$field] : null;
+                    } else {
+                        $params[] = $data[$field];
+                    }
                 }
             }
 
@@ -1118,6 +1160,14 @@ class VolunteerService
 
         if (!self::canManageOpportunity((array) $app, $adminUserId)) {
             self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_opportunity_manage_forbidden')];
+            return false;
+        }
+
+        if ($action === 'decline'
+            && trim($orgNote) === ''
+            && VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_REQUIRE_ORG_NOTE_ON_DECLINE, false)
+        ) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.missing_required_field', ['field' => 'org_note']), 'field' => 'org_note'];
             return false;
         }
 
@@ -2164,8 +2214,8 @@ class VolunteerService
 
         // Verify target exists and reviewer has history
         if ($targetType === 'organization') {
-            $org = DB::selectOne("SELECT id FROM vol_organizations WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
-            if (!$org) {
+            $org = DB::selectOne("SELECT id, status FROM vol_organizations WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
+            if (!$org || ! self::isApprovedOrganizationStatus($org->status ?? null)) {
                 self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.organization_not_found')];
                 return null;
             }
@@ -2222,6 +2272,18 @@ class VolunteerService
     public static function getReviews(string $targetType, int $targetId): array
     {
         $tenantId = self::getTenantId();
+
+        if ($targetType === 'organization') {
+            $org = DB::table('vol_organizations')
+                ->where('tenant_id', $tenantId)
+                ->where('id', $targetId)
+                ->whereIn('status', ['approved', 'active'])
+                ->exists();
+
+            if (! $org) {
+                return [];
+            }
+        }
 
         $rows = DB::select("
             SELECT r.*, u.first_name, u.last_name, u.avatar_url
@@ -2375,6 +2437,10 @@ class VolunteerService
 
     private static function resolveCaringHourLogStatus(int $userId, int $tenantId, array $policy): string
     {
+        if (! VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_HOURS_REQUIRE_VERIFICATION, true)) {
+            return 'approved';
+        }
+
         if (!$policy['approval_required']) {
             return 'approved';
         }
@@ -2511,6 +2577,8 @@ class VolunteerService
             'end_date'      => $opp['end_date'],
             'is_active'     => (bool) ($opp['is_active'] ?? true),
             'is_remote'     => (bool) ($opp['is_remote'] ?? false),
+            'latitude'      => isset($opp['latitude']) ? (float) $opp['latitude'] : null,
+            'longitude'     => isset($opp['longitude']) ? (float) $opp['longitude'] : null,
             'category'      => $opp['category_name'] ?? null,
             'organization'  => [
                 'id'       => (int) $opp['organization_id'],

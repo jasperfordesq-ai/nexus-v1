@@ -59,6 +59,24 @@ class VolunteerExpenseService
             throw new \InvalidArgumentException(__('api.vol_expense_amount_positive'));
         }
 
+        $globalMaxAmount = (float) VolunteeringConfigurationService::get(
+            VolunteeringConfigurationService::CONFIG_EXPENSE_MAX_AMOUNT,
+            500
+        );
+        if ($globalMaxAmount > 0 && $amount > $globalMaxAmount) {
+            throw new \InvalidArgumentException(
+                __('api.vol_expense_amount_exceeds_policy', ['amount' => $globalMaxAmount])
+            );
+        }
+
+        if (VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_EXPENSE_REQUIRE_RECEIPT, false)
+            && empty($data['receipt_path'])
+        ) {
+            throw new \InvalidArgumentException(
+                __('api.vol_expense_receipt_required_above', ['amount' => 0])
+            );
+        }
+
         $organizationId = (int) $data['organization_id'];
         $opportunityId = !empty($data['opportunity_id']) ? (int) $data['opportunity_id'] : null;
 

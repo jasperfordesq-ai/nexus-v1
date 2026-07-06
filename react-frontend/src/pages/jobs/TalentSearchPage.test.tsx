@@ -1,10 +1,10 @@
-// Copyright © 2024–2026 Jasper Ford
+﻿// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 vi.mock('react-i18next', () => ({
@@ -15,13 +15,12 @@ vi.mock('react-i18next', () => ({
   initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
-vi.mock('react-router-dom', async () => {
-  const actual = await import('react-router-dom');
-  const React = await import('react');
+vi.mock('react-router-dom', () => {
   return {
-    ...actual,
+    BrowserRouter: ({ children }: { children?: ReactNode }) => <>{children}</>,
+    MemoryRouter: ({ children }: { children?: ReactNode }) => <>{children}</>,
     Link: ({ children, to, ...rest }: { children: ReactNode; to: string; [k: string]: unknown }) =>
-      React.createElement('a', { href: String(to), ...rest }, children),
+      <a href={String(to)} {...rest}>{children}</a>,
     useSearchParams: () => [new URLSearchParams(), vi.fn()],
   };
 });
@@ -70,7 +69,35 @@ vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
 }));
 
-vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+vi.mock('@/components/ui', () => {
+  const makeStub = (name: string) => ({ children, label, title, description, onPress, onClick, onValueChange, ...props }: Record<string, unknown>) => {
+    const lower = name.toLowerCase();
+    if (lower.includes('button')) {
+      return <button type="button" onClick={(onPress ?? onClick) as (() => void) | undefined}>{(children ?? label ?? title) as ReactNode}</button>;
+    }
+    if (lower.includes('input') || lower.includes('textarea') || lower.includes('field') || lower.includes('select')) {
+      return <input placeholder={props.placeholder as string | undefined} onChange={(event) => typeof onValueChange === 'function' && (onValueChange as (value: string) => void)(event.target.value)} />;
+    }
+    if (lower.includes('switch') || lower.includes('checkbox')) {
+      return <label><input type="checkbox" />{children as ReactNode}</label>;
+    }
+    if (lower.includes('skeleton') || lower.includes('spinner')) {
+      return <div role="status" />;
+    }
+    return <div>{label as ReactNode}{title as ReactNode}{description as ReactNode}{children as ReactNode}</div>;
+  };
+
+  return new Proxy({}, {
+    get(_target, prop) {
+      if (typeof prop === 'symbol') return undefined;
+      if (prop === '__esModule') return true;
+      if (prop === 'default') return undefined;
+      if (prop === 'useConfirm') return () => () => Promise.resolve(true);
+      if (/^use[A-Z]/.test(prop)) return () => ({});
+      return makeStub(String(prop));
+    },
+  });
+});
 
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (

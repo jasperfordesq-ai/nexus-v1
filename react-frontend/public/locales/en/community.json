@@ -221,7 +221,16 @@
     "cancel": "Cancel",
     "submit_application": "Submit Application",
     "job_openings": "Job Openings",
-    "rating_sr": "{{n}} out of 5 stars"
+    "rating_sr": "{{n}} out of 5 stars",
+    "write_review": "Write review",
+    "review_modal_title": "Review this organisation",
+    "rating_label": "Rating",
+    "comment_label": "Comment",
+    "comment_placeholder": "Share what worked well or what others should know.",
+    "submit_review": "Submit review",
+    "review_success": "Review submitted.",
+    "review_error": "Unable to submit your review.",
+    "rating_required": "Choose a rating before submitting."
   },
   "emergency_alerts": {
     "heading": "Emergency Alerts",

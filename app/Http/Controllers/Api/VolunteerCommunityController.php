@@ -20,6 +20,7 @@ use App\Services\VolunteerDonationService;
 use App\Services\GuardianConsentService;
 use App\Services\WebhookDispatchService;
 use App\Services\VolunteerReminderService;
+use App\Services\VolunteeringConfigurationService;
 use App\Core\TenantContext;
 
 /**
@@ -77,7 +78,8 @@ class VolunteerCommunityController extends BaseApiController
 
         // Guardian-consent gate for minors — the waitlist leads straight to a
         // shift place on promotion, so it must be gated like signUp().
-        if (\App\Services\GuardianConsentService::isMinor($userId)) {
+        if (VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_GUARDIAN_CONSENT_REQUIRED, false)
+            && \App\Services\GuardianConsentService::isMinor($userId)) {
             $gateOppId = \Illuminate\Support\Facades\DB::table('vol_shifts')
                 ->where('tenant_id', \App\Core\TenantContext::getId())
                 ->where('id', (int) $id)
@@ -348,6 +350,9 @@ class VolunteerCommunityController extends BaseApiController
     public function recurringPatterns($id): JsonResponse
     {
         $this->ensureFeature();
+        if (! VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_ENABLE_RECURRING_SHIFTS, true)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.module_disabled_for_community'), null, 403);
+        }
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_recurring_list', 60, 60);
         $oppId = (int) $id;
@@ -365,6 +370,9 @@ class VolunteerCommunityController extends BaseApiController
     public function createRecurringPattern($id): JsonResponse
     {
         $this->ensureFeature();
+        if (! VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_ENABLE_RECURRING_SHIFTS, true)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.module_disabled_for_community'), null, 403);
+        }
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_recurring_create', 10, 60);
         $oppId = (int) $id;
@@ -395,6 +403,9 @@ class VolunteerCommunityController extends BaseApiController
     public function updateRecurringPattern($id): JsonResponse
     {
         $this->ensureFeature();
+        if (! VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_ENABLE_RECURRING_SHIFTS, true)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.module_disabled_for_community'), null, 403);
+        }
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_recurring_update', 10, 60);
         $patternId = (int) $id;
@@ -413,6 +424,9 @@ class VolunteerCommunityController extends BaseApiController
     public function deleteRecurringPattern($id): JsonResponse
     {
         $this->ensureFeature();
+        if (! VolunteeringConfigurationService::get(VolunteeringConfigurationService::CONFIG_ENABLE_RECURRING_SHIFTS, true)) {
+            return $this->respondWithError('FEATURE_DISABLED', __('api.module_disabled_for_community'), null, 403);
+        }
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_recurring_delete', 10, 60);
         $patternId = (int) $id;

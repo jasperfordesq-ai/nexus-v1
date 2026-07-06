@@ -52,6 +52,27 @@ class ShiftGroupReservationService
             return null;
         }
 
+        $publicShift = DB::table('vol_shifts as s')
+            ->join('vol_opportunities as opp', function ($join) {
+                $join->on('s.opportunity_id', '=', 'opp.id')
+                    ->on('s.tenant_id', '=', 'opp.tenant_id');
+            })
+            ->join('vol_organizations as org', function ($join) {
+                $join->on('opp.organization_id', '=', 'org.id')
+                    ->on('opp.tenant_id', '=', 'org.tenant_id');
+            })
+            ->where('s.id', $shiftId)
+            ->where('s.tenant_id', $tenantId)
+            ->where('opp.is_active', true)
+            ->whereIn('opp.status', ['open', 'active'])
+            ->whereIn('org.status', ['approved', 'active'])
+            ->exists();
+
+        if (! $publicShift) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_opportunity_not_active')];
+            return null;
+        }
+
         // Verify group exists
         $group = Group::find($groupId);
         if (! $group) {

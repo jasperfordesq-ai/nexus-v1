@@ -1,10 +1,10 @@
-// Copyright © 2024–2026 Jasper Ford
+﻿// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { api } from '@/lib/api';
 import type { ReactNode } from 'react';
 
@@ -32,13 +32,12 @@ vi.mock('react-i18next', () => ({
   initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
-vi.mock('react-router-dom', async () => {
-  const actual = await import('react-router-dom');
-  const React = await import('react');
+vi.mock('react-router-dom', () => {
   return {
-    ...actual,
+    BrowserRouter: ({ children }: { children?: ReactNode }) => <>{children}</>,
+    MemoryRouter: ({ children }: { children?: ReactNode }) => <>{children}</>,
     Link: ({ children, to, ...rest }: { children: ReactNode; to: string; [k: string]: unknown }) =>
-      React.createElement('a', { href: String(to), ...rest }, children),
+      <a href={String(to)} {...rest}>{children}</a>,
     useNavigate: () => vi.fn(),
   };
 });

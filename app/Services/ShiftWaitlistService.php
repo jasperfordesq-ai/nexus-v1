@@ -47,6 +47,48 @@ class ShiftWaitlistService
             return null;
         }
 
+        $context = DB::table('vol_shifts as s')
+            ->join('vol_opportunities as opp', function ($join) {
+                $join->on('s.opportunity_id', '=', 'opp.id')
+                    ->on('s.tenant_id', '=', 'opp.tenant_id');
+            })
+            ->join('vol_organizations as org', function ($join) {
+                $join->on('opp.organization_id', '=', 'org.id')
+                    ->on('opp.tenant_id', '=', 'org.tenant_id');
+            })
+            ->where('s.id', $shiftId)
+            ->where('s.tenant_id', $tenantId)
+            ->select(
+                's.id',
+                's.capacity',
+                'opp.id as opportunity_id',
+                'opp.status as opportunity_status',
+                'opp.is_active as opportunity_is_active',
+                'org.status as organization_status'
+            )
+            ->first();
+
+        if (! $context
+            || (int) ($context->opportunity_is_active ?? 0) !== 1
+            || ! in_array((string) ($context->opportunity_status ?? ''), ['open', 'active'], true)
+            || ! in_array((string) ($context->organization_status ?? ''), ['approved', 'active'], true)
+        ) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_opportunity_not_active')];
+            return null;
+        }
+
+        $approvedApplication = DB::table('vol_applications')
+            ->where('opportunity_id', (int) $context->opportunity_id)
+            ->where('user_id', $userId)
+            ->where('status', 'approved')
+            ->where('tenant_id', $tenantId)
+            ->exists();
+
+        if (! $approvedApplication) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_shift_approved_application_required')];
+            return null;
+        }
+
         // Check if already on waitlist
         $onWaitlist = DB::table('vol_shift_waitlist')
             ->where('shift_id', $shiftId)
@@ -70,6 +112,23 @@ class ShiftWaitlistService
 
         if ($signedUp) {
             self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.shift_waitlist_already_signed_up')];
+            return null;
+        }
+
+        $capacity = $context->capacity !== null ? (int) $context->capacity : null;
+        if ($capacity === null) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_shift_not_full')];
+            return null;
+        }
+
+        $approvedCount = (int) DB::table('vol_applications')
+            ->where('shift_id', $shiftId)
+            ->where('status', 'approved')
+            ->where('tenant_id', $tenantId)
+            ->count();
+
+        if ($approvedCount < $capacity) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_shift_not_full')];
             return null;
         }
 
@@ -336,7 +395,30 @@ class ShiftWaitlistService
                     }
                 }
 
-                // Mark as promoted
+                // Attach the notified volunteer's existing approved application to the offered shift.
+                $existingApp = DB::table('vol_applications')
+                    ->where('opportunity_id', (int) $shift->opportunity_id)
+                    ->where('user_id', $entry->user_id)
+                    ->where('status', 'approved')
+                    ->where('tenant_id', $tenantId)
+                    ->first();
+
+                if (! $existingApp) {
+                    self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_shift_approved_application_required')];
+                    return false;
+                }
+
+                // Attach the already-approved application to the shift. If it
+                // was already attached to a different shift, capture that so
+                // its waitlist gets the freed slot after we commit.
+                if (!empty($existingApp->shift_id) && (int) $existingApp->shift_id !== (int) $entry->shift_id) {
+                    $displacedShiftId = (int) $existingApp->shift_id;
+                }
+                DB::table('vol_applications')
+                    ->where('id', $existingApp->id)
+                    ->where('tenant_id', $tenantId)
+                    ->update(['shift_id' => $entry->shift_id, 'updated_at' => now()]);
+
                 DB::table('vol_shift_waitlist')
                     ->where('id', $waitlistId)
                     ->where('tenant_id', $tenantId)
@@ -344,36 +426,6 @@ class ShiftWaitlistService
                         'status'      => 'promoted',
                         'promoted_at' => now(),
                     ]);
-
-                // Sign up for shift — create an approved application
-                $existingApp = DB::table('vol_applications')
-                    ->where('opportunity_id', (int) $shift->opportunity_id)
-                    ->where('user_id', $entry->user_id)
-                    ->where('tenant_id', $tenantId)
-                    ->first();
-
-                if ($existingApp) {
-                    // Reactivate existing application and attach the shift. If it
-                    // was already attached to a different shift, capture that so
-                    // its waitlist gets the freed slot after we commit.
-                    if (!empty($existingApp->shift_id) && (int) $existingApp->shift_id !== (int) $entry->shift_id) {
-                        $displacedShiftId = (int) $existingApp->shift_id;
-                    }
-                    DB::table('vol_applications')
-                        ->where('id', $existingApp->id)
-                        ->where('tenant_id', $tenantId)
-                        ->update(['status' => 'approved', 'shift_id' => $entry->shift_id, 'updated_at' => now()]);
-                } else {
-                    DB::table('vol_applications')->insert([
-                        'tenant_id'      => $tenantId,
-                        'opportunity_id' => (int) $shift->opportunity_id,
-                        'shift_id'       => $entry->shift_id,
-                        'user_id'        => $entry->user_id,
-                        'status'         => 'approved',
-                        'created_at'     => now(),
-                        'updated_at'     => now(),
-                    ]);
-                }
 
                 return true;
             });

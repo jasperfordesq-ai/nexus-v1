@@ -15,7 +15,7 @@ import Clock from 'lucide-react/icons/clock';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import Users from 'lucide-react/icons/users';
 import Plus from 'lucide-react/icons/plus';
-import { GlassCard, Button, Chip, Spinner, SearchField, Avatar, Checkbox } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Spinner, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Checkbox } from '@/components/ui';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { formatDateValue, resolveAvatarUrl } from '@/lib/helpers';
@@ -70,7 +70,7 @@ function formatDate(d: string) { return formatDateValue(d); }
 function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
   const toast = useToast();
   const { t } = useTranslation('volunteering');
-  const { tenantPath } = useTenant();
+  const { tenantPath, volunteeringConfig } = useTenant();
 
   const [applications, setApplications] = useState<OrgApplication[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -82,6 +82,10 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
   const [nameSearch, setNameSearch] = useState('');
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [isBulkRunning, setIsBulkRunning] = useState(false);
+  const declineModal = useDisclosure();
+  const [pendingDeclineIds, setPendingDeclineIds] = useState<number[]>([]);
+  const [declineNote, setDeclineNote] = useState('');
+  const declineNoteRequired = Boolean(volunteeringConfig?.['volunteering.require_org_note_on_decline']);
 
   const tRef = useRef(t);
   tRef.current = t;
@@ -151,17 +155,19 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
 
   /* ---- Single action ---- */
 
-  async function handleAction(applicationId: number, action: 'approve' | 'decline') {
+  async function handleAction(applicationId: number, action: 'approve' | 'decline', orgNote = '') {
     setActionLoading((prev) => ({ ...prev, [applicationId]: action }));
 
     // Optimistic update
     const newStatus = action === 'approve' ? 'approved' : 'declined';
     setApplications((prev) =>
-      prev.map((a) => (a.id === applicationId ? { ...a, status: newStatus as OrgApplication['status'] } : a)),
+      prev.map((a) => (a.id === applicationId ? { ...a, status: newStatus as OrgApplication['status'], org_note: action === 'decline' ? orgNote || a.org_note : a.org_note } : a)),
     );
 
     try {
-      const response = await api.put(`/v2/volunteering/applications/${applicationId}`, { action });
+      const body: { action: 'approve' | 'decline'; org_note?: string } = { action };
+      if (orgNote.trim()) body.org_note = orgNote.trim();
+      const response = await api.put(`/v2/volunteering/applications/${applicationId}`, body);
       if (response.success) {
         toast.success(
           action === 'approve'
@@ -199,6 +205,32 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
       }
       setSelected(new Set());
       loadApplications(statusFilter);
+    } finally {
+      setIsBulkRunning(false);
+    }
+  }
+
+  function openDeclineModal(ids: number[]) {
+    setPendingDeclineIds(ids);
+    setDeclineNote('');
+    declineModal.onOpen();
+  }
+
+  async function confirmDecline() {
+    if (declineNoteRequired && !declineNote.trim()) return;
+    const ids = pendingDeclineIds;
+    if (ids.length === 0) return;
+
+    setIsBulkRunning(ids.length > 1);
+    try {
+      for (const id of ids) {
+        await handleAction(id, 'decline', declineNote.trim());
+      }
+      setSelected(new Set());
+      declineModal.onClose();
+      setPendingDeclineIds([]);
+      setDeclineNote('');
+      if (ids.length > 1) loadApplications(statusFilter);
     } finally {
       setIsBulkRunning(false);
     }
@@ -309,7 +341,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
             size="sm"
             variant="danger-soft"
             startContent={<XCircle className="w-3.5 h-3.5" />}
-            onPress={() => handleBulkAction('decline')}
+            onPress={() => openDeclineModal(Array.from(selected))}
             isDisabled={isBulkRunning}
           >
             {t('applications.decline_all')}
@@ -444,7 +476,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
                     isLoading={actionLoading[app.id] === 'decline'}
                     isDisabled={!!actionLoading[app.id]}
                     startContent={actionLoading[app.id] !== 'decline' ? <XCircle className="w-3.5 h-3.5" /> : undefined}
-                    onPress={() => handleAction(app.id, 'decline')}
+                    onPress={() => openDeclineModal([app.id])}
                   >
                     {t('applications.decline')}
                   </Button>
@@ -469,6 +501,45 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
           </Button>
         </div>
       )}
+
+      <Modal isOpen={declineModal.isOpen} onClose={declineModal.onClose} size="md" classNames={{
+        base: 'bg-overlay border border-theme-default',
+      }}>
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">{t('applications.decline_modal_title')}</ModalHeader>
+          <ModalBody className="space-y-4">
+            <p className="text-sm text-theme-muted">
+              {t('applications.decline_modal_description', { count: pendingDeclineIds.length })}
+            </p>
+            <Textarea
+              label={t('applications.decline_note_label')}
+              placeholder={t('applications.decline_note_placeholder')}
+              value={declineNote}
+              onValueChange={setDeclineNote}
+              minRows={3}
+              isRequired={declineNoteRequired}
+              classNames={{
+                input: 'bg-transparent text-theme-primary',
+                inputWrapper: 'bg-theme-elevated border-theme-default',
+              }}
+            />
+            {declineNoteRequired && !declineNote.trim() && (
+              <p className="text-xs text-danger">{t('applications.decline_note_required')}</p>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="tertiary" onPress={declineModal.onClose}>{t('applications.cancel')}</Button>
+            <Button
+              variant="danger-soft"
+              onPress={confirmDecline}
+              isLoading={isBulkRunning}
+              isDisabled={declineNoteRequired && !declineNote.trim()}
+            >
+              {t('applications.decline_confirm')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </GlassCard>
   );
 }

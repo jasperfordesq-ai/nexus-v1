@@ -25,6 +25,8 @@ class UpdateOpportunityRequest extends FormRequest
             'description' => ['sometimes', 'string'],
             'location' => ['sometimes', 'nullable', 'string', 'max:255'],
             'is_remote' => ['sometimes', 'boolean'],
+            'latitude' => ['sometimes', 'nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['sometimes', 'nullable', 'numeric', 'between:-180,180'],
             'skills_needed' => ['sometimes', 'nullable', 'string', 'max:1000'],
             'start_date' => ['sometimes', 'nullable', 'date'],
             'end_date' => ['sometimes', 'nullable', 'date', 'after_or_equal:start_date'],

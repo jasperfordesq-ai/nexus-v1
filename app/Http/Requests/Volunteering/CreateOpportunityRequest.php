@@ -25,6 +25,8 @@ class CreateOpportunityRequest extends FormRequest
             'description' => ['required', 'string'],
             'location' => ['nullable', 'string'],
             'is_remote' => ['nullable', 'boolean'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after:start_date'],
             'category_id' => ['nullable', 'integer', 'exists:categories,id'],

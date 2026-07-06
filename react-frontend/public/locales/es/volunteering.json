@@ -236,7 +236,13 @@
       "type": "Tipo de Gasto",
       "amount": "Cantidad",
       "currency": "Moneda",
-      "description": "Descripción"
+      "description": "Descripción",
+      "receipt": "Receipt",
+      "receipt_none": "No receipt attached",
+      "receipt_hint": "Attach a PDF, JPG, PNG, or WebP receipt up to 10 MB.",
+      "receipt_attach": "Attach receipt",
+      "receipt_replace": "Replace",
+      "receipt_remove": "Remove receipt"
     },
     "no_organisation": "Aún no hay organizaciones de voluntarios aprobadas disponibles para cubrir gastos.",
     "cancel": "Cancelar",
@@ -626,7 +632,18 @@
     "apply_message_placeholder": "Dile al organizador por qué te gustaría ser voluntario...",
     "select_shift": "Seleccione un turno (opcional)",
     "cancel": "Cancelar",
-    "submit_application": "Enviar solicitud"
+    "submit_application": "Enviar solicitud",
+    "shift_signed_up": "Signed up",
+    "sign_up_shift": "Sign up",
+    "switch_shift": "Switch shift",
+    "cancel_shift_signup": "Cancel signup",
+    "join_waitlist": "Join waitlist",
+    "shift_signup_success": "Shift signup confirmed.",
+    "shift_signup_failed": "Unable to sign up for this shift.",
+    "shift_cancel_success": "Shift signup cancelled.",
+    "shift_cancel_failed": "Unable to cancel this shift signup.",
+    "shift_waitlist_success": "You have joined the waitlist.",
+    "shift_waitlist_failed": "Unable to join this waitlist."
   },
   "org_settings": {
     "heading": "Configuración de la organización",
@@ -673,7 +690,14 @@
     "filter_label": "Filtrar aplicaciones",
     "empty_title": "No applications yet",
     "empty_desc": "When someone applies to one of your opportunities, they'll appear here for you to approve or decline. Post an opportunity to start attracting volunteers.",
-    "empty_cta": "Post an opportunity"
+    "empty_cta": "Post an opportunity",
+    "decline_modal_title": "Decline application",
+    "decline_modal_description": "Add a note for {{count}} application before declining.",
+    "decline_note_label": "Decision note",
+    "decline_note_placeholder": "Share the reason or next steps for the volunteer.",
+    "decline_note_required": "A note is required before declining.",
+    "decline_confirm": "Decline application",
+    "cancel": "Cancel"
   },
   "org_wallet_balance": "Saldo de la billetera:",
   "auto_pay_on": "Pago automático activado",
@@ -719,7 +743,22 @@
     "search_label": "Nombre del miembro",
     "search_placeholder": "Buscar miembros por nombre…",
     "search_description": "Busca al miembro que quieres añadir a esta reserva de grupo y selecciónalo en los resultados. Recibirá una invitación para unirse.",
-    "no_results": "Ningún miembro coincide con tu búsqueda."
+    "no_results": "Ningún miembro coincide con tu búsqueda.",
+    "reserve_slots": "Reserve slots",
+    "reserve_modal_title": "Reserve shift slots",
+    "reserve_group": "Group",
+    "reserve_opportunity": "Opportunity",
+    "reserve_opportunity_option": "{{title}} - {{organization}}",
+    "reserve_shift": "Shift",
+    "reserve_shift_option": "{{date}}, {{start}}-{{end}}",
+    "reserve_slots_label": "Slots to reserve",
+    "reserve_notes": "Notes",
+    "reserve_submit": "Reserve slots",
+    "reserve_success": "Group reservation created.",
+    "reserve_error": "Unable to create this group reservation.",
+    "reserve_load_error": "Unable to load groups and opportunities.",
+    "reserve_shifts_error": "Unable to load shifts for this opportunity.",
+    "reserve_required": "Choose a group, shift, and number of slots."
   },
   "recommendations": {
     "title": "Recomendado para ti",
@@ -962,5 +1001,7 @@
   "my_organisations_load_error": "Unable to load your organisations. Please try again.",
   "distance_m": "{{value}} m",
   "distance_km": "{{value}} km",
-  "date_range_separator": " – "
+  "date_range_separator": " – ",
+  "form_remote_label": "Remote opportunity",
+  "form_remote_description": "Volunteers can take part online or by phone."
 }
