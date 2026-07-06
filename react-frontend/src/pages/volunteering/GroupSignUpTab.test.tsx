@@ -39,18 +39,22 @@ vi.mock("@/lib/api", () => ({
   },
 }));
 
-// The Add Member modal is gated by useDisclosure() + <Modal isOpen>. The shared
-// uiMock's useDisclosure is a static { isOpen: false } stub that never flips, and
-// the uiMock Modal now honors isOpen — so the modal content stays hidden until
-// the trigger is clicked. Compose the shared uiMock via a Proxy and override ONLY
-// useDisclosure with a real stateful hook so clicking "Add Member" opens the
-// modal and the real handleAddMember/search wiring runs.
-vi.mock("@/components/ui", async () => {
-  const ReactMod = await import("react");
-  const { uiMock } = await import("@/test/uiMock");
+vi.mock("@/contexts", () => ({
+  useAuth: vi.fn(() => ({
+    user: { id: 1, first_name: "Test" },
+    isAuthenticated: true,
+  })),
+  useToast: vi.fn(() => ({
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+  })),
+}));
 
+vi.mock("@/components/ui", () => {
   function useDisclosureStub(defaultOpen = false) {
-    const [isOpen, setIsOpen] = ReactMod.useState(defaultOpen);
+    const [isOpen, setIsOpen] = React.useState(defaultOpen);
     return {
       isOpen,
       onOpen: () => setIsOpen(true),
@@ -61,12 +65,54 @@ vi.mock("@/components/ui", async () => {
     };
   }
 
-  return new Proxy(uiMock, {
-    get(target, prop) {
-      if (prop === "useDisclosure") return useDisclosureStub;
-      return Reflect.get(target, prop);
-    },
-  });
+  const Box = ({ children, label, title, description }: Record<string, unknown>) => (
+    <div>
+      {label as React.ReactNode}
+      {title as React.ReactNode}
+      {description as React.ReactNode}
+      {typeof children === "function" ? (children as (arg: unknown) => React.ReactNode)(vi.fn()) : children as React.ReactNode}
+    </div>
+  );
+  const Button = ({ children, onPress, onClick, isDisabled, disabled }: Record<string, unknown>) => (
+    <button type="button" disabled={Boolean(isDisabled ?? disabled)} onClick={(onPress ?? onClick) as (() => void) | undefined}>
+      {children as React.ReactNode}
+    </button>
+  );
+  const Input = ({ placeholder, value, onValueChange, onChange, label }: Record<string, unknown>) => (
+    <label>
+      {label as React.ReactNode}
+      <input
+        placeholder={placeholder as string | undefined}
+        value={(value as string | undefined) ?? ""}
+        onChange={(event) => {
+          if (typeof onValueChange === "function") onValueChange(event.target.value);
+          if (typeof onChange === "function") onChange(event);
+        }}
+      />
+    </label>
+  );
+  const Select = ({ children, label }: Record<string, unknown>) => <label>{label as React.ReactNode}<select>{children as React.ReactNode}</select></label>;
+  const SelectItem = ({ children }: { children?: React.ReactNode }) => <option>{children}</option>;
+  const Modal = ({ isOpen, children }: Record<string, unknown>) => isOpen === false ? null : <div>{children as React.ReactNode}</div>;
+
+  return {
+    useDisclosure: useDisclosureStub,
+    GlassCard: Box,
+    Button,
+    Chip: Box,
+    Input,
+    Select,
+    SelectItem,
+    Textarea: Input,
+    Modal,
+    ModalContent: Box,
+    ModalHeader: Box,
+    ModalBody: Box,
+    ModalFooter: Box,
+    Avatar: Box,
+    AvatarGroup: Box,
+    CardRowsSkeleton: () => <div role="status" />,
+  };
 });
 
 vi.mock("@/components/feedback", () => ({

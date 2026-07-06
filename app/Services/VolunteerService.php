@@ -312,49 +312,47 @@ class VolunteerService
                 throw new \RuntimeException(__('api.already_applied'), 409);
             }
 
-            $shiftId = !empty($data['shift_id']) ? (int) $data['shift_id'] : null;
-            if ($shiftId !== null) {
-                $shift = DB::selectOne(
-                    "SELECT id, opportunity_id, start_time, capacity FROM vol_shifts WHERE id = ? AND opportunity_id = ? AND tenant_id = ?",
-                    [$shiftId, $opportunityId, $tenantId]
-                );
-
-                if (!$shift) {
-                    throw new \RuntimeException(__('api.volunteer_shift_not_found'), 404);
-                }
-
-                if (strtotime((string) $shift->start_time) < time()) {
-                    throw new \RuntimeException(__('api.volunteer_shift_started'), 422);
-                }
-
-                if (!empty($shift->capacity)) {
-                    $signupCount = (int) DB::selectOne(
-                        "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
-                        [$shiftId, $tenantId]
-                    )->cnt;
-
-                    if ($signupCount >= (int) $shift->capacity) {
-                        throw new \RuntimeException(__('api.volunteer_shift_at_capacity'), 422);
-                    }
-                }
-            }
-
             $initialStatus = VolunteeringConfigurationService::get(
                 VolunteeringConfigurationService::CONFIG_AUTO_APPROVE_APPLICATIONS,
                 false
             ) ? 'approved' : 'pending';
 
-            $application = VolApplication::create([
-                'opportunity_id' => $opportunityId,
-                'user_id'        => $userId,
-                'message'        => trim($data['message'] ?? ''),
-                'shift_id'       => $shiftId,
-            ]);
+            $shiftId = !empty($data['shift_id']) ? (int) $data['shift_id'] : null;
 
-            $application->forceFill(['status' => $initialStatus]);
-            $application->save();
+            return DB::transaction(function () use ($shiftId, $opportunityId, $tenantId, $userId, $data, $initialStatus) {
+                if ($shiftId !== null) {
+                    $shift = self::getShiftContext($shiftId, $tenantId, true);
 
-            return $application->fresh(['user', 'opportunity']);
+                    if (!$shift || (int) $shift->opportunity_id !== $opportunityId) {
+                        throw new \RuntimeException(__('api.volunteer_shift_not_found'), 404);
+                    }
+
+                    if (! self::isPublicShiftContext($shift)) {
+                        throw new \RuntimeException(__('api.volunteer_opportunity_not_active'), 404);
+                    }
+
+                    if (strtotime((string) $shift->start_time) < time()) {
+                        throw new \RuntimeException(__('api.volunteer_shift_started'), 422);
+                    }
+
+                    $capacity = $shift->capacity !== null ? (int) $shift->capacity : null;
+                    if (! VolunteerShiftCapacityService::hasAvailableSlot($shiftId, $tenantId, $capacity)) {
+                        throw new \RuntimeException(__('api.volunteer_shift_at_capacity'), 422);
+                    }
+                }
+
+                $application = VolApplication::create([
+                    'opportunity_id' => $opportunityId,
+                    'user_id'        => $userId,
+                    'message'        => trim($data['message'] ?? ''),
+                    'shift_id'       => $shiftId,
+                ]);
+
+                $application->forceFill(['status' => $initialStatus]);
+                $application->save();
+
+                return $application->fresh(['user', 'opportunity']);
+            });
         } finally {
             $dupLock->release();
         }
@@ -1277,8 +1275,20 @@ class VolunteerService
             $counts[(int) $row->shift_id] = (int) $row->cnt;
         }
 
-        return array_map(function ($shift) use ($counts) {
+        $reservationRows = DB::select(
+            "SELECT shift_id, COALESCE(SUM(reserved_slots), 0) as cnt FROM vol_shift_group_reservations
+             WHERE shift_id IN ($placeholders) AND status = 'active' AND tenant_id = ?
+             GROUP BY shift_id",
+            [...$shiftIds, $tenantId]
+        );
+        $reservationCounts = [];
+        foreach ($reservationRows as $row) {
+            $reservationCounts[(int) $row->shift_id] = (int) $row->cnt;
+        }
+
+        return array_map(function ($shift) use ($counts, $reservationCounts) {
             $signupCount = $counts[(int) $shift->id] ?? 0;
+            $reservedCount = $reservationCounts[(int) $shift->id] ?? 0;
 
             return [
                 'id'              => (int) $shift->id,
@@ -1286,7 +1296,8 @@ class VolunteerService
                 'end_time'        => $shift->end_time,
                 'capacity'        => $shift->capacity ? (int) $shift->capacity : null,
                 'signup_count'    => $signupCount,
-                'spots_available' => $shift->capacity ? max(0, (int) $shift->capacity - $signupCount) : null,
+                'reserved_count'  => $reservedCount,
+                'spots_available' => $shift->capacity ? max(0, (int) $shift->capacity - $signupCount - $reservedCount) : null,
             ];
         }, $shifts);
     }
@@ -1300,9 +1311,14 @@ class VolunteerService
         $tenantId = self::getTenantId();
 
         // Check user has approved application for this opportunity (outside lock — read-only pre-check)
-        $shift = DB::selectOne("SELECT * FROM vol_shifts WHERE id = ? AND tenant_id = ?", [$shiftId, $tenantId]);
+        $shift = self::getShiftContext($shiftId, $tenantId);
         if (!$shift) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_shift_not_found')];
+            return false;
+        }
+
+        if (! self::isPublicShiftContext($shift)) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_opportunity_not_active')];
             return false;
         }
 
@@ -1333,23 +1349,25 @@ class VolunteerService
         try {
             $ok = DB::transaction(function () use ($shiftId, $tenantId, $app, $userId, $shift) {
                 // Lock the shift row to prevent concurrent signups from exceeding capacity
-                $lockedShift = DB::selectOne(
-                    "SELECT * FROM vol_shifts WHERE id = ? AND tenant_id = ? FOR UPDATE",
-                    [$shiftId, $tenantId]
-                );
+                $lockedShift = self::getShiftContext($shiftId, $tenantId, true);
 
                 if (!$lockedShift) {
                     self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_shift_not_found')];
                     return false;
                 }
 
-                // Re-check capacity under the lock
-                $signupCount = (int) DB::selectOne(
-                    "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
-                    [$shiftId, $tenantId]
-                )->cnt;
+                if (! self::isPublicShiftContext($lockedShift)) {
+                    self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_opportunity_not_active')];
+                    return false;
+                }
 
-                if ($lockedShift->capacity && $signupCount >= (int) $lockedShift->capacity) {
+                if (strtotime($lockedShift->start_time) < time()) {
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_shift_started')];
+                    return false;
+                }
+
+                $capacity = $lockedShift->capacity !== null ? (int) $lockedShift->capacity : null;
+                if (! VolunteerShiftCapacityService::hasAvailableSlot($shiftId, $tenantId, $capacity)) {
                     self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_shift_at_capacity')];
                     return false;
                 }
@@ -2610,12 +2628,32 @@ class VolunteerService
             return true;
         }
 
-        $approvedCount = (int) DB::selectOne(
-            "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
-            [$shiftId, $tenantId]
-        )->cnt;
+        return VolunteerShiftCapacityService::hasAvailableSlot($shiftId, $tenantId, (int) $shift->capacity);
+    }
 
-        return $approvedCount < (int) $shift->capacity;
+    private static function getShiftContext(int $shiftId, int $tenantId, bool $lock = false): ?object
+    {
+        $lockSql = $lock ? ' FOR UPDATE' : '';
+
+        return DB::selectOne(
+            "SELECT s.*, opp.status as opportunity_status, opp.is_active as opportunity_is_active, org.status as organization_status
+             FROM vol_shifts s
+             JOIN vol_opportunities opp ON s.opportunity_id = opp.id AND s.tenant_id = opp.tenant_id
+             JOIN vol_organizations org ON opp.organization_id = org.id AND opp.tenant_id = org.tenant_id
+             WHERE s.id = ? AND s.tenant_id = ?{$lockSql}",
+            [$shiftId, $tenantId]
+        );
+    }
+
+    private static function isPublicShiftContext(?object $shift): bool
+    {
+        if (!$shift) {
+            return false;
+        }
+
+        return (int) ($shift->opportunity_is_active ?? 0) === 1
+            && in_array((string) ($shift->opportunity_status ?? ''), ['open', 'active'], true)
+            && in_array((string) ($shift->organization_status ?? ''), ['approved', 'active'], true);
     }
 
     /**

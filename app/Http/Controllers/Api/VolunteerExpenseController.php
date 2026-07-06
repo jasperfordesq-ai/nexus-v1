@@ -13,6 +13,7 @@ use App\Services\VolunteerExpenseService;
 use App\Services\VolunteeringConfigurationService;
 use App\Core\TenantContext;
 use App\Support\CsvExportSanitizer;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * VolunteerExpenseController -- Expense submissions, reviews, policies, and exports.
@@ -92,18 +93,22 @@ class VolunteerExpenseController extends BaseApiController
         $data = $this->getAllInput();
         unset($data['receipt'], $data['receipt_path'], $data['receipt_filename']);
 
+        $storedReceiptPath = null;
         $receipt = request()->file('receipt');
         if ($receipt) {
             $tenantId = TenantContext::getId();
-            $data['receipt_path'] = $receipt->store("volunteer-expenses/{$tenantId}", 'local');
+            $storedReceiptPath = $receipt->store("volunteer-expenses/{$tenantId}", 'local');
+            $data['receipt_path'] = $storedReceiptPath;
             $data['receipt_filename'] = basename((string) $receipt->getClientOriginalName());
         }
 
         try {
             $result = $this->volunteerExpenseService->submitExpense($userId, $data);
         } catch (\InvalidArgumentException $e) {
+            $this->deleteStoredReceipt($storedReceiptPath);
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\RuntimeException $e) {
+            $this->deleteStoredReceipt($storedReceiptPath);
             $status = (int) $e->getCode();
             if (!in_array($status, [403, 404], true)) {
                 $status = 400;
@@ -112,10 +117,18 @@ class VolunteerExpenseController extends BaseApiController
         }
 
         if (isset($result['error'])) {
+            $this->deleteStoredReceipt($storedReceiptPath);
             return $this->respondWithError('VALIDATION_ERROR', $result['error'], null, 422);
         }
 
         return $this->respondWithData($result, null, 201);
+    }
+
+    private function deleteStoredReceipt(?string $path): void
+    {
+        if ($path) {
+            Storage::disk('local')->delete($path);
+        }
     }
 
     public function getExpense($id): JsonResponse

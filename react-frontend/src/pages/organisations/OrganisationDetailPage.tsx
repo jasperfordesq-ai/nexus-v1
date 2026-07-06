@@ -93,8 +93,9 @@ export function OrganisationDetailPage() {
   const { t } = useTranslation(['community', 'volunteering']);
   const { id } = useParams<{ id: string }>();
   const { isAuthenticated } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, volunteeringConfig } = useTenant();
   const toast = useToast();
+  const reviewsEnabled = volunteeringConfig?.['volunteering.enable_reviews'] !== false;
 
   const [organisation, setOrganisation] = useState<OrganisationDetail | null>(null);
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
@@ -136,11 +137,13 @@ export function OrganisationDetailPage() {
       setIsLoading(true);
       setError(null);
 
-      // Load org details, opportunities, and reviews in parallel.
+      // Load org details, opportunities, and enabled secondary data in parallel.
       const [orgRes, oppsRes, reviewsRes] = await Promise.all([
         api.get<OrganisationDetail>(`/v2/volunteering/organisations/${id}`),
         api.get<{ data: Opportunity[] }>(`/v2/volunteering/opportunities?organization_id=${id}&per_page=50`),
-        api.get<{ reviews: Review[] }>(`/v2/volunteering/reviews/organization/${id}`),
+        reviewsEnabled
+          ? api.get<{ reviews: Review[] }>(`/v2/volunteering/reviews/organization/${id}`)
+          : Promise.resolve({ success: true, data: { reviews: [] } }),
       ]);
 
       if (controller.signal.aborted) return;
@@ -156,9 +159,11 @@ export function OrganisationDetailPage() {
         setOpportunities(Array.isArray(oppsRes.data) ? oppsRes.data as Opportunity[] : []);
       }
 
-      if (reviewsRes.success && reviewsRes.data) {
+      if (reviewsEnabled && reviewsRes.success && reviewsRes.data) {
         const reviewsData = reviewsRes.data as { reviews?: Review[] };
         setReviews(reviewsData.reviews ?? []);
+      } else if (!reviewsEnabled) {
+        setReviews([]);
       }
     } catch (err) {
       if (controller.signal.aborted) return;
@@ -167,7 +172,7 @@ export function OrganisationDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, reviewsEnabled]);
 
   useEffect(() => {
     loadData();
@@ -391,7 +396,7 @@ export function OrganisationDetailPage() {
       </GlassCard>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className={`grid grid-cols-2 ${reviewsEnabled ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
         <GlassCard className="p-4 text-center">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-rose-500/10 mx-auto mb-2">
             <Heart className="w-5 h-5 text-rose-400" aria-hidden="true" />
@@ -422,6 +427,7 @@ export function OrganisationDetailPage() {
           </dl>
         </GlassCard>
 
+        {reviewsEnabled && (
         <GlassCard className="p-4 text-center">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-amber-500/10 mx-auto mb-2">
             <Star className="w-5 h-5 text-amber-400" aria-hidden="true" />
@@ -435,6 +441,7 @@ export function OrganisationDetailPage() {
             </dt>
           </dl>
         </GlassCard>
+        )}
       </div>
 
       {/* Active Opportunities */}
@@ -520,7 +527,7 @@ export function OrganisationDetailPage() {
         )}
       </div>
 
-      {/* Reviews */}
+      {reviewsEnabled && (
       <div>
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
@@ -589,6 +596,7 @@ export function OrganisationDetailPage() {
           </div>
         )}
       </div>
+      )}
 
       {/* Apply Modal */}
       <Modal isOpen={applyModal.isOpen} onClose={applyModal.onClose} size="lg" classNames={{
@@ -630,7 +638,7 @@ export function OrganisationDetailPage() {
         </ModalContent>
       </Modal>
 
-      {/* Review Modal */}
+      {reviewsEnabled && (
       <Modal isOpen={reviewModal.isOpen} onClose={reviewModal.onClose} size="md" classNames={{
         base: 'bg-overlay border border-theme-default',
       }}>
@@ -684,6 +692,7 @@ export function OrganisationDetailPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      )}
 
       <GuardianConsentModal
         isOpen={guardianModal.isOpen}

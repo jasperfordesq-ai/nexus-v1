@@ -85,38 +85,76 @@ class ShiftGroupReservationService
             return null;
         }
 
-        // Check available capacity
-        $availableSlots = self::getAvailableSlots($shiftId, $shift);
-        if ($availableSlots !== null && $slots > $availableSlots) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_reservation_slots_available', ['count' => $availableSlots]), 'field' => 'reserved_slots'];
-            return null;
-        }
-
-        // Check for existing reservation
-        $existing = DB::table('vol_shift_group_reservations')
-            ->where('shift_id', $shiftId)
-            ->where('group_id', $groupId)
-            ->where('status', 'active')
-            ->where('tenant_id', $tenantId)
-            ->exists();
-
-        if ($existing) {
-            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.shift_reservation_already_exists')];
-            return null;
-        }
-
         try {
-            return DB::table('vol_shift_group_reservations')->insertGetId([
-                'tenant_id'      => $tenantId,
-                'shift_id'       => $shiftId,
-                'group_id'       => $groupId,
-                'reserved_slots' => $slots,
-                'filled_slots'   => 0,
-                'reserved_by'    => $reservedBy,
-                'status'         => 'active',
-                'notes'          => $notes,
-                'created_at'     => now(),
-            ]);
+            return DB::transaction(function () use ($shiftId, $groupId, $reservedBy, $slots, $notes, $tenantId) {
+                $lockedShift = DB::table('vol_shifts as s')
+                    ->join('vol_opportunities as opp', function ($join) {
+                        $join->on('s.opportunity_id', '=', 'opp.id')
+                            ->on('s.tenant_id', '=', 'opp.tenant_id');
+                    })
+                    ->join('vol_organizations as org', function ($join) {
+                        $join->on('opp.organization_id', '=', 'org.id')
+                            ->on('opp.tenant_id', '=', 'org.tenant_id');
+                    })
+                    ->where('s.id', $shiftId)
+                    ->where('s.tenant_id', $tenantId)
+                    ->select([
+                        's.id',
+                        's.capacity',
+                        's.start_time',
+                        'opp.is_active as opportunity_is_active',
+                        'opp.status as opportunity_status',
+                        'org.status as organization_status',
+                    ])
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $lockedShift
+                    || (int) ($lockedShift->opportunity_is_active ?? 0) !== 1
+                    || ! in_array((string) ($lockedShift->opportunity_status ?? ''), ['open', 'active'], true)
+                    || ! in_array((string) ($lockedShift->organization_status ?? ''), ['approved', 'active'], true)
+                ) {
+                    self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_opportunity_not_active')];
+                    return null;
+                }
+
+                if (strtotime((string) $lockedShift->start_time) < time()) {
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_reservation_shift_started')];
+                    return null;
+                }
+
+                $capacity = $lockedShift->capacity !== null ? (int) $lockedShift->capacity : null;
+                $availableSlots = VolunteerShiftCapacityService::availableSlots($shiftId, $tenantId, $capacity);
+                if ($availableSlots !== null && $slots > $availableSlots) {
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_reservation_slots_available', ['count' => $availableSlots]), 'field' => 'reserved_slots'];
+                    return null;
+                }
+
+                $existing = DB::table('vol_shift_group_reservations')
+                    ->where('shift_id', $shiftId)
+                    ->where('group_id', $groupId)
+                    ->where('status', 'active')
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($existing) {
+                    self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.shift_reservation_already_exists')];
+                    return null;
+                }
+
+                return DB::table('vol_shift_group_reservations')->insertGetId([
+                    'tenant_id'      => $tenantId,
+                    'shift_id'       => $shiftId,
+                    'group_id'       => $groupId,
+                    'reserved_slots' => $slots,
+                    'filled_slots'   => 0,
+                    'reserved_by'    => $reservedBy,
+                    'status'         => 'active',
+                    'notes'          => $notes,
+                    'created_at'     => now(),
+                ]);
+            });
         } catch (\Exception $e) {
             Log::error('ShiftGroupReservationService::reserve error: ' . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.shift_reservation_create_failed')];
@@ -406,25 +444,10 @@ class ShiftGroupReservationService
      */
     private static function getAvailableSlots(int $shiftId, VolShift $shift): ?int
     {
-        if (! $shift->capacity) {
-            return null; // Unlimited
-        }
-
         $tenantId = TenantContext::getId();
+        $capacity = $shift->capacity ? (int) $shift->capacity : null;
 
-        $regularSignups = DB::table('vol_applications')
-            ->where('shift_id', $shiftId)
-            ->where('status', 'approved')
-            ->where('tenant_id', $tenantId)
-            ->count();
-
-        $reservedSlots = (int) DB::table('vol_shift_group_reservations')
-            ->where('shift_id', $shiftId)
-            ->where('status', 'active')
-            ->where('tenant_id', $tenantId)
-            ->sum('reserved_slots');
-
-        return max(0, (int) $shift->capacity - $regularSignups - $reservedSlots);
+        return VolunteerShiftCapacityService::availableSlots($shiftId, $tenantId, $capacity);
     }
 
     private static function canManageReservation(int $groupId, int $reservedBy, int $userId, int $tenantId): bool

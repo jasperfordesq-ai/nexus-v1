@@ -68,34 +68,87 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 vi.mock('@/components/ui', () => {
-  const makeStub = (name: string) => ({ children, label, title, description, onPress, onClick, onValueChange, ...props }: Record<string, unknown>) => {
-    const lower = name.toLowerCase();
-    if (lower.includes('button')) {
-      return <button type="button" onClick={(onPress ?? onClick) as (() => void) | undefined}>{(children ?? label ?? title) as ReactNode}</button>;
-    }
-    if (lower.includes('input') || lower.includes('textarea') || lower.includes('field') || lower.includes('select')) {
-      return <input placeholder={props.placeholder as string | undefined} onChange={(event) => typeof onValueChange === 'function' && (onValueChange as (value: string) => void)(event.target.value)} />;
-    }
-    if (lower.includes('switch') || lower.includes('checkbox')) {
-      return <label><input type="checkbox" />{children as ReactNode}</label>;
-    }
-    if (lower.includes('skeleton') || lower.includes('spinner')) {
-      return <div role="status" />;
-    }
-    return <div>{label as ReactNode}{title as ReactNode}{description as ReactNode}{children as ReactNode}</div>;
+  let currentNumberField: {
+    value?: number;
+    onChange?: (n: number | undefined) => void;
+    isDisabled?: boolean;
+  } = {};
+  const Box = ({ children, label, title, description }: Record<string, unknown>) => (
+    <div>
+      {label as ReactNode}
+      {title as ReactNode}
+      {description as ReactNode}
+      {children as ReactNode}
+    </div>
+  );
+  const Button = ({ children, onPress, onClick }: Record<string, unknown>) => (
+    <button type="button" onClick={(onPress ?? onClick) as (() => void) | undefined}>{children as ReactNode}</button>
+  );
+  const Input = ({ label, placeholder, value, onValueChange }: Record<string, unknown>) => {
+    const input = (
+      <input
+        placeholder={placeholder as string | undefined}
+        value={(value as string | undefined) ?? ''}
+        onChange={(event) => typeof onValueChange === 'function' && (onValueChange as (value: string) => void)(event.target.value)}
+      />
+    );
+    return label ? <label>{label as ReactNode}{input}</label> : input;
   };
-
-  return new Proxy({}, {
-    get(_target, prop) {
-      if (typeof prop === 'symbol') return undefined;
-      if (prop === '__esModule') return true;
-      if (prop === 'default') return undefined;
-      if (prop === 'useConfirm') return () => () => Promise.resolve(true);
-      if (/^use[A-Z]/.test(prop)) return () => ({});
-      return makeStub(String(prop));
-    },
+  const Textarea = Input;
+  const Select = ({ children, label }: Record<string, unknown>) => (
+    <div>
+      {label as ReactNode}
+      {children as ReactNode}
+    </div>
+  );
+  const Switch = ({ children, onValueChange }: Record<string, unknown>) => (
+    <label>
+      <input
+        type="checkbox"
+        onChange={(event) => typeof onValueChange === 'function' && (onValueChange as (value: boolean) => void)(event.target.checked)}
+      />
+      {children as ReactNode}
+    </label>
+  );
+  const NumberFieldRoot = ({ value, onChange, isDisabled, children }: Record<string, unknown>) => {
+    currentNumberField = {
+      value: value as number | undefined,
+      onChange: onChange as ((n: number | undefined) => void) | undefined,
+      isDisabled: isDisabled as boolean | undefined,
+    };
+    return <div>{children as ReactNode}</div>;
+  };
+  const NumberField = Object.assign(NumberFieldRoot, {
+    Group: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+    Input: () => (
+      <input
+        type="number"
+        value={currentNumberField.value ?? ''}
+        disabled={currentNumberField.isDisabled || undefined}
+        onChange={(event) => currentNumberField.onChange?.(event.target.value === '' ? undefined : Number(event.target.value))}
+      />
+    ),
+    DecrementButton: () => null,
+    IncrementButton: () => null,
   });
+
+  return {
+    Select,
+    SelectItem: Box,
+    GlassCard: Box,
+    Progress: ({ value }: Record<string, unknown>) => <progress value={value as number | undefined} max={100} />,
+    Button,
+    Input,
+    Textarea,
+    Switch,
+    NumberField,
+    Label: ({ children }: { children?: ReactNode }) => <label>{children}</label>,
+  };
 });
+
+vi.mock('@/components/seo', () => ({
+  PageMeta: () => null,
+}));
 
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (

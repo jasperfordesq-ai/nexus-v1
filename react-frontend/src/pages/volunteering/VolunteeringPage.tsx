@@ -154,6 +154,11 @@ const VOLUNTEER_TABS: VolunteerTab[] = ['opportunities', 'applications', 'hours'
 // tucked behind a "More" toggle so the page doesn't open as a wall of tabs.
 const PRIMARY_VOLUNTEER_TABS: VolunteerTab[] = ['opportunities', 'applications', 'hours', 'recommended', 'certificates'];
 
+const VOLUNTEER_TAB_FEATURE_GATES: Partial<Record<VolunteerTab, (keyof VolunteeringConfig)[]>> = {
+  recommended: ['volunteering.enable_matching'],
+  expenses: ['volunteering.expenses_enabled'],
+};
+
 // Volunteering brand gradient — centralized so it can be themed later via tokens.
 const VOL_GRADIENT_BASE = 'bg-linear-to-r from-rose-500 to-pink-600';
 const VOL_GRADIENT = `${VOL_GRADIENT_BASE} text-white`;
@@ -187,7 +192,8 @@ export function VolunteeringPage() {
   const isTabEnabled = useCallback((tabKey: VolunteerTab): boolean => {
     const configKey = `volunteering.tab_${tabKey.replace(/-/g, '_')}` as keyof VolunteeringConfig;
     const config = volunteeringConfig as Partial<VolunteeringConfig> | undefined;
-    return config?.[configKey] !== false;
+    const requiredFeatures = VOLUNTEER_TAB_FEATURE_GATES[tabKey] ?? [];
+    return config?.[configKey] !== false && requiredFeatures.every((key) => config?.[key] !== false);
   }, [volunteeringConfig]);
 
   const requestedTab = searchParams.get('tab') as VolunteerTab | null;

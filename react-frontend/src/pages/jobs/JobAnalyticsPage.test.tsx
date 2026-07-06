@@ -72,34 +72,36 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 vi.mock('@/components/ui', () => {
-  const makeStub = (name: string) => ({ children, label, title, description, onPress, onClick, onValueChange, ...props }: Record<string, unknown>) => {
-    const lower = name.toLowerCase();
-    if (lower.includes('button')) {
-      return <button type="button" onClick={(onPress ?? onClick) as (() => void) | undefined}>{(children ?? label ?? title) as ReactNode}</button>;
-    }
-    if (lower.includes('input') || lower.includes('textarea') || lower.includes('field') || lower.includes('select')) {
-      return <input placeholder={props.placeholder as string | undefined} onChange={(event) => typeof onValueChange === 'function' && (onValueChange as (value: string) => void)(event.target.value)} />;
-    }
-    if (lower.includes('switch') || lower.includes('checkbox')) {
-      return <label><input type="checkbox" />{children as ReactNode}</label>;
-    }
-    if (lower.includes('skeleton') || lower.includes('spinner')) {
-      return <div role="status" />;
-    }
-    return <div>{label as ReactNode}{title as ReactNode}{description as ReactNode}{children as ReactNode}</div>;
-  };
-
-  return new Proxy({}, {
-    get(_target, prop) {
-      if (typeof prop === 'symbol') return undefined;
-      if (prop === '__esModule') return true;
-      if (prop === 'default') return undefined;
-      if (prop === 'useConfirm') return () => () => Promise.resolve(true);
-      if (/^use[A-Z]/.test(prop)) return () => ({});
-      return makeStub(String(prop));
-    },
+  const Box = ({ children, label, title, description }: Record<string, unknown>) => (
+    <div>
+      {label as ReactNode}
+      {title as ReactNode}
+      {description as ReactNode}
+      {children as ReactNode}
+    </div>
+  );
+  const Chip = Object.assign(Box, {
+    Label: ({ children }: { children?: ReactNode }) => <span>{children}</span>,
   });
+  return {
+    Chip,
+    GlassCard: Box,
+    Progress: ({ value, 'aria-label': ariaLabel }: Record<string, unknown>) => (
+      <progress aria-label={ariaLabel as string | undefined} value={value as number | undefined} max={100} />
+    ),
+    Button: ({ children, onPress, onClick }: Record<string, unknown>) => (
+      <button type="button" onClick={(onPress ?? onClick) as (() => void) | undefined}>{children as ReactNode}</button>
+    ),
+    Spinner: () => <div role="status" />,
+    Tooltip: ({ children }: { children?: ReactNode }) => <>{children}</>,
+    CardRowsSkeleton: () => <div role="status" aria-busy="true" />,
+    Skeleton: () => <div role="status" aria-busy="true" />,
+  };
 });
+
+vi.mock('@/components/seo', () => ({
+  PageMeta: () => null,
+}));
 
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (

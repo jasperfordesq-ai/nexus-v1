@@ -712,7 +712,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
 export function OpportunityDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { isAuthenticated, user } = useAuth();
-  const { tenantPath, hasFeature } = useTenant();
+  const { tenantPath, hasFeature, volunteeringConfig } = useTenant();
   const toast = useToast();
   const { t } = useTranslation('volunteering');
 
@@ -729,6 +729,7 @@ export function OpportunityDetailPage() {
   const [isApplying, setIsApplying] = useState(false);
   const [selectedShiftId, setSelectedShiftId] = useState<number | null>(null);
   const [shiftAction, setShiftAction] = useState<{ id: number; type: 'signup' | 'cancel' | 'waitlist' } | null>(null);
+  const qrCheckinEnabled = volunteeringConfig?.['volunteering.enable_qr_checkin'] !== false;
 
   // Guardian consent modal — opened when the API gates a minor with
   // GUARDIAN_CONSENT_REQUIRED (under-18 member without an active consent).
@@ -1159,7 +1160,7 @@ export function OpportunityDetailPage() {
       )}
 
       {/* QR Check-in — approved volunteers only */}
-      {opp.has_applied && opp.application?.status === 'approved' && opp.shifts && opp.shifts.length > 0 && (
+      {qrCheckinEnabled && opp.has_applied && opp.application?.status === 'approved' && opp.shifts && opp.shifts.length > 0 && (
         <ShiftCheckinPanel shifts={opp.shifts} />
       )}
 

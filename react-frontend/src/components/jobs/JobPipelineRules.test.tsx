@@ -27,7 +27,33 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+vi.mock('@/components/ui', () => {
+  const Box = ({ children, label, title, description }: Record<string, unknown>) => (
+    <div>
+      {label as ReactNode}
+      {title as ReactNode}
+      {description as ReactNode}
+      {children as ReactNode}
+    </div>
+  );
+  return {
+    Select: Box,
+    SelectItem: Box,
+    GlassCard: Box,
+    Button: ({ children, onPress, onClick }: Record<string, unknown>) => (
+      <button type="button" onClick={(onPress ?? onClick) as (() => void) | undefined}>{children as ReactNode}</button>
+    ),
+    Input: ({ label, value, onValueChange }: Record<string, unknown>) => (
+      <label>
+        {label as ReactNode}
+        <input
+          value={(value as string | number | undefined) ?? ''}
+          onChange={(event) => typeof onValueChange === 'function' && (onValueChange as (value: string) => void)(event.target.value)}
+        />
+      </label>
+    ),
+  };
+});
 
 vi.mock('@/lib/api', () => ({
   api: {

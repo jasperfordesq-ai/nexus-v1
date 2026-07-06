@@ -121,13 +121,8 @@ class ShiftWaitlistService
             return null;
         }
 
-        $approvedCount = (int) DB::table('vol_applications')
-            ->where('shift_id', $shiftId)
-            ->where('status', 'approved')
-            ->where('tenant_id', $tenantId)
-            ->count();
-
-        if ($approvedCount < $capacity) {
+        $availableSlots = VolunteerShiftCapacityService::availableSlots($shiftId, $tenantId, $capacity);
+        if ($availableSlots === null || $availableSlots > 0) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_shift_not_full')];
             return null;
         }
@@ -383,16 +378,9 @@ class ShiftWaitlistService
                     return false;
                 }
 
-                if ($shift->capacity) {
-                    $approvedCount = (int) DB::selectOne(
-                        "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
-                        [$entry->shift_id, $tenantId]
-                    )->cnt;
-
-                    if ($approvedCount >= (int) $shift->capacity) {
-                        self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_waitlist_spot_gone')];
-                        return false;
-                    }
+                if ($shift->capacity && ! VolunteerShiftCapacityService::hasAvailableSlot((int) $entry->shift_id, $tenantId, (int) $shift->capacity)) {
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_waitlist_spot_gone')];
+                    return false;
                 }
 
                 // Attach the notified volunteer's existing approved application to the offered shift.
@@ -471,21 +459,8 @@ class ShiftWaitlistService
 
                 // Only offer a spot if there is genuinely free capacity once
                 // approved signups AND outstanding (unexpired) offers are counted.
-                if ($shift->capacity) {
-                    $approvedCount = (int) DB::selectOne(
-                        "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
-                        [$shiftId, $tenantId]
-                    )->cnt;
-
-                    $outstandingOffers = (int) DB::table('vol_shift_waitlist')
-                        ->where('shift_id', $shiftId)
-                        ->where('status', 'notified')
-                        ->where('tenant_id', $tenantId)
-                        ->count();
-
-                    if ($approvedCount + $outstandingOffers >= (int) $shift->capacity) {
-                        return null;
-                    }
+                if ($shift->capacity && ! VolunteerShiftCapacityService::hasAvailableSlot($shiftId, $tenantId, (int) $shift->capacity, null, true)) {
+                    return null;
                 }
 
                 $entry = DB::table('vol_shift_waitlist')

@@ -79,6 +79,49 @@ vi.mock('@/contexts', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
+vi.mock('@/components/ui', () => {
+  const Box = ({ children, label, title, description }: Record<string, unknown>) => (
+    <div>
+      {label as ReactNode}
+      {title as ReactNode}
+      {description as ReactNode}
+      {typeof children === 'function' ? (children as (arg: unknown) => ReactNode)(vi.fn()) : children as ReactNode}
+    </div>
+  );
+  const Chip = Object.assign(Box, {
+    Label: ({ children }: { children?: ReactNode }) => <span>{children}</span>,
+  });
+  const Button = ({ children, onPress, onClick, as: _as, href, target, rel, download }: Record<string, unknown>) => {
+    const props = {
+      href: href as string | undefined,
+      target: target as string | undefined,
+      rel: rel as string | undefined,
+      download: download as string | undefined,
+      onClick: (onPress ?? onClick) as (() => void) | undefined,
+    };
+    return href ? <a {...props}>{children as ReactNode}</a> : <button type="button" onClick={props.onClick}>{children as ReactNode}</button>;
+  };
+  return {
+    Chip,
+    GlassCard: Box,
+    useDisclosure: () => ({ isOpen: false, onOpen: vi.fn(), onOpenChange: vi.fn(), onClose: vi.fn() }),
+    Button,
+    Spinner: () => <div role="status" />,
+    Modal: ({ isOpen, children }: Record<string, unknown>) => isOpen === false ? null : <div>{children as ReactNode}</div>,
+    ModalContent: Box,
+    ModalHeader: Box,
+    ModalBody: Box,
+    ModalFooter: Box,
+    Tabs: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+    Tab: ({ title }: Record<string, unknown>) => <div>{title as ReactNode}</div>,
+    Skeleton: () => <div className="animate-pulse" data-slot="base" />,
+  };
+});
+
+vi.mock('@/components/seo', () => ({
+  PageMeta: () => null,
+}));
+
 import { MyApplicationsPage } from './MyApplicationsPage';
 
 const mockApplicationsResponse = {

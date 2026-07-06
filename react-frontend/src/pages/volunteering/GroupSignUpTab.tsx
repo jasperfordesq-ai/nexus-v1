@@ -28,7 +28,7 @@ import { GlassCard, useDisclosure, Button, Chip, Input, Select, SelectItem, Text
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { useToast } from '@/contexts';
+import { useAuth, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
@@ -68,6 +68,12 @@ interface GroupReservation {
 interface GroupOption {
   id: number;
   name: string;
+  owner_id?: number | string | null;
+  viewer_membership?: {
+    status?: string;
+    role?: string | null;
+    is_admin?: boolean;
+  } | null;
 }
 
 interface OpportunityOption {
@@ -131,6 +137,7 @@ function extractItems<T>(payload: unknown): T[] {
 export function GroupSignUpTab() {
   const { t } = useTranslation('volunteering');
   const toast = useToast();
+  const { user } = useAuth();
   const [reservations, setReservations] = useState<GroupReservation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -279,11 +286,18 @@ export function GroupSignUpTab() {
       ]);
 
       const groups = groupsRes.success ? extractItems<GroupOption>(groupsRes.data) : [];
+      const userId = user?.id !== undefined && user?.id !== null ? Number(user.id) : null;
+      const manageableGroups = groups.filter((group) => {
+        const membership = group.viewer_membership;
+        const role = membership?.role ?? '';
+        return (userId !== null && group.owner_id !== undefined && group.owner_id !== null && Number(group.owner_id) === userId)
+          || (membership?.status === 'active' && (membership.is_admin === true || role === 'owner' || role === 'admin'));
+      });
       const opportunities = opportunitiesRes.success ? extractItems<OpportunityOption>(opportunitiesRes.data) : [];
-      setGroupOptions(groups);
+      setGroupOptions(manageableGroups);
       setOpportunityOptions(opportunities);
-      if (groups.length === 1) {
-        setReserveGroupId(String(groups[0]?.id ?? ''));
+      if (manageableGroups.length === 1) {
+        setReserveGroupId(String(manageableGroups[0]?.id ?? ''));
       }
     } catch (err) {
       logError('Failed to load group reservation options', err);
@@ -291,7 +305,7 @@ export function GroupSignUpTab() {
     } finally {
       setIsLoadingReservationOptions(false);
     }
-  }, []);
+  }, [user?.id]);
 
   const openReservationModal = () => {
     resetReservationForm();

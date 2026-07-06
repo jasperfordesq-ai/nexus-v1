@@ -11,6 +11,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) =>
       (opts?.fallbackValue as string | undefined) ?? key,
+    i18n: { language: 'en' },
   }),
 }));
 
@@ -65,34 +66,57 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 vi.mock('@/components/ui', () => {
-  const makeStub = (name: string) => ({ children, label, title, description, onPress, onClick, onValueChange, ...props }: Record<string, unknown>) => {
-    const lower = name.toLowerCase();
-    if (lower.includes('button')) {
-      return <button type="button" onClick={(onPress ?? onClick) as (() => void) | undefined}>{(children ?? label ?? title) as ReactNode}</button>;
-    }
-    if (lower.includes('input') || lower.includes('textarea') || lower.includes('field') || lower.includes('select')) {
-      return <input placeholder={props.placeholder as string | undefined} onChange={(event) => typeof onValueChange === 'function' && (onValueChange as (value: string) => void)(event.target.value)} />;
-    }
-    if (lower.includes('switch') || lower.includes('checkbox')) {
-      return <label><input type="checkbox" />{children as ReactNode}</label>;
-    }
-    if (lower.includes('skeleton') || lower.includes('spinner')) {
-      return <div role="status" />;
-    }
-    return <div>{label as ReactNode}{title as ReactNode}{description as ReactNode}{children as ReactNode}</div>;
-  };
+  const Box = ({ children, label, title, description }: Record<string, unknown>) => (
+    <div>
+      {label as ReactNode}
+      {title as ReactNode}
+      {description as ReactNode}
+      {children as ReactNode}
+    </div>
+  );
+  const Button = ({ children, onPress, onClick }: Record<string, unknown>) => (
+    <button type="button" onClick={(onPress ?? onClick) as (() => void) | undefined}>
+      {children as ReactNode}
+    </button>
+  );
+  const Textarea = ({ placeholder, value, onValueChange }: Record<string, unknown>) => (
+    <textarea
+      placeholder={placeholder as string | undefined}
+      value={(value as string | undefined) ?? ''}
+      onChange={(event) => typeof onValueChange === 'function' && (onValueChange as (value: string) => void)(event.target.value)}
+    />
+  );
+  const Slider = ({ label, value, onChange }: Record<string, unknown>) => (
+    <label>
+      {label as ReactNode}
+      <input
+        type="range"
+        value={Array.isArray(value) ? value[0] : (value as number | undefined) ?? 0}
+        onChange={(event) => typeof onChange === 'function' && (onChange as (value: number[]) => void)([Number(event.target.value)])}
+      />
+    </label>
+  );
+  const Avatar = ({ name }: Record<string, unknown>) => <span>{name as ReactNode}</span>;
+  const Progress = ({ value }: Record<string, unknown>) => <progress value={value as number | undefined} max={100} />;
 
-  return new Proxy({}, {
-    get(_target, prop) {
-      if (typeof prop === 'symbol') return undefined;
-      if (prop === '__esModule') return true;
-      if (prop === 'default') return undefined;
-      if (prop === 'useConfirm') return () => () => Promise.resolve(true);
-      if (/^use[A-Z]/.test(prop)) return () => ({});
-      return makeStub(String(prop));
-    },
+  const Chip = Object.assign(Box, {
+    Label: ({ children }: { children?: ReactNode }) => <span>{children}</span>,
   });
+
+  return {
+    Chip,
+    Slider,
+    GlassCard: Box,
+    Progress,
+    Button,
+    Textarea,
+    Avatar,
+  };
 });
+
+vi.mock('@/components/seo', () => ({
+  PageMeta: () => null,
+}));
 
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (
@@ -125,6 +149,18 @@ vi.mock('@/lib/motion', () => ({
 
 import { EmployerBrandPage } from './EmployerBrandPage';
 import { api } from '@/lib/api';
+
+function makeEmployer(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 42,
+    name: 'Test Employer',
+    avatar_url: null,
+    tagline: 'Community work that matters',
+    company_size: '1-10',
+    open_jobs_count: 1,
+    ...overrides,
+  };
+}
 
 function makeJob(overrides: Record<string, unknown> = {}) {
   return {
@@ -160,16 +196,19 @@ describe('EmployerBrandPage', () => {
     expect(document.body).toBeTruthy();
   });
 
-  it('shows loading screen while data is loading', () => {
+  it('shows loading screen while data is loading', async () => {
+    let resolveRequest: (value: { success: boolean; data: unknown; meta: Record<string, unknown> }) => void = () => {};
     vi.mocked(api.get).mockReturnValue(new Promise((resolve) => {
-      window.setTimeout(() => resolve({
-        success: true,
-        data: { employer: makeEmployer(), jobs: [] },
-        meta: {},
-      }), 25);
+      resolveRequest = resolve;
     }));
     const { unmount } = render(<EmployerBrandPage />);
     expect(screen.getByTestId('loading-screen')).toBeInTheDocument();
+    resolveRequest({
+      success: true,
+      data: { employer: makeEmployer(), jobs: [] },
+      meta: {},
+    });
+    await waitFor(() => expect(api.get).toHaveBeenCalled());
     unmount();
   });
 
