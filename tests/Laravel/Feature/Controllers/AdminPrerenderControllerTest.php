@@ -108,6 +108,24 @@ class AdminPrerenderControllerTest extends TestCase
             ->assertStatus(400);
     }
 
+    public function test_enqueue_rejects_tenant_owned_route_without_tenant_scope(): void
+    {
+        Sanctum::actingAs($this->makeSuperAdmin());
+
+        $this->apiPost('/v2/admin/prerender/jobs', ['routes' => '/page/tenant-only-page'])
+            ->assertStatus(400);
+    }
+
+    public function test_purge_rejects_all_tenant_delete_without_confirmation(): void
+    {
+        Sanctum::actingAs($this->makeSuperAdmin());
+
+        $this->apiPost('/v2/admin/prerender/purge', [
+            'pattern' => '/page/*',
+            'dry_run' => false,
+        ])->assertStatus(400);
+    }
+
     public function test_cancel_marks_queued_job_cancelled(): void
     {
         Sanctum::actingAs($this->makeSuperAdmin());

@@ -8,7 +8,9 @@ namespace Tests\Laravel\Feature;
 
 use App\Console\Commands\PrerenderProcessQueue;
 use App\Services\PrerenderService;
+use App\Services\SitemapService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Tests\Laravel\TestCase;
@@ -22,7 +24,7 @@ class PrerenderServiceTest extends TestCase
 {
     use DatabaseTransactions;
 
-    private string $tmpCache;
+    private ?string $tmpCache = null;
 
     protected function setUp(): void
     {
@@ -46,7 +48,9 @@ class PrerenderServiceTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->rrmdir($this->tmpCache);
+        if ($this->tmpCache !== null) {
+            $this->rrmdir($this->tmpCache);
+        }
         putenv('PRERENDER_CACHE_PATH');
         putenv('PRERENDER_EVENT_LOG');
         putenv('PRERENDER_ASSETS_MANIFEST');
@@ -237,7 +241,7 @@ HTML;
         $this->writeSnapshot('example.com/about/index.html', '<html><body>c</body></html>');
 
         $svc = new PrerenderService();
-        $result = $svc->purgePattern('/blog/*', 'example.com', dryRun: true);
+        $result = $svc->purgePattern('/blog/*', null, dryRun: true);
 
         $this->assertCount(2, $result['deleted']);
         $this->assertTrue($result['dry_run']);
@@ -250,7 +254,7 @@ HTML;
     {
         $this->writeSnapshot('example.com/blog/post-1/index.html', '<html><body>a</body></html>');
         $svc = new PrerenderService();
-        $result = $svc->purgePattern('/blog/*', 'example.com', dryRun: false);
+        $result = $svc->purgePattern('/blog/*', null, dryRun: false);
         $this->assertCount(1, $result['deleted']);
         $this->assertFileDoesNotExist($this->tmpCache . '/example.com/blog/post-1/index.html');
     }
@@ -260,18 +264,77 @@ HTML;
         $this->writeSnapshot('example.com/blog/post-1/index.html', '<html><body>a</body></html>');
         $this->writeSnapshot('example.com/blog/category/foo/index.html', '<html><body>b</body></html>');
         $svc = new PrerenderService();
-        $result = $svc->purgePattern('/blog/**', 'example.com', dryRun: true);
+        $result = $svc->purgePattern('/blog/**', null, dryRun: true);
         $this->assertCount(2, $result['deleted']);
     }
 
-    public function test_purge_pattern_scopes_to_host(): void
+    public function test_purge_pattern_scopes_to_shared_host_tenant_prefix(): void
     {
-        $this->writeSnapshot('a.com/blog/post/index.html', '<html><body>a</body></html>');
-        $this->writeSnapshot('b.com/blog/post/index.html', '<html><body>b</body></html>');
+        $slugA = 'purge-a-' . uniqid();
+        $slugB = 'purge-b-' . uniqid();
+        DB::table('tenants')->insert([
+            [
+                'name' => 'Purge A',
+                'slug' => $slugA,
+                'domain' => null,
+                'is_active' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ],
+            [
+                'name' => 'Purge B',
+                'slug' => $slugB,
+                'domain' => null,
+                'is_active' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ],
+        ]);
+        $host = parse_url((string) env('FRONTEND_URL', 'https://app.project-nexus.ie'), PHP_URL_HOST)
+            ?: 'app.project-nexus.ie';
+        $this->writeSnapshot("{$host}/{$slugA}/blog/post/index.html", '<html><body>a</body></html>');
+        $this->writeSnapshot("{$host}/{$slugB}/blog/post/index.html", '<html><body>b</body></html>');
+
         $svc = new PrerenderService();
-        $result = $svc->purgePattern('/blog/*', 'a.com', dryRun: true);
+        $result = $svc->purgePattern('/blog/*', $slugA, dryRun: true);
         $this->assertCount(1, $result['deleted']);
-        $this->assertSame('a.com/blog/post/index.html', $result['deleted'][0]);
+        $this->assertSame("{$host}/{$slugA}/blog/post/index.html", $result['deleted'][0]);
+    }
+
+    public function test_inventory_tenant_filter_scopes_to_shared_host_tenant_prefix(): void
+    {
+        $slugA = 'inventory-a-' . uniqid();
+        $slugB = 'inventory-b-' . uniqid();
+        DB::table('tenants')->insert([
+            [
+                'name' => 'Inventory A',
+                'slug' => $slugA,
+                'domain' => null,
+                'is_active' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ],
+            [
+                'name' => 'Inventory B',
+                'slug' => $slugB,
+                'domain' => null,
+                'is_active' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ],
+        ]);
+        $host = parse_url((string) env('FRONTEND_URL', 'https://app.project-nexus.ie'), PHP_URL_HOST)
+            ?: 'app.project-nexus.ie';
+        $this->writeSnapshot("{$host}/{$slugA}/about/index.html", '<html><body>a</body></html>');
+        $this->writeSnapshot("{$host}/{$slugB}/about/index.html", '<html><body>b</body></html>');
+
+        $svc = new PrerenderService();
+        $rows = $svc->inventory($slugA, false);
+
+        $this->assertCount(1, $rows);
+        $this->assertSame($slugA, $rows[0]['tenant_slug']);
+        $this->assertSame('/about', $rows[0]['tenant_route']);
+        $this->assertSame("/{$slugA}/about", $rows[0]['route']);
     }
 
     public function test_ttl_for_route_picks_most_specific_pattern(): void
@@ -640,11 +703,209 @@ HTML;
         $this->assertTrue($tenantWide, 'burst above threshold must enqueue a tenant-wide row');
     }
 
-    private function writeSnapshot(string $rel, string $html): void
+    public function test_enqueue_rejects_global_cms_page_route(): void
+    {
+        $service = new PrerenderService();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Route requires tenant scope');
+
+        $service->enqueueJob(null, '/page/tenant-only-page', false, false, null);
+    }
+
+    public function test_tenant_scoped_cms_page_route_must_belong_to_that_tenant(): void
+    {
+        [$ownerId, $otherId, , , $pageSlug] = $this->seedCmsTenantPair('enqueue-owner', 'enqueue-other');
+
+        $service = new PrerenderService();
+        $jobId = $service->enqueueJob($ownerId, "/page/{$pageSlug}", false, false, null);
+        $this->assertGreaterThan(0, $jobId);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Route is not available for tenant');
+
+        $service->enqueueJob($otherId, "/page/{$pageSlug}", false, false, null);
+    }
+
+    public function test_route_planner_lists_cms_page_only_for_owning_tenant(): void
+    {
+        [, , $ownerSlug, $otherSlug, $pageSlug] = $this->seedCmsTenantPair('plan-owner', 'plan-other');
+
+        Artisan::call('prerender:plan-routes', [
+            '--tenant' => $ownerSlug,
+            '--include-static' => '0',
+            '--include-sitemap' => '1',
+        ]);
+        $ownerPlan = json_decode(Artisan::output(), true);
+
+        Artisan::call('prerender:plan-routes', [
+            '--tenant' => $otherSlug,
+            '--include-static' => '0',
+            '--include-sitemap' => '1',
+        ]);
+        $otherPlan = json_decode(Artisan::output(), true);
+
+        $ownerRoutes = $ownerPlan['tenants'][0]['routes'] ?? [];
+        $otherRoutes = $otherPlan['tenants'][0]['routes'] ?? [];
+
+        $this->assertContains("/page/{$pageSlug}", $ownerRoutes);
+        $this->assertNotContains("/page/{$pageSlug}", $otherRoutes);
+    }
+
+    public function test_auto_recache_does_not_enqueue_wrong_tenant_cms_snapshot(): void
+    {
+        [$ownerId, $otherId, $ownerSlug, $otherSlug, $pageSlug] = $this->seedCmsTenantPair('recache-owner', 'recache-other');
+        $host = $this->frontendHost();
+        $old = time() - 90 * 86400;
+
+        $ownerPath = $this->writeSnapshot("{$host}/{$ownerSlug}/page/{$pageSlug}/index.html", '<html><body>owner</body></html>');
+        $otherPath = $this->writeSnapshot("{$host}/{$otherSlug}/page/{$pageSlug}/index.html", '<html><body>wrong tenant</body></html>');
+        touch($ownerPath, $old);
+        touch($otherPath, $old);
+
+        Artisan::call('prerender:auto-recache', [
+            '--min-stale-seconds' => '0',
+            '--include-ttl' => '1',
+            '--include-content' => '0',
+            '--max-tenants' => '10',
+            '--max-routes' => '10',
+        ]);
+
+        $ownerRoutes = (string) DB::table('prerender_jobs')->where('tenant_id', $ownerId)->value('routes');
+        $otherRoutes = (string) DB::table('prerender_jobs')->where('tenant_id', $otherId)->value('routes');
+
+        $this->assertStringContainsString("/page/{$pageSlug}", $ownerRoutes);
+        $this->assertStringNotContainsString("/page/{$pageSlug}", $otherRoutes);
+    }
+
+    public function test_drift_detector_does_not_enqueue_wrong_tenant_cms_route(): void
+    {
+        [$ownerId, $otherId, , , $pageSlug] = $this->seedCmsTenantPair('drift-owner', 'drift-other');
+
+        $fakeSitemap = new class($ownerId, $pageSlug) extends SitemapService {
+            public function __construct(private readonly int $ownerId, private readonly string $pageSlug) {}
+
+            public function generateForTenant(int $tenantId, ?string $baseUrl = null): string
+            {
+                $base = rtrim($baseUrl ?: 'https://app.project-nexus.ie/test', '/');
+                $routes = $tenantId === $this->ownerId ? ["/page/{$this->pageSlug}"] : [];
+                $xml = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+                foreach ($routes as $route) {
+                    $xml .= '<url><loc>' . htmlspecialchars($base . $route, ENT_XML1) . '</loc><lastmod>' . date('c') . '</lastmod></url>';
+                }
+                return $xml . '</urlset>';
+            }
+        };
+        app()->instance(SitemapService::class, $fakeSitemap);
+
+        Artisan::call('prerender:detect-drift', [
+            '--include-missing' => '1',
+            '--min-drift-seconds' => '0',
+            '--max-tenants' => '10',
+            '--max-routes' => '10',
+        ]);
+
+        $ownerRoutes = (string) DB::table('prerender_jobs')->where('tenant_id', $ownerId)->value('routes');
+        $otherRoutes = (string) DB::table('prerender_jobs')->where('tenant_id', $otherId)->value('routes');
+
+        $this->assertStringContainsString("/page/{$pageSlug}", $ownerRoutes);
+        $this->assertStringNotContainsString("/page/{$pageSlug}", $otherRoutes);
+    }
+
+    public function test_purge_unexpected_removes_cross_tenant_cms_page_snapshot(): void
+    {
+        [, , $ownerSlug, $otherSlug, $pageSlug] = $this->seedCmsTenantPair('cms-owner', 'cms-other');
+        $host = $this->frontendHost();
+        $this->writeSnapshot("{$host}/{$ownerSlug}/page/{$pageSlug}/index.html", '<html><body>owner</body></html>');
+        $this->writeSnapshot("{$host}/{$otherSlug}/page/{$pageSlug}/index.html", '<html><body>wrong tenant</body></html>');
+
+        $service = new PrerenderService();
+        $dryRun = $service->purgeUnexpectedSnapshots(true);
+
+        $this->assertContains("/{$otherSlug}/page/{$pageSlug}", $dryRun['by_tenant'][$otherSlug] ?? []);
+        $this->assertNotContains("/{$ownerSlug}/page/{$pageSlug}", $dryRun['by_tenant'][$ownerSlug] ?? []);
+
+        $result = $service->purgeUnexpectedSnapshots(false);
+
+        $this->assertSame(1, $result['deleted_total']);
+        $this->assertFileExists($this->tmpCache . "/{$host}/{$ownerSlug}/page/{$pageSlug}/index.html");
+        $this->assertFileDoesNotExist($this->tmpCache . "/{$host}/{$otherSlug}/page/{$pageSlug}/index.html");
+    }
+
+    public function test_tenant_safety_report_flags_unexpected_cross_tenant_cms_page(): void
+    {
+        [, , $ownerSlug, $otherSlug, $pageSlug] = $this->seedCmsTenantPair('safety-owner', 'safety-other');
+        $host = $this->frontendHost();
+        $this->writeSnapshot("{$host}/{$ownerSlug}/page/{$pageSlug}/index.html", '<html><body>owner</body></html>');
+        $this->writeSnapshot("{$host}/{$otherSlug}/page/{$pageSlug}/index.html", '<html><body>wrong tenant</body></html>');
+
+        $service = new PrerenderService();
+        $owner = $service->tenantSafetyReport($ownerSlug, ["/page/{$pageSlug}"]);
+        $other = $service->tenantSafetyReport($otherSlug, []);
+
+        $this->assertNotNull($owner);
+        $this->assertNotNull($other);
+        $this->assertSame(0, $owner['counts']['unexpected']);
+        $this->assertSame(1, $other['counts']['unexpected']);
+        $this->assertContains("/page/{$pageSlug}", $other['unexpected_routes']);
+    }
+
+    /**
+     * @return array{0:int,1:int,2:string,3:string,4:string}
+     */
+    private function seedCmsTenantPair(string $ownerPrefix, string $otherPrefix): array
+    {
+        $ownerSlug = $ownerPrefix . '-' . uniqid();
+        $otherSlug = $otherPrefix . '-' . uniqid();
+        $pageSlug = 'tenant-owned-page-' . uniqid();
+        $now = date('Y-m-d H:i:s');
+
+        $ownerId = (int) DB::table('tenants')->insertGetId([
+            'name' => 'CMS Owner',
+            'slug' => $ownerSlug,
+            'domain' => null,
+            'is_active' => 1,
+            'features' => '{}',
+            'configuration' => '{"modules":{}}',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+        $otherId = (int) DB::table('tenants')->insertGetId([
+            'name' => 'CMS Other',
+            'slug' => $otherSlug,
+            'domain' => null,
+            'is_active' => 1,
+            'features' => '{}',
+            'configuration' => '{"modules":{}}',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+        DB::table('pages')->insert([
+            'tenant_id' => $ownerId,
+            'title' => 'Tenant owned page',
+            'slug' => $pageSlug,
+            'content' => '<p>Only the owner tenant should prerender this.</p>',
+            'is_published' => 1,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        return [$ownerId, $otherId, $ownerSlug, $otherSlug, $pageSlug];
+    }
+
+    private function frontendHost(): string
+    {
+        return parse_url((string) env('FRONTEND_URL', 'https://app.project-nexus.ie'), PHP_URL_HOST)
+            ?: 'app.project-nexus.ie';
+    }
+
+    private function writeSnapshot(string $rel, string $html): string
     {
         $path = $this->tmpCache . '/' . $rel;
         @mkdir(dirname($path), 0777, true);
         file_put_contents($path, $html);
+
+        return $path;
     }
 
     private function rrmdir(string $dir): void

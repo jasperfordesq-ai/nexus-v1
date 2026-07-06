@@ -86,6 +86,30 @@ class AdminPrerenderController extends BaseApiController
         ]);
     }
 
+    /** GET /api/v2/admin/prerender/tenant-safety?tenant=slug */
+    public function tenantSafety(Request $r): JsonResponse
+    {
+        $this->requireAdmin();
+        $slug = (string) $r->query('tenant', '');
+        if ($slug === '' || !preg_match('/^[A-Za-z0-9_-]{1,64}$/', $slug)) {
+            return $this->error('Valid tenant slug required', 400, 'VALIDATION_INVALID');
+        }
+        $tenant = \DB::table('tenants')->where('slug', $slug)->where('is_active', 1)->first();
+        if (!$tenant) return $this->error('Tenant not found', 404, 'NOT_FOUND');
+
+        $staticRoutes = $this->service->routesForTenant((int) $tenant->id);
+        $plannedRoutes = $this->plannedRoutesForTenant($slug);
+        $dynamicRoutes = array_values(array_filter(
+            $plannedRoutes,
+            fn ($route) => is_string($route) && $route !== '' && $route[0] === '/' && !in_array($route, $staticRoutes, true)
+        ));
+
+        $report = $this->service->tenantSafetyReport($slug, array_merge($staticRoutes, $dynamicRoutes));
+        if ($report === null) return $this->error('Tenant not found', 404, 'NOT_FOUND');
+
+        return $this->respondWithData($report);
+    }
+
     /** GET /api/v2/admin/prerender/events?limit=200 */
     public function events(Request $r): JsonResponse
     {
@@ -175,6 +199,13 @@ class AdminPrerenderController extends BaseApiController
                         'VALIDATION_INVALID'
                     );
                 }
+                if ($tenantId === null && PrerenderService::routeRequiresTenantScope($tok)) {
+                    return $this->error(
+                        "Route requires tenant_slug: $tok",
+                        400,
+                        'VALIDATION_INVALID'
+                    );
+                }
             }
             $routesValue = implode(',', $tokens);
         }
@@ -208,6 +239,7 @@ class AdminPrerenderController extends BaseApiController
      *   tenant_slug?: string  — limit to a single tenant
      *   dry_run?:     bool    — return matches without deleting
      *   recache?:     bool    — also enqueue a low-priority recache job
+     *   confirm_all_tenants?: bool — required for a real purge without tenant_slug
      *
      * Requires super_admin: a poorly-chosen pattern can blow away the whole
      * cache, which is fine operationally (snapshots regenerate) but expensive.
@@ -228,7 +260,6 @@ class AdminPrerenderController extends BaseApiController
             return $this->error('Invalid pattern characters', 400, 'VALIDATION_INVALID');
         }
 
-        $hostFilter = null;
         $tenantSlug = $payload['tenant_slug'] ?? null;
         $tenantId = null;
         if (is_string($tenantSlug) && $tenantSlug !== '') {
@@ -238,17 +269,24 @@ class AdminPrerenderController extends BaseApiController
             $row = \DB::table('tenants')->where('slug', $tenantSlug)->where('is_active', 1)->first();
             if (!$row) return $this->error('Tenant not found', 404, 'NOT_FOUND');
             $tenantId = (int) $row->id;
-            // Resolve host so purgePattern can filter on it.
-            $domain = trim((string) ($row->domain ?? ''));
-            $appHost = parse_url((string) env('FRONTEND_URL', 'https://app.project-nexus.ie'), PHP_URL_HOST)
-                       ?: 'app.project-nexus.ie';
-            $hostFilter = $domain !== '' ? $domain : $appHost;
         }
 
         $dryRun = (bool) ($payload['dry_run'] ?? false);
         $recache = (bool) ($payload['recache'] ?? false);
+        $confirmAllTenants = (bool) ($payload['confirm_all_tenants'] ?? false);
+        if (!$dryRun && $tenantId === null && !$confirmAllTenants) {
+            return $this->error(
+                'confirm_all_tenants is required when deleting snapshots across all tenants',
+                400,
+                'VALIDATION_REQUIRED_FIELD'
+            );
+        }
 
-        $result = $this->service->purgePattern($pattern, $hostFilter, $dryRun);
+        $result = $this->service->purgePattern(
+            $pattern,
+            is_string($tenantSlug) && $tenantSlug !== '' ? $tenantSlug : null,
+            $dryRun
+        );
 
         $jobId = null;
         if ($recache && !$dryRun && !empty($result['deleted'])) {
@@ -268,7 +306,13 @@ class AdminPrerenderController extends BaseApiController
 
         $this->service->audit(
             'purge', $userId, $tenantId, $jobId, 'ok',
-            ['pattern' => $pattern, 'dry_run' => $dryRun, 'deleted_count' => count($result['deleted']), 'recache' => $recache],
+            [
+                'pattern' => $pattern,
+                'dry_run' => $dryRun,
+                'deleted_count' => count($result['deleted']),
+                'recache' => $recache,
+                'confirmed_all_tenants' => $confirmAllTenants,
+            ],
             $r->ip(), substr((string) $r->userAgent(), 0, 255)
         );
 
@@ -805,13 +849,11 @@ class AdminPrerenderController extends BaseApiController
         $staticRoutes  = $this->service->routesForTenant((int) $tenant->id);
         $dynamicRoutes = [];
         try {
-            // Plan-routes artisan output: one route per line. Limit to 1000
-            // entries to keep the JSON response sane.
-            \Artisan::call('prerender:plan-routes', ['--tenant' => $slug]);
-            $out = trim(\Artisan::output());
+            $routes = $this->plannedRoutesForTenant($slug);
+            $staticLookup = array_fill_keys($staticRoutes, true);
             $dynamicRoutes = array_values(array_filter(
-                array_map('trim', explode("\n", $out)),
-                fn($r) => $r !== '' && $r[0] === '/'
+                array_map('strval', $routes),
+                fn($route) => $route !== '' && $route[0] === '/' && !isset($staticLookup[$route])
             ));
             $dynamicRoutes = array_slice($dynamicRoutes, 0, 1000);
         } catch (\Throwable $e) {
@@ -838,6 +880,30 @@ class AdminPrerenderController extends BaseApiController
             return $this->error('Invalid route', 400, 'VALIDATION_INVALID');
         }
         return $this->respondWithData($this->service->describeTtlForRoute($route));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function plannedRoutesForTenant(string $slug): array
+    {
+        \Artisan::call('prerender:plan-routes', ['--tenant' => $slug]);
+        $out = trim(\Artisan::output());
+        $planned = json_decode($out, true);
+        if (!is_array($planned)) return [];
+
+        if (isset($planned['routes']) && is_array($planned['routes'])) {
+            return array_values(array_map('strval', $planned['routes']));
+        }
+
+        foreach (($planned['tenants'] ?? []) as $tenantPlan) {
+            if (!is_array($tenantPlan)) continue;
+            if (($tenantPlan['slug'] ?? null) !== $slug) continue;
+            $routes = $tenantPlan['routes'] ?? [];
+            return is_array($routes) ? array_values(array_map('strval', $routes)) : [];
+        }
+
+        return [];
     }
 
     /**

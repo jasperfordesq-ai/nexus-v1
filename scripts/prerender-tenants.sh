@@ -179,6 +179,23 @@ for ROUTE in "${PUBLIC_ROUTES[@]}"; do
         log_err "Invalid route for pre-rendering: $ROUTE"
         exit 1
     fi
+    if [ -n "$FILTER_ROUTES" ] && [ -z "$FILTER_TENANT" ]; then
+        if [[ "$ROUTE" =~ ^/page/[^/]+$ ]] \
+            || [[ "$ROUTE" =~ ^/blog/[^/]+$ ]] \
+            || [[ "$ROUTE" =~ ^/listings/[^/]+$ ]] \
+            || [[ "$ROUTE" =~ ^/events/[^/]+$ ]] \
+            || [[ "$ROUTE" =~ ^/jobs/[^/]+$ ]] \
+            || [[ "$ROUTE" =~ ^/groups/[^/]+$ ]] \
+            || [[ "$ROUTE" =~ ^/organisations/[^/]+$ ]] \
+            || [[ "$ROUTE" =~ ^/ideation/[^/]+$ ]] \
+            || [[ "$ROUTE" =~ ^/kb/[^/]+$ ]] \
+            || [[ "$ROUTE" =~ ^/volunteering/opportunities/[^/]+$ ]] \
+            || [[ "$ROUTE" =~ ^/marketplace/category/[^/]+$ ]] \
+            || [[ "$ROUTE" =~ ^/marketplace/[^/]+$ && "$ROUTE" != "/marketplace/free" && "$ROUTE" != "/marketplace/map" ]]; then
+            log_err "Route requires --tenant to avoid cross-tenant snapshots: $ROUTE"
+            exit 1
+        fi
+    fi
 done
 
 cleanup() {

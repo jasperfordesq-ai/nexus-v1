@@ -22,6 +22,16 @@ return [
             'prefix' => '',
             'strict' => false,
             'engine' => null,
+            // Laravel's schema loader shells out to mysql/mysqldump. In the
+            // Docker test environment, the MariaDB client can inherit SSL
+            // defaults that the local DB service does not support; keep this
+            // testing-only unless explicitly configured.
+            'options' => array_filter([
+                \Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT => env(
+                    'DB_SSL_VERIFY_SERVER_CERT',
+                    env('APP_ENV') === 'testing' ? false : null
+                ),
+            ], static fn ($value) => $value !== null),
         ],
     ],
     'migrations' => [

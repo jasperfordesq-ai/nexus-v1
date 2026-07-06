@@ -54,17 +54,36 @@ class PrerenderAutoRecache extends Command
             return self::SUCCESS;
         }
 
-        // Resolve tenant slugs from hosts. We need the slug to pass --tenant
-        // to prerender-tenants.sh.
+        // Resolve tenant slugs from snapshot host + route prefix. App-domain
+        // tenants share a host, so host alone is not enough.
         $tenants = $this->service->loadTenantTargets();
-        $hostToSlug = [];
-        foreach ($tenants as $t) $hostToSlug[$t['host']] = $t['slug'];
+        $targetsByHost = [];
+        $targetsBySlug = [];
+        foreach ($tenants as $t) {
+            $targetsByHost[$t['host']][] = $t;
+            $targetsBySlug[$t['slug']] = $t;
+        }
+        foreach ($targetsByHost as &$targets) {
+            usort($targets, fn ($a, $b) => strlen($b['prefix']) <=> strlen($a['prefix']));
+        }
+        unset($targets);
 
         // Group stale routes by tenant slug.
         $byTenant = [];
         $reasons = [];
         foreach ($inventory as $row) {
             if ($row['age_s'] < $minStale) continue;
+            [$slug, $tenantLocalRoute] = $this->resolveSnapshotTenantRoute(
+                $row['host'],
+                $row['route'],
+                $targetsByHost[$row['host']] ?? []
+            );
+            if ($slug === null || $tenantLocalRoute === null) continue; // Snapshot for a host we don't recognise.
+            $tenantId = (int) ($targetsBySlug[$slug]['tenant_id'] ?? 0);
+            if ($tenantId > 0 && !$this->service->tenantOwnedRouteExistsForTenant($tenantId, $tenantLocalRoute)) {
+                continue;
+            }
+
             $stale = false;
             $why = null;
             if ($includeContent && !empty($row['content_stale'])) {
@@ -72,7 +91,7 @@ class PrerenderAutoRecache extends Command
                 $why = 'content';
             }
             if (!$stale && $includeTtl) {
-                $ttl = $this->service->ttlForRoute($row['route']);
+                $ttl = $this->service->ttlForRoute($tenantLocalRoute);
                 if ($row['age_s'] >= $ttl) {
                     $stale = true;
                     $why = 'ttl';
@@ -80,10 +99,8 @@ class PrerenderAutoRecache extends Command
             }
             if (!$stale) continue;
 
-            $slug = $hostToSlug[$row['host']] ?? null;
-            if ($slug === null) continue; // Snapshot for a host we don't recognise.
-            $byTenant[$slug][] = $row['route'];
-            $reasons[$slug . ':' . $row['route']] = $why;
+            $byTenant[$slug][] = $tenantLocalRoute;
+            $reasons[$slug . ':' . $tenantLocalRoute] = $why;
         }
 
         if (empty($byTenant)) {
@@ -156,5 +173,27 @@ class PrerenderAutoRecache extends Command
             'skipped'  => $skipped,
         ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
         return self::SUCCESS;
+    }
+
+    /**
+     * @param list<array{slug:string,prefix:string}> $targets
+     * @return array{0:?string,1:?string}
+     */
+    private function resolveSnapshotTenantRoute(string $host, string $route, array $targets): array
+    {
+        foreach ($targets as $target) {
+            $prefix = (string) $target['prefix'];
+            if ($prefix === '') {
+                return [(string) $target['slug'], $route];
+            }
+            if ($route === $prefix) {
+                return [(string) $target['slug'], '/'];
+            }
+            if (str_starts_with($route, $prefix . '/')) {
+                return [(string) $target['slug'], substr($route, strlen($prefix)) ?: '/'];
+            }
+        }
+
+        return [null, null];
     }
 }

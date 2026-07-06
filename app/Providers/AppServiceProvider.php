@@ -1177,6 +1177,9 @@ class AppServiceProvider extends ServiceProvider
             // decoding hundreds of JSON files on every request is extremely slow
             // on Docker Desktop bind mounts.
             foreach ($this->loadCachedJsonTranslations($basePath) as $locale => $lines) {
+                if ($this->shouldSkipJsonTranslationLocaleForTesting($locale)) {
+                    continue;
+                }
                 if (!empty($lines)) {
                     $this->preloadPhpGroupsForJsonLines($translator, $basePath, $locale, $lines);
                     $translator->addLines($lines, $locale);
@@ -1186,6 +1189,25 @@ class AppServiceProvider extends ServiceProvider
             // Non-fatal — emails will show raw keys but the app won't crash
             \Illuminate\Support\Facades\Log::warning('loadJsonTranslations failed: ' . $e->getMessage());
         }
+    }
+
+    private function shouldSkipJsonTranslationLocaleForTesting(string $locale): bool
+    {
+        if (!$this->app->environment('testing')) {
+            return false;
+        }
+
+        $raw = (string) env('TEST_TRANSLATION_LOCALES', 'en,ga,de');
+        if ($raw === '*' || strtolower($raw) === 'all') {
+            return false;
+        }
+
+        $allowed = array_filter(array_map(
+            static fn (string $entry): string => trim($entry),
+            explode(',', $raw)
+        ));
+
+        return !in_array($locale, $allowed, true);
     }
 
     private function preloadPhpGroupsForJsonLines(object $translator, string $basePath, string $locale, array $lines): void
@@ -1215,6 +1237,19 @@ class AppServiceProvider extends ServiceProvider
     private function loadCachedJsonTranslations(string $basePath): array
     {
         $cachePath = base_path('bootstrap/cache/' . self::TRANSLATION_CACHE_FILE);
+
+        // PHPUnit in the Docker-on-Windows dev environment boots Laravel many
+        // times. Walking every locale JSON file on the bind mount just to
+        // freshness-check the generated bundle can take 30+ seconds before the
+        // first assertion. Tests do not need to rebuild the production
+        // translation cache on every bootstrap; i18n drift is covered by the
+        // dedicated npm checks.
+        if ($this->app->environment('testing') && is_file($cachePath)) {
+            $cached = require $cachePath;
+            if (is_array($cached)) {
+                return $cached;
+            }
+        }
 
         if (is_file($cachePath) && $this->isJsonTranslationCacheFresh($cachePath, $basePath)) {
             $cached = require $cachePath;

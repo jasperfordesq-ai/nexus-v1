@@ -72,12 +72,26 @@ class PrerenderDetectDrift extends Command
             $this->info('No active tenants.');
             return self::SUCCESS;
         }
+        $targetsByHost = [];
+        foreach ($tenants as $t) {
+            $targetsByHost[$t['host']][] = $t;
+        }
+        foreach ($targetsByHost as &$targets) {
+            usort($targets, fn ($a, $b) => strlen($b['prefix']) <=> strlen($a['prefix']));
+        }
+        unset($targets);
 
         // SHALLOW inventory — we only need mtimes, not asset/content drift flags.
         $inventory = $this->prerender->inventory(null, false);
         $snapMtime = [];
         foreach ($inventory as $row) {
-            $snapMtime[$row['host']][$row['route']] = (int) $row['mtime'];
+            [$slug, $tenantLocalRoute] = $this->resolveSnapshotTenantRoute(
+                $row['host'],
+                $row['route'],
+                $targetsByHost[$row['host']] ?? []
+            );
+            if ($slug === null || $tenantLocalRoute === null) continue;
+            $snapMtime[$slug][$tenantLocalRoute] = (int) $row['mtime'];
         }
 
         // Active-job skip list to avoid pile-up.
@@ -125,7 +139,7 @@ class PrerenderDetectDrift extends Command
             $staleRoutes = [];
             $missingRoutes = [];
             foreach ($entries as $route => $lastmodTs) {
-                $snap = $snapMtime[$host][$route] ?? null;
+                $snap = $snapMtime[$t['slug']][$route] ?? null;
                 if ($snap === null) {
                     if ($includeMissing) $missingRoutes[] = $route;
                     continue;
@@ -207,5 +221,27 @@ class PrerenderDetectDrift extends Command
             $out[$path] = max($out[$path] ?? 0, $lastmod);
         }
         return $out;
+    }
+
+    /**
+     * @param list<array{slug:string,prefix:string}> $targets
+     * @return array{0:?string,1:?string}
+     */
+    private function resolveSnapshotTenantRoute(string $host, string $route, array $targets): array
+    {
+        foreach ($targets as $target) {
+            $prefix = (string) $target['prefix'];
+            if ($prefix === '') {
+                return [(string) $target['slug'], $route];
+            }
+            if ($route === $prefix) {
+                return [(string) $target['slug'], '/'];
+            }
+            if (str_starts_with($route, $prefix . '/')) {
+                return [(string) $target['slug'], substr($route, strlen($prefix)) ?: '/'];
+            }
+        }
+
+        return [null, null];
     }
 }

@@ -155,6 +155,7 @@ class PrerenderService
     public function cachePath(): string    { return $this->cachePath; }
     public function eventLogPath(): string { return $this->eventLogPath; }
     public function cacheReadable(): bool  { return is_dir($this->cachePath) && is_readable($this->cachePath); }
+    public function cacheWritable(): bool  { return is_dir($this->cachePath) && is_writable($this->cachePath); }
 
     // -------------------------------------------------------------------------
     // Summary / health
@@ -175,11 +176,15 @@ class PrerenderService
             60,
             fn () => $this->inventory(null, true)
         );
+        $inventoryRows = array_values(array_filter(
+            $inventory,
+            fn ($row) => empty($row['__truncated'])
+        ));
         $expected = $this->expectedSnapshotCount($tenants);
-        $present = count($inventory);
+        $present = count($inventoryRows);
 
         $oldest = null; $newest = null; $stale = 0; $warn = 0; $totalSize = 0;
-        foreach ($inventory as $row) {
+        foreach ($inventoryRows as $row) {
             $age = $row['age_s'];
             $totalSize += $row['size_bytes'];
             if ($oldest === null || $age > $oldest) $oldest = $age;
@@ -191,7 +196,7 @@ class PrerenderService
         $lastRun = $this->readJsonFile($this->cachePath . '/.last-run.json');
         $failures = $this->readFailures();
         $events = $this->tailEvents(1);
-        $contentStale = $this->contentStalenessCounts($inventory);
+        $contentStale = $this->contentStalenessCounts($inventoryRows);
 
         // Tolerate the prerender_jobs table being absent — the migration may
         // not have run yet (e.g. fresh deploys). Treat as "no jobs" instead of
@@ -224,7 +229,7 @@ class PrerenderService
             'expected_routes'       => self::EXPECTED_ROUTES,
             'tenant_count'          => count($tenants),
             'content_stale_count'   => $contentStale['content_stale'],
-            'asset_invalid_count'   => $this->countAssetInvalid($inventory),
+            'asset_invalid_count'   => $this->countAssetInvalid($inventoryRows),
             'realtime_channel'      => self::REALTIME_CHANNEL,
             'realtime_event'        => self::REALTIME_EVENT,
         ];
@@ -252,9 +257,12 @@ class PrerenderService
     {
         if (!$this->cacheReadable()) return [];
 
-        $hostFilter = null;
+        $tenantTargets = $this->loadTenantTargets();
+        $targetsByHost = $this->tenantTargetsByHost($tenantTargets);
+        $tenantFilter = null;
         if ($tenantSlug !== null && $tenantSlug !== '') {
-            $hostFilter = $this->resolveTenantHost($tenantSlug);
+            $tenantFilter = $this->tenantTargetFromList($tenantTargets, $tenantSlug);
+            if ($tenantFilter === null) return [];
         }
 
         $now = time();
@@ -286,7 +294,14 @@ class PrerenderService
             $remainder = substr($rel, $firstSlash);
             $route = preg_replace('#/index\.html$#', '', $remainder) ?: '/';
 
-            if ($hostFilter !== null && $host !== $hostFilter) continue;
+            [$tenantTarget, $tenantRoute] = $this->tenantAttributionForRoute($host, $route, $targetsByHost);
+
+            if ($tenantFilter !== null) {
+                if ($host !== $tenantFilter['host']) continue;
+                if (!$this->routeMatchesTenantTarget($route, $tenantFilter)) continue;
+                $tenantTarget = $tenantFilter;
+                $tenantRoute = $this->tenantLocalRoute($route, $tenantFilter);
+            }
 
             $mtime = $file->getMTime();
             $age = $now - $mtime;
@@ -301,7 +316,11 @@ class PrerenderService
             if ($deep) {
                 [$assetRefs, $assetIssues] = $this->parseAssetRefs($absPath, $validAssets);
                 [$contentStale, $contentStaleReason] = $this->checkContentStaleness(
-                    $host, $route, $mtime, $tenantUpdated, $contentUpdated
+                    $tenantTarget['tenant_id'] ?? null,
+                    $tenantRoute,
+                    $mtime,
+                    $tenantUpdated,
+                    $contentUpdated
                 );
             }
 
@@ -316,6 +335,9 @@ class PrerenderService
             $rows[] = [
                 'host'             => $host,
                 'route'            => $route,
+                'tenant_id'        => $tenantTarget['tenant_id'] ?? null,
+                'tenant_slug'      => $tenantTarget['slug'] ?? null,
+                'tenant_route'     => $tenantRoute,
                 'cache_path'       => $rel,
                 'size_bytes'       => $file->getSize(),
                 'mtime'            => $mtime,
@@ -531,6 +553,104 @@ class PrerenderService
         return $rows;
     }
 
+    /**
+     * Human-readable tenant safety report for the admin inspector.
+     *
+     * @param list<string> $sitemapRoutes tenant-local dynamic/static routes from prerender:plan-routes
+     */
+    public function tenantSafetyReport(string $tenantSlug, array $sitemapRoutes = []): ?array
+    {
+        $targets = $this->loadTenantTargets();
+        $target = $this->tenantTargetFromList($targets, $tenantSlug);
+        if ($target === null) return null;
+
+        $tenantObj = (object) [
+            'features' => $target['features'] ?? null,
+            'configuration' => $target['configuration'] ?? null,
+        ];
+        $staticRoutes = $this->routesForTenant($tenantObj);
+        $expectedRoutes = array_values(array_unique(array_merge(
+            $staticRoutes,
+            array_values(array_filter($sitemapRoutes, fn ($route) => is_string($route) && $route !== '' && $route[0] === '/'))
+        )));
+        sort($expectedRoutes);
+
+        $staticLookup = array_fill_keys($staticRoutes, true);
+        $expectedLookup = array_fill_keys($expectedRoutes, true);
+        $inventory = array_values(array_filter(
+            $this->inventory($tenantSlug, true),
+            fn ($row) => empty($row['__truncated'])
+        ));
+        $snapshotsByRoute = [];
+        foreach ($inventory as $row) {
+            $snapshotsByRoute[(string) ($row['tenant_route'] ?? $row['route'] ?? '')] = $row;
+        }
+
+        $missing = [];
+        $stale = [];
+        $assetInvalid = [];
+        foreach ($expectedRoutes as $route) {
+            $row = $snapshotsByRoute[$route] ?? null;
+            if ($row === null) {
+                $missing[] = $route;
+                continue;
+            }
+            if (($row['staleness'] ?? 'fresh') !== 'fresh') $stale[] = $route;
+            if (!empty($row['asset_issues'])) $assetInvalid[] = $route;
+        }
+
+        $unexpected = [];
+        $explanations = [];
+        foreach ($inventory as $row) {
+            $route = (string) ($row['tenant_route'] ?? $row['route'] ?? '');
+            $expected = isset($expectedLookup[$route]);
+            if (!$expected) $unexpected[] = $route;
+            $source = isset($staticLookup[$route])
+                ? 'static'
+                : ($expected ? 'sitemap' : 'unexpected');
+            $explanations[] = [
+                'route' => $route,
+                'cache_path' => $row['cache_path'] ?? '',
+                'host_route' => $row['route'] ?? $route,
+                'source' => $source,
+                'expected' => $expected,
+                'reason' => $this->routeEligibilityReason($route, $tenantObj, $source),
+                'staleness' => $row['staleness'] ?? 'fresh',
+                'http_status' => $row['http_status'] ?? 200,
+                'content_stale' => (bool) ($row['content_stale'] ?? false),
+                'asset_issues' => $row['asset_issues'] ?? [],
+            ];
+        }
+        usort($explanations, fn ($a, $b) => strcmp((string) $a['route'], (string) $b['route']));
+
+        return [
+            'tenant' => [
+                'tenant_id' => $target['tenant_id'],
+                'slug' => $target['slug'],
+                'host' => $target['host'],
+                'prefix' => $target['prefix'],
+            ],
+            'counts' => [
+                'expected' => count($expectedRoutes),
+                'static' => count($staticRoutes),
+                'sitemap' => max(0, count($expectedRoutes) - count($staticRoutes)),
+                'snapshots' => count($inventory),
+                'missing' => count($missing),
+                'stale' => count($stale),
+                'asset_invalid' => count($assetInvalid),
+                'unexpected' => count($unexpected),
+            ],
+            'static_routes' => $staticRoutes,
+            'sitemap_routes' => array_values(array_diff($expectedRoutes, $staticRoutes)),
+            'expected_routes' => $expectedRoutes,
+            'missing_routes' => $missing,
+            'stale_routes' => $stale,
+            'asset_invalid_routes' => $assetInvalid,
+            'unexpected_routes' => array_values(array_unique($unexpected)),
+            'snapshots' => $explanations,
+        ];
+    }
+
     // -------------------------------------------------------------------------
     // Events / failures
     // -------------------------------------------------------------------------
@@ -733,18 +853,10 @@ class PrerenderService
         )));
         if (empty($routes)) return 0;
 
-        // Resolve tenant host + prefix.
-        $row = DB::table('tenants')
-            ->where('id', $tenantId)
-            ->where('is_active', 1)
-            ->select('slug', DB::raw("COALESCE(domain, '') as domain"))
-            ->first();
-        if (!$row) return 0;
-
-        $appHost = $this->frontendHost();
-        $domain = trim((string) $row->domain);
-        $host = $domain !== '' ? $domain : $appHost;
-        $prefix = $domain !== '' ? '' : '/' . $row->slug;
+        $target = $this->tenantTargetById($tenantId);
+        if (!$target) return 0;
+        $host = $target['host'];
+        $prefix = $target['prefix'];
 
         $deleted = 0;
         foreach ($routes as $route) {
@@ -801,19 +913,29 @@ class PrerenderService
      *   /listings/*       — direct children only (no nested)
      *   /                 — homepage only
      *
-     * Optional $hostFilter scopes the purge to a single host (tenant domain or
-     * app-host slug prefix). NULL = every tenant.
+     * Optional $tenantSlug scopes the purge to one tenant. For shared-host
+     * tenants, matching uses the tenant-local route after stripping the slug
+     * prefix; a tenant purge of /blog/* therefore cannot touch a sibling's
+     * /other-tenant/blog/* snapshot.
      *
      * Returns the list of cache_paths deleted. The caller is responsible for
      * enqueueing recache jobs if it wants the routes re-rendered.
      *
-     * @return array{deleted:list<string>, dry_run:bool, pattern:string, host:?string}
+     * @return array{deleted:list<string>, dry_run:bool, pattern:string, tenant_slug:?string}
      */
-    public function purgePattern(string $pattern, ?string $hostFilter = null, bool $dryRun = false): array
+    public function purgePattern(string $pattern, ?string $tenantSlug = null, bool $dryRun = false): array
     {
         $pattern = trim($pattern);
         if ($pattern === '' || $pattern[0] !== '/') {
-            return ['deleted' => [], 'dry_run' => $dryRun, 'pattern' => $pattern, 'host' => $hostFilter];
+            return ['deleted' => [], 'dry_run' => $dryRun, 'pattern' => $pattern, 'tenant_slug' => $tenantSlug];
+        }
+
+        $tenantTarget = null;
+        if ($tenantSlug !== null && $tenantSlug !== '') {
+            $tenantTarget = $this->tenantTargetBySlug($tenantSlug);
+            if ($tenantTarget === null) {
+                return ['deleted' => [], 'dry_run' => $dryRun, 'pattern' => $pattern, 'tenant_slug' => $tenantSlug];
+            }
         }
 
         $allowDoubleStar = str_contains($pattern, '**');
@@ -821,8 +943,15 @@ class PrerenderService
         $deleted = [];
 
         foreach ($this->inventory(null, false) as $row) {
-            if ($hostFilter !== null && $row['host'] !== $hostFilter) continue;
-            if (!preg_match($globRegex, $row['route'])) continue;
+            if ($tenantTarget !== null) {
+                if (($row['host'] ?? '') !== $tenantTarget['host']) continue;
+                if (!$this->routeMatchesTenantTarget((string) ($row['route'] ?? ''), $tenantTarget)) continue;
+            }
+
+            $matchRoute = $tenantTarget !== null
+                ? (string) ($row['tenant_route'] ?? $this->tenantLocalRoute((string) ($row['route'] ?? ''), $tenantTarget))
+                : (string) ($row['route'] ?? '');
+            if (!preg_match($globRegex, $matchRoute)) continue;
 
             $abs = $this->cachePath . '/' . $row['cache_path'];
             if (!$dryRun && is_file($abs)) {
@@ -839,7 +968,7 @@ class PrerenderService
             'deleted'  => $deleted,
             'dry_run'  => $dryRun,
             'pattern'  => $pattern,
-            'host'     => $hostFilter,
+            'tenant_slug' => $tenantSlug,
         ];
     }
 
@@ -881,6 +1010,32 @@ class PrerenderService
      */
     public const ROUTE_REGEX = '#^/[A-Za-z0-9._~/%:@!$()*+,;=\-]*$#';
 
+    public static function routeRequiresTenantScope(string $route): bool
+    {
+        static $patterns = [
+            '#^/page/[^/]+$#',
+            '#^/blog/[^/]+$#',
+            '#^/listings/[^/]+$#',
+            '#^/events/[^/]+$#',
+            '#^/jobs/[^/]+$#',
+            '#^/groups/[^/]+$#',
+            '#^/organisations/[^/]+$#',
+            '#^/ideation/[^/]+$#',
+            '#^/kb/[^/]+$#',
+            '#^/volunteering/opportunities/[^/]+$#',
+            '#^/marketplace/(?!free$|map$|category/)[^/]+$#',
+            '#^/marketplace/category/[^/]+$#',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $route) === 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function enqueueJob(
         ?int $tenantId,
         ?string $routes,
@@ -904,6 +1059,12 @@ class PrerenderService
                 foreach ($tokens as $tok) {
                     if (!preg_match(self::ROUTE_REGEX, $tok)) {
                         throw new \InvalidArgumentException("Invalid route in enqueueJob: {$tok}");
+                    }
+                    if ($tenantId === null && self::routeRequiresTenantScope($tok)) {
+                        throw new \InvalidArgumentException("Route requires tenant scope in enqueueJob: {$tok}");
+                    }
+                    if ($tenantId !== null && !$this->tenantOwnedRouteExistsForTenant($tenantId, $tok)) {
+                        throw new \InvalidArgumentException("Route is not available for tenant in enqueueJob: {$tok}");
                     }
                 }
                 $routes = implode(',', $tokens);
@@ -1331,6 +1492,42 @@ class PrerenderService
         return array_values(array_unique($routes));
     }
 
+    private function routeEligibilityReason(string $route, object $tenant, string $source): array
+    {
+        if ($source === 'sitemap') {
+            return ['key' => 'sitemap', 'value' => null];
+        }
+        if ($source === 'unexpected') {
+            return ['key' => 'unexpected', 'value' => null];
+        }
+        if (in_array($route, self::ALWAYS_PUBLIC_ROUTES, true)) {
+            return ['key' => 'always_public', 'value' => null];
+        }
+
+        $features = $this->decodeJsonColumn($tenant->features ?? null);
+        foreach (self::FEATURE_GATED_ROUTES as $feature => $routes) {
+            if (!in_array($route, $routes, true)) continue;
+            $enabled = ($features[$feature] ?? true) === true || ($features[$feature] ?? true) === 1;
+            return [
+                'key' => $enabled ? 'feature_enabled' : 'feature_disabled',
+                'value' => $feature,
+            ];
+        }
+
+        $configuration = $this->decodeJsonColumn($tenant->configuration ?? null);
+        $modules = is_array($configuration['modules'] ?? null) ? $configuration['modules'] : [];
+        foreach (self::MODULE_GATED_ROUTES as $module => $routes) {
+            if (!in_array($route, $routes, true)) continue;
+            $enabled = ($modules[$module] ?? true) === true || ($modules[$module] ?? true) === 1;
+            return [
+                'key' => $enabled ? 'module_enabled' : 'module_disabled',
+                'value' => $module,
+            ];
+        }
+
+        return ['key' => 'expected', 'value' => null];
+    }
+
     private function decodeJsonColumn(?string $raw): array
     {
         if (!is_string($raw) || $raw === '') return [];
@@ -1345,17 +1542,37 @@ class PrerenderService
     {
         $appHost = $this->frontendHost();
         $rows = DB::table('tenants')
-            ->where('is_active', 1)
-            ->where('id', '<>', 1)
-            ->select('id', 'slug', DB::raw("COALESCE(domain, '') as domain"), 'features', 'configuration')
-            ->orderBy('id')
+            ->leftJoin('tenants as p', function ($join) {
+                $join->on('p.id', '=', 'tenants.parent_id')
+                    ->where('p.is_active', '=', 1);
+            })
+            ->where('tenants.is_active', 1)
+            ->where('tenants.id', '<>', 1)
+            ->select(
+                'tenants.id',
+                'tenants.slug',
+                DB::raw("COALESCE(tenants.domain, '') as domain"),
+                DB::raw("COALESCE(p.domain, '') as parent_domain"),
+                'tenants.features',
+                'tenants.configuration'
+            )
+            ->orderBy('tenants.id')
             ->get();
 
         $out = [];
         foreach ($rows as $r) {
             $domain = trim((string) $r->domain);
-            $host = $domain !== '' ? $domain : $appHost;
-            $prefix = $domain !== '' ? '' : '/' . $r->slug;
+            $parentDomain = trim((string) ($r->parent_domain ?? ''));
+            if ($domain !== '') {
+                $host = $domain;
+                $prefix = '';
+            } elseif ($parentDomain !== '') {
+                $host = $parentDomain;
+                $prefix = '/' . $r->slug;
+            } else {
+                $host = $appHost;
+                $prefix = '/' . $r->slug;
+            }
             $out[] = [
                 'tenant_id'      => (int) $r->id,
                 'slug'           => (string) $r->slug,
@@ -1431,15 +1648,45 @@ class PrerenderService
             // guess from a regex, because routes like /marketplace/free would
             // otherwise be misread as a tenant prefix.
             $tenantLocalRoute = $row['route'];
+            $snapshotTenantId = null;
+            $snapshotTenantSlug = null;
             foreach ($prefixesByHost[$row['host']] ?? [] as $tenantPrefix) {
                 if (str_starts_with($tenantLocalRoute, $tenantPrefix . '/')) {
                     $tenantLocalRoute = substr($tenantLocalRoute, strlen($tenantPrefix));
+                    $snapshotTenantSlug = ltrim($tenantPrefix, '/');
                     break;
                 }
                 if ($tenantLocalRoute === $tenantPrefix) {
                     $tenantLocalRoute = '/';
+                    $snapshotTenantSlug = ltrim($tenantPrefix, '/');
                     break;
                 }
+            }
+            foreach ($tenants as $tenantTarget) {
+                if ($tenantTarget['host'] !== $row['host']) continue;
+                if ($snapshotTenantSlug !== null && $tenantTarget['slug'] !== $snapshotTenantSlug) continue;
+                if ($snapshotTenantSlug === null && $tenantTarget['prefix'] !== '') continue;
+                $snapshotTenantId = $tenantTarget['tenant_id'];
+                if ($snapshotTenantSlug === null) $snapshotTenantSlug = $tenantTarget['slug'];
+                break;
+            }
+
+            if (
+                str_starts_with($tenantLocalRoute, '/page/')
+                && !$this->cmsPageExistsForTenant((int) $snapshotTenantId, $tenantLocalRoute)
+            ) {
+                $byTenant[$snapshotTenantSlug ?? '(unknown)'][] = $row['route'];
+                $deletedTotal++;
+
+                if (!$dryRun) {
+                    $abs = $this->cachePath . '/' . $row['cache_path'];
+                    @unlink($abs);
+                    @unlink($abs . '.sha256');
+                    @unlink(dirname($abs) . '/_status');
+                    @unlink(dirname($abs) . '/index.md');
+                    @rmdir(dirname($abs));
+                }
+                continue;
             }
 
             // Skip dynamic-content routes — they're not in the static
@@ -1512,6 +1759,27 @@ class PrerenderService
         return false;
     }
 
+    private function cmsPageExistsForTenant(int $tenantId, string $tenantLocalRoute): bool
+    {
+        if ($tenantId <= 0) return false;
+        if (!preg_match('#^/page/([^/]+)$#', $tenantLocalRoute, $m)) return true;
+
+        return DB::table('pages')
+            ->where('tenant_id', $tenantId)
+            ->where('slug', $m[1])
+            ->where('is_published', 1)
+            ->exists();
+    }
+
+    public function tenantOwnedRouteExistsForTenant(int $tenantId, string $tenantLocalRoute): bool
+    {
+        if (preg_match('#^/page/[^/]+$#', $tenantLocalRoute) === 1) {
+            return $this->cmsPageExistsForTenant($tenantId, $tenantLocalRoute);
+        }
+
+        return true;
+    }
+
     private function isUnsupportedPublicRoute(string $route): bool
     {
         // React has a public /resources listing and /resources/{id}/download API,
@@ -1529,14 +1797,98 @@ class PrerenderService
 
     private function resolveTenantHost(string $slug): ?string
     {
-        $row = DB::table('tenants')
-            ->where('is_active', 1)
-            ->where('slug', $slug)
-            ->select('slug', DB::raw("COALESCE(domain, '') as domain"))
-            ->first();
-        if (!$row) return null;
-        $domain = trim((string) $row->domain);
-        return $domain !== '' ? $domain : $this->frontendHost();
+        $target = $this->tenantTargetBySlug($slug);
+        return $target['host'] ?? null;
+    }
+
+    /**
+     * @param list<array{tenant_id:int, slug:string, host:string, prefix:string}> $targets
+     * @return array<string,list<array{tenant_id:int, slug:string, host:string, prefix:string}>>
+     */
+    private function tenantTargetsByHost(array $targets): array
+    {
+        $byHost = [];
+        foreach ($targets as $target) {
+            $byHost[$target['host']][] = $target;
+        }
+        foreach ($byHost as &$hostTargets) {
+            usort(
+                $hostTargets,
+                fn($a, $b) => strlen((string) $b['prefix']) <=> strlen((string) $a['prefix'])
+            );
+        }
+        unset($hostTargets);
+        return $byHost;
+    }
+
+    /**
+     * @param list<array{tenant_id:int, slug:string, host:string, prefix:string}> $targets
+     * @return array{tenant_id:int, slug:string, host:string, prefix:string}|null
+     */
+    private function tenantTargetFromList(array $targets, string $slug): ?array
+    {
+        foreach ($targets as $target) {
+            if ($target['slug'] === $slug) return $target;
+        }
+        return null;
+    }
+
+    /**
+     * @return array{tenant_id:int, slug:string, host:string, prefix:string}|null
+     */
+    private function tenantTargetBySlug(string $slug): ?array
+    {
+        return $this->tenantTargetFromList($this->loadTenantTargets(), $slug);
+    }
+
+    /**
+     * @return array{tenant_id:int, slug:string, host:string, prefix:string}|null
+     */
+    private function tenantTargetById(int $tenantId): ?array
+    {
+        foreach ($this->loadTenantTargets() as $target) {
+            if ((int) $target['tenant_id'] === $tenantId) return $target;
+        }
+        return null;
+    }
+
+    /**
+     * @param array<string,list<array{tenant_id:int, slug:string, host:string, prefix:string}>> $targetsByHost
+     * @return array{0:array{tenant_id:int, slug:string, host:string, prefix:string}|null,1:string}
+     */
+    private function tenantAttributionForRoute(string $host, string $route, array $targetsByHost): array
+    {
+        foreach ($targetsByHost[$host] ?? [] as $target) {
+            if ($this->routeMatchesTenantTarget($route, $target)) {
+                return [$target, $this->tenantLocalRoute($route, $target)];
+            }
+        }
+        return [null, $route];
+    }
+
+    /**
+     * @param array{host:string, prefix:string} $target
+     */
+    private function routeMatchesTenantTarget(string $route, array $target): bool
+    {
+        $prefix = (string) ($target['prefix'] ?? '');
+        if ($prefix === '') return true;
+        return $route === $prefix || str_starts_with($route, $prefix . '/');
+    }
+
+    /**
+     * @param array{prefix:string} $target
+     */
+    private function tenantLocalRoute(string $route, array $target): string
+    {
+        $prefix = (string) ($target['prefix'] ?? '');
+        if ($prefix === '') return $route;
+        if ($route === $prefix) return '/';
+        if (str_starts_with($route, $prefix . '/')) {
+            $local = substr($route, strlen($prefix));
+            return $local === '' ? '/' : $local;
+        }
+        return $route;
     }
 
     private function expectedSnapshotCount(array $tenants): int
@@ -1725,20 +2077,21 @@ class PrerenderService
     /**
      * Snapshot of tenants.updated_at to detect content drift. NULL → epoch.
      *
-     * @return array<int,int> host => unix ts
+     * @return array<int,int> tenant id => unix ts
      */
     private function loadTenantUpdatedAt(): array
     {
-        $appHost = $this->frontendHost();
         $rows = DB::table('tenants')
-            ->where('is_active', 1)
-            ->select('id', 'slug', 'updated_at', DB::raw("COALESCE(domain, '') as domain"))
+            ->where('tenants.is_active', 1)
+            ->select(
+                'tenants.id',
+                'tenants.updated_at'
+            )
             ->get();
         $out = [];
         foreach ($rows as $r) {
-            $host = trim((string) $r->domain) !== '' ? $r->domain : $appHost;
             $ts = $r->updated_at ? strtotime((string) $r->updated_at) : 0;
-            $out[$host] = max($out[$host] ?? 0, (int) $ts);
+            $out[(int) $r->id] = (int) $ts;
         }
         return $out;
     }
@@ -1752,20 +2105,15 @@ class PrerenderService
      *   /events     — newest events.updated_at
      *   /listings   — newest listings.updated_at
      *
-     * @return array<string, array<string,int>>  host => route => unix ts
+     * @return array<int, array<string,int>>  tenant id => route => unix ts
      */
     private function loadContentUpdatedAt(): array
     {
-        $appHost = $this->frontendHost();
-        $tenants = DB::table('tenants')
-            ->where('is_active', 1)
-            ->select('id', 'slug', DB::raw("COALESCE(domain, '') as domain"))
-            ->get()
-            ->mapWithKeys(function ($r) use ($appHost) {
-                $host = trim((string) $r->domain) !== '' ? $r->domain : $appHost;
-                return [(int) $r->id => $host];
-            })
-            ->toArray();
+        $tenantIds = DB::table('tenants')
+            ->where('tenants.is_active', 1)
+            ->pluck('id')
+            ->mapWithKeys(fn($id) => [(int) $id => true])
+            ->all();
 
         $out = [];
 
@@ -1784,10 +2132,10 @@ class PrerenderService
                 ->groupBy('tenant_id')
                 ->get();
             foreach ($rows as $row) {
-                $host = $tenants[(int) $row->tenant_id] ?? null;
-                if (!$host) continue;
+                $tenantId = (int) $row->tenant_id;
+                if (!isset($tenantIds[$tenantId])) continue;
                 $ts = $row->ts ? strtotime((string) $row->ts) : 0;
-                $out[$host][$route] = max($out[$host][$route] ?? 0, (int) $ts);
+                $out[$tenantId][$route] = max($out[$tenantId][$route] ?? 0, (int) $ts);
             }
         }
 
@@ -1795,23 +2143,27 @@ class PrerenderService
     }
 
     private function checkContentStaleness(
-        string $host,
-        string $route,
+        ?int $tenantId,
+        string $tenantRoute,
         int $snapshotMtime,
         array $tenantUpdated,
         array $contentUpdated
     ): array {
+        if ($tenantId === null) {
+            return [false, null];
+        }
+
         // Tenant-level changes (logo, meta description, h1, etc) invalidate
-        // every route on that host.
-        $tenantTs = $tenantUpdated[$host] ?? 0;
+        // every route for that tenant.
+        $tenantTs = $tenantUpdated[$tenantId] ?? 0;
         if ($tenantTs > $snapshotMtime + 60) {
             return [true, 'tenant settings updated ' . $this->ago($tenantTs) . ' (snapshot older)'];
         }
 
         // Route-specific content. Match by prefix so "/blog" covers
         // "/blog/post-1" too.
-        foreach ($contentUpdated[$host] ?? [] as $contentRoute => $ts) {
-            if ($ts > $snapshotMtime + 60 && (str_starts_with($route, $contentRoute) || $route === $contentRoute)) {
+        foreach ($contentUpdated[$tenantId] ?? [] as $contentRoute => $ts) {
+            if ($ts > $snapshotMtime + 60 && (str_starts_with($tenantRoute, $contentRoute) || $tenantRoute === $contentRoute)) {
                 return [true, "{$contentRoute} content updated " . $this->ago($ts)];
             }
         }
@@ -2150,10 +2502,10 @@ class PrerenderService
 
         // 1. Cache filesystem.
         if ($this->cacheReadable()) {
-            $checks[] = ['name' => 'cache_filesystem', 'status' => 'green', 'detail' => $this->cachePath];
+            $checks[] = ['name' => 'cache_readable', 'status' => 'green', 'detail' => $this->cachePath];
         } else {
             $checks[] = [
-                'name'   => 'cache_filesystem',
+                'name'   => 'cache_readable',
                 'status' => 'red',
                 'detail' => 'Snapshot cache directory not readable',
                 'action' => "ls -la {$this->cachePath} on the host; check the nexus-php-prerendered volume mount",
@@ -2161,7 +2513,75 @@ class PrerenderService
             $bump('red');
         }
 
-        // 2. Circuit breaker.
+        if ($this->cacheWritable()) {
+            $checks[] = ['name' => 'cache_writable', 'status' => 'green', 'detail' => 'Snapshot cache accepts worker writes'];
+        } else {
+            $checks[] = [
+                'name'   => 'cache_writable',
+                'status' => 'red',
+                'detail' => 'Snapshot cache directory is not writable',
+                'action' => "Fix permissions on {$this->cachePath}; the worker cannot publish fresh snapshots",
+            ];
+            $bump('red');
+        }
+
+        // 2. Tenant-aware route planner. Sample live tenants so broken JSON
+        // feature flags, schema drift, or a bad planner regression shows up as
+        // an operator-facing health problem before the worker fans out.
+        try {
+            $targets = $this->loadTenantTargets();
+            $sampled = array_slice($targets, 0, 5);
+            $empty = [];
+            foreach ($sampled as $target) {
+                if ($this->routesForTenant((object) $target) === []) {
+                    $empty[] = $target['slug'];
+                }
+            }
+            if ($targets === []) {
+                $checks[] = [
+                    'name'   => 'route_planner',
+                    'status' => 'yellow',
+                    'detail' => 'No active tenant targets found',
+                    'action' => 'Confirm active tenants exist before expecting snapshots',
+                ];
+                $bump('yellow');
+            } elseif ($empty !== []) {
+                $checks[] = [
+                    'name'   => 'route_planner',
+                    'status' => 'red',
+                    'detail' => 'No routes planned for: ' . implode(', ', $empty),
+                    'action' => 'Inspect tenant feature/module configuration and rerun prerender:plan-routes',
+                ];
+                $bump('red');
+            } else {
+                $checks[] = [
+                    'name'   => 'route_planner',
+                    'status' => 'green',
+                    'detail' => 'Tenant-aware planner returned routes for ' . count($sampled) . ' sampled tenant(s)',
+                ];
+            }
+        } catch (\Throwable $e) {
+            $checks[] = [
+                'name'   => 'route_planner',
+                'status' => 'red',
+                'detail' => 'Tenant-aware planner failed: ' . $e->getMessage(),
+                'action' => 'Run php artisan prerender:plan-routes --tenant=<slug> and inspect the exception',
+            ];
+            $bump('red');
+        }
+
+        $hasJobsTable = Schema::hasTable('prerender_jobs');
+        if (!$hasJobsTable) {
+            $checks[] = [
+                'name'   => 'job_table',
+                'status' => 'yellow',
+                'detail' => 'prerender_jobs table is not available yet',
+                'action' => 'Run migrations before enabling the worker',
+            ];
+            $bump('yellow');
+        }
+
+        // 3. Circuit breaker.
         $breakerUntil = $this->breakerTrippedUntil();
         if ($breakerUntil !== null) {
             $checks[] = [
@@ -2175,10 +2595,10 @@ class PrerenderService
             $checks[] = ['name' => 'circuit_breaker', 'status' => 'green', 'detail' => 'Closed (normal)'];
         }
 
-        // 3. Queue draining. Oldest queued row should be < 5 minutes old.
-        $oldestQueued = DB::table('prerender_jobs')
-            ->where('status', 'queued')
-            ->min('queued_at');
+        // 4. Queue draining. Oldest queued row should be < 5 minutes old.
+        $oldestQueued = $hasJobsTable
+            ? DB::table('prerender_jobs')->where('status', 'queued')->min('queued_at')
+            : null;
         if ($oldestQueued !== null) {
             $ageS = max(0, time() - strtotime($oldestQueued));
             if ($ageS > 600) {
@@ -2204,12 +2624,11 @@ class PrerenderService
             $checks[] = ['name' => 'queue_age', 'status' => 'green', 'detail' => 'Queue empty'];
         }
 
-        // 4. Recent failure rate.
+        // 5. Recent failure rate.
         $cutoff = date('Y-m-d H:i:s', time() - self::BREAKER_WINDOW_SECONDS);
-        $recentFails = DB::table('prerender_jobs')
-            ->where('status', 'failed')
-            ->where('finished_at', '>=', $cutoff)
-            ->count();
+        $recentFails = $hasJobsTable
+            ? DB::table('prerender_jobs')->where('status', 'failed')->where('finished_at', '>=', $cutoff)->count()
+            : 0;
         if ($recentFails >= self::BREAKER_FAILURE_THRESHOLD) {
             $checks[] = [
                 'name'   => 'recent_failures',
@@ -2230,12 +2649,11 @@ class PrerenderService
             $checks[] = ['name' => 'recent_failures', 'status' => 'green', 'detail' => 'No recent failures'];
         }
 
-        // 5. Stuck claimed/running rows.
+        // 6. Stuck claimed/running rows.
         $stuckCutoff = date('Y-m-d H:i:s', time() - 1800);
-        $stuck = DB::table('prerender_jobs')
-            ->whereIn('status', ['claimed', 'running'])
-            ->where('claimed_at', '<', $stuckCutoff)
-            ->count();
+        $stuck = $hasJobsTable
+            ? DB::table('prerender_jobs')->whereIn('status', ['claimed', 'running'])->where('claimed_at', '<', $stuckCutoff)->count()
+            : 0;
         if ($stuck > 0) {
             $checks[] = [
                 'name'   => 'stuck_jobs',
@@ -2248,7 +2666,54 @@ class PrerenderService
             $checks[] = ['name' => 'stuck_jobs', 'status' => 'green', 'detail' => 'No stuck jobs'];
         }
 
-        // 6. Scheduler liveness. Each prerender:* cron stamps a cache key on
+        // 7. Last completed / failed job context. These are not health
+        // degraders on their own; they make the banner useful during incident
+        // triage by showing the latest tenant pass/failure when data exists.
+        if ($hasJobsTable) {
+            $lastSuccess = DB::table('prerender_jobs as j')
+                ->leftJoin('tenants as t', 't.id', '=', 'j.tenant_id')
+                ->whereIn('j.status', ['completed', 'succeeded', 'partial'])
+                ->orderByDesc('j.finished_at')
+                ->orderByDesc('j.id')
+                ->select('j.id', 't.slug as tenant_slug', 'j.routes', 'j.finished_at')
+                ->first();
+            $lastFailure = DB::table('prerender_jobs as j')
+                ->leftJoin('tenants as t', 't.id', '=', 'j.tenant_id')
+                ->where('j.status', 'failed')
+                ->orderByDesc('j.finished_at')
+                ->orderByDesc('j.id')
+                ->select('j.id', 't.slug as tenant_slug', 'j.routes', 'j.finished_at', 'j.error_message')
+                ->first();
+            if ($lastSuccess) {
+                $checks[] = [
+                    'name'   => 'last_successful_pass',
+                    'status' => 'green',
+                    'detail' => sprintf(
+                        '#%s %s at %s%s',
+                        $lastSuccess->id,
+                        $lastSuccess->tenant_slug ?: 'all tenants',
+                        $lastSuccess->finished_at ?: 'unknown time',
+                        $lastSuccess->routes ? ' routes: ' . $lastSuccess->routes : ''
+                    ),
+                ];
+            }
+            if ($lastFailure) {
+                $checks[] = [
+                    'name'   => 'last_failed_pass',
+                    'status' => 'yellow',
+                    'detail' => sprintf(
+                        '#%s %s at %s: %s',
+                        $lastFailure->id,
+                        $lastFailure->tenant_slug ?: 'all tenants',
+                        $lastFailure->finished_at ?: 'unknown time',
+                        trim((string) $lastFailure->error_message) ?: 'No error message recorded'
+                    ),
+                    'action' => 'Open the job detail panel and inspect the worker log tail',
+                ];
+            }
+        }
+
+        // 8. Scheduler liveness. Each prerender:* cron stamps a cache key on
         // success; if the gap exceeds 3× the expected interval, the scheduler
         // itself is probably wedged (Laravel queue worker / supervisord
         // problem) and the engine is degrading silently.

@@ -19,6 +19,8 @@ import Trash from 'lucide-react/icons/trash-2';
 import Bot from 'lucide-react/icons/bot';
 import Gauge from 'lucide-react/icons/gauge';
 import Zap from 'lucide-react/icons/zap';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import RouteIcon from 'lucide-react/icons/route';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useAuth, usePusherOptional } from '@/contexts';
@@ -38,6 +40,20 @@ import {
   type PrerenderAuditEntry,
   type PrerenderTtlInspect,
 } from '../../../api/adminApi';
+import { GuidedWorkflows, OperatorGuide } from './OperatorGuide';
+import { PurgeControls } from './PurgeControls';
+import { TenantSafetyTab } from './TenantSafetyTab';
+import {
+  formatAge,
+  formatBytes,
+  formatTs,
+  httpStatusColor,
+  jobStatusColor,
+  seoGradeColor,
+  SEO_GRADE_TEXT_CLASSES,
+  stalenessColor,
+} from './prerenderFormat';
+import type { ToastShape } from './prerenderAdminTypes';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -60,69 +76,6 @@ import {
 
 
 // ─── helpers ───────────────────────────────────────────────────────────────
-
-function formatBytes(n: number): string {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-  return `${(n / 1024 / 1024).toFixed(2)} MB`;
-}
-
-function formatAge(seconds: number | null | undefined): string {
-  if (seconds == null) return '—';
-  if (seconds < 60) return `${seconds}s`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
-  return `${Math.floor(seconds / 86400)}d`;
-}
-
-function formatTs(ts: number | string | null | undefined): string {
-  if (!ts) return '—';
-  const d = typeof ts === 'number' ? new Date(ts * 1000) : new Date(ts);
-  if (Number.isNaN(d.getTime())) return String(ts);
-  return d.toLocaleString();
-}
-
-function stalenessColor(s: 'fresh' | 'warn' | 'stale'): 'success' | 'warning' | 'danger' {
-  return s === 'fresh' ? 'success' : s === 'warn' ? 'warning' : 'danger';
-}
-
-function seoGradeColor(g: 'A' | 'B' | 'C' | 'D' | 'F'): 'success' | 'primary' | 'warning' | 'danger' | 'default' {
-  switch (g) {
-    case 'A': return 'success';
-    case 'B': return 'primary';
-    case 'C': return 'warning';
-    case 'D': return 'warning';
-    case 'F': return 'danger';
-  }
-}
-
-const SEO_GRADE_TEXT_CLASSES: Record<ReturnType<typeof seoGradeColor>, string> = {
-  success: 'text-success',
-  primary: 'text-accent',
-  warning: 'text-warning',
-  danger: 'text-danger',
-  default: 'text-muted',
-};
-
-function httpStatusColor(n: number): 'default' | 'success' | 'warning' | 'danger' {
-  if (n === 200) return 'success';
-  if (n >= 300 && n < 400) return 'default';
-  if (n >= 400 && n < 500) return 'warning';
-  if (n >= 500) return 'danger';
-  return 'default';
-}
-
-function jobStatusColor(s: PrerenderJob['status']): 'default' | 'primary' | 'success' | 'warning' | 'danger' {
-  switch (s) {
-    case 'queued':    return 'default';
-    case 'claimed':
-    case 'running':   return 'primary';
-    case 'succeeded': return 'success';
-    case 'partial':   return 'warning';
-    case 'failed':    return 'danger';
-    case 'cancelled': return 'default';
-  }
-}
 
 // ─── main component ────────────────────────────────────────────────────────
 
@@ -202,6 +155,10 @@ export function PrerenderAdmin() {
       )}
 
       <HealthBanner isSuperAdmin={isSuperAdmin} toast={toast} lastUpdate={lastUpdate} />
+      <OperatorGuide />
+      <GuidedWorkflows
+        onSelect={(nextTab) => setTab(nextTab)}
+      />
 
       <div className="flex justify-end mb-2">
         <Chip
@@ -226,6 +183,16 @@ export function PrerenderAdmin() {
           title={<span className="flex items-center gap-2"><Activity size={16} />{t('tabs.overview')}</span>}
         >
           <OverviewTab isSuperAdmin={isSuperAdmin} toast={toast} lastUpdate={lastUpdate} live={live} />
+        </Tab>
+        <Tab
+          key="tenant-safety"
+          title={<span className="flex items-center gap-2"><ShieldCheck size={16} />{t('tabs.tenant_safety')}</span>}
+        >
+          <TenantSafetyTab
+            isSuperAdmin={isSuperAdmin}
+            toast={toast}
+            onOpenInventory={(slug) => { setCoverageFilter(slug); setTab('inventory'); }}
+          />
         </Tab>
         <Tab
           key="inventory"
@@ -281,11 +248,6 @@ export function PrerenderAdmin() {
 export default PrerenderAdmin;
 
 // ─── Overview ──────────────────────────────────────────────────────────────
-
-interface ToastShape {
-  success: (m: string) => void;
-  error: (m: string) => void;
-}
 
 function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number; live: boolean }) {
   const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.overview' });
@@ -450,7 +412,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
       <FreshnessControls isSuperAdmin={isSuperAdmin} toast={toast} onActed={load} />
       <TtlInspector />
       <SitemapExplorer />
-      <PurgeControls   isSuperAdmin={isSuperAdmin} toast={toast} onActed={load} />
+      <PurgeControls isSuperAdmin={isSuperAdmin} toast={toast} onActed={load} />
     </div>
   );
 }
@@ -650,112 +612,6 @@ function FreshnessControls({
   );
 }
 
-function PurgeControls({
-  isSuperAdmin, toast, onActed,
-}: { isSuperAdmin: boolean; toast: ToastShape; onActed: () => void }) {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.purge' });
-  const [pattern, setPattern] = useState('');
-  const [tenant, setTenant] = useState('');
-  const [dryRun, setDryRun] = useState(true);
-  const [recache, setRecache] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{ deleted_count: number; deleted: string[]; dry_run: boolean } | null>(null);
-
-  const submit = async () => {
-    if (!pattern.trim()) {
-      toast.error(t('errors.pattern_required'));
-      return;
-    }
-    setLoading(true);
-    setResult(null);
-    try {
-      const res = await adminPrerender.purge({
-        pattern: pattern.trim(),
-        tenant_slug: tenant.trim() || undefined,
-        dry_run: dryRun,
-        recache,
-      });
-      if (res.data) {
-        setResult(res.data);
-        toast.success(dryRun
-          ? t('messages.dry_run', { count: res.data.deleted_count })
-          : t('messages.purged', { count: res.data.deleted_count, job: res.data.recache_job_id ? ` #${res.data.recache_job_id}` : '' }));
-        if (!dryRun) onActed();
-      }
-    } catch {
-      toast.error(t('errors.purge_failed'));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Card>
-      <CardHeader>
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Trash size={18} />{t('title')}
-        </h3>
-      </CardHeader>
-      <CardBody className="gap-3">
-        <p className="text-sm text-muted">
-          {t('description_prefix')} <code>*</code> {t('description_middle')}
-          <code className="ml-1">**</code> {t('description_suffix')} <code>/blog/*</code>,
-          <code className="ml-1">/listings/**</code>, <code className="ml-1">/</code>.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <Input
-            label={t('fields.pattern')}
-            placeholder={t('placeholders.pattern')}
-            variant="secondary"
-            value={pattern}
-            onValueChange={setPattern}
-            isDisabled={!isSuperAdmin}
-          />
-          <Input
-            label={t('fields.tenant_slug')}
-            placeholder={t('placeholders.tenant_slug')}
-            variant="secondary"
-            value={tenant}
-            onValueChange={setTenant}
-            isDisabled={!isSuperAdmin}
-          />
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
-          <Switch isSelected={dryRun} onValueChange={setDryRun} isDisabled={!isSuperAdmin}>
-            <span className="text-sm">{t('actions.dry_run')}</span>
-          </Switch>
-          <Switch isSelected={recache} onValueChange={setRecache} isDisabled={!isSuperAdmin}>
-            <span className="text-sm">{t('actions.auto_recache')}</span>
-          </Switch>
-        </div>
-        <div className="flex justify-end">
-          <Button
-            color={dryRun ? 'primary' : 'danger'}
-            startContent={<Trash size={16} />}
-            onPress={submit}
-            isLoading={loading}
-            isDisabled={!isSuperAdmin}
-          >
-            {dryRun ? t('actions.preview_purge') : t('actions.purge_now')}
-          </Button>
-        </div>
-        {result && (
-          <div className="space-y-1">
-            <p className="text-sm font-medium">
-              {result.dry_run ? t('result.would_delete', { count: result.deleted_count }) : t('result.deleted', { count: result.deleted_count })}
-            </p>
-            {result.deleted.length > 0 && (
-              <Code className="text-xs whitespace-pre-wrap block max-h-48 overflow-auto">
-                {result.deleted.join('\n')}
-              </Code>
-            )}
-          </div>
-        )}
-      </CardBody>
-    </Card>
-  );
-}
-
 function KpiCard({
   label,
   value,
@@ -848,32 +704,25 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
     if (selected.size === 0) return;
     setBulkLoading(true);
     try {
-      // Group selected items by host (resolves to tenant via the inventory rows).
-      const byHost = new Map<string, { tenantId: number | null; routes: string[] }>();
+      const byTenant = new Map<number, string[]>();
       const itemMap = new Map(filtered.map((i) => [i.cache_path, i] as const));
-      // We need tenant_id, but the inventory row doesn't carry it. Use the
-      // invalidate webhook which takes (tenant_id, routes[]). To resolve
-      // tenant_id from host, look up via the coverage API on first use.
-      const coverage = await adminPrerender.getCoverage();
-      const hostToTenantId = new Map(
-        (coverage.data?.rows ?? []).map((r) => [r.host, r.tenant_id] as const),
-      );
 
       for (const cachePath of selected) {
         const it = itemMap.get(cachePath);
         if (!it) continue;
-        const tenantId = hostToTenantId.get(it.host) ?? null;
-        const slot = byHost.get(it.host) ?? { tenantId, routes: [] };
-        slot.routes.push(it.route);
-        byHost.set(it.host, slot);
+        if (it.tenant_id == null) continue;
+        const routes = byTenant.get(it.tenant_id) ?? [];
+        routes.push(it.tenant_route || it.route);
+        byTenant.set(it.tenant_id, routes);
       }
 
       let invalidated = 0;
-      for (const [, slot] of byHost) {
-        if (slot.tenantId == null || slot.routes.length === 0) continue;
+      for (const [tenantId, routes] of byTenant) {
+        const uniqueRoutes = Array.from(new Set(routes));
+        if (uniqueRoutes.length === 0) continue;
         const res = await adminPrerender.invalidate({
-          tenant_id: slot.tenantId,
-          routes: slot.routes,
+          tenant_id: tenantId,
+          routes: uniqueRoutes,
           recache: true,
         });
         invalidated += res.data?.invalidated ?? 0;
@@ -2063,6 +1912,12 @@ const HEALTH_DOT_CLASSES: Record<ReturnType<typeof statusToColor>, string> = {
   danger: 'bg-danger',
 };
 
+function readableHealthCheckName(t: (key: string, options?: Record<string, unknown>) => string, name: string): string {
+  const translated = t(`checks.${name}`);
+  if (translated !== `checks.${name}`) return translated;
+  return name.replace(/_/g, ' ');
+}
+
 function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number }) {
   const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.health_banner' });
   const [health, setHealth] = useState<PrerenderHealth | null>(null);
@@ -2146,7 +2001,7 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
           {health.checks.map((c) => (
             <li key={c.name}>
               <span className={`inline-block w-2 h-2 rounded-full mr-2 align-middle ${HEALTH_DOT_CLASSES[statusToColor(c.status)]}`} />
-              <strong>{c.name}:</strong> {c.detail}
+              <strong>{readableHealthCheckName(t, c.name)}:</strong> {c.detail}
               {c.action && <span className="block ml-4 text-xs opacity-80">→ {c.action}</span>}
             </li>
           ))}
@@ -2200,6 +2055,9 @@ function AuditTab() {
   }, [filter]);
 
   useEffect(() => { load(); }, [load]);
+
+  const actionLabel = (action: string) => t(`actions.${action}`, { defaultValue: action });
+  const outcomeLabel = (outcome: string) => t(`outcomes.${outcome}`, { defaultValue: outcome });
 
   return (
     <div className="space-y-3">
@@ -2259,14 +2117,14 @@ function AuditTab() {
                     ? <Tooltip content={`#${row.actor_user_id ?? '?'}`}><span>{row.actor_first} {row.actor_last}</span></Tooltip>
                     : <span className="text-muted">{t('fallbacks.system')}</span>}
                 </TableCell>
-                <TableCell><Code size="sm">{row.action}</Code></TableCell>
+                <TableCell>{actionLabel(row.action)}</TableCell>
                 <TableCell>
                   <Chip
                     size="sm"
                     variant="soft"
                     color={row.outcome === 'ok' ? 'success' : row.outcome === 'denied' ? 'warning' : 'danger'}
                   >
-                    {row.outcome}
+                    {outcomeLabel(row.outcome)}
                   </Chip>
                 </TableCell>
                 <TableCell>{row.tenant_slug ?? <span className="text-muted">{t('fallbacks.all')}</span>}</TableCell>
@@ -2274,9 +2132,9 @@ function AuditTab() {
                 <TableCell className="max-w-md">
                   {row.details ? (
                     <Code size="sm" className="text-xs whitespace-pre-wrap block max-h-20 overflow-auto">
-                      {JSON.stringify(row.details)}
+                      {JSON.stringify(row.details, null, 2)}
                     </Code>
-                  ) : '—'}
+                  ) : <span className="text-muted">{t('details_empty')}</span>}
                 </TableCell>
               </TableRow>
             ))}

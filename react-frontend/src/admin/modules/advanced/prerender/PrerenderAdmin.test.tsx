@@ -31,6 +31,7 @@ const { mockAdminPrerender } = vi.hoisted(() => ({
     getInventory: vi.fn(),
     inspect: vi.fn(),
     getCoverage: vi.fn(),
+    getTenantSafety: vi.fn(),
     getEvents: vi.fn(),
     getFailures: vi.fn(),
     listJobs: vi.fn(),
@@ -242,6 +243,34 @@ describe('PrerenderAdmin', () => {
     mockAdminPrerender.getInventory.mockResolvedValue({ success: true, data: { cache_readable: true, cache_path: '/tmp', items: [] } });
     mockAdminPrerender.inspect.mockResolvedValue({ success: true, data: null });
     mockAdminPrerender.getCoverage.mockResolvedValue({ success: true, data: { expected_routes: [], rows: [] } });
+    mockAdminPrerender.getTenantSafety.mockResolvedValue({
+      success: true,
+      data: {
+        tenant: { tenant_id: 2, slug: 'hour-timebank', host: 'app.project-nexus.ie', prefix: '/hour-timebank' },
+        counts: { expected: 2, static: 1, sitemap: 1, snapshots: 1, missing: 1, stale: 0, asset_invalid: 0, unexpected: 0 },
+        static_routes: ['/about'],
+        sitemap_routes: ['/page/tenant-page'],
+        expected_routes: ['/about', '/page/tenant-page'],
+        missing_routes: ['/about'],
+        stale_routes: [],
+        asset_invalid_routes: [],
+        unexpected_routes: [],
+        snapshots: [
+          {
+            route: '/page/tenant-page',
+            cache_path: 'app.project-nexus.ie/hour-timebank/page/tenant-page/index.html',
+            host_route: '/hour-timebank/page/tenant-page',
+            source: 'sitemap',
+            expected: true,
+            reason: { key: 'sitemap', value: null },
+            staleness: 'fresh',
+            http_status: 200,
+            content_stale: false,
+            asset_issues: [],
+          },
+        ],
+      },
+    });
     mockAdminPrerender.getEvents.mockResolvedValue({ success: true, data: { events: [] } });
     mockAdminPrerender.getFailures.mockResolvedValue({ success: true, data: { items: [] } });
     mockAdminPrerender.getAnalytics.mockResolvedValue({ success: true, data: null });
@@ -329,6 +358,18 @@ describe('PrerenderAdmin', () => {
       const tabs = screen.queryAllByRole('tab');
       const inventoryTab = tabs.find((t) => t.textContent?.toLowerCase().includes('inventor'));
       expect(inventoryTab).toBeDefined();
+    });
+  });
+
+  it('renders the tenant safety workflow and tab', async () => {
+    const { PrerenderAdmin } = await import('./PrerenderAdmin');
+    render(<PrerenderAdmin />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/check one tenant is safe/i)).toBeInTheDocument();
+      const tabs = screen.queryAllByRole('tab');
+      const safetyTab = tabs.find((t) => t.textContent?.toLowerCase().includes('tenant safety'));
+      expect(safetyTab).toBeDefined();
     });
   });
 
