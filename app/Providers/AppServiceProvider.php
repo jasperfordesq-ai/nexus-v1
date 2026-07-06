@@ -1196,7 +1196,7 @@ class AppServiceProvider extends ServiceProvider
             return false;
         }
 
-        $raw = (string) env('TEST_TRANSLATION_LOCALES', 'en,ga,de');
+        $raw = (string) config('app.test_translation_locales', 'en,ga,de');
         if ($raw === '*' || strtolower($raw) === 'all') {
             return false;
         }

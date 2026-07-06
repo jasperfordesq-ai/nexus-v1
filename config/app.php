@@ -18,6 +18,9 @@ return [
     // Optional override directory for backup:verify. Read via
     // config('app.backup_verify_dir') for the same config-cache safety.
     'backup_verify_dir' => env('BACKUP_VERIFY_DIR'),
+    // Test-only translation preload limiter. Runtime code reads
+    // config('app.test_translation_locales') so config:cache remains safe.
+    'test_translation_locales' => env('TEST_TRANSLATION_LOCALES', 'en,ga,de'),
     'timezone' => 'UTC',
     'locale' => 'en',
     'fallback_locale' => 'en',
