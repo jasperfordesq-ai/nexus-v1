@@ -160,6 +160,23 @@
   </suppress>
 
   <!--
+    DEV/CI-ONLY: extract-zip@2.0.1 via Puppeteer browser-download tooling.
+    Pulled by pa11y (root devDependency) and Lighthouse CI tooling
+    (react-frontend devDependency chain). It is not bundled into the React app
+    and is not installed on the production PHP server. npm audit currently has
+    no advisory and npm publishes no patched extract-zip release newer than
+    2.0.1, so this OWASP-only CVE is suppressed as non-runtime tooling risk.
+  -->
+  <suppress>
+    <notes><![CDATA[
+      DEV/CI-ONLY: extract-zip is used by Puppeteer browser-download tooling
+      for pa11y/Lighthouse CI. Not production runtime; no patched npm release.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:npm/extract-zip@2\.0\.1$</packageUrl>
+    <vulnerabilityName>CVE-2026-56876</vulnerabilityName>
+  </suppress>
+
+  <!--
     MOBILE-ONLY: lodash@4.17.23 in mobile/package-lock.json (Capacitor APK).
     The mobile app compiles to APK/IPA and is NOT deployed to the web server.
     GHSA-r5fr-rjxr-66jc — prototype pollution in lodash. Not reachable from web.

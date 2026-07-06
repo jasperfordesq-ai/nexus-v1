@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **Main-branch CI now passes npm 10 lockfile validation and PHP 8.2 config bootstrap.** The React frontend lockfile now includes the nested rxjs@7.8.2 peer entry required by HeroUI/i18next tooling under GitHub Actions npm 10 resolver, the Docker/test database SSL option now uses a guarded PHP 8.2-compatible PDO constant, and prerender/page regression tests were updated for tenant-prefixed inventory routes and full custom-page fillable fields.
+- **Main-branch CI now passes npm 10 lockfile validation, PHP 8.2 config bootstrap, and the current OWASP scan.** The React frontend lockfile now includes the nested rxjs@7.8.2 peer entry required by HeroUI/i18next tooling under GitHub Actions npm 10 resolver, the Docker/test database SSL option now uses a guarded PHP 8.2-compatible PDO constant, the OWASP-only `extract-zip@2.0.1` finding is suppressed as dev/CI-only Puppeteer browser-download tooling with no patched npm release, and prerender/page regression tests were updated for tenant-prefixed inventory routes and full custom-page fillable fields.
 
 - **Local Laravel API boot no longer stalls the Vite login flow on Docker Desktop.** The custom translation cache now stores merged PHP + JSON translation groups, avoiding a full per-locale PHP translation preload during every Laravel bootstrap. This cuts local Docker API startup/request overhead that made the React Vite login screen feel stuck.
 

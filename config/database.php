@@ -4,16 +4,6 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-$mysqlOptions = [];
-$mysqlSslVerifyServerCert = env(
-    'DB_SSL_VERIFY_SERVER_CERT',
-    in_array(env('APP_ENV'), ['local', 'development', 'testing'], true) ? false : null
-);
-
-if ($mysqlSslVerifyServerCert !== null && defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
-    $mysqlOptions[\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = $mysqlSslVerifyServerCert;
-}
-
 return [
     'default' => env('DB_CONNECTION', 'mysql'),
     'connections' => [
@@ -36,7 +26,19 @@ return [
             // Docker dev/test environment, the MariaDB client can inherit SSL
             // defaults that the local DB service does not support; keep this
             // away from production unless explicitly configured.
-            'options' => $mysqlOptions,
+            'options' => (static function (): array {
+                $mysqlOptions = [];
+                $mysqlSslVerifyServerCert = env(
+                    'DB_SSL_VERIFY_SERVER_CERT',
+                    in_array(env('APP_ENV'), ['local', 'development', 'testing'], true) ? false : null
+                );
+
+                if ($mysqlSslVerifyServerCert !== null && defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
+                    $mysqlOptions[\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = $mysqlSslVerifyServerCert;
+                }
+
+                return $mysqlOptions;
+            })(),
         ],
     ],
     'migrations' => [
