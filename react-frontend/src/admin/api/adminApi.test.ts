@@ -789,6 +789,24 @@ describe('adminBlog', () => {
     await adminBlog.bulkPublish([4, 5]);
     expect(mockPost).toHaveBeenCalledWith('/v2/admin/blog/bulk-publish', { post_ids: [4, 5] });
   });
+
+  it('uploadFeaturedImage sends blog-scoped multipart upload', async () => {
+    mockUpload.mockResolvedValueOnce({ success: true, data: { url: 'https://api.example.test/storage/blog.webp' } });
+    const file = new File(['image'], 'blog.webp', { type: 'image/webp' });
+    const onUploadProgress = vi.fn();
+
+    await adminBlog.uploadFeaturedImage(file, onUploadProgress);
+
+    expect(mockUpload).toHaveBeenCalledWith(
+      '/v2/upload',
+      expect.any(FormData),
+      'file',
+      { onUploadProgress },
+    );
+    const formData = mockUpload.mock.calls[0][1] as FormData;
+    expect(formData.get('file')).toBe(file);
+    expect(formData.get('type')).toBe('blog');
+  });
 });
 
 // ─── Marketplace ──────────────────────────────────────────────────────────────

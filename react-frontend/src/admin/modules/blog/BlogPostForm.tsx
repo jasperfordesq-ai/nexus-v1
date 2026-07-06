@@ -1,4 +1,3 @@
-import { CardBody, Card, Select, SelectItem, Button, Spinner, Input, Textarea, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,22 +10,47 @@ import { CardBody, Card, Select, SelectItem, Button, Spinner, Input, Textarea, S
  * Parity: PHP Admin\BlogController::create() / edit()
  */
 
-import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { CardBody, Card, Select, SelectItem, Button, Spinner, Input, Textarea, Switch, Progress } from '@/components/ui';
 import { Separator } from '@/components/ui';
 const RichTextEditor = lazy(() =>
   import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
 );
 import ArrowLeft from 'lucide-react/icons/arrow-left';
+import ImagePlus from 'lucide-react/icons/image-plus';
 import Save from 'lucide-react/icons/save';
 import Search from 'lucide-react/icons/search';
+import UploadCloud from 'lucide-react/icons/upload-cloud';
+import X from 'lucide-react/icons/x';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminBlog, adminCategories } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import type { AdminBlogPost, AdminCategory } from '../../api/types';
 import { useTranslation } from 'react-i18next';
+import { resolveUploadedUrl } from '../../components/builderImage';
+import { resolveAssetUrl } from '@/lib/helpers';
+import { logError } from '@/lib/logger';
+
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+const ACCEPTED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+const ACCEPTED_IMAGE_INPUT = [
+  ...ACCEPTED_IMAGE_TYPES,
+  ...ACCEPTED_IMAGE_EXTENSIONS.map((extension) => `.${extension}`),
+].join(',');
+const MAX_FEATURED_IMAGE_BYTES = 10 * 1024 * 1024;
+
+function isAcceptedImageFile(file: File): boolean {
+  const type = file.type.toLowerCase();
+  if (type) {
+    return ACCEPTED_IMAGE_TYPES.includes(type);
+  }
+
+  const extension = file.name.split('.').pop()?.toLowerCase();
+  return !!extension && ACCEPTED_IMAGE_EXTENSIONS.includes(extension);
+}
 
 export function BlogPostForm() {
   const { t } = useTranslation('admin');
@@ -35,11 +59,16 @@ export function BlogPostForm() {
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Loading states
   const [loading, setLoading] = useState(isEdit);
   const [submitting, setSubmitting] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [isDraggingImage, setIsDraggingImage] = useState(false);
+  const [imagePreviewError, setImagePreviewError] = useState(false);
 
   // Original post data (for edit mode page title)
   const [post, setPost] = useState<AdminBlogPost | null>(null);
@@ -63,6 +92,9 @@ export function BlogPostForm() {
 
   // Validation
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const featuredImagePreview = featuredImage.trim() && !imagePreviewError
+    ? resolveAssetUrl(featuredImage.trim())
+    : '';
 
   // Dynamic page title
   usePageTitle(isEdit && post
@@ -165,7 +197,7 @@ export function BlogPostForm() {
         content,
         excerpt: excerpt.trim(),
         status: status as 'draft' | 'published',
-        featured_image: featuredImage.trim() || undefined,
+        featured_image: featuredImage.trim() || null,
         category_id: categoryId ? Number(categoryId) : undefined,
         meta_title: metaTitle.trim() || undefined,
         meta_description: metaDescription.trim() || undefined,
@@ -186,6 +218,58 @@ export function BlogPostForm() {
       toast.error(t('blog.an_unexpected_error_occurred'));
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function uploadFeaturedImageFile(file: File) {
+    if (!file) return;
+
+    if (!isAcceptedImageFile(file)) {
+      toast.error(t('blog.featured_image_type_error'));
+      return;
+    }
+
+    if (file.size > MAX_FEATURED_IMAGE_BYTES) {
+      toast.error(t('blog.featured_image_size_error'));
+      return;
+    }
+
+    setUploadingImage(true);
+    setUploadProgress(0);
+    try {
+      const url = resolveUploadedUrl(await adminBlog.uploadFeaturedImage(file, setUploadProgress));
+      if (!url) {
+        toast.error(t('blog.featured_image_upload_failed'));
+        return;
+      }
+      setFeaturedImage(url);
+      setImagePreviewError(false);
+      toast.success(t('blog.featured_image_uploaded'));
+    } catch (error) {
+      logError('BlogPostForm: featured image upload failed', error);
+      toast.error(t('blog.featured_image_upload_failed'));
+    } finally {
+      setUploadingImage(false);
+      setUploadProgress(null);
+      setIsDraggingImage(false);
+    }
+  }
+
+  function handleFeaturedImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (file) {
+      void uploadFeaturedImageFile(file);
+    }
+  }
+
+  function handleFeaturedImageDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setIsDraggingImage(false);
+    if (submitting || uploadingImage) return;
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      void uploadFeaturedImageFile(file);
     }
   }
 
@@ -328,15 +412,130 @@ export function BlogPostForm() {
               </Select>
             </div>
 
-            {/* Featured Image URL */}
-            <Input
-              label={t('blog.featured_image')}
-              placeholder={t('blog.placeholder_featured_image')}
-              value={featuredImage}
-              onValueChange={setFeaturedImage}
-              isDisabled={submitting}
-              description={t('blog.featured_image_desc')}
-            />
+            {/* Featured Image */}
+            <div className="space-y-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                <Input
+                  label={t('blog.featured_image')}
+                  placeholder={t('blog.placeholder_featured_image')}
+                  value={featuredImage}
+                  onValueChange={(value) => {
+                    setFeaturedImage(value);
+                    setImagePreviewError(false);
+                  }}
+                  isDisabled={submitting || uploadingImage}
+                  description={t('blog.featured_image_desc')}
+                  className="flex-1"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    startContent={!uploadingImage ? <ImagePlus size={16} /> : undefined}
+                    isLoading={uploadingImage}
+                    isDisabled={submitting || uploadingImage}
+                    onPress={() => fileInputRef.current?.click()}
+                  >
+                    {t('blog.featured_image_upload')}
+                  </Button>
+                  {featuredImage && (
+                    <Button
+                      type="button"
+                      variant="tertiary"
+                      isIconOnly
+                      aria-label={t('blog.featured_image_remove')}
+                      isDisabled={submitting || uploadingImage}
+                      onPress={() => {
+                        setFeaturedImage('');
+                        setImagePreviewError(false);
+                      }}
+                    >
+                      <X size={16} />
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={ACCEPTED_IMAGE_INPUT}
+                className="hidden"
+                onChange={handleFeaturedImageUpload}
+                aria-hidden="true"
+                tabIndex={-1}
+              />
+              <div
+                className={`overflow-hidden rounded-lg border bg-default-50 transition-colors ${
+                  isDraggingImage
+                    ? 'border-accent bg-accent/10'
+                    : 'border-default-200'
+                }`}
+                onDragEnter={(e) => {
+                  e.preventDefault();
+                  if (!submitting && !uploadingImage) setIsDraggingImage(true);
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  if (!submitting && !uploadingImage) setIsDraggingImage(true);
+                }}
+                onDragLeave={(e) => {
+                  const nextTarget = e.relatedTarget;
+                  if (!(nextTarget instanceof Node) || !e.currentTarget.contains(nextTarget)) {
+                    setIsDraggingImage(false);
+                  }
+                }}
+                onDrop={handleFeaturedImageDrop}
+              >
+                {featuredImagePreview ? (
+                  <div className="relative">
+                    <img
+                      src={featuredImagePreview}
+                      alt={t('blog.featured_image_preview_alt')}
+                      className="h-52 w-full object-cover"
+                      onError={() => setImagePreviewError(true)}
+                    />
+                    {uploadingImage && (
+                      <div className="absolute inset-x-0 bottom-0 bg-background/90 p-3 backdrop-blur">
+                        <Progress
+                          aria-label={t('blog.featured_image_uploading')}
+                          value={uploadProgress ?? 0}
+                          size="sm"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex h-52 flex-col items-center justify-center gap-3 px-4 text-center">
+                    {uploadingImage ? (
+                      <>
+                        <Spinner size="sm" />
+                        <div className="w-full max-w-xs">
+                          <Progress
+                            aria-label={t('blog.featured_image_uploading')}
+                            value={uploadProgress ?? 0}
+                            size="sm"
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <UploadCloud size={28} className="text-muted" aria-hidden="true" />
+                        <div>
+                          <p className="text-sm font-medium">
+                            {featuredImage.trim()
+                              ? t('blog.featured_image_preview_unavailable')
+                              : t('blog.featured_image_preview_empty')}
+                          </p>
+                          <p className="mt-1 text-xs text-muted">
+                            {t('blog.featured_image_format_hint')}
+                          </p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
 
             {/* SEO Override (Optional) */}
             <Separator />

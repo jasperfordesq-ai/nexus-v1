@@ -13,7 +13,7 @@ const { mockToast, mockNavigate, mockUseParams, mockAdminBlog, mockAdminCategori
   mockNavigate: vi.fn(),
   // By default, no :id param → create mode. Tests that need edit mode set this.
   mockUseParams: vi.fn(() => ({ id: undefined as string | undefined })),
-  mockAdminBlog: { get: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), list: vi.fn() },
+  mockAdminBlog: { get: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), list: vi.fn(), uploadFeaturedImage: vi.fn() },
   mockAdminCategories: { list: vi.fn() },
 }));
 
@@ -113,6 +113,11 @@ const EXISTING_POST = {
   noindex: false,
 };
 
+const EXISTING_POST_WITH_IMAGE = {
+  ...EXISTING_POST,
+  featured_image: 'https://api.example.test/storage/tenant_2/uploads/blog/current.webp',
+};
+
 describe('BlogPostForm — create mode', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -172,6 +177,58 @@ describe('BlogPostForm — create mode', () => {
       expect(mockToast.success).toHaveBeenCalled();
       expect(mockNavigate).toHaveBeenCalled();
     });
+  });
+
+  it('uploads a featured image and shows a preview', async () => {
+    mockAdminBlog.uploadFeaturedImage.mockResolvedValueOnce({
+      success: true,
+      data: { url: 'https://api.example.test/storage/tenant_2/uploads/blog/hero.webp', path: 'tenant_2/uploads/blog/hero.webp' },
+    });
+    renderCreate();
+    await waitFor(() => getTitleInput());
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['hero'], 'hero.webp', { type: 'image/webp' });
+    fireEvent.change(fileInput, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(mockAdminBlog.uploadFeaturedImage).toHaveBeenCalledWith(file, expect.any(Function));
+      expect(screen.getByRole('img', { name: /featured_image_preview_alt|featured image preview/i })).toHaveAttribute(
+        'src',
+        'https://api.example.test/storage/tenant_2/uploads/blog/hero.webp',
+      );
+      expect(mockToast.success).toHaveBeenCalled();
+    });
+  });
+
+  it('accepts image uploads by extension when the browser omits the MIME type', async () => {
+    mockAdminBlog.uploadFeaturedImage.mockResolvedValueOnce({
+      success: true,
+      data: { url: 'https://api.example.test/storage/tenant_2/uploads/blog/hero.jpg', path: 'tenant_2/uploads/blog/hero.jpg' },
+    });
+    renderCreate();
+    await waitFor(() => getTitleInput());
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['hero'], 'hero.jpg', { type: '' });
+    fireEvent.change(fileInput, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(mockAdminBlog.uploadFeaturedImage).toHaveBeenCalledWith(file, expect.any(Function));
+      expect(mockToast.success).toHaveBeenCalled();
+    });
+  });
+
+  it('rejects non-image featured image uploads before calling the API', async () => {
+    renderCreate();
+    await waitFor(() => getTitleInput());
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['not an image'], 'notes.txt', { type: 'text/plain' });
+    fireEvent.change(fileInput, { target: { files: [file] } });
+
+    expect(mockAdminBlog.uploadFeaturedImage).not.toHaveBeenCalled();
+    expect(mockToast.error).toHaveBeenCalled();
   });
 
   it('shows error toast when create API returns failure', async () => {
@@ -239,6 +296,26 @@ describe('BlogPostForm — edit mode', () => {
         expect.objectContaining({ title: 'My Existing Post' }),
       );
       expect(mockAdminBlog.create).not.toHaveBeenCalled();
+    });
+  });
+
+  it('sends null when an existing featured image is removed in edit mode', async () => {
+    mockAdminBlog.get.mockResolvedValueOnce({ success: true, data: EXISTING_POST_WITH_IMAGE });
+    mockAdminBlog.update.mockResolvedValueOnce({ success: true });
+    renderEdit();
+
+    await waitFor(() => {
+      expect(screen.getByRole('img', { name: /featured_image_preview_alt|featured image preview/i })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /featured_image_remove|remove featured image/i }));
+    fireEvent.submit(document.querySelector('form')!);
+
+    await waitFor(() => {
+      expect(mockAdminBlog.update).toHaveBeenCalledWith(
+        42,
+        expect.objectContaining({ featured_image: null }),
+      );
     });
   });
 

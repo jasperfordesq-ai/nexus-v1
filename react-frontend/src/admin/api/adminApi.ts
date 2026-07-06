@@ -685,6 +685,18 @@ export const adminBlog = {
 
   bulkPublish: (postIds: number[]) =>
     api.post<BulkActionResult>('/v2/admin/blog/bulk-publish', { post_ids: postIds }),
+
+  uploadFeaturedImage: (file: File, onUploadProgress?: (percent: number) => void) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'blog');
+    return api.upload<{ url: string; path: string }>(
+      '/v2/upload',
+      formData,
+      'file',
+      onUploadProgress ? { onUploadProgress } : undefined,
+    );
+  },
 };
 
 export const adminMarketplace = {

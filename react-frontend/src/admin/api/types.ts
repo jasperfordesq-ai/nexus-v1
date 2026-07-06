@@ -1156,7 +1156,7 @@ export interface CreateBlogPostPayload {
   content?: string;
   excerpt?: string;
   status?: 'draft' | 'published';
-  featured_image?: string;
+  featured_image?: string | null;
   category_id?: number;
   meta_title?: string;
   meta_description?: string;
