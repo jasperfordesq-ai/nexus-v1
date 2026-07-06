@@ -7,6 +7,29 @@ import postcss, { type AtRule, type Container, type Declaration, type Rule } fro
 
 const BUILDER_SCOPE = '.nexus-custom-page-builder';
 
+const PAGE_BUILDER_BASELINE_CSS = `
+.nexus-custom-page-builder{background:var(--background,#ffffff);color:var(--foreground,#111827);color-scheme:inherit}
+.nexus-custom-page-builder a{color:var(--accent-color,var(--color-accent,#0891b2))}
+.nexus-custom-page-builder img{max-width:100%;height:auto}
+.nexus-custom-page-builder .nexus-page-section{background:var(--background,#ffffff);color:var(--foreground,#111827)}
+.nexus-custom-page-builder .nexus-page-section:nth-child(even){background:var(--surface-elevated,rgba(255,255,255,.9))}
+.nexus-custom-page-builder .nexus-page-card{background:var(--surface-elevated,rgba(255,255,255,.9));border-color:var(--border-default,rgba(17,24,39,.12));color:var(--foreground,#111827)}
+.nexus-custom-page-builder .nexus-page-button{background:var(--accent-color,var(--color-accent,#0891b2));color:var(--accent-foreground,#ffffff)}
+`.trim();
+
+const LEGACY_NEXUS_PAGE_COLOR_VALUES = new Map<string, string>([
+  ['#ffffff', 'var(--background,#ffffff)'],
+  ['#f7faf8', 'var(--surface-elevated,rgba(255,255,255,.9))'],
+  ['#f6fbf8', 'var(--surface-elevated,rgba(255,255,255,.9))'],
+  ['#eef6ff', 'color-mix(in srgb,var(--accent-color,var(--color-accent,#0891b2)) 12%,var(--background,#ffffff))'],
+  ['#fff7ed', 'color-mix(in srgb,var(--color-warning,#d97706) 10%,var(--background,#ffffff))'],
+  ['#111827', 'var(--foreground,#111827)'],
+  ['#10201a', 'var(--foreground,#111827)'],
+  ['#40524a', 'var(--foreground-muted,var(--foreground,#4b5563))'],
+  ['#4b5563', 'var(--foreground-muted,var(--foreground,#4b5563))'],
+  ['#047857', 'var(--accent-color,var(--color-accent,#0891b2))'],
+]);
+
 const UNSAFE_CSS_PATTERNS = [
   /@import\b/i,
   /expression\s*\(/i,
@@ -100,14 +123,40 @@ function isSafeCssDeclaration(property: string, value: string): boolean {
   return true;
 }
 
+function shouldTokenizeLegacyNexusRule(rule: Rule): boolean {
+  return splitSelectorList(rule.selector).some((selector) => selector.includes('nexus-page-'));
+}
+
+function tokenizeLegacyNexusPageValue(property: string, value: string, shouldTokenize: boolean): string {
+  if (!shouldTokenize) return value;
+
+  const normalizedProperty = property.trim().toLowerCase();
+  if (!['background', 'background-color', 'border-color', 'box-shadow', 'color'].includes(normalizedProperty)) {
+    return value;
+  }
+
+  let next = value;
+  if (normalizedProperty === 'color') {
+    next = next.replace(/#fff(?:fff)?\b/gi, 'var(--accent-foreground,#fff)');
+  } else {
+    next = next.replace(/#fff(?:fff)?\b/gi, 'var(--background,#ffffff)');
+  }
+  for (const [legacyValue, tokenValue] of LEGACY_NEXUS_PAGE_COLOR_VALUES) {
+    next = next.replace(new RegExp(legacyValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), tokenValue);
+  }
+  return next;
+}
+
 function serializeSafeDeclarations(rule: Rule): string {
   const declarations: string[] = [];
+  const shouldTokenize = shouldTokenizeLegacyNexusRule(rule);
 
   rule.nodes?.forEach((node) => {
     if (node.type !== 'decl') return;
     const declaration = node as Declaration;
     if (!isSafeCssDeclaration(declaration.prop, declaration.value)) return;
-    declarations.push(`${declaration.prop}:${declaration.value}${declaration.important ? ' !important' : ''}`);
+    const value = tokenizeLegacyNexusPageValue(declaration.prop, declaration.value, shouldTokenize);
+    declarations.push(`${declaration.prop}:${value}${declaration.important ? ' !important' : ''}`);
   });
 
   return declarations.join(';');
@@ -184,11 +233,18 @@ export function scopePageBuilderHtml(html: string | null | undefined): string {
 
   doc.querySelectorAll('style, script').forEach((node) => node.remove());
   const body = doc.body.innerHTML.trim();
-  return `${scopedCss ? `<style>${scopedCss}</style>` : ''}<div class="nexus-custom-page-builder">${body}</div>`;
+  const css = [PAGE_BUILDER_BASELINE_CSS, scopedCss].filter(Boolean).join('\n');
+  return `${css ? `<style>${css}</style>` : ''}<div class="nexus-custom-page-builder">${body}</div>`;
 }
 
 export function exportScopedPageBuilderHtml(bodyHtml: string, css: string): string {
   return scopePageBuilderHtml(`<style>${css}</style>${bodyHtml}`);
 }
 
-export const __pageBuilderHtmlTesting = { BUILDER_SCOPE, isSafeCssDeclaration, scopeSelector };
+export const __pageBuilderHtmlTesting = {
+  BUILDER_SCOPE,
+  PAGE_BUILDER_BASELINE_CSS,
+  isSafeCssDeclaration,
+  scopeSelector,
+  tokenizeLegacyNexusPageValue,
+};

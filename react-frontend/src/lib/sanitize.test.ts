@@ -104,6 +104,33 @@ describe('sanitizeCustomPageHtml', () => {
     expect(out).toContain('style="font-size:42px;line-height:1.1"');
   });
 
+  it('adds a scoped theme baseline for custom page builder pages', () => {
+    const out = sanitizeCustomPageHtml('<section class="hero">Hi</section>');
+
+    expect(out).toContain('.nexus-custom-page-builder{background:var(--background,#ffffff);color:var(--foreground,#111827);color-scheme:inherit}');
+    expect(out).toContain('.nexus-custom-page-builder a{color:var(--accent-color,var(--color-accent,#0891b2))}');
+    expect(out).toContain('class="nexus-custom-page-builder"');
+  });
+
+  it('tokenizes legacy NEXUS starter block colours when old builder CSS is rendered publicly', () => {
+    const out = sanitizeCustomPageHtml(`
+      <style>
+        .nexus-page-section{background:#ffffff;color:#111827}
+        .nexus-page-section:nth-child(even){background:#f7faf8}
+        .nexus-page-hero h1{color:#10201a}
+        .nexus-page-button{background:#047857;color:#fff}
+      </style>
+      <section class="nexus-page-section"><a class="nexus-page-button" href="/">Start</a></section>
+    `);
+
+    expect(out).toContain('.nexus-custom-page-builder .nexus-page-section{background:var(--background,#ffffff);color:var(--foreground,#111827)}');
+    expect(out).toContain('.nexus-custom-page-builder .nexus-page-section:nth-child(even){background:var(--surface-elevated,rgba(255,255,255,.9))}');
+    expect(out).toContain('.nexus-custom-page-builder .nexus-page-hero h1{color:var(--foreground,#111827)}');
+    expect(out).toContain('.nexus-custom-page-builder .nexus-page-button{background:var(--accent-color,var(--color-accent,#0891b2));color:var(--accent-foreground,#fff)}');
+    expect(out).not.toContain('background:#ffffff');
+    expect(out).not.toContain('color:#111827');
+  });
+
   it('removes dangerous inline CSS while preserving safe declarations in the same attribute', () => {
     const out = sanitizeCustomPageHtml(
       '<div style="color:green;position:fixed;inset:0;z-index:9999;background:url(javascript:alert(1))">Safe text</div>',

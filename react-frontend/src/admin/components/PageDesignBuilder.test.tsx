@@ -70,7 +70,7 @@ vi.mock('@/contexts', () =>
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-import { PageDesignBuilder } from './PageDesignBuilder';
+import { DEFAULT_PAGE_CSS, PageDesignBuilder } from './PageDesignBuilder';
 
 function renderBuilder(designJson: string | null, readOnly = false) {
   return render(
@@ -187,5 +187,15 @@ describe('PageDesignBuilder', () => {
     renderBuilder(null, true);
 
     expect(await screen.findByRole('status', { name: /saving/i })).toBeInTheDocument();
+  });
+
+  it('seeds NEXUS page blocks with light/dark theme tokens instead of fixed light colours', () => {
+    expect(DEFAULT_PAGE_CSS).toContain('var(--background');
+    expect(DEFAULT_PAGE_CSS).toContain('var(--foreground');
+    expect(DEFAULT_PAGE_CSS).toContain('var(--surface-elevated');
+    expect(DEFAULT_PAGE_CSS).toContain('var(--accent-color');
+    expect(DEFAULT_PAGE_CSS).not.toContain('background:#ffffff');
+    expect(DEFAULT_PAGE_CSS).not.toContain('color:#111827');
+    expect(DEFAULT_PAGE_CSS).not.toContain('background:#f7faf8');
   });
 });
