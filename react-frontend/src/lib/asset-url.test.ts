@@ -13,8 +13,12 @@
  * 3. They provide fallback defaults for missing avatars
  */
 
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
 import { resolveAssetUrl, resolveAvatarUrl, getUserDisplayName, getUserInitials } from './helpers';
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 describe('resolveAssetUrl', () => {
   it('returns empty string for null input', () => {
@@ -69,6 +73,30 @@ describe('resolveAssetUrl', () => {
   it('leaves non-upload absolute URLs from external domains untouched', () => {
     const url = 'https://gravatar.com/avatar/abc123';
     expect(resolveAssetUrl(url)).toBe(url);
+  });
+
+  it('uses VITE_API_URL as the asset base when VITE_API_BASE is not set', async () => {
+    vi.resetModules();
+    vi.stubEnv('VITE_API_BASE', '');
+    vi.stubEnv('VITE_API_URL', 'https://dev-api.example.test');
+
+    const { resolveAssetUrl: resolveWithApiUrl } = await import('./helpers');
+
+    expect(resolveWithApiUrl('/storage/tenant_2/uploads/blog/hero.webp')).toBe(
+      'https://dev-api.example.test/storage/tenant_2/uploads/blog/hero.webp',
+    );
+  });
+
+  it('re-routes stale localhost storage URLs through the configured API server', async () => {
+    vi.resetModules();
+    vi.stubEnv('VITE_API_BASE', 'https://api.example.test/api');
+    vi.stubEnv('VITE_API_URL', '');
+
+    const { resolveAssetUrl: resolveWithApiBase } = await import('./helpers');
+
+    expect(resolveWithApiBase('http://localhost:8090/storage/tenant_2/uploads/blog/hero.webp')).toBe(
+      'https://api.example.test/storage/tenant_2/uploads/blog/hero.webp',
+    );
   });
 });
 

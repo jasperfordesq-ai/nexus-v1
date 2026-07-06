@@ -251,6 +251,10 @@ export default defineConfig(({ command, mode }) => {
         target: apiUrl,
         changeOrigin: true,
       },
+      '/storage': {
+        target: apiUrl,
+        changeOrigin: true,
+      },
       // Proxy health check
       '/health.php': {
         target: apiUrl,
@@ -276,6 +280,7 @@ export default defineConfig(({ command, mode }) => {
       },
       '/admin-legacy': { target: apiUrl, changeOrigin: true },
       '/uploads': { target: apiUrl, changeOrigin: true },
+      '/storage': { target: apiUrl, changeOrigin: true },
       '/health.php': { target: apiUrl, changeOrigin: true },
     },
   },

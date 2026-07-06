@@ -42,6 +42,8 @@ const ACCEPTED_IMAGE_INPUT = [
 ].join(',');
 const MAX_FEATURED_IMAGE_BYTES = 10 * 1024 * 1024;
 
+type FeaturedImageUploadResult = Awaited<ReturnType<typeof adminBlog.uploadFeaturedImage>>;
+
 function isAcceptedImageFile(file: File): boolean {
   const type = file.type.toLowerCase();
   if (type) {
@@ -50,6 +52,28 @@ function isAcceptedImageFile(file: File): boolean {
 
   const extension = file.name.split('.').pop()?.toLowerCase();
   return !!extension && ACCEPTED_IMAGE_EXTENSIONS.includes(extension);
+}
+
+function resolveBlogFeaturedImageValue(res: FeaturedImageUploadResult): string | null {
+  if (res.success && res.data?.path) {
+    return `/storage/${res.data.path.replace(/^\/+/, '')}`;
+  }
+
+  const uploadedUrl = resolveUploadedUrl(res);
+  if (!uploadedUrl) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(uploadedUrl);
+    if (parsed.pathname.startsWith('/storage/')) {
+      return parsed.pathname;
+    }
+  } catch {
+    return uploadedUrl;
+  }
+
+  return uploadedUrl;
 }
 
 export function BlogPostForm() {
@@ -237,7 +261,7 @@ export function BlogPostForm() {
     setUploadingImage(true);
     setUploadProgress(0);
     try {
-      const url = resolveUploadedUrl(await adminBlog.uploadFeaturedImage(file, setUploadProgress));
+      const url = resolveBlogFeaturedImageValue(await adminBlog.uploadFeaturedImage(file, setUploadProgress));
       if (!url) {
         toast.error(t('blog.featured_image_upload_failed'));
         return;

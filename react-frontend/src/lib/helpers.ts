@@ -18,7 +18,8 @@ type DateValue = Date | number | string;
  * API Base URL for resolving relative image/asset URLs
  * This is the PHP backend URL where uploads are stored
  */
-const API_ASSET_BASE = import.meta.env.VITE_API_BASE?.replace(/\/api$/, '') || (import.meta.env.DEV ? '' : 'https://api.project-nexus.ie');
+const API_BASE_ENV = import.meta.env.VITE_API_BASE || import.meta.env.VITE_API_URL || '';
+const API_ASSET_BASE = API_BASE_ENV.replace(/\/api$/, '') || (import.meta.env.DEV ? '' : 'https://api.project-nexus.ie');
 
 /**
  * Resolve a relative URL to an absolute URL pointing to the API server.
@@ -40,10 +41,10 @@ export function resolveAssetUrl(url: string | null | undefined, fallback?: strin
     // avatars from federation partners load from the correct server.
     try {
       const parsed = new URL(url);
-      if (parsed.pathname.startsWith('/uploads/')) {
+      if (parsed.pathname.startsWith('/uploads/') || parsed.pathname.startsWith('/storage/')) {
         const apiHost = API_ASSET_BASE ? new URL(API_ASSET_BASE).host : '';
-        const knownLocalDomains = [apiHost, 'hour-timebank.ie', 'app.project-nexus.ie'];
-        if (knownLocalDomains.some(d => d && parsed.host === d)) {
+        const knownLocalHostnames = ['localhost', '127.0.0.1', 'hour-timebank.ie', 'app.project-nexus.ie'];
+        if (parsed.host === apiHost || knownLocalHostnames.includes(parsed.hostname)) {
           return API_ASSET_BASE + parsed.pathname;
         }
       }

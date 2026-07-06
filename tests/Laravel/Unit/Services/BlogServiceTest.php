@@ -104,4 +104,32 @@ class BlogServiceTest extends TestCase
         $result = $this->service->getCategories();
         $this->assertIsArray($result);
     }
+
+    public function test_resolveImageUrl_reroots_stale_localhost_storage_urls(): void
+    {
+        $method = new \ReflectionMethod(BlogService::class, 'resolveImageUrl');
+        $method->setAccessible(true);
+
+        $result = $method->invoke(
+            $this->service,
+            'http://localhost:8090/storage/tenant_2/uploads/blog/hero.webp',
+            'https://api.project-nexus.ie'
+        );
+
+        $this->assertSame('https://api.project-nexus.ie/storage/tenant_2/uploads/blog/hero.webp', $result);
+    }
+
+    public function test_resolveImageUrl_leaves_external_absolute_urls_unchanged(): void
+    {
+        $method = new \ReflectionMethod(BlogService::class, 'resolveImageUrl');
+        $method->setAccessible(true);
+
+        $result = $method->invoke(
+            $this->service,
+            'https://cdn.example.net/blog/hero.webp',
+            'https://api.project-nexus.ie'
+        );
+
+        $this->assertSame('https://cdn.example.net/blog/hero.webp', $result);
+    }
 }

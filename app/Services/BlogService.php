@@ -238,6 +238,18 @@ class BlogService
             return null;
         }
         if (str_starts_with($url, 'http')) {
+            $parts = parse_url($url);
+            $path = is_array($parts) ? (string) ($parts['path'] ?? '') : '';
+            $host = is_array($parts) ? (string) ($parts['host'] ?? '') : '';
+            $baseHost = (string) (parse_url($baseUrl, PHP_URL_HOST) ?: '');
+
+            if (
+                (str_starts_with($path, '/storage/') || str_starts_with($path, '/uploads/'))
+                && in_array($host, array_filter([$baseHost, 'localhost', '127.0.0.1', 'hour-timebank.ie', 'app.project-nexus.ie']), true)
+            ) {
+                return $baseUrl . $path;
+            }
+
             return $url;
         }
         return $baseUrl . '/' . ltrim($url, '/');

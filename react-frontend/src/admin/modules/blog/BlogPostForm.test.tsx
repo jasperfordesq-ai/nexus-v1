@@ -180,6 +180,7 @@ describe('BlogPostForm — create mode', () => {
   });
 
   it('uploads a featured image and shows a preview', async () => {
+    mockAdminBlog.create.mockResolvedValueOnce({ success: true });
     mockAdminBlog.uploadFeaturedImage.mockResolvedValueOnce({
       success: true,
       data: { url: 'https://api.example.test/storage/tenant_2/uploads/blog/hero.webp', path: 'tenant_2/uploads/blog/hero.webp' },
@@ -195,9 +196,18 @@ describe('BlogPostForm — create mode', () => {
       expect(mockAdminBlog.uploadFeaturedImage).toHaveBeenCalledWith(file, expect.any(Function));
       expect(screen.getByRole('img', { name: /featured_image_preview_alt|featured image preview/i })).toHaveAttribute(
         'src',
-        'https://api.example.test/storage/tenant_2/uploads/blog/hero.webp',
+        'http://127.0.0.1:8090/storage/tenant_2/uploads/blog/hero.webp',
       );
       expect(mockToast.success).toHaveBeenCalled();
+    });
+
+    fireEvent.change(getTitleInput(), { target: { value: 'Uploaded Hero Post' } });
+    fireEvent.submit(document.querySelector('form')!);
+
+    await waitFor(() => {
+      expect(mockAdminBlog.create).toHaveBeenCalledWith(
+        expect.objectContaining({ featured_image: '/storage/tenant_2/uploads/blog/hero.webp' }),
+      );
     });
   });
 
@@ -215,6 +225,10 @@ describe('BlogPostForm — create mode', () => {
 
     await waitFor(() => {
       expect(mockAdminBlog.uploadFeaturedImage).toHaveBeenCalledWith(file, expect.any(Function));
+      expect(screen.getByRole('img', { name: /featured_image_preview_alt|featured image preview/i })).toHaveAttribute(
+        'src',
+        'http://127.0.0.1:8090/storage/tenant_2/uploads/blog/hero.jpg',
+      );
       expect(mockToast.success).toHaveBeenCalled();
     });
   });
